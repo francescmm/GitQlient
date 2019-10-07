@@ -25,6 +25,8 @@
         <file alias="go_up">resources/go_up.svg</file>
         <file alias="home">resources/home.svg</file>
         <file alias="terminal">resources/terminal.svg</file>
+        <file alias="open_repo">resources/open_repo.svg</file>
+        <file alias="warning_error">resources/warning_error.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>stylesheet.css</file>
