@@ -1,0 +1,32 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="git_pull">resources/git_pull.svg</file>
+        <file alias="git_push">resources/git_push.svg</file>
+        <file alias="git_stash">resources/git_stash.svg</file>
+        <file alias="git_pop">resources/git_stash_pop.svg</file>
+        <file alias="go_to">resources/go_to.svg</file>
+        <file alias="git">resources/git.svg</file>
+        <file alias="git_orange">resources/git_orange.svg</file>
+        <file alias="server">resources/server.svg</file>
+        <file alias="stashes">resources/stashes.svg</file>
+        <file alias="folder">resources/folder.svg</file>
+        <file alias="local">resources/local.svg</file>
+        <file alias="tags">resources/tags.svg</file>
+        <file alias="file">resources/file.svg</file>
+        <file alias="git_prune">resources/git_prune.svg</file>
+        <file alias="pull_request">resources/pull_requests.svg</file>
+        <file alias="arrow_down">resources/arrow_down.svg</file>
+        <file alias="arrow_up">resources/arrow_up.svg</file>
+        <file alias="staged">resources/files_staged.svg</file>
+        <file alias="unstaged">resources/files_unstaged.svg</file>
+        <file alias="submodules">resources/submodules.svg</file>
+        <file alias="back">resources/back.svg</file>
+        <file alias="go_down">resources/go_down.svg</file>
+        <file alias="go_up">resources/go_up.svg</file>
+        <file alias="home">resources/home.svg</file>
+        <file alias="terminal">resources/terminal.svg</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>stylesheet.css</file>
+    </qresource>
+</RCC>

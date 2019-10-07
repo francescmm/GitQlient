@@ -1,0 +1,23 @@
+0. Remove unnecessary files from the repo
+
+1. MainWindow refactor
+    - Functionality:
+        - After merging, if no problems it should commit with the default message
+    - MainWindow
+        - Move the showBranches() to a different thread
+    - Diff widget
+        - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
+
+Submodules:
+- Add support for submodule updates/deletes
+
+File diff:
+- How we handle when a file changes its directory?
+
+Full diff:
+- Move to the file diff chunck when user clics the file
+
+Future:
+- Open multiple repos
+- Open submodule
+- Implement modification browsing in FileDiffView
