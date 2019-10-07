@@ -5,6 +5,6 @@ TARGET = Heimdall
 QT += widgets
 
 # project files
-include(Heimdall.pri)
+include(Heimdal.pri)
 
 OTHER_FILES += Tasks.txt
