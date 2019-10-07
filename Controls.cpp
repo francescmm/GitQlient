@@ -18,8 +18,6 @@ Controls::Controls(QWidget *parent)
    , mPullBtn(new QToolButton())
    , mPushBtn(new QToolButton())
    , mStashBtn(new QToolButton())
-   , mPopBtn(new QToolButton())
-   , mPruneBtn(new QToolButton())
    , mTerminalBtn(new QToolButton())
 {
    mOpenRepo->setIcon(QIcon(":/icons/open_repo"));
@@ -44,6 +42,8 @@ Controls::Controls(QWidget *parent)
    menu->addAction(action = new QAction("Pull"));
    connect(action, &QAction::triggered, this, &Controls::pullCurrentBranch);
    mPullBtn->setDefaultAction(action);
+   menu->addAction(action = new QAction("Prune"));
+   connect(action, &QAction::triggered, this, &Controls::pruneBranches);
    menu->addSeparator();
 
    mPullBtn->setMenu(menu);
@@ -58,20 +58,19 @@ Controls::Controls(QWidget *parent)
    mPushBtn->setText(tr("Push"));
    mPushBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
+   const auto stashMenu = new QMenu(mStashBtn);
+   stashMenu->addAction(action = new QAction(QIcon(":/icons/git_stash"), "Save"));
+   connect(action, &QAction::triggered, this, &Controls::stashCurrentWork);
+   // mStashBtn->setDefaultAction(action);
+   stashMenu->addAction(action = new QAction(QIcon(":/icons/git_pop"), "Pop"));
+   connect(action, &QAction::triggered, this, &Controls::popStashedWork);
+
+   mStashBtn->setMenu(stashMenu);
    mStashBtn->setIcon(QIcon(":/icons/git_stash"));
    mStashBtn->setIconSize(QSize(22, 22));
    mStashBtn->setText(tr("Stash"));
    mStashBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-
-   mPopBtn->setIcon(QIcon(":/icons/git_pop"));
-   mPopBtn->setIconSize(QSize(22, 22));
-   mPopBtn->setText(tr("Pop"));
-   mPopBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-
-   mPruneBtn->setIcon(QIcon(":/icons/git_prune"));
-   mPruneBtn->setIconSize(QSize(22, 22));
-   mPruneBtn->setText(tr("Prune"));
-   mPruneBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mStashBtn->setPopupMode(QToolButton::MenuButtonPopup);
 
    mTerminalBtn->setIcon(QIcon(":/icons/terminal"));
    mTerminalBtn->setIconSize(QSize(22, 22));
@@ -86,8 +85,6 @@ Controls::Controls(QWidget *parent)
    vLayout->addWidget(mPullBtn);
    vLayout->addWidget(mPushBtn);
    vLayout->addWidget(mStashBtn);
-   vLayout->addWidget(mPopBtn);
-   vLayout->addWidget(mPruneBtn);
    vLayout->addWidget(mTerminalBtn);
    vLayout->addStretch();
 
@@ -95,9 +92,6 @@ Controls::Controls(QWidget *parent)
    connect(mHome, &QToolButton::clicked, this, &Controls::signalGoBack);
    connect(mGoToBtn, &QToolButton::clicked, this, &Controls::openGoToDialog);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
-   connect(mStashBtn, &QToolButton::clicked, this, &Controls::stashCurrentWork);
-   connect(mPopBtn, &QToolButton::clicked, this, &Controls::popStashedWork);
-   connect(mPruneBtn, &QToolButton::clicked, this, &Controls::pruneBranches);
    connect(mTerminalBtn, &QToolButton::clicked, this, &Controls::showTerminal);
 }
 

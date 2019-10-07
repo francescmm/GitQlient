@@ -50,8 +50,6 @@ private:
    QToolButton *mPullBtn = nullptr;
    QToolButton *mPushBtn = nullptr;
    QToolButton *mStashBtn = nullptr;
-   QToolButton *mPopBtn = nullptr;
-   QToolButton *mPruneBtn = nullptr;
    QToolButton *mTerminalBtn = nullptr;
 
    void openRepo();
