@@ -33,7 +33,7 @@ Terminal::Terminal()
    QGit::kErrorLogBrowser = outputTerminal;
 
    leGitCommand->setObjectName("leGitCommand");
-   leGitCommand->setPlaceholderText(tr("Enter command..."));
+   leGitCommand->setPlaceholderText(tr("Enter Git command..."));
 
    outputTerminal->setObjectName("outputTerminal");
 
