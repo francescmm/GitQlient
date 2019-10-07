@@ -163,10 +163,7 @@ void CommitWidget::contextMenuPopup(const QPoint &pos)
 
 void CommitWidget::applyChanges()
 {
-   const auto done = mIsAmmend ? ammendChanges() : commitChanges();
-
-   if (done)
-      clear();
+   mIsAmmend ? ammendChanges() : commitChanges();
 }
 
 QStringList CommitWidget::getFiles()
