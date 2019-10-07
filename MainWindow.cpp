@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *p)
    ui->setupUi(this);
 
    setObjectName("mainWindow");
-   setWindowTitle("Heimdall");
+   setWindowTitle("GitQlientl");
 
    ui->mainStackedWidget->setCurrentIndex(0);
    ui->page_5->layout()->addWidget(rv->getRepoList());

@@ -1,10 +1,10 @@
 # General stuff
 TEMPLATE = app
 CONFIG += qt warn_on exceptions
-TARGET = Heimdall
+TARGET = GitQlient
 QT += widgets
 
 # project files
-include(Heimdal.pri)
+include(GitQlient.pri)
 
 OTHER_FILES += Tasks.txt

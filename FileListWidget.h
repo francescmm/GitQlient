@@ -1,8 +1,8 @@
 #pragma once
 
 /****************************************************************************************
- ** Heimdall is an application to manage and operate one or several Git repositories. With
- ** Heimdal you will be able to add commits, branches and manage all the options Git provides.
+ ** GitQlientl is an application to manage and operate one or several Git repositories. With
+ ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
  ** Copyright (C) 2019  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
