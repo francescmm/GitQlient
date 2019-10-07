@@ -12,7 +12,7 @@
 #include <QFileDialog>
 
 Controls::Controls(QWidget *parent)
-   : QWidget(parent)
+   : QFrame(parent)
    , mOpenRepo(new QToolButton())
    , mHome(new QToolButton())
    , mGoToBtn(new QToolButton())
@@ -79,6 +79,7 @@ Controls::Controls(QWidget *parent)
    mTerminalBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
    const auto vLayout = new QHBoxLayout(this);
+   vLayout->setContentsMargins(10, 10, 10, 10);
    vLayout->addStretch();
    vLayout->addWidget(mOpenRepo);
    vLayout->addWidget(mHome);

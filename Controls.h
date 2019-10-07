@@ -23,11 +23,11 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QWidget>
+#include <QFrame>
 
 class QToolButton;
 
-class Controls : public QWidget
+class Controls : public QFrame
 {
    Q_OBJECT
 

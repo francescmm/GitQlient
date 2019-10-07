@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
    const auto mainWin = new MainWindow();
-   mainWin->showMaximized();
+   mainWin->show();
 
    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
 

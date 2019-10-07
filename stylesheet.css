@@ -10,6 +10,12 @@ QMessageBox
     color: white;
 }
 
+Controls
+{
+    max-height: 70px;
+    min-height: 70px;
+}
+
 Controls > QPushButton, Controls > QToolButton
 {
     max-width: 50px;
@@ -27,18 +33,15 @@ QPushButton, QToolButton
 }
 
 QToolButton[popupMode="1"] { /* only for MenuButtonPopup */
-    padding-right: 15px; /* make way for the popup button */
 }
 
 QToolButton::menu-button {
     background-color: #404142;
-    padding-right: 10px;
 }
 
 
 QToolButton::menu-button:hover {
     background-color: #606162;
-    padding-right: 10px;
 }
 
 
