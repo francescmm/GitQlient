@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
    const auto mainWin = new MainWindow();
    mainWin->showMaximized();
-   mainWin->setRepository("/home/francesc/GitHub/GitEditor/");
+
    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
 
    return app.exec();
