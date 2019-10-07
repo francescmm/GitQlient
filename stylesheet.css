@@ -166,7 +166,7 @@ QMenu::item
    border: 0px;
    min-height: 25px;
    max-height: 25px;
-   padding-left: 35px;
+   padding-left: 15px;
    padding-right: 15px;
    background-color: #2E2F30;
    color: #ffffff;
