@@ -12,11 +12,11 @@ QMessageBox
 
 Controls
 {
-    max-height: 70px;
-    min-height: 70px;
+    max-height: 80px;
+    min-height: 80px;
 }
 
-Controls > QPushButton, Controls > QToolButton
+Controls > QToolButton
 {
     max-width: 50px;
     min-width: 50px;
