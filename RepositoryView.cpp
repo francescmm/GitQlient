@@ -36,10 +36,16 @@ RepositoryView::RepositoryView(QWidget *parent)
    : QTreeView(parent)
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
-   // setHeaderHidden(true);
    setItemsExpandable(false);
    setMouseTracking(true);
    header()->setSortIndicatorShown(false);
+
+   const auto lvd = new RepositoryViewDelegate(this, this);
+   setItemDelegate(lvd);
+
+   connect(lvd, &RepositoryViewDelegate::updateView, viewport(), qOverload<>(&QWidget::update));
+   connect(this, &RepositoryView::diffTargetChanged, lvd, &RepositoryViewDelegate::diffTargetChanged);
+   connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
 }
 
 void RepositoryView::setup(Domain *dm)
@@ -54,15 +60,7 @@ void RepositoryView::setup(Domain *dm)
    lp = new ListViewProxy(this, d);
    setModel(fh);
 
-   const auto lvd = new RepositoryViewDelegate(this, this);
-   setItemDelegate(lvd);
-
    setupGeometry(); // after setting delegate
-
-   const auto vp = viewport();
-   connect(lvd, &RepositoryViewDelegate::updateView, vp, qOverload<>(&QWidget::update));
-   connect(this, &RepositoryView::diffTargetChanged, lvd, &RepositoryViewDelegate::diffTargetChanged);
-   connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
 }
 
 RepositoryView::~RepositoryView()
@@ -226,6 +224,8 @@ void RepositoryView::currentChanged(const QModelIndex &index, const QModelIndex 
       st->setSha(selRev);
       st->setSelectItem(true);
       d->update(false, false);
+
+      emit clicked(index);
    }
 }
 
