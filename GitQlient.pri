@@ -31,6 +31,7 @@ HEADERS += \
     $$PWD/RevisionWidget.h \
     $$PWD/StateInfo.h \
     $$PWD/TagDlg.h \
+    $$PWD/Terminal.h \
     $$PWD/common.h \
     $$PWD/dataloader.h \
     $$PWD/domain.h \
@@ -63,6 +64,7 @@ SOURCES += \
     $$PWD/RevisionWidget.cpp \
     $$PWD/StateInfo.cpp \
     $$PWD/TagDlg.cpp \
+    $$PWD/Terminal.cpp \
     $$PWD/dataloader.cpp \
     $$PWD/domain.cpp \
     $$PWD/git.cpp \

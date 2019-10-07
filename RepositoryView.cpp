@@ -231,16 +231,7 @@ void RepositoryView::currentChanged(const QModelIndex &index, const QModelIndex 
 
 void RepositoryView::markDiffToSha(const QString &sha)
 {
-   if (sha != st->diffToSha())
-   {
-      st->setDiffToSha(sha);
-      emit showStatusMessage("Marked " + sha + " for diff. (Ctrl-RightClick)");
-   }
-   else
-   {
-      st->setDiffToSha(""); // restore std view
-      emit showStatusMessage("Unmarked diff reference.");
-   }
+   st->setDiffToSha(sha != st->diffToSha() ? sha : QString());
    d->update(false, false);
 }
 

@@ -49,7 +49,6 @@ signals:
    void moveRef(const QString &refName, const QString &toSHA);
    void contextMenu(const QString &, int);
    void diffTargetChanged(int); // used by new model_view integration
-   void showStatusMessage(const QString &, int timeout = 0);
 
 private slots:
    virtual void currentChanged(const QModelIndex &, const QModelIndex &);

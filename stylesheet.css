@@ -198,15 +198,20 @@ QMenu::separator
 
 /**  END  RepositoryContextMenu **/
 
-FullDiffWidget, #leGitCommand, CommitWidget > QLineEdit, CommitWidget > #teDescription, MainWindow > #leGitCommand, MainWindow > #outputTerminal
+FullDiffWidget, CommitWidget > QLineEdit, CommitWidget > #teDescription
 {
     border: 1px solid #202122;
 }
 
-CommitWidget > QLineEdit, CommitWidget > #teDescription, MainWindow > #leGitCommand
+CommitWidget > QLineEdit, CommitWidget > #teDescription, #leGitCommand
 {
     background-color: #606162;
     color: white;
+}
+
+#leGitCommand
+{
+border: 1px solid #606162;
 }
 
 CommitWidget > QFrame#stagedFiles, CommitWidget > QFrame#unstagedFiles
@@ -216,7 +221,7 @@ CommitWidget > QFrame#stagedFiles, CommitWidget > QFrame#unstagedFiles
     min-height: 30px;
 }
 
-MainWindow > #outputTerminal, FileDiffView
+#outputTerminal, FileDiffView
 {
     background-color: #2E2F30;
     color: white;
@@ -232,7 +237,7 @@ FileDiffWidget, FileDiffWidget > QPushButton
     background-color: #202122;
 }
 
-CommitWidget > QLineEdit, MainWindow > #leGitCommand
+CommitWidget > QLineEdit, #leGitCommand
 {
     border-bottom: 1px solid #404142;
     max-height: 30px;
@@ -240,15 +245,10 @@ CommitWidget > QLineEdit, MainWindow > #leGitCommand
     padding-left: 10px;
 }
 
-CommitWidget > #teDescription, MainWindow > #outputTerminal
+CommitWidget > #teDescription, #outputTerminal
 {
     border-top: none;
     padding-left: 8px;
-}
-
-#outputTerminal
-{
-    border: 1px solid #606162;
 }
 
 /** START QHeaderView **/

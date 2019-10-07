@@ -1,6 +1,7 @@
 #include "Controls.h"
 
-#include <git.h>
+#include "git.h"
+#include "Terminal.h"
 
 #include <QApplication>
 #include <QToolButton>
@@ -176,4 +177,10 @@ void Controls::pruneBranches()
       emit signalRepositoryUpdated();
 }
 
-void Controls::showTerminal() {}
+void Controls::showTerminal()
+{
+   const auto terminal = new Terminal();
+   connect(terminal, &Terminal::signalUpdateUi, this, &Controls::signalRepositoryUpdated);
+
+   terminal->show();
+}

@@ -11,10 +11,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-using namespace QGit;
-
-QTextBrowser *QGit::kErrorLogBrowser = nullptr;
-
 MainWindow::MainWindow(QWidget *p)
    : QFrame(p)
    , ui(new Ui::MainWindow)
@@ -38,8 +34,6 @@ MainWindow::MainWindow(QWidget *p)
 
    Git::getInstance(this);
 
-   QGit::kErrorLogBrowser = ui->outputTerminal;
-
    ui->revisionWidget->setup(rv);
 
    qApp->installEventFilter(this);
@@ -50,8 +44,6 @@ MainWindow::MainWindow(QWidget *p)
    connect(ui->controls, &Controls::signalGoBack, this, [this]() { ui->mainStackedWidget->setCurrentIndex(0); });
    connect(ui->controls, &Controls::signalRepositoryUpdated, this, &MainWindow::updateUi);
    connect(ui->controls, &Controls::signalGoToSha, this, &MainWindow::goToCommitSha);
-
-   connect(ui->leGitCommand, &QLineEdit::returnPressed, this, &MainWindow::executeCommand);
 
    connect(ui->branchesWidget, &BranchesWidget::signalBranchesUpdated, this, &MainWindow::updateUi);
    connect(ui->branchesWidget, &BranchesWidget::signalSelectCommit, this, &MainWindow::goToCommitSha);
@@ -70,7 +62,6 @@ MainWindow::MainWindow(QWidget *p)
    connect(rv->getRepoList(), &RepositoryView::clicked, this,
            qOverload<const QModelIndex &>(&MainWindow::onCommitClicked));
    connect(rv->getRepoList(), &RepositoryView::doubleClicked, this, &MainWindow::openCommitDiff);
-   connect(rv->getRepoList(), &RepositoryView::showStatusMessage, ui->outputTerminal, &QTextBrowser::setText);
    connect(rv->getRepoList(), &RepositoryView::signalAmmendCommit, this, &MainWindow::onAmmendCommit);
 }
 
@@ -177,9 +168,7 @@ void MainWindow::clearWindow(bool deepClear)
 
    ui->commitWidget->clear();
    ui->revisionWidget->clear();
-   ui->leGitCommand->clear();
-   ui->outputTerminal->clearHistory();
-   ui->outputTerminal->clear();
+
    rv->clear(deepClear);
    ui->patchView->clear(deepClear);
    ui->fileDiffWidget->clear();
@@ -193,31 +182,10 @@ void MainWindow::setWidgetsEnabled(bool enabled)
    ui->commitWidget->setEnabled(enabled);
    ui->revisionWidget->setEnabled(enabled);
    ui->commitStackedWidget->setEnabled(enabled);
-   ui->outputTerminal->setEnabled(enabled);
    rv->setEnabled(enabled);
    ui->patchView->setEnabled(enabled);
    ui->fileDiffWidget->setEnabled(enabled);
    ui->branchesWidget->setEnabled(enabled);
-}
-
-void MainWindow::executeCommand()
-{
-   if (!ui->leGitCommand->text().isEmpty())
-   {
-      if (ui->leGitCommand->text() == "clear")
-         ui->outputTerminal->clear();
-      else if (ui->leGitCommand->text() == "ui update")
-         updateUi();
-      else
-      {
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QString output;
-         Git::getInstance()->run(ui->leGitCommand->text(), &output);
-         QApplication::restoreOverrideCursor();
-         ui->outputTerminal->setText(output);
-      }
-   }
-   ui->leGitCommand->setText("");
 }
 
 void MainWindow::goToCommitSha(const QString &goToSha)
@@ -241,7 +209,12 @@ void MainWindow::openCommitDiff()
 
 void MainWindow::changesCommitted(bool ok)
 {
-   ok ? updateUi() : ui->outputTerminal->setText("Failed to commit changes");
+   if (ok)
+      updateUi();
+   else
+   {
+      QMessageBox::critical(this, tr("Commit error"), tr("Failed to commit changes"));
+   }
 }
 
 void MainWindow::onCommitClicked(const QModelIndex &index)
@@ -306,9 +279,6 @@ void MainWindow::merge(const QStringList &shas, const QString &into)
 
       // TODO: Enable it again
       // controlsWidget->commitChanges();
-
-      ui->outputTerminal->setText(QString("Successfully merged into %1").arg(into));
-
       updateUi();
    }
    else if (!output.isEmpty())
@@ -337,7 +307,7 @@ void MainWindow::moveRef(const QString &target, const QString &toSHA)
       if (!sha.isEmpty())
       {
          const QStringList &children = git->getChildren(sha);
-         if ((children.count() == 0 || (children.count() == 1 && children.front() == ZERO_SHA)) && // no children
+         if ((children.count() == 0 || (children.count() == 1 && children.front() == QGit::ZERO_SHA)) && // no children
              git->getRefNames(sha, Git::ANY_REF).count() == 1 && // last ref name
              QMessageBox::question(this, "move branch",
                                    QString("This is the last reference to this branch.\n"
