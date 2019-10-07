@@ -7,9 +7,12 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QMenu>
+#include <QDir>
+#include <QFileDialog>
 
 Controls::Controls(QWidget *parent)
    : QWidget(parent)
+   , mOpenRepo(new QToolButton())
    , mHome(new QToolButton())
    , mGoToBtn(new QToolButton())
    , mPullBtn(new QToolButton())
@@ -19,6 +22,11 @@ Controls::Controls(QWidget *parent)
    , mPruneBtn(new QToolButton())
    , mTerminalBtn(new QToolButton())
 {
+   mOpenRepo->setIcon(QIcon(":/icons/open_repo"));
+   mOpenRepo->setIconSize(QSize(22, 22));
+   mOpenRepo->setText("Open");
+   mOpenRepo->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
    mHome->setIcon(QIcon(":/icons/home"));
    mHome->setIconSize(QSize(22, 22));
    mHome->setText("Home");
@@ -72,6 +80,7 @@ Controls::Controls(QWidget *parent)
 
    const auto vLayout = new QHBoxLayout(this);
    vLayout->addStretch();
+   vLayout->addWidget(mOpenRepo);
    vLayout->addWidget(mHome);
    vLayout->addWidget(mGoToBtn);
    vLayout->addWidget(mPullBtn);
@@ -82,6 +91,7 @@ Controls::Controls(QWidget *parent)
    vLayout->addWidget(mTerminalBtn);
    vLayout->addStretch();
 
+   connect(mOpenRepo, &QToolButton::clicked, this, &Controls::openRepo);
    connect(mHome, &QToolButton::clicked, this, &Controls::signalGoBack);
    connect(mGoToBtn, &QToolButton::clicked, this, &Controls::openGoToDialog);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
@@ -89,6 +99,17 @@ Controls::Controls(QWidget *parent)
    connect(mPopBtn, &QToolButton::clicked, this, &Controls::popStashedWork);
    connect(mPruneBtn, &QToolButton::clicked, this, &Controls::pruneBranches);
    connect(mTerminalBtn, &QToolButton::clicked, this, &Controls::showTerminal);
+}
+
+void Controls::openRepo()
+{
+   const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
+
+   if (!dirName.isEmpty())
+   {
+      QDir d(dirName);
+      emit signalOpenRepo(d.absolutePath());
+   }
 }
 
 void Controls::openGoToDialog()

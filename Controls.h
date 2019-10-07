@@ -35,6 +35,7 @@ signals:
    void signalGoBack();
    void signalGoToSha(const QString &sha);
    void signalRepositoryUpdated();
+   void signalOpenRepo(const QString &path);
 
 public:
    explicit Controls(QWidget *parent = nullptr);
@@ -43,6 +44,7 @@ public:
 
 private:
    QString mCurrentSha;
+   QToolButton *mOpenRepo = nullptr;
    QToolButton *mHome = nullptr;
    QToolButton *mGoToBtn = nullptr;
    QToolButton *mPullBtn = nullptr;
@@ -52,6 +54,7 @@ private:
    QToolButton *mPruneBtn = nullptr;
    QToolButton *mTerminalBtn = nullptr;
 
+   void openRepo();
    void openGoToDialog();
    void pullCurrentBranch();
    void fetchAll();
