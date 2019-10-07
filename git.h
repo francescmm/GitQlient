@@ -161,7 +161,7 @@ public:
    void addExtraFileInfo(QString *rowName, const QString &sha, const QString &diffToSha, bool allMergeFiles);
    void removeExtraFileInfo(QString *rowName);
    void formatPatchFileHeader(QString *rowName, const QString &sha, const QString &dts, bool cmb, bool all);
-   const QString filePath(const RevFile &rf, uint i) const { return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)]; }
+   const QString filePath(const RevFile &rf, int i) const { return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)]; }
    void setCurContext(Domain *d) { mCurrentDomain = d; }
    Domain *curContext() const { return mCurrentDomain; }
    bool run(const QString &cmd, QString *out = nullptr, QObject *rcv = nullptr, const QString &buf = "");

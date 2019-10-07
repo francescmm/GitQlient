@@ -74,8 +74,8 @@ void CommitWidget::init(const QString &shaToAmmend)
    }
 
    const RevFile *f = git->getFiles(mIsAmmend ? shaToAmmend : ZERO_SHA);
-   auto i = 0u;
-   for (; f && i < static_cast<unsigned int>(f->count()); ++i)
+   auto i = 0;
+   for (; f && i < f->count(); ++i)
    { // in case of amend f could be null
 
       bool isNew = (f->statusCmp(i, RevFile::NEW) || f->statusCmp(i, RevFile::UNKNOWN));
