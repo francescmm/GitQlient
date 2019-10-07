@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *p)
 
    rv->setEnabled(false);
 
+   connect(ui->controls, &Controls::signalOpenRepo, this, &MainWindow::setRepository);
    connect(ui->controls, &Controls::signalGoBack, this, [this]() { ui->mainStackedWidget->setCurrentIndex(0); });
    connect(ui->controls, &Controls::signalRepositoryUpdated, this, &MainWindow::updateUi);
    connect(ui->controls, &Controls::signalGoToSha, this, &MainWindow::goToCommitSha);
@@ -207,17 +208,6 @@ void MainWindow::executeCommand()
          ui->outputTerminal->clear();
       else if (ui->leGitCommand->text() == "ui update")
          updateUi();
-      else if (ui->leGitCommand->text() == "open repo")
-      {
-         const QString dirName(QFileDialog::getExistingDirectory(this, "Choose a directory"));
-
-         if (!dirName.isEmpty())
-         {
-            QDir d(dirName);
-
-            setRepository(d.absolutePath());
-         }
-      }
       else
       {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
