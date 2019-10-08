@@ -185,9 +185,12 @@ bool CommitWidget::checkMsg(QString &msg)
    msg = title;
 
    if (!ui->teDescription->toPlainText().isEmpty())
-      msg += QString("\n\n%1").arg(ui->teDescription->toPlainText());
+   {
+      auto description = QString("\n\n%1").arg(ui->teDescription->toPlainText());
+      description.remove(QRegExp("(^|\\n)\\s*#[^\\n]*")); // strip comments
+      msg += description;
+   }
 
-   msg.remove(QRegExp("(^|\\n)\\s*#[^\\n]*")); // strip comments
    msg.replace(QRegExp("[ \\t\\r\\f\\v]+\\n"), "\n"); // strip line trailing cruft
    msg = msg.trimmed();
 
