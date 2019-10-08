@@ -25,6 +25,8 @@
 
 #include <QPlainTextEdit>
 
+class LineNumberArea;
+
 class FileDiffView : public QPlainTextEdit
 {
    Q_OBJECT
@@ -43,7 +45,7 @@ private slots:
    void updateLineNumberArea(const QRect &, int);
 
 private:
-   QWidget *lineNumberArea;
+   LineNumberArea *mLineNumberArea;
 };
 
 class LineNumberArea : public QWidget

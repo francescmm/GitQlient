@@ -53,7 +53,7 @@ public:
    void clear();
 
 private:
-   Ui::RevisionWidget *ui;
+   Ui::RevisionWidget *ui = nullptr;
    QString mCurrentSha;
    QString mParentSha;
 };

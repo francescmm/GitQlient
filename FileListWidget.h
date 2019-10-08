@@ -42,7 +42,6 @@ public:
    void setup(Domain *dm);
    void update(const RevFile *files, bool newFiles);
    void addItem(const QString &label, const QColor &clr);
-   QString currentText();
 
 private:
    void showContextMenu(const QPoint &);

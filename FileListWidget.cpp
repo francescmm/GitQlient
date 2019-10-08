@@ -19,8 +19,6 @@ Copyright: See COPYING file that comes with this distribution
 
 FileListWidget::FileListWidget(QWidget *p)
    : QListWidget(p)
-   , d(nullptr)
-   , st(nullptr)
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
 }
@@ -37,12 +35,6 @@ void FileListWidget::addItem(const QString &label, const QColor &clr)
 {
    const auto item = new QListWidgetItem(label, this);
    item->setForeground(clr);
-}
-
-QString FileListWidget::currentText()
-{
-   const auto item = currentItem();
-   return item ? item->data(Qt::DisplayRole).toString() : "";
 }
 
 void FileListWidget::showContextMenu(const QPoint &pos)
@@ -136,26 +128,31 @@ void FileListWidget::update(const RevFile *files, bool newFiles)
    if (newFiles)
       insertFiles(files);
 
-   QString fileName(currentText());
+   const auto item = currentItem();
+   const auto currentText = item ? item->data(Qt::DisplayRole).toString() : "";
+   QString fileName(currentText);
    Git::getInstance()->removeExtraFileInfo(&fileName); // could be a renamed/copied file
 
-   if (!fileName.isEmpty() && (fileName == st->fileName()))
+   if (item && !fileName.isEmpty() && (fileName == st->fileName()))
    {
-      currentItem()->setSelected(st->selectItem()); // just a refresh
+      item->setSelected(st->selectItem()); // just a refresh
       return;
    }
+
    clearSelection();
 
    if (st->fileName().isEmpty())
       return;
 
-   QList<QListWidgetItem *> l = findItems(st->fileName(), Qt::MatchExactly);
+   auto l = findItems(st->fileName(), Qt::MatchExactly);
+
    if (l.isEmpty())
    { // could be a renamed/copied file, try harder
       fileName = st->fileName();
       Git::getInstance()->addExtraFileInfo(&fileName, st->sha(), st->diffToSha(), st->allMergeFiles());
       l = findItems(fileName, Qt::MatchExactly);
    }
+
    if (!l.isEmpty())
    {
       setCurrentItem(l.first());

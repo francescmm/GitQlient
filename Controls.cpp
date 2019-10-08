@@ -63,7 +63,7 @@ Controls::Controls(QWidget *parent)
 
    const auto stashMenu = new QMenu(mStashBtn);
 
-   action = stashMenu->addAction(tr("Save"));
+   action = stashMenu->addAction(tr("Push"));
    action->setIcon(QIcon(":/icons/git_stash"));
    connect(action, &QAction::triggered, this, &Controls::stashCurrentWork);
 

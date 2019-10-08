@@ -50,10 +50,13 @@ void Terminal::executeCommand()
 {
    if (!leGitCommand->text().isEmpty())
    {
-      if (leGitCommand->text() == "clear")
+      const auto order = leGitCommand->text();
+      if (order == "clear")
          outputTerminal->clear();
-      else if (leGitCommand->text() == "ui update")
+      else if (order == "update")
          emit signalUpdateUi();
+      else if (order == "exit" || order == "quit")
+         close();
       else
       {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -63,7 +66,8 @@ void Terminal::executeCommand()
          outputTerminal->setText(output);
       }
    }
-   leGitCommand->setText("");
+
+   leGitCommand->clear();
 }
 
 int Terminal::exec()

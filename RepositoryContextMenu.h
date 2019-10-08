@@ -36,4 +36,19 @@ signals:
 
 public:
    explicit RepositoryContextMenu(const QString &sha, QWidget *parent = nullptr);
+
+private:
+   QString mSha;
+
+   void stashPush();
+   void stashPop();
+   void createBranch();
+   void createTag();
+   void cherryPickCommit();
+   void push();
+   void pull();
+   void fetch();
+   void resetSoft();
+   void resetMixed();
+   void resetHard();
 };

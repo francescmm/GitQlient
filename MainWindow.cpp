@@ -74,14 +74,12 @@ void MainWindow::updateUi()
    rv->clear(true);
    Git::getInstance()->init2();
 
-   auto currentSha = QGit::ZERO_SHA;
-
-   if (ui->commitStackedWidget->currentIndex() == 0)
-      currentSha = ui->revisionWidget->getCurrentCommitSha();
+   const auto commitStackedIndex = ui->commitStackedWidget->currentIndex();
+   const auto currentSha = commitStackedIndex == 0 ? ui->revisionWidget->getCurrentCommitSha() : QGit::ZERO_SHA;
 
    goToCommitSha(currentSha);
 
-   if (ui->commitStackedWidget->currentIndex() == 1)
+   if (commitStackedIndex == 1)
       ui->commitWidget->init(currentSha);
 }
 
@@ -100,7 +98,7 @@ void MainWindow::setRepository(const QString &newDir)
       git->getBaseDir(newDir, mCurrentDir, archiveChanged);
       git->stop(archiveChanged); // stop all pending processes, non blocking
 
-      bool ok = git->init(mCurrentDir, nullptr); // blocking call
+      const auto ok = git->init(mCurrentDir, nullptr); // blocking call
 
       if (ok)
       {
@@ -197,8 +195,6 @@ void MainWindow::goToCommitSha(const QString &goToSha)
       rv->st.setSha(sha);
       rv->update(false, false);
    }
-   else
-      rv->getRepoList()->scrollToNext(0);
 }
 
 void MainWindow::openCommitDiff()
@@ -212,9 +208,7 @@ void MainWindow::changesCommitted(bool ok)
    if (ok)
       updateUi();
    else
-   {
       QMessageBox::critical(this, tr("Commit error"), tr("Failed to commit changes"));
-   }
 }
 
 void MainWindow::onCommitClicked(const QModelIndex &index)
@@ -243,13 +237,14 @@ void MainWindow::onCommitSelected(const QString &sha)
 void MainWindow::onAmmendCommit(const QString &sha)
 {
    ui->commitStackedWidget->setCurrentIndex(1);
-   // ui->revisionWidget->setCurrentCommitSha(sha);
    ui->commitWidget->init(sha);
 }
 
 void MainWindow::onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file)
 {
-   if (ui->fileDiffWidget->onFileDiffRequested(currentSha, previousSha, file))
+   const auto fileWithModifications = ui->fileDiffWidget->onFileDiffRequested(currentSha, previousSha, file);
+
+   if (fileWithModifications)
       ui->mainStackedWidget->setCurrentIndex(2);
    else
       QMessageBox::information(this, tr("No modifications"), tr("There are no content modifications for this file"));
@@ -272,11 +267,11 @@ void MainWindow::rebase(const QString &from, const QString &to, const QString &o
 
 void MainWindow::merge(const QStringList &shas, const QString &into)
 {
-   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QString output;
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
    if (Git::getInstance()->merge(into, shas, &output))
    {
-
       // TODO: Enable it again
       // controlsWidget->commitChanges();
       updateUi();

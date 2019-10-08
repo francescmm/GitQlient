@@ -12,65 +12,39 @@
 
 RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent)
    : QMenu(parent)
+   , mSha(sha)
 {
-   if (sha == QGit::ZERO_SHA)
+   if (mSha == QGit::ZERO_SHA)
    {
-      const auto stashAction = new QAction("Push stash");
-      connect(stashAction, &QAction::triggered, this, [this]() {
-         const auto ret = Git::getInstance()->stash();
+      const auto stashAction = addAction("Push stash");
+      connect(stashAction, &QAction::triggered, this, &RepositoryContextMenu::stashPush);
 
-         if (ret)
-            emit signalRepositoryUpdated();
-      });
-      addAction(stashAction);
+      const auto popAction = addAction("Pop stash");
+      connect(popAction, &QAction::triggered, this, &RepositoryContextMenu::stashPop);
 
-      const auto popAction = new QAction("Pop stash");
-      connect(popAction, &QAction::triggered, this, [this]() {
-         const auto ret = Git::getInstance()->pop();
-
-         if (ret)
-            emit signalRepositoryUpdated();
-      });
-      addAction(popAction);
-
-      const auto commitAction = new QAction("Commit");
+      const auto commitAction = addAction("Commit");
       // connect(commitAction, &QAction::triggered, this, [this]() {});
       addAction(commitAction);
    }
 
-   const auto commitAction = new QAction("See diff");
-   connect(commitAction, &QAction::triggered, this, [this, sha]() { emit signalOpenDiff(sha); });
-   addAction(commitAction);
+   const auto commitAction = addAction("See diff");
+   connect(commitAction, &QAction::triggered, this, [this]() { emit signalOpenDiff(mSha); });
 
-   if (sha != QGit::ZERO_SHA)
+   if (mSha != QGit::ZERO_SHA)
    {
-      const auto ammendCommitAction = new QAction("Ammend");
+      const auto ammendCommitAction = addAction("Ammend");
       connect(ammendCommitAction, &QAction::triggered, this, &RepositoryContextMenu::signalAmmendCommit);
-      addAction(ammendCommitAction);
 
-      const auto createBranchAction = new QAction("Create branch here");
-      connect(createBranchAction, &QAction::triggered, this, [this, sha]() {
-         BranchDlg dlg(sha, BranchDlgMode::CREATE_FROM_COMMIT);
-         const auto ret = dlg.exec();
+      const auto createBranchAction = addAction("Create branch here");
+      connect(createBranchAction, &QAction::triggered, this, &RepositoryContextMenu::createBranch);
 
-         if (ret == QDialog::Accepted)
-            emit signalRepositoryUpdated();
-      });
-      addAction(createBranchAction);
+      const auto createTagAction = addAction("Create tag here");
+      connect(createTagAction, &QAction::triggered, this, &RepositoryContextMenu::createTag);
 
-      const auto createTagAction = new QAction("Create tag here");
-      connect(createTagAction, &QAction::triggered, this, [this, sha]() {
-         TagDlg dlg(sha);
-         const auto ret = dlg.exec();
-
-         if (ret == QDialog::Accepted)
-            emit signalRepositoryUpdated();
-      });
-      addAction(createTagAction);
       addSeparator();
 
       QByteArray output;
-      const auto ret = Git::getInstance()->getBranchesOfCommit(sha, output);
+      const auto ret = Git::getInstance()->getBranchesOfCommit(mSha, output);
       const auto currentBranch = Git::getInstance()->getCurrentBranchName();
 
       if (ret)
@@ -93,10 +67,9 @@ RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent
 
             if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
             {
-               const auto checkoutCommitAction = new QAction(QString("Checkout %1").arg(branch));
+               const auto checkoutCommitAction = addAction(QString(tr("Checkout %1")).arg(branch));
                checkoutCommitAction->setDisabled(true);
                // connect(checkoutCommitAction, &QAction::triggered, this, &RepositoryView::executeAction);
-               addAction(checkoutCommitAction);
             }
          }
 
@@ -105,10 +78,9 @@ RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent
             if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
             {
                // If is the last commit of a branch
-               const auto mergeBranchAction = new QAction(QString("Merge %1").arg(branch));
+               const auto mergeBranchAction = addAction(QString(tr("Merge %1")).arg(branch));
                mergeBranchAction->setDisabled(true);
                // connect(mergeBranchAction, &QAction::triggered, this, &RepositoryView::executeAction);
-               addAction(mergeBranchAction);
             }
          }
 
@@ -121,12 +93,8 @@ RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent
 
          if (!isCommitInCurrentBranch)
          {
-            const auto cherryPickAction = new QAction("Cherry pick commit");
-            connect(cherryPickAction, &QAction::triggered, this, [this, sha]() {
-               if (Git::getInstance()->cherryPickCommit(sha))
-                  emit signalRepositoryUpdated();
-            });
-            addAction(cherryPickAction);
+            const auto cherryPickAction = addAction(tr("Cherry pick commit"));
+            connect(cherryPickAction, &QAction::triggered, this, &RepositoryContextMenu::cherryPickCommit);
          }
       }
 
@@ -135,71 +103,123 @@ RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent
       {
          const auto lastShaStr = QString::fromUtf8(lastSha).remove('\n');
 
-         if (lastShaStr == sha)
+         if (lastShaStr == mSha)
          {
-            const auto pushAction = new QAction("Push");
-            connect(pushAction, &QAction::triggered, this, [this]() {
-               QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-               const auto ret = Git::getInstance()->push();
-               QApplication::restoreOverrideCursor();
+            const auto pushAction = addAction("Push");
+            connect(pushAction, &QAction::triggered, this, &RepositoryContextMenu::push);
 
-               if (ret)
-                  emit signalRepositoryUpdated();
-            });
-            addAction(pushAction);
+            const auto pullAction = addAction("Pull");
+            connect(pullAction, &QAction::triggered, this, &RepositoryContextMenu::pull);
 
-            const auto pullAction = new QAction("Pull");
-            connect(pullAction, &QAction::triggered, this, [this]() {
-               QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-               QString output;
-               const auto ret = Git::getInstance()->pull(output);
-               QApplication::restoreOverrideCursor();
-
-               if (ret)
-                  emit signalRepositoryUpdated();
-            });
-            addAction(pullAction);
-
-            const auto fetchAction = new QAction("Fetch");
-            connect(fetchAction, &QAction::triggered, this, [this]() {
-               if (Git::getInstance()->fetch())
-                  emit signalRepositoryUpdated();
-            });
-            addAction(fetchAction);
+            const auto fetchAction = addAction("Fetch");
+            connect(fetchAction, &QAction::triggered, this, &RepositoryContextMenu::fetch);
          }
       }
 
-      const auto copyShaAction = new QAction("Copy SHA");
-      connect(copyShaAction, &QAction::triggered, this, [sha]() { QApplication::clipboard()->setText(sha); });
-      addAction(copyShaAction);
+      const auto copyShaAction = addAction("Copy SHA");
+      connect(copyShaAction, &QAction::triggered, this, [this]() { QApplication::clipboard()->setText(mSha); });
+
       addSeparator();
 
-      const auto resetSoftAction = new QAction("Reset - Soft");
-      connect(resetSoftAction, &QAction::triggered, this, [this, sha]() {
-         if (Git::getInstance()->resetCommit(sha, Git::CommitResetType::SOFT))
-            emit signalRepositoryUpdated();
-      });
-      addAction(resetSoftAction);
+      const auto resetSoftAction = addAction("Reset - Soft");
+      connect(resetSoftAction, &QAction::triggered, this, &RepositoryContextMenu::resetSoft);
 
-      const auto resetMixedAction = new QAction("Reset - Mixed");
-      connect(resetMixedAction, &QAction::triggered, this, [this, sha]() {
-         if (Git::getInstance()->resetCommit(sha, Git::CommitResetType::MIXED))
-            emit signalRepositoryUpdated();
-      });
-      addAction(resetMixedAction);
+      const auto resetMixedAction = addAction("Reset - Mixed");
+      connect(resetMixedAction, &QAction::triggered, this, &RepositoryContextMenu::resetMixed);
 
-      const auto resetHardAction = new QAction("Reset - Hard");
-      connect(resetHardAction, &QAction::triggered, this, [this, sha]() {
-         const auto retMsg
-             = QMessageBox::warning(this, "Reset hard requested!",
-                                    "Are you sure you want to reset the branch to this commit in a <b>hard</b> way?",
-                                    QMessageBox::Ok, QMessageBox::Cancel);
-         if (retMsg == QMessageBox::Ok)
-         {
-            if (Git::getInstance()->resetCommit(sha, Git::CommitResetType::HARD))
-               emit signalRepositoryUpdated();
-         }
-      });
-      addAction(resetHardAction);
+      const auto resetHardAction = addAction("Reset - Hard");
+      connect(resetHardAction, &QAction::triggered, this, &RepositoryContextMenu::resetHard);
+   }
+}
+
+void RepositoryContextMenu::stashPush()
+{
+   const auto ret = Git::getInstance()->stash();
+
+   if (ret)
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::stashPop()
+{
+   const auto ret = Git::getInstance()->pop();
+
+   if (ret)
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::createBranch()
+{
+   BranchDlg dlg(mSha, BranchDlgMode::CREATE_FROM_COMMIT);
+   const auto ret = dlg.exec();
+
+   if (ret == QDialog::Accepted)
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::createTag()
+{
+   TagDlg dlg(mSha);
+   const auto ret = dlg.exec();
+
+   if (ret == QDialog::Accepted)
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::cherryPickCommit()
+{
+   if (Git::getInstance()->cherryPickCommit(mSha))
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::push()
+{
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   const auto ret = Git::getInstance()->push();
+   QApplication::restoreOverrideCursor();
+
+   if (ret)
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::pull()
+{
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   QString output;
+   const auto ret = Git::getInstance()->pull(output);
+   QApplication::restoreOverrideCursor();
+
+   if (ret)
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::fetch()
+{
+   if (Git::getInstance()->fetch())
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::resetSoft()
+{
+   if (Git::getInstance()->resetCommit(mSha, Git::CommitResetType::SOFT))
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::resetMixed()
+{
+   if (Git::getInstance()->resetCommit(mSha, Git::CommitResetType::MIXED))
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::resetHard()
+{
+   const auto retMsg = QMessageBox::warning(
+       this, "Reset hard requested!", "Are you sure you want to reset the branch to this commit in a <b>hard</b> way?",
+       QMessageBox::Ok, QMessageBox::Cancel);
+
+   if (retMsg == QMessageBox::Ok)
+   {
+      if (Git::getInstance()->resetCommit(mSha, Git::CommitResetType::HARD))
+         emit signalRepositoryUpdated();
    }
 }

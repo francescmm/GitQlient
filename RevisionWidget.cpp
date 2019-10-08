@@ -36,6 +36,9 @@ void RevisionWidget::setCurrentCommitSha(const QString &sha)
 {
    clear();
 
+   mCurrentSha = sha;
+   mParentSha = sha;
+
    if (sha != QGit::ZERO_SHA and !sha.isEmpty())
    {
       const auto currentRev = const_cast<Rev *>(Git::getInstance()->revLookup(sha));
@@ -68,11 +71,6 @@ void RevisionWidget::setCurrentCommitSha(const QString &sha)
          ui->fileListWidget->update(files, true);
          ui->labelModCount->setText(QString("(%1)").arg(ui->fileListWidget->count()));
       }
-   }
-   else
-   {
-      mCurrentSha = sha;
-      mParentSha = sha;
    }
 }
 

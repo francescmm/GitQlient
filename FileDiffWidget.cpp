@@ -58,16 +58,10 @@ bool FileDiffWidget::onFileDiffRequested(const QString &currentSha, const QStrin
 
       mDiffView->setPlainText(text);
 
-      mModifications = mDiffHighlighter->getModifiedRows();
+      mRowIndex = 0;
+      mDiffHighlighter->resetState();
 
-      if (!mModifications.isEmpty())
-      {
-         mRowIndex = 0;
-         // mDiffView->moveToRow(mModifications.at(mRowIndex));
-         mDiffHighlighter->resetState();
-
-         return true;
-      }
+      return true;
    }
 
    return false;

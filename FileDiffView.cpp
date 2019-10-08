@@ -5,10 +5,9 @@
 
 FileDiffView::FileDiffView(QWidget *parent)
    : QPlainTextEdit(parent)
+   , mLineNumberArea(new LineNumberArea(this))
 {
    setReadOnly(true);
-
-   lineNumberArea = new LineNumberArea(this);
 
    connect(this, &FileDiffView::blockCountChanged, this, &FileDiffView::updateLineNumberAreaWidth);
    connect(this, &FileDiffView::updateRequest, this, &FileDiffView::updateLineNumberArea);
@@ -18,17 +17,16 @@ FileDiffView::FileDiffView(QWidget *parent)
 
 int FileDiffView::lineNumberAreaWidth()
 {
-   int digits = 1;
-   int max = qMax(1, blockCount());
+   auto digits = 1;
+   auto max = std::max(1, blockCount());
+
    while (max >= 10)
    {
       max /= 10;
       ++digits;
    }
 
-   int space = 8 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
-
-   return space;
+   return 8 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
 }
 
 void FileDiffView::updateLineNumberAreaWidth(int /* newBlockCount */)
@@ -38,10 +36,10 @@ void FileDiffView::updateLineNumberAreaWidth(int /* newBlockCount */)
 
 void FileDiffView::updateLineNumberArea(const QRect &rect, int dy)
 {
-   if (dy)
-      lineNumberArea->scroll(0, dy);
+   if (dy != 0)
+      mLineNumberArea->scroll(0, dy);
    else
-      lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
+      mLineNumberArea->update(0, rect.y(), mLineNumberArea->width(), rect.height());
 
    if (rect.contains(viewport()->rect()))
       updateLineNumberAreaWidth(0);
@@ -51,17 +49,18 @@ void FileDiffView::resizeEvent(QResizeEvent *e)
 {
    QPlainTextEdit::resizeEvent(e);
 
-   QRect cr = contentsRect();
-   lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+   const auto cr = contentsRect();
+
+   mLineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
 void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
-   QPainter painter(lineNumberArea);
+   QPainter painter(mLineNumberArea);
    painter.fillRect(event->rect(), QColor("#202122"));
 
-   QTextBlock block = firstVisibleBlock();
-   int blockNumber = block.blockNumber();
+   auto block = firstVisibleBlock();
+   auto blockNumber = block.blockNumber();
    auto top = blockBoundingGeometry(block).translated(contentOffset()).top();
    auto bottom = top + blockBoundingRect(block).height();
 
@@ -69,10 +68,10 @@ void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
    {
       if (block.isVisible() && bottom >= event->rect().top())
       {
-         QString number = QString::number(blockNumber + 1);
+         const auto number = QString::number(blockNumber + 1);
          painter.setPen(Qt::white);
-         painter.drawText(0, static_cast<int>(top), lineNumberArea->width() - 3, fontMetrics().height(), Qt::AlignRight,
-                          number);
+         painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - 3, fontMetrics().height(),
+                          Qt::AlignRight, number);
       }
 
       block = block.next();
@@ -90,7 +89,7 @@ LineNumberArea::LineNumberArea(FileDiffView *editor)
 
 QSize LineNumberArea::sizeHint() const
 {
-   return QSize(fileDiffWidget->lineNumberAreaWidth(), 0);
+   return { fileDiffWidget->lineNumberAreaWidth(), 0 };
 }
 
 void LineNumberArea::paintEvent(QPaintEvent *event)

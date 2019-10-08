@@ -54,6 +54,8 @@ protected:
 private:
    Ui::MainWindow *ui = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
+   QString mCurrentDir;
+   bool mRepositoryBusy = false;
 
    void updateUi();
    void goToCommitSha(const QString &goToSha);
@@ -76,13 +78,5 @@ private:
    void rebase(const QString &from, const QString &to, const QString &onto);
    void merge(const QStringList &shas, const QString &into);
    void moveRef(const QString &refName, const QString &toSHA);
-
    bool isMatch(const QString &sha, const QString &f, int cn, const QMap<QString, bool> &sm);
-
-   // curDir is the repository working directory, could be different from qgit running
-   // directory QDir::current(). Note that qgit could be run from subdirectory
-   // so only after git->isArchive() that updates curDir to point to working directory
-   // we are sure is correct.
-   QString mCurrentDir;
-   bool mRepositoryBusy = false;
 };
