@@ -367,7 +367,7 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
    connect(UpdateSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
       QByteArray output;
-      const auto ret = Git::getInstance()->removeTag(submoduleName, true, output);
+      const auto ret = Git::getInstance()->submoduleUpdate(submoduleName);
       QApplication::restoreOverrideCursor();
 
       if (ret)
