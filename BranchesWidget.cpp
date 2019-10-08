@@ -19,6 +19,13 @@ BranchesWidget::BranchesWidget(QWidget *parent)
    , mRemoteBranchesTree(new BranchTreeWidget())
    , mTagsList(new QListWidget())
    , mStashesList(new QListWidget())
+   , mSubmodulesList(new QListWidget())
+   , mTagsCount(new QLabel("(0)"))
+   , mTagArrow(new QLabel())
+   , mStashesArrow(new QLabel())
+   , mSubmodulesCount(new QLabel("(0)"))
+   , mSubmodulesArrow(new QLabel())
+
 {
    mLocalBranchesTree->setLocalRepo(true);
    mLocalBranchesTree->setColumnHidden(0, true);
@@ -27,10 +34,10 @@ BranchesWidget::BranchesWidget(QWidget *parent)
    mLocalBranchesTree->setColumnCount(4);
 
    const auto localHeader = mLocalBranchesTree->headerItem();
-   localHeader->setText(1, "   Local");
+   localHeader->setText(1, QString("   %1").arg(tr("Local")));
    localHeader->setIcon(1, QIcon(":/icons/local"));
-   localHeader->setText(2, "To master");
-   localHeader->setText(3, "To origin");
+   localHeader->setText(2, tr("To master"));
+   localHeader->setText(3, tr("To origin"));
 
    mRemoteBranchesTree->setColumnCount(4);
    mRemoteBranchesTree->setMouseTracking(true);
@@ -39,10 +46,10 @@ BranchesWidget::BranchesWidget(QWidget *parent)
    mRemoteBranchesTree->setColumnHidden(3, true);
 
    const auto remoteHeader = mRemoteBranchesTree->headerItem();
-   remoteHeader->setText(1, "   Remote");
+   remoteHeader->setText(1, QString("   %1").arg(tr("Remote")));
    remoteHeader->setIcon(1, QIcon(":/icons/server"));
-   remoteHeader->setText(2, "To master");
-   remoteHeader->setText(3, "To origin");
+   remoteHeader->setText(2, tr("To master"));
+   remoteHeader->setText(3, tr("To origin"));
 
    /* TAGS */
 
@@ -52,18 +59,19 @@ BranchesWidget::BranchesWidget(QWidget *parent)
    tagsHeaderLayout->setContentsMargins(20, 9, 10, 9);
    tagsHeaderLayout->setSpacing(10);
    QIcon icon(":/icons/tags");
-   QLabel *tagsIcon = nullptr;
-   tagsHeaderLayout->addWidget(tagsIcon = new QLabel());
+
+   const auto tagsIcon = new QLabel();
    tagsIcon->setPixmap(icon.pixmap(QSize(15, 15)));
+
+   tagsHeaderLayout->addWidget(tagsIcon);
    tagsHeaderLayout->addWidget(new QLabel(tr("Tags")));
-   tagsHeaderLayout->addWidget(mTagsCount = new QLabel(tr("(0)")));
+   tagsHeaderLayout->addWidget(mTagsCount);
    tagsHeaderLayout->addStretch();
+
    icon = QIcon(":/icons/arrow_down");
-   mTagArrow = new QLabel();
    mTagArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    tagsHeaderLayout->addWidget(mTagArrow);
 
-   mTagsList = new QListWidget();
    mTagsList->setMouseTracking(true);
    mTagsList->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -79,23 +87,25 @@ BranchesWidget::BranchesWidget(QWidget *parent)
 
    const auto stashFrame = new ClickableFrame();
    stashFrame->setObjectName("tagsFrame");
+
    const auto stashHeaderLayout = new QHBoxLayout(stashFrame);
    stashHeaderLayout->setContentsMargins(20, 9, 10, 9);
    stashHeaderLayout->setSpacing(10);
+
    QIcon stashIcon(":/icons/stashes");
-   QLabel *stashIconLabel = nullptr;
-   // tagsHeaderLayout->addSpacerItem(new QSpacerItem(10, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
-   stashHeaderLayout->addWidget(stashIconLabel = new QLabel());
+
+   const auto stashIconLabel = new QLabel();
    stashIconLabel->setPixmap(stashIcon.pixmap(QSize(15, 15)));
+
+   stashHeaderLayout->addWidget(stashIconLabel);
    stashHeaderLayout->addWidget(new QLabel(tr("Stashes")));
    stashHeaderLayout->addWidget(mStashesCount = new QLabel(tr("(0)")));
    stashHeaderLayout->addStretch();
+
    stashIcon = QIcon(":/icons/arrow_down");
-   mStashesArrow = new QLabel();
    mStashesArrow->setPixmap(stashIcon.pixmap(QSize(15, 15)));
    stashHeaderLayout->addWidget(mStashesArrow);
 
-   mStashesList = new QListWidget();
    mStashesList->setMouseTracking(true);
    mStashesList->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -109,23 +119,25 @@ BranchesWidget::BranchesWidget(QWidget *parent)
 
    const auto submoduleFrame = new ClickableFrame();
    submoduleFrame->setObjectName("tagsFrame");
+
    const auto submoduleHeaderLayout = new QHBoxLayout(submoduleFrame);
    submoduleHeaderLayout->setContentsMargins(20, 9, 10, 9);
    submoduleHeaderLayout->setSpacing(10);
+
    QIcon submoduleIcon(":/icons/submodules");
-   QLabel *submoduleIconLabel = nullptr;
-   // tagsHeaderLayout->addSpacerItem(new QSpacerItem(10, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
-   submoduleHeaderLayout->addWidget(submoduleIconLabel = new QLabel());
+   const auto submoduleIconLabel = new QLabel();
    submoduleIconLabel->setPixmap(submoduleIcon.pixmap(QSize(15, 15)));
+
+   submoduleHeaderLayout->addWidget(submoduleIconLabel);
    submoduleHeaderLayout->addWidget(new QLabel(tr("Submodules")));
-   submoduleHeaderLayout->addWidget(mSubmodulesCount = new QLabel(tr("(0)")));
+   submoduleHeaderLayout->addWidget(mSubmodulesCount);
    submoduleHeaderLayout->addStretch();
+
    submoduleIcon = QIcon(":/icons/arrow_down");
-   mSubmodulesArrow = new QLabel();
    mSubmodulesArrow->setPixmap(submoduleIcon.pixmap(QSize(15, 15)));
+
    submoduleHeaderLayout->addWidget(mSubmodulesArrow);
 
-   mSubmodulesList = new QListWidget();
    mSubmodulesList->setMouseTracking(true);
    mSubmodulesList->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -336,6 +348,7 @@ void BranchesWidget::showTagsContextMenu(const QPoint &p)
       if (ret)
          emit signalBranchesUpdated();
    });
+
    menu->exec(mTagsList->viewport()->mapToGlobal(p));
 }
 
@@ -360,10 +373,13 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
       if (ret)
          emit signalBranchesUpdated();
    });
+
    const auto openSubmoduleAction = menu->addAction(tr("Open"));
-   connect(openSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {});
+   connect(openSubmoduleAction, &QAction::triggered, this, []() {});
+
    const auto deleteSubmoduleAction = menu->addAction(tr("Delete"));
-   connect(deleteSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {});
+   connect(deleteSubmoduleAction, &QAction::triggered, this, []() {});
+
    menu->exec(mSubmodulesList->viewport()->mapToGlobal(p));
 }
 

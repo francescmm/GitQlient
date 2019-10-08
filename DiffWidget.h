@@ -69,13 +69,9 @@ private:
 class PatchViewDomain : public Domain
 {
 public:
-   PatchViewDomain(DiffWidget *owner)
-      : Domain(false)
-      , mOwner(owner)
-   {
-   }
-
-   bool doUpdate(bool force) override { return mOwner->doUpdate(force); }
+   PatchViewDomain();
+   void setOwner(DiffWidget *owner);
+   bool doUpdate(bool force) override;
 
    friend class DiffWidget;
 

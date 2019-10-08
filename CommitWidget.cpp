@@ -73,34 +73,36 @@ void CommitWidget::init(const QString &shaToAmmend)
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
    }
 
-   const RevFile *f = git->getFiles(mIsAmmend ? shaToAmmend : ZERO_SHA);
-   auto i = 0;
-   for (; f && i < f->count(); ++i)
-   { // in case of amend f could be null
+   const auto files = git->getFiles(mIsAmmend ? shaToAmmend : ZERO_SHA);
 
-      bool isNew = (f->statusCmp(i, RevFile::NEW) || f->statusCmp(i, RevFile::UNKNOWN));
-      QColor myColor = QPalette().color(QPalette::WindowText);
-      if (isNew)
-         myColor = Qt::darkGreen;
-      else if (f->statusCmp(i, RevFile::DELETED))
-         myColor = Qt::red;
-      else
-         myColor = Qt::white;
+   if (files)
+   {
+      for (auto i = 0; i < files->count(); ++i)
+      {
+         QColor myColor;
 
-      const auto item = new QListWidgetItem(ui->listWidgetFiles);
-      item->setText(git->filePath(*f, i));
-      item->setForeground(myColor);
+         if (files->statusCmp(i, RevFile::NEW) || files->statusCmp(i, RevFile::UNKNOWN))
+            myColor = Qt::darkGreen;
+         else if (files->statusCmp(i, RevFile::DELETED))
+            myColor = Qt::red;
+         else
+            myColor = Qt::white;
+
+         const auto item = new QListWidgetItem(ui->listWidgetFiles);
+         item->setText(git->filePath(*files, i));
+         item->setForeground(myColor);
+      }
    }
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
 
    // compute cursor offsets. Take advantage of fixed width font
-   QPair<QString, QString> logMessage;
 
    if (lastMsgBeforeError.isEmpty())
    {
-      // setup teDescription with old commit message to be amended
+      QPair<QString, QString> logMessage;
+
       if (mIsAmmend)
          logMessage = git->getSplitCommitMsg(shaToAmmend);
 
@@ -112,7 +114,6 @@ void CommitWidget::init(const QString &shaToAmmend)
 
    ui->teDescription->setPlainText(msg);
    ui->teDescription->moveCursor(QTextCursor::Start);
-
    ui->pbCommit->setEnabled(ui->filesWidget->count());
 }
 
@@ -121,10 +122,8 @@ void CommitWidget::addFileToCommitList(QListWidgetItem *item)
    const auto row = ui->listWidgetFiles->row(item);
    ui->listWidgetFiles->takeItem(row);
    ui->filesWidget->addItem(item);
-
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
-
    ui->pbCommit->setEnabled(true);
 }
 
@@ -133,24 +132,23 @@ void CommitWidget::removeFileFromCommitList(QListWidgetItem *item)
    const auto row = ui->filesWidget->row(item);
    ui->filesWidget->takeItem(row);
    ui->listWidgetFiles->addItem(item);
-
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
-
    ui->pbCommit->setDisabled(ui->filesWidget->count() == 0);
 }
 
 void CommitWidget::contextMenuPopup(const QPoint &pos)
 {
    const auto fileName = ui->listWidgetFiles->itemAt(pos)->data(Qt::DisplayRole).toString();
-
    const auto contextMenu = new QMenu(this);
+
    connect(contextMenu->addAction("Checkout file"), &QAction::triggered, this, [this, fileName]() {
       const auto ret = Git::getInstance()->resetFile(fileName);
 
       if (ret)
          emit signalChangesCommitted(ret);
    });
+
    connect(contextMenu->addAction("Add file to commit"), &QAction::triggered, this, [this, fileName]() {
       const auto ret = Git::getInstance()->resetFile(fileName);
 
@@ -185,18 +183,20 @@ bool CommitWidget::checkMsg(QString &msg)
       QMessageBox::warning(this, "Commit changes", "Please, add a title.");
 
    msg = title;
+
    if (!ui->teDescription->toPlainText().isEmpty())
       msg += QString("\n\n%1").arg(ui->teDescription->toPlainText());
 
    msg.remove(QRegExp("(^|\\n)\\s*#[^\\n]*")); // strip comments
    msg.replace(QRegExp("[ \\t\\r\\f\\v]+\\n"), "\n"); // strip line trailing cruft
    msg = msg.trimmed();
+
    if (msg.isEmpty())
    {
       QMessageBox::warning(this, "Commit changes", "Please, add a title.");
       return false;
    }
-   // split subject from message body
+
    QString subj(msg.section('\n', 0, 0, QString::SectionIncludeTrailingSep));
    QString body(msg.section('\n', 1).trimmed());
    msg = subj + '\n' + body + '\n';
@@ -213,9 +213,7 @@ bool CommitWidget::commitChanges()
    if (!selFiles.isEmpty() && checkMsg(msg))
    {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-      auto ok = Git::getInstance()->commitFiles(selFiles, msg, false);
-
+      const auto ok = Git::getInstance()->commitFiles(selFiles, msg, false);
       QApplication::restoreOverrideCursor();
 
       lastMsgBeforeError = (ok ? "" : msg);
@@ -240,11 +238,10 @@ bool CommitWidget::ammendChanges()
 
       if (checkMsg(msg))
       {
+         const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
+
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-         auto ok = git->commitFiles(selFiles, msg, true,
-                                    QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text()));
-
+         const auto ok = git->commitFiles(selFiles, msg, true, author);
          QApplication::restoreOverrideCursor();
 
          emit signalChangesCommitted(ok);

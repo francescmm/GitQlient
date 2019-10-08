@@ -547,9 +547,15 @@ QVector<QString> Git::getSubmodules()
    return submodulesList;
 }
 
-bool Git::submoduleUpdate(const QString &submodule) {}
+bool Git::submoduleUpdate(const QString &)
+{
+   return false;
+}
 
-bool Git::submoduleRemove(const QString &submodule) {}
+bool Git::submoduleRemove(const QString &)
+{
+   return false;
+}
 
 const RevFile *Git::insertNewFiles(const QString &sha, const QString &data)
 {

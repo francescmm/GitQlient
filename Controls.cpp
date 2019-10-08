@@ -37,13 +37,15 @@ Controls::Controls(QWidget *parent)
    mGoToBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
    const auto menu = new QMenu(mPullBtn);
-   QAction *action = nullptr;
-   menu->addAction(action = new QAction("Fetch all"));
+
+   auto action = menu->addAction(tr("Fetch all"));
    connect(action, &QAction::triggered, this, &Controls::fetchAll);
-   menu->addAction(action = new QAction("Pull"));
+
+   action = menu->addAction(tr("Pull"));
    connect(action, &QAction::triggered, this, &Controls::pullCurrentBranch);
    mPullBtn->setDefaultAction(action);
-   menu->addAction(action = new QAction("Prune"));
+
+   action = menu->addAction(tr("Prune"));
    connect(action, &QAction::triggered, this, &Controls::pruneBranches);
    menu->addSeparator();
 
@@ -60,10 +62,14 @@ Controls::Controls(QWidget *parent)
    mPushBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
    const auto stashMenu = new QMenu(mStashBtn);
-   stashMenu->addAction(action = new QAction(QIcon(":/icons/git_stash"), "Save"));
+
+   action = stashMenu->addAction(tr("Save"));
+   action->setIcon(QIcon(":/icons/git_stash"));
    connect(action, &QAction::triggered, this, &Controls::stashCurrentWork);
+
    // mStashBtn->setDefaultAction(action);
-   stashMenu->addAction(action = new QAction(QIcon(":/icons/git_pop"), "Pop"));
+   action = stashMenu->addAction(tr("Pop"));
+   action->setIcon(QIcon(":/icons/git_pop"));
    connect(action, &QAction::triggered, this, &Controls::popStashedWork);
 
    mStashBtn->setMenu(stashMenu);
@@ -110,7 +116,7 @@ void Controls::openRepo()
 
 void Controls::openGoToDialog()
 {
-   QLineEdit *goToSha = new QLineEdit();
+   const auto goToSha = new QLineEdit();
    goToSha->setWindowModality(Qt::ApplicationModal);
    goToSha->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -121,8 +127,9 @@ void Controls::openGoToDialog()
 
 void Controls::pullCurrentBranch()
 {
-   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QString output;
+
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    const auto ret = Git::getInstance()->pull(output);
    QApplication::restoreOverrideCursor();
 
