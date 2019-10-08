@@ -1,6 +1,7 @@
 # General stuff
 TEMPLATE = app
-CONFIG += qt warn_on exceptions
+CONFIG += qt warn_on c++17
+QMAKE_CXXFLAGS += -Werror
 TARGET = GitQlient
 QT += widgets
 
