@@ -6,67 +6,38 @@
 #include <QApplication>
 #include <QMessageBox>
 
-BranchContextMenu::BranchContextMenu(const QString &branchSelected, bool isLocal, QWidget *parent)
+BranchContextMenu::BranchContextMenu(const BranchContextMenuConfig &config, QWidget *parent)
    : QMenu(parent)
-   , mSelectedBranch(branchSelected)
-   , mLocal(isLocal)
+   , mConfig(config)
 {
-   const auto currentBranch = Git::getInstance()->getCurrentBranchName();
-
-   if (mLocal)
+   if (mConfig.isLocal)
    {
-      const auto pullAction = new QAction("Pull");
-      connect(pullAction, &QAction::triggered, this, &BranchContextMenu::pull);
-      addAction(pullAction);
-
-      const auto fetchAction = new QAction("Fetch");
-      connect(fetchAction, &QAction::triggered, this, &BranchContextMenu::fetch);
-      addAction(fetchAction);
+      connect(addAction("Pull"), &QAction::triggered, this, &BranchContextMenu::pull);
+      connect(addAction("Fetch"), &QAction::triggered, this, &BranchContextMenu::fetch);
    }
 
-   if (currentBranch == branchSelected)
+   if (mConfig.currentBranch == mConfig.branchSelected)
    {
-
-      const auto pushAction = new QAction("Push");
-      connect(pushAction, &QAction::triggered, this, &BranchContextMenu::push);
-      addAction(pushAction);
-
-      const auto pushForceAction = new QAction("Push force");
-      connect(pushForceAction, &QAction::triggered, this, &BranchContextMenu::pushForce);
-      addAction(pushForceAction);
+      connect(addAction("Push"), &QAction::triggered, this, &BranchContextMenu::push);
+      connect(addAction("Push force"), &QAction::triggered, this, &BranchContextMenu::pushForce);
    }
 
    addSeparator();
 
-   const auto createBranchAction = new QAction("Create branch");
-   connect(createBranchAction, &QAction::triggered, this, &BranchContextMenu::createBranch);
-   addAction(createBranchAction);
+   connect(addAction("Create branch"), &QAction::triggered, this, &BranchContextMenu::createBranch);
+   connect(addAction("Create && checkout branch"), &QAction::triggered, this, &BranchContextMenu::createCheckoutBranch);
+   connect(addAction("Checkout branch"), &QAction::triggered, this, &BranchContextMenu::signalCheckoutBranch);
 
-   const auto createCheckoutBranchAction = new QAction("Create and checkout branch");
-   connect(createCheckoutBranchAction, &QAction::triggered, this, &BranchContextMenu::createAndCheckoutBranch);
-   addAction(createCheckoutBranchAction);
-   addSeparator();
-
-   const auto checkoutBranchAction = new QAction("Checkout branch");
-   connect(checkoutBranchAction, &QAction::triggered, this, &BranchContextMenu::signalCheckoutBranch);
-   addAction(checkoutBranchAction);
-
-   if (currentBranch != branchSelected)
+   if (mConfig.currentBranch != mConfig.branchSelected)
    {
-      const auto actionName = QString("Merge %1 into %2").arg(branchSelected, currentBranch);
-      const auto mergeMasterAction = new QAction(actionName);
-
-      connect(mergeMasterAction, &QAction::triggered, this, &BranchContextMenu::merge);
-      addAction(mergeMasterAction);
+      const auto actionName = QString("Merge %1 into %2").arg(mConfig.branchSelected, mConfig.currentBranch);
+      connect(addAction(actionName), &QAction::triggered, this, &BranchContextMenu::merge);
    }
 
-   const auto renameBranchAction = new QAction("Rename");
-   connect(renameBranchAction, &QAction::triggered, this, &BranchContextMenu::rename);
-   addAction(renameBranchAction);
+   addSeparator();
 
-   const auto deleteBranchAction = new QAction("Delete");
-   connect(deleteBranchAction, &QAction::triggered, this, &BranchContextMenu::deleteBranch);
-   addAction(deleteBranchAction);
+   connect(addAction("Rename"), &QAction::triggered, this, &BranchContextMenu::rename);
+   connect(addAction("Delete"), &QAction::triggered, this, &BranchContextMenu::deleteBranch);
 }
 
 void BranchContextMenu::pull()
@@ -79,7 +50,7 @@ void BranchContextMenu::pull()
    if (ret)
       emit signalBranchesUpdated();
    else
-      QMessageBox::critical(this, "Pull failed", output);
+      QMessageBox::critical(this, tr("Pull failed"), output);
 }
 
 void BranchContextMenu::fetch()
@@ -121,16 +92,16 @@ void BranchContextMenu::pushForce()
 
 void BranchContextMenu::createBranch()
 {
-   BranchDlg dlg(mSelectedBranch, BranchDlgMode::CREATE);
+   BranchDlg dlg(mConfig.branchSelected, BranchDlgMode::CREATE);
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
       emit signalBranchesUpdated();
 }
 
-void BranchContextMenu::createAndCheckoutBranch()
+void BranchContextMenu::createCheckoutBranch()
 {
-   BranchDlg dlg(mSelectedBranch, BranchDlgMode::CREATE_CHECKOUT);
+   BranchDlg dlg(mConfig.branchSelected, BranchDlgMode::CREATE_CHECKOUT, this);
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
@@ -141,8 +112,8 @@ void BranchContextMenu::merge()
 {
    QString output;
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto currentBranch = Git::getInstance()->getCurrentBranchName();
-   const auto ret = Git::getInstance()->merge(currentBranch, { mSelectedBranch }, &output);
+   const auto currentBranch = mConfig.currentBranch;
+   const auto ret = Git::getInstance()->merge(currentBranch, { mConfig.branchSelected }, &output);
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -154,7 +125,7 @@ void BranchContextMenu::merge()
 
 void BranchContextMenu::rename()
 {
-   BranchDlg dlg(mSelectedBranch, BranchDlgMode::RENAME);
+   BranchDlg dlg(mConfig.branchSelected, BranchDlgMode::RENAME);
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
@@ -163,11 +134,11 @@ void BranchContextMenu::rename()
 
 void BranchContextMenu::deleteBranch()
 {
-   if (mSelectedBranch == "master")
-      QMessageBox::critical(this, "Master delete!", "You are not allowed to delete master.", QMessageBox::Ok);
+   if (mConfig.branchSelected == "master")
+      QMessageBox::critical(this, tr("Delete master?!"), tr("You are not allowed to delete master."), QMessageBox::Ok);
    else
    {
-      auto ret = QMessageBox::warning(this, "Branch delete!", "Are you sure you want to delete the branch?",
+      auto ret = QMessageBox::warning(this, tr("Delete branch!"), tr("Are you sure you want to delete the branch?"),
                                       QMessageBox::Ok, QMessageBox::Cancel);
 
       if (ret == QMessageBox::Ok)
@@ -175,8 +146,8 @@ void BranchContextMenu::deleteBranch()
          QByteArray output;
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-         ret = mLocal ? Git::getInstance()->removeLocalBranch(mSelectedBranch, output)
-                      : Git::getInstance()->removeRemoteBranch(mSelectedBranch, output);
+         ret = mConfig.isLocal ? Git::getInstance()->removeLocalBranch(mConfig.branchSelected, output)
+                               : Git::getInstance()->removeRemoteBranch(mConfig.branchSelected, output);
 
          QApplication::restoreOverrideCursor();
 

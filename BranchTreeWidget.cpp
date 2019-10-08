@@ -21,7 +21,8 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 
    if (item)
    {
-      const auto menu = new BranchContextMenu(item->text(1), mLocal, this);
+      const auto currentBranch = Git::getInstance()->getCurrentBranchName();
+      const auto menu = new BranchContextMenu({ currentBranch, item->text(1), mLocal }, this);
       connect(menu, &BranchContextMenu::signalBranchesUpdated, this, &BranchTreeWidget::signalBranchesUpdated);
       connect(menu, &BranchContextMenu::signalCheckoutBranch, this, [this, item]() { checkoutBranch(item); });
 

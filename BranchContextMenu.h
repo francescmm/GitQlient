@@ -25,6 +25,13 @@
 
 #include <QMenu>
 
+struct BranchContextMenuConfig
+{
+   QString currentBranch;
+   QString branchSelected;
+   bool isLocal;
+};
+
 class BranchContextMenu : public QMenu
 {
    Q_OBJECT
@@ -34,18 +41,17 @@ signals:
    void signalCheckoutBranch();
 
 public:
-   explicit BranchContextMenu(const QString &branchSelected, bool isLocal, QWidget *parent = nullptr);
+   explicit BranchContextMenu(const BranchContextMenuConfig &config, QWidget *parent = nullptr);
 
 private:
-   QString mSelectedBranch;
-   bool mLocal = false;
+   BranchContextMenuConfig mConfig;
 
    void pull();
    void fetch();
    void push();
    void pushForce();
    void createBranch();
-   void createAndCheckoutBranch();
+   void createCheckoutBranch();
    void merge();
    void rename();
    void deleteBranch();
