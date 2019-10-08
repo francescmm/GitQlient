@@ -49,7 +49,8 @@ QPushButton
 {
     border: 0px;
     background-color: #2E2F30;
-    border: 0px;
+    max-height: 20px;
+    min-height: 20px;
 }
 
 QPushButton:hover
@@ -278,4 +279,19 @@ QHeaderView:section
     color: white;
 }
 
+BranchDlg
+{
+    background-color: #404142;
+    color: white;
+}
+
+BranchDlg > QLineEdit
+{
+    border: 1px solid #202122;
+    background-color: #606162;
+    color: white;
+    max-height: 25px;
+    min-height: 25px;
+    padding-left: 10px;
+}
 

@@ -1,13 +1,23 @@
 #include "BranchDlg.h"
 #include "ui_BranchDlg.h"
 
-#include <git.h>
+#include "git.h"
+
+#include <QFile>
 
 BranchDlg::BranchDlg(const QString &currentName, BranchDlgMode mode, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::BranchDlg)
    , mMode(mode)
 {
+   QFile styles(":/stylesheet.css");
+
+   if (styles.open(QIODevice::ReadOnly))
+   {
+      setStyleSheet(QString::fromUtf8(styles.readAll()));
+      styles.close();
+   }
+
    ui->setupUi(this);
    ui->leOldName->setText(currentName);
 
