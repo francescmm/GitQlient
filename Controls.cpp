@@ -75,7 +75,7 @@ Controls::Controls(QWidget *parent)
 
    mTerminalBtn->setIcon(QIcon(":/icons/terminal"));
    mTerminalBtn->setIconSize(QSize(22, 22));
-   mTerminalBtn->setText(tr("Console"));
+   mTerminalBtn->setText(tr("Terminal"));
    mTerminalBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
    const auto vLayout = new QHBoxLayout(this);
