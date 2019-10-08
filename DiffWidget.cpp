@@ -19,10 +19,11 @@
 DiffWidget::DiffWidget(QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::DiffWidget)
+   , mDomain(new PatchViewDomain())
 {
    ui->setupUi(this);
 
-   mDomain = new PatchViewDomain(this);
+   mDomain->setOwner(this);
 }
 
 void DiffWidget::clear(bool complete)
@@ -41,17 +42,12 @@ void DiffWidget::setStateInfo(const StateInfo &st)
 
 bool DiffWidget::doUpdate(bool force)
 {
-   if (mSt.isChanged(StateInfo::SHA) || force)
+   if ((mSt.isChanged(StateInfo::SHA) || force) && !mDomain->isLinked())
    {
+      QString caption(Git::getInstance()->getShortLog(mSt.sha()));
 
-      if (!mDomain->isLinked())
-      {
-         QString caption(Git::getInstance()->getShortLog(mSt.sha()));
-         if (caption.length() > 30)
-            caption = caption.left(30 - 3).trimmed().append("...");
-
-         // setTabCaption(caption);
-      }
+      if (caption.length() > 30)
+         caption = caption.left(30 - 3).trimmed().append("...");
    }
 
    if (mSt.isChanged(StateInfo::ANY & ~StateInfo::FILE_NAME) || force)
@@ -68,4 +64,19 @@ bool DiffWidget::doUpdate(bool force)
       ui->textEditDiff->centerOnFileHeader(mSt);
 
    return true;
+}
+
+PatchViewDomain::PatchViewDomain()
+   : Domain(false)
+{
+}
+
+void PatchViewDomain::setOwner(DiffWidget *owner)
+{
+   mOwner = owner;
+}
+
+bool PatchViewDomain::doUpdate(bool force)
+{
+   return mOwner->doUpdate(force);
 }

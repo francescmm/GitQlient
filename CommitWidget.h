@@ -47,7 +47,6 @@ public:
 
 private:
    bool mIsAmmend = false;
-
    Ui::CommitWidget *ui = nullptr;
 
    void addFileToCommitList(QListWidgetItem *item);

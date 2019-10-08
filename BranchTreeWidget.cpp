@@ -34,11 +34,11 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
    const auto cmd = QString("git checkout -q ").append(item->text(1));
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-   if (Git::getInstance()->run(cmd))
-      emit signalBranchesUpdated();
-
+   const auto ret = Git::getInstance()->run(cmd);
    QApplication::restoreOverrideCursor();
+
+   if (ret)
+      emit signalBranchesUpdated();
 }
 
 void BranchTreeWidget::selectCommit(QTreeWidgetItem *item)

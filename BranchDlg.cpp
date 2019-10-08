@@ -54,30 +54,18 @@ void BranchDlg::accept()
    {
       QByteArray output;
 
+      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
       if (mMode == BranchDlgMode::CREATE)
-      {
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          Git::getInstance()->createBranchFromAnotherBranch(ui->leOldName->text(), ui->leNewName->text(), output);
-         QApplication::restoreOverrideCursor();
-      }
       else if (mMode == BranchDlgMode::CREATE_CHECKOUT)
-      {
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          Git::getInstance()->checkoutNewLocalBranch(ui->leNewName->text(), output);
-         QApplication::restoreOverrideCursor();
-      }
       else if (mMode == BranchDlgMode::RENAME)
-      {
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          Git::getInstance()->renameBranch(ui->leOldName->text(), ui->leNewName->text(), output);
-         QApplication::restoreOverrideCursor();
-      }
       else if (mMode == BranchDlgMode::CREATE_FROM_COMMIT)
-      {
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          Git::getInstance()->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text(), output);
-         QApplication::restoreOverrideCursor();
-      }
+
+      QApplication::restoreOverrideCursor();
 
       QDialog::accept();
    }

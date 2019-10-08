@@ -12,7 +12,6 @@ BranchContextMenu::BranchContextMenu(const QString &branchSelected, bool isLocal
    , mLocal(isLocal)
 {
    const auto currentBranch = Git::getInstance()->getCurrentBranchName();
-   auto insertSeparator = false;
 
    if (mLocal)
    {
@@ -35,13 +34,9 @@ BranchContextMenu::BranchContextMenu(const QString &branchSelected, bool isLocal
       const auto pushForceAction = new QAction("Push force");
       connect(pushForceAction, &QAction::triggered, this, &BranchContextMenu::pushForce);
       addAction(pushForceAction);
-      addSeparator();
-
-      insertSeparator = true;
    }
 
-   if (!insertSeparator)
-      addSeparator();
+   addSeparator();
 
    const auto createBranchAction = new QAction("Create branch");
    connect(createBranchAction, &QAction::triggered, this, &BranchContextMenu::createBranch);
@@ -90,28 +85,38 @@ void BranchContextMenu::pull()
 void BranchContextMenu::fetch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   Git::getInstance()->fetch();
+   const auto ret = Git::getInstance()->fetch();
    QApplication::restoreOverrideCursor();
 
-   emit signalBranchesUpdated();
+   if (ret)
+      emit signalBranchesUpdated();
+   else
+      QMessageBox::critical(this, tr("Fetch failed"), tr("There were some problems while fetching. Please try again."));
 }
 
 void BranchContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   Git::getInstance()->push();
+   const auto ret = Git::getInstance()->push();
    QApplication::restoreOverrideCursor();
 
-   emit signalBranchesUpdated();
+   if (ret)
+      emit signalBranchesUpdated();
+   else
+      QMessageBox::critical(this, tr("Push failed"), tr("There were some problems while pushing. Please try again."));
 }
 
 void BranchContextMenu::pushForce()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   Git::getInstance()->push(true);
+   const auto ret = Git::getInstance()->push(true);
    QApplication::restoreOverrideCursor();
 
-   emit signalBranchesUpdated();
+   if (ret)
+      emit signalBranchesUpdated();
+   else
+      QMessageBox::critical(this, tr("Push force failed"),
+                            tr("There were some problems while pusing forced. Please try again."));
 }
 
 void BranchContextMenu::createBranch()
@@ -142,6 +147,9 @@ void BranchContextMenu::merge()
 
    if (ret)
       emit signalBranchesUpdated();
+   else
+      QMessageBox::critical(this, tr("Merge failed"),
+                            tr("There were some problems during the merge. Please try again."));
 }
 
 void BranchContextMenu::rename()
@@ -174,6 +182,9 @@ void BranchContextMenu::deleteBranch()
 
          if (ret)
             emit signalBranchesUpdated();
+         else
+            QMessageBox::critical(this, tr("Delete a branch failed"),
+                                  tr("There were some problems while deleting the branch. Please try again."));
       }
    }
 }

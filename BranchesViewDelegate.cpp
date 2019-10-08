@@ -26,9 +26,7 @@ void BranchesViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &o, con
       p->fillRect(newOpt.rect, c);
    }
    else
-   {
       p->fillRect(newOpt.rect, QColor("#2E2F30"));
-   }
 
    QFontMetrics fm(newOpt.font);
    const auto textBoundingRect = fm.boundingRect(i.data().toString());

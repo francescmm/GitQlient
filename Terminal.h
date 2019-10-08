@@ -39,9 +39,9 @@ public:
    Terminal();
 
 private:
-   void executeCommand();
-   int exec() override;
-
    QLineEdit *leGitCommand = nullptr;
    QTextBrowser *outputTerminal = nullptr;
+
+   void executeCommand();
+   int exec() override;
 };
