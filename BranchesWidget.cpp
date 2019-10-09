@@ -39,17 +39,14 @@ BranchesWidget::BranchesWidget(QWidget *parent)
    localHeader->setText(2, tr("To master"));
    localHeader->setText(3, tr("To origin"));
 
-   mRemoteBranchesTree->setColumnCount(4);
+   mRemoteBranchesTree->setColumnCount(2);
    mRemoteBranchesTree->setMouseTracking(true);
    mRemoteBranchesTree->setItemDelegate(new BranchesViewDelegate());
    mRemoteBranchesTree->setColumnHidden(0, true);
-   mRemoteBranchesTree->setColumnHidden(3, true);
 
    const auto remoteHeader = mRemoteBranchesTree->headerItem();
    remoteHeader->setText(1, QString("   %1").arg(tr("Remote")));
    remoteHeader->setIcon(1, QIcon(":/icons/server"));
-   remoteHeader->setText(2, tr("To master"));
-   remoteHeader->setText(3, tr("To origin"));
 
    /* TAGS */
 
@@ -264,18 +261,6 @@ void BranchesWidget::processRemoteBranch(QString branch)
    auto item = new QTreeWidgetItem(mRemoteBranchesTree);
    item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
 
-   if (!branch.contains("master"))
-   {
-      QByteArray distance;
-      Git::getInstance()->getDistanceBetweenBranches(true, branch, distance);
-
-      QString distStr = QString::fromUtf8(distance);
-      distStr.replace('\n', "");
-      distStr.replace('\t', "\u2193 - ");
-      distStr.append("\u2191");
-      item->setText(2, distStr);
-   }
-
    branch.replace("origin/", "");
 
    item->setText(1, branch);
@@ -321,11 +306,14 @@ void BranchesWidget::processSubmodules()
 
 void BranchesWidget::adjustBranchesTree(BranchTreeWidget *treeWidget)
 {
-   treeWidget->resizeColumnToContents(2);
-   treeWidget->resizeColumnToContents(3);
+   for (auto i = 2; i < treeWidget->columnCount(); ++i)
+      treeWidget->resizeColumnToContents(i);
+
    treeWidget->header()->setSectionResizeMode(1, QHeaderView::Stretch);
-   treeWidget->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-   treeWidget->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+
+   for (auto i = 2; i < treeWidget->columnCount(); ++i)
+      treeWidget->header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
+
    treeWidget->header()->setStretchLastSection(false);
 }
 
