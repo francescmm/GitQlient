@@ -739,7 +739,7 @@ const QStringList Git::getOtherFiles(const QStringList &selFiles)
    QStringList notSelFiles;
    for (auto i = 0; i < files->count(); ++i)
    {
-      const QString &fp = filePath(*files, static_cast<unsigned int>(i));
+      const QString &fp = filePath(*files, i);
       if (selFiles.indexOf(fp) == -1 && files->statusCmp(i, RevFile::IN_INDEX))
          notSelFiles.append(fp);
    }
@@ -880,6 +880,11 @@ bool Git::createBranchFromAnotherBranch(const QString &oldName, const QString &n
 bool Git::createBranchAtCommit(const QString &commitSha, const QString &branchName, QByteArray &output)
 {
    return run(&output, QString("git branch %1 %2").arg(branchName, commitSha), nullptr, "");
+}
+
+bool Git::checkoutRemoteBranch(const QString &branchName, QByteArray &output)
+{
+   return run(&output, QString("git checkout -q %1").arg(branchName), nullptr, "");
 }
 
 bool Git::checkoutNewLocalBranch(const QString &branchName, QByteArray &output)
@@ -1291,7 +1296,7 @@ const RevFile *Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
    flushFileNames(fl);
 
    for (auto i = 0; i < rf->count(); i++)
-      if (findFileIndex(cachedFiles, filePath(*rf, static_cast<unsigned int>(i))) != -1)
+      if (findFileIndex(cachedFiles, filePath(*rf, i)) != -1)
          rf->status[i] |= RevFile::IN_INDEX;
    return rf;
 }
@@ -1592,15 +1597,8 @@ void Git::on_newDataReady(const RepositoryModel *fh)
    emit newRevsAdded(fh, fh->revOrder);
 }
 
-void Git::on_loaded(RepositoryModel *fh, ulong byteSize, int loadTime, bool normalExit, const QString &cmd,
-                    const QString &errorDesc)
+void Git::on_loaded(RepositoryModel *fh, ulong byteSize, int loadTime, bool normalExit)
 {
-
-   if (!errorDesc.isEmpty())
-   {
-      MainExecErrorEvent *e = new MainExecErrorEvent(cmd, errorDesc);
-      QApplication::postEvent(parent(), e);
-   }
    if (normalExit)
    { // do not send anything if killed
 
@@ -1658,14 +1656,14 @@ bool Git::saveOnCache(const QString &gitDir, const RevFileMap &rf, const QVector
    QDataStream stream(&data, QIODevice::WriteOnly);
 
    // Write a header with a "magic number" and a version
-   stream << (quint32)C_MAGIC;
-   stream << (qint32)C_VERSION;
+   stream << static_cast<quint32>(C_MAGIC);
+   stream << static_cast<qint32>(C_VERSION);
 
-   stream << (qint32)dirs.count();
+   stream << static_cast<qint32>(dirs.count());
    for (int i = 0; i < dirs.count(); ++i)
       stream << dirs.at(i);
 
-   stream << (qint32)files.count();
+   stream << static_cast<qint32>(files.count());
    for (int i = 0; i < files.count(); ++i)
       stream << files.at(i);
 
@@ -1702,7 +1700,7 @@ bool Git::saveOnCache(const QString &gitDir, const RevFileMap &rf, const QVector
       }
    }
    buf.resize(newSize);
-   stream << (qint32)newSize;
+   stream << static_cast<qint32>(newSize);
    stream << buf;
 
    for (int i = 0; i < v.size(); ++i)
@@ -1956,7 +1954,7 @@ int Git::addChunk(RepositoryModel *fh, const QByteArray &ba, int start)
    do
    {
       // only here we create a new rev
-      rev = new Rev(ba, start, fh->revOrder.count(), &nextStart, !isMainHistory(fh));
+      rev = new Rev(ba, static_cast<uint>(start), fh->revOrder.count(), &nextStart, !isMainHistory(fh));
 
       if (nextStart == -2)
       {
@@ -2059,10 +2057,10 @@ void Git::setLane(const QString &sha, RepositoryModel *fh)
    const QString &ss = toPersistentSha(sha, ba);
    const QVector<QString> &shaVec(fh->revOrder);
 
-   for (uint cnt = shaVec.count(); i < cnt; ++i)
+   for (uint cnt = static_cast<uint>(shaVec.count()); i < cnt; ++i)
    {
 
-      const QString &curSha = shaVec[i];
+      const QString &curSha = shaVec[static_cast<int>(i)];
       Rev *r = const_cast<Rev *>(revLookup(curSha, fh));
       if (r->lanes.count() == 0)
          updateLanes(*r, *l, curSha);

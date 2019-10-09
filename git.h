@@ -57,6 +57,7 @@ public:
    bool createBranchFromCurrent(const QString &newName, QByteArray &output);
    bool createBranchFromAnotherBranch(const QString &oldName, const QString &newName, QByteArray &output);
    bool createBranchAtCommit(const QString &commitSha, const QString &branchName, QByteArray &output);
+   bool checkoutRemoteBranch(const QString &branchName, QByteArray &output);
    bool checkoutNewLocalBranch(const QString &branchName, QByteArray &output);
    bool renameBranch(const QString &oldName, const QString &newName, QByteArray &output);
    bool removeLocalBranch(const QString &branchName, QByteArray &output);
@@ -171,7 +172,7 @@ private:
    void loadFileNames();
    void loadFileCache();
    void on_newDataReady(const RepositoryModel *);
-   void on_loaded(RepositoryModel *, ulong, int, bool, const QString &, const QString &);
+   void on_loaded(RepositoryModel *, ulong, int, bool);
    bool saveOnCache(const QString &gitDir, const RevFileMap &rf, const QVector<QString> &dirs,
                     const QVector<QString> &files);
    bool loadFromCache(const QString &gitDir, RevFileMap &rfm, QVector<QString> &dirs, QVector<QString> &files,

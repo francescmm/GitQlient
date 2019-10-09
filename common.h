@@ -5,17 +5,17 @@
 
 */
 #ifndef COMMON_H
-#   define COMMON_H
+#define COMMON_H
 
-#   include <QColor>
-#   include <QEvent>
-#   include <QFont>
-#   include <QHash>
-#   include <QLatin1String>
-#   include <QSet>
-#   include <QVariant>
-#   include <QVector>
-#   include <QTextBrowser>
+#include <QColor>
+#include <QEvent>
+#include <QFont>
+#include <QHash>
+#include <QLatin1String>
+#include <QSet>
+#include <QVariant>
+#include <QVector>
+#include <QTextBrowser>
 
 class QDataStream;
 class QProcess;
@@ -305,57 +305,4 @@ public:
 };
 typedef QHash<QString, const RevFile *> RevFileMap;
 
-class BaseEvent : public QEvent
-{
-public:
-   BaseEvent(const QString &d, int id)
-      : QEvent((QEvent::Type)id)
-      , payLoad(d)
-   {
-   }
-   const QString myData() const { return payLoad; }
-
-private:
-   const QString payLoad; // passed by copy
-};
-
-#   define DEF_EVENT(X, T)                                                                                             \
-      class X : public BaseEvent                                                                                       \
-      {                                                                                                                \
-      public:                                                                                                          \
-         explicit X(const QString &d)                                                                                  \
-            : BaseEvent(d, T)                                                                                          \
-         {                                                                                                             \
-         }                                                                                                             \
-      }
-
-DEF_EVENT(AnnotateProgressEvent, QGit::ANN_PRG_EV);
-
-class DeferredPopupEvent : public BaseEvent
-{
-public:
-   DeferredPopupEvent(const QString &msg, int type)
-      : BaseEvent(msg, type)
-   {
-   }
-};
-
-class MainExecErrorEvent : public BaseEvent
-{
-public:
-   MainExecErrorEvent(const QString &c, const QString &e)
-      : BaseEvent("", QGit::ERROR_EV)
-      , cmd(c)
-      , err(e)
-   {
-   }
-   const QString command() const { return cmd; }
-   const QString report() const { return err; }
-
-private:
-   const QString cmd, err;
-};
-
 #endif
-
-QString qt4and5escaping(QString toescape);
