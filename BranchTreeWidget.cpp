@@ -32,10 +32,9 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 
 void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 {
-   const auto cmd = QString("git checkout -q ").append(item->text(1));
-
+   QByteArray output;
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->run(cmd);
+   const auto ret = Git::getInstance()->checkoutRemoteBranch(item->text(1), output);
    QApplication::restoreOverrideCursor();
 
    if (ret)
