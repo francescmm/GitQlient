@@ -55,9 +55,6 @@ void RepositoryView::setup(Domain *dm)
    st = &(d->st);
    filterNextContextMenuRequest = false;
 
-   // create ListViewProxy unplugged, will be plug
-   // to the model only when filtering is needed
-   lp = new ListViewProxy(this, d);
    setModel(fh);
 
    setupGeometry(); // after setting delegate
@@ -70,23 +67,12 @@ RepositoryView::~RepositoryView()
 
 const QString RepositoryView::sha(int row) const
 {
-
-   if (!lp->sourceModel()) // unplugged
-      return fh->sha(row);
-
-   QModelIndex idx = lp->mapToSource(lp->index(row, 0));
-   return fh->sha(idx.row());
+   return fh->sha(row);
 }
 
 int RepositoryView::row(const QString &sha) const
 {
-
-   if (!lp->sourceModel()) // unplugged
-      return fh->row(sha);
-
-   int row = fh->row(sha);
-   QModelIndex idx = fh->index(row, 0);
-   return lp->mapFromSource(idx).row();
+   return fh->row(sha);
 }
 
 void RepositoryView::setupGeometry()
@@ -159,17 +145,6 @@ const QString RepositoryView::shaFromAnnId(int id)
       return "";
 
    return sha(model()->rowCount() - id);
-}
-
-int RepositoryView::filterRows(bool isOn, bool highlight, const QString &filter, int colNum, QSet<QString> *set)
-{
-
-   setUpdatesEnabled(false);
-   int matchedNum = lp->setFilter(isOn, highlight, filter, colNum, set);
-   viewport()->update();
-   setUpdatesEnabled(true);
-   d->update(false, false);
-   return matchedNum;
 }
 
 bool RepositoryView::update()
@@ -316,38 +291,4 @@ bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringLi
    // then find children
    c = Git::getInstance()->getChildren(root);
    return true;
-}
-
-// *****************************************************************************
-
-ListViewProxy::ListViewProxy(QObject *p, Domain *dm)
-   : QSortFilterProxyModel(p)
-{
-   d = dm;
-   setDynamicSortFilter(false);
-}
-
-int ListViewProxy::setFilter(bool isOn, bool, const QString &fl, int cn, QSet<QString> *s)
-{
-   filter = QRegExp(fl, Qt::CaseInsensitive, QRegExp::Wildcard);
-   colNum = cn;
-   if (s)
-      shaSet = *s;
-
-   RepositoryView *lv = static_cast<RepositoryView *>(parent());
-   RepositoryModel *fh = d->model();
-   const QString &cur = lv->sha(lv->currentIndex().row());
-
-   if (!isOn && sourceModel())
-   {
-      lv->setModel(fh);
-      setSourceModel(nullptr);
-   }
-   else if (isOn)
-   {
-      setSourceModel(fh); // trigger a rows scanning
-      lv->setModel(this);
-   }
-   lv->setCurrentIndex(lv->model()->index(lv->row(cur), 0));
-   return (sourceModel() ? rowCount() : 0);
 }

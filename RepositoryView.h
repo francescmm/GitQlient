@@ -8,14 +8,12 @@ Copyright: See COPYING file that comes with this distribution
 
 #include <QItemDelegate>
 #include <QRegExp>
-#include <QSortFilterProxyModel>
 #include <QTreeView>
 
 class Git;
 class StateInfo;
 class Domain;
 class RepositoryModel;
-class ListViewProxy;
 class Rev;
 
 class RepositoryView : public QTreeView
@@ -38,7 +36,6 @@ public:
    void getSelectedItems(QStringList &selectedItems);
    bool update();
    void addNewRevs(const QVector<QString> &shaVec);
-   int filterRows(bool, bool, const QString & = QString(), int = -1, QSet<QString> * = nullptr);
    const QString sha(int row) const;
    int row(const QString &sha) const;
    void markDiffToSha(const QString &sha);
@@ -63,21 +60,6 @@ private:
    Domain *d = nullptr;
    StateInfo *st = nullptr;
    RepositoryModel *fh = nullptr;
-   ListViewProxy *lp = nullptr;
    unsigned long secs;
    bool filterNextContextMenuRequest;
-};
-
-class ListViewProxy : public QSortFilterProxyModel
-{
-   Q_OBJECT
-public:
-   ListViewProxy(QObject *parent, Domain *d);
-   int setFilter(bool isOn, bool highlight, const QString &filter, int colNum, QSet<QString> *s);
-
-private:
-   Domain *d = nullptr;
-   QRegExp filter;
-   int colNum = 0;
-   QSet<QString> shaSet;
 };
