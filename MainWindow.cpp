@@ -261,8 +261,8 @@ void MainWindow::rebase(const QString &from, const QString &to, const QString &o
 
    const auto git = Git::getInstance();
    const auto success = from.isEmpty()
-       ? git->run(QString("git checkout -q %1").arg(to)) && git->run(QString("git rebase %1").arg(onto))
-       : git->run(QString("git rebase --onto %3 %1^ %2").arg(from, to, onto));
+       ? git->run(QString("git checkout -q %1").arg(to)).first && git->run(QString("git rebase %1").arg(onto)).first
+       : git->run(QString("git rebase --onto %3 %1^ %2").arg(from, to, onto)).first;
 
    if (success)
       updateUi();
@@ -325,7 +325,7 @@ void MainWindow::moveRef(const QString &target, const QString &toSHA)
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-   if (Git::getInstance()->run(cmd))
+   if (Git::getInstance()->run(cmd).first)
       updateUi();
 
    QApplication::restoreOverrideCursor();

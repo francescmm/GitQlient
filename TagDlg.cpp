@@ -43,7 +43,7 @@ void TagDlg::accept()
          if (ret)
             QDialog::accept();
          else
-            Git::getInstance()->removeTag(tagName, false, output);
+            Git::getInstance()->removeTag(tagName, false);
       }
    }
 }

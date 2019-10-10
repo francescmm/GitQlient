@@ -41,7 +41,7 @@ bool MyProcess::runAsync(const QString &rc, QObject *rcv, const QString &buf)
    return true;
 }
 
-bool MyProcess::runSync(const QString &rc, QByteArray *ro, QObject *rcv, const QString &buf)
+bool MyProcess::runSync(const QString &rc, QString *ro, QObject *rcv, const QString &buf)
 {
 
    async = false;

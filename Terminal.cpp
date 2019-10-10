@@ -60,10 +60,9 @@ void Terminal::executeCommand()
       else
       {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QString output;
-         Git::getInstance()->run(leGitCommand->text(), &output);
+         const auto ret = Git::getInstance()->run(leGitCommand->text());
          QApplication::restoreOverrideCursor();
-         outputTerminal->setText(output);
+         outputTerminal->setText(ret.second);
       }
    }
 

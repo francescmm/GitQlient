@@ -270,8 +270,7 @@ void BranchesWidget::processRemoteBranch(QString branch)
 
 void BranchesWidget::processTags()
 {
-   QByteArray output;
-   const auto tags = Git::getInstance()->getTags(output);
+   const auto tags = Git::getInstance()->getTags();
 
    for (auto tag : tags)
       mTagsList->addItem(tag);
@@ -281,8 +280,7 @@ void BranchesWidget::processTags()
 
 void BranchesWidget::processStashes()
 {
-   QByteArray output;
-   const auto stashes = Git::getInstance()->getStashes(output);
+   const auto stashes = Git::getInstance()->getStashes();
 
    for (auto stash : stashes)
    {
@@ -329,8 +327,7 @@ void BranchesWidget::showTagsContextMenu(const QPoint &p)
    const auto removeTagAction = menu->addAction(tr("Remove tag"));
    connect(removeTagAction, &QAction::triggered, this, [this, tagName]() {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      QByteArray output;
-      const auto ret = Git::getInstance()->removeTag(tagName, true, output);
+      const auto ret = Git::getInstance()->removeTag(tagName, true);
       QApplication::restoreOverrideCursor();
 
       if (ret)

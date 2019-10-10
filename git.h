@@ -72,9 +72,9 @@ public:
    /** END BRANCHES **/
 
    /** START TAGS **/
-   QVector<QString> getTags(QByteArray &output);
+   QVector<QString> getTags();
    bool addTag(const QString &tagName, const QString &tagMessage, const QString &sha, QByteArray &output);
-   bool removeTag(const QString &tagName, bool remote, QByteArray &output);
+   bool removeTag(const QString &tagName, bool remote);
    bool pushTag(const QString &tagName, QByteArray &output);
    bool getTagCommit(const QString &tagName, QByteArray &output);
    const QString getTagMsg(const QString &sha);
@@ -82,7 +82,7 @@ public:
    /**  END  TAGS **/
 
    /** START STASHES **/
-   QVector<QString> getStashes(QByteArray &output);
+   QVector<QString> getStashes();
    bool getStashCommit(const QString &stash, QByteArray &output);
    /**  END  STASHES **/
 
@@ -165,8 +165,7 @@ public:
    const QString filePath(const RevFile &rf, int i) const { return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)]; }
    void setCurContext(Domain *d) { mCurrentDomain = d; }
    Domain *curContext() const { return mCurrentDomain; }
-   bool run(const QString &cmd, QString *out = nullptr, QObject *rcv = nullptr, const QString &buf = "");
-   bool run(QByteArray *runOutput, const QString &cmd, QObject *rcv = nullptr, const QString &buf = "");
+   QPair<bool, QString> run(const QString &cmd, QObject *rcv = nullptr, const QString &buf = "");
 
 private:
    void loadFileNames();

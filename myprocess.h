@@ -18,7 +18,7 @@ class MyProcess : public QProcess
    Q_OBJECT
 public:
    MyProcess(QObject *go, const QString &wd, bool reportErrors);
-   bool runSync(const QString &runCmd, QByteArray *runOutput, QObject *rcv, const QString &buf);
+   bool runSync(const QString &runCmd, QString *runOutput, QObject *rcv, const QString &buf);
    bool runAsync(const QString &rc, QObject *rcv, const QString &buf);
    static const QStringList splitArgList(const QString &cmd);
    const QString &getErrorOutput() const { return accError; }
@@ -43,7 +43,7 @@ private:
 
    QObject *guiObject;
    QString runCmd;
-   QByteArray *runOutput;
+   QString *runOutput;
    QString workDir;
    QObject *receiver;
    QStringList arguments;
