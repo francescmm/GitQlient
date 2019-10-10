@@ -10,7 +10,10 @@
 #include "RepositoryModel.h"
 #include "dataloader.h"
 #include "lanes.h"
+#include "GitSyncProcess.h"
+#include "GitAsyncProcess.h"
 #include "myprocess.h"
+#include "domain.h"
 
 #include <QApplication>
 #include <QDir>
@@ -275,22 +278,25 @@ const Rev *Git::revLookup(const QString &sha, const RepositoryModel *fh) const
 QPair<bool, QString> Git::run(const QString &runCmd)
 {
    QString runOutput;
-   MyProcess p(mWorkingDir, mErrorReportingEnabled);
+   GitSyncProcess p(mWorkingDir, mErrorReportingEnabled);
 
-   const auto ret = p.runSync(runCmd, runOutput);
+   if (const auto d = Git::getInstance()->curContext())
+      connect(d, &Domain::cancelDomainProcesses, &p, &IGitProcess::onCancel);
+
+   const auto ret = p.run(runCmd, runOutput);
 
    return qMakePair(ret, runOutput);
 }
 
-MyProcess *Git::runAsync(const QString &runCmd, QObject *receiver, const QString &buf)
+GitAsyncProcess *Git::runAsync(const QString &runCmd, QObject *receiver, const QString &buf)
 {
-
-   MyProcess *p = new MyProcess(mWorkingDir, mErrorReportingEnabled);
-   if (!p->runAsync(runCmd, receiver, buf))
+   auto p = new GitAsyncProcess(mWorkingDir, mErrorReportingEnabled, receiver);
+   if (!p->run(runCmd, const_cast<QString &>(buf)))
    {
       delete p;
       p = nullptr;
    }
+
    return p; // auto-deleted when done
 }
 
@@ -378,7 +384,7 @@ const QString Git::getShortLog(const QString &sha)
    return (r ? r->shortLog() : "");
 }
 
-MyProcess *Git::getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined)
+GitAsyncProcess *Git::getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined)
 {
 
    if (sha.isEmpty())

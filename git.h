@@ -21,7 +21,7 @@ class Annotate;
 class Domain;
 class RepositoryModel;
 class Lanes;
-class MyProcess;
+class GitAsyncProcess;
 
 class Git : public QObject
 {
@@ -144,7 +144,7 @@ public:
    bool isMainHistory(const RepositoryModel *fh) { return (fh == mRevData); }
 
    // TODO: Is not right to return a MyProcess when it's supposed to be async
-   MyProcess *getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined);
+   GitAsyncProcess *getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined);
    QString getDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 
    const RevFile *getFiles(const QString &sha, const QString &sha2 = "", bool all = false, const QString &path = "");
@@ -230,7 +230,7 @@ private:
    bool updateIndex(const QStringList &selFiles);
    const QString getWorkDirDiff(const QString &fileName = "");
    int findFileIndex(const RevFile &rf, const QString &name);
-   MyProcess *runAsync(const QString &cmd, QObject *rcv, const QString &buf = "");
+   GitAsyncProcess *runAsync(const QString &cmd, QObject *rcv, const QString &buf = "");
    bool getRefs();
    void clearRevs();
    void clearFileNames();

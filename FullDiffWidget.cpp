@@ -8,7 +8,7 @@
 #include "common.h"
 #include "domain.h"
 #include "git.h"
-#include "myprocess.h"
+#include "GitAsyncProcess.h"
 #include <QScrollBar>
 #include <QTextCharFormat>
 
@@ -103,7 +103,7 @@ FullDiffWidget::FullDiffWidget(QWidget *parent)
 void FullDiffWidget::clear()
 {
    if (!proc.isNull())
-      proc->on_cancel();
+      proc->onCancel();
 
    QTextEdit::clear();
    patchRowData.clear();

@@ -29,7 +29,7 @@
 
 class Domain;
 class Git;
-class MyProcess;
+class GitAsyncProcess;
 class StateInfo;
 
 class DiffHighlighter : public QSyntaxHighlighter
@@ -84,7 +84,7 @@ private:
    void processData(const QByteArray &data, int *prevLineNum = nullptr);
 
    DiffHighlighter *diffHighlighter = nullptr;
-   QPointer<MyProcess> proc;
+   QPointer<GitAsyncProcess> proc;
    bool diffLoaded = false;
    bool seekTarget = false;
    QByteArray patchRowData;
