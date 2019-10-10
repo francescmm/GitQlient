@@ -16,34 +16,25 @@
 #include <git.h>
 #include <MainWindow.h>
 
-MyProcess::MyProcess(QObject *go, const QString &wd, bool err)
+MyProcess::MyProcess(const QString &wd, bool err)
    : QProcess(Git::getInstance())
 {
-
-   guiObject = go;
    workDir = wd;
-   runOutput = nullptr;
-   receiver = nullptr;
    errorReportingEnabled = err;
-   canceling = async = isErrorExit = false;
 }
 
 bool MyProcess::runAsync(const QString &rc, QObject *rcv, const QString &buf)
 {
-
    async = true;
    runCmd = rc;
    receiver = rcv;
    setupSignals();
-   if (!launchMe(runCmd, buf))
-      return false; // caller will delete us
 
-   return true;
+   return launchMe(runCmd, buf);
 }
 
 bool MyProcess::runSync(const QString &rc, QString &ro)
 {
-
    async = false;
    runCmd = rc;
    runOutput = &ro;
@@ -100,8 +91,7 @@ void MyProcess::sendErrorMsg(bool notStarted)
       errorDesc = QString::fromLatin1("Unable to start the process!");
 
    const QString cmd(arguments.join(" ")); // hide any "$" or related stuff
-   // MainExecErrorEvent *e = new MainExecErrorEvent(cmd, errorDesc);
-   // QApplication::postEvent(guiObject, e);
+
    QString text("An error occurred while executing command:\n\n");
    text.append(cmd + "\n\nGit says: \n\n" + errorDesc);
 

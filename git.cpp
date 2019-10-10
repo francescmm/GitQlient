@@ -275,7 +275,7 @@ const Rev *Git::revLookup(const QString &sha, const RepositoryModel *fh) const
 QPair<bool, QString> Git::run(const QString &runCmd)
 {
    QString runOutput;
-   MyProcess p(parent(), mWorkingDir, mErrorReportingEnabled);
+   MyProcess p(mWorkingDir, mErrorReportingEnabled);
 
    const auto ret = p.runSync(runCmd, runOutput);
 
@@ -285,7 +285,7 @@ QPair<bool, QString> Git::run(const QString &runCmd)
 MyProcess *Git::runAsync(const QString &runCmd, QObject *receiver, const QString &buf)
 {
 
-   MyProcess *p = new MyProcess(parent(), mWorkingDir, mErrorReportingEnabled);
+   MyProcess *p = new MyProcess(mWorkingDir, mErrorReportingEnabled);
    if (!p->runAsync(runCmd, receiver, buf))
    {
       delete p;

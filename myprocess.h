@@ -17,7 +17,7 @@ class MyProcess : public QProcess
 {
    Q_OBJECT
 public:
-   MyProcess(QObject *go, const QString &wd, bool reportErrors);
+   MyProcess(const QString &wd, bool reportErrors);
    bool runSync(const QString &runCmd, QString &runOutput);
    bool runAsync(const QString &rc, QObject *rcv, const QString &buf);
    static const QStringList splitArgList(const QString &cmd);
@@ -41,15 +41,14 @@ private:
    void sendErrorMsg(bool notStarted = false);
    static void restoreSpaces(QString &newCmd, const QChar &sepChar);
 
-   QObject *guiObject;
    QString runCmd;
-   QString *runOutput;
+   QString *runOutput = nullptr;
    QString workDir;
    QObject *receiver = nullptr;
    QStringList arguments;
    QString accError;
-   bool errorReportingEnabled;
-   bool canceling;
-   bool async;
-   bool isErrorExit;
+   bool errorReportingEnabled = false;
+   bool canceling = false;
+   bool async = false;
+   bool isErrorExit = false;
 };
