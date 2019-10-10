@@ -165,7 +165,7 @@ public:
    const QString filePath(const RevFile &rf, int i) const { return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)]; }
    void setCurContext(Domain *d) { mCurrentDomain = d; }
    Domain *curContext() const { return mCurrentDomain; }
-   QPair<bool, QString> run(const QString &cmd, QObject *rcv = nullptr, const QString &buf = "");
+   QPair<bool, QString> run(const QString &cmd);
 
 private:
    void loadFileNames();

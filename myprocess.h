@@ -18,7 +18,7 @@ class MyProcess : public QProcess
    Q_OBJECT
 public:
    MyProcess(QObject *go, const QString &wd, bool reportErrors);
-   bool runSync(const QString &runCmd, QString *runOutput, QObject *rcv, const QString &buf);
+   bool runSync(const QString &runCmd, QString &runOutput);
    bool runAsync(const QString &rc, QObject *rcv, const QString &buf);
    static const QStringList splitArgList(const QString &cmd);
    const QString &getErrorOutput() const { return accError; }
@@ -37,7 +37,7 @@ private slots:
 
 private:
    void setupSignals();
-   bool launchMe(const QString &runCmd, const QString &buf);
+   bool launchMe(const QString &runCmd, const QString &buf = "");
    void sendErrorMsg(bool notStarted = false);
    static void restoreSpaces(QString &newCmd, const QChar &sepChar);
 
@@ -45,12 +45,11 @@ private:
    QString runCmd;
    QString *runOutput;
    QString workDir;
-   QObject *receiver;
+   QObject *receiver = nullptr;
    QStringList arguments;
    QString accError;
    bool errorReportingEnabled;
    bool canceling;
-   bool busy;
    bool async;
    bool isErrorExit;
 };

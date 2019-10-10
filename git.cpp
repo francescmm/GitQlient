@@ -272,14 +272,14 @@ const Rev *Git::revLookup(const QString &sha, const RepositoryModel *fh) const
    return !sha.isEmpty() ? r.value(sha) : nullptr;
 }
 
-QPair<bool, QString> Git::run(const QString &runCmd, QObject *receiver, const QString &buf)
+QPair<bool, QString> Git::run(const QString &runCmd)
 {
-   const auto runOutput = new QString();
-
+   QString runOutput;
    MyProcess p(parent(), mWorkingDir, mErrorReportingEnabled);
-   const auto ret = p.runSync(runCmd, runOutput, receiver, buf);
 
-   return qMakePair(ret, *runOutput);
+   const auto ret = p.runSync(runCmd, runOutput);
+
+   return qMakePair(ret, runOutput);
 }
 
 MyProcess *Git::runAsync(const QString &runCmd, QObject *receiver, const QString &buf)

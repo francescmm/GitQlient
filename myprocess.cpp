@@ -41,44 +41,41 @@ bool MyProcess::runAsync(const QString &rc, QObject *rcv, const QString &buf)
    return true;
 }
 
-bool MyProcess::runSync(const QString &rc, QString *ro, QObject *rcv, const QString &buf)
+bool MyProcess::runSync(const QString &rc, QString &ro)
 {
 
    async = false;
    runCmd = rc;
-   runOutput = ro;
-   receiver = rcv;
+   runOutput = &ro;
+
    if (runOutput)
       runOutput->clear();
 
    setupSignals();
-   if (!launchMe(runCmd, buf))
+
+   if (!launchMe(runCmd))
       return false;
 
    QTime t;
    t.start();
 
-   busy = true; // we have to wait here until we exit
+   waitForFinished(10000); // suspend 20ms to let OS reschedule
 
-   while (busy)
-   {
-      waitForFinished(20); // suspend 20ms to let OS reschedule
-
-      if (t.elapsed() > 200)
-         t.restart();
-   }
    return !isErrorExit;
 }
 
 void MyProcess::setupSignals()
 {
    connect(Git::getInstance(), &Git::cancelAllProcesses, this, &MyProcess::on_cancel);
-   connect(this, &MyProcess::readyReadStandardOutput, this, &MyProcess::on_readyReadStandardOutput);
-   connect(this, qOverload<int, QProcess::ExitStatus>(&MyProcess::finished), this, &MyProcess::on_finished);
+   connect(this, &MyProcess::readyReadStandardOutput, this, &MyProcess::on_readyReadStandardOutput,
+           Qt::DirectConnection);
+   connect(this, qOverload<int, QProcess::ExitStatus>(&MyProcess::finished), this, &MyProcess::on_finished,
+           Qt::DirectConnection);
 
    if (receiver && receiver != Git::getInstance())
    {
-      connect(this, &MyProcess::readyReadStandardError, this, &MyProcess::on_readyReadStandardError);
+      connect(this, &MyProcess::readyReadStandardError, this, &MyProcess::on_readyReadStandardError,
+              Qt::DirectConnection);
       connect(this, SIGNAL(procDataReady(const QByteArray &)), receiver, SLOT(procReadyRead(const QByteArray &)));
       connect(this, SIGNAL(eof()), receiver, SLOT(procFinished()));
    }
@@ -195,7 +192,7 @@ void MyProcess::on_finished(int, QProcess::ExitStatus exitStatus)
       if (isErrorExit)
          sendErrorMsg(false);
    }
-   busy = false;
+
    if (async)
       deleteLater();
 }
