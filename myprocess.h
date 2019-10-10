@@ -41,7 +41,6 @@ private:
    void sendErrorMsg(bool notStarted = false);
    static void restoreSpaces(QString &newCmd, const QChar &sepChar);
 
-   QString runCmd;
    QString *runOutput = nullptr;
    QString workDir;
    QObject *receiver = nullptr;

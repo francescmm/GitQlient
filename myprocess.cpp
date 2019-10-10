@@ -26,17 +26,15 @@ MyProcess::MyProcess(const QString &wd, bool err)
 bool MyProcess::runAsync(const QString &rc, QObject *rcv, const QString &buf)
 {
    async = true;
-   runCmd = rc;
    receiver = rcv;
    setupSignals();
 
-   return launchMe(runCmd, buf);
+   return launchMe(rc, buf);
 }
 
 bool MyProcess::runSync(const QString &rc, QString &ro)
 {
    async = false;
-   runCmd = rc;
    runOutput = &ro;
 
    if (runOutput)
@@ -44,7 +42,7 @@ bool MyProcess::runSync(const QString &rc, QString &ro)
 
    setupSignals();
 
-   if (!launchMe(runCmd))
+   if (!launchMe(rc))
       return false;
 
    QTime t;
