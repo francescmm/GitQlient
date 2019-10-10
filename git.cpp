@@ -1191,7 +1191,7 @@ bool Git::getRefs()
    if (!ret2.first)
       return false;
 
-   mCurrentBranchName = ret.second;
+   mCurrentBranchName = ret2.second;
 
    curBranchSHA = curBranchSHA.trimmed();
    mCurrentBranchName = mCurrentBranchName.prepend('\n').section("\n*", 1);
