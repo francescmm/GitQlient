@@ -108,8 +108,11 @@ void MyProcess::sendErrorMsg(bool notStarted)
    QString text("An error occurred while executing command:\n\n");
    text.append(cmd + "\n\nGit says: \n\n" + errorDesc);
 
-   QGit::kErrorLogBrowser->clear();
-   QGit::kErrorLogBrowser->setText(text);
+   if (QGit::kErrorLogBrowser)
+   {
+      QGit::kErrorLogBrowser->clear();
+      QGit::kErrorLogBrowser->setText(text);
+   }
 }
 
 bool MyProcess::launchMe(const QString &runCmd, const QString &buf)

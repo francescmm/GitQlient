@@ -41,6 +41,7 @@ public:
    explicit Controls(QWidget *parent = nullptr);
 
    void setCurrentSha(const QString &sha) { mCurrentSha = sha; }
+   void enableButtons(bool enabled);
 
 private:
    QString mCurrentSha;

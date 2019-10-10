@@ -16,6 +16,9 @@ MainWindow::MainWindow(QWidget *p)
    , ui(new Ui::MainWindow)
    , rv(new RevsView(true))
 {
+   setObjectName("mainWindow");
+   setWindowTitle("GitQlient");
+
    QFile styles(":/stylesheet.css");
 
    if (styles.open(QIODevice::ReadOnly))
@@ -25,12 +28,9 @@ MainWindow::MainWindow(QWidget *p)
    }
 
    ui->setupUi(this);
-
-   setObjectName("mainWindow");
-   setWindowTitle("GitQlient");
-
    ui->mainStackedWidget->setCurrentIndex(0);
    ui->page_5->layout()->addWidget(rv->getRepoList());
+   ui->controls->enableButtons(false);
 
    Git::getInstance(this);
 
@@ -67,25 +67,28 @@ MainWindow::MainWindow(QWidget *p)
 
 void MainWindow::updateUi()
 {
-   Git::getInstance()->init(mCurrentDir, nullptr);
+   if (!mCurrentDir.isEmpty())
+   {
+      Git::getInstance()->init(mCurrentDir, nullptr);
 
-   ui->branchesWidget->showBranches();
+      ui->branchesWidget->showBranches();
 
-   rv->clear(true);
-   Git::getInstance()->init2();
+      rv->clear(true);
+      Git::getInstance()->init2();
 
-   const auto commitStackedIndex = ui->commitStackedWidget->currentIndex();
-   const auto currentSha = commitStackedIndex == 0 ? ui->revisionWidget->getCurrentCommitSha() : QGit::ZERO_SHA;
+      const auto commitStackedIndex = ui->commitStackedWidget->currentIndex();
+      const auto currentSha = commitStackedIndex == 0 ? ui->revisionWidget->getCurrentCommitSha() : QGit::ZERO_SHA;
 
-   goToCommitSha(currentSha);
+      goToCommitSha(currentSha);
 
-   if (commitStackedIndex == 1)
-      ui->commitWidget->init(currentSha);
+      if (commitStackedIndex == 1)
+         ui->commitWidget->init(currentSha);
+   }
 }
 
 void MainWindow::setRepository(const QString &newDir)
 {
-   if (!mRepositoryBusy)
+   if (!mRepositoryBusy && !newDir.isEmpty())
    {
       mRepositoryBusy = true;
 
@@ -114,9 +117,11 @@ void MainWindow::setRepository(const QString &newDir)
 
          ui->mainStackedWidget->setCurrentIndex(0);
          ui->commitStackedWidget->setCurrentIndex(1);
+         ui->controls->enableButtons(true);
       }
       else
       {
+         mCurrentDir = "";
          clearWindow(true);
          setWidgetsEnabled(false);
       }
@@ -161,7 +166,7 @@ void MainWindow::clearWindow(bool deepClear)
 {
    blockSignals(true);
 
-   ui->commitStackedWidget->setCurrentIndex(1);
+   ui->commitStackedWidget->setCurrentIndex(ui->commitStackedWidget->currentIndex());
    ui->mainStackedWidget->setCurrentIndex(0);
 
    ui->commitWidget->clear();

@@ -103,6 +103,16 @@ Controls::Controls(QWidget *parent)
    connect(mTerminalBtn, &QToolButton::clicked, this, &Controls::showTerminal);
 }
 
+void Controls::enableButtons(bool enabled)
+{
+   mHome->setEnabled(enabled);
+   mGoToBtn->setEnabled(enabled);
+   mPullBtn->setEnabled(enabled);
+   mPushBtn->setEnabled(enabled);
+   mStashBtn->setEnabled(enabled);
+   mTerminalBtn->setEnabled(enabled);
+}
+
 void Controls::openRepo()
 {
    const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
