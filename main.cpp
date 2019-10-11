@@ -4,25 +4,31 @@
         Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QSettings>
 #include <QApplication>
-#include <QFile>
 
-#include "common.h"
 #include "MainWindow.h"
+#include <QLogger.h>
 
-using namespace QGit;
+using namespace QLogger;
 
 int main(int argc, char *argv[])
 {
-
    QApplication app(argc, argv);
    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
+
+   const auto manager = QLoggerManager::getInstance();
+   manager->addDestination("GitQlient.log", "UI", LogLevel::Debug);
+
+   QLog_Info("UI", "Starting GitQlient...");
 
    const auto mainWin = new MainWindow();
    mainWin->show();
 
    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
 
-   return app.exec();
+   const auto ret = app.exec();
+
+   QLog_Info("UI", "Stopping GitQlient...");
+
+   return ret;
 }

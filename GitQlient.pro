@@ -8,4 +8,8 @@ QT += widgets
 # project files
 include(GitQlient.pri)
 
+INCLUDEPATH += QLogger
+
+include(QLogger/QLogger.pri)
+
 OTHER_FILES += Tasks.txt
