@@ -25,15 +25,15 @@
 
 #include <QProcess>
 
-class IGitProcess : public QProcess
+class AGitProcess : public QProcess
 {
    Q_OBJECT
+
 signals:
-   void procDataReady(const QByteArray &);
    void eof();
 
 public:
-   explicit IGitProcess(const QString &workingDir, bool reportErrorsEnabled);
+   explicit AGitProcess(const QString &workingDir, bool reportErrorsEnabled);
 
    virtual bool run(const QString &command, QString &output) = 0;
    void onCancel();
@@ -41,13 +41,14 @@ public:
 protected:
    QString *mRunOutput = nullptr;
    QString mWorkingDirectory;
+   QString mErrorOutput;
+   QString mCommand;
    bool mErrorReportingEnabled = false;
    bool mErrorExit = false;
    bool mCanceling = false;
-   QStringList mArguments;
+   bool execute(const QString &command);
+   virtual void onFinished(int, QProcess::ExitStatus exitStatus);
 
 private:
-   virtual void onReadyStandardOutput() = 0;
-   virtual void onReadyStandardError() = 0;
-   virtual void onFinished(int, QProcess::ExitStatus exitStatus) = 0;
+   void onReadyStandardOutput();
 };

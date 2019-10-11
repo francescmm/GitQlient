@@ -23,22 +23,18 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <IGitProcess.h>
+#include <AGitProcess.h>
 
-class GitAsyncProcess : public IGitProcess
+class GitAsyncProcess final : public AGitProcess
 {
 public:
-   GitAsyncProcess(const QString &workingDir, bool reportErrorsEnabled, QObject *receiver = nullptr);
+   explicit GitAsyncProcess(const QString &workingDir, bool reportErrorsEnabled, QObject *receiver = nullptr);
 
-   bool run(const QString &command, QString &buffer) override;
+   bool run(const QString &command, QString &output);
 
 private:
    QObject *mReceiver = nullptr;
-   QString mErrorOutput;
 
-   void onReadyStandardOutput() override;
-   void onReadyStandardError() override;
-
-   bool startProcess(QProcess *proc, QStringList args, const QString &buf);
+   void onReadyStandardError();
    void onFinished(int, QProcess::ExitStatus exitStatus) override;
 };

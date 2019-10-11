@@ -44,6 +44,7 @@ private:
    void addSplittedChunks(const QByteArray *halfChunk);
    bool createTemporaryFile();
    ulong readNewData(bool lastBuffer);
+   bool startProcess(QProcess *proc, QStringList args, const QString &buf = "");
 
    RepositoryModel *fh;
    QByteArray *halfChunk;

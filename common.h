@@ -128,7 +128,6 @@ bool stripPartialParaghraps(const QByteArray &src, QString *dst, QString *prev);
 bool writeToFile(const QString &fileName, const QString &data, bool setExecutable = false);
 bool writeToFile(const QString &fileName, const QByteArray &data, bool setExecutable = false);
 bool readFromFile(const QString &fileName, QString &data);
-bool startProcess(QProcess *proc, QStringList args, const QString &buf = "");
 
 // cache file
 const uint C_MAGIC = 0xA0B0C0D0;

@@ -23,19 +23,12 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include "IGitProcess.h"
+#include "AGitProcess.h"
 
-class GitSyncProcess : public IGitProcess
+class GitSyncProcess final : public AGitProcess
 {
 public:
    GitSyncProcess(const QString &workingDir, bool reportErrorsEnabled);
 
    bool run(const QString &command, QString &output) override;
-
-private:
-   void onReadyStandardOutput() override;
-   void onReadyStandardError() override;
-
-   bool startProcess(QProcess *proc, QStringList args, const QString &buf);
-   void onFinished(int, QProcess::ExitStatus exitStatus) override;
 };

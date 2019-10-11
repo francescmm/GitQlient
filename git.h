@@ -143,8 +143,7 @@ public:
    bool isNothingToCommit();
    bool isMainHistory(const RepositoryModel *fh) { return (fh == mRevData); }
 
-   // TODO: Is not right to return a MyProcess when it's supposed to be async
-   GitAsyncProcess *getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined);
+   void getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined);
    QString getDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 
    const RevFile *getFiles(const QString &sha, const QString &sha2 = "", bool all = false, const QString &path = "");

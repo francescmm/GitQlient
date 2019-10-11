@@ -6,11 +6,13 @@
         Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QDir>
-#include <QTemporaryFile>
 #include "RepositoryModel.h"
 #include "git.h"
 #include "dataloader.h"
+
+#include <QDir>
+#include <QTemporaryFile>
+#include <QTextStream>
 
 #define GUI_UPDATE_INTERVAL 500
 #define READ_BLOCK_SIZE 65535
@@ -76,7 +78,7 @@ bool DataLoader::start(const QStringList &args, const QString &wd, const QString
 
    connect(this, qOverload<int, QProcess::ExitStatus>(&DataLoader::finished), this, &DataLoader::on_finished);
 
-   if (!createTemporaryFile() || !QGit::startProcess(this, args, buf))
+   if (!createTemporaryFile() || !startProcess(this, args, buf))
    {
       deleteLater();
       return false;
@@ -334,6 +336,41 @@ bool DataLoader::createTemporaryFile()
    setStandardOutputFile(dataFile->fileName());
    dataFile->close();
    return true;
+}
+
+bool DataLoader::startProcess(QProcess *proc, QStringList args, const QString &buf)
+{
+
+   if (!proc || args.isEmpty())
+      return false;
+
+   QStringList arguments(args);
+   QString prog(arguments.takeFirst());
+
+   if (!buf.isEmpty())
+   {
+      /*
+         On Windows buffer size of QProcess's standard input
+         pipe is quite limited and a crash can occur in case
+         a big chunk of data is written to process stdin.
+         As a workaround we use a temporary file to store data.
+         Process stdin will be redirected to this file
+      */
+      QTemporaryFile *bufFile = new QTemporaryFile(proc);
+      bufFile->open();
+      QTextStream stream(bufFile);
+      stream << buf;
+      proc->setStandardInputFile(bufFile->fileName());
+      bufFile->close();
+   }
+
+   QStringList env = QProcess::systemEnvironment();
+   env << "GIT_TRACE=0"; // avoid choking on debug traces
+   env << "GIT_FLUSH=0"; // skip the fflush() in 'git log'
+   proc->setEnvironment(env);
+
+   proc->start(prog, arguments); // TODO test QIODevice::Unbuffered
+   return proc->waitForStarted();
 }
 
 #endif // USE_QPROCESS

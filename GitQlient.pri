@@ -9,6 +9,7 @@ FORMS += \
     $$PWD/TagDlg.ui
 
 HEADERS += \
+    $$PWD/AGitProcess.h \
     $$PWD/BranchContextMenu.h \
     $$PWD/BranchTreeWidget.h \
     $$PWD/BranchesViewDelegate.h \
@@ -25,7 +26,6 @@ HEADERS += \
     $$PWD/FullDiffWidget.h \
     $$PWD/GitAsyncProcess.h \
     $$PWD/GitSyncProcess.h \
-    $$PWD/IGitProcess.h \
     $$PWD/MainWindow.h \
     $$PWD/RepositoryContextMenu.h \
     $$PWD/RepositoryModel.h \
@@ -40,11 +40,11 @@ HEADERS += \
     $$PWD/domain.h \
     $$PWD/git.h \
     $$PWD/lanes.h \
-    $$PWD/myprocess.h \
     $$PWD/revsview.h \
     $$PWD/BranchDlg.h
 
 SOURCES += \
+    $$PWD/AGitProcess.cpp \
     $$PWD/BranchContextMenu.cpp \
     $$PWD/BranchTreeWidget.cpp \
     $$PWD/BranchesViewDelegate.cpp \
@@ -61,7 +61,6 @@ SOURCES += \
     $$PWD/FullDiffWidget.cpp \
     $$PWD/GitAsyncProcess.cpp \
     $$PWD/GitSyncProcess.cpp \
-    $$PWD/IGitProcess.cpp \
     $$PWD/MainWindow.cpp \
     $$PWD/RepositoryContextMenu.cpp \
     $$PWD/RepositoryModel.cpp \
@@ -76,7 +75,6 @@ SOURCES += \
     $$PWD/git.cpp \
     $$PWD/lanes.cpp \
     $$PWD/main.cpp \
-    $$PWD/myprocess.cpp \
     $$PWD/namespace_def.cpp \
     $$PWD/revsview.cpp \
     $$PWD/common.cpp \

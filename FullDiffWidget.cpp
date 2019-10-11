@@ -102,9 +102,6 @@ FullDiffWidget::FullDiffWidget(QWidget *parent)
 
 void FullDiffWidget::clear()
 {
-   if (!proc.isNull())
-      proc->onCancel();
-
    QTextEdit::clear();
    patchRowData.clear();
    halfLine = "";
@@ -349,5 +346,6 @@ void FullDiffWidget::update(StateInfo &st)
       diffHighlighter->setCombinedLength(0);
 
    clear();
-   proc = Git::getInstance()->getDiff(st.sha(), this, st.diffToSha(), combined); // non blocking
+
+   Git::getInstance()->getDiff(st.sha(), this, st.diffToSha(), combined); // non blocking
 }

@@ -12,7 +12,6 @@
 #include "lanes.h"
 #include "GitSyncProcess.h"
 #include "GitAsyncProcess.h"
-#include "myprocess.h"
 #include "domain.h"
 
 #include <QApplication>
@@ -279,9 +278,10 @@ QPair<bool, QString> Git::run(const QString &runCmd)
 {
    QString runOutput;
    GitSyncProcess p(mWorkingDir, mErrorReportingEnabled);
+   connect(Git::getInstance(), &Git::cancelAllProcesses, &p, &AGitProcess::onCancel);
 
    if (const auto d = Git::getInstance()->curContext())
-      connect(d, &Domain::cancelDomainProcesses, &p, &IGitProcess::onCancel);
+      connect(d, &Domain::cancelDomainProcesses, &p, &AGitProcess::onCancel);
 
    const auto ret = p.run(runCmd, runOutput);
 
@@ -291,6 +291,8 @@ QPair<bool, QString> Git::run(const QString &runCmd)
 GitAsyncProcess *Git::runAsync(const QString &runCmd, QObject *receiver, const QString &buf)
 {
    auto p = new GitAsyncProcess(mWorkingDir, mErrorReportingEnabled, receiver);
+   connect(Git::getInstance(), &Git::cancelAllProcesses, p, &AGitProcess::onCancel);
+
    if (!p->run(runCmd, const_cast<QString &>(buf)))
    {
       delete p;
@@ -384,28 +386,27 @@ const QString Git::getShortLog(const QString &sha)
    return (r ? r->shortLog() : "");
 }
 
-GitAsyncProcess *Git::getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined)
+void Git::getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined)
 {
-
-   if (sha.isEmpty())
-      return nullptr;
-
-   QString runCmd;
-   if (sha != ZERO_SHA)
+   if (!sha.isEmpty())
    {
-      runCmd = "git diff-tree --no-color -r --patch-with-stat ";
-      runCmd.append(combined ? QString("-c ") : QString("-C -m ")); // TODO rename for combined
+      QString runCmd;
+      if (sha != ZERO_SHA)
+      {
+         runCmd = "git diff-tree --no-color -r --patch-with-stat ";
+         runCmd.append(combined ? QString("-c ") : QString("-C -m ")); // TODO rename for combined
 
-      const Rev *r = revLookup(sha);
-      if (r && r->parentsCount() == 0)
-         runCmd.append("--root ");
+         const auto r = revLookup(sha);
+         if (r && r->parentsCount() == 0)
+            runCmd.append("--root ");
 
-      runCmd.append(diffToSha + " " + sha); // diffToSha could be empty
+         runCmd.append(diffToSha + " " + sha); // diffToSha could be empty
+      }
+      else
+         runCmd = "git diff-index --no-color -r -m --patch-with-stat HEAD";
+
+      runAsync(runCmd, receiver);
    }
-   else
-      runCmd = "git diff-index --no-color -r -m --patch-with-stat HEAD";
-
-   return runAsync(runCmd, receiver);
 }
 
 QString Git::getDiff(const QString &currentSha, const QString &previousSha, const QString &file)
@@ -429,6 +430,8 @@ const QString Git::getWorkDirDiff(const QString &fileName)
    const auto ret = run(runCmd);
    if (!ret.first)
       return "";
+
+   runOutput = ret.second;
 
    /* For unknown reasons file sha of index is not ZERO_SHA but
     a value of unknown origin.
@@ -579,6 +582,8 @@ bool Git::runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutp
    mErrorReportingEnabled = false;
    const auto renameDetection = run(cmd);
    mErrorReportingEnabled = true;
+
+   *runOutput = renameDetection.second;
 
    if (!renameDetection.first) // retry without rename detection
    {
@@ -1997,7 +2002,7 @@ void Git::loadFileNames()
       mFilesLoadingStartOfs = mRevsFiles.count();
 
       const QString runCmd("git diff-tree --no-color -r -C --stdin");
-      runAsync(runCmd, this, diffTreeBuf);
+      runAsync(runCmd, nullptr, diffTreeBuf);
    }
 }
 
