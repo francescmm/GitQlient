@@ -266,7 +266,9 @@ QPair<bool, QString> Git::run(const QString &runCmd)
    QString runOutput;
    GitSyncProcess p(mWorkingDir, mErrorReportingEnabled);
    connect(Git::getInstance(), &Git::cancelAllProcesses, &p, &AGitProcess::onCancel);
-   connect(Git::getInstance()->curContext(), &Domain::cancelDomainProcesses, &p, &AGitProcess::onCancel);
+
+   if (Git::getInstance()->curContext())
+      connect(Git::getInstance()->curContext(), &Domain::cancelDomainProcesses, &p, &AGitProcess::onCancel);
 
    const auto ret = p.run(runCmd, runOutput);
 

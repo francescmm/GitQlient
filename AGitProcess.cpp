@@ -108,12 +108,14 @@ void AGitProcess::onCancel()
 
 void AGitProcess::onReadyStandardOutput()
 {
-   if (!mCanceling && mRunOutput)
+   if (!mCanceling)
    {
       const auto standardOutput = readAllStandardOutput();
-      mRunOutput->append(standardOutput);
 
-      emit procDataReady(readAllStandardOutput());
+      if (mRunOutput)
+         mRunOutput->append(standardOutput);
+
+      emit procDataReady(standardOutput);
    }
 }
 
