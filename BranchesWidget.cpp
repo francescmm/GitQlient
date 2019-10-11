@@ -177,36 +177,39 @@ void BranchesWidget::showBranches()
 {
    clear();
 
-   QByteArray info;
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   Git::getInstance()->getBranches(info);
+   auto ret = Git::getInstance()->getBranches();
 
-   if (!info.startsWith("fatal"))
+   if (ret.success)
    {
-      info.replace(' ', "");
-      const auto branches = info.split('\n');
-
-      for (auto branch : branches)
+      auto output = ret.output.toString();
+      if (!output.startsWith("fatal"))
       {
-         if (!branch.isEmpty())
+         output.replace(' ', "");
+         const auto branches = output.split('\n');
+
+         for (auto branch : branches)
          {
-            // TODO: Evaluate if it can be moved to a different thread
-            if (branch.startsWith("remotes/") && !branch.contains("HEAD->"))
-               processRemoteBranch(QString::fromUtf8(branch));
-            else if (!branch.contains("HEAD->"))
-               processLocalBranch(QString::fromUtf8(branch));
+            if (!branch.isEmpty())
+            {
+               // TODO: Evaluate if it can be moved to a different thread
+               if (branch.startsWith("remotes/") && !branch.contains("HEAD->"))
+                  processRemoteBranch(branch);
+               else if (!branch.contains("HEAD->"))
+                  processLocalBranch(branch);
+            }
          }
       }
+
+      processTags();
+      processStashes();
+      processSubmodules();
+
+      QApplication::restoreOverrideCursor();
+
+      adjustBranchesTree(mLocalBranchesTree);
+      adjustBranchesTree(mRemoteBranchesTree);
    }
-
-   processTags();
-   processStashes();
-   processSubmodules();
-
-   QApplication::restoreOverrideCursor();
-
-   adjustBranchesTree(mLocalBranchesTree);
-   adjustBranchesTree(mRemoteBranchesTree);
 }
 
 void BranchesWidget::clear()
@@ -231,14 +234,13 @@ void BranchesWidget::processLocalBranch(QString branch)
       item->setData(1, Qt::UserRole, true);
    }
 
-   QByteArray distance;
-   Git::getInstance()->getDistanceBetweenBranches(true, branch, distance);
+   auto distance = Git::getInstance()->getDistanceBetweenBranches(true, branch).output.toString();
    distance.replace('\n', "");
    distance.replace('\t', "\u2193 - ");
    distance.append("\u2191");
-   item->setText(2, QString::fromUtf8(distance));
+   item->setText(2, distance);
 
-   Git::getInstance()->getDistanceBetweenBranches(false, branch, distance);
+   distance = Git::getInstance()->getDistanceBetweenBranches(false, branch).output.toString();
 
    if (!distance.contains("fatal"))
    {
@@ -248,7 +250,7 @@ void BranchesWidget::processLocalBranch(QString branch)
    else
       distance = "Local";
 
-   item->setText(3, QString::fromUtf8(distance));
+   item->setText(3, distance);
    item->setText(1, branch);
 
    mLocalBranchesTree->addTopLevelItem(item);

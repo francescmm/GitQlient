@@ -77,19 +77,6 @@ void Git::userInfo(QStringList &info)
    mErrorReportingEnabled = true;
 }
 
-QStringList Git::getGitConfigList(bool global)
-{
-   QString runOutput;
-
-   mErrorReportingEnabled = false; // 'git config' could fail, see docs
-
-   runOutput = run(global ? "git config --global --list" : "git config --list").second;
-
-   mErrorReportingEnabled = true;
-
-   return runOutput.split('\n', QString::SkipEmptyParts);
-}
-
 // CT TODO utility function; can go elsewhere
 const QString Git::quote(const QString &nm)
 {
@@ -109,7 +96,7 @@ const QString Git::quote(const QStringList &sl)
 uint Git::checkRef(const QString &sha, uint mask) const
 {
 
-   RefMap::const_iterator it(mRefsShaMap.constFind(sha));
+   QHash<QString, Reference>::const_iterator it(mRefsShaMap.constFind(sha));
    return (it != mRefsShaMap.constEnd() ? (*it).type & mask : 0);
 }
 
@@ -279,27 +266,20 @@ QPair<bool, QString> Git::run(const QString &runCmd)
    QString runOutput;
    GitSyncProcess p(mWorkingDir, mErrorReportingEnabled);
    connect(Git::getInstance(), &Git::cancelAllProcesses, &p, &AGitProcess::onCancel);
-
-   if (const auto d = Git::getInstance()->curContext())
-      connect(d, &Domain::cancelDomainProcesses, &p, &AGitProcess::onCancel);
+   connect(Git::getInstance()->curContext(), &Domain::cancelDomainProcesses, &p, &AGitProcess::onCancel);
 
    const auto ret = p.run(runCmd, runOutput);
 
    return qMakePair(ret, runOutput);
 }
 
-GitAsyncProcess *Git::runAsync(const QString &runCmd, QObject *receiver, const QString &buf)
+void Git::runAsync(const QString &runCmd, QObject *receiver, const QString &buf)
 {
    auto p = new GitAsyncProcess(mWorkingDir, mErrorReportingEnabled, receiver);
    connect(Git::getInstance(), &Git::cancelAllProcesses, p, &AGitProcess::onCancel);
 
    if (!p->run(runCmd, const_cast<QString &>(buf)))
-   {
       delete p;
-      p = nullptr;
-   }
-
-   return p; // auto-deleted when done
 }
 
 int Git::findFileIndex(const RevFile &rf, const QString &name)
@@ -882,79 +862,47 @@ bool Git::resetCommit(const QString &sha, Git::CommitResetType type)
    return run(QString("git reset --%1 %2").arg(typeStr, sha)).first;
 }
 
-bool Git::createBranchFromCurrent(const QString &newName, QByteArray &output)
+GitExecResult Git::createBranchFromAnotherBranch(const QString &oldName, const QString &newName)
 {
-   const auto ret = run(QString("git branch %1").arg(newName));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git branch %1 %2").arg(newName, oldName));
 }
 
-bool Git::createBranchFromAnotherBranch(const QString &oldName, const QString &newName, QByteArray &output)
+GitExecResult Git::createBranchAtCommit(const QString &commitSha, const QString &branchName)
 {
-   const auto ret = run(QString("git branch %1 %2").arg(newName, oldName));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git branch %1 %2").arg(branchName, commitSha));
 }
 
-bool Git::createBranchAtCommit(const QString &commitSha, const QString &branchName, QByteArray &output)
+GitExecResult Git::checkoutRemoteBranch(const QString &branchName)
 {
-   const auto ret = run(QString("git branch %1 %2").arg(branchName, commitSha));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git checkout -q %1").arg(branchName));
 }
 
-bool Git::checkoutRemoteBranch(const QString &branchName, QByteArray &output)
+GitExecResult Git::checkoutNewLocalBranch(const QString &branchName)
 {
-   const auto ret = run(QString("git checkout -q %1").arg(branchName));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git checkout -b %1").arg(branchName));
 }
 
-bool Git::checkoutNewLocalBranch(const QString &branchName, QByteArray &output)
+GitExecResult Git::renameBranch(const QString &oldName, const QString &newName)
 {
-   const auto ret = run(QString("git checkout -b %1").arg(branchName));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git branch -m %1 %2").arg(oldName, newName));
 }
 
-bool Git::renameBranch(const QString &oldName, const QString &newName, QByteArray &output)
+GitExecResult Git::removeLocalBranch(const QString &branchName)
 {
-   const auto ret = run(QString("git branch -m %1 %2").arg(oldName, newName));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git branch -D %1").arg(branchName));
 }
 
-bool Git::removeLocalBranch(const QString &branchName, QByteArray &output)
+GitExecResult Git::removeRemoteBranch(const QString &branchName)
 {
-   const auto ret = run(QString("git branch -D %1").arg(branchName));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git push --delete origin %1").arg(branchName));
 }
 
-bool Git::removeRemoteBranch(const QString &branchName, QByteArray &output)
+GitExecResult Git::getBranches()
 {
-   const auto ret = run(QString("git push --delete origin %1").arg(branchName));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git branch -a"));
 }
 
-bool Git::getBranches(QByteArray &output)
-{
-   const auto ret = run(QString("git branch -a"));
-   output = ret.second.toUtf8();
-
-   return ret.first;
-}
-
-bool Git::getDistanceBetweenBranches(bool toMaster, const QString &right, QByteArray &output)
+GitExecResult Git::getDistanceBetweenBranches(bool toMaster, const QString &right)
 {
    const QString firstArg = toMaster ? QString::fromUtf8("--left-right") : QString::fromUtf8("");
    const QString gitCmd = QString("git rev-list %1 --count %2...%3")
@@ -962,39 +910,27 @@ bool Git::getDistanceBetweenBranches(bool toMaster, const QString &right, QByteA
                               .arg(toMaster ? QString::fromUtf8("origin/master") : QString::fromUtf8("origin/%3"))
                               .arg(right);
 
-   const auto ret = run(gitCmd);
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(gitCmd);
 }
 
-bool Git::getBranchesOfCommit(const QString &sha, QByteArray &output)
+GitExecResult Git::getBranchesOfCommit(const QString &sha)
 {
-   const auto ret = run(QString("git branch --contains %1 --all").arg(sha));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git branch --contains %1 --all").arg(sha));
 }
 
-bool Git::getLastCommitOfBranch(const QString &branch, QByteArray &sha)
+GitExecResult Git::getLastCommitOfBranch(const QString &branch)
 {
-   const auto ret = run(QString("git rev-parse %1").arg(branch));
+   auto ret = run(QString("git rev-parse %1").arg(branch));
 
    if (ret.first)
-   {
-      sha = ret.second.toUtf8();
-      sha.remove(sha.count() - 1, sha.count());
-   }
+      ret.second.remove(ret.second.count() - 1, ret.second.count());
 
-   return ret.first;
+   return ret;
 }
 
-bool Git::prune(QByteArray &output)
+GitExecResult Git::prune()
 {
-   const auto ret = run("git remote prune origin");
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run("git remote prune origin");
 }
 
 QVector<QString> Git::getTags()
@@ -1170,7 +1106,7 @@ bool Git::getBaseDir(const QString &wd, QString &bd, bool &changed)
 
 Git::Reference *Git::lookupOrAddReference(const QString &sha)
 {
-   RefMap::iterator it(mRefsShaMap.find(sha));
+   QHash<QString, Reference>::iterator it(mRefsShaMap.find(sha));
    if (it == mRefsShaMap.end())
       it = mRefsShaMap.insert(sha, Reference());
    return &(*it);
@@ -1178,7 +1114,7 @@ Git::Reference *Git::lookupOrAddReference(const QString &sha)
 
 Git::Reference *Git::lookupReference(const QString &sha)
 {
-   RefMap::iterator it(mRefsShaMap.find(sha));
+   QHash<QString, Reference>::iterator it(mRefsShaMap.find(sha));
    if (it == mRefsShaMap.end())
       return nullptr;
 
@@ -1608,9 +1544,7 @@ void Git::stop(bool saveCache)
 
 void Git::clearRevs()
 {
-
    mRevData->clear();
-   mPatchesStillToFind = 0; // TODO TEST WITH FILTERING
    mFirstNonStGitPatch = "";
    workingDirInfo.clear();
    mRevsFiles.remove(ZERO_SHA);
@@ -1638,7 +1572,7 @@ bool Git::init(const QString &wd, const QStringList *passedArgs)
 
    // check if repository is valid
    bool repoChanged;
-   mIsGIT = getGitDBDir(wd, mGitDir, repoChanged);
+   const auto isGIT = getGitDBDir(wd, mGitDir, repoChanged);
 
    if (repoChanged)
    {
@@ -1651,7 +1585,7 @@ bool Git::init(const QString &wd, const QStringList *passedArgs)
       loadFileCache();
    }
 
-   if (!mIsGIT)
+   if (!isGIT)
       return false;
 
    if (!passedArgs)
@@ -1684,32 +1618,22 @@ void Git::on_loaded(RepositoryModel *fh, ulong byteSize, int loadTime, bool norm
 
       on_newDataReady(fh);
 
-      if (!mLoadingUnappliedPatches)
-      {
+      fh->loadTime += loadTime;
 
-         fh->loadTime += loadTime;
+      ulong kb = byteSize / 1024;
+      double mbs = static_cast<double>(byteSize) / fh->loadTime / 1000;
+      QString tmp;
+      tmp.sprintf("Loaded %i revisions  (%li KB),   "
+                  "time elapsed: %i ms  (%.2f MB/s)",
+                  fh->revs.count(), kb, fh->loadTime, mbs);
 
-         ulong kb = byteSize / 1024;
-         double mbs = static_cast<double>(byteSize) / fh->loadTime / 1000;
-         QString tmp;
-         tmp.sprintf("Loaded %i revisions  (%li KB),   "
-                     "time elapsed: %i ms  (%.2f MB/s)",
-                     fh->revs.count(), kb, fh->loadTime, mbs);
+      if (!tryFollowRenames(fh))
+         emit loadCompleted(fh, tmp);
 
-         if (!tryFollowRenames(fh))
-            emit loadCompleted(fh, tmp);
-
-         if (isMainHistory(fh))
-            // wait the dust to settle down before to start
-            // background file names loading for new revisions
-            QTimer::singleShot(500, this, &Git::loadFileNames);
-      }
-   }
-   if (mLoadingUnappliedPatches)
-   {
-      mLoadingUnappliedPatches = false;
-      mRevData->lns->clear(); // again to reset lanes
-      init2(); // continue with loading of remaining revisions
+      if (isMainHistory(fh))
+         // wait the dust to settle down before to start
+         // background file names loading for new revisions
+         QTimer::singleShot(500, this, &Git::loadFileNames);
    }
 }
 
@@ -1962,12 +1886,11 @@ void Git::populateFileNamesMap()
 
 void Git::loadFileCache()
 {
-
    if (!mFileCacheAccessed)
    {
-
       mFileCacheAccessed = true;
       QByteArray shaBuf;
+
       if (loadFromCache(mGitDir, mRevsFiles, mDirNames, mFileNames, shaBuf))
       {
          mRevsFilesShaBackupBuf.append(shaBuf);
@@ -1998,8 +1921,7 @@ void Git::loadFileNames()
    }
    if (!diffTreeBuf.isEmpty())
    {
-      mFilesLoadingPending = mFilesLoadingCurrentSha = "";
-      mFilesLoadingStartOfs = mRevsFiles.count();
+      mFilesLoadingCurrentSha = "";
 
       const QString runCmd("git diff-tree --no-color -r -C --stdin");
       runAsync(runCmd, nullptr, diffTreeBuf);

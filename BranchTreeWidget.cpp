@@ -32,20 +32,19 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 
 void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 {
-   QByteArray output;
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->checkoutRemoteBranch(item->text(1), output);
+   const auto ret = Git::getInstance()->checkoutRemoteBranch(item->text(1));
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (ret.success)
       emit signalBranchesUpdated();
 }
 
 void BranchTreeWidget::selectCommit(QTreeWidgetItem *item)
 {
    const auto branchName = item->text(1);
-   QByteArray sha;
-   Git::getInstance()->getLastCommitOfBranch(mLocal ? branchName : QString("origin/%1").arg(branchName), sha);
+   const auto ret
+       = Git::getInstance()->getLastCommitOfBranch(mLocal ? branchName : QString("origin/%1").arg(branchName));
 
-   emit signalSelectCommit(QString::fromUtf8(sha));
+   emit signalSelectCommit(ret.output.toString());
 }

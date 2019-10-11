@@ -44,12 +44,12 @@ RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent
       addSeparator();
 
       QByteArray output;
-      const auto ret = Git::getInstance()->getBranchesOfCommit(mSha, output);
+      auto ret = Git::getInstance()->getBranchesOfCommit(mSha);
       const auto currentBranch = Git::getInstance()->getCurrentBranchName();
 
-      if (ret)
+      if (ret.success)
       {
-         auto branches = QString::fromUtf8(output).split('\n');
+         auto branches = ret.output.toString().split('\n');
 
          for (auto &branch : branches)
          {
@@ -98,10 +98,11 @@ RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent
          }
       }
 
-      QByteArray lastSha;
-      if (Git::getInstance()->getLastCommitOfBranch(currentBranch, lastSha))
+      ret = Git::getInstance()->getLastCommitOfBranch(currentBranch);
+
+      if (ret.success)
       {
-         const auto lastShaStr = QString::fromUtf8(lastSha).remove('\n');
+         const auto lastShaStr = ret.output.toString().remove('\n');
 
          if (lastShaStr == mSha)
          {

@@ -188,10 +188,10 @@ void Controls::pruneBranches()
    QByteArray output;
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->prune(output);
+   const auto ret = Git::getInstance()->prune();
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (ret.success)
       emit signalRepositoryUpdated();
 }
 

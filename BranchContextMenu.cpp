@@ -146,12 +146,12 @@ void BranchContextMenu::deleteBranch()
          QByteArray output;
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-         ret = mConfig.isLocal ? Git::getInstance()->removeLocalBranch(mConfig.branchSelected, output)
-                               : Git::getInstance()->removeRemoteBranch(mConfig.branchSelected, output);
+         const auto ret2 = mConfig.isLocal ? Git::getInstance()->removeLocalBranch(mConfig.branchSelected)
+                                           : Git::getInstance()->removeRemoteBranch(mConfig.branchSelected);
 
          QApplication::restoreOverrideCursor();
 
-         if (ret)
+         if (ret2.success)
             emit signalBranchesUpdated();
          else
             QMessageBox::critical(this, tr("Delete a branch failed"),

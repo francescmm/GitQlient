@@ -67,13 +67,13 @@ void BranchDlg::accept()
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
       if (mMode == BranchDlgMode::CREATE)
-         Git::getInstance()->createBranchFromAnotherBranch(ui->leOldName->text(), ui->leNewName->text(), output);
+         Git::getInstance()->createBranchFromAnotherBranch(ui->leOldName->text(), ui->leNewName->text());
       else if (mMode == BranchDlgMode::CREATE_CHECKOUT)
-         Git::getInstance()->checkoutNewLocalBranch(ui->leNewName->text(), output);
+         Git::getInstance()->checkoutNewLocalBranch(ui->leNewName->text());
       else if (mMode == BranchDlgMode::RENAME)
-         Git::getInstance()->renameBranch(ui->leOldName->text(), ui->leNewName->text(), output);
+         Git::getInstance()->renameBranch(ui->leOldName->text(), ui->leNewName->text());
       else if (mMode == BranchDlgMode::CREATE_FROM_COMMIT)
-         Git::getInstance()->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text(), output);
+         Git::getInstance()->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text());
 
       QApplication::restoreOverrideCursor();
 

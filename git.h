@@ -23,6 +23,17 @@ class RepositoryModel;
 class Lanes;
 class GitAsyncProcess;
 
+struct GitExecResult
+{
+   GitExecResult(const QPair<bool, QString> &result)
+      : success(result.first)
+      , output(result.second)
+   {
+   }
+   bool success;
+   QVariant output;
+};
+
 class Git : public QObject
 {
    Q_OBJECT
@@ -54,19 +65,18 @@ public:
    /** END Git CONFIGURATION **/
 
    /** START BRANCHES **/
-   bool createBranchFromCurrent(const QString &newName, QByteArray &output);
-   bool createBranchFromAnotherBranch(const QString &oldName, const QString &newName, QByteArray &output);
-   bool createBranchAtCommit(const QString &commitSha, const QString &branchName, QByteArray &output);
-   bool checkoutRemoteBranch(const QString &branchName, QByteArray &output);
-   bool checkoutNewLocalBranch(const QString &branchName, QByteArray &output);
-   bool renameBranch(const QString &oldName, const QString &newName, QByteArray &output);
-   bool removeLocalBranch(const QString &branchName, QByteArray &output);
-   bool removeRemoteBranch(const QString &branchName, QByteArray &output);
-   bool getBranches(QByteArray &output);
-   bool getDistanceBetweenBranches(bool toMaster, const QString &right, QByteArray &output);
-   bool getBranchesOfCommit(const QString &sha, QByteArray &output);
-   bool getLastCommitOfBranch(const QString &branch, QByteArray &sha);
-   bool prune(QByteArray &output);
+   GitExecResult createBranchFromAnotherBranch(const QString &oldName, const QString &newName);
+   GitExecResult createBranchAtCommit(const QString &commitSha, const QString &branchName);
+   GitExecResult checkoutRemoteBranch(const QString &branchName);
+   GitExecResult checkoutNewLocalBranch(const QString &branchName);
+   GitExecResult renameBranch(const QString &oldName, const QString &newName);
+   GitExecResult removeLocalBranch(const QString &branchName);
+   GitExecResult removeRemoteBranch(const QString &branchName);
+   GitExecResult getBranches();
+   GitExecResult getDistanceBetweenBranches(bool toMaster, const QString &right);
+   GitExecResult getBranchesOfCommit(const QString &sha);
+   GitExecResult getLastCommitOfBranch(const QString &branch);
+   GitExecResult prune();
    const QString getCurrentBranchName() const { return mCurrentBranchName; }
 
    /** END BRANCHES **/
@@ -116,7 +126,6 @@ public:
 
    /** START SETTINGS **/
    void userInfo(QStringList &info);
-   QStringList getGitConfigList(bool global);
 
    /** END SETTINGS **/
 
@@ -181,7 +190,6 @@ private:
    static Git *INSTANCE;
 
    friend class DataLoader;
-   friend class ConsoleImpl;
 
    struct Reference
    { // stores tag information associated to a revision
@@ -198,7 +206,6 @@ private:
       QString tagMsg;
       QString stgitPatch;
    };
-   typedef QHash<QString, Reference> RefMap;
 
    struct WorkingDirInfo
    {
@@ -229,7 +236,7 @@ private:
    bool updateIndex(const QStringList &selFiles);
    const QString getWorkDirDiff(const QString &fileName = "");
    int findFileIndex(const RevFile &rf, const QString &name);
-   GitAsyncProcess *runAsync(const QString &cmd, QObject *rcv, const QString &buf = "");
+   void runAsync(const QString &cmd, QObject *rcv, const QString &buf = "");
    bool getRefs();
    void clearRevs();
    void clearFileNames();
@@ -271,28 +278,19 @@ private:
    Reference *lookupReference(const QString &sha);
    Reference *lookupOrAddReference(const QString &sha);
 
-   int exGitStopped;
-
    Domain *mCurrentDomain = nullptr;
-   QString mWorkingDir; // workDir is always without trailing '/'
+   QString mWorkingDir;
    QString mGitDir;
-   QString mFilesLoadingPending;
    QString mFilesLoadingCurrentSha;
    QString mCurrentBranchName;
-   int mFilesLoadingStartOfs = 0;
    bool mCacheNeedsUpdate = false;
    bool mErrorReportingEnabled = true;
    bool mIsMergeHead = false;
-   bool mIsGIT = false;
-   bool mTextHighlighterFound = false;
-   QString mTextHighlighterVersionFound;
-   bool mLoadingUnappliedPatches = false;
    bool mFileCacheAccessed = false;
-   int mPatchesStillToFind = 0;
    QString mFirstNonStGitPatch;
    RevFileMap mRevsFiles;
    QVector<QByteArray> mRevsFilesShaBackupBuf;
-   RefMap mRefsShaMap;
+   QHash<QString, Reference> mRefsShaMap;
    QVector<QByteArray> mShaBackupBuf;
    QVector<QString> mFileNames;
    QVector<QString> mDirNames;
