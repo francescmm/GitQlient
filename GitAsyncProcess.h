@@ -30,7 +30,7 @@ class GitAsyncProcess final : public AGitProcess
 public:
    explicit GitAsyncProcess(const QString &workingDir, bool reportErrorsEnabled, QObject *receiver = nullptr);
 
-   bool run(const QString &command, QString &output);
+   bool run(const QString &command, QString &output) override;
 
 private:
    QObject *mReceiver = nullptr;

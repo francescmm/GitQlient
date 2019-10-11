@@ -26,6 +26,8 @@ void GitAsyncProcess::onReadyStandardError()
    {
       const auto err = readAllStandardError();
       mErrorOutput += QString::fromUtf8(err);
+
+      emit procDataReady(err);
    }
 }
 

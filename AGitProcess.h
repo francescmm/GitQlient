@@ -31,6 +31,7 @@ class AGitProcess : public QProcess
 
 signals:
    void eof();
+   void procDataReady(const QByteArray &data);
 
 public:
    explicit AGitProcess(const QString &workingDir, bool reportErrorsEnabled);
