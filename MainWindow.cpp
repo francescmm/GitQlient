@@ -1,6 +1,7 @@
 #include "MainWindow.h"
-#include <ui_MainWindow.h>
 
+#include <Controls.h>
+#include <BranchesWidget.h>
 #include <CommitWidget.h>
 #include <RevisionWidget.h>
 #include <RepositoryModel.h>
@@ -15,18 +16,24 @@
 #include <QFileSystemWatcher>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QStackedWidget>
+#include <QGridLayout>
+#include <QApplication>
 
 using namespace QLogger;
 
 MainWindow::MainWindow(QWidget *p)
    : QFrame(p)
-   , ui(new Ui::MainWindow)
    , mGit(Git::getInstance())
+   , commitStackedWidget(new QStackedWidget())
+   , mainStackedWidget(new QStackedWidget())
+   , mControls(new Controls(mGit))
    , mCommitWidget(new CommitWidget(mGit))
    , mRevisionWidget(new RevisionWidget(mGit))
    , rv(new RevsView(true))
    , mDiffWidget(new DiffWidget(mGit))
    , mFileDiffWidget(new FileDiffWidget(mGit))
+   , mBranchesWidget(new BranchesWidget(mGit))
 {
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
@@ -39,30 +46,37 @@ MainWindow::MainWindow(QWidget *p)
       styles.close();
    }
 
-   ui->setupUi(this);
+   commitStackedWidget->setCurrentIndex(0);
+   commitStackedWidget->addWidget(mRevisionWidget);
+   commitStackedWidget->addWidget(mCommitWidget);
+   commitStackedWidget->setFixedWidth(310);
 
-   ui->commitStackedWidget->setCurrentIndex(0);
-   ui->commitPage->layout()->addWidget(mCommitWidget);
-   ui->revisionPage->layout()->addWidget(mRevisionWidget);
+   mainStackedWidget->setCurrentIndex(0);
+   mainStackedWidget->addWidget(rv->getRepoList());
+   mainStackedWidget->addWidget(mDiffWidget);
+   mainStackedWidget->addWidget(mFileDiffWidget);
+   mainStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-   ui->mainStackedWidget->setCurrentIndex(0);
-   ui->repoPage->layout()->addWidget(rv->getRepoList());
-   ui->fullDiffPage->layout()->addWidget(mDiffWidget);
-   ui->fileDiffPage->layout()->addWidget(mFileDiffWidget);
+   const auto gridLayout = new QGridLayout(this);
+   gridLayout->setSpacing(0);
+   gridLayout->setContentsMargins(10, 0, 10, 10);
+   gridLayout->addWidget(mControls, 0, 1);
+   gridLayout->addWidget(commitStackedWidget, 1, 0);
+   gridLayout->addWidget(mainStackedWidget, 1, 1);
+   gridLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Fixed, QSizePolicy::Fixed), 1, 2);
+   gridLayout->addWidget(mBranchesWidget, 1, 3);
 
    mRevisionWidget->setup(rv);
 
-   qApp->installEventFilter(this);
-
    rv->setEnabled(false);
 
-   connect(ui->controls, &Controls::signalOpenRepo, this, &MainWindow::setRepository);
-   connect(ui->controls, &Controls::signalGoBack, this, [this]() { ui->mainStackedWidget->setCurrentIndex(0); });
-   connect(ui->controls, &Controls::signalRepositoryUpdated, this, &MainWindow::updateUi);
-   connect(ui->controls, &Controls::signalGoToSha, this, &MainWindow::goToCommitSha);
+   connect(mControls, &Controls::signalOpenRepo, this, &MainWindow::setRepository);
+   connect(mControls, &Controls::signalGoBack, this, [this]() { mainStackedWidget->setCurrentIndex(0); });
+   connect(mControls, &Controls::signalRepositoryUpdated, this, &MainWindow::updateUi);
+   connect(mControls, &Controls::signalGoToSha, this, &MainWindow::goToCommitSha);
 
-   connect(ui->branchesWidget, &BranchesWidget::signalBranchesUpdated, this, &MainWindow::updateUi);
-   connect(ui->branchesWidget, &BranchesWidget::signalSelectCommit, this, &MainWindow::goToCommitSha);
+   connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &MainWindow::updateUi);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &MainWindow::goToCommitSha);
 
    connect(rv, &RevsView::rebase, this, &MainWindow::rebase);
    connect(rv, &RevsView::merge, this, &MainWindow::merge);
@@ -95,13 +109,13 @@ void MainWindow::updateUi()
    {
       mGit->init(mCurrentDir, nullptr);
 
-      ui->branchesWidget->showBranches();
+      mBranchesWidget->showBranches();
 
       rv->clear(true);
 
       mGit->init2();
 
-      const auto commitStackedIndex = ui->commitStackedWidget->currentIndex();
+      const auto commitStackedIndex = commitStackedWidget->currentIndex();
       const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : QGit::ZERO_SHA;
 
       goToCommitSha(currentSha);
@@ -142,13 +156,13 @@ void MainWindow::setRepository(const QString &newDir)
          mGit->init2();
 
          onCommitSelected(QGit::ZERO_SHA);
-         ui->branchesWidget->showBranches();
+         mBranchesWidget->showBranches();
 
          mCommitWidget->init(QGit::ZERO_SHA);
 
-         ui->mainStackedWidget->setCurrentIndex(0);
-         ui->commitStackedWidget->setCurrentIndex(1);
-         ui->controls->enableButtons(true);
+         mainStackedWidget->setCurrentIndex(0);
+         commitStackedWidget->setCurrentIndex(1);
+         mControls->enableButtons(true);
 
          QLog_Info("UI", "MainWindow widgets configured with the new repo");
       }
@@ -201,8 +215,8 @@ void MainWindow::clearWindow(bool deepClear)
 {
    blockSignals(true);
 
-   ui->commitStackedWidget->setCurrentIndex(ui->commitStackedWidget->currentIndex());
-   ui->mainStackedWidget->setCurrentIndex(0);
+   commitStackedWidget->setCurrentIndex(commitStackedWidget->currentIndex());
+   mainStackedWidget->setCurrentIndex(0);
 
    mCommitWidget->clear();
    mRevisionWidget->clear();
@@ -210,7 +224,7 @@ void MainWindow::clearWindow(bool deepClear)
    rv->clear(deepClear);
    mDiffWidget->clear(deepClear);
    mFileDiffWidget->clear();
-   ui->branchesWidget->clear();
+   mBranchesWidget->clear();
 
    blockSignals(false);
 }
@@ -219,11 +233,11 @@ void MainWindow::setWidgetsEnabled(bool enabled)
 {
    mCommitWidget->setEnabled(enabled);
    mRevisionWidget->setEnabled(enabled);
-   ui->commitStackedWidget->setEnabled(enabled);
+   commitStackedWidget->setEnabled(enabled);
    rv->setEnabled(enabled);
    mDiffWidget->setEnabled(enabled);
    mFileDiffWidget->setEnabled(enabled);
-   ui->branchesWidget->setEnabled(enabled);
+   mBranchesWidget->setEnabled(enabled);
 }
 
 void MainWindow::goToCommitSha(const QString &goToSha)
@@ -242,7 +256,7 @@ void MainWindow::goToCommitSha(const QString &goToSha)
 void MainWindow::openCommitDiff()
 {
    mDiffWidget->setStateInfo(rv->st);
-   ui->mainStackedWidget->setCurrentIndex(1);
+   mainStackedWidget->setCurrentIndex(1);
 }
 
 void MainWindow::changesCommitted(bool ok)
@@ -268,7 +282,7 @@ void MainWindow::onCommitClicked(const QModelIndex &index)
 void MainWindow::onCommitSelected(const QString &sha)
 {
    const auto isWip = sha == QGit::ZERO_SHA;
-   ui->commitStackedWidget->setCurrentIndex(isWip);
+   commitStackedWidget->setCurrentIndex(isWip);
 
    QLog_Info("UI", QString("User selects the commit {%1}").arg(sha));
 
@@ -280,7 +294,7 @@ void MainWindow::onCommitSelected(const QString &sha)
 
 void MainWindow::onAmmendCommit(const QString &sha)
 {
-   ui->commitStackedWidget->setCurrentIndex(1);
+   commitStackedWidget->setCurrentIndex(1);
    mCommitWidget->init(sha);
 }
 
@@ -294,7 +308,7 @@ void MainWindow::onFileDiffRequested(const QString &currentSha, const QString &p
           "UI",
           QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
 
-      ui->mainStackedWidget->setCurrentIndex(2);
+      mainStackedWidget->setCurrentIndex(2);
    }
    else
       QMessageBox::information(this, tr("No modifications"), tr("There are no content modifications for this file"));

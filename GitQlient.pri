@@ -2,7 +2,6 @@ RESOURCES += $$PWD/icons.qrc
 
 FORMS += \
     $$PWD/CommitWidget.ui \
-    $$PWD/MainWindow.ui \
     $$PWD/BranchDlg.ui \
     $$PWD/RevisionWidget.ui \
     $$PWD/TagDlg.ui

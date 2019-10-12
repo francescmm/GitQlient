@@ -11,9 +11,9 @@
 #include <QDir>
 #include <QFileDialog>
 
-Controls::Controls(QWidget *parent)
+Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
-   , mGit(Git::getInstance())
+   , mGit(git)
    , mOpenRepo(new QToolButton())
    , mHome(new QToolButton())
    , mGoToBtn(new QToolButton())

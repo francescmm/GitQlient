@@ -13,9 +13,9 @@
 #include <QMenu>
 #include <QHeaderView>
 
-BranchesWidget::BranchesWidget(QWidget *parent)
+BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
    : QWidget(parent)
-   , mGit(Git::getInstance())
+   , mGit(git)
    , mLocalBranchesTree(new BranchTreeWidget(mGit))
    , mRemoteBranchesTree(new BranchTreeWidget(mGit))
    , mTagsList(new QListWidget())

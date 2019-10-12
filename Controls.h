@@ -39,7 +39,7 @@ signals:
    void signalOpenRepo(const QString &path);
 
 public:
-   explicit Controls(QWidget *parent = nullptr);
+   explicit Controls(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
    void setCurrentSha(const QString &sha) { mCurrentSha = sha; }
    void enableButtons(bool enabled);

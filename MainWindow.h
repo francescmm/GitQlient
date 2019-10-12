@@ -25,17 +25,20 @@
 
 #include <QFrame>
 
+class Git;
 class QCloseEvent;
 class QFileSystemWatcher;
 class QListWidgetItem;
+class QStackedWidget;
+class Controls;
 class CommitWidget;
 class RevisionWidget;
 class DiffWidget;
 class FileDiffWidget;
-class RevsView;
-class FileDiffHighlighter;
-class Git;
 class RepositoryView;
+class RevsView;
+class BranchesWidget;
+class FileDiffHighlighter;
 
 namespace Ui
 {
@@ -59,11 +62,13 @@ protected:
    void closeEvent(QCloseEvent *ce) override;
 
 private:
-   Ui::MainWindow *ui = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    QString mCurrentDir;
    bool mRepositoryBusy = false;
    QSharedPointer<Git> mGit;
+   QStackedWidget *commitStackedWidget = nullptr;
+   QStackedWidget *mainStackedWidget = nullptr;
+   Controls *mControls = nullptr;
    CommitWidget *mCommitWidget = nullptr;
    RevisionWidget *mRevisionWidget = nullptr;
    RevsView *rv = nullptr;
@@ -71,6 +76,7 @@ private:
    FileDiffWidget *mFileDiffWidget = nullptr;
    RepositoryView *mRepositoryView = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
+   BranchesWidget *mBranchesWidget = nullptr;
 
    void updateUi();
    void goToCommitSha(const QString &goToSha);

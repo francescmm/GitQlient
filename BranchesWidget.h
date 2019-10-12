@@ -40,7 +40,7 @@ signals:
    void signalSelectCommit(const QString &sha);
 
 public:
-   explicit BranchesWidget(QWidget *parent = nullptr);
+   explicit BranchesWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
    void showBranches();
    void clear();
 
