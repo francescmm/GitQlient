@@ -44,7 +44,7 @@ void BranchContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QString output;
-   const auto ret = Git::getInstance()->pull(output);
+   const auto ret = mConfig.mGit->pull(output);
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -56,7 +56,7 @@ void BranchContextMenu::pull()
 void BranchContextMenu::fetch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->fetch();
+   const auto ret = mConfig.mGit->fetch();
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -68,7 +68,7 @@ void BranchContextMenu::fetch()
 void BranchContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->push();
+   const auto ret = mConfig.mGit->push();
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -80,7 +80,7 @@ void BranchContextMenu::push()
 void BranchContextMenu::pushForce()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->push(true);
+   const auto ret = mConfig.mGit->push(true);
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -92,7 +92,7 @@ void BranchContextMenu::pushForce()
 
 void BranchContextMenu::createBranch()
 {
-   BranchDlg dlg(mConfig.branchSelected, BranchDlgMode::CREATE);
+   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::CREATE, mConfig.mGit });
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
@@ -101,7 +101,7 @@ void BranchContextMenu::createBranch()
 
 void BranchContextMenu::createCheckoutBranch()
 {
-   BranchDlg dlg(mConfig.branchSelected, BranchDlgMode::CREATE_CHECKOUT, this);
+   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::CREATE_CHECKOUT, mConfig.mGit }, this);
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
@@ -113,7 +113,7 @@ void BranchContextMenu::merge()
    QString output;
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    const auto currentBranch = mConfig.currentBranch;
-   const auto ret = Git::getInstance()->merge(currentBranch, { mConfig.branchSelected }, &output);
+   const auto ret = mConfig.mGit->merge(currentBranch, { mConfig.branchSelected }, &output);
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -125,7 +125,7 @@ void BranchContextMenu::merge()
 
 void BranchContextMenu::rename()
 {
-   BranchDlg dlg(mConfig.branchSelected, BranchDlgMode::RENAME);
+   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::RENAME, mConfig.mGit });
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
@@ -146,8 +146,8 @@ void BranchContextMenu::deleteBranch()
          QByteArray output;
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-         const auto ret2 = mConfig.isLocal ? Git::getInstance()->removeLocalBranch(mConfig.branchSelected)
-                                           : Git::getInstance()->removeRemoteBranch(mConfig.branchSelected);
+         const auto ret2 = mConfig.isLocal ? mConfig.mGit->removeLocalBranch(mConfig.branchSelected)
+                                           : mConfig.mGit->removeRemoteBranch(mConfig.branchSelected);
 
          QApplication::restoreOverrideCursor();
 

@@ -15,8 +15,9 @@
 
 BranchesWidget::BranchesWidget(QWidget *parent)
    : QWidget(parent)
-   , mLocalBranchesTree(new BranchTreeWidget())
-   , mRemoteBranchesTree(new BranchTreeWidget())
+   , mGit(Git::getInstance())
+   , mLocalBranchesTree(new BranchTreeWidget(mGit))
+   , mRemoteBranchesTree(new BranchTreeWidget(mGit))
    , mTagsList(new QListWidget())
    , mStashesList(new QListWidget())
    , mSubmodulesList(new QListWidget())
@@ -25,7 +26,6 @@ BranchesWidget::BranchesWidget(QWidget *parent)
    , mStashesArrow(new QLabel())
    , mSubmodulesCount(new QLabel("(0)"))
    , mSubmodulesArrow(new QLabel())
-
 {
    mLocalBranchesTree->setLocalRepo(true);
    mLocalBranchesTree->setColumnHidden(0, true);
@@ -178,7 +178,7 @@ void BranchesWidget::showBranches()
    clear();
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   auto ret = Git::getInstance()->getBranches();
+   auto ret = mGit->getBranches();
 
    if (ret.success)
    {
@@ -234,13 +234,13 @@ void BranchesWidget::processLocalBranch(QString branch)
       item->setData(1, Qt::UserRole, true);
    }
 
-   auto distance = Git::getInstance()->getDistanceBetweenBranches(true, branch).output.toString();
+   auto distance = mGit->getDistanceBetweenBranches(true, branch).output.toString();
    distance.replace('\n', "");
    distance.replace('\t', "\u2193 - ");
    distance.append("\u2191");
    item->setText(2, distance);
 
-   distance = Git::getInstance()->getDistanceBetweenBranches(false, branch).output.toString();
+   distance = mGit->getDistanceBetweenBranches(false, branch).output.toString();
 
    if (!distance.contains("fatal"))
    {
@@ -272,7 +272,7 @@ void BranchesWidget::processRemoteBranch(QString branch)
 
 void BranchesWidget::processTags()
 {
-   const auto tags = Git::getInstance()->getTags();
+   const auto tags = mGit->getTags();
 
    for (auto tag : tags)
       mTagsList->addItem(tag);
@@ -282,7 +282,7 @@ void BranchesWidget::processTags()
 
 void BranchesWidget::processStashes()
 {
-   const auto stashes = Git::getInstance()->getStashes();
+   const auto stashes = mGit->getStashes();
 
    for (auto stash : stashes)
    {
@@ -298,7 +298,7 @@ void BranchesWidget::processStashes()
 
 void BranchesWidget::processSubmodules()
 {
-   const auto submodules = Git::getInstance()->getSubmodules();
+   const auto submodules = mGit->getSubmodules();
 
    for (auto submodule : submodules)
       mSubmodulesList->addItem(submodule);
@@ -329,7 +329,7 @@ void BranchesWidget::showTagsContextMenu(const QPoint &p)
    const auto removeTagAction = menu->addAction(tr("Remove tag"));
    connect(removeTagAction, &QAction::triggered, this, [this, tagName]() {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      const auto ret = Git::getInstance()->removeTag(tagName, true);
+      const auto ret = mGit->removeTag(tagName, true);
       QApplication::restoreOverrideCursor();
 
       if (ret)
@@ -354,7 +354,7 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
    connect(UpdateSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
       QByteArray output;
-      const auto ret = Git::getInstance()->submoduleUpdate(submoduleName);
+      const auto ret = mGit->submoduleUpdate(submoduleName);
       QApplication::restoreOverrideCursor();
 
       if (ret)
@@ -397,7 +397,7 @@ void BranchesWidget::onSubmodulesHeaderClicked()
 void BranchesWidget::onTagClicked(QListWidgetItem *item)
 {
    QByteArray sha;
-   Git::getInstance()->getTagCommit(item->text(), sha);
+   mGit->getTagCommit(item->text(), sha);
 
    emit signalSelectCommit(QString::fromUtf8(sha));
 }
@@ -405,7 +405,7 @@ void BranchesWidget::onTagClicked(QListWidgetItem *item)
 void BranchesWidget::onStashClicked(QListWidgetItem *item)
 {
    QByteArray sha;
-   Git::getInstance()->getTagCommit(item->data(Qt::UserRole).toString(), sha);
+   mGit->getTagCommit(item->data(Qt::UserRole).toString(), sha);
 
    emit signalSelectCommit(QString::fromUtf8(sha));
 }

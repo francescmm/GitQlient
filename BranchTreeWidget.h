@@ -25,6 +25,8 @@
 
 #include <QTreeWidget>
 
+class Git;
+
 class BranchTreeWidget : public QTreeWidget
 {
    Q_OBJECT
@@ -34,11 +36,12 @@ signals:
    void signalSelectCommit(const QString &sha);
 
 public:
-   explicit BranchTreeWidget(QWidget *parent = nullptr);
+   explicit BranchTreeWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
    void setLocalRepo(const bool isLocal) { mLocal = isLocal; }
 
 private:
    bool mLocal = false;
+   QSharedPointer<Git> mGit;
 
    void showBranchesContextMenu(const QPoint &pos);
    void checkoutBranch(QTreeWidgetItem *item);

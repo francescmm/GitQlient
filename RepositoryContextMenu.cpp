@@ -151,7 +151,7 @@ void RepositoryContextMenu::stashPop()
 
 void RepositoryContextMenu::createBranch()
 {
-   BranchDlg dlg(mSha, BranchDlgMode::CREATE_FROM_COMMIT);
+   BranchDlg dlg({ mSha, BranchDlgMode::CREATE_FROM_COMMIT, QSharedPointer<Git>(Git::getInstance()) });
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)

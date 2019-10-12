@@ -30,6 +30,8 @@ namespace Ui
 class BranchDlg;
 }
 
+class Git;
+
 enum class BranchDlgMode
 {
    CREATE,
@@ -38,17 +40,24 @@ enum class BranchDlgMode
    RENAME,
 };
 
+struct BranchDlgConfig
+{
+   QString mCurrentBranchName;
+   BranchDlgMode mDialogMode;
+   QSharedPointer<Git> mGit;
+};
+
 class BranchDlg : public QDialog
 {
    Q_OBJECT
 
 public:
-   explicit BranchDlg(const QString &currentName, BranchDlgMode mode, QWidget *parent = nullptr);
+   explicit BranchDlg(const BranchDlgConfig &config, QWidget *parent = nullptr);
    ~BranchDlg() override;
 
 private:
    Ui::BranchDlg *ui = nullptr;
-   BranchDlgMode mMode = BranchDlgMode::RENAME;
+   BranchDlgConfig mConfig;
 
    void checkNewBranchName();
    void accept() override;

@@ -29,6 +29,7 @@ class BranchTreeWidget;
 class QListWidget;
 class QListWidgetItem;
 class QLabel;
+class Git;
 
 class BranchesWidget : public QWidget
 {
@@ -44,6 +45,7 @@ public:
    void clear();
 
 private:
+   QSharedPointer<Git> mGit;
    BranchTreeWidget *mLocalBranchesTree = nullptr;
    BranchTreeWidget *mRemoteBranchesTree = nullptr;
    QListWidget *mTagsList = nullptr;

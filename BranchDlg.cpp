@@ -5,10 +5,10 @@
 
 #include <QFile>
 
-BranchDlg::BranchDlg(const QString &currentName, BranchDlgMode mode, QWidget *parent)
+BranchDlg::BranchDlg(const BranchDlgConfig &config, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::BranchDlg)
-   , mMode(mode)
+   , mConfig(config)
 {
    QFile styles(":/stylesheet.css");
 
@@ -19,21 +19,21 @@ BranchDlg::BranchDlg(const QString &currentName, BranchDlgMode mode, QWidget *pa
    }
 
    ui->setupUi(this);
-   ui->leOldName->setText(currentName);
+   ui->leOldName->setText(mConfig.mCurrentBranchName);
 
-   if (mMode == BranchDlgMode::CREATE)
+   if (mConfig.mDialogMode == BranchDlgMode::CREATE)
       setWindowTitle("Create branch");
-   else if (mMode == BranchDlgMode::RENAME)
+   else if (mConfig.mDialogMode == BranchDlgMode::RENAME)
    {
       ui->pbAccept->setText(tr("Rename"));
       setWindowTitle("Rename branch");
    }
-   else if (mMode == BranchDlgMode::CREATE_CHECKOUT)
+   else if (mConfig.mDialogMode == BranchDlgMode::CREATE_CHECKOUT)
    {
       setWindowTitle("Create and checkout branch");
       ui->leOldName->setHidden(true);
    }
-   else if (mMode == BranchDlgMode::CREATE_FROM_COMMIT)
+   else if (mConfig.mDialogMode == BranchDlgMode::CREATE_FROM_COMMIT)
    {
       setWindowTitle("Create branch at commit");
       ui->leOldName->setHidden(true);
@@ -66,14 +66,14 @@ void BranchDlg::accept()
 
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-      if (mMode == BranchDlgMode::CREATE)
-         Git::getInstance()->createBranchFromAnotherBranch(ui->leOldName->text(), ui->leNewName->text());
-      else if (mMode == BranchDlgMode::CREATE_CHECKOUT)
-         Git::getInstance()->checkoutNewLocalBranch(ui->leNewName->text());
-      else if (mMode == BranchDlgMode::RENAME)
-         Git::getInstance()->renameBranch(ui->leOldName->text(), ui->leNewName->text());
-      else if (mMode == BranchDlgMode::CREATE_FROM_COMMIT)
-         Git::getInstance()->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text());
+      if (mConfig.mDialogMode == BranchDlgMode::CREATE)
+         mConfig.mGit->createBranchFromAnotherBranch(ui->leOldName->text(), ui->leNewName->text());
+      else if (mConfig.mDialogMode == BranchDlgMode::CREATE_CHECKOUT)
+         mConfig.mGit->checkoutNewLocalBranch(ui->leNewName->text());
+      else if (mConfig.mDialogMode == BranchDlgMode::RENAME)
+         mConfig.mGit->renameBranch(ui->leOldName->text(), ui->leNewName->text());
+      else if (mConfig.mDialogMode == BranchDlgMode::CREATE_FROM_COMMIT)
+         mConfig.mGit->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text());
 
       QApplication::restoreOverrideCursor();
 
