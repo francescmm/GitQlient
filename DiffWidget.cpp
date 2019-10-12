@@ -19,6 +19,7 @@
 DiffWidget::DiffWidget(QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::DiffWidget)
+   , mGit(Git::getInstance())
    , mDomain(new PatchViewDomain())
 {
    ui->setupUi(this);
@@ -44,7 +45,7 @@ bool DiffWidget::doUpdate(bool force)
 {
    if ((mSt.isChanged(StateInfo::SHA) || force) && !mDomain->isLinked())
    {
-      QString caption(Git::getInstance()->getShortLog(mSt.sha()));
+      QString caption(mGit->getShortLog(mSt.sha()));
 
       if (caption.length() > 30)
          caption = caption.left(30 - 3).trimmed().append("...");

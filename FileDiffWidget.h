@@ -28,6 +28,7 @@
 class FileDiffHighlighter;
 class FileDiffView;
 class QPushButton;
+class Git;
 
 class FileDiffWidget : public QFrame
 {
@@ -42,6 +43,7 @@ private:
    void moveToPreviousDiff();
    void moveToNextDiff();
 
+   QSharedPointer<Git> mGit;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    FileDiffView *mDiffView = nullptr;
    QPushButton *mGoPrevious = nullptr;

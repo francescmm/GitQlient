@@ -8,6 +8,7 @@
 
 FileDiffWidget::FileDiffWidget(QWidget *parent)
    : QFrame(parent)
+   , mGit(Git::getInstance())
    , mDiffView(new FileDiffView())
    , mGoPrevious(new QPushButton())
    , mGoNext(new QPushButton())
@@ -46,7 +47,7 @@ bool FileDiffWidget::onFileDiffRequested(const QString &currentSha, const QStrin
    if (destFile.contains("-->"))
       destFile = destFile.split("--> ").last().split("(").first().trimmed();
 
-   auto text = Git::getInstance()->getDiff(currentSha, previousSha, destFile);
+   auto text = mGit->getDiff(currentSha, previousSha, destFile);
    auto lines = text.split("\n");
 
    for (auto i = 0; !lines.isEmpty() && i < 5; ++i)

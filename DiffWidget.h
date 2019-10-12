@@ -35,6 +35,7 @@ class DiffWidget;
 }
 
 class PatchViewDomain;
+class Git;
 
 class DiffWidget : public QWidget
 {
@@ -54,6 +55,7 @@ private:
    void saveRestoreSizes(bool startup = false);
 
    Ui::DiffWidget *ui = nullptr;
+   QSharedPointer<Git> mGit;
    QString normalizedSha;
    PatchViewDomain *mDomain = nullptr;
    StateInfo mSt;
