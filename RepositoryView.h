@@ -27,7 +27,7 @@ signals:
    void signalAmmendCommit(const QString &sha);
 
 public:
-   explicit RepositoryView(QWidget *parent = nullptr);
+   explicit RepositoryView(QSharedPointer<Git> git, QWidget *parent = nullptr);
    ~RepositoryView();
    void setup();
    const QString shaFromAnnId(int id);
@@ -52,6 +52,8 @@ private slots:
    virtual void currentChanged(const QModelIndex &, const QModelIndex &);
 
 private:
+   QSharedPointer<Git> mGit;
+
    void showContextMenu(const QPoint &);
    void setupGeometry();
    bool filterRightButtonPressed(QMouseEvent *e);

@@ -16,13 +16,14 @@ using namespace QGit;
 
 // ************************* Domain ****************************
 
-Domain::Domain(bool isMain)
+Domain::Domain(QSharedPointer<Git> git, bool isMain)
    : QObject()
+   , mGit(git)
 {
    fileHistory = new RepositoryModel(this);
 
    if (isMain)
-      Git::getInstance()->setDefaultModel(fileHistory);
+      mGit->setDefaultModel(fileHistory);
 
    st.clear();
    busy = linked = false;
@@ -124,8 +125,7 @@ void Domain::update(bool fromMaster, bool force)
       return;
    }
 
-   const auto git = Git::getInstance();
-   git->setCurContext(this);
+   mGit->setCurContext(this);
    busy = true;
    populateState(); // complete any missing state information
    st.setLock(true); // any state change will be queued now
@@ -137,12 +137,12 @@ void Domain::update(bool fromMaster, bool force)
 
    st.setLock(false);
    busy = false;
-   if (git->curContext() != this)
+   if (mGit->curContext() != this)
       qDebug("ASSERT in Domain::update, context is %p "
              "instead of %p",
-             (void *)git->curContext(), (void *)this);
+             (void *)mGit->curContext(), (void *)this);
 
-   git->setCurContext(nullptr);
+   mGit->setCurContext(nullptr);
 
    bool nextRequestPending = flushQueue();
 

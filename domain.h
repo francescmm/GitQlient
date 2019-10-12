@@ -8,6 +8,7 @@
 #define DOMAIN_H
 
 #include <QObject>
+#include <QSharedPointer>
 #include <StateInfo.h>
 
 class Domain;
@@ -19,7 +20,7 @@ class Domain : public QObject
 {
    Q_OBJECT
 public:
-   Domain(bool isMain);
+   Domain(QSharedPointer<Git> git, bool isMain);
    virtual ~Domain();
    void deleteWhenDone(); // will delete when no more run() are pending
    RepositoryModel *model() const { return fileHistory; }
@@ -47,6 +48,7 @@ protected:
    virtual bool doUpdate(bool) { return true; }
    void linkDomain(Domain *d);
    void unlinkDomain(Domain *d);
+   QSharedPointer<Git> mGit;
 
    bool busy;
 

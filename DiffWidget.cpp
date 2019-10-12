@@ -16,7 +16,7 @@
 DiffWidget::DiffWidget(QSharedPointer<Git> git, QWidget *parent)
    : QWidget(parent)
    , mGit(git)
-   , mDomain(new PatchViewDomain())
+   , mDomain(new PatchViewDomain(mGit))
    , mTextEditDiff(new FullDiffWidget(mGit))
 {
    QFont font;
@@ -76,8 +76,8 @@ bool DiffWidget::doUpdate(bool force)
    return true;
 }
 
-PatchViewDomain::PatchViewDomain()
-   : Domain(false)
+PatchViewDomain::PatchViewDomain(QSharedPointer<Git> git)
+   : Domain(git, false)
 {
 }
 

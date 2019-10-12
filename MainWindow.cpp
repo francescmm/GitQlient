@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *p)
    , mDiffWidget(new DiffWidget(mGit))
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
-   , mRepositoryView(new RepositoryView())
+   , mRepositoryView(new RepositoryView(mGit))
 {
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");

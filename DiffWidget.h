@@ -66,7 +66,7 @@ private:
 class PatchViewDomain : public Domain
 {
 public:
-   PatchViewDomain();
+   PatchViewDomain(QSharedPointer<Git> git);
    void setOwner(DiffWidget *owner);
    bool doUpdate(bool force) override;
 

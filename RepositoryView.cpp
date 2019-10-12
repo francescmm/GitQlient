@@ -32,9 +32,10 @@ using namespace QGit;
 
 uint refTypeFromName(const QString &name);
 
-RepositoryView::RepositoryView(QWidget *parent)
+RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
    : QTreeView(parent)
-   , d(new Domain(true))
+   , mGit(git)
+   , d(new Domain(mGit, true))
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -48,8 +49,8 @@ RepositoryView::RepositoryView(QWidget *parent)
    connect(lvd, &RepositoryViewDelegate::updateView, viewport(), qOverload<>(&QWidget::update));
    connect(this, &RepositoryView::diffTargetChanged, lvd, &RepositoryViewDelegate::diffTargetChanged);
    connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
-   connect(Git::getInstance(), &Git::newRevsAdded, this, [this]() {
-      if (!Git::getInstance()->isMainHistory(fh) || !d->st.sha().isEmpty())
+   connect(mGit.get(), &Git::newRevsAdded, this, [this]() {
+      if (!mGit->isMainHistory(fh) || !d->st.sha().isEmpty())
          return;
 
       if (model()->rowCount() == 0)
@@ -59,8 +60,8 @@ RepositoryView::RepositoryView(QWidget *parent)
       d->st.setSelectItem(true);
       update();
    });
-   connect(Git::getInstance(), &Git::loadCompleted, this, [this]() {
-      if (!Git::getInstance()->isMainHistory(fh))
+   connect(mGit.get(), &Git::loadCompleted, this, [this]() {
+      if (!mGit->isMainHistory(fh))
          return;
 
       d->update(false, false);
@@ -80,7 +81,7 @@ void RepositoryView::setup()
 
 RepositoryView::~RepositoryView()
 {
-   Git::getInstance()->cancelDataLoading(fh); // non blocking
+   mGit->cancelDataLoading(fh); // non blocking
 }
 
 const QString RepositoryView::sha(int row) const
@@ -104,7 +105,7 @@ void RepositoryView::setupGeometry()
    hv->setSectionResizeMode(static_cast<int>(RepositoryModel::FileHistoryColumn::LOG), QHeaderView::Stretch);
    hv->setStretchLastSection(false);
 
-   if (Git::getInstance()->isMainHistory(fh))
+   if (mGit->isMainHistory(fh))
    {
       hideColumn(static_cast<int>(RepositoryModel::FileHistoryColumn::SHA));
       hideColumn(static_cast<int>(RepositoryModel::FileHistoryColumn::DATE));
@@ -119,11 +120,11 @@ void RepositoryView::scrollToNext(int direction)
    // -1 = the next child in history
    //  1 = the previous parent in history
    const QString &s = sha(currentIndex().row());
-   const auto r = Git::getInstance()->revLookup(s);
+   const auto r = mGit->revLookup(s);
 
    if (r)
    {
-      const QStringList &next = direction < 0 ? Git::getInstance()->getChildren(s) : r->parents();
+      const QStringList &next = direction < 0 ? mGit->getChildren(s) : r->parents();
       if (next.size() >= 1)
          setCurrentIndex(model()->index(row(next.first()), 0));
    }
@@ -139,7 +140,7 @@ void RepositoryView::scrollToCurrent(ScrollHint hint)
 int RepositoryView::getLaneType(const QString &sha, int pos) const
 {
 
-   const auto r = Git::getInstance()->revLookup(sha, fh);
+   const auto r = mGit->revLookup(sha, fh);
    return (r && pos < r->lanes.count() && pos >= 0 ? r->lanes.at(pos) : -1);
 }
 
@@ -153,13 +154,13 @@ void RepositoryView::getSelectedItems(QStringList &selectedItems)
 
    // selectedRows() returns the items in an unspecified order,
    // so be sure rows are ordered from newest to oldest.
-   selectedItems = Git::getInstance()->sortShaListByIndex(selectedItems);
+   selectedItems = mGit->sortShaListByIndex(selectedItems);
 }
 
 const QString RepositoryView::shaFromAnnId(int id)
 {
 
-   if (Git::getInstance()->isMainHistory(fh))
+   if (mGit->isMainHistory(fh))
       return "";
 
    return sha(model()->rowCount() - id);
@@ -200,7 +201,7 @@ bool RepositoryView::update()
             sel->select(newIndex, QItemSelectionModel::Deselect);
       }
    }
-   if (Git::getInstance()->isMainHistory(fh))
+   if (mGit->isMainHistory(fh))
       emit diffTargetChanged(row(st->diffToSha()));
 
    setupGeometry();
@@ -304,12 +305,12 @@ bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringLi
    QString root;
    if (!isFreeLane(t))
    {
-      p = Git::getInstance()->revLookup(sha, fh)->parents(); // pointer cannot be nullptr
+      p = mGit->revLookup(sha, fh)->parents(); // pointer cannot be nullptr
       root = sha;
    }
    else
    {
-      const QString &par(Git::getInstance()->getLaneParent(sha, lane));
+      const QString &par(mGit->getLaneParent(sha, lane));
       if (par.isEmpty())
          return false;
 
@@ -317,6 +318,6 @@ bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringLi
       root = p.first();
    }
    // then find children
-   c = Git::getInstance()->getChildren(root);
+   c = mGit->getChildren(root);
    return true;
 }
