@@ -3,7 +3,6 @@ RESOURCES += $$PWD/icons.qrc
 FORMS += \
     $$PWD/CommitWidget.ui \
     $$PWD/BranchDlg.ui \
-    $$PWD/RevisionWidget.ui \
     $$PWD/TagDlg.ui
 
 HEADERS += \

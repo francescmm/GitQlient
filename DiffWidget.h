@@ -49,10 +49,10 @@ public:
 private:
    void saveRestoreSizes(bool startup = false);
 
-   FullDiffWidget *mTextEditDiff = nullptr;
    QSharedPointer<Git> mGit;
-   QString normalizedSha;
    PatchViewDomain *mDomain = nullptr;
+   FullDiffWidget *mTextEditDiff = nullptr;
+   QString normalizedSha;
    StateInfo mSt;
 
    enum ButtonId

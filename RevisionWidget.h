@@ -25,16 +25,13 @@
 
 #include <QWidget>
 
-namespace Ui
-{
-class RevisionWidget;
-}
-
 class RevsView;
 class RevFile;
 class QListWidgetItem;
 class Rev;
 class Git;
+class QLabel;
+class FileListWidget;
 
 class RevisionWidget : public QWidget
 {
@@ -46,7 +43,6 @@ signals:
 
 public:
    explicit RevisionWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
-   ~RevisionWidget();
 
    void setup(RevsView *);
    void setCurrentCommitSha(const QString &sha);
@@ -54,8 +50,15 @@ public:
    void clear();
 
 private:
-   Ui::RevisionWidget *ui = nullptr;
    QSharedPointer<Git> mGit;
    QString mCurrentSha;
    QString mParentSha;
+   QLabel *labelSha = nullptr;
+   QLabel *labelTitle = nullptr;
+   QLabel *labelDescription = nullptr;
+   QLabel *labelAuthor = nullptr;
+   QLabel *labelDateTime = nullptr;
+   QLabel *labelEmail = nullptr;
+   FileListWidget *fileListWidget = nullptr;
+   QLabel *labelModCount = nullptr;
 };

@@ -94,8 +94,9 @@ void DiffHighlighter::highlightBlock(const QString &text)
    }
 }
 
-FullDiffWidget::FullDiffWidget(QWidget *parent)
+FullDiffWidget::FullDiffWidget(QSharedPointer<Git> git, QWidget *parent)
    : QTextEdit(parent)
+   , mGit(git)
 {
    diffHighlighter = new DiffHighlighter(this);
 }
@@ -185,7 +186,7 @@ void FullDiffWidget::centerOnFileHeader(StateInfo &st)
 
    target = st.fileName();
    bool combined = (st.isMerge() && !st.allMergeFiles());
-   Git::getInstance()->formatPatchFileHeader(&target, st.sha(), st.diffToSha(), combined, st.allMergeFiles());
+   mGit->formatPatchFileHeader(&target, st.sha(), st.diffToSha(), combined, st.allMergeFiles());
    seekTarget = !target.isEmpty();
    if (seekTarget)
       seekTarget = !centerTarget(target);
@@ -338,7 +339,7 @@ void FullDiffWidget::update(StateInfo &st)
    bool combined = (st.isMerge() && !st.allMergeFiles());
    if (combined)
    {
-      const Rev *r = Git::getInstance()->revLookup(st.sha());
+      const Rev *r = mGit->revLookup(st.sha());
       if (r)
          diffHighlighter->setCombinedLength(r->parentsCount());
    }
@@ -347,5 +348,5 @@ void FullDiffWidget::update(StateInfo &st)
 
    clear();
 
-   Git::getInstance()->getDiff(st.sha(), this, st.diffToSha(), combined); // non blocking
+   mGit->getDiff(st.sha(), this, st.diffToSha(), combined); // non blocking
 }

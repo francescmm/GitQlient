@@ -263,10 +263,10 @@ QPair<bool, QString> Git::run(const QString &runCmd)
 {
    QString runOutput;
    GitSyncProcess p(mWorkingDir, mErrorReportingEnabled);
-   connect(Git::getInstance(), &Git::cancelAllProcesses, &p, &AGitProcess::onCancel);
+   connect(this, &Git::cancelAllProcesses, &p, &AGitProcess::onCancel);
 
-   if (Git::getInstance()->curContext())
-      connect(Git::getInstance()->curContext(), &Domain::cancelDomainProcesses, &p, &AGitProcess::onCancel);
+   if (curContext())
+      connect(curContext(), &Domain::cancelDomainProcesses, &p, &AGitProcess::onCancel);
 
    const auto ret = p.run(runCmd, runOutput);
 
@@ -276,7 +276,7 @@ QPair<bool, QString> Git::run(const QString &runCmd)
 void Git::runAsync(const QString &runCmd, QObject *receiver, const QString &buf)
 {
    auto p = new GitAsyncProcess(mWorkingDir, mErrorReportingEnabled, receiver);
-   connect(Git::getInstance(), &Git::cancelAllProcesses, p, &AGitProcess::onCancel);
+   connect(this, &Git::cancelAllProcesses, p, &AGitProcess::onCancel);
 
    if (!p->run(runCmd, const_cast<QString &>(buf)))
       delete p;

@@ -17,11 +17,11 @@ DiffWidget::DiffWidget(QSharedPointer<Git> git, QWidget *parent)
    : QWidget(parent)
    , mGit(git)
    , mDomain(new PatchViewDomain())
+   , mTextEditDiff(new FullDiffWidget(mGit))
 {
    QFont font;
    font.setFamily(QString::fromUtf8("Ubuntu Mono"));
 
-   mTextEditDiff = new FullDiffWidget();
    mTextEditDiff->setObjectName("textEditDiff");
    mTextEditDiff->setFont(font);
    mTextEditDiff->setUndoRedoEnabled(false);

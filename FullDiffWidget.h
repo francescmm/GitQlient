@@ -48,7 +48,7 @@ class FullDiffWidget : public QTextEdit
 {
    Q_OBJECT
 public:
-   explicit FullDiffWidget(QWidget *parent = nullptr);
+   explicit FullDiffWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
    void clear();
    void centerOnFileHeader(StateInfo &st);
    void refresh();
@@ -70,6 +70,7 @@ public slots:
 
 private:
    friend class DiffHighlighter;
+   QSharedPointer<Git> mGit;
 
    void scrollCursorToTop();
    void scrollLineToTop(int lineNum);

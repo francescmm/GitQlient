@@ -38,7 +38,7 @@ signals:
    void contextMenu(const QString &, int);
 
 public:
-   FileListWidget(QWidget *parent);
+   explicit FileListWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
    void setup(Domain *dm);
    void update(const RevFile *files, bool newFiles);
    void addItem(const QString &label, const QColor &clr);
@@ -47,6 +47,7 @@ private:
    void showContextMenu(const QPoint &);
    void insertFiles(const RevFile *files);
 
+   QSharedPointer<Git> mGit = nullptr;
    Domain *d = nullptr;
    StateInfo *st = nullptr;
 };

@@ -86,6 +86,7 @@ RevisionWidget #labelSha
     background-color: #202122;
     padding: 8px 10px 8px 10px;
     font-weight: bold;
+    font-family: Ubuntu Mono;
 }
 
 CommitWidget > QListWidget, BranchesWidget > QListWidget{

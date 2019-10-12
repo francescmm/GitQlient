@@ -17,8 +17,9 @@ Copyright: See COPYING file that comes with this distribution
 #include <QPalette>
 #include <QMenu>
 
-FileListWidget::FileListWidget(QWidget *p)
+FileListWidget::FileListWidget(QSharedPointer<Git> git, QWidget *p)
    : QListWidget(p)
+   , mGit(git)
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
 }
@@ -111,7 +112,7 @@ void FileListWidget::insertFiles(const RevFile *files)
             continue;
          }
       }
-      addItem(Git::getInstance()->filePath(*files, i), clr);
+      addItem(mGit->filePath(*files, i), clr);
    }
    setUpdatesEnabled(true);
 }
@@ -131,7 +132,7 @@ void FileListWidget::update(const RevFile *files, bool newFiles)
    const auto item = currentItem();
    const auto currentText = item ? item->data(Qt::DisplayRole).toString() : "";
    QString fileName(currentText);
-   Git::getInstance()->removeExtraFileInfo(&fileName); // could be a renamed/copied file
+   mGit->removeExtraFileInfo(&fileName); // could be a renamed/copied file
 
    if (item && !fileName.isEmpty() && (fileName == st->fileName()))
    {
@@ -149,7 +150,7 @@ void FileListWidget::update(const RevFile *files, bool newFiles)
    if (l.isEmpty())
    { // could be a renamed/copied file, try harder
       fileName = st->fileName();
-      Git::getInstance()->addExtraFileInfo(&fileName, st->sha(), st->diffToSha(), st->allMergeFiles());
+      mGit->addExtraFileInfo(&fileName, st->sha(), st->diffToSha(), st->allMergeFiles());
       l = findItems(fileName, Qt::MatchExactly);
    }
 
