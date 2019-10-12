@@ -6,6 +6,7 @@
 #include <git.h>
 #include <revsview.h>
 #include <QLogger.h>
+#include <DiffWidget.h>
 
 #include <QDirIterator>
 #include <QFileSystemWatcher>
@@ -17,8 +18,9 @@ using namespace QLogger;
 MainWindow::MainWindow(QWidget *p)
    : QFrame(p)
    , ui(new Ui::MainWindow)
-   , rv(new RevsView(true))
    , mGit(Git::getInstance())
+   , rv(new RevsView(true))
+   , mDiffWidget(new DiffWidget(mGit))
 {
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
@@ -34,6 +36,7 @@ MainWindow::MainWindow(QWidget *p)
    ui->setupUi(this);
    ui->mainStackedWidget->setCurrentIndex(0);
    ui->page_5->layout()->addWidget(rv->getRepoList());
+   ui->page_6->layout()->addWidget(mDiffWidget);
    ui->controls->enableButtons(false);
 
    ui->revisionWidget->setup(rv);
@@ -194,7 +197,7 @@ void MainWindow::clearWindow(bool deepClear)
    ui->revisionWidget->clear();
 
    rv->clear(deepClear);
-   ui->patchView->clear(deepClear);
+   mDiffWidget->clear(deepClear);
    ui->fileDiffWidget->clear();
    ui->branchesWidget->clear();
 
@@ -207,7 +210,7 @@ void MainWindow::setWidgetsEnabled(bool enabled)
    ui->revisionWidget->setEnabled(enabled);
    ui->commitStackedWidget->setEnabled(enabled);
    rv->setEnabled(enabled);
-   ui->patchView->setEnabled(enabled);
+   mDiffWidget->setEnabled(enabled);
    ui->fileDiffWidget->setEnabled(enabled);
    ui->branchesWidget->setEnabled(enabled);
 }
@@ -227,7 +230,7 @@ void MainWindow::goToCommitSha(const QString &goToSha)
 
 void MainWindow::openCommitDiff()
 {
-   ui->patchView->setStateInfo(rv->st);
+   mDiffWidget->setStateInfo(rv->st);
    ui->mainStackedWidget->setCurrentIndex(1);
 }
 

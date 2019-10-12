@@ -13,8 +13,9 @@ using namespace QGit;
 
 QTextBrowser *QGit::kErrorLogBrowser = nullptr;
 
-Terminal::Terminal()
+Terminal::Terminal(QSharedPointer<Git> git)
    : QDialog()
+   , mGit(git)
    , leGitCommand(new QLineEdit())
    , outputTerminal(new QTextBrowser())
 {
@@ -60,7 +61,7 @@ void Terminal::executeCommand()
       else
       {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         const auto ret = Git::getInstance()->run(leGitCommand->text());
+         const auto ret = mGit->run(leGitCommand->text());
          QApplication::restoreOverrideCursor();
          outputTerminal->setText(ret.second);
       }

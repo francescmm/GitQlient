@@ -29,22 +29,17 @@
 
 class Git;
 
-namespace Ui
-{
-class DiffWidget;
-}
-
 class PatchViewDomain;
 class Git;
+class FullDiffWidget;
 
 class DiffWidget : public QWidget
 {
    Q_OBJECT
 
 public:
-   explicit DiffWidget(QWidget *parent = nullptr);
+   explicit DiffWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
    void clear(bool complete = true);
-   Ui::DiffWidget *tab() { return ui; }
 
    StateInfo st() const { return mSt; }
    void setStateInfo(const StateInfo &st);
@@ -54,7 +49,7 @@ public:
 private:
    void saveRestoreSizes(bool startup = false);
 
-   Ui::DiffWidget *ui = nullptr;
+   FullDiffWidget *mTextEditDiff = nullptr;
    QSharedPointer<Git> mGit;
    QString normalizedSha;
    PatchViewDomain *mDomain = nullptr;

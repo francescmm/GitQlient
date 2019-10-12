@@ -27,6 +27,7 @@
 
 class QLineEdit;
 class QTextBrowser;
+class Git;
 
 class Terminal final : public QDialog
 {
@@ -36,9 +37,10 @@ signals:
    void signalUpdateUi();
 
 public:
-   Terminal();
+   Terminal(QSharedPointer<Git> git);
 
 private:
+   QSharedPointer<Git> mGit;
    QLineEdit *leGitCommand = nullptr;
    QTextBrowser *outputTerminal = nullptr;
 

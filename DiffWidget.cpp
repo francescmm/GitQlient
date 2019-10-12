@@ -7,22 +7,31 @@
 
 */
 #include "DiffWidget.h"
-#include "ui_DiffWidget.h"
-
 #include "common.h"
 #include "git.h"
-#include "MainWindow.h"
 #include "FullDiffWidget.h"
-#include <QButtonGroup>
-#include <QScrollBar>
 
-DiffWidget::DiffWidget(QWidget *parent)
+#include <QVBoxLayout>
+
+DiffWidget::DiffWidget(QSharedPointer<Git> git, QWidget *parent)
    : QWidget(parent)
-   , ui(new Ui::DiffWidget)
-   , mGit(Git::getInstance())
+   , mGit(git)
    , mDomain(new PatchViewDomain())
 {
-   ui->setupUi(this);
+   QFont font;
+   font.setFamily(QString::fromUtf8("Ubuntu Mono"));
+
+   mTextEditDiff = new FullDiffWidget();
+   mTextEditDiff->setObjectName("textEditDiff");
+   mTextEditDiff->setFont(font);
+   mTextEditDiff->setUndoRedoEnabled(false);
+   mTextEditDiff->setLineWrapMode(QTextEdit::NoWrap);
+   mTextEditDiff->setReadOnly(true);
+   mTextEditDiff->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
+   const auto vLayout = new QVBoxLayout(this);
+   vLayout->setContentsMargins(QMargins());
+   vLayout->addWidget(mTextEditDiff);
 
    mDomain->setOwner(this);
 }
@@ -32,7 +41,7 @@ void DiffWidget::clear(bool complete)
    if (complete)
       mSt.clear();
 
-   ui->textEditDiff->clear();
+   mTextEditDiff->clear();
 }
 
 void DiffWidget::setStateInfo(const StateInfo &st)
@@ -53,16 +62,16 @@ bool DiffWidget::doUpdate(bool force)
 
    if (mSt.isChanged(StateInfo::ANY & ~StateInfo::FILE_NAME) || force)
    {
-      ui->textEditDiff->clear();
+      mTextEditDiff->clear();
 
       if (normalizedSha != mSt.diffToSha() && !normalizedSha.isEmpty())
          normalizedSha = "";
 
-      ui->textEditDiff->update(mSt); // non blocking
+      mTextEditDiff->update(mSt); // non blocking
    }
 
    if (mSt.isChanged() || force)
-      ui->textEditDiff->centerOnFileHeader(mSt);
+      mTextEditDiff->centerOnFileHeader(mSt);
 
    return true;
 }

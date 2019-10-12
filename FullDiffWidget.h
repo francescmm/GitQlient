@@ -48,7 +48,7 @@ class FullDiffWidget : public QTextEdit
 {
    Q_OBJECT
 public:
-   FullDiffWidget(QWidget *parent);
+   explicit FullDiffWidget(QWidget *parent = nullptr);
    void clear();
    void centerOnFileHeader(StateInfo &st);
    void refresh();

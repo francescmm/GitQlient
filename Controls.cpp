@@ -198,7 +198,7 @@ void Controls::pruneBranches()
 
 void Controls::showTerminal()
 {
-   const auto terminal = new Terminal();
+   const auto terminal = new Terminal(mGit);
    connect(terminal, &Terminal::signalUpdateUi, this, &Controls::signalRepositoryUpdated);
 
    terminal->show();

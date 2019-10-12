@@ -31,6 +31,8 @@ class QListWidgetItem;
 class RevsView;
 class FileDiffHighlighter;
 class Git;
+class RepositoryView;
+class DiffWidget;
 
 namespace Ui
 {
@@ -58,6 +60,11 @@ private:
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    QString mCurrentDir;
    bool mRepositoryBusy = false;
+   QSharedPointer<Git> mGit;
+   RevsView *rv = nullptr;
+   DiffWidget *mDiffWidget = nullptr;
+   RepositoryView *mRepositoryView = nullptr;
+   QFileSystemWatcher *mGitWatcher = nullptr;
 
    void updateUi();
    void goToCommitSha(const QString &goToSha);
@@ -71,10 +78,6 @@ private:
    void clearWindow(bool deepClear);
    void setWidgetsEnabled(bool enabled);
    void executeCommand();
-
-   RevsView *rv = nullptr;
-   QFileSystemWatcher *mGitWatcher = nullptr;
-   QSharedPointer<Git> mGit;
 
    // End of MainWindow refactor
 

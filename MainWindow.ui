@@ -191,9 +191,6 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="DiffWidget" name="patchView" native="true"/>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="page_3">
@@ -249,12 +246,6 @@
    <class>CommitWidget</class>
    <extends>QWidget</extends>
    <header>CommitWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>DiffWidget</class>
-   <extends>QWidget</extends>
-   <header>DiffWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
