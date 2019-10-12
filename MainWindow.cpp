@@ -23,7 +23,7 @@ using namespace QLogger;
 
 MainWindow::MainWindow(QWidget *p)
    : QFrame(p)
-   , mGit(Git::getInstance())
+   , mGit(new Git())
    , commitStackedWidget(new QStackedWidget())
    , mainStackedWidget(new QStackedWidget())
    , mControls(new Controls(mGit))

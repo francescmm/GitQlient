@@ -20,7 +20,7 @@ Domain::Domain(QSharedPointer<Git> git, bool isMain)
    : QObject()
    , mGit(git)
 {
-   fileHistory = new RepositoryModel(this);
+   fileHistory = new RepositoryModel(mGit, this);
 
    if (isMain)
       mGit->setDefaultModel(fileHistory);

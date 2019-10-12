@@ -29,16 +29,6 @@
 
 using namespace QGit;
 
-Git *Git::INSTANCE = nullptr;
-
-Git *Git::getInstance()
-{
-   if (INSTANCE == nullptr)
-      INSTANCE = new Git();
-
-   return INSTANCE;
-}
-
 Git::Git()
    : QObject()
 {

@@ -19,8 +19,9 @@
 
 using namespace QGit;
 
-RepositoryModel::RepositoryModel(QObject *p)
+RepositoryModel::RepositoryModel(QSharedPointer<Git> git, QObject *p)
    : QAbstractItemModel(p)
+   , mGit(git)
 {
    mColumns.insert(FileHistoryColumn::GRAPH, "Graph");
    mColumns.insert(FileHistoryColumn::ID, "Id");
@@ -33,8 +34,8 @@ RepositoryModel::RepositoryModel(QObject *p)
    revs.reserve(QGit::MAX_DICT_SIZE);
    clear(); // after _headerInfo is set
 
-   connect(Git::getInstance(), &Git::newRevsAdded, this, &RepositoryModel::on_newRevsAdded);
-   connect(Git::getInstance(), &Git::loadCompleted, this, &RepositoryModel::on_loadCompleted);
+   connect(mGit.get(), &Git::newRevsAdded, this, &RepositoryModel::on_newRevsAdded);
+   connect(mGit.get(), &Git::loadCompleted, this, &RepositoryModel::on_loadCompleted);
 }
 
 RepositoryModel::~RepositoryModel()
@@ -67,7 +68,7 @@ bool RepositoryModel::hasChildren(const QModelIndex &parent) const
 int RepositoryModel::row(const QString &sha) const
 {
 
-   const Rev *r = Git::getInstance()->revLookup(sha, this);
+   const Rev *r = mGit->revLookup(sha, this);
    return r ? r->orderIdx : -1;
 }
 
@@ -117,7 +118,7 @@ void RepositoryModel::clear(bool complete)
       return;
    }
 
-   Git::getInstance()->cancelDataLoading(this);
+   mGit->cancelDataLoading(this);
 
    beginResetModel();
    qDeleteAll(revs);
@@ -239,7 +240,7 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
       return no_value; // fast path, 90% of calls ends here!
 
-   const auto git = Git::getInstance();
+   const auto git = mGit;
    const Rev *r = git->revLookup(revOrder.at(index.row()), this);
    if (!r)
       return no_value;

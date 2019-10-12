@@ -57,7 +57,6 @@ public:
    };
 
    explicit Git();
-   static Git *getInstance();
 
    /** START Git CONFIGURATION **/
    bool init(const QString &wd, const QStringList *args);
@@ -187,8 +186,6 @@ private:
    bool loadFromCache(const QString &gitDir, RevFileMap &rfm, QVector<QString> &dirs, QVector<QString> &files,
                       QByteArray &revsFilesShaBuf);
    bool getGitDBDir(const QString &wd, QString &gd, bool &changed);
-
-   static Git *INSTANCE;
 
    friend class DataLoader;
 

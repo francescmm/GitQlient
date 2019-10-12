@@ -10,6 +10,7 @@
 */
 
 #include <QAbstractItemModel>
+#include <QSharedPointer>
 
 class Git;
 class Lanes;
@@ -29,7 +30,7 @@ public:
       DATE
    };
 
-   RepositoryModel(QObject *parent);
+   RepositoryModel(QSharedPointer<Git> git, QObject *parent);
    ~RepositoryModel();
    void clear(bool complete = true);
    const QString sha(int row) const;
@@ -55,6 +56,7 @@ private slots:
    void on_loadCompleted(const RepositoryModel *, const QString &);
 
 private:
+   QSharedPointer<Git> mGit;
    friend class Annotate;
    friend class DataLoader;
    friend class Git;
