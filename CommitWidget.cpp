@@ -25,10 +25,10 @@ using namespace QGit;
 
 QString CommitWidget::lastMsgBeforeError;
 
-CommitWidget::CommitWidget(QWidget *parent)
+CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::CommitWidget)
-   , mGit(Git::getInstance())
+   , mGit(git)
 {
    ui->setupUi(this);
 

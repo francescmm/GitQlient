@@ -41,7 +41,7 @@ signals:
    void signalChangesCommitted(bool commited);
 
 public:
-   explicit CommitWidget(QWidget *parent = nullptr);
+   explicit CommitWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
    void init(const QString &shaToAmmend);
    void clear();

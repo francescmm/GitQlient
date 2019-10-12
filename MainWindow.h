@@ -28,11 +28,13 @@
 class QCloseEvent;
 class QFileSystemWatcher;
 class QListWidgetItem;
+class CommitWidget;
+class RevisionWidget;
+class DiffWidget;
 class RevsView;
 class FileDiffHighlighter;
 class Git;
 class RepositoryView;
-class DiffWidget;
 
 namespace Ui
 {
@@ -61,6 +63,8 @@ private:
    QString mCurrentDir;
    bool mRepositoryBusy = false;
    QSharedPointer<Git> mGit;
+   CommitWidget *mCommitWidget = nullptr;
+   RevisionWidget *mRevisionWidget = nullptr;
    RevsView *rv = nullptr;
    DiffWidget *mDiffWidget = nullptr;
    RepositoryView *mRepositoryView = nullptr;

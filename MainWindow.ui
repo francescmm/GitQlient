@@ -66,7 +66,7 @@
        <height>310</height>
       </size>
      </property>
-     <widget class="QWidget" name="page">
+     <widget class="QWidget" name="revisionPage">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -89,19 +89,9 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="RevisionWidget" name="revisionWidget" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_2">
+     <widget class="QWidget" name="commitPage">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -124,9 +114,6 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="CommitWidget" name="commitWidget" native="true"/>
-       </item>
       </layout>
      </widget>
     </widget>
@@ -155,7 +142,7 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <widget class="QWidget" name="page_5">
+     <widget class="QWidget" name="repoPage">
       <layout class="QGridLayout" name="gridLayout_2">
        <property name="leftMargin">
         <number>0</number>
@@ -174,7 +161,7 @@
        </property>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_6">
+     <widget class="QWidget" name="fullDiffPage">
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
         <number>0</number>
@@ -193,7 +180,7 @@
        </property>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_3">
+     <widget class="QWidget" name="fileDiffPage">
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <property name="spacing">
         <number>0</number>
@@ -234,18 +221,6 @@
    <class>BranchesWidget</class>
    <extends>QWidget</extends>
    <header>BranchesWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>RevisionWidget</class>
-   <extends>QWidget</extends>
-   <header>RevisionWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>CommitWidget</class>
-   <extends>QWidget</extends>
-   <header>CommitWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

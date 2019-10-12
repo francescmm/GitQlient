@@ -8,10 +8,10 @@
 
 #include <QDateTime>
 
-RevisionWidget::RevisionWidget(QWidget *parent)
+RevisionWidget::RevisionWidget(QSharedPointer<Git> git, QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::RevisionWidget)
-   , mGit(Git::getInstance())
+   , mGit(git)
 {
    ui->setupUi(this);
 

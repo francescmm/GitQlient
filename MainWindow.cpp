@@ -1,6 +1,8 @@
 #include "MainWindow.h"
 #include <ui_MainWindow.h>
 
+#include <CommitWidget.h>
+#include <RevisionWidget.h>
 #include <RepositoryModel.h>
 #include <RepositoryView.h>
 #include <git.h>
@@ -19,6 +21,8 @@ MainWindow::MainWindow(QWidget *p)
    : QFrame(p)
    , ui(new Ui::MainWindow)
    , mGit(Git::getInstance())
+   , mCommitWidget(new CommitWidget(mGit))
+   , mRevisionWidget(new RevisionWidget(mGit))
    , rv(new RevsView(true))
    , mDiffWidget(new DiffWidget(mGit))
 {
@@ -34,12 +38,15 @@ MainWindow::MainWindow(QWidget *p)
    }
 
    ui->setupUi(this);
+   ui->commitStackedWidget->setCurrentIndex(0);
+   ui->commitPage->layout()->addWidget(mCommitWidget);
+   ui->revisionPage->layout()->addWidget(mRevisionWidget);
    ui->mainStackedWidget->setCurrentIndex(0);
-   ui->page_5->layout()->addWidget(rv->getRepoList());
-   ui->page_6->layout()->addWidget(mDiffWidget);
+   ui->repoPage->layout()->addWidget(rv->getRepoList());
+   ui->fullDiffPage->layout()->addWidget(mDiffWidget);
    ui->controls->enableButtons(false);
 
-   ui->revisionWidget->setup(rv);
+   mRevisionWidget->setup(rv);
 
    qApp->installEventFilter(this);
 
@@ -59,10 +66,10 @@ MainWindow::MainWindow(QWidget *p)
    connect(rv, &RevsView::signalViewUpdated, this, &MainWindow::updateUi);
    connect(rv, &RevsView::signalOpenDiff, this, &MainWindow::openCommitDiff);
 
-   connect(ui->revisionWidget, &RevisionWidget::signalOpenFileContextMenu, rv, &RevsView::on_contextMenu);
-   connect(ui->revisionWidget, &RevisionWidget::signalOpenFileCommit, this, &MainWindow::onFileDiffRequested);
+   connect(mRevisionWidget, &RevisionWidget::signalOpenFileContextMenu, rv, &RevsView::on_contextMenu);
+   connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &MainWindow::onFileDiffRequested);
 
-   connect(ui->commitWidget, &CommitWidget::signalChangesCommitted, this, &MainWindow::changesCommitted);
+   connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &MainWindow::changesCommitted);
 
    connect(rv->getRepoList(), &RepositoryView::clicked, this,
            qOverload<const QModelIndex &>(&MainWindow::onCommitClicked));
@@ -91,12 +98,12 @@ void MainWindow::updateUi()
       mGit->init2();
 
       const auto commitStackedIndex = ui->commitStackedWidget->currentIndex();
-      const auto currentSha = commitStackedIndex == 0 ? ui->revisionWidget->getCurrentCommitSha() : QGit::ZERO_SHA;
+      const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : QGit::ZERO_SHA;
 
       goToCommitSha(currentSha);
 
       if (commitStackedIndex == 1)
-         ui->commitWidget->init(currentSha);
+         mCommitWidget->init(currentSha);
    }
 }
 
@@ -133,7 +140,7 @@ void MainWindow::setRepository(const QString &newDir)
          onCommitSelected(QGit::ZERO_SHA);
          ui->branchesWidget->showBranches();
 
-         ui->commitWidget->init(QGit::ZERO_SHA);
+         mCommitWidget->init(QGit::ZERO_SHA);
 
          ui->mainStackedWidget->setCurrentIndex(0);
          ui->commitStackedWidget->setCurrentIndex(1);
@@ -193,8 +200,8 @@ void MainWindow::clearWindow(bool deepClear)
    ui->commitStackedWidget->setCurrentIndex(ui->commitStackedWidget->currentIndex());
    ui->mainStackedWidget->setCurrentIndex(0);
 
-   ui->commitWidget->clear();
-   ui->revisionWidget->clear();
+   mCommitWidget->clear();
+   mRevisionWidget->clear();
 
    rv->clear(deepClear);
    mDiffWidget->clear(deepClear);
@@ -206,8 +213,8 @@ void MainWindow::clearWindow(bool deepClear)
 
 void MainWindow::setWidgetsEnabled(bool enabled)
 {
-   ui->commitWidget->setEnabled(enabled);
-   ui->revisionWidget->setEnabled(enabled);
+   mCommitWidget->setEnabled(enabled);
+   mRevisionWidget->setEnabled(enabled);
    ui->commitStackedWidget->setEnabled(enabled);
    rv->setEnabled(enabled);
    mDiffWidget->setEnabled(enabled);
@@ -262,15 +269,15 @@ void MainWindow::onCommitSelected(const QString &sha)
    QLog_Info("UI", QString("User selects the commit {%1}").arg(sha));
 
    if (isWip)
-      ui->commitWidget->init(sha);
+      mCommitWidget->init(sha);
    else
-      ui->revisionWidget->setCurrentCommitSha(sha);
+      mRevisionWidget->setCurrentCommitSha(sha);
 }
 
 void MainWindow::onAmmendCommit(const QString &sha)
 {
    ui->commitStackedWidget->setCurrentIndex(1);
-   ui->commitWidget->init(sha);
+   mCommitWidget->init(sha);
 }
 
 void MainWindow::onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file)

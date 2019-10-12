@@ -45,7 +45,7 @@ signals:
    void signalOpenFileContextMenu(const QString &, int);
 
 public:
-   explicit RevisionWidget(QWidget *parent = nullptr);
+   explicit RevisionWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
    ~RevisionWidget();
 
    void setup(RevsView *);
