@@ -197,9 +197,6 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="FileDiffWidget" name="fileDiffWidget"/>
-       </item>
       </layout>
      </widget>
     </widget>
@@ -221,12 +218,6 @@
    <class>BranchesWidget</class>
    <extends>QWidget</extends>
    <header>BranchesWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>FileDiffWidget</class>
-   <extends>QFrame</extends>
-   <header>FileDiffWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -31,6 +31,7 @@ class QListWidgetItem;
 class CommitWidget;
 class RevisionWidget;
 class DiffWidget;
+class FileDiffWidget;
 class RevsView;
 class FileDiffHighlighter;
 class Git;
@@ -67,6 +68,7 @@ private:
    RevisionWidget *mRevisionWidget = nullptr;
    RevsView *rv = nullptr;
    DiffWidget *mDiffWidget = nullptr;
+   FileDiffWidget *mFileDiffWidget = nullptr;
    RepositoryView *mRepositoryView = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
 

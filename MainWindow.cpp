@@ -9,6 +9,7 @@
 #include <revsview.h>
 #include <QLogger.h>
 #include <DiffWidget.h>
+#include <FileDiffWidget.h>
 
 #include <QDirIterator>
 #include <QFileSystemWatcher>
@@ -25,6 +26,7 @@ MainWindow::MainWindow(QWidget *p)
    , mRevisionWidget(new RevisionWidget(mGit))
    , rv(new RevsView(true))
    , mDiffWidget(new DiffWidget(mGit))
+   , mFileDiffWidget(new FileDiffWidget(mGit))
 {
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
@@ -38,13 +40,15 @@ MainWindow::MainWindow(QWidget *p)
    }
 
    ui->setupUi(this);
+
    ui->commitStackedWidget->setCurrentIndex(0);
    ui->commitPage->layout()->addWidget(mCommitWidget);
    ui->revisionPage->layout()->addWidget(mRevisionWidget);
+
    ui->mainStackedWidget->setCurrentIndex(0);
    ui->repoPage->layout()->addWidget(rv->getRepoList());
    ui->fullDiffPage->layout()->addWidget(mDiffWidget);
-   ui->controls->enableButtons(false);
+   ui->fileDiffPage->layout()->addWidget(mFileDiffWidget);
 
    mRevisionWidget->setup(rv);
 
@@ -205,7 +209,7 @@ void MainWindow::clearWindow(bool deepClear)
 
    rv->clear(deepClear);
    mDiffWidget->clear(deepClear);
-   ui->fileDiffWidget->clear();
+   mFileDiffWidget->clear();
    ui->branchesWidget->clear();
 
    blockSignals(false);
@@ -218,7 +222,7 @@ void MainWindow::setWidgetsEnabled(bool enabled)
    ui->commitStackedWidget->setEnabled(enabled);
    rv->setEnabled(enabled);
    mDiffWidget->setEnabled(enabled);
-   ui->fileDiffWidget->setEnabled(enabled);
+   mFileDiffWidget->setEnabled(enabled);
    ui->branchesWidget->setEnabled(enabled);
 }
 
@@ -282,7 +286,7 @@ void MainWindow::onAmmendCommit(const QString &sha)
 
 void MainWindow::onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file)
 {
-   const auto fileWithModifications = ui->fileDiffWidget->onFileDiffRequested(currentSha, previousSha, file);
+   const auto fileWithModifications = mFileDiffWidget->onFileDiffRequested(currentSha, previousSha, file);
 
    if (fileWithModifications)
    {

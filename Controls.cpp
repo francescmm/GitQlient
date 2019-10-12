@@ -102,6 +102,8 @@ Controls::Controls(QWidget *parent)
    connect(mGoToBtn, &QToolButton::clicked, this, &Controls::openGoToDialog);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mTerminalBtn, &QToolButton::clicked, this, &Controls::showTerminal);
+
+   enableButtons(false);
 }
 
 void Controls::enableButtons(bool enabled)

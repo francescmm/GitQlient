@@ -6,9 +6,9 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 
-FileDiffWidget::FileDiffWidget(QWidget *parent)
+FileDiffWidget::FileDiffWidget(QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
-   , mGit(Git::getInstance())
+   , mGit(git)
    , mDiffView(new FileDiffView())
    , mGoPrevious(new QPushButton())
    , mGoNext(new QPushButton())
