@@ -45,6 +45,7 @@ signals:
 
 public:
    explicit MainWindow(QWidget *parent = nullptr);
+   explicit MainWindow(const QString &repo, QWidget *parent = nullptr);
 
    void setRepository(const QString &newDir);
 

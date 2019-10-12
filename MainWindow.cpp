@@ -65,6 +65,12 @@ MainWindow::MainWindow(QWidget *p)
    connect(rv->getRepoList(), &RepositoryView::signalAmmendCommit, this, &MainWindow::onAmmendCommit);
 }
 
+MainWindow::MainWindow(const QString &repo, QWidget *parent)
+   : MainWindow(parent)
+{
+   setRepository(repo);
+}
+
 void MainWindow::updateUi()
 {
    if (!mCurrentDir.isEmpty())
