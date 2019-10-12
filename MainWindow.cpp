@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *p)
    : QFrame(p)
    , ui(new Ui::MainWindow)
    , rv(new RevsView(true))
+   , mGit(Git::getInstance())
 {
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
@@ -34,8 +35,6 @@ MainWindow::MainWindow(QWidget *p)
    ui->mainStackedWidget->setCurrentIndex(0);
    ui->page_5->layout()->addWidget(rv->getRepoList());
    ui->controls->enableButtons(false);
-
-   Git::getInstance(this);
 
    ui->revisionWidget->setup(rv);
 
@@ -80,12 +79,13 @@ void MainWindow::updateUi()
 {
    if (!mCurrentDir.isEmpty())
    {
-      Git::getInstance()->init(mCurrentDir, nullptr);
+      mGit->init(mCurrentDir, nullptr);
 
       ui->branchesWidget->showBranches();
 
       rv->clear(true);
-      Git::getInstance()->init2();
+
+      mGit->init2();
 
       const auto commitStackedIndex = ui->commitStackedWidget->currentIndex();
       const auto currentSha = commitStackedIndex == 0 ? ui->revisionWidget->getCurrentCommitSha() : QGit::ZERO_SHA;
@@ -110,13 +110,13 @@ void MainWindow::setRepository(const QString &newDir)
       resetWatcher(oldDir, newDir);
 
       bool archiveChanged;
-      const auto git = Git::getInstance();
-      git->getBaseDir(newDir, mCurrentDir, archiveChanged);
-      git->stop(archiveChanged);
+
+      mGit->getBaseDir(newDir, mCurrentDir, archiveChanged);
+      mGit->stop(archiveChanged);
 
       QLog_Info("UI", "Initializing Git...");
 
-      const auto ok = git->init(mCurrentDir, nullptr); // blocking call
+      const auto ok = mGit->init(mCurrentDir, nullptr); // blocking call
 
       if (ok)
       {
@@ -125,7 +125,7 @@ void MainWindow::setRepository(const QString &newDir)
          clearWindow(true);
          setWidgetsEnabled(true);
 
-         Git::getInstance()->init2();
+         mGit->init2();
 
          onCommitSelected(QGit::ZERO_SHA);
          ui->branchesWidget->showBranches();
@@ -216,7 +216,7 @@ void MainWindow::goToCommitSha(const QString &goToSha)
 {
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(goToSha));
 
-   const auto sha = Git::getInstance()->getRefSha(goToSha);
+   const auto sha = mGit->getRefSha(goToSha);
 
    if (!sha.isEmpty())
    {
@@ -290,10 +290,9 @@ void MainWindow::rebase(const QString &from, const QString &to, const QString &o
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-   const auto git = Git::getInstance();
    const auto success = from.isEmpty()
-       ? git->run(QString("git checkout -q %1").arg(to)).first && git->run(QString("git rebase %1").arg(onto)).first
-       : git->run(QString("git rebase --onto %3 %1^ %2").arg(from, to, onto)).first;
+       ? mGit->run(QString("git checkout -q %1").arg(to)).first && mGit->run(QString("git rebase %1").arg(onto)).first
+       : mGit->run(QString("git rebase --onto %3 %1^ %2").arg(from, to, onto)).first;
 
    if (success)
       updateUi();
@@ -306,7 +305,7 @@ void MainWindow::merge(const QStringList &shas, const QString &into)
    QString output;
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-   if (Git::getInstance()->merge(into, shas, &output))
+   if (mGit->merge(into, shas, &output))
    {
       // TODO: Enable it again
       // controlsWidget->commitChanges();
@@ -333,13 +332,12 @@ void MainWindow::moveRef(const QString &target, const QString &toSHA)
    }
    else if (!target.isEmpty())
    {
-      const auto git = Git::getInstance();
-      const QString &sha = git->getRefSha(target, Git::BRANCH, false);
+      const QString &sha = mGit->getRefSha(target, Git::BRANCH, false);
       if (!sha.isEmpty())
       {
-         const QStringList &children = git->getChildren(sha);
+         const QStringList &children = mGit->getChildren(sha);
          if ((children.count() == 0 || (children.count() == 1 && children.front() == QGit::ZERO_SHA)) && // no children
-             git->getRefNames(sha, Git::ANY_REF).count() == 1 && // last ref name
+             mGit->getRefNames(sha, Git::ANY_REF).count() == 1 && // last ref name
              QMessageBox::question(this, "move branch",
                                    QString("This is the last reference to this branch.\n"
                                            "Do you really want to move '%1'?")
@@ -347,7 +345,7 @@ void MainWindow::moveRef(const QString &target, const QString &toSHA)
                  == QMessageBox::No)
             return;
 
-         if (target == git->getCurrentBranchName()) // move current branch
+         if (target == mGit->getCurrentBranchName()) // move current branch
             cmd = QString("git checkout -q -B %1 %2").arg(target, toSHA);
          else // move any other local branch
             cmd = QString("git branch -f %1 %2").arg(target, toSHA);
@@ -356,7 +354,7 @@ void MainWindow::moveRef(const QString &target, const QString &toSHA)
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-   if (Git::getInstance()->run(cmd).first)
+   if (mGit->run(cmd).first)
       updateUi();
 
    QApplication::restoreOverrideCursor();
@@ -379,7 +377,7 @@ void MainWindow::closeEvent(QCloseEvent *ce)
    emit closeAllWindows();
    hide();
 
-   Git::getInstance()->stop(true);
+   mGit->stop(true);
 
    QWidget::closeEvent(ce);
 }

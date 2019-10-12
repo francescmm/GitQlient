@@ -30,6 +30,7 @@ class QFileSystemWatcher;
 class QListWidgetItem;
 class RevsView;
 class FileDiffHighlighter;
+class Git;
 
 namespace Ui
 {
@@ -73,6 +74,7 @@ private:
 
    RevsView *rv = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
+   Git *mGit;
 
    // End of MainWindow refactor
 
