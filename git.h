@@ -55,7 +55,9 @@ public:
       MIXED,
       HARD
    };
-   static Git *getInstance(QObject *p = nullptr);
+
+   explicit Git();
+   static Git *getInstance();
 
    /** START Git CONFIGURATION **/
    bool init(const QString &wd, const QStringList *args);
@@ -186,7 +188,6 @@ private:
                       QByteArray &revsFilesShaBuf);
    bool getGitDBDir(const QString &wd, QString &gd, bool &changed);
 
-   explicit Git(QObject *parent = nullptr);
    static Git *INSTANCE;
 
    friend class DataLoader;

@@ -31,19 +31,17 @@ using namespace QGit;
 
 Git *Git::INSTANCE = nullptr;
 
-Git *Git::getInstance(QObject *p)
+Git *Git::getInstance()
 {
    if (INSTANCE == nullptr)
-      INSTANCE = new Git(p);
+      INSTANCE = new Git();
 
    return INSTANCE;
 }
 
-Git::Git(QObject *p)
-   : QObject(p)
+Git::Git()
+   : QObject()
 {
-   setParent(p);
-
    mRevsFiles.reserve(MAX_DICT_SIZE);
 }
 
