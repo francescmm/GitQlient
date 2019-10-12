@@ -5,11 +5,14 @@
 #include <RepositoryView.h>
 #include <git.h>
 #include <revsview.h>
+#include <QLogger.h>
 
 #include <QDirIterator>
 #include <QFileSystemWatcher>
 #include <QFileDialog>
 #include <QMessageBox>
+
+using namespace QLogger;
 
 MainWindow::MainWindow(QWidget *p)
    : QFrame(p)
@@ -68,6 +71,8 @@ MainWindow::MainWindow(QWidget *p)
 MainWindow::MainWindow(const QString &repo, QWidget *parent)
    : MainWindow(parent)
 {
+   QLog_Info("UI", "Initializing MainWindow with repo");
+
    setRepository(repo);
 }
 
@@ -96,6 +101,8 @@ void MainWindow::setRepository(const QString &newDir)
 {
    if (!mRepositoryBusy && !newDir.isEmpty())
    {
+      QLog_Info("UI", QString("Starting repository: %1").arg(newDir));
+
       mRepositoryBusy = true;
 
       const auto oldDir = mCurrentDir;
@@ -105,12 +112,16 @@ void MainWindow::setRepository(const QString &newDir)
       bool archiveChanged;
       const auto git = Git::getInstance();
       git->getBaseDir(newDir, mCurrentDir, archiveChanged);
-      git->stop(archiveChanged); // stop all pending processes, non blocking
+      git->stop(archiveChanged);
+
+      QLog_Info("UI", "Initializing Git...");
 
       const auto ok = git->init(mCurrentDir, nullptr); // blocking call
 
       if (ok)
       {
+         QLog_Info("UI", "... Git initialized!");
+
          clearWindow(true);
          setWidgetsEnabled(true);
 
@@ -124,6 +135,8 @@ void MainWindow::setRepository(const QString &newDir)
          ui->mainStackedWidget->setCurrentIndex(0);
          ui->commitStackedWidget->setCurrentIndex(1);
          ui->controls->enableButtons(true);
+
+         QLog_Info("UI", "MainWindow widgets configured with the new repo");
       }
       else
       {
@@ -152,6 +165,8 @@ void MainWindow::resetWatcher(const QString &oldDir, const QString &newDir)
 
    if (oldDir != newDir)
    {
+      QLog_Info("UI", QString("Resetting the file watcher from dir {%1} to {%2}").arg(oldDir, newDir));
+
       if (!oldDir.isEmpty())
          mGitWatcher->removePath(oldDir);
 
@@ -199,6 +214,8 @@ void MainWindow::setWidgetsEnabled(bool enabled)
 
 void MainWindow::goToCommitSha(const QString &goToSha)
 {
+   QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(goToSha));
+
    const auto sha = Git::getInstance()->getRefSha(goToSha);
 
    if (!sha.isEmpty())
@@ -239,6 +256,8 @@ void MainWindow::onCommitSelected(const QString &sha)
    const auto isWip = sha == QGit::ZERO_SHA;
    ui->commitStackedWidget->setCurrentIndex(isWip);
 
+   QLog_Info("UI", QString("User selects the commit {%1}").arg(sha));
+
    if (isWip)
       ui->commitWidget->init(sha);
    else
@@ -256,7 +275,13 @@ void MainWindow::onFileDiffRequested(const QString &currentSha, const QString &p
    const auto fileWithModifications = ui->fileDiffWidget->onFileDiffRequested(currentSha, previousSha, file);
 
    if (fileWithModifications)
+   {
+      QLog_Info(
+          "UI",
+          QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
+
       ui->mainStackedWidget->setCurrentIndex(2);
+   }
    else
       QMessageBox::information(this, tr("No modifications"), tr("There are no content modifications for this file"));
 }
@@ -339,6 +364,8 @@ void MainWindow::moveRef(const QString &target, const QString &toSHA)
 
 void MainWindow::closeEvent(QCloseEvent *ce)
 {
+   QLog_Info("UI", QString("Closing UI for repository {%1}").arg(mCurrentDir));
+
    // lastWindowClosed() signal is emitted by close(), after sending
    // closeEvent(), so we need to close _here_ all secondary windows before
    // the close() method checks for lastWindowClosed flag to avoid missing
