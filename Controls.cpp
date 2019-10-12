@@ -13,6 +13,7 @@
 
 Controls::Controls(QWidget *parent)
    : QFrame(parent)
+   , mGit(Git::getInstance())
    , mOpenRepo(new QToolButton())
    , mHome(new QToolButton())
    , mGoToBtn(new QToolButton())
@@ -140,7 +141,7 @@ void Controls::pullCurrentBranch()
    QString output;
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->pull(output);
+   const auto ret = mGit->pull(output);
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -150,7 +151,7 @@ void Controls::pullCurrentBranch()
 void Controls::fetchAll()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->fetch();
+   const auto ret = mGit->fetch();
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -160,7 +161,7 @@ void Controls::fetchAll()
 void Controls::pushCurrentBranch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->push();
+   const auto ret = mGit->push();
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -169,7 +170,7 @@ void Controls::pushCurrentBranch()
 
 void Controls::stashCurrentWork()
 {
-   const auto ret = Git::getInstance()->stash();
+   const auto ret = mGit->stash();
 
    if (ret)
       emit signalRepositoryUpdated();
@@ -177,7 +178,7 @@ void Controls::stashCurrentWork()
 
 void Controls::popStashedWork()
 {
-   const auto ret = Git::getInstance()->pop();
+   const auto ret = mGit->pop();
 
    if (ret)
       emit signalRepositoryUpdated();
@@ -188,7 +189,7 @@ void Controls::pruneBranches()
    QByteArray output;
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->prune();
+   const auto ret = mGit->prune();
    QApplication::restoreOverrideCursor();
 
    if (ret.success)

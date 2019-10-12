@@ -11,6 +11,7 @@
 RevisionWidget::RevisionWidget(QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::RevisionWidget)
+   , mGit(Git::getInstance())
 {
    ui->setupUi(this);
 
@@ -41,7 +42,7 @@ void RevisionWidget::setCurrentCommitSha(const QString &sha)
 
    if (sha != QGit::ZERO_SHA and !sha.isEmpty())
    {
-      const auto currentRev = const_cast<Rev *>(Git::getInstance()->revLookup(sha));
+      const auto currentRev = const_cast<Rev *>(mGit->revLookup(sha));
 
       if (currentRev)
       {
@@ -67,7 +68,7 @@ void RevisionWidget::setCurrentCommitSha(const QString &sha)
          f.setItalic(description.isEmpty());
          ui->labelDescription->setFont(f);
 
-         const auto files = Git::getInstance()->getFiles(sha, "", false, "");
+         const auto files = mGit->getFiles(sha, "", false, "");
          ui->fileListWidget->update(files, true);
          ui->labelModCount->setText(QString("(%1)").arg(ui->fileListWidget->count()));
       }

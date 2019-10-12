@@ -34,6 +34,7 @@ class RevsView;
 class RevFile;
 class QListWidgetItem;
 class Rev;
+class Git;
 
 class RevisionWidget : public QWidget
 {
@@ -54,6 +55,7 @@ public:
 
 private:
    Ui::RevisionWidget *ui = nullptr;
+   QSharedPointer<Git> mGit;
    QString mCurrentSha;
    QString mParentSha;
 };

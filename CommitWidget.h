@@ -26,6 +26,7 @@
 #include <QWidget>
 
 class QListWidgetItem;
+class Git;
 
 namespace Ui
 {
@@ -48,6 +49,7 @@ public:
 private:
    bool mIsAmmend = false;
    Ui::CommitWidget *ui = nullptr;
+   QSharedPointer<Git> mGit;
 
    void addFileToCommitList(QListWidgetItem *item);
    void removeFileFromCommitList(QListWidgetItem *item);

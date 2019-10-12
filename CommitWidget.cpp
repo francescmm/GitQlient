@@ -28,6 +28,7 @@ QString CommitWidget::lastMsgBeforeError;
 CommitWidget::CommitWidget(QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::CommitWidget)
+   , mGit(Git::getInstance())
 {
    ui->setupUi(this);
 
@@ -64,16 +65,15 @@ void CommitWidget::init(const QString &shaToAmmend)
       readFromFile(templ, msg);
 
    // set-up files list
-   const auto git = Git::getInstance();
    if (mIsAmmend)
    {
-      const auto revInfo = git->revLookup(shaToAmmend);
+      const auto revInfo = mGit->revLookup(shaToAmmend);
       const auto author = revInfo->author().split("<");
       ui->leAuthorName->setText(author.first());
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
    }
 
-   const auto files = git->getFiles(mIsAmmend ? shaToAmmend : ZERO_SHA);
+   const auto files = mGit->getFiles(mIsAmmend ? shaToAmmend : ZERO_SHA);
 
    if (files)
    {
@@ -89,7 +89,7 @@ void CommitWidget::init(const QString &shaToAmmend)
             myColor = Qt::white;
 
          const auto item = new QListWidgetItem(ui->listWidgetFiles);
-         item->setText(git->filePath(*files, i));
+         item->setText(mGit->filePath(*files, i));
          item->setForeground(myColor);
       }
    }
@@ -104,7 +104,7 @@ void CommitWidget::init(const QString &shaToAmmend)
       QPair<QString, QString> logMessage;
 
       if (mIsAmmend)
-         logMessage = git->getSplitCommitMsg(shaToAmmend);
+         logMessage = mGit->getSplitCommitMsg(shaToAmmend);
 
       msg = logMessage.second.trimmed();
       ui->leCommitTitle->setText(logMessage.first);
@@ -143,14 +143,14 @@ void CommitWidget::contextMenuPopup(const QPoint &pos)
    const auto contextMenu = new QMenu(this);
 
    connect(contextMenu->addAction("Checkout file"), &QAction::triggered, this, [this, fileName]() {
-      const auto ret = Git::getInstance()->resetFile(fileName);
+      const auto ret = mGit->resetFile(fileName);
 
       if (ret)
          emit signalChangesCommitted(ret);
    });
 
    connect(contextMenu->addAction("Add file to commit"), &QAction::triggered, this, [this, fileName]() {
-      const auto ret = Git::getInstance()->resetFile(fileName);
+      const auto ret = mGit->resetFile(fileName);
 
       if (ret)
          emit signalChangesCommitted(ret);
@@ -216,7 +216,7 @@ bool CommitWidget::commitChanges()
    if (!selFiles.isEmpty() && checkMsg(msg))
    {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      const auto ok = Git::getInstance()->commitFiles(selFiles, msg, false);
+      const auto ok = mGit->commitFiles(selFiles, msg, false);
       QApplication::restoreOverrideCursor();
 
       lastMsgBeforeError = (ok ? "" : msg);
@@ -236,7 +236,6 @@ bool CommitWidget::ammendChanges()
 
    if (!selFiles.isEmpty())
    {
-      const auto git = Git::getInstance();
       QString msg;
 
       if (checkMsg(msg))
@@ -244,7 +243,7 @@ bool CommitWidget::ammendChanges()
          const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         const auto ok = git->commitFiles(selFiles, msg, true, author);
+         const auto ok = mGit->commitFiles(selFiles, msg, true, author);
          QApplication::restoreOverrideCursor();
 
          emit signalChangesCommitted(ok);

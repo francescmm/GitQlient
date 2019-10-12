@@ -26,6 +26,7 @@
 #include <QFrame>
 
 class QToolButton;
+class Git;
 
 class Controls : public QFrame
 {
@@ -45,6 +46,7 @@ public:
 
 private:
    QString mCurrentSha;
+   QSharedPointer<Git> mGit;
    QToolButton *mOpenRepo = nullptr;
    QToolButton *mHome = nullptr;
    QToolButton *mGoToBtn = nullptr;
