@@ -34,7 +34,9 @@ uint refTypeFromName(const QString &name);
 
 RepositoryView::RepositoryView(QWidget *parent)
    : QTreeView(parent)
+   , d(new Domain(true))
 {
+   setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
    setItemsExpandable(false);
    setMouseTracking(true);
@@ -46,11 +48,27 @@ RepositoryView::RepositoryView(QWidget *parent)
    connect(lvd, &RepositoryViewDelegate::updateView, viewport(), qOverload<>(&QWidget::update));
    connect(this, &RepositoryView::diffTargetChanged, lvd, &RepositoryViewDelegate::diffTargetChanged);
    connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
+   connect(Git::getInstance(), &Git::newRevsAdded, this, [this]() {
+      if (!Git::getInstance()->isMainHistory(fh) || !d->st.sha().isEmpty())
+         return;
+
+      if (model()->rowCount() == 0)
+         return;
+
+      d->st.setSha(sha(0));
+      d->st.setSelectItem(true);
+      update();
+   });
+   connect(Git::getInstance(), &Git::loadCompleted, this, [this]() {
+      if (!Git::getInstance()->isMainHistory(fh))
+         return;
+
+      d->update(false, false);
+   });
 }
 
-void RepositoryView::setup(Domain *dm)
+void RepositoryView::setup()
 {
-   d = dm;
    fh = d->model();
    st = &(d->st);
    filterNextContextMenuRequest = false;
@@ -208,6 +226,16 @@ void RepositoryView::markDiffToSha(const QString &sha)
 {
    st->setDiffToSha(sha != st->diffToSha() ? sha : QString());
    d->update(false, false);
+}
+
+void RepositoryView::clear(bool complete)
+{
+   d->clear(complete);
+}
+
+Domain *RepositoryView::domain()
+{
+   return d;
 }
 
 bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)

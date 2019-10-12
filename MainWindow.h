@@ -74,9 +74,9 @@ private:
    RevsView *rv = nullptr;
    DiffWidget *mDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;
-   RepositoryView *mRepositoryView = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;
+   RepositoryView *mRepositoryView = nullptr;
 
    void updateUi();
    void goToCommitSha(const QString &goToSha);

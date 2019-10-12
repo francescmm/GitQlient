@@ -25,7 +25,7 @@
 
 #include <QWidget>
 
-class RevsView;
+class Domain;
 class RevFile;
 class QListWidgetItem;
 class Rev;
@@ -44,7 +44,7 @@ signals:
 public:
    explicit RevisionWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
-   void setup(RevsView *);
+   void setup(Domain *);
    void setCurrentCommitSha(const QString &sha);
    QString getCurrentCommitSha() const;
    void clear();

@@ -3,7 +3,6 @@
 #include <common.h>
 #include <FileListWidget.h>
 #include <git.h>
-#include <revsview.h>
 
 #include <QLabel>
 #include <QVBoxLayout>
@@ -82,7 +81,7 @@ RevisionWidget::RevisionWidget(QSharedPointer<Git> git, QWidget *parent)
    connect(fileListWidget, &FileListWidget::contextMenu, this, &RevisionWidget::signalOpenFileContextMenu);
 }
 
-void RevisionWidget::setup(RevsView *rv)
+void RevisionWidget::setup(Domain *rv)
 {
    fileListWidget->setup(rv);
 }

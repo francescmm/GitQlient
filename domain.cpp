@@ -153,30 +153,10 @@ void Domain::update(bool fromMaster, bool force)
       // QApplication::postEvent(m(), new MessageEvent(statusBarRequest));
       statusBarRequest = "";
    }
-   if (!nextRequestPending && popupType)
-      sendPopupEvent();
-}
-
-void Domain::sendPopupEvent()
-{
-   // call an async context popup, must be executed
-   // after returning to event loop
-   // TODO: Popup the error in ApplicationModality context
-   /*
-   DeferredPopupEvent* e = new DeferredPopupEvent(popupData, popupType);
-   QApplication::postEvent(m(), e);
-   popupType = 0;
-*/
 }
 
 void Domain::on_contextMenu(const QString &data, int type)
 {
-
    popupType = type;
    popupData = data;
-
-   if (busy)
-      return; // we are in the middle of an update
-
-   sendPopupEvent();
 }

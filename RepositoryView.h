@@ -29,7 +29,7 @@ signals:
 public:
    explicit RepositoryView(QWidget *parent = nullptr);
    ~RepositoryView();
-   void setup(Domain *d);
+   void setup();
    const QString shaFromAnnId(int id);
    void scrollToCurrent(ScrollHint hint = EnsureVisible);
    void scrollToNext(int direction);
@@ -39,12 +39,13 @@ public:
    const QString sha(int row) const;
    int row(const QString &sha) const;
    void markDiffToSha(const QString &sha);
+   void clear(bool complete);
+   Domain *domain();
 
 signals:
    void rebase(const QString &from, const QString &to, const QString &onto);
    void merge(const QStringList &shas, const QString &into);
    void moveRef(const QString &refName, const QString &toSHA);
-   void contextMenu(const QString &, int);
    void diffTargetChanged(int); // used by new model_view integration
 
 private slots:

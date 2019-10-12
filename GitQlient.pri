@@ -37,7 +37,6 @@ HEADERS += \
     $$PWD/domain.h \
     $$PWD/git.h \
     $$PWD/lanes.h \
-    $$PWD/revsview.h \
     $$PWD/BranchDlg.h
 
 SOURCES += \
@@ -73,6 +72,5 @@ SOURCES += \
     $$PWD/lanes.cpp \
     $$PWD/main.cpp \
     $$PWD/namespace_def.cpp \
-    $$PWD/revsview.cpp \
     $$PWD/common.cpp \
     $$PWD/BranchDlg.cpp

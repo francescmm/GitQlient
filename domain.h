@@ -37,14 +37,14 @@ signals:
 public slots:
    void on_closeAllTabs();
    virtual void on_contextMenu(const QString &, int);
+   virtual void clear(bool complete = true);
 
 protected slots:
    void on_updateRequested(StateInfo newSt);
    void on_deleteWhenDone();
 
 protected:
-   virtual void clear(bool complete = true);
-   virtual bool doUpdate(bool force) = 0;
+   virtual bool doUpdate(bool) { return true; }
    void linkDomain(Domain *d);
    void unlinkDomain(Domain *d);
 
@@ -53,7 +53,6 @@ protected:
 private:
    void populateState();
    bool flushQueue();
-   void sendPopupEvent();
 
    int exDeleteRequest;
    int exCancelRequest;

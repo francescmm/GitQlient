@@ -7,7 +7,6 @@
 #include <RepositoryModel.h>
 #include <RepositoryView.h>
 #include <git.h>
-#include <revsview.h>
 #include <QLogger.h>
 #include <DiffWidget.h>
 #include <FileDiffWidget.h>
@@ -30,10 +29,10 @@ MainWindow::MainWindow(QWidget *p)
    , mControls(new Controls(mGit))
    , mCommitWidget(new CommitWidget(mGit))
    , mRevisionWidget(new RevisionWidget(mGit))
-   , rv(new RevsView(true))
    , mDiffWidget(new DiffWidget(mGit))
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
+   , mRepositoryView(new RepositoryView())
 {
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
@@ -52,7 +51,7 @@ MainWindow::MainWindow(QWidget *p)
    commitStackedWidget->setFixedWidth(310);
 
    mainStackedWidget->setCurrentIndex(0);
-   mainStackedWidget->addWidget(rv->getRepoList());
+   mainStackedWidget->addWidget(mRepositoryView);
    mainStackedWidget->addWidget(mDiffWidget);
    mainStackedWidget->addWidget(mFileDiffWidget);
    mainStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -66,9 +65,8 @@ MainWindow::MainWindow(QWidget *p)
    gridLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Fixed, QSizePolicy::Fixed), 1, 2);
    gridLayout->addWidget(mBranchesWidget, 1, 3);
 
-   mRevisionWidget->setup(rv);
-
-   rv->setEnabled(false);
+   mRepositoryView->setup();
+   mRevisionWidget->setup(mRepositoryView->domain());
 
    connect(mControls, &Controls::signalOpenRepo, this, &MainWindow::setRepository);
    connect(mControls, &Controls::signalGoBack, this, [this]() { mainStackedWidget->setCurrentIndex(0); });
@@ -78,21 +76,20 @@ MainWindow::MainWindow(QWidget *p)
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &MainWindow::updateUi);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &MainWindow::goToCommitSha);
 
-   connect(rv, &RevsView::rebase, this, &MainWindow::rebase);
-   connect(rv, &RevsView::merge, this, &MainWindow::merge);
-   connect(rv, &RevsView::moveRef, this, &MainWindow::moveRef);
-   connect(rv, &RevsView::signalViewUpdated, this, &MainWindow::updateUi);
-   connect(rv, &RevsView::signalOpenDiff, this, &MainWindow::openCommitDiff);
-
-   connect(mRevisionWidget, &RevisionWidget::signalOpenFileContextMenu, rv, &RevsView::on_contextMenu);
-   connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &MainWindow::onFileDiffRequested);
+   connect(mRepositoryView, &RepositoryView::rebase, this, &MainWindow::rebase);
+   connect(mRepositoryView, &RepositoryView::merge, this, &MainWindow::merge);
+   connect(mRepositoryView, &RepositoryView::moveRef, this, &MainWindow::moveRef);
+   connect(mRepositoryView, &RepositoryView::signalViewUpdated, this, &MainWindow::updateUi);
+   connect(mRepositoryView, &RepositoryView::signalOpenDiff, this, &MainWindow::openCommitDiff);
+   connect(mRepositoryView, &RepositoryView::clicked, this,
+           qOverload<const QModelIndex &>(&MainWindow::onCommitClicked));
+   connect(mRepositoryView, &RepositoryView::doubleClicked, this, &MainWindow::openCommitDiff);
+   connect(mRepositoryView, &RepositoryView::signalAmmendCommit, this, &MainWindow::onAmmendCommit);
 
    connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &MainWindow::changesCommitted);
-
-   connect(rv->getRepoList(), &RepositoryView::clicked, this,
-           qOverload<const QModelIndex &>(&MainWindow::onCommitClicked));
-   connect(rv->getRepoList(), &RepositoryView::doubleClicked, this, &MainWindow::openCommitDiff);
-   connect(rv->getRepoList(), &RepositoryView::signalAmmendCommit, this, &MainWindow::onAmmendCommit);
+   connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &MainWindow::onFileDiffRequested);
+   connect(mRevisionWidget, &RevisionWidget::signalOpenFileContextMenu, mRepositoryView->domain(),
+           &Domain::on_contextMenu);
 }
 
 MainWindow::MainWindow(const QString &repo, QWidget *parent)
@@ -111,7 +108,7 @@ void MainWindow::updateUi()
 
       mBranchesWidget->showBranches();
 
-      rv->clear(true);
+      mRepositoryView->clear(true);
 
       mGit->init2();
 
@@ -221,7 +218,7 @@ void MainWindow::clearWindow(bool deepClear)
    mCommitWidget->clear();
    mRevisionWidget->clear();
 
-   rv->clear(deepClear);
+   mRepositoryView->clear(deepClear);
    mDiffWidget->clear(deepClear);
    mFileDiffWidget->clear();
    mBranchesWidget->clear();
@@ -234,7 +231,7 @@ void MainWindow::setWidgetsEnabled(bool enabled)
    mCommitWidget->setEnabled(enabled);
    mRevisionWidget->setEnabled(enabled);
    commitStackedWidget->setEnabled(enabled);
-   rv->setEnabled(enabled);
+   mRepositoryView->setEnabled(enabled);
    mDiffWidget->setEnabled(enabled);
    mFileDiffWidget->setEnabled(enabled);
    mBranchesWidget->setEnabled(enabled);
@@ -248,14 +245,14 @@ void MainWindow::goToCommitSha(const QString &goToSha)
 
    if (!sha.isEmpty())
    {
-      rv->st.setSha(sha);
-      rv->update(false, false);
+      mRepositoryView->domain()->st.setSha(sha);
+      mRepositoryView->domain()->update(false, false);
    }
 }
 
 void MainWindow::openCommitDiff()
 {
-   mDiffWidget->setStateInfo(rv->st);
+   mDiffWidget->setStateInfo(mRepositoryView->domain()->st);
    mainStackedWidget->setCurrentIndex(1);
 }
 
@@ -269,10 +266,10 @@ void MainWindow::changesCommitted(bool ok)
 
 void MainWindow::onCommitClicked(const QModelIndex &index)
 {
-   if (sender() == dynamic_cast<RepositoryView *>(rv->getRepoList()))
+   if (mRepositoryView == dynamic_cast<RepositoryView *>(sender()))
    {
       const auto shaIndex
-          = rv->getRepoList()->model()->index(index.row(), static_cast<int>(RepositoryModel::FileHistoryColumn::SHA));
+          = mRepositoryView->model()->index(index.row(), static_cast<int>(RepositoryModel::FileHistoryColumn::SHA));
       const auto sha = shaIndex.data().toString();
 
       onCommitSelected(sha);
