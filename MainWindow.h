@@ -74,7 +74,7 @@ private:
 
    RevsView *rv = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
-   Git *mGit;
+   QSharedPointer<Git> mGit;
 
    // End of MainWindow refactor
 
