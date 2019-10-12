@@ -10,6 +10,7 @@ Copyright: See COPYING file that comes with this distribution
 #include <QProcess>
 #include <QTime>
 #include <QTimer>
+#include <QSharedPointer>
 
 class Git;
 class RepositoryModel;
@@ -24,7 +25,7 @@ class DataLoader : public QProcess
 {
    Q_OBJECT
 public:
-   DataLoader(RepositoryModel *f);
+   DataLoader(Git *git, RepositoryModel *f);
    ~DataLoader();
    bool start(const QStringList &args, const QString &wd, const QString &buf);
    void on_cancel(const RepositoryModel *);
@@ -39,6 +40,7 @@ private slots:
    void on_timeout();
 
 private:
+   Git *mGit;
    void parseSingleBuffer(const QByteArray &ba);
    void baAppend(QByteArray **src, const char *ascii, int len);
    void addSplittedChunks(const QByteArray *halfChunk);

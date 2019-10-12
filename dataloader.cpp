@@ -27,8 +27,9 @@ public:
    bool unbufOpen() { return open(QIODevice::ReadOnly | QIODevice::Unbuffered); }
 };
 
-DataLoader::DataLoader(RepositoryModel *f)
-   : QProcess(Git::getInstance())
+DataLoader::DataLoader(Git *git, RepositoryModel *f)
+   : QProcess()
+   , mGit(git)
    , fh(f)
 {
    canceling = parsing = false;
@@ -38,7 +39,7 @@ DataLoader::DataLoader(RepositoryModel *f)
    loadedBytes = 0;
    guiUpdateTimer.setSingleShot(true);
 
-   connect(Git::getInstance(), &Git::cancelAllProcesses, this, qOverload<>(&DataLoader::on_cancel));
+   connect(mGit, &Git::cancelAllProcesses, this, qOverload<>(&DataLoader::on_cancel));
    connect(&guiUpdateTimer, &QTimer::timeout, this, &DataLoader::on_timeout);
 }
 
@@ -147,7 +148,7 @@ void DataLoader::parseSingleBuffer(const QByteArray &ba)
       if (!halfChunk)
       {
 
-         newOfs = Git::getInstance()->addChunk(fh, ba, ofs);
+         newOfs = mGit->addChunk(fh, ba, ofs);
          if (newOfs == -1)
             break; // half chunk detected
 
@@ -181,7 +182,7 @@ void DataLoader::addSplittedChunks(const QByteArray *hc)
    // do not assume we have only one chunk in hc
    int ofs = 0;
    while (ofs != -1 && ofs != (int)hc->size())
-      ofs = Git::getInstance()->addChunk(fh, *hc, ofs);
+      ofs = mGit->addChunk(fh, *hc, ofs);
 }
 
 void DataLoader::baAppend(QByteArray **baPtr, const char *ascii, int len)

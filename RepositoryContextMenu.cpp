@@ -161,7 +161,7 @@ void RepositoryContextMenu::createBranch()
 
 void RepositoryContextMenu::createTag()
 {
-   TagDlg dlg(mSha);
+   TagDlg dlg(mGit, mSha);
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)

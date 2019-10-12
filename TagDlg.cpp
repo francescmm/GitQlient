@@ -3,9 +3,10 @@
 
 #include <git.h>
 
-TagDlg::TagDlg(const QString &sha, QWidget *parent)
+TagDlg::TagDlg(QSharedPointer<Git> git, const QString &sha, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::TagDlg)
+   , mGit(git)
    , mSha(sha)
 {
    ui->setupUi(this);
@@ -32,18 +33,18 @@ void TagDlg::accept()
       tagMessage = tagMessage.trimmed();
 
       QByteArray output;
-      auto ret = Git::getInstance()->addTag(tagName, tagMessage, mSha, output);
+      auto ret = mGit->addTag(tagName, tagMessage, mSha, output);
 
       if (ret)
       {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         ret = Git::getInstance()->pushTag(tagName, output);
+         ret = mGit->pushTag(tagName, output);
          QApplication::restoreOverrideCursor();
 
          if (ret)
             QDialog::accept();
          else
-            Git::getInstance()->removeTag(tagName, false);
+            mGit->removeTag(tagName, false);
       }
    }
 }

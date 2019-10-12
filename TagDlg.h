@@ -25,6 +25,8 @@
 
 #include <QDialog>
 
+class Git;
+
 namespace Ui
 {
 class TagDlg;
@@ -35,12 +37,13 @@ class TagDlg : public QDialog
    Q_OBJECT
 
 public:
-   explicit TagDlg(const QString &sha, QWidget *parent = nullptr);
+   explicit TagDlg(QSharedPointer<Git> git, const QString &sha, QWidget *parent = nullptr);
    ~TagDlg() override;
 
    void accept() override;
 
 private:
    Ui::TagDlg *ui;
+   QSharedPointer<Git> mGit;
    QString mSha;
 };

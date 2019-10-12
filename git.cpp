@@ -1481,7 +1481,7 @@ void Git::parseDiffFormat(RevFile &rf, const QString &buf, FileNamesLoader &fl)
 
 bool Git::startParseProc(const QStringList &initCmd, RepositoryModel *fh, const QString &buf)
 {
-   DataLoader *dl = new DataLoader(fh); // auto-deleted when done
+   DataLoader *dl = new DataLoader(this, fh); // auto-deleted when done
    connect(this, &Git::cancelLoading, dl, qOverload<const RepositoryModel *>(&DataLoader::on_cancel));
    connect(dl, &DataLoader::newDataReady, this, &Git::on_newDataReady);
    connect(dl, &DataLoader::loaded, this, &Git::on_loaded);
