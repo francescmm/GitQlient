@@ -43,7 +43,7 @@ RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
    setMouseTracking(true);
    header()->setSortIndicatorShown(false);
 
-   const auto lvd = new RepositoryViewDelegate(this, this);
+   const auto lvd = new RepositoryViewDelegate(mGit, this);
    setItemDelegate(lvd);
 
    connect(lvd, &RepositoryViewDelegate::updateView, viewport(), qOverload<>(&QWidget::update));
@@ -286,7 +286,7 @@ void RepositoryView::showContextMenu(const QPoint &pos)
    }
 
    const auto sha = fh->sha(index.row());
-   const auto menu = new RepositoryContextMenu(sha, this);
+   const auto menu = new RepositoryContextMenu(mGit, sha, this);
    connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
    connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
    connect(menu, &RepositoryContextMenu::signalAmmendCommit, this, [this, sha]() { emit signalAmmendCommit(sha); });

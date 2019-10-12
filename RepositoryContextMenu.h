@@ -25,6 +25,8 @@
 
 #include <QMenu>
 
+class Git;
+
 class RepositoryContextMenu : public QMenu
 {
    Q_OBJECT
@@ -35,9 +37,10 @@ signals:
    void signalAmmendCommit();
 
 public:
-   explicit RepositoryContextMenu(const QString &sha, QWidget *parent = nullptr);
+   explicit RepositoryContextMenu(QSharedPointer<Git> git, const QString &sha, QWidget *parent = nullptr);
 
 private:
+   QSharedPointer<Git> mGit;
    QString mSha;
 
    void stashPush();

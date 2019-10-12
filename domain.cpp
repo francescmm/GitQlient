@@ -100,7 +100,7 @@ bool Domain::flushQueue()
 
 void Domain::populateState()
 {
-   const auto r = Git::getInstance()->revLookup(st.sha());
+   const auto r = mGit->revLookup(st.sha());
 
    if (r)
       st.setIsMerge(r->parentsCount() > 1);

@@ -18,6 +18,7 @@ namespace
 class RefNameIterator
 {
    const QString sha;
+   QSharedPointer<Git> mGit;
    uint ref_types; // all reference types associated with sha
    int cur_state; // state indicating the currently processed ref type
    QStringList ref_names; // ref_names of current type
@@ -25,7 +26,7 @@ class RefNameIterator
    QString cur_branch;
 
 public:
-   RefNameIterator(const QString &sha);
+   RefNameIterator(QSharedPointer<Git> git, const QString &sha);
    bool valid() const { return cur_state != -1; }
    QString name() const { return *cur_name; }
    int type() { return cur_state; }
@@ -34,12 +35,13 @@ public:
    void next();
 };
 
-RefNameIterator::RefNameIterator(const QString &sha)
+RefNameIterator::RefNameIterator(QSharedPointer<Git> git, const QString &sha)
    : sha(sha)
+   , mGit(git)
    , cur_state(0)
-   , cur_branch(Git::getInstance()->getCurrentBranchName())
+   , cur_branch(mGit->getCurrentBranchName())
 {
-   ref_types = Git::getInstance()->checkRef(sha);
+   ref_types = mGit->checkRef(sha);
    if (ref_types == 0)
    {
       cur_state = -1; // indicates end
@@ -86,15 +88,16 @@ void RefNameIterator::next()
          default:
             cur_state = -1; // indicate end
       }
-      ref_names = Git::getInstance()->getRefNames(sha, (Git::RefType)cur_state);
+      ref_names = mGit->getRefNames(sha, (Git::RefType)cur_state);
       cur_name = ref_names.begin();
    }
 }
 
 }
 
-RepositoryViewDelegate::RepositoryViewDelegate(RepositoryView *view, QObject *p)
-   : QStyledItemDelegate(p)
+RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, RepositoryView *view)
+   : QStyledItemDelegate(view)
+   , mGit(git)
    , mRepoView(view)
 {
 }
@@ -115,7 +118,7 @@ const Rev *RepositoryViewDelegate::revLookup(int row, RepositoryModel **fhPtr) c
    if (fhPtr)
       *fhPtr = realModel;
 
-   return Git::getInstance()->revLookup(realModel->sha(row), realModel);
+   return mGit->revLookup(realModel->sha(row), realModel);
 }
 
 static QColor blend(const QColor &col1, const QColor &col2, int amount = 128)
@@ -362,7 +365,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    if (!r)
       return;
 
-   if (r->isDiffCache && !Git::getInstance()->isNothingToCommit())
+   if (r->isDiffCache && !mGit->isNothingToCommit())
    {
       paintWip(p, opt);
       return;
@@ -374,7 +377,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 
    // calculate lanes
    if (r->lanes.count() == 0)
-      Git::getInstance()->setLane(r->sha(), fh);
+      mGit->setLane(r->sha(), fh);
 
    QBrush back = opt.palette.base();
    const QVector<int> &lanes(r->lanes);
@@ -438,7 +441,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto offset = 0;
 
-   if (Git::getInstance()->checkRef(r->sha()) > 0)
+   if (mGit->checkRef(r->sha()) > 0)
       paintTagBranch(p, opt, offset, r->sha());
 
    auto newOpt = opt;
@@ -455,7 +458,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 {
    const int mark_spacing = 5; // Space between markers in pixels
 
-   for (RefNameIterator it(sha); it.valid(); it.next())
+   for (RefNameIterator it(mGit, sha); it.valid(); it.next())
    {
       auto name = it.name();
 

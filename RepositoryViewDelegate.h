@@ -28,6 +28,7 @@
 class RepositoryView;
 class RepositoryModel;
 class Rev;
+class Git;
 
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
@@ -37,7 +38,7 @@ class RepositoryViewDelegate : public QStyledItemDelegate
    friend class RepositoryView;
    Q_OBJECT
 public:
-   RepositoryViewDelegate(RepositoryView *view, QObject *parent);
+   RepositoryViewDelegate(QSharedPointer<Git> git, RepositoryView *view);
 
    virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
    virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
@@ -52,6 +53,7 @@ public slots:
    void diffTargetChanged(int);
 
 private:
+   QSharedPointer<Git> mGit;
    const Rev *revLookup(int row, RepositoryModel **fhPtr = nullptr) const;
    void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
    void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;

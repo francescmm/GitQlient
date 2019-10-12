@@ -10,8 +10,9 @@
 #include <QApplication>
 #include <QClipboard>
 
-RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent)
+RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QString &sha, QWidget *parent)
    : QMenu(parent)
+   , mGit(git)
    , mSha(sha)
 {
    if (mSha == QGit::ZERO_SHA)
@@ -44,8 +45,8 @@ RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent
       addSeparator();
 
       QByteArray output;
-      auto ret = Git::getInstance()->getBranchesOfCommit(mSha);
-      const auto currentBranch = Git::getInstance()->getCurrentBranchName();
+      auto ret = mGit->getBranchesOfCommit(mSha);
+      const auto currentBranch = mGit->getCurrentBranchName();
 
       if (ret.success)
       {
@@ -98,7 +99,7 @@ RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent
          }
       }
 
-      ret = Git::getInstance()->getLastCommitOfBranch(currentBranch);
+      ret = mGit->getLastCommitOfBranch(currentBranch);
 
       if (ret.success)
       {
@@ -135,7 +136,7 @@ RepositoryContextMenu::RepositoryContextMenu(const QString &sha, QWidget *parent
 
 void RepositoryContextMenu::stashPush()
 {
-   const auto ret = Git::getInstance()->stash();
+   const auto ret = mGit->stash();
 
    if (ret)
       emit signalRepositoryUpdated();
@@ -143,7 +144,7 @@ void RepositoryContextMenu::stashPush()
 
 void RepositoryContextMenu::stashPop()
 {
-   const auto ret = Git::getInstance()->pop();
+   const auto ret = mGit->pop();
 
    if (ret)
       emit signalRepositoryUpdated();
@@ -151,7 +152,7 @@ void RepositoryContextMenu::stashPop()
 
 void RepositoryContextMenu::createBranch()
 {
-   BranchDlg dlg({ mSha, BranchDlgMode::CREATE_FROM_COMMIT, QSharedPointer<Git>(Git::getInstance()) });
+   BranchDlg dlg({ mSha, BranchDlgMode::CREATE_FROM_COMMIT, QSharedPointer<Git>(mGit) });
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
@@ -169,14 +170,14 @@ void RepositoryContextMenu::createTag()
 
 void RepositoryContextMenu::cherryPickCommit()
 {
-   if (Git::getInstance()->cherryPickCommit(mSha))
+   if (mGit->cherryPickCommit(mSha))
       emit signalRepositoryUpdated();
 }
 
 void RepositoryContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = Git::getInstance()->push();
+   const auto ret = mGit->push();
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -187,7 +188,7 @@ void RepositoryContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QString output;
-   const auto ret = Git::getInstance()->pull(output);
+   const auto ret = mGit->pull(output);
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -196,19 +197,19 @@ void RepositoryContextMenu::pull()
 
 void RepositoryContextMenu::fetch()
 {
-   if (Git::getInstance()->fetch())
+   if (mGit->fetch())
       emit signalRepositoryUpdated();
 }
 
 void RepositoryContextMenu::resetSoft()
 {
-   if (Git::getInstance()->resetCommit(mSha, Git::CommitResetType::SOFT))
+   if (mGit->resetCommit(mSha, Git::CommitResetType::SOFT))
       emit signalRepositoryUpdated();
 }
 
 void RepositoryContextMenu::resetMixed()
 {
-   if (Git::getInstance()->resetCommit(mSha, Git::CommitResetType::MIXED))
+   if (mGit->resetCommit(mSha, Git::CommitResetType::MIXED))
       emit signalRepositoryUpdated();
 }
 
@@ -220,7 +221,7 @@ void RepositoryContextMenu::resetHard()
 
    if (retMsg == QMessageBox::Ok)
    {
-      if (Git::getInstance()->resetCommit(mSha, Git::CommitResetType::HARD))
+      if (mGit->resetCommit(mSha, Git::CommitResetType::HARD))
          emit signalRepositoryUpdated();
    }
 }
