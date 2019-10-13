@@ -177,7 +177,6 @@ public:
    QPair<bool, QString> run(const QString &cmd);
 
 private:
-   void loadFileNames();
    void loadFileCache();
    void on_newDataReady(const RepositoryModel *);
    void on_loaded(RepositoryModel *, ulong, int, bool);

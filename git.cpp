@@ -1619,11 +1619,6 @@ void Git::on_loaded(RepositoryModel *fh, ulong byteSize, int loadTime, bool norm
 
       if (!tryFollowRenames(fh))
          emit loadCompleted(fh, tmp);
-
-      if (isMainHistory(fh))
-         // wait the dust to settle down before to start
-         // background file names loading for new revisions
-         QTimer::singleShot(500, this, &Git::loadFileNames);
    }
 }
 
@@ -1886,35 +1881,6 @@ void Git::loadFileCache()
          mRevsFilesShaBackupBuf.append(shaBuf);
          populateFileNamesMap();
       }
-   }
-}
-
-void Git::loadFileNames()
-{
-
-   indexTree(); // we are sure data loading is finished at this point
-
-   int revCnt = 0;
-   QString diffTreeBuf;
-   for (auto it : mRevData->revOrder)
-   {
-
-      if (!mRevsFiles.contains(it))
-      {
-         const Rev *c = revLookup(it);
-         if (c->parentsCount() == 1)
-         { // skip initials and merges
-            diffTreeBuf.append(it).append('\n');
-            revCnt++;
-         }
-      }
-   }
-   if (!diffTreeBuf.isEmpty())
-   {
-      mFilesLoadingCurrentSha = "";
-
-      const QString runCmd("git diff-tree --no-color -r -C --stdin");
-      runAsync(runCmd, nullptr, diffTreeBuf);
    }
 }
 
