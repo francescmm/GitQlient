@@ -11,7 +11,16 @@ GitQlient::GitQlient(QWidget *parent)
    : QWidget(parent)
    , mRepos(new QTabWidget())
 {
+   QFile styles(":/stylesheet.css");
+
+   if (styles.open(QIODevice::ReadOnly))
+   {
+      setStyleSheet(QString::fromUtf8(styles.readAll()));
+      styles.close();
+   }
+
    const auto newRepo = new QPushButton(tr("Open repo"));
+   newRepo->setObjectName("openNewRepo");
    newRepo->setIcon(QIcon(":/icons/open_repo"));
 
    connect(newRepo, &QPushButton::clicked, this, &GitQlient::openRepo);
@@ -45,15 +54,34 @@ void GitQlient::openRepo()
    }
 }
 
+#include <GitSyncProcess.h>
+
 void GitQlient::addRepoTab(const QString &repoPath)
 {
-   const auto blankRepo = new GitQlientRepo(repoPath);
+   const auto newRepo = new GitQlientRepo(repoPath);
    const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "No repo";
-   const auto index = mRepos->addTab(blankRepo, repoName);
+   const auto index = mRepos->addTab(newRepo, repoName);
+
+   if (!repoPath.isEmpty())
+   {
+      QProcess p;
+      p.setWorkingDirectory(repoPath + "/..");
+      p.start("git rev-parse --is-inside-work-tree");
+      p.waitForFinished(5000);
+
+      QString isSubmodule = p.readAll();
+      const auto ok = p.readAllStandardOutput();
+      const auto error = p.readAllStandardError();
+
+      if (isSubmodule.contains("true"))
+         mRepos->setTabIcon(index, QIcon(":/icons/submodules"));
+      else
+         mRepos->setTabIcon(index, QIcon(":/icons/local"));
+   }
 
    mRepos->setCurrentIndex(index);
 
-   mCurrentRepos.insert(blankRepo, repoName);
+   mCurrentRepos.insert(newRepo, repoName);
 }
 
 void GitQlient::repoClosed(int tabIndex)

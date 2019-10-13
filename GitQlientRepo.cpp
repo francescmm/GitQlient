@@ -37,14 +37,6 @@ GitQlientRepo::GitQlientRepo(QWidget *p)
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
 
-   QFile styles(":/stylesheet.css");
-
-   if (styles.open(QIODevice::ReadOnly))
-   {
-      setStyleSheet(QString::fromUtf8(styles.readAll()));
-      styles.close();
-   }
-
    commitStackedWidget->setCurrentIndex(0);
    commitStackedWidget->addWidget(mRevisionWidget);
    commitStackedWidget->addWidget(mCommitWidget);
