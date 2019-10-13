@@ -46,6 +46,12 @@ GitQlient::GitQlient(QWidget *parent)
 
 void GitQlient::setRepositories(const QStringList repositories)
 {
+   if (!mFirstRepoInitialized)
+   {
+      closeTab(0);
+      mFirstRepoInitialized = true;
+   }
+
    for (auto repo : repositories)
       addRepoTab(repo);
 }
