@@ -47,7 +47,6 @@ public:
 private:
    QString mCurrentSha;
    QSharedPointer<Git> mGit;
-   QToolButton *mOpenRepo = nullptr;
    QToolButton *mHome = nullptr;
    QToolButton *mGoToBtn = nullptr;
    QToolButton *mPullBtn = nullptr;
@@ -55,7 +54,6 @@ private:
    QToolButton *mStashBtn = nullptr;
    QToolButton *mTerminalBtn = nullptr;
 
-   void openRepo();
    void openGoToDialog();
    void pullCurrentBranch();
    void fetchAll();

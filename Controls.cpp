@@ -14,7 +14,6 @@
 Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
-   , mOpenRepo(new QToolButton())
    , mHome(new QToolButton())
    , mGoToBtn(new QToolButton())
    , mPullBtn(new QToolButton())
@@ -22,11 +21,6 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    , mStashBtn(new QToolButton())
    , mTerminalBtn(new QToolButton())
 {
-   mOpenRepo->setIcon(QIcon(":/icons/open_repo"));
-   mOpenRepo->setIconSize(QSize(22, 22));
-   mOpenRepo->setText("Open");
-   mOpenRepo->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-
    mHome->setIcon(QIcon(":/icons/home"));
    mHome->setIconSize(QSize(22, 22));
    mHome->setText("Home");
@@ -88,7 +82,6 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    const auto vLayout = new QHBoxLayout(this);
    vLayout->setContentsMargins(10, 10, 10, 10);
    vLayout->addStretch();
-   vLayout->addWidget(mOpenRepo);
    vLayout->addWidget(mHome);
    vLayout->addWidget(mGoToBtn);
    vLayout->addWidget(mPullBtn);
@@ -97,7 +90,6 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    vLayout->addWidget(mTerminalBtn);
    vLayout->addStretch();
 
-   connect(mOpenRepo, &QToolButton::clicked, this, &Controls::openRepo);
    connect(mHome, &QToolButton::clicked, this, &Controls::signalGoBack);
    connect(mGoToBtn, &QToolButton::clicked, this, &Controls::openGoToDialog);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
@@ -114,17 +106,6 @@ void Controls::enableButtons(bool enabled)
    mPushBtn->setEnabled(enabled);
    mStashBtn->setEnabled(enabled);
    mTerminalBtn->setEnabled(enabled);
-}
-
-void Controls::openRepo()
-{
-   const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
-
-   if (!dirName.isEmpty())
-   {
-      QDir d(dirName);
-      emit signalOpenRepo(d.absolutePath());
-   }
 }
 
 void Controls::openGoToDialog()
