@@ -76,25 +76,28 @@ void GitQlient::openRepo()
 
 void GitQlient::addRepoTab(const QString &repoPath)
 {
-   const auto newRepo = new GitQlientRepo(repoPath);
-   const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "No repo";
-   const auto index = mRepos->addTab(newRepo, repoName);
-
-   if (!repoPath.isEmpty())
+   if (!mCurrentRepos.contains(repoPath))
    {
-      QProcess p;
-      p.setWorkingDirectory(repoPath + "/..");
-      p.start("git rev-parse --is-inside-work-tree");
-      p.waitForFinished(5000);
+      const auto newRepo = new GitQlientRepo(repoPath);
+      const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "No repo";
+      const auto index = mRepos->addTab(newRepo, repoName);
 
-      auto isSubmodule = p.readAll().contains("true");
+      if (!repoPath.isEmpty())
+      {
+         QProcess p;
+         p.setWorkingDirectory(repoPath + "/..");
+         p.start("git rev-parse --is-inside-work-tree");
+         p.waitForFinished(5000);
 
-      mRepos->setTabIcon(index, QIcon(isSubmodule ? ":/icons/submodules" : ":/icons/local"));
+         auto isSubmodule = p.readAll().contains("true");
+
+         mRepos->setTabIcon(index, QIcon(isSubmodule ? ":/icons/submodules" : ":/icons/local"));
+      }
+
+      mRepos->setCurrentIndex(index);
+
+      mCurrentRepos.insert(repoPath);
    }
-
-   mRepos->setCurrentIndex(index);
-
-   mCurrentRepos.insert(newRepo, repoName);
 }
 
 void GitQlient::repoClosed(int tabIndex)
@@ -110,9 +113,8 @@ void GitQlient::repoClosed(int tabIndex)
 
 void GitQlient::closeTab(int tabIndex)
 {
-   const auto repoName = mRepos->tabText(tabIndex);
    auto repoToRemove = dynamic_cast<GitQlientRepo *>(mRepos->widget(tabIndex));
-   mCurrentRepos.remove(repoToRemove);
+   mCurrentRepos.remove(repoToRemove->currentDir());
    mRepos->removeTab(tabIndex);
    repoToRemove->close();
 }

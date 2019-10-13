@@ -2,7 +2,7 @@
 #define GIQLIENT_H
 
 #include <QWidget>
-#include <QMap>
+#include <QSet>
 
 class QTabWidget;
 class GitQlientRepo;
@@ -18,7 +18,7 @@ public:
 private:
    bool mFirstRepoInitialized = false;
    QTabWidget *mRepos = nullptr;
-   QMap<GitQlientRepo *, QString> mCurrentRepos;
+   QSet<QString> mCurrentRepos;
 
    void setRepoName(const QString &repoName);
    void openRepo();

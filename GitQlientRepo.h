@@ -57,6 +57,7 @@ public:
    explicit GitQlientRepo(QWidget *parent = nullptr);
    explicit GitQlientRepo(const QString &repo, QWidget *parent = nullptr);
 
+   QString currentDir() const { return mCurrentDir; }
    void setRepository(const QString &newDir);
    void close();
 
