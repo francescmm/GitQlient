@@ -14,7 +14,6 @@
 class Domain;
 class RepositoryModel;
 class Git;
-class MainWindow;
 
 class Domain : public QObject
 {
