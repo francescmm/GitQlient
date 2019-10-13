@@ -19,13 +19,20 @@ GitQlient::GitQlient(QWidget *parent)
       styles.close();
    }
 
-   const auto newRepo = new QPushButton(tr("Open repo"));
-   newRepo->setObjectName("openNewRepo");
-   newRepo->setIcon(QIcon(":/icons/open_repo"));
+   const auto newRepo = new QPushButton();
+   newRepo->setObjectName("openGitAdmin");
+   newRepo->setIcon(QIcon(":/icons/git_orange"));
+   newRepo->setToolTip(tr("Open new repository"));
+   // connect(newRepo, &QPushButton::clicked, this, &GitQlient::openRepo);
 
-   connect(newRepo, &QPushButton::clicked, this, &GitQlient::openRepo);
+   const auto addTab = new QPushButton();
+   addTab->setObjectName("openNewRepo");
+   addTab->setIcon(QIcon(":/icons/open_repo"));
+   addTab->setToolTip(tr("Open new repository"));
+   connect(addTab, &QPushButton::clicked, this, &GitQlient::openRepo);
 
-   mRepos->setCornerWidget(newRepo);
+   mRepos->setCornerWidget(newRepo, Qt::TopLeftCorner);
+   mRepos->setCornerWidget(addTab, Qt::TopRightCorner);
    mRepos->setTabsClosable(true);
    connect(mRepos, &QTabWidget::tabCloseRequested, this, &GitQlient::repoClosed);
 

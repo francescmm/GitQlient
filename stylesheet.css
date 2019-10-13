@@ -302,16 +302,23 @@ GitQlient
    background: #2E2F30;
 }
 
-#openNewRepo
+#openNewRepo, #openGitAdmin
 {
    background-color: #202122;
    max-height: 26px; /** 25px for the button + 3px to compensate the border of the tabs in the QTabWidget **/
    min-height: 26px;
+   max-width: 31px;
+   min-width: 31px;
 }
 
-#openNewRepo:hover
+#openNewRepo
 {
-   background-color: #404142;
+    padding-left: 10px;
+}
+
+#openNewRepo:hover, #openGitAdmin:hover
+{
+   background-color: #606162;
 }
 
 QTabWidget::pane
@@ -320,7 +327,6 @@ QTabWidget::pane
 
 QTabWidget::tab-bar
 {
-   left: 10px;
    background-color: #404142;
 }
 
@@ -352,12 +358,18 @@ QTabBar::tab:disabled
     color: #606162;
 }
 
-QTabBar::close-button {
-    image: url(remove-symbol.svg)
-    subcontrol-position: left;
+QTabBar::close-button
+{
+    image: url(:/icons/close);
 }
 
-QTabBar::close-button:hover {
-    image: url(close.svg)
+QTabBar::close-button:hover
+{
+    image: url(:/icons/close_hover);
+}
+
+QTabBar::close-button:pressed
+{
+  image: url(":/icons/close_press");
 }
 

@@ -28,6 +28,9 @@
         <file alias="open_repo">resources/open_repo.svg</file>
         <file alias="warning_error">resources/warning_error.svg</file>
         <file alias="close">resources/remove-symbol.svg</file>
+        <file alias="close_hover">resources/remove-symbol_hover.svg</file>
+        <file alias="close_press">resources/remove-symbol_press.svg</file>
+        <file alias="add_tab">resources/add_tab.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>stylesheet.css</file>
