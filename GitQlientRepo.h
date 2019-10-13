@@ -45,18 +45,20 @@ namespace Ui
 class MainWindow;
 }
 
-class MainWindow : public QFrame
+class GitQlientRepo : public QFrame
 {
    Q_OBJECT
 
 signals:
    void closeAllWindows();
+   void signalRepoOpened(const QString &repoName);
 
 public:
-   explicit MainWindow(QWidget *parent = nullptr);
-   explicit MainWindow(const QString &repo, QWidget *parent = nullptr);
+   explicit GitQlientRepo(QWidget *parent = nullptr);
+   explicit GitQlientRepo(const QString &repo, QWidget *parent = nullptr);
 
    void setRepository(const QString &newDir);
+   void close();
 
 protected:
    void closeEvent(QCloseEvent *ce) override;

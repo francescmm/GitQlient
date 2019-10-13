@@ -22,8 +22,9 @@ HEADERS += \
     $$PWD/FileListWidget.h \
     $$PWD/FullDiffWidget.h \
     $$PWD/GitAsyncProcess.h \
+    $$PWD/GitQlient.h \
+    $$PWD/GitQlientRepo.h \
     $$PWD/GitSyncProcess.h \
-    $$PWD/MainWindow.h \
     $$PWD/RepositoryContextMenu.h \
     $$PWD/RepositoryModel.h \
     $$PWD/RepositoryView.h \
@@ -56,8 +57,9 @@ SOURCES += \
     $$PWD/FileListWidget.cpp \
     $$PWD/FullDiffWidget.cpp \
     $$PWD/GitAsyncProcess.cpp \
+    $$PWD/GitQlient.cpp \
+    $$PWD/GitQlientRepo.cpp \
     $$PWD/GitSyncProcess.cpp \
-    $$PWD/MainWindow.cpp \
     $$PWD/RepositoryContextMenu.cpp \
     $$PWD/RepositoryModel.cpp \
     $$PWD/RepositoryView.cpp \

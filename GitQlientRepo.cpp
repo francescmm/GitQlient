@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+#include "GitQlientRepo.h"
 
 #include <Controls.h>
 #include <BranchesWidget.h>
@@ -21,7 +21,7 @@
 
 using namespace QLogger;
 
-MainWindow::MainWindow(QWidget *p)
+GitQlientRepo::GitQlientRepo(QWidget *p)
    : QFrame(p)
    , mGit(new Git())
    , commitStackedWidget(new QStackedWidget())
@@ -68,39 +68,39 @@ MainWindow::MainWindow(QWidget *p)
    mRepositoryView->setup();
    mRevisionWidget->setup(mRepositoryView->domain());
 
-   connect(mControls, &Controls::signalOpenRepo, this, &MainWindow::setRepository);
+   connect(mControls, &Controls::signalOpenRepo, this, &GitQlientRepo::setRepository);
    connect(mControls, &Controls::signalGoBack, this, [this]() { mainStackedWidget->setCurrentIndex(0); });
-   connect(mControls, &Controls::signalRepositoryUpdated, this, &MainWindow::updateUi);
-   connect(mControls, &Controls::signalGoToSha, this, &MainWindow::goToCommitSha);
+   connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateUi);
+   connect(mControls, &Controls::signalGoToSha, this, &GitQlientRepo::goToCommitSha);
 
-   connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &MainWindow::updateUi);
-   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &MainWindow::goToCommitSha);
+   connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &GitQlientRepo::updateUi);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &GitQlientRepo::goToCommitSha);
 
-   connect(mRepositoryView, &RepositoryView::rebase, this, &MainWindow::rebase);
-   connect(mRepositoryView, &RepositoryView::merge, this, &MainWindow::merge);
-   connect(mRepositoryView, &RepositoryView::moveRef, this, &MainWindow::moveRef);
-   connect(mRepositoryView, &RepositoryView::signalViewUpdated, this, &MainWindow::updateUi);
-   connect(mRepositoryView, &RepositoryView::signalOpenDiff, this, &MainWindow::openCommitDiff);
+   connect(mRepositoryView, &RepositoryView::rebase, this, &GitQlientRepo::rebase);
+   connect(mRepositoryView, &RepositoryView::merge, this, &GitQlientRepo::merge);
+   connect(mRepositoryView, &RepositoryView::moveRef, this, &GitQlientRepo::moveRef);
+   connect(mRepositoryView, &RepositoryView::signalViewUpdated, this, &GitQlientRepo::updateUi);
+   connect(mRepositoryView, &RepositoryView::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
    connect(mRepositoryView, &RepositoryView::clicked, this,
-           qOverload<const QModelIndex &>(&MainWindow::onCommitClicked));
-   connect(mRepositoryView, &RepositoryView::doubleClicked, this, &MainWindow::openCommitDiff);
-   connect(mRepositoryView, &RepositoryView::signalAmmendCommit, this, &MainWindow::onAmmendCommit);
+           qOverload<const QModelIndex &>(&GitQlientRepo::onCommitClicked));
+   connect(mRepositoryView, &RepositoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
+   connect(mRepositoryView, &RepositoryView::signalAmmendCommit, this, &GitQlientRepo::onAmmendCommit);
 
-   connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &MainWindow::changesCommitted);
-   connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &MainWindow::onFileDiffRequested);
+   connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
+   connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
    connect(mRevisionWidget, &RevisionWidget::signalOpenFileContextMenu, mRepositoryView->domain(),
            &Domain::on_contextMenu);
 }
 
-MainWindow::MainWindow(const QString &repo, QWidget *parent)
-   : MainWindow(parent)
+GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
+   : GitQlientRepo(parent)
 {
    QLog_Info("UI", "Initializing MainWindow with repo");
 
    setRepository(repo);
 }
 
-void MainWindow::updateUi()
+void GitQlientRepo::updateUi()
 {
    if (!mCurrentDir.isEmpty())
    {
@@ -122,7 +122,7 @@ void MainWindow::updateUi()
    }
 }
 
-void MainWindow::setRepository(const QString &newDir)
+void GitQlientRepo::setRepository(const QString &newDir)
 {
    if (!mRepositoryBusy && !newDir.isEmpty())
    {
@@ -146,6 +146,8 @@ void MainWindow::setRepository(const QString &newDir)
       if (ok)
       {
          QLog_Info("UI", "... Git initialized!");
+
+         signalRepoOpened(mCurrentDir);
 
          clearWindow(true);
          setWidgetsEnabled(true);
@@ -172,9 +174,20 @@ void MainWindow::setRepository(const QString &newDir)
 
       mRepositoryBusy = false;
    }
+   else
+   {
+      mCurrentDir = "";
+      clearWindow(true);
+      setWidgetsEnabled(false);
+   }
 }
 
-void MainWindow::resetWatcher(const QString &oldDir, const QString &newDir)
+void GitQlientRepo::close()
+{
+   QWidget::close();
+}
+
+void GitQlientRepo::resetWatcher(const QString &oldDir, const QString &newDir)
 {
    if (!mGitWatcher)
    {
@@ -208,7 +221,7 @@ void MainWindow::resetWatcher(const QString &oldDir, const QString &newDir)
    }
 }
 
-void MainWindow::clearWindow(bool deepClear)
+void GitQlientRepo::clearWindow(bool deepClear)
 {
    blockSignals(true);
 
@@ -226,8 +239,9 @@ void MainWindow::clearWindow(bool deepClear)
    blockSignals(false);
 }
 
-void MainWindow::setWidgetsEnabled(bool enabled)
+void GitQlientRepo::setWidgetsEnabled(bool enabled)
 {
+   mControls->enableButtons(enabled);
    mCommitWidget->setEnabled(enabled);
    mRevisionWidget->setEnabled(enabled);
    commitStackedWidget->setEnabled(enabled);
@@ -237,7 +251,7 @@ void MainWindow::setWidgetsEnabled(bool enabled)
    mBranchesWidget->setEnabled(enabled);
 }
 
-void MainWindow::goToCommitSha(const QString &goToSha)
+void GitQlientRepo::goToCommitSha(const QString &goToSha)
 {
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(goToSha));
 
@@ -250,13 +264,13 @@ void MainWindow::goToCommitSha(const QString &goToSha)
    }
 }
 
-void MainWindow::openCommitDiff()
+void GitQlientRepo::openCommitDiff()
 {
    mDiffWidget->setStateInfo(mRepositoryView->domain()->st);
    mainStackedWidget->setCurrentIndex(1);
 }
 
-void MainWindow::changesCommitted(bool ok)
+void GitQlientRepo::changesCommitted(bool ok)
 {
    if (ok)
       updateUi();
@@ -264,7 +278,7 @@ void MainWindow::changesCommitted(bool ok)
       QMessageBox::critical(this, tr("Commit error"), tr("Failed to commit changes"));
 }
 
-void MainWindow::onCommitClicked(const QModelIndex &index)
+void GitQlientRepo::onCommitClicked(const QModelIndex &index)
 {
    if (mRepositoryView == dynamic_cast<RepositoryView *>(sender()))
    {
@@ -276,7 +290,7 @@ void MainWindow::onCommitClicked(const QModelIndex &index)
    }
 }
 
-void MainWindow::onCommitSelected(const QString &sha)
+void GitQlientRepo::onCommitSelected(const QString &sha)
 {
    const auto isWip = sha == QGit::ZERO_SHA;
    commitStackedWidget->setCurrentIndex(isWip);
@@ -289,13 +303,13 @@ void MainWindow::onCommitSelected(const QString &sha)
       mRevisionWidget->setCurrentCommitSha(sha);
 }
 
-void MainWindow::onAmmendCommit(const QString &sha)
+void GitQlientRepo::onAmmendCommit(const QString &sha)
 {
    commitStackedWidget->setCurrentIndex(1);
    mCommitWidget->init(sha);
 }
 
-void MainWindow::onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file)
+void GitQlientRepo::onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file)
 {
    const auto fileWithModifications = mFileDiffWidget->onFileDiffRequested(currentSha, previousSha, file);
 
@@ -311,7 +325,7 @@ void MainWindow::onFileDiffRequested(const QString &currentSha, const QString &p
       QMessageBox::information(this, tr("No modifications"), tr("There are no content modifications for this file"));
 }
 
-void MainWindow::rebase(const QString &from, const QString &to, const QString &onto)
+void GitQlientRepo::rebase(const QString &from, const QString &to, const QString &onto)
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
@@ -325,7 +339,7 @@ void MainWindow::rebase(const QString &from, const QString &to, const QString &o
    QApplication::restoreOverrideCursor();
 }
 
-void MainWindow::merge(const QStringList &shas, const QString &into)
+void GitQlientRepo::merge(const QStringList &shas, const QString &into)
 {
    QString output;
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -342,7 +356,7 @@ void MainWindow::merge(const QStringList &shas, const QString &into)
    QApplication::restoreOverrideCursor();
 }
 
-void MainWindow::moveRef(const QString &target, const QString &toSHA)
+void GitQlientRepo::moveRef(const QString &target, const QString &toSHA)
 {
    QString cmd;
    if (target.startsWith("remotes/"))
@@ -385,7 +399,7 @@ void MainWindow::moveRef(const QString &target, const QString &toSHA)
    QApplication::restoreOverrideCursor();
 }
 
-void MainWindow::closeEvent(QCloseEvent *ce)
+void GitQlientRepo::closeEvent(QCloseEvent *ce)
 {
    QLog_Info("UI", QString("Closing UI for repository {%1}").arg(mCurrentDir));
 

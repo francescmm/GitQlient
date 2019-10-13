@@ -6,7 +6,7 @@
 */
 #include <QApplication>
 
-#include "MainWindow.h"
+#include <GitQlient.h>
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
    QLog_Info("UI", "Starting GitQlient...");
 
-   const auto mainWin = new MainWindow();
+   const auto mainWin = new GitQlient();
    mainWin->show();
 
    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
