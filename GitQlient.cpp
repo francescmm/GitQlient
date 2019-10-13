@@ -91,7 +91,7 @@ void GitQlient::addRepoTab(const QString &repoPath)
 
          auto isSubmodule = p.readAll().contains("true");
 
-         mRepos->setTabIcon(index, QIcon(isSubmodule ? ":/icons/submodules" : ":/icons/local"));
+         mRepos->setTabIcon(index, QIcon(isSubmodule ? QString(":/icons/submodules") : QString(":/icons/local")));
       }
 
       mRepos->setCurrentIndex(index);

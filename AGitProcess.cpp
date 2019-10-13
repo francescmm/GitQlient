@@ -113,7 +113,7 @@ void AGitProcess::onReadyStandardOutput()
       const auto standardOutput = readAllStandardOutput();
 
       if (mRunOutput)
-         mRunOutput->append(standardOutput);
+         mRunOutput->append(QString::fromUtf8(standardOutput));
 
       emit procDataReady(standardOutput);
    }
