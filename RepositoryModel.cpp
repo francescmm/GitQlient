@@ -129,8 +129,6 @@ void RepositoryModel::clear(bool complete)
    lns->clear();
    fNames.clear();
    curFNames.clear();
-   qDeleteAll(rowData);
-   rowData.clear();
 
    rowCnt = revOrder.count();
    annIdValid = false;

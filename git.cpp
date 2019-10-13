@@ -1248,7 +1248,6 @@ Rev *Git::fakeRevData(const QString &sha, const QStringList &parents, const QStr
 #endif
    ba->append('\0');
 
-   fh->rowData.append(ba);
    int dummy;
    Rev *c = new Rev(*ba, 0, idx, &dummy, !isMainHistory(fh));
    return c;

@@ -57,8 +57,6 @@ private slots:
 
 private:
    QSharedPointer<Git> mGit;
-   friend class Annotate;
-   friend class DataLoader;
    friend class Git;
 
    void flushTail();
@@ -68,7 +66,6 @@ private:
    QVector<QString> revOrder;
    Lanes *lns = nullptr;
    uint firstFreeLane;
-   QList<QByteArray *> rowData;
    QMap<FileHistoryColumn, QString> mColumns;
    int rowCnt;
    bool annIdValid;

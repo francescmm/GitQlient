@@ -163,7 +163,6 @@ void DataLoader::parseSingleBuffer(const QByteArray &ba)
 
          ofs = end + 1;
          baAppend(&halfChunk, ba.constData(), ofs);
-         fh->rowData.append(halfChunk);
          addSplittedChunks(halfChunk);
          halfChunk = nullptr;
       }
@@ -197,51 +196,6 @@ void DataLoader::baAppend(QByteArray **baPtr, const char *ascii, int len)
 }
 
 // *************** git interface facility dependant code *****************************
-
-#ifdef USE_QPROCESS
-
-ulong DataLoader::readNewData(bool lastBuffer)
-{
-
-   /*
-      QByteArray copy c'tor uses shallow copy, but there is a deep copy in
-      QProcess::readStdout(), from an internal buffers list to return value.
-
-      Qt uses a select() to detect new data is ready, copies immediately the
-      data to the heap with a read() and stores the pointer to new data in a
-      pointer list, from qprocess_unix.cpp:
-
-           const int basize = 4096;
-           QByteArray *ba = new QByteArray(basize);
-           n = ::read(fd, ba->data(), basize);
-           buffer->append(ba); // added to a QPtrList<QByteArray> pointer list
-
-      When we call QProcess::readStdout() data from buffers pointed by the
-      pointer list is memcpy() to the function return value, from qprocess.cpp:
-
-           ....
-           return buf->readAll(); // memcpy() here
-   */
-   QByteArray *ba = new QByteArray(readAllStandardOutput());
-   if (lastBuffer)
-      ba->append('\0'); // be sure stream is null terminated
-
-   if (ba->size() == 0)
-   {
-      delete ba;
-      return 0;
-   }
-   fh->rowData.append(ba);
-   parseSingleBuffer(*ba);
-   return ba->size();
-}
-
-bool DataLoader::createTemporaryFile()
-{
-   return true;
-}
-
-#else // temporary file as data exchange facility
 
 ulong DataLoader::readNewData(bool lastBuffer)
 {
@@ -278,7 +232,6 @@ ulong DataLoader::readNewData(bool lastBuffer)
       dataFile->seek(readPos);
 
       cnt += len;
-      fh->rowData.append(ba);
       parseSingleBuffer(*ba);
 
       // avoid reading small chunks if data producer is still running
@@ -288,7 +241,6 @@ ulong DataLoader::readNewData(bool lastBuffer)
    if (lastBuffer)
    { // be sure stream is null terminated
       QByteArray *zb = new QByteArray(1, '\0');
-      fh->rowData.append(zb);
       parseSingleBuffer(*zb);
    }
    return cnt;
@@ -300,7 +252,7 @@ bool DataLoader::createTemporaryFile()
    // redirect 'git log' output to a temporary file
    dataFile = new UnbufferedTemporaryFile(this);
 
-#   ifndef Q_OS_WIN32
+#ifndef Q_OS_WIN32
    /*
       For performance reasons we would like to use a tmpfs filesystem
       if available, this is normally mounted under '/tmp' in Linux.
@@ -330,7 +282,7 @@ bool DataLoader::createTemporaryFile()
       else
          dataFile->close();
    }
-#   endif
+#endif
    if (!dataFile->open()) // to read the file name
       return false;
 
@@ -373,5 +325,3 @@ bool DataLoader::startProcess(QProcess *proc, QStringList args, const QString &b
    proc->start(prog, arguments); // TODO test QIODevice::Unbuffered
    return proc->waitForStarted();
 }
-
-#endif // USE_QPROCESS
