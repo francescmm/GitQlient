@@ -296,3 +296,68 @@ BranchDlg > QLineEdit
     padding-left: 10px;
 }
 
+/** QTabWidget **/
+GitQlient
+{
+   background: #2E2F30;
+}
+
+#openNewRepo
+{
+   background-color: #202122;
+   max-height: 26px; /** 25px for the button + 3px to compensate the border of the tabs in the QTabWidget **/
+   min-height: 26px;
+}
+
+#openNewRepo:hover
+{
+   background-color: #404142;
+}
+
+QTabWidget::pane
+{
+}
+
+QTabWidget::tab-bar
+{
+   left: 10px;
+   background-color: #404142;
+}
+
+QTabBar::tab
+{
+   background-color: #202122;
+   color: white;
+   padding: 5px;
+   padding-left: 15px;
+   border: 1px solid #202122;
+   max-height: 25px;
+   min-height: 25px;
+}
+
+QTabBar::tab:selected
+{
+   background-color: #404142;
+   border: 0;
+}
+
+QTabBar::tab:!selected:hover
+{
+    background-color: #606162;
+    border: 1px solid #606162;
+}
+
+QTabBar::tab:disabled
+{
+    color: #606162;
+}
+
+QTabBar::close-button {
+    image: url(remove-symbol.svg)
+    subcontrol-position: left;
+}
+
+QTabBar::close-button:hover {
+    image: url(close.svg)
+}
+

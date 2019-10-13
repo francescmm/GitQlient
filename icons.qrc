@@ -27,6 +27,7 @@
         <file alias="terminal">resources/terminal.svg</file>
         <file alias="open_repo">resources/open_repo.svg</file>
         <file alias="warning_error">resources/warning_error.svg</file>
+        <file alias="close">resources/remove-symbol.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>stylesheet.css</file>
