@@ -11,7 +11,6 @@ Author: Marco Costalba (C) 2005-2007
 #include "RepositoryModel.h"
 #include "domain.h"
 #include "git.h"
-#include "MainWindow.h"
 #include <RepositoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
 
