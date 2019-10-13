@@ -1,5 +1,6 @@
 #include "GitQlient.h"
 
+#include <QProcess>
 #include <QTabWidget>
 #include <GitQlientRepo.h>
 #include <QVBoxLayout>
@@ -43,6 +44,12 @@ GitQlient::GitQlient(QWidget *parent)
    addRepoTab();
 }
 
+void GitQlient::setRepositories(const QStringList repositories)
+{
+   for (auto repo : repositories)
+      addRepoTab(repo);
+}
+
 void GitQlient::openRepo()
 {
    const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
@@ -61,8 +68,6 @@ void GitQlient::openRepo()
    }
 }
 
-#include <GitSyncProcess.h>
-
 void GitQlient::addRepoTab(const QString &repoPath)
 {
    const auto newRepo = new GitQlientRepo(repoPath);
@@ -76,14 +81,9 @@ void GitQlient::addRepoTab(const QString &repoPath)
       p.start("git rev-parse --is-inside-work-tree");
       p.waitForFinished(5000);
 
-      QString isSubmodule = p.readAll();
-      const auto ok = p.readAllStandardOutput();
-      const auto error = p.readAllStandardError();
+      auto isSubmodule = p.readAll().contains("true");
 
-      if (isSubmodule.contains("true"))
-         mRepos->setTabIcon(index, QIcon(":/icons/submodules"));
-      else
-         mRepos->setTabIcon(index, QIcon(":/icons/local"));
+      mRepos->setTabIcon(index, QIcon(isSubmodule ? ":/icons/submodules" : ":/icons/local"));
    }
 
    mRepos->setCurrentIndex(index);

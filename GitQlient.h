@@ -13,6 +13,8 @@ class GitQlient : public QWidget
 public:
    explicit GitQlient(QWidget *parent = nullptr);
 
+   void setRepositories(const QStringList repositories);
+
 private:
    bool mFirstRepoInitialized = false;
    QTabWidget *mRepos = nullptr;
