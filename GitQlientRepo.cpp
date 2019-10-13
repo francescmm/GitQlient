@@ -80,8 +80,6 @@ GitQlientRepo::GitQlientRepo(QWidget *p)
 
    connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
-   connect(mRevisionWidget, &RevisionWidget::signalOpenFileContextMenu, mRepositoryView->domain(),
-           &Domain::on_contextMenu);
 }
 
 GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)

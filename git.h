@@ -173,7 +173,6 @@ public:
    void formatPatchFileHeader(QString *rowName, const QString &sha, const QString &dts, bool cmb, bool all);
    const QString filePath(const RevFile &rf, int i) const { return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)]; }
    void setCurContext(Domain *d) { mCurrentDomain = d; }
-   Domain *curContext() const { return mCurrentDomain; }
    QPair<bool, QString> run(const QString &cmd);
 
 private:

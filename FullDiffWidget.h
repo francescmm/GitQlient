@@ -26,7 +26,6 @@
 #include <QSyntaxHighlighter>
 #include <QTextEdit>
 
-class Domain;
 class Git;
 class StateInfo;
 

@@ -36,7 +36,6 @@ signals:
 
 public slots:
    void on_closeAllTabs();
-   virtual void on_contextMenu(const QString &, int);
    virtual void clear(bool complete = true);
 
 protected slots:
@@ -60,8 +59,6 @@ private:
 
    RepositoryModel *fileHistory;
    bool linked;
-   int popupType;
-   QString popupData;
    QString statusBarRequest;
 };
 

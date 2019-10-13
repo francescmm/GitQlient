@@ -26,7 +26,6 @@ Domain::Domain(QSharedPointer<Git> git, bool isMain)
 
    st.clear();
    busy = linked = false;
-   popupType = 0;
 }
 
 Domain::~Domain()
@@ -136,10 +135,6 @@ void Domain::update(bool fromMaster, bool force)
 
    st.setLock(false);
    busy = false;
-   if (mGit->curContext() != this)
-      qDebug("ASSERT in Domain::update, context is %p "
-             "instead of %p",
-             (void *)mGit->curContext(), (void *)this);
 
    mGit->setCurContext(nullptr);
 
@@ -152,10 +147,4 @@ void Domain::update(bool fromMaster, bool force)
       // QApplication::postEvent(m(), new MessageEvent(statusBarRequest));
       statusBarRequest = "";
    }
-}
-
-void Domain::on_contextMenu(const QString &data, int type)
-{
-   popupType = type;
-   popupData = data;
 }
