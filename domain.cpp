@@ -5,7 +5,6 @@ Copyright: See COPYING file that comes with this distribution
 
                 */
 #include "domain.h"
-#include "RepositoryModel.h"
 #include "git.h"
 #include <QApplication>
 #include <QStatusBar>

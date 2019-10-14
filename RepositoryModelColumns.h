@@ -23,42 +23,12 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QStyledItemDelegate>
-
-class RepositoryModel;
-class Git;
-
-const int ROW_HEIGHT = 25;
-const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
-
-class RepositoryViewDelegate : public QStyledItemDelegate
+enum class RepositoryModelColumns
 {
-   Q_OBJECT
-
-signals:
-   void updateView();
-
-public:
-   RepositoryViewDelegate(QSharedPointer<Git> git, RepositoryModel *model);
-
-   virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
-   virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
-   {
-      return QSize(LANE_WIDTH, ROW_HEIGHT);
-   }
-
-public slots:
-   void diffTargetChanged(int);
-
-private:
-   QSharedPointer<Git> mGit;
-   void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
-   void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
-   void paintGraphLane(QPainter *p, int type, int x1, int x2, const QColor &col, const QColor &activeCol,
-                       const QBrush &back) const;
-   void paintWip(QPainter *painter, QStyleOptionViewItem opt) const;
-   void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
-
-   RepositoryModel *mRepoModel = nullptr;
-   int diffTargetRow = -1;
+   ID,
+   GRAPH,
+   SHA,
+   LOG,
+   AUTHOR,
+   DATE
 };

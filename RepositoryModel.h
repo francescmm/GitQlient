@@ -15,16 +15,7 @@
 class Git;
 class Lanes;
 class Rev;
-
-enum class RepositoryModelColumns
-{
-   ID,
-   GRAPH,
-   SHA,
-   LOG,
-   AUTHOR,
-   DATE
-};
+enum class RepositoryModelColumns;
 
 class RepositoryModel : public QAbstractItemModel
 {

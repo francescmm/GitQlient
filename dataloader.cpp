@@ -6,7 +6,6 @@
         Copyright: See COPYING file that comes with this distribution
 
 */
-#include "RepositoryModel.h"
 #include "git.h"
 #include "dataloader.h"
 

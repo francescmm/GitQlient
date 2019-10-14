@@ -8,6 +8,7 @@
 */
 
 #include "RepositoryModel.h"
+#include <RepositoryModelColumns.h>
 
 #include <QApplication>
 #include <QDateTime>

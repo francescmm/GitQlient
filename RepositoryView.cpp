@@ -9,6 +9,7 @@ Author: Marco Costalba (C) 2005-2007
 #include "RepositoryView.h"
 
 #include "RepositoryModel.h"
+#include <RepositoryModelColumns.h>
 #include "domain.h"
 #include "git.h"
 #include <RepositoryContextMenu.h>
@@ -43,7 +44,7 @@ RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
    setMouseTracking(true);
    header()->setSortIndicatorShown(false);
 
-   const auto lvd = new RepositoryViewDelegate(mGit, this);
+   const auto lvd = new RepositoryViewDelegate(mGit, mRepositoryModel);
    setItemDelegate(lvd);
 
    connect(lvd, &RepositoryViewDelegate::updateView, viewport(), qOverload<>(&QWidget::update));

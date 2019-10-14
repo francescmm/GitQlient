@@ -4,7 +4,7 @@
 #include <BranchesWidget.h>
 #include <CommitWidget.h>
 #include <RevisionWidget.h>
-#include <RepositoryModel.h>
+#include <RepositoryModelColumns.h>
 #include <RepositoryView.h>
 #include <git.h>
 #include <QLogger.h>

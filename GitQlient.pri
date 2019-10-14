@@ -27,6 +27,7 @@ HEADERS += \
     $$PWD/GitSyncProcess.h \
     $$PWD/RepositoryContextMenu.h \
     $$PWD/RepositoryModel.h \
+    $$PWD/RepositoryModelColumns.h \
     $$PWD/RepositoryView.h \
     $$PWD/RepositoryViewDelegate.h \
     $$PWD/RevisionWidget.h \
