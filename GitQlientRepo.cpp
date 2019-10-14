@@ -251,6 +251,7 @@ void GitQlientRepo::goToCommitSha(const QString &goToSha)
    {
       mRepositoryView->domain()->st.setSha(sha);
       mRepositoryView->domain()->update(false, false);
+      mRepositoryView->update();
    }
 }
 
