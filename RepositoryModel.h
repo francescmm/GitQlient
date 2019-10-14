@@ -52,7 +52,6 @@ private:
    friend class Git;
 
    void flushTail();
-   const QString timeDiff(unsigned long secs) const;
 
    QHash<QString, const Rev *> revs;
    QVector<QString> revOrder;
@@ -61,7 +60,6 @@ private:
    QMap<RepositoryModelColumns, QString> mColumns;
    int rowCnt;
    bool annIdValid;
-   unsigned long secs;
    int loadTime;
    int earlyOutputCnt;
    int earlyOutputCntBase;

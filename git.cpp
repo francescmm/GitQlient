@@ -240,7 +240,7 @@ void Git::cancelDataLoading()
 {
    // normally called when closing file viewer
 
-   emit cancelLoading(mRevData); // non blocking
+   emit cancelLoading(); // non blocking
 }
 
 const Rev *Git::revLookup(const QString &sha) const
@@ -971,35 +971,6 @@ bool Git::getStashCommit(const QString &stash, QByteArray &output)
    return ret.first;
 }
 
-//! cache for dates conversion. Common among qgit windows
-static QHash<QString, QString> localDates;
-/**
- * Accesses a cache that avoids slow date calculation
- *
- * @param gitDate
- *   the reference from which we want to get the date
- *
- * @return
- *   human-readable date
- **/
-const QString Git::getLocalDate(const QString &gitDate)
-{
-   QString localDate(localDates.value(gitDate));
-
-   // cache miss
-   if (localDate.isEmpty())
-   {
-      static QDateTime d;
-      d.setSecsSinceEpoch(gitDate.toUInt());
-      localDate = d.toString(Qt::SystemLocaleShortDate);
-
-      // save to cache
-      localDates[gitDate] = localDate;
-   }
-
-   return localDate;
-}
-
 bool Git::getGitDBDir(const QString &wd, QString &gd, bool &changed)
 {
    // we could run from a subdirectory, so we need to get correct directories
@@ -1508,7 +1479,6 @@ bool Git::init(const QString &wd, const QStringList *passedArgs)
    {
       bool dummy;
       getBaseDir(wd, mWorkingDir, dummy);
-      localDates.clear();
       clearFileNames();
       mFileCacheAccessed = false;
 

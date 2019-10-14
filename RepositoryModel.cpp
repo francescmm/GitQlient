@@ -70,14 +70,13 @@ bool RepositoryModel::hasChildren(const QModelIndex &parent) const
 
 const Rev *RepositoryModel::revLookup(int row) const
 {
-   return mGit->revLookup(sha(row));
+   const auto shaStr = sha(row);
+   return !shaStr.isEmpty() ? revs.value(shaStr) : nullptr;
 }
 
 int RepositoryModel::row(const QString &sha) const
 {
-
-   const Rev *r = mGit->revLookup(sha);
-   return r ? r->orderIdx : -1;
+   return !sha.isEmpty() ? revs.value(sha)->orderIdx : -1;
 }
 
 const QString RepositoryModel::sha(int row) const
@@ -212,27 +211,6 @@ QModelIndex RepositoryModel::parent(const QModelIndex &) const
    return no_parent;
 }
 
-const QString RepositoryModel::timeDiff(unsigned long secs) const
-{
-
-   ulong days = secs / (3600 * 24);
-   ulong hours = (secs - days * 3600 * 24) / 3600;
-   ulong min = (secs - days * 3600 * 24 - hours * 3600) / 60;
-   ulong sec = secs - days * 3600 * 24 - hours * 3600 - min * 60;
-   QString tmp;
-   if (days > 0)
-      tmp.append(QString::number(days) + "d ");
-
-   if (hours > 0 || !tmp.isEmpty())
-      tmp.append(QString::number(hours) + "h ");
-
-   if (min > 0 || !tmp.isEmpty())
-      tmp.append(QString::number(min) + "m ");
-
-   tmp.append(QString::number(sec) + "s");
-   return tmp;
-}
-
 QVariant RepositoryModel::data(const QModelIndex &index, int role) const
 {
 
@@ -241,22 +219,25 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
       return no_value; // fast path, 90% of calls ends here!
 
-   const auto git = mGit;
-   const Rev *r = git->revLookup(revOrder.at(index.row()));
+   const auto r = revLookup(index.row());
+
    if (!r)
       return no_value;
 
    if (role == Qt::ToolTipRole)
    {
+      QDateTime d;
+      d.setSecsSinceEpoch(r->authorDate().toUInt());
+
       return QString("<p><b>Author:</b> %1</p><p><b>Date:</b> %2</p>")
-          .arg(r->author().split("<").first(), git->getLocalDate(r->authorDate()));
+          .arg(r->author().split("<").first(), d.toString(Qt::SystemLocaleShortDate));
    }
 
    int col = index.column();
 
    // calculate lanes
    if (r->lanes.count() == 0)
-      git->setLane(r->sha());
+      mGit->setLane(r->sha());
 
    switch (static_cast<RepositoryModelColumns>(col))
    {

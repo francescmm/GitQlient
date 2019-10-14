@@ -45,7 +45,7 @@ signals:
 signals:
    void newRevsAdded();
    void loadCompleted(const QString &);
-   void cancelLoading(const RepositoryModel *);
+   void cancelLoading();
    void cancelAllProcesses();
 
 public:
@@ -156,7 +156,6 @@ public:
    QString getDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 
    const RevFile *getFiles(const QString &sha, const QString &sha2 = "", bool all = false, const QString &path = "");
-   static const QString getLocalDate(const QString &gitDate);
 
    const QString getLaneParent(const QString &fromSHA, int laneNum);
    const QStringList getChildren(const QString &parent);

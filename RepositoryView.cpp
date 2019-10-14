@@ -77,7 +77,7 @@ RepositoryView::~RepositoryView()
 
 const QString RepositoryView::sha(int row) const
 {
-   return mRepositoryModel->sha(row);
+   return model() ? model()->index(row, static_cast<int>(RepositoryModelColumns::SHA)).data().toString() : QString();
 }
 
 int RepositoryView::row(const QString &sha) const
