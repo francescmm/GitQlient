@@ -14,6 +14,7 @@ Author: Marco Costalba (C) 2005-2007
 #include "git.h"
 #include <RepositoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
+#include <QLogger.h>
 
 #include <QApplication>
 #include <QClipboard>
@@ -29,6 +30,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <QMenu>
 
 using namespace QGit;
+using namespace QLogger;
 
 uint refTypeFromName(const QString &name);
 
@@ -222,6 +224,30 @@ void RepositoryView::clear(bool complete)
 Domain *RepositoryView::domain()
 {
    return d;
+}
+
+void RepositoryView::focusOnCommit(const QString &goToSha)
+{
+   QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(goToSha));
+
+   const auto sha = mGit->getRefSha(goToSha);
+
+   if (!sha.isEmpty())
+   {
+      d->st.setSha(sha);
+      d->update(false, false);
+      update();
+   }
+}
+
+QVariant RepositoryView::data(int row, RepositoryModelColumns column) const
+{
+   return model()->index(row, static_cast<int>(column)).data();
+}
+
+QAbstractItemModel *RepositoryView::model() const
+{
+   return QTreeView::model();
 }
 
 bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)

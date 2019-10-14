@@ -145,15 +145,13 @@ void CommitWidget::contextMenuPopup(const QPoint &pos)
    connect(contextMenu->addAction("Checkout file"), &QAction::triggered, this, [this, fileName]() {
       const auto ret = mGit->resetFile(fileName);
 
-      if (ret)
-         emit signalChangesCommitted(ret);
+      emit signalChangesCommitted(ret);
    });
 
    connect(contextMenu->addAction("Add file to commit"), &QAction::triggered, this, [this, fileName]() {
       const auto ret = mGit->resetFile(fileName);
 
-      if (ret)
-         emit signalChangesCommitted(ret);
+      emit signalChangesCommitted(ret);
    });
 
    contextMenu->popup(mapToGlobal(pos));

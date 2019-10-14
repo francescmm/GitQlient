@@ -82,7 +82,6 @@ private:
    RepositoryView *mRepositoryView = nullptr;
 
    void updateUi();
-   void goToCommitSha(const QString &goToSha);
    void openCommitDiff();
    void changesCommitted(bool ok);
    void onCommitClicked(const QModelIndex &index);

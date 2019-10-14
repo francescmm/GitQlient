@@ -63,10 +63,10 @@ GitQlientRepo::GitQlientRepo(QWidget *p)
    connect(mControls, &Controls::signalOpenRepo, this, &GitQlientRepo::setRepository);
    connect(mControls, &Controls::signalGoBack, this, [this]() { mainStackedWidget->setCurrentIndex(0); });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateUi);
-   connect(mControls, &Controls::signalGoToSha, this, &GitQlientRepo::goToCommitSha);
+   connect(mControls, &Controls::signalGoToSha, mRepositoryView, &RepositoryView::focusOnCommit);
 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &GitQlientRepo::updateUi);
-   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &GitQlientRepo::goToCommitSha);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &RepositoryView::focusOnCommit);
 
    connect(mRepositoryView, &RepositoryView::rebase, this, &GitQlientRepo::rebase);
    connect(mRepositoryView, &RepositoryView::merge, this, &GitQlientRepo::merge);
@@ -105,7 +105,7 @@ void GitQlientRepo::updateUi()
       const auto commitStackedIndex = commitStackedWidget->currentIndex();
       const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : QGit::ZERO_SHA;
 
-      goToCommitSha(currentSha);
+      mRepositoryView->focusOnCommit(currentSha);
 
       if (commitStackedIndex == 1)
          mCommitWidget->init(currentSha);
@@ -241,20 +241,6 @@ void GitQlientRepo::setWidgetsEnabled(bool enabled)
    mBranchesWidget->setEnabled(enabled);
 }
 
-void GitQlientRepo::goToCommitSha(const QString &goToSha)
-{
-   QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(goToSha));
-
-   const auto sha = mGit->getRefSha(goToSha);
-
-   if (!sha.isEmpty())
-   {
-      mRepositoryView->domain()->st.setSha(sha);
-      mRepositoryView->domain()->update(false, false);
-      mRepositoryView->update();
-   }
-}
-
 void GitQlientRepo::openCommitDiff()
 {
    mDiffWidget->setStateInfo(mRepositoryView->domain()->st);
@@ -273,8 +259,7 @@ void GitQlientRepo::onCommitClicked(const QModelIndex &index)
 {
    if (mRepositoryView == dynamic_cast<RepositoryView *>(sender()))
    {
-      const auto shaIndex = mRepositoryView->model()->index(index.row(), static_cast<int>(RepositoryModelColumns::SHA));
-      const auto sha = shaIndex.data().toString();
+      const auto sha = mRepositoryView->data(index.row(), RepositoryModelColumns::SHA).toString();
 
       onCommitSelected(sha);
    }

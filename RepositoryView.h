@@ -15,6 +15,7 @@ class StateInfo;
 class Domain;
 class RepositoryModel;
 class Rev;
+enum class RepositoryModelColumns;
 
 class RepositoryView : public QTreeView
 {
@@ -41,6 +42,11 @@ public:
    void markDiffToSha(const QString &sha);
    void clear(bool complete);
    Domain *domain();
+   void focusOnCommit(const QString &goToSha);
+   QVariant data(int row, RepositoryModelColumns column) const;
+
+protected:
+   QAbstractItemModel *model() const;
 
 signals:
    void rebase(const QString &from, const QString &to, const QString &onto);
