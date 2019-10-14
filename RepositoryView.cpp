@@ -110,7 +110,7 @@ void RepositoryView::scrollToNext(int direction)
    // -1 = the next child in history
    //  1 = the previous parent in history
    const QString &s = sha(currentIndex().row());
-   const auto r = mGit->revLookup(s);
+   const auto r = mRepositoryModel->revLookup(s);
 
    if (r)
    {
@@ -130,7 +130,7 @@ void RepositoryView::scrollToCurrent(ScrollHint hint)
 int RepositoryView::getLaneType(const QString &sha, int pos) const
 {
 
-   const auto r = mGit->revLookup(sha);
+   const auto r = mRepositoryModel->revLookup(sha);
    return (r && pos < r->lanes.count() && pos >= 0 ? r->lanes.at(pos) : -1);
 }
 
@@ -311,7 +311,7 @@ bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringLi
    QString root;
    if (!isFreeLane(t))
    {
-      p = mGit->revLookup(sha)->parents(); // pointer cannot be nullptr
+      p = mRepositoryModel->revLookup(sha)->parents(); // pointer cannot be nullptr
       root = sha;
    }
    else

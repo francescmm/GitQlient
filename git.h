@@ -174,10 +174,10 @@ public:
 private:
    void loadFileCache();
    void on_loaded(ulong, int, bool);
-   bool saveOnCache(const QString &gitDir, const RevFileMap &rf, const QVector<QString> &dirs,
+   bool saveOnCache(const QString &gitDir, const QHash<QString, const RevFile *> &rf, const QVector<QString> &dirs,
                     const QVector<QString> &files);
-   bool loadFromCache(const QString &gitDir, RevFileMap &rfm, QVector<QString> &dirs, QVector<QString> &files,
-                      QByteArray &revsFilesShaBuf);
+   bool loadFromCache(const QString &gitDir, QHash<QString, const RevFile *> &rfm, QVector<QString> &dirs,
+                      QVector<QString> &files, QByteArray &revsFilesShaBuf);
    bool getGitDBDir(const QString &wd, QString &gd, bool &changed);
 
    friend class DataLoader;
@@ -274,7 +274,7 @@ private:
    bool mIsMergeHead = false;
    bool mFileCacheAccessed = false;
    QString mFirstNonStGitPatch;
-   RevFileMap mRevsFiles;
+   QHash<QString, const RevFile *> mRevsFiles;
    QVector<QByteArray> mRevsFilesShaBackupBuf;
    QHash<QString, Reference> mRefsShaMap;
    QVector<QByteArray> mShaBackupBuf;

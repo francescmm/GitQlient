@@ -87,7 +87,7 @@ const QString RepositoryModel::getShortLog(const QString &sha)
 
 int RepositoryModel::row(const QString &sha) const
 {
-   return !sha.isEmpty() ? revs.value(sha)->orderIdx : -1;
+   return !sha.isEmpty() && revs.value(sha) ? revs.value(sha)->orderIdx : -1;
 }
 
 QString RepositoryModel::sha(int row) const

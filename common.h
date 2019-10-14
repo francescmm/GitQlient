@@ -225,7 +225,6 @@ private:
 public:
    bool isDiffCache, isApplied, isUnApplied; // put here to optimize padding
 };
-typedef QHash<QString, const Rev *> RevMap; // faster then a map
 
 class RevFile
 {
@@ -302,6 +301,5 @@ public:
    const RevFile &operator>>(QDataStream &) const;
    RevFile &operator<<(QDataStream &);
 };
-typedef QHash<QString, const RevFile *> RevFileMap;
 
 #endif

@@ -245,7 +245,7 @@ void Git::cancelDataLoading()
 
 const Rev *Git::revLookup(const QString &sha) const
 {
-   const RevMap &r = mRevData->revs;
+   const QHash<QString, const Rev *> &r = mRevData->revs;
    return !sha.isEmpty() ? r.value(sha) : nullptr;
 }
 
@@ -1515,7 +1515,7 @@ void Git::on_loaded(ulong byteSize, int loadTime, bool normalExit)
    }
 }
 
-bool Git::saveOnCache(const QString &gitDir, const RevFileMap &rf, const QVector<QString> &dirs,
+bool Git::saveOnCache(const QString &gitDir, const QHash<QString, const RevFile *> &rf, const QVector<QString> &dirs,
                       const QVector<QString> &files)
 {
    if (gitDir.isEmpty() || rf.isEmpty())
@@ -1604,8 +1604,8 @@ bool Git::saveOnCache(const QString &gitDir, const RevFileMap &rf, const QVector
    return true;
 }
 
-bool Git::loadFromCache(const QString &gitDir, RevFileMap &rfm, QVector<QString> &dirs, QVector<QString> &files,
-                        QByteArray &revsFilesShaBuf)
+bool Git::loadFromCache(const QString &gitDir, QHash<QString, const RevFile *> &rfm, QVector<QString> &dirs,
+                        QVector<QString> &files, QByteArray &revsFilesShaBuf)
 {
    // check for cache file
    QString path(gitDir + C_DAT_FILE);
@@ -1783,7 +1783,7 @@ bool Git::filterEarlyOutputRev(Rev *rev)
 int Git::addChunk(const QByteArray &ba, int start)
 {
 
-   RevMap &r = mRevData->revs;
+   auto &r = mRevData->revs;
    int nextStart;
    Rev *rev;
 

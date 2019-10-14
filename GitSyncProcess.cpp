@@ -1,6 +1,6 @@
 #include "GitSyncProcess.h"
 
-#include "git.h"
+#include <git.h>
 
 #include <QTemporaryFile>
 #include <QTextStream>
