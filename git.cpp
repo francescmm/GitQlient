@@ -255,9 +255,6 @@ QPair<bool, QString> Git::run(const QString &runCmd)
    GitSyncProcess p(mWorkingDir, mErrorReportingEnabled);
    connect(this, &Git::cancelAllProcesses, &p, &AGitProcess::onCancel);
 
-   if (mCurrentDomain)
-      connect(mCurrentDomain, &Domain::cancelDomainProcesses, &p, &AGitProcess::onCancel);
-
    const auto ret = p.run(runCmd, runOutput);
 
    return qMakePair(ret, runOutput);
@@ -347,13 +344,6 @@ const QStringList Git::getChildren(const QString &parent)
       (*itC) = (*itC).section(' ', -1, -1);
 
    return children;
-}
-
-const QString Git::getShortLog(const QString &sha)
-{
-
-   const Rev *r = revLookup(sha);
-   return (r ? r->shortLog() : "");
 }
 
 void Git::getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined)

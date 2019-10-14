@@ -25,9 +25,12 @@
 
 #include <QSyntaxHighlighter>
 #include <QTextEdit>
+#include <QPointer>
 
+class RepositoryModel;
 class Git;
 class StateInfo;
+class Domain;
 
 class DiffHighlighter : public QSyntaxHighlighter
 {
@@ -46,12 +49,14 @@ private:
 class FullDiffWidget : public QTextEdit
 {
    Q_OBJECT
+
 public:
-   explicit FullDiffWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit FullDiffWidget(QSharedPointer<Git> git, RepositoryModel *repositoryModel, QWidget *parent = nullptr);
+
    void clear();
-   void centerOnFileHeader(StateInfo &st);
+   void centerOnFileHeader(const StateInfo &st);
    void refresh();
-   void update(StateInfo &st);
+   void update(const StateInfo &st);
 
    enum PatchFilter
    {
@@ -66,10 +71,13 @@ public slots:
    void typeWriterFontChanged();
    void procReadyRead(const QByteArray &data);
    void procFinished();
+   void onStateInfoUpdate(const StateInfo &stateInfo);
 
 private:
    friend class DiffHighlighter;
    QSharedPointer<Git> mGit;
+   RepositoryModel *mRepositoryModel = nullptr;
+   Domain *mDomain = nullptr;
 
    void scrollCursorToTop();
    void scrollLineToTop(int lineNum);
@@ -77,7 +85,6 @@ private:
    int topToLineNum();
    void saveRestoreSizes(bool startup = false);
    bool getMatch(int para, int *indexFrom, int *indexTo);
-   void centerMatch(int id = 0);
    bool centerTarget(const QString &target);
    void processData(const QByteArray &data, int *prevLineNum = nullptr);
 

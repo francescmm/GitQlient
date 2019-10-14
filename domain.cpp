@@ -5,18 +5,16 @@ Copyright: See COPYING file that comes with this distribution
 
                 */
 #include "domain.h"
-#include "git.h"
+#include <RepositoryModel.h>
+#include <common.h>
+
 #include <QApplication>
 #include <QStatusBar>
 #include <QTimer>
 
-using namespace QGit;
-
-// ************************* Domain ****************************
-
-Domain::Domain(QSharedPointer<Git> git, bool)
+Domain::Domain(QPointer<RepositoryModel> repositoryModel)
    : QObject()
-   , mGit(git)
+   , mRepositoryModel(repositoryModel)
 {
    st.clear();
    busy = linked = false;
@@ -36,8 +34,6 @@ void Domain::clear(bool complete)
 
 void Domain::deleteWhenDone()
 {
-   emit cancelDomainProcesses();
-
    on_deleteWhenDone();
 }
 
@@ -67,7 +63,7 @@ void Domain::on_updateRequested(StateInfo newSt)
 {
 
    st = newSt;
-   update(false, false);
+   update(false);
 }
 
 bool Domain::flushQueue()
@@ -76,27 +72,14 @@ bool Domain::flushQueue()
 
    if (!busy && st.flushQueue())
    {
-      update(false, false);
+      update(false);
       return true;
    }
    return false;
 }
 
-void Domain::populateState()
+void Domain::update(bool fromMaster)
 {
-   const auto r = mGit->revLookup(st.sha());
-
-   if (r)
-      st.setIsMerge(r->parentsCount() > 1);
-}
-
-void Domain::update(bool fromMaster, bool force)
-{
-
-   if (busy && st.requestPending())
-   {
-      emit cancelDomainProcesses();
-   }
    if (busy)
       return;
 
@@ -109,20 +92,18 @@ void Domain::update(bool fromMaster, bool force)
       return;
    }
 
-   mGit->setCurContext(this);
    busy = true;
-   populateState(); // complete any missing state information
-   st.setLock(true); // any state change will be queued now
 
-   if (doUpdate(force))
-      st.commit();
-   else
-      st.rollBack();
+   if (const auto r = mRepositoryModel->revLookup(st.sha()))
+      st.setIsMerge(r->parentsCount() > 1);
+
+   st.setLock(true); // any state change will be queued now
+   emit signalUpdated();
+   st.commit();
+   st.rollBack();
 
    st.setLock(false);
    busy = false;
-
-   mGit->setCurContext(nullptr);
 
    flushQueue();
 }

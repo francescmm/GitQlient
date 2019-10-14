@@ -37,8 +37,8 @@ uint refTypeFromName(const QString &name);
 RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
    : QTreeView(parent)
    , mGit(git)
-   , d(new Domain(mGit, true))
-   , mRepositoryModel(new RepositoryModel(mGit, d))
+   , mRepositoryModel(new RepositoryModel(mGit))
+   , d(new Domain(mRepositoryModel))
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -60,7 +60,7 @@ RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
       d->st.setSelectItem(true);
       update();
    });
-   connect(mGit.get(), &Git::loadCompleted, this, [this]() { d->update(false, false); });
+   connect(mGit.get(), &Git::loadCompleted, this, [this]() { d->update(false); });
 }
 
 void RepositoryView::setup()
@@ -203,7 +203,7 @@ void RepositoryView::currentChanged(const QModelIndex &index, const QModelIndex 
    { // to avoid looping
       st->setSha(selRev);
       st->setSelectItem(true);
-      d->update(false, false);
+      d->update(false);
 
       emit clicked(index);
    }
@@ -212,7 +212,7 @@ void RepositoryView::currentChanged(const QModelIndex &index, const QModelIndex 
 void RepositoryView::markDiffToSha(const QString &sha)
 {
    st->setDiffToSha(sha != st->diffToSha() ? sha : QString());
-   d->update(false, false);
+   d->update(false);
 }
 
 void RepositoryView::clear(bool complete)
@@ -235,7 +235,7 @@ void RepositoryView::focusOnCommit(const QString &goToSha)
    if (!sha.isEmpty())
    {
       d->st.setSha(sha);
-      d->update(false, false);
+      d->update(false);
       update();
    }
 }
@@ -243,11 +243,6 @@ void RepositoryView::focusOnCommit(const QString &goToSha)
 QVariant RepositoryView::data(int row, RepositoryModelColumns column) const
 {
    return model()->index(row, static_cast<int>(column)).data();
-}
-
-QAbstractItemModel *RepositoryView::model() const
-{
-   return QTreeView::model();
 }
 
 bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)

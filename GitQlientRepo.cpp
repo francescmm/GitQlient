@@ -8,8 +8,9 @@
 #include <RepositoryView.h>
 #include <git.h>
 #include <QLogger.h>
-#include <DiffWidget.h>
 #include <FileDiffWidget.h>
+#include <FullDiffWidget.h>
+#include <domain.h>
 
 #include <QDirIterator>
 #include <QFileSystemWatcher>
@@ -24,15 +25,15 @@ using namespace QLogger;
 GitQlientRepo::GitQlientRepo(QWidget *p)
    : QFrame(p)
    , mGit(new Git())
+   , mRepositoryView(new RepositoryView(mGit))
    , commitStackedWidget(new QStackedWidget())
    , mainStackedWidget(new QStackedWidget())
    , mControls(new Controls(mGit))
    , mCommitWidget(new CommitWidget(mGit))
    , mRevisionWidget(new RevisionWidget(mGit))
-   , mDiffWidget(new DiffWidget(mGit))
+   , mFullDiffWidget(new FullDiffWidget(mGit, mRepositoryView->model()))
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
-   , mRepositoryView(new RepositoryView(mGit))
 {
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
@@ -44,7 +45,7 @@ GitQlientRepo::GitQlientRepo(QWidget *p)
 
    mainStackedWidget->setCurrentIndex(0);
    mainStackedWidget->addWidget(mRepositoryView);
-   mainStackedWidget->addWidget(mDiffWidget);
+   mainStackedWidget->addWidget(mFullDiffWidget);
    mainStackedWidget->addWidget(mFileDiffWidget);
    mainStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
@@ -222,7 +223,7 @@ void GitQlientRepo::clearWindow(bool deepClear)
    mRevisionWidget->clear();
 
    mRepositoryView->clear(deepClear);
-   mDiffWidget->clear(deepClear);
+   mFullDiffWidget->clear();
    mFileDiffWidget->clear();
    mBranchesWidget->clear();
 
@@ -236,14 +237,14 @@ void GitQlientRepo::setWidgetsEnabled(bool enabled)
    mRevisionWidget->setEnabled(enabled);
    commitStackedWidget->setEnabled(enabled);
    mRepositoryView->setEnabled(enabled);
-   mDiffWidget->setEnabled(enabled);
+   mFullDiffWidget->setEnabled(enabled);
    mFileDiffWidget->setEnabled(enabled);
    mBranchesWidget->setEnabled(enabled);
 }
 
 void GitQlientRepo::openCommitDiff()
 {
-   mDiffWidget->setStateInfo(mRepositoryView->domain()->st);
+   mFullDiffWidget->onStateInfoUpdate(mRepositoryView->domain()->st);
    mainStackedWidget->setCurrentIndex(1);
 }
 

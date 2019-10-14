@@ -106,7 +106,6 @@ public:
    bool pop();
    bool stash();
    bool resetCommit(const QString &sha, CommitResetType type);
-   const QString getShortLog(const QString &sha);
    bool resetCommits(int parentDepth);
    /** END COMMIT WORK **/
 
@@ -170,7 +169,6 @@ public:
    void removeExtraFileInfo(QString *rowName);
    void formatPatchFileHeader(QString *rowName, const QString &sha, const QString &dts, bool cmb, bool all);
    const QString filePath(const RevFile &rf, int i) const { return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)]; }
-   void setCurContext(Domain *d) { mCurrentDomain = d; }
    QPair<bool, QString> run(const QString &cmd);
 
 private:
@@ -267,7 +265,6 @@ private:
    Reference *lookupReference(const QString &sha);
    Reference *lookupOrAddReference(const QString &sha);
 
-   Domain *mCurrentDomain = nullptr;
    QString mWorkingDir;
    QString mGitDir;
    QString mFilesLoadingCurrentSha;

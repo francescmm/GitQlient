@@ -5,6 +5,8 @@
 
 */
 #include "FullDiffWidget.h"
+
+#include <RepositoryModel.h>
 #include "common.h"
 #include "domain.h"
 #include "git.h"
@@ -94,11 +96,22 @@ void DiffHighlighter::highlightBlock(const QString &text)
    }
 }
 
-FullDiffWidget::FullDiffWidget(QSharedPointer<Git> git, QWidget *parent)
+FullDiffWidget::FullDiffWidget(QSharedPointer<Git> git, RepositoryModel *repositoryModel, QWidget *parent)
    : QTextEdit(parent)
    , mGit(git)
+   , mRepositoryModel(repositoryModel)
+   , mDomain(new Domain(repositoryModel))
 {
    diffHighlighter = new DiffHighlighter(this);
+
+   QFont font;
+   font.setFamily(QString::fromUtf8("Ubuntu Mono"));
+   setFont(font);
+   setObjectName("textEditDiff");
+   setUndoRedoEnabled(false);
+   setLineWrapMode(QTextEdit::NoWrap);
+   setReadOnly(true);
+   setTextInteractionFlags(Qt::TextSelectableByMouse);
 }
 
 void FullDiffWidget::clear()
@@ -178,9 +191,8 @@ bool FullDiffWidget::centerTarget(const QString &target)
    return true;
 }
 
-void FullDiffWidget::centerOnFileHeader(StateInfo &st)
+void FullDiffWidget::centerOnFileHeader(const StateInfo &st)
 {
-
    if (st.fileName().isEmpty())
       return;
 
@@ -190,16 +202,6 @@ void FullDiffWidget::centerOnFileHeader(StateInfo &st)
    seekTarget = !target.isEmpty();
    if (seekTarget)
       seekTarget = !centerTarget(target);
-}
-
-void FullDiffWidget::centerMatch(int id)
-{
-
-   if (matches.count() <= id)
-      return;
-   // FIXME
-   //	patchTab->textEditDiff->setSelection(matches[id].paraFrom, matches[id].indexFrom,
-   //	                                     matches[id].paraTo, matches[id].indexTo);
 }
 
 void FullDiffWidget::procReadyRead(const QByteArray &data)
@@ -319,6 +321,16 @@ void FullDiffWidget::procFinished()
    diffLoaded = true;
 }
 
+void FullDiffWidget::onStateInfoUpdate(const StateInfo &stateInfo)
+{
+   mDomain->update(true);
+
+   clear();
+   update(stateInfo); // non blocking
+
+   centerOnFileHeader(stateInfo);
+}
+
 bool FullDiffWidget::getMatch(int para, int *indexFrom, int *indexTo)
 {
 
@@ -333,13 +345,12 @@ bool FullDiffWidget::getMatch(int para, int *indexFrom, int *indexTo)
    return false;
 }
 
-void FullDiffWidget::update(StateInfo &st)
+void FullDiffWidget::update(const StateInfo &st)
 {
-
    bool combined = (st.isMerge() && !st.allMergeFiles());
    if (combined)
    {
-      const Rev *r = mGit->revLookup(st.sha());
+      const auto r = mRepositoryModel->revLookup(st.sha());
       if (r)
          diffHighlighter->setCombinedLength(r->parentsCount());
    }

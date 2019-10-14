@@ -44,9 +44,7 @@ public:
    Domain *domain();
    void focusOnCommit(const QString &goToSha);
    QVariant data(int row, RepositoryModelColumns column) const;
-
-protected:
-   QAbstractItemModel *model() const;
+   RepositoryModel *model() const { return mRepositoryModel; }
 
 signals:
    void rebase(const QString &from, const QString &to, const QString &onto);
@@ -66,9 +64,9 @@ private:
    bool getLaneParentsChildren(const QString &sha, int x, QStringList &p, QStringList &c);
    int getLaneType(const QString &sha, int pos) const;
 
+   RepositoryModel *mRepositoryModel = nullptr;
    Domain *d = nullptr;
    StateInfo *st = nullptr;
-   RepositoryModel *mRepositoryModel = nullptr;
    unsigned long secs;
    bool filterNextContextMenuRequest;
 };

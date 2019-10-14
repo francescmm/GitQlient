@@ -14,7 +14,6 @@ HEADERS += \
     $$PWD/ClickableFrame.h \
     $$PWD/CommitWidget.h \
     $$PWD/Controls.h \
-    $$PWD/DiffWidget.h \
     $$PWD/FileContextMenu.h \
     $$PWD/FileDiffHighlighter.h \
     $$PWD/FileDiffView.h \
@@ -50,7 +49,6 @@ SOURCES += \
     $$PWD/ClickableFrame.cpp \
     $$PWD/CommitWidget.cpp \
     $$PWD/Controls.cpp \
-    $$PWD/DiffWidget.cpp \
     $$PWD/FileContextMenu.cpp \
     $$PWD/FileDiffHighlighter.cpp \
     $$PWD/FileDiffView.cpp \

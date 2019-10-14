@@ -8,28 +8,31 @@
 #define DOMAIN_H
 
 #include <QObject>
-#include <QSharedPointer>
+#include <QPointer>
 #include <StateInfo.h>
 
 class Domain;
-class Git;
+class RepositoryModel;
 
 class Domain : public QObject
 {
    Q_OBJECT
+
+signals:
+   void signalUpdated();
+
 public:
-   Domain(QSharedPointer<Git> git, bool isMain);
+   Domain(QPointer<RepositoryModel> repositoryModel);
    virtual ~Domain();
    void deleteWhenDone(); // will delete when no more run() are pending
    bool isLinked() const { return linked; }
    virtual bool isMatch(const QString &) { return false; }
-   void update(bool fromMaster, bool force);
+   void update(bool fromMaster);
 
    StateInfo st;
 
 signals:
    void updateRequested(StateInfo newSt);
-   void cancelDomainProcesses();
    void setTabText(QWidget *w, const QString &label);
 
 public slots:
@@ -43,12 +46,11 @@ protected:
    virtual bool doUpdate(bool) { return true; }
    void linkDomain(Domain *d);
    void unlinkDomain(Domain *d);
-   QSharedPointer<Git> mGit;
+   QPointer<RepositoryModel> mRepositoryModel;
 
    bool busy;
 
 private:
-   void populateState();
    bool flushQueue();
 
    int exDeleteRequest;

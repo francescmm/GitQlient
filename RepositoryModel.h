@@ -21,10 +21,10 @@ class RepositoryModel : public QAbstractItemModel
 {
    Q_OBJECT
 public:
-   RepositoryModel(QSharedPointer<Git> git, QObject *parent);
+   explicit RepositoryModel(QSharedPointer<Git> git, QObject *parent = nullptr);
    ~RepositoryModel();
    void clear(bool complete = true);
-   const QString sha(int row) const;
+   QString sha(int row) const;
    int row(const QString &sha) const;
    const QStringList fileNames() const { return fNames; }
    void resetFileNames(const QString &fn);
@@ -39,6 +39,8 @@ public:
    virtual bool hasChildren(const QModelIndex &par = QModelIndex()) const;
    virtual int columnCount(const QModelIndex &) const { return mColumns.count(); }
    const Rev *revLookup(int row) const;
+   const Rev *revLookup(const QString &sha) const;
+   const QString getShortLog(const QString &sha);
 
 public slots:
    void on_changeFont(const QFont &);

@@ -74,14 +74,24 @@ const Rev *RepositoryModel::revLookup(int row) const
    return !shaStr.isEmpty() ? revs.value(shaStr) : nullptr;
 }
 
+const Rev *RepositoryModel::revLookup(const QString &sha) const
+{
+   return !sha.isEmpty() ? revs.value(sha) : nullptr;
+}
+
+const QString RepositoryModel::getShortLog(const QString &sha)
+{
+   const auto r = revLookup(sha);
+   return r ? r->shortLog() : QString();
+}
+
 int RepositoryModel::row(const QString &sha) const
 {
    return !sha.isEmpty() ? revs.value(sha)->orderIdx : -1;
 }
 
-const QString RepositoryModel::sha(int row) const
+QString RepositoryModel::sha(int row) const
 {
-
    return row >= 0 && row < rowCnt ? QString(revOrder.at(row)) : "";
 }
 
