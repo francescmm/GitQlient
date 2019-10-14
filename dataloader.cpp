@@ -148,7 +148,7 @@ void DataLoader::parseSingleBuffer(const QByteArray &ba)
       if (!halfChunk)
       {
 
-         newOfs = mGit->addChunk(fh, ba, ofs);
+         newOfs = mGit->addChunk(ba, ofs);
          if (newOfs == -1)
             break; // half chunk detected
 
@@ -181,7 +181,7 @@ void DataLoader::addSplittedChunks(const QByteArray *hc)
    // do not assume we have only one chunk in hc
    int ofs = 0;
    while (ofs != -1 && ofs != (int)hc->size())
-      ofs = mGit->addChunk(fh, *hc, ofs);
+      ofs = mGit->addChunk(*hc, ofs);
 }
 
 void DataLoader::baAppend(QByteArray **baPtr, const char *ascii, int len)

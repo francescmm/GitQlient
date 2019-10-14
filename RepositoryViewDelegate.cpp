@@ -368,7 +368,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 
    // calculate lanes
    if (r->lanes.count() == 0)
-      mGit->setLane(r->sha(), repositoryModel);
+      mGit->setLane(r->sha());
 
    QBrush back = opt.palette.base();
    const QVector<int> &lanes(r->lanes);

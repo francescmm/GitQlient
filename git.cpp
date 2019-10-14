@@ -236,16 +236,16 @@ void Git::formatPatchFileHeader(QString *rowName, const QString &sha, const QStr
       *rowName = "diff --git a/" + *rowName + " b/" + *rowName;
 }
 
-void Git::cancelDataLoading(const RepositoryModel *fh)
+void Git::cancelDataLoading()
 {
    // normally called when closing file viewer
 
-   emit cancelLoading(fh); // non blocking
+   emit cancelLoading(mRevData); // non blocking
 }
 
-const Rev *Git::revLookup(const QString &sha, const RepositoryModel *fh) const
+const Rev *Git::revLookup(const QString &sha) const
 {
-   const RevMap &r = fh ? fh->revs : mRevData->revs;
+   const RevMap &r = mRevData->revs;
    return !sha.isEmpty() ? r.value(sha) : nullptr;
 }
 
@@ -625,47 +625,6 @@ const RevFile *Git::getFiles(const QString &sha, const QString &diffToSha, bool 
 
    mCacheNeedsUpdate = true;
    return insertNewFiles(sha, runOutput);
-}
-
-const QString Git::getNewestFileName(QStringList &branches, const QString &fileName)
-{
-
-   QString curFileName(fileName), runOutput, args;
-   while (true)
-   {
-      args = branches.join(" ") + " -- " + curFileName;
-
-      const auto ret = run("git ls-tree " + args);
-      if (!ret.first)
-         break;
-
-      if (!ret.second.isEmpty())
-         break;
-
-      QString msg("Retrieving file renames, now at '" + curFileName + "'...");
-
-      const auto ret2 = run("git rev-list -n1 " + args);
-      if (!ret2.first)
-         break;
-
-      if (ret2.second.isEmpty()) // try harder
-      {
-         const auto ret3 = run("git rev-list --full-history -n1 " + args);
-
-         if (ret3.first)
-         {
-            if (!ret3.second.isEmpty())
-            {
-               QStringList newCur;
-               if (!populateRenamedPatches(ret3.second.trimmed(), QStringList(curFileName), nullptr, &newCur, true))
-                  break;
-
-               curFileName = newCur.first();
-            }
-         }
-      }
-   }
-   return curFileName;
 }
 
 bool Git::resetCommits(int parentDepth)
@@ -1228,7 +1187,7 @@ const QStringList Git::getOthersFiles()
 }
 
 Rev *Git::fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,
-                      const QString &log, const QString &longLog, const QString &patch, int idx, RepositoryModel *fh)
+                      const QString &log, const QString &longLog, const QString &patch, int idx)
 {
 
    QString data('>' + sha + 'X' + parents.join(" ") + " \n");
@@ -1249,22 +1208,18 @@ Rev *Git::fakeRevData(const QString &sha, const QStringList &parents, const QStr
    ba->append('\0');
 
    int dummy;
-   Rev *c = new Rev(*ba, 0, idx, &dummy, !isMainHistory(fh));
+   Rev *c = new Rev(*ba, 0, idx, &dummy);
    return c;
 }
 
-const Rev *Git::fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx,
-                               RepositoryModel *fh)
+const Rev *Git::fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx)
 {
 
    QString patch;
-   if (!isMainHistory(fh))
-      patch = getWorkDirDiff(fh->fileNames().first());
-
    QString date(QString::number(QDateTime::currentDateTime().toSecsSinceEpoch()));
    QString author("-");
    QStringList parents(parent);
-   Rev *c = fakeRevData(ZERO_SHA, parents, author, date, log, longLog, patch, idx, fh);
+   Rev *c = fakeRevData(ZERO_SHA, parents, author, date, log, longLog, patch, idx);
    c->isDiffCache = true;
    c->lanes.append(EMPTY);
    return c;
@@ -1337,7 +1292,7 @@ void Git::getDiffIndex()
 
    // then mockup the corresponding Rev
    const QString &log = (isNothingToCommit() ? QString("No local changes") : QString("Local changes"));
-   const Rev *r = fakeWorkDirRev(head, log, status, mRevData->revOrder.count(), mRevData);
+   const Rev *r = fakeWorkDirRev(head, log, status, mRevData->revOrder.count());
    mRevData->revs.insert(ZERO_SHA, r);
    mRevData->revOrder.append(ZERO_SHA);
    mRevData->earlyOutputCntBase = mRevData->revOrder.count();
@@ -1468,17 +1423,18 @@ void Git::parseDiffFormat(RevFile &rf, const QString &buf, FileNamesLoader &fl)
    }
 }
 
-bool Git::startParseProc(const QStringList &initCmd, RepositoryModel *fh, const QString &buf)
+bool Git::startParseProc(const QStringList &initCmd)
 {
-   DataLoader *dl = new DataLoader(this, fh); // auto-deleted when done
+   DataLoader *dl = new DataLoader(this, mRevData); // auto-deleted when done
    connect(this, &Git::cancelLoading, dl, qOverload<const RepositoryModel *>(&DataLoader::on_cancel));
    connect(dl, &DataLoader::newDataReady, this, &Git::on_newDataReady);
    connect(dl, &DataLoader::loaded, this, &Git::on_loaded);
 
+   QString buf;
    return dl->start(initCmd, mWorkingDir, buf);
 }
 
-bool Git::startRevList(QStringList &args, RepositoryModel *fh)
+bool Git::startRevList(QStringList &args)
 {
 
    QString baseCmd("git log --date-order --no-color "
@@ -1490,26 +1446,11 @@ bool Git::startRevList(QStringList &args, RepositoryModel *fh)
                    "--pretty=format:" GIT_LOG_FORMAT);
 
    // we don't need log message body for file history
-   if (isMainHistory(fh))
-      baseCmd.append("%b --all");
+   baseCmd.append("%b --all");
 
    QStringList initCmd(baseCmd.split(' '));
-   if (!isMainHistory(fh))
-   {
-      /*
-     NOTE: we don't use '--remove-empty' option because
-     in case a file is deleted and then a new file with
-     the same name is created again in the same directory
-     then, with this option, file history is truncated to
-     the file deletion revision.
-  */
-      initCmd << QString("-r -m -p --full-index").split(' ');
-   }
-   else
-   {
-   } // initCmd << QString("--early-output"); currently disabled
 
-   return startParseProc(initCmd + args, fh, QString());
+   return startParseProc(initCmd + args);
 }
 
 void Git::stop(bool saveCache)
@@ -1591,7 +1532,7 @@ void Git::init2()
 
    // build up command line arguments
    QStringList args;
-   startRevList(args, mRevData);
+   startRevList(args);
 }
 
 void Git::on_newDataReady(const RepositoryModel *fh)
@@ -1616,8 +1557,7 @@ void Git::on_loaded(RepositoryModel *fh, ulong byteSize, int loadTime, bool norm
                   "time elapsed: %i ms  (%.2f MB/s)",
                   fh->revs.count(), kb, fh->loadTime, mbs);
 
-      if (!tryFollowRenames(fh))
-         emit loadCompleted(fh, tmp);
+      emit loadCompleted(mRevData, tmp);
    }
 }
 
@@ -1769,31 +1709,8 @@ bool Git::loadFromCache(const QString &gitDir, RevFileMap &rfm, QVector<QString>
    return true;
 }
 
-bool Git::tryFollowRenames(RepositoryModel *fh)
-{
-
-   if (isMainHistory(fh))
-      return false;
-
-   QStringList oldNames;
-   QMutableStringListIterator it(fh->renamedRevs);
-   while (it.hasNext())
-      if (!populateRenamedPatches(it.next(), fh->curFNames, fh, &oldNames, false))
-         it.remove();
-
-   if (fh->renamedRevs.isEmpty())
-      return false;
-
-   QStringList args;
-   args << fh->renamedRevs << "--" << oldNames;
-   fh->fNames << oldNames;
-   fh->curFNames = oldNames;
-   fh->renamedRevs.clear();
-   return startRevList(args, fh);
-}
-
-bool Git::populateRenamedPatches(const QString &renamedSha, const QStringList &newNames, RepositoryModel *fh,
-                                 QStringList *oldNames, bool backTrack)
+bool Git::populateRenamedPatches(const QString &renamedSha, const QStringList &newNames, QStringList *oldNames,
+                                 bool backTrack)
 {
 
    const auto ret = run("git diff-tree -r -M " + renamedSha);
@@ -1850,10 +1767,10 @@ bool Git::populateRenamedPatches(const QString &renamedSha, const QStringList &n
 
    // save the patch, will be used later to create a
    // proper graft sha with correct parent info
-   if (fh)
+   if (mRevData)
    {
       QString tmp(!runOutput.isEmpty() ? runOutput : "diff --no-ext-diff --\nsimilarity index 100%\n");
-      fh->renamedPatches.insert(renamedSha, tmp);
+      mRevData->renamedPatches.insert(renamedSha, tmp);
    }
    return true;
 }
@@ -1883,14 +1800,14 @@ void Git::loadFileCache()
    }
 }
 
-bool Git::filterEarlyOutputRev(RepositoryModel *fh, Rev *rev)
+bool Git::filterEarlyOutputRev(Rev *rev)
 {
 
-   if (fh->earlyOutputCnt < fh->revOrder.count())
+   if (mRevData->earlyOutputCnt < mRevData->revOrder.count())
    {
 
-      const QString &sha = fh->revOrder[fh->earlyOutputCnt++];
-      const Rev *c = revLookup(sha, fh);
+      const QString &sha = mRevData->revOrder[mRevData->earlyOutputCnt++];
+      const Rev *c = revLookup(sha);
       if (c)
       {
          if (rev->sha() != sha || rev->parents() != c->parents())
@@ -1905,26 +1822,26 @@ bool Git::filterEarlyOutputRev(RepositoryModel *fh, Rev *rev)
       }
    }
    // we have new revisions, exit from early output state
-   fh->setEarlyOutputState(false);
+   mRevData->setEarlyOutputState(false);
    return false;
 }
 
-int Git::addChunk(RepositoryModel *fh, const QByteArray &ba, int start)
+int Git::addChunk(const QByteArray &ba, int start)
 {
 
-   RevMap &r = fh->revs;
+   RevMap &r = mRevData->revs;
    int nextStart;
    Rev *rev;
 
    do
    {
       // only here we create a new rev
-      rev = new Rev(ba, static_cast<uint>(start), fh->revOrder.count(), &nextStart, !isMainHistory(fh));
+      rev = new Rev(ba, static_cast<uint>(start), mRevData->revOrder.count(), &nextStart);
 
       if (nextStart == -2)
       {
          delete rev;
-         fh->setEarlyOutputState(true);
+         mRevData->setEarlyOutputState(true);
          start = ba.indexOf('\n', start) + 1;
       }
 
@@ -1938,64 +1855,26 @@ int Git::addChunk(RepositoryModel *fh, const QByteArray &ba, int start)
 
    const QString &sha = rev->sha();
 
-   if (fh->earlyOutputCnt != -1 && filterEarlyOutputRev(fh, rev))
+   if (mRevData->earlyOutputCnt != -1 && filterEarlyOutputRev(rev))
    {
       delete rev;
       return nextStart;
    }
 
-   if (r.isEmpty() && !isMainHistory(fh))
-   {
-      bool added = copyDiffIndex(fh, sha);
-      rev->orderIdx = added ? 1 : 0;
-   }
-   if (!isMainHistory(fh) && !fh->renamedPatches.isEmpty() && fh->renamedPatches.contains(sha))
-   {
-
-      // this is the new rev with renamed file, the rev is correct but
-      // the patch, create a new rev with proper patch and use that instead
-      const Rev *prevSha = revLookup(sha, fh);
-      Rev *c = fakeRevData(sha, rev->parents(), rev->author(), rev->authorDate(), rev->shortLog(), rev->longLog(),
-                           fh->renamedPatches[sha], prevSha->orderIdx, fh);
-
-      r.insert(sha, c); // overwrite old content
-      fh->renamedPatches.remove(sha);
-      return nextStart;
-   }
-   if (!isMainHistory(fh) && rev->parentsCount() > 1 && r.contains(sha))
-   {
-      /* In this case git log is called with -m option and merges are splitted
-     in one commit per parent but all them have the same sha.
-     So we add only the first to fh->revOrder to display history correctly,
-     but we nevertheless add all the commits to 'r' so that annotation code
-     can get the patches.
-  */
-      QString mergeSha;
-      int i = 0;
-      do
-         mergeSha = QString("%1%2%3").arg(++i).arg(" m ").arg(sha);
-      while (r.contains(mergeSha));
-
-      const QString &ss = toPersistentSha(mergeSha, mShaBackupBuf);
-      r.insert(ss, rev);
-   }
-   else
+   if (!(rev->parentsCount() > 1 && r.contains(sha)))
    {
       r.insert(sha, rev);
-      fh->revOrder.append(sha);
-
-      if (rev->parentsCount() == 0 && !isMainHistory(fh))
-         fh->renamedRevs.append(sha);
+      mRevData->revOrder.append(sha);
    }
 
    return nextStart;
 }
 
-bool Git::copyDiffIndex(RepositoryModel *fh, const QString &parent)
+bool Git::copyDiffIndex(const QString &parent)
 {
    // must be called with empty revs and empty revOrder
 
-   if (!fh->revOrder.isEmpty() || !fh->revs.isEmpty())
+   if (!mRevData->revOrder.isEmpty() || !mRevData->revs.isEmpty())
       return false;
 
    const Rev *r = revLookup(ZERO_SHA);
@@ -2003,37 +1882,37 @@ bool Git::copyDiffIndex(RepositoryModel *fh, const QString &parent)
       return false;
 
    const RevFile *files = getFiles(ZERO_SHA);
-   if (!files || findFileIndex(*files, fh->fileNames().first()) == -1)
+   if (!files || findFileIndex(*files, mRevData->fileNames().first()) == -1)
       return false;
 
    // insert a custom ZERO_SHA rev with proper parent
-   const Rev *rf = fakeWorkDirRev(parent, "Working directory changes", "long log\n", 0, fh);
-   fh->revs.insert(ZERO_SHA, rf);
-   fh->revOrder.append(ZERO_SHA);
+   const Rev *rf = fakeWorkDirRev(parent, "Working directory changes", "long log\n", 0);
+   mRevData->revs.insert(ZERO_SHA, rf);
+   mRevData->revOrder.append(ZERO_SHA);
    return true;
 }
 
-void Git::setLane(const QString &sha, RepositoryModel *fh)
+void Git::setLane(const QString &sha)
 {
 
-   Lanes *l = fh->lns;
-   uint i = fh->firstFreeLane;
+   Lanes *l = mRevData->lns;
+   uint i = mRevData->firstFreeLane;
    QVector<QByteArray> ba;
    const QString &ss = toPersistentSha(sha, ba);
-   const QVector<QString> &shaVec(fh->revOrder);
+   const QVector<QString> &shaVec(mRevData->revOrder);
 
    for (uint cnt = static_cast<uint>(shaVec.count()); i < cnt; ++i)
    {
 
       const QString &curSha = shaVec[static_cast<int>(i)];
-      Rev *r = const_cast<Rev *>(revLookup(curSha, fh));
+      Rev *r = const_cast<Rev *>(revLookup(curSha));
       if (r->lanes.count() == 0)
          updateLanes(*r, *l, curSha);
 
       if (curSha == ss)
          break;
    }
-   fh->firstFreeLane = ++i;
+   mRevData->firstFreeLane = ++i;
 }
 
 void Git::updateLanes(Rev &c, Lanes &lns, const QString &sha)

@@ -69,13 +69,13 @@ bool RepositoryModel::hasChildren(const QModelIndex &parent) const
 
 const Rev *RepositoryModel::revLookup(int row) const
 {
-   return mGit->revLookup(sha(row), this);
+   return mGit->revLookup(sha(row));
 }
 
 int RepositoryModel::row(const QString &sha) const
 {
 
-   const Rev *r = mGit->revLookup(sha, this);
+   const Rev *r = mGit->revLookup(sha);
    return r ? r->orderIdx : -1;
 }
 
@@ -125,7 +125,7 @@ void RepositoryModel::clear(bool complete)
       return;
    }
 
-   mGit->cancelDataLoading(this);
+   mGit->cancelDataLoading();
 
    beginResetModel();
    qDeleteAll(revs);
@@ -246,7 +246,7 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
       return no_value; // fast path, 90% of calls ends here!
 
    const auto git = mGit;
-   const Rev *r = git->revLookup(revOrder.at(index.row()), this);
+   const Rev *r = git->revLookup(revOrder.at(index.row()));
    if (!r)
       return no_value;
 
@@ -260,7 +260,7 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
 
    // calculate lanes
    if (r->lanes.count() == 0)
-      git->setLane(r->sha(), const_cast<RepositoryModel *>(this));
+      git->setLane(r->sha());
 
    switch (static_cast<FileHistoryColumn>(col))
    {

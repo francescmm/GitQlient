@@ -147,11 +147,10 @@ public:
    };
 
    void setDefaultModel(RepositoryModel *fh) { mRevData = fh; }
-   void setLane(const QString &sha, RepositoryModel *fh);
-   void cancelDataLoading(const RepositoryModel *fh);
+   void setLane(const QString &sha);
+   void cancelDataLoading();
 
    bool isNothingToCommit();
-   bool isMainHistory(const RepositoryModel *fh) { return (fh == mRevData); }
 
    void getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined);
    QString getDiff(const QString &currentSha, const QString &previousSha, const QString &file);
@@ -161,7 +160,7 @@ public:
 
    const QString getLaneParent(const QString &fromSHA, int laneNum);
    const QStringList getChildren(const QString &parent);
-   const Rev *revLookup(const QString &sha, const RepositoryModel *fh = nullptr) const;
+   const Rev *revLookup(const QString &sha) const;
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;
    const QString getRefSha(const QString &refName, RefType type = ANY_REF, bool askGit = true);
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
@@ -236,22 +235,19 @@ private:
    bool getRefs();
    void clearRevs();
    void clearFileNames();
-   bool startRevList(QStringList &args, RepositoryModel *fh);
-   bool startParseProc(const QStringList &initCmd, RepositoryModel *fh, const QString &buf);
-   bool tryFollowRenames(RepositoryModel *fh);
-   bool populateRenamedPatches(const QString &sha, const QStringList &nn, RepositoryModel *fh, QStringList *on,
-                               bool bt);
-   bool filterEarlyOutputRev(RepositoryModel *fh, Rev *rev);
-   int addChunk(RepositoryModel *fh, const QByteArray &ba, int ofs);
+   bool startRevList(QStringList &args);
+   bool startParseProc(const QStringList &initCmd);
+   bool populateRenamedPatches(const QString &sha, const QStringList &nn, QStringList *on, bool bt);
+   bool filterEarlyOutputRev(Rev *rev);
+   int addChunk(const QByteArray &ba, int ofs);
    void parseDiffFormat(RevFile &rf, const QString &buf, FileNamesLoader &fl);
    void parseDiffFormatLine(RevFile &rf, const QString &line, int parNum, FileNamesLoader &fl);
    void getDiffIndex();
    Rev *fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,
-                    const QString &log, const QString &longLog, const QString &patch, int idx, RepositoryModel *fh);
-   const Rev *fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx,
-                             RepositoryModel *fh);
+                    const QString &log, const QString &longLog, const QString &patch, int idx);
+   const Rev *fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx);
    const RevFile *fakeWorkDirRevFile(const WorkingDirInfo &wd);
-   bool copyDiffIndex(RepositoryModel *fh, const QString &parent);
+   bool copyDiffIndex(const QString &parent);
    const RevFile *insertNewFiles(const QString &sha, const QString &data);
    const RevFile *getAllMergeFiles(const Rev *r);
    bool runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutput);
@@ -262,7 +258,6 @@ private:
    void updateLanes(Rev &c, Lanes &lns, const QString &sha);
    const QStringList getOthersFiles();
    const QStringList getOtherFiles(const QStringList &selFiles);
-   const QString getNewestFileName(QStringList &args, const QString &fileName);
    void appendFileName(RevFile &rf, const QString &name, FileNamesLoader &fl);
    void flushFileNames(FileNamesLoader &fl);
    void populateFileNamesMap();

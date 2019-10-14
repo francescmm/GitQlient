@@ -151,7 +151,7 @@ class Rev
    Rev &operator=(const Rev &);
 
 public:
-   Rev(const QByteArray &b, uint s, int idx, int *next, bool withDiff)
+   Rev(const QByteArray &b, uint s, int idx, int *next)
       : orderIdx(idx)
       , ba(b)
       , start(s)
@@ -159,7 +159,7 @@ public:
 
       indexed = isDiffCache = isApplied = isUnApplied = false;
       descRefsMaster = ancRefsMaster = descBrnMaster = -1;
-      *next = indexData(true, withDiff);
+      *next = indexData(true, false);
    }
    bool isBoundary() const { return (ba.at(shaStart - 1) == '-'); }
    uint parentsCount() const { return parentsCnt; }
