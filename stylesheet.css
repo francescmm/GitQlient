@@ -305,7 +305,7 @@ GitQlient
 #openNewRepo, #openGitAdmin
 {
    background-color: #202122;
-   max-height: 26px; /** 25px for the button + 3px to compensate the border of the tabs in the QTabWidget **/
+   max-height: 26px; /** 25px for the button + 1px to compensate the border of the tabs in the QTabWidget **/
    min-height: 26px;
    max-width: 31px;
    min-width: 31px;
