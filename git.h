@@ -43,8 +43,8 @@ signals:
 
    // TODO: To review
 signals:
-   void newRevsAdded(const RepositoryModel *, const QVector<QString> &);
-   void loadCompleted(const RepositoryModel *, const QString &);
+   void newRevsAdded();
+   void loadCompleted(const QString &);
    void cancelLoading(const RepositoryModel *);
    void cancelAllProcesses();
 
@@ -176,8 +176,7 @@ public:
 
 private:
    void loadFileCache();
-   void on_newDataReady(const RepositoryModel *);
-   void on_loaded(RepositoryModel *, ulong, int, bool);
+   void on_loaded(ulong, int, bool);
    bool saveOnCache(const QString &gitDir, const RevFileMap &rf, const QVector<QString> &dirs,
                     const QVector<QString> &files);
    bool loadFromCache(const QString &gitDir, RevFileMap &rfm, QVector<QString> &dirs, QVector<QString> &files,

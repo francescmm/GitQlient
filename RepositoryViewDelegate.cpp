@@ -332,10 +332,10 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       p->fillRect(newOpt.rect, c);
    }
 
-   if (index.column() == static_cast<int>(RepositoryModel::FileHistoryColumn::GRAPH))
+   if (index.column() == static_cast<int>(RepositoryModelColumns::GRAPH))
       return paintGraph(p, newOpt, index);
 
-   if (index.column() == static_cast<int>(RepositoryModel::FileHistoryColumn::LOG))
+   if (index.column() == static_cast<int>(RepositoryModelColumns::LOG))
       return paintLog(p, newOpt, index);
 }
 

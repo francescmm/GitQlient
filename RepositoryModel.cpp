@@ -25,12 +25,12 @@ RepositoryModel::RepositoryModel(QSharedPointer<Git> git, QObject *p)
 {
    mGit->setDefaultModel(this);
 
-   mColumns.insert(FileHistoryColumn::GRAPH, "Graph");
-   mColumns.insert(FileHistoryColumn::ID, "Id");
-   mColumns.insert(FileHistoryColumn::SHA, "Sha");
-   mColumns.insert(FileHistoryColumn::LOG, "Log");
-   mColumns.insert(FileHistoryColumn::AUTHOR, "Author");
-   mColumns.insert(FileHistoryColumn::DATE, "Date");
+   mColumns.insert(RepositoryModelColumns::GRAPH, "Graph");
+   mColumns.insert(RepositoryModelColumns::ID, "Id");
+   mColumns.insert(RepositoryModelColumns::SHA, "Sha");
+   mColumns.insert(RepositoryModelColumns::LOG, "Log");
+   mColumns.insert(RepositoryModelColumns::AUTHOR, "Author");
+   mColumns.insert(RepositoryModelColumns::DATE, "Date");
 
    lns = new Lanes();
    revs.reserve(QGit::MAX_DICT_SIZE);
@@ -143,30 +143,25 @@ void RepositoryModel::clear(bool complete)
    emit headerDataChanged(Qt::Horizontal, 0, 5);
 }
 
-void RepositoryModel::on_newRevsAdded(const RepositoryModel *fh, const QVector<QString> &shaVec)
+void RepositoryModel::on_newRevsAdded()
 {
-
-   if (fh != this) // signal newRevsAdded() is broadcast
-      return;
-
    // do not process revisions if there are possible renamed points
    // or pending renamed patch to apply
    if (!renamedRevs.isEmpty() || !renamedPatches.isEmpty())
       return;
 
    // do not attempt to insert 0 rows since the inclusive range would be invalid
-   if (rowCnt == shaVec.count())
+   if (rowCnt == revOrder.count())
       return;
 
-   beginInsertRows(QModelIndex(), rowCnt, shaVec.count() - 1);
-   rowCnt = shaVec.count();
+   beginInsertRows(QModelIndex(), rowCnt, revOrder.count() - 1);
+   rowCnt = revOrder.count();
    endInsertRows();
 }
 
-void RepositoryModel::on_loadCompleted(const RepositoryModel *fh, const QString &)
+void RepositoryModel::on_loadCompleted(const QString &)
 {
-
-   if (fh != this || rowCnt >= revOrder.count())
+   if (rowCnt >= revOrder.count())
       return;
 
    // now we can process last revision
@@ -188,7 +183,7 @@ void RepositoryModel::on_changeFont(const QFont &f)
    while (fmId.boundingRect(id).width() < neededWidth)
       id += ' ';
 
-   mColumns[FileHistoryColumn::ID] = id;
+   mColumns[RepositoryModelColumns::ID] = id;
    emit headerDataChanged(Qt::Horizontal, 1, 1);
 }
 
@@ -196,7 +191,7 @@ QVariant RepositoryModel::headerData(int section, Qt::Orientation orientation, i
 {
 
    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-      return mColumns.value(static_cast<FileHistoryColumn>(section));
+      return mColumns.value(static_cast<RepositoryModelColumns>(section));
 
    return QVariant();
 }
@@ -262,17 +257,17 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
    if (r->lanes.count() == 0)
       git->setLane(r->sha());
 
-   switch (static_cast<FileHistoryColumn>(col))
+   switch (static_cast<RepositoryModelColumns>(col))
    {
-      case FileHistoryColumn::ID:
+      case RepositoryModelColumns::ID:
          return (annIdValid ? rowCnt - index.row() : QVariant());
-      case FileHistoryColumn::SHA:
+      case RepositoryModelColumns::SHA:
          return r->sha();
-      case FileHistoryColumn::LOG:
+      case RepositoryModelColumns::LOG:
          return r->shortLog();
-      case FileHistoryColumn::AUTHOR:
+      case RepositoryModelColumns::AUTHOR:
          return r->author().split("<").first();
-      case FileHistoryColumn::DATE:
+      case RepositoryModelColumns::DATE:
       {
          QDateTime dt;
          dt.setSecsSinceEpoch(r->authorDate().toUInt());

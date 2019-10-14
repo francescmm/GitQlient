@@ -16,20 +16,20 @@ class Git;
 class Lanes;
 class Rev;
 
+enum class RepositoryModelColumns
+{
+   ID,
+   GRAPH,
+   SHA,
+   LOG,
+   AUTHOR,
+   DATE
+};
+
 class RepositoryModel : public QAbstractItemModel
 {
    Q_OBJECT
 public:
-   enum class FileHistoryColumn
-   {
-      ID,
-      GRAPH,
-      SHA,
-      LOG,
-      AUTHOR,
-      DATE
-   };
-
    RepositoryModel(QSharedPointer<Git> git, QObject *parent);
    ~RepositoryModel();
    void clear(bool complete = true);
@@ -53,8 +53,8 @@ public slots:
    void on_changeFont(const QFont &);
 
 private slots:
-   void on_newRevsAdded(const RepositoryModel *, const QVector<QString> &);
-   void on_loadCompleted(const RepositoryModel *, const QString &);
+   void on_newRevsAdded();
+   void on_loadCompleted(const QString &);
 
 private:
    QSharedPointer<Git> mGit;
@@ -67,7 +67,7 @@ private:
    QVector<QString> revOrder;
    Lanes *lns = nullptr;
    uint firstFreeLane;
-   QMap<FileHistoryColumn, QString> mColumns;
+   QMap<RepositoryModelColumns, QString> mColumns;
    int rowCnt;
    bool annIdValid;
    unsigned long secs;

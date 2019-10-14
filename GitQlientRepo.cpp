@@ -272,8 +272,7 @@ void GitQlientRepo::onCommitClicked(const QModelIndex &index)
 {
    if (mRepositoryView == dynamic_cast<RepositoryView *>(sender()))
    {
-      const auto shaIndex
-          = mRepositoryView->model()->index(index.row(), static_cast<int>(RepositoryModel::FileHistoryColumn::SHA));
+      const auto shaIndex = mRepositoryView->model()->index(index.row(), static_cast<int>(RepositoryModelColumns::SHA));
       const auto sha = shaIndex.data().toString();
 
       onCommitSelected(sha);

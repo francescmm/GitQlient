@@ -27,10 +27,9 @@ public:
    bool unbufOpen() { return open(QIODevice::ReadOnly | QIODevice::Unbuffered); }
 };
 
-DataLoader::DataLoader(Git *git, RepositoryModel *f)
+DataLoader::DataLoader(Git *git)
    : QProcess()
    , mGit(git)
-   , fh(f)
 {
    canceling = parsing = false;
    isProcExited = true;
@@ -39,7 +38,7 @@ DataLoader::DataLoader(Git *git, RepositoryModel *f)
    loadedBytes = 0;
    guiUpdateTimer.setSingleShot(true);
 
-   connect(mGit, &Git::cancelAllProcesses, this, qOverload<>(&DataLoader::on_cancel));
+   connect(mGit, &Git::cancelAllProcesses, this, &DataLoader::on_cancel);
    connect(&guiUpdateTimer, &QTimer::timeout, this, &DataLoader::on_timeout);
 }
 
@@ -49,13 +48,6 @@ DataLoader::~DataLoader()
    // avoid a Qt warning in case we are
    // destroyed while still running
    waitForFinished(1000);
-}
-
-void DataLoader::on_cancel(const RepositoryModel *f)
-{
-
-   if (f == fh)
-      on_cancel();
 }
 
 void DataLoader::on_cancel()
@@ -110,11 +102,11 @@ void DataLoader::on_timeout()
    // process could exit while we are processing so save the flag now
    bool lastBuffer = isProcExited;
    loadedBytes += readNewData(lastBuffer);
-   emit newDataReady(fh); // inserting in list view is about 3% of total time
+   emit newDataReady(); // inserting in list view is about 3% of total time
 
    if (lastBuffer)
    {
-      emit loaded(fh, loadedBytes, loadTime.elapsed(), true, "", "");
+      emit loaded(loadedBytes, loadTime.elapsed(), true, "", "");
       deleteLater();
    }
    else if (isProcExited)

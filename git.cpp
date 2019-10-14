@@ -1298,7 +1298,7 @@ void Git::getDiffIndex()
    mRevData->earlyOutputCntBase = mRevData->revOrder.count();
 
    // finally send it to GUI
-   emit newRevsAdded(mRevData, mRevData->revOrder);
+   emit newRevsAdded();
 }
 
 void Git::parseDiffFormatLine(RevFile &rf, const QString &line, int parNum, FileNamesLoader &fl)
@@ -1425,9 +1425,9 @@ void Git::parseDiffFormat(RevFile &rf, const QString &buf, FileNamesLoader &fl)
 
 bool Git::startParseProc(const QStringList &initCmd)
 {
-   DataLoader *dl = new DataLoader(this, mRevData); // auto-deleted when done
-   connect(this, &Git::cancelLoading, dl, qOverload<const RepositoryModel *>(&DataLoader::on_cancel));
-   connect(dl, &DataLoader::newDataReady, this, &Git::on_newDataReady);
+   DataLoader *dl = new DataLoader(this); // auto-deleted when done
+   connect(this, &Git::cancelLoading, dl, &DataLoader::on_cancel);
+   connect(dl, &DataLoader::newDataReady, this, &Git::newRevsAdded);
    connect(dl, &DataLoader::loaded, this, &Git::on_loaded);
 
    QString buf;
@@ -1535,29 +1535,23 @@ void Git::init2()
    startRevList(args);
 }
 
-void Git::on_newDataReady(const RepositoryModel *fh)
-{
-
-   emit newRevsAdded(fh, fh->revOrder);
-}
-
-void Git::on_loaded(RepositoryModel *fh, ulong byteSize, int loadTime, bool normalExit)
+void Git::on_loaded(ulong byteSize, int loadTime, bool normalExit)
 {
    if (normalExit)
    { // do not send anything if killed
 
-      on_newDataReady(fh);
+      emit newRevsAdded();
 
-      fh->loadTime += loadTime;
+      mRevData->loadTime += loadTime;
 
       ulong kb = byteSize / 1024;
-      double mbs = static_cast<double>(byteSize) / fh->loadTime / 1000;
+      double mbs = static_cast<double>(byteSize) / mRevData->loadTime / 1000;
       QString tmp;
       tmp.sprintf("Loaded %i revisions  (%li KB),   "
                   "time elapsed: %i ms  (%.2f MB/s)",
-                  fh->revs.count(), kb, fh->loadTime, mbs);
+                  mRevData->revs.count(), kb, mRevData->loadTime, mbs);
 
-      emit loadCompleted(mRevData, tmp);
+      emit loadCompleted(tmp);
    }
 }
 

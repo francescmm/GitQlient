@@ -13,7 +13,6 @@ Copyright: See COPYING file that comes with this distribution
 #include <QSharedPointer>
 
 class Git;
-class RepositoryModel;
 class QString;
 class UnbufferedTemporaryFile;
 
@@ -25,18 +24,17 @@ class DataLoader : public QProcess
 {
    Q_OBJECT
 public:
-   DataLoader(Git *git, RepositoryModel *f);
+   DataLoader(Git *git);
    ~DataLoader();
    bool start(const QStringList &args, const QString &wd, const QString &buf);
-   void on_cancel(const RepositoryModel *);
+   void on_cancel();
 
 signals:
-   void newDataReady(const RepositoryModel *);
-   void loaded(RepositoryModel *, ulong, int, bool, const QString &, const QString &);
+   void newDataReady();
+   void loaded(ulong, int, bool, const QString &, const QString &);
 
 private slots:
    void on_finished(int, QProcess::ExitStatus);
-   void on_cancel();
    void on_timeout();
 
 private:
@@ -48,7 +46,6 @@ private:
    ulong readNewData(bool lastBuffer);
    bool startProcess(QProcess *proc, QStringList args, const QString &buf = "");
 
-   RepositoryModel *fh;
    QByteArray *halfChunk;
    UnbufferedTemporaryFile *dataFile;
    QTime loadTime;

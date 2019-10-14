@@ -88,17 +88,17 @@ void RepositoryView::setupGeometry()
 {
    QHeaderView *hv = header();
    hv->setCascadingSectionResizes(true);
-   hv->resizeSection(static_cast<int>(RepositoryModel::FileHistoryColumn::GRAPH), 80);
-   hv->resizeSection(static_cast<int>(RepositoryModel::FileHistoryColumn::SHA), 60);
-   hv->resizeSection(static_cast<int>(RepositoryModel::FileHistoryColumn::AUTHOR), 200);
-   hv->resizeSection(static_cast<int>(RepositoryModel::FileHistoryColumn::DATE), 115);
-   hv->setSectionResizeMode(static_cast<int>(RepositoryModel::FileHistoryColumn::LOG), QHeaderView::Stretch);
+   hv->resizeSection(static_cast<int>(RepositoryModelColumns::GRAPH), 80);
+   hv->resizeSection(static_cast<int>(RepositoryModelColumns::SHA), 60);
+   hv->resizeSection(static_cast<int>(RepositoryModelColumns::AUTHOR), 200);
+   hv->resizeSection(static_cast<int>(RepositoryModelColumns::DATE), 115);
+   hv->setSectionResizeMode(static_cast<int>(RepositoryModelColumns::LOG), QHeaderView::Stretch);
    hv->setStretchLastSection(false);
 
-   hideColumn(static_cast<int>(RepositoryModel::FileHistoryColumn::SHA));
-   hideColumn(static_cast<int>(RepositoryModel::FileHistoryColumn::DATE));
-   hideColumn(static_cast<int>(RepositoryModel::FileHistoryColumn::AUTHOR));
-   hideColumn(static_cast<int>(RepositoryModel::FileHistoryColumn::ID));
+   hideColumn(static_cast<int>(RepositoryModelColumns::SHA));
+   hideColumn(static_cast<int>(RepositoryModelColumns::DATE));
+   hideColumn(static_cast<int>(RepositoryModelColumns::AUTHOR));
+   hideColumn(static_cast<int>(RepositoryModelColumns::ID));
 }
 
 void RepositoryView::scrollToNext(int direction)
