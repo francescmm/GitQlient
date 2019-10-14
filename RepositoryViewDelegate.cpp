@@ -111,16 +111,6 @@ void RepositoryViewDelegate::diffTargetChanged(int row)
    }
 }
 
-const Rev *RepositoryViewDelegate::revLookup(int row, RepositoryModel **fhPtr) const
-{
-   const auto realModel = dynamic_cast<RepositoryModel *>(mRepoView->model());
-
-   if (fhPtr)
-      *fhPtr = realModel;
-
-   return mGit->revLookup(realModel->sha(row), realModel);
-}
-
 static QColor blend(const QColor &col1, const QColor &col2, int amount = 128)
 {
    // Returns ((256 - amount)*col1 + amount*col2) / 256;
@@ -360,8 +350,9 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
                                               QColor("#848484") /* grey */,
                                               QColor("#FF79C6") /* pink */,
                                               QColor("#CD9077") /* pastel */ };
-   RepositoryModel *fh;
-   const Rev *r = revLookup(i.row(), &fh);
+   const auto repositoryModel = dynamic_cast<RepositoryModel *>(mRepoView->model());
+   const auto r = repositoryModel->revLookup(i.row());
+
    if (!r)
       return;
 
@@ -377,7 +368,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 
    // calculate lanes
    if (r->lanes.count() == 0)
-      mGit->setLane(r->sha(), fh);
+      mGit->setLane(r->sha(), repositoryModel);
 
    QBrush back = opt.palette.base();
    const QVector<int> &lanes(r->lanes);
@@ -435,7 +426,7 @@ void RepositoryViewDelegate::paintWip(QPainter *painter, QStyleOptionViewItem op
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
    int row = index.row();
-   const Rev *r = revLookup(row);
+   const Rev *r = dynamic_cast<RepositoryModel *>(mRepoView->model())->revLookup(row);
    if (!r)
       return;
 

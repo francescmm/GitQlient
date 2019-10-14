@@ -23,6 +23,8 @@ RepositoryModel::RepositoryModel(QSharedPointer<Git> git, QObject *p)
    : QAbstractItemModel(p)
    , mGit(git)
 {
+   mGit->setDefaultModel(this);
+
    mColumns.insert(FileHistoryColumn::GRAPH, "Graph");
    mColumns.insert(FileHistoryColumn::ID, "Id");
    mColumns.insert(FileHistoryColumn::SHA, "Sha");
@@ -63,6 +65,11 @@ bool RepositoryModel::hasChildren(const QModelIndex &parent) const
 {
 
    return !parent.isValid();
+}
+
+const Rev *RepositoryModel::revLookup(int row) const
+{
+   return mGit->revLookup(sha(row), this);
 }
 
 int RepositoryModel::row(const QString &sha) const

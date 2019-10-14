@@ -12,7 +12,6 @@
 #include <StateInfo.h>
 
 class Domain;
-class RepositoryModel;
 class Git;
 
 class Domain : public QObject
@@ -22,7 +21,6 @@ public:
    Domain(QSharedPointer<Git> git, bool isMain);
    virtual ~Domain();
    void deleteWhenDone(); // will delete when no more run() are pending
-   RepositoryModel *model() const { return fileHistory; }
    bool isLinked() const { return linked; }
    virtual bool isMatch(const QString &) { return false; }
    void update(bool fromMaster, bool force);
@@ -35,7 +33,6 @@ signals:
    void setTabText(QWidget *w, const QString &label);
 
 public slots:
-   void on_closeAllTabs();
    virtual void clear(bool complete = true);
 
 protected slots:
@@ -57,9 +54,7 @@ private:
    int exDeleteRequest;
    int exCancelRequest;
 
-   RepositoryModel *fileHistory;
    bool linked;
-   QString statusBarRequest;
 };
 
 #endif

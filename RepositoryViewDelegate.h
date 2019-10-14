@@ -26,8 +26,6 @@
 #include <QStyledItemDelegate>
 
 class RepositoryView;
-class RepositoryModel;
-class Rev;
 class Git;
 
 const int ROW_HEIGHT = 25;
@@ -54,7 +52,6 @@ public slots:
 
 private:
    QSharedPointer<Git> mGit;
-   const Rev *revLookup(int row, RepositoryModel **fhPtr = nullptr) const;
    void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
    void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
    void paintGraphLane(QPainter *p, int type, int x1, int x2, const QColor &col, const QColor &activeCol,

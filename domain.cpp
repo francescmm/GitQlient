@@ -15,15 +15,10 @@ using namespace QGit;
 
 // ************************* Domain ****************************
 
-Domain::Domain(QSharedPointer<Git> git, bool isMain)
+Domain::Domain(QSharedPointer<Git> git, bool)
    : QObject()
    , mGit(git)
 {
-   fileHistory = new RepositoryModel(mGit, this);
-
-   if (isMain)
-      mGit->setDefaultModel(fileHistory);
-
    st.clear();
    busy = linked = false;
 }
@@ -38,14 +33,6 @@ void Domain::clear(bool complete)
 {
    if (complete)
       st.clear();
-
-   fileHistory->clear();
-}
-
-void Domain::on_closeAllTabs()
-{
-
-   delete this; // must be sync, deleteLater() does not work
 }
 
 void Domain::deleteWhenDone()
@@ -138,13 +125,5 @@ void Domain::update(bool fromMaster, bool force)
 
    mGit->setCurContext(nullptr);
 
-   bool nextRequestPending = flushQueue();
-
-   if (!nextRequestPending && !statusBarRequest.isEmpty())
-   {
-      // update status bar when we are sure no more work is pending
-      // TODO: Update the status bar through the Singleton (Future)
-      // QApplication::postEvent(m(), new MessageEvent(statusBarRequest));
-      statusBarRequest = "";
-   }
+   flushQueue();
 }

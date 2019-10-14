@@ -62,7 +62,7 @@ private:
 
    Domain *d = nullptr;
    StateInfo *st = nullptr;
-   RepositoryModel *fh = nullptr;
+   RepositoryModel *mRepositoryModel = nullptr;
    unsigned long secs;
    bool filterNextContextMenuRequest;
 };

@@ -35,6 +35,7 @@ RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
    : QTreeView(parent)
    , mGit(git)
    , d(new Domain(mGit, true))
+   , mRepositoryModel(new RepositoryModel(mGit, d))
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -49,7 +50,7 @@ RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
    connect(this, &RepositoryView::diffTargetChanged, lvd, &RepositoryViewDelegate::diffTargetChanged);
    connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
    connect(mGit.get(), &Git::newRevsAdded, this, [this]() {
-      if (!mGit->isMainHistory(fh) || !d->st.sha().isEmpty())
+      if (!mGit->isMainHistory(mRepositoryModel) || !d->st.sha().isEmpty())
          return;
 
       if (model()->rowCount() == 0)
@@ -60,7 +61,7 @@ RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
       update();
    });
    connect(mGit.get(), &Git::loadCompleted, this, [this]() {
-      if (!mGit->isMainHistory(fh))
+      if (!mGit->isMainHistory(mRepositoryModel))
          return;
 
       d->update(false, false);
@@ -69,28 +70,26 @@ RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
 
 void RepositoryView::setup()
 {
-   fh = d->model();
    st = &(d->st);
    filterNextContextMenuRequest = false;
-
-   setModel(fh);
+   setModel(mRepositoryModel);
 
    setupGeometry(); // after setting delegate
 }
 
 RepositoryView::~RepositoryView()
 {
-   mGit->cancelDataLoading(fh); // non blocking
+   mGit->cancelDataLoading(mRepositoryModel); // non blocking
 }
 
 const QString RepositoryView::sha(int row) const
 {
-   return fh->sha(row);
+   return mRepositoryModel->sha(row);
 }
 
 int RepositoryView::row(const QString &sha) const
 {
-   return fh->row(sha);
+   return mRepositoryModel->row(sha);
 }
 
 void RepositoryView::setupGeometry()
@@ -104,7 +103,7 @@ void RepositoryView::setupGeometry()
    hv->setSectionResizeMode(static_cast<int>(RepositoryModel::FileHistoryColumn::LOG), QHeaderView::Stretch);
    hv->setStretchLastSection(false);
 
-   if (mGit->isMainHistory(fh))
+   if (mGit->isMainHistory(mRepositoryModel))
    {
       hideColumn(static_cast<int>(RepositoryModel::FileHistoryColumn::SHA));
       hideColumn(static_cast<int>(RepositoryModel::FileHistoryColumn::DATE));
@@ -139,7 +138,7 @@ void RepositoryView::scrollToCurrent(ScrollHint hint)
 int RepositoryView::getLaneType(const QString &sha, int pos) const
 {
 
-   const auto r = mGit->revLookup(sha, fh);
+   const auto r = mGit->revLookup(sha, mRepositoryModel);
    return (r && pos < r->lanes.count() && pos >= 0 ? r->lanes.at(pos) : -1);
 }
 
@@ -159,7 +158,7 @@ void RepositoryView::getSelectedItems(QStringList &selectedItems)
 const QString RepositoryView::shaFromAnnId(int id)
 {
 
-   if (mGit->isMainHistory(fh))
+   if (mGit->isMainHistory(mRepositoryModel))
       return "";
 
    return sha(model()->rowCount() - id);
@@ -200,7 +199,7 @@ bool RepositoryView::update()
             sel->select(newIndex, QItemSelectionModel::Deselect);
       }
    }
-   if (mGit->isMainHistory(fh))
+   if (mGit->isMainHistory(mRepositoryModel))
       emit diffTargetChanged(row(st->diffToSha()));
 
    setupGeometry();
@@ -231,6 +230,7 @@ void RepositoryView::markDiffToSha(const QString &sha)
 void RepositoryView::clear(bool complete)
 {
    d->clear(complete);
+   mRepositoryModel->clear();
 }
 
 Domain *RepositoryView::domain()
@@ -284,7 +284,7 @@ void RepositoryView::showContextMenu(const QPoint &pos)
       return;
    }
 
-   const auto sha = fh->sha(index.row());
+   const auto sha = mRepositoryModel->sha(index.row());
    const auto menu = new RepositoryContextMenu(mGit, sha, this);
    connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
    connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
@@ -304,7 +304,7 @@ bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringLi
    QString root;
    if (!isFreeLane(t))
    {
-      p = mGit->revLookup(sha, fh)->parents(); // pointer cannot be nullptr
+      p = mGit->revLookup(sha, mRepositoryModel)->parents(); // pointer cannot be nullptr
       root = sha;
    }
    else

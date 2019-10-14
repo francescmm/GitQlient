@@ -47,6 +47,7 @@ public:
    virtual int rowCount(const QModelIndex &par = QModelIndex()) const;
    virtual bool hasChildren(const QModelIndex &par = QModelIndex()) const;
    virtual int columnCount(const QModelIndex &) const { return mColumns.count(); }
+   const Rev *revLookup(int row) const;
 
 public slots:
    void on_changeFont(const QFont &);
