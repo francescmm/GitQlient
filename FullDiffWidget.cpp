@@ -100,7 +100,6 @@ FullDiffWidget::FullDiffWidget(QSharedPointer<Git> git, RepositoryModel *reposit
    : QTextEdit(parent)
    , mGit(git)
    , mRepositoryModel(repositoryModel)
-   , mDomain(new Domain(repositoryModel))
 {
    diffHighlighter = new DiffHighlighter(this);
 
@@ -323,8 +322,6 @@ void FullDiffWidget::procFinished()
 
 void FullDiffWidget::onStateInfoUpdate(const StateInfo &stateInfo)
 {
-   mDomain->update(true);
-
    clear();
    update(stateInfo); // non blocking
 

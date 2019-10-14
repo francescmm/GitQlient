@@ -77,7 +77,6 @@ private:
    friend class DiffHighlighter;
    QSharedPointer<Git> mGit;
    RepositoryModel *mRepositoryModel = nullptr;
-   Domain *mDomain = nullptr;
 
    void scrollCursorToTop();
    void scrollLineToTop(int lineNum);
