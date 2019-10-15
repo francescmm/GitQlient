@@ -23,42 +23,37 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QStyledItemDelegate>
+#include <QObject>
+#include <QHash>
+#include <QSharedPointer>
 
-class RevisionsCache;
 class Git;
+class Revision;
 
-const int ROW_HEIGHT = 25;
-const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
-
-class RepositoryViewDelegate : public QStyledItemDelegate
+class RevisionsCache : public QObject
 {
    Q_OBJECT
 
+   friend class Git;
+
 signals:
-   void updateView();
+   void signalCacheUpdated();
 
 public:
-   RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache);
+   explicit RevisionsCache(QSharedPointer<Git> git, QObject *parent = nullptr);
 
-   virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
-   virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
-   {
-      return QSize(LANE_WIDTH, ROW_HEIGHT);
-   }
-
-public slots:
-   void diffTargetChanged(int);
+   QString sha(int row) const;
+   const Revision *revLookup(int row) const;
+   const Revision *revLookup(const QString &sha) const;
+   QString getShortLog(const QString &sha) const;
+   int row(const QString &sha) const;
+   int count() const { return revOrder.count(); }
+   bool isEmpty() const { return revOrder.isEmpty(); }
+   void flushTail(int earlyOutputCnt, int earlyOutputCntBase);
+   void clear();
 
 private:
    QSharedPointer<Git> mGit;
-   void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
-   void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
-   void paintGraphLane(QPainter *p, int type, int x1, int x2, const QColor &col, const QColor &activeCol,
-                       const QBrush &back) const;
-   void paintWip(QPainter *painter, QStyleOptionViewItem opt) const;
-   void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
-
-   QSharedPointer<RevisionsCache> mRevCache;
-   int diffTargetRow = -1;
+   QHash<QString, const Revision *> revs;
+   QVector<QString> revOrder;
 };

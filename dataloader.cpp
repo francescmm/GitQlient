@@ -72,6 +72,7 @@ bool DataLoader::start(const QStringList &args, const QString &wd, const QString
 
    if (!createTemporaryFile() || !startProcess(this, args, buf))
    {
+      const auto erorr = readAll();
       deleteLater();
       return false;
    }

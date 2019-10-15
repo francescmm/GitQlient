@@ -14,7 +14,8 @@ class Git;
 class StateInfo;
 class Domain;
 class RepositoryModel;
-class Rev;
+class Revision;
+class RevisionsCache;
 enum class RepositoryModelColumns;
 
 class RepositoryView : public QTreeView
@@ -28,7 +29,7 @@ signals:
    void signalAmmendCommit(const QString &sha);
 
 public:
-   explicit RepositoryView(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent = nullptr);
    ~RepositoryView();
    void setup();
    const QString shaFromAnnId(int id);
@@ -56,6 +57,7 @@ private slots:
    virtual void currentChanged(const QModelIndex &, const QModelIndex &);
 
 private:
+   QSharedPointer<RevisionsCache> mRevCache;
    QSharedPointer<Git> mGit;
 
    void showContextMenu(const QPoint &);

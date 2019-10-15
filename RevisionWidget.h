@@ -28,7 +28,7 @@
 class Domain;
 class RevFile;
 class QListWidgetItem;
-class Rev;
+class Revision;
 class Git;
 class QLabel;
 class FileListWidget;

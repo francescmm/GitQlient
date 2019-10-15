@@ -1,5 +1,6 @@
 #include "GitQlientRepo.h"
 
+#include <RevisionsCache.h>
 #include <Controls.h>
 #include <BranchesWidget.h>
 #include <CommitWidget.h>
@@ -25,13 +26,14 @@ using namespace QLogger;
 GitQlientRepo::GitQlientRepo(QWidget *p)
    : QFrame(p)
    , mGit(new Git())
-   , mRepositoryView(new RepositoryView(mGit))
+   , mRevisionsCache(new RevisionsCache(mGit))
+   , mRepositoryView(new RepositoryView(mRevisionsCache, mGit))
    , commitStackedWidget(new QStackedWidget())
    , mainStackedWidget(new QStackedWidget())
    , mControls(new Controls(mGit))
    , mCommitWidget(new CommitWidget(mGit))
    , mRevisionWidget(new RevisionWidget(mGit))
-   , mFullDiffWidget(new FullDiffWidget(mGit, mRepositoryView->model()))
+   , mFullDiffWidget(new FullDiffWidget(mGit, mRevisionsCache))
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
 {
@@ -95,7 +97,7 @@ void GitQlientRepo::updateUi()
 {
    if (!mCurrentDir.isEmpty())
    {
-      mGit->init(mCurrentDir, nullptr);
+      mGit->init(mCurrentDir, mRevisionsCache);
 
       mBranchesWidget->showBranches();
 
@@ -132,7 +134,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
       QLog_Info("UI", "Initializing Git...");
 
-      const auto ok = mGit->init(mCurrentDir, nullptr); // blocking call
+      const auto ok = mGit->init(mCurrentDir, mRevisionsCache); // blocking call
 
       if (ok)
       {

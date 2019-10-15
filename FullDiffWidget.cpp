@@ -6,9 +6,10 @@
 */
 #include "FullDiffWidget.h"
 
-#include <RepositoryModel.h>
-#include "common.h"
-#include "domain.h"
+#include <RevisionsCache.h>
+#include <Revision.h>
+#include <StateInfo.h>
+
 #include "git.h"
 #include "GitAsyncProcess.h"
 #include <QScrollBar>
@@ -96,10 +97,10 @@ void DiffHighlighter::highlightBlock(const QString &text)
    }
 }
 
-FullDiffWidget::FullDiffWidget(QSharedPointer<Git> git, RepositoryModel *repositoryModel, QWidget *parent)
+FullDiffWidget::FullDiffWidget(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache, QWidget *parent)
    : QTextEdit(parent)
    , mGit(git)
-   , mRepositoryModel(repositoryModel)
+   , mRevCache(revCache)
 {
    diffHighlighter = new DiffHighlighter(this);
 
@@ -136,14 +137,6 @@ void FullDiffWidget::refresh()
    setUpdatesEnabled(true);
 }
 
-void FullDiffWidget::scrollCursorToTop()
-{
-
-   QRect r = cursorRect();
-   QScrollBar *vsb = verticalScrollBar();
-   vsb->setValue(vsb->value() + r.top());
-}
-
 void FullDiffWidget::scrollLineToTop(int lineNum)
 {
 
@@ -151,7 +144,6 @@ void FullDiffWidget::scrollLineToTop(int lineNum)
    tc.movePosition(QTextCursor::Start);
    tc.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, lineNum);
    setTextCursor(tc);
-   scrollCursorToTop();
 }
 
 int FullDiffWidget::positionToLineNum(int pos)
@@ -347,7 +339,7 @@ void FullDiffWidget::update(const StateInfo &st)
    bool combined = (st.isMerge() && !st.allMergeFiles());
    if (combined)
    {
-      const auto r = mRepositoryModel->revLookup(st.sha());
+      const auto r = mRevCache->revLookup(st.sha());
       if (r)
          diffHighlighter->setCombinedLength(r->parentsCount());
    }

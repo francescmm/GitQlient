@@ -5,16 +5,13 @@ Copyright: See COPYING file that comes with this distribution
 
                 */
 #include "domain.h"
-#include <RepositoryModel.h>
-#include <common.h>
 
-#include <QApplication>
-#include <QStatusBar>
-#include <QTimer>
+#include <RevisionsCache.h>
+#include <Revision.h>
 
-Domain::Domain(QPointer<RepositoryModel> repositoryModel)
+Domain::Domain(QSharedPointer<RevisionsCache> revCache)
    : QObject()
-   , mRepositoryModel(repositoryModel)
+   , mRevCache(revCache)
 {
    st.clear();
    busy = linked = false;
@@ -94,7 +91,7 @@ void Domain::update(bool fromMaster)
 
    busy = true;
 
-   if (const auto r = mRepositoryModel->revLookup(st.sha()))
+   if (const auto r = mRevCache->revLookup(st.sha()))
       st.setIsMerge(r->parentsCount() > 1);
 
    st.setLock(true); // any state change will be queued now

@@ -25,6 +25,7 @@
 
 #include <QFrame>
 
+class RevisionsCache;
 class Git;
 class QCloseEvent;
 class QFileSystemWatcher;
@@ -70,6 +71,7 @@ private:
    QString mCurrentDir;
    bool mRepositoryBusy = false;
    QSharedPointer<Git> mGit;
+   QSharedPointer<RevisionsCache> mRevisionsCache;
    RepositoryView *mRepositoryView = nullptr;
    QStackedWidget *commitStackedWidget = nullptr;
    QStackedWidget *mainStackedWidget = nullptr;

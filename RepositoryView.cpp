@@ -8,7 +8,9 @@ Author: Marco Costalba (C) 2005-2007
                              */
 #include "RepositoryView.h"
 
-#include "RepositoryModel.h"
+#include <RevisionsCache.h>
+#include <Revision.h>
+#include <RepositoryModel.h>
 #include <RepositoryModelColumns.h>
 #include "domain.h"
 #include "git.h"
@@ -34,11 +36,12 @@ using namespace QLogger;
 
 uint refTypeFromName(const QString &name);
 
-RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
+RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent)
    : QTreeView(parent)
+   , mRevCache(revCache)
    , mGit(git)
-   , mRepositoryModel(new RepositoryModel(mGit))
-   , d(new Domain(mRepositoryModel))
+   , mRepositoryModel(new RepositoryModel(mRevCache, mGit))
+   , d(new Domain(mRevCache))
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -46,7 +49,7 @@ RepositoryView::RepositoryView(QSharedPointer<Git> git, QWidget *parent)
    setMouseTracking(true);
    header()->setSortIndicatorShown(false);
 
-   const auto lvd = new RepositoryViewDelegate(mGit, mRepositoryModel);
+   const auto lvd = new RepositoryViewDelegate(mGit, revCache);
    setItemDelegate(lvd);
 
    connect(lvd, &RepositoryViewDelegate::updateView, viewport(), qOverload<>(&QWidget::update));
@@ -84,7 +87,7 @@ const QString RepositoryView::sha(int row) const
 
 int RepositoryView::row(const QString &sha) const
 {
-   return mRepositoryModel->row(sha);
+   return mRevCache->row(sha);
 }
 
 void RepositoryView::setupGeometry()
@@ -110,7 +113,7 @@ void RepositoryView::scrollToNext(int direction)
    // -1 = the next child in history
    //  1 = the previous parent in history
    const QString &s = sha(currentIndex().row());
-   const auto r = mRepositoryModel->revLookup(s);
+   const auto r = mRevCache->revLookup(s);
 
    if (r)
    {
@@ -130,7 +133,7 @@ void RepositoryView::scrollToCurrent(ScrollHint hint)
 int RepositoryView::getLaneType(const QString &sha, int pos) const
 {
 
-   const auto r = mRepositoryModel->revLookup(sha);
+   const auto r = mRevCache->revLookup(sha);
    return (r && pos < r->lanes.count() && pos >= 0 ? r->lanes.at(pos) : -1);
 }
 
@@ -311,7 +314,7 @@ bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringLi
    QString root;
    if (!isFreeLane(t))
    {
-      p = mRepositoryModel->revLookup(sha)->parents(); // pointer cannot be nullptr
+      p = mRevCache->revLookup(sha)->parents(); // pointer cannot be nullptr
       root = sha;
    }
    else

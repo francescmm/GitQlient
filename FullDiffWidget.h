@@ -27,7 +27,7 @@
 #include <QTextEdit>
 #include <QPointer>
 
-class RepositoryModel;
+class RevisionsCache;
 class Git;
 class StateInfo;
 class Domain;
@@ -51,7 +51,7 @@ class FullDiffWidget : public QTextEdit
    Q_OBJECT
 
 public:
-   explicit FullDiffWidget(QSharedPointer<Git> git, RepositoryModel *repositoryModel, QWidget *parent = nullptr);
+   explicit FullDiffWidget(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache, QWidget *parent = nullptr);
 
    void clear();
    void centerOnFileHeader(const StateInfo &st);
@@ -76,9 +76,8 @@ public slots:
 private:
    friend class DiffHighlighter;
    QSharedPointer<Git> mGit;
-   RepositoryModel *mRepositoryModel = nullptr;
+   QSharedPointer<RevisionsCache> mRevCache;
 
-   void scrollCursorToTop();
    void scrollLineToTop(int lineNum);
    int positionToLineNum(int pos);
    int topToLineNum();

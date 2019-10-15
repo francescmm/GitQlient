@@ -13,8 +13,9 @@
 template<class, class>
 struct QPair;
 
+class RevisionsCache;
 class RevFile;
-class Rev;
+class Revision;
 class QRegExp;
 class QTextCodec;
 class Annotate;
@@ -59,7 +60,7 @@ public:
    explicit Git();
 
    /** START Git CONFIGURATION **/
-   bool init(const QString &wd, const QStringList *args);
+   bool init(const QString &wd, QSharedPointer<RevisionsCache> revCache);
    void init2();
    void stop(bool saveCache);
 
@@ -158,7 +159,7 @@ public:
 
    const QString getLaneParent(const QString &fromSHA, int laneNum);
    const QStringList getChildren(const QString &parent);
-   const Rev *revLookup(const QString &sha) const;
+   const Revision *revLookup(const QString &sha) const;
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;
    const QString getRefSha(const QString &refName, RefType type = ANY_REF, bool askGit = true);
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
@@ -234,24 +235,24 @@ private:
    bool startRevList(QStringList &args);
    bool startParseProc(const QStringList &initCmd);
    bool populateRenamedPatches(const QString &sha, const QStringList &nn, QStringList *on, bool bt);
-   bool filterEarlyOutputRev(Rev *rev);
+   bool filterEarlyOutputRev(Revision *revision);
    int addChunk(const QByteArray &ba, int ofs);
    void parseDiffFormat(RevFile &rf, const QString &buf, FileNamesLoader &fl);
    void parseDiffFormatLine(RevFile &rf, const QString &line, int parNum, FileNamesLoader &fl);
    void getDiffIndex();
-   Rev *fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,
-                    const QString &log, const QString &longLog, const QString &patch, int idx);
-   const Rev *fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx);
+   Revision *fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,
+                         const QString &log, const QString &longLog, const QString &patch, int idx);
+   const Revision *fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx);
    const RevFile *fakeWorkDirRevFile(const WorkingDirInfo &wd);
    bool copyDiffIndex(const QString &parent);
    const RevFile *insertNewFiles(const QString &sha, const QString &data);
-   const RevFile *getAllMergeFiles(const Rev *r);
+   const RevFile *getAllMergeFiles(const Revision *r);
    bool runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutput);
    void indexTree();
-   void updateDescMap(const Rev *r, uint i, QHash<QPair<uint, uint>, bool> &dm, QHash<uint, QVector<int>> &dv);
-   void mergeNearTags(bool down, Rev *p, const Rev *r, const QHash<QPair<uint, uint>, bool> &dm);
-   void mergeBranches(Rev *p, const Rev *r);
-   void updateLanes(Rev &c, Lanes &lns, const QString &sha);
+   void updateDescMap(const Revision *r, uint i, QHash<QPair<uint, uint>, bool> &dm, QHash<uint, QVector<int>> &dv);
+   void mergeNearTags(bool down, Revision *p, const Revision *r, const QHash<QPair<uint, uint>, bool> &dm);
+   void mergeBranches(Revision *p, const Revision *r);
+   void updateLanes(Revision &c, Lanes &lns, const QString &sha);
    const QStringList getOthersFiles();
    const QStringList getOtherFiles(const QStringList &selFiles);
    void appendFileName(RevFile &rf, const QString &name, FileNamesLoader &fl);
@@ -283,6 +284,7 @@ private:
    QHash<QString, int> mFileNamesMap; // quick lookup file name
    QHash<QString, int> mDirNamesMap; // quick lookup directory name
    RepositoryModel *mRevData = nullptr;
+   QSharedPointer<RevisionsCache> mRevCache;
 };
 
 #endif

@@ -12,7 +12,7 @@
 #include <StateInfo.h>
 
 class Domain;
-class RepositoryModel;
+class RevisionsCache;
 
 class Domain : public QObject
 {
@@ -22,7 +22,7 @@ signals:
    void signalUpdated();
 
 public:
-   Domain(QPointer<RepositoryModel> repositoryModel);
+   Domain(QSharedPointer<RevisionsCache> revCache);
    virtual ~Domain();
    void deleteWhenDone(); // will delete when no more run() are pending
    bool isLinked() const { return linked; }
@@ -46,7 +46,7 @@ protected:
    virtual bool doUpdate(bool) { return true; }
    void linkDomain(Domain *d);
    void unlinkDomain(Domain *d);
-   QPointer<RepositoryModel> mRepositoryModel;
+   QSharedPointer<RevisionsCache> mRevCache;
 
    bool busy;
 

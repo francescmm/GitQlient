@@ -29,7 +29,9 @@ HEADERS += \
     $$PWD/RepositoryModelColumns.h \
     $$PWD/RepositoryView.h \
     $$PWD/RepositoryViewDelegate.h \
+    $$PWD/Revision.h \
     $$PWD/RevisionWidget.h \
+    $$PWD/RevisionsCache.h \
     $$PWD/StateInfo.h \
     $$PWD/TagDlg.h \
     $$PWD/Terminal.h \
@@ -63,7 +65,9 @@ SOURCES += \
     $$PWD/RepositoryModel.cpp \
     $$PWD/RepositoryView.cpp \
     $$PWD/RepositoryViewDelegate.cpp \
+    $$PWD/Revision.cpp \
     $$PWD/RevisionWidget.cpp \
+    $$PWD/RevisionsCache.cpp \
     $$PWD/StateInfo.cpp \
     $$PWD/TagDlg.cpp \
     $$PWD/Terminal.cpp \

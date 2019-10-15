@@ -1,6 +1,6 @@
 #include <RevisionWidget.h>
 
-#include <common.h>
+#include <Revision.h>
 #include <FileListWidget.h>
 #include <git.h>
 
@@ -95,7 +95,7 @@ void RevisionWidget::setCurrentCommitSha(const QString &sha)
 
    if (sha != QGit::ZERO_SHA and !sha.isEmpty())
    {
-      const auto currentRev = const_cast<Rev *>(mGit->revLookup(sha));
+      const auto currentRev = const_cast<Revision *>(mGit->revLookup(sha));
 
       if (currentRev)
       {

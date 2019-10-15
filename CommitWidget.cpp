@@ -9,6 +9,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <ui_CommitWidget.h>
 
 #include <git.h>
+#include <Revision.h>
 
 #include <QDir>
 #include <QKeyEvent>

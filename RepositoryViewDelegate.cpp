@@ -1,8 +1,8 @@
 #include "RepositoryViewDelegate.h"
 
 #include <git.h>
-#include <common.h>
-#include <RepositoryModel.h>
+#include <RevisionsCache.h>
+#include <Revision.h>
 #include <RepositoryModelColumns.h>
 
 #include <QPainter>
@@ -95,10 +95,10 @@ void RefNameIterator::next()
 
 }
 
-RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, RepositoryModel *model)
+RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache)
    : QStyledItemDelegate()
    , mGit(git)
-   , mRepoModel(model)
+   , mRevCache(revCache)
 {
 }
 
@@ -350,7 +350,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
                                               QColor("#848484") /* grey */,
                                               QColor("#FF79C6") /* pink */,
                                               QColor("#CD9077") /* pastel */ };
-   const auto r = mRepoModel->revLookup(i.row());
+   const auto r = mRevCache->revLookup(i.row());
 
    if (!r)
       return;
@@ -425,7 +425,8 @@ void RepositoryViewDelegate::paintWip(QPainter *painter, QStyleOptionViewItem op
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
    int row = index.row();
-   const Rev *r = mRepoModel->revLookup(row);
+   const auto r = mRevCache->revLookup(row);
+
    if (!r)
       return;
 
