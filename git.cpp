@@ -772,15 +772,7 @@ bool Git::cherryPickCommit(const QString &sha)
 
 bool Git::pop()
 {
-   /*
-   const QStringList patch(getRefNames(sha, APPLIED));
-   if (patch.count() != 1)
-   {
-      dbp("ASSERT in Git::stgPop, found %1 patches instead of 1", patch.count());
-      return false;
-   }
-   */
-   return run("git pop").first;
+   return run("git stash pop").first;
 }
 
 bool Git::stash()
