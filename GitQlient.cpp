@@ -85,11 +85,14 @@ void GitQlient::addRepoTab(const QString &repoPath)
       if (!repoPath.isEmpty())
       {
          QProcess p;
-         p.setWorkingDirectory(repoPath + "/..");
-         p.start("git rev-parse --is-inside-work-tree");
+         p.setWorkingDirectory(repoPath);
+         p.start("git rev-parse --show-superproject-working-tree");
          p.waitForFinished(5000);
 
-         auto isSubmodule = p.readAll().contains("true");
+         const auto output = p.readAll();
+         const auto isSubmodule = !output.isEmpty();
+         const auto val = p.readAllStandardOutput();
+         const auto err = p.readAllStandardError();
 
          mRepos->setTabIcon(index, QIcon(isSubmodule ? QString(":/icons/submodules") : QString(":/icons/local")));
       }
