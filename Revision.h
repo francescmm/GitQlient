@@ -6,46 +6,22 @@ class Revision
 {
    // prevent implicit C++ compiler defaults
    Revision();
-   Revision(const Revision &);
+   // Revision(const Revision &);
    Revision &operator=(const Revision &);
 
 public:
    Revision(const QByteArray &b, uint s, int idx, int *next);
-   bool isBoundary() const { return (ba.at(shaStart - 1) == '-'); }
-   uint parentsCount() const { return parentsCnt; }
+   bool isBoundary() const;
+   uint parentsCount() const;
    QString parent(int idx) const;
    QStringList parents() const;
-   QString sha() const { return QString::fromUtf8(ba.constData() + shaStart); }
-   QString committer() const
-   {
-      setup();
-      return mid(comStart, autStart - comStart - 1);
-   }
-   QString author() const
-   {
-      setup();
-      return mid(autStart, autDateStart - autStart - 1);
-   }
-   QString authorDate() const
-   {
-      setup();
-      return mid(autDateStart, 10);
-   }
-   QString shortLog() const
-   {
-      setup();
-      return mid(sLogStart, sLogLen);
-   }
-   QString longLog() const
-   {
-      setup();
-      return mid(lLogStart, lLogLen);
-   }
-   QString diff() const
-   {
-      setup();
-      return mid(diffStart, diffLen);
-   }
+   QString sha() const;
+   QString committer() const;
+   QString author() const;
+   QString authorDate() const;
+   QString shortLog() const;
+   QString longLog() const;
+   QString diff() const;
 
    QVector<int> lanes, children;
    QVector<int> descRefs; // list of descendant refs index, normally tags
@@ -57,11 +33,7 @@ public:
    int orderIdx;
 
 private:
-   inline void setup() const
-   {
-      if (!indexed)
-         indexData(false, false);
-   }
+   void setup() const;
    int indexData(bool quick, bool withDiff) const;
    QString mid(int start, int len) const;
    QString midSha(int start, int len) const;

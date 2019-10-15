@@ -26,6 +26,12 @@ const Revision *RevisionsCache::revLookup(const QString &sha) const
    return !sha.isEmpty() ? revs.value(sha) : nullptr;
 }
 
+void RevisionsCache::insertRevision(const QString sha, const Revision &rev)
+{
+   revs.insert(sha, new Revision(rev));
+   revOrder.append(sha);
+}
+
 QString RevisionsCache::getShortLog(const QString &sha) const
 {
    auto r = revLookup(sha);

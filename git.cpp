@@ -157,7 +157,7 @@ const QString Git::getRefSha(const QString &refName, RefType type, bool askGit)
 void Git::appendNamesWithId(QStringList &names, const QString &sha, const QStringList &data, bool onlyLoaded)
 {
 
-   const Revision *r = revLookup(sha);
+   const Revision *r = mRevCache->revLookup(sha);
    if (onlyLoaded && !r)
       return;
 
@@ -250,8 +250,7 @@ void Git::cancelDataLoading()
 
 const Revision *Git::revLookup(const QString &sha) const
 {
-   const QHash<QString, const Revision *> &r = mRevCache->revs;
-   return !sha.isEmpty() ? r.value(sha) : nullptr;
+   return mRevCache->revLookup(sha);
 }
 
 QPair<bool, QString> Git::run(const QString &runCmd)
@@ -297,14 +296,14 @@ int Git::findFileIndex(const RevFile &rf, const QString &name)
 const QString Git::getLaneParent(const QString &fromSHA, int laneNum)
 {
 
-   const Revision *rs = revLookup(fromSHA);
+   const Revision *rs = mRevCache->revLookup(fromSHA);
    if (!rs)
       return "";
 
    for (int idx = rs->orderIdx - 1; idx >= 0; idx--)
    {
 
-      const auto r = revLookup(mRevCache->revOrder[idx]);
+      const auto r = mRevCache->revLookup(mRevCache->createRevisionSha(idx));
       if (laneNum >= r->lanes.count())
          return "";
 
@@ -330,18 +329,18 @@ const QStringList Git::getChildren(const QString &parent)
 {
 
    QStringList children;
-   const Revision *r = revLookup(parent);
+   const Revision *r = mRevCache->revLookup(parent);
    if (!r)
       return children;
 
    for (int i = 0; i < r->children.count(); i++)
-      children.append(mRevCache->revOrder[r->children[i]]);
+      children.append(mRevCache->createRevisionSha(r->children[i]));
 
    // reorder children by loading order
    QStringList::iterator itC(children.begin());
    for (; itC != children.end(); ++itC)
    {
-      const Revision *r = revLookup(*itC);
+      const Revision *r = mRevCache->revLookup(*itC);
       (*itC).prepend(QString("%1 ").arg(r->orderIdx, 6));
    }
    children.sort();
@@ -361,7 +360,7 @@ void Git::getDiff(const QString &sha, QObject *receiver, const QString &diffToSh
          runCmd = "git diff-tree --no-color -r --patch-with-stat ";
          runCmd.append(combined ? QString("-c ") : QString("-C -m ")); // TODO rename for combined
 
-         const auto r = revLookup(sha);
+         const auto r = mRevCache->revLookup(sha);
          if (r && r->parentsCount() == 0)
             runCmd.append("--root ");
 
@@ -429,7 +428,7 @@ bool Git::resetFile(const QString &fileName)
 
 QPair<QString, QString> Git::getSplitCommitMsg(const QString &sha)
 {
-   const Revision *c = revLookup(sha);
+   const Revision *c = mRevCache->revLookup(sha);
 
    if (!c)
       return qMakePair(QString(), QString());
@@ -439,7 +438,7 @@ QPair<QString, QString> Git::getSplitCommitMsg(const QString &sha)
 
 QString Git::getCommitMsg(const QString &sha) const
 {
-   const Revision *c = revLookup(sha);
+   const Revision *c = mRevCache->revLookup(sha);
    if (!c)
       return "";
 
@@ -458,7 +457,7 @@ const QString Git::getLastCommitMsg()
    else
       return "";
 
-   const Revision *c = revLookup(sha);
+   const Revision *c = mRevCache->revLookup(sha);
 
    if (!c)
       return "";
@@ -469,7 +468,7 @@ const QString Git::getLastCommitMsg()
 const QString Git::getNewCommitMsg()
 {
 
-   const Revision *c = revLookup(ZERO_SHA);
+   const Revision *c = mRevCache->revLookup(ZERO_SHA);
    if (!c)
       return "";
 
@@ -579,7 +578,7 @@ const RevFile *Git::getAllMergeFiles(const Revision *r)
 const RevFile *Git::getFiles(const QString &sha, const QString &diffToSha, bool allFiles, const QString &path)
 {
 
-   const Revision *r = revLookup(sha);
+   const Revision *r = mRevCache->revLookup(sha);
    if (!r)
       return nullptr;
 
@@ -1258,10 +1257,9 @@ void Git::getDiffIndex()
 
    // then mockup the corresponding Revision
    const QString &log = (isNothingToCommit() ? QString("No local changes") : QString("Local changes"));
-   const Revision *r = fakeWorkDirRev(head, log, status, mRevCache->revOrder.count());
-   mRevCache->revs.insert(ZERO_SHA, r);
-   mRevCache->revOrder.append(ZERO_SHA);
-   mRevData->earlyOutputCntBase = mRevCache->revOrder.count();
+   const Revision *r = fakeWorkDirRev(head, log, status, mRevCache->revOrderCount());
+   mRevCache->insertRevision(ZERO_SHA, *r);
+   mRevData->earlyOutputCntBase = mRevCache->revOrderCount();
 
    // finally send it to GUI
    emit newRevsAdded();
@@ -1513,7 +1511,7 @@ void Git::on_loaded(ulong byteSize, int loadTime, bool normalExit)
       QString tmp;
       tmp.sprintf("Loaded %i revisions  (%li KB),   "
                   "time elapsed: %i ms  (%.2f MB/s)",
-                  mRevCache->revs.count(), kb, mRevData->loadTime, mbs);
+                  mRevCache->count(), kb, mRevData->loadTime, mbs);
 
       emit loadCompleted(tmp);
    }
@@ -1761,11 +1759,11 @@ void Git::loadFileCache()
 bool Git::filterEarlyOutputRev(Revision *revision)
 {
 
-   if (mRevData->earlyOutputCnt < mRevCache->revOrder.count())
+   if (mRevData->earlyOutputCnt < mRevCache->revOrderCount())
    {
 
-      const QString &sha = mRevCache->revOrder[mRevData->earlyOutputCnt++];
-      const auto c = revLookup(sha);
+      const QString &sha = mRevCache->createRevisionSha(mRevData->earlyOutputCnt++);
+      const auto c = mRevCache->revLookup(sha);
       if (c)
       {
          if (revision->sha() != sha || revision->parents() != c->parents())
@@ -1786,15 +1784,13 @@ bool Git::filterEarlyOutputRev(Revision *revision)
 
 int Git::addChunk(const QByteArray &ba, int start)
 {
-
-   auto &r = mRevCache->revs;
    int nextStart;
    Revision *revision;
 
    do
    {
       // only here we create a new Revision
-      revision = new Revision(ba, static_cast<uint>(start), mRevCache->revOrder.count(), &nextStart);
+      revision = new Revision(ba, static_cast<uint>(start), mRevCache->revOrderCount(), &nextStart);
 
       if (nextStart == -2)
       {
@@ -1811,7 +1807,7 @@ int Git::addChunk(const QByteArray &ba, int start)
       return -1;
    }
 
-   const QString &sha = revision->sha();
+   const auto sha = revision->sha();
 
    if (mRevData->earlyOutputCnt != -1 && filterEarlyOutputRev(revision))
    {
@@ -1819,10 +1815,9 @@ int Git::addChunk(const QByteArray &ba, int start)
       return nextStart;
    }
 
-   if (!(revision->parentsCount() > 1 && r.contains(sha)))
+   if (!(revision->parentsCount() > 1 && mRevCache->contains(sha)))
    {
-      r.insert(sha, revision);
-      mRevCache->revOrder.append(sha);
+      mRevCache->insertRevision(sha, *revision);
 
       emit mRevCache->signalCacheUpdated();
       emit newRevsAdded();
@@ -1835,10 +1830,10 @@ bool Git::copyDiffIndex(const QString &parent)
 {
    // must be called with empty revs and empty revOrder
 
-   if (!mRevCache->revOrder.isEmpty() || !mRevCache->revs.isEmpty())
+   if (mRevCache->revOrderCount() != 0 || !mRevCache->isEmpty())
       return false;
 
-   const Revision *r = revLookup(ZERO_SHA);
+   const Revision *r = mRevCache->revLookup(ZERO_SHA);
    if (!r)
       return false;
 
@@ -1848,8 +1843,7 @@ bool Git::copyDiffIndex(const QString &parent)
 
    // insert a custom ZERO_SHA Revision with proper parent
    const Revision *rf = fakeWorkDirRev(parent, "Working directory changes", "long log\n", 0);
-   mRevCache->revs.insert(ZERO_SHA, rf);
-   mRevCache->revOrder.append(ZERO_SHA);
+   mRevCache->insertRevision(ZERO_SHA, *rf);
 
    emit mRevCache->signalCacheUpdated();
    emit newRevsAdded();
@@ -1864,13 +1858,12 @@ void Git::setLane(const QString &sha)
    uint i = mRevData->firstFreeLane;
    QVector<QByteArray> ba;
    const QString &ss = toPersistentSha(sha, ba);
-   const QVector<QString> &shaVec(mRevCache->revOrder);
 
-   for (uint cnt = static_cast<uint>(shaVec.count()); i < cnt; ++i)
+   for (uint cnt = static_cast<uint>(mRevCache->revOrderCount()); i < cnt; ++i)
    {
 
-      const QString &curSha = shaVec[static_cast<int>(i)];
-      Revision *r = const_cast<Revision *>(revLookup(curSha));
+      const QString &curSha = mRevCache->getRevisionSha(static_cast<int>(i));
+      Revision *r = const_cast<Revision *>(mRevCache->revLookup(curSha));
       if (r->lanes.count() == 0)
          updateLanes(*r, *l, curSha);
 
@@ -1997,7 +1990,7 @@ void Git::updateDescMap(const Revision *r, uint idx, QHash<QPair<uint, uint>, bo
    if (r->descRefsMaster != -1)
    {
 
-      const Revision *tmp = revLookup(mRevCache->revOrder[r->descRefsMaster]);
+      const Revision *tmp = mRevCache->revLookup(mRevCache->createRevisionSha(r->descRefsMaster));
       const QVector<int> &nr = tmp->descRefs;
 
       for (int i = 0; i < nr.count(); i++)
@@ -2041,8 +2034,8 @@ void Git::mergeBranches(Revision *p, const Revision *r)
       return;
 
    // we want all the descendant branches, so just avoid duplicates
-   const QVector<int> &src1 = revLookup(mRevCache->revOrder[p->descBrnMaster])->descBranches;
-   const QVector<int> &src2 = revLookup(mRevCache->revOrder[r_descBrnMaster])->descBranches;
+   const QVector<int> &src1 = mRevCache->revLookup(mRevCache->createRevisionSha(p->descBrnMaster))->descBranches;
+   const QVector<int> &src2 = mRevCache->revLookup(mRevCache->createRevisionSha(r_descBrnMaster))->descBranches;
    QVector<int> dst(src1);
    for (int i = 0; i < src2.count(); i++)
       if (std::find(src1.constBegin(), src1.constEnd(), src2[i]) == src1.constEnd())
@@ -2067,11 +2060,10 @@ void Git::mergeNearTags(bool down, Revision *p, const Revision *r, const QHash<Q
 
    // we want the nearest tag only, so remove any tag
    // that is ancestor of any other tag in p U r
-   const QVector<QString> &ro = mRevCache->revOrder;
-   const QString &sha1 = down ? ro[p->descRefsMaster] : ro[p->ancRefsMaster];
-   const QString &sha2 = down ? ro[r_descRefsMaster] : ro[r_ancRefsMaster];
-   const QVector<int> &src1 = down ? revLookup(sha1)->descRefs : revLookup(sha1)->ancRefs;
-   const QVector<int> &src2 = down ? revLookup(sha2)->descRefs : revLookup(sha2)->ancRefs;
+   const QString &sha1 = mRevCache->getRevisionSha(down ? p->descRefsMaster : p->ancRefsMaster);
+   const QString &sha2 = mRevCache->getRevisionSha(down ? r_descRefsMaster : r_ancRefsMaster);
+   const QVector<int> &src1 = down ? mRevCache->revLookup(sha1)->descRefs : mRevCache->revLookup(sha1)->ancRefs;
+   const QVector<int> &src2 = down ? mRevCache->revLookup(sha2)->descRefs : mRevCache->revLookup(sha2)->ancRefs;
    QVector<int> dst(src1);
 
    for (int s2 = 0; s2 < src2.count(); s2++)
@@ -2115,9 +2107,7 @@ void Git::mergeNearTags(bool down, Revision *p, const Revision *r, const QHash<Q
 
 void Git::indexTree()
 {
-
-   const QVector<QString> &ro = mRevCache->revOrder;
-   if (ro.count() == 0)
+   if (mRevCache->revOrderCount() == 0)
       return;
 
    // we keep the pairs(x, y). Value is true if x is
@@ -2127,37 +2117,38 @@ void Git::indexTree()
 
    // walk down the tree from latest to oldest,
    // compute children and nearest descendants
-   for (int i = 0, cnt = ro.count(); i < cnt; i++)
+   for (int i = 0, cnt = mRevCache->revOrderCount(); i < cnt; ++i)
    {
 
-      uint type = checkRef(ro[i]);
-      bool isB = (type & (BRANCH | RMT_BRANCH));
-      bool isT = (type & TAG);
+      const auto shaToLookup = mRevCache->getRevisionSha(i);
+      auto type = checkRef(shaToLookup);
+      auto isB = type & (BRANCH | RMT_BRANCH);
+      auto isT = type & TAG;
 
-      const Revision *r = revLookup(ro[i]);
+      const Revision *r = mRevCache->revLookup(shaToLookup);
 
       if (isB)
       {
-         Revision *rr = const_cast<Revision *>(r);
+         auto rr = const_cast<Revision *>(r);
+
          if (r->descBrnMaster != -1)
          {
-            const QString &sha = ro[r->descBrnMaster];
-            rr->descBranches = revLookup(sha)->descBranches;
+            const auto sha = mRevCache->getRevisionSha(r->descBrnMaster);
+            rr->descBranches = mRevCache->revLookup(sha)->descBranches;
          }
+
          rr->descBranches.append(i);
       }
       if (isT)
       {
          updateDescMap(r, i, descMap, descVect);
-         Revision *rr = const_cast<Revision *>(r);
+         auto rr = const_cast<Revision *>(r);
          rr->descRefs.clear();
          rr->descRefs.append(i);
       }
       for (uint y = 0; y < r->parentsCount(); y++)
       {
-
-         Revision *p = const_cast<Revision *>(revLookup(r->parent(y)));
-         if (p)
+         if (auto p = const_cast<Revision *>(mRevCache->revLookup(r->parent(y))))
          {
             p->children.append(i);
 
@@ -2174,11 +2165,10 @@ void Git::indexTree()
       }
    }
    // walk backward through the tree and compute nearest tagged ancestors
-   for (int i = ro.count() - 1; i >= 0; i--)
+   for (auto i = mRevCache->revOrderCount() - 1; i >= 0; --i)
    {
-
-      const Revision *r = revLookup(ro[i]);
-      bool isTag = checkRef(ro[i], TAG);
+      const auto r = mRevCache->revLookup(mRevCache->getRevisionSha(i));
+      const auto isTag = checkRef(mRevCache->getRevisionSha(i), TAG);
 
       if (isTag)
       {
@@ -2188,8 +2178,9 @@ void Git::indexTree()
       }
       for (int y = 0; y < r->children.count(); y++)
       {
+         const auto revSha = mRevCache->getRevisionSha(r->children[y]);
+         auto c = const_cast<Revision *>(mRevCache->revLookup(revSha));
 
-         Revision *c = const_cast<Revision *>(revLookup(ro[r->children[y]]));
          if (c)
          {
             if (c->ancRefsMaster == -1)

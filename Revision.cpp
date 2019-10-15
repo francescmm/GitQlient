@@ -13,6 +13,16 @@ Revision::Revision(const QByteArray &b, uint s, int idx, int *next)
    *next = indexData(true, false);
 }
 
+bool Revision::isBoundary() const
+{
+   return (ba.at(shaStart - 1) == '-');
+}
+
+uint Revision::parentsCount() const
+{
+   return parentsCnt;
+}
+
 QString Revision::mid(int start, int len) const
 {
 
@@ -47,6 +57,53 @@ QStringList Revision::parents() const
       idx += 41;
    }
    return p;
+}
+
+QString Revision::sha() const
+{
+   return QString::fromUtf8(ba.constData() + shaStart);
+}
+
+QString Revision::committer() const
+{
+   setup();
+   return mid(comStart, autStart - comStart - 1);
+}
+
+QString Revision::author() const
+{
+   setup();
+   return mid(autStart, autDateStart - autStart - 1);
+}
+
+QString Revision::authorDate() const
+{
+   setup();
+   return mid(autDateStart, 10);
+}
+
+QString Revision::shortLog() const
+{
+   setup();
+   return mid(sLogStart, sLogLen);
+}
+
+QString Revision::longLog() const
+{
+   setup();
+   return mid(lLogStart, lLogLen);
+}
+
+QString Revision::diff() const
+{
+   setup();
+   return mid(diffStart, diffLen);
+}
+
+void Revision::setup() const
+{
+   if (!indexed)
+      indexData(false, false);
 }
 
 int Revision::indexData(bool quick, bool withDiff) const

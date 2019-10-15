@@ -34,8 +34,6 @@ class RevisionsCache : public QObject
 {
    Q_OBJECT
 
-   friend class Git;
-
 signals:
    void signalCacheUpdated();
 
@@ -45,12 +43,17 @@ public:
    QString sha(int row) const;
    const Revision *revLookup(int row) const;
    const Revision *revLookup(const QString &sha) const;
+   void insertRevision(const QString sha, const Revision &rev);
    QString getShortLog(const QString &sha) const;
    int row(const QString &sha) const;
    int count() const { return revOrder.count(); }
    bool isEmpty() const { return revOrder.isEmpty(); }
    void flushTail(int earlyOutputCnt, int earlyOutputCntBase);
    void clear();
+   QString &createRevisionSha(int index) { return revOrder[index]; }
+   QString getRevisionSha(int index) const { return revOrder.at(index); }
+   int revOrderCount() const { return revOrder.count(); }
+   bool contains(const QString &sha) { return revs.contains(sha); }
 
 private:
    QSharedPointer<Git> mGit;
