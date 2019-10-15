@@ -44,7 +44,7 @@ RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QStr
 
       addSeparator();
 
-      const auto checkoutCommitAction = addAction("Create tag here");
+      const auto checkoutCommitAction = addAction("Checkout commit");
       connect(checkoutCommitAction, &QAction::triggered, this, &RepositoryContextMenu::checkoutCommit);
 
       QByteArray output;
