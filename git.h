@@ -108,6 +108,7 @@ public:
    bool stash();
    bool resetCommit(const QString &sha, CommitResetType type);
    bool resetCommits(int parentDepth);
+   GitExecResult checkoutCommit(const QString &sha);
    /** END COMMIT WORK **/
 
    /** START COMMIT INFO **/

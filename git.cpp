@@ -629,6 +629,11 @@ bool Git::resetCommits(int parentDepth)
    return run(runCmd).first;
 }
 
+GitExecResult Git::checkoutCommit(const QString &sha)
+{
+   return run(QString("git checkout %1").arg(sha));
+}
+
 bool Git::merge(const QString &into, QStringList sources, QString *error)
 {
    if (error)

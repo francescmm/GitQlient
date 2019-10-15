@@ -44,6 +44,9 @@ RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QStr
 
       addSeparator();
 
+      const auto checkoutCommitAction = addAction("Create tag here");
+      connect(checkoutCommitAction, &QAction::triggered, this, &RepositoryContextMenu::checkoutCommit);
+
       QByteArray output;
       auto ret = mGit->getBranchesOfCommit(mSha);
       const auto currentBranch = mGit->getCurrentBranchName();
@@ -165,6 +168,14 @@ void RepositoryContextMenu::createTag()
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
+      emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::checkoutCommit()
+{
+   const auto ret = mGit->checkoutCommit(mSha);
+
+   if (ret.success)
       emit signalRepositoryUpdated();
 }
 

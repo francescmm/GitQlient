@@ -47,6 +47,7 @@ private:
    void stashPop();
    void createBranch();
    void createTag();
+   void checkoutCommit();
    void cherryPickCommit();
    void push();
    void pull();
