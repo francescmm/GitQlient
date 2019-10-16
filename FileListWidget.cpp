@@ -59,16 +59,9 @@ void FileListWidget::insertFiles(const RevFile *files)
    if (!files)
       return;
 
-   if (st->isMerge())
-   {
-      const QString header((st->allMergeFiles()) ? QString("Click to view only interesting files")
-                                                 : QString("Click to view all merge files"));
-      const bool useDark = QPalette().color(QPalette::Window).value() > QPalette().color(QPalette::WindowText).value();
-      QColor color(Qt::blue);
-      if (!useDark)
-         color = color.lighter();
-      addItem(header, color);
-   }
+   if (st->isMerge() && !st->allMergeFiles())
+      st->setAllMergeFiles(!st->allMergeFiles());
+
    if (files->count() == 0)
       return;
 

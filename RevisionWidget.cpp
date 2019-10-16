@@ -121,7 +121,7 @@ void RevisionWidget::setCurrentCommitSha(const QString &sha)
          f.setItalic(description.isEmpty());
          labelDescription->setFont(f);
 
-         const auto files = mGit->getFiles(sha, "", false, "");
+         const auto files = mGit->getFiles(sha, currentRev->parent(0), true, "");
          fileListWidget->update(files, true);
          labelModCount->setText(QString("(%1)").arg(fileListWidget->count()));
       }
