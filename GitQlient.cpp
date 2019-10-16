@@ -7,15 +7,27 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include <QDir>
+#include <QLogger.h>
+
+using namespace QLogger;
 
 GitQlient::GitQlient(QWidget *parent)
    : QWidget(parent)
    , mRepos(new QTabWidget())
 {
+   QLog_Info("UI", "*******************************************");
+   QLog_Info("UI", "*          GitQlient has started          *");
+   QLog_Info("UI", "*                  0.7.0                  *");
+   QLog_Info("UI", "*******************************************");
+
+   QLog_Info("UI", "Creating Main Window");
+
    QFile styles(":/stylesheet.css");
 
    if (styles.open(QIODevice::ReadOnly))
    {
+      QLog_Info("UI", "Applying the stylesheet");
+
       setStyleSheet(QString::fromUtf8(styles.readAll()));
       styles.close();
    }
@@ -41,11 +53,19 @@ GitQlient::GitQlient(QWidget *parent)
    vLayout->setContentsMargins(QMargins());
    vLayout->addWidget(mRepos);
 
+   QLog_Info("UI", "Adding an empty repo");
    addRepoTab();
+}
+
+GitQlient::~GitQlient()
+{
+   QLog_Info("UI", "*            Closing GitQlient            *");
 }
 
 void GitQlient::setRepositories(const QStringList repositories)
 {
+   QLog_Info("UI", QString("Adding {%1} repositories").arg(repositories.count()));
+
    if (!mFirstRepoInitialized)
    {
       closeTab(0);
@@ -80,13 +100,9 @@ void GitQlient::addRepoTab(const QString &repoPath)
    {
       const auto newRepo = new GitQlientRepo(repoPath);
       connect(newRepo, &GitQlientRepo::signalOpenSubmodule, this, [this](const QString &repoName) {
-         if (!mFirstRepoInitialized)
-         {
-            closeTab(0);
-            mFirstRepoInitialized = true;
-         }
+         const auto currentDir = dynamic_cast<GitQlientRepo *>(sender())->currentDir();
+         auto submoduleDir = currentDir + "/" + repoName;
 
-         auto submoduleDir = dynamic_cast<GitQlientRepo *>(sender())->currentDir() + "/" + repoName;
          addRepoTab(submoduleDir);
       });
 
@@ -105,10 +121,18 @@ void GitQlient::addRepoTab(const QString &repoPath)
 
          mRepos->setTabIcon(index, QIcon(isSubmodule ? QString(":/icons/submodules") : QString(":/icons/local")));
 
+         QLog_Info("UI", "Attaching repository to a new tab");
+
          if (isSubmodule)
          {
-            const auto parentRepo = output.split('/').last();
+            const auto parentRepo = QString::fromUtf8(output.split('/').last());
+
             mRepos->setTabText(index, QString("%1 \u2192 %2").arg(parentRepo, repoName));
+
+            QLog_Info("UI",
+                      QString("Opening the submodule {%1} from the repo {%2} on tab index {%3}")
+                          .arg(repoName, parentRepo)
+                          .arg(index));
          }
       }
 
@@ -116,6 +140,8 @@ void GitQlient::addRepoTab(const QString &repoPath)
 
       mCurrentRepos.insert(repoPath);
    }
+   else
+      QLog_Warning("UI", QString("Repository at {%1} already opened. Skip adding it again.").arg(repoPath));
 }
 
 void GitQlient::repoClosed(int tabIndex)
@@ -124,6 +150,8 @@ void GitQlient::repoClosed(int tabIndex)
 
    if (mRepos->count() == 0)
    {
+      QLog_Info("UI", "Adding an empty repo");
+
       addRepoTab();
       mFirstRepoInitialized = false;
    }
@@ -132,6 +160,9 @@ void GitQlient::repoClosed(int tabIndex)
 void GitQlient::closeTab(int tabIndex)
 {
    auto repoToRemove = dynamic_cast<GitQlientRepo *>(mRepos->widget(tabIndex));
+
+   QLog_Info("UI", QString("Removing repository {%1}").arg(repoToRemove->currentDir()));
+
    mCurrentRepos.remove(repoToRemove->currentDir());
    mRepos->removeTab(tabIndex);
    repoToRemove->close();

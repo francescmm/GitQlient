@@ -13,6 +13,10 @@
 #include <QMenu>
 #include <QHeaderView>
 
+#include <QLogger.h>
+
+using namespace QLogger;
+
 BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
    : QWidget(parent)
    , mGit(git)
@@ -175,6 +179,8 @@ BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
 
 void BranchesWidget::showBranches()
 {
+   QLog_Info("UI", QString("Loading branches data"));
+
    clear();
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -188,17 +194,21 @@ void BranchesWidget::showBranches()
          output.replace(' ', "");
          const auto branches = output.split('\n');
 
+         QLog_Info("UI", QString("Fetched {%1} branches").arg(branches.count()));
+         QLog_Info("UI", QString("Processing branches...").arg(branches.count()));
+
          for (auto branch : branches)
          {
             if (!branch.isEmpty())
             {
-               // TODO: Evaluate if it can be moved to a different thread
                if (branch.startsWith("remotes/") && !branch.contains("HEAD->"))
                   processRemoteBranch(branch);
                else if (!branch.contains("HEAD->"))
                   processLocalBranch(branch);
             }
          }
+
+         QLog_Info("UI", QString("... branches processed").arg(branches.count()));
       }
 
       processTags();
@@ -234,6 +244,10 @@ void BranchesWidget::processLocalBranch(QString branch)
       item->setData(1, Qt::UserRole, true);
    }
 
+   QLog_Debug("UI", QString("Adding local branch {%1}").arg(branch));
+
+   QLog_Debug("UI", QString("Calculating distances..."));
+
    auto distance = mGit->getDistanceBetweenBranches(true, branch).output.toString();
    distance.replace('\n', "");
    distance.replace('\t', "\u2193 - ");
@@ -254,11 +268,15 @@ void BranchesWidget::processLocalBranch(QString branch)
    item->setText(1, branch);
 
    mLocalBranchesTree->addTopLevelItem(item);
+
+   QLog_Debug("UI", QString("Finish gathering local branch information"));
 }
 
 void BranchesWidget::processRemoteBranch(QString branch)
 {
    branch.replace("remotes/", "");
+
+   QLog_Debug("UI", QString("Adding remote branch {%1}").arg(branch));
 
    auto item = new QTreeWidgetItem(mRemoteBranchesTree);
    item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
@@ -274,6 +292,8 @@ void BranchesWidget::processTags()
 {
    const auto tags = mGit->getTags();
 
+   QLog_Info("UI", QString("Fetching {%1} tags").arg(tags.count()));
+
    for (auto tag : tags)
       mTagsList->addItem(tag);
 
@@ -283,6 +303,8 @@ void BranchesWidget::processTags()
 void BranchesWidget::processStashes()
 {
    const auto stashes = mGit->getStashes();
+
+   QLog_Info("UI", QString("Fetching {%1} stashes").arg(stashes.count()));
 
    for (auto stash : stashes)
    {
@@ -299,6 +321,8 @@ void BranchesWidget::processStashes()
 void BranchesWidget::processSubmodules()
 {
    const auto submodules = mGit->getSubmodules();
+
+   QLog_Info("UI", QString("Fetching {%1} submodules").arg(submodules.count()));
 
    for (auto submodule : submodules)
       mSubmodulesList->addItem(submodule);

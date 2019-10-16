@@ -8,6 +8,10 @@
 #include <QVBoxLayout>
 #include <QDateTime>
 
+#include <QLogger.h>
+
+using namespace QLogger;
+
 RevisionWidget::RevisionWidget(QSharedPointer<Git> git, QWidget *parent)
    : QWidget(parent)
    , mGit(git)
@@ -99,6 +103,8 @@ void RevisionWidget::setCurrentCommitSha(const QString &sha)
 
       if (currentRev)
       {
+
+         QLog_Info("UI", QString("Loading information of the commit {%1}").arg(sha));
          mCurrentSha = currentRev->sha();
          mParentSha = currentRev->parent(0);
 

@@ -24,6 +24,10 @@ Author: Marco Costalba (C) 2005-2007
 #include <QListWidgetItem>
 #include <QTextStream>
 
+#include <QLogger.h>
+
+using namespace QLogger;
+
 namespace
 {
 bool readFromFile(const QString &fileName, QString &data)
@@ -66,6 +70,11 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
 void CommitWidget::init(const QString &shaToAmmend)
 {
    mIsAmmend = shaToAmmend != ZERO_SHA;
+
+   QLog_Info("UI",
+             QString("Configuring commit widget with sha {%1} as {%2}")
+                 .arg(shaToAmmend)
+                 .arg(mIsAmmend ? QString("amend") : QString("wip")));
 
    blockSignals(true);
    clear();

@@ -237,7 +237,7 @@ private:
    bool getRefs();
    void clearRevs();
    void clearFileNames();
-   bool startRevList(QStringList &args);
+   bool startRevList();
    bool startParseProc(const QStringList &initCmd);
    bool populateRenamedPatches(const QString &sha, const QStringList &nn, QStringList *on, bool bt);
    bool filterEarlyOutputRev(Revision *revision);

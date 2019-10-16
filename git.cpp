@@ -32,6 +32,10 @@
 #include <QTextDocument>
 #include <QTextStream>
 
+#include <QLogger.h>
+
+using namespace QLogger;
+
 static const QString GIT_LOG_FORMAT = "%m%HX%PX%n%cn<%ce>%n%an<%ae>%n%at%n%s%n";
 static const QString CUSTOM_SHA = "*** CUSTOM * CUSTOM * CUSTOM * CUSTOM **";
 static const uint C_MAGIC = 0xA0B0C0D0;
@@ -1434,7 +1438,7 @@ bool Git::startParseProc(const QStringList &initCmd)
    return dl->start(initCmd, mWorkingDir, buf);
 }
 
-bool Git::startRevList(QStringList &args)
+bool Git::startRevList()
 {
 
    QString baseCmd("git log --date-order --no-color "
@@ -1451,7 +1455,7 @@ bool Git::startRevList(QStringList &args)
 
    QStringList initCmd(baseCmd.split(' '));
 
-   return startParseProc(initCmd + args);
+   return startParseProc(initCmd);
 }
 
 void Git::stop(bool saveCache)
@@ -1496,6 +1500,8 @@ void Git::clearFileNames()
 
 bool Git::init(const QString &wd, QSharedPointer<RevisionsCache> revCache)
 {
+   QLog_Info("Git", "Initializing Git...");
+
    mRevCache = revCache;
 
    // normally called when changing git directory. Must be called after stop()
@@ -1522,16 +1528,20 @@ bool Git::init(const QString &wd, QSharedPointer<RevisionsCache> revCache)
 
    getRefs(); // load references
 
+   QLog_Info("Git", "... Git init finished");
+
    return true;
 }
 
 void Git::init2()
 {
+   QLog_Info("Git", "Adding revisions...");
+
    getDiffIndex(); // blocking, we could be in setRepository() now
 
-   // build up command line arguments
-   QStringList args;
-   startRevList(args);
+   startRevList();
+
+   QLog_Info("Git", "... revisions finished");
 }
 
 void Git::on_loaded(ulong byteSize, int loadTime, bool normalExit)

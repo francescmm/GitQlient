@@ -23,8 +23,8 @@
 
 using namespace QLogger;
 
-GitQlientRepo::GitQlientRepo(QWidget *p)
-   : QFrame(p)
+GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
+   : QFrame(parent)
    , mGit(new Git())
    , mRevisionsCache(new RevisionsCache(mGit))
    , mRepositoryView(new RepositoryView(mRevisionsCache, mGit))
@@ -37,6 +37,8 @@ GitQlientRepo::GitQlientRepo(QWidget *p)
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
 {
+   QLog_Info("UI", QString("Initializing GitQlient with repo {%1}").arg(repo));
+
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
 
@@ -84,12 +86,6 @@ GitQlientRepo::GitQlientRepo(QWidget *p)
 
    connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
-}
-
-GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
-   : GitQlientRepo(parent)
-{
-   QLog_Info("UI", "Initializing MainWindow with repo");
 
    setRepository(repo);
 }
@@ -98,6 +94,8 @@ void GitQlientRepo::updateUi()
 {
    if (!mCurrentDir.isEmpty())
    {
+      QLog_Debug("UI", QString("Updating the GitQlient UI"));
+
       mGit->init(mCurrentDir, mRevisionsCache);
 
       mBranchesWidget->showBranches();
@@ -120,7 +118,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 {
    if (!mRepositoryBusy && !newDir.isEmpty())
    {
-      QLog_Info("UI", QString("Starting repository: %1").arg(newDir));
+      QLog_Info("UI", QString("Loading repository..."));
 
       mRepositoryBusy = true;
 
@@ -133,16 +131,10 @@ void GitQlientRepo::setRepository(const QString &newDir)
       mGit->getBaseDir(newDir, mCurrentDir, archiveChanged);
       mGit->stop(archiveChanged);
 
-      QLog_Info("UI", "Initializing Git...");
-
       const auto ok = mGit->init(mCurrentDir, mRevisionsCache); // blocking call
 
       if (ok)
       {
-         QLog_Info("UI", "... Git initialized!");
-
-         signalRepoOpened(mCurrentDir);
-
          clearWindow(true);
          setWidgetsEnabled(true);
 
@@ -157,7 +149,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
          commitStackedWidget->setCurrentIndex(1);
          mControls->enableButtons(true);
 
-         QLog_Info("UI", "MainWindow widgets configured with the new repo");
+         QLog_Info("UI", "... repository loaded successfully");
       }
       else
       {
@@ -170,6 +162,8 @@ void GitQlientRepo::setRepository(const QString &newDir)
    }
    else
    {
+      QLog_Info("UI", QString("Repository is empty. Cleaning GitQlient"));
+
       mCurrentDir = "";
       clearWindow(true);
       setWidgetsEnabled(false);
@@ -197,7 +191,7 @@ void GitQlientRepo::resetWatcher(const QString &oldDir, const QString &newDir)
 
    if (oldDir != newDir)
    {
-      QLog_Info("UI", QString("Resetting the file watcher from dir {%1} to {%2}").arg(oldDir, newDir));
+      QLog_Info("UI", QString("Setting the file watcher for dir {%1}").arg(newDir));
 
       if (!oldDir.isEmpty())
          mGitWatcher->removePath(oldDir);
@@ -274,7 +268,7 @@ void GitQlientRepo::onCommitSelected(const QString &sha)
    const auto isWip = sha == ZERO_SHA;
    commitStackedWidget->setCurrentIndex(isWip);
 
-   QLog_Info("UI", QString("User selects the commit {%1}").arg(sha));
+   QLog_Info("UI", QString("Selected commit {%1}").arg(sha));
 
    if (isWip)
       mCommitWidget->init(sha);
@@ -380,7 +374,7 @@ void GitQlientRepo::moveRef(const QString &target, const QString &toSHA)
 
 void GitQlientRepo::closeEvent(QCloseEvent *ce)
 {
-   QLog_Info("UI", QString("Closing UI for repository {%1}").arg(mCurrentDir));
+   QLog_Info("UI", QString("Closing GitQlient for repository {%1}").arg(mCurrentDir));
 
    // lastWindowClosed() signal is emitted by close(), after sending
    // closeEvent(), so we need to close _here_ all secondary windows before
