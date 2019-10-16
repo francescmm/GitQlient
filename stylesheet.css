@@ -100,7 +100,6 @@ QListWidget::item
 {
    padding-left: 7px;
    padding-right: 7px;
-   color: white;
    background-color: #2E2F30;
    border-left: 0px;
    border-bottom: 0px;
@@ -153,8 +152,11 @@ RevisionWidget, CommitWidget
 RepositoryView, FullDiffWidget, CommitWidget > QListWidget, FileListWidget, QTreeWidget
 {
     background-color: #2E2F30;
-    color: white;
+}
 
+RepositoryView, FullDiffWidget, CommitWidget > QListWidget, QTreeWidget
+{
+    color: white;
 }
 
 /** START RepositoryContextMenu **/
