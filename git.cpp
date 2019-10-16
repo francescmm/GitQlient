@@ -508,7 +508,7 @@ QVector<QString> Git::getSubmodules()
 
 bool Git::submoduleUpdate(const QString &)
 {
-   return false;
+   return run("git submodule update --init --recursive").first;
 }
 
 bool Git::submoduleRemove(const QString &)
