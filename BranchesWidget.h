@@ -38,6 +38,7 @@ class BranchesWidget : public QWidget
 signals:
    void signalBranchesUpdated();
    void signalSelectCommit(const QString &sha);
+   void signalOpenSubmodule(const QString &submoduleName);
 
 public:
    explicit BranchesWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);

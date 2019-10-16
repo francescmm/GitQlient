@@ -70,6 +70,7 @@ GitQlientRepo::GitQlientRepo(QWidget *p)
 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &GitQlientRepo::updateUi);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &RepositoryView::focusOnCommit);
+   connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
 
    connect(mRepositoryView, &RepositoryView::rebase, this, &GitQlientRepo::rebase);
    connect(mRepositoryView, &RepositoryView::merge, this, &GitQlientRepo::merge);

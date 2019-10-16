@@ -18,6 +18,5 @@ Full diff:
 - Move to the file diff chunck when user clics the file
 
 Future:
-- Open multiple repos
 - Open submodule
 - Implement modification browsing in FileDiffView

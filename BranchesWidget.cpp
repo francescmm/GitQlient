@@ -350,8 +350,8 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
 
    const auto submoduleName = index.data().toString();
    const auto menu = new QMenu(this);
-   const auto UpdateSubmoduleAction = menu->addAction(tr("Update"));
-   connect(UpdateSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
+   const auto updateSubmoduleAction = menu->addAction(tr("Update"));
+   connect(updateSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
       QByteArray output;
       const auto ret = mGit->submoduleUpdate(submoduleName);
@@ -362,7 +362,8 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
    });
 
    const auto openSubmoduleAction = menu->addAction(tr("Open"));
-   connect(openSubmoduleAction, &QAction::triggered, this, []() {});
+   connect(openSubmoduleAction, &QAction::triggered, this,
+           [this, submoduleName]() { emit signalOpenSubmodule(submoduleName); });
 
    const auto deleteSubmoduleAction = menu->addAction(tr("Delete"));
    connect(deleteSubmoduleAction, &QAction::triggered, this, []() {});

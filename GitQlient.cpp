@@ -79,6 +79,17 @@ void GitQlient::addRepoTab(const QString &repoPath)
    if (!mCurrentRepos.contains(repoPath))
    {
       const auto newRepo = new GitQlientRepo(repoPath);
+      connect(newRepo, &GitQlientRepo::signalOpenSubmodule, this, [this](const QString &repoName) {
+         if (!mFirstRepoInitialized)
+         {
+            closeTab(0);
+            mFirstRepoInitialized = true;
+         }
+
+         auto submoduleDir = dynamic_cast<GitQlientRepo *>(sender())->currentDir() + "/" + repoName;
+         addRepoTab(submoduleDir);
+      });
+
       const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "No repo";
       const auto index = mRepos->addTab(newRepo, repoName);
 
@@ -89,12 +100,16 @@ void GitQlient::addRepoTab(const QString &repoPath)
          p.start("git rev-parse --show-superproject-working-tree");
          p.waitForFinished(5000);
 
-         const auto output = p.readAll();
+         const auto output = p.readAll().trimmed();
          const auto isSubmodule = !output.isEmpty();
-         const auto val = p.readAllStandardOutput();
-         const auto err = p.readAllStandardError();
 
          mRepos->setTabIcon(index, QIcon(isSubmodule ? QString(":/icons/submodules") : QString(":/icons/local")));
+
+         if (isSubmodule)
+         {
+            const auto parentRepo = output.split('/').last();
+            mRepos->setTabText(index, QString("%1 \u2192 %2").arg(parentRepo, repoName));
+         }
       }
 
       mRepos->setCurrentIndex(index);

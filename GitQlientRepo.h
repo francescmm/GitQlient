@@ -54,6 +54,7 @@ class GitQlientRepo : public QFrame
 signals:
    void closeAllWindows();
    void signalRepoOpened(const QString &repoName);
+   void signalOpenSubmodule(const QString &submoduleName);
 
 public:
    explicit GitQlientRepo(QWidget *parent = nullptr);
