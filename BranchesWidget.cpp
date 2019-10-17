@@ -195,7 +195,7 @@ void BranchesWidget::showBranches()
          const auto branches = output.split('\n');
 
          QLog_Info("UI", QString("Fetched {%1} branches").arg(branches.count()));
-         QLog_Info("UI", QString("Processing branches...").arg(branches.count()));
+         QLog_Info("UI", QString("Processing branches..."));
 
          for (auto branch : branches)
          {
