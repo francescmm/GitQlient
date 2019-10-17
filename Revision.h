@@ -2,6 +2,8 @@
 
 #include <QVector>
 
+enum class LaneType;
+
 class Revision
 {
    // prevent implicit C++ compiler defaults
@@ -23,7 +25,8 @@ public:
    QString longLog() const;
    QString diff() const;
 
-   QVector<int> lanes, children;
+   QVector<LaneType> lanes;
+   QVector<int> children;
    QVector<int> descRefs; // list of descendant refs index, normally tags
    QVector<int> ancRefs; // list of ancestor refs index, normally tags
    QVector<int> descBranches; // list of descendant branches index

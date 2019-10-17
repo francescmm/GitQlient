@@ -353,8 +353,9 @@ const QString Git::getLaneParent(const QString &fromSHA, int laneNum)
       if (!isFreeLane(static_cast<LaneType>(r->lanes[laneNum])))
       {
 
-         int type = r->lanes[laneNum], parNum = 0;
-         while (!isMerge(static_cast<LaneType>(type)) && type != static_cast<int>(LaneType::ACTIVE))
+         auto type = r->lanes[laneNum];
+         auto parNum = 0;
+         while (!isMerge(type) && type != LaneType::ACTIVE)
          {
 
             if (isHead(static_cast<LaneType>(type)))
@@ -1221,7 +1222,7 @@ const Revision *Git::fakeWorkDirRev(const QString &parent, const QString &log, c
    QStringList parents(parent);
    Revision *c = fakeRevData(ZERO_SHA, parents, author, date, log, longLog, patch, idx);
    c->isDiffCache = true;
-   c->lanes.append(static_cast<int>(LaneType::EMPTY));
+   c->lanes.append(LaneType::EMPTY);
    return c;
 }
 
@@ -1935,7 +1936,7 @@ void Git::updateLanes(Revision &c, Lanes &lns, const QString &sha)
    if (isInitial)
       lns.setInitial();
 
-   lns.getLanes(c.lanes); // here lanes are snapshotted
+   lns.setLanes(c.lanes); // here lanes are snapshotted
 
    const QString &nextSha = (isInitial) ? "" : QString(c.parent(0));
 

@@ -120,7 +120,7 @@ static QColor blend(const QColor &col1, const QColor &col2, int amount = 128)
                  ((256 - amount) * col1.blue() + amount * col2.blue()) / 256);
 }
 
-void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x2, const QColor &col,
+void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, int x2, const QColor &col,
                                             const QColor &activeCol, const QBrush &back) const
 {
    const int padding = 2;
@@ -151,7 +151,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
    static QPen lanePen(lanePenColor, 2); // fast path here
 
    // arc
-   switch (static_cast<LaneType>(type))
+   switch (type)
    {
       case LaneType::JOIN:
       case LaneType::JOIN_R:
@@ -195,7 +195,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
    p->setPen(lanePen);
 
    // vertical line
-   switch (static_cast<LaneType>(type))
+   switch (type)
    {
       case LaneType::ACTIVE:
       case LaneType::NOT_ACTIVE:
@@ -228,7 +228,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
    p->setPen(lanePen);
 
    // horizontal line
-   switch (static_cast<LaneType>(type))
+   switch (type)
    {
       case LaneType::MERGE_FORK:
       case LaneType::JOIN:
@@ -254,7 +254,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
    }
 
    // center symbol, e.g. rect or ellipse
-   switch (static_cast<LaneType>(type))
+   switch (type)
    {
       case LaneType::ACTIVE:
       case LaneType::INITIAL:
@@ -371,11 +371,11 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       mGit->setLane(r->sha());
 
    QBrush back = opt.palette.base();
-   const QVector<int> &lanes(r->lanes);
+   const QVector<LaneType> &lanes(r->lanes);
    auto laneNum = lanes.count();
    auto activeLane = 0;
    for (int i = 0; i < laneNum; i++)
-      if (isActive(static_cast<LaneType>(lanes[i])))
+      if (isActive(lanes[i]))
       {
          activeLane = i;
          break;
@@ -392,8 +392,8 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       x1 = x2;
       x2 += LANE_WIDTH;
 
-      int ln = lanes[i];
-      if (ln != static_cast<int>(LaneType::EMPTY))
+      auto ln = lanes[i];
+      if (ln != LaneType::EMPTY)
       {
          QColor color = i == activeLane ? activeColor : colors[i % COLORS_NUM];
          paintGraphLane(p, ln, x1, x2, color, activeColor, back);

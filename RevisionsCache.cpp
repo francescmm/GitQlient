@@ -1,7 +1,6 @@
 #include "RevisionsCache.h"
 
 #include <Revision.h>
-#include <common.h>
 
 RevisionsCache::RevisionsCache(QSharedPointer<Git> git, QObject *parent)
    : QObject(parent)

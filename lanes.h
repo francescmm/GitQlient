@@ -105,7 +105,7 @@ public:
    void afterBranch();
    void afterApplied();
    void nextParent(const QString &sha);
-   void getLanes(QVector<int> &ln) { ln = typeVec; } // O(1) vector is implicitly shared
+   void setLanes(QVector<LaneType> &ln) { ln = typeVec; } // O(1) vector is implicitly shared
 
 private:
    int findNextSha(const QString &next, int pos);
@@ -113,7 +113,7 @@ private:
    int add(const LaneType type, const QString &next, int pos);
 
    int activeLane;
-   QVector<int> typeVec; // Describes which glyphs should be drawn.
+   QVector<LaneType> typeVec; // Describes which glyphs should be drawn.
    QVector<QString> nextShaVec; // The sha1 hashes of the next commit to appear in each lane (column).
    bool boundary;
    LaneType NODE, NODE_L, NODE_R;

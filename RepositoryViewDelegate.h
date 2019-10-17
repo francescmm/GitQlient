@@ -31,6 +31,8 @@ class Git;
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
 
+enum class LaneType;
+
 class RepositoryViewDelegate : public QStyledItemDelegate
 {
    Q_OBJECT
@@ -54,7 +56,7 @@ private:
    QSharedPointer<Git> mGit;
    void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
    void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
-   void paintGraphLane(QPainter *p, int type, int x1, int x2, const QColor &col, const QColor &activeCol,
+   void paintGraphLane(QPainter *p, const LaneType type, int x1, int x2, const QColor &col, const QColor &activeCol,
                        const QBrush &back) const;
    void paintWip(QPainter *painter, QStyleOptionViewItem opt) const;
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;

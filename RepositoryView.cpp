@@ -134,7 +134,7 @@ int RepositoryView::getLaneType(const QString &sha, int pos) const
 {
 
    const auto r = mRevCache->revLookup(sha);
-   return (r && pos < r->lanes.count() && pos >= 0 ? r->lanes.at(pos) : -1);
+   return (r && pos < r->lanes.count() && pos >= 0 ? static_cast<int>(r->lanes.at(pos)) : -1);
 }
 
 void RepositoryView::getSelectedItems(QStringList &selectedItems)
