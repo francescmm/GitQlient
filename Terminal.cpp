@@ -11,7 +11,6 @@
 Terminal::Terminal(QSharedPointer<Git> git)
    : QDialog()
    , mGit(git)
-   , leGitCommand(new QLineEdit())
    , outputTerminal(new QTextBrowser())
 {
    setWindowTitle(tr("GitQlient terminal"));
@@ -26,6 +25,7 @@ Terminal::Terminal(QSharedPointer<Git> git)
       styles.close();
    }
 
+   const auto leGitCommand = new QLineEdit();
    leGitCommand->setObjectName("leGitCommand");
    leGitCommand->setPlaceholderText(tr("Enter Git command..."));
 
@@ -42,6 +42,8 @@ Terminal::Terminal(QSharedPointer<Git> git)
 
 void Terminal::executeCommand()
 {
+   const auto leGitCommand = dynamic_cast<QLineEdit *>(sender());
+
    if (!leGitCommand->text().isEmpty())
    {
       const auto order = leGitCommand->text();

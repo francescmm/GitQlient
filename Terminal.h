@@ -41,7 +41,6 @@ public:
 
 private:
    QSharedPointer<Git> mGit;
-   QLineEdit *leGitCommand = nullptr;
    QTextBrowser *outputTerminal = nullptr;
 
    void executeCommand();
