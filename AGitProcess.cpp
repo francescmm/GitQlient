@@ -165,6 +165,6 @@ void AGitProcess::onFinished(int, QProcess::ExitStatus exitStatus)
       const auto errorText = QString("An error occurred while executing command:\n\n%1").arg(command);
 
       QLog_Warning("Git", errorText);
-      QLog_Info("Errors", QString("%1\n\nGit says: \n\n%1").arg(errorText, mErrorOutput));
+      QLog_Info("Errors", QString("%1\n\nGit says: \n\n%2").arg(errorText, mErrorOutput));
    }
 }

@@ -319,12 +319,11 @@ void GitQlientRepo::merge(const QStringList &shas, const QString &into)
 
    if (mGit->merge(into, shas, &output))
    {
-      // TODO: Enable it again
-      // controlsWidget->commitChanges();
+      // git->commit !!
       updateUi();
    }
    else if (!output.isEmpty())
-      QMessageBox::warning(this, "git merge failed", QString("\n\nGit says: \n\n" + output));
+      QMessageBox::warning(this, "git merge failed", QString("\n\nGit says: \n\n%1").arg(output));
 
    QApplication::restoreOverrideCursor();
 }
