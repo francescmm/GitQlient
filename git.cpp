@@ -805,7 +805,7 @@ bool Git::pull(QString &output)
 
 bool Git::fetch()
 {
-   return run("git fetch --all").first;
+   return run("git fetch --all --tags --prune --force").first;
 }
 
 bool Git::cherryPickCommit(const QString &sha)
