@@ -6,6 +6,37 @@
     - Diff widget
         - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
 
+2. Improvements & Bugs & Fixes
+- Change License to fit requirements :)
+- Don't push tags when created. Add specifics options in the Context menu
+    - That will require to add colors to differentiate between local and remote tags
+- Reduce space for the Description in the CommitWidget, expand the files
+- Study how to show untracked files
+- In unstaged files:
+    - Add context menu option to checkout all unstaged files
+    - Add context menu option to add to .gitignore a file/pattern
+    - Add context menu option to remove files in unstaged list
+    - When a file is checkout, change the signalChangesCommit for one to refresh the unstaged files list. Refresh Diff if active, not the whole ui.
+    - Disable checkout option if the file is not part of git -> new + unstaged
+- Fix amend: When amending a commit not all the files available are shown
+- When focus on a commit after search, reload files
+- When focus on FullDiffWidget or FileDiffWidget on WIP, update view if something changes
+- Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
+- Extra: add a disabled option to edit a file that throws a signal with the complete path of the file
+- Increase the height in the repository view so it can hold two lines, if it doesn't fit, elide the text
+- Increase the height of the QListWidgets and QTreeWidgets in the BranchWidget
+- When a checkout is performed, the UI refreshes a lot. Try to disable the FileWatcher
+- Add functionality for squash commits
+- Add functionality for patches
+- Add functionality to add submodules (dialog needed)
+- Add styles to the TagDlg
+- Add styles to the QScrollBar
+- Check what happens when we load gigantic repos
+- Add License in the repo and the Contributions Guidelines
+
+Options
+- Implement the options screen: for the moment only Git related options
+
 File diff:
 - How we handle when a file changes its directory?
 
