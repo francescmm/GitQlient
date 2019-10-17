@@ -28,7 +28,7 @@
 class GitAsyncProcess final : public AGitProcess
 {
 public:
-   explicit GitAsyncProcess(const QString &workingDir, bool reportErrorsEnabled, QObject *receiver = nullptr);
+   explicit GitAsyncProcess(const QString &workingDir, QObject *receiver = nullptr);
 
    bool run(const QString &command, QString &output) override;
 

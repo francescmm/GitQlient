@@ -26,7 +26,7 @@
 #include <QWidget>
 
 class Domain;
-class RevFile;
+class RevisionFile;
 class QListWidgetItem;
 class Revision;
 class Git;

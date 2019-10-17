@@ -30,6 +30,7 @@ HEADERS += \
     $$PWD/RepositoryView.h \
     $$PWD/RepositoryViewDelegate.h \
     $$PWD/Revision.h \
+    $$PWD/RevisionFile.h \
     $$PWD/RevisionWidget.h \
     $$PWD/RevisionsCache.h \
     $$PWD/StateInfo.h \
@@ -66,6 +67,7 @@ SOURCES += \
     $$PWD/RepositoryView.cpp \
     $$PWD/RepositoryViewDelegate.cpp \
     $$PWD/Revision.cpp \
+    $$PWD/RevisionFile.cpp \
     $$PWD/RevisionWidget.cpp \
     $$PWD/RevisionsCache.cpp \
     $$PWD/StateInfo.cpp \
@@ -77,5 +79,4 @@ SOURCES += \
     $$PWD/lanes.cpp \
     $$PWD/main.cpp \
     $$PWD/namespace_def.cpp \
-    $$PWD/common.cpp \
     $$PWD/BranchDlg.cpp

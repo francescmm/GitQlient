@@ -1,20 +1,10 @@
-/*
-        Description: interface to git programs
-
-        Author: Marco Costalba (C) 2005-2007
-
-        Copyright: See COPYING file that comes with this distribution
-
-*/
-
+#include "RevisionFile.h"
 #include <QDataStream>
-#include <QTextDocument>
-#include "common.h"
 
 /**
- * RevFile streaming out
+ * RevisionFile streaming out
  */
-const RevFile &RevFile::operator>>(QDataStream &stream) const
+const RevisionFile &RevisionFile::operator>>(QDataStream &stream) const
 {
 
    stream << pathsIdx;
@@ -41,9 +31,9 @@ const RevFile &RevFile::operator>>(QDataStream &stream) const
 }
 
 /**
- * RevFile streaming in
+ * RevisionFile streaming in
  */
-RevFile &RevFile::operator<<(QDataStream &stream)
+RevisionFile &RevisionFile::operator<<(QDataStream &stream)
 {
 
    stream >> pathsIdx;

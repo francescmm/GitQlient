@@ -34,7 +34,7 @@ signals:
    void procDataReady(const QByteArray &data);
 
 public:
-   explicit AGitProcess(const QString &workingDir, bool reportErrorsEnabled);
+   explicit AGitProcess(const QString &workingDir);
 
    virtual bool run(const QString &command, QString &output) = 0;
    void onCancel();
@@ -44,7 +44,6 @@ protected:
    QString mWorkingDirectory;
    QString mErrorOutput;
    QString mCommand;
-   bool mErrorReportingEnabled = false;
    bool mErrorExit = false;
    bool mCanceling = false;
    bool execute(const QString &command);

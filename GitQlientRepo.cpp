@@ -12,6 +12,7 @@
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
 #include <domain.h>
+#include <common.h>
 
 #include <QDirIterator>
 #include <QFileSystemWatcher>

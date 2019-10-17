@@ -3,6 +3,7 @@
 #include <Revision.h>
 #include <FileListWidget.h>
 #include <git.h>
+#include <common.h>
 
 #include <QLabel>
 #include <QVBoxLayout>

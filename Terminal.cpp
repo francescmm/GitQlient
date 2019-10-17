@@ -11,8 +11,6 @@
 
 using namespace QGit;
 
-QTextBrowser *QGit::kErrorLogBrowser = nullptr;
-
 Terminal::Terminal(QSharedPointer<Git> git)
    : QDialog()
    , mGit(git)
@@ -31,8 +29,6 @@ Terminal::Terminal(QSharedPointer<Git> git)
       styles.close();
    }
 
-   QGit::kErrorLogBrowser = outputTerminal;
-
    leGitCommand->setObjectName("leGitCommand");
    leGitCommand->setPlaceholderText(tr("Enter Git command..."));
 
@@ -45,7 +41,6 @@ Terminal::Terminal(QSharedPointer<Git> git)
    vLayout->addWidget(outputTerminal);
 
    connect(leGitCommand, &QLineEdit::returnPressed, this, &Terminal::executeCommand);
-   connect(this, &Terminal::destroyed, []() { QGit::kErrorLogBrowser = nullptr; });
 }
 
 void Terminal::executeCommand()

@@ -1,6 +1,7 @@
 #include "RepositoryViewDelegate.h"
 
 #include <git.h>
+#include <common.h>
 #include <RevisionsCache.h>
 #include <Revision.h>
 #include <RepositoryModelColumns.h>
@@ -152,10 +153,10 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
    // arc
    switch (type)
    {
-      case JOIN:
-      case JOIN_R:
-      case HEAD:
-      case HEAD_R:
+      case QGit::JOIN:
+      case QGit::JOIN_R:
+      case QGit::HEAD:
+      case QGit::HEAD_R:
       {
          QConicalGradient gradient(CENTER_UR);
          gradient.setColorAt(0.375, col);
@@ -165,7 +166,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
          p->drawArc(P_CENTER, DELTA_UR);
          break;
       }
-      case JOIN_L:
+      case QGit::JOIN_L:
       {
          QConicalGradient gradient(CENTER_UL);
          gradient.setColorAt(0.375, activeCol);
@@ -175,8 +176,8 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
          p->drawArc(P_CENTER, DELTA_UL);
          break;
       }
-      case TAIL:
-      case TAIL_R:
+      case QGit::TAIL:
+      case QGit::TAIL_R:
       {
          QConicalGradient gradient(CENTER_DR);
          gradient.setColorAt(0.375, activeCol);

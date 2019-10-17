@@ -10,6 +10,8 @@ Author: Marco Costalba (C) 2005-2007
 
 #include <git.h>
 #include <Revision.h>
+#include <RevisionFile.h>
+#include <common.h>
 
 #include <QDir>
 #include <QKeyEvent>
@@ -82,9 +84,9 @@ void CommitWidget::init(const QString &shaToAmmend)
       {
          QColor myColor;
 
-         if (files->statusCmp(i, RevFile::NEW) || files->statusCmp(i, RevFile::UNKNOWN))
+         if (files->statusCmp(i, RevisionFile::NEW) || files->statusCmp(i, RevisionFile::UNKNOWN))
             myColor = Qt::darkGreen;
-         else if (files->statusCmp(i, RevFile::DELETED))
+         else if (files->statusCmp(i, RevisionFile::DELETED))
             myColor = Qt::red;
          else
             myColor = Qt::white;

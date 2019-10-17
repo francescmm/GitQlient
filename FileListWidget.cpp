@@ -6,6 +6,7 @@ Copyright: See COPYING file that comes with this distribution
 #include "FileListWidget.h"
 
 #include <FileContextMenu.h>
+#include <RevisionFile.h>
 #include "domain.h"
 #include "git.h"
 
@@ -52,7 +53,7 @@ void FileListWidget::showContextMenu(const QPoint &pos)
    }
 }
 
-void FileListWidget::insertFiles(const RevFile *files)
+void FileListWidget::insertFiles(const RevisionFile *files)
 {
    clear();
 
@@ -71,7 +72,7 @@ void FileListWidget::insertFiles(const RevFile *files)
    for (auto i = 0; i < files->count(); ++i)
    {
 
-      if (files->statusCmp(i, RevFile::UNKNOWN))
+      if (files->statusCmp(i, RevisionFile::UNKNOWN))
          continue;
 
       QColor clr = palette().color(QPalette::WindowText);
@@ -84,9 +85,9 @@ void FileListWidget::insertFiles(const RevFile *files)
       QString extSt(files->extendedStatus(i));
       if (extSt.isEmpty())
       {
-         if (files->statusCmp(i, RevFile::NEW))
+         if (files->statusCmp(i, RevisionFile::NEW))
             clr = QColor("#50FA7B");
-         else if (files->statusCmp(i, RevFile::DELETED))
+         else if (files->statusCmp(i, RevisionFile::DELETED))
             clr = QColor("#FF5555");
          else
             clr = Qt::white;
@@ -95,11 +96,11 @@ void FileListWidget::insertFiles(const RevFile *files)
       {
          clr = QColor("#579BD5");
          // in case of rename deleted file is not shown and...
-         if (files->statusCmp(i, RevFile::DELETED))
+         if (files->statusCmp(i, RevisionFile::DELETED))
             continue;
 
          // ...new file is shown with extended info
-         if (files->statusCmp(i, RevFile::NEW))
+         if (files->statusCmp(i, RevisionFile::NEW))
          {
             addItem(extSt, clr);
             continue;
@@ -110,7 +111,7 @@ void FileListWidget::insertFiles(const RevFile *files)
    setUpdatesEnabled(true);
 }
 
-void FileListWidget::update(const RevFile *files, bool newFiles)
+void FileListWidget::update(const RevisionFile *files, bool newFiles)
 {
    QPalette pl = QApplication::palette();
 

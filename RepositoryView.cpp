@@ -17,6 +17,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <RepositoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
 #include <QLogger.h>
+#include <common.h>
 
 #include <QApplication>
 #include <QClipboard>

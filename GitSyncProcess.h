@@ -28,7 +28,7 @@
 class GitSyncProcess final : public AGitProcess
 {
 public:
-   GitSyncProcess(const QString &workingDir, bool reportErrorsEnabled);
+   GitSyncProcess(const QString &workingDir);
 
    bool run(const QString &command, QString &output) override;
 };

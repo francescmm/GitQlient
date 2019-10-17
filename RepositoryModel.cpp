@@ -20,8 +20,6 @@
 
 #include "git.h"
 
-using namespace QGit;
-
 RepositoryModel::RepositoryModel(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QObject *p)
    : QAbstractItemModel(p)
    , mRevCache(revCache)

@@ -5,6 +5,10 @@
 #include <QTemporaryFile>
 #include <QTextStream>
 
+#include <QLogger.h>
+
+using namespace QLogger;
+
 namespace
 {
 void restoreSpaces(QString &newCmd, const QChar &sepChar)
@@ -86,10 +90,9 @@ const QStringList splitArgList(const QString &cmd)
 }
 }
 
-AGitProcess::AGitProcess(const QString &workingDir, bool reportErrorsEnabled)
+AGitProcess::AGitProcess(const QString &workingDir)
    : QProcess()
    , mWorkingDirectory(workingDir)
-   , mErrorReportingEnabled(reportErrorsEnabled)
 {
    setWorkingDirectory(mWorkingDirectory);
 
@@ -138,11 +141,8 @@ bool AGitProcess::execute(const QString &command)
 
       processStarted = waitForStarted();
 
-      if (!processStarted && QGit::kErrorLogBrowser)
-      {
-         QGit::kErrorLogBrowser->clear();
-         QGit::kErrorLogBrowser->setText(QString("Unable to start the process:\n\n%1\n\n").arg(command));
-      }
+      if (!processStarted)
+         QLog_Warning("Git", QString("Unable to start the process:\n\n%1\n\n").arg(command));
    }
 
    return processStarted;
@@ -159,10 +159,12 @@ void AGitProcess::onFinished(int, QProcess::ExitStatus exitStatus)
    if (!mErrorExit && mRunOutput)
       mRunOutput->append(readAllStandardOutput() + mErrorOutput);
 
-   if (mErrorExit && mErrorReportingEnabled && QGit::kErrorLogBrowser)
+   if (mErrorExit)
    {
-      QGit::kErrorLogBrowser->clear();
-      QGit::kErrorLogBrowser->setText(QString("An error occurred while executing command:\n\n%1\n\nGit says: \n\n%2")
-                                          .arg(program() + " " + arguments().join(" "), mErrorOutput));
+      const auto command = program() + " " + arguments().join(" ");
+      const auto errorText = QString("An error occurred while executing command:\n\n%1").arg(command);
+
+      QLog_Warning("Git", errorText);
+      QLog_Info("Errors", QString("%1\n\nGit says: \n\n%1").arg(errorText, mErrorOutput));
    }
 }

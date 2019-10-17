@@ -5,8 +5,8 @@
 #include <QTemporaryFile>
 #include <QTextStream>
 
-GitSyncProcess::GitSyncProcess(const QString &workingDir, bool reportErrorsEnabled)
-   : AGitProcess(workingDir, reportErrorsEnabled)
+GitSyncProcess::GitSyncProcess(const QString &workingDir)
+   : AGitProcess(workingDir)
 {
 }
 

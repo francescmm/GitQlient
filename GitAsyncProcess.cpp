@@ -2,8 +2,8 @@
 
 #include "git.h"
 
-GitAsyncProcess::GitAsyncProcess(const QString &workingDir, bool reportErrorsEnabled, QObject *receiver)
-   : AGitProcess(workingDir, reportErrorsEnabled)
+GitAsyncProcess::GitAsyncProcess(const QString &workingDir, QObject *receiver)
+   : AGitProcess(workingDir)
    , mReceiver(receiver)
 {
    if (mReceiver)

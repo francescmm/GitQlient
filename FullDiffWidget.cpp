@@ -9,6 +9,7 @@
 #include <RevisionsCache.h>
 #include <Revision.h>
 #include <StateInfo.h>
+#include <common.h>
 
 #include "git.h"
 #include "GitAsyncProcess.h"
