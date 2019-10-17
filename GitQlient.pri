@@ -36,7 +36,6 @@ HEADERS += \
     $$PWD/StateInfo.h \
     $$PWD/TagDlg.h \
     $$PWD/Terminal.h \
-    $$PWD/common.h \
     $$PWD/dataloader.h \
     $$PWD/domain.h \
     $$PWD/git.h \
@@ -78,5 +77,4 @@ SOURCES += \
     $$PWD/git.cpp \
     $$PWD/lanes.cpp \
     $$PWD/main.cpp \
-    $$PWD/namespace_def.cpp \
     $$PWD/BranchDlg.cpp

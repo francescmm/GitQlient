@@ -6,10 +6,7 @@
 #include <QApplication>
 #include <QFile>
 
-#include "common.h"
 #include "git.h"
-
-using namespace QGit;
 
 Terminal::Terminal(QSharedPointer<Git> git)
    : QDialog()

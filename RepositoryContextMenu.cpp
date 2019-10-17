@@ -1,7 +1,6 @@
 #include "RepositoryContextMenu.h"
 
 #include <git.h>
-#include <common.h>
 #include <CommitWidget.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
@@ -15,7 +14,7 @@ RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QStr
    , mGit(git)
    , mSha(sha)
 {
-   if (mSha == QGit::ZERO_SHA)
+   if (mSha == ZERO_SHA)
    {
       const auto stashAction = addAction("Push stash");
       connect(stashAction, &QAction::triggered, this, &RepositoryContextMenu::stashPush);
@@ -31,7 +30,7 @@ RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QStr
    const auto commitAction = addAction("See diff");
    connect(commitAction, &QAction::triggered, this, [this]() { emit signalOpenDiff(mSha); });
 
-   if (mSha != QGit::ZERO_SHA)
+   if (mSha != ZERO_SHA)
    {
       const auto ammendCommitAction = addAction("Ammend");
       connect(ammendCommitAction, &QAction::triggered, this, &RepositoryContextMenu::signalAmmendCommit);

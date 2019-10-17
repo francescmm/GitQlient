@@ -11,7 +11,6 @@ Author: Marco Costalba (C) 2005-2007
 #include <git.h>
 #include <Revision.h>
 #include <RevisionFile.h>
-#include <common.h>
 
 #include <QDir>
 #include <QKeyEvent>
@@ -23,8 +22,24 @@ Author: Marco Costalba (C) 2005-2007
 #include <QTextCodec>
 #include <QToolTip>
 #include <QListWidgetItem>
+#include <QTextStream>
 
-using namespace QGit;
+namespace
+{
+bool readFromFile(const QString &fileName, QString &data)
+{
+
+   data = "";
+   QFile file(fileName);
+   if (!file.open(QIODevice::ReadOnly))
+      return false;
+
+   QTextStream stream(&file);
+   data = stream.readAll();
+   file.close();
+   return true;
+}
+}
 
 QString CommitWidget::lastMsgBeforeError;
 

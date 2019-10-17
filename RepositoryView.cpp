@@ -17,7 +17,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <RepositoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
 #include <QLogger.h>
-#include <common.h>
+#include <lanes.h>
 
 #include <QApplication>
 #include <QClipboard>
@@ -32,7 +32,6 @@ Author: Marco Costalba (C) 2005-2007
 #include <QUrl>
 #include <QMenu>
 
-using namespace QGit;
 using namespace QLogger;
 
 uint refTypeFromName(const QString &name);
@@ -307,13 +306,13 @@ bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringLi
 {
    uint lane = x / LANE_WIDTH;
    int t = getLaneType(sha, lane);
-   if (t == EMPTY || t == -1)
+   if (t == static_cast<int>(LaneType::EMPTY) || t == -1)
       return false;
 
    // first find the parents
    p.clear();
    QString root;
-   if (!isFreeLane(t))
+   if (!isFreeLane(static_cast<LaneType>(t)))
    {
       p = mRevCache->revLookup(sha)->parents(); // pointer cannot be nullptr
       root = sha;

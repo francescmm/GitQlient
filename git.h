@@ -25,6 +25,8 @@ class RepositoryModel;
 class Lanes;
 class GitAsyncProcess;
 
+static const QString ZERO_SHA = "0000000000000000000000000000000000000000";
+
 struct GitExecResult
 {
    GitExecResult(const QPair<bool, QString> &result)
@@ -287,6 +289,7 @@ private:
    QHash<QString, int> mDirNamesMap; // quick lookup directory name
    RepositoryModel *mRevData = nullptr;
    QSharedPointer<RevisionsCache> mRevCache;
+   static const QString kCacheFileName;
 };
 
 #endif

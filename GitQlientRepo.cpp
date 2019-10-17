@@ -12,7 +12,6 @@
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
 #include <domain.h>
-#include <common.h>
 
 #include <QDirIterator>
 #include <QFileSystemWatcher>
@@ -108,7 +107,7 @@ void GitQlientRepo::updateUi()
       mGit->init2();
 
       const auto commitStackedIndex = commitStackedWidget->currentIndex();
-      const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : QGit::ZERO_SHA;
+      const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : ZERO_SHA;
 
       mRepositoryView->focusOnCommit(currentSha);
 
@@ -149,10 +148,10 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          mGit->init2();
 
-         onCommitSelected(QGit::ZERO_SHA);
+         onCommitSelected(ZERO_SHA);
          mBranchesWidget->showBranches();
 
-         mCommitWidget->init(QGit::ZERO_SHA);
+         mCommitWidget->init(ZERO_SHA);
 
          mainStackedWidget->setCurrentIndex(0);
          commitStackedWidget->setCurrentIndex(1);
@@ -272,7 +271,7 @@ void GitQlientRepo::onCommitClicked(const QModelIndex &index)
 
 void GitQlientRepo::onCommitSelected(const QString &sha)
 {
-   const auto isWip = sha == QGit::ZERO_SHA;
+   const auto isWip = sha == ZERO_SHA;
    commitStackedWidget->setCurrentIndex(isWip);
 
    QLog_Info("UI", QString("User selects the commit {%1}").arg(sha));
@@ -355,7 +354,7 @@ void GitQlientRepo::moveRef(const QString &target, const QString &toSHA)
       if (!sha.isEmpty())
       {
          const QStringList &children = mGit->getChildren(sha);
-         if ((children.count() == 0 || (children.count() == 1 && children.front() == QGit::ZERO_SHA)) && // no children
+         if ((children.count() == 0 || (children.count() == 1 && children.front() == ZERO_SHA)) && // no children
              mGit->getRefNames(sha, Git::ANY_REF).count() == 1 && // last ref name
              QMessageBox::question(this, "move branch",
                                    QString("This is the last reference to this branch.\n"

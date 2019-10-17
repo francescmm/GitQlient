@@ -9,12 +9,60 @@
 #include <RevisionsCache.h>
 #include <Revision.h>
 #include <StateInfo.h>
-#include <common.h>
 
 #include "git.h"
 #include "GitAsyncProcess.h"
+
 #include <QScrollBar>
 #include <QTextCharFormat>
+#include <QTextCodec>
+
+namespace
+{
+bool stripPartialParaghraps(const QByteArray &ba, QString *dst, QString *prev)
+{
+
+   QTextCodec *tc = QTextCodec::codecForLocale();
+
+   if (ba.endsWith('\n'))
+   { // optimize common case
+      *dst = tc->toUnicode(ba);
+
+      // handle rare case of a '\0' inside content
+      while (dst->size() < ba.size() && ba.at(dst->size()) == '\0')
+      {
+         QString s = tc->toUnicode(ba.mid(dst->size() + 1)); // sizes should match
+         dst->append(" ").append(s);
+      }
+
+      dst->truncate(dst->size() - 1); // strip trailing '\n'
+      if (!prev->isEmpty())
+      {
+         dst->prepend(*prev);
+         prev->clear();
+      }
+      return true;
+   }
+   QString src = tc->toUnicode(ba);
+   // handle rare case of a '\0' inside content
+   while (src.size() < ba.size() && ba.at(src.size()) == '\0')
+   {
+      QString s = tc->toUnicode(ba.mid(src.size() + 1));
+      src.append(" ").append(s);
+   }
+
+   int idx = src.lastIndexOf('\n');
+   if (idx == -1)
+   {
+      prev->append(src);
+      dst->clear();
+      return false;
+   }
+   *dst = src.left(idx).prepend(*prev); // strip trailing '\n'
+   *prev = src.mid(idx + 1); // src[idx] is '\n', skip it
+   return true;
+}
+}
 
 void DiffHighlighter::highlightBlock(const QString &text)
 {
@@ -213,7 +261,7 @@ void FullDiffWidget::processData(const QByteArray &fileChunk, int *prevLineNum)
 {
 
    QString newLines;
-   if (!QGit::stripPartialParaghraps(fileChunk, &newLines, &halfLine))
+   if (!stripPartialParaghraps(fileChunk, &newLines, &halfLine))
       return;
 
    if (!prevLineNum && curFilter == VIEW_ALL)

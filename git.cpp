@@ -1,4 +1,4 @@
-/*
+﻿/*
         Description: interface to git programs
 
         Author: Marco Costalba (C) 2005-2007
@@ -12,8 +12,7 @@
 #include <Revision.h>
 #include <RevisionFile.h>
 #include <StateInfo.h>
-
-#include <common.h>
+#include <lanes.h>
 
 #include "RepositoryModel.h"
 #include "dataloader.h"
@@ -33,14 +32,56 @@
 #include <QTextDocument>
 #include <QTextStream>
 
-#define GIT_LOG_FORMAT "%m%HX%PX%n%cn<%ce>%n%an<%ae>%n%at%n%s%n"
+static const QString GIT_LOG_FORMAT = "%m%HX%PX%n%cn<%ce>%n%an<%ae>%n%at%n%s%n";
+static const QString CUSTOM_SHA = "*** CUSTOM * CUSTOM * CUSTOM * CUSTOM **";
+static const uint C_MAGIC = 0xA0B0C0D0;
+static const int C_VERSION = 15;
 
-using namespace QGit;
+const QString Git::kCacheFileName = QString("qgit_cache.dat");
+
+namespace
+{
+const QString toPersistentSha(const QString &sha, QVector<QByteArray> &v)
+{
+
+   v.append(sha.toLatin1());
+   return QString::fromUtf8(v.last().constData());
+}
+
+#ifndef Q_OS_WIN32
+#   include <sys/types.h> // used by chmod()
+#   include <sys/stat.h> // used by chmod()
+#endif
+
+bool writeToFile(const QString &fileName, const QString &data, bool setExecutable = false)
+{
+
+   QFile file(fileName);
+   if (!file.open(QIODevice::WriteOnly))
+      return false;
+
+   QString data2(data);
+   QTextStream stream(&file);
+
+#ifdef Q_OS_WIN32
+   data2.replace("\r\n", "\n"); // change windows CRLF to linux
+   data2.replace("\n", "\r\n"); // then change all linux CRLF to windows
+#endif
+   stream << data2;
+   file.close();
+
+#ifndef Q_OS_WIN32
+   if (setExecutable)
+      chmod(fileName.toLatin1().constData(), 0755);
+#endif
+   return true;
+}
+}
 
 Git::Git()
    : QObject()
 {
-   mRevsFiles.reserve(MAX_DICT_SIZE);
+   mRevsFiles.reserve(RevisionsCache::MAX_DICT_SIZE);
 }
 
 void Git::userInfo(QStringList &info)
@@ -309,14 +350,14 @@ const QString Git::getLaneParent(const QString &fromSHA, int laneNum)
       if (laneNum >= r->lanes.count())
          return "";
 
-      if (!isFreeLane(r->lanes[laneNum]))
+      if (!isFreeLane(static_cast<LaneType>(r->lanes[laneNum])))
       {
 
          int type = r->lanes[laneNum], parNum = 0;
-         while (!isMerge(type) && type != ACTIVE)
+         while (!isMerge(static_cast<LaneType>(type)) && type != static_cast<int>(LaneType::ACTIVE))
          {
 
-            if (isHead(type))
+            if (isHead(static_cast<LaneType>(type)))
                parNum++;
 
             type = r->lanes[--laneNum];
@@ -564,7 +605,8 @@ bool Git::runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutp
 const RevisionFile *Git::getAllMergeFiles(const Revision *r)
 {
 
-   const QString &mySha(ALL_MERGE_FILES + QString(r->sha()));
+   QString mySha("ALL_MERGE_FILES" + QString(r->sha()));
+
    if (mRevsFiles.contains(mySha))
       return mRevsFiles[mySha];
 
@@ -1179,7 +1221,7 @@ const Revision *Git::fakeWorkDirRev(const QString &parent, const QString &log, c
    QStringList parents(parent);
    Revision *c = fakeRevData(ZERO_SHA, parents, author, date, log, longLog, patch, idx);
    c->isDiffCache = true;
-   c->lanes.append(EMPTY);
+   c->lanes.append(static_cast<int>(LaneType::EMPTY));
    return c;
 }
 
@@ -1400,7 +1442,8 @@ bool Git::startRevList(QStringList &args)
                    "--log-size " // FIXME broken on Windows
 #endif
                    "--parents --boundary -z "
-                   "--pretty=format:" GIT_LOG_FORMAT);
+                   "--pretty=format:"
+                   + GIT_LOG_FORMAT);
 
    // we don't need log message body for file history
    baseCmd.append("%b --all");
@@ -1516,8 +1559,8 @@ bool Git::saveOnCache(const QString &gitDir, const QHash<QString, const Revision
    if (gitDir.isEmpty() || rf.isEmpty())
       return false;
 
-   QString path(gitDir + C_DAT_FILE);
-   QString tmpPath(path + BAK_EXT);
+   const auto path = QString("%1/%2").arg(gitDir, kCacheFileName);
+   const auto tmpPath = QString("%1.bak").arg(path);
 
    QDir dir;
    if (!dir.exists(gitDir))
@@ -1586,7 +1629,6 @@ bool Git::saveOnCache(const QString &gitDir, const QHash<QString, const Revision
    f.write(qCompress(data, 1)); // no need to encode with compressed data
    f.close();
 
-   // rename C_DAT_FILE + BAK_EXT -> C_DAT_FILE
    if (dir.exists(path))
    {
       if (!dir.remove(path))
@@ -1603,7 +1645,7 @@ bool Git::loadFromCache(const QString &gitDir, QHash<QString, const RevisionFile
                         QVector<QString> &files, QByteArray &revsFilesShaBuf)
 {
    // check for cache file
-   QString path(gitDir + C_DAT_FILE);
+   QString path = QString("%1/%2").arg(gitDir, kCacheFileName);
    QFile f(path);
    if (!f.exists())
       return true; // no cache file is not an error

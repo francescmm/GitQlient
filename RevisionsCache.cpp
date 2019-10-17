@@ -7,7 +7,7 @@ RevisionsCache::RevisionsCache(QSharedPointer<Git> git, QObject *parent)
    : QObject(parent)
    , mGit(git)
 {
-   revs.reserve(QGit::MAX_DICT_SIZE);
+   revs.reserve(MAX_DICT_SIZE);
 }
 
 QString RevisionsCache::sha(int row) const

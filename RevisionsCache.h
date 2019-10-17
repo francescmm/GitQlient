@@ -55,6 +55,8 @@ public:
    int revOrderCount() const { return revOrder.count(); }
    bool contains(const QString &sha) { return revs.contains(sha); }
 
+   static const int MAX_DICT_SIZE = 100003; // must be a prime number see QDict docs
+
 private:
    QSharedPointer<Git> mGit;
    QHash<QString, const Revision *> revs;

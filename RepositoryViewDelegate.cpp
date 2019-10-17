@@ -1,14 +1,14 @@
 #include "RepositoryViewDelegate.h"
 
 #include <git.h>
-#include <common.h>
+#include <lanes.h>
 #include <RevisionsCache.h>
 #include <Revision.h>
 #include <RepositoryModelColumns.h>
 
 #include <QPainter>
 
-using namespace QGit;
+static const int COLORS_NUM = 8;
 
 namespace
 {
@@ -151,12 +151,12 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
    static QPen lanePen(lanePenColor, 2); // fast path here
 
    // arc
-   switch (type)
+   switch (static_cast<LaneType>(type))
    {
-      case QGit::JOIN:
-      case QGit::JOIN_R:
-      case QGit::HEAD:
-      case QGit::HEAD_R:
+      case LaneType::JOIN:
+      case LaneType::JOIN_R:
+      case LaneType::HEAD:
+      case LaneType::HEAD_R:
       {
          QConicalGradient gradient(CENTER_UR);
          gradient.setColorAt(0.375, col);
@@ -166,7 +166,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
          p->drawArc(P_CENTER, DELTA_UR);
          break;
       }
-      case QGit::JOIN_L:
+      case LaneType::JOIN_L:
       {
          QConicalGradient gradient(CENTER_UL);
          gradient.setColorAt(0.375, activeCol);
@@ -176,8 +176,8 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
          p->drawArc(P_CENTER, DELTA_UL);
          break;
       }
-      case QGit::TAIL:
-      case QGit::TAIL_R:
+      case LaneType::TAIL:
+      case LaneType::TAIL_R:
       {
          QConicalGradient gradient(CENTER_DR);
          gradient.setColorAt(0.375, activeCol);
@@ -195,29 +195,29 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
    p->setPen(lanePen);
 
    // vertical line
-   switch (type)
+   switch (static_cast<LaneType>(type))
    {
-      case ACTIVE:
-      case NOT_ACTIVE:
-      case MERGE_FORK:
-      case MERGE_FORK_R:
-      case MERGE_FORK_L:
-      case JOIN:
-      case JOIN_R:
-      case JOIN_L:
-      case CROSS:
+      case LaneType::ACTIVE:
+      case LaneType::NOT_ACTIVE:
+      case LaneType::MERGE_FORK:
+      case LaneType::MERGE_FORK_R:
+      case LaneType::MERGE_FORK_L:
+      case LaneType::JOIN:
+      case LaneType::JOIN_R:
+      case LaneType::JOIN_L:
+      case LaneType::CROSS:
          p->drawLine(P_90, P_270);
          break;
-      case HEAD_L:
-      case BRANCH:
+      case LaneType::HEAD_L:
+      case LaneType::BRANCH:
          p->drawLine(P_CENTER, P_270);
          break;
-      case TAIL_L:
-      case INITIAL:
-      case BOUNDARY:
-      case BOUNDARY_C:
-      case BOUNDARY_R:
-      case BOUNDARY_L:
+      case LaneType::TAIL_L:
+      case LaneType::INITIAL:
+      case LaneType::BOUNDARY:
+      case LaneType::BOUNDARY_C:
+      case LaneType::BOUNDARY_R:
+      case LaneType::BOUNDARY_L:
          p->drawLine(P_90, P_CENTER);
          break;
       default:
@@ -228,25 +228,25 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
    p->setPen(lanePen);
 
    // horizontal line
-   switch (type)
+   switch (static_cast<LaneType>(type))
    {
-      case MERGE_FORK:
-      case JOIN:
-      case HEAD:
-      case TAIL:
-      case CROSS:
-      case CROSS_EMPTY:
-      case BOUNDARY_C:
+      case LaneType::MERGE_FORK:
+      case LaneType::JOIN:
+      case LaneType::HEAD:
+      case LaneType::TAIL:
+      case LaneType::CROSS:
+      case LaneType::CROSS_EMPTY:
+      case LaneType::BOUNDARY_C:
          p->drawLine(P_180, P_0);
          break;
-      case MERGE_FORK_R:
-      case BOUNDARY_R:
+      case LaneType::MERGE_FORK_R:
+      case LaneType::BOUNDARY_R:
          p->drawLine(P_180, P_CENTER);
          break;
-      case MERGE_FORK_L:
-      case HEAD_L:
-      case TAIL_L:
-      case BOUNDARY_L:
+      case LaneType::MERGE_FORK_L:
+      case LaneType::HEAD_L:
+      case LaneType::TAIL_L:
+      case LaneType::BOUNDARY_L:
          p->drawLine(P_CENTER, P_0);
          break;
       default:
@@ -254,43 +254,43 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, int type, int x1, int x
    }
 
    // center symbol, e.g. rect or ellipse
-   switch (type)
+   switch (static_cast<LaneType>(type))
    {
-      case ACTIVE:
-      case INITIAL:
-      case BRANCH:
+      case LaneType::ACTIVE:
+      case LaneType::INITIAL:
+      case LaneType::BRANCH:
          p->setPen(Qt::black);
          p->setBrush(col);
          p->drawEllipse(R_CENTER);
          break;
-      case MERGE_FORK:
-      case MERGE_FORK_R:
-      case MERGE_FORK_L:
+      case LaneType::MERGE_FORK:
+      case LaneType::MERGE_FORK_R:
+      case LaneType::MERGE_FORK_L:
          p->setPen(Qt::black);
          p->setBrush(col);
          p->drawRect(R_CENTER);
          break;
-      case UNAPPLIED:
+      case LaneType::UNAPPLIED:
          // Red minus sign
          p->setPen(Qt::NoPen);
          p->setBrush(Qt::red);
          p->drawRect(m - r, h - 1, d, 2);
          break;
-      case APPLIED:
+      case LaneType::APPLIED:
          // Green plus sign
          p->setPen(Qt::NoPen);
          p->setBrush(Qt::darkGreen);
          p->drawRect(m - r, h - 1, d, 2);
          p->drawRect(m - 1, h - r, 2, d);
          break;
-      case BOUNDARY:
+      case LaneType::BOUNDARY:
          p->setPen(Qt::black);
          p->setBrush(back);
          p->drawEllipse(R_CENTER);
          break;
-      case BOUNDARY_C:
-      case BOUNDARY_R:
-      case BOUNDARY_L:
+      case LaneType::BOUNDARY_C:
+      case LaneType::BOUNDARY_R:
+      case LaneType::BOUNDARY_L:
          p->setPen(Qt::black);
          p->setBrush(back);
          p->drawRect(R_CENTER);
@@ -375,7 +375,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    auto laneNum = lanes.count();
    auto activeLane = 0;
    for (int i = 0; i < laneNum; i++)
-      if (isActive(lanes[i]))
+      if (isActive(static_cast<LaneType>(lanes[i])))
       {
          activeLane = i;
          break;
@@ -393,11 +393,11 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       x2 += LANE_WIDTH;
 
       int ln = lanes[i];
-      if (ln == EMPTY)
-         continue;
-
-      QColor color = i == activeLane ? activeColor : colors[i % COLORS_NUM];
-      paintGraphLane(p, ln, x1, x2, color, activeColor, back);
+      if (ln != static_cast<int>(LaneType::EMPTY))
+      {
+         QColor color = i == activeLane ? activeColor : colors[i % COLORS_NUM];
+         paintGraphLane(p, ln, x1, x2, color, activeColor, back);
+      }
    }
    p->restore();
 }
