@@ -166,22 +166,27 @@ void CommitWidget::removeFileFromCommitList(QListWidgetItem *item)
 
 void CommitWidget::contextMenuPopup(const QPoint &pos)
 {
-   const auto fileName = ui->listWidgetFiles->itemAt(pos)->data(Qt::DisplayRole).toString();
-   const auto contextMenu = new QMenu(this);
+   const auto item = ui->listWidgetFiles->itemAt(pos);
 
-   connect(contextMenu->addAction("Checkout file"), &QAction::triggered, this, [this, fileName]() {
-      const auto ret = mGit->resetFile(fileName);
+   if (item)
+   {
+      const auto fileName = ui->listWidgetFiles->itemAt(pos)->data(Qt::DisplayRole).toString();
+      const auto contextMenu = new QMenu(this);
 
-      emit signalChangesCommitted(ret);
-   });
+      connect(contextMenu->addAction("Checkout file"), &QAction::triggered, this, [this, fileName]() {
+         const auto ret = mGit->resetFile(fileName);
 
-   connect(contextMenu->addAction("Add file to commit"), &QAction::triggered, this, [this, fileName]() {
-      const auto ret = mGit->resetFile(fileName);
+         emit signalChangesCommitted(ret);
+      });
 
-      emit signalChangesCommitted(ret);
-   });
+      connect(contextMenu->addAction("Add file to commit"), &QAction::triggered, this, [this, fileName]() {
+         const auto ret = mGit->resetFile(fileName);
 
-   contextMenu->popup(mapToGlobal(pos));
+         emit signalChangesCommitted(ret);
+      });
+
+      contextMenu->popup(mapToGlobal(pos));
+   }
 }
 
 void CommitWidget::applyChanges()
