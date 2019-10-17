@@ -208,7 +208,7 @@ void BranchesWidget::showBranches()
             }
          }
 
-         QLog_Info("UI", QString("... branches processed").arg(branches.count()));
+         QLog_Info("UI", QString("... branches processed"));
       }
 
       processTags();
