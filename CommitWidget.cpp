@@ -28,6 +28,8 @@ Author: Marco Costalba (C) 2005-2007
 
 using namespace QLogger;
 
+const int CommitWidget::kMaxTitleChars = 80;
+
 namespace
 {
 bool readFromFile(const QString &fileName, QString &data)
@@ -54,6 +56,8 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
 {
    ui->setupUi(this);
 
+   ui->lCounter->setText(QString::number(kMaxTitleChars));
+   ui->leCommitTitle->setMaxLength(kMaxTitleChars);
    ui->teDescription->setMaximumHeight(125);
 
    QIcon stagedIcon(":/icons/staged");
@@ -62,6 +66,7 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
    QIcon unstagedIcon(":/icons/unstaged");
    ui->unstagedIcon->setPixmap(unstagedIcon.pixmap(15, 15));
 
+   connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitWidget::applyChanges);
    connect(ui->pbCommit, &QPushButton::clicked, this, &CommitWidget::applyChanges);
    connect(ui->listWidgetFiles, &QListWidget::customContextMenuRequested, this, &CommitWidget::contextMenuPopup);
@@ -237,6 +242,11 @@ bool CommitWidget::checkMsg(QString &msg)
    msg = subj + '\n' + body + '\n';
 
    return true;
+}
+
+void CommitWidget::updateCounter(const QString &text)
+{
+   ui->lCounter->setText(QString::number(kMaxTitleChars - text.count()));
 }
 
 bool CommitWidget::commitChanges()

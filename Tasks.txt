@@ -20,8 +20,7 @@
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Extra: add a disabled option to edit a file that throws a signal with the complete path of the file
 Improve readability in the views:
-    - Reduce to 80 characters the size of the title of a commit, or:
-        - Increase the height to 30px of the rows in the repository view so it can hold two lines, if it doesn't fit, elide the text
+    - Set the text elided and show a tooltip for the branch names longer than 50 px
     - Create a real tree structure for the branches both local and remote, or:
         - Increase the height to 30px of the rows in the QListWidgets and QTreeWidgets in the BranchWidget
 - When a checkout is performed, the UI refreshes a lot. Try to disable the FileWatcher

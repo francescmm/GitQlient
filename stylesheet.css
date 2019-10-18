@@ -216,6 +216,25 @@ CommitWidget > QLineEdit, CommitWidget > #teDescription, #leGitCommand
     color: white;
 }
 
+CommitWidget > #leCommitTitle
+{
+    border-right: 0px;
+}
+
+QLabel#lCounter
+{
+    background-color: #606162;
+    font-family: Ubuntu Mono;
+    max-width: 29px;
+    min-width: 29px;
+    color: #A3A3A4;
+    border: 0px;
+    border-top: 1px solid #202122;
+    border-right: 1px solid #202122;
+    border-bottom: 1px solid #404141;
+    qproperty-alignment: AlignCenter;
+}
+
 #leGitCommand
 {
 border: 1px solid #606162;

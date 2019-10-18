@@ -59,6 +59,8 @@ private:
    void applyChanges();
    QStringList getFiles();
    bool checkMsg(QString &msg);
+   void updateCounter(const QString &text);
 
    static QString lastMsgBeforeError;
+   static const int kMaxTitleChars;
 };
