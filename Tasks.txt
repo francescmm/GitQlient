@@ -9,7 +9,6 @@
 2. Improvements & Bugs & Fixes
 - Change License to fit requirements :)
 - Add colors to differentiate between local and remote tags
-- Reduce space for the Description in the CommitWidget, expand the files
 - Study how to show untracked files
 - In unstaged files:
     - Add context menu option to checkout all unstaged files

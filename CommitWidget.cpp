@@ -54,6 +54,8 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
 {
    ui->setupUi(this);
 
+   ui->teDescription->setMaximumHeight(125);
+
    QIcon stagedIcon(":/icons/staged");
    ui->stagedFilesIcon->setPixmap(stagedIcon.pixmap(15, 15));
 
