@@ -7,7 +7,6 @@
         - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
 
 2. Improvements & Bugs & Fixes
-- Change License to fit requirements :)
 - Add colors to differentiate between local and remote tags
 - Study how to show untracked files
 - In unstaged files:
@@ -20,8 +19,11 @@
 - When focus on FullDiffWidget or FileDiffWidget on WIP, update view if something changes
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Extra: add a disabled option to edit a file that throws a signal with the complete path of the file
-- Increase the height in the repository view so it can hold two lines, if it doesn't fit, elide the text
-- Increase the height of the QListWidgets and QTreeWidgets in the BranchWidget
+Improve readability in the views:
+    - Reduce to 80 characters the size of the title of a commit, or:
+        - Increase the height to 30px of the rows in the repository view so it can hold two lines, if it doesn't fit, elide the text
+    - Create a real tree structure for the branches both local and remote, or:
+        - Increase the height to 30px of the rows in the QListWidgets and QTreeWidgets in the BranchWidget
 - When a checkout is performed, the UI refreshes a lot. Try to disable the FileWatcher
 - Add functionality for squash commits
 - Add functionality for patches
