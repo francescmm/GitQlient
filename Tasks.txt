@@ -8,8 +8,7 @@
 
 2. Improvements & Bugs & Fixes
 - Change License to fit requirements :)
-- Don't push tags when created. Add specifics options in the Context menu
-    - That will require to add colors to differentiate between local and remote tags
+- Add colors to differentiate between local and remote tags
 - Reduce space for the Description in the CommitWidget, expand the files
 - Study how to show untracked files
 - In unstaged files:

@@ -39,15 +39,6 @@ void TagDlg::accept()
       auto ret = mGit->addTag(tagName, tagMessage, mSha, output);
 
       if (ret)
-      {
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         ret = mGit->pushTag(tagName, output);
-         QApplication::restoreOverrideCursor();
-
-         if (ret)
-            QDialog::accept();
-         else
-            mGit->removeTag(tagName, false);
-      }
+         QDialog::accept();
    }
 }

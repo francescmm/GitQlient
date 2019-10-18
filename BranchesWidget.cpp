@@ -291,11 +291,25 @@ void BranchesWidget::processRemoteBranch(QString branch)
 void BranchesWidget::processTags()
 {
    const auto tags = mGit->getTags();
+   const auto localTags = mGit->getLocalTags();
 
    QLog_Info("UI", QString("Fetching {%1} tags").arg(tags.count()));
 
    for (auto tag : tags)
-      mTagsList->addItem(tag);
+   {
+      auto item = new QListWidgetItem();
+      item->setData(Qt::UserRole, tag);
+      item->setData(Qt::UserRole + 1, true);
+
+      if (localTags.contains(tag))
+      {
+         tag += " (local)";
+         item->setData(Qt::UserRole + 1, false);
+      }
+
+      item->setText(tag);
+      mTagsList->addItem(item);
+   }
 
    mTagsCount->setText(QString("(%1)").arg(tags.count()));
 }
@@ -348,12 +362,25 @@ void BranchesWidget::showTagsContextMenu(const QPoint &p)
    if (!index.isValid())
       return;
 
-   const auto tagName = index.data().toString();
+   const auto tagName = index.data(Qt::UserRole).toString();
+   const auto isRemote = index.data(Qt::UserRole + 1).toBool();
    const auto menu = new QMenu(this);
    const auto removeTagAction = menu->addAction(tr("Remove tag"));
-   connect(removeTagAction, &QAction::triggered, this, [this, tagName]() {
+   connect(removeTagAction, &QAction::triggered, this, [this, tagName, isRemote]() {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      const auto ret = mGit->removeTag(tagName, true);
+      const auto ret = mGit->removeTag(tagName, isRemote);
+      QApplication::restoreOverrideCursor();
+
+      if (ret)
+         emit signalBranchesUpdated();
+   });
+
+   const auto pushTagAction = menu->addAction(tr("Push tag"));
+   pushTagAction->setEnabled(!isRemote);
+   connect(pushTagAction, &QAction::triggered, this, [this, tagName]() {
+      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+      QByteArray ba;
+      const auto ret = mGit->pushTag(tagName, ba);
       QApplication::restoreOverrideCursor();
 
       if (ret)

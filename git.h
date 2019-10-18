@@ -87,7 +87,8 @@ public:
    /** END BRANCHES **/
 
    /** START TAGS **/
-   QVector<QString> getTags();
+   QVector<QString> getTags() const;
+   QVector<QString> getLocalTags() const;
    bool addTag(const QString &tagName, const QString &tagMessage, const QString &sha, QByteArray &output);
    bool removeTag(const QString &tagName, bool remote);
    bool pushTag(const QString &tagName, QByteArray &output);
@@ -175,7 +176,7 @@ public:
    void removeExtraFileInfo(QString *rowName);
    void formatPatchFileHeader(QString *rowName, const QString &sha, const QString &dts, bool cmb, bool all);
    const QString filePath(const RevisionFile &rf, int i) const;
-   QPair<bool, QString> run(const QString &cmd);
+   QPair<bool, QString> run(const QString &cmd) const;
 
 private:
    void loadFileCache();

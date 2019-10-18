@@ -300,7 +300,7 @@ const Revision *Git::revLookup(const QString &sha) const
    return mRevCache->revLookup(sha);
 }
 
-QPair<bool, QString> Git::run(const QString &runCmd)
+QPair<bool, QString> Git::run(const QString &runCmd) const
 {
    QString runOutput;
    GitSyncProcess p(mWorkingDir);
@@ -920,7 +920,7 @@ GitExecResult Git::prune()
    return run("git remote prune origin");
 }
 
-QVector<QString> Git::getTags()
+QVector<QString> Git::getTags() const
 {
    const auto ret = run("git tag");
 
@@ -933,6 +933,24 @@ QVector<QString> Git::getTags()
       for (auto tag : tagsTmp)
          if (tag != "\n" && !tag.isEmpty())
             tags.append(tag);
+   }
+
+   return tags;
+}
+
+QVector<QString> Git::getLocalTags() const
+{
+   const auto ret = run("git push --tags --dry-run");
+
+   QVector<QString> tags;
+
+   if (ret.first)
+   {
+      const auto tagsTmp = ret.second.split("\n");
+
+      for (auto tag : tagsTmp)
+         if (tag != "\n" && !tag.isEmpty() && tag.contains("[new tag]"))
+            tags.append(tag.split(" -> ").last());
    }
 
    return tags;
