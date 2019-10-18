@@ -11,6 +11,9 @@ TagDlg::TagDlg(QSharedPointer<Git> git, const QString &sha, QWidget *parent)
 {
    ui->setupUi(this);
 
+   connect(ui->leTagName, &QLineEdit::returnPressed, this, &TagDlg::accept);
+   connect(ui->leTagMessage, &QLineEdit::returnPressed, this, &TagDlg::accept);
+
    connect(ui->pbAccept, &QPushButton::clicked, this, &TagDlg::accept);
    connect(ui->pbCancel, &QPushButton::clicked, this, &QDialog::reject);
 }
