@@ -114,6 +114,10 @@ QTreeWidget::item
     max-height: 25px;
 }
 
+QTreeView::branch {
+        background-color: #2E2F30;
+}
+
 BranchesWidget
 {
     min-width: 400px;

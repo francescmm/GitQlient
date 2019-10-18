@@ -18,27 +18,56 @@ void BranchesViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &o, con
       QColor c("#404142");
       c.setAlphaF(0.75);
       p->fillRect(newOpt.rect, c);
+
+      if (i.column() == 0)
+      {
+         QRect rect(0, newOpt.rect.y(), newOpt.rect.x(), newOpt.rect.height());
+         p->fillRect(rect, c);
+      }
    }
    else if (newOpt.state & QStyle::State_MouseOver)
    {
       QColor c("#404142");
       c.setAlphaF(0.4);
       p->fillRect(newOpt.rect, c);
+
+      if (i.column() == 0)
+      {
+         QRect rect(0, newOpt.rect.y(), newOpt.rect.x(), newOpt.rect.height());
+         p->fillRect(rect, c);
+      }
    }
    else
       p->fillRect(newOpt.rect, QColor("#2E2F30"));
 
-   QFontMetrics fm(newOpt.font);
-   const auto textBoundingRect = fm.boundingRect(i.data().toString());
-   const auto height = textBoundingRect.height();
+   if (i.column() == 0)
+   {
+      if (i.data(Qt::UserRole + 2).toBool())
+      {
+         const auto width = newOpt.rect.x();
+         QRect rectIcon(width - 20, newOpt.rect.y(), 20, newOpt.rect.height());
+         QIcon icon(":/icons/repo_indicator");
+         icon.paint(p, rectIcon);
+      }
+      else
+      {
+         const auto width = newOpt.rect.x();
+         QRect rectIcon(width - 20, newOpt.rect.y(), 20, newOpt.rect.height());
+         QIcon icon(":/icons/folder_indicator");
+         icon.paint(p, rectIcon);
+      }
+   }
 
-   QRect textRect = newOpt.rect;
-   textRect.setX(newOpt.rect.x() + 10);
-   textRect.setY(newOpt.rect.y() + 25 - height - (25 - height) / 2);
+   p->setPen(QColor("white"));
+
+   QFontMetrics fm(newOpt.font);
 
    newOpt.font.setBold(i.data(Qt::UserRole).toBool());
    p->setFont(newOpt.font);
-   p->drawText(textRect, i.data().toString());
+
+   const auto elidedText = fm.elidedText(i.data().toString(), Qt::ElideRight, newOpt.rect.width());
+
+   p->drawText(newOpt.rect, elidedText, QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
 }
 
 QSize BranchesViewDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const

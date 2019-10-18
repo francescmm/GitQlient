@@ -32,25 +32,24 @@ BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
    , mSubmodulesArrow(new QLabel())
 {
    mLocalBranchesTree->setLocalRepo(true);
-   mLocalBranchesTree->setColumnHidden(0, true);
+   // mLocalBranchesTree->setColumnHidden(0, true);
    mLocalBranchesTree->setMouseTracking(true);
    mLocalBranchesTree->setItemDelegate(new BranchesViewDelegate());
-   mLocalBranchesTree->setColumnCount(4);
+   mLocalBranchesTree->setColumnCount(3);
 
    const auto localHeader = mLocalBranchesTree->headerItem();
-   localHeader->setText(1, QString("   %1").arg(tr("Local")));
-   localHeader->setIcon(1, QIcon(":/icons/local"));
-   localHeader->setText(2, tr("To master"));
-   localHeader->setText(3, tr("To origin"));
+   localHeader->setText(0, QString("   %1").arg(tr("Local")));
+   localHeader->setIcon(0, QIcon(":/icons/local"));
+   localHeader->setText(1, tr("To master"));
+   localHeader->setText(2, tr("To origin"));
 
-   mRemoteBranchesTree->setColumnCount(2);
+   mRemoteBranchesTree->setColumnCount(1);
    mRemoteBranchesTree->setMouseTracking(true);
    mRemoteBranchesTree->setItemDelegate(new BranchesViewDelegate());
-   mRemoteBranchesTree->setColumnHidden(0, true);
 
    const auto remoteHeader = mRemoteBranchesTree->headerItem();
-   remoteHeader->setText(1, QString("   %1").arg(tr("Remote")));
-   remoteHeader->setIcon(1, QIcon(":/icons/server"));
+   remoteHeader->setText(0, QString("   %1").arg(tr("Remote")));
+   remoteHeader->setIcon(0, QIcon(":/icons/server"));
 
    /* TAGS */
 
@@ -163,8 +162,12 @@ BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
    setLayout(vLayout);
 
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
+   connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, mRemoteBranchesTree,
+           &BranchTreeWidget::clearSelection);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalBranchesUpdated, this, &BranchesWidget::signalBranchesUpdated);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
+   connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, mLocalBranchesTree,
+           &BranchTreeWidget::clearSelection);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalBranchesUpdated, this, &BranchesWidget::signalBranchesUpdated);
    connect(mTagsList, &QListWidget::itemClicked, this, &BranchesWidget::onTagClicked);
    connect(mTagsList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showTagsContextMenu);
@@ -197,6 +200,8 @@ void BranchesWidget::showBranches()
          QLog_Info("UI", QString("Fetched {%1} branches").arg(branches.count()));
          QLog_Info("UI", QString("Processing branches..."));
 
+         mRemoteBranchesTree->addTopLevelItem(new QTreeWidgetItem({ "origin" }));
+
          for (auto branch : branches)
          {
             if (!branch.isEmpty())
@@ -218,7 +223,6 @@ void BranchesWidget::showBranches()
       QApplication::restoreOverrideCursor();
 
       adjustBranchesTree(mLocalBranchesTree);
-      adjustBranchesTree(mRemoteBranchesTree);
    }
 }
 
@@ -235,16 +239,41 @@ void BranchesWidget::clear()
 
 void BranchesWidget::processLocalBranch(QString branch)
 {
-   auto item = new QTreeWidgetItem(mLocalBranchesTree);
-   item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
+   QLog_Debug("UI", QString("Adding local branch {%1}").arg(branch));
+
+   QTreeWidgetItem *parent = nullptr;
+   auto fullBranchName = branch;
+   auto folders = branch.split("/");
+   branch = folders.takeLast();
+
+   for (auto folder : folders)
+   {
+      const auto childs = mLocalBranchesTree->findItems(folder, Qt::MatchExactly);
+      if (childs.isEmpty())
+      {
+         QTreeWidgetItem *item = nullptr;
+         parent ? item = new QTreeWidgetItem(parent) : item = new QTreeWidgetItem(mLocalBranchesTree);
+         item->setText(0, folder);
+
+         parent = item;
+      }
+      else
+         parent = childs.first();
+   }
+
+   auto item = new QTreeWidgetItem(parent);
 
    if (branch.startsWith('*'))
    {
       branch.replace('*', "");
-      item->setData(1, Qt::UserRole, true);
+      fullBranchName.replace('*', "");
+      item->setData(0, Qt::UserRole, true);
    }
 
-   QLog_Debug("UI", QString("Adding local branch {%1}").arg(branch));
+   item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
+   item->setText(0, branch);
+   item->setData(0, Qt::UserRole + 1, fullBranchName);
+   item->setData(0, Qt::UserRole + 2, true);
 
    QLog_Debug("UI", QString("Calculating distances..."));
 
@@ -252,7 +281,7 @@ void BranchesWidget::processLocalBranch(QString branch)
    distance.replace('\n', "");
    distance.replace('\t', "\u2193 - ");
    distance.append("\u2191");
-   item->setText(2, distance);
+   item->setText(1, distance);
 
    distance = mGit->getDistanceBetweenBranches(false, branch).output.toString();
 
@@ -264,8 +293,7 @@ void BranchesWidget::processLocalBranch(QString branch)
    else
       distance = "Local";
 
-   item->setText(3, distance);
-   item->setText(1, branch);
+   item->setText(2, distance);
 
    mLocalBranchesTree->addTopLevelItem(item);
 
@@ -275,17 +303,36 @@ void BranchesWidget::processLocalBranch(QString branch)
 void BranchesWidget::processRemoteBranch(QString branch)
 {
    branch.replace("remotes/", "");
+   branch.replace("origin/", "");
+
+   auto parent = mRemoteBranchesTree->topLevelItem(0);
+   const auto fullBranchName = branch;
+   auto folders = branch.split("/");
+   branch = folders.takeLast();
+
+   for (auto folder : folders)
+   {
+      const auto childs = mRemoteBranchesTree->findItems(folder, Qt::MatchExactly);
+      if (childs.isEmpty())
+      {
+         auto item = new QTreeWidgetItem(parent);
+         item->setText(0, folder);
+
+         parent = item;
+      }
+      else
+         parent = childs.first();
+   }
 
    QLog_Debug("UI", QString("Adding remote branch {%1}").arg(branch));
 
-   auto item = new QTreeWidgetItem(mRemoteBranchesTree);
+   auto item = new QTreeWidgetItem(parent);
    item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
+   item->setText(0, branch);
+   item->setData(0, Qt::UserRole + 1, fullBranchName);
+   item->setData(0, Qt::UserRole + 2, true);
 
-   branch.replace("origin/", "");
-
-   item->setText(1, branch);
-
-   mRemoteBranchesTree->addTopLevelItem(item);
+   // mRemoteBranchesTree->addTopLevelItem(item);
 }
 
 void BranchesWidget::processTags()
@@ -344,12 +391,12 @@ void BranchesWidget::processSubmodules()
 
 void BranchesWidget::adjustBranchesTree(BranchTreeWidget *treeWidget)
 {
-   for (auto i = 2; i < treeWidget->columnCount(); ++i)
+   for (auto i = 1; i < treeWidget->columnCount(); ++i)
       treeWidget->resizeColumnToContents(i);
 
-   treeWidget->header()->setSectionResizeMode(1, QHeaderView::Stretch);
+   treeWidget->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 
-   for (auto i = 2; i < treeWidget->columnCount(); ++i)
+   for (auto i = 1; i < treeWidget->columnCount(); ++i)
       treeWidget->header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
 
    treeWidget->header()->setStretchLastSection(false);

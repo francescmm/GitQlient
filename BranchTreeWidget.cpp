@@ -20,10 +20,11 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 {
    const auto item = itemAt(pos);
 
-   if (item)
+   if (item && item->data(0, Qt::UserRole + 2).toBool())
    {
       const auto currentBranch = mGit->getCurrentBranchName();
-      const auto menu = new BranchContextMenu({ currentBranch, item->text(1), mLocal, mGit }, this);
+      const auto menu
+          = new BranchContextMenu({ currentBranch, item->data(0, Qt::UserRole + 1).toString(), mLocal, mGit }, this);
       connect(menu, &BranchContextMenu::signalBranchesUpdated, this, &BranchTreeWidget::signalBranchesUpdated);
       connect(menu, &BranchContextMenu::signalCheckoutBranch, this, [this, item]() { checkoutBranch(item); });
 
@@ -33,18 +34,24 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 
 void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 {
-   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->checkoutRemoteBranch(item->text(1));
-   QApplication::restoreOverrideCursor();
+   if (item->data(0, Qt::UserRole + 2).toBool())
+   {
+      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+      const auto ret = mGit->checkoutRemoteBranch(item->data(0, Qt::UserRole + 1).toString());
+      QApplication::restoreOverrideCursor();
 
-   if (ret.success)
-      emit signalBranchesUpdated();
+      if (ret.success)
+         emit signalBranchesUpdated();
+   }
 }
 
 void BranchTreeWidget::selectCommit(QTreeWidgetItem *item)
 {
-   const auto branchName = item->text(1);
-   const auto ret = mGit->getLastCommitOfBranch(mLocal ? branchName : QString("origin/%1").arg(branchName));
+   if (item->data(0, Qt::UserRole + 2).toBool())
+   {
+      const auto branchName = item->data(0, Qt::UserRole + 1).toString();
+      const auto ret = mGit->getLastCommitOfBranch(mLocal ? branchName : QString("origin/%1").arg(branchName));
 
-   emit signalSelectCommit(ret.output.toString());
+      emit signalSelectCommit(ret.output.toString());
+   }
 }
