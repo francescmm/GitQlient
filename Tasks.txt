@@ -17,7 +17,6 @@
     - When a file is checkout, change the signalChangesCommit for one to refresh the unstaged files list. Refresh Diff if active, not the whole ui.
     - Disable checkout option if the file is not part of git -> new + unstaged
 - Fix amend: When amending a commit not all the files available are shown
-- When focus on a commit after search, reload files
 - When focus on FullDiffWidget or FileDiffWidget on WIP, update view if something changes
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Extra: add a disabled option to edit a file that throws a signal with the complete path of the file

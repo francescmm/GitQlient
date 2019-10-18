@@ -69,9 +69,11 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mControls, &Controls::signalGoBack, this, [this]() { mainStackedWidget->setCurrentIndex(0); });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateUi);
    connect(mControls, &Controls::signalGoToSha, mRepositoryView, &RepositoryView::focusOnCommit);
+   connect(mControls, &Controls::signalGoToSha, this, &GitQlientRepo::onCommitSelected);
 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &GitQlientRepo::updateUi);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &RepositoryView::focusOnCommit);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &GitQlientRepo::onCommitSelected);
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
 
    connect(mRepositoryView, &RepositoryView::rebase, this, &GitQlientRepo::rebase);
@@ -263,8 +265,10 @@ void GitQlientRepo::onCommitClicked(const QModelIndex &index)
    }
 }
 
-void GitQlientRepo::onCommitSelected(const QString &sha)
+void GitQlientRepo::onCommitSelected(const QString &goToSha)
 {
+   const auto sha = mGit->getRefSha(goToSha);
+
    const auto isWip = sha == ZERO_SHA;
    commitStackedWidget->setCurrentIndex(isWip);
 

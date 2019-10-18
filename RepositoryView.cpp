@@ -231,9 +231,9 @@ Domain *RepositoryView::domain()
 
 void RepositoryView::focusOnCommit(const QString &goToSha)
 {
-   QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(goToSha));
-
    const auto sha = mGit->getRefSha(goToSha);
+
+   QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(sha));
 
    if (!sha.isEmpty())
    {
