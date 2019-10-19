@@ -1,12 +1,14 @@
 RESOURCES += $$PWD/icons.qrc
 
 FORMS += \
+    $$PWD/AddSubmoduleDlg.ui \
     $$PWD/CommitWidget.ui \
     $$PWD/BranchDlg.ui \
     $$PWD/TagDlg.ui
 
 HEADERS += \
     $$PWD/AGitProcess.h \
+    $$PWD/AddSubmoduleDlg.h \
     $$PWD/BranchContextMenu.h \
     $$PWD/BranchTreeWidget.h \
     $$PWD/BranchesViewDelegate.h \
@@ -45,6 +47,7 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/AGitProcess.cpp \
+    $$PWD/AddSubmoduleDlg.cpp \
     $$PWD/BranchContextMenu.cpp \
     $$PWD/BranchTreeWidget.cpp \
     $$PWD/BranchesViewDelegate.cpp \

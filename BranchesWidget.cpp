@@ -4,6 +4,7 @@
 #include <git.h>
 #include <BranchesViewDelegate.h>
 #include <ClickableFrame.h>
+#include <AddSubmoduleDlg.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -443,28 +444,39 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
 {
    QModelIndex index = mSubmodulesList->indexAt(p);
 
-   if (!index.isValid())
-      return;
-
-   const auto submoduleName = index.data().toString();
    const auto menu = new QMenu(this);
-   const auto updateSubmoduleAction = menu->addAction(tr("Update"));
-   connect(updateSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
-      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      QByteArray output;
-      const auto ret = mGit->submoduleUpdate(submoduleName);
-      QApplication::restoreOverrideCursor();
 
-      if (ret)
-         emit signalBranchesUpdated();
-   });
+   if (!index.isValid())
+   {
+      const auto addSubmoduleAction = menu->addAction(tr("Add submodule"));
+      connect(addSubmoduleAction, &QAction::triggered, this, [this] {
+         AddSubmoduleDlg addDlg(mGit);
+         const auto ret = addDlg.exec();
+         if (ret == QDialog::Accepted)
+            emit signalBranchesUpdated();
+      });
+   }
+   else
+   {
+      const auto submoduleName = index.data().toString();
+      const auto updateSubmoduleAction = menu->addAction(tr("Update"));
+      connect(updateSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+         QByteArray output;
+         const auto ret = mGit->submoduleUpdate(submoduleName);
+         QApplication::restoreOverrideCursor();
 
-   const auto openSubmoduleAction = menu->addAction(tr("Open"));
-   connect(openSubmoduleAction, &QAction::triggered, this,
-           [this, submoduleName]() { emit signalOpenSubmodule(submoduleName); });
+         if (ret)
+            emit signalBranchesUpdated();
+      });
 
-   const auto deleteSubmoduleAction = menu->addAction(tr("Delete"));
-   connect(deleteSubmoduleAction, &QAction::triggered, this, []() {});
+      const auto openSubmoduleAction = menu->addAction(tr("Open"));
+      connect(openSubmoduleAction, &QAction::triggered, this,
+              [this, submoduleName]() { emit signalOpenSubmodule(submoduleName); });
+
+      const auto deleteSubmoduleAction = menu->addAction(tr("Delete"));
+      connect(deleteSubmoduleAction, &QAction::triggered, this, []() {});
+   }
 
    menu->exec(mSubmodulesList->viewport()->mapToGlobal(p));
 }

@@ -554,6 +554,11 @@ QVector<QString> Git::getSubmodules()
    return submodulesList;
 }
 
+bool Git::submoduleAdd(const QString &url, const QString &name)
+{
+   return run(QString("git submodule add %1 %2").arg(url).arg(name)).first;
+}
+
 bool Git::submoduleUpdate(const QString &)
 {
    return run("git submodule update --init --recursive").first;

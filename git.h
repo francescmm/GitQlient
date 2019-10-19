@@ -126,6 +126,7 @@ public:
 
    /** START SUBMODULES **/
    QVector<QString> getSubmodules();
+   bool submoduleAdd(const QString &url, const QString &name);
    bool submoduleUpdate(const QString &submodule);
    bool submoduleRemove(const QString &submodule);
    /**  END  SUBMODULES **/
