@@ -19,9 +19,8 @@
 - When focus on FullDiffWidget or FileDiffWidget on WIP, update view if something changes
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Extra: add a disabled option to edit a file that throws a signal with the complete path of the file
-Improve readability in the views:
+- Improve readability in the views:
     - Set the text elided and show a tooltip for the branch names longer than 50 px
-- When a checkout is performed, the UI refreshes a lot. Try to disable the FileWatcher
 - Add functionality for squash commits
 - Add functionality for patches
 - Add functionality to add submodules (dialog needed)
@@ -29,6 +28,7 @@ Improve readability in the views:
 - Add styles to the QScrollBar
 - Check what happens when we load gigantic repos
 - Add License in the repo and the Contributions Guidelines
+- Fix selection/focus color on files list widgets by using a delegate
 
 Options
 - Implement the options screen: for the moment only Git related options

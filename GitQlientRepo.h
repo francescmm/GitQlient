@@ -84,6 +84,7 @@ private:
    BranchesWidget *mBranchesWidget = nullptr;
 
    void updateUi();
+   void updateUiFromWatcher();
    void openCommitDiff();
    void changesCommitted(bool ok);
    void onCommitClicked(const QModelIndex &index);

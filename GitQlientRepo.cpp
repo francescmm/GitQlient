@@ -87,6 +87,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mRepositoryView, &RepositoryView::signalAmmendCommit, this, &GitQlientRepo::onAmmendCommit);
 
    connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
+   connect(mCommitWidget, &CommitWidget::signalCheckoutPerformed, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
 
    setRepository(repo);
@@ -113,6 +114,17 @@ void GitQlientRepo::updateUi()
 
       if (commitStackedIndex == 1)
          mCommitWidget->init(currentSha);
+   }
+}
+
+void GitQlientRepo::updateUiFromWatcher()
+{
+   const auto commitStackedIndex = commitStackedWidget->currentIndex();
+
+   if (commitStackedIndex == 1)
+   {
+      mGit->updateWipRevision();
+      mCommitWidget->init(ZERO_SHA);
    }
 }
 
@@ -186,7 +198,7 @@ void GitQlientRepo::resetWatcher(const QString &oldDir, const QString &newDir)
           mGitWatcher, &QFileSystemWatcher::fileChanged, this,
           [this](const QString &path) {
              if (!path.endsWith(".autosave") and !path.endsWith(".tmp") and !path.endsWith(".user"))
-                updateUi();
+                updateUiFromWatcher();
           },
           Qt::UniqueConnection);
    }

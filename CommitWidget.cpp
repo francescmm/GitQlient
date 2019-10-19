@@ -183,7 +183,7 @@ void CommitWidget::contextMenuPopup(const QPoint &pos)
       connect(contextMenu->addAction("Checkout file"), &QAction::triggered, this, [this, fileName]() {
          const auto ret = mGit->resetFile(fileName);
 
-         emit signalChangesCommitted(ret);
+         emit signalCheckoutPerformed(ret);
       });
 
       connect(contextMenu->addAction("Add file to commit"), &QAction::triggered, this, [this, fileName]() {

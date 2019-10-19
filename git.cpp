@@ -1273,7 +1273,7 @@ const RevisionFile *Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
    return rf;
 }
 
-void Git::getDiffIndex()
+void Git::updateWipRevision()
 {
 
    const auto ret = run("git status");
@@ -1555,7 +1555,7 @@ void Git::init2()
 {
    QLog_Info("Git", "Adding revisions...");
 
-   getDiffIndex(); // blocking, we could be in setRepository() now
+   updateWipRevision(); // blocking, we could be in setRepository() now
 
    startRevList();
 

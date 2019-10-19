@@ -39,6 +39,7 @@ class CommitWidget : public QWidget
 
 signals:
    void signalChangesCommitted(bool commited);
+   void signalCheckoutPerformed(bool success);
 
 public:
    explicit CommitWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);

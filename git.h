@@ -178,6 +178,8 @@ public:
    const QString filePath(const RevisionFile &rf, int i) const;
    QPair<bool, QString> run(const QString &cmd) const;
 
+   void updateWipRevision();
+
 private:
    void loadFileCache();
    void on_loaded(ulong, int, bool);
@@ -245,7 +247,6 @@ private:
    int addChunk(const QByteArray &ba, int ofs);
    void parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl);
    void parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl);
-   void getDiffIndex();
    Revision *fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,
                          const QString &log, const QString &longLog, const QString &patch, int idx);
    const Revision *fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx);
