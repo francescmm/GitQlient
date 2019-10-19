@@ -23,47 +23,26 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QWidget>
+#include <QMenu>
 
-class QListWidgetItem;
 class Git;
 
-namespace Ui
-{
-class CommitWidget;
-}
-
-class CommitWidget : public QWidget
+class UnstagedFilesContextMenu : public QMenu
 {
    Q_OBJECT
 
 signals:
-   void signalChangesCommitted(bool commited);
-   void signalCheckoutPerformed(bool success);
+
+   void signalCommitAll();
+   void signalRevertAll();
+   void signalCheckedOut(bool success);
 
 public:
-   explicit CommitWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
-
-   void init(const QString &shaToAmmend);
-   void clear();
+   explicit UnstagedFilesContextMenu(QSharedPointer<Git> git, const QString &fileName, QWidget *parent = nullptr);
 
 private:
-   bool mIsAmmend = false;
-   Ui::CommitWidget *ui = nullptr;
    QSharedPointer<Git> mGit;
+   QString mFileName;
 
-   void addAllFilesToCommitList();
-   void addFileToCommitList(QListWidgetItem *item);
-   void revertAllChanges();
-   void removeFileFromCommitList(QListWidgetItem *item);
-   bool commitChanges();
-   bool ammendChanges();
-   void contextMenuPopup(const QPoint &);
-   void applyChanges();
-   QStringList getFiles();
-   bool checkMsg(QString &msg);
-   void updateCounter(const QString &text);
-
-   static QString lastMsgBeforeError;
-   static const int kMaxTitleChars;
+   bool addEntryToGitIgnore(const QString &entry);
 };

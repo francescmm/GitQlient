@@ -10,18 +10,14 @@
 - Add colors to differentiate between local and remote tags
 - Study how to show untracked files
 - In unstaged files:
-    - Add context menu option to checkout all unstaged files
-    - Add context menu option to add to .gitignore a file/pattern
-    - Add context menu option to remove files in unstaged list
-    - When a file is checkout, change the signalChangesCommit for one to refresh the unstaged files list. Refresh Diff if active, not the whole ui.
+    - Add context menu option to remove files in untracked list
     - Disable checkout option if the file is not part of git -> new + unstaged
 - Fix amend: When amending a commit not all the files available are shown
 - When focus on FullDiffWidget or FileDiffWidget on WIP, update view if something changes
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
-- Extra: add a disabled option to edit a file that throws a signal with the complete path of the file
 - Improve readability in the views:
     - Set the text elided and show a tooltip for the branch names longer than 50 px
-- Add functionality for squash commits
+- Add functionality to squash commits
 - Add functionality for patches
 - Add functionality to add submodules (dialog needed)
 - Add styles to the TagDlg
@@ -29,6 +25,8 @@
 - Check what happens when we load gigantic repos
 - Add License in the repo and the Contributions Guidelines
 - Fix selection/focus color on files list widgets by using a delegate
+- Make logger opt-out with a method in GitQlient class
+- Extra: add a disabled option to edit a file that throws a signal with the complete path of the file
 
 Options
 - Implement the options screen: for the moment only Git related options

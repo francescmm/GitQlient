@@ -36,6 +36,7 @@ HEADERS += \
     $$PWD/StateInfo.h \
     $$PWD/TagDlg.h \
     $$PWD/Terminal.h \
+    $$PWD/UnstagedFilesContextMenu.h \
     $$PWD/dataloader.h \
     $$PWD/domain.h \
     $$PWD/git.h \
@@ -72,6 +73,7 @@ SOURCES += \
     $$PWD/StateInfo.cpp \
     $$PWD/TagDlg.cpp \
     $$PWD/Terminal.cpp \
+    $$PWD/UnstagedFilesContextMenu.cpp \
     $$PWD/dataloader.cpp \
     $$PWD/domain.cpp \
     $$PWD/git.cpp \

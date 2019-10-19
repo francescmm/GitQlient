@@ -66,7 +66,7 @@ public:
    bool init(const QString &wd, QSharedPointer<RevisionsCache> revCache);
    void init2();
    void stop(bool saveCache);
-
+   QString getWorkingDir() const { return mWorkingDir; }
    /** END Git CONFIGURATION **/
 
    /** START BRANCHES **/

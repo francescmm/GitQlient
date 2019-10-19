@@ -11,6 +11,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <git.h>
 #include <Revision.h>
 #include <RevisionFile.h>
+#include <UnstagedFilesContextMenu.h>
 
 #include <QDir>
 #include <QKeyEvent>
@@ -151,6 +152,21 @@ void CommitWidget::init(const QString &shaToAmmend)
    ui->pbCommit->setEnabled(ui->filesWidget->count());
 }
 
+void CommitWidget::addAllFilesToCommitList()
+{
+   auto i = ui->listWidgetFiles->count();
+
+   for (; ++i >= 0; ++i)
+   {
+      auto item = ui->listWidgetFiles->takeItem(i);
+      ui->filesWidget->addItem(item);
+   }
+
+   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
+   ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
+   ui->pbCommit->setEnabled(i != ui->listWidgetFiles->count());
+}
+
 void CommitWidget::addFileToCommitList(QListWidgetItem *item)
 {
    const auto row = ui->listWidgetFiles->row(item);
@@ -159,6 +175,19 @@ void CommitWidget::addFileToCommitList(QListWidgetItem *item)
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
    ui->pbCommit->setEnabled(true);
+}
+
+void CommitWidget::revertAllChanges()
+{
+   auto i = ui->listWidgetFiles->count();
+
+   for (; ++i >= 0; ++i)
+   {
+      const auto fileName = ui->listWidgetFiles->takeItem(i)->data(Qt::DisplayRole).toString();
+      const auto ret = mGit->resetFile(fileName);
+
+      emit signalCheckoutPerformed(ret);
+   }
 }
 
 void CommitWidget::removeFileFromCommitList(QListWidgetItem *item)
@@ -178,19 +207,10 @@ void CommitWidget::contextMenuPopup(const QPoint &pos)
    if (item)
    {
       const auto fileName = ui->listWidgetFiles->itemAt(pos)->data(Qt::DisplayRole).toString();
-      const auto contextMenu = new QMenu(this);
-
-      connect(contextMenu->addAction("Checkout file"), &QAction::triggered, this, [this, fileName]() {
-         const auto ret = mGit->resetFile(fileName);
-
-         emit signalCheckoutPerformed(ret);
-      });
-
-      connect(contextMenu->addAction("Add file to commit"), &QAction::triggered, this, [this, fileName]() {
-         const auto ret = mGit->resetFile(fileName);
-
-         emit signalChangesCommitted(ret);
-      });
+      const auto contextMenu = new UnstagedFilesContextMenu(mGit, fileName, this);
+      connect(contextMenu, &UnstagedFilesContextMenu::signalCommitAll, this, &CommitWidget::addAllFilesToCommitList);
+      connect(contextMenu, &UnstagedFilesContextMenu::signalRevertAll, this, &CommitWidget::revertAllChanges);
+      connect(contextMenu, &UnstagedFilesContextMenu::signalCheckedOut, this, &CommitWidget::signalCheckoutPerformed);
 
       contextMenu->popup(mapToGlobal(pos));
    }
