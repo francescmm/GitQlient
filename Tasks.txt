@@ -20,13 +20,13 @@
 - Add functionality to squash commits
 - Add functionality for patches
 - Add functionality to add submodules (dialog needed)
-- Add styles to the TagDlg
-- Add styles to the QScrollBar
 - Check what happens when we load gigantic repos
 - Add License in the repo and the Contributions Guidelines
 - Fix selection/focus color on files list widgets by using a delegate
 - Make logger opt-out with a method in GitQlient class
 - Extra: add a disabled option to edit a file that throws a signal with the complete path of the file
+- Add styles to the TagDlg
+- Add styles to the QScrollBar
 
 Options
 - Implement the options screen: for the moment only Git related options
