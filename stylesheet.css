@@ -244,7 +244,7 @@ QLabel#lCounter
 border: 1px solid #606162;
 }
 
-CommitWidget > QFrame#stagedFiles, CommitWidget > QFrame#unstagedFiles
+CommitWidget > QFrame#stagedFiles, CommitWidget > QFrame#unstagedFiles, CommitWidget > QFrame#untrackedFiles
 {
     background: #202122;
     max-height: 30px;

@@ -33,6 +33,7 @@
         <file alias="add_tab">resources/add_tab.svg</file>
         <file alias="folder_indicator">resources/folder_indicator.svg</file>
         <file alias="repo_indicator">resources/git_orange_indicator.svg</file>
+        <file alias="untracked">resources/untracked.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>stylesheet.css</file>

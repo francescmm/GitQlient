@@ -67,12 +67,15 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
    QIcon unstagedIcon(":/icons/unstaged");
    ui->unstagedIcon->setPixmap(unstagedIcon.pixmap(15, 15));
 
+   QIcon untrackedIcon(":/icons/untracked");
+   ui->untrackedFilesIcon->setPixmap(untrackedIcon.pixmap(15, 15));
+
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitWidget::applyChanges);
    connect(ui->pbCommit, &QPushButton::clicked, this, &CommitWidget::applyChanges);
-   connect(ui->listWidgetFiles, &QListWidget::customContextMenuRequested, this, &CommitWidget::contextMenuPopup);
-   connect(ui->listWidgetFiles, &QListWidget::itemClicked, this, &CommitWidget::addFileToCommitList);
-   connect(ui->filesWidget, &QListWidget::itemClicked, this, &CommitWidget::removeFileFromCommitList);
+   connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this, &CommitWidget::contextMenuPopup);
+   connect(ui->unstagedFilesList, &QListWidget::itemClicked, this, &CommitWidget::addFileToCommitList);
+   connect(ui->stagedFilesList, &QListWidget::itemClicked, this, &CommitWidget::removeFileFromCommitList);
 }
 
 void CommitWidget::init(const QString &shaToAmmend)
@@ -114,17 +117,17 @@ void CommitWidget::init(const QString &shaToAmmend)
 
    if (files)
    {
-      insertFilesInList(files, mIsAmmend ? ui->filesWidget : ui->listWidgetFiles);
+      insertFilesInList(files, mIsAmmend ? ui->stagedFilesList : ui->unstagedFilesList);
 
       if (mIsAmmend)
       {
          files = mGit->getFiles(ZERO_SHA);
-         insertFilesInList(files, ui->listWidgetFiles);
+         insertFilesInList(files, ui->unstagedFilesList);
       }
    }
 
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
+   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
 
    // compute cursor offsets. Take advantage of fixed width font
 
@@ -143,7 +146,7 @@ void CommitWidget::init(const QString &shaToAmmend)
 
    ui->teDescription->setPlainText(msg);
    ui->teDescription->moveCursor(QTextCursor::Start);
-   ui->pbCommit->setEnabled(ui->filesWidget->count());
+   ui->pbCommit->setEnabled(ui->stagedFilesList->count());
 }
 
 void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fileList)
@@ -163,43 +166,43 @@ void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fil
       item->setText(mGit->filePath(*files, i));
       item->setForeground(myColor);
 
-      if (mIsAmmend && fileList == ui->filesWidget)
+      if (mIsAmmend && fileList == ui->stagedFilesList)
          item->setFlags(item->flags() & (~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled));
    }
 }
 
 void CommitWidget::addAllFilesToCommitList()
 {
-   auto i = ui->listWidgetFiles->count();
+   auto i = ui->unstagedFilesList->count();
 
    for (; ++i >= 0; ++i)
    {
-      auto item = ui->listWidgetFiles->takeItem(i);
-      ui->filesWidget->addItem(item);
+      auto item = ui->unstagedFilesList->takeItem(i);
+      ui->stagedFilesList->addItem(item);
    }
 
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
-   ui->pbCommit->setEnabled(i != ui->listWidgetFiles->count());
+   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
+   ui->pbCommit->setEnabled(i != ui->unstagedFilesList->count());
 }
 
 void CommitWidget::addFileToCommitList(QListWidgetItem *item)
 {
-   const auto row = ui->listWidgetFiles->row(item);
-   ui->listWidgetFiles->takeItem(row);
-   ui->filesWidget->addItem(item);
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
+   const auto row = ui->unstagedFilesList->row(item);
+   ui->unstagedFilesList->takeItem(row);
+   ui->stagedFilesList->addItem(item);
+   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->pbCommit->setEnabled(true);
 }
 
 void CommitWidget::revertAllChanges()
 {
-   auto i = ui->listWidgetFiles->count();
+   auto i = ui->unstagedFilesList->count();
 
    for (; ++i >= 0; ++i)
    {
-      const auto fileName = ui->listWidgetFiles->takeItem(i)->data(Qt::DisplayRole).toString();
+      const auto fileName = ui->unstagedFilesList->takeItem(i)->data(Qt::DisplayRole).toString();
       const auto ret = mGit->resetFile(fileName);
 
       emit signalCheckoutPerformed(ret);
@@ -210,22 +213,22 @@ void CommitWidget::removeFileFromCommitList(QListWidgetItem *item)
 {
    if (item->flags() & Qt::ItemIsSelectable)
    {
-      const auto row = ui->filesWidget->row(item);
-      ui->filesWidget->takeItem(row);
-      ui->listWidgetFiles->addItem(item);
-      ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
-      ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
-      ui->pbCommit->setDisabled(ui->filesWidget->count() == 0);
+      const auto row = ui->stagedFilesList->row(item);
+      ui->stagedFilesList->takeItem(row);
+      ui->unstagedFilesList->addItem(item);
+      ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+      ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
+      ui->pbCommit->setDisabled(ui->stagedFilesList->count() == 0);
    }
 }
 
 void CommitWidget::contextMenuPopup(const QPoint &pos)
 {
-   const auto item = ui->listWidgetFiles->itemAt(pos);
+   const auto item = ui->unstagedFilesList->itemAt(pos);
 
    if (item)
    {
-      const auto fileName = ui->listWidgetFiles->itemAt(pos)->data(Qt::DisplayRole).toString();
+      const auto fileName = ui->unstagedFilesList->itemAt(pos)->data(Qt::DisplayRole).toString();
       const auto contextMenu = new UnstagedFilesContextMenu(mGit, fileName, this);
       connect(contextMenu, &UnstagedFilesContextMenu::signalCommitAll, this, &CommitWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedFilesContextMenu::signalRevertAll, this, &CommitWidget::revertAllChanges);
@@ -243,10 +246,10 @@ void CommitWidget::applyChanges()
 QStringList CommitWidget::getFiles()
 {
    QStringList selFiles;
-   const auto totalItems = ui->filesWidget->count();
+   const auto totalItems = ui->stagedFilesList->count();
 
    for (auto i = 0; i < totalItems; ++i)
-      selFiles.append(ui->filesWidget->item(i)->text());
+      selFiles.append(ui->stagedFilesList->item(i)->text());
 
    return selFiles;
 }
@@ -340,11 +343,11 @@ void CommitWidget::clear()
 {
    ui->leAuthorName->clear();
    ui->leAuthorEmail->clear();
-   ui->listWidgetFiles->clear();
+   ui->unstagedFilesList->clear();
    ui->leCommitTitle->clear();
    ui->teDescription->clear();
-   ui->filesWidget->clear();
+   ui->stagedFilesList->clear();
    ui->pbCommit->setEnabled(false);
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
+   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
 }
