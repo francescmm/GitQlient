@@ -16,6 +16,8 @@
 - Add functionality for patches
 - Show a progress bar or custom waiting mouse icon when loading a new repo
 - Add License in the repo and the Contributions Guidelines
+- Improve information about branches:
+    - Add "To master" in the remot branches in a way that doesn't cause too much overheads
 - Fix selection/focus color on files list widgets by using a delegate
 - Make logger opt-out with a method in GitQlient class
 - Extra: add a disabled option to edit a file that throws a signal with the complete path of the file
