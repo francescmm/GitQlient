@@ -413,3 +413,11 @@ QTabBar::close-button:pressed
   image: url(":/icons/close_press");
 }
 
+QToolTip
+{
+   padding: 5px;
+   border: 1px solid #202122;
+   background-color: #606162;
+   color: white;
+}
+
