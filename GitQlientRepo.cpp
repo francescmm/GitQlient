@@ -110,12 +110,11 @@ void GitQlientRepo::updateUi()
 
       const auto commitStackedIndex = commitStackedWidget->currentIndex();
       const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : ZERO_SHA;
-      auto revision = mGit->revLookup(currentSha);
 
-      mRepositoryView->focusOnCommit(revision->sha());
+      mRepositoryView->focusOnCommit(currentSha);
 
       if (commitStackedIndex == 1)
-         mCommitWidget->init(revision->sha());
+         mCommitWidget->init(currentSha);
 
       if (mainStackedWidget->currentIndex() == 1)
          openCommitDiff();
