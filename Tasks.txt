@@ -7,6 +7,7 @@
         - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
 
 2. Improvements & Bugs & Fixes
+- Show the error text when trying to push without pull first
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Improve readability in the views:
     - Set the text elided and show a tooltip for the branch names longer than 50 px
