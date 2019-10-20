@@ -61,7 +61,8 @@ private:
    void removeFileFromCommitList(QListWidgetItem *item);
    bool commitChanges();
    bool ammendChanges();
-   void contextMenuPopup(const QPoint &);
+   void showUnstagedMenu(const QPoint &pos);
+   void showUntrackedMenu(const QPoint &pos);
    void applyChanges();
    QStringList getFiles();
    bool checkMsg(QString &msg);

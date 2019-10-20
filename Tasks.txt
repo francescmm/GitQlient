@@ -9,9 +9,6 @@
 2. Improvements & Bugs & Fixes
 - Add colors to differentiate between local and remote tags
 - Study how to show untracked files
-- In unstaged files:
-    - Add context menu option to remove files in untracked list
-    - Disable checkout option if the file is not part of git -> new + unstaged
 - When focus on FullDiffWidget or FileDiffWidget on WIP, update view if something changes
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Improve readability in the views:

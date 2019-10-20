@@ -14,26 +14,44 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(QSharedPointer<Git> git, cons
 {
 
    connect(addAction("Revert file changes"), &QAction::triggered, this, [this, fileName]() {
-      const auto ret = mGit->resetFile(fileName);
+      const auto msgBoxRet
+          = QMessageBox::question(this, tr("Ignoring file"), tr("Are you sure you want to revert the changes?"));
 
-      emit signalCheckedOut(ret);
+      if (msgBoxRet == QMessageBox::Yes)
+      {
+         const auto ret = mGit->resetFile(fileName);
+
+         emit signalCheckedOut(ret);
+      }
    });
 
    connect(addAction("Ignore file name"), &QAction::triggered, this, [this, fileName]() {
-      const auto ret = addEntryToGitIgnore(fileName);
+      const auto ret = QMessageBox::question(this, tr("Ignoring file"),
+                                             tr("Are you sure you want to add the file to the black list?"));
 
-      if (ret)
-         emit signalCheckedOut(ret);
+      if (ret == QMessageBox::Yes)
+      {
+         const auto gitRet = addEntryToGitIgnore(fileName);
+
+         if (gitRet)
+            emit signalCheckedOut(gitRet);
+      }
    });
 
    connect(addAction("Ignore file extension"), &QAction::triggered, this, [this, fileName]() {
-      auto fileParts = fileName.split(".");
-      fileParts.takeFirst();
-      const auto extension = QString("*.%1").arg(fileParts.join("."));
-      const auto ret = addEntryToGitIgnore(extension);
+      const auto msgBoxRet = QMessageBox::question(this, tr("Ignoring file"),
+                                                   tr("Are you sure you want to add the file to the black list?"));
 
-      if (ret)
-         emit signalCheckedOut(ret);
+      if (msgBoxRet == QMessageBox::Yes)
+      {
+         auto fileParts = fileName.split(".");
+         fileParts.takeFirst();
+         const auto extension = QString("*.%1").arg(fileParts.join("."));
+         const auto ret = addEntryToGitIgnore(extension);
+
+         if (ret)
+            emit signalCheckedOut(ret);
+      }
    });
 
    QAction *removeAction = nullptr;
@@ -43,7 +61,12 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(QSharedPointer<Git> git, cons
    addSeparator();
 
    connect(addAction("Add all files to commit"), &QAction::triggered, this, &UnstagedFilesContextMenu::signalCommitAll);
-   connect(addAction("Revert all changes"), &QAction::triggered, this, [this, fileName]() { emit signalRevertAll(); });
+   connect(addAction("Revert all changes"), &QAction::triggered, this, [this, fileName]() {
+      const auto msgBoxRet = QMessageBox::question(this, tr("Ignoring file"),
+                                                   tr("Are you sure you want to add the file to the black list?"));
+      if (msgBoxRet == QMessageBox::Yes)
+         emit signalRevertAll();
+   });
 }
 
 bool UnstagedFilesContextMenu::addEntryToGitIgnore(const QString &entry)

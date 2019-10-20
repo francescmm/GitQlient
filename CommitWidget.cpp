@@ -24,6 +24,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <QToolTip>
 #include <QListWidgetItem>
 #include <QTextStream>
+#include <QProcess>
 
 #include <QLogger.h>
 
@@ -73,8 +74,9 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitWidget::applyChanges);
    connect(ui->pbCommit, &QPushButton::clicked, this, &CommitWidget::applyChanges);
-   connect(ui->untrackedFileList, &QListWidget::itemClicked, this, &CommitWidget::addFileToCommitList);
-   connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this, &CommitWidget::contextMenuPopup);
+   connect(ui->untrackedFilesList, &QListWidget::itemClicked, this, &CommitWidget::addFileToCommitList);
+   connect(ui->untrackedFilesList, &QListWidget::customContextMenuRequested, this, &CommitWidget::showUntrackedMenu);
+   connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this, &CommitWidget::showUnstagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemClicked, this, &CommitWidget::addFileToCommitList);
    connect(ui->stagedFilesList, &QListWidget::itemClicked, this, &CommitWidget::removeFileFromCommitList);
 }
@@ -174,7 +176,7 @@ void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fil
       QListWidgetItem *item = nullptr;
 
       if (untrackedFile)
-         item = new QListWidgetItem(ui->untrackedFileList);
+         item = new QListWidgetItem(ui->untrackedFilesList);
       else if (staged)
          item = new QListWidgetItem(ui->stagedFilesList);
       else
@@ -205,9 +207,11 @@ void CommitWidget::addAllFilesToCommitList()
 
 void CommitWidget::addFileToCommitList(QListWidgetItem *item)
 {
-   const auto row = ui->unstagedFilesList->row(item);
-   ui->unstagedFilesList->takeItem(row);
+   const auto fileList = dynamic_cast<QListWidget *>(sender());
+   const auto row = fileList->row(item);
+   fileList->takeItem(row);
    ui->stagedFilesList->addItem(item);
+   ui->lUntrackedCount->setText(QString("(%1)").arg(ui->untrackedFilesList->count()));
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->pbCommit->setEnabled(true);
@@ -239,7 +243,7 @@ void CommitWidget::removeFileFromCommitList(QListWidgetItem *item)
    }
 }
 
-void CommitWidget::contextMenuPopup(const QPoint &pos)
+void CommitWidget::showUnstagedMenu(const QPoint &pos)
 {
    const auto item = ui->unstagedFilesList->itemAt(pos);
 
@@ -251,7 +255,29 @@ void CommitWidget::contextMenuPopup(const QPoint &pos)
       connect(contextMenu, &UnstagedFilesContextMenu::signalRevertAll, this, &CommitWidget::revertAllChanges);
       connect(contextMenu, &UnstagedFilesContextMenu::signalCheckedOut, this, &CommitWidget::signalCheckoutPerformed);
 
-      contextMenu->popup(mapToGlobal(pos));
+      const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
+      contextMenu->popup(mapToGlobal(parentPos));
+   }
+}
+
+void CommitWidget::showUntrackedMenu(const QPoint &pos)
+{
+   const auto item = ui->untrackedFilesList->itemAt(pos);
+
+   if (item)
+   {
+      const auto fileName = ui->untrackedFilesList->itemAt(pos)->data(Qt::DisplayRole).toString();
+      const auto contextMenu = new QMenu(this);
+      connect(contextMenu->addAction(tr("Delete file")), &QAction::triggered, this, [this, fileName]() {
+         QProcess p;
+         p.setWorkingDirectory(mGit->getWorkingDir());
+         p.start(QString("rm -rf %1").arg(fileName));
+         if (p.waitForFinished())
+            emit this->signalCheckoutPerformed(true);
+      });
+
+      const auto parentPos = ui->untrackedFilesList->mapToParent(pos);
+      contextMenu->popup(mapToGlobal(parentPos));
    }
 }
 
@@ -358,7 +384,7 @@ bool CommitWidget::ammendChanges()
 
 void CommitWidget::clear()
 {
-   ui->untrackedFileList->clear();
+   ui->untrackedFilesList->clear();
    ui->unstagedFilesList->clear();
    ui->stagedFilesList->clear();
    ui->leCommitTitle->clear();
