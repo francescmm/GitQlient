@@ -108,24 +108,18 @@ void CommitWidget::init(const QString &shaToAmmend)
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
    }
 
-   const auto files = mGit->getFiles(mIsAmmend ? shaToAmmend : ZERO_SHA);
+   const RevisionFile *files = nullptr;
+
+   files = mGit->getFiles(mIsAmmend ? shaToAmmend : ZERO_SHA);
 
    if (files)
    {
-      for (auto i = 0; i < files->count(); ++i)
+      insertFilesInList(files, mIsAmmend ? ui->filesWidget : ui->listWidgetFiles);
+
+      if (mIsAmmend)
       {
-         QColor myColor;
-
-         if (files->statusCmp(i, RevisionFile::NEW) || files->statusCmp(i, RevisionFile::UNKNOWN))
-            myColor = Qt::darkGreen;
-         else if (files->statusCmp(i, RevisionFile::DELETED))
-            myColor = Qt::red;
-         else
-            myColor = Qt::white;
-
-         const auto item = new QListWidgetItem(ui->listWidgetFiles);
-         item->setText(mGit->filePath(*files, i));
-         item->setForeground(myColor);
+         files = mGit->getFiles(ZERO_SHA);
+         insertFilesInList(files, ui->listWidgetFiles);
       }
    }
 
@@ -150,6 +144,28 @@ void CommitWidget::init(const QString &shaToAmmend)
    ui->teDescription->setPlainText(msg);
    ui->teDescription->moveCursor(QTextCursor::Start);
    ui->pbCommit->setEnabled(ui->filesWidget->count());
+}
+
+void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fileList)
+{
+   for (auto i = 0; i < files->count(); ++i)
+   {
+      QColor myColor;
+
+      if (files->statusCmp(i, RevisionFile::NEW) || files->statusCmp(i, RevisionFile::UNKNOWN))
+         myColor = Qt::darkGreen;
+      else if (files->statusCmp(i, RevisionFile::DELETED))
+         myColor = Qt::red;
+      else
+         myColor = Qt::white;
+
+      const auto item = new QListWidgetItem(fileList);
+      item->setText(mGit->filePath(*files, i));
+      item->setForeground(myColor);
+
+      if (mIsAmmend && fileList == ui->filesWidget)
+         item->setFlags(item->flags() & (~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled));
+   }
 }
 
 void CommitWidget::addAllFilesToCommitList()
@@ -192,12 +208,15 @@ void CommitWidget::revertAllChanges()
 
 void CommitWidget::removeFileFromCommitList(QListWidgetItem *item)
 {
-   const auto row = ui->filesWidget->row(item);
-   ui->filesWidget->takeItem(row);
-   ui->listWidgetFiles->addItem(item);
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
-   ui->pbCommit->setDisabled(ui->filesWidget->count() == 0);
+   if (item->flags() & Qt::ItemIsSelectable)
+   {
+      const auto row = ui->filesWidget->row(item);
+      ui->filesWidget->takeItem(row);
+      ui->listWidgetFiles->addItem(item);
+      ui->lUnstagedCount->setText(QString("(%1)").arg(ui->listWidgetFiles->count()));
+      ui->lStagedCount->setText(QString("(%1)").arg(ui->filesWidget->count()));
+      ui->pbCommit->setDisabled(ui->filesWidget->count() == 0);
+   }
 }
 
 void CommitWidget::contextMenuPopup(const QPoint &pos)

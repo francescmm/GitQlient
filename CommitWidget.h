@@ -25,8 +25,10 @@
 
 #include <QWidget>
 
+class QListWidget;
 class QListWidgetItem;
 class Git;
+class RevisionFile;
 
 namespace Ui
 {
@@ -52,6 +54,7 @@ private:
    Ui::CommitWidget *ui = nullptr;
    QSharedPointer<Git> mGit;
 
+   void insertFilesInList(const RevisionFile *files, QListWidget *fileList);
    void addAllFilesToCommitList();
    void addFileToCommitList(QListWidgetItem *item);
    void revertAllChanges();
