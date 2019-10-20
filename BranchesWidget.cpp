@@ -242,8 +242,17 @@ void BranchesWidget::processLocalBranch(QString branch)
 {
    QLog_Debug("UI", QString("Adding local branch {%1}").arg(branch));
 
-   QTreeWidgetItem *parent = nullptr;
    auto fullBranchName = branch;
+   auto isCurrentBranch = false;
+
+   if (branch.startsWith('*'))
+   {
+      branch.replace('*', "");
+      fullBranchName.replace('*', "");
+      isCurrentBranch = true;
+   }
+
+   QTreeWidgetItem *parent = nullptr;
    auto folders = branch.split("/");
    branch = folders.takeLast();
 
@@ -263,16 +272,9 @@ void BranchesWidget::processLocalBranch(QString branch)
    }
 
    auto item = new QTreeWidgetItem(parent);
-
-   if (branch.startsWith('*'))
-   {
-      branch.replace('*', "");
-      fullBranchName.replace('*', "");
-      item->setData(0, Qt::UserRole, true);
-   }
-
    item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
    item->setText(0, branch);
+   item->setData(0, Qt::UserRole, isCurrentBranch);
    item->setData(0, Qt::UserRole + 1, fullBranchName);
    item->setData(0, Qt::UserRole + 2, true);
 
