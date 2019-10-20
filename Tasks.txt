@@ -19,7 +19,6 @@
     - Set the text elided and show a tooltip for the branch names longer than 50 px
 - Add functionality to squash commits
 - Add functionality for patches
-- Add functionality to add submodules (dialog needed)
 - Check what happens when we load gigantic repos
 - Add License in the repo and the Contributions Guidelines
 - Fix selection/focus color on files list widgets by using a delegate
