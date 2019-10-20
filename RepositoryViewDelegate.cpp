@@ -9,6 +9,7 @@
 #include <QPainter>
 
 static const int COLORS_NUM = 8;
+static const int MIN_VIEW_WIDTH_PX = 480;
 
 namespace
 {
@@ -156,8 +157,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
       case LaneType::JOIN:
       case LaneType::JOIN_R:
       case LaneType::HEAD:
-      case LaneType::HEAD_R:
-      {
+      case LaneType::HEAD_R: {
          QConicalGradient gradient(CENTER_UR);
          gradient.setColorAt(0.375, col);
          gradient.setColorAt(0.625, activeCol);
@@ -166,8 +166,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
          p->drawArc(P_CENTER, DELTA_UR);
          break;
       }
-      case LaneType::JOIN_L:
-      {
+      case LaneType::JOIN_L: {
          QConicalGradient gradient(CENTER_UL);
          gradient.setColorAt(0.375, activeCol);
          gradient.setColorAt(0.625, col);
@@ -177,8 +176,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
          break;
       }
       case LaneType::TAIL:
-      case LaneType::TAIL_R:
-      {
+      case LaneType::TAIL_R: {
          QConicalGradient gradient(CENTER_DR);
          gradient.setColorAt(0.375, activeCol);
          gradient.setColorAt(0.625, col);
@@ -439,15 +437,18 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
    auto newOpt = opt;
    newOpt.rect.setX(opt.rect.x() + offset + 5);
 
-   p->setPen(QColor("white"));
-   p->drawText(newOpt.rect, index.data().toString(), QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
+   QFontMetrics fm(newOpt.font);
+   fm.height();
 
-   // QStyledItemDelegate::paint(p, newOpt, index);
+   p->setPen(QColor("white"));
+   p->drawText(newOpt.rect, fm.elidedText(index.data().toString(), Qt::ElideRight, newOpt.rect.width()),
+               QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
 }
 
 void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewItem o, int &startPoint,
                                             const QString &sha) const
 {
+   const auto showMinimal = o.rect.width() <= MIN_VIEW_WIDTH_PX;
    const int mark_spacing = 5; // Space between markers in pixels
 
    for (RefNameIterator it(mGit, sha); it.valid(); it.next())
@@ -478,10 +479,11 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
       o.font.setBold(it.isCurrentBranch());
 
+      const auto nameToDisplay = showMinimal ? QString(". . .") : name;
       QFontMetrics fm(o.font);
-      const auto textBoundingRect = fm.boundingRect(name);
+      const auto textBoundingRect = fm.boundingRect(nameToDisplay);
       const int textPadding = 10;
-      int rectWidth = textBoundingRect.width() + 2 * textPadding;
+      const auto rectWidth = textBoundingRect.width() + 2 * textPadding;
 
       painter->save();
       painter->fillRect(o.rect.x() + startPoint, o.rect.y(), rectWidth, ROW_HEIGHT, clr);
@@ -490,7 +492,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
       const auto fontRect = textBoundingRect.height();
       const auto y = o.rect.y() + ROW_HEIGHT - (ROW_HEIGHT - fontRect) + 2;
       painter->setFont(o.font);
-      painter->drawText(o.rect.x() + startPoint + textPadding, y, name);
+      painter->drawText(o.rect.x() + startPoint + textPadding, y, nameToDisplay);
       painter->restore();
 
       startPoint += rectWidth + mark_spacing;

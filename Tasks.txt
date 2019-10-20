@@ -10,7 +10,8 @@
 - Show the error text when trying to push without pull first
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Improve readability in the views:
-    - Set the text elided and show a tooltip for the branch names longer than 50 px
+    - Show the branches name on the tooltip
+    - Performance: remove the RefNameIterator and retrieve the data from the RevisionsCache
 - Add functionality to squash commits
 - Add functionality for patches
 - Show a progress bar or custom waiting mouse icon when loading a new repo
