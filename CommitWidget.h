@@ -46,11 +46,11 @@ signals:
 public:
    explicit CommitWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
-   void init(const QString &shaToAmmend);
+   void init(const QString &shaToAmend);
    void clear();
 
 private:
-   bool mIsAmmend = false;
+   bool mIsAmend = false;
    Ui::CommitWidget *ui = nullptr;
    QSharedPointer<Git> mGit;
 
@@ -60,7 +60,7 @@ private:
    void revertAllChanges();
    void removeFileFromCommitList(QListWidgetItem *item);
    bool commitChanges();
-   bool ammendChanges();
+   bool amendChanges();
    void showUnstagedMenu(const QPoint &pos);
    void showUntrackedMenu(const QPoint &pos);
    void applyChanges();

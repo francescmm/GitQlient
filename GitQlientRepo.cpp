@@ -85,7 +85,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mRepositoryView, &RepositoryView::clicked, this,
            qOverload<const QModelIndex &>(&GitQlientRepo::onCommitClicked));
    connect(mRepositoryView, &RepositoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
-   connect(mRepositoryView, &RepositoryView::signalAmmendCommit, this, &GitQlientRepo::onAmmendCommit);
+   connect(mRepositoryView, &RepositoryView::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
 
    connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mCommitWidget, &CommitWidget::signalCheckoutPerformed, this, &GitQlientRepo::updateUiFromWatcher);
@@ -299,7 +299,7 @@ void GitQlientRepo::onCommitSelected(const QString &goToSha)
       mRevisionWidget->setCurrentCommitSha(sha);
 }
 
-void GitQlientRepo::onAmmendCommit(const QString &sha)
+void GitQlientRepo::onAmendCommit(const QString &sha)
 {
    commitStackedWidget->setCurrentIndex(1);
    mCommitWidget->init(sha);

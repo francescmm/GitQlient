@@ -26,7 +26,7 @@ class RepositoryView : public QTreeView
 signals:
    void signalViewUpdated();
    void signalOpenDiff(const QString &sha);
-   void signalAmmendCommit(const QString &sha);
+   void signalAmendCommit(const QString &sha);
 
 public:
    explicit RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent = nullptr);

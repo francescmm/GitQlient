@@ -32,8 +32,8 @@ RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QStr
 
    if (mSha != ZERO_SHA)
    {
-      const auto ammendCommitAction = addAction("Ammend");
-      connect(ammendCommitAction, &QAction::triggered, this, &RepositoryContextMenu::signalAmmendCommit);
+      const auto amendCommitAction = addAction("Amend");
+      connect(amendCommitAction, &QAction::triggered, this, &RepositoryContextMenu::signalAmendCommit);
 
       const auto createBranchAction = addAction("Create branch here");
       connect(createBranchAction, &QAction::triggered, this, &RepositoryContextMenu::createBranch);

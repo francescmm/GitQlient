@@ -81,22 +81,22 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
    connect(ui->stagedFilesList, &QListWidget::itemClicked, this, &CommitWidget::removeFileFromCommitList);
 }
 
-void CommitWidget::init(const QString &shaToAmmend)
+void CommitWidget::init(const QString &shaToAmend)
 {
-   mIsAmmend = shaToAmmend != ZERO_SHA;
+   mIsAmend = shaToAmend != ZERO_SHA;
 
    QLog_Info("UI",
              QString("Configuring commit widget with sha {%1} as {%2}")
-                 .arg(shaToAmmend)
-                 .arg(mIsAmmend ? QString("amend") : QString("wip")));
+                 .arg(shaToAmend)
+                 .arg(mIsAmend ? QString("amend") : QString("wip")));
 
    blockSignals(true);
    clear();
-   ui->leAuthorName->setVisible(mIsAmmend);
-   ui->leAuthorEmail->setVisible(mIsAmmend);
+   ui->leAuthorName->setVisible(mIsAmend);
+   ui->leAuthorEmail->setVisible(mIsAmend);
    blockSignals(false);
 
-   ui->pbCommit->setText(mIsAmmend ? QString("Amend") : QString("Commit"));
+   ui->pbCommit->setText(mIsAmend ? QString("Amend") : QString("Commit"));
 
    QString templ(".git/commit-template");
    QString msg;
@@ -106,9 +106,9 @@ void CommitWidget::init(const QString &shaToAmmend)
       readFromFile(templ, msg);
 
    // set-up files list
-   if (mIsAmmend)
+   if (mIsAmend)
    {
-      const auto revInfo = mGit->revLookup(shaToAmmend);
+      const auto revInfo = mGit->revLookup(shaToAmend);
       const auto author = revInfo->author().split("<");
       ui->leAuthorName->setText(author.first());
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
@@ -116,13 +116,13 @@ void CommitWidget::init(const QString &shaToAmmend)
 
    const RevisionFile *files = nullptr;
 
-   files = mGit->getFiles(mIsAmmend ? shaToAmmend : ZERO_SHA);
+   files = mGit->getFiles(mIsAmend ? shaToAmend : ZERO_SHA);
 
    if (files)
    {
-      insertFilesInList(files, mIsAmmend ? ui->stagedFilesList : ui->unstagedFilesList);
+      insertFilesInList(files, mIsAmend ? ui->stagedFilesList : ui->unstagedFilesList);
 
-      if (mIsAmmend)
+      if (mIsAmend)
       {
          files = mGit->getFiles(ZERO_SHA);
          insertFilesInList(files, ui->unstagedFilesList);
@@ -138,8 +138,8 @@ void CommitWidget::init(const QString &shaToAmmend)
    {
       QPair<QString, QString> logMessage;
 
-      if (mIsAmmend)
-         logMessage = mGit->getSplitCommitMsg(shaToAmmend);
+      if (mIsAmend)
+         logMessage = mGit->getSplitCommitMsg(shaToAmend);
 
       msg = logMessage.second.trimmed();
       ui->leCommitTitle->setText(logMessage.first);
@@ -185,7 +185,7 @@ void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fil
       item->setText(fileName);
       item->setForeground(myColor);
 
-      if (mIsAmmend && fileList == ui->stagedFilesList)
+      if (mIsAmend && fileList == ui->stagedFilesList)
          item->setFlags(item->flags() & (~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled));
    }
 }
@@ -283,7 +283,7 @@ void CommitWidget::showUntrackedMenu(const QPoint &pos)
 
 void CommitWidget::applyChanges()
 {
-   mIsAmmend ? ammendChanges() : commitChanges();
+   mIsAmend ? amendChanges() : commitChanges();
 }
 
 QStringList CommitWidget::getFiles()
@@ -356,7 +356,7 @@ bool CommitWidget::commitChanges()
    return done;
 }
 
-bool CommitWidget::ammendChanges()
+bool CommitWidget::amendChanges()
 {
    QStringList selFiles = getFiles();
    auto done = false;

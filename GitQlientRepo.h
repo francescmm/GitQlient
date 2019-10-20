@@ -89,7 +89,7 @@ private:
    void changesCommitted(bool ok);
    void onCommitClicked(const QModelIndex &index);
    void onCommitSelected(const QString &goToSha);
-   void onAmmendCommit(const QString &sha);
+   void onAmendCommit(const QString &sha);
    void onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file);
    void resetWatcher(const QString &oldDir, const QString &newDir);
    void clearWindow(bool deepClear);

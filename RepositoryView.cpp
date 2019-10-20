@@ -298,7 +298,7 @@ void RepositoryView::showContextMenu(const QPoint &pos)
    const auto menu = new RepositoryContextMenu(mGit, sha, this);
    connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
    connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
-   connect(menu, &RepositoryContextMenu::signalAmmendCommit, this, [this, sha]() { emit signalAmmendCommit(sha); });
+   connect(menu, &RepositoryContextMenu::signalAmendCommit, this, [this, sha]() { emit signalAmendCommit(sha); });
    menu->exec(viewport()->mapToGlobal(pos));
 }
 

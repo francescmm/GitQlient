@@ -34,7 +34,7 @@ class RepositoryContextMenu : public QMenu
 signals:
    void signalRepositoryUpdated();
    void signalOpenDiff(const QString &sha);
-   void signalAmmendCommit();
+   void signalAmendCommit();
 
 public:
    explicit RepositoryContextMenu(QSharedPointer<Git> git, const QString &sha, QWidget *parent = nullptr);
