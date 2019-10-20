@@ -7,8 +7,6 @@
         - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
 
 2. Improvements & Bugs & Fixes
-- Add colors to differentiate between local and remote tags
-- Study how to show untracked files
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Improve readability in the views:
     - Set the text elided and show a tooltip for the branch names longer than 50 px
