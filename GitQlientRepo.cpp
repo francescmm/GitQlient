@@ -12,6 +12,7 @@
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
 #include <domain.h>
+#include <Revision.h>
 
 #include <QDirIterator>
 #include <QFileSystemWatcher>
@@ -109,11 +110,15 @@ void GitQlientRepo::updateUi()
 
       const auto commitStackedIndex = commitStackedWidget->currentIndex();
       const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : ZERO_SHA;
+      auto revision = mGit->revLookup(currentSha);
 
-      mRepositoryView->focusOnCommit(currentSha);
+      mRepositoryView->focusOnCommit(revision->sha());
 
       if (commitStackedIndex == 1)
-         mCommitWidget->init(currentSha);
+         mCommitWidget->init(revision->sha());
+
+      if (mainStackedWidget->currentIndex() == 1)
+         openCommitDiff();
    }
 }
 
@@ -125,6 +130,9 @@ void GitQlientRepo::updateUiFromWatcher()
    {
       mGit->updateWipRevision();
       mCommitWidget->init(ZERO_SHA);
+
+      if (mainStackedWidget->currentIndex() == 1)
+         openCommitDiff();
    }
 }
 

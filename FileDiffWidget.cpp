@@ -30,9 +30,6 @@ FileDiffWidget::FileDiffWidget(QSharedPointer<Git> git, QWidget *parent)
    vLayout->setSpacing(0);
    vLayout->addLayout(controlsLayout);
    vLayout->addWidget(mDiffView);
-
-   connect(mGoPrevious, &QPushButton::clicked, this, &FileDiffWidget::moveToPreviousDiff);
-   connect(mGoNext, &QPushButton::clicked, this, &FileDiffWidget::moveToNextDiff);
 }
 
 void FileDiffWidget::clear()
@@ -42,6 +39,7 @@ void FileDiffWidget::clear()
 
 bool FileDiffWidget::onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file)
 {
+   mCurrentFile = file;
    auto destFile = file;
 
    if (destFile.contains("-->"))
@@ -66,26 +64,4 @@ bool FileDiffWidget::onFileDiffRequested(const QString &currentSha, const QStrin
    }
 
    return false;
-}
-
-void FileDiffWidget::moveToPreviousDiff()
-{
-   /*
-   if (mRowIndex > 0 && !mModifications.empty())
-   {
-      const auto destRow = mModifications.at(--mRowIndex);
-      mDiffView->moveToRow(destRow);
-   }
-   */
-}
-
-void FileDiffWidget::moveToNextDiff()
-{
-   /*
-   if (mRowIndex < mModifications.count() - 1)
-   {
-      const auto destRow = mModifications.at(++mRowIndex);
-      mDiffView->moveToRow(destRow);
-   }
-   */
 }

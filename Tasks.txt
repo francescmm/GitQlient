@@ -9,13 +9,12 @@
 2. Improvements & Bugs & Fixes
 - Add colors to differentiate between local and remote tags
 - Study how to show untracked files
-- When focus on FullDiffWidget or FileDiffWidget on WIP, update view if something changes
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Improve readability in the views:
     - Set the text elided and show a tooltip for the branch names longer than 50 px
 - Add functionality to squash commits
 - Add functionality for patches
-- Check what happens when we load gigantic repos
+- Show a progress bar or custom waiting mouse icon when loading a new repo
 - Add License in the repo and the Contributions Guidelines
 - Fix selection/focus color on files list widgets by using a delegate
 - Make logger opt-out with a method in GitQlient class

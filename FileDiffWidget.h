@@ -38,11 +38,10 @@ public:
    explicit FileDiffWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
    void clear();
    bool onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file);
+   QString getCurrentFile() const { return mCurrentFile; }
 
 private:
-   void moveToPreviousDiff();
-   void moveToNextDiff();
-
+   QString mCurrentFile;
    QSharedPointer<Git> mGit;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    FileDiffView *mDiffView = nullptr;
