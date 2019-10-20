@@ -163,6 +163,11 @@ RepositoryView, FullDiffWidget, CommitWidget > QListWidget, QTreeWidget
     color: white;
 }
 
+CommitWidget > QListWidget
+{
+    border: 1px solid #202122;
+}
+
 /** START RepositoryContextMenu **/
 QMenu
 {
@@ -223,6 +228,16 @@ CommitWidget > QLineEdit, CommitWidget > #teDescription, #leGitCommand
 CommitWidget > #leCommitTitle
 {
     border-right: 0px;
+}
+
+CommitWidget > #leAuthorName
+{
+    border-bottom: 1px solid #404142;
+}
+
+CommitWidget > #leAuthorEmail
+{
+    border-top: 0px;
 }
 
 QLabel#lCounter

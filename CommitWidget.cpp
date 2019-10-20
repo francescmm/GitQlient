@@ -73,6 +73,7 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitWidget::applyChanges);
    connect(ui->pbCommit, &QPushButton::clicked, this, &CommitWidget::applyChanges);
+   connect(ui->untrackedFileList, &QListWidget::itemClicked, this, &CommitWidget::addFileToCommitList);
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this, &CommitWidget::contextMenuPopup);
    connect(ui->unstagedFilesList, &QListWidget::itemClicked, this, &CommitWidget::addFileToCommitList);
    connect(ui->stagedFilesList, &QListWidget::itemClicked, this, &CommitWidget::removeFileFromCommitList);
@@ -155,15 +156,31 @@ void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fil
    {
       QColor myColor;
 
-      if (files->statusCmp(i, RevisionFile::NEW) || files->statusCmp(i, RevisionFile::UNKNOWN))
+      const auto isUnknown = files->statusCmp(i, RevisionFile::UNKNOWN);
+      const auto isInIndex = files->statusCmp(i, RevisionFile::IN_INDEX);
+      const auto untrackedFile = !isInIndex && isUnknown;
+      const auto staged = isInIndex && !isUnknown;
+
+      if ((files->statusCmp(i, RevisionFile::NEW) || isUnknown || isInIndex) && !untrackedFile)
          myColor = Qt::darkGreen;
       else if (files->statusCmp(i, RevisionFile::DELETED))
          myColor = Qt::red;
+      else if (untrackedFile)
+         myColor = QColor("#D89000");
       else
          myColor = Qt::white;
 
-      const auto item = new QListWidgetItem(fileList);
-      item->setText(mGit->filePath(*files, i));
+      const auto fileName = mGit->filePath(*files, i);
+      QListWidgetItem *item = nullptr;
+
+      if (untrackedFile)
+         item = new QListWidgetItem(ui->untrackedFileList);
+      else if (staged)
+         item = new QListWidgetItem(ui->stagedFilesList);
+      else
+         item = new QListWidgetItem(fileList);
+
+      item->setText(fileName);
       item->setForeground(myColor);
 
       if (mIsAmmend && fileList == ui->stagedFilesList)
@@ -341,13 +358,15 @@ bool CommitWidget::ammendChanges()
 
 void CommitWidget::clear()
 {
+   ui->untrackedFileList->clear();
+   ui->unstagedFilesList->clear();
+   ui->stagedFilesList->clear();
+   ui->leCommitTitle->clear();
    ui->leAuthorName->clear();
    ui->leAuthorEmail->clear();
-   ui->unstagedFilesList->clear();
-   ui->leCommitTitle->clear();
    ui->teDescription->clear();
-   ui->stagedFilesList->clear();
    ui->pbCommit->setEnabled(false);
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+   ui->lStagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
+   ui->lUntrackedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
 }
