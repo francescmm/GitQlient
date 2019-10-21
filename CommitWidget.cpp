@@ -176,11 +176,20 @@ void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fil
       QListWidgetItem *item = nullptr;
 
       if (untrackedFile)
+      {
          item = new QListWidgetItem(ui->untrackedFilesList);
+         item->setData(Qt::UserRole, QVariant::fromValue(ui->untrackedFilesList));
+      }
       else if (staged)
+      {
          item = new QListWidgetItem(ui->stagedFilesList);
+         item->setData(Qt::UserRole, QVariant::fromValue(ui->stagedFilesList));
+      }
       else
+      {
          item = new QListWidgetItem(fileList);
+         item->setData(Qt::UserRole, QVariant::fromValue(fileList));
+      }
 
       item->setText(fileName);
       item->setForeground(myColor);
@@ -234,9 +243,11 @@ void CommitWidget::removeFileFromCommitList(QListWidgetItem *item)
 {
    if (item->flags() & Qt::ItemIsSelectable)
    {
+      const auto itemOriginalList = qvariant_cast<QListWidget *>(item->data(Qt::UserRole));
       const auto row = ui->stagedFilesList->row(item);
+
       ui->stagedFilesList->takeItem(row);
-      ui->unstagedFilesList->addItem(item);
+      itemOriginalList->addItem(item);
       ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
       ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
       ui->pbCommit->setDisabled(ui->stagedFilesList->count() == 0);
