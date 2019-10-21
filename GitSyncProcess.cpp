@@ -18,7 +18,9 @@ bool GitSyncProcess::run(const QString &command, QString &output)
    const auto processStarted = execute(command);
 
    if (processStarted)
-      waitForFinished(10000); // suspend 20ms to let OS reschedule
+      waitForFinished(10000);
+
+   close();
 
    return !mErrorExit;
 }
