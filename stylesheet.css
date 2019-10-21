@@ -416,8 +416,8 @@ QTabBar::close-button:pressed
 QToolTip
 {
    padding: 5px;
-   border: 1px solid #202122;
-   background-color: #606162;
+   border: 1px solid #606162;
+   background-color: #202122;
    color: white;
 }
 

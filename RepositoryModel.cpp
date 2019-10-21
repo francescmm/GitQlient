@@ -192,24 +192,45 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
       return no_value; // fast path, 90% of calls ends here!
 
    const auto r = mRevCache->revLookup(index.row());
-
    if (!r)
       return no_value;
 
+   const auto sha = r->sha();
+
    if (role == Qt::ToolTipRole)
    {
+      QString auxMessage;
+
+      if ((mGit->checkRef(sha) & Git::CUR_BRANCH) && mGit->getCurrentBranchName().isEmpty())
+         auxMessage.append("<p>Status: <b>detached</b></p>");
+
+      const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
+
+      if (!localBranches.isEmpty())
+         auxMessage.append(QString("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
+
+      const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
+
+      if (!remoteBranches.isEmpty())
+         auxMessage.append(QString("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
+
+      const auto tags = mGit->getRefNames(sha, Git::TAG);
+
+      if (!tags.isEmpty())
+         auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));
+
       QDateTime d;
       d.setSecsSinceEpoch(r->authorDate().toUInt());
 
-      return QString("<p><b>Author:</b> %1</p><p><b>Date:</b> %2</p>")
-          .arg(r->author().split("<").first(), d.toString(Qt::SystemLocaleShortDate));
+      return QString("<p>%1 - %2<p></p>%3</p>%4")
+          .arg(r->author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
    }
 
    int col = index.column();
 
    // calculate lanes
    if (r->lanes.count() == 0)
-      mGit->setLane(r->sha());
+      mGit->setLane(sha);
 
    switch (static_cast<RepositoryModelColumns>(col))
    {
@@ -221,8 +242,7 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
          return r->shortLog();
       case RepositoryModelColumns::AUTHOR:
          return r->author().split("<").first();
-      case RepositoryModelColumns::DATE:
-      {
+      case RepositoryModelColumns::DATE: {
          QDateTime dt;
          dt.setSecsSinceEpoch(r->authorDate().toUInt());
          return dt.toString("dd/MM/yyyy hh:mm");
