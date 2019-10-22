@@ -8,8 +8,6 @@
 
 2. Improvements & Bugs & Fixes
 - Add License in the repo and the Contributions Guidelines
-- Improve readability in the views:
-    - Performance: remove the RefNameIterator
 - Add functionality to squash commits
 - Add functionality for patches
 - Show the error text when trying to push without pull first

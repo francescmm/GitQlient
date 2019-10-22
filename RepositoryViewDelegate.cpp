@@ -1,4 +1,4 @@
-#include "RepositoryViewDelegate.h"
+﻿#include "RepositoryViewDelegate.h"
 
 #include <git.h>
 #include <lanes.h>
@@ -10,92 +10,6 @@
 
 static const int COLORS_NUM = 8;
 static const int MIN_VIEW_WIDTH_PX = 480;
-
-namespace
-{
-/** Iterator over all refnames of a given sha.
- *  References are traversed in following order:
- *  detached (name empty), local branches, remote branches, tags, other refs
- */
-class RefNameIterator
-{
-   const QString sha;
-   QSharedPointer<Git> mGit;
-   uint ref_types; // all reference types associated with sha
-   int cur_state; // state indicating the currently processed ref type
-   QStringList ref_names; // ref_names of current type
-   QStringList::const_iterator cur_name;
-   QString cur_branch;
-
-public:
-   RefNameIterator(QSharedPointer<Git> git, const QString &sha);
-   bool valid() const { return cur_state != -1; }
-   QString name() const { return *cur_name; }
-   int type() { return cur_state; }
-   bool isCurrentBranch() { return *cur_name == cur_branch; }
-
-   void next();
-};
-
-RefNameIterator::RefNameIterator(QSharedPointer<Git> git, const QString &sha)
-   : sha(sha)
-   , mGit(git)
-   , cur_state(0)
-   , cur_branch(mGit->getCurrentBranchName())
-{
-   ref_types = mGit->checkRef(sha);
-   if (ref_types == 0)
-   {
-      cur_state = -1; // indicates end
-      return;
-   }
-
-   // initialize dummy string list
-   ref_names << "";
-   cur_name = ref_names.begin();
-
-   // detached ?
-   if ((ref_types & Git::CUR_BRANCH) && cur_branch.isEmpty())
-   {
-      // indicate detached state with type() == 0 and empty ref name
-      cur_branch = *cur_name;
-   }
-   else
-   { // advance to first real ref name
-      next();
-   }
-}
-
-void RefNameIterator::next()
-{
-   ++cur_name;
-
-   // switch to next ref type if required
-   while (valid() && cur_name == ref_names.end())
-   {
-      switch (cur_state)
-      {
-         case 0:
-            cur_state = Git::BRANCH;
-            break;
-         case Git::BRANCH:
-            cur_state = Git::RMT_BRANCH;
-            break;
-         case Git::RMT_BRANCH:
-            cur_state = Git::TAG;
-            break;
-         case Git::TAG:
-            cur_state = Git::REF;
-            break;
-         default:
-            cur_state = -1; // indicate end
-      }
-      ref_names = mGit->getRefNames(sha, (Git::RefType)cur_state);
-      cur_name = ref_names.begin();
-   }
-}
-
-}
 
 RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache)
    : QStyledItemDelegate()
@@ -451,43 +365,49 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
    const auto showMinimal = o.rect.width() <= MIN_VIEW_WIDTH_PX;
    const int mark_spacing = 5; // Space between markers in pixels
 
-   for (RefNameIterator it(mGit, sha); it.valid(); it.next())
+   QMap<QString, QColor> markValues;
+   auto ref_types = mGit->checkRef(sha);
+
+   if (ref_types != 0)
    {
-      auto name = it.name();
-
-      QColor clr;
-
-      switch (it.type())
+      if (ref_types & Git::CUR_BRANCH && mGit->getCurrentBranchName().isEmpty())
+         markValues.insert("detached", QColor("#851e3e"));
+      else
       {
-         case 0:
-            name = "detached";
-            clr = QColor("#851e3e");
-            break;
-         case Git::BRANCH:
-            clr = it.isCurrentBranch() ? QColor("#005b96") : QColor("#6497b1");
-            break;
-         case Git::RMT_BRANCH:
-            clr = QColor("#011f4b");
-            break;
-         case Git::TAG:
-            clr = QColor("#dec3c3");
-            break;
-         case Git::REF:
-            clr = QColor("#FF5555");
-            break;
+         const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
+         for (auto branch : localBranches)
+            markValues.insert(branch, branch == mGit->getCurrentBranchName() ? QColor("#005b96") : QColor("#6497b1"));
+
+         const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
+         for (auto branch : remoteBranches)
+            markValues.insert(branch, QColor("#011f4b"));
+
+         const auto tags = mGit->getRefNames(sha, Git::TAG);
+         for (auto tag : tags)
+            markValues.insert(tag, QColor("#dec3c3"));
+
+         const auto refs = mGit->getRefNames(sha, Git::REF);
+         for (auto ref : refs)
+            markValues.insert(ref, QColor("#FF5555"));
       }
+   }
 
-      o.font.setBold(it.isCurrentBranch());
+   const auto mapEnd = markValues.constEnd();
+   for (auto mapIt = markValues.constBegin(); mapIt != mapEnd; ++mapIt)
+   {
+      o.font.setBold(mapIt.key() == mGit->getCurrentBranchName());
 
-      const auto nameToDisplay = showMinimal ? QString(". . .") : name;
+      const auto nameToDisplay = showMinimal ? QString(". . .") : mapIt.key();
       QFontMetrics fm(o.font);
       const auto textBoundingRect = fm.boundingRect(nameToDisplay);
       const int textPadding = 10;
       const auto rectWidth = textBoundingRect.width() + 2 * textPadding;
 
       painter->save();
-      painter->fillRect(o.rect.x() + startPoint, o.rect.y(), rectWidth, ROW_HEIGHT, clr);
-      painter->setPen(QColor(it.type() == Git::TAG ? QString("#000000") : QString("#FFFFFF")));
+      painter->fillRect(o.rect.x() + startPoint, o.rect.y(), rectWidth, ROW_HEIGHT, mapIt.value());
+
+      // TODO: Fix this with a nicer way
+      painter->setPen(QColor(mapIt.value() == QColor("#dec3c3") ? QString("#000000") : QString("#FFFFFF")));
 
       const auto fontRect = textBoundingRect.height();
       const auto y = o.rect.y() + ROW_HEIGHT - (ROW_HEIGHT - fontRect) + 2;
