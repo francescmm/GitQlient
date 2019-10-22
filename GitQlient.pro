@@ -12,4 +12,6 @@ INCLUDEPATH += QLogger
 
 include(QLogger/QLogger.pri)
 
-OTHER_FILES += Tasks.txt
+OTHER_FILES += $$PWD/Tasks.txt \
+    $$PWD/LICENSE \
+    $$PWD/README.md
