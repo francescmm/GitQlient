@@ -9,6 +9,7 @@
 
 #include <QObject>
 #include <QVariant>
+#include <QVector>
 #include <QSharedPointer>
 
 template<class, class>
