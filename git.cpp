@@ -57,7 +57,7 @@ const QString toPersistentSha(const QString &sha, QVector<QByteArray> &v)
 #   include <sys/stat.h> // used by chmod()
 #endif
 
-bool writeToFile(const QString &fileName, const QString &data, bool setExecutable = false)
+bool writeToFile(const QString &fileName, const QString &data)
 {
 
    QFile file(fileName);
