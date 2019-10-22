@@ -792,7 +792,7 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    return ret;
 }
 
-GitExecResult Git::formatPatch()
+GitExecResult Git::exportPatch()
 {
    return run("git format-patch -1 HEAD");
 }
