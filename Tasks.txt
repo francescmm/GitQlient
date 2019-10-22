@@ -9,7 +9,7 @@
 2. Improvements & Bugs & Fixes
 - Add License in the repo and the Contributions Guidelines
 - Add functionality to squash commits
-- Add functionality for patches
+- Add functionality to generate patches from commit
 - Add history of a file
 - Add blame on a file
 - Show the error text when trying to push without pull first
