@@ -5,6 +5,14 @@ StateInfo::StateInfo()
    clear();
 }
 
+StateInfo::StateInfo(const StateInfo &st)
+{
+   if (st.isLocked)
+      nextS = st.curS;
+   else
+      curS = st.curS; // prevS is mot modified to allow a rollback
+}
+
 void StateInfo::S::clear()
 {
 

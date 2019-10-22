@@ -74,10 +74,6 @@ bool writeToFile(const QString &fileName, const QString &data)
    stream << data2;
    file.close();
 
-#ifndef Q_OS_WIN32
-   if (setExecutable)
-      chmod(fileName.toLatin1().constData(), 0755);
-#endif
    return true;
 }
 }

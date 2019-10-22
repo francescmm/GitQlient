@@ -7,11 +7,11 @@ enum class LaneType;
 class Revision
 {
    // prevent implicit C++ compiler defaults
-   Revision();
    // Revision(const Revision &);
-   Revision &operator=(const Revision &);
 
 public:
+   Revision() = delete;
+   Revision &operator=(const Revision &) = delete;
    Revision(const QByteArray &b, uint s, int idx, int *next);
    bool isBoundary() const;
    uint parentsCount() const;

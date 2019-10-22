@@ -15,6 +15,7 @@ public:
    };
 
    StateInfo();
+   StateInfo(const StateInfo &st);
    StateInfo &operator=(const StateInfo &newState);
    bool operator==(const StateInfo &newState) const;
    bool operator!=(const StateInfo &newState) const;
