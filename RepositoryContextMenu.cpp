@@ -180,6 +180,19 @@ void RepositoryContextMenu::createTag()
       emit signalRepositoryUpdated();
 }
 
+void RepositoryContextMenu::exportAsPatch()
+{
+   const auto ret = mGit->formatPatch();
+
+   if (ret.success)
+      QMessageBox::information(this, tr("Patch generated"),
+                               tr("<p>The patch has been generated!</p>"
+                                  "<p><b>Commit:</b> %1</p>"
+                                  "<p><b>Destination:</b> %2</p>"
+                                  "<p><b>File name:</b> %3</p>")
+                                   .arg(mSha, mGit->getWorkingDir(), ret.output.toString()));
+}
+
 void RepositoryContextMenu::checkoutCommit()
 {
    const auto ret = mGit->checkoutCommit(mSha);

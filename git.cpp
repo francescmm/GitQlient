@@ -1,4 +1,4 @@
-﻿/*
+/*
         Description: interface to git programs
 
         Author: Marco Costalba (C) 2005-2007
@@ -790,6 +790,11 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    }
 
    return ret;
+}
+
+GitExecResult Git::formatPatch()
+{
+   return run("git format-patch -1 HEAD");
 }
 
 bool Git::apply(const QString &fileName, bool asCommit)
