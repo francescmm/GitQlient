@@ -34,6 +34,9 @@
         <file alias="folder_indicator">resources/folder_indicator.svg</file>
         <file alias="repo_indicator">resources/git_orange_indicator.svg</file>
         <file alias="untracked">resources/untracked.svg</file>
+        <file alias="git_apply">resources/apply.svg</file>
+        <file alias="sign-in">resources/sign-in.svg</file>
+        <file alias="squash">resources/squash.svg</file>
     </qresource>
     <qresource prefix="/">
         <file>stylesheet.css</file>
