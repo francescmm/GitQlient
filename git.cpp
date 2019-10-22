@@ -1,4 +1,4 @@
-/*
+﻿/*
         Description: interface to git programs
 
         Author: Marco Costalba (C) 2005-2007
@@ -799,8 +799,10 @@ GitExecResult Git::formatPatch()
 
 bool Git::apply(const QString &fileName, bool asCommit)
 {
-   QString cmd = asCommit ? QString("git am --signof < ") : QString("git apply ");
-   return run(QString("%1 %2").arg(cmd, fileName)).first;
+   const auto cmd = asCommit ? QString("git am --signof ") : QString("git apply ");
+   const auto ret = run(QString("%1 %2").arg(cmd, fileName));
+
+   return ret.first;
 }
 
 bool Git::push(bool force)

@@ -211,16 +211,16 @@ void RepositoryContextMenu::applyPatch()
 {
    const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
 
-   if (!fileName.isEmpty())
-      mGit->apply(fileName);
+   if (!fileName.isEmpty() && mGit->apply(fileName))
+      emit signalRepositoryUpdated();
 }
 
 void RepositoryContextMenu::applyCommit()
 {
    const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
 
-   if (!fileName.isEmpty())
-      mGit->apply(fileName, true);
+   if (!fileName.isEmpty() && mGit->apply(fileName, true))
+      emit signalRepositoryUpdated();
 }
 
 void RepositoryContextMenu::push()
