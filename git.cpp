@@ -792,6 +792,11 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    return ret;
 }
 
+bool Git::apply(const QString &fileName)
+{
+   return run(QString("git apply %1").arg(fileName)).first;
+}
+
 bool Git::push(bool force)
 {
    QString output;

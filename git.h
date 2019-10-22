@@ -104,6 +104,7 @@ public:
 
    /** START COMMIT WORK **/
    bool commitFiles(QStringList &files, const QString &msg, bool amend, const QString &author = QString());
+   bool apply(const QString &fileName);
    bool push(bool force = false);
    bool pull(QString &output);
    bool fetch();
@@ -121,7 +122,6 @@ public:
    const QString getLastCommitMsg();
    const QString getNewCommitMsg();
    bool resetFile(const QString &fileName);
-
    /** END COMMIT INFO **/
 
    /** START SUBMODULES **/

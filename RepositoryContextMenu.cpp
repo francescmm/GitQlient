@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
+#include <QFileDialog>
 
 RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QString &sha, QWidget *parent)
    : QMenu(parent)
@@ -40,6 +41,9 @@ RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QStr
 
       const auto createTagAction = addAction("Create tag here");
       connect(createTagAction, &QAction::triggered, this, &RepositoryContextMenu::createTag);
+
+      const auto exportAsPatchAction = addAction("Export as patch");
+      connect(exportAsPatchAction, &QAction::triggered, this, &RepositoryContextMenu::exportAsPatch);
 
       addSeparator();
 
@@ -109,6 +113,12 @@ RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QStr
 
          if (lastShaStr == mSha)
          {
+            const auto applyPatchAction = addAction("Apply patch");
+            connect(applyPatchAction, &QAction::triggered, this, &RepositoryContextMenu::applyPatch);
+
+            const auto applyCommitAction = addAction("Apply commit");
+            connect(applyCommitAction, &QAction::triggered, this, &RepositoryContextMenu::applyCommit);
+
             const auto pushAction = addAction("Push");
             connect(pushAction, &QAction::triggered, this, &RepositoryContextMenu::push);
 
@@ -182,6 +192,19 @@ void RepositoryContextMenu::cherryPickCommit()
 {
    if (mGit->cherryPickCommit(mSha))
       emit signalRepositoryUpdated();
+}
+
+void RepositoryContextMenu::applyPatch()
+{
+   const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
+
+   if (!fileName.isEmpty())
+      mGit->apply(fileName);
+}
+
+void RepositoryContextMenu::applyCommit()
+{
+   const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the file to apply"));
 }
 
 void RepositoryContextMenu::push()
