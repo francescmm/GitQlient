@@ -792,9 +792,10 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    return ret;
 }
 
-bool Git::apply(const QString &fileName)
+bool Git::apply(const QString &fileName, bool asCommit)
 {
-   return run(QString("git apply %1").arg(fileName)).first;
+   QString cmd = asCommit ? QString("git am --signof < ") : QString("git apply ");
+   return run(QString("%1 %2").arg(cmd, fileName)).first;
 }
 
 bool Git::push(bool force)

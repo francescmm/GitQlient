@@ -204,7 +204,10 @@ void RepositoryContextMenu::applyPatch()
 
 void RepositoryContextMenu::applyCommit()
 {
-   const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the file to apply"));
+   const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
+
+   if (!fileName.isEmpty())
+      mGit->apply(fileName, true);
 }
 
 void RepositoryContextMenu::push()
