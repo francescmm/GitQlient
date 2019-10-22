@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
    const auto manager = QLoggerManager::getInstance();
-   manager->addDestination("GitQlient.log", "UI", LogLevel::Debug);
+   manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
 
    QLog_Info("UI", "Starting GitQlient...");
 
