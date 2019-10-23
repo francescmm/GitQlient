@@ -22,7 +22,7 @@ GitQlient::GitQlient(QWidget *parent)
 
    QLog_Info("UI", "Creating Main Window");
 
-   QFile styles(":/stylesheet.css");
+   QFile styles(":/stylesheet");
 
    if (styles.open(QIODevice::ReadOnly))
    {

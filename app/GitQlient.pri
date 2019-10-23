@@ -1,4 +1,5 @@
-RESOURCES += $$PWD/icons.qrc
+RESOURCES += \
+    $$PWD/resources.qrc
 
 FORMS += \
     $$PWD/AddSubmoduleDlg.ui \

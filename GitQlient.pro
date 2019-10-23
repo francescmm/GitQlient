@@ -6,9 +6,10 @@ TARGET = GitQlient
 QT += widgets
 
 # project files
-include(GitQlient.pri)
+include(app/GitQlient.pri)
 
-INCLUDEPATH += QLogger
+INCLUDEPATH += QLogger \
+    app
 
 include(QLogger/QLogger.pri)
 
