@@ -1,4 +1,6 @@
 # GitQlient
+Windows [![Build status](https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient/branch/master)
+Lionux & OSX [![Build Status](https://travis-ci.org/francescmm/GitQlient.svg?branch=master)](https://travis-ci.org/francescmm/GitQlient)
 
 GitQlient is Git client that was forked from QGit. Nowadays still have some old functionality mainly in the core parts.
 
@@ -52,19 +54,19 @@ If you just want to play with it a bit with GitQlient or just build it for your 
 1. Clone the repository:
 
     ```git clone https://github.com/francescmm/GitQlient.git ```
-    
+
 2. Go into the GitQlient project folder and initialize the submodules:
 
     ```git submodule update --init --recursive ```
-    
+
 3. Or use QtCreator or run qmake in the main repository folder (where GitQlient.pro is located):
 
     ```qmake GitQlient.pro ```
-    
+
     If you want to build GitQlient in debug mode, write this instead:
-    
+
     ```qmake CONFIG+=debug GitQlient.pro```
-    
+
 4. Run make in the main repository folder to compile the code:
 
     ```make```
