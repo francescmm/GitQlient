@@ -2,20 +2,20 @@ language: cpp
 
 git:
   depth: 1
-  
+
 sudo: required
-dist: trusty
+dist: bionic
 
 install:
     - bash ci-scripts/$TRAVIS_OS_NAME/install.sh
 
 script:
     - bash ci-scripts/$TRAVIS_OS_NAME/build.sh
-  
+
 matrix:
   include:
       - os: osx
-        osx_image: xcode8.3
+        osx_image: xcode11.2
       - os: linux
         compiler: gcc
 
