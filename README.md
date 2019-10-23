@@ -49,10 +49,25 @@ Remember that the first time you will need to initialize the submodule and updat
 
 If you just want to play with it a bit with GitQlient or just build it for your own environment, you will need to do:
 
-1. Clone the repository
-2. Initialize the submodules
-3. Run qmake in the main repository folder (where the .pro is placed)
-4. Run make to compile the code
+1. Clone the repository:
+
+    ```git clone https://github.com/francescmm/GitQlient.git ```
+    
+2. Go into the GitQlient project folder and initialize the submodules:
+
+    ```git submodule update --init --recursive ```
+    
+3. Or use QtCreator or run qmake in the main repository folder (where GitQlient.pro is located):
+
+    ```qmake GitQlient.pro ```
+    
+    If you want to build GitQlient in debug mode, write this instead:
+    
+    ```qmake CONFIG+=debug GitQlient.pro```
+    
+4. Run make in the main repository folder to compile the code:
+
+    ```make```
 
 ## Contributions
 
