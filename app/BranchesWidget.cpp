@@ -277,16 +277,17 @@ void BranchesWidget::processLocalBranch(QString branch)
    item->setData(0, Qt::UserRole, isCurrentBranch);
    item->setData(0, Qt::UserRole + 1, fullBranchName);
    item->setData(0, Qt::UserRole + 2, true);
+   item->setData(0, Qt::ToolTipRole, fullBranchName);
 
    QLog_Debug("UI", QString("Calculating distances..."));
 
-   auto distance = mGit->getDistanceBetweenBranches(true, branch).output.toString();
+   auto distance = mGit->getDistanceBetweenBranches(true, fullBranchName).output.toString();
    distance.replace('\n', "");
    distance.replace('\t', "\u2193 - ");
    distance.append("\u2191");
    item->setText(1, distance);
 
-   distance = mGit->getDistanceBetweenBranches(false, branch).output.toString();
+   distance = mGit->getDistanceBetweenBranches(false, fullBranchName).output.toString();
 
    if (!distance.contains("fatal"))
    {
@@ -334,6 +335,7 @@ void BranchesWidget::processRemoteBranch(QString branch)
    item->setText(0, branch);
    item->setData(0, Qt::UserRole + 1, fullBranchName);
    item->setData(0, Qt::UserRole + 2, true);
+   item->setData(0, Qt::ToolTipRole, fullBranchName);
 
    // mRemoteBranchesTree->addTopLevelItem(item);
 }
