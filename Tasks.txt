@@ -8,20 +8,21 @@
 
 2. Improvements & Bugs & Fixes
 - Add Contributions Guidelines
-- Add functionality to squash commits
 - Add Options
     - Implement the options screen: for the moment only Git related options
     - Add options for logging and recent/starred projects
+    - Make logger opt-out with a method in GitQlient class
 - Add history of a file
 - Add blame on a file
+- Fix selection/focus color on files list widgets by using a delegate: Make the color be in a padding int he left part of the file name
 - Show the error text when trying to push without pull first
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Show a progress bar or custom waiting mouse icon when loading a new repo
-- Fix selection/focus color on files list widgets by using a delegate: Make the color be in a padding int he left part of the file name
-- Make logger opt-out with a method in GitQlient class
+- Add functionality to squash commits
 - Extra: add a disabled option to edit a file that throws a signal with the complete path of the file
 - Add styles to the TagDlg
 - Add styles to the QScrollBar
+- Add styles to the GoTo dialog
 
 File diff:
 - How we handle when a file changes its directory?
