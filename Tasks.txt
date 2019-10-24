@@ -7,11 +7,14 @@
         - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
 
 2. Improvements & Bugs & Fixes
-- Add Contributions Guidelines
 - Add Options
     - Implement the options screen: for the moment only Git related options
     - Add options for logging and recent/starred projects
     - Make logger opt-out with a method in GitQlient class
+- Add some configuration options
+    - Open repos when executed from command line
+    - Disable logging
+    - Set logging level
 - Add history of a file
 - Add blame on a file
 - Fix selection/focus color on files list widgets by using a delegate: Make the color be in a padding int he left part of the file name
