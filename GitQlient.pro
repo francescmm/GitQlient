@@ -15,4 +15,5 @@ include(QLogger/QLogger.pri)
 
 OTHER_FILES += $$PWD/Tasks.txt \
     $$PWD/LICENSE \
-    $$PWD/README.md
+    $$PWD/README.md \
+    $$PWD/CONTRIBUTING.md
