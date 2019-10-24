@@ -30,7 +30,7 @@ Author: Marco Costalba (C) 2005-2007
 
 using namespace QLogger;
 
-const int CommitWidget::kMaxTitleChars = 80;
+const int CommitWidget::kMaxTitleChars = 50;
 
 namespace
 {
