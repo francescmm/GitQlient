@@ -340,7 +340,16 @@ void BranchesWidget::processRemoteBranch(QString branch)
 
 void BranchesWidget::processTags()
 {
-   const auto tags = mGit->getTags();
+   auto tags = mGit->getTags();
+   std::sort(tags.begin(), tags.end(), [](QString a, QString b) {
+      a.remove("v");
+      b.remove("v");
+      const auto version = a.split(".").first().toInt() <= b.split(".").first().toInt();
+      const auto rev = a.split(".").last().toInt() <= b.split(".").last().toInt();
+
+      return version && rev;
+   });
+
    const auto localTags = mGit->getLocalTags();
 
    QLog_Info("UI", QString("Fetching {%1} tags").arg(tags.count()));
