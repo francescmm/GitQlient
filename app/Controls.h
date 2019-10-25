@@ -43,6 +43,7 @@ public:
 
    void setCurrentSha(const QString &sha) { mCurrentSha = sha; }
    void enableButtons(bool enabled);
+   void fetchAll();
 
 private:
    QString mCurrentSha;
@@ -56,7 +57,6 @@ private:
 
    void openGoToDialog();
    void pullCurrentBranch();
-   void fetchAll();
    void pushCurrentBranch();
    void stashCurrentWork();
    void popStashedWork();

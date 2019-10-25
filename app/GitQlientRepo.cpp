@@ -14,6 +14,7 @@
 #include <domain.h>
 #include <Revision.h>
 
+#include <QTimer>
 #include <QDirIterator>
 #include <QFileSystemWatcher>
 #include <QFileDialog>
@@ -37,6 +38,8 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    , mFullDiffWidget(new FullDiffWidget(mGit, mRevisionsCache))
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
+   , mAutoFetch(new QTimer())
+   , mAutoFilesUpdate(new QTimer())
 {
    QLog_Info("UI", QString("Initializing GitQlient with repo {%1}").arg(repo));
 
@@ -66,6 +69,12 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    mRepositoryView->setup();
    mRevisionWidget->setup(mRepositoryView->domain());
 
+   mAutoFetch->setInterval(mConfig.mAutoFetchSecs * 1000);
+   mAutoFilesUpdate->setInterval(mConfig.mAutoFileUpdateSecs * 1000);
+
+   connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
+   connect(mAutoFilesUpdate, &QTimer::timeout, this, &GitQlientRepo::updateUiFromWatcher);
+
    connect(mControls, &Controls::signalOpenRepo, this, &GitQlientRepo::setRepository);
    connect(mControls, &Controls::signalGoBack, this, [this]() { mainStackedWidget->setCurrentIndex(0); });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateUi);
@@ -92,6 +101,22 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
 
    setRepository(repo);
+
+   // mAutoFetch->start();
+   // mAutoFilesUpdate->start();
+}
+
+void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
+{
+   mConfig = config;
+
+   mAutoFetch->stop();
+   mAutoFetch->setInterval(mConfig.mAutoFetchSecs);
+   mAutoFetch->start();
+
+   mAutoFilesUpdate->stop();
+   mAutoFilesUpdate->setInterval(mConfig.mAutoFileUpdateSecs);
+   mAutoFilesUpdate->start();
 }
 
 void GitQlientRepo::updateUi()

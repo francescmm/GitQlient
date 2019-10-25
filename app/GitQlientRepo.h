@@ -41,11 +41,18 @@ class RepositoryView;
 class RevsView;
 class BranchesWidget;
 class FileDiffHighlighter;
+class QTimer;
 
 namespace Ui
 {
 class MainWindow;
 }
+
+struct GitQlientRepoConfig
+{
+   int mAutoFetchSecs = 300;
+   int mAutoFileUpdateSecs = 15;
+};
 
 class GitQlientRepo : public QFrame
 {
@@ -58,6 +65,7 @@ signals:
 public:
    explicit GitQlientRepo(const QString &repo, QWidget *parent = nullptr);
 
+   void setConfig(const GitQlientRepoConfig &config);
    QString currentDir() const { return mCurrentDir; }
    void setRepository(const QString &newDir);
    void close();
@@ -82,6 +90,9 @@ private:
    FileDiffWidget *mFileDiffWidget = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;
+   QTimer *mAutoFetch = nullptr;
+   QTimer *mAutoFilesUpdate = nullptr;
+   GitQlientRepoConfig mConfig;
 
    void updateUi();
    void updateUiFromWatcher();
