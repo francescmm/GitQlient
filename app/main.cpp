@@ -13,11 +13,15 @@ using namespace QLogger;
 
 int main(int argc, char *argv[])
 {
+   auto logsEnabled = true;
    QStringList repos;
+   auto i = 0;
 
-   for (auto i = 0; i < argc;)
+   while (i < argc)
    {
-      if (QString(argv[i]) == "-repos")
+      if (QString(argv[i++]) == "-noLog")
+         logsEnabled = false;
+      else if (QString(argv[i]) == "-repos")
       {
          while (!QString(argv[++i]).startsWith("-"))
             repos.append(argv[i]);
@@ -29,7 +33,8 @@ int main(int argc, char *argv[])
 
    const auto manager = QLoggerManager::getInstance();
 
-   manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
+   if (logsEnabled)
+      manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
 
    QLog_Info("UI", "Starting GitQlient...");
 
