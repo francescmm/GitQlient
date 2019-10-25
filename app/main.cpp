@@ -36,7 +36,10 @@ int main(int argc, char *argv[])
    if (logsEnabled)
       manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
 
-   QLog_Info("UI", "Starting GitQlient...");
+   QLog_Info("UI", "*******************************************");
+   QLog_Info("UI", "*          GitQlient has started          *");
+   QLog_Info("UI", "*                 -alpha-                 *");
+   QLog_Info("UI", "*******************************************");
 
    const auto mainWin = new GitQlient();
 
@@ -49,7 +52,7 @@ int main(int argc, char *argv[])
 
    const auto ret = app.exec();
 
-   QLog_Info("UI", "Stopping GitQlient...");
+   QLog_Info("UI", "*            Closing GitQlient            *");
 
    return ret;
 }

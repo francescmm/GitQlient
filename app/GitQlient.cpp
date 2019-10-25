@@ -15,11 +15,6 @@ GitQlient::GitQlient(QWidget *parent)
    : QWidget(parent)
    , mRepos(new QTabWidget())
 {
-   QLog_Info("UI", "*******************************************");
-   QLog_Info("UI", "*          GitQlient has started          *");
-   QLog_Info("UI", "*                  0.7.0                  *");
-   QLog_Info("UI", "*******************************************");
-
    QLog_Info("UI", "Creating Main Window");
 
    QFile styles(":/stylesheet");
@@ -55,11 +50,6 @@ GitQlient::GitQlient(QWidget *parent)
 
    QLog_Info("UI", "Adding an empty repo");
    addRepoTab();
-}
-
-GitQlient::~GitQlient()
-{
-   QLog_Info("UI", "*            Closing GitQlient            *");
 }
 
 void GitQlient::setRepositories(const QStringList repositories)
