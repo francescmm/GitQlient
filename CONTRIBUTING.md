@@ -13,6 +13,7 @@ My intention is to use the features that GitHub provides. So the [Issues page](h
 - Critical bug: Bug that makes GitQlient to crash
 - Bug: Bug that makes GitQlient unstable. It doesn't crash
 - Documentation: The issue is only about documentation
+- Ready to review: The issue is ready to review
 
 As soon as I see need of more I'll add them.
 
