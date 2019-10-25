@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
          logsEnabled = false;
       else if (QString(argv[i]) == "-repos")
       {
-         while (!QString(argv[++i]).startsWith("-"))
+         while (i < argc - 1 && !QString(argv[++i]).startsWith("-"))
             repos.append(argv[i]);
       }
    }
