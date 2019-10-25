@@ -12,8 +12,6 @@
     - Add options for logging and recent/starred projects
     - Make logger opt-out with a method in GitQlient class
 - Add some configuration options
-    - Open repos when executed from command line
-    - Disable logging
     - Set logging level
 - Add history of a file
 - Add blame on a file
