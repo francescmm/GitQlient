@@ -13,15 +13,31 @@ using namespace QLogger;
 
 int main(int argc, char *argv[])
 {
+   QStringList repos;
+
+   for (auto i = 0; i < argc;)
+   {
+      if (QString(argv[i]) == "-repos")
+      {
+         while (!QString(argv[++i]).startsWith("-"))
+            repos.append(argv[i]);
+      }
+   }
+
    QApplication app(argc, argv);
    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
    const auto manager = QLoggerManager::getInstance();
+
    manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
 
    QLog_Info("UI", "Starting GitQlient...");
 
    const auto mainWin = new GitQlient();
+
+   if (!repos.isEmpty())
+      mainWin->setRepositories(repos);
+
    mainWin->show();
 
    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
