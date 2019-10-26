@@ -32,13 +32,14 @@ int main(int argc, char *argv[])
    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
    const auto manager = QLoggerManager::getInstance();
+   manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
 
-   if (logsEnabled)
-      manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
+   if (!logsEnabled)
+      QLoggerManager::getInstance()->stopQLogger();
 
    QLog_Info("UI", "*******************************************");
    QLog_Info("UI", "*          GitQlient has started          *");
-   QLog_Info("UI", "*                 -alpha-                 *");
+   QLog_Info("UI", "*                 - dev -                 *");
    QLog_Info("UI", "*******************************************");
 
    const auto mainWin = new GitQlient();
