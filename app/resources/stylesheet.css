@@ -478,3 +478,8 @@ QFrame#tabWidget > QPushButton[selected=true], QFrame#tabWidget > QPushButton[se
     background-color: #606162;
 }
 
+QFrame#configPage
+{
+    background-color: #606162;
+}
+

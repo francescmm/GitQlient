@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
    if (!repos.isEmpty())
       mainWin->setRepositories(repos);
 
-   mainWin->show();
+   mainWin->showMaximized();
 
    QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
 

@@ -1,5 +1,8 @@
 #include "ConfigWidget.h"
 
+#include <CloneDlg.h>
+#include <git.h>
+
 #include <QLabel>
 #include <QPushButton>
 #include <QGridLayout>
@@ -8,9 +11,13 @@
 #include <QButtonGroup>
 #include <QStackedWidget>
 #include <QStyle>
+#include <QSpinBox>
+#include <QCheckBox>
+#include <QComboBox>
 
 ConfigWidget::ConfigWidget(QWidget *parent)
    : QFrame(parent)
+   , mGit(new Git())
    , mOpenRepo(new QPushButton(tr("Open existing repo")))
    , mCloneRepo(new QPushButton(tr("Clone new repo")))
    , mInitRepo(new QPushButton(tr("Init new repo")))
@@ -57,7 +64,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    configLayout->setContentsMargins(QMargins());
    configLayout->setSpacing(20);
    configLayout->addWidget(usedSubtitle);
-   // configLayout->addWidget(createConfigWidget());
+   configLayout->addWidget(createConfigWidget());
    configLayout->addStretch();
 
    const auto widgetsLayout = new QHBoxLayout();
@@ -86,6 +93,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 2);
 
    connect(mOpenRepo, &QPushButton::clicked, this, &ConfigWidget::openRepo);
+   connect(mCloneRepo, &QPushButton::clicked, this, &ConfigWidget::cloneRepo);
 }
 
 void ConfigWidget::openRepo()
@@ -99,12 +107,25 @@ void ConfigWidget::openRepo()
    }
 }
 
+void ConfigWidget::cloneRepo()
+{
+   CloneDlg cloneDlg(mGit);
+
+   connect(&cloneDlg, &CloneDlg::signalRepoCloned, this, &ConfigWidget::signalOpenRepo);
+
+   cloneDlg.exec();
+}
+
 QWidget *ConfigWidget::createConfigWidget()
 {
    mBtnGroup = new QButtonGroup();
-   mBtnGroup->addButton(new QPushButton(tr("General")));
-   mBtnGroup->addButton(new QPushButton(tr("Git config")));
-   mBtnGroup->addButton(new QPushButton(tr("Profiles")));
+   mBtnGroup->addButton(new QPushButton(tr("General")), 0);
+   mBtnGroup->addButton(new QPushButton(tr("Git config")), 1);
+
+   const auto firstBtn = mBtnGroup->button(0);
+   firstBtn->setProperty("selected", true);
+   firstBtn->style()->unpolish(firstBtn);
+   firstBtn->style()->polish(firstBtn);
 
    const auto buttons = mBtnGroup->buttons();
    const auto buttonsLayout = new QVBoxLayout();
@@ -126,14 +147,10 @@ QWidget *ConfigWidget::createConfigWidget()
 
    buttonsLayout->addStretch();
 
-   const auto testWidget = new QWidget();
-   testWidget->setObjectName("testWidget");
-
    const auto stackedWidget = new QStackedWidget();
    stackedWidget->setMinimumHeight(300);
-   stackedWidget->addWidget(testWidget);
-   stackedWidget->addWidget(new QWidget());
-   stackedWidget->addWidget(new QWidget());
+   stackedWidget->addWidget(createGeneralPage());
+   stackedWidget->addWidget(createConfigPage());
    stackedWidget->setCurrentIndex(0);
 
    connect(mBtnGroup, qOverload<int>(&QButtonGroup::buttonClicked), this, [this, stackedWidget](int index) {
@@ -161,17 +178,66 @@ QWidget *ConfigWidget::createConfigWidget()
    return tabWidget;
 }
 
-QWidget *ConfigWidget::createConfigPage()
-{
-   return nullptr;
-}
-
 QWidget *ConfigWidget::createGeneralPage()
 {
-   return nullptr;
+   const auto autoFetch = new QSpinBox();
+   autoFetch->setRange(0, 60);
+
+   const auto labelAutoFetch = new QLabel(tr("The interval is expected to be in minutes. "
+                                             "Choose a value between 0 (for disabled) and 60"));
+   labelAutoFetch->setWordWrap(true);
+
+   const auto fetchLayout = new QVBoxLayout();
+   fetchLayout->setAlignment(Qt::AlignTop);
+   fetchLayout->setContentsMargins(QMargins());
+   fetchLayout->setSpacing(0);
+   fetchLayout->addWidget(autoFetch);
+   fetchLayout->addWidget(labelAutoFetch);
+
+   const auto fetchLayoutLabel = new QVBoxLayout();
+   fetchLayoutLabel->setAlignment(Qt::AlignTop);
+   fetchLayoutLabel->setContentsMargins(QMargins());
+   fetchLayoutLabel->setSpacing(0);
+   fetchLayoutLabel->addWidget(new QLabel(tr("Auto-Fetch interval")));
+   fetchLayoutLabel->addStretch();
+
+   const auto autoPrune = new QCheckBox();
+
+   const auto disableLogs = new QCheckBox();
+
+   const auto levelCombo = new QComboBox();
+   levelCombo->addItems({ "Trace", "Debug", "Info", "Warning", "Error", "Fatal" });
+   levelCombo->setCurrentText("Info");
+
+   const auto autoFormat = new QCheckBox(tr(" (needs clang-format)"));
+
+   const auto frame = new QFrame();
+   frame->setObjectName("configPage");
+   const auto layout = new QGridLayout(frame);
+   layout->setContentsMargins(20, 20, 20, 20);
+   layout->setSpacing(20);
+   layout->setAlignment(Qt::AlignTop);
+   layout->addLayout(fetchLayoutLabel, 0, 0);
+   layout->addLayout(fetchLayout, 0, 1);
+   layout->addWidget(new QLabel(tr("Auto-Prune")), 2, 0);
+   layout->addWidget(autoPrune, 2, 1);
+   layout->addWidget(new QLabel(tr("Disable logs")), 3, 0);
+   layout->addWidget(disableLogs, 3, 1);
+   layout->addWidget(new QLabel(tr("Set log level")), 4, 0);
+   layout->addWidget(levelCombo, 4, 1);
+   layout->addWidget(new QLabel(tr("Auto-Format files")), 5, 0);
+   layout->addWidget(autoFormat, 5, 1);
+   layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 6, 0, 1, 2);
+
+   frame->setDisabled(true);
+
+   return frame;
 }
 
-QWidget *ConfigWidget::createProfilesPage()
+QWidget *ConfigWidget::createConfigPage()
 {
-   return nullptr;
+   const auto frame = new QFrame();
+   frame->setObjectName("configPage");
+
+   return frame;
 }

@@ -5,6 +5,7 @@
 
 class QPushButton;
 class QButtonGroup;
+class Git;
 
 class ConfigWidget : public QFrame
 {
@@ -17,16 +18,17 @@ public:
    explicit ConfigWidget(QWidget *parent = nullptr);
 
 private:
+   QSharedPointer<Git> mGit;
    QPushButton *mOpenRepo = nullptr;
    QPushButton *mCloneRepo = nullptr;
    QPushButton *mInitRepo = nullptr;
    QButtonGroup *mBtnGroup = nullptr;
 
    void openRepo();
+   void cloneRepo();
    QWidget *createConfigWidget();
    QWidget *createConfigPage();
    QWidget *createGeneralPage();
-   QWidget *createProfilesPage();
 };
 
 #endif // CONFIG_H
