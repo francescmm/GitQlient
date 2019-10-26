@@ -29,10 +29,16 @@ class Git;
 
 namespace Ui
 {
-class CloneDlg;
+class CreateRepoDlg;
 }
 
-class CloneDlg : public QDialog
+enum class CreateRepoDlgType
+{
+   CLONE,
+   INIT
+};
+
+class CreateRepoDlg : public QDialog
 {
    Q_OBJECT
 
@@ -40,13 +46,14 @@ signals:
    void signalRepoCloned(const QString &path);
 
 public:
-   explicit CloneDlg(QSharedPointer<Git> git, QWidget *parent = nullptr);
-   ~CloneDlg() override;
+   explicit CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<Git> git, QWidget *parent = nullptr);
+   ~CreateRepoDlg() override;
 
    void accept() override;
 
 private:
-   Ui::CloneDlg *ui;
+   Ui::CreateRepoDlg *ui;
+   CreateRepoDlgType mType;
    QSharedPointer<Git> mGit;
 
    void selectFolder();

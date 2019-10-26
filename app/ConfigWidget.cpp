@@ -1,6 +1,6 @@
 #include "ConfigWidget.h"
 
-#include <CloneDlg.h>
+#include <CreateRepoDlg.h>
 #include <git.h>
 
 #include <QLabel>
@@ -94,6 +94,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
 
    connect(mOpenRepo, &QPushButton::clicked, this, &ConfigWidget::openRepo);
    connect(mCloneRepo, &QPushButton::clicked, this, &ConfigWidget::cloneRepo);
+   connect(mInitRepo, &QPushButton::clicked, this, &ConfigWidget::initRepo);
 }
 
 void ConfigWidget::openRepo()
@@ -109,9 +110,18 @@ void ConfigWidget::openRepo()
 
 void ConfigWidget::cloneRepo()
 {
-   CloneDlg cloneDlg(mGit);
+   CreateRepoDlg cloneDlg(CreateRepoDlgType::CLONE, mGit);
 
-   connect(&cloneDlg, &CloneDlg::signalRepoCloned, this, &ConfigWidget::signalOpenRepo);
+   connect(&cloneDlg, &CreateRepoDlg::signalRepoCloned, this, &ConfigWidget::signalOpenRepo);
+
+   cloneDlg.exec();
+}
+
+void ConfigWidget::initRepo()
+{
+   CreateRepoDlg cloneDlg(CreateRepoDlgType::INIT, mGit);
+
+   connect(&cloneDlg, &CreateRepoDlg::signalRepoCloned, this, &ConfigWidget::signalOpenRepo);
 
    cloneDlg.exec();
 }

@@ -8,7 +8,6 @@
 
 2. Improvements & Bugs & Fixes
 - Add Options
-    - Implement the options screen: for the moment only Git related options
     - Add options for logging and recent/starred projects
     - Make logger opt-out with a method in GitQlient class
 - Add some configuration options

@@ -26,6 +26,7 @@ private:
 
    void openRepo();
    void cloneRepo();
+   void initRepo();
    QWidget *createConfigWidget();
    QWidget *createConfigPage();
    QWidget *createGeneralPage();

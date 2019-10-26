@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>CloneDlg</class>
- <widget class="QDialog" name="CloneDlg">
+ <class>CreateRepoDlg</class>
+ <widget class="QDialog" name="CreateRepoDlg">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>363</width>
-    <height>126</height>
+    <height>160</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,7 +72,7 @@
    <item row="3" column="0" colspan="3">
     <widget class="QCheckBox" name="chbOpen">
      <property name="text">
-      <string>Open repository after clone</string>
+      <string>Open repository after %1</string>
      </property>
      <property name="checked">
       <bool>true</bool>

@@ -69,6 +69,7 @@ public:
    void stop(bool saveCache);
    QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
+   bool initRepo(const QString &fullPath);
    /** END Git CONFIGURATION **/
 
    /** START BRANCHES **/

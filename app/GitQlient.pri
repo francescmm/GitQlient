@@ -3,9 +3,9 @@ RESOURCES += \
 
 FORMS += \
     $$PWD/AddSubmoduleDlg.ui \
-    $$PWD/CloneDlg.ui \
     $$PWD/CommitWidget.ui \
     $$PWD/BranchDlg.ui \
+    $$PWD/CreateRepoDlg.ui \
     $$PWD/TagDlg.ui
 
 HEADERS += \
@@ -16,10 +16,10 @@ HEADERS += \
     $$PWD/BranchesViewDelegate.h \
     $$PWD/BranchesWidget.h \
     $$PWD/ClickableFrame.h \
-    $$PWD/CloneDlg.h \
     $$PWD/CommitWidget.h \
     $$PWD/ConfigWidget.h \
     $$PWD/Controls.h \
+    $$PWD/CreateRepoDlg.h \
     $$PWD/FileContextMenu.h \
     $$PWD/FileDiffHighlighter.h \
     $$PWD/FileDiffView.h \
@@ -57,10 +57,10 @@ SOURCES += \
     $$PWD/BranchesViewDelegate.cpp \
     $$PWD/BranchesWidget.cpp \
     $$PWD/ClickableFrame.cpp \
-    $$PWD/CloneDlg.cpp \
     $$PWD/CommitWidget.cpp \
     $$PWD/ConfigWidget.cpp \
     $$PWD/Controls.cpp \
+    $$PWD/CreateRepoDlg.cpp \
     $$PWD/FileContextMenu.cpp \
     $$PWD/FileDiffHighlighter.cpp \
     $$PWD/FileDiffView.cpp \
