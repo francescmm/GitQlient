@@ -27,6 +27,7 @@
 #include <QSet>
 
 class QTabWidget;
+class ConfigWidget;
 class GitQlientRepo;
 
 class GitQlient : public QWidget
@@ -38,13 +39,12 @@ public:
    void setRepositories(const QStringList repositories);
 
 private:
-   bool mFirstRepoInitialized = false;
    QTabWidget *mRepos = nullptr;
+   ConfigWidget *mConfigWidget = nullptr;
    QSet<QString> mCurrentRepos;
 
-   void setRepoName(const QString &repoName);
    void openRepo();
+   void setRepoName(const QString &repoName);
    void addRepoTab(const QString &repoPath = "");
-   void repoClosed(int tabIndex);
    void closeTab(int tabIndex);
 };

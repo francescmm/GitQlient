@@ -1,12 +1,16 @@
 #include "GitQlient.h"
 
+#include <ConfigWidget.h>
+
 #include <QProcess>
 #include <QTabWidget>
+#include <QTabBar>
 #include <GitQlientRepo.h>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QFile>
 #include <QFileDialog>
-#include <QDir>
+
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -14,6 +18,7 @@ using namespace QLogger;
 GitQlient::GitQlient(QWidget *parent)
    : QWidget(parent)
    , mRepos(new QTabWidget())
+   , mConfigWidget(new ConfigWidget())
 {
    QLog_Info("UI", "Creating Main Window");
 
@@ -27,43 +32,26 @@ GitQlient::GitQlient(QWidget *parent)
       styles.close();
    }
 
-   const auto newRepo = new QPushButton();
-   newRepo->setObjectName("openGitAdmin");
-   newRepo->setIcon(QIcon(":/icons/git_orange"));
-   newRepo->setToolTip(tr("Open new repository"));
-   // connect(newRepo, &QPushButton::clicked, this, &GitQlient::openRepo);
-
    const auto addTab = new QPushButton();
    addTab->setObjectName("openNewRepo");
    addTab->setIcon(QIcon(":/icons/open_repo"));
    addTab->setToolTip(tr("Open new repository"));
    connect(addTab, &QPushButton::clicked, this, &GitQlient::openRepo);
 
-   mRepos->setCornerWidget(newRepo, Qt::TopLeftCorner);
    mRepos->setCornerWidget(addTab, Qt::TopRightCorner);
    mRepos->setTabsClosable(true);
-   connect(mRepos, &QTabWidget::tabCloseRequested, this, &GitQlient::repoClosed);
+   connect(mRepos, &QTabWidget::tabCloseRequested, this, &GitQlient::closeTab);
 
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
    vLayout->addWidget(mRepos);
 
+   auto configIndex = mRepos->addTab(mConfigWidget, QIcon(":/icons/git_orange"), QString());
+   mRepos->tabBar()->setTabButton(configIndex, QTabBar::RightSide, nullptr);
+
    QLog_Info("UI", "Adding an empty repo");
-   addRepoTab();
-}
 
-void GitQlient::setRepositories(const QStringList repositories)
-{
-   QLog_Info("UI", QString("Adding {%1} repositories").arg(repositories.count()));
-
-   if (!mFirstRepoInitialized)
-   {
-      closeTab(0);
-      mFirstRepoInitialized = true;
-   }
-
-   for (auto repo : repositories)
-      addRepoTab(repo);
+   connect(mConfigWidget, &ConfigWidget::signalOpenRepo, this, &GitQlient::addRepoTab);
 }
 
 void GitQlient::openRepo()
@@ -73,15 +61,16 @@ void GitQlient::openRepo()
    if (!dirName.isEmpty())
    {
       QDir d(dirName);
-
-      if (!mFirstRepoInitialized)
-      {
-         closeTab(0);
-         mFirstRepoInitialized = true;
-      }
-
       addRepoTab(d.absolutePath());
    }
+}
+
+void GitQlient::setRepositories(const QStringList repositories)
+{
+   QLog_Info("UI", QString("Adding {%1} repositories").arg(repositories.count()));
+
+   for (auto repo : repositories)
+      addRepoTab(repo);
 }
 
 void GitQlient::addRepoTab(const QString &repoPath)
@@ -132,19 +121,6 @@ void GitQlient::addRepoTab(const QString &repoPath)
    }
    else
       QLog_Warning("UI", QString("Repository at {%1} already opened. Skip adding it again.").arg(repoPath));
-}
-
-void GitQlient::repoClosed(int tabIndex)
-{
-   closeTab(tabIndex);
-
-   if (mRepos->count() == 0)
-   {
-      QLog_Info("UI", "Adding an empty repo");
-
-      addRepoTab();
-      mFirstRepoInitialized = false;
-   }
 }
 
 void GitQlient::closeTab(int tabIndex)
