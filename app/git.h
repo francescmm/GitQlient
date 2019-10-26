@@ -68,6 +68,7 @@ public:
    void init2();
    void stop(bool saveCache);
    QString getWorkingDir() const { return mWorkingDir; }
+   bool clone(const QString &url, const QString &fullPath);
    /** END Git CONFIGURATION **/
 
    /** START BRANCHES **/

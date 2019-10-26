@@ -3,6 +3,7 @@ RESOURCES += \
 
 FORMS += \
     $$PWD/AddSubmoduleDlg.ui \
+    $$PWD/CloneDlg.ui \
     $$PWD/CommitWidget.ui \
     $$PWD/BranchDlg.ui \
     $$PWD/TagDlg.ui
@@ -15,6 +16,7 @@ HEADERS += \
     $$PWD/BranchesViewDelegate.h \
     $$PWD/BranchesWidget.h \
     $$PWD/ClickableFrame.h \
+    $$PWD/CloneDlg.h \
     $$PWD/CommitWidget.h \
     $$PWD/ConfigWidget.h \
     $$PWD/Controls.h \
@@ -55,6 +57,7 @@ SOURCES += \
     $$PWD/BranchesViewDelegate.cpp \
     $$PWD/BranchesWidget.cpp \
     $$PWD/ClickableFrame.cpp \
+    $$PWD/CloneDlg.cpp \
     $$PWD/CommitWidget.cpp \
     $$PWD/ConfigWidget.cpp \
     $$PWD/Controls.cpp \

@@ -1509,6 +1509,11 @@ void Git::stop(bool saveCache)
    }
 }
 
+bool Git::clone(const QString &url, const QString &fullPath)
+{
+   return run(QString("git clone %1 %2").arg(url, fullPath)).first;
+}
+
 void Git::clearRevs()
 {
    mRevData->clear();
