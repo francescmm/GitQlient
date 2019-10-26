@@ -49,8 +49,6 @@ GitQlient::GitQlient(QWidget *parent)
    auto configIndex = mRepos->addTab(mConfigWidget, QIcon(":/icons/git_orange"), QString());
    mRepos->tabBar()->setTabButton(configIndex, QTabBar::RightSide, nullptr);
 
-   QLog_Info("UI", "Adding an empty repo");
-
    connect(mConfigWidget, &ConfigWidget::signalOpenRepo, this, &GitQlient::addRepoTab);
 }
 
