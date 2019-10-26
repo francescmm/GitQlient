@@ -16,6 +16,7 @@ HEADERS += \
     $$PWD/BranchesWidget.h \
     $$PWD/ClickableFrame.h \
     $$PWD/CommitWidget.h \
+    $$PWD/ConfigWidget.h \
     $$PWD/Controls.h \
     $$PWD/FileContextMenu.h \
     $$PWD/FileDiffHighlighter.h \
@@ -55,6 +56,7 @@ SOURCES += \
     $$PWD/BranchesWidget.cpp \
     $$PWD/ClickableFrame.cpp \
     $$PWD/CommitWidget.cpp \
+    $$PWD/ConfigWidget.cpp \
     $$PWD/Controls.cpp \
     $$PWD/FileContextMenu.cpp \
     $$PWD/FileDiffHighlighter.cpp \
