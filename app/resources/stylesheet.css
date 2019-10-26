@@ -423,3 +423,58 @@ QToolTip
    color: white;
 }
 
+ConfigWidget
+{
+    background-color: #404142;
+}
+
+QFrame#separator
+{
+   background-color: #202122;
+   min-height: 1px;
+   max-height: 1px;
+}
+
+QFrame#separator2px
+{
+   background-color: #202122;
+   min-height: 2px;
+   max-height: 2px;
+}
+
+QLabel#subtitle
+{
+    font-size: 16pt;
+}
+
+QLabel#title
+{
+    font-size: 24pt;
+}
+
+QWidget#testWidget
+{
+    background-color: #606162;
+}
+
+QPushButton#bigButton
+{
+    max-height: 30px;
+    min-height: 30px;
+    border: 2px solid #101112;
+}
+
+QFrame#tabWidget > QPushButton, QFrame#tabWidget > QPushButton[selected=false]
+{
+    max-width: 125px;
+    min-width: 125px;
+    max-height: 30px;
+    min-height: 30px;
+    border-right: 0px;
+}
+
+QFrame#tabWidget > QPushButton[selected=true], QFrame#tabWidget > QPushButton[selected=true]:hover
+{
+    background-color: #606162;
+}
+
