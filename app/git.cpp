@@ -458,7 +458,7 @@ bool Git::isNothingToCommit()
    if (!mRevsFiles.contains(ZERO_SHA))
       return true;
 
-   const RevisionFile *rf = mRevsFiles[ZERO_SHA];
+   const auto rf = mRevsFiles.value(ZERO_SHA);
    return rf->count() == workingDirInfo.otherFiles.count();
 }
 
@@ -1521,6 +1521,7 @@ bool Git::initRepo(const QString &fullPath)
 
 void Git::clearRevs()
 {
+   mRevCache->clear();
    mRevData->clear();
    mFirstNonStGitPatch = "";
    workingDirInfo.clear();

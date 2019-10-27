@@ -28,7 +28,9 @@ const Revision *RevisionsCache::revLookup(const QString &sha) const
 void RevisionsCache::insertRevision(const QString sha, const Revision &rev)
 {
    revs.insert(sha, new Revision(rev));
-   revOrder.append(sha);
+
+   if (!revOrder.contains(sha))
+      revOrder.append(sha);
 }
 
 QString RevisionsCache::getShortLog(const QString &sha) const
