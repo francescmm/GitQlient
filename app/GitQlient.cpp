@@ -15,12 +15,17 @@
 
 using namespace QLogger;
 
-GitQlient::GitQlient(QWidget *parent)
+GitQlient::GitQlient(int argc, char *argv[], QWidget *parent)
    : QWidget(parent)
    , mRepos(new QTabWidget())
    , mConfigWidget(new ConfigWidget())
 {
-   QLog_Info("UI", "Creating Main Window");
+   const auto repos = parseArguments(argc, argv);
+
+   QLog_Info("UI", "*******************************************");
+   QLog_Info("UI", "*          GitQlient has started          *");
+   QLog_Info("UI", "*                 - dev -                 *");
+   QLog_Info("UI", "*******************************************");
 
    QFile styles(":/stylesheet");
 
@@ -50,6 +55,13 @@ GitQlient::GitQlient(QWidget *parent)
    mRepos->tabBar()->setTabButton(configIndex, QTabBar::RightSide, nullptr);
 
    connect(mConfigWidget, &ConfigWidget::signalOpenRepo, this, &GitQlient::addRepoTab);
+
+   setRepositories(repos);
+}
+
+GitQlient::~GitQlient()
+{
+   QLog_Info("UI", "*            Closing GitQlient            *");
 }
 
 void GitQlient::openRepo()
@@ -69,6 +81,32 @@ void GitQlient::setRepositories(const QStringList repositories)
 
    for (auto repo : repositories)
       addRepoTab(repo);
+}
+
+QStringList GitQlient::parseArguments(int argc, char *argv[])
+{
+   auto logsEnabled = true;
+   QStringList repos;
+   auto i = 0;
+
+   while (i < argc)
+   {
+      if (QString(argv[i++]) == "-noLog")
+         logsEnabled = false;
+      else if (QString(argv[i]) == "-repos")
+      {
+         while (i < argc - 1 && !QString(argv[++i]).startsWith("-"))
+            repos.append(argv[i]);
+      }
+   }
+
+   const auto manager = QLoggerManager::getInstance();
+   manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
+
+   if (!logsEnabled)
+      QLoggerManager::getInstance()->pause();
+
+   return repos;
 }
 
 void GitQlient::addRepoTab(const QString &repoPath)
