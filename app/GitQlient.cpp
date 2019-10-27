@@ -91,13 +91,18 @@ QStringList GitQlient::parseArguments(int argc, char *argv[])
 
    while (i < argc)
    {
-      if (QString(argv[i++]) == "-noLog")
+      if (QString(argv[i]) == "-noLog")
+      {
          logsEnabled = false;
+         ++i;
+      }
       else if (QString(argv[i]) == "-repos")
       {
          while (i < argc - 1 && !QString(argv[++i]).startsWith("-"))
             repos.append(argv[i]);
       }
+      else
+         ++i;
    }
 
    const auto manager = QLoggerManager::getInstance();
