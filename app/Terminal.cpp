@@ -17,7 +17,7 @@ Terminal::Terminal(QSharedPointer<Git> git)
    setMinimumSize(800, 400);
    setAttribute(Qt::WA_DeleteOnClose);
 
-   QFile styles(":/stylesheet.css");
+   QFile styles(":/stylesheet");
 
    if (styles.open(QIODevice::ReadOnly))
    {

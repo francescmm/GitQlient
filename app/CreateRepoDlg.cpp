@@ -11,6 +11,14 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<Git> git, QW
    , mType(type)
    , mGit(git)
 {
+   QFile styles(":/stylesheet");
+
+   if (styles.open(QIODevice::ReadOnly))
+   {
+      setStyleSheet(QString::fromUtf8(styles.readAll()));
+      styles.close();
+   }
+
    ui->setupUi(this);
 
    const auto operation = mType == CreateRepoDlgType::INIT ? QString("init") : QString("clone");

@@ -15,7 +15,6 @@
 - Show a progress bar or custom waiting mouse icon when loading a new repo
 - Add functionality to squash commits
 - Extra: add a disabled option to edit a file that throws a signal with the complete path of the file
-- Add styles to the TagDlg
 - Add styles to the QScrollBar
 - Add styles to the GoTo dialog
 

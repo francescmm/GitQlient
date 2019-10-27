@@ -10,7 +10,7 @@ BranchDlg::BranchDlg(const BranchDlgConfig &config, QWidget *parent)
    , ui(new Ui::BranchDlg)
    , mConfig(config)
 {
-   QFile styles(":/stylesheet.css");
+   QFile styles(":/stylesheet");
 
    if (styles.open(QIODevice::ReadOnly))
    {

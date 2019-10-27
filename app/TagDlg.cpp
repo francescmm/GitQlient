@@ -3,12 +3,22 @@
 
 #include <git.h>
 
+#include <QFile>
+
 TagDlg::TagDlg(QSharedPointer<Git> git, const QString &sha, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::TagDlg)
    , mGit(git)
    , mSha(sha)
 {
+   QFile styles(":/stylesheet");
+
+   if (styles.open(QIODevice::ReadOnly))
+   {
+      setStyleSheet(QString::fromUtf8(styles.readAll()));
+      styles.close();
+   }
+
    ui->setupUi(this);
 
    connect(ui->leTagName, &QLineEdit::returnPressed, this, &TagDlg::accept);

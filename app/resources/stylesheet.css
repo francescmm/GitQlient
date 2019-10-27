@@ -483,3 +483,23 @@ GeneralConfigPage
     background-color: #606162;
 }
 
+QDialog
+{
+    background-color: #404142;
+}
+
+QDialog > QPushButton
+{
+    padding: 5px;
+}
+
+QDialog > QLineEdit
+{
+    border: 1px solid #202122;
+    background-color: #606162;
+    color: white;
+    min-height: 25px;
+    max-height: 25px;
+    padding-left: 10px;
+}
+
