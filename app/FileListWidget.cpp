@@ -7,6 +7,7 @@ Copyright: See COPYING file that comes with this distribution
 
 #include <FileContextMenu.h>
 #include <RevisionFile.h>
+#include <FileListDelegate.h>
 #include "domain.h"
 #include "git.h"
 
@@ -17,12 +18,14 @@ Copyright: See COPYING file that comes with this distribution
 #include <QPainter>
 #include <QPalette>
 #include <QMenu>
+#include <QItemDelegate>
 
 FileListWidget::FileListWidget(QSharedPointer<Git> git, QWidget *p)
    : QListWidget(p)
    , mGit(git)
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
+   setItemDelegate(new FileListDelegate(this));
 }
 
 void FileListWidget::setup(Domain *dm)
@@ -37,6 +40,7 @@ void FileListWidget::addItem(const QString &label, const QColor &clr)
 {
    const auto item = new QListWidgetItem(label, this);
    item->setForeground(clr);
+   item->setToolTip(label);
 }
 
 void FileListWidget::showContextMenu(const QPoint &pos)
@@ -79,8 +83,8 @@ void FileListWidget::insertFiles(const RevisionFile *files)
       if (isMergeParents && files->mergeParent.at(i) != prevPar)
       {
          prevPar = files->mergeParent.at(i);
-         new QListWidgetItem("", this);
-         new QListWidgetItem("", this);
+         new QListWidgetItem("", this); // WTF?
+         new QListWidgetItem("", this); // WTF?
       }
       QString extSt(files->extendedStatus(i));
       if (extSt.isEmpty())

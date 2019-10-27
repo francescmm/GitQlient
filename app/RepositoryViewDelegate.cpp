@@ -352,7 +352,6 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
    newOpt.rect.setX(opt.rect.x() + offset + 5);
 
    QFontMetrics fm(newOpt.font);
-   fm.height();
 
    p->setPen(QColor("white"));
    p->drawText(newOpt.rect, fm.elidedText(index.data().toString(), Qt::ElideRight, newOpt.rect.width()),

@@ -12,6 +12,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <Revision.h>
 #include <RevisionFile.h>
 #include <UnstagedFilesContextMenu.h>
+#include <FileListDelegate.h>
 
 #include <QDir>
 #include <QKeyEvent>
@@ -25,6 +26,8 @@ Author: Marco Costalba (C) 2005-2007
 #include <QListWidgetItem>
 #include <QTextStream>
 #include <QProcess>
+#include <QItemDelegate>
+#include <QPainter>
 
 #include <QLogger.h>
 
@@ -57,6 +60,10 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
    , mGit(git)
 {
    ui->setupUi(this);
+
+   ui->unstagedFilesList->setItemDelegate(new FileListDelegate(this));
+   ui->stagedFilesList->setItemDelegate(new FileListDelegate(this));
+   ui->untrackedFilesList->setItemDelegate(new FileListDelegate(this));
 
    ui->lCounter->setText(QString::number(kMaxTitleChars));
    ui->leCommitTitle->setMaxLength(kMaxTitleChars);
