@@ -7,7 +7,6 @@
         - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
 
 2. Improvements & Bugs & Fixes
-- Implement the general config options
 - Add history of a file
 - Add blame on a file
 - Fix selection/focus color on files list widgets by using a delegate: Make the color be in a padding int he left part of the file name

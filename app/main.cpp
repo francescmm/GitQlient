@@ -11,7 +11,9 @@ int main(int argc, char *argv[])
    QApplication app(argc, argv);
    app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
-   QSettings settings("Francesc M.", "GitQlient");
+   QCoreApplication::setOrganizationName("CescSoftware");
+   QCoreApplication::setOrganizationDomain("francescmm.com");
+   QCoreApplication::setApplicationName("GitQlient");
 
    const auto mainWin = new GitQlient(argc, argv);
    mainWin->showMaximized();
