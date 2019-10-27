@@ -10,6 +10,9 @@
 #include <QMenu>
 #include <QDir>
 #include <QFileDialog>
+#include <QLabel>
+#include <QApplication>
+#include <QDesktopWidget>
 
 Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
@@ -110,13 +113,30 @@ void Controls::enableButtons(bool enabled)
 
 void Controls::openGoToDialog()
 {
+   const auto gotoDlg = new QDialog();
+
+   QFile styles(":/stylesheet");
+   if (styles.open(QIODevice::ReadOnly))
+   {
+      gotoDlg->setStyleSheet(QString::fromUtf8(styles.readAll()));
+      styles.close();
+   }
+
+   gotoDlg->setWindowFlags(Qt::FramelessWindowHint);
+   gotoDlg->setWindowModality(Qt::ApplicationModal);
+   gotoDlg->setAttribute(Qt::WA_DeleteOnClose);
+
    const auto goToSha = new QLineEdit();
-   goToSha->setWindowModality(Qt::ApplicationModal);
-   goToSha->setAttribute(Qt::WA_DeleteOnClose);
+
+   const auto goToShaLayout = new QVBoxLayout(gotoDlg);
+   goToShaLayout->setContentsMargins(20, 20, 20, 20);
+   goToShaLayout->setSpacing(10);
+   goToShaLayout->addWidget(new QLabel(tr("Write the SHA and press enter. To exit, press Esc or Alt+F4.")));
+   goToShaLayout->addWidget(goToSha);
 
    connect(goToSha, &QLineEdit::returnPressed, this, [this, goToSha]() { emit signalGoToSha(goToSha->text()); });
-
-   goToSha->show();
+   connect(goToSha, &QLineEdit::returnPressed, gotoDlg, &QDialog::close);
+   gotoDlg->exec();
 }
 
 void Controls::pullCurrentBranch()
