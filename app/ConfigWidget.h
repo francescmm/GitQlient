@@ -29,7 +29,6 @@ private:
    void initRepo();
    QWidget *createConfigWidget();
    QWidget *createConfigPage();
-   QWidget *createGeneralPage();
 };
 
 #endif // CONFIG_H
