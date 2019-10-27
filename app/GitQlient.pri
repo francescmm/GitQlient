@@ -30,6 +30,7 @@ HEADERS += \
     $$PWD/GitAsyncProcess.h \
     $$PWD/GitQlient.h \
     $$PWD/GitQlientRepo.h \
+    $$PWD/GitQlientSettings.h \
     $$PWD/GitSyncProcess.h \
     $$PWD/RepositoryContextMenu.h \
     $$PWD/RepositoryModel.h \
@@ -72,6 +73,7 @@ SOURCES += \
     $$PWD/GitAsyncProcess.cpp \
     $$PWD/GitQlient.cpp \
     $$PWD/GitQlientRepo.cpp \
+    $$PWD/GitQlientSettings.cpp \
     $$PWD/GitSyncProcess.cpp \
     $$PWD/RepositoryContextMenu.cpp \
     $$PWD/RepositoryModel.cpp \

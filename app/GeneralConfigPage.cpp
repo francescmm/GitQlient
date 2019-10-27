@@ -1,6 +1,8 @@
 #include "GeneralConfigPage.h"
 
-#include <QSettings>
+#include <GitQlientSettings.h>
+#include <QLogger.h>
+
 #include <QTimer>
 #include <QSpinBox>
 #include <QCheckBox>
@@ -9,14 +11,24 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 
+using namespace QLogger;
+
 GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    : QFrame(parent)
-{
-   QSettings settings;
+   , mAutoFetch(new QSpinBox())
+   , mAutoPrune(new QCheckBox())
+   , mDisableLogs(new QCheckBox())
+   , mLevelCombo(new QComboBox())
+   , mAutoFormat(new QCheckBox(tr(" (needs clang-format)")))
+   , mStatusLabel(new QLabel())
+   , mReset(new QPushButton(tr("Reset")))
+   , mApply(new QPushButton(tr("Apply")))
 
-   const auto autoFetch = new QSpinBox();
-   autoFetch->setRange(0, 60);
-   autoFetch->setValue(settings.value("autoFetch", 0).toInt());
+{
+   GitQlientSettings settings;
+
+   mAutoFetch->setRange(0, 60);
+   mAutoFetch->setValue(settings.value("autoFetch", 0).toInt());
 
    const auto labelAutoFetch = new QLabel(tr("The interval is expected to be in minutes. "
                                              "Choose a value between 0 (for disabled) and 60"));
@@ -26,7 +38,7 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    fetchLayout->setAlignment(Qt::AlignTop);
    fetchLayout->setContentsMargins(QMargins());
    fetchLayout->setSpacing(0);
-   fetchLayout->addWidget(autoFetch);
+   fetchLayout->addWidget(mAutoFetch);
    fetchLayout->addWidget(labelAutoFetch);
 
    const auto fetchLayoutLabel = new QVBoxLayout();
@@ -36,57 +48,27 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    fetchLayoutLabel->addWidget(new QLabel(tr("Auto-Fetch interval")));
    fetchLayoutLabel->addStretch();
 
-   const auto autoPrune = new QCheckBox();
-   autoPrune->setChecked(settings.value("autoPrune", true).toBool());
+   mAutoPrune->setChecked(settings.value("autoPrune", true).toBool());
 
-   const auto disableLogs = new QCheckBox();
-   disableLogs->setChecked(settings.value("logsDisabled", false).toBool());
+   mDisableLogs->setChecked(settings.value("logsDisabled", false).toBool());
 
-   const auto levelCombo = new QComboBox();
-   levelCombo->addItems({ "Trace", "Debug", "Info", "Warning", "Error", "Fatal" });
-   levelCombo->setCurrentIndex(settings.value("logsLevel", 2).toInt());
+   mLevelCombo->addItems({ "Trace", "Debug", "Info", "Warning", "Error", "Fatal" });
+   mLevelCombo->setCurrentIndex(settings.value("logsLevel", 2).toInt());
 
-   const auto autoFormat = new QCheckBox(tr(" (needs clang-format)"));
-   autoFormat->setChecked(settings.value("autoFormat", true).toBool());
+   mAutoFormat->setChecked(settings.value("autoFormat", true).toBool());
 
-   const auto lStatus = new QLabel();
+   connect(mReset, &QPushButton::clicked, this, &GeneralConfigPage::resetChanges);
 
-   const auto pbReset = new QPushButton(tr("Reset"));
-   connect(pbReset, &QPushButton::clicked, this,
-           [autoFetch, autoPrune, disableLogs, levelCombo, autoFormat, lStatus]() {
-              QSettings settings;
-              autoFetch->setValue(settings.value("autoFetch", 0).toInt());
-              autoPrune->setChecked(settings.value("autoPrune", true).toBool());
-              disableLogs->setChecked(settings.value("logsDisabled", false).toBool());
-              levelCombo->setCurrentIndex(settings.value("logsLevel", 2).toInt());
-              autoFormat->setChecked(settings.value("autoFormat", true).toBool());
-
-              QTimer::singleShot(3000, [lStatus]() { lStatus->setText(""); });
-              lStatus->setText(tr("Changes reseted"));
-           });
-
-   const auto pbApply = new QPushButton(tr("Apply"));
-   connect(pbApply, &QPushButton::clicked, this,
-           [autoFetch, autoPrune, disableLogs, levelCombo, autoFormat, lStatus]() {
-              QSettings settings;
-              settings.setValue("autoFetch", autoFetch->value());
-              settings.setValue("autoPrune", autoPrune->isChecked());
-              settings.setValue("logsDisabled", disableLogs->isChecked());
-              settings.setValue("logsLevel", levelCombo->currentIndex());
-              settings.setValue("autoFormat", autoFormat->isChecked());
-
-              QTimer::singleShot(3000, [lStatus]() { lStatus->setText(""); });
-              lStatus->setText(tr("Changes applied"));
-           });
+   connect(mApply, &QPushButton::clicked, this, &GeneralConfigPage::applyChanges);
 
    const auto buttonsLayout = new QHBoxLayout();
    buttonsLayout->setContentsMargins(QMargins());
    buttonsLayout->setSpacing(0);
-   buttonsLayout->addWidget(pbReset);
+   buttonsLayout->addWidget(mReset);
    buttonsLayout->addStretch();
-   buttonsLayout->addWidget(lStatus);
+   buttonsLayout->addWidget(mStatusLabel);
    buttonsLayout->addStretch();
-   buttonsLayout->addWidget(pbApply);
+   buttonsLayout->addWidget(mApply);
 
    const auto layout = new QGridLayout(this);
    layout->setContentsMargins(20, 20, 20, 20);
@@ -95,13 +77,47 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    layout->addLayout(fetchLayoutLabel, 0, 0);
    layout->addLayout(fetchLayout, 0, 1);
    layout->addWidget(new QLabel(tr("Auto-Prune")), 2, 0);
-   layout->addWidget(autoPrune, 2, 1);
+   layout->addWidget(mAutoPrune, 2, 1);
    layout->addWidget(new QLabel(tr("Disable logs")), 3, 0);
-   layout->addWidget(disableLogs, 3, 1);
+   layout->addWidget(mDisableLogs, 3, 1);
    layout->addWidget(new QLabel(tr("Set log level")), 4, 0);
-   layout->addWidget(levelCombo, 4, 1);
+   layout->addWidget(mLevelCombo, 4, 1);
    layout->addWidget(new QLabel(tr("Auto-Format files")), 5, 0);
-   layout->addWidget(autoFormat, 5, 1);
+   layout->addWidget(mAutoFormat, 5, 1);
    layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 6, 0, 1, 2);
    layout->addLayout(buttonsLayout, 7, 0, 1, 2);
+}
+
+void GeneralConfigPage::resetChanges()
+{
+   GitQlientSettings settings;
+   mAutoFetch->setValue(settings.value("autoFetch", 0).toInt());
+   mAutoPrune->setChecked(settings.value("autoPrune", true).toBool());
+   mDisableLogs->setChecked(settings.value("logsDisabled", false).toBool());
+   mLevelCombo->setCurrentIndex(settings.value("logsLevel", 2).toInt());
+   mAutoFormat->setChecked(settings.value("autoFormat", true).toBool());
+
+   QTimer::singleShot(3000, [this]() { mStatusLabel->setText(""); });
+   mStatusLabel->setText(tr("Changes reseted"));
+}
+
+void GeneralConfigPage::applyChanges()
+{
+   GitQlientSettings settings;
+   settings.setValue("autoFetch", mAutoFetch->value());
+   settings.setValue("autoPrune", mAutoPrune->isChecked());
+   settings.setValue("logsDisabled", mDisableLogs->isChecked());
+   settings.setValue("logsLevel", mLevelCombo->currentIndex());
+   settings.setValue("autoFormat", mAutoFormat->isChecked());
+
+   QTimer::singleShot(3000, [this]() { mStatusLabel->setText(""); });
+   mStatusLabel->setText(tr("Changes applied"));
+
+   const auto logger = QLoggerManager::getInstance();
+   logger->overwriteLogLevel(static_cast<LogLevel>(mLevelCombo->currentIndex()));
+
+   if (mDisableLogs->isChecked())
+      logger->pause();
+   else
+      logger->resume();
 }

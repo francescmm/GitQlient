@@ -23,31 +23,17 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QFrame>
+#include <QSettings>
 
-class QSpinBox;
-class QCheckBox;
-class QComboBox;
-class QLabel;
-class QPushButton;
-
-class GeneralConfigPage : public QFrame
+class GitQlientSettings : public QSettings
 {
    Q_OBJECT
 
+signals:
+   void valueChanged(const QString &key, const QVariant &value);
+
 public:
-   explicit GeneralConfigPage(QWidget *parent = nullptr);
+   GitQlientSettings() = default;
 
-private:
-   QSpinBox *mAutoFetch = nullptr;
-   QCheckBox *mAutoPrune = nullptr;
-   QCheckBox *mDisableLogs = nullptr;
-   QComboBox *mLevelCombo = nullptr;
-   QCheckBox *mAutoFormat = nullptr;
-   QLabel *mStatusLabel = nullptr;
-   QPushButton *mReset = nullptr;
-   QPushButton *mApply = nullptr;
-
-   void resetChanges();
-   void applyChanges();
+   void setValue(const QString &key, const QVariant &value);
 };
