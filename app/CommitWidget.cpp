@@ -171,7 +171,7 @@ void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fil
       const auto staged = isInIndex && !isUnknown;
 
       if ((files->statusCmp(i, RevisionFile::NEW) || isUnknown || isInIndex) && !untrackedFile)
-         myColor = QColor("#8dc944");
+         myColor = QColor("#8DC944");
       else if (files->statusCmp(i, RevisionFile::DELETED))
          myColor = QColor("#FF5555");
       else if (untrackedFile)

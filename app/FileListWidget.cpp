@@ -90,7 +90,7 @@ void FileListWidget::insertFiles(const RevisionFile *files)
       if (extSt.isEmpty())
       {
          if (files->statusCmp(i, RevisionFile::NEW))
-            clr = QColor("#50FA7B");
+            clr = QColor("#8DC944");
          else if (files->statusCmp(i, RevisionFile::DELETED))
             clr = QColor("#FF5555");
          else

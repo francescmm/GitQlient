@@ -73,7 +73,7 @@ void DiffHighlighter::highlightBlock(const QString &text)
       return;
 
    QBrush blue = QColor("#579BD5");
-   QBrush green = QColor("#50FA7B");
+   QBrush green = QColor("#8DC944");
    QBrush magenta = QColor("#FF5555");
    QBrush orange = QColor("#FFB86C");
 
