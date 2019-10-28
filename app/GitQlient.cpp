@@ -15,7 +15,12 @@
 
 using namespace QLogger;
 
-GitQlient::GitQlient(int argc, char *argv[], QWidget *parent)
+GitQlient::GitQlient(QWidget *parent)
+   : GitQlient(0, nullptr, parent)
+{
+}
+
+GitQlient::GitQlient(int argc, char **argv, QWidget *parent)
    : QWidget(parent)
    , mRepos(new QTabWidget())
    , mConfigWidget(new ConfigWidget())
@@ -91,15 +96,15 @@ QStringList GitQlient::parseArguments(int argc, char *argv[])
 
    while (i < argc)
    {
-      if (QString(argv[i]) == "-noLog")
+      if (QString::fromUtf8(argv[i]) == "-noLog")
       {
          logsEnabled = false;
          ++i;
       }
-      else if (QString(argv[i]) == "-repos")
+      else if (QString::fromUtf8(argv[i]) == "-repos")
       {
-         while (i < argc - 1 && !QString(argv[++i]).startsWith("-"))
-            repos.append(argv[i]);
+         while (i < argc - 1 && !QString::fromUtf8(argv[++i]).startsWith("-"))
+            repos.append(QString::fromUtf8(argv[i]));
       }
       else
          ++i;

@@ -34,7 +34,8 @@ class GitQlient : public QWidget
 {
    Q_OBJECT
 public:
-   explicit GitQlient(int argc, char *argv[], QWidget *parent = nullptr);
+   explicit GitQlient(QWidget *parent = nullptr);
+   explicit GitQlient(int argc, char **argv, QWidget *parent = nullptr);
    ~GitQlient();
 
    void setRepositories(const QStringList repositories);
