@@ -7,7 +7,6 @@
         - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
 
 2. Improvements & Bugs & Fixes
-- Unify colors between Repository branches, File views and diff views
 - Show the error text when trying to push without pull first
 - Show a warning if a merge or cherry-pick reported conflicts. Show the conflicts styled in the unstaged files list.
 - Add styles to the QScrollBar
