@@ -38,11 +38,11 @@ GitQlient can be executed from command line with additional params. Please take 
 
 ## Setup & Building the code
 
-GitQlient is really easy to set up and build. You just need to follow [the guide](https://github.com/francscmm/GitQlient/blob/master/SETUP_BUILD.md).
+GitQlient is really easy to set up and build. You just need to follow [the guide](https://github.com/francescmm/GitQlient/blob/master/SETUP_BUILD.md).
 
 ## Contributions
 
-The current contribution guidelines are in progress. They will be updated in its [own guideline](https://github.com/francscmm/GitQlient/blob/master/CONTRIBUTING.md).
+The current contribution guidelines are in progress. They will be updated in its [own guideline](https://github.com/francescmm/GitQlient/blob/master/CONTRIBUTING.md).
 
 ## Recognition
 
@@ -54,4 +54,4 @@ Even when is 100% transformed is nice to thanks those that make the original QGi
 
 GitQlient is released under LGPLv2+. However some parts of the old QGit are GPLv2 so for the moment the code is stacked with that.
 
-If you are interested, here is [the license](https://github.com/francscmm/GitQlient/blob/master/LICENSE)
+If you are interested, here is [the license](https://github.com/francescmm/GitQlient/blob/master/LICENSE)
