@@ -109,8 +109,8 @@ public:
    bool commitFiles(QStringList &files, const QString &msg, bool amend, const QString &author = QString());
    GitExecResult exportPatch();
    bool apply(const QString &fileName, bool asCommit = false);
-   bool push(bool force = false);
-   bool pull(QString &output);
+   GitExecResult push(bool force = false);
+   GitExecResult pull();
    bool fetch();
    bool cherryPickCommit(const QString &sha);
    bool pop();

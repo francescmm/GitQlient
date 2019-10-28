@@ -151,18 +151,22 @@ bool AGitProcess::execute(const QString &command)
 void AGitProcess::onFinished(int, QProcess::ExitStatus exitStatus)
 {
    const auto errorOutput = readAllStandardError();
+   const auto output = readAll();
 
    mErrorOutput += QString::fromUtf8(errorOutput);
 
-   mErrorExit = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error");
+   mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error");
 
-   if (!mErrorExit && mRunOutput)
+   if (!mRealError && mRunOutput)
       mRunOutput->append(readAllStandardOutput() + mErrorOutput);
 
-   if (mErrorExit)
+   if (mRealError)
    {
       const auto command = program() + " " + arguments().join(" ");
       const auto errorText = QString("An error occurred while executing command:\n\n%1").arg(command);
+
+      if (mRunOutput)
+         *mRunOutput = mErrorOutput;
 
       QLog_Warning("Git", errorText);
       QLog_Info("Errors", QString("%1\n\nGit says: \n\n%2").arg(errorText, mErrorOutput));

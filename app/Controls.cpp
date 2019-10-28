@@ -13,6 +13,7 @@
 #include <QLabel>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QMessageBox>
 
 Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
@@ -144,11 +145,13 @@ void Controls::pullCurrentBranch()
    QString output;
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->pull(output);
+   const auto ret = mGit->pull();
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (ret.success)
       emit signalRepositoryUpdated();
+   else
+      QMessageBox::critical(this, tr("Error while pulling"), ret.output.toString());
 }
 
 void Controls::fetchAll()
@@ -167,8 +170,10 @@ void Controls::pushCurrentBranch()
    const auto ret = mGit->push();
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (ret.success)
       emit signalRepositoryUpdated();
+   else
+      QMessageBox::critical(this, tr("Error while pushing"), ret.output.toString());
 }
 
 void Controls::stashCurrentWork()

@@ -44,7 +44,7 @@ protected:
    QString mWorkingDirectory;
    QString mErrorOutput;
    QString mCommand;
-   bool mErrorExit = false;
+   bool mRealError = false;
    bool mCanceling = false;
    bool execute(const QString &command);
    virtual void onFinished(int, QProcess::ExitStatus exitStatus);

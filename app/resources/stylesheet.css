@@ -503,3 +503,9 @@ QDialog > QLineEdit
     padding-left: 10px;
 }
 
+QMessageBox
+{
+    background-color: #606162;
+    color: white;
+}
+

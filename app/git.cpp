@@ -801,24 +801,23 @@ bool Git::apply(const QString &fileName, bool asCommit)
    return ret.first;
 }
 
-bool Git::push(bool force)
+GitExecResult Git::push(bool force)
 {
    QString output;
    const auto ret = run(QString("git push ").append(force ? QString("--force") : QString()));
    output = ret.second;
 
-   if (!ret.first || output.contains("fatal") || output.contains("has no upstream branch"))
-      return run(QString("git push --set-upstream origin %1").arg(mCurrentBranchName)).first;
+   if (!ret.first && output.contains("has no upstream branch"))
+      return run(QString("git push --set-upstream origin %1").arg(mCurrentBranchName));
 
-   return ret.first;
+   return ret;
 }
 
-bool Git::pull(QString &output)
+GitExecResult Git::pull()
 {
    const auto ret = run("git pull");
-   output = ret.second;
 
-   return ret.first;
+   return ret;
 }
 
 bool Git::fetch()

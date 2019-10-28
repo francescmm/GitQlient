@@ -22,5 +22,5 @@ bool GitSyncProcess::run(const QString &command, QString &output)
 
    close();
 
-   return !mErrorExit;
+   return !mRealError;
 }

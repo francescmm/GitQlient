@@ -229,19 +229,23 @@ void RepositoryContextMenu::push()
    const auto ret = mGit->push();
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (ret.success)
       emit signalRepositoryUpdated();
+   else
+      QMessageBox::critical(this, tr("Error while pushin"), ret.output.toString());
 }
 
 void RepositoryContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QString output;
-   const auto ret = mGit->pull(output);
+   const auto ret = mGit->pull();
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (ret.success)
       emit signalRepositoryUpdated();
+   else
+      QMessageBox::critical(this, tr("Error while pulling"), ret.output.toString());
 }
 
 void RepositoryContextMenu::fetch()

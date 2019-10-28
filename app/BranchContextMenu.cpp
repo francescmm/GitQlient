@@ -44,13 +44,13 @@ void BranchContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QString output;
-   const auto ret = mConfig.mGit->pull(output);
+   const auto ret = mConfig.mGit->pull();
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (ret.success)
       emit signalBranchesUpdated();
    else
-      QMessageBox::critical(this, tr("Pull failed"), output);
+      QMessageBox::critical(this, tr("Pull failed"), ret.output.toString());
 }
 
 void BranchContextMenu::fetch()
@@ -71,10 +71,10 @@ void BranchContextMenu::push()
    const auto ret = mConfig.mGit->push();
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (ret.success)
       emit signalBranchesUpdated();
    else
-      QMessageBox::critical(this, tr("Push failed"), tr("There were some problems while pushing. Please try again."));
+      QMessageBox::critical(this, tr("Push failed"), ret.output.toString());
 }
 
 void BranchContextMenu::pushForce()
@@ -83,7 +83,7 @@ void BranchContextMenu::pushForce()
    const auto ret = mConfig.mGit->push(true);
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (ret.success)
       emit signalBranchesUpdated();
    else
       QMessageBox::critical(this, tr("Push force failed"),
