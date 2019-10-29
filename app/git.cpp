@@ -825,9 +825,9 @@ bool Git::fetch()
    return run("git fetch --all --tags --prune --force").first;
 }
 
-bool Git::cherryPickCommit(const QString &sha)
+GitExecResult Git::cherryPickCommit(const QString &sha)
 {
-   return run(QString("git cherry-pick %1").arg(sha)).first;
+   return run(QString("git cherry-pick %1").arg(sha));
 }
 
 bool Git::pop()

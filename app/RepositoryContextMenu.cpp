@@ -203,8 +203,12 @@ void RepositoryContextMenu::checkoutCommit()
 
 void RepositoryContextMenu::cherryPickCommit()
 {
-   if (mGit->cherryPickCommit(mSha))
+   const auto ret = mGit->cherryPickCommit(mSha);
+
+   if (ret.success)
       emit signalRepositoryUpdated();
+   else
+      QMessageBox::critical(this, tr("Error while cherry-pick"), ret.output.toString());
 }
 
 void RepositoryContextMenu::applyPatch()
