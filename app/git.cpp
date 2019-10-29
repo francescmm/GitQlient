@@ -807,7 +807,7 @@ GitExecResult Git::push(bool force)
    const auto ret = run(QString("git push ").append(force ? QString("--force") : QString()));
    output = ret.second;
 
-   if (!ret.first && output.contains("has no upstream branch"))
+   if (output.contains("has no upstream branch"))
       return run(QString("git push --set-upstream origin %1").arg(mCurrentBranchName));
 
    return ret;
