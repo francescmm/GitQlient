@@ -1407,10 +1407,11 @@ void Git::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileN
 
    // we want store extra info with format "orig --> dest (Rxx%)"
    // but git give us something like "Rxx\t<orig>\t<dest>"
-   const QString &type = sl[0];
+   QString type = sl[0];
+   type.remove(0, 1);
    const QString &orig = sl[1];
    const QString &dest = sl[2];
-   const QString extStatusInfo(orig + " --> " + dest + " (" + type + "%)");
+   const QString extStatusInfo(orig + " --> " + dest + " (" + QString::number(type.toInt()) + "%)");
 
    /*
     NOTE: we set rf.extStatus size equal to position of latest
