@@ -86,13 +86,9 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &GitQlientRepo::onCommitSelected);
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
 
-   connect(mRepositoryView, &RepositoryView::rebase, this, &GitQlientRepo::rebase);
-   connect(mRepositoryView, &RepositoryView::merge, this, &GitQlientRepo::merge);
-   connect(mRepositoryView, &RepositoryView::moveRef, this, &GitQlientRepo::moveRef);
    connect(mRepositoryView, &RepositoryView::signalViewUpdated, this, &GitQlientRepo::updateUi);
    connect(mRepositoryView, &RepositoryView::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
-   connect(mRepositoryView, &RepositoryView::clicked, this,
-           qOverload<const QModelIndex &>(&GitQlientRepo::onCommitClicked));
+   connect(mRepositoryView, &RepositoryView::clicked, this, &GitQlientRepo::onCommitClicked);
    connect(mRepositoryView, &RepositoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
    connect(mRepositoryView, &RepositoryView::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
 
@@ -101,9 +97,6 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
 
    setRepository(repo);
-
-   // mAutoFetch->start();
-   // mAutoFilesUpdate->start();
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
@@ -344,79 +337,6 @@ void GitQlientRepo::onFileDiffRequested(const QString &currentSha, const QString
    }
    else
       QMessageBox::information(this, tr("No modifications"), tr("There are no content modifications for this file"));
-}
-
-void GitQlientRepo::rebase(const QString &from, const QString &to, const QString &onto)
-{
-   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-   const auto success = from.isEmpty()
-       ? mGit->run(QString("git checkout -q %1").arg(to)).first && mGit->run(QString("git rebase %1").arg(onto)).first
-       : mGit->run(QString("git rebase --onto %3 %1^ %2").arg(from, to, onto)).first;
-
-   if (success)
-      updateUi();
-
-   QApplication::restoreOverrideCursor();
-}
-
-void GitQlientRepo::merge(const QStringList &shas, const QString &into)
-{
-   QString output;
-   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-   if (mGit->merge(into, shas, &output))
-   {
-      // git->commit !!
-      updateUi();
-   }
-   else if (!output.isEmpty())
-      QMessageBox::warning(this, "git merge failed", QString("\n\nGit says: \n\n%1").arg(output));
-
-   QApplication::restoreOverrideCursor();
-}
-
-void GitQlientRepo::moveRef(const QString &target, const QString &toSHA)
-{
-   QString cmd;
-   if (target.startsWith("remotes/"))
-   {
-      QString remote = target.section("/", 1, 1);
-      QString name = target.section("/", 2);
-      cmd = QString("git push -q %1 %2:%3").arg(remote, toSHA, name);
-   }
-   else if (target.startsWith("tags/"))
-   {
-      cmd = QString("git tag -f %1 %2").arg(target.section("/", 1), toSHA);
-   }
-   else if (!target.isEmpty())
-   {
-      const QString &sha = mGit->getRefSha(target, Git::BRANCH, false);
-      if (!sha.isEmpty())
-      {
-         const QStringList &children = mGit->getChildren(sha);
-         if ((children.count() == 0 || (children.count() == 1 && children.front() == ZERO_SHA)) && // no children
-             mGit->getRefNames(sha, Git::ANY_REF).count() == 1 && // last ref name
-             QMessageBox::question(this, "move branch",
-                                   QString("This is the last reference to this branch.\n"
-                                           "Do you really want to move '%1'?")
-                                       .arg(target))
-                 == QMessageBox::No)
-            return;
-
-         if (target == mGit->getCurrentBranchName()) // move current branch
-            cmd = QString("git checkout -q -B %1 %2").arg(target, toSHA);
-         else // move any other local branch
-            cmd = QString("git branch -f %1 %2").arg(target, toSHA);
-      }
-   }
-
-   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-   if (mGit->run(cmd).first)
-      updateUi();
-
-   QApplication::restoreOverrideCursor();
 }
 
 void GitQlientRepo::closeEvent(QCloseEvent *ce)

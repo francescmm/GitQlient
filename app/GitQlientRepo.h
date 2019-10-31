@@ -108,9 +108,5 @@ private:
    void executeCommand();
 
    // End of MainWindow refactor
-
-   void rebase(const QString &from, const QString &to, const QString &onto);
-   void merge(const QStringList &shas, const QString &into);
-   void moveRef(const QString &refName, const QString &toSHA);
    bool isMatch(const QString &sha, const QString &f, int cn, const QMap<QString, bool> &sm);
 };
