@@ -182,7 +182,7 @@ void RepositoryContextMenu::createTag()
 
 void RepositoryContextMenu::exportAsPatch()
 {
-   const auto ret = mGit->exportPatch();
+   const auto ret = mGit->exportPatch(mSha);
 
    if (ret.success)
       QMessageBox::information(this, tr("Patch generated"),

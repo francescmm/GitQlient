@@ -776,9 +776,9 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    return ret;
 }
 
-GitExecResult Git::exportPatch()
+GitExecResult Git::exportPatch(const QString &sha)
 {
-   return run("git format-patch -1 HEAD");
+   return run(QString("git format-patch -1 %1").arg(sha));
 }
 
 bool Git::apply(const QString &fileName, bool asCommit)

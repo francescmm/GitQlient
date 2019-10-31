@@ -107,7 +107,7 @@ public:
 
    /** START COMMIT WORK **/
    bool commitFiles(QStringList &files, const QString &msg, bool amend, const QString &author = QString());
-   GitExecResult exportPatch();
+   GitExecResult exportPatch(const QString &sha = QString());
    bool apply(const QString &fileName, bool asCommit = false);
    GitExecResult push(bool force = false);
    GitExecResult pull();

@@ -254,15 +254,10 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
 void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &i) const
 {
-   static const QColor &baseColor = QPalette().color(QPalette::WindowText);
-   static const QColor colors[COLORS_NUM] = { baseColor,
-                                              QColor("#FF5555") /* red */,
-                                              QColor("#579BD5") /* blue */,
-                                              QColor("#8dc944") /* green */,
-                                              QColor("#FFB86C") /* orange */,
-                                              QColor("#848484") /* grey */,
-                                              QColor("#FF79C6") /* pink */,
-                                              QColor("#CD9077") /* pastel */ };
+   static const QColor colors[COLORS_NUM] = { QPalette().color(QPalette::WindowText), QColor("#FF5555") /* red */,
+                                              QColor("#579BD5") /* blue */,           QColor("#8dc944") /* green */,
+                                              QColor("#FFB86C") /* orange */,         QColor("#848484") /* grey */,
+                                              QColor("#FF79C6") /* pink */,           QColor("#CD9077") /* pastel */ };
    const auto r = mRevCache->revLookup(i.row());
 
    if (!r)
