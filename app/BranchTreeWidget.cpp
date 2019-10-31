@@ -4,6 +4,7 @@
 #include <BranchContextMenu.h>
 
 #include <QApplication>
+#include <QMessageBox>
 
 BranchTreeWidget::BranchTreeWidget(QSharedPointer<Git> git, QWidget *parent)
    : QTreeWidget(parent)
@@ -42,6 +43,8 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 
       if (ret.success)
          emit signalBranchesUpdated();
+      else
+         QMessageBox::critical(this, tr("Checkout branch error"), ret.output.toString());
    }
 }
 
