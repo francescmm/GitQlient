@@ -1,20 +1,14 @@
 0. Remove unnecessary files from the repo
 
-1. MainWindow refactor
-    - Functionality:
-        - After merging, if no problems it should commit with the default message
-    - Diff widget
-        - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
-
-2. Improvements & Bugs & Fixes
+1. Improvements & Bugs & Fixes
 - Show the conflicts of a merge or cherry-pick styled in the unstaged files list.
-- Allow to export any commit as patch -> Modify git.cpp to pass the current branch and the distance of the commit
 - Allow to export N commits as patch
 - Add styles to the QScrollBar
 - Add functionality to squash commits
 - Add history of a file
 - Add blame on a file
 - Show a progress bar or custom waiting mouse icon when loading a new repo
+- Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
 
 File diff:
 - How we handle when a file changes its directory?
