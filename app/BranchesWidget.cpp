@@ -446,7 +446,10 @@ void BranchesWidget::showStashesContextMenu(const QPoint &) {}
 
 void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
 {
+
    QModelIndex index = mSubmodulesList->indexAt(p);
+
+   QLog_Info("UI", QString("Requesting context menu for submodules"));
 
    const auto menu = new QMenu(this);
 

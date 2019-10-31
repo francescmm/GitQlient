@@ -126,7 +126,10 @@ void GitQlient::addRepoTab(const QString &repoPath)
       const auto newRepo = new GitQlientRepo(repoPath);
       connect(newRepo, &GitQlientRepo::signalOpenSubmodule, this, [this](const QString &repoName) {
          const auto currentDir = dynamic_cast<GitQlientRepo *>(sender())->currentDir();
-         auto submoduleDir = currentDir + "/" + repoName;
+
+         auto submoduleDir = QString("%1/%2").arg(currentDir, repoName);
+
+         QLog_Info("UI", QString("Adding a new tab for the submodule {%1} in {%2}").arg(repoName, currentDir));
 
          addRepoTab(submoduleDir);
       });

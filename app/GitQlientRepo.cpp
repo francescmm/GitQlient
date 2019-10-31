@@ -145,6 +145,8 @@ void GitQlientRepo::updateUiFromWatcher()
 
    if (commitStackedIndex == 1)
    {
+      QLog_Info("UI", QString("Updating the GitQlient UI from watcher"));
+
       mGit->updateWipRevision();
       mCommitWidget->init(ZERO_SHA);
 
@@ -181,8 +183,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          onCommitSelected(ZERO_SHA);
          mBranchesWidget->showBranches();
-
-         mCommitWidget->init(ZERO_SHA);
 
          mainStackedWidget->setCurrentIndex(0);
          commitStackedWidget->setCurrentIndex(1);
