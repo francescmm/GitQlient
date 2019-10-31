@@ -10,6 +10,10 @@
 #include <QClipboard>
 #include <QFileDialog>
 
+#include <QLogger.h>
+
+using namespace QLogger;
+
 RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QString &sha, QWidget *parent)
    : QMenu(parent)
    , mGit(git)
@@ -195,10 +199,14 @@ void RepositoryContextMenu::exportAsPatch()
 
 void RepositoryContextMenu::checkoutCommit()
 {
+   QLog_Info("UI", QString("Checking out the commit {%1}").arg(mSha));
+
    const auto ret = mGit->checkoutCommit(mSha);
 
    if (ret.success)
       emit signalRepositoryUpdated();
+   else
+      QMessageBox::critical(this, tr("Checkout error"), ret.output.toString());
 }
 
 void RepositoryContextMenu::cherryPickCommit()

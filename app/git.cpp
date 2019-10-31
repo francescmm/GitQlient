@@ -783,7 +783,7 @@ GitExecResult Git::exportPatch(const QString &sha)
 
 bool Git::apply(const QString &fileName, bool asCommit)
 {
-   const auto cmd = asCommit ? QString("git am --signof ") : QString("git apply ");
+   const auto cmd = asCommit ? QString("git am --signof") : QString("git apply");
    const auto ret = run(QString("%1 %2").arg(cmd, fileName));
 
    return ret.first;
