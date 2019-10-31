@@ -48,9 +48,6 @@ public:
    RepositoryModel *model() const { return mRepositoryModel; }
 
 signals:
-   void rebase(const QString &from, const QString &to, const QString &onto);
-   void merge(const QStringList &shas, const QString &into);
-   void moveRef(const QString &refName, const QString &toSHA);
    void diffTargetChanged(int); // used by new model_view integration
 
 private slots:

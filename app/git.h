@@ -175,7 +175,7 @@ public:
    const QString getRefSha(const QString &refName, RefType type = ANY_REF, bool askGit = true);
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
    const QStringList sortShaListByIndex(QStringList &shaList);
-   bool merge(const QString &into, QStringList sources, QString *error = nullptr);
+   GitExecResult merge(const QString &into, QStringList sources);
 
    void addExtraFileInfo(QString *rowName, const QString &sha, const QString &diffToSha, bool allMergeFiles);
    void removeExtraFileInfo(QString *rowName);

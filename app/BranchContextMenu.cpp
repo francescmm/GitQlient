@@ -110,17 +110,15 @@ void BranchContextMenu::createCheckoutBranch()
 
 void BranchContextMenu::merge()
 {
-   QString output;
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    const auto currentBranch = mConfig.currentBranch;
-   const auto ret = mConfig.mGit->merge(currentBranch, { mConfig.branchSelected }, &output);
+   const auto ret = mConfig.mGit->merge(currentBranch, { mConfig.branchSelected });
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (ret.success)
       emit signalBranchesUpdated();
    else
-      QMessageBox::critical(this, tr("Merge failed"),
-                            tr("There were some problems during the merge. Please try again."));
+      QMessageBox::critical(this, tr("Merge failed"), ret.output.toString());
 }
 
 void BranchContextMenu::rename()

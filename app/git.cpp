@@ -682,26 +682,14 @@ GitExecResult Git::checkoutCommit(const QString &sha)
    return run(QString("git checkout %1").arg(sha));
 }
 
-bool Git::merge(const QString &into, QStringList sources, QString *error)
+GitExecResult Git::merge(const QString &into, QStringList sources)
 {
-   if (error)
-      *error = "";
+   const auto ret = run(QString("git checkout -q %1").arg(into));
 
-   if (!run(QString("git checkout -q %1").arg(into)).first)
-      return false; // failed to checkout
+   if (!ret.first)
+      return ret;
 
-   QString cmd = QString("git merge -q --no-commit ") + sources.join(" ");
-
-   const auto ret = run(cmd);
-   *error = ret.second;
-
-   if (error->contains("Automatic merge failed"))
-   {
-      // emit signalMergeWithConflicts();
-      return false;
-   }
-
-   return ret.first;
+   return run(QString("git merge -q ") + sources.join(" "));
 }
 
 const QStringList Git::sortShaListByIndex(QStringList &shaList)
