@@ -361,35 +361,35 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
    QMap<QString, QColor> markValues;
    auto ref_types = mGit->checkRef(sha);
+   const auto currentBranch = mGit->getCurrentBranchName();
 
    if (ref_types != 0)
    {
-      if (ref_types & Git::CUR_BRANCH && mGit->getCurrentBranchName().isEmpty())
+      if (ref_types & Git::CUR_BRANCH && currentBranch.isEmpty())
          markValues.insert("detached", QColor("#851e3e"));
-      else
-      {
-         const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
-         for (auto branch : localBranches)
-            markValues.insert(branch, branch == mGit->getCurrentBranchName() ? QColor("#005b96") : QColor("#6497b1"));
 
-         const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
-         for (auto branch : remoteBranches)
-            markValues.insert(branch, QColor("#011f4b"));
+      const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
+      for (auto branch : localBranches)
+         markValues.insert(branch, branch == currentBranch ? QColor("#005b96") : QColor("#6497b1"));
 
-         const auto tags = mGit->getRefNames(sha, Git::TAG);
-         for (auto tag : tags)
-            markValues.insert(tag, QColor("#dec3c3"));
+      const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
+      for (auto branch : remoteBranches)
+         markValues.insert(branch, QColor("#011f4b"));
 
-         const auto refs = mGit->getRefNames(sha, Git::REF);
-         for (auto ref : refs)
-            markValues.insert(ref, QColor("#FF5555"));
-      }
+      const auto tags = mGit->getRefNames(sha, Git::TAG);
+      for (auto tag : tags)
+         markValues.insert(tag, QColor("#dec3c3"));
+
+      const auto refs = mGit->getRefNames(sha, Git::REF);
+      for (auto ref : refs)
+         markValues.insert(ref, QColor("#FF5555"));
    }
 
    const auto mapEnd = markValues.constEnd();
    for (auto mapIt = markValues.constBegin(); mapIt != mapEnd; ++mapIt)
    {
-      o.font.setBold(mapIt.key() == mGit->getCurrentBranchName());
+      const auto isCurrentSpot = (mapIt.key() == "detached" && currentBranch.isEmpty()) || mapIt.key() == currentBranch;
+      o.font.setBold(isCurrentSpot);
 
       const auto nameToDisplay = showMinimal ? QString(". . .") : mapIt.key();
       QFontMetrics fm(o.font);
