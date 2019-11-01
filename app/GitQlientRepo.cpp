@@ -287,7 +287,11 @@ void GitQlientRepo::openCommitDiff()
 void GitQlientRepo::changesCommitted(bool ok)
 {
    if (ok)
+   {
       updateUi();
+      mainStackedWidget->setCurrentIndex(0);
+      onCommitSelected(ZERO_SHA);
+   }
    else
       QMessageBox::critical(this, tr("Commit error"), tr("Failed to commit changes"));
 }
