@@ -47,6 +47,7 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    setContextMenuPolicy(Qt::CustomContextMenu);
    setItemsExpandable(false);
    setMouseTracking(true);
+   setSelectionMode(QAbstractItemView::ExtendedSelection);
    header()->setSortIndicatorShown(false);
 
    const auto lvd = new RepositoryViewDelegate(mGit, revCache);
@@ -69,7 +70,6 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
 void RepositoryView::setup()
 {
    st = &(d->st);
-   filterNextContextMenuRequest = false;
    setModel(mRepositoryModel);
 
    setupGeometry(); // after setting delegate
@@ -260,8 +260,6 @@ bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)
    { // check for 'diff to' function
       if (selSha != ZERO_SHA)
       {
-
-         filterNextContextMenuRequest = true;
          markDiffToSha(selSha);
          return true; // filter event out
       }
@@ -282,24 +280,50 @@ uint refTypeFromName(const QString &name)
 
 void RepositoryView::showContextMenu(const QPoint &pos)
 {
-   QModelIndex index = indexAt(pos);
+   const auto indexes = selectedIndexes();
+   QSet<QString> shas;
+   QVector<QVector<QString>> godVector;
 
-   if (!index.isValid())
-      return;
-
-   if (filterNextContextMenuRequest)
+   for (auto index : indexes)
    {
-      // event filter does not work on them
-      filterNextContextMenuRequest = false;
-      return;
+      const auto sha = mRepositoryModel->sha(index.row());
+
+      if (!shas.contains(sha))
+      {
+         shas.insert(sha);
+         auto ret = mGit->getBranchesOfCommit(sha);
+         auto branches = ret.output.toString().trimmed().split("\n ");
+         std::sort(branches.begin(), branches.end());
+         godVector.append(branches.toVector());
+      }
    }
 
-   const auto sha = mRepositoryModel->sha(index.row());
-   const auto menu = new RepositoryContextMenu(mGit, sha, this);
-   connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
-   connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
-   connect(menu, &RepositoryContextMenu::signalAmendCommit, this, [this, sha]() { emit signalAmendCommit(sha); });
-   menu->exec(viewport()->mapToGlobal(pos));
+   if (godVector.count() > 1)
+   {
+      QVector<QString> common;
+
+      for (auto i = 0; i < godVector.count() - 1; ++i)
+      {
+         QVector<QString> aux;
+         std::set_intersection(godVector.at(i).constBegin(), godVector.at(i).constEnd(),
+                               godVector.at(i + 1).constBegin(), godVector.at(i + 1).constEnd(),
+                               std::back_inserter(aux));
+         common = aux;
+      }
+
+      if (!common.isEmpty())
+      {
+         const auto menu = new RepositoryContextMenu(mGit, shas.toList(), this);
+         connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
+         connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
+         connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &RepositoryView::signalAmendCommit);
+         menu->exec(viewport()->mapToGlobal(pos));
+      }
+      else
+         QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
+   }
+   else
+      QLog_Warning("UI", "No branches were retrieve for the current SHA selection.");
 }
 
 bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringList &p, QStringList &c)

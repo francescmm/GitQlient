@@ -34,15 +34,17 @@ class RepositoryContextMenu : public QMenu
 signals:
    void signalRepositoryUpdated();
    void signalOpenDiff(const QString &sha);
-   void signalAmendCommit();
+   void signalAmendCommit(const QString &sha);
 
 public:
-   explicit RepositoryContextMenu(QSharedPointer<Git> git, const QString &sha, QWidget *parent = nullptr);
+   explicit RepositoryContextMenu(QSharedPointer<Git> git, const QStringList &shas, QWidget *parent = nullptr);
 
 private:
    QSharedPointer<Git> mGit;
-   QString mSha;
+   QStringList mShas;
 
+   void createIndividualShaMenu();
+   void createMultipleShasMenu();
    void stashPush();
    void stashPop();
    void createBranch();

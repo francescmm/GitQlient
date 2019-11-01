@@ -67,5 +67,4 @@ private:
    Domain *d = nullptr;
    StateInfo *st = nullptr;
    unsigned long secs;
-   bool filterNextContextMenuRequest;
 };
