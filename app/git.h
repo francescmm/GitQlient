@@ -30,6 +30,7 @@ static const QString ZERO_SHA = "0000000000000000000000000000000000000000";
 
 struct GitExecResult
 {
+   GitExecResult() = default;
    GitExecResult(const QPair<bool, QString> &result)
       : success(result.first)
       , output(result.second)
@@ -107,7 +108,7 @@ public:
 
    /** START COMMIT WORK **/
    bool commitFiles(QStringList &files, const QString &msg, bool amend, const QString &author = QString());
-   GitExecResult exportPatch(const QString &sha = QString());
+   GitExecResult exportPatch(const QStringList &shaList);
    bool apply(const QString &fileName, bool asCommit = false);
    GitExecResult push(bool force = false);
    GitExecResult pull();

@@ -179,6 +179,8 @@ void RepositoryContextMenu::createMultipleShasMenu()
       connect(copyShaAction, &QAction::triggered, this,
               [this]() { QApplication::clipboard()->setText(mShas.join(',')); });
    }
+   else
+      QLog_Warning("UI", "WIP selected as part of a series of SHAs");
 }
 
 void RepositoryContextMenu::stashPush()
@@ -217,16 +219,16 @@ void RepositoryContextMenu::createTag()
 
 void RepositoryContextMenu::exportAsPatch()
 {
-   const auto sha = mShas.first();
-   const auto ret = mGit->exportPatch(sha);
+   const auto ret = mGit->exportPatch(mShas);
 
    if (ret.success)
-      QMessageBox::information(this, tr("Patch generated"),
-                               tr("<p>The patch has been generated!</p>"
-                                  "<p><b>Commit:</b> %1</p>"
-                                  "<p><b>Destination:</b> %2</p>"
-                                  "<p><b>File name:</b> %3</p>")
-                                   .arg(sha, mGit->getWorkingDir(), ret.output.toString()));
+      QMessageBox::information(
+          this, tr("Patch generated"),
+          tr("<p>The patch has been generated!</p>"
+             "<p><b>Commit:</b></p><p>%1</p>"
+             "<p><b>Destination:</b> %2</p>"
+             "<p><b>File names:</b></p><p>%3</p>")
+              .arg(mShas.join("<br>"), mGit->getWorkingDir(), ret.output.toStringList().join("<br>")));
 }
 
 void RepositoryContextMenu::checkoutCommit()
