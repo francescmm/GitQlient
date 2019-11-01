@@ -2,7 +2,6 @@
 
 1. Improvements & Bugs & Fixes
 - Show the conflicts of a merge or cherry-pick styled in the unstaged files list.
-- Allow to export N commits as patch
 - Add styles to the QScrollBar
 - Add functionality to squash commits
 - Add history of a file
