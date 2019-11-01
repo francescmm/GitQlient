@@ -298,6 +298,8 @@ void RepositoryView::showContextMenu(const QPoint &pos)
       }
    }
 
+   auto commitsInSameBranch = false;
+
    if (godVector.count() > 1)
    {
       QVector<QString> common;
@@ -311,19 +313,19 @@ void RepositoryView::showContextMenu(const QPoint &pos)
          common = aux;
       }
 
-      if (!common.isEmpty())
-      {
-         const auto menu = new RepositoryContextMenu(mGit, shas.toList(), this);
-         connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
-         connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
-         connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &RepositoryView::signalAmendCommit);
-         menu->exec(viewport()->mapToGlobal(pos));
-      }
-      else
-         QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
+      commitsInSameBranch = !common.isEmpty();
+   }
+
+   if (commitsInSameBranch || shas.count() == 1)
+   {
+      const auto menu = new RepositoryContextMenu(mGit, shas.toList(), this);
+      connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
+      connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
+      connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &RepositoryView::signalAmendCommit);
+      menu->exec(viewport()->mapToGlobal(pos));
    }
    else
-      QLog_Warning("UI", "No branches were retrieve for the current SHA selection.");
+      QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
 }
 
 bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringList &p, QStringList &c)
