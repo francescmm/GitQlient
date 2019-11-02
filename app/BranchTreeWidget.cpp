@@ -53,7 +53,7 @@ void BranchTreeWidget::selectCommit(QTreeWidgetItem *item)
    if (item->data(0, Qt::UserRole + 2).toBool())
    {
       const auto branchName = item->data(0, Qt::UserRole + 1).toString();
-      const auto ret = mGit->getLastCommitOfBranch(mLocal ? branchName : QString("origin/%1").arg(branchName));
+      const auto ret = mGit->getLastCommitOfBranch(branchName);
 
       emit signalSelectCommit(ret.output.toString());
    }

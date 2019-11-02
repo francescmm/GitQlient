@@ -307,10 +307,12 @@ void BranchesWidget::processLocalBranch(QString branch)
 void BranchesWidget::processRemoteBranch(QString branch)
 {
    branch.replace("remotes/", "");
+
+   const auto fullBranchName = branch;
+
    branch.replace("origin/", "");
 
    auto parent = mRemoteBranchesTree->topLevelItem(0);
-   const auto fullBranchName = branch;
    auto folders = branch.split("/");
    branch = folders.takeLast();
 
