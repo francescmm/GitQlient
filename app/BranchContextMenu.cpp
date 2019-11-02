@@ -116,9 +116,16 @@ void BranchContextMenu::merge()
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
+   {
       emit signalBranchesUpdated();
+
+      const auto outputStr = ret.output.toString();
+
+      if (!outputStr.isEmpty())
+         QMessageBox::information(parentWidget(), tr("Merge status"), ret.output.toString());
+   }
    else
-      QMessageBox::critical(this, tr("Merge failed"), ret.output.toString());
+      QMessageBox::critical(parentWidget(), tr("Merge failed"), ret.output.toString());
 }
 
 void BranchContextMenu::rename()
