@@ -124,9 +124,10 @@ void AGitProcess::onReadyStandardOutput()
 
 bool AGitProcess::execute(const QString &command)
 {
+   mCommand = command;
    auto processStarted = false;
 
-   auto arguments = splitArgList(command);
+   auto arguments = splitArgList(mCommand);
 
    if (!arguments.isEmpty())
    {
@@ -142,7 +143,7 @@ bool AGitProcess::execute(const QString &command)
       processStarted = waitForStarted();
 
       if (!processStarted)
-         QLog_Warning("Git", QString("Unable to start the process:\n\n%1\n\n").arg(command));
+         QLog_Warning("Git", QString("Unable to start the process:\n\n%1\n\n").arg(mCommand));
    }
 
    return processStarted;
@@ -154,8 +155,8 @@ void AGitProcess::onFinished(int, QProcess::ExitStatus exitStatus)
    const auto output = readAll();
 
    mErrorOutput += QString::fromUtf8(errorOutput);
-
-   mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error");
+   mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error")
+       || errorOutput.contains("could not read Username");
 
    if (!mRealError && mRunOutput)
       mRunOutput->append(readAllStandardOutput() + mErrorOutput);
