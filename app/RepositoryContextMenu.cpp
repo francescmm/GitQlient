@@ -102,8 +102,7 @@ void RepositoryContextMenu::createIndividualShaMenu()
                {
                   // If is the last commit of a branch
                   const auto mergeBranchAction = addAction(QString(tr("Merge %1")).arg(branch));
-                  mergeBranchAction->setDisabled(true);
-                  // connect(mergeBranchAction, &QAction::triggered, this, &RepositoryView::executeAction);
+                  connect(mergeBranchAction, &QAction::triggered, this, [this, branch]() { merge(branch); });
                }
             }
 
@@ -324,4 +323,24 @@ void RepositoryContextMenu::resetHard()
       if (mGit->resetCommit(mShas.first(), Git::CommitResetType::HARD))
          emit signalRepositoryUpdated();
    }
+}
+
+void RepositoryContextMenu::merge(const QString &branchFrom)
+{
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   const auto currentBranch = mGit->getCurrentBranchName();
+   const auto ret = mGit->merge(currentBranch, { branchFrom });
+   QApplication::restoreOverrideCursor();
+
+   const auto outputStr = ret.output.toString();
+
+   if (ret.success)
+   {
+      emit signalRepositoryUpdated();
+
+      if (!outputStr.isEmpty())
+         QMessageBox::information(parentWidget(), tr("Merge status"), outputStr);
+   }
+   else
+      QMessageBox::critical(parentWidget(), tr("Merge failed"), outputStr);
 }

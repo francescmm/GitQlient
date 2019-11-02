@@ -60,4 +60,5 @@ private:
    void resetSoft();
    void resetMixed();
    void resetHard();
+   void merge(const QString &branchFrom);
 };
