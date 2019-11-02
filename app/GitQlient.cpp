@@ -36,7 +36,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
    if (styles.open(QIODevice::ReadOnly))
    {
-      QLog_Info("UI", "Applying the stylesheet");
+      QLog_Info("UI", "Applying the styles");
 
       setStyleSheet(QString::fromUtf8(styles.readAll()));
       styles.close();
@@ -95,18 +95,20 @@ void GitQlient::setArgumentsPostInit(const QStringList &arguments)
 
 QStringList GitQlient::parseArguments(const QStringList &arguments)
 {
-   auto logsEnabled = true;
+   const auto manager = QLoggerManager::getInstance();
+   manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
+
+   if (arguments.contains("-noLog"))
+      QLoggerManager::getInstance()->pause();
+
+   QLog_Info("UI", QString("Getting arguments {%1}").arg(arguments.join(", ")));
+
    QStringList repos;
    const auto argSize = arguments.count();
 
    for (auto i = 0; i < argSize;)
    {
-      if (arguments.at(i) == "-noLog")
-      {
-         logsEnabled = false;
-         ++i;
-      }
-      else if (arguments.at(i) == "-repos")
+      if (arguments.at(i) == "-repos")
       {
          while (++i < argSize && !arguments.at(i).startsWith("-"))
             repos.append(arguments.at(i));
@@ -114,12 +116,6 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
       else
          ++i;
    }
-
-   const auto manager = QLoggerManager::getInstance();
-   manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
-
-   if (!logsEnabled)
-      QLoggerManager::getInstance()->pause();
 
    return repos;
 }

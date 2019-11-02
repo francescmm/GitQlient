@@ -5,6 +5,8 @@
 #include <GitQlient.h>
 #include <QLogger.h>
 
+#include <QDebug>
+
 using namespace QLogger;
 
 int main(int argc, char *argv[])
