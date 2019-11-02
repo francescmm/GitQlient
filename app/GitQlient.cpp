@@ -16,16 +16,16 @@
 using namespace QLogger;
 
 GitQlient::GitQlient(QWidget *parent)
-   : GitQlient(0, nullptr, parent)
+   : GitQlient(QStringList(), parent)
 {
 }
 
-GitQlient::GitQlient(int argc, char **argv, QWidget *parent)
+GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    : QWidget(parent)
    , mRepos(new QTabWidget())
    , mConfigWidget(new ConfigWidget())
 {
-   const auto repos = parseArguments(argc, argv);
+   const auto repos = parseArguments(arguments);
 
    QLog_Info("UI", "*******************************************");
    QLog_Info("UI", "*          GitQlient has started          *");
@@ -88,23 +88,28 @@ void GitQlient::setRepositories(const QStringList repositories)
       addRepoTab(repo);
 }
 
-QStringList GitQlient::parseArguments(int argc, char *argv[])
+void GitQlient::setArgumentsPostInit(const QStringList &arguments)
+{
+   QLog_Info("UI", QString("External call with the params {%1}").arg(arguments.join(",")));
+}
+
+QStringList GitQlient::parseArguments(const QStringList &arguments)
 {
    auto logsEnabled = true;
    QStringList repos;
-   auto i = 0;
+   const auto argSize = arguments.count();
 
-   while (i < argc)
+   for (auto i = 0; i < argSize;)
    {
-      if (QString::fromUtf8(argv[i]) == "-noLog")
+      if (arguments.at(i) == "-noLog")
       {
          logsEnabled = false;
          ++i;
       }
-      else if (QString::fromUtf8(argv[i]) == "-repos")
+      else if (arguments.at(i) == "-repos")
       {
-         while (i < argc - 1 && !QString::fromUtf8(argv[++i]).startsWith("-"))
-            repos.append(QString::fromUtf8(argv[i]));
+         while (++i < argSize && !arguments.at(i).startsWith("-"))
+            repos.append(arguments.at(i));
       }
       else
          ++i;
