@@ -3,6 +3,7 @@
 1. Improvements & Bugs & Fixes
 - Amend a comit that is not the last one: amend + rebase
 - Add functionality to squash commits
+   - This needs a new screen when the user needs to change the command in the editor
 - Merge solving:
    - Notify the user and ask to show the results of the merge in GitQlient in a different window
    - Show the conflicts of a merge and/or cherry-pick styled in the unstaged files list
