@@ -36,7 +36,7 @@ GitQlient::GitQlient(int argc, char **argv, QWidget *parent)
 
    if (styles.open(QIODevice::ReadOnly))
    {
-      QLog_Info("UI", "Applying the stylesheet");
+      QLog_Info("UI", "Applying the styles");
 
       setStyleSheet(QString::fromUtf8(styles.readAll()));
       styles.close();
@@ -90,31 +90,40 @@ void GitQlient::setRepositories(const QStringList repositories)
 
 QStringList GitQlient::parseArguments(int argc, char *argv[])
 {
-   auto logsEnabled = true;
-   QStringList repos;
-   auto i = 0;
 
-   while (i < argc)
-   {
-      if (QString::fromUtf8(argv[i]) == "-noLog")
-      {
-         logsEnabled = false;
-         ++i;
-      }
-      else if (QString::fromUtf8(argv[i]) == "-repos")
-      {
-         while (i < argc - 1 && !QString::fromUtf8(argv[++i]).startsWith("-"))
-            repos.append(QString::fromUtf8(argv[i]));
-      }
-      else
-         ++i;
-   }
+   QStringList arguments;
+
+   while (argc--)
+      arguments.append(argv[argc]);
 
    const auto manager = QLoggerManager::getInstance();
    manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
 
-   if (!logsEnabled)
+   if (arguments.contains("-noLog"))
       QLoggerManager::getInstance()->pause();
+
+   QLog_Info("UI", QString("Getting arguments {%1}").arg(arguments.join(", ")));
+
+   QStringList repos;
+   auto i = 0;
+   const auto argumentsSize = arguments.count();
+
+   while (i < argumentsSize)
+   {
+      QLog_Info("UI", QString("Found argument {%1}").arg(arguments.at(i)));
+
+      if (arguments.at(i) == "-repos")
+      {
+         while (i < argc - 1 && !QString::fromUtf8(argv[++i]).startsWith("-"))
+         {
+            QLog_Info("UI", QString("Found path {%1}").arg(arguments.at(i)));
+
+            repos.append(arguments.at(i));
+         }
+      }
+      else
+         ++i;
+   }
 
    return repos;
 }
