@@ -1,16 +1,24 @@
 0. Remove unnecessary files from the repo
 
 1. Improvements & Bugs & Fixes
-- Show the conflicts of a merge or cherry-pick styled in the unstaged files list.
-- Add styles to the QScrollBar
+- Amend a comit that is not the last one: amend + rebase
 - Add functionality to squash commits
+- Merge solving:
+   - Notify the user and ask to show the results of the merge in GitQlient in a different window
+   - Show the conflicts of a merge and/or cherry-pick styled in the unstaged files list
+   - File editor?
+   - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
+- Add styles to the QScrollBar
+- Add icon and version
+- Improve the CommitWidget to use a timer to refresh the files
+   - This will need a refactor of how the QListWidgetItem are stored
+   - Avoid remove and restore of items if they are not in the original list
 - Add history of a file
 - Add blame on a file
 - Show a progress bar or custom waiting mouse icon when loading a new repo
-- Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
 
 File diff:
-- How we handle when a file changes its directory?
+- How we handle when a file changes its directory? Do we need to download the old one to do the diff?
 
 Full diff:
 - Move to the file diff chunck when user clics the file
