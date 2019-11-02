@@ -242,7 +242,7 @@ void GitQlientRepo::resetWatcher(const QString &oldDir, const QString &newDir)
       {
          const auto dir = it.next();
 
-         if (!dir.endsWith(".") and !dir.endsWith(".."))
+         if (it.fileInfo().isDir() and !dir.endsWith(".") and !dir.endsWith(".."))
             mGitWatcher->addPath(dir);
       }
    }
