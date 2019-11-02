@@ -7,9 +7,11 @@ QT += widgets
 
 # project files
 include(app/GitQlient.pri)
+include($$PWD/qtsingleapplication/src/qtsingleapplication.pri)
 
 INCLUDEPATH += QLogger \
-    app
+    app \
+    qtsingleapplication/src
 
 include(QLogger/QLogger.pri)
 
