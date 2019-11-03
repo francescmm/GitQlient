@@ -1,6 +1,12 @@
 0. Remove unnecessary files from the repo
 
-1. Improvements & Bugs & Fixes
+1. Pre-release tasks
+- Add styles to the QScrollBar
+- Add icon and version
+- Add history of a file
+- Add blame on a file
+
+2. Improvements
 - Amend a commit that is not the last one: amend + rebase
 - Amend a commit already pushed
 - Add functionality to squash commits
@@ -9,10 +15,6 @@
    - Show the conflicts of a merge and/or cherry-pick styled in the unstaged files list
    - Ask to show the results of the merge in GitQlient in a different window (File editor)
 - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
-- Add styles to the QScrollBar
-- Add icon and version
-- Add history of a file
-- Add blame on a file
 - Show a progress bar or custom waiting mouse icon when loading a new repo
 
 File diff:
