@@ -1,7 +1,6 @@
 0. Remove unnecessary files from the repo
 
 1. Improvements & Bugs & Fixes
-- Create a message queue in the Logger incase it's used in the future. Store a max of 100 messages. Keep an initial message explaining that it was loggin without destination.
 - Amend a commit that is not the last one: amend + rebase
 - Amend a commit already pushed
 - Add functionality to squash commits
