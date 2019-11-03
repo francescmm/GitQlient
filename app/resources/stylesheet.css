@@ -509,3 +509,110 @@ QMessageBox
     color: white;
 }
 
+QScrollBar:vertical
+{
+    border: 0px;
+    border-left: 1px solid #202122;
+    width: 16px;
+    margin: 16px 0 16px 0;
+    background-color: transparent;
+}
+
+QScrollBar:horizontal
+{
+    border: 0px;
+    border-top: 1px solid #202122;
+    height: 16px;
+    margin: 0 16px 0 16px;
+    background-color: transparent;
+}
+
+QScrollBar::handle:vertical
+{
+    width: 14px;
+    background-color: #2E2F30;
+    border: 1px solid #202122;
+    border-right: 0px;
+    border-left: 0px;
+}
+
+QScrollBar::handle:horizontal
+{
+    height: 14px;
+    background-color: #2E2F30;
+    border: 1px solid #202122;
+    border-top: 0px;
+    border-bottom: 0px;
+}
+
+QScrollBar::add-line:vertical:hover, QScrollBar::sub-line:vertical:hover,
+QScrollBar::handle:vertical:hover, QScrollBar::add-line:horizontal:hover,
+QScrollBar::sub-line:horizontal:hover, QScrollBar::handle:horizontal:hover
+{
+    background-color: #404142;
+}
+
+QScrollBar::add-line:vertical:pressed, QScrollBar::sub-line:vertical:pressed,
+QScrollBar::handle:vertical:pressed, QScrollBar::add-line:horizontal:pressed,
+QScrollBar::sub-line:horizontal:pressed, QScrollBar::handle:horizontal:pressed
+{
+    background-color: #303132;
+}
+
+QScrollBar::add-line:vertical
+{
+    subcontrol-position: bottom center;
+    subcontrol-origin: margin;
+    border: 1px solid #202122;
+    border-right: 0px;
+    border-bottom: 0px;
+    height: 15px;
+    width: 15px;
+    background-color: #2E2F30;
+    image: url(:/icons/down-arrow);
+}
+
+QScrollBar::add-line:horizontal
+{
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+    border: 1px solid #202122;
+    border-right: 0px;
+    border-bottom: 0px;
+    height: 15px;
+    width: 15px;
+    background-color: #2E2F30;
+    image: url(:/icons/right-arrow);
+}
+
+QScrollBar::sub-line:vertical
+{
+    subcontrol-position: top center;
+    subcontrol-origin: margin;
+    border: 1px solid #202122;
+    border-right: 0px;
+    border-top: 0px;
+    height: 15px;
+    width: 15px;
+    background-color: #2E2F30;
+    image: url(:/icons/up-arrow);
+}
+
+QScrollBar::sub-line:horizontal
+{
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+    border: 1px solid #202122;
+    border-left: 0px;
+    border-bottom: 0px;
+    height: 15px;
+    width: 15px;
+    background-color: #2E2F30;
+    image: url(:/icons/left-arrow);
+}
+
+QScrollBar::add-page, QScrollBar::sub-page
+{
+    background-color: #606162;
+}
+
