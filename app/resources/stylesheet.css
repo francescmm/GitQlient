@@ -616,3 +616,13 @@ QScrollBar::add-page, QScrollBar::sub-page
     background-color: #606162;
 }
 
+QScrollArea
+{
+    border: 0px;
+}
+
+#AnnotationFrame
+{
+    background-color: #202122;
+}
+

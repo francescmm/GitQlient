@@ -23,27 +23,26 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QMenu>
+#include <QFrame>
 
 class Git;
+class FileDiffView;
+class QGridLayout;
 
-class UnstagedFilesContextMenu : public QMenu
+class FileHistoryWidget : public QFrame
 {
    Q_OBJECT
 
-signals:
-
-   void signalCommitAll();
-   void signalRevertAll();
-   void signalCheckedOut(bool success);
-   void signalShowFileHistory(const QString &fileName);
-
 public:
-   explicit UnstagedFilesContextMenu(QSharedPointer<Git> git, const QString &fileName, QWidget *parent = nullptr);
+   explicit FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+
+   void setup(const QString &fileName);
 
 private:
    QSharedPointer<Git> mGit;
-   QString mFileName;
+   QFrame *mAnotation = nullptr;
+   FileDiffView *mFileDiffView = nullptr;
+   QGridLayout *mGridLayout = nullptr;
 
-   bool addEntryToGitIgnore(const QString &entry);
+   QString processBlame(const QString &blame);
 };

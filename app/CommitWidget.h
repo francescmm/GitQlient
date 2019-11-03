@@ -43,6 +43,7 @@ class CommitWidget : public QWidget
 signals:
    void signalChangesCommitted(bool commited);
    void signalCheckoutPerformed(bool success);
+   void signalShowFileHistory(const QString &fileName);
 
 public:
    explicit CommitWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);

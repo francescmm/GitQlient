@@ -301,6 +301,8 @@ void CommitWidget::showUnstagedMenu(const QPoint &pos)
       connect(contextMenu, &UnstagedFilesContextMenu::signalCommitAll, this, &CommitWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedFilesContextMenu::signalRevertAll, this, &CommitWidget::revertAllChanges);
       connect(contextMenu, &UnstagedFilesContextMenu::signalCheckedOut, this, &CommitWidget::signalCheckoutPerformed);
+      connect(contextMenu, &UnstagedFilesContextMenu::signalShowFileHistory, this,
+              &CommitWidget::signalShowFileHistory);
 
       const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
       contextMenu->popup(mapToGlobal(parentPos));

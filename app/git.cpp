@@ -470,6 +470,11 @@ bool Git::resetFile(const QString &fileName)
    return run(QString("git checkout %1").arg(fileName)).first;
 }
 
+GitExecResult Git::blame(const QString &file)
+{
+   return run(QString("git annotate %1").arg(file));
+}
+
 QPair<QString, QString> Git::getSplitCommitMsg(const QString &sha)
 {
    const Revision *c = mRevCache->revLookup(sha);

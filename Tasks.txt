@@ -2,8 +2,8 @@
 
 1. Pre-release tasks
 - Add icon
-- Add history of a file
-- Add blame on a file
+- Improve functionality and styles of the blame
+- Add commits history of a file
 
 2. Improvements
 - Amend a commit that is not the last one: amend + rebase

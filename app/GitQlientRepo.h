@@ -37,6 +37,7 @@ class RevisionWidget;
 class FullDiffControler;
 class FullDiffWidget;
 class FileDiffWidget;
+class FileHistoryWidget;
 class RepositoryView;
 class RevsView;
 class BranchesWidget;
@@ -88,6 +89,7 @@ private:
    RevsView *rv = nullptr;
    FullDiffWidget *mFullDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;
+   FileHistoryWidget *mFileHistoryWidget = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;
    QTimer *mAutoFetch = nullptr;

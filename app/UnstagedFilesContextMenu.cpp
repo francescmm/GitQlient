@@ -25,6 +25,9 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(QSharedPointer<Git> git, cons
       }
    });
 
+   connect(addAction("Show history/blame"), &QAction::triggered, this,
+           [this]() { emit signalShowFileHistory(mFileName); });
+
    connect(addAction("Ignore file name"), &QAction::triggered, this, [this, fileName]() {
       const auto ret = QMessageBox::question(this, tr("Ignoring file"),
                                              tr("Are you sure you want to add the file to the black list?"));

@@ -11,6 +11,7 @@
 #include <QLogger.h>
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
+#include <FileHistoryWidget.h>
 #include <domain.h>
 #include <Revision.h>
 
@@ -37,6 +38,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    , mRevisionWidget(new RevisionWidget(mGit))
    , mFullDiffWidget(new FullDiffWidget(mGit, mRevisionsCache))
    , mFileDiffWidget(new FileDiffWidget(mGit))
+   , mFileHistoryWidget(new FileHistoryWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
@@ -55,6 +57,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    mainStackedWidget->addWidget(mRepositoryView);
    mainStackedWidget->addWidget(mFullDiffWidget);
    mainStackedWidget->addWidget(mFileDiffWidget);
+   mainStackedWidget->addWidget(mFileHistoryWidget);
    mainStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
    const auto gridLayout = new QGridLayout(this);
@@ -94,6 +97,11 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
 
    connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mCommitWidget, &CommitWidget::signalCheckoutPerformed, this, &GitQlientRepo::updateUiFromWatcher);
+   connect(mCommitWidget, &CommitWidget::signalShowFileHistory, this, [this](const QString &fileName) {
+      mFileHistoryWidget->setup(fileName);
+      mainStackedWidget->setCurrentWidget(mFileHistoryWidget);
+   });
+
    connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
 
    setRepository(repo);
