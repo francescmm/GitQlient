@@ -5,9 +5,6 @@
 - Amend a commit already pushed
 - Add functionality to squash commits
    - This needs a new screen when the user needs to change the command in the editor
-- Improve the CommitWidget to use a timer to refresh the files
-    - This will need a refactor of how the QListWidgetItem are stored
-    - Avoid remove and restore of items if they are not in the original list
 - Merge solving (create new UI view):
    - Show the conflicts of a merge and/or cherry-pick styled in the unstaged files list
    - Ask to show the results of the merge in GitQlient in a different window (File editor)

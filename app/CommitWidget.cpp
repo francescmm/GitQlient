@@ -88,17 +88,18 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
    connect(ui->stagedFilesList, &QListWidget::itemClicked, this, &CommitWidget::removeFileFromCommitList);
 }
 
-void CommitWidget::init(const QString &shaToAmend)
+void CommitWidget::init(const QString &sha)
 {
-   mIsAmend = shaToAmend != ZERO_SHA;
+   auto shaChange = mCurrentSha != sha;
+   mCurrentSha = sha;
+   mIsAmend = mCurrentSha != ZERO_SHA;
 
    QLog_Info("UI",
              QString("Configuring commit widget with sha {%1} as {%2}")
-                 .arg(shaToAmend)
+                 .arg(mCurrentSha)
                  .arg(mIsAmend ? QString("amend") : QString("wip")));
 
    blockSignals(true);
-   clear();
    ui->leAuthorName->setVisible(mIsAmend);
    ui->leAuthorEmail->setVisible(mIsAmend);
    blockSignals(false);
@@ -115,7 +116,7 @@ void CommitWidget::init(const QString &shaToAmend)
    // set-up files list
    if (mIsAmend)
    {
-      const auto revInfo = mGit->revLookup(shaToAmend);
+      const auto revInfo = mGit->revLookup(mCurrentSha);
       const auto author = revInfo->author().split("<");
       ui->leAuthorName->setText(author.first());
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
@@ -123,7 +124,7 @@ void CommitWidget::init(const QString &shaToAmend)
 
    const RevisionFile *files = nullptr;
 
-   files = mGit->getFiles(mIsAmend ? shaToAmend : ZERO_SHA);
+   files = mGit->getFiles(mIsAmend ? mCurrentSha : ZERO_SHA);
 
    if (files)
    {
@@ -146,21 +147,30 @@ void CommitWidget::init(const QString &shaToAmend)
       QPair<QString, QString> logMessage;
 
       if (mIsAmend)
-         logMessage = mGit->getSplitCommitMsg(shaToAmend);
+         logMessage = mGit->getSplitCommitMsg(mCurrentSha);
 
       msg = logMessage.second.trimmed();
-      ui->leCommitTitle->setText(logMessage.first);
+
+      if (mIsAmend || shaChange)
+         ui->leCommitTitle->setText(logMessage.first);
    }
    else
       msg = lastMsgBeforeError;
 
-   ui->teDescription->setPlainText(msg);
-   ui->teDescription->moveCursor(QTextCursor::Start);
+   if (mIsAmend || shaChange)
+   {
+      ui->teDescription->setPlainText(msg);
+      ui->teDescription->moveCursor(QTextCursor::Start);
+   }
+
    ui->pbCommit->setEnabled(ui->stagedFilesList->count());
 }
 
 void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fileList)
 {
+   for (auto file = mCurrentFilesCache.begin(); file != mCurrentFilesCache.end(); ++file)
+      file.value().first = false;
+
    for (auto i = 0; i < files->count(); ++i)
    {
       QColor myColor;
@@ -180,29 +190,48 @@ void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fil
          myColor = Qt::white;
 
       const auto fileName = mGit->filePath(*files, i);
-      QListWidgetItem *item = nullptr;
 
-      if (untrackedFile)
+      if (!mCurrentFilesCache.contains(fileName))
       {
-         item = new QListWidgetItem(ui->untrackedFilesList);
-         item->setData(Qt::UserRole, QVariant::fromValue(ui->untrackedFilesList));
-      }
-      else if (staged)
-      {
-         item = new QListWidgetItem(ui->stagedFilesList);
-         item->setData(Qt::UserRole, QVariant::fromValue(ui->stagedFilesList));
+         QListWidgetItem *item = nullptr;
+
+         if (untrackedFile)
+         {
+            item = new QListWidgetItem(ui->untrackedFilesList);
+            item->setData(Qt::UserRole, QVariant::fromValue(ui->untrackedFilesList));
+         }
+         else if (staged)
+         {
+            item = new QListWidgetItem(ui->stagedFilesList);
+            item->setData(Qt::UserRole, QVariant::fromValue(ui->stagedFilesList));
+         }
+         else
+         {
+            item = new QListWidgetItem(fileList);
+            item->setData(Qt::UserRole, QVariant::fromValue(fileList));
+         }
+
+         item->setText(fileName);
+         item->setForeground(myColor);
+
+         if (mIsAmend && fileList == ui->stagedFilesList)
+            item->setFlags(item->flags() & (~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled));
+
+         mCurrentFilesCache.insert(fileName, qMakePair(true, item));
       }
       else
+         mCurrentFilesCache[fileName].first = true;
+   }
+
+   for (auto it = mCurrentFilesCache.begin(); it != mCurrentFilesCache.end();)
+   {
+      if (!it.value().first)
       {
-         item = new QListWidgetItem(fileList);
-         item->setData(Qt::UserRole, QVariant::fromValue(fileList));
+         delete it.value().second;
+         it = mCurrentFilesCache.erase(it);
       }
-
-      item->setText(fileName);
-      item->setForeground(myColor);
-
-      if (mIsAmend && fileList == ui->stagedFilesList)
-         item->setFlags(item->flags() & (~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled));
+      else
+         ++it;
    }
 }
 

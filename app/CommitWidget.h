@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <QWidget>
+#include <QMap>
 
 class QListWidget;
 class QListWidgetItem;
@@ -46,13 +47,15 @@ signals:
 public:
    explicit CommitWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
-   void init(const QString &shaToAmend);
+   void init(const QString &sha);
    void clear();
 
 private:
    bool mIsAmend = false;
    Ui::CommitWidget *ui = nullptr;
    QSharedPointer<Git> mGit;
+   QString mCurrentSha;
+   QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;
 
    void insertFilesInList(const RevisionFile *files, QListWidget *fileList);
    void addAllFilesToCommitList();
