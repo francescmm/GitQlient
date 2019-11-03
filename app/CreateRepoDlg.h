@@ -57,4 +57,5 @@ private:
    QSharedPointer<Git> mGit;
 
    void selectFolder();
+   void addDefaultName(const QString &url);
 };

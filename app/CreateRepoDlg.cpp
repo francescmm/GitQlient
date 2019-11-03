@@ -26,6 +26,7 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<Git> git, QW
    ui->chbOpen->setText(checkText);
 
    connect(ui->leURL, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
+   connect(ui->leURL, &QLineEdit::textChanged, this, &CreateRepoDlg::addDefaultName);
    connect(ui->pbBrowse, &QPushButton::clicked, this, &CreateRepoDlg::selectFolder);
    connect(ui->lePath, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
    connect(ui->leRepoName, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
@@ -48,6 +49,18 @@ void CreateRepoDlg::selectFolder()
       QDir d(dirName);
 
       ui->lePath->setText(d.absolutePath());
+   }
+}
+
+void CreateRepoDlg::addDefaultName(const QString &url)
+{
+   static const QString extension(".git");
+   if (url.endsWith(extension))
+   {
+      const auto lastDashIndex = url.lastIndexOf("/");
+      const auto projectName = url.mid(lastDashIndex + 1, url.size() - lastDashIndex - extension.size() - 1);
+
+      ui->leRepoName->setText(projectName);
    }
 }
 
