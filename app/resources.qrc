@@ -37,6 +37,10 @@
         <file alias="git_apply">resources/icons/apply.svg</file>
         <file alias="sign-in">resources/icons/sign-in.svg</file>
         <file alias="squash">resources/icons/squash.svg</file>
+        <file alias="down-arrow">resources/icons/down-arrow.svg</file>
+        <file alias="up-arrow">resources/icons/up-arrow.svg</file>
+        <file alias="left-arrow">resources/icons/left-arrow.svg</file>
+        <file alias="right-arrow">resources/icons/right-arrow.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>
