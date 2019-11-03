@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
    QtSingleApplication::setOrganizationName("CescSoftware");
    QtSingleApplication::setOrganizationDomain("francescmm.com");
-   QtSingleApplication::setApplicationName("GitQlient");
+   QtSingleApplication::setApplicationName(APP_NAME);
 
    const auto mainWin = new GitQlient(arguments);
    mainWin->showMaximized();
