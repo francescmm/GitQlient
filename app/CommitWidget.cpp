@@ -398,6 +398,9 @@ bool CommitWidget::commitChanges()
       emit signalChangesCommitted(ok);
 
       done = true;
+
+      ui->leCommitTitle->clear();
+      ui->teDescription->clear();
    }
 
    return done;
