@@ -316,18 +316,29 @@ void BranchesWidget::processRemoteBranch(QString branch)
    auto folders = branch.split("/");
    branch = folders.takeLast();
 
+   auto found = false;
+
    for (auto folder : folders)
    {
-      const auto childs = mRemoteBranchesTree->findItems(folder, Qt::MatchExactly);
-      if (childs.isEmpty())
+      const auto children = parent->childCount();
+      if (children != 0)
+      {
+         for (auto i = 0; i < children; ++i)
+         {
+            if (parent->child(i)->data(0, Qt::DisplayRole) == folder)
+            {
+               parent = parent->child(i);
+               found = true;
+               break;
+            }
+         }
+      }
+      if (!found)
       {
          auto item = new QTreeWidgetItem(parent);
          item->setText(0, folder);
-
          parent = item;
       }
-      else
-         parent = childs.first();
    }
 
    QLog_Debug("UI", QString("Adding remote branch {%1}").arg(branch));
