@@ -1,7 +1,6 @@
 0. Remove unnecessary files from the repo
 
 1. Pre-release tasks
-- Add styles to the QScrollBar
 - Add icon
 - Add history of a file
 - Add blame on a file
