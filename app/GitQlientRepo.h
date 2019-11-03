@@ -51,7 +51,7 @@ class MainWindow;
 struct GitQlientRepoConfig
 {
    int mAutoFetchSecs = 300;
-   int mAutoFileUpdateSecs = 15;
+   int mAutoFileUpdateSecs = 10;
 };
 
 class GitQlientRepo : public QFrame

@@ -97,6 +97,8 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
 
    setRepository(repo);
+
+   mAutoFilesUpdate->start();
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
