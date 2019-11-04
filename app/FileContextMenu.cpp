@@ -18,10 +18,6 @@ FileContextMenu::FileContextMenu(const QString &file, QWidget *parent)
 
    addSeparator();
 
-   const auto showInFolderAction = addAction(tr("Show in folder"));
-   showInFolderAction->setEnabled(false);
-   // connect(showInFolderAction, &QAction::triggered, this, &FileList::executeAction);
-
    const auto copyPathAction = addAction(tr("Copy path"));
    connect(copyPathAction, &QAction::triggered, this, [file]() {
       QSettings settings;
