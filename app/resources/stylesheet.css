@@ -623,6 +623,39 @@ QScrollArea
 
 #AnnotationFrame
 {
-    background-color: #202122;
+    background-color: #2E2F30;
+}
+
+QLabel#normalLabel
+{
+    padding: 2px;
+}
+
+QLabel#numberLabel
+{
+    padding: 2px;
+    background-color: #606162;
+}
+
+QLabel#firstOfItsName, QLabel#firstOfItsNameWIP, QLabel#primusInterPares
+{
+    padding: 2px;
+    border: 0px;
+    border-bottom: 1px solid #606162;
+}
+
+QLabel#primusInterPares
+{
+    border-top: 1px solid #606162;
+}
+
+QLabel#firstOfItsName, QLabel#primusInterPares
+{
+    border-right: 3px solid #202122;
+}
+
+QLabel#firstOfItsNameWIP
+{
+    border-right: 3px solid #D89000;
 }
 

@@ -23,26 +23,14 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mAnotation(new QFrame())
-   , mFileDiffView(new FileDiffView())
-   , mGridLayout(new QGridLayout())
 {
-   mFileDiffView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-   mFileDiffView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-   mGridLayout->setContentsMargins(QMargins());
-   mGridLayout->setSpacing(0);
-   mGridLayout->addWidget(mFileDiffView, 0, 1);
-
-   const auto scrollWidget = new QFrame();
-   scrollWidget->setLayout(mGridLayout);
-
-   QScrollArea *scrollArea = new QScrollArea();
-   scrollArea->setWidget(scrollWidget);
-   scrollArea->setWidgetResizable(true);
+   mScrollArea = new QScrollArea();
+   mScrollArea->setWidget(mAnotation);
+   mScrollArea->setWidgetResizable(true);
 
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
-   layout->addWidget(scrollArea);
+   layout->addWidget(mScrollArea);
 
    setLayout(layout);
 }
@@ -55,13 +43,10 @@ void FileHistoryWidget::setup(const QString &fileName)
    const auto ret = mGit->blame(fileName);
 
    if (ret.success)
-   {
-      const auto processedText = processBlame(ret.output.toString());
-      mFileDiffView->setPlainText(processedText);
-   }
+      processBlame(ret.output.toString());
 }
 
-QString FileHistoryWidget::processBlame(const QString &blame)
+void FileHistoryWidget::processBlame(const QString &blame)
 {
    const auto lines = blame.split("\n", QString::SkipEmptyParts);
    QVector<Annotation> annotations;
@@ -69,8 +54,18 @@ QString FileHistoryWidget::processBlame(const QString &blame)
 
    mAnotation = new QFrame();
    mAnotation->setObjectName("AnnotationFrame");
-   const auto anotationLayout = new QVBoxLayout(mAnotation);
-   anotationLayout->setSpacing(0);
+   const auto annotationLayout = new QGridLayout(mAnotation);
+   annotationLayout->setSpacing(0);
+
+   QLabel *shaLabel = nullptr;
+   QRect boundingRect;
+   auto row = 0;
+   auto labelRow = 0;
+   auto labelRowSpan = 1;
+
+   QFont f;
+   f.setFamily("Ubuntu Mono");
+   f.setPointSize(11);
 
    for (const auto &line : lines)
    {
@@ -93,19 +88,50 @@ QString FileHistoryWidget::processBlame(const QString &blame)
       Annotation a { fields.at(0), author, std::move(dt), lineText.toInt(), content };
       annotations.append(a);
 
-      const auto label = new QLabel(lastAnnotation.shortSha == a.shortSha ? QString() : a.shortSha);
-      label->setToolTip(a.toString());
-      label->setFont(mFileDiffView->font());
-      QFontMetrics fm(mFileDiffView->font());
-      const auto boundingRect = fm.boundingRect(a.shortSha);
-      label->setFixedSize(boundingRect.width(), boundingRect.height());
+      if (lastAnnotation.shortSha != a.shortSha)
+      {
+         if (shaLabel)
+            annotationLayout->addWidget(shaLabel, labelRow, 0, labelRowSpan, 1);
 
-      anotationLayout->addWidget(label);
+         labelRow = row;
+         labelRowSpan = 1;
+         shaLabel = new QLabel(a.shortSha);
+         shaLabel->setObjectName(row == 0 ? QString("primusInterPares")
+                                          : a.shortSha == ZERO_SHA.left(8) ? QString("firstOfItsNameWIP")
+                                                                           : QString("firstOfItsName"));
+         shaLabel->setToolTip(a.toString());
+         shaLabel->setFont(f);
+         shaLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+         QFontMetrics fm(f);
+         boundingRect = fm.boundingRect(a.shortSha);
+      }
+      else
+         ++labelRowSpan;
+
+      const auto numberLabel = new QLabel(QString::number(row + 1));
+      numberLabel->setFont(f);
+      numberLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
+      numberLabel->setObjectName("numberLabel");
+      numberLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+      annotationLayout->addWidget(numberLabel, row, 1);
+
+      const auto contentLabel = new QLabel(content);
+      contentLabel->setFont(f);
+      contentLabel->setObjectName("normalLabel");
+      annotationLayout->addWidget(contentLabel, row, 2);
 
       file.append(content + QString("\n"));
+
+      ++row;
    }
 
-   mGridLayout->addWidget(mAnotation, 0, 0);
+   // Adding the last row
+   if (shaLabel)
+      annotationLayout->addWidget(shaLabel, labelRow, 0, labelRowSpan, 1);
 
-   return file;
+   annotationLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), row, 2);
+
+   mScrollArea->setWidget(mAnotation);
+   mScrollArea->setWidgetResizable(true);
 }

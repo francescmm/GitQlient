@@ -27,7 +27,8 @@
 
 class Git;
 class FileDiffView;
-class QGridLayout;
+class QVBoxLayout;
+class QScrollArea;
 
 class FileHistoryWidget : public QFrame
 {
@@ -41,8 +42,7 @@ public:
 private:
    QSharedPointer<Git> mGit;
    QFrame *mAnotation = nullptr;
-   FileDiffView *mFileDiffView = nullptr;
-   QGridLayout *mGridLayout = nullptr;
+   QScrollArea *mScrollArea = nullptr;
 
-   QString processBlame(const QString &blame);
+   void processBlame(const QString &blame);
 };
