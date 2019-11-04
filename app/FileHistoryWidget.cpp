@@ -25,11 +25,11 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    , mGit(git)
    , mAnotation(new QFrame())
 {
-   mInfoFont.setFamily("Ubuntu Mono");
    mInfoFont.setPointSize(9);
 
    mCodeFont = QFont(mInfoFont);
-   mCodeFont.setPointSize(11);
+   mCodeFont.setFamily("Ubuntu Mono");
+   mCodeFont.setPointSize(10);
 
    mScrollArea = new QScrollArea();
    mScrollArea->setWidget(mAnotation);
