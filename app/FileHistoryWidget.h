@@ -30,6 +30,7 @@ class Git;
 class FileDiffView;
 class QVBoxLayout;
 class QScrollArea;
+class QLabel;
 
 class FileHistoryWidget : public QFrame
 {
@@ -44,6 +45,8 @@ private:
    QSharedPointer<Git> mGit;
    QFrame *mAnotation = nullptr;
    QScrollArea *mScrollArea = nullptr;
+   QFont mInfoFont;
+   QFont mCodeFont;
 
    struct Annotation
    {
@@ -56,4 +59,9 @@ private:
 
    QVector<Annotation> processBlame(const QString &blame);
    void formatAnnotatedFile(const QVector<Annotation> &annotations);
+   QLabel *createDateLabel(const Annotation &annotation, bool isFirst);
+   QLabel *createAuthorLabel(const Annotation &annotation, bool isFirst);
+   QLabel *createMessageLabel(const Annotation &annotation, bool isFirst);
+   QLabel *createNumLabel(int row);
+   QLabel *createCodeLabel(const Annotation &annotation);
 };
