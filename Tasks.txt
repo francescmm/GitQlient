@@ -3,6 +3,7 @@
 1. Pre-release tasks
 - Add icon
 - Improve functionality and styles of the blame
+    - Study whether or not should be moved to its own window
 - Add commits history of a file
 
 2. Improvements
