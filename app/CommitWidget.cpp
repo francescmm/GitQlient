@@ -1,10 +1,3 @@
-/*
-        Description: changes commit dialog
-
-Author: Marco Costalba (C) 2005-2007
-
-             Copyright: See COPYING file that comes with this distribution
-                             */
 #include <CommitWidget.h>
 #include <ui_CommitWidget.h>
 

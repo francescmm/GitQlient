@@ -629,6 +629,7 @@ QScrollArea
 QLabel#normalLabel
 {
     padding: 2px;
+    padding-left: 5px;
 }
 
 QLabel#numberLabel
@@ -647,15 +648,5 @@ QLabel#firstOfItsName, QLabel#firstOfItsNameWIP, QLabel#primusInterPares
 QLabel#primusInterPares
 {
     border-top: 1px solid #606162;
-}
-
-QLabel#firstOfItsName, QLabel#primusInterPares
-{
-    border-right: 3px solid #202122;
-}
-
-QLabel#firstOfItsNameWIP
-{
-    border-right: 3px solid #D89000;
 }
 
