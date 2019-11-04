@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <QFrame>
+#include <QDateTime>
 
 class Git;
 class FileDiffView;
@@ -44,5 +45,15 @@ private:
    QFrame *mAnotation = nullptr;
    QScrollArea *mScrollArea = nullptr;
 
-   void processBlame(const QString &blame);
+   struct Annotation
+   {
+      QString shortSha;
+      QString author;
+      QDateTime dateTime;
+      int line;
+      QString content;
+   };
+
+   QVector<Annotation> processBlame(const QString &blame);
+   void formatAnnotatedFile(const QVector<Annotation> &annotations);
 };

@@ -786,7 +786,7 @@ GitExecResult Git::exportPatch(const QStringList &shaList)
    auto val = 1;
    QStringList files;
 
-   for (const auto sha : shaList)
+   for (const auto &sha : shaList)
    {
       const auto ret = run(QString("git format-patch -1 %1").arg(sha));
 

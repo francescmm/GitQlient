@@ -635,18 +635,29 @@ QLabel#normalLabel
 QLabel#numberLabel
 {
     padding: 2px;
-    background-color: #606162;
+    border: 0px;
+    border-right: 1px solid #202122;
 }
 
-QLabel#firstOfItsName, QLabel#firstOfItsNameWIP, QLabel#primusInterPares
+QLabel#authorFirstOfItsName, QLabel#authorPrimusInterPares
 {
     padding: 2px;
     border: 0px;
-    border-bottom: 1px solid #606162;
+    padding-right: 15px;
 }
 
-QLabel#primusInterPares
+QLabel#authorFirstOfItsName
 {
     border-top: 1px solid #606162;
 }
 
+QLabel#firstOfItsName, QLabel#primusInterPares
+{
+    padding: 2px;
+    border: 0px;
+}
+
+QLabel#firstOfItsName
+{
+    border-top: 1px solid #606162;
+}

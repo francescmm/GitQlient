@@ -22,7 +22,16 @@ const Revision *RevisionsCache::revLookup(int row) const
 
 const Revision *RevisionsCache::revLookup(const QString &sha) const
 {
-   return !sha.isEmpty() ? revs.value(sha) : nullptr;
+   if (!sha.isEmpty())
+   {
+      const auto iter = std::find_if(revs.constBegin(), revs.constEnd(),
+                                     [sha](const Revision *revision) { return revision->sha().startsWith(sha); });
+
+      if (iter != std::end(revs))
+         return *iter;
+   }
+
+   return nullptr;
 }
 
 void RevisionsCache::insertRevision(const QString sha, const Revision &rev)
