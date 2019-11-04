@@ -71,40 +71,35 @@ void FileHistoryWidget::processBlame(const QString &blame)
    {
       const auto fields = line.split("\t");
 
-      auto author = fields.at(1);
-      author.remove(0, 1);
-
-      auto datetimeStr = fields.at(2).split(" ");
-      datetimeStr.takeLast();
-
-      const auto dt = QDateTime::fromString(datetimeStr.join(" "), "yyyy-MM-dd hh:mm:ss");
+      const auto sha = fields.at(0);
+      const auto author = QString(fields.at(1)).remove("(");
+      const auto dt = QDateTime::fromString(fields.at(2), Qt::ISODate);
       const auto lineNumAndContent = fields.at(3);
       const auto divisorChar = lineNumAndContent.indexOf(")");
       const auto lineText = lineNumAndContent.mid(0, divisorChar);
       const auto content = lineNumAndContent.mid(divisorChar + 1, lineNumAndContent.count() - lineText.count() - 1);
-
       const auto &lastAnnotation = annotations.isEmpty() ? Annotation() : annotations.last();
 
-      Annotation a { fields.at(0), author, std::move(dt), lineText.toInt(), content };
-      annotations.append(a);
+      Annotation a { sha, author, std::move(dt), lineText.toInt(), content };
+      annotations.append({ sha, author, std::move(dt), lineText.toInt(), content });
 
-      if (lastAnnotation.shortSha != a.shortSha)
+      if (lastAnnotation.shortSha != sha)
       {
          if (shaLabel)
             annotationLayout->addWidget(shaLabel, labelRow, 0, labelRowSpan, 1);
 
          labelRow = row;
          labelRowSpan = 1;
-         shaLabel = new QLabel(a.shortSha);
+         shaLabel = new QLabel(sha);
          shaLabel->setObjectName(row == 0 ? QString("primusInterPares")
-                                          : a.shortSha == ZERO_SHA.left(8) ? QString("firstOfItsNameWIP")
-                                                                           : QString("firstOfItsName"));
+                                          : sha == ZERO_SHA.left(8) ? QString("firstOfItsNameWIP")
+                                                                    : QString("firstOfItsName"));
          shaLabel->setToolTip(a.toString());
          shaLabel->setFont(f);
          shaLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
          QFontMetrics fm(f);
-         boundingRect = fm.boundingRect(a.shortSha);
+         boundingRect = fm.boundingRect(sha);
       }
       else
          ++labelRowSpan;
