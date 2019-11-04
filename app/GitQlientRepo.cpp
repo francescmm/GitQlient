@@ -97,12 +97,10 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
 
    connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mCommitWidget, &CommitWidget::signalCheckoutPerformed, this, &GitQlientRepo::updateUiFromWatcher);
-   connect(mCommitWidget, &CommitWidget::signalShowFileHistory, this, [this](const QString &fileName) {
-      mFileHistoryWidget->setup(fileName);
-      mainStackedWidget->setCurrentWidget(mFileHistoryWidget);
-   });
+   connect(mCommitWidget, &CommitWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
 
    connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
+   connect(mRevisionWidget, &RevisionWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
 
    setRepository(repo);
 
@@ -286,6 +284,12 @@ void GitQlientRepo::setWidgetsEnabled(bool enabled)
    mFullDiffWidget->setEnabled(enabled);
    mFileDiffWidget->setEnabled(enabled);
    mBranchesWidget->setEnabled(enabled);
+}
+
+void GitQlientRepo::showFileHistory(const QString &fileName)
+{
+   mFileHistoryWidget->setup(fileName);
+   mainStackedWidget->setCurrentWidget(mFileHistoryWidget);
 }
 
 void GitQlientRepo::openCommitDiff()

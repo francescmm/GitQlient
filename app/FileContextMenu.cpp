@@ -11,9 +11,7 @@ FileContextMenu::FileContextMenu(const QString &file, QWidget *parent)
    fileHistoryAction->setEnabled(false);
    // connect(fileHistoryAction, &QAction::triggered, this, &FileList::executeAction);
 
-   const auto fileBlameAction = addAction(tr("File blame"));
-   fileBlameAction->setEnabled(false);
-   // connect(fileBlameAction, &QAction::triggered, this, &FileList::executeAction);
+   connect(addAction(tr("File blame")), &QAction::triggered, this, &FileContextMenu::signalShowFileHistory);
 
    const auto fileDiffAction = addAction(tr("Diff"));
    connect(fileDiffAction, &QAction::triggered, this, &FileContextMenu::signalOpenFileDiff);

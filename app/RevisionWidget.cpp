@@ -82,6 +82,7 @@ RevisionWidget::RevisionWidget(QSharedPointer<Git> git, QWidget *parent)
 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { emit signalOpenFileCommit(mCurrentSha, mParentSha, item->text()); });
+   connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &RevisionWidget::signalShowFileHistory);
    connect(fileListWidget, &FileListWidget::contextMenu, this, &RevisionWidget::signalOpenFileContextMenu);
 }
 

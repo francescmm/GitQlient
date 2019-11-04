@@ -36,6 +36,7 @@ class FileListWidget : public QListWidget
 
 signals:
    void contextMenu(const QString &, int);
+   void signalShowFileHistory(const QString &fileName);
 
 public:
    explicit FileListWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);

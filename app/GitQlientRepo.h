@@ -108,6 +108,7 @@ private:
    void clearWindow(bool deepClear);
    void setWidgetsEnabled(bool enabled);
    void executeCommand();
+   void showFileHistory(const QString &fileName);
 
    // End of MainWindow refactor
    bool isMatch(const QString &sha, const QString &f, int cn, const QMap<QString, bool> &sm);

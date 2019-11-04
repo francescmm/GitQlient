@@ -51,6 +51,8 @@ void FileListWidget::showContextMenu(const QPoint &pos)
    {
       const auto fileName = item->data(Qt::DisplayRole).toString();
       const auto menu = new FileContextMenu(fileName, this);
+      connect(menu, &FileContextMenu::signalShowFileHistory, this,
+              [this, fileName]() { emit signalShowFileHistory(fileName); });
       connect(menu, &FileContextMenu::signalOpenFileDiff, this,
               [this, item] { emit QListWidget::itemDoubleClicked(item); });
       menu->exec(viewport()->mapToGlobal(pos));

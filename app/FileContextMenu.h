@@ -31,6 +31,7 @@ class FileContextMenu : public QMenu
 
 signals:
    void signalOpenFileDiff();
+   void signalShowFileHistory();
 
 public:
    explicit FileContextMenu(const QString &file, QWidget *parent = nullptr);

@@ -40,6 +40,7 @@ class RevisionWidget : public QWidget
 signals:
    void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file);
    void signalOpenFileContextMenu(const QString &, int);
+   void signalShowFileHistory(const QString &fileName);
 
 public:
    explicit RevisionWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
