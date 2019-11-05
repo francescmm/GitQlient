@@ -54,7 +54,7 @@ private:
 
    struct Annotation
    {
-      QString shortSha;
+      QString sha;
       QString author;
       QDateTime dateTime;
       int line;

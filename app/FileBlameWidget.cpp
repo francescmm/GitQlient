@@ -71,13 +71,14 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
    for (const auto &line : lines)
    {
       const auto fields = line.split("\t");
+      const auto revision = mGit->revLookup(fields.at(0));
       const auto dt = QDateTime::fromString(fields.at(2), Qt::ISODate);
       const auto lineNumAndContent = fields.at(3);
       const auto divisorChar = lineNumAndContent.indexOf(")");
       const auto lineText = lineNumAndContent.mid(0, divisorChar);
       const auto content = lineNumAndContent.mid(divisorChar + 1, lineNumAndContent.count() - lineText.count() - 1);
 
-      annotations.append({ fields.at(0), QString(fields.at(1)).remove("("), dt, lineText.toInt(), content });
+      annotations.append({ revision->sha(), QString(fields.at(1)).remove("("), dt, lineText.toInt(), content });
 
       if (fields.at(0) != ZERO_SHA)
       {
@@ -113,7 +114,7 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
    {
       const auto &lastAnnotation = row == 0 ? Annotation() : annotations.at(row - 1);
 
-      if (lastAnnotation.shortSha != annotations.at(row).shortSha)
+      if (lastAnnotation.sha != annotations.at(row).sha)
       {
          if (dateLabel)
             annotationLayout->addWidget(dateLabel, labelRow, 0, 1, 1);
@@ -160,7 +161,7 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
 
 QLabel *FileBlameWidget::createDateLabel(const Annotation &annotation, bool isFirst)
 {
-   auto isWip = annotation.shortSha == ZERO_SHA.left(8);
+   auto isWip = annotation.sha == ZERO_SHA;
    QString when;
 
    if (!isWip)
@@ -206,15 +207,14 @@ QLabel *FileBlameWidget::createAuthorLabel(const Annotation &annotation, bool is
 
 ClickableFrame *FileBlameWidget::createMessageLabel(const Annotation &annotation, bool isFirst)
 {
-   auto isWip = annotation.shortSha == ZERO_SHA.left(8);
-   const auto revision = mGit->revLookup(annotation.shortSha);
-   const auto longSha = revision ? revision->sha() : annotation.shortSha;
+   auto isWip = annotation.sha == ZERO_SHA.left(8);
+   const auto revision = mGit->revLookup(annotation.sha);
    const auto commitMsg = revision ? revision->shortLog() : QString("WIP");
 
    const auto messageLabel = new ClickableFrame(commitMsg, Qt::AlignTop | Qt::AlignLeft);
    messageLabel->setObjectName(isFirst ? QString("primusInterPares") : QString("firstOfItsName"));
    messageLabel->setToolTip(
-       QString("<p>%1</p><p>%2</p>").arg(longSha, revision ? revision->shortLog() : QString("Local changes")));
+       QString("<p>%1</p><p>%2</p>").arg(annotation.sha, revision ? revision->shortLog() : QString("Local changes")));
    messageLabel->setFont(mInfoFont);
 
    if (!isWip)
@@ -226,14 +226,15 @@ ClickableFrame *FileBlameWidget::createMessageLabel(const Annotation &annotation
    else
       messageLabel->setStyleSheet("QLabel { border-right: 5px solid #D89000 }");
 
-   connect(messageLabel, &ClickableFrame::clicked, this, [this, longSha]() { emit signalCommitSelected(longSha); });
+   connect(messageLabel, &ClickableFrame::clicked, this,
+           [this, annotation]() { emit signalCommitSelected(annotation.sha); });
 
    return messageLabel;
 }
 
 QLabel *FileBlameWidget::createNumLabel(const Annotation &annotation, int row)
 {
-   auto isWip = annotation.shortSha == ZERO_SHA.left(8);
+   auto isWip = annotation.sha == ZERO_SHA.left(8);
    const auto numberLabel = new QLabel(QString::number(row + 1));
    numberLabel->setFont(mCodeFont);
    numberLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
