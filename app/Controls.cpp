@@ -19,6 +19,7 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mHome(new QToolButton())
+   , mBlame(new QToolButton())
    , mGoToBtn(new QToolButton())
    , mPullBtn(new QToolButton())
    , mPushBtn(new QToolButton())
@@ -29,6 +30,11 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    mHome->setIconSize(QSize(22, 22));
    mHome->setText("Home");
    mHome->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+   mBlame->setIcon(QIcon(":/icons/blame"));
+   mBlame->setIconSize(QSize(22, 22));
+   mBlame->setText("Blame");
+   mBlame->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
    mGoToBtn->setIcon(QIcon(":/icons/go_to"));
    mGoToBtn->setIconSize(QSize(22, 22));
@@ -83,18 +89,20 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    mTerminalBtn->setText(tr("Terminal"));
    mTerminalBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
-   const auto vLayout = new QHBoxLayout(this);
-   vLayout->setContentsMargins(10, 10, 10, 10);
-   vLayout->addStretch();
-   vLayout->addWidget(mHome);
-   vLayout->addWidget(mGoToBtn);
-   vLayout->addWidget(mPullBtn);
-   vLayout->addWidget(mPushBtn);
-   vLayout->addWidget(mStashBtn);
-   vLayout->addWidget(mTerminalBtn);
-   vLayout->addStretch();
+   const auto hLayout = new QHBoxLayout(this);
+   hLayout->setContentsMargins(10, 10, 10, 10);
+   hLayout->addStretch();
+   hLayout->addWidget(mHome);
+   hLayout->addWidget(mBlame);
+   hLayout->addWidget(mGoToBtn);
+   hLayout->addWidget(mPullBtn);
+   hLayout->addWidget(mPushBtn);
+   hLayout->addWidget(mStashBtn);
+   hLayout->addWidget(mTerminalBtn);
+   hLayout->addStretch();
 
    connect(mHome, &QToolButton::clicked, this, &Controls::signalGoBack);
+   connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
    connect(mGoToBtn, &QToolButton::clicked, this, &Controls::openGoToDialog);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mTerminalBtn, &QToolButton::clicked, this, &Controls::showTerminal);

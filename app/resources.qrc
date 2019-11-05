@@ -41,6 +41,7 @@
         <file alias="up-arrow">resources/icons/up-arrow.svg</file>
         <file alias="left-arrow">resources/icons/left-arrow.svg</file>
         <file alias="right-arrow">resources/icons/right-arrow.svg</file>
+        <file alias="blame">resources/icons/blame.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

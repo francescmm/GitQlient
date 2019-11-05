@@ -1,4 +1,4 @@
-﻿#include "FileHistoryWidget.h"
+﻿#include "FileBlameWidget.h"
 
 #include <FileDiffView.h>
 #include <git.h>
@@ -20,7 +20,7 @@ static qint64 kSecondsOldest = QDateTime::currentDateTime().toSecsSinceEpoch();
 static qint64 kIncrementSecs = 0;
 }
 
-FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
+FileBlameWidget::FileBlameWidget(QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mAnotation(new QFrame())
@@ -42,7 +42,7 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    setLayout(layout);
 }
 
-void FileHistoryWidget::setup(const QString &fileName)
+void FileBlameWidget::setup(const QString &fileName)
 {
    delete mAnotation;
    mAnotation = nullptr;
@@ -56,7 +56,7 @@ void FileHistoryWidget::setup(const QString &fileName)
    }
 }
 
-QVector<FileHistoryWidget::Annotation> FileHistoryWidget::processBlame(const QString &blame)
+QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString &blame)
 {
    const auto lines = blame.split("\n", QString::SkipEmptyParts);
    QVector<Annotation> annotations;
@@ -89,7 +89,7 @@ QVector<FileHistoryWidget::Annotation> FileHistoryWidget::processBlame(const QSt
    return annotations;
 }
 
-void FileHistoryWidget::formatAnnotatedFile(const QVector<Annotation> &annotations)
+void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations)
 {
    auto labelRow = 0;
    auto labelRowSpan = 1;
@@ -151,7 +151,7 @@ void FileHistoryWidget::formatAnnotatedFile(const QVector<Annotation> &annotatio
    mScrollArea->setWidgetResizable(true);
 }
 
-QLabel *FileHistoryWidget::createDateLabel(const Annotation &annotation, bool isFirst)
+QLabel *FileBlameWidget::createDateLabel(const Annotation &annotation, bool isFirst)
 {
    auto isWip = annotation.shortSha == ZERO_SHA.left(8);
    QString when;
@@ -187,7 +187,7 @@ QLabel *FileHistoryWidget::createDateLabel(const Annotation &annotation, bool is
    return dateLabel;
 }
 
-QLabel *FileHistoryWidget::createAuthorLabel(const Annotation &annotation, bool isFirst)
+QLabel *FileBlameWidget::createAuthorLabel(const Annotation &annotation, bool isFirst)
 {
    const auto authorLabel = new QLabel(annotation.author);
    authorLabel->setObjectName(isFirst ? QString("authorPrimusInterPares") : QString("authorFirstOfItsName"));
@@ -197,7 +197,7 @@ QLabel *FileHistoryWidget::createAuthorLabel(const Annotation &annotation, bool 
    return authorLabel;
 }
 
-QLabel *FileHistoryWidget::createMessageLabel(const Annotation &annotation, bool isFirst)
+QLabel *FileBlameWidget::createMessageLabel(const Annotation &annotation, bool isFirst)
 {
    auto isWip = annotation.shortSha == ZERO_SHA.left(8);
    const auto revision = mGit->revLookup(annotation.shortSha);
@@ -225,7 +225,7 @@ QLabel *FileHistoryWidget::createMessageLabel(const Annotation &annotation, bool
    return messageLabel;
 }
 
-QLabel *FileHistoryWidget::createNumLabel(int row)
+QLabel *FileBlameWidget::createNumLabel(int row)
 {
    const auto numberLabel = new QLabel(QString::number(row + 1));
    numberLabel->setFont(mCodeFont);
@@ -236,7 +236,7 @@ QLabel *FileHistoryWidget::createNumLabel(int row)
    return numberLabel;
 }
 
-QLabel *FileHistoryWidget::createCodeLabel(const Annotation &annotation)
+QLabel *FileBlameWidget::createCodeLabel(const Annotation &annotation)
 {
    const auto contentLabel = new QLabel(annotation.content);
    contentLabel->setFont(mCodeFont);

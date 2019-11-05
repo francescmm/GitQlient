@@ -32,12 +32,12 @@ class QVBoxLayout;
 class QScrollArea;
 class QLabel;
 
-class FileHistoryWidget : public QFrame
+class FileBlameWidget : public QFrame
 {
    Q_OBJECT
 
 public:
-   explicit FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit FileBlameWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
    void setup(const QString &fileName);
 

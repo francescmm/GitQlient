@@ -20,11 +20,11 @@ HEADERS += \
     $$PWD/ConfigWidget.h \
     $$PWD/Controls.h \
     $$PWD/CreateRepoDlg.h \
+    $$PWD/FileBlameWidget.h \
     $$PWD/FileContextMenu.h \
     $$PWD/FileDiffHighlighter.h \
     $$PWD/FileDiffView.h \
     $$PWD/FileDiffWidget.h \
-    $$PWD/FileHistoryWidget.h \
     $$PWD/FileListDelegate.h \
     $$PWD/FileListWidget.h \
     $$PWD/FullDiffWidget.h \
@@ -65,11 +65,11 @@ SOURCES += \
     $$PWD/ConfigWidget.cpp \
     $$PWD/Controls.cpp \
     $$PWD/CreateRepoDlg.cpp \
+    $$PWD/FileBlameWidget.cpp \
     $$PWD/FileContextMenu.cpp \
     $$PWD/FileDiffHighlighter.cpp \
     $$PWD/FileDiffView.cpp \
     $$PWD/FileDiffWidget.cpp \
-    $$PWD/FileHistoryWidget.cpp \
     $$PWD/FileListDelegate.cpp \
     $$PWD/FileListWidget.cpp \
     $$PWD/FullDiffWidget.cpp \
