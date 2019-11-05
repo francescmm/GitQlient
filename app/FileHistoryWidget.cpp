@@ -57,7 +57,9 @@ void FileHistoryWidget::showFileHistory(const QString &file)
 
 void FileHistoryWidget::showFileSystemContextMenu(const QPoint &pos)
 {
-   const auto item = fileSystemView->indexAt(pos).data().toString();
+   const auto index = fileSystemView->currentIndex();
+   auto item = fileSystemModel->filePath(index);
+   item.remove(mGit->getWorkingDir().append("/"));
 
    if (!item.isEmpty())
    {
