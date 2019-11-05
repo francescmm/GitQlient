@@ -87,7 +87,7 @@ const QString RepositoryView::sha(int row) const
 
 int RepositoryView::row(const QString &sha) const
 {
-   return mRevCache->row(sha);
+   return mRevCache ? mRevCache->row(sha) : -1;
 }
 
 void RepositoryView::setupGeometry()
@@ -157,6 +157,8 @@ const QString RepositoryView::shaFromAnnId(int id)
 
 bool RepositoryView::update()
 {
+   if (!st)
+      return false;
 
    int stRow = row(st->sha());
    if (stRow == -1)
