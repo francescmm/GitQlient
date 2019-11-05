@@ -651,13 +651,24 @@ QLabel#authorFirstOfItsName
     border-top: 1px solid #606162;
 }
 
-QLabel#firstOfItsName, QLabel#primusInterPares
+ClickableFrame#firstOfItsName, ClickableFrame#primusInterPares
 {
     padding: 2px;
     border: 0px;
 }
 
-QLabel#firstOfItsName
+ClickableFrame#firstOfItsName
 {
     border-top: 1px solid #606162;
 }
+
+ClickableFrame#firstOfItsName::hover, ClickableFrame#primusInterPares::hover
+{
+    background-color: #606162;
+}
+
+ClickableFrame#firstOfItsName::pressed,  ClickableFrame#primusInterPares::pressed
+{
+    background-color: #202122;
+}
+

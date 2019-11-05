@@ -39,6 +39,8 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QS
    historyBlameLayout->addWidget(repoView, 0, 0);
    historyBlameLayout->addWidget(fileSystemView, 1, 0);
    historyBlameLayout->addWidget(mFileBlameWidget, 0, 1, 2, 1);
+
+   connect(mFileBlameWidget, &FileBlameWidget::signalCommitSelected, repoView, &RepositoryView::focusOnCommit);
 }
 
 void FileHistoryWidget::init(const QString &workingDirectory)

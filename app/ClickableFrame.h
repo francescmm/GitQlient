@@ -34,6 +34,7 @@ signals:
 
 public:
    explicit ClickableFrame(QWidget *parent = nullptr);
+   explicit ClickableFrame(const QString &text, Qt::Alignment alignment, QWidget *parent = nullptr);
 
 protected:
    void mousePressEvent(QMouseEvent *e) override;

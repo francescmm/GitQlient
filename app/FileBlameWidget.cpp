@@ -3,6 +3,7 @@
 #include <FileDiffView.h>
 #include <git.h>
 #include <Revision.h>
+#include <ClickableFrame.h>
 
 #include <QGridLayout>
 #include <QLabel>
@@ -101,7 +102,7 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
    auto labelRowSpan = 1;
    QLabel *dateLabel = nullptr;
    QLabel *authorLabel = nullptr;
-   QLabel *messageLabel = nullptr;
+   ClickableFrame *messageLabel = nullptr;
 
    const auto annotationLayout = new QGridLayout();
    annotationLayout->setContentsMargins(QMargins());
@@ -115,13 +116,13 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
       if (lastAnnotation.shortSha != annotations.at(row).shortSha)
       {
          if (dateLabel)
-            annotationLayout->addWidget(dateLabel, labelRow, 0, labelRowSpan, 1);
+            annotationLayout->addWidget(dateLabel, labelRow, 0, 1, 1);
 
          if (authorLabel)
-            annotationLayout->addWidget(authorLabel, labelRow, 1, labelRowSpan, 1);
+            annotationLayout->addWidget(authorLabel, labelRow, 1, 1, 1);
 
          if (messageLabel)
-            annotationLayout->addWidget(messageLabel, labelRow, 2, labelRowSpan, 1);
+            annotationLayout->addWidget(messageLabel, labelRow, 2, 1, 1);
 
          dateLabel = createDateLabel(annotations.at(row), row == 0);
          authorLabel = createAuthorLabel(annotations.at(row), row == 0);
@@ -133,19 +134,19 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
       else
          ++labelRowSpan;
 
-      annotationLayout->addWidget(createNumLabel(row), row, 3);
+      annotationLayout->addWidget(createNumLabel(annotations.at(row), row), row, 3);
       annotationLayout->addWidget(createCodeLabel(annotations.at(row)), row, 4);
    }
 
    // Adding the last row
    if (dateLabel)
-      annotationLayout->addWidget(dateLabel, labelRow, 0, labelRowSpan, 1);
+      annotationLayout->addWidget(dateLabel, labelRow, 0, 1, 1);
 
    if (authorLabel)
-      annotationLayout->addWidget(authorLabel, labelRow, 1, labelRowSpan, 1);
+      annotationLayout->addWidget(authorLabel, labelRow, 1, 1, 1);
 
    if (messageLabel)
-      annotationLayout->addWidget(messageLabel, labelRow, 2, labelRowSpan, 1);
+      annotationLayout->addWidget(messageLabel, labelRow, 2, 1, 1);
 
    annotationLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), totalAnnot, 4);
 
@@ -203,18 +204,18 @@ QLabel *FileBlameWidget::createAuthorLabel(const Annotation &annotation, bool is
    return authorLabel;
 }
 
-QLabel *FileBlameWidget::createMessageLabel(const Annotation &annotation, bool isFirst)
+ClickableFrame *FileBlameWidget::createMessageLabel(const Annotation &annotation, bool isFirst)
 {
    auto isWip = annotation.shortSha == ZERO_SHA.left(8);
    const auto revision = mGit->revLookup(annotation.shortSha);
+   const auto longSha = revision ? revision->sha() : annotation.shortSha;
    const auto commitMsg = revision ? revision->shortLog() : QString("WIP");
 
-   const auto messageLabel = new QLabel(commitMsg);
+   const auto messageLabel = new ClickableFrame(commitMsg, Qt::AlignTop | Qt::AlignLeft);
    messageLabel->setObjectName(isFirst ? QString("primusInterPares") : QString("firstOfItsName"));
-   messageLabel->setToolTip(QString("<p>%1</p><p>%2</p>")
-                                .arg(annotation.shortSha, revision ? revision->shortLog() : QString("Local changes")));
+   messageLabel->setToolTip(
+       QString("<p>%1</p><p>%2</p>").arg(longSha, revision ? revision->shortLog() : QString("Local changes")));
    messageLabel->setFont(mInfoFont);
-   messageLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
    if (!isWip)
    {
@@ -225,16 +226,28 @@ QLabel *FileBlameWidget::createMessageLabel(const Annotation &annotation, bool i
    else
       messageLabel->setStyleSheet("QLabel { border-right: 5px solid #D89000 }");
 
+   connect(messageLabel, &ClickableFrame::clicked, this, [this, longSha]() { emit signalCommitSelected(longSha); });
+
    return messageLabel;
 }
 
-QLabel *FileBlameWidget::createNumLabel(int row)
+QLabel *FileBlameWidget::createNumLabel(const Annotation &annotation, int row)
 {
+   auto isWip = annotation.shortSha == ZERO_SHA.left(8);
    const auto numberLabel = new QLabel(QString::number(row + 1));
    numberLabel->setFont(mCodeFont);
    numberLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
    numberLabel->setObjectName("numberLabel");
    numberLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
+
+   if (!isWip)
+   {
+      const auto dtSinceEpoch = annotation.dateTime.toSecsSinceEpoch();
+      const auto colorIndex = qCeil((kSecondsNewest - dtSinceEpoch) / kIncrementSecs);
+      numberLabel->setStyleSheet(QString("QLabel { border-left: 5px solid rgb(%1) }").arg(kBorderColors[colorIndex]));
+   }
+   else
+      numberLabel->setStyleSheet("QLabel { border-left: 5px solid #D89000 }");
 
    return numberLabel;
 }

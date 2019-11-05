@@ -30,11 +30,15 @@ class Git;
 class FileDiffView;
 class QVBoxLayout;
 class QScrollArea;
+class ClickableFrame;
 class QLabel;
 
 class FileBlameWidget : public QFrame
 {
    Q_OBJECT
+
+signals:
+   void signalCommitSelected(const QString &sha);
 
 public:
    explicit FileBlameWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
@@ -61,7 +65,7 @@ private:
    void formatAnnotatedFile(const QVector<Annotation> &annotations);
    QLabel *createDateLabel(const Annotation &annotation, bool isFirst);
    QLabel *createAuthorLabel(const Annotation &annotation, bool isFirst);
-   QLabel *createMessageLabel(const Annotation &annotation, bool isFirst);
-   QLabel *createNumLabel(int row);
+   ClickableFrame *createMessageLabel(const Annotation &annotation, bool isFirst);
+   QLabel *createNumLabel(const Annotation &annotation, int row);
    QLabel *createCodeLabel(const Annotation &annotation);
 };
