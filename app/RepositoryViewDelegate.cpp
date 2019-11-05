@@ -354,7 +354,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto offset = 0;
 
-   if (mGit->checkRef(r->sha()) > 0)
+   if (mGit->checkRef(r->sha()) > 0 && !mView->hasActiveFiler())
       paintTagBranch(p, opt, offset, r->sha());
 
    auto newOpt = opt;
