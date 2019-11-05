@@ -2,9 +2,7 @@
 
 1. Pre-release tasks
 - Add icon
-- Improve functionality and styles of the blame
-    - Study whether or not should be moved to its own window
-- Add commits history of a file
+- Add commits history of a file to the blame screen
 
 2. Improvements
 - Amend a commit that is not the last one: amend + rebase
