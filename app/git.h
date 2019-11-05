@@ -128,6 +128,7 @@ public:
    const QString getNewCommitMsg();
    bool resetFile(const QString &fileName);
    GitExecResult blame(const QString &file);
+   GitExecResult history(const QString &file);
    /** END COMMIT INFO **/
 
    /** START SUBMODULES **/

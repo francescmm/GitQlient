@@ -475,6 +475,11 @@ GitExecResult Git::blame(const QString &file)
    return run(QString("git annotate %1").arg(file));
 }
 
+GitExecResult Git::history(const QString &file)
+{
+   return run(QString("git log --pretty=%H %1").arg(file));
+}
+
 QPair<QString, QString> Git::getSplitCommitMsg(const QString &sha)
 {
    const Revision *c = mRevCache->revLookup(sha);
