@@ -38,10 +38,10 @@ class RevisionWidget;
 class FullDiffControler;
 class FullDiffWidget;
 class FileDiffWidget;
-class FileBlameWidget;
 class RepositoryView;
 class RevsView;
 class BranchesWidget;
+class FileHistoryWidget;
 class FileDiffHighlighter;
 class QTimer;
 
@@ -91,9 +91,9 @@ private:
    RevsView *rv = nullptr;
    FullDiffWidget *mFullDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;
-   FileBlameWidget *mFileBlameWidget = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;
+   FileHistoryWidget *fileHistoryWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    GitQlientRepoConfig mConfig;

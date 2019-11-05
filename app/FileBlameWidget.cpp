@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QScrollArea>
 #include <QtMath>
+#include <QMessageBox>
 
 namespace
 {
@@ -25,6 +26,8 @@ FileBlameWidget::FileBlameWidget(QSharedPointer<Git> git, QWidget *parent)
    , mGit(git)
    , mAnotation(new QFrame())
 {
+   mAnotation->setObjectName("AnnotationFrame");
+
    mInfoFont.setPointSize(9);
 
    mCodeFont = QFont(mInfoFont);
@@ -44,16 +47,19 @@ FileBlameWidget::FileBlameWidget(QSharedPointer<Git> git, QWidget *parent)
 
 void FileBlameWidget::setup(const QString &fileName)
 {
-   delete mAnotation;
-   mAnotation = nullptr;
-
    const auto ret = mGit->blame(fileName);
 
-   if (ret.success)
+   if (ret.success && !ret.output.toString().contains("fatal"))
    {
+      delete mAnotation;
+      mAnotation = nullptr;
+
       const auto annotations = processBlame(ret.output.toString());
       formatAnnotatedFile(annotations);
    }
+   else
+      QMessageBox::warning(this, tr("File not in Git"),
+                           tr("The file {%1} is not under Git control version. You cannot blame it.").arg(fileName));
 }
 
 QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString &blame)
@@ -141,7 +147,7 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
    if (messageLabel)
       annotationLayout->addWidget(messageLabel, labelRow, 2, labelRowSpan, 1);
 
-   annotationLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), totalAnnot, 2);
+   annotationLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), totalAnnot, 4);
 
    mAnotation = new QFrame();
    mAnotation->setObjectName("AnnotationFrame");
@@ -201,10 +207,7 @@ QLabel *FileBlameWidget::createMessageLabel(const Annotation &annotation, bool i
 {
    auto isWip = annotation.shortSha == ZERO_SHA.left(8);
    const auto revision = mGit->revLookup(annotation.shortSha);
-   const auto commitMsg = revision ? revision->shortLog().count() < 25
-           ? revision->shortLog()
-           : QString("%1...").arg(revision->shortLog().left(25).trimmed())
-                                   : QString("WIP");
+   const auto commitMsg = revision ? revision->shortLog() : QString("WIP");
 
    const auto messageLabel = new QLabel(commitMsg);
    messageLabel->setObjectName(isFirst ? QString("primusInterPares") : QString("firstOfItsName"));

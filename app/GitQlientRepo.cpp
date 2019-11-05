@@ -11,10 +11,11 @@
 #include <QLogger.h>
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
-#include <FileBlameWidget.h>
+#include <FileHistoryWidget.h>
 #include <domain.h>
 #include <Revision.h>
 
+#include <QFileSystemModel>
 #include <QTimer>
 #include <QDirIterator>
 #include <QFileSystemWatcher>
@@ -40,8 +41,9 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    , mRevisionWidget(new RevisionWidget(mGit))
    , mFullDiffWidget(new FullDiffWidget(mGit, mRevisionsCache))
    , mFileDiffWidget(new FileDiffWidget(mGit))
-   , mFileBlameWidget(new FileBlameWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
+   , fileHistoryWidget(new FileHistoryWidget(mRevisionsCache, mGit))
+
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
@@ -72,7 +74,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    centerWidget->setLayout(centerLayout);
 
    mainStackedLayout->addWidget(centerWidget);
-   mainStackedLayout->addWidget(mFileBlameWidget);
+   mainStackedLayout->addWidget(fileHistoryWidget);
 
    const auto gridLayout = new QGridLayout(this);
    gridLayout->setSpacing(0);
@@ -207,6 +209,8 @@ void GitQlientRepo::setRepository(const QString &newDir)
          onCommitSelected(ZERO_SHA);
          mBranchesWidget->showBranches();
 
+         fileHistoryWidget->init(newDir);
+
          centerStackedWidget->setCurrentIndex(0);
          commitStackedWidget->setCurrentIndex(1);
          mControls->enableButtons(true);
@@ -303,8 +307,8 @@ void GitQlientRepo::setWidgetsEnabled(bool enabled)
 
 void GitQlientRepo::showFileHistory(const QString &fileName)
 {
-   mFileBlameWidget->setup(fileName);
-   mainStackedLayout->setCurrentWidget(mFileBlameWidget);
+   fileHistoryWidget->showFileHistory(fileName);
+   mainStackedLayout->setCurrentIndex(1);
 }
 
 void GitQlientRepo::openCommitDiff()
