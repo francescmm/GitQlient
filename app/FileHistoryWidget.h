@@ -30,6 +30,7 @@ class Git;
 class QFileSystemModel;
 class FileBlameWidget;
 class QTreeView;
+class RepositoryView;
 
 class FileHistoryWidget : public QFrame
 {
@@ -45,6 +46,7 @@ public:
 private:
    QSharedPointer<Git> mGit;
    QFileSystemModel *fileSystemModel = nullptr;
+   RepositoryView *mRepoView = nullptr;
    QTreeView *fileSystemView = nullptr;
    FileBlameWidget *mFileBlameWidget = nullptr;
    QString mWorkingDirectory;

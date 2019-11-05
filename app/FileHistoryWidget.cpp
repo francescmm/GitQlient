@@ -15,15 +15,15 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QS
    : QFrame(parent)
    , mGit(git)
    , fileSystemModel(new QFileSystemModel())
+   , mRepoView(new RepositoryView(revCache, mGit))
    , fileSystemView(new QTreeView())
    , mFileBlameWidget(new FileBlameWidget(mGit))
 {
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
-   const auto repoView = new RepositoryView(revCache, mGit);
-   repoView->setup();
-   repoView->setEnabled(true);
-   repoView->setMaximumWidth(400);
+   mRepoView->setup();
+   mRepoView->setEnabled(true);
+   mRepoView->setMaximumWidth(400);
 
    // fileSystemView->setItemDelegate(new BranchesViewDelegate());
    fileSystemView->setModel(fileSystemModel);
@@ -36,11 +36,11 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QS
 
    const auto historyBlameLayout = new QGridLayout(this);
    historyBlameLayout->setContentsMargins(QMargins());
-   historyBlameLayout->addWidget(repoView, 0, 0);
+   historyBlameLayout->addWidget(mRepoView, 0, 0);
    historyBlameLayout->addWidget(fileSystemView, 1, 0);
    historyBlameLayout->addWidget(mFileBlameWidget, 0, 1, 2, 1);
 
-   connect(mFileBlameWidget, &FileBlameWidget::signalCommitSelected, repoView, &RepositoryView::focusOnCommit);
+   connect(mFileBlameWidget, &FileBlameWidget::signalCommitSelected, mRepoView, &RepositoryView::focusOnCommit);
 }
 
 void FileHistoryWidget::init(const QString &workingDirectory)
@@ -52,6 +52,11 @@ void FileHistoryWidget::init(const QString &workingDirectory)
 
 void FileHistoryWidget::showFileHistory(const QString &file)
 {
+   const auto ret = mGit->history(file);
+
+   if (ret.success)
+      mRepoView->filterBySha(ret.output.toString().split("\n", QString::SkipEmptyParts));
+
    mFileBlameWidget->setup(file);
 }
 
