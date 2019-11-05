@@ -50,6 +50,7 @@ public:
 
    void init(const QString &sha);
    void clear();
+   bool isAmendActive() const { return mIsAmend; }
 
 private:
    bool mIsAmend = false;
