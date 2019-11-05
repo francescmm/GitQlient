@@ -61,7 +61,7 @@ void FileHistoryWidget::showFileSystemContextMenu(const QPoint &pos)
 
    if (!item.isEmpty())
    {
-      const auto menu = new QMenu();
+      const auto menu = new QMenu(this);
       const auto blameAction = menu->addAction(tr("Blame"));
       connect(blameAction, &QAction::triggered, this,
               [this, item]() { showFileHistory(QString("%1/%2").arg(mWorkingDirectory, item)); });
