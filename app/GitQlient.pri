@@ -25,6 +25,7 @@ HEADERS += \
     $$PWD/FileDiffHighlighter.h \
     $$PWD/FileDiffView.h \
     $$PWD/FileDiffWidget.h \
+    $$PWD/FileHistoryWidget.h \
     $$PWD/FileListDelegate.h \
     $$PWD/FileListWidget.h \
     $$PWD/FullDiffWidget.h \
@@ -70,6 +71,7 @@ SOURCES += \
     $$PWD/FileDiffHighlighter.cpp \
     $$PWD/FileDiffView.cpp \
     $$PWD/FileDiffWidget.cpp \
+    $$PWD/FileHistoryWidget.cpp \
     $$PWD/FileListDelegate.cpp \
     $$PWD/FileListWidget.cpp \
     $$PWD/FullDiffWidget.cpp \
