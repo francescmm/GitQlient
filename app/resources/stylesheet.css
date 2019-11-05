@@ -89,14 +89,14 @@ RevisionWidget #labelSha
     font-family: Ubuntu Mono;
 }
 
-CommitWidget > QListWidget, BranchesWidget > QListWidget{
+CommitWidget > QListWidget, BranchesWidget > QListWidget, FileHistoryWidget > QTreeView {
    color: white;
    border: 0px;
    background-color: #2E2F30;
    outline: 0;
  }
 
-QListWidget::item
+QListWidget::item, FileHistoryWidget > QTreeView::item
 {
    padding-left: 7px;
    padding-right: 7px;
@@ -124,12 +124,12 @@ BranchesWidget
     max-width: 400px;
 }
 
-QListWidget::item:hover
+QListWidget::item:hover, FileHistoryWidget > QTreeView::item:hover
 {
    background:#363637;
 }
 
-QListWidget::item:focus
+QListWidget::item:focus, FileHistoryWidget > QTreeView::item:focus
 {
    border: 0px;
    background-color: #3C3D3D;
