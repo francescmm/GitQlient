@@ -32,7 +32,10 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QS
    fileSystemView->header()->setSectionHidden(2, true);
    fileSystemView->header()->setSectionHidden(3, true);
    fileSystemView->setContextMenuPolicy(Qt::CustomContextMenu);
-   connect(fileSystemView, &QTreeView::customContextMenuRequested, this, &FileHistoryWidget::showFileSystemContextMenu);
+   connect(fileSystemView, &QTreeView::clicked, this, [this](const QModelIndex &index) {
+      auto item = fileSystemModel->filePath(index);
+      showFileHistory(QString("%1").arg(item));
+   });
 
    const auto historyBlameLayout = new QGridLayout(this);
    historyBlameLayout->setContentsMargins(QMargins());
@@ -58,21 +61,4 @@ void FileHistoryWidget::showFileHistory(const QString &file)
       mRepoView->filterBySha(ret.output.toString().split("\n", QString::SkipEmptyParts));
 
    mFileBlameWidget->setup(file);
-}
-
-void FileHistoryWidget::showFileSystemContextMenu(const QPoint &pos)
-{
-   const auto index = fileSystemView->currentIndex();
-   auto item = fileSystemModel->filePath(index);
-   item.remove(mGit->getWorkingDir().append("/"));
-
-   if (!item.isEmpty())
-   {
-      const auto menu = new QMenu(this);
-      const auto blameAction = menu->addAction(tr("Blame"));
-      connect(blameAction, &QAction::triggered, this,
-              [this, item]() { showFileHistory(QString("%1/%2").arg(mWorkingDirectory, item)); });
-
-      menu->exec(fileSystemView->mapToGlobal(pos));
-   }
 }

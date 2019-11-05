@@ -117,13 +117,13 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
       if (lastAnnotation.sha != annotations.at(row).sha)
       {
          if (dateLabel)
-            annotationLayout->addWidget(dateLabel, labelRow, 0, 1, 1);
+            annotationLayout->addWidget(dateLabel, labelRow, 0);
 
          if (authorLabel)
-            annotationLayout->addWidget(authorLabel, labelRow, 1, 1, 1);
+            annotationLayout->addWidget(authorLabel, labelRow, 1);
 
          if (messageLabel)
-            annotationLayout->addWidget(messageLabel, labelRow, 2, 1, 1);
+            annotationLayout->addWidget(messageLabel, labelRow, 2);
 
          dateLabel = createDateLabel(annotations.at(row), row == 0);
          authorLabel = createAuthorLabel(annotations.at(row), row == 0);
@@ -141,13 +141,13 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
 
    // Adding the last row
    if (dateLabel)
-      annotationLayout->addWidget(dateLabel, labelRow, 0, 1, 1);
+      annotationLayout->addWidget(dateLabel, labelRow, 0);
 
    if (authorLabel)
-      annotationLayout->addWidget(authorLabel, labelRow, 1, 1, 1);
+      annotationLayout->addWidget(authorLabel, labelRow, 1);
 
    if (messageLabel)
-      annotationLayout->addWidget(messageLabel, labelRow, 2, 1, 1);
+      annotationLayout->addWidget(messageLabel, labelRow, 2);
 
    annotationLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), totalAnnot, 4);
 
