@@ -91,7 +91,7 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
       }
    }
 
-   kIncrementSecs = (kSecondsNewest - kSecondsOldest) / (kTotalColors - 1);
+   kIncrementSecs = kSecondsNewest != kSecondsOldest ? (kSecondsNewest - kSecondsOldest) / (kTotalColors - 1) : 1;
 
    return annotations;
 }
