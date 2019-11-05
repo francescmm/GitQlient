@@ -12,8 +12,9 @@ Author: Marco Costalba (C) 2005-2007
 #include <Revision.h>
 #include <RepositoryModel.h>
 #include <RepositoryModelColumns.h>
-#include "domain.h"
-#include "git.h"
+#include <domain.h>
+#include <git.h>
+#include <ShaFilterProxyModel.h>
 #include <RepositoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
 #include <QLogger.h>
@@ -50,17 +51,17 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    setSelectionMode(QAbstractItemView::ExtendedSelection);
    header()->setSortIndicatorShown(false);
 
-   const auto lvd = new RepositoryViewDelegate(mGit, revCache);
+   const auto lvd = new RepositoryViewDelegate(mGit, revCache, this);
    setItemDelegate(lvd);
 
    connect(lvd, &RepositoryViewDelegate::updateView, viewport(), qOverload<>(&QWidget::update));
    connect(this, &RepositoryView::diffTargetChanged, lvd, &RepositoryViewDelegate::diffTargetChanged);
    connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
    connect(mGit.get(), &Git::newRevsAdded, this, [this]() {
-      if (!d->st.sha().isEmpty() || model()->rowCount() == 0)
+      if (!d->st.sha().isEmpty() || mRepositoryModel->rowCount() == 0)
          return;
 
-      d->st.setSha(sha(0));
+      d->st.setSha(mRepositoryModel->index(0, static_cast<int>(RepositoryModelColumns::SHA)).data().toString());
       d->st.setSelectItem(true);
       update();
    });
@@ -75,19 +76,22 @@ void RepositoryView::setup()
    setupGeometry(); // after setting delegate
 }
 
+void RepositoryView::filterBySha(const QStringList &shaList)
+{
+   mIsFiltering = true;
+
+   delete mProxyModel;
+   setModel(mRepositoryModel);
+
+   mProxyModel = new ShaFilterProxyModel(this);
+   mProxyModel->setAcceptedSha(shaList);
+   mProxyModel->setSourceModel(mRepositoryModel);
+   setModel(mProxyModel);
+}
+
 RepositoryView::~RepositoryView()
 {
    mGit->cancelDataLoading(); // non blocking
-}
-
-const QString RepositoryView::sha(int row) const
-{
-   return model() ? model()->index(row, static_cast<int>(RepositoryModelColumns::SHA)).data().toString() : QString();
-}
-
-int RepositoryView::row(const QString &sha) const
-{
-   return mRevCache ? mRevCache->row(sha) : -1;
 }
 
 void RepositoryView::setupGeometry()
@@ -107,29 +111,6 @@ void RepositoryView::setupGeometry()
    hideColumn(static_cast<int>(RepositoryModelColumns::ID));
 }
 
-void RepositoryView::scrollToNext(int direction)
-{
-   // Depending on the value of direction, scroll to:
-   // -1 = the next child in history
-   //  1 = the previous parent in history
-   const QString &s = sha(currentIndex().row());
-   const auto r = mRevCache->revLookup(s);
-
-   if (r)
-   {
-      const QStringList &next = direction < 0 ? mGit->getChildren(s) : r->parents();
-      if (next.size() >= 1)
-         setCurrentIndex(model()->index(row(next.first()), 0));
-   }
-}
-
-void RepositoryView::scrollToCurrent(ScrollHint hint)
-{
-
-   if (currentIndex().isValid())
-      scrollTo(currentIndex(), hint);
-}
-
 int RepositoryView::getLaneType(const QString &sha, int pos) const
 {
 
@@ -137,30 +118,16 @@ int RepositoryView::getLaneType(const QString &sha, int pos) const
    return (r && pos < r->lanes.count() && pos >= 0 ? static_cast<int>(r->lanes.at(pos)) : -1);
 }
 
-void RepositoryView::getSelectedItems(QStringList &selectedItems)
-{
-
-   selectedItems.clear();
-   const auto ml = selectionModel()->selectedRows();
-   for (auto &it : ml)
-      selectedItems.append(sha(it.row()));
-
-   // selectedRows() returns the items in an unspecified order,
-   // so be sure rows are ordered from newest to oldest.
-   selectedItems = mGit->sortShaListByIndex(selectedItems);
-}
-
-const QString RepositoryView::shaFromAnnId(int id)
-{
-   return sha(model()->rowCount() - id);
-}
-
 bool RepositoryView::update()
 {
    if (!st)
       return false;
 
-   int stRow = row(st->sha());
+   auto stRow = mRevCache ? mRevCache->row(st->sha()) : -1;
+
+   if (mIsFiltering)
+      stRow = mProxyModel->mapFromSource(mRepositoryModel->index(stRow, 0)).row();
+
    if (stRow == -1)
       return false; // main/tree view asked us a sha not in history
 
@@ -193,7 +160,7 @@ bool RepositoryView::update()
       }
    }
 
-   emit diffTargetChanged(row(st->diffToSha()));
+   emit diffTargetChanged(mRevCache ? mRevCache->row(st->sha()) : -1);
 
    setupGeometry();
 
@@ -203,7 +170,7 @@ bool RepositoryView::update()
 void RepositoryView::currentChanged(const QModelIndex &index, const QModelIndex &)
 {
 
-   const QString &selRev = sha(index.row());
+   const auto &selRev = model()->index(index.row(), static_cast<int>(RepositoryModelColumns::SHA)).data().toString();
    if (st->sha() != selRev)
    { // to avoid looping
       st->setSha(selRev);
@@ -212,12 +179,6 @@ void RepositoryView::currentChanged(const QModelIndex &index, const QModelIndex 
 
       emit clicked(index);
    }
-}
-
-void RepositoryView::markDiffToSha(const QString &sha)
-{
-   st->setDiffToSha(sha != st->diffToSha() ? sha : QString());
-   d->update(false);
 }
 
 void RepositoryView::clear(bool complete)
@@ -254,7 +215,8 @@ bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)
 {
 
    QModelIndex index = indexAt(e->pos());
-   const QString &selSha = sha(index.row());
+   const auto &selSha = model()->index(index.row(), static_cast<int>(RepositoryModelColumns::SHA)).data().toString();
+
    if (selSha.isEmpty())
       return false;
 
@@ -262,7 +224,8 @@ bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)
    { // check for 'diff to' function
       if (selSha != ZERO_SHA)
       {
-         markDiffToSha(selSha);
+         st->setDiffToSha(selSha != st->diffToSha() ? selSha : QString());
+         d->update(false);
          return true; // filter event out
       }
    }

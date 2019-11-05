@@ -5,16 +5,20 @@
 #include <RevisionsCache.h>
 #include <Revision.h>
 #include <RepositoryModelColumns.h>
+#include <RepositoryView.h>
 
+#include <QSortFilterProxyModel>
 #include <QPainter>
 
 static const int COLORS_NUM = 8;
 static const int MIN_VIEW_WIDTH_PX = 480;
 
-RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache)
+RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache,
+                                               RepositoryView *view)
    : QStyledItemDelegate()
    , mGit(git)
    , mRevCache(revCache)
+   , mView(view)
 {
 }
 
@@ -252,18 +256,22 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       return paintLog(p, newOpt, index);
 }
 
-void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &i) const
+void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
    static const QColor colors[COLORS_NUM] = { QPalette().color(QPalette::WindowText), QColor("#FF5555") /* red */,
                                               QColor("#579BD5") /* blue */,           QColor("#8dc944") /* green */,
                                               QColor("#FFB86C") /* orange */,         QColor("#848484") /* grey */,
                                               QColor("#FF79C6") /* pink */,           QColor("#CD9077") /* pastel */ };
-   const auto r = mRevCache->revLookup(i.row());
+
+   const auto row = mView->hasActiveFiler()
+       ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
+       : index.row();
+   const auto r = mRevCache->revLookup(row);
 
    if (!r)
       return;
 
-   if (r->isDiffCache && !mGit->isNothingToCommit())
+   if (r->isDiffCache && !mGit->isNothingToCommit() && !mView->hasActiveFiler())
    {
       paintWip(p, opt);
       return;
@@ -281,12 +289,15 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    const QVector<LaneType> &lanes(r->lanes);
    auto laneNum = lanes.count();
    auto activeLane = 0;
-   for (int i = 0; i < laneNum; i++)
+
+   for (int i = 0; i < laneNum && !mView->hasActiveFiler(); i++)
+   {
       if (isActive(lanes[i]))
       {
          activeLane = i;
          break;
       }
+   }
 
    int x1 = 0, x2 = 0;
    int maxWidth = opt.rect.width();
@@ -299,11 +310,14 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       x1 = x2;
       x2 += LANE_WIDTH;
 
-      auto ln = lanes[i];
+      auto ln = mView->hasActiveFiler() ? LaneType::ACTIVE : lanes[i];
       if (ln != LaneType::EMPTY)
       {
          QColor color = i == activeLane ? activeColor : colors[i % COLORS_NUM];
          paintGraphLane(p, ln, x1, x2, color, activeColor, back);
+
+         if (mView->hasActiveFiler())
+            break;
       }
    }
    p->restore();

@@ -16,6 +16,7 @@ class Domain;
 class RepositoryModel;
 class Revision;
 class RevisionsCache;
+class ShaFilterProxyModel;
 enum class RepositoryModelColumns;
 
 class RepositoryView : public QTreeView
@@ -32,20 +33,14 @@ public:
    explicit RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent = nullptr);
    ~RepositoryView();
    void setup();
-   const QString shaFromAnnId(int id);
-   void scrollToCurrent(ScrollHint hint = EnsureVisible);
-   void scrollToNext(int direction);
-   void getSelectedItems(QStringList &selectedItems);
+   void filterBySha(const QStringList &shaList);
+   bool hasActiveFiler() const { return mIsFiltering; }
+
    bool update();
-   void addNewRevs(const QVector<QString> &shaVec);
-   const QString sha(int row) const;
-   int row(const QString &sha) const;
-   void markDiffToSha(const QString &sha);
    void clear(bool complete);
    Domain *domain();
    void focusOnCommit(const QString &goToSha);
    QVariant data(int row, RepositoryModelColumns column) const;
-   RepositoryModel *model() const { return mRepositoryModel; }
 
 signals:
    void diffTargetChanged(int); // used by new model_view integration
@@ -56,6 +51,11 @@ private slots:
 private:
    QSharedPointer<RevisionsCache> mRevCache;
    QSharedPointer<Git> mGit;
+   RepositoryModel *mRepositoryModel = nullptr;
+   Domain *d = nullptr;
+   StateInfo *st = nullptr;
+   ShaFilterProxyModel *mProxyModel = nullptr;
+   bool mIsFiltering = false;
 
    void showContextMenu(const QPoint &);
    void setupGeometry();
@@ -63,8 +63,5 @@ private:
    bool getLaneParentsChildren(const QString &sha, int x, QStringList &p, QStringList &c);
    int getLaneType(const QString &sha, int pos) const;
 
-   RepositoryModel *mRepositoryModel = nullptr;
-   Domain *d = nullptr;
-   StateInfo *st = nullptr;
    unsigned long secs;
 };

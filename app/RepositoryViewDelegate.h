@@ -25,6 +25,7 @@
 
 #include <QStyledItemDelegate>
 
+class RepositoryView;
 class RevisionsCache;
 class Git;
 
@@ -41,7 +42,7 @@ signals:
    void updateView();
 
 public:
-   RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache);
+   RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache, RepositoryView *view);
 
    virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
    virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
@@ -54,13 +55,14 @@ public slots:
 
 private:
    QSharedPointer<Git> mGit;
+   QSharedPointer<RevisionsCache> mRevCache;
+   RepositoryView *mView = nullptr;
+   int diffTargetRow = -1;
+
    void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
-   void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
+   void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &index) const;
    void paintGraphLane(QPainter *p, const LaneType type, int x1, int x2, const QColor &col, const QColor &activeCol,
                        const QBrush &back) const;
    void paintWip(QPainter *painter, QStyleOptionViewItem opt) const;
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
-
-   QSharedPointer<RevisionsCache> mRevCache;
-   int diffTargetRow = -1;
 };
