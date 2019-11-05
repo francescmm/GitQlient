@@ -173,7 +173,9 @@ void GitQlientRepo::updateUiFromWatcher()
       QLog_Info("UI", QString("Updating the GitQlient UI from watcher"));
 
       mGit->updateWipRevision();
-      mCommitWidget->init(ZERO_SHA);
+
+      if (!mCommitWidget->isAmendActive())
+         mCommitWidget->init(ZERO_SHA);
 
       if (centerStackedWidget->currentIndex() == 1)
          openCommitDiff();
