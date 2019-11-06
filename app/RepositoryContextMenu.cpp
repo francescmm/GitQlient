@@ -49,9 +49,6 @@ void RepositoryContextMenu::createIndividualShaMenu()
 
       if (sha != ZERO_SHA)
       {
-         const auto amendCommitAction = addAction("Amend");
-         connect(amendCommitAction, &QAction::triggered, this, [this]() { emit signalAmendCommit(mShas.first()); });
-
          const auto createBranchAction = addAction("Create branch here");
          connect(createBranchAction, &QAction::triggered, this, &RepositoryContextMenu::createBranch);
 
@@ -128,6 +125,10 @@ void RepositoryContextMenu::createIndividualShaMenu()
 
             if (lastShaStr == sha)
             {
+               const auto amendCommitAction = addAction("Amend");
+               connect(amendCommitAction, &QAction::triggered, this,
+                       [this]() { emit signalAmendCommit(mShas.first()); });
+
                const auto applyPatchAction = addAction("Apply patch");
                connect(applyPatchAction, &QAction::triggered, this, &RepositoryContextMenu::applyPatch);
 
