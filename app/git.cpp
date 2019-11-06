@@ -477,7 +477,7 @@ GitExecResult Git::blame(const QString &file)
 
 GitExecResult Git::history(const QString &file)
 {
-   return run(QString("git log --pretty=%H %1").arg(file));
+   return run(QString("git log --follow --pretty=%H %1").arg(file));
 }
 
 QPair<QString, QString> Git::getSplitCommitMsg(const QString &sha)
