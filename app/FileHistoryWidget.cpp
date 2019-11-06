@@ -21,6 +21,7 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QS
 {
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
+   mRepoView->setObjectName("blameRepoView");
    mRepoView->setup();
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(400);

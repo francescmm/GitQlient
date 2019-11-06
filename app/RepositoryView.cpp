@@ -32,6 +32,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <QShortcut>
 #include <QUrl>
 #include <QMenu>
+#include <QByteArray>
 
 using namespace QLogger;
 
@@ -92,23 +93,36 @@ void RepositoryView::filterBySha(const QStringList &shaList)
 RepositoryView::~RepositoryView()
 {
    mGit->cancelDataLoading(); // non blocking
+
+   QSettings s;
+   s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
 }
 
 void RepositoryView::setupGeometry()
 {
-   QHeaderView *hv = header();
-   hv->setCascadingSectionResizes(true);
-   hv->resizeSection(static_cast<int>(RepositoryModelColumns::GRAPH), 80);
-   hv->resizeSection(static_cast<int>(RepositoryModelColumns::SHA), 60);
-   hv->resizeSection(static_cast<int>(RepositoryModelColumns::AUTHOR), 200);
-   hv->resizeSection(static_cast<int>(RepositoryModelColumns::DATE), 115);
-   hv->setSectionResizeMode(static_cast<int>(RepositoryModelColumns::LOG), QHeaderView::Stretch);
-   hv->setStretchLastSection(false);
+   QSettings s;
+   const auto previousState = s.value(QString("RepositoryView::%1").arg(objectName()), QByteArray()).toByteArray();
 
-   hideColumn(static_cast<int>(RepositoryModelColumns::SHA));
-   hideColumn(static_cast<int>(RepositoryModelColumns::DATE));
-   hideColumn(static_cast<int>(RepositoryModelColumns::AUTHOR));
-   hideColumn(static_cast<int>(RepositoryModelColumns::ID));
+   if (previousState.isEmpty())
+   {
+      QHeaderView *hv = header();
+      hv->setCascadingSectionResizes(true);
+      hv->resizeSection(static_cast<int>(RepositoryModelColumns::GRAPH), 80);
+      hv->resizeSection(static_cast<int>(RepositoryModelColumns::SHA), 60);
+      hv->resizeSection(static_cast<int>(RepositoryModelColumns::AUTHOR), 200);
+      hv->resizeSection(static_cast<int>(RepositoryModelColumns::DATE), 115);
+      hv->setSectionResizeMode(static_cast<int>(RepositoryModelColumns::LOG), QHeaderView::Stretch);
+      hv->setStretchLastSection(false);
+
+      hideColumn(static_cast<int>(RepositoryModelColumns::SHA));
+      hideColumn(static_cast<int>(RepositoryModelColumns::DATE));
+      hideColumn(static_cast<int>(RepositoryModelColumns::AUTHOR));
+      hideColumn(static_cast<int>(RepositoryModelColumns::ID));
+   }
+   else
+   {
+      header()->restoreState(previousState);
+   }
 }
 
 int RepositoryView::getLaneType(const QString &sha, int pos) const
