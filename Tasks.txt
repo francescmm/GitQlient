@@ -13,6 +13,7 @@
    - Ask to show the results of the merge in GitQlient in a different window (File editor)
 - Add file vs file diff as option (Check options: DiffEditor plugin from QtCreator or other)
 - Show a progress bar or custom waiting mouse icon when loading a new repo
+- When generating patch, add option to open folder. QtCreator does that platform independently
 
 File diff:
 - How we handle when a file changes its directory? Do we need to download the old one to do the diff?
