@@ -1,3 +1,10 @@
+win32:VERSION = 0.13.0.0
+else:VERSION = 0.13.0
+
+DEFINES += \
+    VER=\\\"$$VERSION\\\" \
+    APP_NAME=\\\"$$TARGET\\\"
+
 RESOURCES += \
     $$PWD/resources.qrc
 
@@ -99,5 +106,4 @@ SOURCES += \
     $$PWD/domain.cpp \
     $$PWD/git.cpp \
     $$PWD/lanes.cpp \
-    $$PWD/main.cpp \
     $$PWD/BranchDlg.cpp

@@ -5,12 +5,8 @@ QMAKE_CXXFLAGS += -Werror
 TARGET = GitQlient
 QT += widgets
 
-win32:VERSION = 0.13.0.0
-else:VERSION = 0.13.0
-
-DEFINES += \
-    VER=\\\"$$VERSION\\\" \
-    APP_NAME=\\\"$$TARGET\\\"
+SOURCES += \
+    $$PWD/main.cpp
 
 # project files
 include(app/GitQlient.pri)
