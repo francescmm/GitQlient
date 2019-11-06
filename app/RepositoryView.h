@@ -58,6 +58,8 @@ private:
    bool mIsFiltering = false;
 
    void showContextMenu(const QPoint &);
+   void saveHeaderState();
+
    void setupGeometry();
    bool filterRightButtonPressed(QMouseEvent *e);
    bool getLaneParentsChildren(const QString &sha, int x, QStringList &p, QStringList &c);

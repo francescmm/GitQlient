@@ -35,8 +35,6 @@ Author: Marco Costalba (C) 2005-2007
 
 using namespace QLogger;
 
-uint refTypeFromName(const QString &name);
-
 RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent)
    : QTreeView(parent)
    , mRevCache(revCache)
@@ -50,6 +48,8 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    setMouseTracking(true);
    setSelectionMode(QAbstractItemView::ExtendedSelection);
    header()->setSortIndicatorShown(false);
+
+   connect(header(), &QHeaderView::sectionResized, this, &RepositoryView::saveHeaderState);
 
    const auto lvd = new RepositoryViewDelegate(mGit, revCache, this);
    setItemDelegate(lvd);
@@ -232,17 +232,6 @@ bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)
    return false;
 }
 
-uint refTypeFromName(const QString &name)
-{
-   if (name.startsWith("tags/"))
-      return Git::TAG;
-   if (name.startsWith("remotes/"))
-      return Git::RMT_BRANCH;
-   if (!name.isEmpty())
-      return Git::BRANCH;
-   return 0;
-}
-
 void RepositoryView::showContextMenu(const QPoint &pos)
 {
    const auto indexes = selectedIndexes();
@@ -291,6 +280,12 @@ void RepositoryView::showContextMenu(const QPoint &pos)
    }
    else
       QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
+}
+
+void RepositoryView::saveHeaderState()
+{
+   QSettings s;
+   s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
 }
 
 bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringList &p, QStringList &c)
