@@ -54,9 +54,7 @@ public:
    explicit FullDiffWidget(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache, QWidget *parent = nullptr);
 
    void clear();
-   void centerOnFileHeader(const StateInfo &st);
    void refresh();
-   void update(const StateInfo &st);
 
    enum PatchFilter
    {
@@ -71,7 +69,7 @@ public slots:
    void typeWriterFontChanged();
    void procReadyRead(const QByteArray &data);
    void procFinished();
-   void onStateInfoUpdate(const StateInfo &stateInfo);
+   void onStateInfoUpdate(const QString &sha, const QString &diffToSha);
 
 private:
    friend class DiffHighlighter;

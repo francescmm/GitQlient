@@ -110,6 +110,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
 
    connect(mRepositoryView, &RepositoryView::signalViewUpdated, this, &GitQlientRepo::updateUi);
    connect(mRepositoryView, &RepositoryView::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
+   connect(mRepositoryView, &RepositoryView::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
    connect(mRepositoryView, &RepositoryView::clicked, this, &GitQlientRepo::onCommitClicked);
    connect(mRepositoryView, &RepositoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
    connect(mRepositoryView, &RepositoryView::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
@@ -317,7 +318,14 @@ void GitQlientRepo::showFileHistory(const QString &fileName)
 
 void GitQlientRepo::openCommitDiff()
 {
-   mFullDiffWidget->onStateInfoUpdate(mRepositoryView->domain()->st);
+   const auto st = mRepositoryView->domain()->st;
+   mFullDiffWidget->onStateInfoUpdate(st.sha(), st.diffToSha());
+   centerStackedWidget->setCurrentIndex(1);
+}
+
+void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
+{
+   mFullDiffWidget->onStateInfoUpdate(shas.last(), shas.first());
    centerStackedWidget->setCurrentIndex(1);
 }
 

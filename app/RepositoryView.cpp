@@ -33,6 +33,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <QUrl>
 #include <QMenu>
 #include <QByteArray>
+#include <QDateTime>
 
 using namespace QLogger;
 
@@ -249,21 +250,21 @@ bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)
 void RepositoryView::showContextMenu(const QPoint &pos)
 {
    const auto indexes = selectedIndexes();
-   QSet<QString> shas;
+   QMap<QDateTime, QString> shas;
    QVector<QVector<QString>> godVector;
 
    for (auto index : indexes)
    {
       const auto sha = mRepositoryModel->sha(index.row());
+      const auto dtStr
+          = mRepositoryModel->index(index.row(), static_cast<int>(RepositoryModelColumns::DATE)).data().toString();
+      const auto dt = QDateTime::fromString(dtStr, "dd/MM/yyyy hh:mm");
 
-      if (!shas.contains(sha))
-      {
-         shas.insert(sha);
-         auto ret = mGit->getBranchesOfCommit(sha);
-         auto branches = ret.output.toString().trimmed().split("\n ");
-         std::sort(branches.begin(), branches.end());
-         godVector.append(branches.toVector());
-      }
+      shas.insert(dt, sha);
+      auto ret = mGit->getBranchesOfCommit(sha);
+      auto branches = ret.output.toString().trimmed().split("\n ");
+      std::sort(branches.begin(), branches.end());
+      godVector.append(branches.toVector());
    }
 
    auto commitsInSameBranch = false;
@@ -286,9 +287,10 @@ void RepositoryView::showContextMenu(const QPoint &pos)
 
    if (commitsInSameBranch || shas.count() == 1)
    {
-      const auto menu = new RepositoryContextMenu(mGit, shas.toList(), this);
+      const auto menu = new RepositoryContextMenu(mGit, shas.values(), this);
       connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
       connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
+      connect(menu, &RepositoryContextMenu::signalOpenCompareDiff, this, &RepositoryView::signalOpenCompareDiff);
       connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &RepositoryView::signalAmendCommit);
       menu->exec(viewport()->mapToGlobal(pos));
    }

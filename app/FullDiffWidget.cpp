@@ -1,9 +1,3 @@
-/*
-        Author: Marco Costalba (C) 2005-2007
-
-        Copyright: See COPYING file that comes with this distribution
-
-*/
 #include "FullDiffWidget.h"
 
 #include <RevisionsCache.h>
@@ -231,19 +225,6 @@ bool FullDiffWidget::centerTarget(const QString &target)
    return true;
 }
 
-void FullDiffWidget::centerOnFileHeader(const StateInfo &st)
-{
-   if (st.fileName().isEmpty())
-      return;
-
-   target = st.fileName();
-   bool combined = (st.isMerge() && !st.allMergeFiles());
-   mGit->formatPatchFileHeader(&target, st.sha(), st.diffToSha(), combined, st.allMergeFiles());
-   seekTarget = !target.isEmpty();
-   if (seekTarget)
-      seekTarget = !centerTarget(target);
-}
-
 void FullDiffWidget::procReadyRead(const QByteArray &data)
 {
 
@@ -361,12 +342,13 @@ void FullDiffWidget::procFinished()
    diffLoaded = true;
 }
 
-void FullDiffWidget::onStateInfoUpdate(const StateInfo &stateInfo)
+void FullDiffWidget::onStateInfoUpdate(const QString &sha, const QString &diffToSha)
 {
-   clear();
-   update(stateInfo); // non blocking
+   diffHighlighter->setCombinedLength(0);
 
-   centerOnFileHeader(stateInfo);
+   clear();
+
+   mGit->getDiff(sha, this, diffToSha, false); // non blocking
 }
 
 bool FullDiffWidget::getMatch(int para, int *indexFrom, int *indexTo)
@@ -381,21 +363,4 @@ bool FullDiffWidget::getMatch(int para, int *indexFrom, int *indexTo)
          return true;
       }
    return false;
-}
-
-void FullDiffWidget::update(const StateInfo &st)
-{
-   bool combined = (st.isMerge() && !st.allMergeFiles());
-   if (combined)
-   {
-      const auto r = mRevCache->revLookup(st.sha());
-      if (r)
-         diffHighlighter->setCombinedLength(r->parentsCount());
-   }
-   else
-      diffHighlighter->setCombinedLength(0);
-
-   clear();
-
-   mGit->getDiff(st.sha(), this, st.diffToSha(), combined); // non blocking
 }

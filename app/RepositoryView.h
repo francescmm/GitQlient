@@ -27,6 +27,7 @@ class RepositoryView : public QTreeView
 signals:
    void signalViewUpdated();
    void signalOpenDiff(const QString &sha);
+   void signalOpenCompareDiff(const QStringList &sha);
    void signalAmendCommit(const QString &sha);
 
 public:

@@ -166,9 +166,11 @@ void RepositoryContextMenu::createIndividualShaMenu()
 
 void RepositoryContextMenu::createMultipleShasMenu()
 {
-   const auto diffAction = addAction("See diff");
-   diffAction->setDisabled(true);
-   // connect(commitAction, &QAction::triggered, this, [this]() { emit signalOpenDiff(mShas); });
+   if (mShas.count() == 2)
+   {
+      const auto diffAction = addAction("See diff");
+      connect(diffAction, &QAction::triggered, this, [this]() { emit signalOpenCompareDiff(mShas); });
+   }
 
    if (!mShas.contains(ZERO_SHA))
    {

@@ -34,6 +34,7 @@ class RepositoryContextMenu : public QMenu
 signals:
    void signalRepositoryUpdated();
    void signalOpenDiff(const QString &sha);
+   void signalOpenCompareDiff(const QStringList &sha);
    void signalAmendCommit(const QString &sha);
 
 public:

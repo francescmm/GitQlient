@@ -101,6 +101,7 @@ private:
    void updateUi();
    void updateUiFromWatcher();
    void openCommitDiff();
+   void openCommitCompareDiff(const QStringList &shas);
    void changesCommitted(bool ok);
    void onCommitClicked(const QModelIndex &index);
    void onCommitSelected(const QString &goToSha);
