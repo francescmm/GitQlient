@@ -630,6 +630,8 @@ QLabel#normalLabel
 {
     padding: 2px;
     padding-left: 5px;
+    max-height: 22px;
+    min-height: 22px;
 }
 
 QLabel#numberLabel
@@ -637,6 +639,8 @@ QLabel#numberLabel
     padding: 2px;
     border: 0px;
     border-right: 1px solid #202122;
+    max-height: 22px;
+    min-height: 22px;
 }
 
 QLabel#authorFirstOfItsName, QLabel#authorPrimusInterPares
@@ -644,6 +648,8 @@ QLabel#authorFirstOfItsName, QLabel#authorPrimusInterPares
     padding: 2px;
     border: 0px;
     padding-right: 15px;
+    max-height: 21px;
+    min-height: 21px;
 }
 
 QLabel#authorFirstOfItsName
@@ -655,6 +661,8 @@ ClickableFrame#firstOfItsName, ClickableFrame#primusInterPares
 {
     padding: 2px;
     border: 0px;
+    max-height: 21px;
+    min-height: 21px;
 }
 
 ClickableFrame#firstOfItsName
