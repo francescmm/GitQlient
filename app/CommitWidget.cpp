@@ -93,6 +93,15 @@ void CommitWidget::init(const QString &sha)
                  .arg(mIsAmend ? QString("amend") : QString("wip")));
 
    blockSignals(true);
+
+   if (mIsAmend)
+   {
+      mCurrentFilesCache.clear();
+      ui->untrackedFilesList->clear();
+      ui->unstagedFilesList->clear();
+      ui->stagedFilesList->clear();
+   }
+
    ui->leAuthorName->setVisible(mIsAmend);
    ui->leAuthorEmail->setVisible(mIsAmend);
    blockSignals(false);
@@ -120,15 +129,7 @@ void CommitWidget::init(const QString &sha)
    files = mGit->getFiles(mIsAmend ? mCurrentSha : ZERO_SHA);
 
    if (files)
-   {
       insertFilesInList(files, mIsAmend ? ui->stagedFilesList : ui->unstagedFilesList);
-
-      if (mIsAmend)
-      {
-         files = mGit->getFiles(ZERO_SHA);
-         insertFilesInList(files, ui->unstagedFilesList);
-      }
-   }
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
