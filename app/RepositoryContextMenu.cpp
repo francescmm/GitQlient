@@ -219,18 +219,36 @@ void RepositoryContextMenu::createTag()
       emit signalRepositoryUpdated();
 }
 
+#include <QProcess>
 void RepositoryContextMenu::exportAsPatch()
 {
    const auto ret = mGit->exportPatch(mShas);
 
    if (ret.success)
-      QMessageBox::information(
+   {
+      const auto action = QMessageBox::information(
           this, tr("Patch generated"),
           tr("<p>The patch has been generated!</p>"
              "<p><b>Commit:</b></p><p>%1</p>"
              "<p><b>Destination:</b> %2</p>"
              "<p><b>File names:</b></p><p>%3</p>")
-              .arg(mShas.join("<br>"), mGit->getWorkingDir(), ret.output.toStringList().join("<br>")));
+              .arg(mShas.join("<br>"), mGit->getWorkingDir(), ret.output.toStringList().join("<br>")),
+          QMessageBox::Ok, QMessageBox::Open);
+
+      if (action == QMessageBox::Open)
+      {
+         QProcess proc;
+         QString fileBrowser;
+
+#ifdef Q_OS_LINUX
+         fileBrowser.append("xdg-open");
+#elif Q_OS_WIN
+         fileBrowser.append("explorer.exe");
+#endif
+
+         proc.startDetached(QString("%1 %2").arg(fileBrowser, mGit->getWorkingDir()));
+      }
+   }
 }
 
 void RepositoryContextMenu::checkoutCommit()
