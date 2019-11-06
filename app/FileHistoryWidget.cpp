@@ -34,8 +34,10 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QS
    fileSystemView->header()->setSectionHidden(3, true);
    fileSystemView->setContextMenuPolicy(Qt::CustomContextMenu);
    connect(fileSystemView, &QTreeView::clicked, this, [this](const QModelIndex &index) {
-      auto item = fileSystemModel->filePath(index);
-      showFileHistory(QString("%1").arg(item));
+      auto item = fileSystemModel->fileInfo(index);
+
+      if (item.isFile())
+         showFileHistory(QString("%1").arg(item.filePath()));
    });
 
    const auto historyBlameLayout = new QGridLayout(this);
