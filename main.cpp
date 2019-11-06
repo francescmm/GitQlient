@@ -26,12 +26,12 @@ int main(int argc, char *argv[])
    QtSingleApplication::setOrganizationDomain("francescmm.com");
    QtSingleApplication::setApplicationName(APP_NAME);
 
-   const auto mainWin = new GitQlient(arguments);
-   mainWin->showMaximized();
+   GitQlient mainWin(arguments);
+   mainWin.showMaximized();
 
    QObject::connect(&app, &QtSingleApplication::messageReceived,
-                    [mainWin](const QString &message) { mainWin->setArgumentsPostInit(message.split(",")); });
-   QObject::connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
+                    [&mainWin](const QString &message) { mainWin.setArgumentsPostInit(message.split(",")); });
+   QObject::connect(&app, &QtSingleApplication::lastWindowClosed, &app, &QtSingleApplication::quit);
 
    const auto ret = app.exec();
 
