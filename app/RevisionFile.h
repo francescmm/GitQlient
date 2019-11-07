@@ -22,10 +22,6 @@ class RevisionFile
    QVector<int> status;
    QVector<QString> extStatus;
 
-   // prevent implicit C++ compiler defaults
-   RevisionFile(const RevisionFile &);
-   RevisionFile &operator=(const RevisionFile &);
-
 public:
    enum StatusFlag
    {

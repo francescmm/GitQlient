@@ -12,11 +12,12 @@
 #include <QVector>
 #include <QSharedPointer>
 
+#include <RevisionFile.h>
+
 template<class, class>
 struct QPair;
 
 class RevisionsCache;
-class RevisionFile;
 class Revision;
 class QRegExp;
 class QTextCodec;
@@ -168,8 +169,8 @@ public:
    void getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined);
    QString getDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 
-   const RevisionFile *getFiles(const QString &sha, const QString &sha2 = "", bool all = false,
-                                const QString &path = "");
+   RevisionFile getWipFiles();
+   RevisionFile getFiles(const QString &sha, const QString &sha2 = "", bool all = false);
 
    const QString getLaneParent(const QString &fromSHA, int laneNum);
    const QStringList getChildren(const QString &parent);
@@ -180,9 +181,6 @@ public:
    const QStringList sortShaListByIndex(QStringList &shaList);
    GitExecResult merge(const QString &into, QStringList sources);
 
-   void addExtraFileInfo(QString *rowName, const QString &sha, const QString &diffToSha, bool allMergeFiles);
-   void removeExtraFileInfo(QString *rowName);
-   void formatPatchFileHeader(QString *rowName, const QString &sha, const QString &dts, bool cmb, bool all);
    const QString filePath(const RevisionFile &rf, int i) const;
    QPair<bool, QString> run(const QString &cmd) const;
 
@@ -191,9 +189,9 @@ public:
 private:
    void loadFileCache();
    void on_loaded();
-   bool saveOnCache(const QString &gitDir, const QHash<QString, const RevisionFile *> &rf, const QVector<QString> &dirs,
+   bool saveOnCache(const QString &gitDir, const QHash<QString, RevisionFile> &rf, const QVector<QString> &dirs,
                     const QVector<QString> &files);
-   bool loadFromCache(const QString &gitDir, QHash<QString, const RevisionFile *> &rfm, QVector<QString> &dirs,
+   bool loadFromCache(const QString &gitDir, QHash<QString, RevisionFile> &rfm, QVector<QString> &dirs,
                       QVector<QString> &files, QByteArray &revsFilesShaBuf);
    bool getGitDBDir(const QString &wd, QString &gd, bool &changed);
 
@@ -258,9 +256,9 @@ private:
    Revision *fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,
                          const QString &log, const QString &longLog, const QString &patch, int idx);
    const Revision *fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx);
-   const RevisionFile *fakeWorkDirRevFile(const WorkingDirInfo &wd);
-   const RevisionFile *insertNewFiles(const QString &sha, const QString &data);
-   const RevisionFile *getAllMergeFiles(const Revision *r);
+   RevisionFile fakeWorkDirRevFile(const WorkingDirInfo &wd);
+   RevisionFile insertNewFiles(const QString &sha, const QString &data);
+   RevisionFile getAllMergeFiles(const Revision *r);
    bool runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutput);
    void indexTree();
    void updateDescMap(const Revision *r, uint i, QHash<QPair<uint, uint>, bool> &dm, QHash<uint, QVector<int>> &dv);
@@ -288,7 +286,7 @@ private:
    bool mIsMergeHead = false;
    bool mFileCacheAccessed = false;
    QString mFirstNonStGitPatch;
-   QHash<QString, const RevisionFile *> mRevsFiles;
+   QHash<QString, RevisionFile> mRevsFiles;
    QVector<QByteArray> mRevsFilesShaBackupBuf;
    QHash<QString, Reference> mRefsShaMap;
    QVector<QByteArray> mShaBackupBuf;

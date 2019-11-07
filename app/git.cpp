@@ -10,7 +10,6 @@
 
 #include <RevisionsCache.h>
 #include <Revision.h>
-#include <RevisionFile.h>
 #include <StateInfo.h>
 #include <lanes.h>
 
@@ -232,53 +231,6 @@ const QString Git::getTagMsg(const QString &sha)
    return rf.tagMsg;
 }
 
-void Git::addExtraFileInfo(QString *rowName, const QString &sha, const QString &diffToSha, bool allMergeFiles)
-{
-
-   const RevisionFile *files = getFiles(sha, diffToSha, allMergeFiles);
-   if (!files)
-      return;
-
-   int idx = findFileIndex(*files, *rowName);
-   if (idx == -1)
-      return;
-
-   QString extSt(files->extendedStatus(idx));
-   if (extSt.isEmpty())
-      return;
-
-   *rowName = extSt;
-}
-
-void Git::removeExtraFileInfo(QString *rowName)
-{
-
-   if (rowName->contains(" --> ")) // return destination file name
-      *rowName = rowName->section(" --> ", 1, 1).section(" (", 0, 0);
-}
-
-void Git::formatPatchFileHeader(QString *rowName, const QString &sha, const QString &diffToSha, bool combined,
-                                bool allMergeFiles)
-{
-   if (combined)
-   {
-      rowName->prepend("diff --combined ");
-      return; // TODO rename/copy still not supported in this case
-   }
-   // let's see if it's a rename/copy...
-   addExtraFileInfo(rowName, sha, diffToSha, allMergeFiles);
-
-   if (rowName->contains(" --> "))
-   { // ...it is!
-
-      const QString &destFile(rowName->section(" --> ", 1, 1).section(" (", 0, 0));
-      const QString &origFile(rowName->section(" --> ", 0, 0));
-      *rowName = "diff --git a/" + origFile + " b/" + destFile;
-   }
-   else
-      *rowName = "diff --git a/" + *rowName + " b/" + *rowName;
-}
-
 const QString Git::filePath(const RevisionFile &rf, int i) const
 {
    return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)];
@@ -459,7 +411,7 @@ bool Git::isNothingToCommit()
       return true;
 
    const auto rf = mRevsFiles.value(ZERO_SHA);
-   return rf->count() == workingDirInfo.otherFiles.count();
+   return rf.count() == workingDirInfo.otherFiles.count();
 }
 
 bool Git::resetFile(const QString &fileName)
@@ -575,7 +527,7 @@ bool Git::submoduleRemove(const QString &)
    return false;
 }
 
-const RevisionFile *Git::insertNewFiles(const QString &sha, const QString &data)
+RevisionFile Git::insertNewFiles(const QString &sha, const QString &data)
 {
 
    /* we use an independent FileNamesLoader to avoid data
@@ -583,8 +535,8 @@ const RevisionFile *Git::insertNewFiles(const QString &sha, const QString &data)
     */
    FileNamesLoader fl;
 
-   RevisionFile *rf = new RevisionFile();
-   parseDiffFormat(*rf, data, fl);
+   RevisionFile rf;
+   parseDiffFormat(rf, data, fl);
    flushFileNames(fl);
 
    mRevsFiles.insert(toPersistentSha(sha, mRevsFilesShaBackupBuf), rf);
@@ -618,7 +570,7 @@ bool Git::runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutp
    return true;
 }
 
-const RevisionFile *Git::getAllMergeFiles(const Revision *r)
+RevisionFile Git::getAllMergeFiles(const Revision *r)
 {
 
    QString mySha("ALL_MERGE_FILES" + QString(r->sha()));
@@ -627,56 +579,50 @@ const RevisionFile *Git::getAllMergeFiles(const Revision *r)
       return mRevsFiles[mySha];
 
    QString runCmd(QString("git diff-tree --no-color -r -m ").arg(r->sha())), runOutput;
-   if (!runDiffTreeWithRenameDetection(runCmd, &runOutput))
-      return nullptr;
 
-   return insertNewFiles(mySha, runOutput);
+   if (runDiffTreeWithRenameDetection(runCmd, &runOutput))
+      return insertNewFiles(mySha, runOutput);
+
+   return RevisionFile();
 }
 
-const RevisionFile *Git::getFiles(const QString &sha, const QString &diffToSha, bool allFiles, const QString &path)
+RevisionFile Git::getWipFiles()
 {
+   return mRevsFiles.value(ZERO_SHA); // ZERO_SHA search arrives here
+}
 
-   const Revision *r = mRevCache->revLookup(sha);
-   if (!r)
-      return nullptr;
+RevisionFile Git::getFiles(const QString &sha, const QString &diffToSha, bool allFiles)
+{
+   const auto r = mRevCache->revLookup(sha);
+   if (!r || r->parentsCount() == 0)
+      return RevisionFile();
 
-   if (r->parentsCount() == 0) // skip initial Revision
-      return nullptr;
+   QString mySha;
+   QString runCmd;
 
    if (r->parentsCount() > 1 && diffToSha.isEmpty() && allFiles)
-      return getAllMergeFiles(r);
-
-   if (!diffToSha.isEmpty() && (sha != ZERO_SHA))
    {
+      mySha = QString("ALL_MERGE_FILES" + QString(sha));
 
-      QString runCmd("git diff-tree --no-color -r -m ");
-      runCmd.append(diffToSha + " " + sha);
-      if (!path.isEmpty())
-         runCmd.append(" " + path);
+      if (mRevsFiles.contains(mySha))
+         return mRevsFiles[mySha];
 
-      QString runOutput;
-      if (!runDiffTreeWithRenameDetection(runCmd, &runOutput))
-         return nullptr;
-
-      // we insert a dummy revision file object. It will be
-      // overwritten at each request but we don't care.
-      return insertNewFiles(CUSTOM_SHA, runOutput);
+      runCmd = QString("git diff-tree --no-color -r -m ").arg(r->sha());
    }
-   if (mRevsFiles.contains(r->sha()))
-      return mRevsFiles[r->sha()]; // ZERO_SHA search arrives here
+   else if (!diffToSha.isEmpty() && (sha != ZERO_SHA))
+   {
+      runCmd = QString("git diff-tree --no-color -r -m ");
+      runCmd.append(diffToSha + " " + sha);
 
-   if (sha == ZERO_SHA)
-      return nullptr;
+      mySha = CUSTOM_SHA;
+   }
 
-   QString runCmd("git diff-tree --no-color -r -c " + sha), runOutput;
+   QString runOutput;
+
    if (!runDiffTreeWithRenameDetection(runCmd, &runOutput))
-      return nullptr;
+      return RevisionFile();
 
-   if (mRevsFiles.contains(r->sha())) // has been created in the mean time?
-      return mRevsFiles[r->sha()];
-
-   mCacheNeedsUpdate = true;
-   return insertNewFiles(sha, runOutput);
+   return insertNewFiles(mySha, runOutput);
 }
 
 bool Git::resetCommits(int parentDepth)
@@ -720,12 +666,12 @@ const QStringList Git::sortShaListByIndex(QStringList &shaList)
 const QStringList Git::getOtherFiles(const QStringList &selFiles)
 {
 
-   const RevisionFile *files = getFiles(ZERO_SHA); // files != nullptr
+   RevisionFile files = getWipFiles(); // files != nullptr
    QStringList notSelFiles;
-   for (auto i = 0; i < files->count(); ++i)
+   for (auto i = 0; i < files.count(); ++i)
    {
-      const QString &fp = filePath(*files, i);
-      if (selFiles.indexOf(fp) == -1 && files->statusCmp(i, RevisionFile::IN_INDEX))
+      const QString &fp = filePath(files, i);
+      if (selFiles.indexOf(fp) == -1 && files.statusCmp(i, RevisionFile::IN_INDEX))
          notSelFiles.append(fp);
    }
    return notSelFiles;
@@ -733,15 +679,15 @@ const QStringList Git::getOtherFiles(const QStringList &selFiles)
 
 bool Git::updateIndex(const QStringList &selFiles)
 {
-   const auto files = getFiles(ZERO_SHA); // files != nullptr
+   const auto files = getWipFiles(); // files != nullptr
 
    QStringList toAdd, toRemove;
 
    for (auto it : selFiles)
    {
-      const auto idx = findFileIndex(*files, it);
+      const auto idx = findFileIndex(files, it);
 
-      idx != -1 && files->statusCmp(idx, RevisionFile::DELETED) ? toRemove << it : toAdd << it;
+      idx != -1 && files.statusCmp(idx, RevisionFile::DELETED) ? toRemove << it : toAdd << it;
    }
    if (!toRemove.isEmpty() && !run("git rm --cached --ignore-unmatch -- " + quote(toRemove)).first)
       return false;
@@ -1288,28 +1234,29 @@ const Revision *Git::fakeWorkDirRev(const QString &parent, const QString &log, c
    return c;
 }
 
-const RevisionFile *Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
+RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
 {
 
    FileNamesLoader fl;
-   RevisionFile *rf = new RevisionFile();
-   parseDiffFormat(*rf, wd.diffIndex, fl);
-   rf->onlyModified = false;
+   RevisionFile rf;
+   parseDiffFormat(rf, wd.diffIndex, fl);
+   rf.onlyModified = false;
 
    for (auto it : wd.otherFiles)
    {
 
-      appendFileName(*rf, it, fl);
-      rf->status.append(RevisionFile::UNKNOWN);
-      rf->mergeParent.append(1);
+      appendFileName(rf, it, fl);
+      rf.status.append(RevisionFile::UNKNOWN);
+      rf.mergeParent.append(1);
    }
    RevisionFile cachedFiles;
    parseDiffFormat(cachedFiles, wd.diffIndexCached, fl);
    flushFileNames(fl);
 
-   for (auto i = 0; i < rf->count(); i++)
-      if (findFileIndex(cachedFiles, filePath(*rf, i)) != -1)
-         rf->status[i] |= RevisionFile::IN_INDEX;
+   for (auto i = 0; i < rf.count(); i++)
+      if (findFileIndex(cachedFiles, filePath(rf, i)) != -1)
+         rf.status[i] |= RevisionFile::IN_INDEX;
+
    return rf;
 }
 
@@ -1557,8 +1504,6 @@ void Git::clearRevs()
 
 void Git::clearFileNames()
 {
-
-   qDeleteAll(mRevsFiles);
    mRevsFiles.clear();
    mFileNamesMap.clear();
    mDirNamesMap.clear();
@@ -1621,8 +1566,8 @@ void Git::on_loaded()
    emit loadCompleted();
 }
 
-bool Git::saveOnCache(const QString &gitDir, const QHash<QString, const RevisionFile *> &rf,
-                      const QVector<QString> &dirs, const QVector<QString> &files)
+bool Git::saveOnCache(const QString &gitDir, const QHash<QString, RevisionFile> &rf, const QVector<QString> &dirs,
+                      const QVector<QString> &files)
 {
    if (gitDir.isEmpty() || rf.isEmpty())
       return false;
@@ -1665,7 +1610,7 @@ bool Git::saveOnCache(const QString &gitDir, const QHash<QString, const Revision
    QByteArray buf;
    buf.reserve(bufSize);
 
-   QVector<const RevisionFile *> v;
+   QVector<RevisionFile> v;
    v.reserve(rf.count());
 
    QVector<QByteArray> ba;
@@ -1692,7 +1637,7 @@ bool Git::saveOnCache(const QString &gitDir, const QHash<QString, const Revision
    stream << buf;
 
    for (int i = 0; i < v.size(); ++i)
-      *(v.at(i)) >> stream;
+      v.at(i) >> stream;
 
    f.write(qCompress(data, 1)); // no need to encode with compressed data
    f.close();
@@ -1709,7 +1654,7 @@ bool Git::saveOnCache(const QString &gitDir, const QHash<QString, const Revision
    return true;
 }
 
-bool Git::loadFromCache(const QString &gitDir, QHash<QString, const RevisionFile *> &rfm, QVector<QString> &dirs,
+bool Git::loadFromCache(const QString &gitDir, QHash<QString, RevisionFile> &rfm, QVector<QString> &dirs,
                         QVector<QString> &files, QByteArray &revsFilesShaBuf)
 {
    // check for cache file
@@ -1753,8 +1698,8 @@ bool Git::loadFromCache(const QString &gitDir, QHash<QString, const RevisionFile
    while (!stream.atEnd())
    {
 
-      RevisionFile *rf = new RevisionFile();
-      *rf << stream;
+      RevisionFile rf;
+      rf << stream;
 
       QString sha = QString::fromUtf8(data);
       rfm.insert(sha, rf);

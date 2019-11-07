@@ -249,6 +249,29 @@ bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)
 
 void RepositoryView::showContextMenu(const QPoint &pos)
 {
+   const auto shas = getSelectedSha();
+
+   if (!shas.isEmpty())
+   {
+      const auto menu = new RepositoryContextMenu(mGit, shas, this);
+      connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
+      connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
+      connect(menu, &RepositoryContextMenu::signalOpenCompareDiff, this, &RepositoryView::signalOpenCompareDiff);
+      connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &RepositoryView::signalAmendCommit);
+      menu->exec(viewport()->mapToGlobal(pos));
+   }
+   else
+      QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
+}
+
+void RepositoryView::saveHeaderState()
+{
+   QSettings s;
+   s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
+}
+
+QList<QString> RepositoryView::getSelectedSha() const
+{
    const auto indexes = selectedIndexes();
    QMap<QDateTime, QString> shas;
    QVector<QVector<QString>> godVector;
@@ -285,23 +308,7 @@ void RepositoryView::showContextMenu(const QPoint &pos)
       commitsInSameBranch = !common.isEmpty();
    }
 
-   if (commitsInSameBranch || shas.count() == 1)
-   {
-      const auto menu = new RepositoryContextMenu(mGit, shas.values(), this);
-      connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
-      connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
-      connect(menu, &RepositoryContextMenu::signalOpenCompareDiff, this, &RepositoryView::signalOpenCompareDiff);
-      connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &RepositoryView::signalAmendCommit);
-      menu->exec(viewport()->mapToGlobal(pos));
-   }
-   else
-      QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
-}
-
-void RepositoryView::saveHeaderState()
-{
-   QSettings s;
-   s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
+   return commitsInSameBranch || shas.count() == 1 ? shas.values() : QList<QString>();
 }
 
 bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringList &p, QStringList &c)

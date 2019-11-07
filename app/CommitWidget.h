@@ -59,7 +59,7 @@ private:
    QString mCurrentSha;
    QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;
 
-   void insertFilesInList(const RevisionFile *files, QListWidget *fileList);
+   void insertFilesInList(const RevisionFile &files, QListWidget *fileList);
    void addAllFilesToCommitList();
    void addFileToCommitList(QListWidgetItem *item);
    void revertAllChanges();

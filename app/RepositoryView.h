@@ -34,6 +34,7 @@ public:
    explicit RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent = nullptr);
    ~RepositoryView();
    void setup();
+   QList<QString> getSelectedSha() const;
    void filterBySha(const QStringList &shaList);
    bool hasActiveFiler() const { return mIsFiltering; }
 

@@ -124,12 +124,11 @@ void CommitWidget::init(const QString &sha)
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
    }
 
-   const RevisionFile *files = nullptr;
+   RevisionFile files;
 
-   files = mGit->getFiles(mIsAmend ? mCurrentSha : ZERO_SHA);
+   files = mIsAmend ? mGit->getFiles(mCurrentSha) : mGit->getWipFiles();
 
-   if (files)
-      insertFilesInList(files, mIsAmend ? ui->stagedFilesList : ui->unstagedFilesList);
+   insertFilesInList(files, mIsAmend ? ui->stagedFilesList : ui->unstagedFilesList);
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
@@ -160,30 +159,30 @@ void CommitWidget::init(const QString &sha)
    ui->pbCommit->setEnabled(ui->stagedFilesList->count());
 }
 
-void CommitWidget::insertFilesInList(const RevisionFile *files, QListWidget *fileList)
+void CommitWidget::insertFilesInList(const RevisionFile &files, QListWidget *fileList)
 {
    for (auto file = mCurrentFilesCache.begin(); file != mCurrentFilesCache.end(); ++file)
       file.value().first = false;
 
-   for (auto i = 0; i < files->count(); ++i)
+   for (auto i = 0; i < files.count(); ++i)
    {
       QColor myColor;
 
-      const auto isUnknown = files->statusCmp(i, RevisionFile::UNKNOWN);
-      const auto isInIndex = files->statusCmp(i, RevisionFile::IN_INDEX);
+      const auto isUnknown = files.statusCmp(i, RevisionFile::UNKNOWN);
+      const auto isInIndex = files.statusCmp(i, RevisionFile::IN_INDEX);
       const auto untrackedFile = !isInIndex && isUnknown;
       const auto staged = isInIndex && !isUnknown;
 
-      if ((files->statusCmp(i, RevisionFile::NEW) || isUnknown || isInIndex) && !untrackedFile)
+      if ((files.statusCmp(i, RevisionFile::NEW) || isUnknown || isInIndex) && !untrackedFile)
          myColor = QColor("#8DC944");
-      else if (files->statusCmp(i, RevisionFile::DELETED))
+      else if (files.statusCmp(i, RevisionFile::DELETED))
          myColor = QColor("#FF5555");
       else if (untrackedFile)
          myColor = QColor("#FFB86C");
       else
          myColor = Qt::white;
 
-      const auto fileName = mGit->filePath(*files, i);
+      const auto fileName = mGit->filePath(files, i);
 
       if (!mCurrentFilesCache.contains(fileName))
       {
