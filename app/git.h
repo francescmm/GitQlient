@@ -189,10 +189,8 @@ public:
 private:
    void loadFileCache();
    void on_loaded();
-   bool saveOnCache(const QString &gitDir, const QHash<QString, RevisionFile> &rf, const QVector<QString> &dirs,
-                    const QVector<QString> &files);
-   bool loadFromCache(const QString &gitDir, QHash<QString, RevisionFile> &rfm, QVector<QString> &dirs,
-                      QVector<QString> &files, QByteArray &revsFilesShaBuf);
+   bool saveOnCache();
+   bool loadFromCache(QByteArray &revsFilesShaBuf);
    bool getGitDBDir(const QString &wd, QString &gd, bool &changed);
 
    friend class DataLoader;

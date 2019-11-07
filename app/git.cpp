@@ -576,7 +576,7 @@ RevisionFile Git::getAllMergeFiles(const Revision *r)
    QString mySha("ALL_MERGE_FILES" + QString(r->sha()));
 
    if (mRevsFiles.contains(mySha))
-      return mRevsFiles[mySha];
+      return mRevsFiles.value(mySha);
 
    QString runCmd(QString("git diff-tree --no-color -r -m ").arg(r->sha())), runOutput;
 
@@ -598,31 +598,28 @@ RevisionFile Git::getFiles(const QString &sha, const QString &diffToSha, bool al
       return RevisionFile();
 
    QString mySha;
-   QString runCmd;
+   QString runCmd = QString("git diff-tree --no-color -r -m ");
 
    if (r->parentsCount() > 1 && diffToSha.isEmpty() && allFiles)
    {
       mySha = QString("ALL_MERGE_FILES" + QString(sha));
-
-      if (mRevsFiles.contains(mySha))
-         return mRevsFiles[mySha];
-
-      runCmd = QString("git diff-tree --no-color -r -m ").arg(r->sha());
+      runCmd.append(sha);
    }
    else if (!diffToSha.isEmpty() && (sha != ZERO_SHA))
    {
-      runCmd = QString("git diff-tree --no-color -r -m ");
+      mySha = sha;
       runCmd.append(diffToSha + " " + sha);
-
-      mySha = CUSTOM_SHA;
    }
+
+   if (mRevsFiles.contains(mySha))
+      return mRevsFiles.value(mySha);
 
    QString runOutput;
 
-   if (!runDiffTreeWithRenameDetection(runCmd, &runOutput))
-      return RevisionFile();
+   if (runDiffTreeWithRenameDetection(runCmd, &runOutput))
+      return insertNewFiles(mySha, runOutput);
 
-   return insertNewFiles(mySha, runOutput);
+   return RevisionFile();
 }
 
 bool Git::resetCommits(int parentDepth)
@@ -1479,7 +1476,7 @@ void Git::stop(bool saveCache)
          mRevsFiles.remove(mFilesLoadingCurrentSha); // remove partial data
 
       if (!mRevsFiles.isEmpty())
-         saveOnCache(mGitDir, mRevsFiles, mDirNames, mFileNames);
+         saveOnCache();
    }
 }
 
@@ -1565,18 +1562,16 @@ void Git::on_loaded()
    emit newRevsAdded();
    emit loadCompleted();
 }
-
-bool Git::saveOnCache(const QString &gitDir, const QHash<QString, RevisionFile> &rf, const QVector<QString> &dirs,
-                      const QVector<QString> &files)
+bool Git::saveOnCache()
 {
-   if (gitDir.isEmpty() || rf.isEmpty())
+   if (mGitDir.isEmpty() || mRevsFiles.isEmpty())
       return false;
 
-   const auto path = QString("%1/%2").arg(gitDir, kCacheFileName);
+   const auto path = QString("%1/%2").arg(mGitDir, kCacheFileName);
    const auto tmpPath = QString("%1.bak").arg(path);
 
    QDir dir;
-   if (!dir.exists(gitDir))
+   if (!dir.exists(mGitDir))
    {
       return false;
    }
@@ -1592,33 +1587,33 @@ bool Git::saveOnCache(const QString &gitDir, const QHash<QString, RevisionFile> 
    stream << static_cast<quint32>(C_MAGIC);
    stream << static_cast<qint32>(C_VERSION);
 
-   stream << static_cast<qint32>(dirs.count());
-   for (int i = 0; i < dirs.count(); ++i)
-      stream << dirs.at(i);
+   stream << static_cast<qint32>(mDirNames.count());
+   for (int i = 0; i < mDirNames.count(); ++i)
+      stream << mDirNames.at(i);
 
-   stream << static_cast<qint32>(files.count());
-   for (int i = 0; i < files.count(); ++i)
-      stream << files.at(i);
+   stream << static_cast<qint32>(mFileNames.count());
+   for (int i = 0; i < mFileNames.count(); ++i)
+      stream << mFileNames.at(i);
 
    // to achieve a better compression we save the sha's as
    // one very long string instead of feeding the stream with
    // each one. With this trick we gain a 15% size reduction
    // in the final compressed file. The save/load speed is
    // almost the same.
-   int bufSize = rf.count() * 41 + 1000; // a little bit more space then required
+   int bufSize = mRevsFiles.count() * 41 + 1000; // a little bit more space then required
 
    QByteArray buf;
    buf.reserve(bufSize);
 
    QVector<RevisionFile> v;
-   v.reserve(rf.count());
+   v.reserve(mRevsFiles.count());
 
    QVector<QByteArray> ba;
    QString CUSTOM_SHA_RAW(toPersistentSha(CUSTOM_SHA, ba));
    int newSize = 0;
 
-   const auto rfEnd = rf.cend();
-   for (auto it = rf.begin(); it != rfEnd; ++it)
+   const auto rfEnd = mRevsFiles.cend();
+   for (auto it = mRevsFiles.begin(); it != rfEnd; ++it)
    {
       const QString &sha = it.key();
       if (sha == ZERO_SHA || sha == CUSTOM_SHA_RAW || sha[0] == 'A') // ALL_MERGE_FILES + Revision sha
@@ -1653,12 +1648,10 @@ bool Git::saveOnCache(const QString &gitDir, const QHash<QString, RevisionFile> 
    dir.rename(tmpPath, path);
    return true;
 }
-
-bool Git::loadFromCache(const QString &gitDir, QHash<QString, RevisionFile> &rfm, QVector<QString> &dirs,
-                        QVector<QString> &files, QByteArray &revsFilesShaBuf)
+bool Git::loadFromCache(QByteArray &revsFilesShaBuf)
 {
    // check for cache file
-   QString path = QString("%1/%2").arg(gitDir, kCacheFileName);
+   QString path = QString("%1/%2").arg(mGitDir, kCacheFileName);
    QFile f(path);
    if (!f.exists())
       return true; // no cache file is not an error
@@ -1679,14 +1672,14 @@ bool Git::loadFromCache(const QString &gitDir, QHash<QString, RevisionFile> &rfm
    }
    // read the data
    stream >> dirsNum;
-   dirs.resize(dirsNum);
+   mDirNames.resize(dirsNum);
    for (int i = 0; i < dirsNum; ++i)
-      stream >> dirs[i];
+      stream >> mDirNames[i];
 
    stream >> filesNum;
-   files.resize(filesNum);
+   mFileNames.resize(filesNum);
    for (int i = 0; i < filesNum; ++i)
-      stream >> files[i];
+      stream >> mFileNames[i];
 
    stream >> bufSize;
    revsFilesShaBuf.clear();
@@ -1702,7 +1695,7 @@ bool Git::loadFromCache(const QString &gitDir, QHash<QString, RevisionFile> &rfm
       rf << stream;
 
       QString sha = QString::fromUtf8(data);
-      rfm.insert(sha, rf);
+      mRevsFiles.insert(sha, rf);
 
       data += 40;
       if (*data != '\0')
@@ -1796,7 +1789,7 @@ void Git::loadFileCache()
       mFileCacheAccessed = true;
       QByteArray shaBuf;
 
-      if (loadFromCache(mGitDir, mRevsFiles, mDirNames, mFileNames, shaBuf))
+      if (loadFromCache(shaBuf))
       {
          mRevsFilesShaBackupBuf.append(shaBuf);
          populateFileNamesMap();
