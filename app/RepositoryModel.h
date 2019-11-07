@@ -39,7 +39,7 @@ public:
 
 private slots:
    void on_newRevsAdded();
-   void on_loadCompleted(const QString &);
+   void on_loadCompleted();
 
 private:
    QSharedPointer<RevisionsCache> mRevCache;
@@ -47,14 +47,12 @@ private:
    friend class Git;
 
    QVariant getToolTipData(const Revision *r) const;
-   QVariant getDisplayData(const Revision *rev, int row, int column) const;
+   QVariant getDisplayData(const Revision *rev, int column) const;
    void flushTail();
 
    Lanes *lns = nullptr;
    uint firstFreeLane;
    QMap<RepositoryModelColumns, QString> mColumns;
-   bool annIdValid;
-   int loadTime;
    int earlyOutputCnt;
    int earlyOutputCntBase;
    int rowCnt = 0;

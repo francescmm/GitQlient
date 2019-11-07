@@ -50,7 +50,7 @@ signals:
    // TODO: To review
 signals:
    void newRevsAdded();
-   void loadCompleted(const QString &);
+   void loadCompleted();
    void cancelLoading();
    void cancelAllProcesses();
 
@@ -190,7 +190,7 @@ public:
 
 private:
    void loadFileCache();
-   void on_loaded(ulong, int, bool);
+   void on_loaded();
    bool saveOnCache(const QString &gitDir, const QHash<QString, const RevisionFile *> &rf, const QVector<QString> &dirs,
                     const QVector<QString> &files);
    bool loadFromCache(const QString &gitDir, QHash<QString, const RevisionFile *> &rfm, QVector<QString> &dirs,

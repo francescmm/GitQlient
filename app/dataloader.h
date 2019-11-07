@@ -31,7 +31,7 @@ public:
 
 signals:
    void newDataReady();
-   void loaded(ulong, int, bool, const QString &, const QString &);
+   void loaded();
 
 private slots:
    void on_finished(int, QProcess::ExitStatus);

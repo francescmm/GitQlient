@@ -91,13 +91,12 @@ void RepositoryModel::clear(bool complete)
 
    mRevCache->clear();
 
-   firstFreeLane = loadTime = earlyOutputCntBase = 0;
+   firstFreeLane = earlyOutputCntBase = 0;
    setEarlyOutputState(false);
    lns->clear();
    curFNames.clear();
 
    rowCnt = mRevCache->count();
-   annIdValid = false;
    endResetModel();
    emit headerDataChanged(Qt::Horizontal, 0, 5);
 }
@@ -119,7 +118,7 @@ void RepositoryModel::on_newRevsAdded()
    endInsertRows();
 }
 
-void RepositoryModel::on_loadCompleted(const QString &)
+void RepositoryModel::on_loadCompleted()
 {
    const auto revisionsCount = mRevCache->count();
    if (rowCnt >= revisionsCount)
@@ -182,12 +181,12 @@ QVariant RepositoryModel::getToolTipData(const Revision *r) const
        .arg(r->author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
 }
 
-QVariant RepositoryModel::getDisplayData(const Revision *rev, int row, int column) const
+QVariant RepositoryModel::getDisplayData(const Revision *rev, int column) const
 {
    switch (static_cast<RepositoryModelColumns>(column))
    {
       case RepositoryModelColumns::ID:
-         return annIdValid ? rowCnt - row : QVariant();
+         return QVariant();
       case RepositoryModelColumns::SHA:
          return rev->sha();
       case RepositoryModelColumns::LOG:
@@ -221,7 +220,7 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
          if (r->lanes.count() == 0)
             mGit->setLane(sha);
 
-         return getDisplayData(r, index.row(), index.column());
+         return getDisplayData(r, index.column());
       }
    }
 

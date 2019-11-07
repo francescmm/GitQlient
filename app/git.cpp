@@ -1614,24 +1614,11 @@ void Git::init2()
    QLog_Info("Git", "... revisions finished");
 }
 
-void Git::on_loaded(ulong byteSize, int loadTime, bool normalExit)
+// TODO: Refactor
+void Git::on_loaded()
 {
-   if (normalExit)
-   { // do not send anything if killed
-
-      emit newRevsAdded();
-
-      mRevData->loadTime += loadTime;
-
-      ulong kb = byteSize / 1024;
-      double mbs = static_cast<double>(byteSize) / mRevData->loadTime / 1000;
-      QString tmp;
-      tmp.sprintf("Loaded %i revisions  (%li KB),   "
-                  "time elapsed: %i ms  (%.2f MB/s)",
-                  mRevCache->count(), kb, mRevData->loadTime, mbs);
-
-      emit loadCompleted(tmp);
-   }
+   emit newRevsAdded();
+   emit loadCompleted();
 }
 
 bool Git::saveOnCache(const QString &gitDir, const QHash<QString, const RevisionFile *> &rf,

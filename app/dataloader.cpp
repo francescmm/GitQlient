@@ -106,7 +106,7 @@ void DataLoader::on_timeout()
 
    if (lastBuffer)
    {
-      emit loaded(loadedBytes, loadTime.elapsed(), true, "", "");
+      emit loaded();
       deleteLater();
    }
    else if (isProcExited)
