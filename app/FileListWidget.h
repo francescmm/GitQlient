@@ -25,7 +25,6 @@
 
 #include <QListWidget>
 
-class Domain;
 class StateInfo;
 class Git;
 class RevisionFile;
@@ -40,15 +39,14 @@ signals:
 
 public:
    explicit FileListWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
-   void setup(Domain *dm);
-   void update(const RevisionFile *files, bool newFiles);
-   void addItem(const QString &label, const QColor &clr);
+   void setup(StateInfo &stateInfo);
+   void update(const RevisionFile *files);
 
 private:
+   QSharedPointer<Git> mGit = nullptr;
+   StateInfo *st = nullptr;
+
    void showContextMenu(const QPoint &);
    void insertFiles(const RevisionFile *files);
-
-   QSharedPointer<Git> mGit = nullptr;
-   Domain *d = nullptr;
-   StateInfo *st = nullptr;
+   void addItem(const QString &label, const QColor &clr);
 };

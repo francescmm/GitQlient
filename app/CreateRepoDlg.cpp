@@ -30,7 +30,6 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<Git> git, QW
    connect(ui->pbBrowse, &QPushButton::clicked, this, &CreateRepoDlg::selectFolder);
    connect(ui->lePath, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
    connect(ui->leRepoName, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
-
    connect(ui->pbAccept, &QPushButton::clicked, this, &CreateRepoDlg::accept);
    connect(ui->pbCancel, &QPushButton::clicked, this, &QDialog::reject);
 }

@@ -2,6 +2,7 @@
 
 #include <Revision.h>
 #include <FileListWidget.h>
+#include <domain.h>
 #include <git.h>
 
 #include <QLabel>
@@ -88,7 +89,7 @@ RevisionWidget::RevisionWidget(QSharedPointer<Git> git, QWidget *parent)
 
 void RevisionWidget::setup(Domain *rv)
 {
-   fileListWidget->setup(rv);
+   fileListWidget->setup(rv->st);
 }
 
 void RevisionWidget::setCurrentCommitSha(const QString &sha)
@@ -129,7 +130,7 @@ void RevisionWidget::setCurrentCommitSha(const QString &sha)
          labelDescription->setFont(f);
 
          const auto files = mGit->getFiles(sha, currentRev->parent(0), true, "");
-         fileListWidget->update(files, true);
+         fileListWidget->update(files);
          labelModCount->setText(QString("(%1)").arg(fileListWidget->count()));
       }
    }
