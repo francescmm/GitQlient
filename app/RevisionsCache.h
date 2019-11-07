@@ -60,6 +60,7 @@ public:
    void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevsFiles.insert(sha, file); }
    void removeRevisionFile(const QString &sha) { mRevsFiles.remove(sha); }
    void clearRevisionFile() { mRevsFiles.clear(); }
+   bool containsRevisionFile(const QString &sha) const { return mRevsFiles.contains(sha); }
 
 private:
    QSharedPointer<Git> mGit;

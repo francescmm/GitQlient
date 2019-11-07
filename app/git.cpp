@@ -397,7 +397,7 @@ const QString Git::getWorkDirDiff(const QString &fileName)
 bool Git::isNothingToCommit()
 {
 
-   if (!mRevCache->contains(ZERO_SHA))
+   if (!mRevCache->containsRevisionFile(ZERO_SHA))
       return true;
 
    const auto rf = mRevCache->getRevisionFile(ZERO_SHA);
@@ -566,7 +566,7 @@ RevisionFile Git::getAllMergeFiles(const Revision *r)
 
    QString mySha("ALL_MERGE_FILES" + QString(r->sha()));
 
-   if (mRevCache->contains(mySha))
+   if (mRevCache->containsRevisionFile(mySha))
       return mRevCache->getRevisionFile(mySha);
 
    QString runCmd(QString("git diff-tree --no-color -r -m ").arg(r->sha())), runOutput;
@@ -602,7 +602,7 @@ RevisionFile Git::getFiles(const QString &sha, const QString &diffToSha, bool al
       runCmd.append(diffToSha + " " + sha);
    }
 
-   if (mRevCache->contains(mySha))
+   if (mRevCache->containsRevisionFile(mySha))
       return mRevCache->getRevisionFile(mySha);
 
    QString runOutput;
