@@ -71,7 +71,6 @@ bool writeToFile(const QString &fileName, const QString &data)
 Git::Git()
    : QObject()
 {
-   mRevsFiles.reserve(RevisionsCache::MAX_DICT_SIZE);
 }
 
 void Git::userInfo(QStringList &info)
@@ -398,10 +397,10 @@ const QString Git::getWorkDirDiff(const QString &fileName)
 bool Git::isNothingToCommit()
 {
 
-   if (!mRevsFiles.contains(ZERO_SHA))
+   if (!mRevCache->contains(ZERO_SHA))
       return true;
 
-   const auto rf = mRevsFiles.value(ZERO_SHA);
+   const auto rf = mRevCache->getRevisionFile(ZERO_SHA);
    return rf.count() == workingDirInfo.otherFiles.count();
 }
 
@@ -530,7 +529,8 @@ RevisionFile Git::insertNewFiles(const QString &sha, const QString &data)
    parseDiffFormat(rf, data, fl);
    flushFileNames(fl);
 
-   mRevsFiles.insert(sha, rf);
+   mRevCache->insertRevisionFile(sha, rf);
+
    return rf;
 }
 
@@ -566,8 +566,8 @@ RevisionFile Git::getAllMergeFiles(const Revision *r)
 
    QString mySha("ALL_MERGE_FILES" + QString(r->sha()));
 
-   if (mRevsFiles.contains(mySha))
-      return mRevsFiles.value(mySha);
+   if (mRevCache->contains(mySha))
+      return mRevCache->getRevisionFile(mySha);
 
    QString runCmd(QString("git diff-tree --no-color -r -m ").arg(r->sha())), runOutput;
 
@@ -579,7 +579,7 @@ RevisionFile Git::getAllMergeFiles(const Revision *r)
 
 RevisionFile Git::getWipFiles()
 {
-   return mRevsFiles.value(ZERO_SHA); // ZERO_SHA search arrives here
+   return mRevCache->getRevisionFile(ZERO_SHA); // ZERO_SHA search arrives here
 }
 
 RevisionFile Git::getFiles(const QString &sha, const QString &diffToSha, bool allFiles)
@@ -602,8 +602,8 @@ RevisionFile Git::getFiles(const QString &sha, const QString &diffToSha, bool al
       runCmd.append(diffToSha + " " + sha);
    }
 
-   if (mRevsFiles.contains(mySha))
-      return mRevsFiles.value(mySha);
+   if (mRevCache->contains(mySha))
+      return mRevCache->getRevisionFile(mySha);
 
    QString runOutput;
 
@@ -1001,7 +1001,7 @@ bool Git::getStashCommit(const QString &stash, QByteArray &output)
    return ret.first;
 }
 
-bool Git::getGitDBDir(const QString &wd, QString &gd, bool &changed)
+bool Git::getGitDBDir(const QString &wd)
 {
    // we could run from a subdirectory, so we need to get correct directories
 
@@ -1015,13 +1015,12 @@ bool Git::getGitDBDir(const QString &wd, QString &gd, bool &changed)
       // 'git rev-parse --git-dir' output could be a relative
       // to working directory (as ex .git) or an absolute path
       QDir d(runOutput.startsWith("/") ? runOutput : wd + "/" + runOutput);
-      changed = (d.absolutePath() != mGitDir);
-      gd = d.absolutePath();
+      mGitDir = d.absolutePath();
    }
    return success.first;
 }
 
-bool Git::getBaseDir(const QString &wd, QString &bd, bool &changed)
+bool Git::getBaseDir(const QString &wd, QString &bd)
 {
    // we could run from a subdirectory, so we need to get correct directories
 
@@ -1034,19 +1033,14 @@ bool Git::getBaseDir(const QString &wd, QString &bd, bool &changed)
    mWorkingDir = wd;
    auto ret = run("git rev-parse --show-cdup"); // run under newWorkDir
    mWorkingDir = tmp;
-   const auto runOutput = ret.second.trimmed();
    if (ret.first)
    {
-      // 'git rev-parse --show-cdup' is relative to working directory.
-      QDir d(wd + "/" + runOutput);
+      QDir d(QString("%1/%2").arg(wd, ret.second.trimmed()));
       bd = d.absolutePath();
-      changed = (bd != mWorkingDir);
    }
    else
-   {
-      changed = true;
       bd = wd;
-   }
+
    return ret.first;
 }
 
@@ -1285,7 +1279,7 @@ void Git::updateWipRevision()
    workingDirInfo.otherFiles = getOthersFiles();
 
    // now mockup a RevisionFile
-   mRevsFiles.insert(ZERO_SHA, fakeWorkDirRevFile(workingDirInfo));
+   mRevCache->insertRevisionFile(ZERO_SHA, fakeWorkDirRevFile(workingDirInfo));
 
    // then mockup the corresponding Revision
    const QString &log = (isNothingToCommit() ? QString("No local changes") : QString("Local changes"));
@@ -1466,12 +1460,12 @@ void Git::clearRevs()
    mRevCache->clear();
    mRevData->clear();
    workingDirInfo.clear();
-   mRevsFiles.remove(ZERO_SHA);
+   mRevCache->removeRevisionFile(ZERO_SHA);
 }
 
 void Git::clearFileNames()
 {
-   mRevsFiles.clear();
+   mRevCache->clearRevisionFile();
    mFileNamesMap.clear();
    mDirNamesMap.clear();
    mDirNames.clear();
@@ -1487,18 +1481,10 @@ bool Git::init(const QString &wd, QSharedPointer<RevisionsCache> revCache)
    // normally called when changing git directory. Must be called after stop()
    clearRevs();
 
-   const QString msg1("Path is '" + mWorkingDir + "'    Loading ");
+   const auto isGIT = getGitDBDir(wd);
 
-   // check if repository is valid
-   bool repoChanged;
-   const auto isGIT = getGitDBDir(wd, mGitDir, repoChanged);
-
-   if (repoChanged)
-   {
-      bool dummy;
-      getBaseDir(wd, mWorkingDir, dummy);
-      clearFileNames();
-   }
+   getBaseDir(wd, mWorkingDir);
+   clearFileNames();
 
    if (!isGIT)
       return false;

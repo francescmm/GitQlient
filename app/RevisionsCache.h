@@ -23,9 +23,10 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <RevisionFile.h>
+
 #include <QObject>
 #include <QHash>
-#include <QVector>
 #include <QSharedPointer>
 
 class Git;
@@ -55,11 +56,14 @@ public:
    QString getRevisionSha(int index) const { return revOrder.at(index); }
    int revOrderCount() const { return revOrder.count(); }
    bool contains(const QString &sha) { return revs.contains(sha); }
-
-   static const int MAX_DICT_SIZE = 100003; // must be a prime number see QDict docs
+   RevisionFile getRevisionFile(const QString &sha) const { return mRevsFiles.value(sha); }
+   void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevsFiles.insert(sha, file); }
+   void removeRevisionFile(const QString &sha) { mRevsFiles.remove(sha); }
+   void clearRevisionFile() { mRevsFiles.clear(); }
 
 private:
    QSharedPointer<Git> mGit;
    QHash<QString, const Revision *> revs;
+   QHash<QString, RevisionFile> mRevsFiles;
    QVector<QString> revOrder;
 };

@@ -93,7 +93,6 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
    connect(mAutoFilesUpdate, &QTimer::timeout, this, &GitQlientRepo::updateUiFromWatcher);
 
-   connect(mControls, &Controls::signalOpenRepo, this, &GitQlientRepo::setRepository);
    connect(mControls, &Controls::signalGoBack, this, [this]() {
       centerStackedWidget->setCurrentIndex(0);
       mainStackedLayout->setCurrentIndex(0);
@@ -187,22 +186,14 @@ void GitQlientRepo::updateUiFromWatcher()
 
 void GitQlientRepo::setRepository(const QString &newDir)
 {
-   if (!mRepositoryBusy && !newDir.isEmpty())
+   if (!newDir.isEmpty())
    {
       QLog_Info("UI", QString("Loading repository..."));
 
-      mRepositoryBusy = true;
-
-      const auto oldDir = mCurrentDir;
-
-      resetWatcher(oldDir, newDir);
-
-      bool archiveChanged;
-
-      mGit->getBaseDir(newDir, mCurrentDir, archiveChanged);
       mGit->cancelAllProcesses();
 
-      const auto ok = mGit->init(mCurrentDir, mRevisionsCache); // blocking call
+      const auto ok = mGit->init(newDir, mRevisionsCache);
+      mCurrentDir = mGit->getWorkingDir();
 
       if (ok)
       {
@@ -210,6 +201,8 @@ void GitQlientRepo::setRepository(const QString &newDir)
          setWidgetsEnabled(true);
 
          mGit->init2();
+
+         setWatcher();
 
          onCommitSelected(ZERO_SHA);
          mBranchesWidget->showBranches();
@@ -228,8 +221,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
          clearWindow(true);
          setWidgetsEnabled(false);
       }
-
-      mRepositoryBusy = false;
    }
    else
    {
@@ -246,37 +237,25 @@ void GitQlientRepo::close()
    QWidget::close();
 }
 
-void GitQlientRepo::resetWatcher(const QString &oldDir, const QString &newDir)
+void GitQlientRepo::setWatcher()
 {
-   if (!mGitWatcher)
+   mGitWatcher = new QFileSystemWatcher(this);
+   connect(mGitWatcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
+      if (!path.endsWith(".autosave") and !path.endsWith(".tmp") and !path.endsWith(".user"))
+         updateUiFromWatcher();
+   });
+
+   QLog_Info("UI", QString("Setting the file watcher for dir {%1}").arg(mCurrentDir));
+
+   mGitWatcher->addPath(mCurrentDir);
+
+   QDirIterator it(mCurrentDir, QDirIterator::Subdirectories);
+   while (it.hasNext())
    {
-      mGitWatcher = new QFileSystemWatcher(this);
-      connect(
-          mGitWatcher, &QFileSystemWatcher::fileChanged, this,
-          [this](const QString &path) {
-             if (!path.endsWith(".autosave") and !path.endsWith(".tmp") and !path.endsWith(".user"))
-                updateUiFromWatcher();
-          },
-          Qt::UniqueConnection);
-   }
+      const auto dir = it.next();
 
-   if (oldDir != newDir)
-   {
-      QLog_Info("UI", QString("Setting the file watcher for dir {%1}").arg(newDir));
-
-      if (!oldDir.isEmpty())
-         mGitWatcher->removePath(oldDir);
-
-      mGitWatcher->addPath(newDir);
-
-      QDirIterator it(newDir, QDirIterator::Subdirectories);
-      while (it.hasNext())
-      {
-         const auto dir = it.next();
-
-         if (it.fileInfo().isDir() and !dir.endsWith(".") and !dir.endsWith(".."))
-            mGitWatcher->addPath(dir);
-      }
+      if (it.fileInfo().isDir() and !dir.endsWith(".") and !dir.endsWith(".."))
+         mGitWatcher->addPath(dir);
    }
 }
 

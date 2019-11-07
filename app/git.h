@@ -65,15 +65,15 @@ public:
 
    explicit Git();
 
-   /** START Git CONFIGURATION **/
+   /* START Git CONFIGURATION */
    bool init(const QString &wd, QSharedPointer<RevisionsCache> revCache);
    void init2();
    QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
    bool initRepo(const QString &fullPath);
-   /** END Git CONFIGURATION **/
+   /* END Git CONFIGURATION */
 
-   /** START BRANCHES **/
+   /* START BRANCHES */
    GitExecResult createBranchFromAnotherBranch(const QString &oldName, const QString &newName);
    GitExecResult createBranchAtCommit(const QString &commitSha, const QString &branchName);
    GitExecResult checkoutRemoteBranch(const QString &branchName);
@@ -88,9 +88,9 @@ public:
    GitExecResult prune();
    const QString getCurrentBranchName() const { return mCurrentBranchName; }
 
-   /** END BRANCHES **/
+   /* END BRANCHES */
 
-   /** START TAGS **/
+   /* START TAGS */
    QVector<QString> getTags() const;
    QVector<QString> getLocalTags() const;
    bool addTag(const QString &tagName, const QString &tagMessage, const QString &sha, QByteArray &output);
@@ -99,14 +99,14 @@ public:
    bool getTagCommit(const QString &tagName, QByteArray &output);
    const QString getTagMsg(const QString &sha);
 
-   /**  END  TAGS **/
+   /*  END  TAGS */
 
-   /** START STASHES **/
+   /* START STASHES */
    QVector<QString> getStashes();
    bool getStashCommit(const QString &stash, QByteArray &output);
-   /**  END  STASHES **/
+   /*  END  STASHES */
 
-   /** START COMMIT WORK **/
+   /* START COMMIT WORK */
    bool commitFiles(QStringList &files, const QString &msg, bool amend, const QString &author = QString());
    GitExecResult exportPatch(const QStringList &shaList);
    bool apply(const QString &fileName, bool asCommit = false);
@@ -119,9 +119,9 @@ public:
    bool resetCommit(const QString &sha, CommitResetType type);
    bool resetCommits(int parentDepth);
    GitExecResult checkoutCommit(const QString &sha);
-   /** END COMMIT WORK **/
+   /* END COMMIT WORK */
 
-   /** START COMMIT INFO **/
+   /* START COMMIT INFO */
    QPair<QString, QString> getSplitCommitMsg(const QString &sha);
    QString getCommitMsg(const QString &sha) const;
    const QString getLastCommitMsg();
@@ -129,23 +129,23 @@ public:
    bool resetFile(const QString &fileName);
    GitExecResult blame(const QString &file);
    GitExecResult history(const QString &file);
-   /** END COMMIT INFO **/
+   /* END COMMIT INFO */
 
-   /** START SUBMODULES **/
+   /* START SUBMODULES */
    QVector<QString> getSubmodules();
    bool submoduleAdd(const QString &url, const QString &name);
    bool submoduleUpdate(const QString &submodule);
    bool submoduleRemove(const QString &submodule);
-   /**  END  SUBMODULES **/
+   /*  END  SUBMODULES */
 
-   /** START SETTINGS **/
+   /* START SETTINGS */
    void userInfo(QStringList &info);
 
-   /** END SETTINGS **/
+   /* END SETTINGS */
 
-   /** START GENERAL REPO **/
-   bool getBaseDir(const QString &wd, QString &bd, bool &changed);
-   /**  END  GENERAL REPO **/
+   /* START GENERAL REPO */
+   bool getBaseDir(const QString &wd, QString &bd);
+   /*  END  GENERAL REPO */
 
    enum RefType
    {
@@ -187,7 +187,7 @@ public:
 
 private:
    void on_loaded();
-   bool getGitDBDir(const QString &wd, QString &gd, bool &changed);
+   bool getGitDBDir(const QString &wd);
 
    friend class DataLoader;
 
@@ -276,7 +276,6 @@ private:
    QString mGitDir;
    QString mCurrentBranchName;
    bool mIsMergeHead = false;
-   QHash<QString, RevisionFile> mRevsFiles;
    QHash<QString, Reference> mRefsShaMap;
    QVector<QString> mFileNames;
    QVector<QString> mDirNames;

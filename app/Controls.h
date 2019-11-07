@@ -37,7 +37,6 @@ signals:
    void signalGoBlame();
    void signalGoToSha(const QString &sha);
    void signalRepositoryUpdated();
-   void signalOpenRepo(const QString &path);
 
 public:
    explicit Controls(QSharedPointer<Git> git, QWidget *parent = nullptr);

@@ -78,7 +78,6 @@ protected:
 private:
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    QString mCurrentDir;
-   bool mRepositoryBusy = false;
    QSharedPointer<Git> mGit;
    QSharedPointer<RevisionsCache> mRevisionsCache;
    RepositoryView *mRepositoryView = nullptr;
@@ -107,7 +106,7 @@ private:
    void onCommitSelected(const QString &goToSha);
    void onAmendCommit(const QString &sha);
    void onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file);
-   void resetWatcher(const QString &oldDir, const QString &newDir);
+   void setWatcher();
    void clearWindow(bool deepClear);
    void setWidgetsEnabled(bool enabled);
    void executeCommand();
