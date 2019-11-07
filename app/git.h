@@ -68,7 +68,6 @@ public:
    /** START Git CONFIGURATION **/
    bool init(const QString &wd, QSharedPointer<RevisionsCache> revCache);
    void init2();
-   void stop(bool saveCache);
    QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
    bool initRepo(const QString &fullPath);
@@ -187,10 +186,7 @@ public:
    void updateWipRevision();
 
 private:
-   void loadFileCache();
    void on_loaded();
-   bool saveOnCache();
-   bool loadFromCache(QByteArray &revsFilesShaBuf);
    bool getGitDBDir(const QString &wd, QString &gd, bool &changed);
 
    friend class DataLoader;
@@ -278,23 +274,16 @@ private:
 
    QString mWorkingDir;
    QString mGitDir;
-   QString mFilesLoadingCurrentSha;
    QString mCurrentBranchName;
-   bool mCacheNeedsUpdate = false;
    bool mIsMergeHead = false;
-   bool mFileCacheAccessed = false;
-   QString mFirstNonStGitPatch;
    QHash<QString, RevisionFile> mRevsFiles;
-   QVector<QByteArray> mRevsFilesShaBackupBuf;
    QHash<QString, Reference> mRefsShaMap;
-   QVector<QByteArray> mShaBackupBuf;
    QVector<QString> mFileNames;
    QVector<QString> mDirNames;
    QHash<QString, int> mFileNamesMap; // quick lookup file name
    QHash<QString, int> mDirNamesMap; // quick lookup directory name
    RepositoryModel *mRevData = nullptr;
    QSharedPointer<RevisionsCache> mRevCache;
-   static const QString kCacheFileName;
 };
 
 #endif

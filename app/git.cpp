@@ -40,17 +40,8 @@ static const QString CUSTOM_SHA = "*** CUSTOM * CUSTOM * CUSTOM * CUSTOM **";
 static const uint C_MAGIC = 0xA0B0C0D0;
 static const int C_VERSION = 15;
 
-const QString Git::kCacheFileName = QString("qgit_cache.dat");
-
 namespace
 {
-const QString toPersistentSha(const QString &sha, QVector<QByteArray> &v)
-{
-
-   v.append(sha.toLatin1());
-   return QString::fromUtf8(v.last().constData());
-}
-
 #ifndef Q_OS_WIN32
 #   include <sys/types.h> // used by chmod()
 #   include <sys/stat.h> // used by chmod()
@@ -539,7 +530,7 @@ RevisionFile Git::insertNewFiles(const QString &sha, const QString &data)
    parseDiffFormat(rf, data, fl);
    flushFileNames(fl);
 
-   mRevsFiles.insert(toPersistentSha(sha, mRevsFilesShaBackupBuf), rf);
+   mRevsFiles.insert(sha, rf);
    return rf;
 }
 
@@ -1107,7 +1098,6 @@ bool Git::getRefs()
       return false;
 
    mRefsShaMap.clear();
-   mShaBackupBuf.clear(); // revs are already empty now
 
    QString prevRefSha;
    QStringList patchNames, patchShas;
@@ -1119,7 +1109,7 @@ bool Git::getRefs()
       const auto refName = it.mid(41);
 
       // one Revision could have many tags
-      Reference *cur = lookupOrAddReference(toPersistentSha(revSha, mShaBackupBuf));
+      Reference *cur = lookupOrAddReference(revSha);
 
       if (refName.startsWith("refs/tags/"))
       {
@@ -1169,7 +1159,7 @@ bool Git::getRefs()
    }
 
    // mark current head (even when detached)
-   Reference *cur = lookupOrAddReference(toPersistentSha(curBranchSHA, mShaBackupBuf));
+   auto cur = lookupOrAddReference(curBranchSHA);
    cur->type |= CUR_BRANCH;
 
    return !mRefsShaMap.empty();
@@ -1461,25 +1451,6 @@ bool Git::startRevList()
    return startParseProc(initCmd);
 }
 
-void Git::stop(bool saveCache)
-{
-   // stop all data sending from process and asks them
-   // to terminate. Note that process could still keep
-   // running for a while although silently
-   emit cancelAllProcesses(); // non blocking
-
-   if (mCacheNeedsUpdate && saveCache)
-   {
-
-      mCacheNeedsUpdate = false;
-      if (!mFilesLoadingCurrentSha.isEmpty()) // we are in the middle of a loading
-         mRevsFiles.remove(mFilesLoadingCurrentSha); // remove partial data
-
-      if (!mRevsFiles.isEmpty())
-         saveOnCache();
-   }
-}
-
 bool Git::clone(const QString &url, const QString &fullPath)
 {
    return run(QString("git clone %1 %2").arg(url, fullPath)).first;
@@ -1494,7 +1465,6 @@ void Git::clearRevs()
 {
    mRevCache->clear();
    mRevData->clear();
-   mFirstNonStGitPatch = "";
    workingDirInfo.clear();
    mRevsFiles.remove(ZERO_SHA);
 }
@@ -1506,8 +1476,6 @@ void Git::clearFileNames()
    mDirNamesMap.clear();
    mDirNames.clear();
    mFileNames.clear();
-   mRevsFilesShaBackupBuf.clear();
-   mCacheNeedsUpdate = false;
 }
 
 bool Git::init(const QString &wd, QSharedPointer<RevisionsCache> revCache)
@@ -1530,9 +1498,6 @@ bool Git::init(const QString &wd, QSharedPointer<RevisionsCache> revCache)
       bool dummy;
       getBaseDir(wd, mWorkingDir, dummy);
       clearFileNames();
-      mFileCacheAccessed = false;
-
-      loadFileCache();
    }
 
    if (!isGIT)
@@ -1561,149 +1526,6 @@ void Git::on_loaded()
 {
    emit newRevsAdded();
    emit loadCompleted();
-}
-bool Git::saveOnCache()
-{
-   if (mGitDir.isEmpty() || mRevsFiles.isEmpty())
-      return false;
-
-   const auto path = QString("%1/%2").arg(mGitDir, kCacheFileName);
-   const auto tmpPath = QString("%1.bak").arg(path);
-
-   QDir dir;
-   if (!dir.exists(mGitDir))
-   {
-      return false;
-   }
-   QFile f(tmpPath);
-   if (!f.open(QIODevice::WriteOnly | QIODevice::Unbuffered))
-      return false;
-
-   // compress in memory before write to file
-   QByteArray data;
-   QDataStream stream(&data, QIODevice::WriteOnly);
-
-   // Write a header with a "magic number" and a version
-   stream << static_cast<quint32>(C_MAGIC);
-   stream << static_cast<qint32>(C_VERSION);
-
-   stream << static_cast<qint32>(mDirNames.count());
-   for (int i = 0; i < mDirNames.count(); ++i)
-      stream << mDirNames.at(i);
-
-   stream << static_cast<qint32>(mFileNames.count());
-   for (int i = 0; i < mFileNames.count(); ++i)
-      stream << mFileNames.at(i);
-
-   // to achieve a better compression we save the sha's as
-   // one very long string instead of feeding the stream with
-   // each one. With this trick we gain a 15% size reduction
-   // in the final compressed file. The save/load speed is
-   // almost the same.
-   int bufSize = mRevsFiles.count() * 41 + 1000; // a little bit more space then required
-
-   QByteArray buf;
-   buf.reserve(bufSize);
-
-   QVector<RevisionFile> v;
-   v.reserve(mRevsFiles.count());
-
-   QVector<QByteArray> ba;
-   QString CUSTOM_SHA_RAW(toPersistentSha(CUSTOM_SHA, ba));
-   int newSize = 0;
-
-   const auto rfEnd = mRevsFiles.cend();
-   for (auto it = mRevsFiles.begin(); it != rfEnd; ++it)
-   {
-      const QString &sha = it.key();
-      if (sha == ZERO_SHA || sha == CUSTOM_SHA_RAW || sha[0] == 'A') // ALL_MERGE_FILES + Revision sha
-         continue;
-
-      v.append(it.value());
-      buf.append(sha.toUtf8()).append('\0');
-      newSize += 41;
-      if (newSize > bufSize)
-      {
-         return false;
-      }
-   }
-   buf.resize(newSize);
-   stream << static_cast<qint32>(newSize);
-   stream << buf;
-
-   for (int i = 0; i < v.size(); ++i)
-      v.at(i) >> stream;
-
-   f.write(qCompress(data, 1)); // no need to encode with compressed data
-   f.close();
-
-   if (dir.exists(path))
-   {
-      if (!dir.remove(path))
-      {
-         dir.remove(tmpPath);
-         return false;
-      }
-   }
-   dir.rename(tmpPath, path);
-   return true;
-}
-bool Git::loadFromCache(QByteArray &revsFilesShaBuf)
-{
-   // check for cache file
-   QString path = QString("%1/%2").arg(mGitDir, kCacheFileName);
-   QFile f(path);
-   if (!f.exists())
-      return true; // no cache file is not an error
-
-   if (!f.open(QIODevice::ReadOnly | QIODevice::Unbuffered))
-      return false;
-
-   QDataStream stream(qUncompress(f.readAll()));
-   quint32 magic;
-   qint32 version;
-   qint32 dirsNum, filesNum, bufSize;
-   stream >> magic;
-   stream >> version;
-   if (magic != C_MAGIC || version != C_VERSION)
-   {
-      f.close();
-      return false;
-   }
-   // read the data
-   stream >> dirsNum;
-   mDirNames.resize(dirsNum);
-   for (int i = 0; i < dirsNum; ++i)
-      stream >> mDirNames[i];
-
-   stream >> filesNum;
-   mFileNames.resize(filesNum);
-   for (int i = 0; i < filesNum; ++i)
-      stream >> mFileNames[i];
-
-   stream >> bufSize;
-   revsFilesShaBuf.clear();
-   revsFilesShaBuf.reserve(bufSize);
-   stream >> revsFilesShaBuf;
-
-   const char *data = revsFilesShaBuf.constData();
-
-   while (!stream.atEnd())
-   {
-
-      RevisionFile rf;
-      rf << stream;
-
-      QString sha = QString::fromUtf8(data);
-      mRevsFiles.insert(sha, rf);
-
-      data += 40;
-      if (*data != '\0')
-         return false;
-      data++;
-   }
-   f.close();
-   return true;
 }
 
 bool Git::populateRenamedPatches(const QString &renamedSha, const QStringList &newNames, QStringList *oldNames,
@@ -1782,21 +1604,6 @@ void Git::populateFileNamesMap()
       mFileNamesMap.insert(mFileNames[i], i);
 }
 
-void Git::loadFileCache()
-{
-   if (!mFileCacheAccessed)
-   {
-      mFileCacheAccessed = true;
-      QByteArray shaBuf;
-
-      if (loadFromCache(shaBuf))
-      {
-         mRevsFilesShaBackupBuf.append(shaBuf);
-         populateFileNamesMap();
-      }
-   }
-}
-
 bool Git::filterEarlyOutputRev(Revision *revision)
 {
 
@@ -1873,7 +1680,6 @@ void Git::setLane(const QString &sha)
    Lanes *l = mRevData->lns;
    uint i = mRevData->firstFreeLane;
    QVector<QByteArray> ba;
-   const QString &ss = toPersistentSha(sha, ba);
 
    for (uint cnt = static_cast<uint>(mRevCache->revOrderCount()); i < cnt; ++i)
    {
@@ -1883,7 +1689,7 @@ void Git::setLane(const QString &sha)
       if (r->lanes.count() == 0)
          updateLanes(*r, *l, curSha);
 
-      if (curSha == ss)
+      if (curSha == sha)
          break;
    }
    mRevData->firstFreeLane = ++i;

@@ -200,7 +200,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
       bool archiveChanged;
 
       mGit->getBaseDir(newDir, mCurrentDir, archiveChanged);
-      mGit->stop(archiveChanged);
+      mGit->cancelAllProcesses();
 
       const auto ok = mGit->init(mCurrentDir, mRevisionsCache); // blocking call
 
@@ -405,7 +405,7 @@ void GitQlientRepo::closeEvent(QCloseEvent *ce)
    emit closeAllWindows();
    hide();
 
-   mGit->stop(true);
+   mGit->cancelAllProcesses();
 
    QWidget::closeEvent(ce);
 }
