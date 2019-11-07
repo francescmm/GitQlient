@@ -1,4 +1,16 @@
 0. Remove unnecessary files from the repo
+- RepositoryView
+- RepositoryModel
+- RepositoryViewDelegate
+- DataLoader
+- Revision
+- RevisionFile
+- RevisionCache
+- StateInfo
+- Domain
+- FileListWidget
+- Lanes
+- Git
 
 1. Pre-release tasks
 - Add icon
