@@ -44,22 +44,12 @@ RepositoryModel::RepositoryModel(QSharedPointer<RevisionsCache> revCache, QShare
 
 RepositoryModel::~RepositoryModel()
 {
-
    clear();
    delete lns;
 }
 
-void RepositoryModel::resetFileNames(const QString &fn)
-{
-
-   fNames.clear();
-   fNames.append(fn);
-   curFNames = fNames;
-}
-
 int RepositoryModel::rowCount(const QModelIndex &parent) const
 {
-
    return !parent.isValid() ? rowCnt : 0;
 }
 
@@ -104,7 +94,6 @@ void RepositoryModel::clear(bool complete)
    firstFreeLane = loadTime = earlyOutputCntBase = 0;
    setEarlyOutputState(false);
    lns->clear();
-   fNames.clear();
    curFNames.clear();
 
    rowCnt = mRevCache->count();

@@ -259,7 +259,6 @@ private:
                          const QString &log, const QString &longLog, const QString &patch, int idx);
    const Revision *fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx);
    const RevisionFile *fakeWorkDirRevFile(const WorkingDirInfo &wd);
-   bool copyDiffIndex(const QString &parent);
    const RevisionFile *insertNewFiles(const QString &sha, const QString &data);
    const RevisionFile *getAllMergeFiles(const Revision *r);
    bool runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutput);

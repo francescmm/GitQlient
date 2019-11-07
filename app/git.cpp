@@ -1942,31 +1942,6 @@ int Git::addChunk(const QByteArray &ba, int start)
    return nextStart;
 }
 
-bool Git::copyDiffIndex(const QString &parent)
-{
-   // must be called with empty revs and empty revOrder
-
-   if (mRevCache->revOrderCount() != 0 || !mRevCache->isEmpty())
-      return false;
-
-   const Revision *r = mRevCache->revLookup(ZERO_SHA);
-   if (!r)
-      return false;
-
-   const RevisionFile *files = getFiles(ZERO_SHA);
-   if (!files || findFileIndex(*files, mRevData->fileNames().first()) == -1)
-      return false;
-
-   // insert a custom ZERO_SHA Revision with proper parent
-   const Revision *rf = fakeWorkDirRev(parent, "Working directory changes", "long log\n", 0);
-   mRevCache->insertRevision(ZERO_SHA, *rf);
-
-   emit mRevCache->signalCacheUpdated();
-   emit newRevsAdded();
-
-   return true;
-}
-
 void Git::setLane(const QString &sha)
 {
 

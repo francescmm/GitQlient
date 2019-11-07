@@ -27,8 +27,6 @@ public:
    ~RepositoryModel();
    void clear(bool complete = true);
    QString sha(int row) const;
-   const QStringList fileNames() const { return fNames; }
-   void resetFileNames(const QString &fn);
    void setEarlyOutputState(bool b = true) { earlyOutputCnt = (b ? earlyOutputCntBase : -1); }
 
    QVariant data(const QModelIndex &index, int role) const override;
@@ -60,7 +58,6 @@ private:
    int earlyOutputCnt;
    int earlyOutputCntBase;
    int rowCnt = 0;
-   QStringList fNames;
    QStringList curFNames;
    QStringList renamedRevs;
    QHash<QString, QString> renamedPatches;
