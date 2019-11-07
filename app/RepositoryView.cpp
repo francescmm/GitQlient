@@ -255,7 +255,7 @@ void RepositoryView::showContextMenu(const QPoint &pos)
 
    for (auto index : indexes)
    {
-      const auto sha = mRepositoryModel->data(index, Qt::DisplayRole).toString();
+      const auto sha = mRepositoryModel->sha(index.row());
       const auto dtStr
           = mRepositoryModel->index(index.row(), static_cast<int>(RepositoryModelColumns::DATE)).data().toString();
       const auto dt = QDateTime::fromString(dtStr, "dd/MM/yyyy hh:mm");
