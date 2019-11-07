@@ -6,11 +6,8 @@ enum class LaneType;
 
 class Revision
 {
-   // prevent implicit C++ compiler defaults
-   // Revision(const Revision &);
-
 public:
-   Revision() = delete;
+   Revision() = default;
    Revision &operator=(const Revision &) = delete;
    Revision(const QByteArray &b, uint s, int idx, int *next);
    bool isBoundary() const;
@@ -41,7 +38,7 @@ private:
    QString mid(int start, int len) const;
    QString midSha(int start, int len) const;
 
-   QByteArray &ba; // reference here!
+   QByteArray ba;
    int start;
    mutable int parentsCnt, shaStart, comStart, autStart, autDateStart;
    mutable int sLogStart, sLogLen, lLogStart, lLogLen, diffStart, diffLen;

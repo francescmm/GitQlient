@@ -4,7 +4,7 @@
 
 Revision::Revision(const QByteArray &b, uint s, int idx, int *next)
    : orderIdx(idx)
-   , ba(const_cast<QByteArray &>(b))
+   , ba(b)
    , start(s)
 {
 

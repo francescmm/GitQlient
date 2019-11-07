@@ -45,6 +45,7 @@ public:
    QString sha(int row) const;
    const Revision *revLookup(int row) const;
    const Revision *revLookup(const QString &sha) const;
+   Revision getRevLookup(const QString &sha) const;
    void insertRevision(const QString sha, const Revision &rev);
    QString getShortLog(const QString &sha) const;
    int row(const QString &sha) const;

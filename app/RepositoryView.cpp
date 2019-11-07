@@ -129,8 +129,8 @@ void RepositoryView::setupGeometry()
 int RepositoryView::getLaneType(const QString &sha, int pos) const
 {
 
-   const auto r = mRevCache->revLookup(sha);
-   return (r && pos < r->lanes.count() && pos >= 0 ? static_cast<int>(r->lanes.at(pos)) : -1);
+   const auto r = mRevCache->getRevLookup(sha);
+   return pos < r.lanes.count() && pos >= 0 ? static_cast<int>(r.lanes.at(pos)) : -1;
 }
 
 bool RepositoryView::update()
@@ -323,7 +323,7 @@ bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringLi
    QString root;
    if (!isFreeLane(static_cast<LaneType>(t)))
    {
-      p = mRevCache->revLookup(sha)->parents(); // pointer cannot be nullptr
+      p = mRevCache->getRevLookup(sha).parents(); // pointer cannot be nullptr
       root = sha;
    }
    else

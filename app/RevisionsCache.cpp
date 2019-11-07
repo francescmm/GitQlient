@@ -33,6 +33,20 @@ const Revision *RevisionsCache::revLookup(const QString &sha) const
    return nullptr;
 }
 
+Revision RevisionsCache::getRevLookup(const QString &sha) const
+{
+   if (!sha.isEmpty())
+   {
+      const auto iter = std::find_if(revs.constBegin(), revs.constEnd(),
+                                     [sha](const Revision *revision) { return revision->sha().startsWith(sha); });
+
+      if (iter != std::end(revs))
+         return **iter;
+   }
+
+   return Revision();
+}
+
 void RevisionsCache::insertRevision(const QString sha, const Revision &rev)
 {
    revs.insert(sha, new Revision(rev));
@@ -43,8 +57,7 @@ void RevisionsCache::insertRevision(const QString sha, const Revision &rev)
 
 QString RevisionsCache::getShortLog(const QString &sha) const
 {
-   auto r = revLookup(sha);
-   return r ? r->shortLog() : QString();
+   return getRevLookup(sha).shortLog();
 }
 
 int RevisionsCache::row(const QString &sha) const
