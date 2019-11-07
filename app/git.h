@@ -160,7 +160,8 @@ public:
    };
 
    void setDefaultModel(RepositoryModel *fh) { mRevData = fh; }
-   void setLane(const QString &sha);
+   void updateLanes(Revision &c, Lanes &lns);
+
    void cancelDataLoading();
 
    bool isNothingToCommit();
@@ -257,7 +258,6 @@ private:
    void updateDescMap(const Revision *r, uint i, QHash<QPair<uint, uint>, bool> &dm, QHash<uint, QVector<int>> &dv);
    void mergeNearTags(bool down, Revision *p, const Revision *r, const QHash<QPair<uint, uint>, bool> &dm);
    void mergeBranches(Revision *p, const Revision *r);
-   void updateLanes(Revision &c, Lanes &lns, const QString &sha);
    const QStringList getOthersFiles();
    const QStringList getOtherFiles(const QStringList &selFiles);
    void appendFileName(RevisionFile &rf, const QString &name, FileNamesLoader &fl);

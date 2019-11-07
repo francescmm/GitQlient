@@ -6,6 +6,7 @@
 #include <Revision.h>
 #include <RepositoryModelColumns.h>
 #include <RepositoryView.h>
+#include <RepositoryModel.h>
 
 #include <QSortFilterProxyModel>
 #include <QPainter>
@@ -263,10 +264,14 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
                                               QColor("#FFB86C") /* orange */,         QColor("#848484") /* grey */,
                                               QColor("#FF79C6") /* pink */,           QColor("#CD9077") /* pastel */ };
 
+   const auto model = mView->hasActiveFiler() ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->sourceModel()
+                                              : mView->model();
+
    const auto row = mView->hasActiveFiler()
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
-   const auto r = mRevCache->revLookup(row);
+
+   const auto r = const_cast<Revision *>(mRevCache->revLookup(row));
 
    if (!r)
       return;
@@ -283,7 +288,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 
    // calculate lanes
    if (r->lanes.count() == 0)
-      mGit->setLane(r->sha());
+      mGit->updateLanes(*r, *dynamic_cast<RepositoryModel *>(model)->lns);
 
    QBrush back = opt.palette.base();
    const QVector<LaneType> &lanes(r->lanes);

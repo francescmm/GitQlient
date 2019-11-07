@@ -1,4 +1,4 @@
-﻿/*
+/*
         Description: interface to git programs
 
         Author: Marco Costalba (C) 2005-2007
@@ -1649,23 +1649,12 @@ int Git::addChunk(const QByteArray &ba, int start)
    return nextStart;
 }
 
-void Git::setLane(const QString &sha)
+void Git::updateLanes(Revision &c, Lanes &lns)
 {
-   Lanes *l = mRevData->lns;
-   QVector<QByteArray> ba;
-
-   Revision *r = const_cast<Revision *>(mRevCache->revLookup(sha));
-   if (r->lanes.count() == 0)
-      updateLanes(*r, *l, sha);
-}
-
-void Git::updateLanes(Revision &c, Lanes &lns, const QString &sha)
-{
-   // we could get third argument from c.sha(), but we are in fast path here
-   // and c.sha() involves a deep copy, so we accept a little redundancy
+   const auto sha = c.sha();
 
    if (lns.isEmpty())
-      lns.init(sha);
+      lns.init(c.sha());
 
    bool isDiscontinuity;
    bool isFork = lns.isFork(sha, isDiscontinuity);
@@ -1701,12 +1690,7 @@ void Git::updateLanes(Revision &c, Lanes &lns, const QString &sha)
    if (lns.isBranch())
       lns.afterBranch();
 
-   //	QString tmp = "", tmp2;
-   //	for (uint i = 0; i < c.lanes.count(); i++) {
-   //		tmp2.setNum(c.lanes[i]);
-   //		tmp.append(tmp2 + "-");
-   //	}
-   //	qDebug("%s %s", tmp.toUtf8().data(), sha.toUtf8().data());
+   // lns.setLanes(c.lanes); // here lanes are snapshotted
 }
 
 void Git::flushFileNames(FileNamesLoader &fl)

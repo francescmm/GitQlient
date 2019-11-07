@@ -205,7 +205,7 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
       return QVariant();
 
-   if (const auto r = mRevCache->revLookup(index.row()))
+   if (const auto r = const_cast<Revision *>(mRevCache->revLookup(index.row())))
    {
       const auto sha = r->sha();
 
@@ -216,7 +216,7 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
       {
          // calculate lanes
          if (r->lanes.count() == 0)
-            mGit->setLane(sha);
+            mGit->updateLanes(*r, *lns);
 
          return getDisplayData(r, index.column());
       }

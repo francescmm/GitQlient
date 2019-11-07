@@ -37,6 +37,7 @@ public:
    bool hasChildren(const QModelIndex &par = QModelIndex()) const override;
    int columnCount(const QModelIndex &) const override { return mColumns.count(); }
 
+   Lanes *lns = nullptr;
 private slots:
    void on_newRevsAdded();
    void on_loadCompleted();
@@ -50,7 +51,6 @@ private:
    QVariant getDisplayData(const Revision *rev, int column) const;
    void flushTail();
 
-   Lanes *lns = nullptr;
    QMap<RepositoryModelColumns, QString> mColumns;
    int earlyOutputCnt;
    int earlyOutputCntBase;
