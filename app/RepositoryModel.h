@@ -51,7 +51,6 @@ private:
    void flushTail();
 
    Lanes *lns = nullptr;
-   uint firstFreeLane;
    QMap<RepositoryModelColumns, QString> mColumns;
    int earlyOutputCnt;
    int earlyOutputCntBase;

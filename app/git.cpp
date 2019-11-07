@@ -233,9 +233,9 @@ void Git::cancelDataLoading()
    emit cancelLoading(); // non blocking
 }
 
-const Revision *Git::revLookup(const QString &sha) const
+Revision Git::getRevLookup(const QString &sha) const
 {
-   return mRevCache->revLookup(sha);
+   return mRevCache->getRevLookup(sha);
 }
 
 QPair<bool, QString> Git::run(const QString &runCmd) const
@@ -288,14 +288,14 @@ const QString Git::getLaneParent(const QString &fromSHA, int laneNum)
    for (int idx = rs.orderIdx - 1; idx >= 0; idx--)
    {
 
-      const auto r = mRevCache->revLookup(mRevCache->createRevisionSha(idx));
-      if (laneNum >= r->lanes.count())
+      const auto r = mRevCache->getRevLookup(mRevCache->createRevisionSha(idx));
+      if (laneNum >= r.lanes.count())
          return "";
 
-      if (!isFreeLane(static_cast<LaneType>(r->lanes[laneNum])))
+      if (!isFreeLane(static_cast<LaneType>(r.lanes[laneNum])))
       {
 
-         auto type = r->lanes[laneNum];
+         auto type = r.lanes[laneNum];
          auto parNum = 0;
          while (!isMerge(type) && type != LaneType::ACTIVE)
          {
@@ -303,9 +303,9 @@ const QString Git::getLaneParent(const QString &fromSHA, int laneNum)
             if (isHead(static_cast<LaneType>(type)))
                parNum++;
 
-            type = r->lanes[--laneNum];
+            type = r.lanes[--laneNum];
          }
-         return r->parent(parNum);
+         return r.parent(parNum);
       }
    }
    return "";
@@ -456,11 +456,11 @@ const QString Git::getLastCommitMsg()
 const QString Git::getNewCommitMsg()
 {
 
-   const auto c = mRevCache->revLookup(ZERO_SHA);
-   if (c->sha().isEmpty())
+   const auto c = mRevCache->getRevLookup(ZERO_SHA);
+   if (c.sha().isEmpty())
       return "";
 
-   QString status = c->longLog();
+   QString status = c.longLog();
    status.prepend('\n').replace(QRegExp("\\n([^#\\n]?)"), "\n#\\1"); // comment all the lines
 
    if (mIsMergeHead)
@@ -1651,23 +1651,12 @@ int Git::addChunk(const QByteArray &ba, int start)
 
 void Git::setLane(const QString &sha)
 {
-
    Lanes *l = mRevData->lns;
-   uint i = mRevData->firstFreeLane;
    QVector<QByteArray> ba;
 
-   for (uint cnt = static_cast<uint>(mRevCache->revOrderCount()); i < cnt; ++i)
-   {
-
-      const QString &curSha = mRevCache->getRevisionSha(static_cast<int>(i));
-      Revision *r = const_cast<Revision *>(mRevCache->revLookup(curSha));
-      if (r->lanes.count() == 0)
-         updateLanes(*r, *l, curSha);
-
-      if (curSha == sha)
-         break;
-   }
-   mRevData->firstFreeLane = ++i;
+   Revision *r = const_cast<Revision *>(mRevCache->revLookup(sha));
+   if (r->lanes.count() == 0)
+      updateLanes(*r, *l, sha);
 }
 
 void Git::updateLanes(Revision &c, Lanes &lns, const QString &sha)
@@ -1900,91 +1889,4 @@ void Git::mergeNearTags(bool down, Revision *p, const Revision *r, const QHash<Q
          nearRefs.append(dst[s2]);
 
    nearRefsMaster = p->orderIdx;
-}
-
-void Git::indexTree()
-{
-   if (mRevCache->revOrderCount() == 0)
-      return;
-
-   // we keep the pairs(x, y). Value is true if x is
-   // ancestor of y or false if y is ancestor of x
-   QHash<QPair<uint, uint>, bool> descMap;
-   QHash<uint, QVector<int>> descVect;
-
-   // walk down the tree from latest to oldest,
-   // compute children and nearest descendants
-   for (int i = 0, cnt = mRevCache->revOrderCount(); i < cnt; ++i)
-   {
-
-      const auto shaToLookup = mRevCache->getRevisionSha(i);
-      auto type = checkRef(shaToLookup);
-      auto isB = type & (BRANCH | RMT_BRANCH);
-      auto isT = type & TAG;
-
-      const Revision *r = mRevCache->revLookup(shaToLookup);
-
-      if (isB)
-      {
-         auto rr = const_cast<Revision *>(r);
-
-         if (r->descBrnMaster != -1)
-         {
-            const auto sha = mRevCache->getRevisionSha(r->descBrnMaster);
-            rr->descBranches = mRevCache->getRevLookup(sha).descBranches;
-         }
-
-         rr->descBranches.append(i);
-      }
-      if (isT)
-      {
-         updateDescMap(r, i, descMap, descVect);
-         auto rr = const_cast<Revision *>(r);
-         rr->descRefs.clear();
-         rr->descRefs.append(i);
-      }
-      for (uint y = 0; y < r->parentsCount(); y++)
-      {
-         if (auto p = const_cast<Revision *>(mRevCache->revLookup(r->parent(y))))
-         {
-            p->children.append(i);
-
-            if (p->descBrnMaster == -1)
-               p->descBrnMaster = isB ? r->orderIdx : r->descBrnMaster;
-            else
-               mergeBranches(p, r);
-
-            if (p->descRefsMaster == -1)
-               p->descRefsMaster = isT ? r->orderIdx : r->descRefsMaster;
-            else
-               mergeNearTags(true, p, r, descMap);
-         }
-      }
-   }
-   // walk backward through the tree and compute nearest tagged ancestors
-   for (auto i = mRevCache->revOrderCount() - 1; i >= 0; --i)
-   {
-      const auto r = mRevCache->revLookup(mRevCache->getRevisionSha(i));
-      const auto isTag = checkRef(mRevCache->getRevisionSha(i), TAG);
-
-      if (isTag)
-      {
-         Revision *rr = const_cast<Revision *>(r);
-         rr->ancRefs.clear();
-         rr->ancRefs.append(i);
-      }
-      for (int y = 0; y < r->children.count(); y++)
-      {
-         const auto revSha = mRevCache->getRevisionSha(r->children[y]);
-         auto c = const_cast<Revision *>(mRevCache->revLookup(revSha));
-
-         if (c)
-         {
-            if (c->ancRefsMaster == -1)
-               c->ancRefsMaster = isTag ? r->orderIdx : r->ancRefsMaster;
-            else
-               mergeNearTags(false, c, r, descMap);
-         }
-      }
-   }
 }

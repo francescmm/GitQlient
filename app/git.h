@@ -173,7 +173,7 @@ public:
 
    const QString getLaneParent(const QString &fromSHA, int laneNum);
    const QStringList getChildren(const QString &parent);
-   const Revision *revLookup(const QString &sha) const;
+   Revision getRevLookup(const QString &sha) const;
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;
    const QString getRefSha(const QString &refName, RefType type = ANY_REF, bool askGit = true);
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
@@ -254,7 +254,6 @@ private:
    RevisionFile insertNewFiles(const QString &sha, const QString &data);
    RevisionFile getAllMergeFiles(const Revision *r);
    bool runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutput);
-   void indexTree();
    void updateDescMap(const Revision *r, uint i, QHash<QPair<uint, uint>, bool> &dm, QHash<uint, QVector<int>> &dv);
    void mergeNearTags(bool down, Revision *p, const Revision *r, const QHash<QPair<uint, uint>, bool> &dm);
    void mergeBranches(Revision *p, const Revision *r);

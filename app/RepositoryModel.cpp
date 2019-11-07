@@ -68,7 +68,6 @@ void RepositoryModel::flushTail()
 {
    beginResetModel();
    mRevCache->flushTail(earlyOutputCnt, earlyOutputCntBase);
-   firstFreeLane = static_cast<unsigned int>(earlyOutputCntBase);
    lns->clear();
    rowCnt = mRevCache->count();
    endResetModel();
@@ -91,7 +90,6 @@ void RepositoryModel::clear(bool complete)
 
    mRevCache->clear();
 
-   firstFreeLane = earlyOutputCntBase = 0;
    setEarlyOutputState(false);
    lns->clear();
    curFNames.clear();

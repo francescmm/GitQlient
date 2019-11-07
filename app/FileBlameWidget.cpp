@@ -71,14 +71,14 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
    for (const auto &line : lines)
    {
       const auto fields = line.split("\t");
-      const auto revision = mGit->revLookup(fields.at(0));
+      const auto revision = mGit->getRevLookup(fields.at(0));
       const auto dt = QDateTime::fromString(fields.at(2), Qt::ISODate);
       const auto lineNumAndContent = fields.at(3);
       const auto divisorChar = lineNumAndContent.indexOf(")");
       const auto lineText = lineNumAndContent.mid(0, divisorChar);
       const auto content = lineNumAndContent.mid(divisorChar + 1, lineNumAndContent.count() - lineText.count() - 1);
 
-      annotations.append({ revision->sha(), QString(fields.at(1)).remove("("), dt, lineText.toInt(), content });
+      annotations.append({ revision.sha(), QString(fields.at(1)).remove("("), dt, lineText.toInt(), content });
 
       if (fields.at(0) != ZERO_SHA)
       {
@@ -207,13 +207,14 @@ QLabel *FileBlameWidget::createAuthorLabel(const Annotation &annotation, bool is
 
 ClickableFrame *FileBlameWidget::createMessageLabel(const Annotation &annotation, bool isFirst)
 {
-   const auto revision = mGit->revLookup(annotation.sha);
-   const auto commitMsg = revision ? revision->shortLog() : QString("WIP");
+   const auto revision = mGit->getRevLookup(annotation.sha);
+   const auto commitMsg = !revision.sha().isEmpty() ? revision.shortLog() : QString("WIP");
 
    const auto messageLabel = new ClickableFrame(commitMsg, Qt::AlignTop | Qt::AlignLeft);
    messageLabel->setObjectName(isFirst ? QString("primusInterPares") : QString("firstOfItsName"));
    messageLabel->setToolTip(
-       QString("<p>%1</p><p>%2</p>").arg(annotation.sha, revision ? revision->shortLog() : QString("Local changes")));
+       QString("<p>%1</p><p>%2</p>")
+           .arg(annotation.sha, !revision.sha().isEmpty() ? revision.shortLog() : QString("Local changes")));
    messageLabel->setFont(mInfoFont);
 
    connect(messageLabel, &ClickableFrame::clicked, this,
