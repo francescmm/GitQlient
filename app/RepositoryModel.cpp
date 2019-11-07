@@ -142,26 +142,8 @@ void RepositoryModel::on_loadCompleted(const QString &)
    endResetModel();
 }
 
-void RepositoryModel::on_changeFont(const QFont &f)
-{
-
-   QString maxStr(QString::number(rowCnt).length() + 1, '8');
-   QFontMetrics fmRows(f);
-   int neededWidth = fmRows.boundingRect(maxStr).width();
-
-   QString id("Id");
-   QFontMetrics fmId(qApp->font());
-
-   while (fmId.boundingRect(id).width() < neededWidth)
-      id += ' ';
-
-   mColumns[RepositoryModelColumns::ID] = id;
-   emit headerDataChanged(Qt::Horizontal, 1, 1);
-}
-
 QVariant RepositoryModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-
    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
       return mColumns.value(static_cast<RepositoryModelColumns>(section));
 
@@ -178,81 +160,81 @@ QModelIndex RepositoryModel::index(int row, int column, const QModelIndex &) con
 
 QModelIndex RepositoryModel::parent(const QModelIndex &) const
 {
+   return QModelIndex();
+}
 
-   static const QModelIndex no_parent;
-   return no_parent;
+QVariant RepositoryModel::getToolTipData(const Revision *r) const
+{
+   QString auxMessage;
+   const auto sha = r->sha();
+
+   if ((mGit->checkRef(sha) & Git::CUR_BRANCH) && mGit->getCurrentBranchName().isEmpty())
+      auxMessage.append("<p>Status: <b>detached</b></p>");
+
+   const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
+
+   if (!localBranches.isEmpty())
+      auxMessage.append(QString("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
+
+   const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
+
+   if (!remoteBranches.isEmpty())
+      auxMessage.append(QString("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
+
+   const auto tags = mGit->getRefNames(sha, Git::TAG);
+
+   if (!tags.isEmpty())
+      auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));
+
+   QDateTime d;
+   d.setSecsSinceEpoch(r->authorDate().toUInt());
+
+   return QString("<p>%1 - %2<p></p>%3</p>%4")
+       .arg(r->author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
+}
+
+QVariant RepositoryModel::getDisplayData(const Revision *rev, int row, int column) const
+{
+   switch (static_cast<RepositoryModelColumns>(column))
+   {
+      case RepositoryModelColumns::ID:
+         return annIdValid ? rowCnt - row : QVariant();
+      case RepositoryModelColumns::SHA:
+         return rev->sha();
+      case RepositoryModelColumns::LOG:
+         return rev->shortLog();
+      case RepositoryModelColumns::AUTHOR:
+         return rev->author().split("<").first();
+      case RepositoryModelColumns::DATE: {
+         QDateTime dt = QDateTime::fromSecsSinceEpoch(rev->authorDate().toUInt());
+         return dt.toString("dd/MM/yyyy hh:mm");
+      }
+      default:
+         return QVariant();
+   }
 }
 
 QVariant RepositoryModel::data(const QModelIndex &index, int role) const
 {
-
-   static const QVariant no_value;
-
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
-      return no_value; // fast path, 90% of calls ends here!
+      return QVariant();
 
-   const auto r = mRevCache->revLookup(index.row());
-   if (!r)
-      return no_value;
-
-   const auto sha = r->sha();
-
-   if (role == Qt::ToolTipRole)
+   if (const auto r = mRevCache->revLookup(index.row()))
    {
-      if (sha != ZERO_SHA)
+      const auto sha = r->sha();
+
+      if (role == Qt::ToolTipRole)
+         return getToolTipData(r);
+
+      if (role == Qt::DisplayRole)
       {
-         QString auxMessage;
+         // calculate lanes
+         if (r->lanes.count() == 0)
+            mGit->setLane(sha);
 
-         if ((mGit->checkRef(sha) & Git::CUR_BRANCH) && mGit->getCurrentBranchName().isEmpty())
-            auxMessage.append("<p>Status: <b>detached</b></p>");
-
-         const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
-
-         if (!localBranches.isEmpty())
-            auxMessage.append(QString("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
-
-         const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
-
-         if (!remoteBranches.isEmpty())
-            auxMessage.append(QString("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
-
-         const auto tags = mGit->getRefNames(sha, Git::TAG);
-
-         if (!tags.isEmpty())
-            auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));
-
-         QDateTime d;
-         d.setSecsSinceEpoch(r->authorDate().toUInt());
-
-         return QString("<p>%1 - %2<p></p>%3</p>%4")
-             .arg(r->author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
+         return getDisplayData(r, index.row(), index.column());
       }
-      else
-         return QString("WIP: Local changes");
    }
 
-   int col = index.column();
-
-   // calculate lanes
-   if (r->lanes.count() == 0)
-      mGit->setLane(sha);
-
-   switch (static_cast<RepositoryModelColumns>(col))
-   {
-      case RepositoryModelColumns::ID:
-         return (annIdValid ? rowCnt - index.row() : QVariant());
-      case RepositoryModelColumns::SHA:
-         return r->sha();
-      case RepositoryModelColumns::LOG:
-         return r->shortLog();
-      case RepositoryModelColumns::AUTHOR:
-         return r->author().split("<").first();
-      case RepositoryModelColumns::DATE: {
-         QDateTime dt;
-         dt.setSecsSinceEpoch(r->authorDate().toUInt());
-         return dt.toString("dd/MM/yyyy hh:mm");
-      }
-      default:
-         return no_value;
-   }
+   return QVariant();
 }
