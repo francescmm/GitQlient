@@ -37,7 +37,6 @@ public:
    bool hasChildren(const QModelIndex &par = QModelIndex()) const override;
    int columnCount(const QModelIndex &) const override { return mColumns.count(); }
 
-   Lanes *lns = nullptr;
 private slots:
    void on_newRevsAdded();
    void on_loadCompleted();
@@ -47,8 +46,8 @@ private:
    QSharedPointer<Git> mGit;
    friend class Git;
 
-   QVariant getToolTipData(const Revision *r) const;
-   QVariant getDisplayData(const Revision *rev, int column) const;
+   QVariant getToolTipData(const Revision &r) const;
+   QVariant getDisplayData(const Revision &rev, int column) const;
    void flushTail();
 
    QMap<RepositoryModelColumns, QString> mColumns;

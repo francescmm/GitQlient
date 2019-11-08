@@ -1272,8 +1272,10 @@ void Git::updateWipRevision()
 
    // then mockup the corresponding Revision
    const QString &log = (isNothingToCommit() ? QString("No local changes") : QString("Local changes"));
-   const Revision *r = fakeWorkDirRev(head, log, status, mRevCache->revOrderCount());
+   auto r = const_cast<Revision *>(fakeWorkDirRev(head, log, status, mRevCache->revOrderCount()));
+
    mRevCache->insertRevision(ZERO_SHA, *r);
+
    mRevData->earlyOutputCntBase = mRevCache->revOrderCount();
 
    // finally send it to GUI
@@ -1608,7 +1610,7 @@ bool Git::filterEarlyOutputRev(Revision *revision)
 int Git::addChunk(const QByteArray &ba, int start)
 {
    int nextStart;
-   Revision *revision;
+   Revision *revision = nullptr;
 
    do
    {
@@ -1647,50 +1649,6 @@ int Git::addChunk(const QByteArray &ba, int start)
    }
 
    return nextStart;
-}
-
-void Git::updateLanes(Revision &c, Lanes &lns)
-{
-   const auto sha = c.sha();
-
-   if (lns.isEmpty())
-      lns.init(c.sha());
-
-   bool isDiscontinuity;
-   bool isFork = lns.isFork(sha, isDiscontinuity);
-   bool isMerge = (c.parentsCount() > 1);
-   bool isInitial = (c.parentsCount() == 0);
-
-   if (isDiscontinuity)
-      lns.changeActiveLane(sha); // uses previous isBoundary state
-
-   lns.setBoundary(c.isBoundary()); // update must be here
-
-   if (isFork)
-      lns.setFork(sha);
-   if (isMerge)
-      lns.setMerge(c.parents());
-   if (c.isApplied)
-      lns.setApplied();
-   if (isInitial)
-      lns.setInitial();
-
-   lns.setLanes(c.lanes); // here lanes are snapshotted
-
-   const QString &nextSha = (isInitial) ? "" : QString(c.parent(0));
-
-   lns.nextParent(nextSha);
-
-   if (c.isApplied)
-      lns.afterApplied();
-   if (isMerge)
-      lns.afterMerge();
-   if (isFork)
-      lns.afterFork();
-   if (lns.isBranch())
-      lns.afterBranch();
-
-   // lns.setLanes(c.lanes); // here lanes are snapshotted
 }
 
 void Git::flushFileNames(FileNamesLoader &fl)

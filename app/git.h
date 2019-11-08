@@ -24,7 +24,6 @@ class QTextCodec;
 class Annotate;
 class Domain;
 class RepositoryModel;
-class Lanes;
 class GitAsyncProcess;
 
 static const QString ZERO_SHA = "0000000000000000000000000000000000000000";
@@ -160,7 +159,6 @@ public:
    };
 
    void setDefaultModel(RepositoryModel *fh) { mRevData = fh; }
-   void updateLanes(Revision &c, Lanes &lns);
 
    void cancelDataLoading();
 

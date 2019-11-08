@@ -264,19 +264,16 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
                                               QColor("#FFB86C") /* orange */,         QColor("#848484") /* grey */,
                                               QColor("#FF79C6") /* pink */,           QColor("#CD9077") /* pastel */ };
 
-   const auto model = mView->hasActiveFiler() ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->sourceModel()
-                                              : mView->model();
-
    const auto row = mView->hasActiveFiler()
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
 
-   const auto r = const_cast<Revision *>(mRevCache->revLookup(row));
+   const auto r = mRevCache->revLookup(row);
 
-   if (!r)
+   if (r.sha().isEmpty())
       return;
 
-   if (r->isDiffCache && !mGit->isNothingToCommit() && !mView->hasActiveFiler())
+   if (r.isDiffCache && !mGit->isNothingToCommit() && !mView->hasActiveFiler())
    {
       paintWip(p, opt);
       return;
@@ -286,12 +283,8 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    p->setClipRect(opt.rect, Qt::IntersectClip);
    p->translate(opt.rect.topLeft());
 
-   // calculate lanes
-   if (r->lanes.count() == 0)
-      mGit->updateLanes(*r, *dynamic_cast<RepositoryModel *>(model)->lns);
-
    QBrush back = opt.palette.base();
-   const QVector<LaneType> &lanes(r->lanes);
+   const QVector<LaneType> &lanes(r.lanes);
    auto laneNum = lanes.count();
    auto activeLane = 0;
 
@@ -352,15 +345,15 @@ void RepositoryViewDelegate::paintWip(QPainter *painter, QStyleOptionViewItem op
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
    int row = index.row();
-   const auto r = mRevCache->revLookup(row);
+   const auto sha = mRevCache->revLookup(row).sha();
 
-   if (!r)
+   if (sha.isEmpty())
       return;
 
    auto offset = 0;
 
-   if (mGit->checkRef(r->sha()) > 0 && !mView->hasActiveFiler())
-      paintTagBranch(p, opt, offset, r->sha());
+   if (mGit->checkRef(sha) > 0 && !mView->hasActiveFiler())
+      paintTagBranch(p, opt, offset, sha);
 
    auto newOpt = opt;
    newOpt.rect.setX(opt.rect.x() + offset + 5);

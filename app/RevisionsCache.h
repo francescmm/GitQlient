@@ -24,13 +24,14 @@
  ***************************************************************************************/
 
 #include <RevisionFile.h>
+#include <lanes.h>
+#include <Revision.h>
 
 #include <QObject>
 #include <QHash>
 #include <QSharedPointer>
 
 class Git;
-class Revision;
 
 class RevisionsCache : public QObject
 {
@@ -43,10 +44,10 @@ public:
    explicit RevisionsCache(QSharedPointer<Git> git, QObject *parent = nullptr);
 
    QString sha(int row) const;
-   const Revision *revLookup(int row) const;
-   const Revision *revLookup(const QString &sha) const;
+   Revision revLookup(int row) const;
    Revision getRevLookup(const QString &sha) const;
    void insertRevision(const QString sha, const Revision &rev);
+   void updateLanes(Revision &c, Lanes &lns);
    QString getShortLog(const QString &sha) const;
    int row(const QString &sha) const;
    int count() const { return revOrder.count(); }
@@ -65,7 +66,8 @@ public:
 
 private:
    QSharedPointer<Git> mGit;
-   QHash<QString, const Revision *> revs;
+   QHash<QString, Revision> revs;
    QHash<QString, RevisionFile> mRevsFiles;
    QVector<QString> revOrder;
+   Lanes lns;
 };

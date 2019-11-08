@@ -8,7 +8,6 @@ class Revision
 {
 public:
    Revision() = default;
-   Revision &operator=(const Revision &) = delete;
    Revision(const QByteArray &b, uint s, int idx, int *next);
    bool isBoundary() const;
    uint parentsCount() const;
@@ -30,7 +29,7 @@ public:
    int descRefsMaster; // in case of many Revision have the same descRefs, ancRefs or
    int ancRefsMaster; // descBranches these are stored only once in a Revision pointed
    int descBrnMaster; // by corresponding index xxxMaster
-   int orderIdx;
+   int orderIdx = -1;
 
 private:
    void setup() const;

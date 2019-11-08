@@ -34,7 +34,6 @@ RepositoryModel::RepositoryModel(QSharedPointer<RevisionsCache> revCache, QShare
    mColumns.insert(RepositoryModelColumns::AUTHOR, "Author");
    mColumns.insert(RepositoryModelColumns::DATE, "Date");
 
-   lns = new Lanes();
    clear(); // after _headerInfo is set
 
    connect(mGit.get(), &Git::newRevsAdded, this, &RepositoryModel::on_newRevsAdded);
@@ -45,7 +44,6 @@ RepositoryModel::RepositoryModel(QSharedPointer<RevisionsCache> revCache, QShare
 RepositoryModel::~RepositoryModel()
 {
    clear();
-   delete lns;
 }
 
 int RepositoryModel::rowCount(const QModelIndex &parent) const
@@ -68,7 +66,7 @@ void RepositoryModel::flushTail()
 {
    beginResetModel();
    mRevCache->flushTail(earlyOutputCnt, earlyOutputCntBase);
-   lns->clear();
+   // lns->clear();
    rowCnt = mRevCache->count();
    endResetModel();
 }
@@ -91,7 +89,7 @@ void RepositoryModel::clear(bool complete)
    mRevCache->clear();
 
    setEarlyOutputState(false);
-   lns->clear();
+   // lns->clear();
    curFNames.clear();
 
    rowCnt = mRevCache->count();
@@ -149,10 +147,10 @@ QModelIndex RepositoryModel::parent(const QModelIndex &) const
    return QModelIndex();
 }
 
-QVariant RepositoryModel::getToolTipData(const Revision *r) const
+QVariant RepositoryModel::getToolTipData(const Revision &r) const
 {
    QString auxMessage;
-   const auto sha = r->sha();
+   const auto sha = r.sha();
 
    if ((mGit->checkRef(sha) & Git::CUR_BRANCH) && mGit->getCurrentBranchName().isEmpty())
       auxMessage.append("<p>Status: <b>detached</b></p>");
@@ -173,26 +171,26 @@ QVariant RepositoryModel::getToolTipData(const Revision *r) const
       auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));
 
    QDateTime d;
-   d.setSecsSinceEpoch(r->authorDate().toUInt());
+   d.setSecsSinceEpoch(r.authorDate().toUInt());
 
    return QString("<p>%1 - %2<p></p>%3</p>%4")
-       .arg(r->author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
+       .arg(r.author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
 }
 
-QVariant RepositoryModel::getDisplayData(const Revision *rev, int column) const
+QVariant RepositoryModel::getDisplayData(const Revision &rev, int column) const
 {
    switch (static_cast<RepositoryModelColumns>(column))
    {
       case RepositoryModelColumns::ID:
          return QVariant();
       case RepositoryModelColumns::SHA:
-         return rev->sha();
+         return rev.sha();
       case RepositoryModelColumns::LOG:
-         return rev->shortLog();
+         return rev.shortLog();
       case RepositoryModelColumns::AUTHOR:
-         return rev->author().split("<").first();
+         return rev.author().split("<").first();
       case RepositoryModelColumns::DATE: {
-         QDateTime dt = QDateTime::fromSecsSinceEpoch(rev->authorDate().toUInt());
+         QDateTime dt = QDateTime::fromSecsSinceEpoch(rev.authorDate().toUInt());
          return dt.toString("dd/MM/yyyy hh:mm");
       }
       default:
@@ -205,22 +203,14 @@ QVariant RepositoryModel::data(const QModelIndex &index, int role) const
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
       return QVariant();
 
-   if (const auto r = const_cast<Revision *>(mRevCache->revLookup(index.row())))
-   {
-      const auto sha = r->sha();
+   const auto r = mRevCache->revLookup(index.row());
+   const auto sha = r.sha();
 
-      if (role == Qt::ToolTipRole)
-         return getToolTipData(r);
+   if (role == Qt::ToolTipRole)
+      return getToolTipData(r);
 
-      if (role == Qt::DisplayRole)
-      {
-         // calculate lanes
-         if (r->lanes.count() == 0)
-            mGit->updateLanes(*r, *lns);
-
-         return getDisplayData(r, index.column());
-      }
-   }
+   if (role == Qt::DisplayRole)
+      return getDisplayData(r, index.column());
 
    return QVariant();
 }
