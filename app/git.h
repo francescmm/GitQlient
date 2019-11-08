@@ -163,7 +163,8 @@ public:
    QString getDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 
    RevisionFile getWipFiles();
-   RevisionFile getFiles(const QString &sha, const QString &sha2 = "", bool all = false);
+   RevisionFile getFiles(const QString &sha) const;
+   RevisionFile getFiles(const QString &sha, const QString &sha2, bool all = false);
 
    const QStringList getChildren(const QString &parent);
    Revision getRevLookup(const QString &sha) const;

@@ -532,6 +532,16 @@ RevisionFile Git::getWipFiles()
    return mRevCache->getRevisionFile(ZERO_SHA); // ZERO_SHA search arrives here
 }
 
+RevisionFile Git::getFiles(const QString &sha) const
+{
+   const auto r = mRevCache->getRevLookup(sha);
+
+   if (r.parentsCount() != 0 && mRevCache->containsRevisionFile(sha))
+      return mRevCache->getRevisionFile(sha);
+
+   return RevisionFile();
+}
+
 RevisionFile Git::getFiles(const QString &sha, const QString &diffToSha, bool allFiles)
 {
    const auto r = mRevCache->getRevLookup(sha);
