@@ -122,7 +122,7 @@ void RevisionsCache::flushTail(int earlyOutputCnt, int earlyOutputCntBase)
 
 void RevisionsCache::clear()
 {
-   lns = Lanes();
+   lns.clear();
    revs.clear();
    revOrder.clear();
 }
