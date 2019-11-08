@@ -123,3 +123,36 @@ void RevisionsCache::clear()
    revs.clear();
    revOrder.clear();
 }
+
+QString RevisionsCache::getLaneParent(const QString &fromSHA, int laneNum)
+{
+   const auto rs = getRevLookup(fromSHA);
+   if (rs.sha().isEmpty())
+      return "";
+
+   for (int idx = rs.orderIdx - 1; idx >= 0; idx--)
+   {
+
+      const auto r = getRevLookup(getRevisionSha(idx));
+      if (laneNum < r.lanes.count())
+      {
+         auto type = r.lanes.at(laneNum);
+
+         if (!isFreeLane(type))
+         {
+            auto parNum = 0;
+
+            while (!isMerge(type) && type != LaneType::ACTIVE)
+            {
+
+               if (isHead(static_cast<LaneType>(type)))
+                  parNum++;
+
+               type = r.lanes[--laneNum];
+            }
+            return r.parent(parNum);
+         }
+      }
+   }
+   return QString();
+}

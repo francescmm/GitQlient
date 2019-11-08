@@ -170,7 +170,6 @@ public:
    RevisionFile getWipFiles();
    RevisionFile getFiles(const QString &sha, const QString &sha2 = "", bool all = false);
 
-   const QString getLaneParent(const QString &fromSHA, int laneNum);
    const QStringList getChildren(const QString &parent);
    Revision getRevLookup(const QString &sha) const;
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;

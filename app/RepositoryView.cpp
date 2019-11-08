@@ -18,7 +18,6 @@ Author: Marco Costalba (C) 2005-2007
 #include <RepositoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
 #include <QLogger.h>
-#include <lanes.h>
 
 #include <QApplication>
 #include <QClipboard>
@@ -328,7 +327,7 @@ bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringLi
    }
    else
    {
-      const QString &par(mGit->getLaneParent(sha, lane));
+      const QString &par(mRevCache->getLaneParent(sha, lane));
       if (par.isEmpty())
          return false;
 

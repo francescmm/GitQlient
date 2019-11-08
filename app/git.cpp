@@ -15,7 +15,6 @@
 
 #include "RepositoryModel.h"
 #include "dataloader.h"
-#include "lanes.h"
 #include "GitSyncProcess.h"
 #include "GitAsyncProcess.h"
 #include "domain.h"
@@ -37,8 +36,6 @@ using namespace QLogger;
 
 static const QString GIT_LOG_FORMAT = "%m%HX%PX%n%cn<%ce>%n%an<%ae>%n%at%n%s%n";
 static const QString CUSTOM_SHA = "*** CUSTOM * CUSTOM * CUSTOM * CUSTOM **";
-static const uint C_MAGIC = 0xA0B0C0D0;
-static const int C_VERSION = 15;
 
 namespace
 {
@@ -276,39 +273,6 @@ int Git::findFileIndex(const RevisionFile &rf, const QString &name)
          return i;
    }
    return -1;
-}
-
-const QString Git::getLaneParent(const QString &fromSHA, int laneNum)
-{
-
-   const auto rs = mRevCache->getRevLookup(fromSHA);
-   if (rs.sha().isEmpty())
-      return "";
-
-   for (int idx = rs.orderIdx - 1; idx >= 0; idx--)
-   {
-
-      const auto r = mRevCache->getRevLookup(mRevCache->createRevisionSha(idx));
-      if (laneNum >= r.lanes.count())
-         return "";
-
-      if (!isFreeLane(static_cast<LaneType>(r.lanes[laneNum])))
-      {
-
-         auto type = r.lanes[laneNum];
-         auto parNum = 0;
-         while (!isMerge(type) && type != LaneType::ACTIVE)
-         {
-
-            if (isHead(static_cast<LaneType>(type)))
-               parNum++;
-
-            type = r.lanes[--laneNum];
-         }
-         return r.parent(parNum);
-      }
-   }
-   return "";
 }
 
 const QStringList Git::getChildren(const QString &parent)

@@ -16,8 +16,6 @@
 #include <QDateTime>
 #include <QFontMetrics>
 
-#include "lanes.h"
-
 #include "git.h"
 
 RepositoryModel::RepositoryModel(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QObject *p)
