@@ -14,9 +14,9 @@
 #include <lanes.h>
 
 #include "RepositoryModel.h"
-#include "dataloader.h"
 #include "GitSyncProcess.h"
 #include "GitAsyncProcess.h"
+#include "GitRequestorProcess.h"
 #include "domain.h"
 
 #include <QApplication>
@@ -29,6 +29,7 @@
 #include <QTextCodec>
 #include <QTextDocument>
 #include <QTextStream>
+#include <QDateTime>
 
 #include <QLogger.h>
 
@@ -221,13 +222,6 @@ const QString Git::getTagMsg(const QString &sha)
 const QString Git::filePath(const RevisionFile &rf, int i) const
 {
    return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)];
-}
-
-void Git::cancelDataLoading()
-{
-   // normally called when closing file viewer
-
-   emit cancelLoading(); // non blocking
 }
 
 Revision Git::getRevLookup(const QString &sha) const
@@ -1241,9 +1235,6 @@ void Git::updateWipRevision()
    mRevCache->insertRevision(ZERO_SHA, *r);
 
    mRevData->earlyOutputCntBase = mRevCache->revOrderCount();
-
-   // finally send it to GUI
-   emit newRevsAdded();
 }
 
 void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl)
@@ -1368,12 +1359,9 @@ void Git::parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader 
       endPos = buf.indexOf('\n', endPos + 99);
    }
 }
-#include <QDebug>
 bool Git::startRevList()
 {
-
    QString baseCmd("git log --date-order --no-color "
-
 #ifndef Q_OS_WIN32
                    "--log-size " // FIXME broken on Windows
 #endif
@@ -1384,17 +1372,12 @@ bool Git::startRevList()
    // we don't need log message body for file history
    baseCmd.append("%b --all");
 
-   QStringList initCmd(baseCmd.split(' '));
-
-   DataLoader *dl = new DataLoader(this); // auto-deleted when done
-   connect(this, &Git::cancelLoading, dl, &DataLoader::on_cancel);
-   connect(dl, &DataLoader::newDataReady, this, &Git::newRevsAdded);
-   connect(dl, &DataLoader::loaded, this, &Git::on_loaded);
+   const auto requestor = new GitRequestorProcess(mWorkingDir);
+   connect(requestor, &GitRequestorProcess::procDataReady, this, &Git::processInitLog);
+   connect(this, &Git::cancelAllProcesses, requestor, &AGitProcess::onCancel);
 
    QString buf;
-   const auto ret = dl->start(initCmd, mWorkingDir, buf);
-
-   const auto isValid = run(baseCmd);
+   const auto ret = requestor->run(baseCmd, buf);
 
    return ret;
 }
@@ -1461,13 +1444,6 @@ void Git::init2()
    QLog_Info("Git", "... revisions finished");
 }
 
-// TODO: Refactor
-void Git::on_loaded()
-{
-   emit newRevsAdded();
-   emit loadCompleted();
-}
-
 void Git::populateFileNamesMap()
 {
 
@@ -1504,7 +1480,7 @@ bool Git::filterEarlyOutputRev(Revision *revision)
    return false;
 }
 
-int Git::addChunk(const QByteArray &ba)
+void Git::processInitLog(const QByteArray &ba)
 {
    int nextStart;
    auto start = 0;
@@ -1514,8 +1490,8 @@ int Git::addChunk(const QByteArray &ba)
    {
       // only here we create a new Revision
       Revision revision(ba, static_cast<uint>(start), mRevCache->revOrderCount(), &nextStart);
-      qDebug() << start << nextStart - start;
-      qDebug() << ba.mid(start, nextStart - start);
+      // qDebug() << start << nextStart - start;
+      // qDebug() << ba.mid(start, nextStart - start);
       start = nextStart;
       ++count;
 
@@ -1524,28 +1500,20 @@ int Git::addChunk(const QByteArray &ba)
          mRevData->setEarlyOutputState(true);
          start = ba.indexOf('\n', start) + 1;
       }
-      else
+      else if (nextStart != -1)
       {
-         if (nextStart == -1)
-            return -1;
-
          const auto sha = revision.sha();
 
          if (mRevData->earlyOutputCnt != -1 && filterEarlyOutputRev(&revision))
             continue;
 
          if (!(revision.parentsCount() > 1 && mRevCache->contains(sha)))
-         {
             mRevCache->insertRevision(sha, revision);
-
-            emit mRevCache->signalCacheUpdated();
-            emit newRevsAdded();
-         }
       }
+      else
+         break;
 
    } while (nextStart < ba.size());
-
-   return 0;
 }
 
 void Git::flushFileNames(FileNamesLoader &fl)

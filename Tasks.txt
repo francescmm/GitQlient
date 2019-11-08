@@ -2,7 +2,6 @@
 - RepositoryView
 - RepositoryModel
 - RepositoryViewDelegate
-- DataLoader
 - Revision
 - RevisionFile
 - RevisionCache

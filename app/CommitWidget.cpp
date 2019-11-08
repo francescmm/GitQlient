@@ -172,10 +172,11 @@ void CommitWidget::insertFilesInList(const RevisionFile &files, QListWidget *fil
       const auto isInIndex = files.statusCmp(i, RevisionFile::IN_INDEX);
       const auto untrackedFile = !isInIndex && isUnknown;
       const auto staged = isInIndex && !isUnknown;
+      const auto isDeleted = files.statusCmp(i, RevisionFile::DELETED);
 
-      if ((files.statusCmp(i, RevisionFile::NEW) || isUnknown || isInIndex) && !untrackedFile)
+      if ((files.statusCmp(i, RevisionFile::NEW) || isUnknown || isInIndex) && !untrackedFile && !isDeleted)
          myColor = QColor("#8DC944");
-      else if (files.statusCmp(i, RevisionFile::DELETED))
+      else if (isDeleted)
          myColor = QColor("#FF5555");
       else if (untrackedFile)
          myColor = QColor("#FFB86C");

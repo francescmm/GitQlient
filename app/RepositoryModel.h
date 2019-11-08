@@ -24,7 +24,7 @@ class RepositoryModel : public QAbstractItemModel
 public:
    explicit RepositoryModel(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git,
                             QObject *parent = nullptr);
-   ~RepositoryModel();
+   ~RepositoryModel() override;
    void clear(bool complete = true);
    QString sha(int row) const;
    void setEarlyOutputState(bool b = true) { earlyOutputCnt = (b ? earlyOutputCntBase : -1); }
@@ -39,7 +39,6 @@ public:
 
 private slots:
    void on_newRevsAdded();
-   void on_loadCompleted();
 
 private:
    QSharedPointer<RevisionsCache> mRevCache;

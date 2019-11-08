@@ -58,7 +58,7 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    connect(lvd, &RepositoryViewDelegate::updateView, viewport(), qOverload<>(&QWidget::update));
    connect(this, &RepositoryView::diffTargetChanged, lvd, &RepositoryViewDelegate::diffTargetChanged);
    connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
-   connect(mGit.get(), &Git::newRevsAdded, this, [this]() {
+   connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, [this]() {
       if (!d->st.sha().isEmpty() || mRepositoryModel->rowCount() == 0)
          return;
 
@@ -66,7 +66,6 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
       d->st.setSelectItem(true);
       update();
    });
-   connect(mGit.get(), &Git::loadCompleted, this, [this]() { d->update(false); });
 }
 
 void RepositoryView::setup()
@@ -92,8 +91,6 @@ void RepositoryView::filterBySha(const QStringList &shaList)
 
 RepositoryView::~RepositoryView()
 {
-   mGit->cancelDataLoading(); // non blocking
-
    QSettings s;
    s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
 }

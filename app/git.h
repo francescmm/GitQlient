@@ -49,9 +49,6 @@ signals:
 
    // TODO: To review
 signals:
-   void newRevsAdded();
-   void loadCompleted();
-   void cancelLoading();
    void cancelAllProcesses();
 
 public:
@@ -160,8 +157,6 @@ public:
 
    void setDefaultModel(RepositoryModel *fh) { mRevData = fh; }
 
-   void cancelDataLoading();
-
    bool isNothingToCommit();
 
    void getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined);
@@ -184,7 +179,6 @@ public:
    void updateWipRevision();
 
 private:
-   void on_loaded();
    bool getGitDBDir(const QString &wd);
 
    friend class DataLoader;
@@ -240,7 +234,7 @@ private:
    void clearFileNames();
    bool startRevList();
    bool filterEarlyOutputRev(Revision *revision);
-   int addChunk(const QByteArray &ba);
+   void processInitLog(const QByteArray &ba);
    void parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl);
    void parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl);
    Revision *fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,

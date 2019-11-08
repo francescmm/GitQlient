@@ -42,6 +42,8 @@ void RevisionsCache::insertRevision(const QString sha, const Revision &rev)
 
    if (!revOrder.contains(sha))
       revOrder.append(sha);
+
+   emit signalCacheUpdated();
 }
 
 void RevisionsCache::updateLanes(Revision &c, Lanes &lns)

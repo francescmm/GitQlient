@@ -41,6 +41,7 @@ HEADERS += \
     $$PWD/GitQlient.h \
     $$PWD/GitQlientRepo.h \
     $$PWD/GitQlientSettings.h \
+    $$PWD/GitRequestorProcess.h \
     $$PWD/GitSyncProcess.h \
     $$PWD/RepositoryContextMenu.h \
     $$PWD/RepositoryModel.h \
@@ -56,7 +57,6 @@ HEADERS += \
     $$PWD/TagDlg.h \
     $$PWD/Terminal.h \
     $$PWD/UnstagedFilesContextMenu.h \
-    $$PWD/dataloader.h \
     $$PWD/domain.h \
     $$PWD/git.h \
     $$PWD/lanes.h \
@@ -88,6 +88,7 @@ SOURCES += \
     $$PWD/GitQlient.cpp \
     $$PWD/GitQlientRepo.cpp \
     $$PWD/GitQlientSettings.cpp \
+    $$PWD/GitRequestorProcess.cpp \
     $$PWD/GitSyncProcess.cpp \
     $$PWD/RepositoryContextMenu.cpp \
     $$PWD/RepositoryModel.cpp \
@@ -102,7 +103,6 @@ SOURCES += \
     $$PWD/TagDlg.cpp \
     $$PWD/Terminal.cpp \
     $$PWD/UnstagedFilesContextMenu.cpp \
-    $$PWD/dataloader.cpp \
     $$PWD/domain.cpp \
     $$PWD/git.cpp \
     $$PWD/lanes.cpp \

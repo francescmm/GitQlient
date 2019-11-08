@@ -34,8 +34,6 @@ RepositoryModel::RepositoryModel(QSharedPointer<RevisionsCache> revCache, QShare
 
    clear(); // after _headerInfo is set
 
-   connect(mGit.get(), &Git::newRevsAdded, this, &RepositoryModel::on_newRevsAdded);
-   connect(mGit.get(), &Git::loadCompleted, this, &RepositoryModel::on_loadCompleted);
    connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &RepositoryModel::on_newRevsAdded);
 }
 
@@ -80,8 +78,6 @@ void RepositoryModel::clear(bool complete)
       return;
    }
 
-   mGit->cancelDataLoading();
-
    beginResetModel();
 
    mRevCache->clear();
@@ -110,18 +106,6 @@ void RepositoryModel::on_newRevsAdded()
    beginInsertRows(QModelIndex(), rowCnt, revisionsCount - 1);
    rowCnt = revisionsCount;
    endInsertRows();
-}
-
-void RepositoryModel::on_loadCompleted()
-{
-   const auto revisionsCount = mRevCache->count();
-   if (rowCnt >= revisionsCount)
-      return;
-
-   // now we can process last revision
-   rowCnt = revisionsCount;
-   beginResetModel(); // force a reset to avoid artifacts in file history graph under Windows
-   endResetModel();
 }
 
 QVariant RepositoryModel::headerData(int section, Qt::Orientation orientation, int role) const
