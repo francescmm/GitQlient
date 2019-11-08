@@ -242,7 +242,7 @@ void RepositoryContextMenu::exportAsPatch()
 
 #ifdef Q_OS_LINUX
          fileBrowser.append("xdg-open");
-#elif define(Q_OS_WIN)
+#elif defined(Q_OS_WIN)
          fileBrowser.append("explorer.exe");
 #endif
 
