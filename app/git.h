@@ -239,9 +239,8 @@ private:
    void clearRevs();
    void clearFileNames();
    bool startRevList();
-   bool populateRenamedPatches(const QString &sha, const QStringList &nn, QStringList *on, bool bt);
    bool filterEarlyOutputRev(Revision *revision);
-   int addChunk(const QByteArray &ba, int ofs);
+   int addChunk(const QByteArray &ba);
    void parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl);
    void parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl);
    Revision *fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,

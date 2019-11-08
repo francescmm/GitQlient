@@ -1368,7 +1368,7 @@ void Git::parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader 
       endPos = buf.indexOf('\n', endPos + 99);
    }
 }
-
+#include <QDebug>
 bool Git::startRevList()
 {
 
@@ -1392,7 +1392,11 @@ bool Git::startRevList()
    connect(dl, &DataLoader::loaded, this, &Git::on_loaded);
 
    QString buf;
-   return dl->start(initCmd, mWorkingDir, buf);
+   const auto ret = dl->start(initCmd, mWorkingDir, buf);
+
+   const auto isValid = run(baseCmd);
+
+   return ret;
 }
 
 bool Git::clone(const QString &url, const QString &fullPath)
@@ -1464,72 +1468,6 @@ void Git::on_loaded()
    emit loadCompleted();
 }
 
-bool Git::populateRenamedPatches(const QString &renamedSha, const QStringList &newNames, QStringList *oldNames,
-                                 bool backTrack)
-{
-
-   const auto ret = run("git diff-tree -r -M " + renamedSha);
-   if (!ret.first)
-      return false;
-
-   QString runOutput = ret.second;
-
-   // find the first renamed file with the new file name in renamedFiles list
-   QString line;
-   for (auto it : newNames)
-   {
-      if (backTrack)
-      {
-         line = runOutput.section('\t' + it + '\t', 0, 0, QString::SectionIncludeTrailingSep);
-         line.chop(1);
-      }
-      else
-         line = runOutput.section('\t' + it + '\n', 0, 0);
-
-      if (!line.isEmpty())
-         break;
-   }
-   if (line.contains('\n'))
-      line = line.section('\n', -1, -1);
-
-   const QString &status = line.section('\t', -2, -2).section(' ', -1, -1);
-   if (!status.startsWith('R'))
-      return false;
-
-   if (backTrack)
-   {
-      const QString &nextFile = runOutput.section(line, 1, 1).section('\t', 1, 1);
-      oldNames->append(nextFile.section('\n', 0, 0));
-      return true;
-   }
-   // get the diff betwen two files
-   const QString &prevFileSha = line.section(' ', 2, 2);
-   const QString &lastFileSha = line.section(' ', 3, 3);
-   if (prevFileSha == lastFileSha) // just renamed
-      runOutput.clear();
-   else
-   {
-      const auto ret2 = run("git diff --no-ext-diff -r --full-index " + prevFileSha + " " + lastFileSha);
-      if (!ret2.first)
-         return false;
-
-      runOutput = ret2.second;
-   }
-
-   const QString &prevFile = line.section('\t', -1, -1);
-   if (!oldNames->contains(prevFile))
-      oldNames->append(prevFile);
-
-   // save the patch, will be used later to create a
-   // proper graft sha with correct parent info
-   if (mRevData)
-   {
-      QString tmp(!runOutput.isEmpty() ? runOutput : "diff --no-ext-diff --\nsimilarity index 100%\n");
-      mRevData->renamedPatches.insert(renamedSha, tmp);
-   }
-   return true;
-}
-
 void Git::populateFileNamesMap()
 {
 
@@ -1566,48 +1504,48 @@ bool Git::filterEarlyOutputRev(Revision *revision)
    return false;
 }
 
-int Git::addChunk(const QByteArray &ba, int start)
+int Git::addChunk(const QByteArray &ba)
 {
    int nextStart;
-   Revision *revision = nullptr;
+   auto start = 0;
+   auto count = 0;
 
    do
    {
       // only here we create a new Revision
-      revision = new Revision(ba, static_cast<uint>(start), mRevCache->revOrderCount(), &nextStart);
+      Revision revision(ba, static_cast<uint>(start), mRevCache->revOrderCount(), &nextStart);
+      qDebug() << start << nextStart - start;
+      qDebug() << ba.mid(start, nextStart - start);
+      start = nextStart;
+      ++count;
 
       if (nextStart == -2)
       {
-         delete revision;
          mRevData->setEarlyOutputState(true);
          start = ba.indexOf('\n', start) + 1;
       }
+      else
+      {
+         if (nextStart == -1)
+            return -1;
 
-   } while (nextStart == -2);
+         const auto sha = revision.sha();
 
-   if (nextStart == -1)
-   { // half chunk detected
-      delete revision;
-      return -1;
-   }
+         if (mRevData->earlyOutputCnt != -1 && filterEarlyOutputRev(&revision))
+            continue;
 
-   const auto sha = revision->sha();
+         if (!(revision.parentsCount() > 1 && mRevCache->contains(sha)))
+         {
+            mRevCache->insertRevision(sha, revision);
 
-   if (mRevData->earlyOutputCnt != -1 && filterEarlyOutputRev(revision))
-   {
-      delete revision;
-      return nextStart;
-   }
+            emit mRevCache->signalCacheUpdated();
+            emit newRevsAdded();
+         }
+      }
 
-   if (!(revision->parentsCount() > 1 && mRevCache->contains(sha)))
-   {
-      mRevCache->insertRevision(sha, *revision);
+   } while (nextStart < ba.size());
 
-      emit mRevCache->signalCacheUpdated();
-      emit newRevsAdded();
-   }
-
-   return nextStart;
+   return 0;
 }
 
 void Git::flushFileNames(FileNamesLoader &fl)

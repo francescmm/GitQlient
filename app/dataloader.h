@@ -1,9 +1,9 @@
 /*
-        Author: Marco Costalba (C) 2005-2007
+     Author: Marco Costalba (C) 2005-2007
 
 Copyright: See COPYING file that comes with this distribution
 
-                */
+             */
 #ifndef DATALOADER_H
 #define DATALOADER_H
 
@@ -35,25 +35,16 @@ signals:
 
 private slots:
    void on_finished(int, QProcess::ExitStatus);
-   void on_timeout();
 
 private:
    Git *mGit;
-   void parseSingleBuffer(const QByteArray &ba);
-   void baAppend(QByteArray **src, const char *ascii, int len);
-   void addSplittedChunks(const QByteArray *halfChunk);
    bool createTemporaryFile();
-   ulong readNewData(bool lastBuffer);
-   bool startProcess(QProcess *proc, QStringList args, const QString &buf = "");
+   void readNewData();
+   bool startProcess(QStringList args, const QString &buf = "");
 
-   QByteArray *halfChunk;
-   UnbufferedTemporaryFile *dataFile;
-   QTime loadTime;
-   QTimer guiUpdateTimer;
-   ulong loadedBytes;
-   bool isProcExited;
-   bool parsing;
-   bool canceling;
+   QByteArray *halfChunk = nullptr;
+   UnbufferedTemporaryFile *dataFile = nullptr;
+   bool canceling = false;
 };
 
 #endif
