@@ -1369,17 +1369,6 @@ void Git::parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader 
    }
 }
 
-bool Git::startParseProc(const QStringList &initCmd)
-{
-   DataLoader *dl = new DataLoader(this); // auto-deleted when done
-   connect(this, &Git::cancelLoading, dl, &DataLoader::on_cancel);
-   connect(dl, &DataLoader::newDataReady, this, &Git::newRevsAdded);
-   connect(dl, &DataLoader::loaded, this, &Git::on_loaded);
-
-   QString buf;
-   return dl->start(initCmd, mWorkingDir, buf);
-}
-
 bool Git::startRevList()
 {
 
@@ -1397,7 +1386,13 @@ bool Git::startRevList()
 
    QStringList initCmd(baseCmd.split(' '));
 
-   return startParseProc(initCmd);
+   DataLoader *dl = new DataLoader(this); // auto-deleted when done
+   connect(this, &Git::cancelLoading, dl, &DataLoader::on_cancel);
+   connect(dl, &DataLoader::newDataReady, this, &Git::newRevsAdded);
+   connect(dl, &DataLoader::loaded, this, &Git::on_loaded);
+
+   QString buf;
+   return dl->start(initCmd, mWorkingDir, buf);
 }
 
 bool Git::clone(const QString &url, const QString &fullPath)

@@ -239,7 +239,6 @@ private:
    void clearRevs();
    void clearFileNames();
    bool startRevList();
-   bool startParseProc(const QStringList &initCmd);
    bool populateRenamedPatches(const QString &sha, const QStringList &nn, QStringList *on, bool bt);
    bool filterEarlyOutputRev(Revision *revision);
    int addChunk(const QByteArray &ba, int ofs);
