@@ -100,7 +100,7 @@ int RevisionsCache::row(const QString &sha) const
    return revs.value(sha).orderIdx;
 }
 
-void RevisionsCache::flushTail(int earlyOutputCnt, int earlyOutputCntBase)
+void RevisionsCache::flushTail(int earlyOutputCnt, int)
 {
    if (earlyOutputCnt < 0 || earlyOutputCnt >= count())
       return;
@@ -116,7 +116,7 @@ void RevisionsCache::flushTail(int earlyOutputCnt, int earlyOutputCntBase)
    }
 
    // reset all lanes, will be redrawn
-   for (int i = earlyOutputCntBase; i < revOrder.count(); i++)
+   for (int i = 0; i < revOrder.count(); i++)
       revs[revOrder[i]].lanes.clear();
 }
 

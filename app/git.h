@@ -23,7 +23,6 @@ class QRegExp;
 class QTextCodec;
 class Annotate;
 class Domain;
-class RepositoryModel;
 class GitAsyncProcess;
 
 static const QString ZERO_SHA = "0000000000000000000000000000000000000000";
@@ -155,8 +154,6 @@ public:
       ANY_REF = 127
    };
 
-   void setDefaultModel(RepositoryModel *fh) { mRevData = fh; }
-
    bool isNothingToCommit();
 
    void getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined);
@@ -171,7 +168,6 @@ public:
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;
    const QString getRefSha(const QString &refName, RefType type = ANY_REF, bool askGit = true);
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
-   const QStringList sortShaListByIndex(QStringList &shaList);
    GitExecResult merge(const QString &into, QStringList sources);
 
    const QString filePath(const RevisionFile &rf, int i) const;
@@ -181,8 +177,7 @@ public:
 
 private:
    bool getGitDBDir(const QString &wd);
-
-   friend class DataLoader;
+   void processInitLog(const QByteArray &ba);
 
    struct Reference
    { // stores tag information associated to a revision
@@ -227,38 +222,27 @@ private:
    FileNamesLoader fileLoader;
 
    bool updateIndex(const QStringList &selFiles);
-   const QString getWorkDirDiff(const QString &fileName = "");
    int findFileIndex(const RevisionFile &rf, const QString &name);
-   void runAsync(const QString &cmd, QObject *rcv, const QString &buf = "");
    bool getRefs();
    void clearRevs();
    void clearFileNames();
    bool startRevList();
-   bool filterEarlyOutputRev(Revision *revision);
-   void processInitLog(const QByteArray &ba);
    void parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl);
    void parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl);
-   Revision *fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,
-                         const QString &log, const QString &longLog, const QString &patch, int idx);
-   const Revision *fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx);
+   Revision fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,
+                        const QString &log, const QString &longLog, const QString &patch, int idx);
+   Revision fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx);
    RevisionFile fakeWorkDirRevFile(const WorkingDirInfo &wd);
    RevisionFile insertNewFiles(const QString &sha, const QString &data);
-   RevisionFile getAllMergeFiles(const Revision *r);
    bool runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutput);
-   void updateDescMap(const Revision *r, uint i, QHash<QPair<uint, uint>, bool> &dm, QHash<uint, QVector<int>> &dv);
-   void mergeNearTags(bool down, Revision *p, const Revision *r, const QHash<QPair<uint, uint>, bool> &dm);
-   void mergeBranches(Revision *p, const Revision *r);
    const QStringList getOthersFiles();
    const QStringList getOtherFiles(const QStringList &selFiles);
    void appendFileName(RevisionFile &rf, const QString &name, FileNamesLoader &fl);
    void flushFileNames(FileNamesLoader &fl);
-   void populateFileNamesMap();
    static const QString quote(const QString &nm);
    static const QString quote(const QStringList &sl);
    void setStatus(RevisionFile &rf, const QString &rowSt);
    void setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
-   void appendNamesWithId(QStringList &names, const QString &sha, const QStringList &data, bool onlyLoaded);
-   Reference *lookupReference(const QString &sha);
    Reference *lookupOrAddReference(const QString &sha);
 
    QString mWorkingDir;
@@ -270,7 +254,6 @@ private:
    QVector<QString> mDirNames;
    QHash<QString, int> mFileNamesMap; // quick lookup file name
    QHash<QString, int> mDirNamesMap; // quick lookup directory name
-   RepositoryModel *mRevData = nullptr;
    QSharedPointer<RevisionsCache> mRevCache;
 };
 

@@ -23,8 +23,6 @@ RepositoryModel::RepositoryModel(QSharedPointer<RevisionsCache> revCache, QShare
    , mRevCache(revCache)
    , mGit(git)
 {
-   mGit->setDefaultModel(this);
-
    mColumns.insert(RepositoryModelColumns::GRAPH, "Graph");
    mColumns.insert(RepositoryModelColumns::ID, "Id");
    mColumns.insert(RepositoryModelColumns::SHA, "Sha");
@@ -61,7 +59,7 @@ QString RepositoryModel::sha(int row) const
 void RepositoryModel::flushTail()
 {
    beginResetModel();
-   mRevCache->flushTail(earlyOutputCnt, earlyOutputCntBase);
+   mRevCache->flushTail(earlyOutputCnt, 0);
    // lns->clear();
    rowCnt = mRevCache->count();
    endResetModel();
