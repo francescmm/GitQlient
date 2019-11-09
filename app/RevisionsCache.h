@@ -46,7 +46,7 @@ public:
    QString sha(int row) const;
    Revision revLookup(int row) const;
    Revision getRevLookup(const QString &sha) const;
-   void insertRevision(const QString sha, const Revision &rev);
+   void insertRevision(const Revision &rev);
    void updateLanes(Revision &c, Lanes &lns);
    QString getLaneParent(const QString &fromSHA, int laneNum);
    QString getShortLog(const QString &sha) const;

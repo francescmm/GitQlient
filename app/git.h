@@ -176,7 +176,7 @@ public:
 
 private:
    bool getGitDBDir(const QString &wd);
-   void processInitLog(const QByteArray &ba);
+   void processRevision(const QByteArray &ba);
 
    struct Reference
    { // stores tag information associated to a revision
@@ -225,7 +225,7 @@ private:
    bool getRefs();
    void clearRevs();
    void clearFileNames();
-   bool startRevList();
+   bool checkoutRevisions();
    void parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl);
    void parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl);
    Revision fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,

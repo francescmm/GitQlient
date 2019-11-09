@@ -31,14 +31,19 @@ Revision RevisionsCache::getRevLookup(const QString &sha) const
    return Revision();
 }
 
-void RevisionsCache::insertRevision(const QString sha, const Revision &rev)
+void RevisionsCache::insertRevision(const Revision &rev)
 {
-   auto r = rev;
+   const auto sha = rev.sha();
 
-   if (r.lanes.count() == 0)
-      updateLanes(r, lns);
+   if (!revs.contains(sha))
+   {
+      auto r = rev;
 
-   revs.insert(sha, r);
+      if (r.lanes.count() == 0)
+         updateLanes(r, lns);
+
+      revs.insert(sha, r);
+   }
 
    if (!revOrder.contains(sha))
       revOrder.append(sha);
@@ -123,7 +128,7 @@ void RevisionsCache::flushTail(int earlyOutputCnt, int)
 void RevisionsCache::clear()
 {
    lns.clear();
-   revs.clear();
+   // revs.clear();
    revOrder.clear();
 }
 

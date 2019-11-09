@@ -1152,7 +1152,7 @@ void Git::updateWipRevision()
    const QString &log = (isNothingToCommit() ? QString("No local changes") : QString("Local changes"));
    auto r = fakeWorkDirRev(head, log, status, mRevCache->revOrderCount());
 
-   mRevCache->insertRevision(ZERO_SHA, r);
+   mRevCache->insertRevision(r);
 }
 
 void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl)
@@ -1277,7 +1277,7 @@ void Git::parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader 
       endPos = buf.indexOf('\n', endPos + 99);
    }
 }
-bool Git::startRevList()
+bool Git::checkoutRevisions()
 {
    QString baseCmd("git log --date-order --no-color "
 #ifndef Q_OS_WIN32
@@ -1291,7 +1291,7 @@ bool Git::startRevList()
    baseCmd.append("%b --all");
 
    const auto requestor = new GitRequestorProcess(mWorkingDir);
-   connect(requestor, &GitRequestorProcess::procDataReady, this, &Git::processInitLog);
+   connect(requestor, &GitRequestorProcess::procDataReady, this, &Git::processRevision);
    connect(this, &Git::cancelAllProcesses, requestor, &AGitProcess::onCancel);
 
    QString buf;
@@ -1356,12 +1356,12 @@ void Git::init2()
 
    updateWipRevision(); // blocking, we could be in setRepository() now
 
-   startRevList();
+   checkoutRevisions();
 
    QLog_Info("Git", "... revisions finished");
 }
 
-void Git::processInitLog(const QByteArray &ba)
+void Git::processRevision(const QByteArray &ba)
 {
    int nextStart;
    auto start = 0;
@@ -1369,25 +1369,14 @@ void Git::processInitLog(const QByteArray &ba)
 
    do
    {
-      // only here we create a new Revision
       Revision revision(ba, static_cast<uint>(start), mRevCache->revOrderCount(), &nextStart);
       // qDebug() << start << nextStart - start;
       // qDebug() << ba.mid(start, nextStart - start);
       start = nextStart;
       ++count;
 
-      if (nextStart == -2)
-      {
-         start = ba.indexOf('\n', start) + 1;
-         break;
-      }
-      else if (nextStart != -1)
-      {
-         const auto sha = revision.sha();
-
-         if (!(revision.parentsCount() > 1 && mRevCache->contains(sha)))
-            mRevCache->insertRevision(sha, revision);
-      }
+      if (nextStart > 0)
+         mRevCache->insertRevision(revision);
       else
          break;
 
