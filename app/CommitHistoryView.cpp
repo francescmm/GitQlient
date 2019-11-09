@@ -62,8 +62,6 @@ void CommitHistoryView::filterBySha(const QStringList &shaList)
       setModel(mProxyModel);
    }
 
-   // update();
-
    setupGeometry();
 }
 

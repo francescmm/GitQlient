@@ -2,15 +2,16 @@
 
 #include <QStringList>
 
-Revision::Revision(const QByteArray &b, uint s, int idx, int *next)
+Revision::Revision(const QByteArray &b, int idx)
    : orderIdx(idx)
    , ba(b)
-   , start(s)
 {
 
    indexed = isDiffCache = isApplied = isUnApplied = false;
    descRefsMaster = ancRefsMaster = descBrnMaster = -1;
-   *next = indexData(true, false);
+   auto dataSize = indexData(true, false);
+
+   ba = b.left(dataSize);
 }
 
 bool Revision::isBoundary() const
@@ -134,21 +135,21 @@ int Revision::indexData(bool quick, bool withDiff) const
    static int asciiPosOfZeroChar = 48; // char "0" has value 48 in ascii table
 
    const int last = ba.size() - 1;
-   int logSize = 0, idx = start;
+   int logSize = 0, idx = 0;
    int logEnd, revEnd;
 
    // direct access is faster then QByteArray.at()
    const char *data = ba.constData();
    char *fixup = const_cast<char *>(data); // to build '\0' terminating strings
 
-   if (start + shaXEndlLength > last) // at least sha header must be present
+   if (shaXEndlLength > last) // at least sha header must be present
       return -1;
 
-   if (data[start] == finalOutputMarker) // "Final output", let caller handle this
-      return (ba.indexOf('\n', start) != -1 ? -2 : -1);
+   if (data[0] == finalOutputMarker) // "Final output", let caller handle this
+      return (ba.indexOf('\n') != -1 ? -2 : -1);
 
    // parse   'log size xxx\n'   if present -- from git ref. spec.
-   if (data[idx] == logSizeMarker)
+   if (data[0] == logSizeMarker)
    {
       idx += logSizeStrLength; // move idx to beginning of log size value
 

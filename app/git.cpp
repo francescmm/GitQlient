@@ -1065,8 +1065,7 @@ Revision Git::fakeRevData(const QString &sha, const QStringList &parents, const 
 
    ba->append('\0');
 
-   int dummy;
-   return Revision(*ba, 0, idx, &dummy);
+   return Revision(*ba, idx);
 }
 
 Revision Git::fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx)
@@ -1376,16 +1375,18 @@ void Git::init2()
 
 void Git::processRevision(const QByteArray &ba)
 {
-   int nextStart;
-   auto start = 0;
    auto count = 0;
+
+   QByteArray auxBa = ba;
 
    do
    {
-      Revision revision(ba, static_cast<uint>(start), mRevCache->revOrderCount(), &nextStart);
+      Revision revision(auxBa, mRevCache->revOrderCount());
+      const auto nextStart = revision.getDataSize();
       // qDebug() << start << nextStart - start;
       // qDebug() << ba.mid(start, nextStart - start);
-      start = nextStart;
+      auxBa = auxBa.mid(nextStart, auxBa.size() - nextStart);
+      // start = nextStart;
       ++count;
 
       if (nextStart > 0)
@@ -1393,7 +1394,7 @@ void Git::processRevision(const QByteArray &ba)
       else
          break;
 
-   } while (nextStart < ba.size());
+   } while (ba.size() > 0);
 
    emit signalNewRevisions();
 }

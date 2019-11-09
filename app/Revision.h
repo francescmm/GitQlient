@@ -8,7 +8,7 @@ class Revision
 {
 public:
    Revision() = default;
-   Revision(const QByteArray &b, uint s, int idx, int *next);
+   Revision(const QByteArray &b, int idx);
    bool isBoundary() const;
    uint parentsCount() const;
    QString parent(int idx) const;
@@ -20,6 +20,7 @@ public:
    QString shortLog() const;
    QString longLog() const;
    QString diff() const;
+   int getDataSize() const { return ba.size(); }
 
    QVector<LaneType> lanes;
    QVector<int> children;
@@ -38,7 +39,7 @@ private:
    QString midSha(int start, int len) const;
 
    QByteArray ba;
-   int start;
+   int start = 0;
    mutable int parentsCnt, shaStart, comStart, autStart, autDateStart;
    mutable int sLogStart, sLogLen, lLogStart, lLogLen, diffStart, diffLen;
    mutable bool indexed;
