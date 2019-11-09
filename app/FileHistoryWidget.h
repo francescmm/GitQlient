@@ -38,8 +38,7 @@ class FileHistoryWidget : public QFrame
    Q_OBJECT
 
 public:
-   explicit FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git,
-                              QWidget *parent = nullptr);
+   explicit FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
    void init(const QString &workingDirectory);
    void showFileHistory(const QString &file);

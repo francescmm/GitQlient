@@ -14,11 +14,9 @@
 static const int COLORS_NUM = 8;
 static const int MIN_VIEW_WIDTH_PX = 480;
 
-RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache,
-                                               CommitHistoryView *view)
+RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, CommitHistoryView *view)
    : QStyledItemDelegate()
    , mGit(git)
-   , mRevCache(revCache)
    , mView(view)
 {
 }
@@ -259,7 +257,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
 
-   const auto r = mRevCache->getRevLookupByRow(row);
+   const auto r = mGit->getCommitByRow(row);
 
    if (r.sha().isEmpty())
       return;
@@ -336,7 +334,7 @@ void RepositoryViewDelegate::paintWip(QPainter *painter, QStyleOptionViewItem op
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
    int row = index.row();
-   const auto sha = mRevCache->getRevLookupByRow(row).sha();
+   const auto sha = mGit->getCommitByRow(row).sha();
 
    if (sha.isEmpty())
       return;

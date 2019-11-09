@@ -13,7 +13,7 @@
 #include <QHeaderView>
 #include <QMenu>
 
-FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent)
+FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , fileSystemModel(new QFileSystemModel())
@@ -23,7 +23,7 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QS
    , mFileBlameWidget(new FileBlameWidget(mGit))
 {
    mRepoView->setModel(mRepoModel);
-   mRepoView->setItemDelegate(new RepositoryViewDelegate(mGit, revCache, mRepoView));
+   mRepoView->setItemDelegate(new RepositoryViewDelegate(mGit, mRepoView));
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 

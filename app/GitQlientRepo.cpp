@@ -44,7 +44,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    , mFullDiffWidget(new FullDiffWidget(mGit, mRevisionsCache))
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
-   , fileHistoryWidget(new FileHistoryWidget(mRevisionsCache, mGit))
+   , fileHistoryWidget(new FileHistoryWidget(mGit))
 
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
@@ -56,7 +56,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
 
    mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setObjectName("mainRepoView");
-   mRepositoryView->setItemDelegate(new RepositoryViewDelegate(mGit, mRevisionsCache, mRepositoryView));
+   mRepositoryView->setItemDelegate(new RepositoryViewDelegate(mGit, mRepositoryView));
 
    commitStackedWidget->setCurrentIndex(0);
    commitStackedWidget->addWidget(mRevisionWidget);
