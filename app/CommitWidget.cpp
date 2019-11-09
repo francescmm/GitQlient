@@ -28,23 +28,6 @@ using namespace QLogger;
 
 const int CommitWidget::kMaxTitleChars = 50;
 
-namespace
-{
-bool readFromFile(const QString &fileName, QString &data)
-{
-
-   data = "";
-   QFile file(fileName);
-   if (!file.open(QIODevice::ReadOnly))
-      return false;
-
-   QTextStream stream(&file);
-   data = stream.readAll();
-   file.close();
-   return true;
-}
-}
-
 QString CommitWidget::lastMsgBeforeError;
 
 CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
@@ -108,13 +91,6 @@ void CommitWidget::init(const QString &sha)
 
    ui->pbCommit->setText(mIsAmend ? QString("Amend") : QString("Commit"));
 
-   QString templ(".git/commit-template");
-   QString msg;
-
-   QDir d;
-   if (d.exists(templ))
-      readFromFile(templ, msg);
-
    // set-up files list
    if (mIsAmend)
    {
@@ -134,6 +110,7 @@ void CommitWidget::init(const QString &sha)
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
 
    // compute cursor offsets. Take advantage of fixed width font
+   QString msg;
 
    if (lastMsgBeforeError.isEmpty())
    {
@@ -233,7 +210,7 @@ void CommitWidget::addAllFilesToCommitList()
 {
    auto i = ui->unstagedFilesList->count();
 
-   for (; ++i >= 0; ++i)
+   for (; i >= 0; --i)
    {
       auto item = ui->unstagedFilesList->takeItem(i);
       ui->stagedFilesList->addItem(item);
@@ -241,7 +218,7 @@ void CommitWidget::addAllFilesToCommitList()
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-   ui->pbCommit->setEnabled(i != ui->unstagedFilesList->count());
+   ui->pbCommit->setEnabled(ui->stagedFilesList->count() > 0);
 }
 
 void CommitWidget::addFileToCommitList(QListWidgetItem *item)

@@ -34,7 +34,6 @@ CommitHistoryView::CommitHistoryView(QSharedPointer<Git> git, QWidget *parent)
    header()->setSortIndicatorShown(false);
 
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
-
    connect(this, &CommitHistoryView::customContextMenuRequested, this, &CommitHistoryView::showContextMenu);
 }
 
@@ -50,7 +49,6 @@ void CommitHistoryView::filterBySha(const QStringList &shaList)
    mIsFiltering = true;
 
    delete mProxyModel;
-   setModel(mCommitHistoryModel);
 
    mProxyModel = new ShaFilterProxyModel(this);
    mProxyModel->setAcceptedSha(shaList);

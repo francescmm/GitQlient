@@ -124,8 +124,6 @@ QVariant CommitHistoryModel::getDisplayData(const Revision &rev, int column) con
 {
    switch (static_cast<CommitHistoryColumns>(column))
    {
-      case CommitHistoryColumns::ID:
-         return QVariant();
       case CommitHistoryColumns::SHA:
          return rev.sha();
       case CommitHistoryColumns::LOG:
@@ -133,8 +131,7 @@ QVariant CommitHistoryModel::getDisplayData(const Revision &rev, int column) con
       case CommitHistoryColumns::AUTHOR:
          return rev.author().split("<").first();
       case CommitHistoryColumns::DATE: {
-         QDateTime dt = QDateTime::fromSecsSinceEpoch(rev.authorDate().toUInt());
-         return dt.toString("dd/MM/yyyy hh:mm");
+         return QDateTime::fromSecsSinceEpoch(rev.authorDate().toUInt()).toString("dd/MM/yyyy hh:mm");
       }
       default:
          return QVariant();
@@ -147,7 +144,6 @@ QVariant CommitHistoryModel::data(const QModelIndex &index, int role) const
       return QVariant();
 
    const auto r = mGit->getCommitInfoByRow(index.row());
-   const auto sha = r.sha();
 
    if (role == Qt::ToolTipRole)
       return getToolTipData(r);
