@@ -43,7 +43,6 @@ BranchContextMenu::BranchContextMenu(const BranchContextMenuConfig &config, QWid
 void BranchContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QString output;
    const auto ret = mConfig.mGit->pull();
    QApplication::restoreOverrideCursor();
 
@@ -86,8 +85,7 @@ void BranchContextMenu::pushForce()
    if (ret.success)
       emit signalBranchesUpdated();
    else
-      QMessageBox::critical(this, tr("Push force failed"),
-                            tr("There were some problems while pusing forced. Please try again."));
+      QMessageBox::critical(this, tr("Push force failed"), ret.output.toString());
 }
 
 void BranchContextMenu::createBranch()
@@ -122,7 +120,7 @@ void BranchContextMenu::merge()
       const auto outputStr = ret.output.toString();
 
       if (!outputStr.isEmpty())
-         QMessageBox::information(parentWidget(), tr("Merge status"), ret.output.toString());
+         QMessageBox::information(parentWidget(), tr("Merge status"), outputStr);
    }
    else
       QMessageBox::critical(parentWidget(), tr("Merge failed"), ret.output.toString());
@@ -148,19 +146,17 @@ void BranchContextMenu::deleteBranch()
 
       if (ret == QMessageBox::Ok)
       {
-         QByteArray output;
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
          const auto ret2 = mConfig.isLocal ? mConfig.mGit->removeLocalBranch(mConfig.branchSelected)
                                            : mConfig.mGit->removeRemoteBranch(mConfig.branchSelected);
-
          QApplication::restoreOverrideCursor();
 
          if (ret2.success)
             emit signalBranchesUpdated();
          else
-            QMessageBox::critical(this, tr("Delete a branch failed"),
-                                  tr("There were some problems while deleting the branch. Please try again."));
+            QMessageBox::critical(
+                this, tr("Delete a branch failed"),
+                tr("There were some problems while deleting the branch:<br><br> %1").arg(ret2.output.toString()));
       }
    }
 }

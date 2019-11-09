@@ -12,9 +12,9 @@ BranchTreeWidget::BranchTreeWidget(QSharedPointer<Git> git, QWidget *parent)
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
 
-   connect(this, &QTreeWidget::customContextMenuRequested, this, &BranchTreeWidget::showBranchesContextMenu);
-   connect(this, &QTreeWidget::itemClicked, this, &BranchTreeWidget::selectCommit);
-   connect(this, &QTreeWidget::itemDoubleClicked, this, &BranchTreeWidget::checkoutBranch);
+   connect(this, &BranchTreeWidget::customContextMenuRequested, this, &BranchTreeWidget::showBranchesContextMenu);
+   connect(this, &BranchTreeWidget::itemClicked, this, &BranchTreeWidget::selectCommit);
+   connect(this, &BranchTreeWidget::itemDoubleClicked, this, &BranchTreeWidget::checkoutBranch);
 }
 
 void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)

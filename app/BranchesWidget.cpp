@@ -59,18 +59,16 @@ BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
    const auto tagsHeaderLayout = new QHBoxLayout(tagsFrame);
    tagsHeaderLayout->setContentsMargins(20, 9, 10, 9);
    tagsHeaderLayout->setSpacing(10);
-   QIcon icon(":/icons/tags");
 
    const auto tagsIcon = new QLabel();
-   tagsIcon->setPixmap(icon.pixmap(QSize(15, 15)));
+   tagsIcon->setPixmap(QIcon(":/icons/tags").pixmap(QSize(15, 15)));
 
    tagsHeaderLayout->addWidget(tagsIcon);
    tagsHeaderLayout->addWidget(new QLabel(tr("Tags")));
    tagsHeaderLayout->addWidget(mTagsCount);
    tagsHeaderLayout->addStretch();
 
-   icon = QIcon(":/icons/arrow_down");
-   mTagArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+   mTagArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
    tagsHeaderLayout->addWidget(mTagArrow);
 
    mTagsList->setMouseTracking(true);
@@ -93,18 +91,15 @@ BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
    stashHeaderLayout->setContentsMargins(20, 9, 10, 9);
    stashHeaderLayout->setSpacing(10);
 
-   QIcon stashIcon(":/icons/stashes");
-
    const auto stashIconLabel = new QLabel();
-   stashIconLabel->setPixmap(stashIcon.pixmap(QSize(15, 15)));
+   stashIconLabel->setPixmap(QIcon(":/icons/stashes").pixmap(QSize(15, 15)));
 
    stashHeaderLayout->addWidget(stashIconLabel);
    stashHeaderLayout->addWidget(new QLabel(tr("Stashes")));
    stashHeaderLayout->addWidget(mStashesCount = new QLabel(tr("(0)")));
    stashHeaderLayout->addStretch();
 
-   stashIcon = QIcon(":/icons/arrow_down");
-   mStashesArrow->setPixmap(stashIcon.pixmap(QSize(15, 15)));
+   mStashesArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
    stashHeaderLayout->addWidget(mStashesArrow);
 
    mStashesList->setMouseTracking(true);
@@ -125,17 +120,15 @@ BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
    submoduleHeaderLayout->setContentsMargins(20, 9, 10, 9);
    submoduleHeaderLayout->setSpacing(10);
 
-   QIcon submoduleIcon(":/icons/submodules");
    const auto submoduleIconLabel = new QLabel();
-   submoduleIconLabel->setPixmap(submoduleIcon.pixmap(QSize(15, 15)));
+   submoduleIconLabel->setPixmap(QIcon(":/icons/submodules").pixmap(QSize(15, 15)));
 
    submoduleHeaderLayout->addWidget(submoduleIconLabel);
    submoduleHeaderLayout->addWidget(new QLabel(tr("Submodules")));
    submoduleHeaderLayout->addWidget(mSubmodulesCount);
    submoduleHeaderLayout->addStretch();
 
-   submoduleIcon = QIcon(":/icons/arrow_down");
-   mSubmodulesArrow->setPixmap(submoduleIcon.pixmap(QSize(15, 15)));
+   mSubmodulesArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
 
    submoduleHeaderLayout->addWidget(mSubmodulesArrow);
 
@@ -343,14 +336,12 @@ void BranchesWidget::processRemoteBranch(QString branch)
 
    QLog_Debug("UI", QString("Adding remote branch {%1}").arg(branch));
 
-   auto item = new QTreeWidgetItem(parent);
+   const auto item = new QTreeWidgetItem(parent);
    item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
    item->setText(0, branch);
    item->setData(0, Qt::UserRole + 1, fullBranchName);
    item->setData(0, Qt::UserRole + 2, true);
    item->setData(0, Qt::ToolTipRole, fullBranchName);
-
-   // mRemoteBranchesTree->addTopLevelItem(item);
 }
 
 void BranchesWidget::processTags()
@@ -362,7 +353,7 @@ void BranchesWidget::processTags()
 
    for (auto tag : tags)
    {
-      auto item = new QListWidgetItem();
+      const auto item = new QListWidgetItem();
       item->setData(Qt::UserRole, tag);
       item->setData(Qt::UserRole + 1, true);
 
@@ -389,7 +380,7 @@ void BranchesWidget::processStashes()
    {
       const auto stashId = stash.split(":").first();
       const auto stashDesc = stash.split("}: ").last();
-      auto item = new QListWidgetItem(stashDesc);
+      const auto item = new QListWidgetItem(stashDesc);
       item->setData(Qt::UserRole, stashId);
       mStashesList->addItem(item);
    }
@@ -403,7 +394,7 @@ void BranchesWidget::processSubmodules()
 
    QLog_Info("UI", QString("Fetching {%1} submodules").arg(submodules.count()));
 
-   for (auto submodule : submodules)
+   for (const auto &submodule : submodules)
       mSubmodulesList->addItem(submodule);
 }
 
@@ -459,11 +450,9 @@ void BranchesWidget::showStashesContextMenu(const QPoint &) {}
 
 void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
 {
-
-   QModelIndex index = mSubmodulesList->indexAt(p);
-
    QLog_Info("UI", QString("Requesting context menu for submodules"));
 
+   const auto index = mSubmodulesList->indexAt(p);
    const auto menu = new QMenu(this);
 
    if (!index.isValid())
@@ -527,16 +516,14 @@ void BranchesWidget::onSubmodulesHeaderClicked()
 
 void BranchesWidget::onTagClicked(QListWidgetItem *item)
 {
-   QByteArray sha;
-   mGit->getTagCommit(item->text(), sha);
+   const auto sha = mGit->getTagCommit(item->text()).output.toString();
 
-   emit signalSelectCommit(QString::fromUtf8(sha));
+   emit signalSelectCommit(sha);
 }
 
 void BranchesWidget::onStashClicked(QListWidgetItem *item)
 {
-   QByteArray sha;
-   mGit->getTagCommit(item->data(Qt::UserRole).toString(), sha);
+   const auto sha = mGit->getTagCommit(item->data(Qt::UserRole).toString()).output.toString();
 
-   emit signalSelectCommit(QString::fromUtf8(sha));
+   emit signalSelectCommit(sha);
 }

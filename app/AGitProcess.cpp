@@ -125,8 +125,8 @@ void AGitProcess::onReadyStandardOutput()
 bool AGitProcess::execute(const QString &command)
 {
    mCommand = command;
-   auto processStarted = false;
 
+   auto processStarted = false;
    auto arguments = splitArgList(mCommand);
 
    if (!arguments.isEmpty())
@@ -154,7 +154,7 @@ void AGitProcess::onFinished(int, QProcess::ExitStatus exitStatus)
    const auto errorOutput = readAllStandardError();
    const auto output = readAll();
 
-   mErrorOutput += QString::fromUtf8(errorOutput);
+   mErrorOutput = QString::fromUtf8(errorOutput);
    mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error")
        || errorOutput.contains("could not read Username");
 

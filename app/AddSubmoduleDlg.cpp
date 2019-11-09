@@ -15,7 +15,6 @@ AddSubmoduleDlg::AddSubmoduleDlg(QSharedPointer<Git> git, QWidget *parent)
 
    connect(ui->lePath, &QLineEdit::returnPressed, this, &AddSubmoduleDlg::accept);
    connect(ui->leUrl, &QLineEdit::returnPressed, this, &AddSubmoduleDlg::accept);
-
    connect(ui->pbAccept, &QPushButton::clicked, this, &AddSubmoduleDlg::accept);
    connect(ui->pbCancel, &QPushButton::clicked, this, &QDialog::reject);
 }

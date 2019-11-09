@@ -97,7 +97,7 @@ public:
    bool addTag(const QString &tagName, const QString &tagMessage, const QString &sha, QByteArray &output);
    bool removeTag(const QString &tagName, bool remote);
    bool pushTag(const QString &tagName, QByteArray &output);
-   bool getTagCommit(const QString &tagName, QByteArray &output);
+   GitExecResult getTagCommit(const QString &tagName);
    const QString getTagMsg(const QString &sha);
 
    /*  END  TAGS */

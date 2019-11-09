@@ -839,17 +839,17 @@ bool Git::pushTag(const QString &tagName, QByteArray &output)
    return ret.first;
 }
 
-bool Git::getTagCommit(const QString &tagName, QByteArray &output)
+GitExecResult Git::getTagCommit(const QString &tagName)
 {
    const auto ret = run(QString("git rev-list -n 1 %1").arg(tagName));
-   output = ret.second.toUtf8();
+   QString output = ret.second;
 
    if (ret.first)
    {
       output.remove(output.count() - 2, output.count() - 1);
    }
 
-   return ret.first;
+   return qMakePair(ret.first, output);
 }
 
 QVector<QString> Git::getStashes()
