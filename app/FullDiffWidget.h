@@ -30,7 +30,6 @@
 class RevisionsCache;
 class Git;
 class StateInfo;
-class Domain;
 
 class DiffHighlighter : public QSyntaxHighlighter
 {

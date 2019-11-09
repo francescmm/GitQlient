@@ -22,7 +22,6 @@ class Revision;
 class QRegExp;
 class QTextCodec;
 class Annotate;
-class Domain;
 class GitAsyncProcess;
 
 static const QString ZERO_SHA = "0000000000000000000000000000000000000000";
