@@ -23,6 +23,8 @@ HEADERS += \
     $$PWD/BranchesViewDelegate.h \
     $$PWD/BranchesWidget.h \
     $$PWD/ClickableFrame.h \
+    $$PWD/CommitHistoryColumns.h \
+    $$PWD/CommitHistoryModel.h \
     $$PWD/CommitWidget.h \
     $$PWD/ConfigWidget.h \
     $$PWD/Controls.h \
@@ -45,7 +47,6 @@ HEADERS += \
     $$PWD/GitSyncProcess.h \
     $$PWD/RepositoryContextMenu.h \
     $$PWD/RepositoryModel.h \
-    $$PWD/RepositoryModelColumns.h \
     $$PWD/RepositoryView.h \
     $$PWD/RepositoryViewDelegate.h \
     $$PWD/Revision.h \
@@ -68,6 +69,7 @@ SOURCES += \
     $$PWD/BranchesViewDelegate.cpp \
     $$PWD/BranchesWidget.cpp \
     $$PWD/ClickableFrame.cpp \
+    $$PWD/CommitHistoryModel.cpp \
     $$PWD/CommitWidget.cpp \
     $$PWD/ConfigWidget.cpp \
     $$PWD/Controls.cpp \

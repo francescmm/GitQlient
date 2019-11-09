@@ -16,7 +16,7 @@ class RevisionsCache;
 class Git;
 class Lanes;
 class Revision;
-enum class RepositoryModelColumns;
+enum class CommitHistoryColumns;
 
 class RepositoryModel : public QAbstractItemModel
 {
@@ -36,18 +36,15 @@ public:
    bool hasChildren(const QModelIndex &par = QModelIndex()) const override;
    int columnCount(const QModelIndex &) const override { return mColumns.count(); }
 
-private slots:
-   void on_newRevsAdded();
-
 private:
    QSharedPointer<RevisionsCache> mRevCache;
    QSharedPointer<Git> mGit;
-   friend class Git;
 
+   void onNewRevisions();
    QVariant getToolTipData(const Revision &r) const;
    QVariant getDisplayData(const Revision &rev, int column) const;
 
-   QMap<RepositoryModelColumns, QString> mColumns;
+   QMap<CommitHistoryColumns, QString> mColumns;
    int earlyOutputCnt;
    int rowCnt = 0;
    QStringList curFNames;

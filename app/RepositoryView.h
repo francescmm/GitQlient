@@ -15,7 +15,7 @@ class RepositoryModel;
 class Revision;
 class RevisionsCache;
 class ShaFilterProxyModel;
-enum class RepositoryModelColumns;
+enum class CommitHistoryColumns;
 
 class RepositoryView : public QTreeView
 {

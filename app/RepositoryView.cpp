@@ -11,7 +11,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <RevisionsCache.h>
 #include <Revision.h>
 #include <RepositoryModel.h>
-#include <RepositoryModelColumns.h>
+#include <CommitHistoryColumns.h>
 #include <git.h>
 #include <ShaFilterProxyModel.h>
 #include <RepositoryContextMenu.h>
@@ -94,22 +94,22 @@ void RepositoryView::setupGeometry()
    {
       const auto hv = header();
       hv->setCascadingSectionResizes(true);
-      hv->resizeSection(static_cast<int>(RepositoryModelColumns::GRAPH), 80);
-      hv->resizeSection(static_cast<int>(RepositoryModelColumns::SHA), 60);
-      hv->resizeSection(static_cast<int>(RepositoryModelColumns::AUTHOR), 200);
-      hv->resizeSection(static_cast<int>(RepositoryModelColumns::DATE), 115);
-      hv->setSectionResizeMode(static_cast<int>(RepositoryModelColumns::LOG), QHeaderView::Stretch);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::GRAPH), 80);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::SHA), 60);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::AUTHOR), 200);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::DATE), 115);
+      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::LOG), QHeaderView::Stretch);
       hv->setStretchLastSection(false);
 
-      hideColumn(static_cast<int>(RepositoryModelColumns::SHA));
-      hideColumn(static_cast<int>(RepositoryModelColumns::DATE));
-      hideColumn(static_cast<int>(RepositoryModelColumns::AUTHOR));
-      hideColumn(static_cast<int>(RepositoryModelColumns::ID));
+      hideColumn(static_cast<int>(CommitHistoryColumns::SHA));
+      hideColumn(static_cast<int>(CommitHistoryColumns::DATE));
+      hideColumn(static_cast<int>(CommitHistoryColumns::AUTHOR));
+      hideColumn(static_cast<int>(CommitHistoryColumns::ID));
    }
    else
    {
       header()->restoreState(previousState);
-      header()->setSectionResizeMode(static_cast<int>(RepositoryModelColumns::LOG), QHeaderView::Stretch);
+      header()->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::LOG), QHeaderView::Stretch);
    }
 }
 
@@ -207,7 +207,7 @@ QList<QString> RepositoryView::getSelectedShaList() const
    {
       const auto sha = mRepositoryModel->sha(index.row());
       const auto dtStr
-          = mRepositoryModel->index(index.row(), static_cast<int>(RepositoryModelColumns::DATE)).data().toString();
+          = mRepositoryModel->index(index.row(), static_cast<int>(CommitHistoryColumns::DATE)).data().toString();
       const auto dt = QDateTime::fromString(dtStr, "dd/MM/yyyy hh:mm");
 
       shas.insert(dt, sha);

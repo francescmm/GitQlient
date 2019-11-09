@@ -1,15 +1,12 @@
-#include "RepositoryModel.h"
+#include "CommitHistoryModel.h"
+
 #include <CommitHistoryColumns.h>
 #include <RevisionsCache.h>
-#include <Revision.h>
+#include <git.h>
 
-#include <QApplication>
 #include <QDateTime>
-#include <QFontMetrics>
 
-#include "git.h"
-
-RepositoryModel::RepositoryModel(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QObject *p)
+CommitHistoryModel::CommitHistoryModel(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QObject *p)
    : QAbstractItemModel(p)
    , mRevCache(revCache)
    , mGit(git)
@@ -21,33 +18,33 @@ RepositoryModel::RepositoryModel(QSharedPointer<RevisionsCache> revCache, QShare
    mColumns.insert(CommitHistoryColumns::AUTHOR, "Author");
    mColumns.insert(CommitHistoryColumns::DATE, "Date");
 
-   clear(); // after _headerInfo is set
+   clear();
 
-   connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &RepositoryModel::onNewRevisions);
+   connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryModel::onNewRevisions);
 }
 
-RepositoryModel::~RepositoryModel()
+CommitHistoryModel::~CommitHistoryModel()
 {
    clear();
 }
 
-int RepositoryModel::rowCount(const QModelIndex &parent) const
+int CommitHistoryModel::rowCount(const QModelIndex &parent) const
 {
    return !parent.isValid() ? rowCnt : 0;
 }
 
-bool RepositoryModel::hasChildren(const QModelIndex &parent) const
+bool CommitHistoryModel::hasChildren(const QModelIndex &parent) const
 {
 
    return !parent.isValid();
 }
 
-QString RepositoryModel::sha(int row) const
+QString CommitHistoryModel::sha(int row) const
 {
    return mRevCache->sha(row);
 }
 
-void RepositoryModel::clear()
+void CommitHistoryModel::clear()
 {
    beginResetModel();
    curFNames.clear();
@@ -56,7 +53,7 @@ void RepositoryModel::clear()
    emit headerDataChanged(Qt::Horizontal, 0, 5);
 }
 
-void RepositoryModel::onNewRevisions()
+void CommitHistoryModel::onNewRevisions()
 {
    // do not process revisions if there are possible renamed points
    // or pending renamed patch to apply
@@ -73,7 +70,7 @@ void RepositoryModel::onNewRevisions()
    endInsertRows();
 }
 
-QVariant RepositoryModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant CommitHistoryModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
       return mColumns.value(static_cast<CommitHistoryColumns>(section));
@@ -81,7 +78,7 @@ QVariant RepositoryModel::headerData(int section, Qt::Orientation orientation, i
    return QVariant();
 }
 
-QModelIndex RepositoryModel::index(int row, int column, const QModelIndex &) const
+QModelIndex CommitHistoryModel::index(int row, int column, const QModelIndex &) const
 {
    if (row < 0 || row >= rowCnt)
       return QModelIndex();
@@ -89,12 +86,12 @@ QModelIndex RepositoryModel::index(int row, int column, const QModelIndex &) con
    return createIndex(row, column, nullptr);
 }
 
-QModelIndex RepositoryModel::parent(const QModelIndex &) const
+QModelIndex CommitHistoryModel::parent(const QModelIndex &) const
 {
    return QModelIndex();
 }
 
-QVariant RepositoryModel::getToolTipData(const Revision &r) const
+QVariant CommitHistoryModel::getToolTipData(const Revision &r) const
 {
    QString auxMessage;
    const auto sha = r.sha();
@@ -126,7 +123,7 @@ QVariant RepositoryModel::getToolTipData(const Revision &r) const
              .arg(r.author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
 }
 
-QVariant RepositoryModel::getDisplayData(const Revision &rev, int column) const
+QVariant CommitHistoryModel::getDisplayData(const Revision &rev, int column) const
 {
    switch (static_cast<CommitHistoryColumns>(column))
    {
@@ -147,7 +144,7 @@ QVariant RepositoryModel::getDisplayData(const Revision &rev, int column) const
    }
 }
 
-QVariant RepositoryModel::data(const QModelIndex &index, int role) const
+QVariant CommitHistoryModel::data(const QModelIndex &index, int role) const
 {
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
       return QVariant();

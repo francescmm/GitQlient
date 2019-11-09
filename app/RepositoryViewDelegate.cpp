@@ -4,7 +4,7 @@
 #include <lanes.h>
 #include <RevisionsCache.h>
 #include <Revision.h>
-#include <RepositoryModelColumns.h>
+#include <CommitHistoryColumns.h>
 #include <RepositoryView.h>
 #include <RepositoryModel.h>
 
@@ -250,10 +250,10 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       p->fillRect(newOpt.rect, c);
    }
 
-   if (index.column() == static_cast<int>(RepositoryModelColumns::GRAPH))
+   if (index.column() == static_cast<int>(CommitHistoryColumns::GRAPH))
       return paintGraph(p, newOpt, index);
 
-   if (index.column() == static_cast<int>(RepositoryModelColumns::LOG))
+   if (index.column() == static_cast<int>(CommitHistoryColumns::LOG))
       return paintLog(p, newOpt, index);
 }
 
