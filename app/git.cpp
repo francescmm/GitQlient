@@ -1309,6 +1309,16 @@ bool Git::initRepo(const QString &fullPath)
    return run(QString("git init %1").arg(fullPath)).first;
 }
 
+int Git::totalCommits() const
+{
+   return mRevCache->count();
+}
+
+Revision Git::getCommitByRow(int row) const
+{
+   return mRevCache->getRevLookupByRow(row);
+}
+
 void Git::clearRevs()
 {
    mRevCache->clear();
@@ -1381,7 +1391,7 @@ void Git::processRevision(const QByteArray &ba)
 
    } while (nextStart < ba.size());
 
-   emit mRevCache->signalCacheUpdated();
+   emit signalNewRevisions();
 }
 
 void Git::flushFileNames(FileNamesLoader &fl)

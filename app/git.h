@@ -43,6 +43,7 @@ class Git : public QObject
    Q_OBJECT
 
 signals:
+   void signalNewRevisions();
    void signalMergeWithConflicts(const QVector<QString> &conflictFiles);
 
    // TODO: To review
@@ -66,6 +67,11 @@ public:
    bool clone(const QString &url, const QString &fullPath);
    bool initRepo(const QString &fullPath);
    /* END Git CONFIGURATION */
+
+   /* START CACHE */
+   int totalCommits() const;
+   Revision getCommitByRow(int row) const;
+   /*  END  CACHE */
 
    /* START BRANCHES */
    GitExecResult createBranchFromAnotherBranch(const QString &oldName, const QString &newName);

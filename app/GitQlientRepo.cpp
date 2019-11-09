@@ -5,7 +5,9 @@
 #include <BranchesWidget.h>
 #include <CommitWidget.h>
 #include <RevisionWidget.h>
+#include <RepositoryViewDelegate.h>
 #include <CommitHistoryColumns.h>
+#include <CommitHistoryModel.h>
 #include <CommitHistoryView.h>
 #include <git.h>
 #include <QLogger.h>
@@ -31,7 +33,8 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
    , mRevisionsCache(new RevisionsCache(mGit))
-   , mRepositoryView(new CommitHistoryView(mRevisionsCache, mGit))
+   , mRepositoryModel(new CommitHistoryModel(mGit))
+   , mRepositoryView(new CommitHistoryView(mGit))
    , commitStackedWidget(new QStackedWidget())
    , centerStackedWidget(new QStackedWidget())
    , mainStackedLayout(new QStackedLayout())
@@ -51,7 +54,9 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
 
+   mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setObjectName("mainRepoView");
+   mRepositoryView->setItemDelegate(new RepositoryViewDelegate(mGit, mRevisionsCache, mRepositoryView));
 
    commitStackedWidget->setCurrentIndex(0);
    commitStackedWidget->addWidget(mRevisionWidget);

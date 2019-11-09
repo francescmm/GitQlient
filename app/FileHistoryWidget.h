@@ -30,6 +30,7 @@ class Git;
 class QFileSystemModel;
 class FileBlameWidget;
 class QTreeView;
+class CommitHistoryModel;
 class CommitHistoryView;
 
 class FileHistoryWidget : public QFrame
@@ -46,6 +47,7 @@ public:
 private:
    QSharedPointer<Git> mGit;
    QFileSystemModel *fileSystemModel = nullptr;
+   CommitHistoryModel *mRepoModel = nullptr;
    CommitHistoryView *mRepoView = nullptr;
    QTreeView *fileSystemView = nullptr;
    FileBlameWidget *mFileBlameWidget = nullptr;

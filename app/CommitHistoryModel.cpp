@@ -6,9 +6,8 @@
 
 #include <QDateTime>
 
-CommitHistoryModel::CommitHistoryModel(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QObject *p)
+CommitHistoryModel::CommitHistoryModel(QSharedPointer<Git> git, QObject *p)
    : QAbstractItemModel(p)
-   , mRevCache(revCache)
    , mGit(git)
 {
    mColumns.insert(CommitHistoryColumns::GRAPH, "Graph");
@@ -18,9 +17,7 @@ CommitHistoryModel::CommitHistoryModel(QSharedPointer<RevisionsCache> revCache, 
    mColumns.insert(CommitHistoryColumns::AUTHOR, "Author");
    mColumns.insert(CommitHistoryColumns::DATE, "Date");
 
-   clear();
-
-   connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryModel::onNewRevisions);
+   connect(mGit.get(), &Git::signalNewRevisions, this, &CommitHistoryModel::onNewRevisions);
 }
 
 CommitHistoryModel::~CommitHistoryModel()
@@ -41,14 +38,14 @@ bool CommitHistoryModel::hasChildren(const QModelIndex &parent) const
 
 QString CommitHistoryModel::sha(int row) const
 {
-   return mRevCache->sha(row);
+   return index(row, static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
 }
 
 void CommitHistoryModel::clear()
 {
    beginResetModel();
    curFNames.clear();
-   rowCnt = mRevCache->count();
+   rowCnt = mGit->totalCommits();
    endResetModel();
    emit headerDataChanged(Qt::Horizontal, 0, 5);
 }
@@ -61,7 +58,7 @@ void CommitHistoryModel::onNewRevisions()
       return;
 
    // do not attempt to insert 0 rows since the inclusive range would be invalid
-   const auto revisionsCount = mRevCache->count();
+   const auto revisionsCount = mGit->totalCommits();
    if (rowCnt == revisionsCount)
       return;
 
@@ -149,7 +146,7 @@ QVariant CommitHistoryModel::data(const QModelIndex &index, int role) const
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
       return QVariant();
 
-   const auto r = mRevCache->getRevLookupByRow(index.row());
+   const auto r = mGit->getCommitByRow(index.row());
    const auto sha = r.sha();
 
    if (role == Qt::ToolTipRole)

@@ -12,7 +12,6 @@ Author: Marco Costalba (C) 2005-2007
 #include <CommitHistoryColumns.h>
 #include <RepositoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
-#include <RevisionsCache.h>
 #include <ShaFilterProxyModel.h>
 #include <git.h>
 
@@ -23,10 +22,9 @@ Author: Marco Costalba (C) 2005-2007
 #include <QLogger.h>
 using namespace QLogger;
 
-CommitHistoryView::CommitHistoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent)
+CommitHistoryView::CommitHistoryView(QSharedPointer<Git> git, QWidget *parent)
    : QTreeView(parent)
    , mGit(git)
-   , mCommitHistoryModel(new CommitHistoryModel(revCache, mGit))
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -37,12 +35,13 @@ CommitHistoryView::CommitHistoryView(QSharedPointer<RevisionsCache> revCache, QS
 
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
 
-   const auto lvd = new RepositoryViewDelegate(mGit, revCache, this);
-   setItemDelegate(lvd);
-
    connect(this, &CommitHistoryView::customContextMenuRequested, this, &CommitHistoryView::showContextMenu);
+}
 
-   setModel(mCommitHistoryModel);
+void CommitHistoryView::setModel(QAbstractItemModel *model)
+{
+   mCommitHistoryModel = dynamic_cast<CommitHistoryModel *>(model);
+   QTreeView::setModel(model);
    setupGeometry();
 }
 

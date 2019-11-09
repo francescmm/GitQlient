@@ -27,7 +27,6 @@
 
 class Git;
 class CommitHistoryModel;
-class RevisionsCache;
 class ShaFilterProxyModel;
 
 class CommitHistoryView : public QTreeView
@@ -41,8 +40,8 @@ signals:
    void signalAmendCommit(const QString &sha);
 
 public:
-   explicit CommitHistoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git,
-                              QWidget *parent = nullptr);
+   explicit CommitHistoryView(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   void setModel(QAbstractItemModel *model) override;
    ~CommitHistoryView() override;
    QList<QString> getSelectedShaList() const;
    void filterBySha(const QStringList &shaList);

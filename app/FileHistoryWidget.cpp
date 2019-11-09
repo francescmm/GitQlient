@@ -3,11 +3,13 @@
 #include <git.h>
 #include <FileBlameWidget.h>
 #include <BranchesViewDelegate.h>
+#include <RepositoryViewDelegate.h>
+#include <CommitHistoryModel.h>
+#include <CommitHistoryView.h>
 
 #include <QFileSystemModel>
 #include <QTreeView>
 #include <QGridLayout>
-#include <CommitHistoryView.h>
 #include <QHeaderView>
 #include <QMenu>
 
@@ -15,10 +17,14 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QS
    : QFrame(parent)
    , mGit(git)
    , fileSystemModel(new QFileSystemModel())
-   , mRepoView(new CommitHistoryView(revCache, mGit))
+   , mRepoModel(new CommitHistoryModel(mGit))
+   , mRepoView(new CommitHistoryView(mGit))
    , fileSystemView(new QTreeView())
    , mFileBlameWidget(new FileBlameWidget(mGit))
 {
+   mRepoView->setModel(mRepoModel);
+   mRepoView->setItemDelegate(new RepositoryViewDelegate(mGit, revCache, mRepoView));
+
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
    mRepoView->setObjectName("blameRepoView");

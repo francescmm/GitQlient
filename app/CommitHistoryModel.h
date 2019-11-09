@@ -35,8 +35,7 @@ class CommitHistoryModel : public QAbstractItemModel
 {
    Q_OBJECT
 public:
-   explicit CommitHistoryModel(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git,
-                               QObject *parent = nullptr);
+   explicit CommitHistoryModel(QSharedPointer<Git> git, QObject *parent = nullptr);
    ~CommitHistoryModel() override;
    void clear();
    QString sha(int row) const;
@@ -50,7 +49,6 @@ public:
    int columnCount(const QModelIndex &) const override { return mColumns.count(); }
 
 private:
-   QSharedPointer<RevisionsCache> mRevCache;
    QSharedPointer<Git> mGit;
 
    void onNewRevisions();
