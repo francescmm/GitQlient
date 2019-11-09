@@ -8,31 +8,19 @@ Author: Marco Costalba (C) 2005-2007
                              */
 #include "CommitHistoryView.h"
 
-#include <RevisionsCache.h>
-#include <Revision.h>
 #include <CommitHistoryModel.h>
 #include <CommitHistoryColumns.h>
-#include <git.h>
-#include <ShaFilterProxyModel.h>
 #include <RepositoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
-#include <QLogger.h>
+#include <RevisionsCache.h>
+#include <ShaFilterProxyModel.h>
+#include <git.h>
 
-#include <QApplication>
-#include <QClipboard>
-#include <QDrag>
 #include <QHeaderView>
-#include <QMimeData>
-#include <QMouseEvent>
-#include <QPainter>
-#include <QPixmap>
 #include <QSettings>
-#include <QShortcut>
-#include <QUrl>
-#include <QMenu>
-#include <QByteArray>
 #include <QDateTime>
 
+#include <QLogger.h>
 using namespace QLogger;
 
 CommitHistoryView::CommitHistoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent)
@@ -54,7 +42,7 @@ CommitHistoryView::CommitHistoryView(QSharedPointer<RevisionsCache> revCache, QS
    setItemDelegate(lvd);
 
    connect(this, &CommitHistoryView::customContextMenuRequested, this, &CommitHistoryView::showContextMenu);
-   connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryView::update);
+   // connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryView::update);
 
    setModel(mCommitHistoryModel);
    setupGeometry();
