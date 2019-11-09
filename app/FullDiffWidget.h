@@ -27,7 +27,6 @@
 #include <QTextEdit>
 #include <QPointer>
 
-class RevisionsCache;
 class Git;
 
 class DiffHighlighter : public QSyntaxHighlighter
@@ -49,7 +48,7 @@ class FullDiffWidget : public QTextEdit
    Q_OBJECT
 
 public:
-   explicit FullDiffWidget(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache, QWidget *parent = nullptr);
+   explicit FullDiffWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
    void clear();
    void refresh();
@@ -72,7 +71,6 @@ public slots:
 private:
    friend class DiffHighlighter;
    QSharedPointer<Git> mGit;
-   QSharedPointer<RevisionsCache> mRevCache;
 
    void scrollLineToTop(int lineNum);
    int positionToLineNum(int pos);

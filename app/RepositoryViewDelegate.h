@@ -26,7 +26,6 @@
 #include <QStyledItemDelegate>
 
 class CommitHistoryView;
-class RevisionsCache;
 class Git;
 
 const int ROW_HEIGHT = 25;

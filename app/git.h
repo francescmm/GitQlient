@@ -61,7 +61,7 @@ public:
    explicit Git();
 
    /* START Git CONFIGURATION */
-   bool init(const QString &wd, QSharedPointer<RevisionsCache> revCache);
+   bool init(const QString &wd);
    void init2();
    QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
@@ -70,7 +70,8 @@ public:
 
    /* START CACHE */
    int totalCommits() const;
-   Revision getCommitByRow(int row) const;
+   Revision getCommitInfoByRow(int row) const;
+   Revision getCommitInfo(const QString &sha);
    /*  END  CACHE */
 
    /* START BRANCHES */

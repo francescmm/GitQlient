@@ -2,7 +2,6 @@
 
 #include <git.h>
 #include <lanes.h>
-#include <RevisionsCache.h>
 #include <Revision.h>
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryView.h>
@@ -257,7 +256,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
 
-   const auto r = mGit->getCommitByRow(row);
+   const auto r = mGit->getCommitInfoByRow(row);
 
    if (r.sha().isEmpty())
       return;
@@ -334,7 +333,7 @@ void RepositoryViewDelegate::paintWip(QPainter *painter, QStyleOptionViewItem op
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
    int row = index.row();
-   const auto sha = mGit->getCommitByRow(row).sha();
+   const auto sha = mGit->getCommitInfoByRow(row).sha();
 
    if (sha.isEmpty())
       return;

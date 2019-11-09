@@ -26,7 +26,6 @@
 #include <QAbstractItemModel>
 #include <QSharedPointer>
 
-class RevisionsCache;
 class Git;
 class Revision;
 enum class CommitHistoryColumns;

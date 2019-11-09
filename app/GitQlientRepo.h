@@ -25,7 +25,6 @@
 
 #include <QFrame>
 
-class RevisionsCache;
 class Git;
 class QCloseEvent;
 class QFileSystemWatcher;
@@ -80,7 +79,6 @@ private:
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    QString mCurrentDir;
    QSharedPointer<Git> mGit;
-   QSharedPointer<RevisionsCache> mRevisionsCache;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;
    QStackedWidget *commitStackedWidget = nullptr;

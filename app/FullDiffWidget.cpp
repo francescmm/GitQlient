@@ -1,6 +1,5 @@
 #include "FullDiffWidget.h"
 
-#include <RevisionsCache.h>
 #include <Revision.h>
 #include <GitAsyncProcess.h>
 #include <git.h>
@@ -138,10 +137,9 @@ void DiffHighlighter::highlightBlock(const QString &text)
    }
 }
 
-FullDiffWidget::FullDiffWidget(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache, QWidget *parent)
+FullDiffWidget::FullDiffWidget(QSharedPointer<Git> git, QWidget *parent)
    : QTextEdit(parent)
    , mGit(git)
-   , mRevCache(revCache)
 {
    diffHighlighter = new DiffHighlighter(this);
 

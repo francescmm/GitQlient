@@ -64,6 +64,7 @@ bool writeToFile(const QString &fileName, const QString &data)
 
 Git::Git()
    : QObject()
+   , mRevCache(new RevisionsCache())
 {
 }
 
@@ -1314,9 +1315,14 @@ int Git::totalCommits() const
    return mRevCache->count();
 }
 
-Revision Git::getCommitByRow(int row) const
+Revision Git::getCommitInfoByRow(int row) const
 {
    return mRevCache->getRevLookupByRow(row);
+}
+
+Revision Git::getCommitInfo(const QString &sha)
+{
+   return mRevCache->getRevLookup(sha);
 }
 
 void Git::clearRevs()
@@ -1335,11 +1341,9 @@ void Git::clearFileNames()
    mFileNames.clear();
 }
 
-bool Git::init(const QString &wd, QSharedPointer<RevisionsCache> revCache)
+bool Git::init(const QString &wd)
 {
    QLog_Info("Git", "Initializing Git...");
-
-   mRevCache = revCache;
 
    // normally called when changing git directory. Must be called after stop()
    clearRevs();

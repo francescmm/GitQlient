@@ -1,6 +1,5 @@
 #include "GitQlientRepo.h"
 
-#include <RevisionsCache.h>
 #include <Controls.h>
 #include <BranchesWidget.h>
 #include <CommitWidget.h>
@@ -32,7 +31,6 @@ using namespace QLogger;
 GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
-   , mRevisionsCache(new RevisionsCache(mGit))
    , mRepositoryModel(new CommitHistoryModel(mGit))
    , mRepositoryView(new CommitHistoryView(mGit))
    , commitStackedWidget(new QStackedWidget())
@@ -41,7 +39,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    , mControls(new Controls(mGit))
    , mCommitWidget(new CommitWidget(mGit))
    , mRevisionWidget(new RevisionWidget(mGit))
-   , mFullDiffWidget(new FullDiffWidget(mGit, mRevisionsCache))
+   , mFullDiffWidget(new FullDiffWidget(mGit))
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
    , fileHistoryWidget(new FileHistoryWidget(mGit))
@@ -146,7 +144,7 @@ void GitQlientRepo::updateUi()
    {
       QLog_Debug("UI", QString("Updating the GitQlient UI"));
 
-      mGit->init(mCurrentDir, mRevisionsCache);
+      mGit->init(mCurrentDir);
 
       mBranchesWidget->showBranches();
 
@@ -193,7 +191,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
       mGit->cancelAllProcesses();
 
-      const auto ok = mGit->init(newDir, mRevisionsCache);
+      const auto ok = mGit->init(newDir);
       mCurrentDir = mGit->getWorkingDir();
 
       if (ok)
@@ -299,7 +297,7 @@ void GitQlientRepo::showFileHistory(const QString &fileName)
 void GitQlientRepo::openCommitDiff()
 {
    const auto currentSha = mRepositoryView->getCurrentSha();
-   const auto rev = mRevisionsCache->getRevLookup(currentSha);
+   const auto rev = mGit->getCommitInfo(currentSha);
    mFullDiffWidget->loadDiff(currentSha, rev.parent(0));
    centerStackedWidget->setCurrentIndex(1);
 }
@@ -324,7 +322,7 @@ void GitQlientRepo::changesCommitted(bool ok)
 
 void GitQlientRepo::onCommitClicked(const QModelIndex &index)
 {
-   const auto sha = mRevisionsCache->getRevLookupByRow(index.row()).sha();
+   const auto sha = mGit->getCommitInfoByRow(index.row()).sha();
 
    onCommitSelected(sha);
 }

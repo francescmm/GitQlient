@@ -25,7 +25,6 @@
 
 #include <QFrame>
 
-class RevisionsCache;
 class Git;
 class QFileSystemModel;
 class FileBlameWidget;

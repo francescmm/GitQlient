@@ -41,7 +41,7 @@ signals:
    void signalCacheUpdated();
 
 public:
-   explicit RevisionsCache(QSharedPointer<Git> git, QObject *parent = nullptr);
+   explicit RevisionsCache(QObject *parent = nullptr);
 
    QString sha(int row) const;
    Revision getRevLookupByRow(int row) const;
@@ -65,7 +65,6 @@ public:
    bool containsRevisionFile(const QString &sha) const { return mRevsFiles.contains(sha); }
 
 private:
-   QSharedPointer<Git> mGit;
    QHash<QString, Revision> revs;
    QHash<QString, RevisionFile> mRevsFiles;
    QVector<QString> revOrder;
