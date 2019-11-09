@@ -38,7 +38,7 @@ class RevisionWidget;
 class FullDiffControler;
 class FullDiffWidget;
 class FileDiffWidget;
-class RepositoryView;
+class CommitHistoryView;
 class RevsView;
 class BranchesWidget;
 class FileHistoryWidget;
@@ -80,7 +80,7 @@ private:
    QString mCurrentDir;
    QSharedPointer<Git> mGit;
    QSharedPointer<RevisionsCache> mRevisionsCache;
-   RepositoryView *mRepositoryView = nullptr;
+   CommitHistoryView *mRepositoryView = nullptr;
    QStackedWidget *commitStackedWidget = nullptr;
    QStackedWidget *centerStackedWidget = nullptr;
    QStackedLayout *mainStackedLayout = nullptr;

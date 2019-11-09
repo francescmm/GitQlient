@@ -25,6 +25,7 @@ HEADERS += \
     $$PWD/ClickableFrame.h \
     $$PWD/CommitHistoryColumns.h \
     $$PWD/CommitHistoryModel.h \
+    $$PWD/CommitHistoryView.h \
     $$PWD/CommitWidget.h \
     $$PWD/ConfigWidget.h \
     $$PWD/Controls.h \
@@ -46,7 +47,6 @@ HEADERS += \
     $$PWD/GitRequestorProcess.h \
     $$PWD/GitSyncProcess.h \
     $$PWD/RepositoryContextMenu.h \
-    $$PWD/RepositoryView.h \
     $$PWD/RepositoryViewDelegate.h \
     $$PWD/Revision.h \
     $$PWD/RevisionFile.h \
@@ -69,6 +69,7 @@ SOURCES += \
     $$PWD/BranchesWidget.cpp \
     $$PWD/ClickableFrame.cpp \
     $$PWD/CommitHistoryModel.cpp \
+    $$PWD/CommitHistoryView.cpp \
     $$PWD/CommitWidget.cpp \
     $$PWD/ConfigWidget.cpp \
     $$PWD/Controls.cpp \
@@ -90,7 +91,6 @@ SOURCES += \
     $$PWD/GitRequestorProcess.cpp \
     $$PWD/GitSyncProcess.cpp \
     $$PWD/RepositoryContextMenu.cpp \
-    $$PWD/RepositoryView.cpp \
     $$PWD/RepositoryViewDelegate.cpp \
     $$PWD/Revision.cpp \
     $$PWD/RevisionFile.cpp \

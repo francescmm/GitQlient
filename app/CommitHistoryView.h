@@ -30,7 +30,7 @@ class CommitHistoryModel;
 class RevisionsCache;
 class ShaFilterProxyModel;
 
-class RepositoryView : public QTreeView
+class CommitHistoryView : public QTreeView
 {
    Q_OBJECT
 
@@ -41,8 +41,9 @@ signals:
    void signalAmendCommit(const QString &sha);
 
 public:
-   explicit RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent = nullptr);
-   ~RepositoryView() override;
+   explicit CommitHistoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git,
+                              QWidget *parent = nullptr);
+   ~CommitHistoryView() override;
    QList<QString> getSelectedShaList() const;
    void filterBySha(const QStringList &shaList);
    bool hasActiveFiler() const { return mIsFiltering; }

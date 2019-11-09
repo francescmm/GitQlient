@@ -7,7 +7,7 @@
 #include <QFileSystemModel>
 #include <QTreeView>
 #include <QGridLayout>
-#include <RepositoryView.h>
+#include <CommitHistoryView.h>
 #include <QHeaderView>
 #include <QMenu>
 
@@ -15,7 +15,7 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QS
    : QFrame(parent)
    , mGit(git)
    , fileSystemModel(new QFileSystemModel())
-   , mRepoView(new RepositoryView(revCache, mGit))
+   , mRepoView(new CommitHistoryView(revCache, mGit))
    , fileSystemView(new QTreeView())
    , mFileBlameWidget(new FileBlameWidget(mGit))
 {
@@ -45,7 +45,7 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<RevisionsCache> revCache, QS
    historyBlameLayout->addWidget(fileSystemView, 1, 0);
    historyBlameLayout->addWidget(mFileBlameWidget, 0, 1, 2, 1);
 
-   connect(mFileBlameWidget, &FileBlameWidget::signalCommitSelected, mRepoView, &RepositoryView::focusOnCommit);
+   connect(mFileBlameWidget, &FileBlameWidget::signalCommitSelected, mRepoView, &CommitHistoryView::focusOnCommit);
 }
 
 void FileHistoryWidget::init(const QString &workingDirectory)

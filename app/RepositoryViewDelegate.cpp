@@ -5,7 +5,7 @@
 #include <RevisionsCache.h>
 #include <Revision.h>
 #include <CommitHistoryColumns.h>
-#include <RepositoryView.h>
+#include <CommitHistoryView.h>
 #include <CommitHistoryModel.h>
 
 #include <QSortFilterProxyModel>
@@ -15,7 +15,7 @@ static const int COLORS_NUM = 8;
 static const int MIN_VIEW_WIDTH_PX = 480;
 
 RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache,
-                                               RepositoryView *view)
+                                               CommitHistoryView *view)
    : QStyledItemDelegate()
    , mGit(git)
    , mRevCache(revCache)

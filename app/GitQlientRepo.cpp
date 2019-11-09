@@ -6,7 +6,7 @@
 #include <CommitWidget.h>
 #include <RevisionWidget.h>
 #include <CommitHistoryColumns.h>
-#include <RepositoryView.h>
+#include <CommitHistoryView.h>
 #include <git.h>
 #include <QLogger.h>
 #include <FileDiffWidget.h>
@@ -31,7 +31,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
    , mRevisionsCache(new RevisionsCache(mGit))
-   , mRepositoryView(new RepositoryView(mRevisionsCache, mGit))
+   , mRepositoryView(new CommitHistoryView(mRevisionsCache, mGit))
    , commitStackedWidget(new QStackedWidget())
    , centerStackedWidget(new QStackedWidget())
    , mainStackedLayout(new QStackedLayout())
@@ -95,20 +95,20 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    });
    connect(mControls, &Controls::signalGoBlame, this, [this]() { mainStackedLayout->setCurrentIndex(1); });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateUi);
-   connect(mControls, &Controls::signalGoToSha, mRepositoryView, &RepositoryView::focusOnCommit);
+   connect(mControls, &Controls::signalGoToSha, mRepositoryView, &CommitHistoryView::focusOnCommit);
    connect(mControls, &Controls::signalGoToSha, this, &GitQlientRepo::onCommitSelected);
 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &GitQlientRepo::updateUi);
-   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &RepositoryView::focusOnCommit);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &GitQlientRepo::onCommitSelected);
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
 
-   connect(mRepositoryView, &RepositoryView::signalViewUpdated, this, &GitQlientRepo::updateUi);
-   connect(mRepositoryView, &RepositoryView::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
-   connect(mRepositoryView, &RepositoryView::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
-   connect(mRepositoryView, &RepositoryView::clicked, this, &GitQlientRepo::onCommitClicked);
-   connect(mRepositoryView, &RepositoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
-   connect(mRepositoryView, &RepositoryView::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
+   connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &GitQlientRepo::updateUi);
+   connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
+   connect(mRepositoryView, &CommitHistoryView::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
+   connect(mRepositoryView, &CommitHistoryView::clicked, this, &GitQlientRepo::onCommitClicked);
+   connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
+   connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
 
    connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mCommitWidget, &CommitWidget::signalCheckoutPerformed, this, &GitQlientRepo::updateUiFromWatcher);

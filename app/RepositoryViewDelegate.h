@@ -25,7 +25,7 @@
 
 #include <QStyledItemDelegate>
 
-class RepositoryView;
+class CommitHistoryView;
 class RevisionsCache;
 class Git;
 
@@ -39,7 +39,7 @@ class RepositoryViewDelegate : public QStyledItemDelegate
    Q_OBJECT
 
 public:
-   RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache, RepositoryView *view);
+   RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache, CommitHistoryView *view);
 
    virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
    virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
@@ -50,7 +50,7 @@ public:
 private:
    QSharedPointer<Git> mGit;
    QSharedPointer<RevisionsCache> mRevCache;
-   RepositoryView *mView = nullptr;
+   CommitHistoryView *mView = nullptr;
    int diffTargetRow = -1;
 
    void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;

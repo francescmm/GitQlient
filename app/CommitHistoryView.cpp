@@ -6,7 +6,7 @@ Author: Marco Costalba (C) 2005-2007
              Copyright: See COPYING file that comes with this distribution
 
                              */
-#include "RepositoryView.h"
+#include "CommitHistoryView.h"
 
 #include <RevisionsCache.h>
 #include <Revision.h>
@@ -35,7 +35,7 @@ Author: Marco Costalba (C) 2005-2007
 
 using namespace QLogger;
 
-RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent)
+CommitHistoryView::CommitHistoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent)
    : QTreeView(parent)
    , mRevCache(revCache)
    , mGit(git)
@@ -48,19 +48,19 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    setSelectionMode(QAbstractItemView::ExtendedSelection);
    header()->setSortIndicatorShown(false);
 
-   connect(header(), &QHeaderView::sectionResized, this, &RepositoryView::saveHeaderState);
+   connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
 
    const auto lvd = new RepositoryViewDelegate(mGit, revCache, this);
    setItemDelegate(lvd);
 
-   connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
-   connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &RepositoryView::update);
+   connect(this, &CommitHistoryView::customContextMenuRequested, this, &CommitHistoryView::showContextMenu);
+   connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryView::update);
 
    setModel(mCommitHistoryModel);
    setupGeometry();
 }
 
-void RepositoryView::filterBySha(const QStringList &shaList)
+void CommitHistoryView::filterBySha(const QStringList &shaList)
 {
    mIsFiltering = true;
 
@@ -75,13 +75,13 @@ void RepositoryView::filterBySha(const QStringList &shaList)
    setupGeometry();
 }
 
-RepositoryView::~RepositoryView()
+CommitHistoryView::~CommitHistoryView()
 {
    QSettings s;
    s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
 }
 
-void RepositoryView::setupGeometry()
+void CommitHistoryView::setupGeometry()
 {
    QSettings s;
    const auto previousState = s.value(QString("RepositoryView::%1").arg(objectName()), QByteArray()).toByteArray();
@@ -106,7 +106,7 @@ void RepositoryView::setupGeometry()
    }
 }
 
-bool RepositoryView::update()
+bool CommitHistoryView::update()
 {
    auto stRow = mRevCache ? mRevCache->row(mCurrentSha) : -1;
 
@@ -144,19 +144,19 @@ bool RepositoryView::update()
    return currentIndex().isValid();
 }
 
-void RepositoryView::currentChanged(const QModelIndex &index, const QModelIndex &)
+void CommitHistoryView::currentChanged(const QModelIndex &index, const QModelIndex &)
 {
    mCurrentSha = mRevCache->revLookup(index.row()).sha();
 
    emit clicked(index);
 }
 
-void RepositoryView::clear()
+void CommitHistoryView::clear()
 {
    mCommitHistoryModel->clear();
 }
 
-void RepositoryView::focusOnCommit(const QString &goToSha)
+void CommitHistoryView::focusOnCommit(const QString &goToSha)
 {
    mCurrentSha = mGit->getRefSha(goToSha);
 
@@ -165,30 +165,30 @@ void RepositoryView::focusOnCommit(const QString &goToSha)
    update();
 }
 
-void RepositoryView::showContextMenu(const QPoint &pos)
+void CommitHistoryView::showContextMenu(const QPoint &pos)
 {
    const auto shas = getSelectedShaList();
 
    if (!shas.isEmpty())
    {
       const auto menu = new RepositoryContextMenu(mGit, shas, this);
-      connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &RepositoryView::signalViewUpdated);
-      connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &RepositoryView::signalOpenDiff);
-      connect(menu, &RepositoryContextMenu::signalOpenCompareDiff, this, &RepositoryView::signalOpenCompareDiff);
-      connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &RepositoryView::signalAmendCommit);
+      connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
+      connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
+      connect(menu, &RepositoryContextMenu::signalOpenCompareDiff, this, &CommitHistoryView::signalOpenCompareDiff);
+      connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
       menu->exec(viewport()->mapToGlobal(pos));
    }
    else
       QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
 }
 
-void RepositoryView::saveHeaderState()
+void CommitHistoryView::saveHeaderState()
 {
    QSettings s;
    s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
 }
 
-QList<QString> RepositoryView::getSelectedShaList() const
+QList<QString> CommitHistoryView::getSelectedShaList() const
 {
    const auto indexes = selectedIndexes();
    QMap<QDateTime, QString> shas;
