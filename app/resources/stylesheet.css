@@ -153,12 +153,12 @@ RevisionWidget, CommitWidget
     min-width: 300px;
 }
 
-RepositoryView, FullDiffWidget, CommitWidget > QListWidget, FileListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget, CommitWidget > QListWidget, FileListWidget, QTreeWidget
 {
     background-color: #2E2F30;
 }
 
-RepositoryView, FullDiffWidget, CommitWidget > QListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget, CommitWidget > QListWidget, QTreeWidget
 {
     color: white;
 }
