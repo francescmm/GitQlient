@@ -196,8 +196,10 @@ void Controls::popStashedWork()
 {
    const auto ret = mGit->pop();
 
-   if (ret)
+   if (ret.success)
       emit signalRepositoryUpdated();
+   else
+      QMessageBox::critical(this, tr("Error while stash pop"), ret.output.toString());
 }
 
 void Controls::pruneBranches()

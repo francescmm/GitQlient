@@ -671,9 +671,9 @@ GitExecResult Git::cherryPickCommit(const QString &sha)
    return run(QString("git cherry-pick %1").arg(sha));
 }
 
-bool Git::pop()
+GitExecResult Git::pop() const
 {
-   return run("git stash pop").first;
+   return run("git stash pop");
 }
 
 bool Git::stash()

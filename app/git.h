@@ -115,7 +115,7 @@ public:
    GitExecResult pull();
    bool fetch();
    GitExecResult cherryPickCommit(const QString &sha);
-   bool pop();
+   GitExecResult pop() const;
    bool stash();
    bool resetCommit(const QString &sha, CommitResetType type);
    bool resetCommits(int parentDepth);

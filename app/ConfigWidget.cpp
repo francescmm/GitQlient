@@ -109,18 +109,14 @@ void ConfigWidget::openRepo()
 void ConfigWidget::cloneRepo()
 {
    CreateRepoDlg cloneDlg(CreateRepoDlgType::CLONE, mGit);
-
    connect(&cloneDlg, &CreateRepoDlg::signalRepoCloned, this, &ConfigWidget::signalOpenRepo);
-
    cloneDlg.exec();
 }
 
 void ConfigWidget::initRepo()
 {
    CreateRepoDlg cloneDlg(CreateRepoDlgType::INIT, mGit);
-
    connect(&cloneDlg, &CreateRepoDlg::signalRepoCloned, this, &ConfigWidget::signalOpenRepo);
-
    cloneDlg.exec();
 }
 
@@ -177,6 +173,7 @@ QWidget *ConfigWidget::createConfigWidget()
 
    const auto tabWidget = new QFrame();
    tabWidget->setObjectName("tabWidget");
+
    const auto layout = new QHBoxLayout(tabWidget);
    layout->setSpacing(0);
    layout->setContentsMargins(QMargins());
