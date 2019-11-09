@@ -38,9 +38,6 @@ class RepositoryViewDelegate : public QStyledItemDelegate
 {
    Q_OBJECT
 
-signals:
-   void updateView();
-
 public:
    RepositoryViewDelegate(QSharedPointer<Git> git, QSharedPointer<RevisionsCache> revCache, RepositoryView *view);
 
@@ -49,9 +46,6 @@ public:
    {
       return QSize(LANE_WIDTH, ROW_HEIGHT);
    }
-
-public slots:
-   void diffTargetChanged(int);
 
 private:
    QSharedPointer<Git> mGit;

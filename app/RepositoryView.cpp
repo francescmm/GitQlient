@@ -53,8 +53,6 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    const auto lvd = new RepositoryViewDelegate(mGit, revCache, this);
    setItemDelegate(lvd);
 
-   connect(lvd, &RepositoryViewDelegate::updateView, viewport(), qOverload<>(&QWidget::update));
-   connect(this, &RepositoryView::diffTargetChanged, lvd, &RepositoryViewDelegate::diffTargetChanged);
    connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
    connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &RepositoryView::update);
 
@@ -140,8 +138,6 @@ bool RepositoryView::update()
          scrollTo(newIndex);
       }
    }
-
-   emit diffTargetChanged(mRevCache ? mRevCache->row(mCurrentSha) : -1);
 
    setupGeometry();
 

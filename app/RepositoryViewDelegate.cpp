@@ -23,15 +23,6 @@ RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, QSharedP
 {
 }
 
-void RepositoryViewDelegate::diffTargetChanged(int row)
-{
-   if (diffTargetRow != row)
-   {
-      diffTargetRow = row;
-      emit updateView();
-   }
-}
-
 static QColor blend(const QColor &col1, const QColor &col2, int amount = 128)
 {
    // Returns ((256 - amount)*col1 + amount*col2) / 256;

@@ -52,9 +52,6 @@ public:
    void focusOnCommit(const QString &goToSha);
    QString getCurrentSha() const { return mCurrentSha; }
 
-signals:
-   void diffTargetChanged(int); // used by new model_view integration
-
 private:
    QSharedPointer<RevisionsCache> mRevCache;
    QSharedPointer<Git> mGit;
