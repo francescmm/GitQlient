@@ -319,7 +319,7 @@ void GitQlientRepo::changesCommitted(bool ok)
 
 void GitQlientRepo::onCommitClicked(const QModelIndex &index)
 {
-   const auto sha = mRevisionsCache->revLookup(index.row()).sha();
+   const auto sha = mRevisionsCache->getRevLookupByRow(index.row()).sha();
 
    onCommitSelected(sha);
 }

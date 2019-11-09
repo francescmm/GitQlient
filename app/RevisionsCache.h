@@ -44,7 +44,7 @@ public:
    explicit RevisionsCache(QSharedPointer<Git> git, QObject *parent = nullptr);
 
    QString sha(int row) const;
-   Revision revLookup(int row) const;
+   Revision getRevLookupByRow(int row) const;
    Revision getRevLookup(const QString &sha) const;
    void insertRevision(const Revision &rev);
    void updateLanes(Revision &c, Lanes &lns);

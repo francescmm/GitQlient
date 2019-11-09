@@ -11,7 +11,7 @@ QString RevisionsCache::sha(int row) const
    return row >= 0 && row < revOrder.count() ? QString(revOrder.at(row)) : QString();
 }
 
-Revision RevisionsCache::revLookup(int row) const
+Revision RevisionsCache::getRevLookupByRow(int row) const
 {
    const auto shaStr = sha(row);
    return revs.value(shaStr, Revision());

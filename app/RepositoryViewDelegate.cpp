@@ -259,7 +259,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
 
-   const auto r = mRevCache->revLookup(row);
+   const auto r = mRevCache->getRevLookupByRow(row);
 
    if (r.sha().isEmpty())
       return;
@@ -336,7 +336,7 @@ void RepositoryViewDelegate::paintWip(QPainter *painter, QStyleOptionViewItem op
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
    int row = index.row();
-   const auto sha = mRevCache->revLookup(row).sha();
+   const auto sha = mRevCache->getRevLookupByRow(row).sha();
 
    if (sha.isEmpty())
       return;

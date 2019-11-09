@@ -149,7 +149,7 @@ QVariant CommitHistoryModel::data(const QModelIndex &index, int role) const
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
       return QVariant();
 
-   const auto r = mRevCache->revLookup(index.row());
+   const auto r = mRevCache->getRevLookupByRow(index.row());
    const auto sha = r.sha();
 
    if (role == Qt::ToolTipRole)
