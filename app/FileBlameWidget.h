@@ -64,8 +64,8 @@ private:
    QVector<Annotation> processBlame(const QString &blame);
    void formatAnnotatedFile(const QVector<Annotation> &annotations);
    QLabel *createDateLabel(const Annotation &annotation, bool isFirst);
-   QLabel *createAuthorLabel(const Annotation &annotation, bool isFirst);
-   ClickableFrame *createMessageLabel(const Annotation &annotation, bool isFirst);
+   QLabel *createAuthorLabel(const QString &author, bool isFirst);
+   ClickableFrame *createMessageLabel(const QString &sha, bool isFirst);
    QLabel *createNumLabel(const Annotation &annotation, int row);
-   QLabel *createCodeLabel(const Annotation &annotation);
+   QLabel *createCodeLabel(const QString &content);
 };

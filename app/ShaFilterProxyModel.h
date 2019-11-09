@@ -33,6 +33,8 @@ public:
    explicit ShaFilterProxyModel(QObject *parent = nullptr);
 
    void setAcceptedSha(const QStringList &acceptedShaList) { mAcceptedShas = acceptedShaList; }
+   void beginResetModel() { QSortFilterProxyModel::beginResetModel(); }
+   void endResetModel() { QSortFilterProxyModel::endResetModel(); }
 
 protected:
    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;

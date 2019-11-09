@@ -48,12 +48,21 @@ void CommitHistoryView::filterBySha(const QStringList &shaList)
 {
    mIsFiltering = true;
 
-   delete mProxyModel;
+   if (mProxyModel)
+   {
+      mProxyModel->beginResetModel();
+      mProxyModel->setAcceptedSha(shaList);
+      mProxyModel->endResetModel();
+   }
+   else
+   {
+      mProxyModel = new ShaFilterProxyModel(this);
+      mProxyModel->setSourceModel(mCommitHistoryModel);
+      mProxyModel->setAcceptedSha(shaList);
+      setModel(mProxyModel);
+   }
 
-   mProxyModel = new ShaFilterProxyModel(this);
-   mProxyModel->setAcceptedSha(shaList);
-   mProxyModel->setSourceModel(mCommitHistoryModel);
-   setModel(mProxyModel);
+   // update();
 
    setupGeometry();
 }

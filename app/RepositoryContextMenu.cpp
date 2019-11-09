@@ -197,7 +197,7 @@ void RepositoryContextMenu::stashPop()
 {
    const auto ret = mGit->pop();
 
-   if (ret)
+   if (ret.success)
       emit signalRepositoryUpdated();
 }
 

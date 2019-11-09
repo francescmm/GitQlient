@@ -42,15 +42,13 @@ FileBlameWidget::FileBlameWidget(QSharedPointer<Git> git, QWidget *parent)
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->addWidget(mScrollArea);
-
-   setLayout(layout);
 }
 
 void FileBlameWidget::setup(const QString &fileName)
 {
    const auto ret = mGit->blame(fileName);
 
-   if (ret.success && !ret.output.toString().contains("fatal"))
+   if (ret.success && !ret.output.toString().startsWith("fatal:"))
    {
       delete mAnotation;
       mAnotation = nullptr;
@@ -126,8 +124,8 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
             annotationLayout->addWidget(messageLabel, labelRow, 2);
 
          dateLabel = createDateLabel(annotations.at(row), row == 0);
-         authorLabel = createAuthorLabel(annotations.at(row), row == 0);
-         messageLabel = createMessageLabel(annotations.at(row), row == 0);
+         authorLabel = createAuthorLabel(annotations.at(row).author, row == 0);
+         messageLabel = createMessageLabel(annotations.at(row).sha, row == 0);
 
          labelRow = row;
          labelRowSpan = 1;
@@ -136,7 +134,7 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
          ++labelRowSpan;
 
       annotationLayout->addWidget(createNumLabel(annotations.at(row), row), row, 3);
-      annotationLayout->addWidget(createCodeLabel(annotations.at(row)), row, 4);
+      annotationLayout->addWidget(createCodeLabel(annotations.at(row).content), row, 4);
    }
 
    // Adding the last row
@@ -195,9 +193,9 @@ QLabel *FileBlameWidget::createDateLabel(const Annotation &annotation, bool isFi
    return dateLabel;
 }
 
-QLabel *FileBlameWidget::createAuthorLabel(const Annotation &annotation, bool isFirst)
+QLabel *FileBlameWidget::createAuthorLabel(const QString &author, bool isFirst)
 {
-   const auto authorLabel = new QLabel(annotation.author);
+   const auto authorLabel = new QLabel(author);
    authorLabel->setObjectName(isFirst ? QString("authorPrimusInterPares") : QString("authorFirstOfItsName"));
    authorLabel->setFont(mInfoFont);
    authorLabel->setAlignment(Qt::AlignTop | Qt::AlignLeft);
@@ -205,20 +203,17 @@ QLabel *FileBlameWidget::createAuthorLabel(const Annotation &annotation, bool is
    return authorLabel;
 }
 
-ClickableFrame *FileBlameWidget::createMessageLabel(const Annotation &annotation, bool isFirst)
+ClickableFrame *FileBlameWidget::createMessageLabel(const QString &sha, bool isFirst)
 {
-   const auto revision = mGit->getRevLookup(annotation.sha);
-   const auto commitMsg = !revision.sha().isEmpty() ? revision.shortLog() : QString("WIP");
+   const auto revision = mGit->getRevLookup(sha);
+   const auto commitMsg = !revision.sha().isEmpty() ? revision.shortLog() : QString("Local changes");
 
    const auto messageLabel = new ClickableFrame(commitMsg, Qt::AlignTop | Qt::AlignLeft);
    messageLabel->setObjectName(isFirst ? QString("primusInterPares") : QString("firstOfItsName"));
-   messageLabel->setToolTip(
-       QString("<p>%1</p><p>%2</p>")
-           .arg(annotation.sha, !revision.sha().isEmpty() ? revision.shortLog() : QString("Local changes")));
+   messageLabel->setToolTip(QString("<p>%1</p><p>%2</p>").arg(sha, commitMsg));
    messageLabel->setFont(mInfoFont);
 
-   connect(messageLabel, &ClickableFrame::clicked, this,
-           [this, annotation]() { emit signalCommitSelected(annotation.sha); });
+   connect(messageLabel, &ClickableFrame::clicked, this, [this, sha]() { emit signalCommitSelected(sha); });
 
    return messageLabel;
 }
@@ -243,9 +238,9 @@ QLabel *FileBlameWidget::createNumLabel(const Annotation &annotation, int row)
    return numberLabel;
 }
 
-QLabel *FileBlameWidget::createCodeLabel(const Annotation &annotation)
+QLabel *FileBlameWidget::createCodeLabel(const QString &content)
 {
-   const auto contentLabel = new QLabel(annotation.content);
+   const auto contentLabel = new QLabel(content);
    contentLabel->setFont(mCodeFont);
    contentLabel->setObjectName("normalLabel");
 
