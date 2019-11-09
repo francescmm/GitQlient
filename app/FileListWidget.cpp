@@ -3,8 +3,7 @@
 #include <FileContextMenu.h>
 #include <RevisionFile.h>
 #include <FileListDelegate.h>
-#include <StateInfo.h>
-#include "git.h"
+#include <git.h>
 
 #include <QApplication>
 #include <QDrag>
@@ -27,11 +26,6 @@ FileListWidget::FileListWidget(QSharedPointer<Git> git, QWidget *p)
    setPalette(pl);
 
    connect(this, &FileListWidget::customContextMenuRequested, this, &FileListWidget::showContextMenu);
-}
-
-void FileListWidget::setup(StateInfo &stateInfo)
-{
-   st = &stateInfo;
 }
 
 void FileListWidget::addItem(const QString &label, const QColor &clr)
@@ -62,10 +56,10 @@ void FileListWidget::insertFiles(const QString currentSha, const QString &compar
    clear();
 
    const auto files = mGit->getFiles(currentSha, compareToSha, true);
-
-   if (st->isMerge() && !st->allMergeFiles())
-      st->setAllMergeFiles(!st->allMergeFiles());
-
+   /*
+      if (st->isMerge() && !st->allMergeFiles())
+         st->setAllMergeFiles(!st->allMergeFiles());
+   */
    if (files.count() != 0)
    {
       setUpdatesEnabled(false);

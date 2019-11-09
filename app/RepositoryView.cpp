@@ -12,7 +12,6 @@ Author: Marco Costalba (C) 2005-2007
 #include <Revision.h>
 #include <RepositoryModel.h>
 #include <RepositoryModelColumns.h>
-#include <domain.h>
 #include <git.h>
 #include <ShaFilterProxyModel.h>
 #include <RepositoryContextMenu.h>
@@ -41,7 +40,6 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    , mRevCache(revCache)
    , mGit(git)
    , mRepositoryModel(new RepositoryModel(mRevCache, mGit))
-   , d(new Domain())
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -58,19 +56,11 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    connect(lvd, &RepositoryViewDelegate::updateView, viewport(), qOverload<>(&QWidget::update));
    connect(this, &RepositoryView::diffTargetChanged, lvd, &RepositoryViewDelegate::diffTargetChanged);
    connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
-   connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, [this]() {
-      if (!d->st.sha().isEmpty() || mRepositoryModel->rowCount() == 0)
-         return;
-
-      d->st.setSha(mRepositoryModel->index(0, static_cast<int>(RepositoryModelColumns::SHA)).data().toString());
-      d->st.setSelectItem(true);
-      update();
-   });
+   connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &RepositoryView::update);
 }
 
 void RepositoryView::setup()
 {
-   st = &(d->st);
    setModel(mRepositoryModel);
 
    setupGeometry(); // after setting delegate
@@ -102,7 +92,7 @@ void RepositoryView::setupGeometry()
 
    if (previousState.isEmpty())
    {
-      QHeaderView *hv = header();
+      const auto hv = header();
       hv->setCascadingSectionResizes(true);
       hv->resizeSection(static_cast<int>(RepositoryModelColumns::GRAPH), 80);
       hv->resizeSection(static_cast<int>(RepositoryModelColumns::SHA), 60);
@@ -119,28 +109,19 @@ void RepositoryView::setupGeometry()
    else
    {
       header()->restoreState(previousState);
+      header()->setSectionResizeMode(static_cast<int>(RepositoryModelColumns::LOG), QHeaderView::Stretch);
    }
-}
-
-int RepositoryView::getLaneType(const QString &sha, int pos) const
-{
-
-   const auto r = mRevCache->getRevLookup(sha);
-   return pos < r.lanes.count() && pos >= 0 ? static_cast<int>(r.lanes.at(pos)) : -1;
 }
 
 bool RepositoryView::update()
 {
-   if (!st)
-      return false;
-
-   auto stRow = mRevCache ? mRevCache->row(st->sha()) : -1;
+   auto stRow = mRevCache ? mRevCache->row(mCurrentSha) : -1;
 
    if (mIsFiltering)
       stRow = mProxyModel->mapFromSource(mRepositoryModel->index(stRow, 0)).row();
 
    if (stRow == -1)
-      return false; // main/tree view asked us a sha not in history
+      return false;
 
    QModelIndex index = currentIndex();
    QItemSelectionModel *sel = selectionModel();
@@ -148,9 +129,7 @@ bool RepositoryView::update()
    if (index.isValid() && (index.row() == stRow))
    {
 
-      if (sel->isSelected(index) != st->selectItem())
-         sel->select(index, QItemSelectionModel::Toggle);
-
+      sel->select(index, QItemSelectionModel::Toggle);
       scrollTo(index);
    }
    else
@@ -162,16 +141,12 @@ bool RepositoryView::update()
       QModelIndex newIndex = model()->index(stRow, 0);
       if (newIndex.isValid())
       {
-
-         // emits QItemSelectionModel::currentChanged()
          setCurrentIndex(newIndex);
          scrollTo(newIndex);
-         if (!st->selectItem())
-            sel->select(newIndex, QItemSelectionModel::Deselect);
       }
    }
 
-   emit diffTargetChanged(mRevCache ? mRevCache->row(st->sha()) : -1);
+   emit diffTargetChanged(mRevCache ? mRevCache->row(mCurrentSha) : -1);
 
    setupGeometry();
 
@@ -180,72 +155,28 @@ bool RepositoryView::update()
 
 void RepositoryView::currentChanged(const QModelIndex &index, const QModelIndex &)
 {
+   mCurrentSha = mRevCache->revLookup(index.row()).sha();
 
-   const auto &selRev = model()->index(index.row(), static_cast<int>(RepositoryModelColumns::SHA)).data().toString();
-   if (st->sha() != selRev)
-   { // to avoid looping
-      st->setSha(selRev);
-      st->setSelectItem(true);
-      d->update();
-
-      emit clicked(index);
-   }
+   emit clicked(index);
 }
 
 void RepositoryView::clear()
 {
-   d->clear();
    mRepositoryModel->clear();
-}
-
-Domain *RepositoryView::domain()
-{
-   return d;
 }
 
 void RepositoryView::focusOnCommit(const QString &goToSha)
 {
-   const auto sha = mGit->getRefSha(goToSha);
+   mCurrentSha = mGit->getRefSha(goToSha);
 
-   QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(sha));
+   QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 
-   if (!sha.isEmpty())
-   {
-      d->st.setSha(sha);
-      d->update();
-      update();
-   }
-}
-
-QVariant RepositoryView::data(int row, RepositoryModelColumns column) const
-{
-   return model()->index(row, static_cast<int>(column)).data();
-}
-
-bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)
-{
-
-   QModelIndex index = indexAt(e->pos());
-   const auto &selSha = model()->index(index.row(), static_cast<int>(RepositoryModelColumns::SHA)).data().toString();
-
-   if (selSha.isEmpty())
-      return false;
-
-   if (e->modifiers() == Qt::ControlModifier)
-   { // check for 'diff to' function
-      if (selSha != ZERO_SHA)
-      {
-         st->setDiffToSha(selSha != st->diffToSha() ? selSha : QString());
-         d->update();
-         return true; // filter event out
-      }
-   }
-   return false;
+   update();
 }
 
 void RepositoryView::showContextMenu(const QPoint &pos)
 {
-   const auto shas = getSelectedSha();
+   const auto shas = getSelectedShaList();
 
    if (!shas.isEmpty())
    {
@@ -266,7 +197,7 @@ void RepositoryView::saveHeaderState()
    s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
 }
 
-QList<QString> RepositoryView::getSelectedSha() const
+QList<QString> RepositoryView::getSelectedShaList() const
 {
    const auto indexes = selectedIndexes();
    QMap<QDateTime, QString> shas;
@@ -305,33 +236,4 @@ QList<QString> RepositoryView::getSelectedSha() const
    }
 
    return commitsInSameBranch || shas.count() == 1 ? shas.values() : QList<QString>();
-}
-
-bool RepositoryView::getLaneParentsChildren(const QString &sha, int x, QStringList &p, QStringList &c)
-{
-   uint lane = x / LANE_WIDTH;
-   int t = getLaneType(sha, lane);
-   if (t == static_cast<int>(LaneType::EMPTY) || t == -1)
-      return false;
-
-   // first find the parents
-   p.clear();
-   QString root;
-   if (!isFreeLane(static_cast<LaneType>(t)))
-   {
-      p = mRevCache->getRevLookup(sha).parents(); // pointer cannot be nullptr
-      root = sha;
-   }
-   else
-   {
-      const QString &par(mRevCache->getLaneParent(sha, lane));
-      if (par.isEmpty())
-         return false;
-
-      p.append(par);
-      root = p.first();
-   }
-   // then find children
-   c = mGit->getChildren(root);
-   return true;
 }

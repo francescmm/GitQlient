@@ -2,7 +2,6 @@
 
 #include <Revision.h>
 #include <FileListWidget.h>
-#include <domain.h>
 #include <git.h>
 
 #include <QLabel>
@@ -85,11 +84,6 @@ RevisionWidget::RevisionWidget(QSharedPointer<Git> git, QWidget *parent)
            [this](QListWidgetItem *item) { emit signalOpenFileCommit(mCurrentSha, mParentSha, item->text()); });
    connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &RevisionWidget::signalShowFileHistory);
    connect(fileListWidget, &FileListWidget::contextMenu, this, &RevisionWidget::signalOpenFileContextMenu);
-}
-
-void RevisionWidget::setup(Domain *rv)
-{
-   fileListWidget->setup(rv->st);
 }
 
 void RevisionWidget::setCurrentCommitSha(const QString &sha)

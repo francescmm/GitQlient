@@ -11,8 +11,6 @@ Copyright: See COPYING file that comes with this distribution
 #include <QTreeView>
 
 class Git;
-class StateInfo;
-class Domain;
 class RepositoryModel;
 class Revision;
 class RevisionsCache;
@@ -34,15 +32,14 @@ public:
    explicit RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent = nullptr);
    ~RepositoryView();
    void setup();
-   QList<QString> getSelectedSha() const;
+   QList<QString> getSelectedShaList() const;
    void filterBySha(const QStringList &shaList);
    bool hasActiveFiler() const { return mIsFiltering; }
 
    bool update();
    void clear();
-   Domain *domain();
    void focusOnCommit(const QString &goToSha);
-   QVariant data(int row, RepositoryModelColumns column) const;
+   QString getCurrentSha() const { return mCurrentSha; }
 
 signals:
    void diffTargetChanged(int); // used by new model_view integration
@@ -54,18 +51,11 @@ private:
    QSharedPointer<RevisionsCache> mRevCache;
    QSharedPointer<Git> mGit;
    RepositoryModel *mRepositoryModel = nullptr;
-   Domain *d = nullptr;
-   StateInfo *st = nullptr;
    ShaFilterProxyModel *mProxyModel = nullptr;
    bool mIsFiltering = false;
+   QString mCurrentSha;
 
    void showContextMenu(const QPoint &);
    void saveHeaderState();
-
    void setupGeometry();
-   bool filterRightButtonPressed(QMouseEvent *e);
-   bool getLaneParentsChildren(const QString &sha, int x, QStringList &p, QStringList &c);
-   int getLaneType(const QString &sha, int pos) const;
-
-   unsigned long secs;
 };

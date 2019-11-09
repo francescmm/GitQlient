@@ -10,14 +10,11 @@
 
 #include <RevisionsCache.h>
 #include <Revision.h>
-#include <StateInfo.h>
 #include <lanes.h>
-
-#include "RepositoryModel.h"
-#include "GitSyncProcess.h"
-#include "GitAsyncProcess.h"
-#include "GitRequestorProcess.h"
-#include "domain.h"
+#include <RepositoryModel.h>
+#include <GitSyncProcess.h>
+#include <GitAsyncProcess.h>
+#include <GitRequestorProcess.h>
 
 #include <QApplication>
 #include <QDir>

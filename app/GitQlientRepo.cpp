@@ -12,7 +12,6 @@
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
 #include <FileHistoryWidget.h>
-#include <domain.h>
 #include <Revision.h>
 
 #include <QFileSystemModel>
@@ -85,7 +84,6 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    gridLayout->addLayout(mainStackedLayout, 1, 0, 1, 3);
 
    mRepositoryView->setup();
-   mRevisionWidget->setup(mRepositoryView->domain());
 
    mAutoFetch->setInterval(mConfig.mAutoFetchSecs * 1000);
    mAutoFilesUpdate->setInterval(mConfig.mAutoFileUpdateSecs * 1000);
@@ -297,8 +295,9 @@ void GitQlientRepo::showFileHistory(const QString &fileName)
 
 void GitQlientRepo::openCommitDiff()
 {
-   const auto st = mRepositoryView->domain()->st;
-   mFullDiffWidget->onStateInfoUpdate(st.sha(), st.diffToSha());
+   const auto currentSha = mRepositoryView->getCurrentSha();
+   const auto rev = mRevisionsCache->getRevLookup(currentSha);
+   mFullDiffWidget->onStateInfoUpdate(currentSha, rev.parent(0));
    centerStackedWidget->setCurrentIndex(1);
 }
 
@@ -322,12 +321,9 @@ void GitQlientRepo::changesCommitted(bool ok)
 
 void GitQlientRepo::onCommitClicked(const QModelIndex &index)
 {
-   if (mRepositoryView == dynamic_cast<RepositoryView *>(sender()))
-   {
-      const auto sha = mRepositoryView->data(index.row(), RepositoryModelColumns::SHA).toString();
+   const auto sha = mRevisionsCache->revLookup(index.row()).sha();
 
-      onCommitSelected(sha);
-   }
+   onCommitSelected(sha);
 }
 
 void GitQlientRepo::onCommitSelected(const QString &goToSha)

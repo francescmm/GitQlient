@@ -57,7 +57,6 @@ HEADERS += \
     $$PWD/TagDlg.h \
     $$PWD/Terminal.h \
     $$PWD/UnstagedFilesContextMenu.h \
-    $$PWD/domain.h \
     $$PWD/git.h \
     $$PWD/lanes.h \
     $$PWD/BranchDlg.h
@@ -103,7 +102,6 @@ SOURCES += \
     $$PWD/TagDlg.cpp \
     $$PWD/Terminal.cpp \
     $$PWD/UnstagedFilesContextMenu.cpp \
-    $$PWD/domain.cpp \
     $$PWD/git.cpp \
     $$PWD/lanes.cpp \
     $$PWD/BranchDlg.cpp
