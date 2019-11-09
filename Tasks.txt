@@ -5,8 +5,6 @@
 - Revision
 - RevisionFile
 - RevisionCache
-- StateInfo
-- Domain
 - FileListWidget
 - Lanes
 - Git

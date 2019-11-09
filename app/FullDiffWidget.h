@@ -29,7 +29,6 @@
 
 class RevisionsCache;
 class Git;
-class StateInfo;
 
 class DiffHighlighter : public QSyntaxHighlighter
 {
@@ -68,7 +67,7 @@ public slots:
    void typeWriterFontChanged();
    void procReadyRead(const QByteArray &data);
    void procFinished();
-   void onStateInfoUpdate(const QString &sha, const QString &diffToSha);
+   void loadDiff(const QString &sha, const QString &diffToSha);
 
 private:
    friend class DiffHighlighter;

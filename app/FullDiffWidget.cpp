@@ -2,10 +2,8 @@
 
 #include <RevisionsCache.h>
 #include <Revision.h>
-#include <StateInfo.h>
-
-#include "git.h"
-#include "GitAsyncProcess.h"
+#include <GitAsyncProcess.h>
+#include <git.h>
 
 #include <QScrollBar>
 #include <QTextCharFormat>
@@ -342,7 +340,7 @@ void FullDiffWidget::procFinished()
    diffLoaded = true;
 }
 
-void FullDiffWidget::onStateInfoUpdate(const QString &sha, const QString &diffToSha)
+void FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
 {
    diffHighlighter->setCombinedLength(0);
 

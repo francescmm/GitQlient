@@ -297,13 +297,13 @@ void GitQlientRepo::openCommitDiff()
 {
    const auto currentSha = mRepositoryView->getCurrentSha();
    const auto rev = mRevisionsCache->getRevLookup(currentSha);
-   mFullDiffWidget->onStateInfoUpdate(currentSha, rev.parent(0));
+   mFullDiffWidget->loadDiff(currentSha, rev.parent(0));
    centerStackedWidget->setCurrentIndex(1);
 }
 
 void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
 {
-   mFullDiffWidget->onStateInfoUpdate(shas.last(), shas.first());
+   mFullDiffWidget->loadDiff(shas.last(), shas.first());
    centerStackedWidget->setCurrentIndex(1);
 }
 
