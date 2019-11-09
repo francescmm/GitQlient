@@ -39,7 +39,7 @@ public:
    bool hasActiveFiler() const { return mIsFiltering; }
 
    bool update();
-   void clear(bool complete);
+   void clear();
    Domain *domain();
    void focusOnCommit(const QString &goToSha);
    QVariant data(int row, RepositoryModelColumns column) const;

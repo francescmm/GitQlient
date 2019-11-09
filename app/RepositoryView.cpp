@@ -41,7 +41,7 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    , mRevCache(revCache)
    , mGit(git)
    , mRepositoryModel(new RepositoryModel(mRevCache, mGit))
-   , d(new Domain(mRevCache))
+   , d(new Domain())
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -186,15 +186,15 @@ void RepositoryView::currentChanged(const QModelIndex &index, const QModelIndex 
    { // to avoid looping
       st->setSha(selRev);
       st->setSelectItem(true);
-      d->update(false);
+      d->update();
 
       emit clicked(index);
    }
 }
 
-void RepositoryView::clear(bool complete)
+void RepositoryView::clear()
 {
-   d->clear(complete);
+   d->clear();
    mRepositoryModel->clear();
 }
 
@@ -212,7 +212,7 @@ void RepositoryView::focusOnCommit(const QString &goToSha)
    if (!sha.isEmpty())
    {
       d->st.setSha(sha);
-      d->update(false);
+      d->update();
       update();
    }
 }
@@ -236,7 +236,7 @@ bool RepositoryView::filterRightButtonPressed(QMouseEvent *e)
       if (selSha != ZERO_SHA)
       {
          st->setDiffToSha(selSha != st->diffToSha() ? selSha : QString());
-         d->update(false);
+         d->update();
          return true; // filter event out
       }
    }

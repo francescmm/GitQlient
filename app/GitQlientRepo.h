@@ -107,7 +107,7 @@ private:
    void onAmendCommit(const QString &sha);
    void onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file);
    void setWatcher();
-   void clearWindow(bool deepClear);
+   void clearWindow();
    void setWidgetsEnabled(bool enabled);
    void executeCommand();
    void showFileHistory(const QString &fileName);

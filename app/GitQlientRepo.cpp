@@ -149,7 +149,7 @@ void GitQlientRepo::updateUi()
 
       mBranchesWidget->showBranches();
 
-      mRepositoryView->clear(true);
+      mRepositoryView->clear();
 
       mGit->init2();
 
@@ -197,7 +197,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
       if (ok)
       {
-         clearWindow(true);
+         clearWindow();
          setWidgetsEnabled(true);
 
          mGit->init2();
@@ -218,7 +218,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
       else
       {
          mCurrentDir = "";
-         clearWindow(true);
+         clearWindow();
          setWidgetsEnabled(false);
       }
    }
@@ -227,7 +227,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
       QLog_Info("UI", QString("Repository is empty. Cleaning GitQlient"));
 
       mCurrentDir = "";
-      clearWindow(true);
+      clearWindow();
       setWidgetsEnabled(false);
    }
 }
@@ -259,7 +259,7 @@ void GitQlientRepo::setWatcher()
    }
 }
 
-void GitQlientRepo::clearWindow(bool deepClear)
+void GitQlientRepo::clearWindow()
 {
    blockSignals(true);
 
@@ -269,7 +269,7 @@ void GitQlientRepo::clearWindow(bool deepClear)
    mCommitWidget->clear();
    mRevisionWidget->clear();
 
-   mRepositoryView->clear(deepClear);
+   mRepositoryView->clear();
    mFullDiffWidget->clear();
    mFileDiffWidget->clear();
    mBranchesWidget->clear();
