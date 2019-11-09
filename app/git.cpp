@@ -1381,6 +1381,8 @@ void Git::processRevision(const QByteArray &ba)
          break;
 
    } while (nextStart < ba.size());
+
+   emit mRevCache->signalCacheUpdated();
 }
 
 void Git::flushFileNames(FileNamesLoader &fl)

@@ -53,7 +53,6 @@ public:
    int row(const QString &sha) const;
    int count() const { return revOrder.count(); }
    bool isEmpty() const { return revOrder.isEmpty(); }
-   void flushTail(int earlyOutputCnt, int earlyOutputCntBase);
    void clear();
    QString &createRevisionSha(int index) { return revOrder[index]; }
    QString getRevisionSha(int index) const { return revOrder.at(index); }

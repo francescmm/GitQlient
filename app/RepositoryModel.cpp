@@ -56,34 +56,10 @@ QString RepositoryModel::sha(int row) const
    return mRevCache->sha(row);
 }
 
-void RepositoryModel::flushTail()
+void RepositoryModel::clear()
 {
    beginResetModel();
-   mRevCache->flushTail(earlyOutputCnt, 0);
-   // lns->clear();
-   rowCnt = mRevCache->count();
-   endResetModel();
-}
-
-void RepositoryModel::clear(bool complete)
-{
-
-   if (!complete)
-   {
-      if (!mRevCache->isEmpty())
-         flushTail();
-
-      return;
-   }
-
-   beginResetModel();
-
-   mRevCache->clear();
-
-   setEarlyOutputState(false);
-   // lns->clear();
    curFNames.clear();
-
    rowCnt = mRevCache->count();
    endResetModel();
    emit headerDataChanged(Qt::Horizontal, 0, 5);
@@ -153,8 +129,10 @@ QVariant RepositoryModel::getToolTipData(const Revision &r) const
    QDateTime d;
    d.setSecsSinceEpoch(r.authorDate().toUInt());
 
-   return QString("<p>%1 - %2<p></p>%3</p>%4")
-       .arg(r.author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
+   return sha == ZERO_SHA
+       ? QString()
+       : QString("<p>%1 - %2<p></p>%3</p>%4")
+             .arg(r.author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
 }
 
 QVariant RepositoryModel::getDisplayData(const Revision &rev, int column) const

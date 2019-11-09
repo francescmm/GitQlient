@@ -47,8 +47,6 @@ void RevisionsCache::insertRevision(const Revision &rev)
 
    if (!revOrder.contains(sha))
       revOrder.append(sha);
-
-   emit signalCacheUpdated();
 }
 
 void RevisionsCache::updateLanes(Revision &c, Lanes &lns)
@@ -103,26 +101,6 @@ QString RevisionsCache::getShortLog(const QString &sha) const
 int RevisionsCache::row(const QString &sha) const
 {
    return revs.value(sha).orderIdx;
-}
-
-void RevisionsCache::flushTail(int earlyOutputCnt, int)
-{
-   if (earlyOutputCnt < 0 || earlyOutputCnt >= count())
-      return;
-
-   auto cnt = count() - earlyOutputCnt + 1;
-
-   while (cnt > 0)
-   {
-      const auto sha = revOrder.last();
-      revs.remove(sha);
-      revOrder.pop_back();
-      --cnt;
-   }
-
-   // reset all lanes, will be redrawn
-   for (int i = 0; i < revOrder.count(); i++)
-      revs[revOrder[i]].lanes.clear();
 }
 
 void RevisionsCache::clear()

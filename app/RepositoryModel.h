@@ -25,9 +25,8 @@ public:
    explicit RepositoryModel(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git,
                             QObject *parent = nullptr);
    ~RepositoryModel() override;
-   void clear(bool complete = true);
+   void clear();
    QString sha(int row) const;
-   void setEarlyOutputState(bool b = true) { earlyOutputCnt = (b ? earlyOutputCntBase : -1); }
 
    QVariant data(const QModelIndex &index, int role) const override;
    QVariant headerData(int s, Qt::Orientation o, int role = Qt::DisplayRole) const override;
@@ -47,11 +46,9 @@ private:
 
    QVariant getToolTipData(const Revision &r) const;
    QVariant getDisplayData(const Revision &rev, int column) const;
-   void flushTail();
 
    QMap<RepositoryModelColumns, QString> mColumns;
    int earlyOutputCnt;
-   int earlyOutputCntBase;
    int rowCnt = 0;
    QStringList curFNames;
    QStringList renamedRevs;
