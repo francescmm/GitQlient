@@ -46,7 +46,6 @@ HEADERS += \
     $$PWD/GitRequestorProcess.h \
     $$PWD/GitSyncProcess.h \
     $$PWD/RepositoryContextMenu.h \
-    $$PWD/RepositoryModel.h \
     $$PWD/RepositoryView.h \
     $$PWD/RepositoryViewDelegate.h \
     $$PWD/Revision.h \
@@ -91,7 +90,6 @@ SOURCES += \
     $$PWD/GitRequestorProcess.cpp \
     $$PWD/GitSyncProcess.cpp \
     $$PWD/RepositoryContextMenu.cpp \
-    $$PWD/RepositoryModel.cpp \
     $$PWD/RepositoryView.cpp \
     $$PWD/RepositoryViewDelegate.cpp \
     $$PWD/Revision.cpp \

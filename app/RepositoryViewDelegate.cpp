@@ -6,7 +6,7 @@
 #include <Revision.h>
 #include <CommitHistoryColumns.h>
 #include <RepositoryView.h>
-#include <RepositoryModel.h>
+#include <CommitHistoryModel.h>
 
 #include <QSortFilterProxyModel>
 #include <QPainter>

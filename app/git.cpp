@@ -11,7 +11,6 @@
 #include <RevisionsCache.h>
 #include <Revision.h>
 #include <lanes.h>
-#include <RepositoryModel.h>
 #include <GitSyncProcess.h>
 #include <GitAsyncProcess.h>
 #include <GitRequestorProcess.h>

@@ -10,7 +10,7 @@ Author: Marco Costalba (C) 2005-2007
 
 #include <RevisionsCache.h>
 #include <Revision.h>
-#include <RepositoryModel.h>
+#include <CommitHistoryModel.h>
 #include <CommitHistoryColumns.h>
 #include <git.h>
 #include <ShaFilterProxyModel.h>
@@ -39,7 +39,7 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    : QTreeView(parent)
    , mRevCache(revCache)
    , mGit(git)
-   , mRepositoryModel(new RepositoryModel(mRevCache, mGit))
+   , mCommitHistoryModel(new CommitHistoryModel(mRevCache, mGit))
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -61,7 +61,7 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
 
 void RepositoryView::setup()
 {
-   setModel(mRepositoryModel);
+   setModel(mCommitHistoryModel);
 
    setupGeometry(); // after setting delegate
 }
@@ -71,11 +71,11 @@ void RepositoryView::filterBySha(const QStringList &shaList)
    mIsFiltering = true;
 
    delete mProxyModel;
-   setModel(mRepositoryModel);
+   setModel(mCommitHistoryModel);
 
    mProxyModel = new ShaFilterProxyModel(this);
    mProxyModel->setAcceptedSha(shaList);
-   mProxyModel->setSourceModel(mRepositoryModel);
+   mProxyModel->setSourceModel(mCommitHistoryModel);
    setModel(mProxyModel);
 }
 
@@ -118,7 +118,7 @@ bool RepositoryView::update()
    auto stRow = mRevCache ? mRevCache->row(mCurrentSha) : -1;
 
    if (mIsFiltering)
-      stRow = mProxyModel->mapFromSource(mRepositoryModel->index(stRow, 0)).row();
+      stRow = mProxyModel->mapFromSource(mCommitHistoryModel->index(stRow, 0)).row();
 
    if (stRow == -1)
       return false;
@@ -162,7 +162,7 @@ void RepositoryView::currentChanged(const QModelIndex &index, const QModelIndex 
 
 void RepositoryView::clear()
 {
-   mRepositoryModel->clear();
+   mCommitHistoryModel->clear();
 }
 
 void RepositoryView::focusOnCommit(const QString &goToSha)
@@ -205,9 +205,9 @@ QList<QString> RepositoryView::getSelectedShaList() const
 
    for (auto index : indexes)
    {
-      const auto sha = mRepositoryModel->sha(index.row());
+      const auto sha = mCommitHistoryModel->sha(index.row());
       const auto dtStr
-          = mRepositoryModel->index(index.row(), static_cast<int>(CommitHistoryColumns::DATE)).data().toString();
+          = mCommitHistoryModel->index(index.row(), static_cast<int>(CommitHistoryColumns::DATE)).data().toString();
       const auto dt = QDateTime::fromString(dtStr, "dd/MM/yyyy hh:mm");
 
       shas.insert(dt, sha);

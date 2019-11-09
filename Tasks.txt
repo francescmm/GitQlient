@@ -1,6 +1,5 @@
 0. Remove unnecessary files from the repo
 - RepositoryView
-- RepositoryModel
 - RepositoryViewDelegate
 - Revision
 - RevisionFile

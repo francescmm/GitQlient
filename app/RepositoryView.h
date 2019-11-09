@@ -11,7 +11,7 @@ Copyright: See COPYING file that comes with this distribution
 #include <QTreeView>
 
 class Git;
-class RepositoryModel;
+class CommitHistoryModel;
 class Revision;
 class RevisionsCache;
 class ShaFilterProxyModel;
@@ -50,7 +50,7 @@ private slots:
 private:
    QSharedPointer<RevisionsCache> mRevCache;
    QSharedPointer<Git> mGit;
-   RepositoryModel *mRepositoryModel = nullptr;
+   CommitHistoryModel *mCommitHistoryModel = nullptr;
    ShaFilterProxyModel *mProxyModel = nullptr;
    bool mIsFiltering = false;
    QString mCurrentSha;
