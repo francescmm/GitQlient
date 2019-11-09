@@ -57,13 +57,9 @@ RepositoryView::RepositoryView(QSharedPointer<RevisionsCache> revCache, QSharedP
    connect(this, &RepositoryView::diffTargetChanged, lvd, &RepositoryViewDelegate::diffTargetChanged);
    connect(this, &RepositoryView::customContextMenuRequested, this, &RepositoryView::showContextMenu);
    connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &RepositoryView::update);
-}
 
-void RepositoryView::setup()
-{
    setModel(mCommitHistoryModel);
-
-   setupGeometry(); // after setting delegate
+   setupGeometry();
 }
 
 void RepositoryView::filterBySha(const QStringList &shaList)
@@ -77,6 +73,8 @@ void RepositoryView::filterBySha(const QStringList &shaList)
    mProxyModel->setAcceptedSha(shaList);
    mProxyModel->setSourceModel(mCommitHistoryModel);
    setModel(mProxyModel);
+
+   setupGeometry();
 }
 
 RepositoryView::~RepositoryView()
@@ -94,10 +92,7 @@ void RepositoryView::setupGeometry()
    {
       const auto hv = header();
       hv->setCascadingSectionResizes(true);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::GRAPH), 80);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::SHA), 60);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::AUTHOR), 200);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::DATE), 115);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::GRAPH), 120);
       hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::LOG), QHeaderView::Stretch);
       hv->setStretchLastSection(false);
 

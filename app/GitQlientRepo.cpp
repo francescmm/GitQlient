@@ -83,8 +83,6 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    gridLayout->addWidget(mControls, 0, 1);
    gridLayout->addLayout(mainStackedLayout, 1, 0, 1, 3);
 
-   mRepositoryView->setup();
-
    mAutoFetch->setInterval(mConfig.mAutoFetchSecs * 1000);
    mAutoFilesUpdate->setInterval(mConfig.mAutoFileUpdateSecs * 1000);
 
