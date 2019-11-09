@@ -48,13 +48,12 @@ public:
    void filterBySha(const QStringList &shaList);
    bool hasActiveFiler() const { return mIsFiltering; }
 
-   bool update();
+   void update();
    void clear();
    void focusOnCommit(const QString &goToSha);
    QString getCurrentSha() const { return mCurrentSha; }
 
 private:
-   QSharedPointer<RevisionsCache> mRevCache;
    QSharedPointer<Git> mGit;
    CommitHistoryModel *mCommitHistoryModel = nullptr;
    ShaFilterProxyModel *mProxyModel = nullptr;

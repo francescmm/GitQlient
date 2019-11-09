@@ -25,9 +25,8 @@ using namespace QLogger;
 
 CommitHistoryView::CommitHistoryView(QSharedPointer<RevisionsCache> revCache, QSharedPointer<Git> git, QWidget *parent)
    : QTreeView(parent)
-   , mRevCache(revCache)
    , mGit(git)
-   , mCommitHistoryModel(new CommitHistoryModel(mRevCache, mGit))
+   , mCommitHistoryModel(new CommitHistoryModel(revCache, mGit))
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -42,7 +41,6 @@ CommitHistoryView::CommitHistoryView(QSharedPointer<RevisionsCache> revCache, QS
    setItemDelegate(lvd);
 
    connect(this, &CommitHistoryView::customContextMenuRequested, this, &CommitHistoryView::showContextMenu);
-   // connect(mRevCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryView::update);
 
    setModel(mCommitHistoryModel);
    setupGeometry();
@@ -94,47 +92,32 @@ void CommitHistoryView::setupGeometry()
    }
 }
 
-bool CommitHistoryView::update()
+void CommitHistoryView::update()
 {
-   auto stRow = mRevCache ? mRevCache->row(mCurrentSha) : -1;
+   auto index = currentIndex();
 
-   if (mIsFiltering)
-      stRow = mProxyModel->mapFromSource(mCommitHistoryModel->index(stRow, 0)).row();
-
-   if (stRow == -1)
-      return false;
-
-   QModelIndex index = currentIndex();
-   QItemSelectionModel *sel = selectionModel();
-
-   if (index.isValid() && (index.row() == stRow))
+   if (index.isValid())
    {
-
-      sel->select(index, QItemSelectionModel::Toggle);
+      selectionModel()->select(index, QItemSelectionModel::Toggle);
       scrollTo(index);
    }
    else
    {
-      // setCurrentIndex() does not clear previous
-      // selections in a multi selection QListView
       clearSelection();
 
-      QModelIndex newIndex = model()->index(stRow, 0);
-      if (newIndex.isValid())
+      index = model()->index(0, 0);
+
+      if (index.isValid())
       {
-         setCurrentIndex(newIndex);
-         scrollTo(newIndex);
+         setCurrentIndex(index);
+         scrollTo(index);
       }
    }
-
-   setupGeometry();
-
-   return currentIndex().isValid();
 }
 
 void CommitHistoryView::currentChanged(const QModelIndex &index, const QModelIndex &)
 {
-   mCurrentSha = mRevCache->revLookup(index.row()).sha();
+   mCurrentSha = model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
 
    emit clicked(index);
 }
