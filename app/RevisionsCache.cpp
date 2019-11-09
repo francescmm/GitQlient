@@ -43,6 +43,9 @@ void RevisionsCache::insertRevision(const Revision &rev)
          updateLanes(r, lns);
 
       revs.insert(sha, r);
+
+      if (revs.contains(rev.parent(0)))
+         revs.remove(rev.parent(0));
    }
 
    if (!revOrder.contains(sha))
