@@ -10,10 +10,10 @@ RESOURCES += \
 
 FORMS += \
     $$PWD/AddSubmoduleDlg.ui \
-    $$PWD/CommitWidget.ui \
     $$PWD/BranchDlg.ui \
     $$PWD/CreateRepoDlg.ui \
-    $$PWD/TagDlg.ui
+    $$PWD/TagDlg.ui \
+    $$PWD/WorkInProgressWidget.ui
 
 HEADERS += \
     $$PWD/AGitProcess.h \
@@ -28,7 +28,6 @@ HEADERS += \
     $$PWD/CommitHistoryView.h \
     $$PWD/CommitInfo.h \
     $$PWD/CommitInfoWidget.h \
-    $$PWD/CommitWidget.h \
     $$PWD/ConfigWidget.h \
     $$PWD/Controls.h \
     $$PWD/CreateRepoDlg.h \
@@ -56,6 +55,7 @@ HEADERS += \
     $$PWD/TagDlg.h \
     $$PWD/Terminal.h \
     $$PWD/UnstagedFilesContextMenu.h \
+    $$PWD/WorkInProgressWidget.h \
     $$PWD/git.h \
     $$PWD/lanes.h \
     $$PWD/BranchDlg.h
@@ -72,7 +72,6 @@ SOURCES += \
     $$PWD/CommitHistoryView.cpp \
     $$PWD/CommitInfo.cpp \
     $$PWD/CommitInfoWidget.cpp \
-    $$PWD/CommitWidget.cpp \
     $$PWD/ConfigWidget.cpp \
     $$PWD/Controls.cpp \
     $$PWD/CreateRepoDlg.cpp \
@@ -100,6 +99,7 @@ SOURCES += \
     $$PWD/TagDlg.cpp \
     $$PWD/Terminal.cpp \
     $$PWD/UnstagedFilesContextMenu.cpp \
+    $$PWD/WorkInProgressWidget.cpp \
     $$PWD/git.cpp \
     $$PWD/lanes.cpp \
     $$PWD/BranchDlg.cpp

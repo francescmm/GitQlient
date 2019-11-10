@@ -33,10 +33,10 @@ class RevisionFile;
 
 namespace Ui
 {
-class CommitWidget;
+class WorkInProgressWidget;
 }
 
-class CommitWidget : public QWidget
+class WorkInProgressWidget : public QWidget
 {
    Q_OBJECT
 
@@ -46,7 +46,7 @@ signals:
    void signalShowFileHistory(const QString &fileName);
 
 public:
-   explicit CommitWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit WorkInProgressWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
    void configure(const QString &sha);
    void clear();
@@ -54,7 +54,7 @@ public:
 
 private:
    bool mIsAmend = false;
-   Ui::CommitWidget *ui = nullptr;
+   Ui::WorkInProgressWidget *ui = nullptr;
    QSharedPointer<Git> mGit;
    QString mCurrentSha;
    QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;

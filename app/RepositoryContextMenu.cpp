@@ -1,7 +1,7 @@
 #include "RepositoryContextMenu.h"
 
 #include <git.h>
-#include <CommitWidget.h>
+#include <WorkInProgressWidget.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
 

@@ -2,7 +2,7 @@
 
 #include <Controls.h>
 #include <BranchesWidget.h>
-#include <CommitWidget.h>
+#include <WorkInProgressWidget.h>
 #include <CommitInfoWidget.h>
 #include <RepositoryViewDelegate.h>
 #include <CommitHistoryColumns.h>
@@ -37,7 +37,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    , centerStackedWidget(new QStackedWidget())
    , mainStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGit))
-   , mCommitWidget(new CommitWidget(mGit))
+   , mCommitWidget(new WorkInProgressWidget(mGit))
    , mRevisionWidget(new CommitInfoWidget(mGit))
    , mFullDiffWidget(new FullDiffWidget(mGit))
    , mFileDiffWidget(new FileDiffWidget(mGit))
@@ -114,9 +114,9 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
 
-   connect(mCommitWidget, &CommitWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
-   connect(mCommitWidget, &CommitWidget::signalCheckoutPerformed, this, &GitQlientRepo::updateUiFromWatcher);
-   connect(mCommitWidget, &CommitWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
+   connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
+   connect(mCommitWidget, &WorkInProgressWidget::signalCheckoutPerformed, this, &GitQlientRepo::updateUiFromWatcher);
+   connect(mCommitWidget, &WorkInProgressWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
 
    connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
    connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
