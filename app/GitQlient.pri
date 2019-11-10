@@ -27,6 +27,7 @@ HEADERS += \
     $$PWD/CommitHistoryModel.h \
     $$PWD/CommitHistoryView.h \
     $$PWD/CommitInfo.h \
+    $$PWD/CommitInfoWidget.h \
     $$PWD/CommitWidget.h \
     $$PWD/ConfigWidget.h \
     $$PWD/Controls.h \
@@ -50,7 +51,6 @@ HEADERS += \
     $$PWD/RepositoryContextMenu.h \
     $$PWD/RepositoryViewDelegate.h \
     $$PWD/RevisionFile.h \
-    $$PWD/RevisionWidget.h \
     $$PWD/RevisionsCache.h \
     $$PWD/ShaFilterProxyModel.h \
     $$PWD/TagDlg.h \
@@ -71,6 +71,7 @@ SOURCES += \
     $$PWD/CommitHistoryModel.cpp \
     $$PWD/CommitHistoryView.cpp \
     $$PWD/CommitInfo.cpp \
+    $$PWD/CommitInfoWidget.cpp \
     $$PWD/CommitWidget.cpp \
     $$PWD/ConfigWidget.cpp \
     $$PWD/Controls.cpp \
@@ -94,7 +95,6 @@ SOURCES += \
     $$PWD/RepositoryContextMenu.cpp \
     $$PWD/RepositoryViewDelegate.cpp \
     $$PWD/RevisionFile.cpp \
-    $$PWD/RevisionWidget.cpp \
     $$PWD/RevisionsCache.cpp \
     $$PWD/ShaFilterProxyModel.cpp \
     $$PWD/TagDlg.cpp \

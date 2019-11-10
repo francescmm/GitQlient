@@ -33,7 +33,7 @@ class QStackedWidget;
 class QStackedLayout;
 class Controls;
 class CommitWidget;
-class RevisionWidget;
+class CommitInfoWidget;
 class FullDiffControler;
 class FullDiffWidget;
 class FileDiffWidget;
@@ -86,7 +86,7 @@ private:
    QStackedLayout *mainStackedLayout = nullptr;
    Controls *mControls = nullptr;
    CommitWidget *mCommitWidget = nullptr;
-   RevisionWidget *mRevisionWidget = nullptr;
+   CommitInfoWidget *mRevisionWidget = nullptr;
    RevsView *rv = nullptr;
    FullDiffWidget *mFullDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;

@@ -3,7 +3,7 @@
 #include <Controls.h>
 #include <BranchesWidget.h>
 #include <CommitWidget.h>
-#include <RevisionWidget.h>
+#include <CommitInfoWidget.h>
 #include <RepositoryViewDelegate.h>
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryModel.h>
@@ -38,7 +38,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    , mainStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGit))
    , mCommitWidget(new CommitWidget(mGit))
-   , mRevisionWidget(new RevisionWidget(mGit))
+   , mRevisionWidget(new CommitInfoWidget(mGit))
    , mFullDiffWidget(new FullDiffWidget(mGit))
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
@@ -118,8 +118,8 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mCommitWidget, &CommitWidget::signalCheckoutPerformed, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mCommitWidget, &CommitWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
 
-   connect(mRevisionWidget, &RevisionWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
-   connect(mRevisionWidget, &RevisionWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
+   connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
+   connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
 
    setRepository(repo);
 

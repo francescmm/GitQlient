@@ -32,7 +32,7 @@ class Git;
 class QLabel;
 class FileListWidget;
 
-class RevisionWidget : public QWidget
+class CommitInfoWidget : public QWidget
 {
    Q_OBJECT
 
@@ -42,7 +42,7 @@ signals:
    void signalShowFileHistory(const QString &fileName);
 
 public:
-   explicit RevisionWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit CommitInfoWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
    void setCurrentCommitSha(const QString &sha);
    QString getCurrentCommitSha() const;

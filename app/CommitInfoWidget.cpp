@@ -1,4 +1,4 @@
-#include <RevisionWidget.h>
+#include <CommitInfoWidget.h>
 
 #include <CommitInfo.h>
 #include <FileListWidget.h>
@@ -12,7 +12,7 @@
 
 using namespace QLogger;
 
-RevisionWidget::RevisionWidget(QSharedPointer<Git> git, QWidget *parent)
+CommitInfoWidget::CommitInfoWidget(QSharedPointer<Git> git, QWidget *parent)
    : QWidget(parent)
    , mGit(git)
    , labelSha(new QLabel())
@@ -82,11 +82,11 @@ RevisionWidget::RevisionWidget(QSharedPointer<Git> git, QWidget *parent)
 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { emit signalOpenFileCommit(mCurrentSha, mParentSha, item->text()); });
-   connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &RevisionWidget::signalShowFileHistory);
-   connect(fileListWidget, &FileListWidget::contextMenu, this, &RevisionWidget::signalOpenFileContextMenu);
+   connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitInfoWidget::signalShowFileHistory);
+   connect(fileListWidget, &FileListWidget::contextMenu, this, &CommitInfoWidget::signalOpenFileContextMenu);
 }
 
-void RevisionWidget::setCurrentCommitSha(const QString &sha)
+void CommitInfoWidget::setCurrentCommitSha(const QString &sha)
 {
    if (sha == mCurrentSha)
       return;
@@ -131,12 +131,12 @@ void RevisionWidget::setCurrentCommitSha(const QString &sha)
    }
 }
 
-QString RevisionWidget::getCurrentCommitSha() const
+QString CommitInfoWidget::getCurrentCommitSha() const
 {
    return mCurrentSha;
 }
 
-void RevisionWidget::clear()
+void CommitInfoWidget::clear()
 {
    fileListWidget->clear();
    labelSha->clear();
