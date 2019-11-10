@@ -48,7 +48,7 @@ signals:
 public:
    explicit CommitWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
-   void init(const QString &sha);
+   void configure(const QString &sha);
    void clear();
    bool isAmendActive() const { return mIsAmend; }
 

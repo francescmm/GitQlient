@@ -164,7 +164,7 @@ void GitQlientRepo::updateCache(bool full)
       mRepositoryView->focusOnCommit(currentSha);
 
       if (commitStackedIndex == 1)
-         mCommitWidget->init(currentSha);
+         mCommitWidget->configure(currentSha);
 
       if (centerStackedWidget->currentIndex() == 1)
          openCommitDiff();
@@ -182,7 +182,7 @@ void GitQlientRepo::updateUiFromWatcher()
       mGit->updateWipRevision();
 
       if (!mCommitWidget->isAmendActive())
-         mCommitWidget->init(ZERO_SHA);
+         mCommitWidget->configure(ZERO_SHA);
 
       if (centerStackedWidget->currentIndex() == 1)
          openCommitDiff();
@@ -343,7 +343,7 @@ void GitQlientRepo::onCommitSelected(const QString &goToSha)
    QLog_Info("UI", QString("Selected commit {%1}").arg(sha));
 
    if (isWip)
-      mCommitWidget->init(sha);
+      mCommitWidget->configure(sha);
    else
       mRevisionWidget->setCurrentCommitSha(sha);
 }
@@ -351,7 +351,7 @@ void GitQlientRepo::onCommitSelected(const QString &goToSha)
 void GitQlientRepo::onAmendCommit(const QString &sha)
 {
    commitStackedWidget->setCurrentIndex(1);
-   mCommitWidget->init(sha);
+   mCommitWidget->configure(sha);
 }
 
 void GitQlientRepo::onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file)

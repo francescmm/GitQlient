@@ -64,7 +64,7 @@ CommitWidget::CommitWidget(QSharedPointer<Git> git, QWidget *parent)
    connect(ui->stagedFilesList, &QListWidget::itemClicked, this, &CommitWidget::removeFileFromCommitList);
 }
 
-void CommitWidget::init(const QString &sha)
+void CommitWidget::configure(const QString &sha)
 {
    auto shaChange = mCurrentSha != sha;
    mCurrentSha = sha;
