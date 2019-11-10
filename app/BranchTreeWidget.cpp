@@ -42,7 +42,7 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
       QApplication::restoreOverrideCursor();
 
       if (ret.success)
-         emit signalBranchesUpdated();
+         emit signalBranchCheckedOut();
       else
          QMessageBox::critical(this, tr("Checkout branch error"), ret.output.toString());
    }

@@ -159,10 +159,14 @@ BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, mRemoteBranchesTree,
            &BranchTreeWidget::clearSelection);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalBranchesUpdated, this, &BranchesWidget::signalBranchesUpdated);
+   connect(mLocalBranchesTree, &BranchTreeWidget::signalBranchCheckedOut, this,
+           &BranchesWidget::signalBranchCheckedOut);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, mLocalBranchesTree,
            &BranchTreeWidget::clearSelection);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalBranchesUpdated, this, &BranchesWidget::signalBranchesUpdated);
+   connect(mRemoteBranchesTree, &BranchTreeWidget::signalBranchCheckedOut, this,
+           &BranchesWidget::signalBranchCheckedOut);
    connect(mTagsList, &QListWidget::itemClicked, this, &BranchesWidget::onTagClicked);
    connect(mTagsList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showTagsContextMenu);
    connect(mTagsList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showTagsContextMenu);

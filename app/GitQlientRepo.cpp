@@ -102,6 +102,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mControls, &Controls::signalGoToSha, this, &GitQlientRepo::onCommitSelected);
 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &GitQlientRepo::updateUi);
+   connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, [this]() { updateCache(true); });
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &GitQlientRepo::onCommitSelected);
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
@@ -140,11 +141,16 @@ void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
 
 void GitQlientRepo::updateUi()
 {
+   updateCache(false);
+}
+
+void GitQlientRepo::updateCache(bool full)
+{
    if (!mCurrentDir.isEmpty())
    {
       QLog_Debug("UI", QString("Updating the GitQlient UI"));
 
-      mGit->init(mCurrentDir);
+      mGit->init(mCurrentDir, full);
 
       mBranchesWidget->showBranches();
 

@@ -37,6 +37,7 @@ class BranchesWidget : public QWidget
 
 signals:
    void signalBranchesUpdated();
+   void signalBranchCheckedOut();
    void signalSelectCommit(const QString &sha);
    void signalOpenSubmodule(const QString &submoduleName);
 

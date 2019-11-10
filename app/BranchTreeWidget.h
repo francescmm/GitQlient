@@ -33,6 +33,7 @@ class BranchTreeWidget : public QTreeWidget
 
 signals:
    void signalBranchesUpdated();
+   void signalBranchCheckedOut();
    void signalSelectCommit(const QString &sha);
 
 public:

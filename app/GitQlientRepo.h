@@ -98,6 +98,7 @@ private:
    GitQlientRepoConfig mConfig;
 
    void updateUi();
+   void updateCache(bool full);
    void updateUiFromWatcher();
    void openCommitDiff();
    void openCommitCompareDiff(const QStringList &shas);

@@ -1269,9 +1269,9 @@ CommitInfo Git::getCommitInfo(const QString &sha)
    return mRevCache->getRevLookup(sha);
 }
 
-void Git::clearRevs()
+void Git::clearRevs(bool full)
 {
-   mRevCache->clear();
+   mRevCache->clear(full);
    mRevCache->removeRevisionFile(ZERO_SHA);
    workingDirInfo.clear();
 }
@@ -1285,12 +1285,12 @@ void Git::clearFileNames()
    mFileNames.clear();
 }
 
-bool Git::init(const QString &wd)
+bool Git::init(const QString &wd, bool full)
 {
    QLog_Info("Git", "Initializing Git...");
 
    // normally called when changing git directory. Must be called after stop()
-   clearRevs();
+   clearRevs(full);
 
    const auto isGIT = getGitDBDir(wd);
 
