@@ -1,6 +1,6 @@
 #include <RevisionWidget.h>
 
-#include <Revision.h>
+#include <CommitInfo.h>
 #include <FileListWidget.h>
 #include <git.h>
 

@@ -2,7 +2,7 @@
 #include <ui_CommitWidget.h>
 
 #include <git.h>
-#include <Revision.h>
+#include <CommitInfo.h>
 #include <RevisionFile.h>
 #include <UnstagedFilesContextMenu.h>
 #include <FileListDelegate.h>

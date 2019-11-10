@@ -2,7 +2,7 @@
 
 #include <git.h>
 #include <lanes.h>
-#include <Revision.h>
+#include <CommitInfo.h>
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryView.h>
 #include <CommitHistoryModel.h>

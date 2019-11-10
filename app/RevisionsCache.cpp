@@ -10,27 +10,27 @@ QString RevisionsCache::sha(int row) const
    return row >= 0 && row < revOrder.count() ? QString(revOrder.at(row)) : QString();
 }
 
-Revision RevisionsCache::getRevLookupByRow(int row) const
+CommitInfo RevisionsCache::getRevLookupByRow(int row) const
 {
    const auto shaStr = sha(row);
-   return revs.value(shaStr, Revision());
+   return revs.value(shaStr, CommitInfo());
 }
 
-Revision RevisionsCache::getRevLookup(const QString &sha) const
+CommitInfo RevisionsCache::getRevLookup(const QString &sha) const
 {
    if (!sha.isEmpty())
    {
       const auto iter = std::find_if(revs.constBegin(), revs.constEnd(),
-                                     [sha](const Revision &revision) { return revision.sha().startsWith(sha); });
+                                     [sha](const CommitInfo &revision) { return revision.sha().startsWith(sha); });
 
       if (iter != std::end(revs))
          return *iter;
    }
 
-   return Revision();
+   return CommitInfo();
 }
 
-void RevisionsCache::insertRevision(const Revision &rev)
+void RevisionsCache::insertRevision(const CommitInfo &rev)
 {
    const auto sha = rev.sha();
 
@@ -51,7 +51,7 @@ void RevisionsCache::insertRevision(const Revision &rev)
       revOrder.append(sha);
 }
 
-void RevisionsCache::updateLanes(Revision &c, Lanes &lns)
+void RevisionsCache::updateLanes(CommitInfo &c, Lanes &lns)
 {
    const auto sha = c.sha();
 

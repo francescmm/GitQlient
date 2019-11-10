@@ -27,7 +27,7 @@
 
 class RevisionFile;
 class QListWidgetItem;
-class Revision;
+class CommitInfo;
 class Git;
 class QLabel;
 class FileListWidget;

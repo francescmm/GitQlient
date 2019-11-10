@@ -9,7 +9,7 @@
 #include "git.h"
 
 #include <RevisionsCache.h>
-#include <Revision.h>
+#include <CommitInfo.h>
 #include <lanes.h>
 #include <GitSyncProcess.h>
 #include <GitAsyncProcess.h>
@@ -31,7 +31,7 @@
 
 using namespace QLogger;
 
-static const QString GIT_LOG_FORMAT = "%m%HX%PX%n%cn<%ce>%n%an<%ae>%n%at%n%s%n";
+static const QString GIT_LOG_FORMAT = "%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n";
 static const QString CUSTOM_SHA = "*** CUSTOM * CUSTOM * CUSTOM * CUSTOM **";
 
 namespace
@@ -203,7 +203,7 @@ const QString Git::filePath(const RevisionFile &rf, int i) const
    return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)];
 }
 
-Revision Git::getRevLookup(const QString &sha) const
+CommitInfo Git::getRevLookup(const QString &sha) const
 {
    return mRevCache->getRevLookup(sha);
 }
@@ -237,31 +237,6 @@ int Git::findFileIndex(const RevisionFile &rf, const QString &name)
          return i;
    }
    return -1;
-}
-
-const QStringList Git::getChildren(const QString &parent)
-{
-
-   QStringList children;
-   const auto r = mRevCache->getRevLookup(parent);
-   if (r.sha().isEmpty())
-      return children;
-
-   for (int i = 0; i < r.children.count(); i++)
-      children.append(mRevCache->createRevisionSha(r.children[i]));
-
-   // reorder children by loading order
-   QStringList::iterator itC(children.begin());
-   for (; itC != children.end(); ++itC)
-   {
-      const auto r = mRevCache->getRevLookup(*itC);
-      (*itC).prepend(QString("%1 ").arg(r.orderIdx, 6));
-   }
-   children.sort();
-   for (itC = children.begin(); itC != children.end(); ++itC)
-      (*itC) = (*itC).section(' ', -1, -1);
-
-   return children;
 }
 
 void Git::getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined)
@@ -1047,40 +1022,6 @@ const QStringList Git::getOthersFiles()
    return runOutput.split('\n', QString::SkipEmptyParts);
 }
 
-Revision Git::fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,
-                          const QString &log, const QString &longLog, const QString &patch, int idx)
-{
-
-   QString data('>' + sha + 'X' + parents.join(" ") + " \n");
-   data.append(author + '\n' + author + '\n' + date + '\n');
-   data.append(log + '\n' + longLog);
-
-   QString header("log size " + QString::number(QByteArray(data.toLatin1()).length() - 1) + '\n');
-   data.prepend(header);
-   if (!patch.isEmpty())
-      data.append('\n' + patch);
-
-   QTextCodec *tc = QTextCodec::codecForLocale();
-   QByteArray *ba = new QByteArray(tc->fromUnicode(data));
-
-   ba->append('\0');
-
-   return Revision(*ba, idx);
-}
-
-Revision Git::fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx)
-{
-
-   QString patch;
-   QString date(QString::number(QDateTime::currentDateTime().toSecsSinceEpoch()));
-   QString author("-");
-   QStringList parents(parent);
-   Revision c = fakeRevData(ZERO_SHA, parents, author, date, log, longLog, patch, idx);
-   c.isDiffCache = true;
-   c.lanes.append(LaneType::EMPTY);
-   return c;
-}
-
 RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
 {
 
@@ -1149,9 +1090,13 @@ void Git::updateWipRevision()
 
    // then mockup the corresponding Revision
    const QString &log = (isNothingToCommit() ? QString("No local changes") : QString("Local changes"));
-   auto r = fakeWorkDirRev(head, log, status, mRevCache->revOrderCount());
 
-   mRevCache->insertRevision(r);
+   CommitInfo c(ZERO_SHA, { head }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, status,
+                mRevCache->revOrderCount());
+   c.isDiffCache = true;
+   c.lanes.append(LaneType::EMPTY);
+
+   mRevCache->insertRevision(c);
 }
 
 void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl)
@@ -1314,12 +1259,12 @@ int Git::totalCommits() const
    return mRevCache->count();
 }
 
-Revision Git::getCommitInfoByRow(int row) const
+CommitInfo Git::getCommitInfoByRow(int row) const
 {
    return mRevCache->getRevLookupByRow(row);
 }
 
-Revision Git::getCommitInfo(const QString &sha)
+CommitInfo Git::getCommitInfo(const QString &sha)
 {
    return mRevCache->getRevLookup(sha);
 }
@@ -1378,18 +1323,18 @@ void Git::processRevision(const QByteArray &ba)
    auto count = 0;
 
    QByteArray auxBa = ba;
+   const auto commits = ba.split('\000');
 
    do
    {
-      Revision revision(auxBa, mRevCache->revOrderCount());
-      const auto nextStart = revision.getDataSize();
-      // qDebug() << start << nextStart - start;
-      // qDebug() << ba.mid(start, nextStart - start);
-      auxBa = auxBa.mid(nextStart, auxBa.size() - nextStart);
-      // start = nextStart;
+      const auto logSize = auxBa.mid(QString("log size ").count(), auxBa.indexOf('\n') - QString("log size ").count());
+      const auto subBa = auxBa.mid(auxBa.indexOf('\n') + 1, logSize.toInt());
+      // auto firstNull = ba.indexOf('\000');
+
+      CommitInfo revision(commits.at(count), mRevCache->revOrderCount());
       ++count;
 
-      if (nextStart > 0)
+      if (count < commits.size())
          mRevCache->insertRevision(revision);
       else
          break;

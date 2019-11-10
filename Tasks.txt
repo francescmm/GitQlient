@@ -1,6 +1,5 @@
 0. Remove unnecessary files from the repo
 - RepositoryViewDelegate
-- Revision
 - RevisionFile
 - RevisionCache
 - FileListWidget
@@ -9,6 +8,7 @@
 
 1. Pre-release tasks
 - Add icon
+- Reload cache when changing branch
 
 2. Improvements
 - Amend a commit that is not the last one: amend + rebase

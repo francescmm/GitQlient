@@ -27,7 +27,7 @@
 #include <QSharedPointer>
 
 class Git;
-class Revision;
+class CommitInfo;
 enum class CommitHistoryColumns;
 
 class CommitHistoryModel : public QAbstractItemModel
@@ -51,8 +51,8 @@ private:
    QSharedPointer<Git> mGit;
 
    void onNewRevisions();
-   QVariant getToolTipData(const Revision &r) const;
-   QVariant getDisplayData(const Revision &rev, int column) const;
+   QVariant getToolTipData(const CommitInfo &r) const;
+   QVariant getDisplayData(const CommitInfo &rev, int column) const;
 
    QMap<CommitHistoryColumns, QString> mColumns;
    int earlyOutputCnt;

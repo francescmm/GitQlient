@@ -1,6 +1,6 @@
 #include "FullDiffWidget.h"
 
-#include <Revision.h>
+#include <CommitInfo.h>
 #include <GitAsyncProcess.h>
 #include <git.h>
 

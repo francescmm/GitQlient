@@ -25,7 +25,7 @@
 
 #include <RevisionFile.h>
 #include <lanes.h>
-#include <Revision.h>
+#include <CommitInfo.h>
 
 #include <QObject>
 #include <QHash>
@@ -44,10 +44,10 @@ public:
    explicit RevisionsCache(QObject *parent = nullptr);
 
    QString sha(int row) const;
-   Revision getRevLookupByRow(int row) const;
-   Revision getRevLookup(const QString &sha) const;
-   void insertRevision(const Revision &rev);
-   void updateLanes(Revision &c, Lanes &lns);
+   CommitInfo getRevLookupByRow(int row) const;
+   CommitInfo getRevLookup(const QString &sha) const;
+   void insertRevision(const CommitInfo &rev);
+   void updateLanes(CommitInfo &c, Lanes &lns);
    QString getLaneParent(const QString &fromSHA, int laneNum);
    QString getShortLog(const QString &sha) const;
    int row(const QString &sha) const;
@@ -65,7 +65,7 @@ public:
    bool containsRevisionFile(const QString &sha) const { return mRevsFiles.contains(sha); }
 
 private:
-   QHash<QString, Revision> revs;
+   QHash<QString, CommitInfo> revs;
    QHash<QString, RevisionFile> mRevsFiles;
    QVector<QString> revOrder;
    Lanes lns;

@@ -1,7 +1,7 @@
 #include "CommitHistoryModel.h"
 
 #include <CommitHistoryColumns.h>
-#include <Revision.h>
+#include <CommitInfo.h>
 #include <git.h>
 
 #include <QDateTime>
@@ -88,7 +88,7 @@ QModelIndex CommitHistoryModel::parent(const QModelIndex &) const
    return QModelIndex();
 }
 
-QVariant CommitHistoryModel::getToolTipData(const Revision &r) const
+QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
 {
    QString auxMessage;
    const auto sha = r.sha();
@@ -120,7 +120,7 @@ QVariant CommitHistoryModel::getToolTipData(const Revision &r) const
              .arg(r.author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
 }
 
-QVariant CommitHistoryModel::getDisplayData(const Revision &rev, int column) const
+QVariant CommitHistoryModel::getDisplayData(const CommitInfo &rev, int column) const
 {
    switch (static_cast<CommitHistoryColumns>(column))
    {

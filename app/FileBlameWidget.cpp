@@ -2,7 +2,7 @@
 
 #include <FileDiffView.h>
 #include <git.h>
-#include <Revision.h>
+#include <CommitInfo.h>
 #include <ClickableFrame.h>
 
 #include <QGridLayout>

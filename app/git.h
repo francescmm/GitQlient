@@ -18,7 +18,7 @@ template<class, class>
 struct QPair;
 
 class RevisionsCache;
-class Revision;
+class CommitInfo;
 class QRegExp;
 class QTextCodec;
 class Annotate;
@@ -70,8 +70,8 @@ public:
 
    /* START CACHE */
    int totalCommits() const;
-   Revision getCommitInfoByRow(int row) const;
-   Revision getCommitInfo(const QString &sha);
+   CommitInfo getCommitInfoByRow(int row) const;
+   CommitInfo getCommitInfo(const QString &sha);
    /*  END  CACHE */
 
    /* START BRANCHES */
@@ -169,8 +169,7 @@ public:
    RevisionFile getFiles(const QString &sha) const;
    RevisionFile getFiles(const QString &sha, const QString &sha2, bool all = false);
 
-   const QStringList getChildren(const QString &parent);
-   Revision getRevLookup(const QString &sha) const;
+   CommitInfo getRevLookup(const QString &sha) const;
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;
    const QString getRefSha(const QString &refName, RefType type = ANY_REF, bool askGit = true);
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
@@ -235,9 +234,6 @@ private:
    bool checkoutRevisions();
    void parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl);
    void parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl);
-   Revision fakeRevData(const QString &sha, const QStringList &parents, const QString &author, const QString &date,
-                        const QString &log, const QString &longLog, const QString &patch, int idx);
-   Revision fakeWorkDirRev(const QString &parent, const QString &log, const QString &longLog, int idx);
    RevisionFile fakeWorkDirRevFile(const WorkingDirInfo &wd);
    RevisionFile insertNewFiles(const QString &sha, const QString &data);
    bool runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutput);

@@ -13,7 +13,7 @@
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
 #include <FileHistoryWidget.h>
-#include <Revision.h>
+#include <CommitInfo.h>
 
 #include <QFileSystemModel>
 #include <QTimer>
