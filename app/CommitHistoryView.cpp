@@ -142,19 +142,22 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
 
 void CommitHistoryView::showContextMenu(const QPoint &pos)
 {
-   const auto shas = getSelectedShaList();
-
-   if (!shas.isEmpty())
+   if (!mIsFiltering)
    {
-      const auto menu = new RepositoryContextMenu(mGit, shas, this);
-      connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
-      connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
-      connect(menu, &RepositoryContextMenu::signalOpenCompareDiff, this, &CommitHistoryView::signalOpenCompareDiff);
-      connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
-      menu->exec(viewport()->mapToGlobal(pos));
+      const auto shas = getSelectedShaList();
+
+      if (!shas.isEmpty())
+      {
+         const auto menu = new RepositoryContextMenu(mGit, shas, this);
+         connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
+         connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
+         connect(menu, &RepositoryContextMenu::signalOpenCompareDiff, this, &CommitHistoryView::signalOpenCompareDiff);
+         connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
+         menu->exec(viewport()->mapToGlobal(pos));
+      }
+      else
+         QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
    }
-   else
-      QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
 }
 
 void CommitHistoryView::saveHeaderState()
