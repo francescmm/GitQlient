@@ -52,8 +52,8 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
 
-   mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setObjectName("mainRepoView");
+   mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setItemDelegate(new RepositoryViewDelegate(mGit, mRepositoryView));
 
    commitStackedWidget->setCurrentIndex(0);

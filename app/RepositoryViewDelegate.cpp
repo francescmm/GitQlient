@@ -239,10 +239,15 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
    }
 
    if (index.column() == static_cast<int>(CommitHistoryColumns::GRAPH))
-      return paintGraph(p, newOpt, index);
-
-   if (index.column() == static_cast<int>(CommitHistoryColumns::LOG))
-      return paintLog(p, newOpt, index);
+      paintGraph(p, newOpt, index);
+   else if (index.column() == static_cast<int>(CommitHistoryColumns::LOG))
+      paintLog(p, newOpt, index);
+   else
+   {
+      newOpt.font.setFamily("Ubuntu Mono");
+      newOpt.font.setPointSize(11);
+      QStyledItemDelegate::paint(p, newOpt, index);
+   }
 }
 
 void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const

@@ -23,15 +23,15 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    , fileSystemView(new QTreeView())
    , mFileBlameWidget(new FileBlameWidget(mGit))
 {
+   mRepoView->setObjectName("blameRepoView");
    mRepoView->setModel(mRepoModel);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::GRAPH), true);
+   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::SHA), false);
    mRepoView->setItemDelegate(new RepositoryViewDelegate(mGit, mRepoView));
-
-   fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
-
-   mRepoView->setObjectName("blameRepoView");
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(450);
+
+   fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
    // fileSystemView->setItemDelegate(new BranchesViewDelegate());
    fileSystemView->setModel(fileSystemModel);
