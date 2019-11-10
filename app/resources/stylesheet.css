@@ -74,13 +74,13 @@ QLabel
     color: white;
 }
 
-RevisionWidget > #labelTitle, RevisionWidget > #commitInfoFrame, RevisionWidget > #labelDescription
+CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoWidget > #labelDescription
 {
     background-color: #606162;
     padding: 10px;
 }
 
-RevisionWidget #labelSha
+CommitInfoWidget #labelSha
 {
     color: #D89000;
     background-color: #202122;
@@ -89,7 +89,7 @@ RevisionWidget #labelSha
     font-family: Ubuntu Mono;
 }
 
-CommitWidget > QListWidget, BranchesWidget > QListWidget, FileHistoryWidget > QTreeView {
+WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, FileHistoryWidget > QTreeView {
    color: white;
    border: 0px;
    background-color: #2E2F30;
@@ -140,30 +140,30 @@ QListWidget::item:disabled
     color: #606162;
 }
 
-CommitWidget > #pbCommit
+WorkInProgressWidget > #pbCommit
 {
     max-height: 30px;
     min-height: 30px;
 }
 
 
-RevisionWidget, CommitWidget
+CommitInfoWidget, WorkInProgressWidget
 {
     max-width: 300px;
     min-width: 300px;
 }
 
-CommitHistoryView, FullDiffWidget, CommitWidget > QListWidget, FileListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget, WorkInProgressWidget > QListWidget, FileListWidget, QTreeWidget
 {
     background-color: #2E2F30;
 }
 
-CommitHistoryView, FullDiffWidget, CommitWidget > QListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget, WorkInProgressWidget > QListWidget, QTreeWidget
 {
     color: white;
 }
 
-CommitWidget > QListWidget
+WorkInProgressWidget > QListWidget
 {
     border: 1px solid #202122;
 }
@@ -214,28 +214,28 @@ QMenu::separator
 
 /**  END  RepositoryContextMenu **/
 
-FullDiffWidget, CommitWidget > QLineEdit, CommitWidget > #teDescription
+FullDiffWidget, WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription
 {
     border: 1px solid #202122;
 }
 
-CommitWidget > QLineEdit, CommitWidget > #teDescription, #leGitCommand
+WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription, #leGitCommand
 {
     background-color: #606162;
     color: white;
 }
 
-CommitWidget > #leCommitTitle
+WorkInProgressWidget > #leCommitTitle
 {
     border-right: 0px;
 }
 
-CommitWidget > #leAuthorName
+WorkInProgressWidget > #leAuthorName
 {
     border-bottom: 1px solid #404142;
 }
 
-CommitWidget > #leAuthorEmail
+WorkInProgressWidget > #leAuthorEmail
 {
     border-top: 0px;
 }
@@ -259,7 +259,7 @@ QLabel#lCounter
 border: 1px solid #606162;
 }
 
-CommitWidget > QFrame#stagedFiles, CommitWidget > QFrame#unstagedFiles, CommitWidget > QFrame#untrackedFiles
+WorkInProgressWidget > QFrame#stagedFiles, WorkInProgressWidget > QFrame#unstagedFiles, WorkInProgressWidget > QFrame#untrackedFiles
 {
     background: #202122;
     max-height: 30px;
@@ -282,7 +282,7 @@ FileDiffWidget, FileDiffWidget > QPushButton
     background-color: #202122;
 }
 
-CommitWidget > QLineEdit, #leGitCommand
+WorkInProgressWidget > QLineEdit, #leGitCommand
 {
     border-bottom: 1px solid #404142;
     max-height: 30px;
@@ -290,7 +290,7 @@ CommitWidget > QLineEdit, #leGitCommand
     padding-left: 10px;
 }
 
-CommitWidget > #teDescription, #outputTerminal
+WorkInProgressWidget > #teDescription, #outputTerminal
 {
     border-top: none;
     padding-left: 8px;
