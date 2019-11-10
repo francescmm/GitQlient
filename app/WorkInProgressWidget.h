@@ -60,6 +60,8 @@ private:
    QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;
 
    void insertFilesInList(const RevisionFile &files, QListWidget *fileList);
+   void prepareCache();
+   void clearCache();
    void addAllFilesToCommitList();
    void addFileToCommitList(QListWidgetItem *item);
    void revertAllChanges();

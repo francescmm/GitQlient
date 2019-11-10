@@ -68,7 +68,7 @@ WorkInProgressWidget::WorkInProgressWidget(QSharedPointer<Git> git, QWidget *par
 
 void WorkInProgressWidget::configure(const QString &sha)
 {
-   auto shaChange = mCurrentSha != sha;
+   const auto shaChange = mCurrentSha != sha;
    mCurrentSha = sha;
    mIsAmend = mCurrentSha != ZERO_SHA;
 
@@ -102,11 +102,21 @@ void WorkInProgressWidget::configure(const QString &sha)
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
    }
 
-   RevisionFile files;
+   const auto files = mGit->getWipFiles();
 
-   files = mIsAmend ? mGit->getFiles(mCurrentSha) : mGit->getWipFiles();
+   if (!shaChange || (mIsAmend && shaChange))
+      prepareCache();
 
-   insertFilesInList(files, mIsAmend ? ui->stagedFilesList : ui->unstagedFilesList);
+   insertFilesInList(files, ui->unstagedFilesList);
+
+   if (!shaChange || (mIsAmend && shaChange))
+      clearCache();
+
+   if (mIsAmend)
+   {
+      const auto amendFiles = mGit->getFiles(mCurrentSha);
+      insertFilesInList(amendFiles, ui->stagedFilesList);
+   }
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
@@ -140,9 +150,6 @@ void WorkInProgressWidget::configure(const QString &sha)
 
 void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWidget *fileList)
 {
-   for (auto file = mCurrentFilesCache.begin(); file != mCurrentFilesCache.end(); ++file)
-      file.value().first = false;
-
    for (auto i = 0; i < files.count(); ++i)
    {
       QColor myColor;
@@ -195,7 +202,16 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWid
       else
          mCurrentFilesCache[fileName].first = true;
    }
+}
 
+void WorkInProgressWidget::prepareCache()
+{
+   for (auto file = mCurrentFilesCache.begin(); file != mCurrentFilesCache.end(); ++file)
+      file.value().first = false;
+}
+
+void WorkInProgressWidget::clearCache()
+{
    for (auto it = mCurrentFilesCache.begin(); it != mCurrentFilesCache.end();)
    {
       if (!it.value().first)
