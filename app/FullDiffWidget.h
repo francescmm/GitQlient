@@ -32,15 +32,8 @@ class Git;
 class DiffHighlighter : public QSyntaxHighlighter
 {
 public:
-   DiffHighlighter(QTextEdit *p)
-      : QSyntaxHighlighter(p)
-   {
-   }
-   void setCombinedLength(uint c) { cl = c; }
+   DiffHighlighter(QTextEdit *p);
    virtual void highlightBlock(const QString &text);
-
-private:
-   uint cl = 0;
 };
 
 class FullDiffWidget : public QTextEdit
@@ -50,50 +43,14 @@ class FullDiffWidget : public QTextEdit
 public:
    explicit FullDiffWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
-   void clear();
-   void refresh();
-
-   enum PatchFilter
-   {
-      VIEW_ALL,
-      VIEW_ADDED,
-      VIEW_REMOVED
-   };
-   PatchFilter curFilter = VIEW_ALL;
-   PatchFilter prevFilter = VIEW_ALL;
-
-public slots:
-   void typeWriterFontChanged();
-   void procReadyRead(const QByteArray &data);
-   void procFinished();
    void loadDiff(const QString &sha, const QString &diffToSha);
 
 private:
    friend class DiffHighlighter;
    QSharedPointer<Git> mGit;
 
-   void scrollLineToTop(int lineNum);
-   int positionToLineNum(int pos);
-   int topToLineNum();
-   void saveRestoreSizes(bool startup = false);
-   bool getMatch(int para, int *indexFrom, int *indexTo);
-   bool centerTarget(const QString &target);
-   void processData(const QByteArray &data, int *prevLineNum = nullptr);
+   void processData(const QString &data);
 
    DiffHighlighter *diffHighlighter = nullptr;
-   bool diffLoaded = false;
-   bool seekTarget = false;
-   QByteArray patchRowData;
-   QString halfLine;
-   QString target;
-
-   struct MatchSelection
-   {
-      int paraFrom;
-      int indexFrom;
-      int paraTo;
-      int indexTo;
-   };
-   typedef QVector<MatchSelection> Matches;
-   Matches matches;
+   QString mPreviousDiffText;
 };

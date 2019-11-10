@@ -239,32 +239,27 @@ int Git::findFileIndex(const RevisionFile &rf, const QString &name)
    return -1;
 }
 
-void Git::getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined)
+GitExecResult Git::getDiff(const QString &sha, QObject *, const QString &diffToSha)
 {
    if (!sha.isEmpty())
    {
       QString runCmd;
+
       if (sha != ZERO_SHA)
       {
-         runCmd = "git diff-tree --no-color -r --patch-with-stat ";
-         runCmd.append(combined ? QString("-c ") : QString("-C -m ")); // TODO rename for combined
+         runCmd = "git diff-tree --no-color -r --patch-with-stat -C -m ";
 
-         const auto r = mRevCache->getRevLookup(sha);
-         if (r.parentsCount() == 0)
+         if (mRevCache->getRevLookup(sha).parentsCount() == 0)
             runCmd.append("--root ");
 
-         runCmd.append(diffToSha + " " + sha); // diffToSha could be empty
+         runCmd.append(QString("%1 %2").arg(diffToSha, sha)); // diffToSha could be empty
       }
       else
          runCmd = "git diff-index --no-color -r -m --patch-with-stat HEAD";
 
-      auto p = new GitAsyncProcess(mWorkingDir, receiver);
-      connect(this, &Git::cancelAllProcesses, p, &AGitProcess::onCancel);
-
-      QString buf;
-      if (!p->run(runCmd, buf))
-         delete p;
+      return run(runCmd);
    }
+   return qMakePair(false, QString());
 }
 
 QString Git::getDiff(const QString &currentSha, const QString &previousSha, const QString &file)

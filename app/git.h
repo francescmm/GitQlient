@@ -162,7 +162,7 @@ public:
 
    bool isNothingToCommit();
 
-   void getDiff(const QString &sha, QObject *receiver, const QString &diffToSha, bool combined);
+   GitExecResult getDiff(const QString &sha, QObject *receiver, const QString &diffToSha);
    QString getDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 
    RevisionFile getWipFiles();
