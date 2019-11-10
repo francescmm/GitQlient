@@ -6,6 +6,7 @@
 #include <RepositoryViewDelegate.h>
 #include <CommitHistoryModel.h>
 #include <CommitHistoryView.h>
+#include <CommitHistoryColumns.h>
 
 #include <QFileSystemModel>
 #include <QTreeView>
@@ -23,17 +24,18 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    , mFileBlameWidget(new FileBlameWidget(mGit))
 {
    mRepoView->setModel(mRepoModel);
+   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::GRAPH), true);
    mRepoView->setItemDelegate(new RepositoryViewDelegate(mGit, mRepoView));
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
    mRepoView->setObjectName("blameRepoView");
    mRepoView->setEnabled(true);
-   mRepoView->setMaximumWidth(400);
+   mRepoView->setMaximumWidth(450);
 
    // fileSystemView->setItemDelegate(new BranchesViewDelegate());
    fileSystemView->setModel(fileSystemModel);
-   fileSystemView->setMaximumWidth(400);
+   fileSystemView->setMaximumWidth(450);
    fileSystemView->header()->setSectionHidden(1, true);
    fileSystemView->header()->setSectionHidden(2, true);
    fileSystemView->header()->setSectionHidden(3, true);
