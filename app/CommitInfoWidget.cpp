@@ -83,7 +83,6 @@ CommitInfoWidget::CommitInfoWidget(QSharedPointer<Git> git, QWidget *parent)
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { emit signalOpenFileCommit(mCurrentSha, mParentSha, item->text()); });
    connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitInfoWidget::signalShowFileHistory);
-   connect(fileListWidget, &FileListWidget::contextMenu, this, &CommitInfoWidget::signalOpenFileContextMenu);
 }
 
 void CommitInfoWidget::setCurrentCommitSha(const QString &sha)

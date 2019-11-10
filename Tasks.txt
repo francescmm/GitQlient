@@ -2,7 +2,6 @@
 - RepositoryViewDelegate
 - RevisionFile
 - RevisionCache
-- FileListWidget
 - Lanes
 - Git
 

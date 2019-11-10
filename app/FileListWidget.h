@@ -32,7 +32,6 @@ class FileListWidget : public QListWidget
    Q_OBJECT
 
 signals:
-   void contextMenu(const QString &, int);
    void signalShowFileHistory(const QString &fileName);
 
 public:

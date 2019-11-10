@@ -56,10 +56,7 @@ void FileListWidget::insertFiles(const QString currentSha, const QString &compar
    clear();
 
    const auto files = mGit->getFiles(currentSha, compareToSha, true);
-   /*
-      if (st->isMerge() && !st->allMergeFiles())
-         st->setAllMergeFiles(!st->allMergeFiles());
-   */
+
    if (files.count() != 0)
    {
       setUpdatesEnabled(false);
@@ -68,7 +65,7 @@ void FileListWidget::insertFiles(const QString currentSha, const QString &compar
       {
          if (!files.statusCmp(i, RevisionFile::UNKNOWN))
          {
-            auto clr = palette().color(QPalette::WindowText);
+            QColor clr;
             QString fileName;
 
             if (files.statusCmp(i, RevisionFile::NEW))
@@ -80,11 +77,7 @@ void FileListWidget::insertFiles(const QString currentSha, const QString &compar
             }
             else
             {
-               if (files.statusCmp(i, RevisionFile::DELETED))
-                  clr = QColor("#FF5555");
-               else
-                  clr = Qt::white;
-
+               clr = files.statusCmp(i, RevisionFile::DELETED) ? QColor("#FF5555") : Qt::white;
                fileName = mGit->filePath(files, i);
             }
 
