@@ -14,6 +14,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <RepositoryViewDelegate.h>
 #include <ShaFilterProxyModel.h>
 #include <git.h>
+#include <CommitInfo.h>
 
 #include <QHeaderView>
 #include <QSettings>
@@ -96,29 +97,6 @@ void CommitHistoryView::setupGeometry()
    }
 }
 
-void CommitHistoryView::update()
-{
-   auto index = currentIndex();
-
-   if (index.isValid())
-   {
-      selectionModel()->select(index, QItemSelectionModel::Toggle);
-      scrollTo(index);
-   }
-   else
-   {
-      clearSelection();
-
-      index = model()->index(0, 0);
-
-      if (index.isValid())
-      {
-         setCurrentIndex(index);
-         scrollTo(index);
-      }
-   }
-}
-
 void CommitHistoryView::currentChanged(const QModelIndex &index, const QModelIndex &)
 {
    mCurrentSha = model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
@@ -137,7 +115,26 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
 
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 
-   update();
+   QModelIndex index;
+   auto row = mGit->getRevLookup(mCurrentSha).orderIdx;
+
+   if (mIsFiltering)
+   {
+      const auto sourceIndex = mProxyModel->sourceModel()->index(row, 0);
+      row = mProxyModel->mapFromSource(sourceIndex).row();
+   }
+   else
+      index = mCommitHistoryModel->index(row, 0);
+
+   clearSelection();
+
+   QModelIndex newIndex = model()->index(row, 0);
+
+   if (newIndex.isValid())
+   {
+      setCurrentIndex(newIndex);
+      scrollTo(newIndex);
+   }
 }
 
 void CommitHistoryView::showContextMenu(const QPoint &pos)

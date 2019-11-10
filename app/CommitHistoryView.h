@@ -47,7 +47,6 @@ public:
    void filterBySha(const QStringList &shaList);
    bool hasActiveFiler() const { return mIsFiltering; }
 
-   void update();
    void clear();
    void focusOnCommit(const QString &goToSha);
    QString getCurrentSha() const { return mCurrentSha; }
