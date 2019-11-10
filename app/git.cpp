@@ -1323,18 +1323,19 @@ void Git::processRevision(const QByteArray &ba)
    auto count = 0;
 
    QByteArray auxBa = ba;
-   const auto commits = ba.split('\000');
 
    do
    {
-      const auto logSize = auxBa.mid(QString("log size ").count(), auxBa.indexOf('\n') - QString("log size ").count());
-      const auto subBa = auxBa.mid(auxBa.indexOf('\n') + 1, logSize.toInt());
-      // auto firstNull = ba.indexOf('\000');
+      auto eol = auxBa.indexOf('\000', count) + 1;
 
-      CommitInfo revision(commits.at(count), mRevCache->revOrderCount());
-      ++count;
+      if (eol == 0)
+         eol = auxBa.size() - count;
 
-      if (count < commits.size())
+      CommitInfo revision(auxBa.mid(count, eol), mRevCache->revOrderCount());
+
+      count = eol;
+
+      if (revision.isValid())
          mRevCache->insertRevision(revision);
       else
          break;
