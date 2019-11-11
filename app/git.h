@@ -61,7 +61,7 @@ public:
    explicit Git();
 
    /* START Git CONFIGURATION */
-   bool init(const QString &wd, bool full = false);
+   bool init(const QString &wd);
    void init2();
    QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
@@ -229,7 +229,7 @@ private:
    bool updateIndex(const QStringList &selFiles);
    int findFileIndex(const RevisionFile &rf, const QString &name);
    bool getRefs();
-   void clearRevs(bool full);
+   void clearRevs();
    void clearFileNames();
    bool checkoutRevisions();
    void parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl);

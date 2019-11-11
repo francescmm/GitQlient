@@ -105,13 +105,10 @@ int RevisionsCache::row(const QString &sha) const
    return revs.value(sha).orderIdx;
 }
 
-void RevisionsCache::clear(bool full)
+void RevisionsCache::clear()
 {
    lns.clear();
-
-   if (full)
-      revs.clear();
-
+   revs.clear();
    revOrder.clear();
 }
 

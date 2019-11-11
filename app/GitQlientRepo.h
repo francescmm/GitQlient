@@ -97,8 +97,7 @@ private:
    QTimer *mAutoFilesUpdate = nullptr;
    GitQlientRepoConfig mConfig;
 
-   void updateUi();
-   void updateCache(bool full);
+   void updateCache();
    void updateUiFromWatcher();
    void openCommitDiff();
    void openCommitCompareDiff(const QStringList &shas);
