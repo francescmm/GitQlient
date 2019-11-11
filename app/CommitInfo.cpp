@@ -38,3 +38,10 @@ CommitInfo::CommitInfo(const QByteArray &b, int idx)
          mLongLog += fields.at(i);
    }
 }
+
+bool CommitInfo::isValid() const
+{
+   QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
+
+   return !mSha.isEmpty() && hexMatcher.exactMatch(mSha);
+}
