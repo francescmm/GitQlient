@@ -93,7 +93,6 @@ SOURCES += \
     $$PWD/GitSyncProcess.cpp \
     $$PWD/RepositoryContextMenu.cpp \
     $$PWD/RepositoryViewDelegate.cpp \
-    $$PWD/RevisionFile.cpp \
     $$PWD/RevisionsCache.cpp \
     $$PWD/ShaFilterProxyModel.cpp \
     $$PWD/TagDlg.cpp \

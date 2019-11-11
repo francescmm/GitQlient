@@ -25,7 +25,6 @@
 
 #include <QDialog>
 
-class QLineEdit;
 class QTextBrowser;
 class Git;
 

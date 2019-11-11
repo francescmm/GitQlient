@@ -25,9 +25,6 @@
 
 #include <QWidget>
 
-class RevisionFile;
-class QListWidgetItem;
-class CommitInfo;
 class Git;
 class QLabel;
 class FileListWidget;

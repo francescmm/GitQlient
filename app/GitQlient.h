@@ -28,7 +28,6 @@
 
 class QTabWidget;
 class ConfigWidget;
-class GitQlientRepo;
 
 class GitQlient : public QWidget
 {

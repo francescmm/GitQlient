@@ -27,8 +27,6 @@
 #include <QDateTime>
 
 class Git;
-class FileDiffView;
-class QVBoxLayout;
 class QScrollArea;
 class ClickableFrame;
 class QLabel;

@@ -29,7 +29,6 @@
 
 #include <QObject>
 #include <QHash>
-#include <QSharedPointer>
 
 class Git;
 

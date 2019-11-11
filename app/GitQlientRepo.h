@@ -28,13 +28,11 @@
 class Git;
 class QCloseEvent;
 class QFileSystemWatcher;
-class QListWidgetItem;
 class QStackedWidget;
 class QStackedLayout;
 class Controls;
 class WorkInProgressWidget;
 class CommitInfoWidget;
-class FullDiffControler;
 class FullDiffWidget;
 class FileDiffWidget;
 class CommitHistoryModel;

@@ -5,7 +5,6 @@
 
 class RevisionFile
 {
-   friend class Cache; // to directly load status
    friend class Git;
 
    // Status information is splitted in a flags vector and in a string
@@ -70,6 +69,4 @@ public:
       */
       return (!extStatus.isEmpty() && idx < extStatus.count() ? extStatus.at(idx) : "");
    }
-   const RevisionFile &operator>>(QDataStream &) const;
-   RevisionFile &operator<<(QDataStream &);
 };

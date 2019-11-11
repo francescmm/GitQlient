@@ -25,7 +25,6 @@
 
 #include <QSyntaxHighlighter>
 #include <QTextEdit>
-#include <QPointer>
 
 class Git;
 
