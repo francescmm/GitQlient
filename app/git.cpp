@@ -205,7 +205,7 @@ const QString Git::filePath(const RevisionFile &rf, int i) const
 
 CommitInfo Git::getRevLookup(const QString &sha) const
 {
-   return mRevCache->getRevLookup(sha);
+   return mRevCache->getCommitInfo(sha);
 }
 
 QPair<bool, QString> Git::run(const QString &runCmd) const
@@ -249,7 +249,7 @@ GitExecResult Git::getDiff(const QString &sha, QObject *, const QString &diffToS
       {
          runCmd = "git diff-tree --no-color -r --patch-with-stat -C -m ";
 
-         if (mRevCache->getRevLookup(sha).parentsCount() == 0)
+         if (mRevCache->getCommitInfo(sha).parentsCount() == 0)
             runCmd.append("--root ");
 
          runCmd.append(QString("%1 %2").arg(diffToSha, sha)); // diffToSha could be empty
@@ -303,14 +303,14 @@ GitExecResult Git::history(const QString &file)
 
 QPair<QString, QString> Git::getSplitCommitMsg(const QString &sha)
 {
-   const auto c = mRevCache->getRevLookup(sha);
+   const auto c = mRevCache->getCommitInfo(sha);
 
    return qMakePair(c.shortLog(), c.longLog().trimmed());
 }
 
 QString Git::getCommitMsg(const QString &sha) const
 {
-   const auto c = mRevCache->getRevLookup(sha);
+   const auto c = mRevCache->getCommitInfo(sha);
    if (c.sha().isEmpty())
       return QString();
 
@@ -335,7 +335,7 @@ const QString Git::getLastCommitMsg()
 const QString Git::getNewCommitMsg()
 {
 
-   const auto c = mRevCache->getRevLookup(ZERO_SHA);
+   const auto c = mRevCache->getCommitInfo(ZERO_SHA);
    if (c.sha().isEmpty())
       return "";
 
@@ -439,7 +439,7 @@ RevisionFile Git::getWipFiles()
 
 RevisionFile Git::getFiles(const QString &sha) const
 {
-   const auto r = mRevCache->getRevLookup(sha);
+   const auto r = mRevCache->getCommitInfo(sha);
 
    if (r.parentsCount() != 0 && mRevCache->containsRevisionFile(sha))
       return mRevCache->getRevisionFile(sha);
@@ -449,7 +449,7 @@ RevisionFile Git::getFiles(const QString &sha) const
 
 RevisionFile Git::getFiles(const QString &sha, const QString &diffToSha, bool allFiles)
 {
-   const auto r = mRevCache->getRevLookup(sha);
+   const auto r = mRevCache->getCommitInfo(sha);
    if (r.parentsCount() == 0)
       return RevisionFile();
 
@@ -1086,12 +1086,11 @@ void Git::updateWipRevision()
    // then mockup the corresponding Revision
    const QString &log = (isNothingToCommit() ? QString("No local changes") : QString("Local changes"));
 
-   CommitInfo c(ZERO_SHA, { head }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, status,
-                mRevCache->revOrderCount());
+   CommitInfo c(ZERO_SHA, { head }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, status, 0);
    c.isDiffCache = true;
    c.lanes.append(LaneType::EMPTY);
 
-   mRevCache->insertRevision(c);
+   mRevCache->insertCommitInfo(c);
 }
 
 void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl)
@@ -1256,18 +1255,17 @@ int Git::totalCommits() const
 
 CommitInfo Git::getCommitInfoByRow(int row) const
 {
-   return mRevCache->getRevLookupByRow(row);
+   return mRevCache->getCommitInfoByRow(row);
 }
 
 CommitInfo Git::getCommitInfo(const QString &sha)
 {
-   return mRevCache->getRevLookup(sha);
+   return mRevCache->getCommitInfo(sha);
 }
 
 void Git::clearRevs()
 {
    mRevCache->clear();
-   mRevCache->removeRevisionFile(ZERO_SHA);
    workingDirInfo.clear();
 }
 
@@ -1306,8 +1304,6 @@ void Git::init2()
 {
    QLog_Info("Git", "Adding revisions...");
 
-   updateWipRevision(); // blocking, we could be in setRepository() now
-
    checkoutRevisions();
 
    QLog_Info("Git", "... revisions finished");
@@ -1315,27 +1311,23 @@ void Git::init2()
 
 void Git::processRevision(const QByteArray &ba)
 {
-   auto count = 0;
-
    QByteArray auxBa = ba;
+   const auto commits = ba.split('\000');
+   auto count = 1;
 
-   do
+   mRevCache->configure(commits.count());
+
+   updateWipRevision();
+
+   for (const auto &commitInfo : commits)
    {
-      auto eol = auxBa.indexOf('\000', count) + 1;
-
-      if (eol == 0)
-         eol = auxBa.size() - count;
-
-      CommitInfo revision(auxBa.mid(count, eol), mRevCache->revOrderCount());
-
-      count = eol;
+      CommitInfo revision(commitInfo, count++);
 
       if (revision.isValid())
-         mRevCache->insertRevision(revision);
+         mRevCache->insertCommitInfo(std::move(revision));
       else
          break;
-
-   } while (ba.size() > 0);
+   }
 
    emit signalNewRevisions();
 }

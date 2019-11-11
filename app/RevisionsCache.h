@@ -42,31 +42,26 @@ signals:
 
 public:
    explicit RevisionsCache(QObject *parent = nullptr);
+   void configure(int numElementsToStore);
+   int count() const { return mCommits.count(); }
 
-   QString sha(int row) const;
-   CommitInfo getRevLookupByRow(int row) const;
-   CommitInfo getRevLookup(const QString &sha) const;
-   void insertRevision(const CommitInfo &rev);
-   void updateLanes(CommitInfo &c, Lanes &lns);
-   QString getLaneParent(const QString &fromSHA, int laneNum);
-   QString getShortLog(const QString &sha) const;
-   int row(const QString &sha) const;
-   int count() const { return revOrder.count(); }
-   bool isEmpty() const { return revOrder.isEmpty(); }
-   void clear();
-   QString &createRevisionSha(int index) { return revOrder[index]; }
-   QString getRevisionSha(int index) const { return revOrder.at(index); }
-   int revOrderCount() const { return revOrder.count(); }
-   bool contains(const QString &sha) { return revs.contains(sha); }
+   CommitInfo getCommitInfoByRow(int row) const;
+   CommitInfo getCommitInfo(const QString &sha) const;
    RevisionFile getRevisionFile(const QString &sha) const { return mRevsFiles.value(sha); }
+
+   void insertCommitInfo(CommitInfo rev);
    void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevsFiles.insert(sha, file); }
-   void removeRevisionFile(const QString &sha) { mRevsFiles.remove(sha); }
+
+   void clear();
    void clearRevisionFile() { mRevsFiles.clear(); }
+
    bool containsRevisionFile(const QString &sha) const { return mRevsFiles.contains(sha); }
 
 private:
-   QHash<QString, CommitInfo> revs;
+   QVector<CommitInfo *> mCommits;
+   QHash<QString, CommitInfo *> revs;
    QHash<QString, RevisionFile> mRevsFiles;
-   QVector<QString> revOrder;
    Lanes lns;
+
+   void updateLanes(CommitInfo &c, Lanes &lns);
 };

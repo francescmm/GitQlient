@@ -197,7 +197,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
       if (ok)
       {
-         clearWindow();
          setWidgetsEnabled(true);
 
          mGit->init2();

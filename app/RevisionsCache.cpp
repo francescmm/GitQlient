@@ -1,54 +1,47 @@
-#include "RevisionsCache.h"
+﻿#include "RevisionsCache.h"
 
 RevisionsCache::RevisionsCache(QObject *parent)
    : QObject(parent)
 {
 }
 
-QString RevisionsCache::sha(int row) const
+void RevisionsCache::configure(int numElementsToStore)
 {
-   return row >= 0 && row < revOrder.count() ? QString(revOrder.at(row)) : QString();
+   // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
+   mCommits.resize(numElementsToStore + 1);
+   revs.reserve(numElementsToStore + 1);
 }
 
-CommitInfo RevisionsCache::getRevLookupByRow(int row) const
+CommitInfo RevisionsCache::getCommitInfoByRow(int row) const
 {
-   const auto shaStr = sha(row);
-   return revs.value(shaStr, CommitInfo());
+   return row >= 0 && row < mCommits.count() ? *mCommits.at(row) : CommitInfo();
 }
 
-CommitInfo RevisionsCache::getRevLookup(const QString &sha) const
+CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 {
    if (!sha.isEmpty())
-   {
-      const auto iter = std::find_if(revs.constBegin(), revs.constEnd(),
-                                     [sha](const CommitInfo &revision) { return revision.sha().startsWith(sha); });
-
-      if (iter != std::end(revs))
-         return *iter;
-   }
+      return revs.value(sha) ? *revs.value(sha) : CommitInfo();
 
    return CommitInfo();
 }
 
-void RevisionsCache::insertRevision(const CommitInfo &rev)
+void RevisionsCache::insertCommitInfo(CommitInfo rev)
 {
    const auto sha = rev.sha();
 
    if (!revs.contains(sha))
    {
-      auto r = rev;
+      if (rev.lanes.count() == 0)
+         updateLanes(rev, lns);
 
-      if (r.lanes.count() == 0)
-         updateLanes(r, lns);
+      const auto commit = new CommitInfo(rev);
 
-      revs.insert(sha, r);
+      mCommits[rev.orderIdx] = commit;
+      revs.insert(sha, commit);
 
       if (revs.contains(rev.parent(0)))
          revs.remove(rev.parent(0));
    }
-
-   if (!revOrder.contains(sha))
-      revOrder.append(sha);
 }
 
 void RevisionsCache::updateLanes(CommitInfo &c, Lanes &lns)
@@ -91,56 +84,12 @@ void RevisionsCache::updateLanes(CommitInfo &c, Lanes &lns)
       lns.afterFork();
    if (lns.isBranch())
       lns.afterBranch();
-
-   // lns.setLanes(c.lanes); // here lanes are snapshotted
-}
-
-QString RevisionsCache::getShortLog(const QString &sha) const
-{
-   return getRevLookup(sha).shortLog();
-}
-
-int RevisionsCache::row(const QString &sha) const
-{
-   return revs.value(sha).orderIdx;
 }
 
 void RevisionsCache::clear()
 {
+   qDeleteAll(mCommits);
+   mCommits.clear();
    lns.clear();
    revs.clear();
-   revOrder.clear();
-}
-
-QString RevisionsCache::getLaneParent(const QString &fromSHA, int laneNum)
-{
-   const auto rs = getRevLookup(fromSHA);
-   if (rs.sha().isEmpty())
-      return "";
-
-   for (int idx = rs.orderIdx - 1; idx >= 0; idx--)
-   {
-
-      const auto r = getRevLookup(getRevisionSha(idx));
-      if (laneNum < r.lanes.count())
-      {
-         auto type = r.lanes.at(laneNum);
-
-         if (!isFreeLane(type))
-         {
-            auto parNum = 0;
-
-            while (!isMerge(type) && type != LaneType::ACTIVE)
-            {
-
-               if (isHead(static_cast<LaneType>(type)))
-                  parNum++;
-
-               type = r.lanes[--laneNum];
-            }
-            return r.parent(parNum);
-         }
-      }
-   }
-   return QString();
 }
