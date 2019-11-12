@@ -54,7 +54,7 @@ private:
    void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
    void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &index) const;
    void paintGraphLane(QPainter *p, const LaneType type, int x1, int x2, const QColor &col, const QColor &activeCol,
-                       const QBrush &back) const;
+                       const QBrush &back, bool isWip = false) const;
    void paintWip(QPainter *painter, QStyleOptionViewItem opt) const;
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
 };

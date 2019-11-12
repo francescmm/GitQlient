@@ -29,7 +29,7 @@ static QColor blend(const QColor &col1, const QColor &col2, int amount = 128)
 }
 
 void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, int x2, const QColor &col,
-                                            const QColor &activeCol, const QBrush &back) const
+                                            const QColor &activeCol, const QBrush &back, bool isWip) const
 {
    const int padding = 2;
    x1 += padding;
@@ -96,7 +96,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
          break;
    }
 
-   lanePen.setColor(col);
+   lanePen.setColor(isWip ? activeCol : col);
    p->setPen(lanePen);
 
    // vertical line
@@ -320,7 +320,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          else
             color = colors[i % COLORS_NUM];
 
-         paintGraphLane(p, ln, x1, x2, color, activeColor, back);
+         paintGraphLane(p, ln, x1, x2, color, activeColor, back, r.sha() == ZERO_SHA);
 
          if (mView->hasActiveFiler())
             break;
