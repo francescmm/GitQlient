@@ -192,6 +192,7 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWid
          }
 
          item->setText(fileName);
+         item->setToolTip(fileName);
          item->setForeground(myColor);
 
          if (mIsAmend && fileList == ui->stagedFilesList)
