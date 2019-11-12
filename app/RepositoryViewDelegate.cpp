@@ -265,13 +265,13 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 
    if (r.sha().isEmpty())
       return;
-
-   if (r.isDiffCache && !mGit->isNothingToCommit() && !mView->hasActiveFiler())
-   {
-      paintWip(p, opt);
-      return;
-   }
-
+   /*
+      if (r.isDiffCache && !mGit->isNothingToCommit() && !mView->hasActiveFiler())
+      {
+         paintWip(p, opt);
+         return;
+      }
+   */
    p->save();
    p->setClipRect(opt.rect, Qt::IntersectClip);
    p->translate(opt.rect.topLeft());
@@ -304,7 +304,22 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       auto ln = mView->hasActiveFiler() ? LaneType::ACTIVE : lanes[i];
       if (ln != LaneType::EMPTY)
       {
-         QColor color = i == activeLane ? activeColor : colors[i % COLORS_NUM];
+         QColor color;
+         if (i == activeLane)
+         {
+            if (r.sha() == ZERO_SHA)
+            {
+               if (!mGit->isNothingToCommit())
+                  color = QColor("#d89000");
+               else
+                  color = QColor("#404142");
+            }
+            else
+               color = activeColor;
+         }
+         else
+            color = colors[i % COLORS_NUM];
+
          paintGraphLane(p, ln, x1, x2, color, activeColor, back);
 
          if (mView->hasActiveFiler())

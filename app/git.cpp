@@ -964,7 +964,7 @@ void Git::updateWipRevision()
 
    CommitInfo c(ZERO_SHA, { head }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, status, 0);
    c.isDiffCache = true;
-   c.lanes.append(LaneType::EMPTY);
+   // c.lanes.append(LaneType::EMPTY);
 
    mRevCache->insertCommitInfo(c);
 }
