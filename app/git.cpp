@@ -1246,18 +1246,11 @@ bool Git::loadRepository(const QString &wd)
 
    getRefs(); // load references
 
+   checkoutRevisions();
+
    QLog_Info("Git", "... Git init finished");
 
    return true;
-}
-
-void Git::init2()
-{
-   QLog_Info("Git", "Adding revisions...");
-
-   checkoutRevisions();
-
-   QLog_Info("Git", "... revisions finished");
 }
 
 void Git::processRevision(const QByteArray &ba)

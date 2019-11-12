@@ -62,7 +62,6 @@ public:
 
    /* START Git CONFIGURATION */
    bool loadRepository(const QString &wd);
-   void init2();
    QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
    bool initRepo(const QString &fullPath);

@@ -148,7 +148,6 @@ void GitQlientRepo::updateCache()
       mRepositoryView->clear();
 
       mGit->loadRepository(mCurrentDir);
-      mGit->init2();
 
       mBranchesWidget->showBranches();
 
@@ -192,7 +191,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
       emit mGit->cancelAllProcesses();
 
       const auto ok = mGit->loadRepository(newDir);
-      mGit->init2();
 
       if (ok)
       {
