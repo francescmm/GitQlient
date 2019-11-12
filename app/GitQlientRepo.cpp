@@ -145,13 +145,12 @@ void GitQlientRepo::updateCache()
    {
       QLog_Debug("UI", QString("Updating the GitQlient UI"));
 
-      mGit->loadRepository(mCurrentDir);
-
-      mBranchesWidget->showBranches();
-
       mRepositoryView->clear();
 
+      mGit->loadRepository(mCurrentDir);
       mGit->init2();
+
+      mBranchesWidget->showBranches();
 
       const auto commitStackedIndex = commitStackedWidget->currentIndex();
       const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : ZERO_SHA;
@@ -193,13 +192,12 @@ void GitQlientRepo::setRepository(const QString &newDir)
       emit mGit->cancelAllProcesses();
 
       const auto ok = mGit->loadRepository(newDir);
-      mCurrentDir = mGit->getWorkingDir();
+      mGit->init2();
 
       if (ok)
       {
+         mCurrentDir = mGit->getWorkingDir();
          setWidgetsEnabled(true);
-
-         mGit->init2();
 
          setWatcher();
 
