@@ -802,47 +802,42 @@ bool Git::getStashCommit(const QString &stash, QByteArray &output)
    return ret.first;
 }
 
-bool Git::setGitDBDir(const QString &wd)
+bool Git::setGitDbDir(const QString &wd)
 {
-   // we could run from a subdirectory, so we need to get correct directories
-
-   QString tmp(mWorkingDir);
+   auto tmp = mWorkingDir;
    mWorkingDir = wd;
+
    const auto success = run("git rev-parse --git-dir"); // run under newWorkDir
    mWorkingDir = tmp;
+
    const auto runOutput = success.second.trimmed();
+
    if (success.first)
    {
-      // 'git rev-parse --git-dir' output could be a relative
-      // to working directory (as ex .git) or an absolute path
       QDir d(runOutput.startsWith("/") ? runOutput : wd + "/" + runOutput);
       mGitDir = d.absolutePath();
    }
+
    return success.first;
 }
 
-bool Git::getBaseDir(const QString &wd, QString &bd)
+GitExecResult Git::getBaseDir(const QString &wd)
 {
-   // we could run from a subdirectory, so we need to get correct directories
-
-   // We use --show-cdup and not --git-dir for this, in order to take into account configurations
-   //  in which .git is indeed a "symlink", a text file containing the path of the actual .git database dir.
-   // In that particular case, the parent directory of the one given by --git-dir is *not* necessarily
-   //  the base directory of the repository.
-
-   QString tmp(mWorkingDir);
+   auto tmp = mWorkingDir;
    mWorkingDir = wd;
-   auto ret = run("git rev-parse --show-cdup"); // run under newWorkDir
+
+   const auto ret = run("git rev-parse --show-cdup"); // run under newWorkDir
    mWorkingDir = tmp;
+
+   auto baseDir = wd;
+
    if (ret.first)
    {
       QDir d(QString("%1/%2").arg(wd, ret.second.trimmed()));
-      bd = d.absolutePath();
+      baseDir = d.absolutePath();
    }
-   else
-      bd = wd;
 
-   return ret.first;
+   return qMakePair(ret.first, baseDir);
 }
 
 Git::Reference *Git::lookupOrAddReference(const QString &sha)
@@ -1237,14 +1232,17 @@ bool Git::loadRepository(const QString &wd)
    clearRevs();
    clearFileNames();
 
-   const auto isGIT = setGitDBDir(wd);
-
-   getBaseDir(wd, mWorkingDir);
+   const auto isGIT = setGitDbDir(wd);
 
    if (!isGIT)
       return false;
 
-   getRefs(); // load references
+   const auto ret = getBaseDir(wd);
+
+   if (ret.success)
+      mWorkingDir = ret.output.toString();
+
+   getRefs();
 
    checkoutRevisions();
 

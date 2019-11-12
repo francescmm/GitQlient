@@ -137,7 +137,7 @@ public:
    /*  END  SUBMODULES */
 
    /* START GENERAL REPO */
-   bool getBaseDir(const QString &wd, QString &bd);
+   GitExecResult getBaseDir(const QString &wd);
    /*  END  GENERAL REPO */
 
    enum RefType
@@ -173,7 +173,7 @@ public:
    void updateWipRevision();
 
 private:
-   bool setGitDBDir(const QString &wd);
+   bool setGitDbDir(const QString &wd);
    void processRevision(const QByteArray &ba);
 
    struct Reference
