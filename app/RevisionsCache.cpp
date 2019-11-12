@@ -10,6 +10,8 @@ void RevisionsCache::configure(int numElementsToStore)
    // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
    mCommits.resize(numElementsToStore + 1);
    revs.reserve(numElementsToStore + 1);
+
+   mCacheLocked = false;
 }
 
 CommitInfo RevisionsCache::getCommitInfoByRow(int row) const
@@ -27,9 +29,7 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 
 void RevisionsCache::insertCommitInfo(CommitInfo rev)
 {
-   const auto sha = rev.sha();
-
-   if (!revs.contains(sha))
+   if (!mCacheLocked && !revs.contains(rev.sha()))
    {
       if (rev.lanes.count() == 0)
          updateLanes(rev, lns);
@@ -37,7 +37,7 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
       const auto commit = new CommitInfo(rev);
 
       mCommits[rev.orderIdx] = commit;
-      revs.insert(sha, commit);
+      revs.insert(rev.sha(), commit);
 
       if (revs.contains(rev.parent(0)))
          revs.remove(rev.parent(0));
@@ -88,6 +88,8 @@ void RevisionsCache::updateLanes(CommitInfo &c, Lanes &lns)
 
 void RevisionsCache::clear()
 {
+   mCacheLocked = true;
+
    qDeleteAll(mCommits);
    mCommits.clear();
    lns.clear();

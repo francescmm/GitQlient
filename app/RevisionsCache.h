@@ -61,6 +61,7 @@ private:
    QHash<QString, CommitInfo *> revs;
    QHash<QString, RevisionFile> mRevsFiles;
    Lanes lns;
+   bool mCacheLocked = true;
 
    void updateLanes(CommitInfo &c, Lanes &lns);
 };
