@@ -191,7 +191,7 @@ int Git::findFileIndex(const RevisionFile &rf, const QString &name)
    return -1;
 }
 
-GitExecResult Git::getDiff(const QString &sha, QObject *, const QString &diffToSha)
+GitExecResult Git::getCommitDiff(const QString &sha, const QString &diffToSha)
 {
    if (!sha.isEmpty())
    {
@@ -214,7 +214,7 @@ GitExecResult Git::getDiff(const QString &sha, QObject *, const QString &diffToS
    return qMakePair(false, QString());
 }
 
-QString Git::getDiff(const QString &currentSha, const QString &previousSha, const QString &file)
+QString Git::getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
    QByteArray output;
    const auto ret = run(QString("git diff -U15000 %1 %2 %3").arg(previousSha, currentSha, file));
@@ -339,7 +339,7 @@ RevisionFile Git::getWipFiles()
    return mRevCache->getRevisionFile(ZERO_SHA); // ZERO_SHA search arrives here
 }
 
-RevisionFile Git::getFiles(const QString &sha) const
+RevisionFile Git::getCommitFiles(const QString &sha) const
 {
    const auto r = mRevCache->getCommitInfo(sha);
 
@@ -349,7 +349,7 @@ RevisionFile Git::getFiles(const QString &sha) const
    return RevisionFile();
 }
 
-RevisionFile Git::getFiles(const QString &sha, const QString &diffToSha, bool allFiles)
+RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha, bool allFiles)
 {
    const auto r = mRevCache->getCommitInfo(sha);
    if (r.parentsCount() == 0)

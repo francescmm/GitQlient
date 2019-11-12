@@ -19,16 +19,18 @@ FileDiffWidget::FileDiffWidget(QSharedPointer<Git> git, QWidget *parent)
    mGoPrevious->setIcon(QIcon(":/icons/go_up"));
    mGoNext->setIcon(QIcon(":/icons/go_down"));
 
+   /*
    const auto controlsLayout = new QVBoxLayout();
    controlsLayout->setContentsMargins(QMargins());
    controlsLayout->addWidget(mGoPrevious);
    controlsLayout->addStretch();
    controlsLayout->addWidget(mGoNext);
+   */
 
    const auto vLayout = new QHBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
    vLayout->setSpacing(0);
-   vLayout->addLayout(controlsLayout);
+   // vLayout->addLayout(controlsLayout);
    vLayout->addWidget(mDiffView);
 }
 
@@ -37,7 +39,7 @@ void FileDiffWidget::clear()
    mDiffView->clear();
 }
 
-bool FileDiffWidget::onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file)
+bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file)
 {
    mCurrentFile = file;
    auto destFile = file;
@@ -45,7 +47,7 @@ bool FileDiffWidget::onFileDiffRequested(const QString &currentSha, const QStrin
    if (destFile.contains("-->"))
       destFile = destFile.split("--> ").last().split("(").first().trimmed();
 
-   auto text = mGit->getDiff(currentSha, previousSha, destFile);
+   auto text = mGit->getFileDiff(currentSha, previousSha, destFile);
    auto lines = text.split("\n");
 
    for (auto i = 0; !lines.isEmpty() && i < 5; ++i)

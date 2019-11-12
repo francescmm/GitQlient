@@ -100,7 +100,7 @@ void FullDiffWidget::processData(const QString &fileChunk)
 
 void FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
 {
-   const auto ret = mGit->getDiff(sha, this, diffToSha);
+   const auto ret = mGit->getCommitDiff(sha, diffToSha);
 
    if (ret.success)
       processData(ret.output.toString());

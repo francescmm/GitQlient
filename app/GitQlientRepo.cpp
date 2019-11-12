@@ -348,7 +348,7 @@ void GitQlientRepo::onAmendCommit(const QString &sha)
 
 void GitQlientRepo::onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file)
 {
-   const auto fileWithModifications = mFileDiffWidget->onFileDiffRequested(currentSha, previousSha, file);
+   const auto fileWithModifications = mFileDiffWidget->configure(currentSha, previousSha, file);
 
    if (fileWithModifications)
    {

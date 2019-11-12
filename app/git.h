@@ -151,12 +151,12 @@ public:
 
    bool isNothingToCommit();
 
-   GitExecResult getDiff(const QString &sha, QObject *receiver, const QString &diffToSha);
-   QString getDiff(const QString &currentSha, const QString &previousSha, const QString &file);
+   GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
+   QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 
    RevisionFile getWipFiles();
-   RevisionFile getFiles(const QString &sha) const;
-   RevisionFile getFiles(const QString &sha, const QString &sha2, bool all = false);
+   RevisionFile getCommitFiles(const QString &sha) const;
+   RevisionFile getDiffFiles(const QString &sha, const QString &sha2, bool all = false);
 
    CommitInfo getCommitInfo(const QString &sha) const;
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;

@@ -115,7 +115,7 @@ void WorkInProgressWidget::configure(const QString &sha)
 
    if (mIsAmend)
    {
-      const auto amendFiles = mGit->getFiles(mCurrentSha);
+      const auto amendFiles = mGit->getCommitFiles(mCurrentSha);
       insertFilesInList(amendFiles, ui->stagedFilesList);
    }
 

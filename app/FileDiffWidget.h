@@ -37,7 +37,7 @@ class FileDiffWidget : public QFrame
 public:
    explicit FileDiffWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
    void clear();
-   bool onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file);
+   bool configure(const QString &currentSha, const QString &previousSha, const QString &file);
    QString getCurrentFile() const { return mCurrentFile; }
 
 private:
