@@ -172,21 +172,22 @@ QPair<bool, QString> Git::run(const QString &runCmd) const
 
 int Git::findFileIndex(const RevisionFile &rf, const QString &name)
 {
-
    if (name.isEmpty())
       return -1;
 
-   int idx = name.lastIndexOf('/') + 1;
-   const QString &dr = name.left(idx);
-   const QString &nm = name.mid(idx);
+   const auto idx = name.lastIndexOf('/') + 1;
+   const auto dr = name.left(idx);
+   const auto nm = name.mid(idx);
 
    for (int i = 0, cnt = rf.count(); i < cnt; ++i)
    {
       const auto isRevFile = mFileNames[rf.nameAt(i)];
       const auto isRevDir = mDirNames[rf.dirAt(i)];
+
       if (isRevFile == nm && isRevDir == dr)
          return i;
    }
+
    return -1;
 }
 
@@ -257,56 +258,6 @@ QPair<QString, QString> Git::getSplitCommitMsg(const QString &sha)
    const auto c = mRevCache->getCommitInfo(sha);
 
    return qMakePair(c.shortLog(), c.longLog().trimmed());
-}
-
-QString Git::getCommitMsg(const QString &sha) const
-{
-   const auto c = mRevCache->getCommitInfo(sha);
-   if (c.sha().isEmpty())
-      return QString();
-
-   return c.shortLog() + "\n\n" + c.longLog().trimmed();
-}
-
-const QString Git::getLastCommitMsg()
-{
-   // FIXME: Make sure the amend action is not called when there is
-   // nothing to amend. That is in empty repository or over StGit stack
-   // with nothing applied.
-   QString sha;
-   const auto ret = run("git rev-parse --verify HEAD");
-   if (ret.first)
-      sha = ret.second.trimmed();
-   else
-      return QString();
-
-   return getCommitMsg(sha);
-}
-
-const QString Git::getNewCommitMsg()
-{
-
-   const auto c = mRevCache->getCommitInfo(ZERO_SHA);
-   if (c.sha().isEmpty())
-      return "";
-
-   QString status = c.longLog();
-   status.prepend('\n').replace(QRegExp("\\n([^#\\n]?)"), "\n#\\1"); // comment all the lines
-
-   if (mIsMergeHead)
-   {
-      QFile file(QDir(mGitDir).absoluteFilePath("MERGE_MSG"));
-      if (file.open(QIODevice::ReadOnly))
-      {
-         QTextStream in(&file);
-
-         while (!in.atEnd())
-            status.prepend(in.readLine());
-
-         file.close();
-      }
-   }
-   return status;
 }
 
 QVector<QString> Git::getSubmodules()

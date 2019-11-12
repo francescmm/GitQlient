@@ -121,9 +121,6 @@ public:
 
    /* START COMMIT INFO */
    QPair<QString, QString> getSplitCommitMsg(const QString &sha);
-   QString getCommitMsg(const QString &sha) const;
-   const QString getLastCommitMsg();
-   const QString getNewCommitMsg();
    bool resetFile(const QString &fileName);
    GitExecResult blame(const QString &file);
    GitExecResult history(const QString &file);
