@@ -60,7 +60,11 @@ void CommitHistoryModel::onNewRevisions()
    // do not attempt to insert 0 rows since the inclusive range would be invalid
    const auto revisionsCount = mGit->totalCommits();
    if (rowCnt == revisionsCount)
+   {
+      beginResetModel();
+      endResetModel();
       return;
+   }
 
    beginInsertRows(QModelIndex(), rowCnt, revisionsCount - 1);
    rowCnt = revisionsCount;
