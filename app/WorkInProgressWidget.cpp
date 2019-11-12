@@ -96,7 +96,7 @@ void WorkInProgressWidget::configure(const QString &sha)
    // set-up files list
    if (mIsAmend)
    {
-      const auto revInfo = mGit->getRevLookup(mCurrentSha);
+      const auto revInfo = mGit->getCommitInfo(mCurrentSha);
       const auto author = revInfo.author().split("<");
       ui->leAuthorName->setText(author.first());
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));

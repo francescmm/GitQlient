@@ -69,7 +69,7 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
    for (const auto &line : lines)
    {
       const auto fields = line.split("\t");
-      const auto revision = mGit->getRevLookup(fields.at(0));
+      const auto revision = mGit->getCommitInfo(fields.at(0));
       const auto dt = QDateTime::fromString(fields.at(2), Qt::ISODate);
       const auto lineNumAndContent = fields.at(3);
       const auto divisorChar = lineNumAndContent.indexOf(")");
@@ -205,7 +205,7 @@ QLabel *FileBlameWidget::createAuthorLabel(const QString &author, bool isFirst)
 
 ClickableFrame *FileBlameWidget::createMessageLabel(const QString &sha, bool isFirst)
 {
-   const auto revision = mGit->getRevLookup(sha);
+   const auto revision = mGit->getCommitInfo(sha);
    const auto commitMsg = !revision.sha().isEmpty() ? revision.shortLog() : QString("Local changes");
 
    const auto messageLabel = new ClickableFrame(commitMsg, Qt::AlignTop | Qt::AlignLeft);

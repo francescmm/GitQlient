@@ -68,33 +68,6 @@ Git::Git()
 {
 }
 
-void Git::userInfo(QStringList &info)
-{
-   /*
-   git looks for commit user information in following order:
-
-         - GIT_AUTHOR_NAME and GIT_AUTHOR_EMAIL environment variables
-         - repository config file
-         - global config file
-         - your name, hostname and domain
- */
-   const QString env(QProcess::systemEnvironment().join(","));
-   QString user(env.section("GIT_AUTHOR_NAME", 1).section(",", 0, 0).section("=", 1).trimmed());
-   QString email(env.section("GIT_AUTHOR_EMAIL", 1).section(",", 0, 0).section("=", 1).trimmed());
-
-   info.clear();
-   info << "Environment" << user << email;
-
-   user = run("git config user.name").second;
-   email = run("git config user.email").second;
-   info << "Local config" << user << email;
-
-   user = run("git config --global user.name").second;
-   email = run("git config --global user.email").second;
-   info << "Global config" << user << email;
-}
-
-// CT TODO utility function; can go elsewhere
 const QString Git::quote(const QString &nm)
 {
 
@@ -176,34 +149,12 @@ const QString Git::getRefSha(const QString &refName, RefType type, bool askGit)
    return (ret.first ? ret.second.trimmed() : "");
 }
 
-const QString Git::getTagMsg(const QString &sha)
-{
-
-   if (!checkRef(sha, TAG))
-      return "";
-
-   Reference &rf = mRefsShaMap[sha];
-
-   if (!rf.tagMsg.isEmpty())
-      return rf.tagMsg;
-
-   QRegExp pgp("-----BEGIN PGP SIGNATURE*END PGP SIGNATURE-----", Qt::CaseSensitive, QRegExp::Wildcard);
-
-   if (!rf.tagObj.isEmpty())
-   {
-      auto ro = run("git cat-file tag " + rf.tagObj);
-      if (ro.first)
-         rf.tagMsg = ro.second.section("\n\n", 1).remove(pgp).trimmed();
-   }
-   return rf.tagMsg;
-}
-
 const QString Git::filePath(const RevisionFile &rf, int i) const
 {
    return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)];
 }
 
-CommitInfo Git::getRevLookup(const QString &sha) const
+CommitInfo Git::getCommitInfo(const QString &sha) const
 {
    return mRevCache->getCommitInfo(sha);
 }
@@ -851,7 +802,7 @@ bool Git::getStashCommit(const QString &stash, QByteArray &output)
    return ret.first;
 }
 
-bool Git::getGitDBDir(const QString &wd)
+bool Git::setGitDBDir(const QString &wd)
 {
    // we could run from a subdirectory, so we need to get correct directories
 
@@ -1266,29 +1217,29 @@ CommitInfo Git::getCommitInfo(const QString &sha)
 void Git::clearRevs()
 {
    mRevCache->clear();
+   mRevCache->clearRevisionFile();
    workingDirInfo.clear();
 }
 
 void Git::clearFileNames()
 {
-   mRevCache->clearRevisionFile();
    mFileNamesMap.clear();
    mDirNamesMap.clear();
    mDirNames.clear();
    mFileNames.clear();
 }
 
-bool Git::init(const QString &wd)
+bool Git::loadRepository(const QString &wd)
 {
    QLog_Info("Git", "Initializing Git...");
 
    // normally called when changing git directory. Must be called after stop()
    clearRevs();
+   clearFileNames();
 
-   const auto isGIT = getGitDBDir(wd);
+   const auto isGIT = setGitDBDir(wd);
 
    getBaseDir(wd, mWorkingDir);
-   clearFileNames();
 
    if (!isGIT)
       return false;

@@ -116,7 +116,7 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 
    QModelIndex index;
-   auto row = mGit->getRevLookup(mCurrentSha).orderIdx;
+   auto row = mGit->getCommitInfo(mCurrentSha).orderIdx;
 
    if (mIsFiltering)
    {

@@ -97,7 +97,7 @@ void CommitInfoWidget::setCurrentCommitSha(const QString &sha)
 
    if (sha != ZERO_SHA and !sha.isEmpty())
    {
-      const auto currentRev = mGit->getRevLookup(sha);
+      const auto currentRev = mGit->getCommitInfo(sha);
 
       if (!currentRev.sha().isEmpty())
       {

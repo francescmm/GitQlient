@@ -61,7 +61,7 @@ public:
    explicit Git();
 
    /* START Git CONFIGURATION */
-   bool init(const QString &wd);
+   bool loadRepository(const QString &wd);
    void init2();
    QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
@@ -98,8 +98,6 @@ public:
    bool removeTag(const QString &tagName, bool remote);
    bool pushTag(const QString &tagName, QByteArray &output);
    GitExecResult getTagCommit(const QString &tagName);
-   const QString getTagMsg(const QString &sha);
-
    /*  END  TAGS */
 
    /* START STASHES */
@@ -139,11 +137,6 @@ public:
    bool submoduleRemove(const QString &submodule);
    /*  END  SUBMODULES */
 
-   /* START SETTINGS */
-   void userInfo(QStringList &info);
-
-   /* END SETTINGS */
-
    /* START GENERAL REPO */
    bool getBaseDir(const QString &wd, QString &bd);
    /*  END  GENERAL REPO */
@@ -169,7 +162,7 @@ public:
    RevisionFile getFiles(const QString &sha) const;
    RevisionFile getFiles(const QString &sha, const QString &sha2, bool all = false);
 
-   CommitInfo getRevLookup(const QString &sha) const;
+   CommitInfo getCommitInfo(const QString &sha) const;
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;
    const QString getRefSha(const QString &refName, RefType type = ANY_REF, bool askGit = true);
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
@@ -181,7 +174,7 @@ public:
    void updateWipRevision();
 
 private:
-   bool getGitDBDir(const QString &wd);
+   bool setGitDBDir(const QString &wd);
    void processRevision(const QByteArray &ba);
 
    struct Reference

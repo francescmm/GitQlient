@@ -145,7 +145,7 @@ void GitQlientRepo::updateCache()
    {
       QLog_Debug("UI", QString("Updating the GitQlient UI"));
 
-      mGit->init(mCurrentDir);
+      mGit->loadRepository(mCurrentDir);
 
       mBranchesWidget->showBranches();
 
@@ -190,9 +190,9 @@ void GitQlientRepo::setRepository(const QString &newDir)
    {
       QLog_Info("UI", QString("Loading repository..."));
 
-      mGit->cancelAllProcesses();
+      emit mGit->cancelAllProcesses();
 
-      const auto ok = mGit->init(newDir);
+      const auto ok = mGit->loadRepository(newDir);
       mCurrentDir = mGit->getWorkingDir();
 
       if (ok)
@@ -381,7 +381,7 @@ void GitQlientRepo::closeEvent(QCloseEvent *ce)
    emit closeAllWindows();
    hide();
 
-   mGit->cancelAllProcesses();
+   emit mGit->cancelAllProcesses();
 
    QWidget::closeEvent(ce);
 }

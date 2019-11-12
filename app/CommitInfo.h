@@ -46,6 +46,7 @@ public:
    QString authorDate() const { return QString::number(mCommitDate.toSecsSinceEpoch()); }
    QString shortLog() const { return mShortLog; }
    QString longLog() const { return mLongLog; }
+   QString fullLog() const { return QString("%1\n\n%2").arg(mShortLog, mLongLog.trimmed()); }
    bool isValid() const;
 
    QVector<LaneType> lanes;
