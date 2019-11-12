@@ -19,16 +19,17 @@ struct QPair;
 
 class RevisionsCache;
 class CommitInfo;
-class QRegExp;
-class QTextCodec;
-class Annotate;
-class GitAsyncProcess;
 
 static const QString ZERO_SHA = "0000000000000000000000000000000000000000";
 
 struct GitExecResult
 {
    GitExecResult() = default;
+   GitExecResult(const QPair<bool, QVariant> &result)
+      : success(result.first)
+      , output(result.second)
+   {
+   }
    GitExecResult(const QPair<bool, QString> &result)
       : success(result.first)
       , output(result.second)
@@ -44,10 +45,6 @@ class Git : public QObject
 
 signals:
    void signalNewRevisions();
-   void signalMergeWithConflicts(const QVector<QString> &conflictFiles);
-
-   // TODO: To review
-signals:
    void cancelAllProcesses();
 
 public:
@@ -101,7 +98,6 @@ public:
 
    /* START STASHES */
    QVector<QString> getStashes();
-   bool getStashCommit(const QString &stash, QByteArray &output);
    /*  END  STASHES */
 
    /* START COMMIT WORK */
@@ -232,7 +228,6 @@ private:
    void flushFileNames(FileNamesLoader &fl);
    static const QString quote(const QString &nm);
    static const QString quote(const QStringList &sl);
-   void setStatus(RevisionFile &rf, const QString &rowSt);
    void setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
    Reference *lookupOrAddReference(const QString &sha);
 

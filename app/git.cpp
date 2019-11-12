@@ -31,8 +31,7 @@
 
 using namespace QLogger;
 
-static const QString GIT_LOG_FORMAT = "%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n";
-static const QString CUSTOM_SHA = "*** CUSTOM * CUSTOM * CUSTOM * CUSTOM **";
+static const QString GIT_LOG_FORMAT = "%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b";
 
 namespace
 {
@@ -500,10 +499,7 @@ GitExecResult Git::exportPatch(const QStringList &shaList)
    if (val != shaList.count())
       QLog_Error("Git", QString("Problem generating patches. Stop after {%1} iterations").arg(val));
 
-   GitExecResult res;
-   res.success = true;
-   res.output = files;
-   return res;
+   return qMakePair(true, QVariant(files));
 }
 
 bool Git::apply(const QString &fileName, bool asCommit)
@@ -516,11 +512,9 @@ bool Git::apply(const QString &fileName, bool asCommit)
 
 GitExecResult Git::push(bool force)
 {
-   QString output;
    const auto ret = run(QString("git push ").append(force ? QString("--force") : QString()));
-   output = ret.second;
 
-   if (output.contains("has no upstream branch"))
+   if (ret.second.contains("has no upstream branch"))
       return run(QString("git push --set-upstream origin %1").arg(mCurrentBranchName));
 
    return ret;
@@ -528,9 +522,7 @@ GitExecResult Git::push(bool force)
 
 GitExecResult Git::pull()
 {
-   const auto ret = run("git pull");
-
-   return ret;
+   return run("git pull");
 }
 
 bool Git::fetch()
@@ -567,8 +559,6 @@ bool Git::resetCommit(const QString &sha, Git::CommitResetType type)
          break;
       case CommitResetType::HARD:
          typeStr = "hard";
-         break;
-      default:
          break;
    }
 
@@ -742,17 +732,6 @@ QVector<QString> Git::getStashes()
    return stashes;
 }
 
-bool Git::getStashCommit(const QString &stash, QByteArray &output)
-{
-   const auto ret = run(QString("git rev-list %1 -n 1 ").arg(stash));
-   output = ret.second.toUtf8();
-
-   if (ret.first)
-      output.remove(output.count() - 2, output.count() - 1);
-
-   return ret.first;
-}
-
 bool Git::setGitDbDir(const QString &wd)
 {
    auto tmp = mWorkingDir;
@@ -777,7 +756,7 @@ GitExecResult Git::getBaseDir(const QString &wd)
    auto tmp = mWorkingDir;
    mWorkingDir = wd;
 
-   const auto ret = run("git rev-parse --show-cdup"); // run under newWorkDir
+   const auto ret = run("git rev-parse --show-cdup");
    mWorkingDir = tmp;
 
    auto baseDir = wd;
@@ -1004,7 +983,7 @@ void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum,
        * the file as modified
        */
       appendFileName(rf, line.section('\t', -1), fl);
-      setStatus(rf, "M");
+      rf.setStatus("M");
       rf.mergeParent.append(parNum);
    }
    else
@@ -1013,42 +992,12 @@ void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum,
       if (line.at(98) == '\t')
       {
          appendFileName(rf, line.mid(99), fl);
-         setStatus(rf, line.at(97));
+         rf.setStatus(line.at(97));
          rf.mergeParent.append(parNum);
       }
       else
          // it's a rename or a copy, we are not in fast path now!
          setExtStatus(rf, line.mid(97), parNum, fl);
-   }
-}
-
-// CT TODO can go in RevisionFile
-void Git::setStatus(RevisionFile &rf, const QString &rowSt)
-{
-
-   char status = rowSt.at(0).toLatin1();
-   switch (status)
-   {
-      case 'M':
-      case 'T':
-      case 'U':
-         rf.status.append(RevisionFile::MODIFIED);
-         break;
-      case 'D':
-         rf.status.append(RevisionFile::DELETED);
-         rf.onlyModified = false;
-         break;
-      case 'A':
-         rf.status.append(RevisionFile::NEW);
-         rf.onlyModified = false;
-         break;
-      case '?':
-         rf.status.append(RevisionFile::UNKNOWN);
-         rf.onlyModified = false;
-         break;
-      default:
-         rf.status.append(RevisionFile::MODIFIED);
-         break;
    }
 }
 
@@ -1112,18 +1061,12 @@ void Git::parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader 
       endPos = buf.indexOf('\n', endPos + 99);
    }
 }
+
 bool Git::checkoutRevisions()
 {
-   QString baseCmd("git log --date-order --no-color "
-#ifndef Q_OS_WIN32
-                   "--log-size " // FIXME broken on Windows
-#endif
-                   "--parents --boundary -z "
-                   "--pretty=format:"
-                   + GIT_LOG_FORMAT);
-
-   // we don't need log message body for file history
-   baseCmd.append("%b --all");
+   auto baseCmd = QString("git log --date-order --no-color --log-size --parents --boundary -z --pretty=format:")
+                      .append(GIT_LOG_FORMAT)
+                      .append(" --all");
 
    const auto requestor = new GitRequestorProcess(mWorkingDir);
    connect(requestor, &GitRequestorProcess::procDataReady, this, &Git::processRevision);
