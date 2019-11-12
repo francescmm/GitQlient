@@ -32,7 +32,7 @@ class UnstagedFilesContextMenu : public QMenu
    Q_OBJECT
 
 signals:
-
+   void signalShowDiff(const QString &fileName);
    void signalCommitAll();
    void signalRevertAll();
    void signalCheckedOut(bool success);

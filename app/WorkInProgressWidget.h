@@ -41,6 +41,7 @@ class WorkInProgressWidget : public QWidget
    Q_OBJECT
 
 signals:
+   void signalShowDiff(const QString &fileName);
    void signalChangesCommitted(bool commited);
    void signalCheckoutPerformed(bool success);
    void signalShowFileHistory(const QString &fileName);
@@ -70,6 +71,7 @@ private:
    bool amendChanges();
    void showUnstagedMenu(const QPoint &pos);
    void showUntrackedMenu(const QPoint &pos);
+   void showStagedMenu(const QPoint &pos);
    void applyChanges();
    QStringList getFiles();
    bool checkMsg(QString &msg);

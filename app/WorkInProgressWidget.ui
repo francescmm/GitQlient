@@ -175,6 +175,9 @@
    </item>
    <item row="7" column="0" colspan="2">
     <widget class="QListWidget" name="stagedFilesList">
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>

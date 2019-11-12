@@ -114,6 +114,8 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
 
+   connect(mCommitWidget, &WorkInProgressWidget::signalShowDiff, this,
+           [this](const QString &fileName) { onFileDiffRequested("", "", fileName); });
    connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mCommitWidget, &WorkInProgressWidget::signalCheckoutPerformed, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mCommitWidget, &WorkInProgressWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);

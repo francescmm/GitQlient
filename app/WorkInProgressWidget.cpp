@@ -62,6 +62,7 @@ WorkInProgressWidget::WorkInProgressWidget(QSharedPointer<Git> git, QWidget *par
            &WorkInProgressWidget::showUntrackedMenu);
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
            &WorkInProgressWidget::showUnstagedMenu);
+   connect(ui->stagedFilesList, &QListWidget::customContextMenuRequested, this, &WorkInProgressWidget::showStagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemClicked, this, &WorkInProgressWidget::addFileToCommitList);
    connect(ui->stagedFilesList, &QListWidget::itemClicked, this, &WorkInProgressWidget::removeFileFromCommitList);
 }
@@ -286,8 +287,9 @@ void WorkInProgressWidget::showUnstagedMenu(const QPoint &pos)
 
    if (item)
    {
-      const auto fileName = ui->unstagedFilesList->itemAt(pos)->data(Qt::DisplayRole).toString();
+      const auto fileName = item->toolTip();
       const auto contextMenu = new UnstagedFilesContextMenu(mGit, fileName, this);
+      connect(contextMenu, &UnstagedFilesContextMenu::signalShowDiff, this, &WorkInProgressWidget::signalShowDiff);
       connect(contextMenu, &UnstagedFilesContextMenu::signalCommitAll, this,
               &WorkInProgressWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedFilesContextMenu::signalRevertAll, this, &WorkInProgressWidget::revertAllChanges);
@@ -307,7 +309,7 @@ void WorkInProgressWidget::showUntrackedMenu(const QPoint &pos)
 
    if (item)
    {
-      const auto fileName = ui->untrackedFilesList->itemAt(pos)->data(Qt::DisplayRole).toString();
+      const auto fileName = item->toolTip();
       const auto contextMenu = new QMenu(this);
       connect(contextMenu->addAction(tr("Delete file")), &QAction::triggered, this, [this, fileName]() {
          QProcess p;
@@ -319,6 +321,22 @@ void WorkInProgressWidget::showUntrackedMenu(const QPoint &pos)
 
       const auto parentPos = ui->untrackedFilesList->mapToParent(pos);
       contextMenu->popup(mapToGlobal(parentPos));
+   }
+}
+
+void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
+{
+   const auto item = ui->stagedFilesList->itemAt(pos);
+
+   if (item)
+   {
+      const auto fileName = item->toolTip();
+      const auto menu = new QMenu(this);
+      const auto action = menu->addAction("See changes");
+      connect(action, &QAction::triggered, this, [this, fileName]() { emit signalShowDiff(fileName); });
+
+      const auto parentPos = ui->stagedFilesList->mapToParent(pos);
+      menu->popup(mapToGlobal(parentPos));
    }
 }
 

@@ -12,6 +12,9 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(QSharedPointer<Git> git, cons
    , mGit(git)
    , mFileName(fileName)
 {
+   connect(addAction("See changes"), &QAction::triggered, this, [this]() { emit signalShowDiff(mFileName); });
+
+   addSeparator();
 
    connect(addAction("Revert file changes"), &QAction::triggered, this, [this, fileName]() {
       const auto msgBoxRet
