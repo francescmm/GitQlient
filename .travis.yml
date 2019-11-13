@@ -1,27 +1,33 @@
 language: cpp
-
 git:
   depth: 1
-
 sudo: required
 dist: bionic
-
 install:
-    - bash ci-scripts/$TRAVIS_OS_NAME/install.sh
-
+- bash ci-scripts/$TRAVIS_OS_NAME/install.sh
 script:
-    - bash ci-scripts/$TRAVIS_OS_NAME/build.sh
-
+- bash ci-scripts/$TRAVIS_OS_NAME/build.sh
 matrix:
   include:
-      - os: osx
-        osx_image: xcode11.2
-      - os: linux
-        compiler: gcc
-
+  - os: osx
+    osx_image: xcode11.2
+  - os: linux
+    compiler: gcc
+before_deploy:
+  - git config --local user.name "Francesc Martinez"
+  - git config --local user.email "francescmm@gmail.com"
+  - export TRAVIS_TAG=${TRAVIS_TAG:-$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)}
+  - git tag $TRAVIS_TAG
 deploy:
   provider: releases
-  api_key: "783142cee384dc5def7cb12cfd048808599bae9b"
-  file: "GitQlient"
+  api_key:
+    secure: qv/f6FbrT5z65nla2V41tmgqBF4+xK+6YSZoku9DSMducdTY69YgwSFcDZtmC2yABKoiykCIpaiSjKY06KUpmF12ydTfnDjT9FYyGiFnyj5VLhWbT4O3u9HiY7rjknYvcbOBVZcGyA/6vRLvCUIA1cpdIyO3VRuJTEYseaTQNkLTgGf+I5Hk+gxHqGM7yXiLOxzbbwqITkT2B9tRSnqFR3HSSHe2p8MQD0Sy01kIsPdi1AwPmllCKaaws+62C21UhUX4ms4utanZYMq2DaXKMDJzpWDlN3kgQFrrpLZe5IJtebkEdOoO1tvuNRl8m7QqBzS+2Bd9P7drXkElz/nYMuz3rdZwKDcUqcjyLfxKayl33Y6S6/nXRsfi0y59tIIWOvPtcH25LZL9mTcovvWFvVS6f6eCfohAxvON1JwSXqjPfk55A9p85QbM4uYgHZQ3Z1drRs4P6i5Vd+qHYK5KwJ8XvFuXeF6NlfVUpuC7zz3VIm0MVmeA7JYZJIhQx8FeVegXJN9czy+bcLKtFht9Neogm/2oVWAuURknKUKmR6x7k1QRXEGmRMdNzgi2hJPGxpzyczhn4bS047niSVS01NQ9kamBBcNhZE7vevth6z6vxSAG7SHxFApMhzp3zVovLISJfz2+nryMzDJmv8xqDJrnpjIGsJeR+SRptWCa0NE=
+  file: "GitQlient_${TRAVIS_OS_NAME}"
   skip_cleanup: true
   draft: true
+  prerelease: true
+  on:
+    condition: $TRAVIS_OS_NAME = linux
+    #tags: true
+    repo: francescmm/GitQlient
+    branch: travis_testing

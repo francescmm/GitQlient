@@ -3,7 +3,6 @@ unzip -qq qt5.zip;
 export QTDIR=$PWD/qt5
 export PATH=$QTDIR/bin:$PATH;
 export QT_PLUGIN_PATH=$PWD/qt5/plugins;
-ls $QTDIR
-ls $QTDIR/bin
 $QTDIR/bin/qmake GitQlient.pro
 make -j 4
+cp GitQlient GitQlient_"${TRAVIS_OS_NAME}"
