@@ -38,7 +38,7 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
    if (item->data(0, Qt::UserRole + 2).toBool())
    {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      const auto ret = mGit->checkoutRemoteBranch(item->data(0, Qt::UserRole + 1).toString());
+      const auto ret = mGit->checkoutRemoteBranch(item->data(0, Qt::UserRole + 1).toString().remove("origin/"));
       QApplication::restoreOverrideCursor();
 
       if (ret.success)
