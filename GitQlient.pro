@@ -22,4 +22,5 @@ OTHER_FILES += $$PWD/Tasks.txt \
     $$PWD/LICENSE \
     $$PWD/README.md \
     $$PWD/CONTRIBUTING.md \
-    $$PWD/SETUP_BUILD.md
+    $$PWD/SETUP_BUILD.md \
+    $$PWD/.travis.yml

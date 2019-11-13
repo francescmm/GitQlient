@@ -19,3 +19,9 @@ matrix:
       - os: linux
         compiler: gcc
 
+deploy:
+  provider: releases
+  api_key: "783142cee384dc5def7cb12cfd048808599bae9b"
+  file: "GitQlient"
+  skip_cleanup: true
+  draft: true
