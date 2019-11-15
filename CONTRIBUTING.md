@@ -9,7 +9,9 @@ It doesn't matter what yo know or not, there is allways a way to help or contrib
 My intention is to use the features that GitHub provides. So the [Issues page](https://github.com/francescmm/GitQlient/issues) and the [Projects page](https://github.com/francescmm/GitQlient/projects) are two options to start with. I you prefer to report bugs or requests features, you can use the Issues tab and add a new issue with a label. [Every label](https://github.com/francescmm/GitQlient/labels) has a description but if you're not sure, don't worry, you can leave it empty. The current labels are:
 
 - Rookie task: Perfect dev task to start to know GitQlient
+- Task: Task that should be solved in a single commit but is not a rookie task
 - Feature: I want this amazing feature!
+- Improvement: Extend functionality or improve performance of a specific topic
 - Critical bug: Bug that makes GitQlient to crash
 - Bug: Bug that makes GitQlient unstable. It doesn't crash
 - Documentation: The issue is only about documentation
