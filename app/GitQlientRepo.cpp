@@ -25,6 +25,7 @@
 #include <QGridLayout>
 #include <QApplication>
 #include <QStackedLayout>
+#include <QProgressDialog>
 
 using namespace QLogger;
 
@@ -122,6 +123,8 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
 
    connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
    connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
+
+   connect(mGit.get(), &Git::signalLoadingProgress, this, &GitQlientRepo::updateProgressDialog, Qt::DirectConnection);
 
    setRepository(repo);
 
@@ -290,6 +293,32 @@ void GitQlientRepo::showFileHistory(const QString &fileName)
 {
    fileHistoryWidget->showFileHistory(fileName);
    mainStackedLayout->setCurrentIndex(1);
+}
+
+void GitQlientRepo::updateProgressDialog(int current, int total)
+{
+   if (current == 0 && !mProgressDlg)
+   {
+      mProgressDlg = new QProgressDialog(tr("Loading repository..."), QString(), 0, total);
+      connect(mProgressDlg, &QProgressDialog::destroyed, this, [this]() { mProgressDlg = nullptr; });
+
+      QFile styles(":/stylesheet");
+
+      if (styles.open(QIODevice::ReadOnly))
+      {
+         QLog_Info("UI", "Applying the styles");
+
+         mProgressDlg->setStyleSheet(QString::fromUtf8(styles.readAll()));
+         styles.close();
+      }
+
+      mProgressDlg->show();
+      mProgressDlg->setAttribute(Qt::WA_DeleteOnClose);
+   }
+   else
+      mProgressDlg->setValue(current);
+
+   mProgressDlg->repaint();
 }
 
 void GitQlientRepo::openCommitDiff()
