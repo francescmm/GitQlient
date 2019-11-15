@@ -10,7 +10,7 @@ Author: Marco Costalba (C) 2005-2007
 
 #include <CommitHistoryModel.h>
 #include <CommitHistoryColumns.h>
-#include <RepositoryContextMenu.h>
+#include <CommitHistoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
 #include <ShaFilterProxyModel.h>
 #include <git.h>
@@ -145,11 +145,11 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
 
       if (!shas.isEmpty())
       {
-         const auto menu = new RepositoryContextMenu(mGit, shas, this);
-         connect(menu, &RepositoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
-         connect(menu, &RepositoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
-         connect(menu, &RepositoryContextMenu::signalOpenCompareDiff, this, &CommitHistoryView::signalOpenCompareDiff);
-         connect(menu, &RepositoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
+         const auto menu = new CommitHistoryContextMenu(mGit, shas, this);
+         connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
+         connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
+         connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this, &CommitHistoryView::signalOpenCompareDiff);
+         connect(menu, &CommitHistoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
          menu->exec(viewport()->mapToGlobal(pos));
       }
       else

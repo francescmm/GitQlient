@@ -24,6 +24,7 @@ HEADERS += \
     $$PWD/BranchesWidget.h \
     $$PWD/ClickableFrame.h \
     $$PWD/CommitHistoryColumns.h \
+    $$PWD/CommitHistoryContextMenu.h \
     $$PWD/CommitHistoryModel.h \
     $$PWD/CommitHistoryView.h \
     $$PWD/CommitInfo.h \
@@ -47,7 +48,6 @@ HEADERS += \
     $$PWD/GitQlientSettings.h \
     $$PWD/GitRequestorProcess.h \
     $$PWD/GitSyncProcess.h \
-    $$PWD/RepositoryContextMenu.h \
     $$PWD/RepositoryViewDelegate.h \
     $$PWD/RevisionFile.h \
     $$PWD/RevisionsCache.h \
@@ -67,6 +67,7 @@ SOURCES += \
     $$PWD/BranchesViewDelegate.cpp \
     $$PWD/BranchesWidget.cpp \
     $$PWD/ClickableFrame.cpp \
+    $$PWD/CommitHistoryContextMenu.cpp \
     $$PWD/CommitHistoryModel.cpp \
     $$PWD/CommitHistoryView.cpp \
     $$PWD/CommitInfo.cpp \
@@ -90,7 +91,6 @@ SOURCES += \
     $$PWD/GitQlientSettings.cpp \
     $$PWD/GitRequestorProcess.cpp \
     $$PWD/GitSyncProcess.cpp \
-    $$PWD/RepositoryContextMenu.cpp \
     $$PWD/RepositoryViewDelegate.cpp \
     $$PWD/RevisionFile.cpp \
     $$PWD/RevisionsCache.cpp \

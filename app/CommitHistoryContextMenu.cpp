@@ -1,4 +1,4 @@
-#include "RepositoryContextMenu.h"
+#include "CommitHistoryContextMenu.h"
 
 #include <git.h>
 #include <WorkInProgressWidget.h>
@@ -14,7 +14,7 @@
 
 using namespace QLogger;
 
-RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QStringList &shas, QWidget *parent)
+CommitHistoryContextMenu::CommitHistoryContextMenu(QSharedPointer<Git> git, const QStringList &shas, QWidget *parent)
    : QMenu(parent)
    , mGit(git)
    , mShas(shas)
@@ -25,7 +25,7 @@ RepositoryContextMenu::RepositoryContextMenu(QSharedPointer<Git> git, const QStr
       createMultipleShasMenu();
 }
 
-void RepositoryContextMenu::createIndividualShaMenu()
+void CommitHistoryContextMenu::createIndividualShaMenu()
 {
    if (mShas.count() == 1)
    {
@@ -34,10 +34,10 @@ void RepositoryContextMenu::createIndividualShaMenu()
       if (sha == ZERO_SHA)
       {
          const auto stashAction = addAction("Push stash");
-         connect(stashAction, &QAction::triggered, this, &RepositoryContextMenu::stashPush);
+         connect(stashAction, &QAction::triggered, this, &CommitHistoryContextMenu::stashPush);
 
          const auto popAction = addAction("Pop stash");
-         connect(popAction, &QAction::triggered, this, &RepositoryContextMenu::stashPop);
+         connect(popAction, &QAction::triggered, this, &CommitHistoryContextMenu::stashPop);
       }
 
       const auto commitAction = addAction("See diff");
@@ -47,18 +47,18 @@ void RepositoryContextMenu::createIndividualShaMenu()
       if (sha != ZERO_SHA)
       {
          const auto createBranchAction = addAction("Create branch here");
-         connect(createBranchAction, &QAction::triggered, this, &RepositoryContextMenu::createBranch);
+         connect(createBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::createBranch);
 
          const auto createTagAction = addAction("Create tag here");
-         connect(createTagAction, &QAction::triggered, this, &RepositoryContextMenu::createTag);
+         connect(createTagAction, &QAction::triggered, this, &CommitHistoryContextMenu::createTag);
 
          const auto exportAsPatchAction = addAction("Export as patch");
-         connect(exportAsPatchAction, &QAction::triggered, this, &RepositoryContextMenu::exportAsPatch);
+         connect(exportAsPatchAction, &QAction::triggered, this, &CommitHistoryContextMenu::exportAsPatch);
 
          addSeparator();
 
          const auto checkoutCommitAction = addAction("Checkout commit");
-         connect(checkoutCommitAction, &QAction::triggered, this, &RepositoryContextMenu::checkoutCommit);
+         connect(checkoutCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::checkoutCommit);
 
          QByteArray output;
          auto ret = mGit->getBranchesOfCommit(sha);
@@ -110,7 +110,7 @@ void RepositoryContextMenu::createIndividualShaMenu()
             if (!isCommitInCurrentBranch)
             {
                const auto cherryPickAction = addAction(tr("Cherry pick commit"));
-               connect(cherryPickAction, &QAction::triggered, this, &RepositoryContextMenu::cherryPickCommit);
+               connect(cherryPickAction, &QAction::triggered, this, &CommitHistoryContextMenu::cherryPickCommit);
             }
          }
 
@@ -127,19 +127,19 @@ void RepositoryContextMenu::createIndividualShaMenu()
                        [this]() { emit signalAmendCommit(mShas.first()); });
 
                const auto applyPatchAction = addAction("Apply patch");
-               connect(applyPatchAction, &QAction::triggered, this, &RepositoryContextMenu::applyPatch);
+               connect(applyPatchAction, &QAction::triggered, this, &CommitHistoryContextMenu::applyPatch);
 
                const auto applyCommitAction = addAction("Apply commit");
-               connect(applyCommitAction, &QAction::triggered, this, &RepositoryContextMenu::applyCommit);
+               connect(applyCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::applyCommit);
 
                const auto pushAction = addAction("Push");
-               connect(pushAction, &QAction::triggered, this, &RepositoryContextMenu::push);
+               connect(pushAction, &QAction::triggered, this, &CommitHistoryContextMenu::push);
 
                const auto pullAction = addAction("Pull");
-               connect(pullAction, &QAction::triggered, this, &RepositoryContextMenu::pull);
+               connect(pullAction, &QAction::triggered, this, &CommitHistoryContextMenu::pull);
 
                const auto fetchAction = addAction("Fetch");
-               connect(fetchAction, &QAction::triggered, this, &RepositoryContextMenu::fetch);
+               connect(fetchAction, &QAction::triggered, this, &CommitHistoryContextMenu::fetch);
             }
          }
 
@@ -150,18 +150,18 @@ void RepositoryContextMenu::createIndividualShaMenu()
          addSeparator();
 
          const auto resetSoftAction = addAction("Reset - Soft");
-         connect(resetSoftAction, &QAction::triggered, this, &RepositoryContextMenu::resetSoft);
+         connect(resetSoftAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetSoft);
 
          const auto resetMixedAction = addAction("Reset - Mixed");
-         connect(resetMixedAction, &QAction::triggered, this, &RepositoryContextMenu::resetMixed);
+         connect(resetMixedAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetMixed);
 
          const auto resetHardAction = addAction("Reset - Hard");
-         connect(resetHardAction, &QAction::triggered, this, &RepositoryContextMenu::resetHard);
+         connect(resetHardAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetHard);
       }
    }
 }
 
-void RepositoryContextMenu::createMultipleShasMenu()
+void CommitHistoryContextMenu::createMultipleShasMenu()
 {
    if (mShas.count() == 2)
    {
@@ -172,7 +172,7 @@ void RepositoryContextMenu::createMultipleShasMenu()
    if (!mShas.contains(ZERO_SHA))
    {
       const auto exportAsPatchAction = addAction("Export as patch");
-      connect(exportAsPatchAction, &QAction::triggered, this, &RepositoryContextMenu::exportAsPatch);
+      connect(exportAsPatchAction, &QAction::triggered, this, &CommitHistoryContextMenu::exportAsPatch);
 
       const auto copyShaAction = addAction("Copy all SHA");
       connect(copyShaAction, &QAction::triggered, this,
@@ -182,7 +182,7 @@ void RepositoryContextMenu::createMultipleShasMenu()
       QLog_Warning("UI", "WIP selected as part of a series of SHAs");
 }
 
-void RepositoryContextMenu::stashPush()
+void CommitHistoryContextMenu::stashPush()
 {
    const auto ret = mGit->stash();
 
@@ -190,7 +190,7 @@ void RepositoryContextMenu::stashPush()
       emit signalRepositoryUpdated();
 }
 
-void RepositoryContextMenu::stashPop()
+void CommitHistoryContextMenu::stashPop()
 {
    const auto ret = mGit->pop();
 
@@ -198,7 +198,7 @@ void RepositoryContextMenu::stashPop()
       emit signalRepositoryUpdated();
 }
 
-void RepositoryContextMenu::createBranch()
+void CommitHistoryContextMenu::createBranch()
 {
    BranchDlg dlg({ mShas.first(), BranchDlgMode::CREATE_FROM_COMMIT, QSharedPointer<Git>(mGit) });
    const auto ret = dlg.exec();
@@ -207,7 +207,7 @@ void RepositoryContextMenu::createBranch()
       emit signalRepositoryUpdated();
 }
 
-void RepositoryContextMenu::createTag()
+void CommitHistoryContextMenu::createTag()
 {
    TagDlg dlg(mGit, mShas.first());
    const auto ret = dlg.exec();
@@ -217,7 +217,7 @@ void RepositoryContextMenu::createTag()
 }
 
 #include <QProcess>
-void RepositoryContextMenu::exportAsPatch()
+void CommitHistoryContextMenu::exportAsPatch()
 {
    const auto ret = mGit->exportPatch(mShas);
 
@@ -248,7 +248,7 @@ void RepositoryContextMenu::exportAsPatch()
    }
 }
 
-void RepositoryContextMenu::checkoutCommit()
+void CommitHistoryContextMenu::checkoutCommit()
 {
    const auto sha = mShas.first();
    QLog_Info("UI", QString("Checking out the commit {%1}").arg(sha));
@@ -261,7 +261,7 @@ void RepositoryContextMenu::checkoutCommit()
       QMessageBox::critical(this, tr("Checkout error"), ret.output.toString());
 }
 
-void RepositoryContextMenu::cherryPickCommit()
+void CommitHistoryContextMenu::cherryPickCommit()
 {
    const auto ret = mGit->cherryPickCommit(mShas.first());
 
@@ -271,7 +271,7 @@ void RepositoryContextMenu::cherryPickCommit()
       QMessageBox::critical(this, tr("Error while cherry-pick"), ret.output.toString());
 }
 
-void RepositoryContextMenu::applyPatch()
+void CommitHistoryContextMenu::applyPatch()
 {
    const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
 
@@ -279,7 +279,7 @@ void RepositoryContextMenu::applyPatch()
       emit signalRepositoryUpdated();
 }
 
-void RepositoryContextMenu::applyCommit()
+void CommitHistoryContextMenu::applyCommit()
 {
    const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
 
@@ -287,7 +287,7 @@ void RepositoryContextMenu::applyCommit()
       emit signalRepositoryUpdated();
 }
 
-void RepositoryContextMenu::push()
+void CommitHistoryContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    const auto ret = mGit->push();
@@ -299,7 +299,7 @@ void RepositoryContextMenu::push()
       QMessageBox::critical(this, tr("Error while pushin"), ret.output.toString());
 }
 
-void RepositoryContextMenu::pull()
+void CommitHistoryContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QString output;
@@ -312,25 +312,25 @@ void RepositoryContextMenu::pull()
       QMessageBox::critical(this, tr("Error while pulling"), ret.output.toString());
 }
 
-void RepositoryContextMenu::fetch()
+void CommitHistoryContextMenu::fetch()
 {
    if (mGit->fetch())
       emit signalRepositoryUpdated();
 }
 
-void RepositoryContextMenu::resetSoft()
+void CommitHistoryContextMenu::resetSoft()
 {
    if (mGit->resetCommit(mShas.first(), Git::CommitResetType::SOFT))
       emit signalRepositoryUpdated();
 }
 
-void RepositoryContextMenu::resetMixed()
+void CommitHistoryContextMenu::resetMixed()
 {
    if (mGit->resetCommit(mShas.first(), Git::CommitResetType::MIXED))
       emit signalRepositoryUpdated();
 }
 
-void RepositoryContextMenu::resetHard()
+void CommitHistoryContextMenu::resetHard()
 {
    const auto retMsg = QMessageBox::warning(
        this, "Reset hard requested!", "Are you sure you want to reset the branch to this commit in a <b>hard</b> way?",
@@ -343,7 +343,7 @@ void RepositoryContextMenu::resetHard()
    }
 }
 
-void RepositoryContextMenu::merge(const QString &branchFrom)
+void CommitHistoryContextMenu::merge(const QString &branchFrom)
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    const auto currentBranch = mGit->getCurrentBranchName();

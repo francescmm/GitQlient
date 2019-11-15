@@ -27,7 +27,7 @@
 
 class Git;
 
-class RepositoryContextMenu : public QMenu
+class CommitHistoryContextMenu : public QMenu
 {
    Q_OBJECT
 
@@ -38,7 +38,7 @@ signals:
    void signalAmendCommit(const QString &sha);
 
 public:
-   explicit RepositoryContextMenu(QSharedPointer<Git> git, const QStringList &shas, QWidget *parent = nullptr);
+   explicit CommitHistoryContextMenu(QSharedPointer<Git> git, const QStringList &shas, QWidget *parent = nullptr);
 
 private:
    QSharedPointer<Git> mGit;
