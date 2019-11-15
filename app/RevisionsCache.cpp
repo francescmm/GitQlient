@@ -22,7 +22,24 @@ CommitInfo RevisionsCache::getCommitInfoByRow(int row) const
 CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 {
    if (!sha.isEmpty())
-      return revs.value(sha) ? *revs.value(sha) : CommitInfo();
+   {
+      CommitInfo *c;
+
+      c = revs.value(sha, nullptr);
+
+      if (c == nullptr)
+      {
+         const auto shas = revs.keys();
+
+         const auto it = std::find_if(shas.cbegin(), shas.cend(),
+                                      [sha](const QString &shaToCompare) { return shaToCompare.startsWith(sha); });
+
+         if (it != shas.cend())
+            return *revs.value(*it);
+      }
+      else
+         return *c;
+   }
 
    return CommitInfo();
 }
