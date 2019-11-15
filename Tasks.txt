@@ -1,13 +1,14 @@
-0. Remove unnecessary files from the repo
-- RepositoryViewDelegate
-- RevisionFile
-- Lanes
-- Git
-
 1. Pre-release tasks
 - Add icon
 
-2. Improvements
+2. Nice improvements
+- More options on git stash
+- Split of Git clas sin scopes (refactor Git)
+
+2. Future improvements
+- Unify RevisionsCache (refactor RevisionFile & Lanes)
+
+3. Big Features
 - Amend a commit that is not the last one: amend + rebase
 - Amend a commit already pushed
 - Add functionality to squash commits
