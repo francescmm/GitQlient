@@ -36,6 +36,8 @@ public:
    CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
               const QString &log, const QString &longLog, int idx);
    CommitInfo(const QByteArray &b, int idx);
+   bool operator==(const CommitInfo &commit) const;
+   bool operator!=(const CommitInfo &commit) const;
    bool isBoundary() const { return mBoundaryInfo == '-'; }
    int parentsCount() const { return mParentsSha.count(); }
    QString parent(int idx) const { return mParentsSha.count() > idx ? mParentsSha.at(idx) : QString(); }

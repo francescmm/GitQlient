@@ -16,7 +16,9 @@ void RevisionsCache::configure(int numElementsToStore)
 
 CommitInfo RevisionsCache::getCommitInfoByRow(int row) const
 {
-   return row >= 0 && row < mCommits.count() ? *mCommits.at(row) : CommitInfo();
+   const auto commit = row >= 0 && row < mCommits.count() ? mCommits.at(row) : nullptr;
+
+   return commit ? *commit : CommitInfo();
 }
 
 CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
@@ -53,8 +55,14 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
 
       const auto commit = new CommitInfo(rev);
 
-      mCommits[rev.orderIdx] = commit;
-      revs.insert(rev.sha(), commit);
+      if (!mCommits[rev.orderIdx] || (mCommits[rev.orderIdx] && *commit != *mCommits[rev.orderIdx]))
+      {
+         if (mCommits[rev.orderIdx])
+            delete mCommits[rev.orderIdx];
+
+         mCommits[rev.orderIdx] = commit;
+         revs.insert(rev.sha(), commit);
+      }
 
       if (revs.contains(rev.parent(0)))
          revs.remove(rev.parent(0));
@@ -107,8 +115,6 @@ void RevisionsCache::clear()
 {
    mCacheLocked = true;
 
-   qDeleteAll(mCommits);
-   mCommits.clear();
    lns.clear();
    revs.clear();
 }

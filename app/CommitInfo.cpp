@@ -39,6 +39,18 @@ CommitInfo::CommitInfo(const QByteArray &b, int idx)
    }
 }
 
+bool CommitInfo::operator==(const CommitInfo &commit) const
+{
+   return mSha == commit.mSha && mParentsSha == commit.mParentsSha && mCommitter == commit.mCommitter
+       && mAuthor == commit.mAuthor && mCommitDate == commit.mCommitDate && mShortLog == commit.mShortLog
+       && mLongLog == commit.mLongLog && orderIdx == commit.orderIdx;
+}
+
+bool CommitInfo::operator!=(const CommitInfo &commit) const
+{
+   return !(*this == commit);
+}
+
 bool CommitInfo::isValid() const
 {
    QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
