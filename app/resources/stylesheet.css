@@ -688,3 +688,27 @@ ClickableFrame#firstOfItsName::pressed,  ClickableFrame#primusInterPares::presse
     background-color: #202122;
 }
 
+QProgressDialog
+{
+    background-color: #404142;
+    color: white;
+}
+
+QProgressBar
+{
+    background-color: #606162;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #202122;
+    border-radius: 2px;
+    width: 20px;
+}
+
+QProgressBar::chunk
+{
+    background-color: #D89000;
+    width: 18px;
+}
+
+
