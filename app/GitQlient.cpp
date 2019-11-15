@@ -56,7 +56,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    vLayout->setContentsMargins(QMargins());
    vLayout->addWidget(mRepos);
 
-   auto configIndex = mRepos->addTab(mConfigWidget, QIcon(":/icons/git_orange"), QString());
+   auto configIndex = mRepos->addTab(mConfigWidget, QIcon(":/icons/options"), QString());
    mRepos->tabBar()->setTabButton(configIndex, QTabBar::RightSide, nullptr);
 
    connect(mConfigWidget, &ConfigWidget::signalOpenRepo, this, &GitQlient::addRepoTab);
