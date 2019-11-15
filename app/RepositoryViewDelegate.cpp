@@ -246,7 +246,10 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
    {
       newOpt.font.setFamily("Ubuntu Mono");
       newOpt.font.setPointSize(11);
-      QStyledItemDelegate::paint(p, newOpt, index);
+
+      p->setPen(QColor("white"));
+      newOpt.rect.setX(newOpt.rect.x() + 10);
+      p->drawText(newOpt.rect, index.data().toString().left(8), QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
    }
 }
 

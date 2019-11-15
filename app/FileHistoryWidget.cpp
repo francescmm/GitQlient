@@ -30,6 +30,7 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    mRepoView->setItemDelegate(new RepositoryViewDelegate(mGit, mRepoView));
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(450);
+   mRepoView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
