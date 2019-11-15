@@ -69,12 +69,10 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    const auto stashMenu = new QMenu(mStashBtn);
 
    action = stashMenu->addAction(tr("Push"));
-   action->setIcon(QIcon(":/icons/git_stash"));
    connect(action, &QAction::triggered, this, &Controls::stashCurrentWork);
 
    // mStashBtn->setDefaultAction(action);
    action = stashMenu->addAction(tr("Pop"));
-   action->setIcon(QIcon(":/icons/git_pop"));
    connect(action, &QAction::triggered, this, &Controls::popStashedWork);
 
    mStashBtn->setMenu(stashMenu);
@@ -89,15 +87,27 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    mTerminalBtn->setText(tr("Terminal"));
    mTerminalBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
+   const auto verticalFrame = new QFrame();
+   verticalFrame->setObjectName("orangeSeparator");
+
+   const auto verticalFrame2 = new QFrame();
+   verticalFrame2->setObjectName("orangeSeparator");
+
+   const auto verticalFrame3 = new QFrame();
+   verticalFrame3->setObjectName("orangeSeparator");
+
    const auto hLayout = new QHBoxLayout(this);
    hLayout->setContentsMargins(10, 10, 10, 10);
    hLayout->addStretch();
    hLayout->addWidget(mHome);
    hLayout->addWidget(mBlame);
+   hLayout->addWidget(verticalFrame);
    hLayout->addWidget(mGoToBtn);
+   hLayout->addWidget(verticalFrame2);
    hLayout->addWidget(mPullBtn);
    hLayout->addWidget(mPushBtn);
    hLayout->addWidget(mStashBtn);
+   hLayout->addWidget(verticalFrame3);
    hLayout->addWidget(mTerminalBtn);
    hLayout->addStretch();
 
