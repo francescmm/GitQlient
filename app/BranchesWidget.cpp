@@ -134,6 +134,8 @@ BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
 
    mSubmodulesList->setMouseTracking(true);
    mSubmodulesList->setContextMenuPolicy(Qt::CustomContextMenu);
+   connect(mSubmodulesList, &QListWidget::itemDoubleClicked, this,
+           [this](QListWidgetItem *item) { emit signalOpenSubmodule(item->text()); });
 
    const auto submoduleLayout = new QVBoxLayout();
    submoduleLayout->setContentsMargins(QMargins());
