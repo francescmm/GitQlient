@@ -25,9 +25,9 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    , mStashBtn(new QToolButton())
    , mRefreshBtn(new QToolButton())
 {
-   mHome->setIcon(QIcon(":/icons/home"));
+   mHome->setIcon(QIcon(":/icons/git_orange"));
    mHome->setIconSize(QSize(22, 22));
-   mHome->setText("Home");
+   mHome->setText("Repo view");
    mHome->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
    mBlame->setIcon(QIcon(":/icons/blame"));
