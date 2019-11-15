@@ -1,7 +1,6 @@
 #include "Controls.h"
 
 #include "git.h"
-#include "Terminal.h"
 
 #include <QApplication>
 #include <QToolButton>
@@ -24,7 +23,7 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    , mPullBtn(new QToolButton())
    , mPushBtn(new QToolButton())
    , mStashBtn(new QToolButton())
-   , mTerminalBtn(new QToolButton())
+   , mRefreshBtn(new QToolButton())
 {
    mHome->setIcon(QIcon(":/icons/home"));
    mHome->setIconSize(QSize(22, 22));
@@ -82,10 +81,10 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    mStashBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
    mStashBtn->setPopupMode(QToolButton::MenuButtonPopup);
 
-   mTerminalBtn->setIcon(QIcon(":/icons/terminal"));
-   mTerminalBtn->setIconSize(QSize(22, 22));
-   mTerminalBtn->setText(tr("Terminal"));
-   mTerminalBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mRefreshBtn->setIcon(QIcon(":/icons/refresh"));
+   mRefreshBtn->setIconSize(QSize(22, 22));
+   mRefreshBtn->setText(tr("Refresh"));
+   mRefreshBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
    const auto verticalFrame = new QFrame();
    verticalFrame->setObjectName("orangeSeparator");
@@ -108,14 +107,14 @@ Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
    hLayout->addWidget(mPushBtn);
    hLayout->addWidget(mStashBtn);
    hLayout->addWidget(verticalFrame3);
-   hLayout->addWidget(mTerminalBtn);
+   hLayout->addWidget(mRefreshBtn);
    hLayout->addStretch();
 
    connect(mHome, &QToolButton::clicked, this, &Controls::signalGoBack);
    connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
    connect(mGoToBtn, &QToolButton::clicked, this, &Controls::openGoToDialog);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
-   connect(mTerminalBtn, &QToolButton::clicked, this, &Controls::showTerminal);
+   connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
 
    enableButtons(false);
 }
@@ -127,7 +126,7 @@ void Controls::enableButtons(bool enabled)
    mPullBtn->setEnabled(enabled);
    mPushBtn->setEnabled(enabled);
    mStashBtn->setEnabled(enabled);
-   mTerminalBtn->setEnabled(enabled);
+   mRefreshBtn->setEnabled(enabled);
 }
 
 void Controls::openGoToDialog()
@@ -222,11 +221,4 @@ void Controls::pruneBranches()
 
    if (ret.success)
       emit signalRepositoryUpdated();
-}
-
-void Controls::showTerminal()
-{
-   const auto terminal = new Terminal(mGit);
-   connect(terminal, &Terminal::signalUpdateUi, this, &Controls::signalRepositoryUpdated);
-   terminal->show();
 }

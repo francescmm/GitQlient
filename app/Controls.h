@@ -54,7 +54,7 @@ private:
    QToolButton *mPullBtn = nullptr;
    QToolButton *mPushBtn = nullptr;
    QToolButton *mStashBtn = nullptr;
-   QToolButton *mTerminalBtn = nullptr;
+   QToolButton *mRefreshBtn = nullptr;
 
    void openGoToDialog();
    void pullCurrentBranch();
@@ -62,5 +62,4 @@ private:
    void stashCurrentWork();
    void popStashedWork();
    void pruneBranches();
-   void showTerminal();
 };
