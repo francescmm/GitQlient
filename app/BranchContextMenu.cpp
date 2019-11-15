@@ -147,6 +147,7 @@ void BranchContextMenu::deleteBranch()
       if (ret == QMessageBox::Ok)
       {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+         const auto remoteBranch = mConfig.branchSelected.remove("origin/");
          const auto ret2 = mConfig.isLocal ? mConfig.mGit->removeLocalBranch(mConfig.branchSelected)
                                            : mConfig.mGit->removeRemoteBranch(mConfig.branchSelected);
          QApplication::restoreOverrideCursor();
