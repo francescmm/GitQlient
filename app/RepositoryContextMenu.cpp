@@ -38,13 +38,10 @@ void RepositoryContextMenu::createIndividualShaMenu()
 
          const auto popAction = addAction("Pop stash");
          connect(popAction, &QAction::triggered, this, &RepositoryContextMenu::stashPop);
-
-         const auto commitAction = addAction("Commit");
-         // connect(commitAction, &QAction::triggered, this, [this]() {});
-         addAction(commitAction);
       }
 
       const auto commitAction = addAction("See diff");
+      commitAction->setDisabled(sha == ZERO_SHA && mGit->isNothingToCommit());
       connect(commitAction, &QAction::triggered, this, [this]() { emit signalOpenDiff(mShas.first()); });
 
       if (sha != ZERO_SHA)

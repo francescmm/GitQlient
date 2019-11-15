@@ -295,9 +295,13 @@ void GitQlientRepo::showFileHistory(const QString &fileName)
 void GitQlientRepo::openCommitDiff()
 {
    const auto currentSha = mRepositoryView->getCurrentSha();
-   const auto rev = mGit->getCommitInfo(currentSha);
-   mFullDiffWidget->loadDiff(currentSha, rev.parent(0));
-   centerStackedWidget->setCurrentIndex(1);
+
+   if (!(currentSha == ZERO_SHA && mGit->isNothingToCommit()))
+   {
+      const auto rev = mGit->getCommitInfo(currentSha);
+      mFullDiffWidget->loadDiff(currentSha, rev.parent(0));
+      centerStackedWidget->setCurrentIndex(1);
+   }
 }
 
 void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
