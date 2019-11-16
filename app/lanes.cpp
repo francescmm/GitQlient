@@ -177,15 +177,8 @@ void Lanes::setInitial()
 {
 
    auto &t = typeVec[activeLane];
-   if (!IS_NODE(t) && t != LaneType::APPLIED)
+   if (!IS_NODE(t))
       t = boundary ? LaneType::BOUNDARY : LaneType::INITIAL;
-}
-
-void Lanes::setApplied()
-{
-
-   // applied patches are not merges, nor forks
-   typeVec[activeLane] = (LaneType::APPLIED); // TODO test with boundaries
 }
 
 void Lanes::changeActiveLane(const QString &sha)
@@ -259,12 +252,6 @@ bool Lanes::isBranch()
 }
 
 void Lanes::afterBranch()
-{
-
-   typeVec[activeLane] = (LaneType::ACTIVE); // TODO test with boundaries
-}
-
-void Lanes::afterApplied()
 {
 
    typeVec[activeLane] = (LaneType::ACTIVE); // TODO test with boundaries

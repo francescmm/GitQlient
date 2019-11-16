@@ -20,16 +20,8 @@ RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, CommitHi
 {
 }
 
-static QColor blend(const QColor &col1, const QColor &col2, int amount = 128)
-{
-   // Returns ((256 - amount)*col1 + amount*col2) / 256;
-   return QColor(((256 - amount) * col1.red() + amount * col2.red()) / 256,
-                 ((256 - amount) * col1.green() + amount * col2.green()) / 256,
-                 ((256 - amount) * col1.blue() + amount * col2.blue()) / 256);
-}
-
 void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, int x2, const QColor &col,
-                                            const QColor &activeCol, const QBrush &back, bool isWip) const
+                                            const QColor &activeCol, const QColor &mergeColor, bool isWip) const
 {
    const auto padding = 2;
    x1 += padding;
@@ -38,7 +30,6 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
    const auto h = ROW_HEIGHT / 2;
    const auto m = (x1 + x2) / 2;
    const auto r = (x2 - x1) * 1 / 3;
-   const auto d = 2 * r;
    const auto spanAngle = 90 * 16;
    const auto angleWidthRight = 2 * (x1 - m);
    const auto angleWidthLeft = 2 * (x2 - m);
@@ -54,30 +45,33 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
       case LaneType::JOIN:
       case LaneType::JOIN_R:
       case LaneType::HEAD:
-      case LaneType::HEAD_R: {
+      case LaneType::HEAD_R:
+      {
          QConicalGradient gradient(x1, 2 * h, 225);
          gradient.setColorAt(0.375, col);
          gradient.setColorAt(0.625, activeCol);
-         lanePen.setBrush(gradient);
+         lanePen.setBrush(col);
          p->setPen(lanePen);
          p->drawArc(m, h, angleWidthRight, angleHeightUp, 0 * 16, spanAngle);
          break;
       }
-      case LaneType::JOIN_L: {
+      case LaneType::JOIN_L:
+      {
          QConicalGradient gradient(2, 2 * h, 315);
          gradient.setColorAt(0.375, activeCol);
          gradient.setColorAt(0.625, col);
-         lanePen.setBrush(gradient);
+         lanePen.setBrush(col);
          p->setPen(lanePen);
          p->drawArc(m, h, angleWidthLeft, angleHeightUp, 90 * 16, spanAngle);
          break;
       }
       case LaneType::TAIL:
-      case LaneType::TAIL_R: {
+      case LaneType::TAIL_R:
+      {
          QConicalGradient gradient(x1, 0, 135);
          gradient.setColorAt(0.375, activeCol);
          gradient.setColorAt(0.625, col);
-         lanePen.setBrush(gradient);
+         lanePen.setBrush(col);
          p->setPen(lanePen);
          p->drawArc(m, h, angleWidthRight, angleHeightDown, 270 * 16, spanAngle);
          break;
@@ -109,17 +103,44 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
          break;
       case LaneType::TAIL_L:
       case LaneType::INITIAL:
-      case LaneType::BOUNDARY:
-      case LaneType::BOUNDARY_C:
-      case LaneType::BOUNDARY_R:
-      case LaneType::BOUNDARY_L:
          p->drawLine(m, 0, m, h);
          break;
       default:
          break;
    }
 
-   lanePen.setColor(activeCol);
+   // center symbol, e.g. rect or ellipse
+   auto isCommit = false;
+   switch (type)
+   {
+      case LaneType::HEAD:
+      case LaneType::INITIAL:
+      case LaneType::BRANCH:
+      case LaneType::MERGE_FORK:
+      case LaneType::MERGE_FORK_R:
+      case LaneType::MERGE_FORK_L:
+      {
+         isCommit = true;
+         QPen pen(col, 2);
+         p->setPen(pen);
+         p->setBrush(col);
+         p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
+      }
+      break;
+      case LaneType::ACTIVE:
+      {
+         isCommit = true;
+         QPen pen(col, 2);
+         p->setPen(pen);
+         p->setBrush(QColor(isWip ? col : "#2E2F30"));
+         p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
+      }
+      break;
+      default:
+         break;
+   }
+
+   lanePen.setColor(mergeColor);
    p->setPen(lanePen);
 
    // horizontal line
@@ -132,63 +153,17 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
       case LaneType::CROSS:
       case LaneType::CROSS_EMPTY:
       case LaneType::BOUNDARY_C:
-         p->drawLine(x1, h, x2, h);
+         p->drawLine(x1 + (isCommit ? 10 : 0), h, x2, h);
          break;
       case LaneType::MERGE_FORK_R:
       case LaneType::BOUNDARY_R:
-         p->drawLine(x1, h, m, h);
+         p->drawLine(x1 + (isCommit ? 7 : 0), h, m, h);
          break;
       case LaneType::MERGE_FORK_L:
       case LaneType::HEAD_L:
       case LaneType::TAIL_L:
       case LaneType::BOUNDARY_L:
-         p->drawLine(m, h, x2, h);
-         break;
-      default:
-         break;
-   }
-
-   // center symbol, e.g. rect or ellipse
-   switch (type)
-   {
-      case LaneType::ACTIVE:
-      case LaneType::INITIAL:
-      case LaneType::BRANCH:
-         p->setPen(Qt::black);
-         p->setBrush(col);
-         p->drawEllipse(m - r, h - r, d, d);
-         break;
-      case LaneType::MERGE_FORK:
-      case LaneType::MERGE_FORK_R:
-      case LaneType::MERGE_FORK_L:
-         p->setPen(Qt::black);
-         p->setBrush(col);
-         p->drawRect(m - r, h - r, d, d);
-         break;
-      case LaneType::UNAPPLIED:
-         // Red minus sign
-         p->setPen(Qt::NoPen);
-         p->setBrush(Qt::red);
-         p->drawRect(m - r, h - 1, d, 2);
-         break;
-      case LaneType::APPLIED:
-         // Green plus sign
-         p->setPen(Qt::NoPen);
-         p->setBrush(Qt::darkGreen);
-         p->drawRect(m - r, h - 1, d, 2);
-         p->drawRect(m - 1, h - r, 2, d);
-         break;
-      case LaneType::BOUNDARY:
-         p->setPen(Qt::black);
-         p->setBrush(back);
-         p->drawEllipse(m - r, h - r, d, d);
-         break;
-      case LaneType::BOUNDARY_C:
-      case LaneType::BOUNDARY_R:
-      case LaneType::BOUNDARY_L:
-         p->setPen(Qt::black);
-         p->setBrush(back);
-         p->drawRect(m - r, h - r, d, d);
+         p->drawLine(m + (isCommit ? 6 : 0), h, x2, h);
          break;
       default:
          break;
@@ -200,6 +175,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
    p->setRenderHints(QPainter::Antialiasing);
 
    QStyleOptionViewItem newOpt(opt);
+   newOpt.font.setPointSize(9);
 
    if (newOpt.state & QStyle::State_Selected)
    {
@@ -221,7 +197,6 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
    else
    {
       newOpt.font.setFamily("Ubuntu Mono");
-      newOpt.font.setPointSize(11);
 
       p->setPen(QColor("white"));
       newOpt.rect.setX(newOpt.rect.x() + 10);
@@ -249,7 +224,6 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    p->setClipRect(opt.rect, Qt::IntersectClip);
    p->translate(opt.rect.topLeft());
 
-   QBrush back = opt.palette.base();
    const QVector<LaneType> &lanes(r.lanes);
    auto laneNum = lanes.count();
    auto activeLane = 0;
@@ -264,18 +238,14 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    }
 
    auto x1 = 0;
-   auto x2 = 0;
-   const auto maxWidth = opt.rect.width();
-   auto activeColor = colors[activeLane % COLORS_NUM];
-
-   if (opt.state & QStyle::State_Selected)
-      activeColor = blend(activeColor, opt.palette.highlightedText().color(), 208);
-
-   for (auto i = 0; i < laneNum && x2 < maxWidth; i++)
+   // const auto maxWidth = opt.rect.width();
+   const auto activeColor = colors[activeLane % COLORS_NUM];
+   auto back = colors[(laneNum - 1) % COLORS_NUM];
+   auto isSet = false;
+   for (auto i = laneNum - 1, x2 = LANE_WIDTH * laneNum; i >= 0; --i, x2 -= LANE_WIDTH)
    {
 
-      x1 = x2;
-      x2 += LANE_WIDTH;
+      x1 = x2 - LANE_WIDTH;
 
       auto ln = mView->hasActiveFiler() ? LaneType::ACTIVE : lanes[i];
       if (ln != LaneType::EMPTY)
@@ -283,19 +253,29 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          QColor color;
          if (i == activeLane)
          {
-            if (r.sha() == ZERO_SHA)
-            {
-               if (!mGit->isNothingToCommit())
-                  color = QColor("#d89000");
-               else
-                  color = QColor("#404142");
-            }
+            if (r.sha() == ZERO_SHA && !mGit->isNothingToCommit())
+               color = QColor("#D89000");
             else
                color = activeColor;
          }
          else
             color = colors[i % COLORS_NUM];
 
+         switch (ln)
+         {
+            case LaneType::HEAD_L:
+            case LaneType::HEAD_R:
+            case LaneType::TAIL_L:
+            case LaneType::TAIL_R:
+               if (!isSet)
+               {
+                  isSet = true;
+                  back = color;
+               }
+               break;
+            default:
+               break;
+         }
          paintGraphLane(p, ln, x1, x2, color, activeColor, back, r.sha() == ZERO_SHA);
 
          if (mView->hasActiveFiler())
@@ -342,6 +322,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    QFontMetrics fm(newOpt.font);
 
+   p->setFont(newOpt.font);
    p->setPen(QColor("white"));
    p->drawText(newOpt.rect, fm.elidedText(index.data().toString(), Qt::ElideRight, newOpt.rect.width()),
                QTextOption(Qt::AlignLeft | Qt::AlignVCenter));

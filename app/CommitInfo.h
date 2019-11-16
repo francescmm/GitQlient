@@ -54,7 +54,6 @@ public:
    QVector<LaneType> lanes;
    int orderIdx = -1;
    bool isDiffCache = false;
-   bool isApplied = false;
 
 private:
    QChar mBoundaryInfo;

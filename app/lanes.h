@@ -44,8 +44,6 @@ enum class LaneType
    CROSS_EMPTY,
    INITIAL,
    BRANCH,
-   UNAPPLIED,
-   APPLIED,
    BOUNDARY,
    BOUNDARY_C, // corresponds to MERGE_FORK
    BOUNDARY_R, // corresponds to MERGE_FORK_R
@@ -97,13 +95,11 @@ public:
    void setFork(const QString &sha);
    void setMerge(const QStringList &parents);
    void setInitial();
-   void setApplied();
    void changeActiveLane(const QString &sha);
    void afterMerge();
    void afterFork();
    bool isBranch();
    void afterBranch();
-   void afterApplied();
    void nextParent(const QString &sha);
    void setLanes(QVector<LaneType> &ln) { ln = typeVec; } // O(1) vector is implicitly shared
 

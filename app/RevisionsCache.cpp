@@ -87,8 +87,6 @@ void RevisionsCache::updateLanes(CommitInfo &c, Lanes &lns)
       lns.setFork(sha);
    if (isMerge)
       lns.setMerge(c.parents());
-   if (c.isApplied)
-      lns.setApplied();
    if (isInitial)
       lns.setInitial();
 
@@ -98,8 +96,6 @@ void RevisionsCache::updateLanes(CommitInfo &c, Lanes &lns)
 
    lns.nextParent(nextSha);
 
-   if (c.isApplied)
-      lns.afterApplied();
    if (isMerge)
       lns.afterMerge();
    if (isFork)
