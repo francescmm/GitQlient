@@ -110,6 +110,9 @@ public:
    GitExecResult cherryPickCommit(const QString &sha);
    GitExecResult pop() const;
    bool stash();
+   GitExecResult stashBranch(const QString &stashId, const QString &branchName);
+   GitExecResult stashDrop(const QString &stashId);
+   GitExecResult stashClear();
    bool resetCommit(const QString &sha, CommitResetType type);
    bool resetCommits(int parentDepth);
    GitExecResult checkoutCommit(const QString &sha);

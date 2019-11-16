@@ -38,6 +38,11 @@ BranchDlg::BranchDlg(const BranchDlgConfig &config, QWidget *parent)
       setWindowTitle("Create branch at commit");
       ui->leOldName->setHidden(true);
    }
+   else if (mConfig.mDialogMode == BranchDlgMode::STASH_BRANCH)
+   {
+      setWindowTitle("Stash branch");
+      // ui->leOldName->setHidden(true);
+   }
 
    connect(ui->leNewName, &QLineEdit::editingFinished, this, &BranchDlg::checkNewBranchName);
    connect(ui->leNewName, &QLineEdit::returnPressed, this, &BranchDlg::accept);
@@ -74,6 +79,8 @@ void BranchDlg::accept()
          mConfig.mGit->renameBranch(ui->leOldName->text(), ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::CREATE_FROM_COMMIT)
          mConfig.mGit->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text());
+      else if (mConfig.mDialogMode == BranchDlgMode::STASH_BRANCH)
+         mConfig.mGit->stashBranch(ui->leOldName->text(), ui->leNewName->text());
 
       QApplication::restoreOverrideCursor();
 

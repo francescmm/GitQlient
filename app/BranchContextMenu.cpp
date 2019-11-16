@@ -99,7 +99,7 @@ void BranchContextMenu::createBranch()
 
 void BranchContextMenu::createCheckoutBranch()
 {
-   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::CREATE_CHECKOUT, mConfig.mGit }, this);
+   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::CREATE_CHECKOUT, mConfig.mGit });
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)

@@ -23,43 +23,26 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QDialog>
-
-namespace Ui
-{
-class BranchDlg;
-}
+#include <QMenu>
 
 class Git;
 
-enum class BranchDlgMode
-{
-   CREATE,
-   CREATE_CHECKOUT,
-   CREATE_FROM_COMMIT,
-   RENAME,
-   STASH_BRANCH
-};
-
-struct BranchDlgConfig
-{
-   QString mCurrentBranchName;
-   BranchDlgMode mDialogMode;
-   QSharedPointer<Git> mGit;
-};
-
-class BranchDlg : public QDialog
+class StashesContextMenu : public QMenu
 {
    Q_OBJECT
 
+signals:
+   void signalContentRemoved();
+   void signalUpdateView();
+
 public:
-   explicit BranchDlg(const BranchDlgConfig &config, QWidget *parent = nullptr);
-   ~BranchDlg() override;
+   explicit StashesContextMenu(QSharedPointer<Git> git, const QString &stashId, QWidget *parent = nullptr);
 
 private:
-   Ui::BranchDlg *ui = nullptr;
-   BranchDlgConfig mConfig;
+   QSharedPointer<Git> mGit;
+   QString mStashId;
 
-   void checkNewBranchName();
-   void accept() override;
+   void drop();
+   void clear();
+   void branch();
 };

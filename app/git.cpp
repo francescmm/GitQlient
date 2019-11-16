@@ -545,6 +545,21 @@ bool Git::stash()
    return run("git stash").first;
 }
 
+GitExecResult Git::stashBranch(const QString &stashId, const QString &branchName)
+{
+   return run(QString("git stash branch %1 %2").arg(branchName, stashId));
+}
+
+GitExecResult Git::stashDrop(const QString &stashId)
+{
+   return run(QString("git stash drop q %1").arg(stashId));
+}
+
+GitExecResult Git::stashClear()
+{
+   return run("git stash clear");
+}
+
 bool Git::resetCommit(const QString &sha, Git::CommitResetType type)
 {
    QString typeStr;

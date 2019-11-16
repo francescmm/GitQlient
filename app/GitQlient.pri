@@ -52,6 +52,7 @@ HEADERS += \
     $$PWD/RevisionFile.h \
     $$PWD/RevisionsCache.h \
     $$PWD/ShaFilterProxyModel.h \
+    $$PWD/StashesContextMenu.h \
     $$PWD/TagDlg.h \
     $$PWD/UnstagedFilesContextMenu.h \
     $$PWD/WorkInProgressWidget.h \
@@ -95,6 +96,7 @@ SOURCES += \
     $$PWD/RevisionFile.cpp \
     $$PWD/RevisionsCache.cpp \
     $$PWD/ShaFilterProxyModel.cpp \
+    $$PWD/StashesContextMenu.cpp \
     $$PWD/TagDlg.cpp \
     $$PWD/UnstagedFilesContextMenu.cpp \
     $$PWD/WorkInProgressWidget.cpp \
