@@ -7,9 +7,12 @@ RevisionsCache::RevisionsCache(QObject *parent)
 
 void RevisionsCache::configure(int numElementsToStore)
 {
-   // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
-   mCommits.resize(numElementsToStore + 1);
-   revs.reserve(numElementsToStore + 1);
+   if (mCommits.isEmpty())
+   {
+      // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
+      mCommits.resize(numElementsToStore + 1);
+      revs.reserve(numElementsToStore + 1);
+   }
 
    mCacheLocked = false;
 }
@@ -55,14 +58,8 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
 
       const auto commit = new CommitInfo(rev);
 
-      if (!mCommits[rev.orderIdx] || (mCommits[rev.orderIdx] && *commit != *mCommits[rev.orderIdx]))
-      {
-         if (mCommits[rev.orderIdx])
-            delete mCommits[rev.orderIdx];
-
-         mCommits[rev.orderIdx] = commit;
-         revs.insert(rev.sha(), commit);
-      }
+      mCommits[rev.orderIdx] = commit;
+      revs.insert(rev.sha(), commit);
 
       if (revs.contains(rev.parent(0)))
          revs.remove(rev.parent(0));
@@ -115,6 +112,8 @@ void RevisionsCache::clear()
 {
    mCacheLocked = true;
 
+   qDeleteAll(mCommits);
+   mCommits.clear();
    lns.clear();
    revs.clear();
 }
