@@ -5,6 +5,7 @@
 #include <BranchesViewDelegate.h>
 #include <ClickableFrame.h>
 #include <AddSubmoduleDlg.h>
+#include <StashesContextMenu.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -452,7 +453,20 @@ void BranchesWidget::showTagsContextMenu(const QPoint &p)
    menu->exec(mTagsList->viewport()->mapToGlobal(p));
 }
 
-void BranchesWidget::showStashesContextMenu(const QPoint &) {}
+void BranchesWidget::showStashesContextMenu(const QPoint &p)
+{
+   QLog_Info("UI", QString("Requesting context menu for stashes"));
+
+   const auto index = mStashesList->indexAt(p);
+
+   if (index.isValid())
+   {
+      const auto menu = new StashesContextMenu(mGit, index.data().toString().split(":").first(), this);
+      connect(menu, &StashesContextMenu::signalUpdateView, this, &BranchesWidget::signalBranchesUpdated);
+      connect(menu, &StashesContextMenu::signalContentRemoved, this, &BranchesWidget::signalBranchesUpdated);
+      menu->exec(mStashesList->viewport()->mapToGlobal(p));
+   }
+}
 
 void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
 {
