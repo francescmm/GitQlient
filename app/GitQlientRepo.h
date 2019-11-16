@@ -42,6 +42,7 @@ class BranchesWidget;
 class FileHistoryWidget;
 class FileDiffHighlighter;
 class QTimer;
+class QProgressDialog;
 
 namespace Ui
 {
@@ -94,6 +95,7 @@ private:
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    GitQlientRepoConfig mConfig;
+   QProgressDialog *mProgressDlg = nullptr;
 
    void updateCache();
    void updateUiFromWatcher();
@@ -109,6 +111,7 @@ private:
    void setWidgetsEnabled(bool enabled);
    void executeCommand();
    void showFileHistory(const QString &fileName);
+   void updateProgressDialog(int current, int total);
 
    // End of MainWindow refactor
    bool isMatch(const QString &sha, const QString &f, int cn, const QMap<QString, bool> &sm);

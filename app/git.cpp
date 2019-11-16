@@ -1135,43 +1135,57 @@ void Git::clearFileNames()
 
 bool Git::loadRepository(const QString &wd)
 {
-   QLog_Info("Git", "Initializing Git...");
+   if (!isLoading)
+   {
+      QLog_Info("Git", "Initializing Git...");
 
-   // normally called when changing git directory. Must be called after stop()
-   clearRevs();
-   clearFileNames();
+      // normally called when changing git directory. Must be called after stop()
+      clearRevs();
+      clearFileNames();
 
-   const auto isGIT = setGitDbDir(wd);
+      const auto isGIT = setGitDbDir(wd);
 
-   if (!isGIT)
-      return false;
+      if (!isGIT)
+         return false;
 
-   const auto ret = getBaseDir(wd);
+      isLoading = true;
 
-   if (ret.success)
-      mWorkingDir = ret.output.toString();
+      const auto ret = getBaseDir(wd);
 
-   getRefs();
+      if (ret.success)
+         mWorkingDir = ret.output.toString();
 
-   checkoutRevisions();
+      getRefs();
 
-   QLog_Info("Git", "... Git init finished");
+      checkoutRevisions();
 
-   return true;
+      QLog_Info("Git", "... Git init finished");
+
+      return true;
+   }
+
+   return false;
 }
 
 void Git::processRevision(const QByteArray &ba)
 {
    QByteArray auxBa = ba;
    const auto commits = ba.split('\000');
+   const auto totalCommits = commits.count();
    auto count = 1;
 
-   mRevCache->configure(commits.count());
+   mRevCache->configure(totalCommits);
+
+   emit signalLoadingProgress(0, totalCommits);
+   QApplication::processEvents();
 
    updateWipRevision();
 
    for (const auto &commitInfo : commits)
    {
+      emit signalLoadingProgress(count, totalCommits);
+      QApplication::processEvents();
+
       CommitInfo revision(commitInfo, count++);
 
       if (revision.isValid())
@@ -1179,6 +1193,8 @@ void Git::processRevision(const QByteArray &ba)
       else
          break;
    }
+
+   isLoading = false;
 
    emit signalNewRevisions();
 }

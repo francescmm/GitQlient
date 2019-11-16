@@ -46,6 +46,7 @@ class Git : public QObject
 signals:
    void signalNewRevisions();
    void cancelAllProcesses();
+   void signalLoadingProgress(int currentStep, int totalSteps);
 
 public:
    enum class CommitResetType
@@ -234,6 +235,7 @@ private:
    void setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
    Reference *lookupOrAddReference(const QString &sha);
 
+   bool isLoading = false;
    QString mWorkingDir;
    QString mGitDir;
    QString mCurrentBranchName;
