@@ -30,7 +30,6 @@ class AGitProcess : public QProcess
    Q_OBJECT
 
 signals:
-   void eof();
    void procDataReady(const QByteArray &data);
 
 public:

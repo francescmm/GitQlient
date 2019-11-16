@@ -43,7 +43,7 @@ class CreateRepoDlg : public QDialog
    Q_OBJECT
 
 signals:
-   void signalRepoCloned(const QString &path);
+   void signalOpenWhenFinish(const QString &path);
 
 public:
    explicit CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<Git> git, QWidget *parent = nullptr);

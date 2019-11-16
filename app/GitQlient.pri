@@ -42,7 +42,7 @@ HEADERS += \
     $$PWD/FileListWidget.h \
     $$PWD/FullDiffWidget.h \
     $$PWD/GeneralConfigPage.h \
-    $$PWD/GitAsyncProcess.h \
+    $$PWD/GitCloneProcess.h \
     $$PWD/GitQlient.h \
     $$PWD/GitQlientRepo.h \
     $$PWD/GitQlientSettings.h \
@@ -86,7 +86,7 @@ SOURCES += \
     $$PWD/FileListWidget.cpp \
     $$PWD/FullDiffWidget.cpp \
     $$PWD/GeneralConfigPage.cpp \
-    $$PWD/GitAsyncProcess.cpp \
+    $$PWD/GitCloneProcess.cpp \
     $$PWD/GitQlient.cpp \
     $$PWD/GitQlientRepo.cpp \
     $$PWD/GitQlientSettings.cpp \

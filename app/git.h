@@ -47,6 +47,7 @@ signals:
    void signalNewRevisions();
    void cancelAllProcesses();
    void signalLoadingProgress(int currentStep, int totalSteps);
+   void signalCloningProgress(QString stepDescription, int value);
 
 public:
    enum class CommitResetType

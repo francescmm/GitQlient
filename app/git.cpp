@@ -12,7 +12,7 @@
 #include <CommitInfo.h>
 #include <lanes.h>
 #include <GitSyncProcess.h>
-#include <GitAsyncProcess.h>
+#include <GitCloneProcess.h>
 #include <GitRequestorProcess.h>
 
 #include <QApplication>
@@ -1095,7 +1095,11 @@ bool Git::checkoutRevisions()
 
 bool Git::clone(const QString &url, const QString &fullPath)
 {
-   return run(QString("git clone %1 %2").arg(url, fullPath)).first;
+   const auto asyncRun = new GitCloneProcess(mWorkingDir);
+   connect(asyncRun, &GitCloneProcess::signalProgress, this, &Git::signalCloningProgress, Qt::DirectConnection);
+
+   QString buffer;
+   return asyncRun->run(QString("git clone --progress %1 %2").arg(url, fullPath), buffer);
 }
 
 bool Git::initRepo(const QString &fullPath)

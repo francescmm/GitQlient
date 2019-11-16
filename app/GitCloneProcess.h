@@ -25,16 +25,19 @@
 
 #include <AGitProcess.h>
 
-class GitAsyncProcess final : public AGitProcess
+class GitCloneProcess final : public AGitProcess
 {
+   Q_OBJECT
+
+signals:
+   void signalProgress(QString stepDescription, int value);
+
 public:
-   explicit GitAsyncProcess(const QString &workingDir, QObject *receiver = nullptr);
+   explicit GitCloneProcess(const QString &workingDir);
 
    bool run(const QString &command, QString &output) override;
 
 private:
-   QObject *mReceiver = nullptr;
-
    void onReadyStandardError();
    void onFinished(int, QProcess::ExitStatus exitStatus) override;
 };

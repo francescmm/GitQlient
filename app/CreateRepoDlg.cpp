@@ -87,7 +87,7 @@ void CreateRepoDlg::accept()
       if (ret)
       {
          if (ui->chbOpen->isChecked())
-            emit signalRepoCloned(fullPath);
+            emit signalOpenWhenFinish(fullPath);
 
          QDialog::accept();
       }

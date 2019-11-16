@@ -28,6 +28,7 @@
 class QPushButton;
 class QButtonGroup;
 class Git;
+class QProgressDialog;
 
 class ConfigWidget : public QFrame
 {
@@ -45,10 +46,14 @@ private:
    QPushButton *mCloneRepo = nullptr;
    QPushButton *mInitRepo = nullptr;
    QButtonGroup *mBtnGroup = nullptr;
+   QProgressDialog *mProgressDlg = nullptr;
+   QString mPathToOpen;
 
    void openRepo();
    void cloneRepo();
    void initRepo();
+   void showCloningProgress(const QString);
    QWidget *createConfigWidget();
    QWidget *createConfigPage();
+   void updateProgressDialog(QString stepDescription, int value);
 };

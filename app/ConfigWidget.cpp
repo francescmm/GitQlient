@@ -12,6 +12,10 @@
 #include <QStackedWidget>
 #include <QStyle>
 #include <QLabel>
+#include <QProgressDialog>
+#include <QLogger.h>
+
+using namespace QLogger;
 
 ConfigWidget::ConfigWidget(QWidget *parent)
    : QFrame(parent)
@@ -93,6 +97,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    connect(mOpenRepo, &QPushButton::clicked, this, &ConfigWidget::openRepo);
    connect(mCloneRepo, &QPushButton::clicked, this, &ConfigWidget::cloneRepo);
    connect(mInitRepo, &QPushButton::clicked, this, &ConfigWidget::initRepo);
+   connect(mGit.get(), &Git::signalCloningProgress, this, &ConfigWidget::updateProgressDialog, Qt::DirectConnection);
 }
 
 void ConfigWidget::openRepo()
@@ -109,14 +114,33 @@ void ConfigWidget::openRepo()
 void ConfigWidget::cloneRepo()
 {
    CreateRepoDlg cloneDlg(CreateRepoDlgType::CLONE, mGit);
-   connect(&cloneDlg, &CreateRepoDlg::signalRepoCloned, this, &ConfigWidget::signalOpenRepo);
+   connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, [this](const QString &path) { mPathToOpen = path; });
    cloneDlg.exec();
+
+   mProgressDlg = new QProgressDialog(tr("Loading repository..."), QString(), 0, 100);
+   mProgressDlg->setAutoClose(false);
+   mProgressDlg->setAutoReset(false);
+   mProgressDlg->setAttribute(Qt::WA_DeleteOnClose);
+   mProgressDlg->setWindowModality(Qt::ApplicationModal);
+   connect(mProgressDlg, &QProgressDialog::destroyed, this, [this]() { mProgressDlg = nullptr; });
+
+   QFile styles(":/stylesheet");
+
+   if (styles.open(QIODevice::ReadOnly))
+   {
+      QLog_Info("UI", "Applying the styles");
+
+      mProgressDlg->setStyleSheet(QString::fromUtf8(styles.readAll()));
+      styles.close();
+   }
+
+   mProgressDlg->show();
 }
 
 void ConfigWidget::initRepo()
 {
    CreateRepoDlg cloneDlg(CreateRepoDlgType::INIT, mGit);
-   connect(&cloneDlg, &CreateRepoDlg::signalRepoCloned, this, &ConfigWidget::signalOpenRepo);
+   connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, &ConfigWidget::signalOpenRepo);
    cloneDlg.exec();
 }
 
@@ -189,4 +213,23 @@ QWidget *ConfigWidget::createConfigPage()
    frame->setObjectName("configPage");
 
    return frame;
+}
+
+void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
+{
+   if (value >= 0)
+   {
+      mProgressDlg->setValue(value);
+
+      if (stepDescription.toLower().contains("done"))
+      {
+         mProgressDlg->setCancelButtonText(tr("Close"));
+         emit signalOpenRepo(mPathToOpen);
+
+         mPathToOpen = "";
+      }
+   }
+
+   mProgressDlg->setLabelText(stepDescription);
+   mProgressDlg->repaint();
 }

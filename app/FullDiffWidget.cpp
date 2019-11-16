@@ -1,7 +1,6 @@
 #include "FullDiffWidget.h"
 
 #include <CommitInfo.h>
-#include <GitAsyncProcess.h>
 #include <git.h>
 
 #include <QScrollBar>
