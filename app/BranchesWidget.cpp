@@ -461,7 +461,7 @@ void BranchesWidget::showStashesContextMenu(const QPoint &p)
 
    if (index.isValid())
    {
-      const auto menu = new StashesContextMenu(mGit, index.data().toString().split(":").first(), this);
+      const auto menu = new StashesContextMenu(mGit, index.data(Qt::UserRole).toString(), this);
       connect(menu, &StashesContextMenu::signalUpdateView, this, &BranchesWidget::signalBranchesUpdated);
       connect(menu, &StashesContextMenu::signalContentRemoved, this, &BranchesWidget::signalBranchesUpdated);
       menu->exec(mStashesList->viewport()->mapToGlobal(p));

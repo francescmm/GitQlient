@@ -552,7 +552,7 @@ GitExecResult Git::stashBranch(const QString &stashId, const QString &branchName
 
 GitExecResult Git::stashDrop(const QString &stashId)
 {
-   return run(QString("git stash drop q %1").arg(stashId));
+   return run(QString("git stash drop -q %1").arg(stashId));
 }
 
 GitExecResult Git::stashClear()
