@@ -206,12 +206,13 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
       if (index.column() == static_cast<int>(CommitHistoryColumns::SHA))
       {
+         newOpt.font.setPointSize(10);
          newOpt.font.setFamily("Ubuntu Mono");
          text = text.left(8);
       }
 
       QFontMetrics fm(newOpt.font);
-
+      p->setFont(newOpt.font);
       p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()),
                   QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
    }

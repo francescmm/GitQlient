@@ -134,9 +134,19 @@ void Controls::openGoToDialog()
    const auto gotoDlg = new QDialog();
 
    QFile styles(":/stylesheet");
+
    if (styles.open(QIODevice::ReadOnly))
    {
-      gotoDlg->setStyleSheet(QString::fromUtf8(styles.readAll()));
+      QFile colors(":/stylesheet_colors");
+      QString colorsCss;
+
+      if (colors.open(QIODevice::ReadOnly))
+      {
+         colorsCss = colors.readAll();
+         colors.close();
+      }
+
+      setStyleSheet(styles.readAll() + colorsCss);
       styles.close();
    }
 

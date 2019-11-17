@@ -21,10 +21,6 @@ FileListWidget::FileListWidget(QSharedPointer<Git> git, QWidget *p)
    setContextMenuPolicy(Qt::CustomContextMenu);
    setItemDelegate(new FileListDelegate(this));
 
-   auto pl = QApplication::palette();
-   pl.setColor(QPalette::Base, QColor("blue"));
-   setPalette(pl);
-
    connect(this, &FileListWidget::customContextMenuRequested, this, &FileListWidget::showContextMenu);
 }
 

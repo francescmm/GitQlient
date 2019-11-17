@@ -306,9 +306,16 @@ void GitQlientRepo::updateProgressDialog(int current, int total)
 
       if (styles.open(QIODevice::ReadOnly))
       {
-         QLog_Info("UI", "Applying the styles");
+         QFile colors(":/stylesheet_colors");
+         QString colorsCss;
 
-         mProgressDlg->setStyleSheet(QString::fromUtf8(styles.readAll()));
+         if (colors.open(QIODevice::ReadOnly))
+         {
+            colorsCss = colors.readAll();
+            colors.close();
+         }
+
+         setStyleSheet(styles.readAll() + colorsCss);
          styles.close();
       }
 

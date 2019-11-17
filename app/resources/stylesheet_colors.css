@@ -1,0 +1,396 @@
+#mainWindow
+{
+    background-color: #404142;
+    color: white;
+}
+
+QMessageBox
+{
+    background-color: #404142;
+    color: white;
+}
+
+QToolButton
+{
+    background-color: #404142;
+    color: white;
+}
+
+QToolButton::menu-button {
+    background-color: #404142;
+}
+
+
+QToolButton::menu-button:hover {
+    background-color: #606162;
+}
+
+QPushButton
+{
+    background-color: #2E2F30;
+    color: white;
+}
+
+QPushButton:hover
+{
+    background-color: #606162;
+}
+
+QToolButton:hover
+{
+    background-color: #606162;
+}
+
+QPushButton:disabled, QToolButton:disabled
+{
+    color: #606162;
+}
+
+QLabel
+{
+    color: white;
+}
+
+CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoWidget > #labelDescription
+{
+    background-color: #606162;
+}
+
+CommitInfoWidget #labelSha
+{
+    color: #D89000;
+    background-color: #202122;
+}
+
+WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, FileHistoryWidget > QTreeView
+{
+   color: white;
+   background-color: #2E2F30;
+}
+
+QListWidget::item, FileHistoryWidget > QTreeView::item
+{
+    background-color: #2E2F30;
+}
+
+QTreeView::branch
+{
+    background-color: #2E2F30;
+}
+
+QListWidget::item:hover, FileHistoryWidget > QTreeView::item:hover
+{
+   background:#363637;
+}
+
+QListWidget::item:focus, FileHistoryWidget > QTreeView::item:focus
+{
+   background-color: #3C3D3D;
+}
+
+QListWidget::item:disabled
+{
+    color: #606162;
+}
+
+CommitHistoryView, FullDiffWidget, WorkInProgressWidget > QListWidget, FileListWidget, QTreeWidget
+{
+    background-color: #2E2F30;
+}
+
+CommitHistoryView, FullDiffWidget, WorkInProgressWidget > QListWidget, QTreeWidget
+{
+    color: white;
+}
+
+WorkInProgressWidget > QListWidget
+{
+    border-color: #202122;
+}
+
+QMenu
+{
+    border-color: #000000;
+    background-color: #000000;
+    color:#ffffff;
+}
+
+QMenu::item
+{
+    background-color: #2E2F30;
+    color: #ffffff;
+}
+
+QMenu::item:selected
+{
+   background-color: #404142;
+   color: #d89000;
+}
+
+QMenu::item:disabled
+{
+   background-color: #242425;
+   color: #656668;
+}
+
+QMenu::separator
+{
+   background: #3f4043;
+}
+
+FullDiffWidget, WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription
+{
+    border-color: #202122
+}
+
+WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription, #leGitCommand
+{
+    background-color: #606162;
+    color: white;
+}
+
+WorkInProgressWidget > #leAuthorName
+{
+    border-bottom-color: #404142;
+}
+
+QLabel#lCounter
+{
+    background-color: #606162;
+    border-color: #202122;
+    border-bottom-color: #404141;
+    color: #A3A3A4;
+}
+
+#leGitCommand
+{
+    border-color: #606162;
+}
+
+WorkInProgressWidget > QFrame#stagedFiles, WorkInProgressWidget > QFrame#unstagedFiles, WorkInProgressWidget > QFrame#untrackedFiles
+{
+    background: #202122;
+}
+
+#outputTerminal, FileDiffView
+{
+    background-color: #2E2F30;
+    color: white;
+}
+
+FileDiffWidget, FileDiffWidget > QPushButton
+{
+    background-color: #202122;
+}
+
+WorkInProgressWidget > QLineEdit, #leGitCommand
+{
+    border-bottom-color: #404142;
+}
+
+QHeaderView
+{
+    color:#ffffff;
+}
+
+QHeaderView:section
+{
+    border-right-color: #606162;
+    background: #202122;
+}
+
+#tagsFrame, #fileTitleFrame
+{
+    background-color: #202122;
+    color: white;
+}
+
+BranchDlg
+{
+    background-color: #404142;
+    color: white;
+}
+
+BranchDlg > QLineEdit
+{
+    border-color: #202122;
+    background-color: #606162;
+    color: white;
+}
+
+GitQlient
+{
+   background: #2E2F30;
+}
+
+#openNewRepo
+{
+   background-color: #202122;
+}
+
+#openNewRepo:hover, #openGitAdmin:hover
+{
+   background-color: #606162;
+}
+
+QTabWidget::tab-bar
+{
+   background-color: #404142;
+}
+
+QTabBar::tab
+{
+   background-color: #202122;
+   color: white;
+}
+
+QTabBar::tab:!selected
+{
+    border-right-color: #2E2F30;
+}
+
+QTabBar::tab:!selected:hover
+{
+    background-color: #606162;
+}
+
+QTabBar::tab:disabled
+{
+    color: #606162;
+}
+
+QToolTip
+{
+    border-color: #606162;
+    background-color: #202122;
+    color: white;
+}
+
+ConfigWidget
+{
+    background-color: #404142;
+}
+
+QFrame#separator, QFrame#separator2px
+{
+   background-color: #202122;
+}
+
+QFrame#orangeSeparator
+{
+   background-color: #D89000;
+}
+
+QWidget#testWidget
+{
+    background-color: #606162;
+}
+
+QPushButton#bigButton
+{
+    border-color: 2px solid #101112;
+}
+
+QFrame#tabWidget > QPushButton[selected=true], QFrame#tabWidget > QPushButton[selected=true]:hover
+{
+    background-color: #606162;
+}
+
+GeneralConfigPage
+{
+    background-color: #606162;
+}
+
+QDialog
+{
+    background-color: #404142;
+}
+
+QDialog > QLineEdit
+{
+    border-color: #202122;
+    background-color: #606162;
+    color: white;
+}
+
+QMessageBox
+{
+    background-color: #606162;
+    color: white;
+}
+
+QScrollBar:vertical, QScrollBar:horizontal
+{
+    border-left-color: #202122;
+    background-color: transparent;
+}
+
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal,
+QScrollBar::add-line:vertical, QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:vertical, QScrollBar::sub-line:horizontal
+{
+    border-color: #202122;
+    background-color: #2E2F30;
+}
+
+QScrollBar::add-line:vertical:hover, QScrollBar::sub-line:vertical:hover,
+QScrollBar::handle:vertical:hover, QScrollBar::add-line:horizontal:hover,
+QScrollBar::sub-line:horizontal:hover, QScrollBar::handle:horizontal:hover
+{
+    background-color: #404142;
+}
+
+QScrollBar::add-line:vertical:pressed, QScrollBar::sub-line:vertical:pressed,
+QScrollBar::handle:vertical:pressed, QScrollBar::add-line:horizontal:pressed,
+QScrollBar::sub-line:horizontal:pressed, QScrollBar::handle:horizontal:pressed
+{
+    background-color: #303132;
+}
+
+QScrollBar::add-page, QScrollBar::sub-page
+{
+    background-color: #606162;
+}
+
+#AnnotationFrame
+{
+    background-color: #2E2F30;
+}
+
+QLabel#numberLabel
+{
+    border-right-color: #202122;
+}
+
+QLabel#authorFirstOfItsName, ClickableFrame#firstOfItsName
+{
+    border-top-color: #606162;
+}
+
+ClickableFrame#firstOfItsName::hover, ClickableFrame#primusInterPares::hover
+{
+    background-color: #606162;
+}
+
+ClickableFrame#firstOfItsName::pressed,  ClickableFrame#primusInterPares::pressed
+{
+    background-color: #202122;
+}
+
+QProgressDialog
+{
+    background-color: #404142;
+    color: white;
+}
+
+QProgressBar
+{
+    background-color: #606162;
+    border-color: #202122;
+}
+
+QProgressBar::chunk
+{
+    background-color: #D89000;
+}
+

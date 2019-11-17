@@ -14,7 +14,16 @@ BranchDlg::BranchDlg(const BranchDlgConfig &config, QWidget *parent)
 
    if (styles.open(QIODevice::ReadOnly))
    {
-      setStyleSheet(QString::fromUtf8(styles.readAll()));
+      QFile colors(":/stylesheet_colors");
+      QString colorsCss;
+
+      if (colors.open(QIODevice::ReadOnly))
+      {
+         colorsCss = colors.readAll();
+         colors.close();
+      }
+
+      setStyleSheet(styles.readAll() + colorsCss);
       styles.close();
    }
 
