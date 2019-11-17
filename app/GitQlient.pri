@@ -48,6 +48,7 @@ HEADERS += \
     $$PWD/GitQlientSettings.h \
     $$PWD/GitRequestorProcess.h \
     $$PWD/GitSyncProcess.h \
+    $$PWD/ProgressDlg.h \
     $$PWD/RepositoryViewDelegate.h \
     $$PWD/RevisionFile.h \
     $$PWD/RevisionsCache.h \
@@ -92,6 +93,7 @@ SOURCES += \
     $$PWD/GitQlientSettings.cpp \
     $$PWD/GitRequestorProcess.cpp \
     $$PWD/GitSyncProcess.cpp \
+    $$PWD/ProgressDlg.cpp \
     $$PWD/RepositoryViewDelegate.cpp \
     $$PWD/RevisionFile.cpp \
     $$PWD/RevisionsCache.cpp \

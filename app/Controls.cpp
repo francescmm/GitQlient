@@ -146,7 +146,7 @@ void Controls::openGoToDialog()
          colors.close();
       }
 
-      setStyleSheet(styles.readAll() + colorsCss);
+      gotoDlg->setStyleSheet(styles.readAll() + colorsCss);
       styles.close();
    }
 

@@ -23,37 +23,18 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QFrame>
+#include <QProgressDialog>
 
-class QPushButton;
-class QButtonGroup;
-class Git;
-class ProgressDlg;
-
-class ConfigWidget : public QFrame
+class ProgressDlg : public QProgressDialog
 {
-   Q_OBJECT
-
-signals:
-   void signalOpenRepo(const QString &repoPath);
-
 public:
-   explicit ConfigWidget(QWidget *parent = nullptr);
+   explicit ProgressDlg(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum,
+                        bool autoReset, bool autoClose);
+
+   void keyPressEvent(QKeyEvent *e) override;
+   void closeEvent(QCloseEvent *e) override;
+   void close();
 
 private:
-   QSharedPointer<Git> mGit;
-   QPushButton *mOpenRepo = nullptr;
-   QPushButton *mCloneRepo = nullptr;
-   QPushButton *mInitRepo = nullptr;
-   QButtonGroup *mBtnGroup = nullptr;
-   ProgressDlg *mProgressDlg = nullptr;
-   QString mPathToOpen;
-
-   void openRepo();
-   void cloneRepo();
-   void initRepo();
-   void showCloningProgress(const QString);
-   QWidget *createConfigWidget();
-   QWidget *createConfigPage();
-   void updateProgressDialog(QString stepDescription, int value);
+   bool mPrepareToClose = false;
 };

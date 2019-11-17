@@ -14,6 +14,7 @@
 #include <FullDiffWidget.h>
 #include <FileHistoryWidget.h>
 #include <CommitInfo.h>
+#include <ProgressDlg.h>
 
 #include <QFileSystemModel>
 #include <QTimer>
@@ -25,7 +26,6 @@
 #include <QGridLayout>
 #include <QApplication>
 #include <QStackedLayout>
-#include <QProgressDialog>
 
 using namespace QLogger;
 
@@ -299,31 +299,18 @@ void GitQlientRepo::updateProgressDialog(int current, int total)
 {
    if (current == 0 && !mProgressDlg)
    {
-      mProgressDlg = new QProgressDialog(tr("Loading repository..."), QString(), 0, total);
-      connect(mProgressDlg, &QProgressDialog::destroyed, this, [this]() { mProgressDlg = nullptr; });
-
-      QFile styles(":/stylesheet");
-
-      if (styles.open(QIODevice::ReadOnly))
-      {
-         QFile colors(":/colors_dark");
-         QString colorsCss;
-
-         if (colors.open(QIODevice::ReadOnly))
-         {
-            colorsCss = colors.readAll();
-            colors.close();
-         }
-
-         setStyleSheet(styles.readAll() + colorsCss);
-         styles.close();
-      }
+      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, total, false, true);
+      connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
 
       mProgressDlg->show();
-      mProgressDlg->setAttribute(Qt::WA_DeleteOnClose);
    }
    else
+   {
       mProgressDlg->setValue(current);
+
+      if (current == mProgressDlg->maximum())
+         mProgressDlg->close();
+   }
 
    mProgressDlg->repaint();
 }

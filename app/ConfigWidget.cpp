@@ -3,6 +3,7 @@
 #include <GeneralConfigPage.h>
 #include <CreateRepoDlg.h>
 #include <git.h>
+#include <ProgressDlg.h>
 
 #include <QPushButton>
 #include <QGridLayout>
@@ -12,7 +13,6 @@
 #include <QStackedWidget>
 #include <QStyle>
 #include <QLabel>
-#include <QProgressDialog>
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -117,30 +117,8 @@ void ConfigWidget::cloneRepo()
    connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, [this](const QString &path) { mPathToOpen = path; });
    cloneDlg.exec();
 
-   mProgressDlg = new QProgressDialog(tr("Loading repository..."), QString(), 0, 100);
-   mProgressDlg->setAutoClose(false);
-   mProgressDlg->setAutoReset(false);
-   mProgressDlg->setAttribute(Qt::WA_DeleteOnClose);
-   mProgressDlg->setWindowModality(Qt::ApplicationModal);
-   connect(mProgressDlg, &QProgressDialog::destroyed, this, [this]() { mProgressDlg = nullptr; });
-
-   QFile styles(":/stylesheet");
-
-   if (styles.open(QIODevice::ReadOnly))
-   {
-      QFile colors(":/colors_dark");
-      QString colorsCss;
-
-      if (colors.open(QIODevice::ReadOnly))
-      {
-         colorsCss = colors.readAll();
-         colors.close();
-      }
-
-      setStyleSheet(styles.readAll() + colorsCss);
-      styles.close();
-   }
-
+   mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, 100, false, false);
+   connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
    mProgressDlg->show();
 }
 
@@ -230,7 +208,7 @@ void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
 
       if (stepDescription.toLower().contains("done"))
       {
-         mProgressDlg->setCancelButtonText(tr("Close"));
+         mProgressDlg->close();
          emit signalOpenRepo(mPathToOpen);
 
          mPathToOpen = "";

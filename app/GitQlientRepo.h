@@ -42,7 +42,7 @@ class BranchesWidget;
 class FileHistoryWidget;
 class FileDiffHighlighter;
 class QTimer;
-class QProgressDialog;
+class ProgressDlg;
 
 namespace Ui
 {
@@ -95,7 +95,7 @@ private:
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    GitQlientRepoConfig mConfig;
-   QProgressDialog *mProgressDlg = nullptr;
+   ProgressDlg *mProgressDlg = nullptr;
 
    void updateCache();
    void updateUiFromWatcher();
