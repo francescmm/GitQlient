@@ -15,7 +15,7 @@ TagDlg::TagDlg(QSharedPointer<Git> git, const QString &sha, QWidget *parent)
 
    if (styles.open(QIODevice::ReadOnly))
    {
-      QFile colors(":/stylesheet_colors");
+      QFile colors(":/colors_dark");
       QString colorsCss;
 
       if (colors.open(QIODevice::ReadOnly))

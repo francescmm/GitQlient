@@ -47,6 +47,7 @@
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>
-        <file alias="stylesheet_colors">resources/stylesheet_colors.css</file>
+        <file alias="colors_bright">resources/stylesheet_colors_bright.css</file>
+        <file alias="colors_dark">resources/stylesheet_colors_dark.css</file>
     </qresource>
 </RCC>

@@ -15,7 +15,7 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<Git> git, QW
 
    if (styles.open(QIODevice::ReadOnly))
    {
-      QFile colors(":/stylesheet_colors");
+      QFile colors(":/colors_dark");
       QString colorsCss;
 
       if (colors.open(QIODevice::ReadOnly))

@@ -14,7 +14,7 @@ BranchDlg::BranchDlg(const BranchDlgConfig &config, QWidget *parent)
 
    if (styles.open(QIODevice::ReadOnly))
    {
-      QFile colors(":/stylesheet_colors");
+      QFile colors(":/colors_dark");
       QString colorsCss;
 
       if (colors.open(QIODevice::ReadOnly))
