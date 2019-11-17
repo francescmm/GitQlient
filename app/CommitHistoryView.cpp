@@ -82,12 +82,15 @@ void CommitHistoryView::setupGeometry()
       const auto hv = header();
       hv->setCascadingSectionResizes(true);
       hv->resizeSection(static_cast<int>(CommitHistoryColumns::GRAPH), 120);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::AUTHOR), 140);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::DATE), 120);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::SHA), 100);
       hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::LOG), QHeaderView::Stretch);
       hv->setStretchLastSection(false);
 
-      hideColumn(static_cast<int>(CommitHistoryColumns::SHA));
-      hideColumn(static_cast<int>(CommitHistoryColumns::DATE));
-      hideColumn(static_cast<int>(CommitHistoryColumns::AUTHOR));
+      // hideColumn(static_cast<int>(CommitHistoryColumns::SHA));
+      // hideColumn(static_cast<int>(CommitHistoryColumns::DATE));
+      // hideColumn(static_cast<int>(CommitHistoryColumns::AUTHOR));
       hideColumn(static_cast<int>(CommitHistoryColumns::ID));
    }
    else
@@ -148,7 +151,8 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
          const auto menu = new CommitHistoryContextMenu(mGit, shas, this);
          connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
-         connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this, &CommitHistoryView::signalOpenCompareDiff);
+         connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,
+                 &CommitHistoryView::signalOpenCompareDiff);
          connect(menu, &CommitHistoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
          menu->exec(viewport()->mapToGlobal(pos));
       }

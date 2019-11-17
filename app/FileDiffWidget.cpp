@@ -19,14 +19,6 @@ FileDiffWidget::FileDiffWidget(QSharedPointer<Git> git, QWidget *parent)
    mGoPrevious->setIcon(QIcon(":/icons/go_up"));
    mGoNext->setIcon(QIcon(":/icons/go_down"));
 
-   /*
-   const auto controlsLayout = new QVBoxLayout();
-   controlsLayout->setContentsMargins(QMargins());
-   controlsLayout->addWidget(mGoPrevious);
-   controlsLayout->addStretch();
-   controlsLayout->addWidget(mGoNext);
-   */
-
    const auto vLayout = new QHBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
    vLayout->setSpacing(0);

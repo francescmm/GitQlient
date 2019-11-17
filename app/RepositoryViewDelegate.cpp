@@ -198,11 +198,22 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       paintLog(p, newOpt, index);
    else
    {
-      newOpt.font.setFamily("Ubuntu Mono");
 
       p->setPen(QColor("white"));
       newOpt.rect.setX(newOpt.rect.x() + 10);
-      p->drawText(newOpt.rect, index.data().toString().left(8), QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
+
+      auto text = index.data().toString();
+
+      if (index.column() == static_cast<int>(CommitHistoryColumns::SHA))
+      {
+         newOpt.font.setFamily("Ubuntu Mono");
+         text = text.left(8);
+      }
+
+      QFontMetrics fm(newOpt.font);
+
+      p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()),
+                  QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
    }
 }
 

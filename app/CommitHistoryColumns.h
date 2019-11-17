@@ -27,8 +27,8 @@ enum class CommitHistoryColumns
 {
    ID,
    GRAPH,
-   SHA,
    LOG,
    AUTHOR,
-   DATE
+   DATE,
+   SHA
 };

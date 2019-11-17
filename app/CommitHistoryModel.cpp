@@ -128,14 +128,18 @@ QVariant CommitHistoryModel::getDisplayData(const CommitInfo &rev, int column) c
 {
    switch (static_cast<CommitHistoryColumns>(column))
    {
-      case CommitHistoryColumns::SHA:
-         return rev.sha();
+      case CommitHistoryColumns::SHA: {
+         const auto sha = rev.sha();
+         return sha;
+      }
       case CommitHistoryColumns::LOG:
          return rev.shortLog();
-      case CommitHistoryColumns::AUTHOR:
-         return rev.author().split("<").first();
+      case CommitHistoryColumns::AUTHOR: {
+         const auto author = rev.author().split("<").first();
+         return author;
+      }
       case CommitHistoryColumns::DATE: {
-         return QDateTime::fromSecsSinceEpoch(rev.authorDate().toUInt()).toString("dd/MM/yyyy hh:mm");
+         return QDateTime::fromSecsSinceEpoch(rev.authorDate().toUInt()).toString("dd MMM yyyy hh:mm");
       }
       default:
          return QVariant();

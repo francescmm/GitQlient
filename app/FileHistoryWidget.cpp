@@ -26,7 +26,9 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    mRepoView->setObjectName("blameRepoView");
    mRepoView->setModel(mRepoModel);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::GRAPH), true);
-   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::SHA), false);
+   // mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::SHA), true);
+   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::DATE), true);
+   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::AUTHOR), true);
    mRepoView->setItemDelegate(new RepositoryViewDelegate(mGit, mRepoView));
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(450);
