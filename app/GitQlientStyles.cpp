@@ -27,7 +27,7 @@ QString GitQlientStyles::getStyles()
 
       if (colorsFile.open(QIODevice::ReadOnly))
       {
-         colorsCss = colorsFile.readAll();
+         colorsCss = QString::fromUtf8(colorsFile.readAll());
          colorsFile.close();
       }
 
