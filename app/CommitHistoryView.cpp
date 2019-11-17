@@ -82,15 +82,12 @@ void CommitHistoryView::setupGeometry()
       const auto hv = header();
       hv->setCascadingSectionResizes(true);
       hv->resizeSection(static_cast<int>(CommitHistoryColumns::GRAPH), 120);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::AUTHOR), 140);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::DATE), 120);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::SHA), 100);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::AUTHOR), 160);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::DATE), 125);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::SHA), 75);
       hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::LOG), QHeaderView::Stretch);
       hv->setStretchLastSection(false);
 
-      // hideColumn(static_cast<int>(CommitHistoryColumns::SHA));
-      // hideColumn(static_cast<int>(CommitHistoryColumns::DATE));
-      // hideColumn(static_cast<int>(CommitHistoryColumns::AUTHOR));
       hideColumn(static_cast<int>(CommitHistoryColumns::ID));
    }
    else
