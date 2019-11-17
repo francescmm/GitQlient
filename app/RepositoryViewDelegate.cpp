@@ -134,7 +134,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
          isCommit = true;
          QPen pen(col, 2);
          p->setPen(pen);
-         p->setBrush(QColor(col));
+         p->setBrush(QColor(isWip ? col : "#2E2F30"));
          p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
       }
       break;
@@ -380,11 +380,16 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
       const auto nameToDisplay = showMinimal ? QString(". . .") : mapIt.key();
       QFontMetrics fm(o.font);
       const auto textBoundingRect = fm.boundingRect(nameToDisplay);
-      const int textPadding = 10;
+      const int textPadding = 3;
       const auto rectWidth = textBoundingRect.width() + 2 * textPadding;
 
       painter->save();
-      painter->fillRect(o.rect.x() + startPoint, o.rect.y(), rectWidth, ROW_HEIGHT, mapIt.value());
+      painter->setRenderHint(QPainter::Antialiasing);
+      painter->setPen(QPen(mapIt.value(), 2));
+      QPainterPath path;
+      path.addRoundedRect(QRectF(o.rect.x() + startPoint, o.rect.y() + 4, rectWidth, ROW_HEIGHT - 8), 1, 1);
+      painter->fillPath(path, mapIt.value());
+      painter->drawPath(path);
 
       // TODO: Fix this with a nicer way
       painter->setPen(QColor(mapIt.value() == QColor("#dec3c3") ? QString("#000000") : QString("#FFFFFF")));
