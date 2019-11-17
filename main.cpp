@@ -14,8 +14,9 @@ int main(int argc, char *argv[])
    QtSingleApplication app(argc, argv);
    QStringList arguments;
 
-   while (argc--)
-      arguments.prepend(argv[argc]);
+   auto argNum = argc;
+   while (argNum--)
+      arguments.prepend(argv[argNum]);
 
    if (app.sendMessage(arguments.join(",")))
       return 0;

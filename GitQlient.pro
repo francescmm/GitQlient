@@ -1,14 +1,18 @@
 # General stuff
-TEMPLATE = app
 CONFIG += qt warn_on c++17
 QMAKE_CXXFLAGS += -Werror
 TARGET = GitQlient
-QT += widgets
+QT += widgets core gui
+DEFINES += QT_DEPRECATED_WARNINGS
 
-SOURCES += \
-    $$PWD/main.cpp
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
 
 # project files
+SOURCES += main.cpp
+
 include(app/GitQlient.pri)
 include($$PWD/qtsingleapplication/src/qtsingleapplication.pri)
 
