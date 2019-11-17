@@ -2,6 +2,7 @@
 #include "ui_TagDlg.h"
 
 #include <git.h>
+#include <GitQlientStyles.h>
 
 #include <QFile>
 
@@ -11,22 +12,7 @@ TagDlg::TagDlg(QSharedPointer<Git> git, const QString &sha, QWidget *parent)
    , mGit(git)
    , mSha(sha)
 {
-   QFile styles(":/stylesheet");
-
-   if (styles.open(QIODevice::ReadOnly))
-   {
-      QFile colors(":/colors_dark");
-      QString colorsCss;
-
-      if (colors.open(QIODevice::ReadOnly))
-      {
-         colorsCss = colors.readAll();
-         colors.close();
-      }
-
-      setStyleSheet(styles.readAll() + colorsCss);
-      styles.close();
-   }
+   setStyleSheet(GitQlientStyles::getStyles());
 
    ui->setupUi(this);
 

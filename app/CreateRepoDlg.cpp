@@ -2,6 +2,7 @@
 #include "ui_CreateRepoDlg.h"
 
 #include <git.h>
+#include <GitQlientStyles.h>
 
 #include <QFileDialog>
 
@@ -11,22 +12,7 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<Git> git, QW
    , mType(type)
    , mGit(git)
 {
-   QFile styles(":/stylesheet");
-
-   if (styles.open(QIODevice::ReadOnly))
-   {
-      QFile colors(":/colors_dark");
-      QString colorsCss;
-
-      if (colors.open(QIODevice::ReadOnly))
-      {
-         colorsCss = colors.readAll();
-         colors.close();
-      }
-
-      setStyleSheet(styles.readAll() + colorsCss);
-      styles.close();
-   }
+   setStyleSheet(GitQlientStyles::getStyles());
 
    ui->setupUi(this);
 

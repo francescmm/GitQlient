@@ -1,5 +1,7 @@
 #include "ProgressDlg.h"
 
+#include <GitQlientStyles.h>
+
 #include <QKeyEvent>
 
 ProgressDlg::ProgressDlg(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum,
@@ -12,22 +14,7 @@ ProgressDlg::ProgressDlg(const QString &labelText, const QString &cancelButtonTe
    setWindowModality(Qt::ApplicationModal);
    setWindowFlags(Qt::FramelessWindowHint);
 
-   QFile styles(":/stylesheet");
-
-   if (styles.open(QIODevice::ReadOnly))
-   {
-      QFile colors(":/colors_dark");
-      QString colorsCss;
-
-      if (colors.open(QIODevice::ReadOnly))
-      {
-         colorsCss = colors.readAll();
-         colors.close();
-      }
-
-      setStyleSheet(styles.readAll() + colorsCss);
-      styles.close();
-   }
+   setStyleSheet(GitQlientStyles::getStyles());
 }
 
 void ProgressDlg::keyPressEvent(QKeyEvent *e)

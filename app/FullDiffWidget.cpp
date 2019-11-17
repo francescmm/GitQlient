@@ -2,6 +2,7 @@
 
 #include <CommitInfo.h>
 #include <git.h>
+#include <GitQlientStyles.h>
 
 #include <QScrollBar>
 #include <QTextCharFormat>
@@ -19,24 +20,19 @@ void DiffHighlighter::highlightBlock(const QString &text)
    if (text.isEmpty())
       return;
 
-   QBrush blue = QColor("#579BD5");
-   QBrush green = QColor("#8DC944");
-   QBrush magenta = QColor("#FF5555");
-   QBrush orange = QColor("#FFB86C");
-
    QTextCharFormat myFormat;
    const char firstChar = text.at(0).toLatin1();
    switch (firstChar)
    {
       case '@':
-         myFormat.setForeground(orange);
+         myFormat.setForeground(GitQlientStyles::getOrange());
          myFormat.setFontWeight(QFont::ExtraBold);
          break;
       case '+':
-         myFormat.setForeground(green);
+         myFormat.setForeground(GitQlientStyles::getGreen());
          break;
       case '-':
-         myFormat.setForeground(magenta);
+         myFormat.setForeground(GitQlientStyles::getRed());
          break;
       case 'c':
       case 'd':
@@ -47,12 +43,12 @@ void DiffHighlighter::highlightBlock(const QString &text)
       case 's':
          if (text.startsWith("diff --git a/"))
          {
-            myFormat.setForeground(blue);
+            myFormat.setForeground(GitQlientStyles::getBlue());
             myFormat.setFontWeight(QFont::ExtraBold);
          }
          else if (text.startsWith("copy ") || text.startsWith("index ") || text.startsWith("new ")
                   || text.startsWith("old ") || text.startsWith("rename ") || text.startsWith("similarity "))
-            myFormat.setForeground(blue);
+            myFormat.setForeground(GitQlientStyles::getBlue());
          break;
       default:
          break;

@@ -4,6 +4,7 @@
 #include <RevisionFile.h>
 #include <FileListDelegate.h>
 #include <git.h>
+#include <GitQlientStyles.h>
 
 #include <QApplication>
 #include <QDrag>
@@ -68,12 +69,13 @@ void FileListWidget::insertFiles(const QString currentSha, const QString &compar
             {
                const auto fileRename = files.extendedStatus(i);
 
-               clr = fileRename.isEmpty() ? QColor("#8DC944") : QColor("#579BD5");
+               clr = fileRename.isEmpty() ? GitQlientStyles::getGreen() : GitQlientStyles::getBlue();
                fileName = fileRename.isEmpty() ? mGit->filePath(files, i) : fileRename;
             }
             else
             {
-               clr = files.statusCmp(i, RevisionFile::DELETED) ? QColor("#FF5555") : Qt::white;
+               clr = files.statusCmp(i, RevisionFile::DELETED) ? GitQlientStyles::getRed()
+                                                               : GitQlientStyles::getTextColor();
                fileName = mGit->filePath(files, i);
             }
 

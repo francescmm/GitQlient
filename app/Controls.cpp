@@ -1,6 +1,7 @@
 #include "Controls.h"
 
-#include "git.h"
+#include <git.h>
+#include <GitQlientStyles.h>
 
 #include <QApplication>
 #include <QToolButton>
@@ -133,22 +134,7 @@ void Controls::openGoToDialog()
 {
    const auto gotoDlg = new QDialog();
 
-   QFile styles(":/stylesheet");
-
-   if (styles.open(QIODevice::ReadOnly))
-   {
-      QFile colors(":/colors_dark");
-      QString colorsCss;
-
-      if (colors.open(QIODevice::ReadOnly))
-      {
-         colorsCss = colors.readAll();
-         colors.close();
-      }
-
-      gotoDlg->setStyleSheet(styles.readAll() + colorsCss);
-      styles.close();
-   }
+   setStyleSheet(GitQlientStyles::getStyles());
 
    gotoDlg->setWindowFlags(Qt::FramelessWindowHint);
    gotoDlg->setWindowModality(Qt::ApplicationModal);

@@ -1,6 +1,7 @@
 #include "GitQlient.h"
 
 #include <ConfigWidget.h>
+#include <GitQlientStyles.h>
 
 #include <QProcess>
 #include <QTabWidget>
@@ -34,20 +35,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
    QFile styles(":/stylesheet");
 
-   if (styles.open(QIODevice::ReadOnly))
-   {
-      QFile colors(":/colors_dark");
-      QString colorsCss;
-
-      if (colors.open(QIODevice::ReadOnly))
-      {
-         colorsCss = colors.readAll();
-         colors.close();
-      }
-
-      setStyleSheet(styles.readAll() + colorsCss);
-      styles.close();
-   }
+   setStyleSheet(GitQlientStyles::getStyles());
 
    const auto addTab = new QPushButton();
    addTab->setObjectName("openNewRepo");

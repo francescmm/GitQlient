@@ -2,6 +2,7 @@
 #include <ui_WorkInProgressWidget.h>
 
 #include <git.h>
+#include <GitQlientStyles.h>
 #include <CommitInfo.h>
 #include <RevisionFile.h>
 #include <UnstagedFilesContextMenu.h>
@@ -162,13 +163,13 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWid
       const auto isDeleted = files.statusCmp(i, RevisionFile::DELETED);
 
       if ((files.statusCmp(i, RevisionFile::NEW) || isUnknown || isInIndex) && !untrackedFile && !isDeleted)
-         myColor = QColor("#8DC944");
+         myColor = GitQlientStyles::getGreen();
       else if (isDeleted)
-         myColor = QColor("#FF5555");
+         myColor = GitQlientStyles::getRed();
       else if (untrackedFile)
-         myColor = QColor("#FFB86C");
+         myColor = GitQlientStyles::getOrange();
       else
-         myColor = Qt::white;
+         myColor = GitQlientStyles::getTextColor();
 
       const auto fileName = mGit->filePath(files, i);
 

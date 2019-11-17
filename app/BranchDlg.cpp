@@ -1,7 +1,8 @@
 #include "BranchDlg.h"
 #include "ui_BranchDlg.h"
 
-#include "git.h"
+#include <git.h>
+#include <GitQlientStyles.h>
 
 #include <QFile>
 
@@ -10,22 +11,7 @@ BranchDlg::BranchDlg(const BranchDlgConfig &config, QWidget *parent)
    , ui(new Ui::BranchDlg)
    , mConfig(config)
 {
-   QFile styles(":/stylesheet");
-
-   if (styles.open(QIODevice::ReadOnly))
-   {
-      QFile colors(":/colors_dark");
-      QString colorsCss;
-
-      if (colors.open(QIODevice::ReadOnly))
-      {
-         colorsCss = colors.readAll();
-         colors.close();
-      }
-
-      setStyleSheet(styles.readAll() + colorsCss);
-      styles.close();
-   }
+   setStyleSheet(GitQlientStyles::getStyles());
 
    ui->setupUi(this);
    ui->leOldName->setText(mConfig.mCurrentBranchName);

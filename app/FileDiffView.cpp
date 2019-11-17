@@ -1,5 +1,7 @@
 #include "FileDiffView.h"
 
+#include <GitQlientStyles.h>
+
 #include <QPainter>
 #include <QTextBlock>
 
@@ -69,7 +71,7 @@ void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
       if (block.isVisible() && bottom >= event->rect().top())
       {
          const auto number = QString::number(blockNumber + 1);
-         painter.setPen(Qt::white);
+         painter.setPen(GitQlientStyles::getTextColor());
          painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - 3, fontMetrics().height(),
                           Qt::AlignRight, number);
       }

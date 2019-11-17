@@ -1,5 +1,7 @@
 #include "BranchesViewDelegate.h"
 
+#include <GitQlientStyles.h>
+
 #include <QPainter>
 
 BranchesViewDelegate::BranchesViewDelegate(QObject *parent)
@@ -58,7 +60,7 @@ void BranchesViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &o, con
       }
    }
 
-   p->setPen(QColor("white"));
+   p->setPen(GitQlientStyles::getTextColor());
 
    QFontMetrics fm(newOpt.font);
 
