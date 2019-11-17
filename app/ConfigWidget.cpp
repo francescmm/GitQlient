@@ -115,11 +115,12 @@ void ConfigWidget::cloneRepo()
 {
    CreateRepoDlg cloneDlg(CreateRepoDlgType::CLONE, mGit);
    connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, [this](const QString &path) { mPathToOpen = path; });
-   cloneDlg.exec();
-
-   mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, 100, false, false);
-   connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
-   mProgressDlg->show();
+   if (cloneDlg.exec() == QDialog::Accepted)
+   {
+      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, 100, false, false);
+      connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
+      mProgressDlg->show();
+   }
 }
 
 void ConfigWidget::initRepo()
