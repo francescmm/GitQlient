@@ -46,6 +46,7 @@ HEADERS += \
     $$PWD/GitQlient.h \
     $$PWD/GitQlientRepo.h \
     $$PWD/GitQlientSettings.h \
+    $$PWD/GitQlientStyles.h \
     $$PWD/GitRequestorProcess.h \
     $$PWD/GitSyncProcess.h \
     $$PWD/ProgressDlg.h \
@@ -91,6 +92,7 @@ SOURCES += \
     $$PWD/GitQlient.cpp \
     $$PWD/GitQlientRepo.cpp \
     $$PWD/GitQlientSettings.cpp \
+    $$PWD/GitQlientStyles.cpp \
     $$PWD/GitRequestorProcess.cpp \
     $$PWD/GitSyncProcess.cpp \
     $$PWD/ProgressDlg.cpp \
