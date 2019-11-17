@@ -1,6 +1,7 @@
 ﻿#include "RepositoryViewDelegate.h"
 
 #include <git.h>
+#include <GitQlientStyles.h>
 #include <lanes.h>
 #include <CommitInfo.h>
 #include <CommitHistoryColumns.h>
@@ -10,7 +11,6 @@
 #include <QSortFilterProxyModel>
 #include <QPainter>
 
-static const int COLORS_NUM = 8;
 static const int MIN_VIEW_WIDTH_PX = 480;
 
 RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, CommitHistoryView *view)
@@ -37,40 +37,27 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
    const auto angleHeightUp = 2 * h;
    const auto angleHeightDown = 2 * -h;
 
-   static QColor const &lanePenColor = QPalette().color(QPalette::WindowText);
-   static QPen lanePen(lanePenColor, 2); // fast path here
+   static QPen lanePen(GitQlientStyles::getTextColor(), 2); // fast path here
 
    // arc
+   lanePen.setBrush(col);
+   p->setPen(lanePen);
+
    switch (type)
    {
       case LaneType::JOIN:
       case LaneType::JOIN_R:
       case LaneType::HEAD:
       case LaneType::HEAD_R: {
-         QConicalGradient gradient(x1, 2 * h, 225);
-         gradient.setColorAt(0.375, col);
-         gradient.setColorAt(0.625, activeCol);
-         lanePen.setBrush(col);
-         p->setPen(lanePen);
          p->drawArc(m, h, angleWidthRight, angleHeightUp, 0 * 16, spanAngle);
          break;
       }
       case LaneType::JOIN_L: {
-         QConicalGradient gradient(2, 2 * h, 315);
-         gradient.setColorAt(0.375, activeCol);
-         gradient.setColorAt(0.625, col);
-         lanePen.setBrush(col);
-         p->setPen(lanePen);
          p->drawArc(m, h, angleWidthLeft, angleHeightUp, 90 * 16, spanAngle);
          break;
       }
       case LaneType::TAIL:
       case LaneType::TAIL_R: {
-         QConicalGradient gradient(x1, 0, 135);
-         gradient.setColorAt(0.375, activeCol);
-         gradient.setColorAt(0.625, col);
-         lanePen.setBrush(col);
-         p->setPen(lanePen);
          p->drawArc(m, h, angleWidthRight, angleHeightDown, 270 * 16, spanAngle);
          break;
       }
@@ -78,8 +65,11 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
          break;
    }
 
-   lanePen.setColor(isWip ? activeCol : col);
-   p->setPen(lanePen);
+   if (isWip)
+   {
+      lanePen.setColor(activeCol);
+      p->setPen(lanePen);
+   }
 
    // vertical line
    switch (type)
@@ -199,7 +189,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
    else
    {
 
-      p->setPen(QColor("white"));
+      p->setPen(GitQlientStyles::getTextColor());
       newOpt.rect.setX(newOpt.rect.x() + 10);
 
       auto text = index.data().toString();
@@ -220,11 +210,6 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
 void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
-   static const QColor colors[COLORS_NUM] = { QPalette().color(QPalette::WindowText), QColor("#FF5555") /* red */,
-                                              QColor("#579BD5") /* blue */,           QColor("#8dc944") /* green */,
-                                              QColor("#FFB86C") /* orange */,         QColor("#848484") /* grey */,
-                                              QColor("#FF79C6") /* pink */,           QColor("#CD9077") /* pastel */ };
-
    const auto row = mView->hasActiveFiler()
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
@@ -253,8 +238,8 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 
    auto x1 = 0;
    // const auto maxWidth = opt.rect.width();
-   const auto activeColor = colors[activeLane % COLORS_NUM];
-   auto back = colors[(laneNum - 1) % COLORS_NUM];
+   const auto activeColor = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
+   auto back = GitQlientStyles::getBranchColorAt((laneNum - 1) % GitQlientStyles::getTotalBranchColors());
    auto isSet = false;
    auto laneHeadPresent = false;
 
@@ -282,7 +267,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
                color = activeColor;
          }
          else
-            color = colors[i % COLORS_NUM];
+            color = GitQlientStyles::getBranchColorAt(i % GitQlientStyles::getTotalBranchColors());
 
          switch (ln)
          {
@@ -308,26 +293,6 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    p->restore();
 }
 
-void RepositoryViewDelegate::paintWip(QPainter *painter, QStyleOptionViewItem opt) const
-{
-   opt.font.setBold(true);
-
-   const auto name = QString("WIP");
-   const auto textBoundingRect = QFontMetrics(opt.font).boundingRect(name);
-   const auto fontRect = textBoundingRect.height();
-
-   painter->save();
-   painter->fillRect(opt.rect.x(), opt.rect.y(), opt.rect.width(), ROW_HEIGHT, QColor("#d89000"));
-   painter->setPen(QColor("#FFFFFF"));
-
-   const auto x = opt.rect.x() + (opt.rect.width() - textBoundingRect.width()) / 2;
-   const auto y = opt.rect.y() + ROW_HEIGHT - (ROW_HEIGHT - fontRect) + 2;
-
-   painter->setFont(opt.font);
-   painter->drawText(x, y, name);
-   painter->restore();
-}
-
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
    const auto sha = mGit->getCommitInfoByRow(index.row()).sha();
@@ -346,7 +311,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
    QFontMetrics fm(newOpt.font);
 
    p->setFont(newOpt.font);
-   p->setPen(QColor("white"));
+   p->setPen(GitQlientStyles::getTextColor());
    p->drawText(newOpt.rect, fm.elidedText(index.data().toString(), Qt::ElideRight, newOpt.rect.width()),
                QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
 }
@@ -361,11 +326,13 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
    if (ref_types != 0)
    {
       if (ref_types & Git::CUR_BRANCH && currentBranch.isEmpty())
-         markValues.insert("detached", QColor("#851e3e"));
+         markValues.insert("detached", GitQlientStyles::getDetachedColor());
 
       const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
       for (auto branch : localBranches)
-         markValues.insert(branch, branch == currentBranch ? QColor("#005b96") : QColor("#6497b1"));
+         markValues.insert(branch,
+                           branch == currentBranch ? GitQlientStyles::getCurrentBranchColor()
+                                                   : GitQlientStyles::getLocalBranchColor());
 
       const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
       for (auto branch : remoteBranches)
@@ -373,11 +340,11 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
       const auto tags = mGit->getRefNames(sha, Git::TAG);
       for (auto tag : tags)
-         markValues.insert(tag, QColor("#dec3c3"));
+         markValues.insert(tag, GitQlientStyles::getTagColor());
 
       const auto refs = mGit->getRefNames(sha, Git::REF);
       for (auto ref : refs)
-         markValues.insert(ref, QColor("#FF5555"));
+         markValues.insert(ref, GitQlientStyles::getRefsColor());
    }
 
    const auto showMinimal = o.rect.width() <= MIN_VIEW_WIDTH_PX;
