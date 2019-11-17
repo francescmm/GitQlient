@@ -53,8 +53,8 @@ private:
 
    void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
    void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &index) const;
-   void paintGraphLane(QPainter *p, const LaneType type, int x1, int x2, const QColor &col, const QColor &activeCol,
-                       const QColor &mergeColor, bool isWip = false) const;
+   void paintGraphLane(QPainter *p, const LaneType type, bool laneHeadPresent, int x1, int x2, const QColor &col,
+                       const QColor &activeCol, const QColor &mergeColor, bool isWip = false) const;
    void paintWip(QPainter *painter, QStyleOptionViewItem opt) const;
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
 };

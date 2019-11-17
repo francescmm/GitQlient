@@ -20,8 +20,9 @@ RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, CommitHi
 {
 }
 
-void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, int x2, const QColor &col,
-                                            const QColor &activeCol, const QColor &mergeColor, bool isWip) const
+void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool laneHeadPresent, int x1, int x2,
+                                            const QColor &col, const QColor &activeCol, const QColor &mergeColor,
+                                            bool isWip) const
 {
    const auto padding = 2;
    x1 += padding;
@@ -45,8 +46,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
       case LaneType::JOIN:
       case LaneType::JOIN_R:
       case LaneType::HEAD:
-      case LaneType::HEAD_R:
-      {
+      case LaneType::HEAD_R: {
          QConicalGradient gradient(x1, 2 * h, 225);
          gradient.setColorAt(0.375, col);
          gradient.setColorAt(0.625, activeCol);
@@ -55,8 +55,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
          p->drawArc(m, h, angleWidthRight, angleHeightUp, 0 * 16, spanAngle);
          break;
       }
-      case LaneType::JOIN_L:
-      {
+      case LaneType::JOIN_L: {
          QConicalGradient gradient(2, 2 * h, 315);
          gradient.setColorAt(0.375, activeCol);
          gradient.setColorAt(0.625, col);
@@ -66,8 +65,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
          break;
       }
       case LaneType::TAIL:
-      case LaneType::TAIL_R:
-      {
+      case LaneType::TAIL_R: {
          QConicalGradient gradient(x1, 0, 135);
          gradient.setColorAt(0.375, activeCol);
          gradient.setColorAt(0.625, col);
@@ -118,21 +116,25 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, int x1, 
       case LaneType::BRANCH:
       case LaneType::MERGE_FORK:
       case LaneType::MERGE_FORK_R:
-      case LaneType::MERGE_FORK_L:
-      {
+      case LaneType::MERGE_FORK_L: {
          isCommit = true;
-         QPen pen(col, 2);
-         p->setPen(pen);
+         QPen pen(mergeColor, 2);
+         p->setPen(col);
          p->setBrush(col);
          p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
+         if (laneHeadPresent)
+         {
+            pen = QPen(mergeColor, 1.5);
+            p->setPen(pen);
+            p->drawArc(m - r + 4, h - r + 2, 8, 8, 16 * 270, 16 * 180);
+         }
       }
       break;
-      case LaneType::ACTIVE:
-      {
+      case LaneType::ACTIVE: {
          isCommit = true;
          QPen pen(col, 2);
          p->setPen(pen);
-         p->setBrush(QColor(isWip ? col : "#2E2F30"));
+         p->setBrush(QColor(col));
          p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
       }
       break;
@@ -242,12 +244,21 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    const auto activeColor = colors[activeLane % COLORS_NUM];
    auto back = colors[(laneNum - 1) % COLORS_NUM];
    auto isSet = false;
+   auto laneHeadPresent = false;
+
    for (auto i = laneNum - 1, x2 = LANE_WIDTH * laneNum; i >= 0; --i, x2 -= LANE_WIDTH)
    {
+      if (!laneHeadPresent)
+      {
+         laneHeadPresent = i < laneNum - 1
+             && (lanes[i + 1] == LaneType::HEAD || lanes[i + 1] == LaneType::HEAD_L
+                 || lanes[i + 1] == LaneType::HEAD_R);
+      }
 
       x1 = x2 - LANE_WIDTH;
 
       auto ln = mView->hasActiveFiler() ? LaneType::ACTIVE : lanes[i];
+
       if (ln != LaneType::EMPTY)
       {
          QColor color;
@@ -276,7 +287,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
             default:
                break;
          }
-         paintGraphLane(p, ln, x1, x2, color, activeColor, back, r.sha() == ZERO_SHA);
+         paintGraphLane(p, ln, laneHeadPresent, x1, x2, color, activeColor, back, r.sha() == ZERO_SHA);
 
          if (mView->hasActiveFiler())
             break;
