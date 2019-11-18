@@ -20,6 +20,52 @@ RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, CommitHi
 {
 }
 
+void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
+{
+   p->setRenderHints(QPainter::Antialiasing);
+
+   QStyleOptionViewItem newOpt(opt);
+   newOpt.font.setPointSize(9);
+
+   if (newOpt.state & QStyle::State_Selected)
+   {
+      QColor c("#404142");
+      c.setAlphaF(0.75);
+      p->fillRect(newOpt.rect, c);
+   }
+   else if (newOpt.state & QStyle::State_MouseOver)
+   {
+      QColor c("#404142");
+      c.setAlphaF(0.4);
+      p->fillRect(newOpt.rect, c);
+   }
+
+   if (index.column() == static_cast<int>(CommitHistoryColumns::GRAPH))
+      paintGraph(p, newOpt, index);
+   else if (index.column() == static_cast<int>(CommitHistoryColumns::LOG))
+      paintLog(p, newOpt, index);
+   else
+   {
+
+      p->setPen(GitQlientStyles::getTextColor());
+      newOpt.rect.setX(newOpt.rect.x() + 10);
+
+      auto text = index.data().toString();
+
+      if (index.column() == static_cast<int>(CommitHistoryColumns::SHA))
+      {
+         newOpt.font.setPointSize(10);
+         newOpt.font.setFamily("Ubuntu Mono");
+         text = text.left(8);
+      }
+
+      QFontMetrics fm(newOpt.font);
+      p->setFont(newOpt.font);
+      p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()),
+                  QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
+   }
+}
+
 void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool laneHeadPresent, int x1, int x2,
                                             const QColor &col, const QColor &activeCol, const QColor &mergeColor,
                                             bool isWip) const
@@ -106,24 +152,20 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
       case LaneType::BRANCH:
       case LaneType::MERGE_FORK:
       case LaneType::MERGE_FORK_R:
-      case LaneType::MERGE_FORK_L: {
          isCommit = true;
-         QPen pen(mergeColor, 2);
-         p->setPen(col);
+         p->setPen(QPen(mergeColor, 2));
          p->setBrush(col);
          p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
-         if (laneHeadPresent)
-         {
-            pen = QPen(mergeColor, 1.5);
-            p->setPen(pen);
-            p->drawArc(m - r + 4, h - r + 2, 8, 8, 16 * 270, 16 * 180);
-         }
-      }
-      break;
+         break;
+      case LaneType::MERGE_FORK_L:
+         isCommit = true;
+         p->setPen(QPen(laneHeadPresent ? mergeColor : col, 2));
+         p->setBrush(col);
+         p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
+         break;
       case LaneType::ACTIVE: {
          isCommit = true;
-         QPen pen(col, 2);
-         p->setPen(pen);
+         p->setPen(QPen(col, 2));
          p->setBrush(QColor(isWip ? col : "#2E2F30"));
          p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
       }
@@ -149,7 +191,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
          break;
       case LaneType::MERGE_FORK_R:
       case LaneType::BOUNDARY_R:
-         p->drawLine(x1 + (isCommit ? 7 : 0), h, m, h);
+         p->drawLine(x1 + (isCommit ? 0 : 10), h, m - (isCommit ? 6 : 0), h);
          break;
       case LaneType::MERGE_FORK_L:
       case LaneType::HEAD_L:
@@ -159,52 +201,6 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
          break;
       default:
          break;
-   }
-}
-
-void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
-{
-   p->setRenderHints(QPainter::Antialiasing);
-
-   QStyleOptionViewItem newOpt(opt);
-   newOpt.font.setPointSize(9);
-
-   if (newOpt.state & QStyle::State_Selected)
-   {
-      QColor c("#404142");
-      c.setAlphaF(0.75);
-      p->fillRect(newOpt.rect, c);
-   }
-   else if (newOpt.state & QStyle::State_MouseOver)
-   {
-      QColor c("#404142");
-      c.setAlphaF(0.4);
-      p->fillRect(newOpt.rect, c);
-   }
-
-   if (index.column() == static_cast<int>(CommitHistoryColumns::GRAPH))
-      paintGraph(p, newOpt, index);
-   else if (index.column() == static_cast<int>(CommitHistoryColumns::LOG))
-      paintLog(p, newOpt, index);
-   else
-   {
-
-      p->setPen(GitQlientStyles::getTextColor());
-      newOpt.rect.setX(newOpt.rect.x() + 10);
-
-      auto text = index.data().toString();
-
-      if (index.column() == static_cast<int>(CommitHistoryColumns::SHA))
-      {
-         newOpt.font.setPointSize(10);
-         newOpt.font.setFamily("Ubuntu Mono");
-         text = text.left(8);
-      }
-
-      QFontMetrics fm(newOpt.font);
-      p->setFont(newOpt.font);
-      p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()),
-                  QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
    }
 }
 
@@ -248,8 +244,8 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       if (!laneHeadPresent)
       {
          laneHeadPresent = i < laneNum - 1
-             && (lanes[i + 1] == LaneType::HEAD || lanes[i + 1] == LaneType::HEAD_L
-                 || lanes[i + 1] == LaneType::HEAD_R);
+             && (lanes[i + 1] == LaneType::HEAD || lanes[i + 1] == LaneType::HEAD_L || lanes[i + 1] == LaneType::HEAD_R
+                 || lanes[i + 1] == LaneType::JOIN_L || lanes[i + 1] == LaneType::JOIN_R);
       }
 
       x1 = x2 - LANE_WIDTH;
@@ -275,10 +271,28 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
             case LaneType::HEAD_R:
             case LaneType::TAIL_L:
             case LaneType::TAIL_R:
+            case LaneType::MERGE_FORK_L:
+            case LaneType::JOIN_R:
                if (!isSet)
                {
                   isSet = true;
                   back = color;
+               }
+               break;
+            case LaneType::MERGE_FORK_R:
+            case LaneType::JOIN_L:
+               if (!isSet)
+               {
+                  QColor fromBranchColor;
+                  for (auto laneCount = 0; laneCount < i; ++laneCount)
+                  {
+                     if (lanes[laneCount] == LaneType::JOIN_L)
+                     {
+                        back = GitQlientStyles::getBranchColorAt(laneCount % GitQlientStyles::getTotalBranchColors());
+                        isSet = true;
+                        break;
+                     }
+                  }
                }
                break;
             default:
