@@ -48,7 +48,6 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
    return CommitInfo();
 }
 
-#include <QDebug>
 void RevisionsCache::insertCommitInfo(CommitInfo rev)
 {
    if (!mCacheLocked && !revs.contains(rev.sha()))

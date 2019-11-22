@@ -1171,12 +1171,8 @@ bool Git::loadRepository(const QString &wd)
    return false;
 }
 
-#include <QTime>
-#include <QDebug>
 void Git::processRevision(const QByteArray &ba)
 {
-   qDebug() << QTime::currentTime();
-
    QByteArray auxBa = ba;
    const auto commits = ba.split('\000');
    const auto totalCommits = commits.count();
@@ -1201,8 +1197,6 @@ void Git::processRevision(const QByteArray &ba)
    isLoading = false;
 
    emit signalLoadingFinished();
-
-   qDebug() << QTime::currentTime();
 }
 
 void Git::flushFileNames(FileNamesLoader &fl)
