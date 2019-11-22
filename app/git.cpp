@@ -979,9 +979,8 @@ void Git::updateWipRevision()
 
    CommitInfo c(ZERO_SHA, { head }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, status, 0);
    c.isDiffCache = true;
-   // c.lanes.append(LaneType::EMPTY);
 
-   mRevCache->insertCommitInfo(c);
+   mRevCache->updateWipCommit(std::move(c));
 }
 
 void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl)

@@ -50,6 +50,7 @@ public:
 
    void insertCommitInfo(CommitInfo rev);
    void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevsFiles.insert(sha, file); }
+   void updateWipCommit(CommitInfo rev);
 
    void clear();
    void clearRevisionFile() { mRevsFiles.clear(); }

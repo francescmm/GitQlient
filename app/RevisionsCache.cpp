@@ -71,6 +71,24 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
    }
 }
 
+void RevisionsCache::updateWipCommit(CommitInfo rev)
+{
+   if (!mCacheLocked)
+   {
+      updateLanes(rev, lns);
+
+      if (mCommits[rev.orderIdx])
+         rev.lanes = mCommits[rev.orderIdx]->lanes;
+
+      const auto commit = new CommitInfo(rev);
+
+      delete mCommits[rev.orderIdx];
+      mCommits[rev.orderIdx] = commit;
+
+      revs.insert(rev.sha(), commit);
+   }
+}
+
 void RevisionsCache::updateLanes(CommitInfo &c, Lanes &lns)
 {
    const auto sha = c.sha();
