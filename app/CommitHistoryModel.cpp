@@ -17,7 +17,7 @@ CommitHistoryModel::CommitHistoryModel(QSharedPointer<Git> git, QObject *p)
    mColumns.insert(CommitHistoryColumns::AUTHOR, "Author");
    mColumns.insert(CommitHistoryColumns::DATE, "Date");
 
-   connect(mGit.get(), &Git::signalNewRevisions, this, &CommitHistoryModel::onNewRevisions);
+   connect(mGit.get(), &Git::signalLoadingFinished, this, &CommitHistoryModel::onNewRevisions);
 }
 
 CommitHistoryModel::~CommitHistoryModel()
