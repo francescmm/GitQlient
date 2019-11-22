@@ -1171,8 +1171,12 @@ bool Git::loadRepository(const QString &wd)
    return false;
 }
 
+#include <QTime>
+#include <QDebug>
 void Git::processRevision(const QByteArray &ba)
 {
+   qDebug() << QTime::currentTime();
+
    QByteArray auxBa = ba;
    const auto commits = ba.split('\000');
    const auto totalCommits = commits.count();
@@ -1180,16 +1184,12 @@ void Git::processRevision(const QByteArray &ba)
 
    mRevCache->configure(totalCommits);
 
-   emit signalLoadingProgress(0, totalCommits);
-   QApplication::processEvents();
+   emit signalLoadingStarted();
 
    updateWipRevision();
 
    for (const auto &commitInfo : commits)
    {
-      emit signalLoadingProgress(count, totalCommits);
-      QApplication::processEvents();
-
       CommitInfo revision(commitInfo, count++);
 
       if (revision.isValid())
@@ -1200,7 +1200,9 @@ void Git::processRevision(const QByteArray &ba)
 
    isLoading = false;
 
-   emit signalNewRevisions();
+   emit signalLoadingFinished();
+
+   qDebug() << QTime::currentTime();
 }
 
 void Git::flushFileNames(FileNamesLoader &fl)

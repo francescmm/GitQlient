@@ -124,7 +124,8 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
    connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
 
-   connect(mGit.get(), &Git::signalLoadingProgress, this, &GitQlientRepo::updateProgressDialog, Qt::DirectConnection);
+   connect(mGit.get(), &Git::signalLoadingStarted, this, &GitQlientRepo::updateProgressDialog, Qt::DirectConnection);
+   connect(mGit.get(), &Git::signalLoadingFinished, this, &GitQlientRepo::closeProgressDialog, Qt::DirectConnection);
 
    setRepository(repo);
 
@@ -295,24 +296,20 @@ void GitQlientRepo::showFileHistory(const QString &fileName)
    mainStackedLayout->setCurrentIndex(1);
 }
 
-void GitQlientRepo::updateProgressDialog(int current, int total)
+void GitQlientRepo::updateProgressDialog()
 {
-   if (current == 0 && !mProgressDlg)
+   if (!mProgressDlg)
    {
-      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, total, false, true);
+      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, 0, false, true);
       connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
 
       mProgressDlg->show();
    }
-   else
-   {
-      mProgressDlg->setValue(current);
+}
 
-      if (current == mProgressDlg->maximum())
-         mProgressDlg->close();
-   }
-
-   mProgressDlg->repaint();
+void GitQlientRepo::closeProgressDialog()
+{
+   mProgressDlg->close();
 }
 
 void GitQlientRepo::openCommitDiff()

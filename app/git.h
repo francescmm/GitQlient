@@ -44,9 +44,9 @@ class Git : public QObject
    Q_OBJECT
 
 signals:
-   void signalNewRevisions();
    void cancelAllProcesses();
-   void signalLoadingProgress(int currentStep, int totalSteps);
+   void signalLoadingStarted();
+   void signalLoadingFinished();
    void signalCloningProgress(QString stepDescription, int value);
 
 public:

@@ -35,7 +35,6 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
       if (c == nullptr)
       {
          const auto shas = revs.keys();
-
          const auto it = std::find_if(shas.cbegin(), shas.cend(),
                                       [sha](const QString &shaToCompare) { return shaToCompare.startsWith(sha); });
 
@@ -49,16 +48,23 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
    return CommitInfo();
 }
 
+#include <QDebug>
 void RevisionsCache::insertCommitInfo(CommitInfo rev)
 {
    if (!mCacheLocked && !revs.contains(rev.sha()))
    {
-      if (rev.lanes.count() == 0)
-         updateLanes(rev, lns);
+      updateLanes(rev, lns);
 
       const auto commit = new CommitInfo(rev);
 
-      mCommits[rev.orderIdx] = commit;
+      if (rev.orderIdx >= mCommits.count())
+         mCommits.insert(rev.orderIdx, commit);
+      else if (!(mCommits[rev.orderIdx] && *mCommits[rev.orderIdx] == *commit))
+      {
+         delete mCommits[rev.orderIdx];
+         mCommits[rev.orderIdx] = commit;
+      }
+
       revs.insert(rev.sha(), commit);
 
       if (revs.contains(rev.parent(0)))
@@ -108,8 +114,8 @@ void RevisionsCache::clear()
 {
    mCacheLocked = true;
 
-   qDeleteAll(mCommits);
-   mCommits.clear();
+   // qDeleteAll(mCommits);
+   // mCommits.clear();
    lns.clear();
    revs.clear();
 }

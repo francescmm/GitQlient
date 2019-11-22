@@ -111,7 +111,8 @@ private:
    void setWidgetsEnabled(bool enabled);
    void executeCommand();
    void showFileHistory(const QString &fileName);
-   void updateProgressDialog(int current, int total);
+   void updateProgressDialog();
+   void closeProgressDialog();
 
    // End of MainWindow refactor
    bool isMatch(const QString &sha, const QString &f, int cn, const QMap<QString, bool> &sm);
