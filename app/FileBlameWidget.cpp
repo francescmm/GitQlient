@@ -29,6 +29,11 @@ FileBlameWidget::FileBlameWidget(QSharedPointer<Git> git, QWidget *parent)
 {
    mAnotation->setObjectName("AnnotationFrame");
 
+   auto initialLayout = new QGridLayout(mAnotation);
+   initialLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, 0);
+   initialLayout->addWidget(new QLabel("Select a file to blame"), 1, 1);
+   initialLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 2);
+
    mInfoFont.setPointSize(9);
 
    mCodeFont = QFont(mInfoFont);
@@ -240,7 +245,7 @@ QLabel *FileBlameWidget::createNumLabel(const Annotation &annotation, int row)
 
 QLabel *FileBlameWidget::createCodeLabel(const QString &content)
 {
-   const auto contentLabel = new QLabel(content);
+   const auto contentLabel = new QLabel(content.toHtmlEscaped());
    contentLabel->setFont(mCodeFont);
    contentLabel->setObjectName("normalLabel");
 
