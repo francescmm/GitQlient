@@ -43,7 +43,7 @@ bool CommitInfo::operator==(const CommitInfo &commit) const
 {
    return mSha == commit.mSha && mParentsSha == commit.mParentsSha && mCommitter == commit.mCommitter
        && mAuthor == commit.mAuthor && mCommitDate == commit.mCommitDate && mShortLog == commit.mShortLog
-       && mLongLog == commit.mLongLog && orderIdx == commit.orderIdx;
+       && mLongLog == commit.mLongLog && orderIdx == commit.orderIdx && lanes == commit.lanes;
 }
 
 bool CommitInfo::operator!=(const CommitInfo &commit) const
