@@ -288,7 +288,7 @@ QWidget#testWidget
 
 QPushButton#bigButton
 {
-    border-color: 2px solid #101112;
+    border-color: #101112;
 }
 
 QFrame#tabWidget > QPushButton[selected=true], QFrame#tabWidget > QPushButton[selected=true]:hover
