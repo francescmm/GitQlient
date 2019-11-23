@@ -107,6 +107,7 @@ private:
    int findNextSha(const QString &next, int pos);
    int findType(const LaneType type, int pos);
    int add(const LaneType type, const QString &next, int pos);
+   bool isNode(LaneType laneType) const;
 
    int activeLane;
    QVector<LaneType> typeVec; // Describes which glyphs should be drawn.

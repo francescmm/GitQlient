@@ -11,6 +11,8 @@ using namespace QLogger;
 
 int main(int argc, char *argv[])
 {
+   qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "1");
+
    QtSingleApplication app(argc, argv);
    QStringList arguments;
 
@@ -20,8 +22,6 @@ int main(int argc, char *argv[])
 
    if (app.sendMessage(arguments.join(",")))
       return 0;
-
-   app.setAttribute(Qt::AA_UseHighDpiPixmaps, true);
 
    QtSingleApplication::setOrganizationName("CescSoftware");
    QtSingleApplication::setOrganizationDomain("francescmm.com");

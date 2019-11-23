@@ -161,7 +161,6 @@ public:
 
    CommitInfo getCommitInfo(const QString &sha) const;
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;
-   const QString getRefSha(const QString &refName, RefType type = ANY_REF, bool askGit = true);
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
    GitExecResult merge(const QString &into, QStringList sources);
 

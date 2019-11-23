@@ -116,38 +116,6 @@ const QStringList Git::getRefNames(const QString &sha, uint mask) const
    return result;
 }
 
-const QString Git::getRefSha(const QString &refName, RefType type, bool askGit)
-{
-   bool any = type == ANY_REF;
-
-   for (auto it = mRefsShaMap.cbegin(); it != mRefsShaMap.cend(); ++it)
-   {
-      const Reference &rf = *it;
-
-      if ((any || type == TAG) && rf.tags.contains(refName))
-         return it.key();
-
-      else if ((any || type == BRANCH) && rf.branches.contains(refName))
-         return it.key();
-
-      else if ((any || type == RMT_BRANCH) && rf.remoteBranches.contains(refName))
-         return it.key();
-
-      else if ((any || type == REF) && rf.refs.contains(refName))
-         return it.key();
-
-      else if ((any || type == APPLIED || type == UN_APPLIED) && rf.stgitPatch == refName)
-         return it.key();
-   }
-   if (!askGit)
-      return "";
-
-   // if a ref was not found perhaps is an abbreviated form
-   QString runOutput;
-   const auto ret = run("git rev-parse --revs-only " + refName);
-   return (ret.first ? ret.second.trimmed() : "");
-}
-
 const QString Git::filePath(const RevisionFile &rf, int i) const
 {
    return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)];

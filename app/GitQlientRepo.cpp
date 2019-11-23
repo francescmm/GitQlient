@@ -351,17 +351,15 @@ void GitQlientRepo::onCommitClicked(const QModelIndex &index)
 
 void GitQlientRepo::onCommitSelected(const QString &goToSha)
 {
-   const auto sha = mGit->getRefSha(goToSha);
-
-   const auto isWip = sha == ZERO_SHA;
+   const auto isWip = goToSha == ZERO_SHA;
    commitStackedWidget->setCurrentIndex(isWip);
 
-   QLog_Info("UI", QString("Selected commit {%1}").arg(sha));
+   QLog_Info("UI", QString("Selected commit {%1}").arg(goToSha));
 
    if (isWip)
-      mCommitWidget->configure(sha);
+      mCommitWidget->configure(goToSha);
    else
-      mRevisionWidget->setCurrentCommitSha(sha);
+      mRevisionWidget->setCurrentCommitSha(goToSha);
 }
 
 void GitQlientRepo::onAmendCommit(const QString &sha)
