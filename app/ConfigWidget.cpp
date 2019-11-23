@@ -134,7 +134,7 @@ QWidget *ConfigWidget::createConfigWidget()
 {
    mBtnGroup = new QButtonGroup();
    mBtnGroup->addButton(new QPushButton(tr("General")), 0);
-   mBtnGroup->addButton(new QPushButton(tr("Git config")), 1);
+   // mBtnGroup->addButton(new QPushButton(tr("Git config")), 1);
 
    const auto firstBtn = mBtnGroup->button(0);
    firstBtn->setProperty("selected", true);
