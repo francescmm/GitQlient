@@ -42,7 +42,6 @@ namespace
 
 bool writeToFile(const QString &fileName, const QString &data)
 {
-
    QFile file(fileName);
    if (!file.open(QIODevice::WriteOnly))
       return false;
@@ -69,14 +68,12 @@ Git::Git()
 
 const QString Git::quote(const QString &nm)
 {
-
    return ("$" + nm + "$");
 }
 
 // CT TODO utility function; can go elsewhere
 const QString Git::quote(const QStringList &sl)
 {
-
    QString q(sl.join(QString("$%1$").arg(' ')));
    q.prepend("$").append("$");
    return q;
@@ -84,14 +81,12 @@ const QString Git::quote(const QStringList &sl)
 
 uint Git::checkRef(const QString &sha, uint mask) const
 {
-
    QHash<QString, Reference>::const_iterator it(mRefsShaMap.constFind(sha));
    return (it != mRefsShaMap.constEnd() ? (*it).type & mask : 0);
 }
 
 const QStringList Git::getRefNames(const QString &sha, uint mask) const
 {
-
    QStringList result;
    if (!checkRef(sha, mask))
       return result;
@@ -194,7 +189,6 @@ QString Git::getFileDiff(const QString &currentSha, const QString &previousSha, 
 
 bool Git::isNothingToCommit()
 {
-
    if (!mRevCache->containsRevisionFile(ZERO_SHA))
       return true;
 
@@ -259,7 +253,6 @@ bool Git::submoduleRemove(const QString &)
 
 RevisionFile Git::insertNewFiles(const QString &sha, const QString &data)
 {
-
    /* we use an independent FileNamesLoader to avoid data
     * corruption if we are loading file names in background
     */
@@ -349,7 +342,6 @@ RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha, boo
 
 bool Git::resetCommits(int parentDepth)
 {
-
    QString runCmd("git reset --soft HEAD~");
    runCmd.append(QString::number(parentDepth));
    return run(runCmd).first;
@@ -372,7 +364,6 @@ GitExecResult Git::merge(const QString &into, QStringList sources)
 
 const QStringList Git::getOtherFiles(const QStringList &selFiles)
 {
-
    RevisionFile files = getWipFiles(); // files != nullptr
    QStringList notSelFiles;
    for (auto i = 0; i < files.count(); ++i)
@@ -798,7 +789,6 @@ bool Git::getRefs()
    const QStringList rLst(ret3.second.split('\n', QString::SkipEmptyParts));
    for (auto it : rLst)
    {
-
       const auto revSha = it.left(40);
       const auto refName = it.mid(41);
 
@@ -807,7 +797,6 @@ bool Git::getRefs()
 
       if (refName.startsWith("refs/tags/"))
       {
-
          if (refName.endsWith("^{}"))
          { // tag dereference
 
@@ -831,7 +820,6 @@ bool Git::getRefs()
       }
       else if (refName.startsWith("refs/heads/"))
       {
-
          cur->branches.append(refName.mid(11));
          cur->type |= BRANCH;
          if (curBranchSHA == revSha)
@@ -839,13 +827,11 @@ bool Git::getRefs()
       }
       else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
       {
-
          cur->remoteBranches.append(refName.mid(13));
          cur->type |= RMT_BRANCH;
       }
       else if (!refName.startsWith("refs/bases/") && !refName.endsWith("HEAD"))
       {
-
          cur->refs.append(refName);
          cur->type |= REF;
       }
@@ -878,7 +864,6 @@ const QStringList Git::getOthersFiles()
 
 RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
 {
-
    FileNamesLoader fl;
    RevisionFile rf;
    parseDiffFormat(rf, wd.diffIndex, fl);
@@ -886,11 +871,11 @@ RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
 
    for (auto it : wd.otherFiles)
    {
-
       appendFileName(rf, it, fl);
       rf.status.append(RevisionFile::UNKNOWN);
       rf.mergeParent.append(1);
    }
+
    RevisionFile cachedFiles;
    parseDiffFormat(cachedFiles, wd.diffIndexCached, fl);
    flushFileNames(fl);
@@ -904,7 +889,6 @@ RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
 
 void Git::updateWipRevision()
 {
-
    const auto ret = run("git status");
    if (!ret.first) // git status refreshes the index, run as first
       return;
@@ -920,7 +904,6 @@ void Git::updateWipRevision()
    head = head.trimmed();
    if (!head.isEmpty())
    { // repository initialized but still no history
-
       const auto ret3 = run("git diff-index " + head);
 
       if (!ret3.first)
@@ -953,10 +936,8 @@ void Git::updateWipRevision()
 
 void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl)
 {
-
    if (line[1] == ':')
    { // it's a combined merge
-
       /* For combined merges rename/copy information is useless
        * because nor the original file name, nor similarity info
        * is given, just the status tracks that in the left/right
@@ -970,7 +951,6 @@ void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum,
    }
    else
    { // faster parsing in normal case
-
       if (line.at(98) == '\t')
       {
          appendFileName(rf, line.mid(99), fl);
@@ -985,7 +965,6 @@ void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum,
 
 void Git::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
-
    const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
    if (sl.count() != 3)
       return;
@@ -1028,11 +1007,10 @@ void Git::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileN
 // CT TODO utility function; can go elsewhere
 void Git::parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl)
 {
-
    int parNum = 1, startPos = 0, endPos = buf.indexOf('\n');
+
    while (endPos != -1)
    {
-
       const QString &line = buf.mid(startPos, endPos - startPos);
       if (line[0] == ':') // avoid sha's in merges output
          parseDiffFormatLine(rf, line, parNum, fl);
@@ -1168,7 +1146,6 @@ void Git::processRevision(const QByteArray &ba)
 
 void Git::flushFileNames(FileNamesLoader &fl)
 {
-
    if (!fl.rf)
       return;
 
@@ -1193,7 +1170,6 @@ void Git::flushFileNames(FileNamesLoader &fl)
 
 void Git::appendFileName(RevisionFile &rf, const QString &name, FileNamesLoader &fl)
 {
-
    if (fl.rf != &rf)
    {
       flushFileNames(fl);

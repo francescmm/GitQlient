@@ -252,9 +252,12 @@ int Lanes::findNextSha(const QString &next, int pos)
 
 int Lanes::findType(const LaneType type, int pos)
 {
-   for (int i = pos; i < typeVec.count(); i++)
-      if (typeVec[i] == (type))
+   const auto typeVecCount = typeVec.count();
+
+   for (int i = pos; i < typeVecCount; i++)
+      if (typeVec[i] == type)
          return i;
+
    return -1;
 }
 
