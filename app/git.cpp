@@ -752,97 +752,112 @@ Git::Reference *Git::lookupOrAddReference(const QString &sha)
    return &(*it);
 }
 
-bool Git::getRefs()
+bool Git::loadCurrentBranch()
 {
-   // check for a StGIT stack
-   QDir d(mGitDir);
-
-   // check for a merge and read current branch sha
-   mIsMergeHead = d.exists("MERGE_HEAD");
-   const auto ret = run("git rev-parse --revs-only HEAD");
-   if (!ret.first)
-      return false;
-
-   QString curBranchSHA = ret.second;
-
    const auto ret2 = run("git branch");
+
    if (!ret2.first)
       return false;
 
-   mCurrentBranchName = ret2.second;
+   const auto branches = ret2.second.trimmed().split('\n');
+   for (auto branch : branches)
+   {
+      if (branch.startsWith("*"))
+      {
+         mCurrentBranchName = branch.remove("*").trimmed();
+         break;
+      }
+   }
 
-   curBranchSHA = curBranchSHA.trimmed();
-   mCurrentBranchName = mCurrentBranchName.prepend('\n').section("\n*", 1);
-   mCurrentBranchName = mCurrentBranchName.section('\n', 0, 0).trimmed();
    if (mCurrentBranchName.contains(" detached "))
       mCurrentBranchName = "";
 
-   // read refs, normally unsorted
-   const auto ret3 = run("git show-ref -d");
-   if (!ret3.first)
-      return false;
+   return true;
+}
 
-   mRefsShaMap.clear();
-
-   QString prevRefSha;
-   QStringList patchNames, patchShas;
-   const QStringList rLst(ret3.second.split('\n', QString::SkipEmptyParts));
-   for (auto it : rLst)
+void Git::Reference::configure(const QString &refName, bool isCurrentBranch, const QString &prevRefSha)
+{
+   if (refName.startsWith("refs/tags/"))
    {
-      const auto revSha = it.left(40);
-      const auto refName = it.mid(41);
-
-      // one Revision could have many tags
-      Reference *cur = lookupOrAddReference(revSha);
-
-      if (refName.startsWith("refs/tags/"))
+      if (refName.endsWith("^{}"))
       {
-         if (refName.endsWith("^{}"))
-         { // tag dereference
+         // we assume that a tag dereference follows strictly
+         // the corresponding tag object in rLst. So the
+         // last added tag is a tag object, not a commit object
+         tags.append(refName.mid(10, refName.length() - 13));
 
-            // we assume that a tag dereference follows strictly
-            // the corresponding tag object in rLst. So the
-            // last added tag is a tag object, not a commit object
-            cur->tags.append(refName.mid(10, refName.length() - 13));
+         // store tag object. Will be used to fetching
+         // tag message (if any) when necessary.
+         tagObj = prevRefSha;
+      }
+      else
+         tags.append(refName.mid(10));
 
-            // store tag object. Will be used to fetching
-            // tag message (if any) when necessary.
-            cur->tagObj = prevRefSha;
+      type |= TAG;
+   }
+   else if (refName.startsWith("refs/heads/"))
+   {
+      branches.append(refName.mid(11));
+      type |= BRANCH;
 
-            // tagObj must be removed from ref map
-            if (!prevRefSha.isEmpty())
+      if (isCurrentBranch)
+         type |= CUR_BRANCH;
+   }
+   else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
+   {
+      remoteBranches.append(refName.mid(13));
+      type |= RMT_BRANCH;
+   }
+   else if (!refName.startsWith("refs/bases/") && !refName.endsWith("HEAD"))
+   {
+      refs.append(refName);
+      type |= REF;
+   }
+}
+
+bool Git::getRefs()
+{
+   const auto branchLoaded = loadCurrentBranch();
+
+   if (branchLoaded)
+   {
+      const auto ret3 = run("git show-ref -d");
+
+      if (ret3.first)
+      {
+         mRefsShaMap.clear();
+
+         const auto ret = getLastCommitOfBranch("HEAD");
+
+         QString prevRefSha;
+         const auto curBranchSHA = ret.output.toString();
+         const auto referencesList = ret3.second.split('\n', QString::SkipEmptyParts);
+
+         for (auto reference : referencesList)
+         {
+            const auto revSha = reference.left(40);
+            const auto refName = reference.mid(41);
+
+            // one Revision could have many tags
+            const auto cur = lookupOrAddReference(revSha);
+
+            cur->configure(refName, curBranchSHA == revSha, prevRefSha);
+
+            if (refName.startsWith("refs/tags/") && refName.endsWith("^{}") && !prevRefSha.isEmpty())
                mRefsShaMap.remove(prevRefSha);
-         }
-         else
-            cur->tags.append(refName.mid(10));
 
-         cur->type |= TAG;
+            prevRefSha = revSha;
+         }
+
+         // mark current head (even when detached)
+         auto cur = lookupOrAddReference(curBranchSHA);
+         cur->type |= CUR_BRANCH;
+
+         return !mRefsShaMap.empty();
       }
-      else if (refName.startsWith("refs/heads/"))
-      {
-         cur->branches.append(refName.mid(11));
-         cur->type |= BRANCH;
-         if (curBranchSHA == revSha)
-            cur->type |= CUR_BRANCH;
-      }
-      else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
-      {
-         cur->remoteBranches.append(refName.mid(13));
-         cur->type |= RMT_BRANCH;
-      }
-      else if (!refName.startsWith("refs/bases/") && !refName.endsWith("HEAD"))
-      {
-         cur->refs.append(refName);
-         cur->type |= REF;
-      }
-      prevRefSha = revSha;
    }
 
-   // mark current head (even when detached)
-   auto cur = lookupOrAddReference(curBranchSHA);
-   cur->type |= CUR_BRANCH;
-
-   return !mRefsShaMap.empty();
+   return false;
 }
 
 const QStringList Git::getOthersFiles()
@@ -1159,7 +1174,6 @@ void Git::flushFileNames(FileNamesLoader &fl)
 
    for (int i = 0; i < dirs.size(); i++)
    {
-
       d[i] = dirs.at(i);
       d[dirs.size() + i] = fl.rfNames.at(i);
    }

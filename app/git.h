@@ -172,14 +172,15 @@ public:
 private:
    bool setGitDbDir(const QString &wd);
    void processRevision(const QByteArray &ba);
+   bool loadCurrentBranch();
 
    struct Reference
-   { // stores tag information associated to a revision
-      Reference()
-         : type(0)
-      {
-      }
-      uint type;
+   {
+      Reference() {}
+
+      void configure(const QString &refName, bool isCurrentBranch, const QString &prevRefSha);
+
+      uint type = 0;
       QStringList branches;
       QStringList remoteBranches;
       QStringList tags;
@@ -239,7 +240,6 @@ private:
    QString mWorkingDir;
    QString mGitDir;
    QString mCurrentBranchName;
-   bool mIsMergeHead = false;
    QHash<QString, Reference> mRefsShaMap;
    QVector<QString> mFileNames;
    QVector<QString> mDirNames;
