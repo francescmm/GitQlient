@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QSettings>
 #include <QtSingleApplication>
+#include <QFontDatabase>
 
 #include <GitQlient.h>
 #include <QLogger.h>
@@ -26,6 +27,8 @@ int main(int argc, char *argv[])
    QtSingleApplication::setOrganizationName("CescSoftware");
    QtSingleApplication::setOrganizationDomain("francescmm.com");
    QtSingleApplication::setApplicationName(APP_NAME);
+   QFontDatabase::addApplicationFont(":/Ubuntu");
+   QFontDatabase::addApplicationFont(":/UbuntuMono");
 
    GitQlient mainWin(arguments);
    mainWin.showMaximized();
