@@ -203,7 +203,7 @@ QHeaderView:section
     border: 0;
     border-right-width: 1px;
     border-right-style: solid;
-    padding-top: 5px 15px 5px 15px;
+    padding: 5px 15px 5px 15px;
 }
 
 /**  END  QHeaderView **/
