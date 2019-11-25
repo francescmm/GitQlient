@@ -211,7 +211,17 @@ QLabel *FileBlameWidget::createAuthorLabel(const QString &author, bool isFirst)
 ClickableFrame *FileBlameWidget::createMessageLabel(const QString &sha, bool isFirst)
 {
    const auto revision = mGit->getCommitInfo(sha);
-   const auto commitMsg = !revision.sha().isEmpty() ? revision.shortLog() : QString("Local changes");
+   auto commitMsg = QString("Local changes");
+
+   if (!revision.sha().isEmpty())
+   {
+      auto log = revision.shortLog();
+
+      if (log.count() > 47)
+         log = log.left(47) + QString("...");
+
+      commitMsg = log;
+   }
 
    const auto messageLabel = new ClickableFrame(commitMsg, Qt::AlignTop | Qt::AlignLeft);
    messageLabel->setObjectName(isFirst ? QString("primusInterPares") : QString("firstOfItsName"));

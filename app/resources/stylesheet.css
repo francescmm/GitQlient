@@ -16,6 +16,7 @@ QPushButton, QToolButton
 {
     border: 0;
     padding: 5px;
+    font-size: 10pt;
 }
 
 QPushButton
@@ -30,7 +31,10 @@ QPushButton:hover
     border: 0;
 }
 
-
+*
+{
+    font-size: 10pt;
+}
 
 CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoWidget > #labelDescription
 {
