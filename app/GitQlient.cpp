@@ -134,7 +134,7 @@ void GitQlient::addRepoTab(const QString &repoPath)
          addRepoTab(submoduleDir);
       });
 
-      const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "No repo";
+      const auto repoName = newRepo->currentDir().contains("/") ? newRepo->currentDir().split("/").last() : "No repo";
       const auto index = mRepos->addTab(newRepo, repoName);
 
       if (!repoPath.isEmpty())
