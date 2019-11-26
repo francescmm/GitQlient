@@ -1,5 +1,6 @@
 #include "GitQlientRepo.h"
 
+#include <GitQlientSettings.h>
 #include <Controls.h>
 #include <BranchesWidget.h>
 #include <WorkInProgressWidget.h>
@@ -200,6 +201,9 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
       if (ok)
       {
+         GitQlientSettings settings;
+         settings.setProjectOpened(newDir);
+
          mCurrentDir = mGit->getWorkingDir();
          setWidgetsEnabled(true);
 

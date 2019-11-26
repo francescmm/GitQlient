@@ -490,3 +490,8 @@ QProgressBar::chunk
     width: 18px;
 }
 
+ClickableFrame
+{
+    padding: 5px;
+}
+

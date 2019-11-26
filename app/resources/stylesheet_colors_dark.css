@@ -296,7 +296,7 @@ QFrame#tabWidget > QPushButton[selected=true], QFrame#tabWidget > QPushButton[se
     background-color: #606162;
 }
 
-GeneralConfigPage
+GeneralConfigPage, #recentProjects
 {
     background-color: #606162;
 }
@@ -392,5 +392,15 @@ QProgressBar
 QProgressBar::chunk
 {
     background-color: #D89000;
+}
+
+ClickableFrame::hover
+{
+    background-color: #404142;
+}
+
+ClickableFrame::pressed
+{
+    background-color: #202122;
 }
 

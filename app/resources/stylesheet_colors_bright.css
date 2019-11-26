@@ -420,3 +420,13 @@ QProgressBar::chunk
     background-color: #D89000;
 }
 
+ClickableFrame::hover
+{
+    background-color: #C6C6C7;
+}
+
+ClickableFrame::pressed
+{
+    background-color: white;
+}
+
