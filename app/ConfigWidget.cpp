@@ -198,13 +198,15 @@ QWidget *ConfigWidget::createRecentProjectsPage()
    mInnerWidget->setObjectName("recentProjects");
 
    const auto innerLayout = new QVBoxLayout(mInnerWidget);
-   // innerLayout->setContentsMargins(QMargins());
+   innerLayout->setSpacing(0);
 
    const auto projects = mSettings->getRecentProjects();
 
    for (auto project : projects)
    {
-      const auto clickableFrame = new ClickableFrame(project, Qt::AlignLeft);
+      const auto projectName = project.mid(project.lastIndexOf("/") + 1);
+      const auto labelText = QString("%1 <%2>").arg(projectName, project);
+      const auto clickableFrame = new ClickableFrame(labelText, Qt::AlignLeft);
       connect(clickableFrame, &ClickableFrame::clicked, this, [this, project]() { emit signalOpenRepo(project); });
       innerLayout->addWidget(clickableFrame);
    }
