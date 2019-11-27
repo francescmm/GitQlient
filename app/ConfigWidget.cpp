@@ -19,6 +19,8 @@
 
 using namespace QLogger;
 
+#include <QDebug>
+
 ConfigWidget::ConfigWidget(QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
@@ -89,7 +91,11 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    connect(mCloneRepo, &QPushButton::clicked, this, &ConfigWidget::cloneRepo);
    connect(mInitRepo, &QPushButton::clicked, this, &ConfigWidget::initRepo);
    connect(mGit.get(), &Git::signalCloningProgress, this, &ConfigWidget::updateProgressDialog, Qt::DirectConnection);
-   connect(mSettings, &GitQlientSettings::valueChanged, this, &ConfigWidget::updateRecentProjectsList);
+}
+
+ConfigWidget::~ConfigWidget()
+{
+   delete mSettings;
 }
 
 void ConfigWidget::openRepo()
@@ -235,8 +241,7 @@ void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
    mProgressDlg->repaint();
 }
 
-void ConfigWidget::updateRecentProjectsList(const QString &key, const QVariant &)
+void ConfigWidget::updateRecentProjectsList()
 {
-   if (key == "recentProjects")
-      createRecentProjectsPage();
+   mRecentProjectsLayout->addWidget(createRecentProjectsPage());
 }

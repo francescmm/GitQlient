@@ -41,6 +41,9 @@ signals:
 
 public:
    explicit ConfigWidget(QWidget *parent = nullptr);
+   ~ConfigWidget();
+
+   void updateRecentProjectsList();
 
 private:
    QSharedPointer<Git> mGit;
@@ -61,5 +64,4 @@ private:
    QWidget *createConfigWidget();
    QWidget *createRecentProjectsPage();
    void updateProgressDialog(QString stepDescription, int value);
-   void updateRecentProjectsList(const QString &key, const QVariant &value);
 };

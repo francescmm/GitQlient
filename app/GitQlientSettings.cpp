@@ -24,10 +24,8 @@ void GitQlientSettings::setProjectOpened(const QString &projectPath)
       timesUsed.append(count);
    }
 
-   QSettings::setValue("recentProjects", projects);
-   QSettings::setValue("recentProjectsCount", timesUsed);
-
-   emit valueChanged("recentProjects", projects);
+   GitQlientSettings::setValue("recentProjects", projects);
+   GitQlientSettings::setValue("recentProjectsCount", timesUsed);
 }
 
 QVector<QString> GitQlientSettings::getRecentProjects() const

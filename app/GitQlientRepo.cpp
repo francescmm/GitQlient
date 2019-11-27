@@ -30,7 +30,7 @@
 
 using namespace QLogger;
 
-GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
+GitQlientRepo::GitQlientRepo(QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
    , mRepositoryModel(new CommitHistoryModel(mGit))
@@ -49,7 +49,7 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
-   QLog_Info("UI", QString("Initializing GitQlient with repo {%1}").arg(repo));
+   QLog_Info("UI", QString("Initializing GitQlient"));
 
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
@@ -127,10 +127,6 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
 
    connect(mGit.get(), &Git::signalLoadingStarted, this, &GitQlientRepo::updateProgressDialog, Qt::DirectConnection);
    connect(mGit.get(), &Git::signalLoadingFinished, this, &GitQlientRepo::closeProgressDialog, Qt::DirectConnection);
-
-   setRepository(repo);
-
-   mAutoFilesUpdate->start();
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
@@ -193,7 +189,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 {
    if (!newDir.isEmpty())
    {
-      QLog_Info("UI", QString("Loading repository..."));
+      QLog_Info("UI", QString("Loading repository at {%1}...").arg(newDir));
 
       emit mGit->cancelAllProcesses();
 
@@ -203,6 +199,8 @@ void GitQlientRepo::setRepository(const QString &newDir)
       {
          GitQlientSettings settings;
          settings.setProjectOpened(newDir);
+
+         emit signalRepoOpened();
 
          mCurrentDir = mGit->getWorkingDir();
          setWidgetsEnabled(true);
@@ -217,6 +215,8 @@ void GitQlientRepo::setRepository(const QString &newDir)
          centerStackedWidget->setCurrentIndex(0);
          commitStackedWidget->setCurrentIndex(1);
          mControls->enableButtons(true);
+
+         mAutoFilesUpdate->start();
 
          QLog_Info("UI", "... repository loaded successfully");
       }

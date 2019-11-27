@@ -123,7 +123,11 @@ void GitQlient::addRepoTab(const QString &repoPath)
 {
    if (!mCurrentRepos.contains(repoPath))
    {
-      const auto newRepo = new GitQlientRepo(repoPath);
+      const auto newRepo = new GitQlientRepo();
+      connect(newRepo, &GitQlientRepo::signalRepoOpened, mConfigWidget, &ConfigWidget::updateRecentProjectsList);
+
+      newRepo->setRepository(repoPath);
+
       connect(newRepo, &GitQlientRepo::signalOpenSubmodule, this, [this](const QString &repoName) {
          const auto currentDir = dynamic_cast<GitQlientRepo *>(sender())->currentDir();
 
