@@ -45,7 +45,6 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
    , fileHistoryWidget(new FileHistoryWidget(mGit))
-
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
