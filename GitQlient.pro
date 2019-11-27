@@ -4,6 +4,7 @@ QMAKE_CXXFLAGS += -Werror
 TARGET = GitQlient
 QT += widgets core gui
 DEFINES += QT_DEPRECATED_WARNINGS
+QMAKE_LFLAGS += -no-pie
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
