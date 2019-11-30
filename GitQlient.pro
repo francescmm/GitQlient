@@ -2,7 +2,7 @@
 CONFIG += qt warn_on c++17
 QMAKE_CXXFLAGS += -Werror
 TARGET = GitQlient
-QT += widgets core gui
+QT += widgets core
 DEFINES += QT_DEPRECATED_WARNINGS
 QMAKE_LFLAGS += -no-pie
 
@@ -15,13 +15,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 SOURCES += main.cpp
 
 include(app/GitQlient.pri)
-include($$PWD/qtsingleapplication/src/qtsingleapplication.pri)
+include(QLogger/QLogger.pri)
 
 INCLUDEPATH += QLogger \
-    app \
-    qtsingleapplication/src
-
-include(QLogger/QLogger.pri)
+    app
 
 OTHER_FILES += $$PWD/Tasks.txt \
     $$PWD/LICENSE \
