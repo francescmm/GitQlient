@@ -460,18 +460,18 @@ QLabel#authorFirstOfItsName, QLabel#authorPrimusInterPares
     min-height: 21px;
 }
 
-QLabel#authorFirstOfItsName, ClickableFrame#firstOfItsName
-{
-    border-top-width: 1px;
-    border-top-style: solid;
-}
-
 ClickableFrame#firstOfItsName, ClickableFrame#primusInterPares
 {
     padding: 2px;
     border: 0;
     max-height: 21px;
     min-height: 21px;
+}
+
+QLabel#authorFirstOfItsName, ClickableFrame#firstOfItsName
+{
+    border-top-width: 1px;
+    border-top-style: solid;
 }
 
 QProgressBar
