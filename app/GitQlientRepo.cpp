@@ -220,7 +220,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          QLog_Info("UI", "... repository loaded successfully");
 
-         if (!mGit->getGlobalUserInfo().isValid() || !mGit->getLocalUserInfo().isValid())
+         if (!mGit->getGlobalUserInfo().isValid())
          {
             QLog_Info("UI", QString("Configuring Git..."));
 
