@@ -68,6 +68,7 @@ public:
    explicit Git();
 
    /* START Git CONFIGURATION */
+   void setWorkingDirectory(const QString &wd) { mWorkingDir = wd; }
    bool loadRepository(const QString &wd);
    QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
