@@ -1067,6 +1067,52 @@ bool Git::initRepo(const QString &fullPath)
    return run(QString("git init %1").arg(fullPath)).first;
 }
 
+GitUserInfo Git::getGlobalUserInfo() const
+{
+   GitUserInfo userInfo;
+
+   const auto nameRequest = run("git config --get --global user.name");
+
+   if (nameRequest.first)
+      userInfo.mUserName = nameRequest.second.trimmed();
+
+   const auto emailRequest = run("git config --get --global user.email");
+
+   if (emailRequest.first)
+      userInfo.mUserEmail = emailRequest.second.trimmed();
+
+   return userInfo;
+}
+
+void Git::setGlobalUserInfo(const GitUserInfo &info)
+{
+   run(QString("git config --global user.name \"%1\"").arg(info.mUserName));
+   run(QString("git config --global user.email %1").arg(info.mUserEmail));
+}
+
+GitUserInfo Git::getLocalUserInfo() const
+{
+   GitUserInfo userInfo;
+
+   const auto nameRequest = run("git config --get --local user.name");
+
+   if (nameRequest.first)
+      userInfo.mUserName = nameRequest.second.trimmed();
+
+   const auto emailRequest = run("git config --get --local user.email");
+
+   if (emailRequest.first)
+      userInfo.mUserEmail = emailRequest.second.trimmed();
+
+   return userInfo;
+}
+
+void Git::setLocalUserInfo(const GitUserInfo &info)
+{
+   run(QString("git config --local user.name \"%1\"").arg(info.mUserName));
+   run(QString("git config --local user.email %1").arg(info.mUserEmail));
+}
+
 int Git::totalCommits() const
 {
    return mRevCache->count();
@@ -1214,4 +1260,9 @@ void Git::appendFileName(RevisionFile &rf, const QString &name, FileNamesLoader 
    }
    else
       fl.rfNames.append(*it);
+}
+
+bool GitUserInfo::isValid() const
+{
+   return !mUserEmail.isNull() && !mUserEmail.isEmpty() && !mUserName.isNull() && !mUserName.isEmpty();
 }

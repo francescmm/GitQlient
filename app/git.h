@@ -39,6 +39,14 @@ struct GitExecResult
    QVariant output;
 };
 
+struct GitUserInfo
+{
+   QString mUserName;
+   QString mUserEmail;
+
+   bool isValid() const;
+};
+
 class Git : public QObject
 {
    Q_OBJECT
@@ -64,6 +72,10 @@ public:
    QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
    bool initRepo(const QString &fullPath);
+   GitUserInfo getGlobalUserInfo() const;
+   void setGlobalUserInfo(const GitUserInfo &info);
+   GitUserInfo getLocalUserInfo() const;
+   void setLocalUserInfo(const GitUserInfo &info);
    /* END Git CONFIGURATION */
 
    /* START CACHE */

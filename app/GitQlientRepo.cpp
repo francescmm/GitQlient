@@ -16,6 +16,7 @@
 #include <FileHistoryWidget.h>
 #include <CommitInfo.h>
 #include <ProgressDlg.h>
+#include <GitConfigDlg.h>
 
 #include <QFileSystemModel>
 #include <QTimer>
@@ -218,6 +219,17 @@ void GitQlientRepo::setRepository(const QString &newDir)
          mAutoFilesUpdate->start();
 
          QLog_Info("UI", "... repository loaded successfully");
+
+         if (!mGit->getGlobalUserInfo().isValid() || !mGit->getLocalUserInfo().isValid())
+         {
+            QLog_Info("UI", QString("Configuring Git..."));
+
+            GitConfigDlg configDlg(mGit);
+
+            configDlg.exec();
+
+            QLog_Info("UI", QString("... Git configured!"));
+         }
       }
       else
       {
