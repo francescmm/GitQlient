@@ -2,7 +2,7 @@
 
 bool RevisionFile::statusCmp(int idx, RevisionFile::StatusFlag sf) const
 {
-   return (onlyModified ? MODIFIED : status.at(static_cast<int>(idx))) & sf;
+   return (mOnlyModified ? MODIFIED : status.at(static_cast<int>(idx))) & sf;
 }
 
 const QString RevisionFile::extendedStatus(int idx) const
@@ -21,23 +21,45 @@ void RevisionFile::setStatus(const QString &rowSt)
    {
       case 'M':
       case 'T':
+         status.append(RevisionFile::MODIFIED);
+         break;
       case 'U':
          status.append(RevisionFile::MODIFIED);
+         status[status.count() - 1] |= RevisionFile::CONFLICT;
+         mOnlyModified = false;
          break;
       case 'D':
          status.append(RevisionFile::DELETED);
-         onlyModified = false;
+         mOnlyModified = false;
          break;
       case 'A':
          status.append(RevisionFile::NEW);
-         onlyModified = false;
+         mOnlyModified = false;
          break;
       case '?':
          status.append(RevisionFile::UNKNOWN);
-         onlyModified = false;
+         mOnlyModified = false;
          break;
       default:
          status.append(RevisionFile::MODIFIED);
          break;
    }
+}
+
+void RevisionFile::setStatus(RevisionFile::StatusFlag flag)
+{
+   status.append(flag);
+
+   if (flag == RevisionFile::DELETED || flag == RevisionFile::NEW || flag == RevisionFile::UNKNOWN)
+      mOnlyModified = false;
+}
+
+void RevisionFile::setStatus(int pos, RevisionFile::StatusFlag flag)
+{
+   status[pos] = flag;
+}
+
+void RevisionFile::appendStatus(int pos, RevisionFile::StatusFlag flag)
+{
+   status[pos] |= flag;
 }

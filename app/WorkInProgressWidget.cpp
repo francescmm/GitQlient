@@ -154,27 +154,16 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWid
 {
    for (auto i = 0; i < files.count(); ++i)
    {
-      QColor myColor;
-
-      const auto isUnknown = files.statusCmp(i, RevisionFile::UNKNOWN);
-      const auto isInIndex = files.statusCmp(i, RevisionFile::IN_INDEX);
-      const auto untrackedFile = !isInIndex && isUnknown;
-      const auto staged = isInIndex && !isUnknown;
-      const auto isDeleted = files.statusCmp(i, RevisionFile::DELETED);
-
-      if ((files.statusCmp(i, RevisionFile::NEW) || isUnknown || isInIndex) && !untrackedFile && !isDeleted)
-         myColor = GitQlientStyles::getGreen();
-      else if (isDeleted)
-         myColor = GitQlientStyles::getRed();
-      else if (untrackedFile)
-         myColor = GitQlientStyles::getOrange();
-      else
-         myColor = GitQlientStyles::getTextColor();
-
-      const auto fileName = mGit->filePath(files, i);
+      auto fileName = mGit->filePath(files, i);
 
       if (!mCurrentFilesCache.contains(fileName))
       {
+         const auto isUnknown = files.statusCmp(i, RevisionFile::UNKNOWN);
+         const auto isInIndex = files.statusCmp(i, RevisionFile::IN_INDEX);
+         const auto isConflict = files.statusCmp(i, RevisionFile::CONFLICT);
+         const auto untrackedFile = !isInIndex && isUnknown;
+         const auto staged = isInIndex && !isUnknown && !isConflict;
+
          QListWidgetItem *item = nullptr;
 
          if (untrackedFile)
@@ -193,6 +182,24 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWid
             item->setData(Qt::UserRole, QVariant::fromValue(fileList));
          }
 
+         QColor myColor;
+         const auto isDeleted = files.statusCmp(i, RevisionFile::DELETED);
+
+         if ((files.statusCmp(i, RevisionFile::NEW) || isUnknown || isInIndex) && !untrackedFile && !isDeleted
+             && !isConflict)
+            myColor = GitQlientStyles::getGreen();
+         else if (isConflict)
+         {
+            myColor = GitQlientStyles::getBlue();
+            item->setData(Qt::UserRole + 1, true);
+         }
+         else if (isDeleted)
+            myColor = GitQlientStyles::getRed();
+         else if (untrackedFile)
+            myColor = GitQlientStyles::getOrange();
+         else
+            myColor = GitQlientStyles::getTextColor();
+
          item->setText(fileName);
          item->setToolTip(fileName);
          item->setForeground(myColor);
@@ -201,6 +208,9 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWid
             item->setFlags(item->flags() & (~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled));
 
          mCurrentFilesCache.insert(fileName, qMakePair(true, item));
+
+         if (item->data(Qt::UserRole + 1).toBool())
+            item->setText(item->text().append(" (conflicts)"));
       }
       else
          mCurrentFilesCache[fileName].first = true;
@@ -235,6 +245,9 @@ void WorkInProgressWidget::addAllFilesToCommitList()
    {
       auto item = ui->unstagedFilesList->takeItem(i);
       ui->stagedFilesList->addItem(item);
+
+      if (item->data(Qt::UserRole + 1).toBool())
+         item->setText(item->text().remove("(conflicts)").trimmed());
    }
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
@@ -248,6 +261,10 @@ void WorkInProgressWidget::addFileToCommitList(QListWidgetItem *item)
    const auto row = fileList->row(item);
    fileList->takeItem(row);
    ui->stagedFilesList->addItem(item);
+
+   if (item->data(Qt::UserRole + 1).toBool())
+      item->setText(item->text().remove("(conflicts)").trimmed());
+
    ui->lUntrackedCount->setText(QString("(%1)").arg(ui->untrackedFilesList->count()));
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
@@ -273,6 +290,9 @@ void WorkInProgressWidget::removeFileFromCommitList(QListWidgetItem *item)
    {
       const auto itemOriginalList = qvariant_cast<QListWidget *>(item->data(Qt::UserRole));
       const auto row = ui->stagedFilesList->row(item);
+
+      if (item->data(Qt::UserRole + 1).toBool())
+         item->setText(item->text().append(" (conflicts)"));
 
       ui->stagedFilesList->takeItem(row);
       itemOriginalList->addItem(item);

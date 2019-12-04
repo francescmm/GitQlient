@@ -882,12 +882,12 @@ RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
    FileNamesLoader fl;
    RevisionFile rf;
    parseDiffFormat(rf, wd.diffIndex, fl);
-   rf.onlyModified = false;
+   rf.setOnlyModified(false);
 
    for (auto it : wd.otherFiles)
    {
       appendFileName(rf, it, fl);
-      rf.status.append(RevisionFile::UNKNOWN);
+      rf.setStatus(RevisionFile::UNKNOWN);
       rf.mergeParent.append(1);
    }
 
@@ -896,8 +896,15 @@ RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
    flushFileNames(fl);
 
    for (auto i = 0; i < rf.count(); i++)
+   {
       if (findFileIndex(cachedFiles, filePath(rf, i)) != -1)
-         rf.status[i] |= RevisionFile::IN_INDEX;
+      {
+         if (cachedFiles.statusCmp(i, RevisionFile::CONFLICT))
+            rf.appendStatus(i, RevisionFile::CONFLICT);
+
+         rf.appendStatus(i, RevisionFile::IN_INDEX);
+      }
+   }
 
    return rf;
 }
@@ -1003,20 +1010,18 @@ void Git::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileN
    // simulate new file
    appendFileName(rf, dest, fl);
    rf.mergeParent.append(parNum);
-   rf.status.append(RevisionFile::NEW);
-   rf.extStatus.resize(rf.status.size());
-   rf.extStatus[rf.status.size() - 1] = extStatusInfo;
+   rf.setStatus(RevisionFile::NEW);
+   rf.appendExtStatus(extStatusInfo);
 
    // simulate deleted orig file only in case of rename
    if (type.at(0) == 'R')
    { // renamed file
       appendFileName(rf, orig, fl);
       rf.mergeParent.append(parNum);
-      rf.status.append(RevisionFile::DELETED);
-      rf.extStatus.resize(rf.status.size());
-      rf.extStatus[rf.status.size() - 1] = extStatusInfo;
+      rf.setStatus(RevisionFile::DELETED);
+      rf.appendExtStatus(extStatusInfo);
    }
-   rf.onlyModified = false;
+   rf.setOnlyModified(false);
 }
 
 // CT TODO utility function; can go elsewhere
