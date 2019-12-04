@@ -32,14 +32,16 @@ class UnstagedFilesContextMenu : public QMenu
    Q_OBJECT
 
 signals:
-   void signalShowDiff(const QString &fileName);
+   void signalShowDiff();
    void signalCommitAll();
    void signalRevertAll();
    void signalCheckedOut(bool success);
-   void signalShowFileHistory(const QString &fileName);
+   void signalShowFileHistory();
+   void signalConflictsResolved();
 
 public:
-   explicit UnstagedFilesContextMenu(QSharedPointer<Git> git, const QString &fileName, QWidget *parent = nullptr);
+   explicit UnstagedFilesContextMenu(QSharedPointer<Git> git, const QString &fileName, bool hasConflicts,
+                                     QWidget *parent = nullptr);
 
 private:
    QSharedPointer<Git> mGit;

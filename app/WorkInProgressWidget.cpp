@@ -72,6 +72,12 @@ void WorkInProgressWidget::configure(const QString &sha)
 {
    const auto shaChange = mCurrentSha != sha;
    mCurrentSha = sha;
+
+   resetInfo(shaChange);
+}
+
+void WorkInProgressWidget::resetInfo(bool force)
+{
    mIsAmend = mCurrentSha != ZERO_SHA;
 
    QLog_Info("UI",
@@ -106,12 +112,12 @@ void WorkInProgressWidget::configure(const QString &sha)
 
    const auto files = mGit->getWipFiles();
 
-   if (!shaChange || (mIsAmend && shaChange))
+   if (!force || (mIsAmend && force))
       prepareCache();
 
    insertFilesInList(files, ui->unstagedFilesList);
 
-   if (!shaChange || (mIsAmend && shaChange))
+   if (!force || (mIsAmend && force))
       clearCache();
 
    if (mIsAmend)
@@ -135,13 +141,13 @@ void WorkInProgressWidget::configure(const QString &sha)
 
       msg = logMessage.second.trimmed();
 
-      if (mIsAmend || shaChange)
+      if (mIsAmend || force)
          ui->leCommitTitle->setText(logMessage.first);
    }
    else
       msg = lastMsgBeforeError;
 
-   if (mIsAmend || shaChange)
+   if (mIsAmend || force)
    {
       ui->teDescription->setPlainText(msg);
       ui->teDescription->moveCursor(QTextCursor::Start);
@@ -309,15 +315,23 @@ void WorkInProgressWidget::showUnstagedMenu(const QPoint &pos)
    if (item)
    {
       const auto fileName = item->toolTip();
-      const auto contextMenu = new UnstagedFilesContextMenu(mGit, fileName, this);
-      connect(contextMenu, &UnstagedFilesContextMenu::signalShowDiff, this, &WorkInProgressWidget::signalShowDiff);
+      const auto unsolvedConflicts = item->data(Qt::UserRole + 1).toBool();
+      const auto contextMenu = new UnstagedFilesContextMenu(mGit, fileName, unsolvedConflicts, this);
+      connect(contextMenu, &UnstagedFilesContextMenu::signalShowDiff, this,
+              [this, fileName]() { signalShowDiff(fileName); });
       connect(contextMenu, &UnstagedFilesContextMenu::signalCommitAll, this,
               &WorkInProgressWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedFilesContextMenu::signalRevertAll, this, &WorkInProgressWidget::revertAllChanges);
       connect(contextMenu, &UnstagedFilesContextMenu::signalCheckedOut, this,
               &WorkInProgressWidget::signalCheckoutPerformed);
       connect(contextMenu, &UnstagedFilesContextMenu::signalShowFileHistory, this,
-              &WorkInProgressWidget::signalShowFileHistory);
+              [this, fileName]() { emit signalShowFileHistory(fileName); });
+      connect(contextMenu, &UnstagedFilesContextMenu::signalConflictsResolved, this, [this, item] {
+         item->setData(Qt::UserRole + 1, false);
+         item->setText(item->text().remove("(conflicts)").trimmed());
+         item->setForeground(GitQlientStyles::getGreen());
+         resetInfo();
+      });
 
       const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
       contextMenu->popup(mapToGlobal(parentPos));
@@ -414,26 +428,45 @@ void WorkInProgressWidget::updateCounter(const QString &text)
    ui->lCounter->setText(QString::number(kMaxTitleChars - text.count()));
 }
 
+bool WorkInProgressWidget::hasConflicts()
+{
+   const auto files = mCurrentFilesCache.values();
+
+   for (const auto &pair : files)
+   {
+      if (pair.second->data(Qt::UserRole + 1).toBool())
+         return true;
+   }
+
+   return false;
+}
+
 bool WorkInProgressWidget::commitChanges()
 {
    QString msg;
    QStringList selFiles = getFiles();
    auto done = false;
 
-   if (!selFiles.isEmpty() && checkMsg(msg))
+   if (!selFiles.isEmpty())
    {
-      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      const auto ok = mGit->commitFiles(selFiles, msg, false);
-      QApplication::restoreOverrideCursor();
+      if (hasConflicts())
+         QMessageBox::warning(this, tr("Impossible to commit"),
+                              tr("There are files with conflicts. Please, resolve the conflicts first."));
+      else if (checkMsg(msg))
+      {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+         const auto ok = mGit->commitFiles(selFiles, msg, false);
+         QApplication::restoreOverrideCursor();
 
-      lastMsgBeforeError = (ok ? "" : msg);
+         lastMsgBeforeError = (ok ? "" : msg);
 
-      emit signalChangesCommitted(ok);
+         emit signalChangesCommitted(ok);
 
-      done = true;
+         done = true;
 
-      ui->leCommitTitle->clear();
-      ui->teDescription->clear();
+         ui->leCommitTitle->clear();
+         ui->teDescription->clear();
+      }
    }
 
    return done;
@@ -448,7 +481,10 @@ bool WorkInProgressWidget::amendChanges()
    {
       QString msg;
 
-      if (checkMsg(msg))
+      if (hasConflicts())
+         QMessageBox::warning(this, tr("Impossible to commit"),
+                              tr("There are files with conflicts. Please, resolve the conflicts first."));
+      else if (checkMsg(msg))
       {
          const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
 

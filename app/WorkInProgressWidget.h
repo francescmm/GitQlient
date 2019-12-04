@@ -76,6 +76,8 @@ private:
    QStringList getFiles();
    bool checkMsg(QString &msg);
    void updateCounter(const QString &text);
+   bool hasConflicts();
+   void resetInfo(bool force = true);
 
    static QString lastMsgBeforeError;
    static const int kMaxTitleChars;

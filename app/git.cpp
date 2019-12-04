@@ -352,6 +352,16 @@ GitExecResult Git::checkoutCommit(const QString &sha)
    return run(QString("git checkout %1").arg(sha));
 }
 
+GitExecResult Git::markFileAsResolved(const QString &fileName)
+{
+   const auto ret = run(QString("git add %1").arg(fileName));
+
+   if (ret.first)
+      updateWipRevision();
+
+   return ret;
+}
+
 GitExecResult Git::merge(const QString &into, QStringList sources)
 {
    const auto ret = run(QString("git checkout -q %1").arg(into));
