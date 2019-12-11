@@ -60,56 +60,9 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          const auto checkoutCommitAction = addAction("Checkout commit");
          connect(checkoutCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::checkoutCommit);
 
-         //=====================================
+         addBranchActions(sha);
 
-         const auto currentBranch = mGit->getCurrentBranchName();
-         const auto branches = mGit->getRefNames(sha, Git::BRANCH) + mGit->getRefNames(sha, Git::RMT_BRANCH);
-         auto isCommitInCurrentBranch = false;
-
-         QList<QAction *> branchesToCheckout;
-
-         for (auto branch : qAsConst(branches))
-         {
-            isCommitInCurrentBranch |= branch == currentBranch;
-
-            if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
-            {
-               const auto checkoutCommitAction = new QAction(QString(tr("Checkout %1")).arg(branch));
-               checkoutCommitAction->setDisabled(true);
-               // connect(checkoutCommitAction, &QAction::triggered, this, &RepositoryView::executeAction);
-               branchesToCheckout.append(checkoutCommitAction);
-            }
-         }
-
-         if (!branchesToCheckout.isEmpty())
-         {
-            const auto branchMenu = addMenu("Checkout branch...");
-            branchMenu->addActions(branchesToCheckout);
-         }
-
-         if (!isCommitInCurrentBranch)
-         {
-            for (auto branch : qAsConst(branches))
-            {
-               if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
-               {
-                  // If is the last commit of a branch
-                  const auto mergeBranchAction = addAction(QString(tr("Merge %1")).arg(branch));
-                  connect(mergeBranchAction, &QAction::triggered, this, [this, branch]() { merge(branch); });
-               }
-            }
-         }
-
-         addSeparator();
-
-         if (!isCommitInCurrentBranch)
-         {
-            const auto cherryPickAction = addAction(tr("Cherry pick commit"));
-            connect(cherryPickAction, &QAction::triggered, this, &CommitHistoryContextMenu::cherryPickCommit);
-         }
-
-         //=====================================
-         const auto ret = mGit->getLastCommitOfBranch(currentBranch);
+         const auto ret = mGit->getLastCommitOfBranch(mGit->getCurrentBranchName());
 
          if (ret.success)
          {
@@ -243,6 +196,14 @@ void CommitHistoryContextMenu::exportAsPatch()
    }
 }
 
+void CommitHistoryContextMenu::checkoutBranch()
+{
+   const auto branchName = qobject_cast<QAction *>(sender())->text();
+   mGit->checkoutRemoteBranch(branchName);
+
+   emit signalRepositoryUpdated();
+}
+
 void CommitHistoryContextMenu::checkoutCommit()
 {
    const auto sha = mShas.first();
@@ -356,4 +317,61 @@ void CommitHistoryContextMenu::merge(const QString &branchFrom)
    }
    else
       QMessageBox::critical(parentWidget(), tr("Merge failed"), outputStr);
+}
+
+void CommitHistoryContextMenu::addBranchActions(const QString &sha)
+{
+   auto isCommitInCurrentBranch = false;
+   const auto currentBranch = mGit->getCurrentBranchName();
+   const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
+   const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
+   auto branches = localBranches;
+
+   for (const auto &branch : remoteBranches)
+   {
+      auto localBranchEquivalent = branch;
+      if (!localBranches.contains(localBranchEquivalent.remove("origin/")))
+         branches.append(branch);
+   }
+
+   QList<QAction *> branchesToCheckout;
+
+   for (auto branch : qAsConst(branches))
+   {
+      isCommitInCurrentBranch |= branch == currentBranch;
+
+      if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
+      {
+         const auto checkoutCommitAction = new QAction(QString(tr("%1")).arg(branch));
+         connect(checkoutCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::checkoutBranch);
+         branchesToCheckout.append(checkoutCommitAction);
+      }
+   }
+
+   if (!branchesToCheckout.isEmpty())
+   {
+      const auto branchMenu = addMenu("Checkout branch...");
+      branchMenu->addActions(branchesToCheckout);
+   }
+
+   if (!isCommitInCurrentBranch)
+   {
+      for (auto branch : qAsConst(branches))
+      {
+         if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
+         {
+            // If is the last commit of a branch
+            const auto mergeBranchAction = addAction(QString(tr("Merge %1")).arg(branch));
+            connect(mergeBranchAction, &QAction::triggered, this, [this, branch]() { merge(branch); });
+         }
+      }
+   }
+
+   addSeparator();
+
+   if (!isCommitInCurrentBranch)
+   {
+      const auto cherryPickAction = addAction(tr("Cherry pick commit"));
+      connect(cherryPickAction, &QAction::triggered, this, &CommitHistoryContextMenu::cherryPickCommit);
+   }
 }
