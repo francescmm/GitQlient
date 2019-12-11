@@ -60,36 +60,35 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          const auto checkoutCommitAction = addAction("Checkout commit");
          connect(checkoutCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::checkoutCommit);
 
-         QByteArray output;
-         auto ret = mGit->getBranchesOfCommit(sha);
+         //=====================================
+
          const auto currentBranch = mGit->getCurrentBranchName();
+         const auto branches = mGit->getRefNames(sha, Git::BRANCH) + mGit->getRefNames(sha, Git::RMT_BRANCH);
+         auto isCommitInCurrentBranch = false;
 
-         if (ret.success)
+         QList<QAction *> branchesToCheckout;
+
+         for (auto branch : qAsConst(branches))
          {
-            auto branches = ret.output.toString().split('\n');
+            isCommitInCurrentBranch |= branch == currentBranch;
 
-            for (auto &branch : branches)
+            if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
             {
-               if (branch.contains("*"))
-                  branch.remove("*");
-
-               if (branch.contains("->"))
-               {
-                  branch.clear();
-                  continue;
-               }
-
-               branch.remove("remotes/");
-               branch = branch.trimmed();
-
-               if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
-               {
-                  const auto checkoutCommitAction = addAction(QString(tr("Checkout %1")).arg(branch));
-                  checkoutCommitAction->setDisabled(true);
-                  // connect(checkoutCommitAction, &QAction::triggered, this, &RepositoryView::executeAction);
-               }
+               const auto checkoutCommitAction = new QAction(QString(tr("Checkout %1")).arg(branch));
+               checkoutCommitAction->setDisabled(true);
+               // connect(checkoutCommitAction, &QAction::triggered, this, &RepositoryView::executeAction);
+               branchesToCheckout.append(checkoutCommitAction);
             }
+         }
 
+         if (!branchesToCheckout.isEmpty())
+         {
+            const auto branchMenu = addMenu("Checkout branch...");
+            branchMenu->addActions(branchesToCheckout);
+         }
+
+         if (!isCommitInCurrentBranch)
+         {
             for (auto branch : qAsConst(branches))
             {
                if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
@@ -99,22 +98,18 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
                   connect(mergeBranchAction, &QAction::triggered, this, [this, branch]() { merge(branch); });
                }
             }
-
-            addSeparator();
-
-            auto isCommitInCurrentBranch = false;
-
-            for (auto branch : qAsConst(branches))
-               isCommitInCurrentBranch |= branch == currentBranch;
-
-            if (!isCommitInCurrentBranch)
-            {
-               const auto cherryPickAction = addAction(tr("Cherry pick commit"));
-               connect(cherryPickAction, &QAction::triggered, this, &CommitHistoryContextMenu::cherryPickCommit);
-            }
          }
 
-         ret = mGit->getLastCommitOfBranch(currentBranch);
+         addSeparator();
+
+         if (!isCommitInCurrentBranch)
+         {
+            const auto cherryPickAction = addAction(tr("Cherry pick commit"));
+            connect(cherryPickAction, &QAction::triggered, this, &CommitHistoryContextMenu::cherryPickCommit);
+         }
+
+         //=====================================
+         const auto ret = mGit->getLastCommitOfBranch(currentBranch);
 
          if (ret.success)
          {
