@@ -13,6 +13,8 @@
 #include <QGridLayout>
 #include <QHeaderView>
 #include <QMenu>
+#include <QApplication>
+#include <QClipboard>
 
 FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
@@ -32,6 +34,9 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(450);
    mRepoView->setSelectionBehavior(QAbstractItemView::SelectRows);
+   mRepoView->setSelectionMode(QAbstractItemView::SingleSelection);
+   mRepoView->setContextMenuPolicy(Qt::CustomContextMenu);
+   connect(this, &CommitHistoryView::customContextMenuRequested, this, &FileHistoryWidget::showRepoViewMenu);
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
@@ -67,10 +72,24 @@ void FileHistoryWidget::init(const QString &workingDirectory)
 
 void FileHistoryWidget::showFileHistory(const QString &file)
 {
-   const auto ret = mGit->history(file);
+   mCurrentFile = file;
+   const auto ret = mGit->history(mCurrentFile);
 
    if (ret.success)
       mRepoView->filterBySha(ret.output.toString().split("\n", QString::SkipEmptyParts));
 
-   mFileBlameWidget->setup(file);
+   mFileBlameWidget->setup(mCurrentFile);
+}
+
+void FileHistoryWidget::showRepoViewMenu(const QPoint &pos)
+{
+   const auto sha = mRepoView->getCurrentSha();
+   const auto menu = new QMenu(this);
+   const auto copyShaAction = menu->addAction(tr("Copy SHA"));
+   connect(copyShaAction, &QAction::triggered, this, [sha]() { QApplication::clipboard()->setText(sha); });
+
+   const auto fileDiff = menu->addAction(tr("Show file diff"));
+   connect(fileDiff, &QAction::triggered, this, [this, sha]() { emit showFileDiff(sha, mCurrentFile); });
+
+   menu->exec(mRepoView->viewport()->mapToGlobal(pos));
 }
