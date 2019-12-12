@@ -116,6 +116,13 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
 
+   connect(fileHistoryWidget, &FileHistoryWidget::showFileDiff, this, &GitQlientRepo::onFileDiffRequested);
+   connect(fileHistoryWidget, &FileHistoryWidget::showFileDiff, this,
+           [this](const QString &sha, const QString &, const QString &) {
+              mainStackedLayout->setCurrentIndex(0);
+              onCommitSelected(sha);
+           });
+
    connect(mCommitWidget, &WorkInProgressWidget::signalShowDiff, this,
            [this](const QString &fileName) { onFileDiffRequested("", "", fileName); });
    connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);

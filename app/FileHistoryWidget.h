@@ -37,7 +37,7 @@ class FileHistoryWidget : public QFrame
    Q_OBJECT
 
 signals:
-   void showFileDiff(const QString &sha, const QString &file);
+   void showFileDiff(const QString &sha, const QString &parentSha, const QString &file);
 
 public:
    explicit FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);

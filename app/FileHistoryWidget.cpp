@@ -7,6 +7,7 @@
 #include <CommitHistoryModel.h>
 #include <CommitHistoryView.h>
 #include <CommitHistoryColumns.h>
+#include <CommitInfo.h>
 
 #include <QFileSystemModel>
 #include <QTreeView>
@@ -36,7 +37,8 @@ FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
    mRepoView->setSelectionBehavior(QAbstractItemView::SelectRows);
    mRepoView->setSelectionMode(QAbstractItemView::SingleSelection);
    mRepoView->setContextMenuPolicy(Qt::CustomContextMenu);
-   connect(this, &CommitHistoryView::customContextMenuRequested, this, &FileHistoryWidget::showRepoViewMenu);
+   mRepoView->activateFilter(true);
+   connect(mRepoView, &CommitHistoryView::customContextMenuRequested, this, &FileHistoryWidget::showRepoViewMenu);
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
@@ -89,7 +91,10 @@ void FileHistoryWidget::showRepoViewMenu(const QPoint &pos)
    connect(copyShaAction, &QAction::triggered, this, [sha]() { QApplication::clipboard()->setText(sha); });
 
    const auto fileDiff = menu->addAction(tr("Show file diff"));
-   connect(fileDiff, &QAction::triggered, this, [this, sha]() { emit showFileDiff(sha, mCurrentFile); });
+   connect(fileDiff, &QAction::triggered, this, [this, sha]() {
+      const auto parentSha = mGit->getCommitInfo(sha).parent(0);
+      emit showFileDiff(sha, parentSha, mCurrentFile);
+   });
 
    menu->exec(mRepoView->viewport()->mapToGlobal(pos));
 }

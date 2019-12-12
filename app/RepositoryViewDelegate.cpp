@@ -206,7 +206,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
 
 void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
-   const auto row = mView->hasActiveFiler()
+   const auto row = mView->hasActiveFilter()
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
 
@@ -223,7 +223,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    auto laneNum = lanes.count();
    auto activeLane = 0;
 
-   for (int i = 0; i < laneNum && !mView->hasActiveFiler(); i++)
+   for (int i = 0; i < laneNum && !mView->hasActiveFilter(); i++)
    {
       if (isActive(lanes[i]))
       {
@@ -250,7 +250,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 
       x1 = x2 - LANE_WIDTH;
 
-      auto ln = mView->hasActiveFiler() ? LaneType::ACTIVE : lanes[i];
+      auto ln = mView->hasActiveFilter() ? LaneType::ACTIVE : lanes[i];
 
       if (ln != LaneType::EMPTY)
       {
@@ -300,7 +300,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          }
          paintGraphLane(p, ln, laneHeadPresent, x1, x2, color, activeColor, back, r.sha() == ZERO_SHA);
 
-         if (mView->hasActiveFiler())
+         if (mView->hasActiveFilter())
             break;
       }
    }
@@ -316,7 +316,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto offset = 0;
 
-   if (mGit->checkRef(sha) > 0 && !mView->hasActiveFiler())
+   if (mGit->checkRef(sha) > 0 && !mView->hasActiveFilter())
    {
       offset = 5;
       paintTagBranch(p, opt, offset, sha);

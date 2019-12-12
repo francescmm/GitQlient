@@ -45,7 +45,8 @@ public:
    ~CommitHistoryView() override;
    QList<QString> getSelectedShaList() const;
    void filterBySha(const QStringList &shaList);
-   bool hasActiveFiler() const { return mIsFiltering; }
+   void activateFilter(bool activate) { mIsFiltering = activate; }
+   bool hasActiveFilter() const { return mIsFiltering; }
 
    void clear();
    void focusOnCommit(const QString &goToSha);
