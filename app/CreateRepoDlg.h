@@ -58,4 +58,5 @@ private:
 
    void selectFolder();
    void addDefaultName(const QString &url);
+   void showGitControls();
 };

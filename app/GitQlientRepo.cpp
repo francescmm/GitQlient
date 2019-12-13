@@ -1,5 +1,6 @@
 #include "GitQlientRepo.h"
 
+#include <GitQlientSettings.h>
 #include <Controls.h>
 #include <BranchesWidget.h>
 #include <WorkInProgressWidget.h>
@@ -15,6 +16,7 @@
 #include <FileHistoryWidget.h>
 #include <CommitInfo.h>
 #include <ProgressDlg.h>
+#include <GitConfigDlg.h>
 
 #include <QFileSystemModel>
 #include <QTimer>
@@ -29,7 +31,7 @@
 
 using namespace QLogger;
 
-GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
+GitQlientRepo::GitQlientRepo(QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
    , mRepositoryModel(new CommitHistoryModel(mGit))
@@ -44,11 +46,10 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mBranchesWidget(new BranchesWidget(mGit))
    , fileHistoryWidget(new FileHistoryWidget(mGit))
-
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
-   QLog_Info("UI", QString("Initializing GitQlient with repo {%1}").arg(repo));
+   QLog_Info("UI", QString("Initializing GitQlient"));
 
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
@@ -115,6 +116,13 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
 
+   connect(fileHistoryWidget, &FileHistoryWidget::showFileDiff, this, &GitQlientRepo::onFileDiffRequested);
+   connect(fileHistoryWidget, &FileHistoryWidget::showFileDiff, this,
+           [this](const QString &sha, const QString &, const QString &) {
+              mainStackedLayout->setCurrentIndex(0);
+              onCommitSelected(sha);
+           });
+
    connect(mCommitWidget, &WorkInProgressWidget::signalShowDiff, this,
            [this](const QString &fileName) { onFileDiffRequested("", "", fileName); });
    connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
@@ -124,11 +132,8 @@ GitQlientRepo::GitQlientRepo(const QString &repo, QWidget *parent)
    connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
    connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
 
-   connect(mGit.get(), &Git::signalLoadingProgress, this, &GitQlientRepo::updateProgressDialog, Qt::DirectConnection);
-
-   setRepository(repo);
-
-   mAutoFilesUpdate->start();
+   connect(mGit.get(), &Git::signalLoadingStarted, this, &GitQlientRepo::updateProgressDialog, Qt::DirectConnection);
+   connect(mGit.get(), &Git::signalLoadingFinished, this, &GitQlientRepo::closeProgressDialog, Qt::DirectConnection);
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
@@ -191,7 +196,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 {
    if (!newDir.isEmpty())
    {
-      QLog_Info("UI", QString("Loading repository..."));
+      QLog_Info("UI", QString("Loading repository at {%1}...").arg(newDir));
 
       emit mGit->cancelAllProcesses();
 
@@ -199,6 +204,11 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
       if (ok)
       {
+         GitQlientSettings settings;
+         settings.setProjectOpened(newDir);
+
+         emit signalRepoOpened();
+
          mCurrentDir = mGit->getWorkingDir();
          setWidgetsEnabled(true);
 
@@ -213,7 +223,20 @@ void GitQlientRepo::setRepository(const QString &newDir)
          commitStackedWidget->setCurrentIndex(1);
          mControls->enableButtons(true);
 
+         mAutoFilesUpdate->start();
+
          QLog_Info("UI", "... repository loaded successfully");
+
+         if (!mGit->getGlobalUserInfo().isValid())
+         {
+            QLog_Info("UI", QString("Configuring Git..."));
+
+            GitConfigDlg configDlg(mGit);
+
+            configDlg.exec();
+
+            QLog_Info("UI", QString("... Git configured!"));
+         }
       }
       else
       {
@@ -295,24 +318,20 @@ void GitQlientRepo::showFileHistory(const QString &fileName)
    mainStackedLayout->setCurrentIndex(1);
 }
 
-void GitQlientRepo::updateProgressDialog(int current, int total)
+void GitQlientRepo::updateProgressDialog()
 {
-   if (current == 0 && !mProgressDlg)
+   if (!mProgressDlg)
    {
-      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, total, false, true);
+      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, 0, false, true);
       connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
 
       mProgressDlg->show();
    }
-   else
-   {
-      mProgressDlg->setValue(current);
+}
 
-      if (current == mProgressDlg->maximum())
-         mProgressDlg->close();
-   }
-
-   mProgressDlg->repaint();
+void GitQlientRepo::closeProgressDialog()
+{
+   mProgressDlg->close();
 }
 
 void GitQlientRepo::openCommitDiff()
@@ -354,17 +373,15 @@ void GitQlientRepo::onCommitClicked(const QModelIndex &index)
 
 void GitQlientRepo::onCommitSelected(const QString &goToSha)
 {
-   const auto sha = mGit->getRefSha(goToSha);
-
-   const auto isWip = sha == ZERO_SHA;
+   const auto isWip = goToSha == ZERO_SHA;
    commitStackedWidget->setCurrentIndex(isWip);
 
-   QLog_Info("UI", QString("Selected commit {%1}").arg(sha));
+   QLog_Info("UI", QString("Selected commit {%1}").arg(goToSha));
 
    if (isWip)
-      mCommitWidget->configure(sha);
+      mCommitWidget->configure(goToSha);
    else
-      mRevisionWidget->setCurrentCommitSha(sha);
+      mRevisionWidget->setCurrentCommitSha(goToSha);
 }
 
 void GitQlientRepo::onAmendCommit(const QString &sha)

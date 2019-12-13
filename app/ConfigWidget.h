@@ -29,6 +29,8 @@ class QPushButton;
 class QButtonGroup;
 class Git;
 class ProgressDlg;
+class GitQlientSettings;
+class QVBoxLayout;
 
 class ConfigWidget : public QFrame
 {
@@ -39,6 +41,9 @@ signals:
 
 public:
    explicit ConfigWidget(QWidget *parent = nullptr);
+   ~ConfigWidget();
+
+   void updateRecentProjectsList();
 
 private:
    QSharedPointer<Git> mGit;
@@ -48,12 +53,15 @@ private:
    QButtonGroup *mBtnGroup = nullptr;
    ProgressDlg *mProgressDlg = nullptr;
    QString mPathToOpen;
+   GitQlientSettings *mSettings = nullptr;
+   QVBoxLayout *mRecentProjectsLayout = nullptr;
+   QWidget *mInnerWidget = nullptr;
 
    void openRepo();
    void cloneRepo();
    void initRepo();
    void showCloningProgress(const QString);
    QWidget *createConfigWidget();
-   QWidget *createConfigPage();
+   QWidget *createRecentProjectsPage();
    void updateProgressDialog(QString stepDescription, int value);
 };

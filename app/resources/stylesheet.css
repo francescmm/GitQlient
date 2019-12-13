@@ -14,27 +14,27 @@ Controls > QToolButton
 
 QPushButton, QToolButton
 {
-    border: 0px;
+    border: 0;
     padding: 5px;
+    font-size: 10pt;
 }
-
-QToolButton[popupMode="1"] {
-}
-
 
 QPushButton
 {
-    border: 0px;
+    border: 0;
     max-height: 20px;
     min-height: 20px;
 }
 
 QPushButton:hover
 {
-    border: 0px;
+    border: 0;
 }
 
-
+*
+{
+    font-size: 10pt;
+}
 
 CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoWidget > #labelDescription
 {
@@ -50,7 +50,7 @@ CommitInfoWidget #labelSha
 
 WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, FileHistoryWidget > QTreeView
 {
-   border: 0px;
+   border: 0;
    outline: 0;
  }
 
@@ -58,9 +58,9 @@ QListWidget::item, FileHistoryWidget > QTreeView::item
 {
    padding-left: 7px;
    padding-right: 7px;
-   border-left: 0px;
-   border-bottom: 0px;
-   margin: 0px;
+   border-left: 0;
+   border-bottom: 0;
+   margin: 0;
    min-height: 25px;
    max-height: 25px;
 }
@@ -79,7 +79,7 @@ BranchesWidget
 
 QListWidget::item:focus, FileHistoryWidget > QTreeView::item:focus
 {
-   border: 0px;
+   border: 0;
 }
 
 WorkInProgressWidget > #pbCommit
@@ -106,12 +106,12 @@ QMenu
 {
     border-width: 1px;
     border-style: solid;
-    margin: 0px;
+    margin: 0;
 }
 
 QMenu::item
 {
-   border: 0px;
+   border: 0;
    min-height: 25px;
    max-height: 25px;
    padding-left: 15px;
@@ -125,7 +125,7 @@ QMenu::icon
 
 QMenu::separator
 {
-   border: 0px;
+   border: 0;
    height: 1px;
 }
 
@@ -139,7 +139,7 @@ FullDiffWidget, WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDesc
 
 WorkInProgressWidget > #leCommitTitle
 {
-    border-right: 0px;
+    border-right: 0;
 }
 
 WorkInProgressWidget > #leAuthorName
@@ -150,14 +150,14 @@ WorkInProgressWidget > #leAuthorName
 
 WorkInProgressWidget > #leAuthorEmail
 {
-    border-top: 0px;
+    border-top: 0;
 }
 
 QLabel#lCounter
 {
     border-width: 1px;
     border-style: solid;
-    border-left-width: 0px;
+    border-left-width: 0;
     font-family: Ubuntu Mono;
     max-width: 29px;
     min-width: 29px;
@@ -200,13 +200,10 @@ WorkInProgressWidget > #teDescription, #outputTerminal
 
 QHeaderView:section
 {
-    border: 0px;
+    border: 0;
     border-right-width: 1px;
     border-right-style: solid;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 15px;
-    padding-right: 15px;
+    padding: 5px 15px 5px 15px;
 }
 
 /**  END  QHeaderView **/
@@ -324,7 +321,7 @@ QFrame#tabWidget > QPushButton, QFrame#tabWidget > QPushButton[selected=false]
     min-width: 125px;
     max-height: 30px;
     min-height: 30px;
-    border-right: 0px;
+    border-right: 0;
 }
 
 QDialog > QPushButton
@@ -345,7 +342,7 @@ QDialog > QLineEdit
 
 QScrollBar:vertical
 {
-    border: 0px;
+    border: 0;
     width: 16px;
     margin: 16px 0 16px 0;
     border-left-width: 1px;
@@ -354,7 +351,7 @@ QScrollBar:vertical
 
 QScrollBar:horizontal
 {
-    border: 0px;
+    border: 0;
     border-left-width: 1px;
     border-left-style: solid;
     height: 16px;
@@ -366,8 +363,8 @@ QScrollBar::handle:vertical
     width: 14px;
     border-width: 1px;
     border-style: solid;
-    border-right: 0px;
-    border-left: 0px;
+    border-right: 0;
+    border-left: 0;
 }
 
 QScrollBar::handle:horizontal
@@ -375,8 +372,8 @@ QScrollBar::handle:horizontal
     height: 14px;
     border-width: 1px;
     border-style: solid;
-    border-top: 0px;
-    border-bottom: 0px;
+    border-top: 0;
+    border-bottom: 0;
 }
 
 QScrollBar::add-line:vertical
@@ -385,8 +382,8 @@ QScrollBar::add-line:vertical
     subcontrol-origin: margin;
     border-width: 1px;
     border-style: solid;
-    border-right: 0px;
-    border-bottom: 0px;
+    border-right: 0;
+    border-bottom: 0;
     height: 15px;
     width: 15px;
     image: url(:/icons/down-arrow);
@@ -398,8 +395,8 @@ QScrollBar::add-line:horizontal
     subcontrol-origin: margin;
     border-width: 1px;
     border-style: solid;
-    border-right: 0px;
-    border-bottom: 0px;
+    border-right: 0;
+    border-bottom: 0;
     height: 15px;
     width: 15px;
     image: url(:/icons/right-arrow);
@@ -411,8 +408,8 @@ QScrollBar::sub-line:vertical
     subcontrol-origin: margin;
     border-width: 1px;
     border-style: solid;
-    border-right: 0px;
-    border-top: 0px;
+    border-right: 0;
+    border-top: 0;
     height: 15px;
     width: 15px;
     image: url(:/icons/up-arrow);
@@ -424,8 +421,8 @@ QScrollBar::sub-line:horizontal
     subcontrol-origin: margin;
     border-width: 1px;
     border-style: solid;
-    border-left: 0px;
-    border-bottom: 0px;
+    border-left: 0;
+    border-bottom: 0;
     height: 15px;
     width: 15px;
     image: url(:/icons/left-arrow);
@@ -433,7 +430,7 @@ QScrollBar::sub-line:horizontal
 
 QScrollArea
 {
-    border: 0px;
+    border: 0;
 }
 
 QLabel#normalLabel
@@ -447,7 +444,7 @@ QLabel#normalLabel
 QLabel#numberLabel
 {
     padding: 2px;
-    border: 0px;
+    border: 0;
     border-right-width: 1px;
     border-right-style: solid;
     max-height: 22px;
@@ -457,8 +454,16 @@ QLabel#numberLabel
 QLabel#authorFirstOfItsName, QLabel#authorPrimusInterPares
 {
     padding: 2px;
-    border: 0px;
+    border: 0;
     padding-right: 15px;
+    max-height: 21px;
+    min-height: 21px;
+}
+
+ClickableFrame#firstOfItsName, ClickableFrame#primusInterPares
+{
+    padding: 2px;
+    border: 0;
     max-height: 21px;
     min-height: 21px;
 }
@@ -467,14 +472,6 @@ QLabel#authorFirstOfItsName, ClickableFrame#firstOfItsName
 {
     border-top-width: 1px;
     border-top-style: solid;
-}
-
-ClickableFrame#firstOfItsName, ClickableFrame#primusInterPares
-{
-    padding: 2px;
-    border: 0px;
-    max-height: 21px;
-    min-height: 21px;
 }
 
 QProgressBar
@@ -491,5 +488,10 @@ QProgressBar
 QProgressBar::chunk
 {
     width: 18px;
+}
+
+ClickableFrame
+{
+    padding: 5px;
 }
 

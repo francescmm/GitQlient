@@ -33,7 +33,7 @@ GitQlient can be executed from command line with additional params. Please take 
 
 | Command  | Desciption  |
 |---|---|
-| -noLog  | Disabled the log system for the current execution  |
+| -noLog  | Disables the log system for the current execution  |
 | -repos  | Provides a list separated with blank spaces for the different repositories that will be open at startup. <br> Ex: ```-repos /path/to/repo1 /path/to/repo2```  |
 
 ## Setup & Building the code

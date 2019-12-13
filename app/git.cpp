@@ -42,7 +42,6 @@ namespace
 
 bool writeToFile(const QString &fileName, const QString &data)
 {
-
    QFile file(fileName);
    if (!file.open(QIODevice::WriteOnly))
       return false;
@@ -69,14 +68,12 @@ Git::Git()
 
 const QString Git::quote(const QString &nm)
 {
-
    return ("$" + nm + "$");
 }
 
 // CT TODO utility function; can go elsewhere
 const QString Git::quote(const QStringList &sl)
 {
-
    QString q(sl.join(QString("$%1$").arg(' ')));
    q.prepend("$").append("$");
    return q;
@@ -84,14 +81,12 @@ const QString Git::quote(const QStringList &sl)
 
 uint Git::checkRef(const QString &sha, uint mask) const
 {
-
    QHash<QString, Reference>::const_iterator it(mRefsShaMap.constFind(sha));
    return (it != mRefsShaMap.constEnd() ? (*it).type & mask : 0);
 }
 
 const QStringList Git::getRefNames(const QString &sha, uint mask) const
 {
-
    QStringList result;
    if (!checkRef(sha, mask))
       return result;
@@ -114,38 +109,6 @@ const QStringList Git::getRefNames(const QString &sha, uint mask) const
       result << QStringList(rf.stgitPatch);
 
    return result;
-}
-
-const QString Git::getRefSha(const QString &refName, RefType type, bool askGit)
-{
-   bool any = type == ANY_REF;
-
-   for (auto it = mRefsShaMap.cbegin(); it != mRefsShaMap.cend(); ++it)
-   {
-      const Reference &rf = *it;
-
-      if ((any || type == TAG) && rf.tags.contains(refName))
-         return it.key();
-
-      else if ((any || type == BRANCH) && rf.branches.contains(refName))
-         return it.key();
-
-      else if ((any || type == RMT_BRANCH) && rf.remoteBranches.contains(refName))
-         return it.key();
-
-      else if ((any || type == REF) && rf.refs.contains(refName))
-         return it.key();
-
-      else if ((any || type == APPLIED || type == UN_APPLIED) && rf.stgitPatch == refName)
-         return it.key();
-   }
-   if (!askGit)
-      return "";
-
-   // if a ref was not found perhaps is an abbreviated form
-   QString runOutput;
-   const auto ret = run("git rev-parse --revs-only " + refName);
-   return (ret.first ? ret.second.trimmed() : "");
 }
 
 const QString Git::filePath(const RevisionFile &rf, int i) const
@@ -226,7 +189,6 @@ QString Git::getFileDiff(const QString &currentSha, const QString &previousSha, 
 
 bool Git::isNothingToCommit()
 {
-
    if (!mRevCache->containsRevisionFile(ZERO_SHA))
       return true;
 
@@ -291,7 +253,6 @@ bool Git::submoduleRemove(const QString &)
 
 RevisionFile Git::insertNewFiles(const QString &sha, const QString &data)
 {
-
    /* we use an independent FileNamesLoader to avoid data
     * corruption if we are loading file names in background
     */
@@ -381,7 +342,6 @@ RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha, boo
 
 bool Git::resetCommits(int parentDepth)
 {
-
    QString runCmd("git reset --soft HEAD~");
    runCmd.append(QString::number(parentDepth));
    return run(runCmd).first;
@@ -404,7 +364,6 @@ GitExecResult Git::merge(const QString &into, QStringList sources)
 
 const QStringList Git::getOtherFiles(const QStringList &selFiles)
 {
-
    RevisionFile files = getWipFiles(); // files != nullptr
    QStringList notSelFiles;
    for (auto i = 0; i < files.count(); ++i)
@@ -793,102 +752,112 @@ Git::Reference *Git::lookupOrAddReference(const QString &sha)
    return &(*it);
 }
 
-bool Git::getRefs()
+bool Git::loadCurrentBranch()
 {
-   // check for a StGIT stack
-   QDir d(mGitDir);
-
-   // check for a merge and read current branch sha
-   mIsMergeHead = d.exists("MERGE_HEAD");
-   const auto ret = run("git rev-parse --revs-only HEAD");
-   if (!ret.first)
-      return false;
-
-   QString curBranchSHA = ret.second;
-
    const auto ret2 = run("git branch");
+
    if (!ret2.first)
       return false;
 
-   mCurrentBranchName = ret2.second;
+   const auto branches = ret2.second.trimmed().split('\n');
+   for (auto branch : branches)
+   {
+      if (branch.startsWith("*"))
+      {
+         mCurrentBranchName = branch.remove("*").trimmed();
+         break;
+      }
+   }
 
-   curBranchSHA = curBranchSHA.trimmed();
-   mCurrentBranchName = mCurrentBranchName.prepend('\n').section("\n*", 1);
-   mCurrentBranchName = mCurrentBranchName.section('\n', 0, 0).trimmed();
    if (mCurrentBranchName.contains(" detached "))
       mCurrentBranchName = "";
 
-   // read refs, normally unsorted
-   const auto ret3 = run("git show-ref -d");
-   if (!ret3.first)
-      return false;
+   return true;
+}
 
-   mRefsShaMap.clear();
-
-   QString prevRefSha;
-   QStringList patchNames, patchShas;
-   const QStringList rLst(ret3.second.split('\n', QString::SkipEmptyParts));
-   for (auto it : rLst)
+void Git::Reference::configure(const QString &refName, bool isCurrentBranch, const QString &prevRefSha)
+{
+   if (refName.startsWith("refs/tags/"))
    {
-
-      const auto revSha = it.left(40);
-      const auto refName = it.mid(41);
-
-      // one Revision could have many tags
-      Reference *cur = lookupOrAddReference(revSha);
-
-      if (refName.startsWith("refs/tags/"))
+      if (refName.endsWith("^{}"))
       {
+         // we assume that a tag dereference follows strictly
+         // the corresponding tag object in rLst. So the
+         // last added tag is a tag object, not a commit object
+         tags.append(refName.mid(10, refName.length() - 13));
 
-         if (refName.endsWith("^{}"))
-         { // tag dereference
+         // store tag object. Will be used to fetching
+         // tag message (if any) when necessary.
+         tagObj = prevRefSha;
+      }
+      else
+         tags.append(refName.mid(10));
 
-            // we assume that a tag dereference follows strictly
-            // the corresponding tag object in rLst. So the
-            // last added tag is a tag object, not a commit object
-            cur->tags.append(refName.mid(10, refName.length() - 13));
+      type |= TAG;
+   }
+   else if (refName.startsWith("refs/heads/"))
+   {
+      branches.append(refName.mid(11));
+      type |= BRANCH;
 
-            // store tag object. Will be used to fetching
-            // tag message (if any) when necessary.
-            cur->tagObj = prevRefSha;
+      if (isCurrentBranch)
+         type |= CUR_BRANCH;
+   }
+   else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
+   {
+      remoteBranches.append(refName.mid(13));
+      type |= RMT_BRANCH;
+   }
+   else if (!refName.startsWith("refs/bases/") && !refName.endsWith("HEAD"))
+   {
+      refs.append(refName);
+      type |= REF;
+   }
+}
 
-            // tagObj must be removed from ref map
-            if (!prevRefSha.isEmpty())
+bool Git::getRefs()
+{
+   const auto branchLoaded = loadCurrentBranch();
+
+   if (branchLoaded)
+   {
+      const auto ret3 = run("git show-ref -d");
+
+      if (ret3.first)
+      {
+         mRefsShaMap.clear();
+
+         const auto ret = getLastCommitOfBranch("HEAD");
+
+         QString prevRefSha;
+         const auto curBranchSHA = ret.output.toString();
+         const auto referencesList = ret3.second.split('\n', QString::SkipEmptyParts);
+
+         for (auto reference : referencesList)
+         {
+            const auto revSha = reference.left(40);
+            const auto refName = reference.mid(41);
+
+            // one Revision could have many tags
+            const auto cur = lookupOrAddReference(revSha);
+
+            cur->configure(refName, curBranchSHA == revSha, prevRefSha);
+
+            if (refName.startsWith("refs/tags/") && refName.endsWith("^{}") && !prevRefSha.isEmpty())
                mRefsShaMap.remove(prevRefSha);
+
+            prevRefSha = revSha;
          }
-         else
-            cur->tags.append(refName.mid(10));
 
-         cur->type |= TAG;
-      }
-      else if (refName.startsWith("refs/heads/"))
-      {
+         // mark current head (even when detached)
+         auto cur = lookupOrAddReference(curBranchSHA);
+         cur->type |= CUR_BRANCH;
 
-         cur->branches.append(refName.mid(11));
-         cur->type |= BRANCH;
-         if (curBranchSHA == revSha)
-            cur->type |= CUR_BRANCH;
+         return !mRefsShaMap.empty();
       }
-      else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
-      {
-
-         cur->remoteBranches.append(refName.mid(13));
-         cur->type |= RMT_BRANCH;
-      }
-      else if (!refName.startsWith("refs/bases/") && !refName.endsWith("HEAD"))
-      {
-
-         cur->refs.append(refName);
-         cur->type |= REF;
-      }
-      prevRefSha = revSha;
    }
 
-   // mark current head (even when detached)
-   auto cur = lookupOrAddReference(curBranchSHA);
-   cur->type |= CUR_BRANCH;
-
-   return !mRefsShaMap.empty();
+   return false;
 }
 
 const QStringList Git::getOthersFiles()
@@ -910,7 +879,6 @@ const QStringList Git::getOthersFiles()
 
 RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
 {
-
    FileNamesLoader fl;
    RevisionFile rf;
    parseDiffFormat(rf, wd.diffIndex, fl);
@@ -918,11 +886,11 @@ RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
 
    for (auto it : wd.otherFiles)
    {
-
       appendFileName(rf, it, fl);
       rf.status.append(RevisionFile::UNKNOWN);
       rf.mergeParent.append(1);
    }
+
    RevisionFile cachedFiles;
    parseDiffFormat(cachedFiles, wd.diffIndexCached, fl);
    flushFileNames(fl);
@@ -936,7 +904,6 @@ RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
 
 void Git::updateWipRevision()
 {
-
    const auto ret = run("git status");
    if (!ret.first) // git status refreshes the index, run as first
       return;
@@ -952,7 +919,6 @@ void Git::updateWipRevision()
    head = head.trimmed();
    if (!head.isEmpty())
    { // repository initialized but still no history
-
       const auto ret3 = run("git diff-index " + head);
 
       if (!ret3.first)
@@ -979,17 +945,14 @@ void Git::updateWipRevision()
 
    CommitInfo c(ZERO_SHA, { head }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, status, 0);
    c.isDiffCache = true;
-   // c.lanes.append(LaneType::EMPTY);
 
-   mRevCache->insertCommitInfo(c);
+   mRevCache->updateWipCommit(std::move(c));
 }
 
 void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl)
 {
-
    if (line[1] == ':')
    { // it's a combined merge
-
       /* For combined merges rename/copy information is useless
        * because nor the original file name, nor similarity info
        * is given, just the status tracks that in the left/right
@@ -1003,7 +966,6 @@ void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum,
    }
    else
    { // faster parsing in normal case
-
       if (line.at(98) == '\t')
       {
          appendFileName(rf, line.mid(99), fl);
@@ -1018,7 +980,6 @@ void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum,
 
 void Git::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
-
    const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
    if (sl.count() != 3)
       return;
@@ -1061,11 +1022,10 @@ void Git::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileN
 // CT TODO utility function; can go elsewhere
 void Git::parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl)
 {
-
    int parNum = 1, startPos = 0, endPos = buf.indexOf('\n');
+
    while (endPos != -1)
    {
-
       const QString &line = buf.mid(startPos, endPos - startPos);
       if (line[0] == ':') // avoid sha's in merges output
          parseDiffFormatLine(rf, line, parNum, fl);
@@ -1105,6 +1065,52 @@ bool Git::clone(const QString &url, const QString &fullPath)
 bool Git::initRepo(const QString &fullPath)
 {
    return run(QString("git init %1").arg(fullPath)).first;
+}
+
+GitUserInfo Git::getGlobalUserInfo() const
+{
+   GitUserInfo userInfo;
+
+   const auto nameRequest = run("git config --get --global user.name");
+
+   if (nameRequest.first)
+      userInfo.mUserName = nameRequest.second.trimmed();
+
+   const auto emailRequest = run("git config --get --global user.email");
+
+   if (emailRequest.first)
+      userInfo.mUserEmail = emailRequest.second.trimmed();
+
+   return userInfo;
+}
+
+void Git::setGlobalUserInfo(const GitUserInfo &info)
+{
+   run(QString("git config --global user.name \"%1\"").arg(info.mUserName));
+   run(QString("git config --global user.email %1").arg(info.mUserEmail));
+}
+
+GitUserInfo Git::getLocalUserInfo() const
+{
+   GitUserInfo userInfo;
+
+   const auto nameRequest = run("git config --get --local user.name");
+
+   if (nameRequest.first)
+      userInfo.mUserName = nameRequest.second.trimmed();
+
+   const auto emailRequest = run("git config --get --local user.email");
+
+   if (emailRequest.first)
+      userInfo.mUserEmail = emailRequest.second.trimmed();
+
+   return userInfo;
+}
+
+void Git::setLocalUserInfo(const GitUserInfo &info)
+{
+   run(QString("git config --local user.name \"%1\"").arg(info.mUserName));
+   run(QString("git config --local user.email %1").arg(info.mUserEmail));
 }
 
 int Git::totalCommits() const
@@ -1180,16 +1186,12 @@ void Git::processRevision(const QByteArray &ba)
 
    mRevCache->configure(totalCommits);
 
-   emit signalLoadingProgress(0, totalCommits);
-   QApplication::processEvents();
+   emit signalLoadingStarted();
 
    updateWipRevision();
 
    for (const auto &commitInfo : commits)
    {
-      emit signalLoadingProgress(count, totalCommits);
-      QApplication::processEvents();
-
       CommitInfo revision(commitInfo, count++);
 
       if (revision.isValid())
@@ -1200,12 +1202,11 @@ void Git::processRevision(const QByteArray &ba)
 
    isLoading = false;
 
-   emit signalNewRevisions();
+   emit signalLoadingFinished();
 }
 
 void Git::flushFileNames(FileNamesLoader &fl)
 {
-
    if (!fl.rf)
       return;
 
@@ -1219,7 +1220,6 @@ void Git::flushFileNames(FileNamesLoader &fl)
 
    for (int i = 0; i < dirs.size(); i++)
    {
-
       d[i] = dirs.at(i);
       d[dirs.size() + i] = fl.rfNames.at(i);
    }
@@ -1230,7 +1230,6 @@ void Git::flushFileNames(FileNamesLoader &fl)
 
 void Git::appendFileName(RevisionFile &rf, const QString &name, FileNamesLoader &fl)
 {
-
    if (fl.rf != &rf)
    {
       flushFileNames(fl);
@@ -1261,4 +1260,9 @@ void Git::appendFileName(RevisionFile &rf, const QString &name, FileNamesLoader 
    }
    else
       fl.rfNames.append(*it);
+}
+
+bool GitUserInfo::isValid() const
+{
+   return !mUserEmail.isNull() && !mUserEmail.isEmpty() && !mUserName.isNull() && !mUserName.isEmpty();
 }

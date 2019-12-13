@@ -36,6 +36,9 @@ class FileHistoryWidget : public QFrame
 {
    Q_OBJECT
 
+signals:
+   void showFileDiff(const QString &sha, const QString &parentSha, const QString &file);
+
 public:
    explicit FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 
@@ -50,6 +53,8 @@ private:
    QTreeView *fileSystemView = nullptr;
    FileBlameWidget *mFileBlameWidget = nullptr;
    QString mWorkingDirectory;
+   QString mCurrentFile;
 
    void showFileSystemContextMenu(const QPoint &pos);
+   void showRepoViewMenu(const QPoint &pos);
 };

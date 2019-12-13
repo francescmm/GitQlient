@@ -111,7 +111,7 @@ void CommitHistoryView::clear()
 
 void CommitHistoryView::focusOnCommit(const QString &goToSha)
 {
-   mCurrentSha = mGit->getRefSha(goToSha);
+   mCurrentSha = goToSha;
 
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 

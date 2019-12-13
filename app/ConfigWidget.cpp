@@ -4,6 +4,8 @@
 #include <CreateRepoDlg.h>
 #include <git.h>
 #include <ProgressDlg.h>
+#include <GitQlientSettings.h>
+#include <ClickableFrame.h>
 
 #include <QPushButton>
 #include <QGridLayout>
@@ -17,12 +19,15 @@
 
 using namespace QLogger;
 
+#include <QDebug>
+
 ConfigWidget::ConfigWidget(QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
    , mOpenRepo(new QPushButton(tr("Open existing repo")))
    , mCloneRepo(new QPushButton(tr("Clone new repo")))
    , mInitRepo(new QPushButton(tr("Init new repo")))
+   , mSettings(new GitQlientSettings())
 {
    mOpenRepo->setObjectName("bigButton");
    mCloneRepo->setObjectName("bigButton");
@@ -44,18 +49,6 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    repoOptionsLayout->addWidget(mCloneRepo);
    repoOptionsLayout->addWidget(mInitRepo);
    repoOptionsLayout->addWidget(line);
-
-   QSettings s;
-   const auto mostUsedRepos = s.value("lastUsedRepos", QStringList()).toStringList();
-   for (const auto &repo : mostUsedRepos)
-   {
-      const auto usedRepo = new QPushButton(repo);
-      usedRepo->setToolTip(repo);
-      repoOptionsLayout->addWidget(usedRepo);
-      connect(usedRepo, &QPushButton::clicked, this,
-              [this]() { emit signalOpenRepo(dynamic_cast<QPushButton *>(sender())->toolTip()); });
-   }
-
    repoOptionsLayout->addStretch();
 
    const auto usedSubtitle = new QLabel(tr("Configuration"));
@@ -100,6 +93,11 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    connect(mGit.get(), &Git::signalCloningProgress, this, &ConfigWidget::updateProgressDialog, Qt::DirectConnection);
 }
 
+ConfigWidget::~ConfigWidget()
+{
+   delete mSettings;
+}
+
 void ConfigWidget::openRepo()
 {
    const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
@@ -134,9 +132,9 @@ QWidget *ConfigWidget::createConfigWidget()
 {
    mBtnGroup = new QButtonGroup();
    mBtnGroup->addButton(new QPushButton(tr("General")), 0);
-   mBtnGroup->addButton(new QPushButton(tr("Git config")), 1);
+   mBtnGroup->addButton(new QPushButton(tr("Recent repos")), 1);
 
-   const auto firstBtn = mBtnGroup->button(0);
+   const auto firstBtn = mBtnGroup->button(1);
    firstBtn->setProperty("selected", true);
    firstBtn->style()->unpolish(firstBtn);
    firstBtn->style()->polish(firstBtn);
@@ -161,11 +159,17 @@ QWidget *ConfigWidget::createConfigWidget()
 
    buttonsLayout->addStretch();
 
+   const auto projectsFrame = new QFrame();
+
+   mRecentProjectsLayout = new QVBoxLayout(projectsFrame);
+   mRecentProjectsLayout->setContentsMargins(QMargins());
+   mRecentProjectsLayout->addWidget(createRecentProjectsPage());
+
    const auto stackedWidget = new QStackedWidget();
    stackedWidget->setMinimumHeight(300);
    stackedWidget->addWidget(new GeneralConfigPage());
-   stackedWidget->addWidget(createConfigPage());
-   stackedWidget->setCurrentIndex(0);
+   stackedWidget->addWidget(projectsFrame);
+   stackedWidget->setCurrentIndex(1);
 
    connect(mBtnGroup, qOverload<int>(&QButtonGroup::buttonClicked), this, [this, stackedWidget](int index) {
       const auto selectedBtn = mBtnGroup->button(index);
@@ -193,12 +197,29 @@ QWidget *ConfigWidget::createConfigWidget()
    return tabWidget;
 }
 
-QWidget *ConfigWidget::createConfigPage()
+QWidget *ConfigWidget::createRecentProjectsPage()
 {
-   const auto frame = new QFrame();
-   frame->setObjectName("configPage");
+   delete mInnerWidget;
+   mInnerWidget = new QFrame();
+   mInnerWidget->setObjectName("recentProjects");
 
-   return frame;
+   const auto innerLayout = new QVBoxLayout(mInnerWidget);
+   innerLayout->setSpacing(0);
+
+   const auto projects = mSettings->getRecentProjects();
+
+   for (auto project : projects)
+   {
+      const auto projectName = project.mid(project.lastIndexOf("/") + 1);
+      const auto labelText = QString("%1 <%2>").arg(projectName, project);
+      const auto clickableFrame = new ClickableFrame(labelText, Qt::AlignLeft);
+      connect(clickableFrame, &ClickableFrame::clicked, this, [this, project]() { emit signalOpenRepo(project); });
+      innerLayout->addWidget(clickableFrame);
+   }
+
+   innerLayout->addStretch();
+
+   return mInnerWidget;
 }
 
 void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
@@ -218,4 +239,9 @@ void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
 
    mProgressDlg->setLabelText(stepDescription);
    mProgressDlg->repaint();
+}
+
+void ConfigWidget::updateRecentProjectsList()
+{
+   mRecentProjectsLayout->addWidget(createRecentProjectsPage());
 }

@@ -51,6 +51,7 @@ private:
    void createBranch();
    void createTag();
    void exportAsPatch();
+   void checkoutBranch();
    void checkoutCommit();
    void cherryPickCommit();
    void applyPatch();
@@ -62,4 +63,5 @@ private:
    void resetMixed();
    void resetHard();
    void merge(const QString &branchFrom);
+   void addBranchActions(const QString &sha);
 };

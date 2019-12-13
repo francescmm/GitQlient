@@ -60,16 +60,14 @@ CommitInfoWidget::CommitInfoWidget(QSharedPointer<Git> git, QWidget *parent)
    sizePolicy.setHeightForWidth(fileListWidget->sizePolicy().hasHeightForWidth());
    fileListWidget->setSizePolicy(sizePolicy);
 
-   const auto gridLayout = new QGridLayout();
-   gridLayout->setHorizontalSpacing(10);
-   gridLayout->setVerticalSpacing(0);
-   gridLayout->setContentsMargins(0, 0, 0, 0);
-   gridLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum), 0, 4, 1, 1);
-   gridLayout->addWidget(new QLabel(tr("Files")), 0, 2, 1, 1);
-   gridLayout->addWidget(labelIcon, 0, 1, 1, 1);
-   gridLayout->addItem(new QSpacerItem(10, 30, QSizePolicy::Fixed, QSizePolicy::Minimum), 0, 0, 1, 1);
-   gridLayout->addWidget(fileListWidget, 1, 0, 1, 5);
-   gridLayout->addWidget(labelModCount, 0, 3, 1, 1);
+   const auto headerLayout = new QHBoxLayout();
+   headerLayout->setContentsMargins(5, 0, 0, 0);
+   headerLayout->setSpacing(0);
+   headerLayout->addWidget(labelIcon);
+   headerLayout->addSpacerItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
+   headerLayout->addWidget(new QLabel(tr("Files ")));
+   headerLayout->addWidget(labelModCount);
+   headerLayout->addStretch();
 
    const auto verticalLayout = new QVBoxLayout(this);
    verticalLayout->setSpacing(10);
@@ -78,7 +76,8 @@ CommitInfoWidget::CommitInfoWidget(QSharedPointer<Git> git, QWidget *parent)
    verticalLayout->addWidget(labelTitle);
    verticalLayout->addWidget(labelDescription);
    verticalLayout->addWidget(commitInfoFrame);
-   verticalLayout->addLayout(gridLayout);
+   verticalLayout->addLayout(headerLayout);
+   verticalLayout->addWidget(fileListWidget);
 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { emit signalOpenFileCommit(mCurrentSha, mParentSha, item->text()); });

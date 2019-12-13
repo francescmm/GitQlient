@@ -36,4 +36,6 @@ public:
    GitQlientSettings() = default;
 
    void setValue(const QString &key, const QVariant &value);
+   void setProjectOpened(const QString &projectPath);
+   QVector<QString> getRecentProjects() const;
 };

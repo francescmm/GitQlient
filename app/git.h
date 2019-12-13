@@ -39,14 +39,22 @@ struct GitExecResult
    QVariant output;
 };
 
+struct GitUserInfo
+{
+   QString mUserName;
+   QString mUserEmail;
+
+   bool isValid() const;
+};
+
 class Git : public QObject
 {
    Q_OBJECT
 
 signals:
-   void signalNewRevisions();
    void cancelAllProcesses();
-   void signalLoadingProgress(int currentStep, int totalSteps);
+   void signalLoadingStarted();
+   void signalLoadingFinished();
    void signalCloningProgress(QString stepDescription, int value);
 
 public:
@@ -60,10 +68,15 @@ public:
    explicit Git();
 
    /* START Git CONFIGURATION */
+   void setWorkingDirectory(const QString &wd) { mWorkingDir = wd; }
    bool loadRepository(const QString &wd);
    QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
    bool initRepo(const QString &fullPath);
+   GitUserInfo getGlobalUserInfo() const;
+   void setGlobalUserInfo(const GitUserInfo &info);
+   GitUserInfo getLocalUserInfo() const;
+   void setLocalUserInfo(const GitUserInfo &info);
    /* END Git CONFIGURATION */
 
    /* START CACHE */
@@ -161,7 +174,6 @@ public:
 
    CommitInfo getCommitInfo(const QString &sha) const;
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;
-   const QString getRefSha(const QString &refName, RefType type = ANY_REF, bool askGit = true);
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
    GitExecResult merge(const QString &into, QStringList sources);
 
@@ -173,14 +185,15 @@ public:
 private:
    bool setGitDbDir(const QString &wd);
    void processRevision(const QByteArray &ba);
+   bool loadCurrentBranch();
 
    struct Reference
-   { // stores tag information associated to a revision
-      Reference()
-         : type(0)
-      {
-      }
-      uint type;
+   {
+      Reference() {}
+
+      void configure(const QString &refName, bool isCurrentBranch, const QString &prevRefSha);
+
+      uint type = 0;
       QStringList branches;
       QStringList remoteBranches;
       QStringList tags;
@@ -240,7 +253,6 @@ private:
    QString mWorkingDir;
    QString mGitDir;
    QString mCurrentBranchName;
-   bool mIsMergeHead = false;
    QHash<QString, Reference> mRefsShaMap;
    QVector<QString> mFileNames;
    QVector<QString> mDirNames;

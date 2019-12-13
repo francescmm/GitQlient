@@ -12,6 +12,7 @@ FORMS += \
     $$PWD/AddSubmoduleDlg.ui \
     $$PWD/BranchDlg.ui \
     $$PWD/CreateRepoDlg.ui \
+    $$PWD/GitConfigDlg.ui \
     $$PWD/TagDlg.ui \
     $$PWD/WorkInProgressWidget.ui
 
@@ -43,6 +44,7 @@ HEADERS += \
     $$PWD/FullDiffWidget.h \
     $$PWD/GeneralConfigPage.h \
     $$PWD/GitCloneProcess.h \
+    $$PWD/GitConfigDlg.h \
     $$PWD/GitQlient.h \
     $$PWD/GitQlientRepo.h \
     $$PWD/GitQlientSettings.h \
@@ -89,6 +91,7 @@ SOURCES += \
     $$PWD/FullDiffWidget.cpp \
     $$PWD/GeneralConfigPage.cpp \
     $$PWD/GitCloneProcess.cpp \
+    $$PWD/GitConfigDlg.cpp \
     $$PWD/GitQlient.cpp \
     $$PWD/GitQlientRepo.cpp \
     $$PWD/GitQlientSettings.cpp \

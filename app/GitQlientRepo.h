@@ -62,10 +62,12 @@ class GitQlientRepo : public QFrame
 signals:
    void closeAllWindows();
    void signalOpenSubmodule(const QString &submoduleName);
+   void signalRepoOpened();
 
 public:
-   explicit GitQlientRepo(const QString &repo, QWidget *parent = nullptr);
+   explicit GitQlientRepo(QWidget *parent = nullptr);
 
+   bool isOpened();
    void setConfig(const GitQlientRepoConfig &config);
    QString currentDir() const { return mCurrentDir; }
    void setRepository(const QString &newDir);
@@ -111,7 +113,8 @@ private:
    void setWidgetsEnabled(bool enabled);
    void executeCommand();
    void showFileHistory(const QString &fileName);
-   void updateProgressDialog(int current, int total);
+   void updateProgressDialog();
+   void closeProgressDialog();
 
    // End of MainWindow refactor
    bool isMatch(const QString &sha, const QString &f, int cn, const QMap<QString, bool> &sm);

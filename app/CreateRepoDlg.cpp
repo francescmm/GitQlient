@@ -3,6 +3,7 @@
 
 #include <git.h>
 #include <GitQlientStyles.h>
+#include <GitQlientSettings.h>
 
 #include <QFileDialog>
 
@@ -27,6 +28,11 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<Git> git, QW
    connect(ui->leRepoName, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
    connect(ui->pbAccept, &QPushButton::clicked, this, &CreateRepoDlg::accept);
    connect(ui->pbCancel, &QPushButton::clicked, this, &QDialog::reject);
+   connect(ui->cbGitUser, &QCheckBox::clicked, this, &CreateRepoDlg::showGitControls);
+
+   GitQlientSettings settings;
+   const auto configGitUser = settings.value("GitConfigRepo", true).toBool();
+   ui->cbGitUser->setChecked(configGitUser);
 }
 
 CreateRepoDlg::~CreateRepoDlg()
@@ -58,6 +64,17 @@ void CreateRepoDlg::addDefaultName(const QString &url)
    }
 }
 
+void CreateRepoDlg::showGitControls()
+{
+   const auto checkedState = ui->cbGitUser->isChecked();
+
+   ui->leGitName->setVisible(checkedState);
+   ui->leGitEmail->setVisible(checkedState);
+
+   GitQlientSettings settings;
+   settings.setValue("GitConfigRepo", checkedState);
+}
+
 void CreateRepoDlg::accept()
 {
    auto url = ui->leURL->text();
@@ -81,6 +98,13 @@ void CreateRepoDlg::accept()
 
       if (ret)
       {
+         if (ui->cbGitUser->isChecked())
+         {
+            Git git;
+            git.setWorkingDirectory(fullPath);
+            git.setLocalUserInfo({ ui->leGitName->text(), ui->leGitEmail->text() });
+         }
+
          if (ui->chbOpen->isChecked())
             emit signalOpenWhenFinish(fullPath);
 
