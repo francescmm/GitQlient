@@ -1,3 +1,8 @@
+ClickableFrame
+{
+    padding: 5px;
+}
+
 Controls
 {
     max-height: 80px;
@@ -75,6 +80,11 @@ BranchesWidget
 {
     min-width: 400px;
     max-width: 400px;
+}
+
+#tagsFrame
+{
+    padding: 0;
 }
 
 QListWidget::item:focus, FileHistoryWidget > QTreeView::item:focus
@@ -294,7 +304,6 @@ QFrame#orangeSeparator
    max-width: 1px;
 }
 
-
 QLabel#subtitle
 {
     font-size: 16pt;
@@ -304,8 +313,6 @@ QLabel#title
 {
     font-size: 24pt;
 }
-
-
 
 QPushButton#bigButton
 {
@@ -337,8 +344,6 @@ QDialog > QLineEdit
     max-height: 25px;
     padding-left: 10px;
 }
-
-
 
 QScrollBar:vertical
 {
@@ -488,10 +493,5 @@ QProgressBar
 QProgressBar::chunk
 {
     width: 18px;
-}
-
-ClickableFrame
-{
-    padding: 5px;
 }
 

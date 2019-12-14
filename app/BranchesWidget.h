@@ -23,7 +23,7 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QWidget>
+#include <QFrame>
 
 class BranchTreeWidget;
 class QListWidget;
@@ -31,7 +31,7 @@ class QListWidgetItem;
 class QLabel;
 class Git;
 
-class BranchesWidget : public QWidget
+class BranchesWidget : public QFrame
 {
    Q_OBJECT
 

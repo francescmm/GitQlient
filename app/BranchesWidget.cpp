@@ -20,7 +20,7 @@
 using namespace QLogger;
 
 BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
-   : QWidget(parent)
+   : QFrame(parent)
    , mGit(git)
    , mLocalBranchesTree(new BranchTreeWidget(mGit))
    , mRemoteBranchesTree(new BranchTreeWidget(mGit))
