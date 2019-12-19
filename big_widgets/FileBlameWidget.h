@@ -42,6 +42,9 @@ public:
    explicit FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
 
    void setup(const QString &fileName, const QString &currentSha, const QString &previousSha);
+   void reload(const QString &currentSha, const QString &previousSha);
+   QString getCurrentSha() const;
+   QString getCurrentFile() const { return mCurrentFile; }
 
 private:
    QSharedPointer<Git> mGit;
@@ -51,6 +54,7 @@ private:
    QScrollArea *mScrollArea = nullptr;
    QFont mInfoFont;
    QFont mCodeFont;
+   QString mCurrentFile;
 
    struct Annotation
    {

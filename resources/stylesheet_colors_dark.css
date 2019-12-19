@@ -404,10 +404,37 @@ ClickableFrame::pressed
     background-color: #202122;
 }
 
-FileBlameWidget, FileBlameWidget > QTabWidget
+FileBlameWidget
 {
     background-color: #2E2F30;
 }
+
+FileHistoryWidget > QTabWidget, QTabWidget#HistoryTab:pane
+{
+    background-color: #2E2F30;
+    border: 0;
+}
+
+QTabWidget#HistoryTab > QTabBar::tab:selected
+{
+    background-color: #2E2F30;
+}
+
+QTabWidget#HistoryTab > QTabBar::tab:selected:hover
+{
+    background-color: #2E2F30;
+}
+
+QTabWidget#HistoryTab > QTabBar::tab:!selected
+{
+    background-color: #505152;
+}
+
+QTabWidget#HistoryTab > QTabBar::tab:!selected:hover
+{
+    background-color: #202122;
+}
+
 
 #ShaLabel
 {

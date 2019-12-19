@@ -27,6 +27,7 @@ FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *pa
    , fileSystemView(new QTreeView())
    , mTabWidget(new QTabWidget())
 {
+   mTabWidget->setObjectName("HistoryTab");
    mRepoView->setObjectName("blameRepoView");
    mRepoView->setModel(mRepoModel);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::GRAPH), true);
@@ -40,6 +41,8 @@ FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *pa
    mRepoView->setContextMenuPolicy(Qt::CustomContextMenu);
    mRepoView->activateFilter(true);
    connect(mRepoView, &CommitHistoryView::customContextMenuRequested, this, &FileHistoryWidget::showRepoViewMenu);
+   connect(mRepoView, &CommitHistoryView::clicked, this,
+           qOverload<const QModelIndex &>(&FileHistoryWidget::reloadBlame));
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
@@ -60,6 +63,7 @@ FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *pa
    historyBlameLayout->addWidget(mTabWidget, 0, 1, 2, 1);
 
    mTabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+   connect(mTabWidget, &QTabWidget::currentChanged, this, &FileHistoryWidget::reloadHistory);
 
    connect(mTabWidget, &QTabWidget::tabCloseRequested, mTabWidget, [this](int index) {
       auto widget = mTabWidget->widget(index);
@@ -77,30 +81,61 @@ void FileHistoryWidget::init(const QString &workingDirectory)
 
 void FileHistoryWidget::showFileHistory(const QString &filePath)
 {
-   mCurrentFile = filePath;
-   if (!mTabsMap.contains(mCurrentFile))
+   if (!mTabsMap.contains(filePath))
    {
-      const auto ret = mGit->history(mCurrentFile);
+      const auto ret = mGit->history(filePath);
 
       if (ret.success)
       {
          const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+         mRepoView->blockSignals(true);
          mRepoView->filterBySha(shaHistory);
+         mRepoView->blockSignals(false);
 
          const auto previousSha = shaHistory.count() > 1 ? shaHistory.at(1) : QString(tr("No info"));
          const auto fileBlameWidget = new FileBlameWidget(mGit);
 
-         fileBlameWidget->setup(mCurrentFile, shaHistory.constFirst(), previousSha);
+         fileBlameWidget->setup(filePath, shaHistory.constFirst(), previousSha);
          connect(fileBlameWidget, &FileBlameWidget::signalCommitSelected, mRepoView, &CommitHistoryView::focusOnCommit);
 
-         mTabWidget->addTab(fileBlameWidget, mCurrentFile.split("/").last());
+         const auto index = mTabWidget->addTab(fileBlameWidget, filePath.split("/").last());
          mTabWidget->setTabsClosable(true);
+         mTabWidget->blockSignals(true);
+         mTabWidget->setCurrentIndex(index);
+         mTabWidget->blockSignals(false);
 
-         mTabsMap.insert(mCurrentFile, fileBlameWidget);
+         mTabsMap.insert(filePath, fileBlameWidget);
       }
    }
    else
-      mTabWidget->setCurrentWidget(mTabsMap.value(mCurrentFile));
+      mTabWidget->setCurrentWidget(mTabsMap.value(filePath));
+}
+
+void FileHistoryWidget::reloadBlame(const QModelIndex &index)
+{
+   const auto sha
+       = mRepoView->model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+   const auto previousSha
+       = mRepoView->model()->index(index.row() + 1, static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+   const auto blameWidget = qobject_cast<FileBlameWidget *>(mTabWidget->currentWidget());
+   blameWidget->reload(sha, previousSha);
+}
+
+void FileHistoryWidget::reloadHistory(int tabIndex)
+{
+   const auto blameWidget = qobject_cast<FileBlameWidget *>(mTabWidget->widget(tabIndex));
+   const auto sha = blameWidget->getCurrentSha();
+   const auto file = blameWidget->getCurrentFile();
+
+   const auto ret = mGit->history(file);
+
+   if (ret.success)
+   {
+      const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+      mRepoView->blockSignals(true);
+      mRepoView->filterBySha(shaHistory);
+      mRepoView->blockSignals(false);
+   }
 }
 
 void FileHistoryWidget::showFileHistory(const QModelIndex &index)
@@ -121,7 +156,8 @@ void FileHistoryWidget::showRepoViewMenu(const QPoint &pos)
    const auto fileDiff = menu->addAction(tr("Show file diff"));
    connect(fileDiff, &QAction::triggered, this, [this, sha]() {
       const auto parentSha = mGit->getCommitInfo(sha).parent(0);
-      emit showFileDiff(sha, parentSha, mCurrentFile);
+      const auto currentFile = qobject_cast<FileBlameWidget *>(mTabWidget->currentWidget())->getCurrentFile();
+      emit showFileDiff(sha, parentSha, currentFile);
    });
 
    menu->exec(mRepoView->viewport()->mapToGlobal(pos));

@@ -57,9 +57,10 @@ private:
    QTreeView *fileSystemView = nullptr;
    QTabWidget *mTabWidget = nullptr;
    QString mWorkingDirectory;
-   QString mCurrentFile;
    QMap<QString, FileBlameWidget *> mTabsMap;
 
    void showFileSystemContextMenu(const QPoint &pos);
    void showRepoViewMenu(const QPoint &pos);
+   void reloadBlame(const QModelIndex &index);
+   void reloadHistory(int tabIndex);
 };

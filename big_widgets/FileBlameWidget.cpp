@@ -76,7 +76,8 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent
 
 void FileBlameWidget::setup(const QString &fileName, const QString &currentSha, const QString &previousSha)
 {
-   const auto ret = mGit->blame(fileName, currentSha);
+   mCurrentFile = fileName;
+   const auto ret = mGit->blame(mCurrentFile, currentSha);
 
    if (ret.success && !ret.output.toString().startsWith("fatal:"))
    {
@@ -90,8 +91,19 @@ void FileBlameWidget::setup(const QString &fileName, const QString &currentSha, 
       formatAnnotatedFile(annotations);
    }
    else
-      QMessageBox::warning(this, tr("File not in Git"),
-                           tr("The file {%1} is not under Git control version. You cannot blame it.").arg(fileName));
+      QMessageBox::warning(
+          this, tr("File not in Git"),
+          tr("The file {%1} is not under Git control version. You cannot blame it.").arg(mCurrentFile));
+}
+
+void FileBlameWidget::reload(const QString &currentSha, const QString &previousSha)
+{
+   setup(mCurrentFile, currentSha, previousSha);
+}
+
+QString FileBlameWidget::getCurrentSha() const
+{
+   return mCurrentSha->text();
 }
 
 QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString &blame)
