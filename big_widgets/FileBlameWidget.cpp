@@ -30,6 +30,7 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent
    , mPreviousSha(new QLabel())
 {
    mCurrentSha->setObjectName("ShaLabel");
+   mPreviousSha->setObjectName("ShaLabel");
    mAnotation->setObjectName("AnnotationFrame");
 
    auto initialLayout = new QGridLayout(mAnotation);
@@ -47,14 +48,24 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent
    mScrollArea->setWidget(mAnotation);
    mScrollArea->setWidgetResizable(true);
 
+   const auto lSha = new QLabel(tr("Current SHA:"));
+   lSha->setObjectName("ShaLabel");
+
+   const auto lSha2 = new QLabel(tr("Previous SHA:"));
+   lSha2->setObjectName("ShaLabel");
+
+   const auto separator = new QFrame();
+   separator->setObjectName("separator");
+
    const auto shasLayout = new QGridLayout();
    shasLayout->setSpacing(0);
    shasLayout->setContentsMargins(QMargins());
-   shasLayout->addWidget(new QLabel(tr("Current SHA:")), 0, 0);
+   shasLayout->addWidget(lSha, 0, 0);
    shasLayout->addWidget(mCurrentSha, 0, 1);
    shasLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 2);
-   shasLayout->addWidget(new QLabel(tr("Previous SHA:")), 1, 0);
+   shasLayout->addWidget(lSha2, 1, 0);
    shasLayout->addWidget(mPreviousSha, 1, 1);
+   shasLayout->addWidget(separator, 2, 0, 1, 3);
 
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
@@ -63,14 +74,17 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent
    layout->addWidget(mScrollArea);
 }
 
-void FileBlameWidget::setup(const QString &fileName)
+void FileBlameWidget::setup(const QString &fileName, const QString &currentSha, const QString &previousSha)
 {
-   const auto ret = mGit->blame(fileName);
+   const auto ret = mGit->blame(fileName, currentSha);
 
    if (ret.success && !ret.output.toString().startsWith("fatal:"))
    {
       delete mAnotation;
       mAnotation = nullptr;
+
+      mCurrentSha->setText(currentSha);
+      mPreviousSha->setText(previousSha);
 
       const auto annotations = processBlame(ret.output.toString());
       formatAnnotatedFile(annotations);
@@ -154,16 +168,6 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
 
       annotationLayout->addWidget(createNumLabel(annotations.at(row), row), row, 3);
       annotationLayout->addWidget(createCodeLabel(annotations.at(row).content), row, 4);
-
-      if (row == 0)
-      {
-         mCurrentSha->setText(annotations.constFirst().sha);
-
-         if (annotations.count() > 1)
-            mPreviousSha->setText(annotations.at(1).sha);
-         else
-            mPreviousSha->setText("No info");
-      }
    }
 
    // Adding the last row

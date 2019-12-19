@@ -204,9 +204,9 @@ bool Git::resetFile(const QString &fileName)
    return run(QString("git checkout %1").arg(fileName)).first;
 }
 
-GitExecResult Git::blame(const QString &file)
+GitExecResult Git::blame(const QString &file, const QString &commitFrom)
 {
-   return run(QString("git annotate %1").arg(file));
+   return run(QString("git annotate %1 %2").arg(file, commitFrom));
 }
 
 GitExecResult Git::history(const QString &file)

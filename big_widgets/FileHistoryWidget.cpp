@@ -59,6 +59,8 @@ FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *pa
    historyBlameLayout->addWidget(fileSystemView, 1, 0);
    historyBlameLayout->addWidget(mTabWidget, 0, 1, 2, 1);
 
+   mTabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
    connect(mTabWidget, &QTabWidget::tabCloseRequested, mTabWidget, [this](int index) {
       auto widget = mTabWidget->widget(index);
       mTabWidget->removeTab(index);
@@ -81,16 +83,21 @@ void FileHistoryWidget::showFileHistory(const QString &filePath)
       const auto ret = mGit->history(mCurrentFile);
 
       if (ret.success)
-         mRepoView->filterBySha(ret.output.toString().split("\n", QString::SkipEmptyParts));
+      {
+         const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+         mRepoView->filterBySha(shaHistory);
 
-      const auto fileBlameWidget = new FileBlameWidget(mGit);
-      fileBlameWidget->setup(mCurrentFile);
-      connect(fileBlameWidget, &FileBlameWidget::signalCommitSelected, mRepoView, &CommitHistoryView::focusOnCommit);
+         const auto previousSha = shaHistory.count() > 1 ? shaHistory.at(1) : QString(tr("No info"));
+         const auto fileBlameWidget = new FileBlameWidget(mGit);
 
-      mTabWidget->addTab(fileBlameWidget, mCurrentFile.split("/").last());
-      mTabWidget->setTabsClosable(true);
+         fileBlameWidget->setup(mCurrentFile, shaHistory.constFirst(), previousSha);
+         connect(fileBlameWidget, &FileBlameWidget::signalCommitSelected, mRepoView, &CommitHistoryView::focusOnCommit);
 
-      mTabsMap.insert(mCurrentFile, fileBlameWidget);
+         mTabWidget->addTab(fileBlameWidget, mCurrentFile.split("/").last());
+         mTabWidget->setTabsClosable(true);
+
+         mTabsMap.insert(mCurrentFile, fileBlameWidget);
+      }
    }
    else
       mTabWidget->setCurrentWidget(mTabsMap.value(mCurrentFile));

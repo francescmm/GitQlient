@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
    QStringList arguments;
 
    auto argNum = argc;
+
    while (argNum--)
       arguments.prepend(argv[argNum]);
 

@@ -41,7 +41,7 @@ signals:
 public:
    explicit FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
 
-   void setup(const QString &fileName);
+   void setup(const QString &fileName, const QString &currentSha, const QString &previousSha);
 
 private:
    QSharedPointer<Git> mGit;
