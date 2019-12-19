@@ -37,7 +37,7 @@ class AddSubmoduleDlg : public QDialog
    Q_OBJECT
 
 public:
-   explicit AddSubmoduleDlg(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit AddSubmoduleDlg(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
    ~AddSubmoduleDlg() override;
 
    void accept() override;

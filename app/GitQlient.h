@@ -35,9 +35,9 @@ class GitQlient : public QWidget
 public:
    explicit GitQlient(QWidget *parent = nullptr);
    explicit GitQlient(const QStringList &arguments, QWidget *parent = nullptr);
-   ~GitQlient();
+   ~GitQlient() override;
 
-   void setRepositories(const QStringList repositories);
+   void setRepositories(const QStringList &repositories);
    void setArgumentsPostInit(const QStringList &arguments);
 
 private:

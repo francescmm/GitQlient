@@ -40,7 +40,7 @@ signals:
    void signalConflictsResolved();
 
 public:
-   explicit UnstagedFilesContextMenu(QSharedPointer<Git> git, const QString &fileName, bool hasConflicts,
+   explicit UnstagedFilesContextMenu(const QSharedPointer<Git> &git, const QString &fileName, bool hasConflicts,
                                      QWidget *parent = nullptr);
 
 private:

@@ -13,9 +13,8 @@
 
 static const int MIN_VIEW_WIDTH_PX = 480;
 
-RepositoryViewDelegate::RepositoryViewDelegate(QSharedPointer<Git> git, CommitHistoryView *view)
-   : QStyledItemDelegate()
-   , mGit(git)
+RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<Git> &git, CommitHistoryView *view)
+   : mGit(git)
    , mView(view)
 {
 }
@@ -283,7 +282,6 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
             case LaneType::JOIN_L:
                if (!isSet)
                {
-                  QColor fromBranchColor;
                   for (auto laneCount = 0; laneCount < i; ++laneCount)
                   {
                      if (lanes[laneCount] == LaneType::JOIN_L)
@@ -346,21 +344,21 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
          markValues.insert("detached", GitQlientStyles::getDetachedColor());
 
       const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
-      for (auto branch : localBranches)
+      for (const auto &branch : localBranches)
          markValues.insert(branch,
                            branch == currentBranch ? GitQlientStyles::getCurrentBranchColor()
                                                    : GitQlientStyles::getLocalBranchColor());
 
       const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
-      for (auto branch : remoteBranches)
+      for (const auto &branch : remoteBranches)
          markValues.insert(branch, QColor("#011f4b"));
 
       const auto tags = mGit->getRefNames(sha, Git::TAG);
-      for (auto tag : tags)
+      for (const auto &tag : tags)
          markValues.insert(tag, GitQlientStyles::getTagColor());
 
       const auto refs = mGit->getRefNames(sha, Git::REF);
-      for (auto ref : refs)
+      for (const auto &ref : refs)
          markValues.insert(ref, GitQlientStyles::getRefsColor());
    }
 

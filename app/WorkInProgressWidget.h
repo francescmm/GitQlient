@@ -47,7 +47,7 @@ signals:
    void signalShowFileHistory(const QString &fileName);
 
 public:
-   explicit WorkInProgressWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit WorkInProgressWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
 
    void configure(const QString &sha);
    void clear();

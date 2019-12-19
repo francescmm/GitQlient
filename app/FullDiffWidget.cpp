@@ -57,7 +57,7 @@ void DiffHighlighter::highlightBlock(const QString &text)
       setFormat(0, text.length(), myFormat);
 }
 
-FullDiffWidget::FullDiffWidget(QSharedPointer<Git> git, QWidget *parent)
+FullDiffWidget::FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent)
    : QTextEdit(parent)
    , mGit(git)
 {

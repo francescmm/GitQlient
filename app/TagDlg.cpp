@@ -6,7 +6,7 @@
 
 #include <QFile>
 
-TagDlg::TagDlg(QSharedPointer<Git> git, const QString &sha, QWidget *parent)
+TagDlg::TagDlg(const QSharedPointer<Git> &git, const QString &sha, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::TagDlg)
    , mGit(git)

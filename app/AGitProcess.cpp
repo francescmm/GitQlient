@@ -39,7 +39,7 @@ void restoreSpaces(QString &newCmd, const QChar &sepChar)
    }
 }
 
-const QStringList splitArgList(const QString &cmd)
+QStringList splitArgList(const QString &cmd)
 {
    // return argument list handling quotes and double quotes
    // substring, as example from:
@@ -91,8 +91,7 @@ const QStringList splitArgList(const QString &cmd)
 }
 
 AGitProcess::AGitProcess(const QString &workingDir)
-   : QProcess()
-   , mWorkingDirectory(workingDir)
+   : mWorkingDirectory(workingDir)
 {
    setWorkingDirectory(mWorkingDirectory);
 
@@ -152,7 +151,6 @@ bool AGitProcess::execute(const QString &command)
 void AGitProcess::onFinished(int, QProcess::ExitStatus exitStatus)
 {
    const auto errorOutput = readAllStandardError();
-   const auto output = readAll();
 
    mErrorOutput = QString::fromUtf8(errorOutput);
    mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error")

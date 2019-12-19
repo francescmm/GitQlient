@@ -6,7 +6,7 @@
 
 #include <QDateTime>
 
-CommitHistoryModel::CommitHistoryModel(QSharedPointer<Git> git, QObject *p)
+CommitHistoryModel::CommitHistoryModel(const QSharedPointer<Git> &git, QObject *p)
    : QAbstractItemModel(p)
    , mGit(git)
 {

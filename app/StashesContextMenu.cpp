@@ -5,7 +5,7 @@
 
 #include <QMessageBox>
 
-StashesContextMenu::StashesContextMenu(QSharedPointer<Git> git, const QString &stashId, QWidget *parent)
+StashesContextMenu::StashesContextMenu(const QSharedPointer<Git> &git, const QString &stashId, QWidget *parent)
    : QMenu(parent)
    , mGit(git)
    , mStashId(stashId)

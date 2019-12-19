@@ -222,13 +222,13 @@ QWidget *ConfigWidget::createRecentProjectsPage()
    return mInnerWidget;
 }
 
-void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
+void ConfigWidget::updateProgressDialog(const QString &stepDescription, int value)
 {
    if (value >= 0)
    {
       mProgressDlg->setValue(value);
 
-      if (stepDescription.toLower().contains("done"))
+      if (stepDescription.contains("done", Qt::CaseInsensitive))
       {
          mProgressDlg->close();
          emit signalOpenRepo(mPathToOpen);

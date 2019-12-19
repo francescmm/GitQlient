@@ -15,7 +15,7 @@
 #include <QMenu>
 #include <QItemDelegate>
 
-FileListWidget::FileListWidget(QSharedPointer<Git> git, QWidget *p)
+FileListWidget::FileListWidget(const QSharedPointer<Git> &git, QWidget *p)
    : QListWidget(p)
    , mGit(git)
 {
@@ -48,7 +48,7 @@ void FileListWidget::showContextMenu(const QPoint &pos)
    }
 }
 
-void FileListWidget::insertFiles(const QString currentSha, const QString &compareToSha)
+void FileListWidget::insertFiles(const QString &currentSha, const QString &compareToSha)
 {
    clear();
 

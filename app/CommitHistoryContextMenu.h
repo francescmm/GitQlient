@@ -38,7 +38,8 @@ signals:
    void signalAmendCommit(const QString &sha);
 
 public:
-   explicit CommitHistoryContextMenu(QSharedPointer<Git> git, const QStringList &shas, QWidget *parent = nullptr);
+   explicit CommitHistoryContextMenu(const QSharedPointer<Git> &git, const QStringList &shas,
+                                     QWidget *parent = nullptr);
 
 private:
    QSharedPointer<Git> mGit;

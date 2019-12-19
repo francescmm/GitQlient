@@ -32,7 +32,7 @@ class DiffHighlighter : public QSyntaxHighlighter
 {
 public:
    DiffHighlighter(QTextEdit *p);
-   virtual void highlightBlock(const QString &text);
+   virtual void highlightBlock(const QString &text) override;
 };
 
 class FullDiffWidget : public QTextEdit
@@ -40,7 +40,7 @@ class FullDiffWidget : public QTextEdit
    Q_OBJECT
 
 public:
-   explicit FullDiffWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
 
    void loadDiff(const QString &sha, const QString &diffToSha);
 
@@ -48,7 +48,7 @@ private:
    friend class DiffHighlighter;
    QSharedPointer<Git> mGit;
 
-   void processData(const QString &data);
+   void processData(const QString &fileChunk);
 
    DiffHighlighter *diffHighlighter = nullptr;
    QString mPreviousDiffText;

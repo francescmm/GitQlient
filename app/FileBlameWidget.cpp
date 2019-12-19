@@ -13,16 +13,16 @@
 
 namespace
 {
-static const int kTotalColors = 8;
-static const QString kBorderColors[kTotalColors] { "25, 65, 99",   "36, 95, 146",   "44, 116, 177",  "56, 136, 205",
-                                                   "87, 155, 213", "118, 174, 221", "150, 192, 221", "197, 220, 240" };
-
-static qint64 kSecondsNewest = 0;
-static qint64 kSecondsOldest = QDateTime::currentDateTime().toSecsSinceEpoch();
-static qint64 kIncrementSecs = 0;
+const int kTotalColors = 8;
+const std::array<QString, kTotalColors> kBorderColors { "25, 65, 99",    "36, 95, 146",  "44, 116, 177",
+                                                        "56, 136, 205",  "87, 155, 213", "118, 174, 221",
+                                                        "150, 192, 221", "197, 220, 240" };
+qint64 kSecondsNewest = 0;
+qint64 kSecondsOldest = QDateTime::currentDateTime().toSecsSinceEpoch();
+qint64 kIncrementSecs = 0;
 }
 
-FileBlameWidget::FileBlameWidget(QSharedPointer<Git> git, QWidget *parent)
+FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mAnotation(new QFrame())
@@ -76,7 +76,7 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
       const auto fields = line.split("\t");
       const auto revision = mGit->getCommitInfo(fields.at(0));
       const auto dt = QDateTime::fromString(fields.at(2), Qt::ISODate);
-      const auto lineNumAndContent = fields.at(3);
+      const auto &lineNumAndContent = fields.at(3);
       const auto divisorChar = lineNumAndContent.indexOf(")");
       const auto lineText = lineNumAndContent.mid(0, divisorChar);
       const auto content = lineNumAndContent.mid(divisorChar + 1, lineNumAndContent.count() - lineText.count() - 1);
@@ -245,7 +245,8 @@ QLabel *FileBlameWidget::createNumLabel(const Annotation &annotation, int row)
    {
       const auto dtSinceEpoch = annotation.dateTime.toSecsSinceEpoch();
       const auto colorIndex = qCeil((kSecondsNewest - dtSinceEpoch) / kIncrementSecs);
-      numberLabel->setStyleSheet(QString("QLabel { border-left: 5px solid rgb(%1) }").arg(kBorderColors[colorIndex]));
+      numberLabel->setStyleSheet(
+          QString("QLabel { border-left: 5px solid rgb(%1) }").arg(kBorderColors.at(colorIndex)));
    }
    else
       numberLabel->setStyleSheet("QLabel { border-left: 5px solid #D89000 }");

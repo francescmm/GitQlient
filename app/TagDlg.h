@@ -37,7 +37,9 @@ class TagDlg : public QDialog
    Q_OBJECT
 
 public:
-   explicit TagDlg(QSharedPointer<Git> git, const QString &sha, QWidget *parent = nullptr);
+   explicit TagDlg(const QSharedPointer<Git> &git, const QString &sha, QWidget *parent = nullptr);
+   TagDlg(const TagDlg &tag) = delete;
+   TagDlg &operator=(const TagDlg &tag) = delete;
    ~TagDlg() override;
 
    void accept() override;

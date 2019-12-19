@@ -45,8 +45,9 @@ bool Lanes::isFork(const QString &sha, bool &isDiscontinuity)
 
 void Lanes::setFork(const QString &sha)
 {
-   int rangeStart, rangeEnd, idx;
-   rangeStart = rangeEnd = idx = findNextSha(sha, 0);
+   auto rangeEnd = 0;
+   auto idx = 0;
+   auto rangeStart = rangeEnd = idx = findNextSha(sha, 0);
 
    while (idx != -1)
    {

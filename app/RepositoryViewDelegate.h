@@ -38,10 +38,10 @@ class RepositoryViewDelegate : public QStyledItemDelegate
    Q_OBJECT
 
 public:
-   RepositoryViewDelegate(QSharedPointer<Git> git, CommitHistoryView *view);
+   RepositoryViewDelegate(const QSharedPointer<Git> &git, CommitHistoryView *view);
 
-   virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
-   virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
+   virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const override;
+   virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override
    {
       return QSize(LANE_WIDTH, ROW_HEIGHT);
    }

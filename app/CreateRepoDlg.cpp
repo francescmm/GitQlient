@@ -7,7 +7,7 @@
 
 #include <QFileDialog>
 
-CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<Git> git, QWidget *parent)
+CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, const QSharedPointer<Git> &git, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::CreateRepoDlg)
    , mType(type)

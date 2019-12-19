@@ -35,8 +35,8 @@ signals:
    void signalShowFileHistory(const QString &fileName);
 
 public:
-   explicit FileListWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
-   void insertFiles(const QString currentSha, const QString &compareToSha);
+   explicit FileListWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   void insertFiles(const QString &currentSha, const QString &compareToSha);
 
 private:
    QSharedPointer<Git> mGit = nullptr;

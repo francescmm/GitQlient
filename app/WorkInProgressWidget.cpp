@@ -31,7 +31,7 @@ const int WorkInProgressWidget::kMaxTitleChars = 50;
 
 QString WorkInProgressWidget::lastMsgBeforeError;
 
-WorkInProgressWidget::WorkInProgressWidget(QSharedPointer<Git> git, QWidget *parent)
+WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<Git> &git, QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::WorkInProgressWidget)
    , mGit(git)
@@ -82,8 +82,7 @@ void WorkInProgressWidget::resetInfo(bool force)
 
    QLog_Info("UI",
              QString("Configuring commit widget with sha {%1} as {%2}")
-                 .arg(mCurrentSha)
-                 .arg(mIsAmend ? QString("amend") : QString("wip")));
+                 .arg(mCurrentSha, mIsAmend ? QString("amend") : QString("wip")));
 
    blockSignals(true);
 

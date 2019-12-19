@@ -15,7 +15,7 @@
 #include <QDesktopWidget>
 #include <QMessageBox>
 
-Controls::Controls(QSharedPointer<Git> git, QWidget *parent)
+Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mHome(new QToolButton())
@@ -155,8 +155,6 @@ void Controls::openGoToDialog()
 
 void Controls::pullCurrentBranch()
 {
-   QString output;
-
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    const auto ret = mGit->pull();
    QApplication::restoreOverrideCursor();
@@ -209,8 +207,6 @@ void Controls::popStashedWork()
 
 void Controls::pruneBranches()
 {
-   QByteArray output;
-
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    const auto ret = mGit->prune();
    QApplication::restoreOverrideCursor();

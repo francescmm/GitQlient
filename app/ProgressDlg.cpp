@@ -24,7 +24,7 @@ void ProgressDlg::keyPressEvent(QKeyEvent *e)
    if (key == Qt::Key_Escape)
       return;
 
-   QDialog::keyPressEvent(e);
+   QProgressDialog::keyPressEvent(e);
 }
 
 void ProgressDlg::closeEvent(QCloseEvent *e)
@@ -32,12 +32,12 @@ void ProgressDlg::closeEvent(QCloseEvent *e)
    if (!mPrepareToClose)
       e->ignore();
    else
-      QDialog::closeEvent(e);
+      QProgressDialog::closeEvent(e);
 }
 
 void ProgressDlg::close()
 {
    mPrepareToClose = true;
 
-   QDialog::close();
+   QProgressDialog::close();
 }

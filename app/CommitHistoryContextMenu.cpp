@@ -14,7 +14,8 @@
 
 using namespace QLogger;
 
-CommitHistoryContextMenu::CommitHistoryContextMenu(QSharedPointer<Git> git, const QStringList &shas, QWidget *parent)
+CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<Git> &git, const QStringList &shas,
+                                                   QWidget *parent)
    : QMenu(parent)
    , mGit(git)
    , mShas(shas)
@@ -182,7 +183,6 @@ void CommitHistoryContextMenu::exportAsPatch()
 
       if (action == QMessageBox::Open)
       {
-         QProcess proc;
          QString fileBrowser;
 
 #ifdef Q_OS_LINUX
@@ -191,7 +191,7 @@ void CommitHistoryContextMenu::exportAsPatch()
          fileBrowser.append("explorer.exe");
 #endif
 
-         proc.startDetached(QString("%1 %2").arg(fileBrowser, mGit->getWorkingDir()));
+         QProcess::startDetached(QString("%1 %2").arg(fileBrowser, mGit->getWorkingDir()));
       }
    }
 }
@@ -258,7 +258,6 @@ void CommitHistoryContextMenu::push()
 void CommitHistoryContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QString output;
    const auto ret = mGit->pull();
    QApplication::restoreOverrideCursor();
 
@@ -336,7 +335,7 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 
    QList<QAction *> branchesToCheckout;
 
-   for (auto branch : qAsConst(branches))
+   for (const auto &branch : qAsConst(branches))
    {
       isCommitInCurrentBranch |= branch == currentBranch;
 
@@ -356,7 +355,7 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 
    if (!isCommitInCurrentBranch)
    {
-      for (auto branch : qAsConst(branches))
+      for (const auto &branch : qAsConst(branches))
       {
          if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
          {

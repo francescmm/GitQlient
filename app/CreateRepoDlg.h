@@ -46,7 +46,7 @@ signals:
    void signalOpenWhenFinish(const QString &path);
 
 public:
-   explicit CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit CreateRepoDlg(CreateRepoDlgType type, const QSharedPointer<Git> &git, QWidget *parent = nullptr);
    ~CreateRepoDlg() override;
 
    void accept() override;

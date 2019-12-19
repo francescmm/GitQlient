@@ -44,7 +44,7 @@ signals:
    void signalCheckoutBranch();
 
 public:
-   explicit BranchContextMenu(const BranchContextMenuConfig &config, QWidget *parent = nullptr);
+   explicit BranchContextMenu(BranchContextMenuConfig config, QWidget *parent = nullptr);
 
 private:
    BranchContextMenuConfig mConfig;

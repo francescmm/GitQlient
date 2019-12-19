@@ -36,7 +36,7 @@ signals:
    void signalUpdateView();
 
 public:
-   explicit StashesContextMenu(QSharedPointer<Git> git, const QString &stashId, QWidget *parent = nullptr);
+   explicit StashesContextMenu(const QSharedPointer<Git> &git, const QString &stashId, QWidget *parent = nullptr);
 
 private:
    QSharedPointer<Git> mGit;

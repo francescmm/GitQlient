@@ -34,7 +34,7 @@ class CommitHistoryModel : public QAbstractItemModel
 {
    Q_OBJECT
 public:
-   explicit CommitHistoryModel(QSharedPointer<Git> git, QObject *parent = nullptr);
+   explicit CommitHistoryModel(const QSharedPointer<Git> &git, QObject *parent = nullptr);
    ~CommitHistoryModel() override;
    void clear();
    QString sha(int row) const;
@@ -55,7 +55,7 @@ private:
    QVariant getDisplayData(const CommitInfo &rev, int column) const;
 
    QMap<CommitHistoryColumns, QString> mColumns;
-   int earlyOutputCnt;
+   int earlyOutputCnt = 0;
    int rowCnt = 0;
    QStringList curFNames;
    QStringList renamedRevs;

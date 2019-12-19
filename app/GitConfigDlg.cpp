@@ -4,7 +4,7 @@
 #include <git.h>
 #include <GitQlientStyles.h>
 
-GitConfigDlg::GitConfigDlg(QSharedPointer<Git> git, QWidget *parent)
+GitConfigDlg::GitConfigDlg(const QSharedPointer<Git> &git, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::GitConfigDlg)
    , mGit(git)

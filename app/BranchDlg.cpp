@@ -5,11 +5,12 @@
 #include <GitQlientStyles.h>
 
 #include <QFile>
+#include <utility>
 
-BranchDlg::BranchDlg(const BranchDlgConfig &config, QWidget *parent)
+BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::BranchDlg)
-   , mConfig(config)
+   , mConfig(std::move(config))
 {
    setStyleSheet(GitQlientStyles::getStyles());
 
@@ -62,8 +63,6 @@ void BranchDlg::accept()
       ui->leNewName->setStyleSheet("border: 1px solid red;");
    else
    {
-      QByteArray output;
-
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
       if (mConfig.mDialogMode == BranchDlgMode::CREATE)

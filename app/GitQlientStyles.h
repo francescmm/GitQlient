@@ -54,5 +54,5 @@ public:
 private:
    static GitQlientStyles *INSTANCE;
 
-   GitQlientStyles();
+   GitQlientStyles() = default;
 };

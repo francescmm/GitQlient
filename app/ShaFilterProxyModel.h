@@ -37,7 +37,7 @@ public:
    void endResetModel() { QSortFilterProxyModel::endResetModel(); }
 
 protected:
-   bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+   bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
 private:
    QStringList mAcceptedShas;

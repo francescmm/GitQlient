@@ -12,7 +12,7 @@
 
 using namespace QLogger;
 
-CommitInfoWidget::CommitInfoWidget(QSharedPointer<Git> git, QWidget *parent)
+CommitInfoWidget::CommitInfoWidget(const QSharedPointer<Git> &git, QWidget *parent)
    : QWidget(parent)
    , mGit(git)
    , labelSha(new QLabel())

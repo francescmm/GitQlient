@@ -40,7 +40,7 @@ signals:
    void signalAmendCommit(const QString &sha);
 
 public:
-   explicit CommitHistoryView(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit CommitHistoryView(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
    void setModel(QAbstractItemModel *model) override;
    ~CommitHistoryView() override;
    QList<QString> getSelectedShaList() const;

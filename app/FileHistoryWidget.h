@@ -40,7 +40,7 @@ signals:
    void showFileDiff(const QString &sha, const QString &parentSha, const QString &file);
 
 public:
-   explicit FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
 
    void init(const QString &workingDirectory);
    void showFileHistory(const QString &file);

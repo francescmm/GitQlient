@@ -42,7 +42,7 @@ signals:
    void signalOpenSubmodule(const QString &submoduleName);
 
 public:
-   explicit BranchesWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit BranchesWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
    void showBranches();
    void clear();
 

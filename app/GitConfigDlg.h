@@ -14,8 +14,8 @@ class GitConfigDlg : public QDialog
    Q_OBJECT
 
 public:
-   explicit GitConfigDlg(QSharedPointer<Git> git, QWidget *parent = nullptr);
-   ~GitConfigDlg();
+   explicit GitConfigDlg(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   ~GitConfigDlg() override;
 
 private:
    Ui::GitConfigDlg *ui;

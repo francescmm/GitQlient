@@ -7,8 +7,8 @@
 #include <QDir>
 #include <QMessageBox>
 
-UnstagedFilesContextMenu::UnstagedFilesContextMenu(QSharedPointer<Git> git, const QString &fileName, bool hasConflicts,
-                                                   QWidget *parent)
+UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<Git> &git, const QString &fileName,
+                                                   bool hasConflicts, QWidget *parent)
    : QMenu(parent)
    , mGit(git)
    , mFileName(fileName)

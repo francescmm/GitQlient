@@ -41,7 +41,7 @@ signals:
 
 public:
    explicit ConfigWidget(QWidget *parent = nullptr);
-   ~ConfigWidget();
+   ~ConfigWidget() override;
 
    void updateRecentProjectsList();
 
@@ -60,8 +60,7 @@ private:
    void openRepo();
    void cloneRepo();
    void initRepo();
-   void showCloningProgress(const QString);
    QWidget *createConfigWidget();
    QWidget *createRecentProjectsPage();
-   void updateProgressDialog(QString stepDescription, int value);
+   void updateProgressDialog(const QString &stepDescription, int value);
 };

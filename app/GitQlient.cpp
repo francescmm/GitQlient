@@ -75,11 +75,11 @@ void GitQlient::openRepo()
    }
 }
 
-void GitQlient::setRepositories(const QStringList repositories)
+void GitQlient::setRepositories(const QStringList &repositories)
 {
    QLog_Info("UI", QString("Adding {%1} repositories").arg(repositories.count()));
 
-   for (auto repo : repositories)
+   for (const auto &repo : repositories)
       addRepoTab(repo);
 }
 

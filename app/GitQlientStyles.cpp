@@ -99,38 +99,36 @@ QColor GitQlientStyles::getBranchColorAt(int index)
 
 QColor GitQlientStyles::getCurrentBranchColor()
 {
-   static QColor currentBranch = QColor("#005b96");
+   static auto currentBranch = QColor("#005b96");
    return currentBranch;
 }
 
 QColor GitQlientStyles::getLocalBranchColor()
 {
-   static QColor localBranch = QColor("#6497b1");
+   static auto localBranch = QColor("#6497b1");
    return localBranch;
 }
 
 QColor GitQlientStyles::getRemoteBranchColor()
 {
-   static QColor remoteBranch = QColor("#011f4b");
+   static auto remoteBranch = QColor("#011f4b");
    return remoteBranch;
 }
 
 QColor GitQlientStyles::getDetachedColor()
 {
-   static QColor detached = QColor("#851e3e");
+   static auto detached = QColor("#851e3e");
    return detached;
 }
 
 QColor GitQlientStyles::getTagColor()
 {
-   static QColor tag = QColor("#dec3c3");
+   static auto tag = QColor("#dec3c3");
    return tag;
 }
 
 QColor GitQlientStyles::getRefsColor()
 {
-   static QColor refs = QColor("#FF5555");
+   static auto refs = QColor("#FF5555");
    return refs;
 }
-
-GitQlientStyles::GitQlientStyles() {}

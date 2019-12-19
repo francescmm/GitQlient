@@ -37,7 +37,7 @@ signals:
    void signalSelectCommit(const QString &sha);
 
 public:
-   explicit BranchTreeWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit BranchTreeWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
    void setLocalRepo(const bool isLocal) { mLocal = isLocal; }
 
 private:

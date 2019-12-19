@@ -6,7 +6,7 @@
 #include <QFile>
 #include <QDir>
 
-AddSubmoduleDlg::AddSubmoduleDlg(QSharedPointer<Git> git, QWidget *parent)
+AddSubmoduleDlg::AddSubmoduleDlg(const QSharedPointer<Git> &git, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::AddSubmoduleDlg)
    , mGit(git)

@@ -80,12 +80,13 @@ void RevisionsCache::updateWipCommit(CommitInfo rev)
       if (mCommits[rev.orderIdx])
          rev.lanes = mCommits[rev.orderIdx]->lanes;
 
+      const auto sha = rev.sha();
       const auto commit = new CommitInfo(std::move(rev));
 
       delete mCommits[commit->orderIdx];
       mCommits[commit->orderIdx] = commit;
 
-      revs.insert(rev.sha(), commit);
+      revs.insert(sha, commit);
    }
 }
 

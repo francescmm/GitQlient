@@ -39,7 +39,7 @@ signals:
    void signalShowFileHistory(const QString &fileName);
 
 public:
-   explicit CommitInfoWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit CommitInfoWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
 
    void setCurrentCommitSha(const QString &sha);
    QString getCurrentCommitSha() const;

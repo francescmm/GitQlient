@@ -19,7 +19,7 @@
 
 using namespace QLogger;
 
-BranchesWidget::BranchesWidget(QSharedPointer<Git> git, QWidget *parent)
+BranchesWidget::BranchesWidget(const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mLocalBranchesTree(new BranchTreeWidget(mGit))
@@ -203,7 +203,7 @@ void BranchesWidget::showBranches()
 
          mRemoteBranchesTree->addTopLevelItem(new QTreeWidgetItem({ "origin" }));
 
-         for (auto branch : branches)
+         for (const auto &branch : branches)
          {
             if (!branch.isEmpty())
             {
@@ -256,7 +256,7 @@ void BranchesWidget::processLocalBranch(QString branch)
    auto folders = branch.split("/");
    branch = folders.takeLast();
 
-   for (auto folder : folders)
+   for (const auto &folder : folders)
    {
       const auto childs = mLocalBranchesTree->findItems(folder, Qt::MatchExactly);
       if (childs.isEmpty())
@@ -318,7 +318,7 @@ void BranchesWidget::processRemoteBranch(QString branch)
 
    auto found = false;
 
-   for (auto folder : folders)
+   for (const auto &folder : folders)
    {
       const auto children = parent->childCount();
       if (children != 0)
@@ -383,7 +383,7 @@ void BranchesWidget::processStashes()
 
    QLog_Info("UI", QString("Fetching {%1} stashes").arg(stashes.count()));
 
-   for (auto stash : stashes)
+   for (const auto &stash : stashes)
    {
       const auto stashId = stash.split(":").first();
       const auto stashDesc = stash.split("}: ").last();
@@ -491,7 +491,6 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
       const auto updateSubmoduleAction = menu->addAction(tr("Update"));
       connect(updateSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QByteArray output;
          const auto ret = mGit->submoduleUpdate(submoduleName);
          QApplication::restoreOverrideCursor();
 

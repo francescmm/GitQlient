@@ -6,9 +6,11 @@
 #include <QApplication>
 #include <QMessageBox>
 
-BranchContextMenu::BranchContextMenu(const BranchContextMenuConfig &config, QWidget *parent)
+#include <utility>
+
+BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *parent)
    : QMenu(parent)
-   , mConfig(config)
+   , mConfig(std::move(config))
 {
    if (mConfig.isLocal)
    {
@@ -147,7 +149,6 @@ void BranchContextMenu::deleteBranch()
       if (ret == QMessageBox::Ok)
       {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         const auto remoteBranch = mConfig.branchSelected.remove("origin/");
          const auto ret2 = mConfig.isLocal ? mConfig.mGit->removeLocalBranch(mConfig.branchSelected)
                                            : mConfig.mGit->removeRemoteBranch(mConfig.branchSelected);
          QApplication::restoreOverrideCursor();

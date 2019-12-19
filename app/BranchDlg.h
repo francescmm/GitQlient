@@ -53,7 +53,7 @@ class BranchDlg : public QDialog
    Q_OBJECT
 
 public:
-   explicit BranchDlg(const BranchDlgConfig &config, QWidget *parent = nullptr);
+   explicit BranchDlg(BranchDlgConfig config, QWidget *parent = nullptr);
    ~BranchDlg() override;
 
 private:

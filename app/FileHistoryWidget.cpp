@@ -17,7 +17,7 @@
 #include <QApplication>
 #include <QClipboard>
 
-FileHistoryWidget::FileHistoryWidget(QSharedPointer<Git> git, QWidget *parent)
+FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , fileSystemModel(new QFileSystemModel())

@@ -6,7 +6,7 @@
 #include <QApplication>
 #include <QMessageBox>
 
-BranchTreeWidget::BranchTreeWidget(QSharedPointer<Git> git, QWidget *parent)
+BranchTreeWidget::BranchTreeWidget(const QSharedPointer<Git> &git, QWidget *parent)
    : QTreeWidget(parent)
    , mGit(git)
 {

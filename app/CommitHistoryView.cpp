@@ -23,7 +23,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <QLogger.h>
 using namespace QLogger;
 
-CommitHistoryView::CommitHistoryView(QSharedPointer<Git> git, QWidget *parent)
+CommitHistoryView::CommitHistoryView(const QSharedPointer<Git> &git, QWidget *parent)
    : QTreeView(parent)
    , mGit(git)
 {

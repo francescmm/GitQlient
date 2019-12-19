@@ -39,7 +39,7 @@ signals:
    void signalCommitSelected(const QString &sha);
 
 public:
-   explicit FileBlameWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
 
    void setup(const QString &fileName);
 
@@ -55,7 +55,7 @@ private:
       QString sha;
       QString author;
       QDateTime dateTime;
-      int line;
+      int line = 0;
       QString content;
    };
 

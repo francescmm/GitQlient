@@ -13,7 +13,6 @@ void FileDiffHighlighter::highlightBlock(const QString &text)
 
    if (!text.isEmpty())
    {
-      QBrush blue = GitQlientStyles::getBlue();
       QBrush green = GitQlientStyles::getGreen();
       QBrush magenta = GitQlientStyles::getRed();
       QBrush orange = GitQlientStyles::getOrange();
