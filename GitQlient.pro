@@ -14,7 +14,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 # project files
 SOURCES += main.cpp
 
-include(GitQlient.pri)
+include(App.pri)
 include(QLogger/QLogger.pri)
 
 INCLUDEPATH += QLogger
