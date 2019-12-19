@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <QFrame>
+#include <QMap>
 
 class Git;
 class QFileSystemModel;
@@ -31,6 +32,8 @@ class FileBlameWidget;
 class QTreeView;
 class CommitHistoryModel;
 class CommitHistoryView;
+class QTabWidget;
+class QModelIndex;
 
 class FileHistoryWidget : public QFrame
 {
@@ -43,7 +46,8 @@ public:
    explicit FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
 
    void init(const QString &workingDirectory);
-   void showFileHistory(const QString &file);
+   void showFileHistory(const QModelIndex &index);
+   void showFileHistory(const QString &filePath);
 
 private:
    QSharedPointer<Git> mGit;
@@ -51,9 +55,10 @@ private:
    CommitHistoryModel *mRepoModel = nullptr;
    CommitHistoryView *mRepoView = nullptr;
    QTreeView *fileSystemView = nullptr;
-   FileBlameWidget *mFileBlameWidget = nullptr;
+   QTabWidget *mTabWidget = nullptr;
    QString mWorkingDirectory;
    QString mCurrentFile;
+   QMap<QString, FileBlameWidget *> mTabsMap;
 
    void showFileSystemContextMenu(const QPoint &pos);
    void showRepoViewMenu(const QPoint &pos);

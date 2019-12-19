@@ -495,3 +495,8 @@ QProgressBar::chunk
     width: 18px;
 }
 
+#ShaLabel
+{
+    padding: 5px;
+}
+

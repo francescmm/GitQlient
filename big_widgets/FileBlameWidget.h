@@ -46,6 +46,8 @@ public:
 private:
    QSharedPointer<Git> mGit;
    QFrame *mAnotation = nullptr;
+   QLabel *mCurrentSha = nullptr;
+   QLabel *mPreviousSha = nullptr;
    QScrollArea *mScrollArea = nullptr;
    QFont mInfoFont;
    QFont mCodeFont;

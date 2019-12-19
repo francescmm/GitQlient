@@ -26,7 +26,10 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent
    : QFrame(parent)
    , mGit(git)
    , mAnotation(new QFrame())
+   , mCurrentSha(new QLabel())
+   , mPreviousSha(new QLabel())
 {
+   mCurrentSha->setObjectName("ShaLabel");
    mAnotation->setObjectName("AnnotationFrame");
 
    auto initialLayout = new QGridLayout(mAnotation);
@@ -44,8 +47,19 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent
    mScrollArea->setWidget(mAnotation);
    mScrollArea->setWidgetResizable(true);
 
+   const auto shasLayout = new QGridLayout();
+   shasLayout->setSpacing(0);
+   shasLayout->setContentsMargins(QMargins());
+   shasLayout->addWidget(new QLabel(tr("Current SHA:")), 0, 0);
+   shasLayout->addWidget(mCurrentSha, 0, 1);
+   shasLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 2);
+   shasLayout->addWidget(new QLabel(tr("Previous SHA:")), 1, 0);
+   shasLayout->addWidget(mPreviousSha, 1, 1);
+
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
+   layout->setSpacing(0);
+   layout->addLayout(shasLayout);
    layout->addWidget(mScrollArea);
 }
 
@@ -140,6 +154,16 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
 
       annotationLayout->addWidget(createNumLabel(annotations.at(row), row), row, 3);
       annotationLayout->addWidget(createCodeLabel(annotations.at(row).content), row, 4);
+
+      if (row == 0)
+      {
+         mCurrentSha->setText(annotations.constFirst().sha);
+
+         if (annotations.count() > 1)
+            mPreviousSha->setText(annotations.at(1).sha);
+         else
+            mPreviousSha->setText("No info");
+      }
    }
 
    // Adding the last row

@@ -404,3 +404,9 @@ ClickableFrame::pressed
     background-color: #202122;
 }
 
+#ShaLabel
+{
+    background-color: #2E2F30;
+    color: white;
+}
+

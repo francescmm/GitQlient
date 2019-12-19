@@ -16,6 +16,7 @@
 #include <QMenu>
 #include <QApplication>
 #include <QClipboard>
+#include <QTabWidget>
 
 FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
@@ -24,7 +25,7 @@ FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *pa
    , mRepoModel(new CommitHistoryModel(mGit))
    , mRepoView(new CommitHistoryView(mGit))
    , fileSystemView(new QTreeView())
-   , mFileBlameWidget(new FileBlameWidget(mGit))
+   , mTabWidget(new QTabWidget())
 {
    mRepoView->setObjectName("blameRepoView");
    mRepoView->setModel(mRepoModel);
@@ -49,20 +50,20 @@ FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *pa
    fileSystemView->header()->setSectionHidden(2, true);
    fileSystemView->header()->setSectionHidden(3, true);
    fileSystemView->setContextMenuPolicy(Qt::CustomContextMenu);
-   connect(fileSystemView, &QTreeView::clicked, this, [this](const QModelIndex &index) {
-      auto item = fileSystemModel->fileInfo(index);
-
-      if (item.isFile())
-         showFileHistory(QString("%1").arg(item.filePath()));
-   });
+   connect(fileSystemView, &QTreeView::clicked, this,
+           qOverload<const QModelIndex &>(&FileHistoryWidget::showFileHistory));
 
    const auto historyBlameLayout = new QGridLayout(this);
    historyBlameLayout->setContentsMargins(QMargins());
    historyBlameLayout->addWidget(mRepoView, 0, 0);
    historyBlameLayout->addWidget(fileSystemView, 1, 0);
-   historyBlameLayout->addWidget(mFileBlameWidget, 0, 1, 2, 1);
+   historyBlameLayout->addWidget(mTabWidget, 0, 1, 2, 1);
 
-   connect(mFileBlameWidget, &FileBlameWidget::signalCommitSelected, mRepoView, &CommitHistoryView::focusOnCommit);
+   connect(mTabWidget, &QTabWidget::tabCloseRequested, mTabWidget, [this](int index) {
+      auto widget = mTabWidget->widget(index);
+      mTabWidget->removeTab(index);
+      delete widget;
+   });
 }
 
 void FileHistoryWidget::init(const QString &workingDirectory)
@@ -72,15 +73,35 @@ void FileHistoryWidget::init(const QString &workingDirectory)
    fileSystemView->setRootIndex(fileSystemModel->index(workingDirectory));
 }
 
-void FileHistoryWidget::showFileHistory(const QString &file)
+void FileHistoryWidget::showFileHistory(const QString &filePath)
 {
-   mCurrentFile = file;
-   const auto ret = mGit->history(mCurrentFile);
+   mCurrentFile = filePath;
+   if (!mTabsMap.contains(mCurrentFile))
+   {
+      const auto ret = mGit->history(mCurrentFile);
 
-   if (ret.success)
-      mRepoView->filterBySha(ret.output.toString().split("\n", QString::SkipEmptyParts));
+      if (ret.success)
+         mRepoView->filterBySha(ret.output.toString().split("\n", QString::SkipEmptyParts));
 
-   mFileBlameWidget->setup(mCurrentFile);
+      const auto fileBlameWidget = new FileBlameWidget(mGit);
+      fileBlameWidget->setup(mCurrentFile);
+      connect(fileBlameWidget, &FileBlameWidget::signalCommitSelected, mRepoView, &CommitHistoryView::focusOnCommit);
+
+      mTabWidget->addTab(fileBlameWidget, mCurrentFile.split("/").last());
+      mTabWidget->setTabsClosable(true);
+
+      mTabsMap.insert(mCurrentFile, fileBlameWidget);
+   }
+   else
+      mTabWidget->setCurrentWidget(mTabsMap.value(mCurrentFile));
+}
+
+void FileHistoryWidget::showFileHistory(const QModelIndex &index)
+{
+   auto item = fileSystemModel->fileInfo(index);
+
+   if (item.isFile())
+      showFileHistory(item.filePath());
 }
 
 void FileHistoryWidget::showRepoViewMenu(const QPoint &pos)
