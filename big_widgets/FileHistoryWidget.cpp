@@ -134,6 +134,20 @@ void FileHistoryWidget::reloadHistory(int tabIndex)
       const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
       mRepoView->blockSignals(true);
       mRepoView->filterBySha(shaHistory);
+
+      const auto repoModel = mRepoView->model();
+      const auto totalRows = repoModel->rowCount();
+      for (auto i = 0; i < totalRows; ++i)
+      {
+         const auto index = mRepoView->model()->index(i, static_cast<int>(CommitHistoryColumns::SHA));
+
+         if (index.data().toString().startsWith(sha))
+         {
+            mRepoView->setCurrentIndex(index);
+            mRepoView->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+         }
+      }
+
       mRepoView->blockSignals(false);
    }
 }

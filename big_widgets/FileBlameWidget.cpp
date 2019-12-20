@@ -29,8 +29,6 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent
    , mCurrentSha(new QLabel())
    , mPreviousSha(new QLabel())
 {
-   mCurrentSha->setObjectName("ShaLabel");
-   mPreviousSha->setObjectName("ShaLabel");
    mAnotation->setObjectName("AnnotationFrame");
 
    auto initialLayout = new QGridLayout(mAnotation);
@@ -49,16 +47,13 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent
    mScrollArea->setWidgetResizable(true);
 
    const auto lSha = new QLabel(tr("Current SHA:"));
-   lSha->setObjectName("ShaLabel");
-
    const auto lSha2 = new QLabel(tr("Previous SHA:"));
-   lSha2->setObjectName("ShaLabel");
 
    const auto separator = new QFrame();
    separator->setObjectName("separator");
 
    const auto shasLayout = new QGridLayout();
-   shasLayout->setSpacing(0);
+   shasLayout->setSpacing(10);
    shasLayout->setContentsMargins(QMargins());
    shasLayout->addWidget(lSha, 0, 0);
    shasLayout->addWidget(mCurrentSha, 0, 1);
@@ -68,8 +63,8 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent
    shasLayout->addWidget(separator, 2, 0, 1, 3);
 
    const auto layout = new QVBoxLayout(this);
-   layout->setContentsMargins(QMargins());
-   layout->setSpacing(0);
+   layout->setContentsMargins(10, 10, 10, 0);
+   layout->setSpacing(10);
    layout->addLayout(shasLayout);
    layout->addWidget(mScrollArea);
 }
