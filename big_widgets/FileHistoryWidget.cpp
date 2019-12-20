@@ -123,32 +123,36 @@ void FileHistoryWidget::reloadBlame(const QModelIndex &index)
 
 void FileHistoryWidget::reloadHistory(int tabIndex)
 {
-   const auto blameWidget = qobject_cast<FileBlameWidget *>(mTabWidget->widget(tabIndex));
-   const auto sha = blameWidget->getCurrentSha();
-   const auto file = blameWidget->getCurrentFile();
-
-   const auto ret = mGit->history(file);
-
-   if (ret.success)
+   if (tabIndex >= 0)
    {
-      const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
-      mRepoView->blockSignals(true);
-      mRepoView->filterBySha(shaHistory);
+      const auto blameWidget = qobject_cast<FileBlameWidget *>(mTabWidget->widget(tabIndex));
+      const auto sha = blameWidget->getCurrentSha();
+      const auto file = blameWidget->getCurrentFile();
 
-      const auto repoModel = mRepoView->model();
-      const auto totalRows = repoModel->rowCount();
-      for (auto i = 0; i < totalRows; ++i)
+      const auto ret = mGit->history(file);
+
+      if (ret.success)
       {
-         const auto index = mRepoView->model()->index(i, static_cast<int>(CommitHistoryColumns::SHA));
+         const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+         mRepoView->blockSignals(true);
+         mRepoView->filterBySha(shaHistory);
 
-         if (index.data().toString().startsWith(sha))
+         const auto repoModel = mRepoView->model();
+         const auto totalRows = repoModel->rowCount();
+         for (auto i = 0; i < totalRows; ++i)
          {
-            mRepoView->setCurrentIndex(index);
-            mRepoView->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
-         }
-      }
+            const auto index = mRepoView->model()->index(i, static_cast<int>(CommitHistoryColumns::SHA));
 
-      mRepoView->blockSignals(false);
+            if (index.data().toString().startsWith(sha))
+            {
+               mRepoView->setCurrentIndex(index);
+               mRepoView->selectionModel()->select(index,
+                                                   QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+            }
+         }
+
+         mRepoView->blockSignals(false);
+      }
    }
 }
 
