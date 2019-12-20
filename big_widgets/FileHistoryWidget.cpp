@@ -113,12 +113,16 @@ void FileHistoryWidget::showFileHistory(const QString &filePath)
 
 void FileHistoryWidget::reloadBlame(const QModelIndex &index)
 {
-   const auto sha
-       = mRepoView->model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
-   const auto previousSha
-       = mRepoView->model()->index(index.row() + 1, static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
    const auto blameWidget = qobject_cast<FileBlameWidget *>(mTabWidget->currentWidget());
-   blameWidget->reload(sha, previousSha);
+
+   if (blameWidget)
+   {
+      const auto sha
+          = mRepoView->model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+      const auto previousSha
+          = mRepoView->model()->index(index.row() + 1, static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+      blameWidget->reload(sha, previousSha);
+   }
 }
 
 void FileHistoryWidget::reloadHistory(int tabIndex)
