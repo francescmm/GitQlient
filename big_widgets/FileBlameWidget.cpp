@@ -291,7 +291,7 @@ QLabel *FileBlameWidget::createNumLabel(const Annotation &annotation, int row)
 
 QLabel *FileBlameWidget::createCodeLabel(const QString &content)
 {
-   const auto contentLabel = new QLabel(content.toHtmlEscaped());
+   const auto contentLabel = new QLabel(content);
    contentLabel->setFont(mCodeFont);
    contentLabel->setObjectName("normalLabel");
 
