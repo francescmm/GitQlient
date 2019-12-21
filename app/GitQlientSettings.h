@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <QSettings>
+#include <QVector>
 
 class GitQlientSettings : public QSettings
 {
