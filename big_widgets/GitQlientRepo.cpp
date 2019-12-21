@@ -74,16 +74,16 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mRepoWidget, &CommitHistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
    connect(mRepoWidget, &CommitHistoryWidget::signalShowDiff, this, [this](const QString &fileName) {
       mainStackedLayout->setCurrentWidget(mDiffWidget);
-      mDiffWidget->configure("", "", fileName);
+      mDiffWidget->loadFileDiff("", "", fileName);
    });
    connect(mRepoWidget, &CommitHistoryWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mRepoWidget, &CommitHistoryWidget::signalUpdateUi, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mRepoWidget, &CommitHistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
-   connect(mRepoWidget, &CommitHistoryWidget::signalOpenFileCommit, mDiffWidget, &DiffWidget::configure);
+   connect(mRepoWidget, &CommitHistoryWidget::signalOpenFileCommit, mDiffWidget, &DiffWidget::loadFileDiff);
    connect(mRepoWidget, &CommitHistoryWidget::signalOpenFileCommit, this,
            [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
 
-   connect(mBlameWidget, &BlameWidget::showFileDiff, mDiffWidget, &DiffWidget::configure);
+   connect(mBlameWidget, &BlameWidget::showFileDiff, mDiffWidget, &DiffWidget::loadFileDiff);
    connect(mBlameWidget, &BlameWidget::showFileDiff, this,
            [this](const QString &sha, const QString &, const QString &) {
               mainStackedLayout->setCurrentWidget(mDiffWidget);
@@ -269,13 +269,13 @@ void GitQlientRepo::openCommitDiff()
    if (!(currentSha == ZERO_SHA && mGit->isNothingToCommit()))
    {
       const auto rev = mGit->getCommitInfo(currentSha);
-      mDiffWidget->reload(currentSha, rev.parent(0));
+      mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
    }
 }
 
 void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
 {
-   mDiffWidget->reload(shas.last(), shas.first());
+   mDiffWidget->loadCommitDiff(shas.last(), shas.first());
 }
 
 void GitQlientRepo::changesCommitted(bool ok)

@@ -16,8 +16,8 @@ public:
    explicit DiffWidget(const QSharedPointer<Git> git, QWidget *parent = nullptr);
 
    void clear() const;
-   void configure(const QString &sha, const QString &previousSha, const QString &file);
-   void reload(const QString &sha, const QString &parentSha);
+   void loadFileDiff(const QString &sha, const QString &previousSha, const QString &file);
+   void loadCommitDiff(const QString &sha, const QString &parentSha);
 
 private:
    QStackedWidget *centerStackedWidget = nullptr;

@@ -35,7 +35,7 @@ void DiffWidget::clear() const
    mFileDiffWidget->clear();
 }
 
-void DiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file)
+void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
    const auto fileWithModifications = mFileDiffWidget->configure(currentSha, previousSha, file);
 
@@ -51,7 +51,7 @@ void DiffWidget::configure(const QString &currentSha, const QString &previousSha
       QMessageBox::information(this, tr("No modifications"), tr("There are no content modifications for this file"));
 }
 
-void DiffWidget::reload(const QString &sha, const QString &parentSha)
+void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 {
 
    mFullDiffWidget->loadDiff(sha, parentSha);
