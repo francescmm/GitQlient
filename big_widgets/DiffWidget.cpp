@@ -2,6 +2,7 @@
 
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
+#include <DiffButton.h>
 
 #include <QLogger.h>
 
@@ -22,14 +23,14 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
    centerStackedWidget->addWidget(mFileDiffWidget);
    centerStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-   const auto diffButtonsContainer = new QVBoxLayout();
-   diffButtonsContainer->setContentsMargins(QMargins());
-   diffButtonsContainer->setSpacing(5);
+   mDiffButtonsContainer = new QVBoxLayout();
+   mDiffButtonsContainer->setContentsMargins(QMargins());
+   mDiffButtonsContainer->setSpacing(5);
 
    const auto diffsLayout = new QVBoxLayout();
    diffsLayout->setContentsMargins(QMargins());
    diffsLayout->setSpacing(10);
-   diffsLayout->addLayout(diffButtonsContainer);
+   diffsLayout->addLayout(mDiffButtonsContainer);
 
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
@@ -56,6 +57,9 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
           "UI",
           QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
 
+      const auto diffButton = new DiffButton(file);
+      mDiffButtonsContainer->addWidget(diffButton);
+      mDiffButtons.insert(file, diffButton);
       centerStackedWidget->setCurrentIndex(1);
    }
    else

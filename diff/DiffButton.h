@@ -5,5 +5,5 @@
 class DiffButton : public QFrame
 {
 public:
-   explicit DiffButton(QWidget *parent = nullptr);
+   explicit DiffButton(const QString &text, QWidget *parent = nullptr);
 };

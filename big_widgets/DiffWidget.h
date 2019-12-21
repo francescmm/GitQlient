@@ -1,11 +1,14 @@
 #pragma once
 
 #include <QFrame>
+#include <QMap>
 
 class Git;
 class QStackedWidget;
 class FullDiffWidget;
 class FileDiffWidget;
+class DiffButton;
+class QVBoxLayout;
 
 class DiffWidget : public QFrame
 {
@@ -22,4 +25,6 @@ private:
    QStackedWidget *centerStackedWidget = nullptr;
    FullDiffWidget *mFullDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;
+   QMap<QString, DiffButton *> mDiffButtons;
+   QVBoxLayout *mDiffButtonsContainer = nullptr;
 };

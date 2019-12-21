@@ -1,6 +1,6 @@
 #include "DiffButton.h"
 
-DiffButton::DiffButton(QWidget *parent)
+DiffButton::DiffButton(const QString &, QWidget *parent)
    : QFrame(parent)
 {
 }
