@@ -32,6 +32,7 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
    diffsLayout->setContentsMargins(QMargins());
    diffsLayout->setSpacing(10);
    diffsLayout->addLayout(mDiffButtonsContainer);
+   diffsLayout->addStretch();
 
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
@@ -75,13 +76,17 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
       if (fileWithModifications)
       {
          const auto diffButton = new DiffButton(id, ":/icons/file");
+         connect(diffButton, &DiffButton::clicked, this, []() {});
+         connect(diffButton, &DiffButton::destroyed, []() {});
+
          mDiffButtonsContainer->addWidget(diffButton);
          mDiffButtons.insert(id, { fileDiffWidget, diffButton });
+
+         const auto index = centerStackedWidget->addWidget(fileDiffWidget);
+         centerStackedWidget->setCurrentIndex(index);
       }
       else
          delete fileDiffWidget;
-
-      centerStackedWidget->setCurrentIndex(1);
    }
    else
       QMessageBox::information(this, tr("No modifications"), tr("There are no content modifications for this file"));
@@ -97,9 +102,12 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       fullDiffWidget->loadDiff(sha, parentSha);
 
       const auto diffButton = new DiffButton(id, ":/icons/commit-list");
+      connect(diffButton, &DiffButton::clicked, this, []() {});
+      connect(diffButton, &DiffButton::destroyed, []() {});
       mDiffButtonsContainer->addWidget(diffButton);
       mDiffButtons.insert(id, { fullDiffWidget, diffButton });
+
+      const auto index = centerStackedWidget->addWidget(fullDiffWidget);
+      centerStackedWidget->setCurrentIndex(index);
    }
-   else if (dynamic_cast<FullDiffWidget *>(mDiffButtons.value(id).first))
-      dynamic_cast<FullDiffWidget *>(mDiffButtons.value(id).first)->loadDiff(sha, parentSha);
 }

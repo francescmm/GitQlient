@@ -495,3 +495,10 @@ QProgressBar::chunk
     width: 18px;
 }
 
+DiffButton
+{
+   min-width: 350px;
+   max-width: 350px;
+}
+
+

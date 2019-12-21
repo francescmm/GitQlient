@@ -449,3 +449,33 @@ QTabWidget#HistoryTab > QTabBar::tab:!selected:hover
     color: white;
 }
 
+DiffButton
+{
+   background-color: #2F2E30;
+}
+
+DiffButton > QLabel
+{
+   background-color: transparent;
+}
+
+DiffButton:hover
+{
+   background-color: #606162;
+}
+
+DiffButton[pressed="true"]
+{
+   background-color: #202122;
+}
+
+#DiffButtonClose:pressed
+{
+   background-color: #606162;
+}
+
+#DiffButtonClose:hover
+{
+   background-color: #202122;
+}
+
