@@ -42,7 +42,6 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    , mRevisionWidget(new CommitInfoWidget(mGit))
    , mFullDiffWidget(new FullDiffWidget(mGit))
    , mFileDiffWidget(new FileDiffWidget(mGit))
-   , mBranchesWidget(new BranchesWidget(mGit))
    , fileHistoryWidget(new FileHistoryWidget(mGit))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
@@ -67,8 +66,6 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    centerLayout->setContentsMargins(QMargins());
    centerLayout->addWidget(commitStackedWidget);
    centerLayout->addWidget(centerStackedWidget);
-   centerLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
-   centerLayout->addWidget(mBranchesWidget);
 
    const auto centerWidget = new QFrame();
    centerWidget->setLayout(centerLayout);
@@ -99,12 +96,8 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
 
-   connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &GitQlientRepo::updateCache);
-   connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &GitQlientRepo::updateCache);
-   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepoWidget, &CommitHistoryWidget::focusOnCommit);
-   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &GitQlientRepo::onCommitSelected);
-   connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
-
+   connect(mRepoWidget, &CommitHistoryWidget::signalUpdateCache, this, &GitQlientRepo::updateCache);
+   connect(mRepoWidget, &CommitHistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
    connect(mRepoWidget, &CommitHistoryWidget::signalGoToSha, this, &GitQlientRepo::onCommitSelected);
    connect(mRepoWidget, &CommitHistoryWidget::signalViewUpdated, this, &GitQlientRepo::updateCache);
    connect(mRepoWidget, &CommitHistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
@@ -154,7 +147,7 @@ void GitQlientRepo::updateCache()
 
       mGit->loadRepository(mCurrentDir);
 
-      mBranchesWidget->showBranches();
+      mRepoWidget->reload();
 
       const auto commitStackedIndex = commitStackedWidget->currentIndex();
       const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : ZERO_SHA;
@@ -210,7 +203,8 @@ void GitQlientRepo::setRepository(const QString &newDir)
          setWatcher();
 
          onCommitSelected(ZERO_SHA);
-         mBranchesWidget->showBranches();
+
+         mRepoWidget->reload();
 
          fileHistoryWidget->init(newDir);
 
@@ -290,7 +284,6 @@ void GitQlientRepo::clearWindow()
    mRepoWidget->clear();
    mFullDiffWidget->clear();
    mFileDiffWidget->clear();
-   mBranchesWidget->clear();
 
    blockSignals(false);
 }
@@ -304,7 +297,6 @@ void GitQlientRepo::setWidgetsEnabled(bool enabled)
    mRepoWidget->setEnabled(enabled);
    mFullDiffWidget->setEnabled(enabled);
    mFileDiffWidget->setEnabled(enabled);
-   mBranchesWidget->setEnabled(enabled);
 }
 
 void GitQlientRepo::showFileHistory(const QString &fileName)

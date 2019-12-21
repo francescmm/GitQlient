@@ -7,6 +7,7 @@ class Git;
 class CommitHistoryModel;
 class CommitHistoryView;
 class QLineEdit;
+class BranchesWidget;
 
 class CommitHistoryWidget : public QFrame
 {
@@ -18,16 +19,20 @@ signals:
    void signalOpenCompareDiff(const QStringList &sha);
    void signalAmendCommit(const QString &sha);
    void signalGoToSha(const QString &sha);
+   void signalUpdateCache();
+   void signalOpenSubmodule(const QString &submodule);
 
 public:
    explicit CommitHistoryWidget(const QSharedPointer<Git> git, QWidget *parent = nullptr);
    void clear();
+   void reload();
    void focusOnCommit(const QString &sha);
    QString getCurrentSha() const;
 
 private:
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;
+   BranchesWidget *mBranchesWidget = nullptr;
    QLineEdit *mGoToSha = nullptr;
 
    void goToSha();

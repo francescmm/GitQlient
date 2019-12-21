@@ -37,7 +37,6 @@ class FullDiffWidget;
 class FileDiffWidget;
 class CommitHistoryWidget;
 class RevsView;
-class BranchesWidget;
 class FileHistoryWidget;
 class FileDiffHighlighter;
 class QTimer;
@@ -90,7 +89,6 @@ private:
    FullDiffWidget *mFullDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
-   BranchesWidget *mBranchesWidget = nullptr;
    FileHistoryWidget *fileHistoryWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;

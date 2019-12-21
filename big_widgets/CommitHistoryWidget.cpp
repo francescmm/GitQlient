@@ -3,15 +3,21 @@
 #include <CommitHistoryModel.h>
 #include <CommitHistoryView.h>
 #include <RepositoryViewDelegate.h>
+#include <BranchesWidget.h>
 
-#include <QVBoxLayout>
+#include <QGridLayout>
 #include <QLineEdit>
 
 CommitHistoryWidget::CommitHistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
    , mRepositoryModel(new CommitHistoryModel(git))
    , mRepositoryView(new CommitHistoryView(git))
+   , mBranchesWidget(new BranchesWidget(git))
+   , mGoToSha(new QLineEdit())
 {
+   mGoToSha->setPlaceholderText(tr("Press Enter to focus on SHA..."));
+   connect(mGoToSha, &QLineEdit::returnPressed, this, &CommitHistoryWidget::goToSha);
+
    mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setItemDelegate(new RepositoryViewDelegate(git, mRepositoryView));
    mRepositoryView->setEnabled(true);
@@ -24,14 +30,23 @@ CommitHistoryWidget::CommitHistoryWidget(const QSharedPointer<Git> git, QWidget 
    connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &CommitHistoryWidget::openDiff);
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &CommitHistoryWidget::signalAmendCommit);
 
-   mGoToSha = new QLineEdit();
-   mGoToSha->setPlaceholderText(tr("Press Enter to focus on SHA..."));
-   connect(mGoToSha, &QLineEdit::returnPressed, this, &CommitHistoryWidget::goToSha);
+   connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &CommitHistoryWidget::signalUpdateCache);
+   connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &CommitHistoryWidget::signalUpdateCache);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &CommitHistoryWidget::signalGoToSha);
+   connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &CommitHistoryWidget::signalOpenSubmodule);
 
-   const auto layout = new QVBoxLayout();
+   const auto viewLayout = new QVBoxLayout();
+   viewLayout->setContentsMargins(QMargins());
+   viewLayout->setSpacing(5);
+   viewLayout->addWidget(mGoToSha);
+   viewLayout->addWidget(mRepositoryView);
+
+   const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
-   layout->addWidget(mGoToSha);
-   layout->addWidget(mRepositoryView);
+   layout->setSpacing(15);
+   layout->addLayout(viewLayout);
+   layout->addWidget(mBranchesWidget);
 
    setLayout(layout);
 }
@@ -39,6 +54,12 @@ CommitHistoryWidget::CommitHistoryWidget(const QSharedPointer<Git> git, QWidget 
 void CommitHistoryWidget::clear()
 {
    mRepositoryView->clear();
+   mBranchesWidget->clear();
+}
+
+void CommitHistoryWidget::reload()
+{
+   mBranchesWidget->showBranches();
 }
 
 void CommitHistoryWidget::focusOnCommit(const QString &sha)
