@@ -1,6 +1,7 @@
 INCLUDEPATH += $$PWD
 
 HEADERS += \
+    $$PWD/CommitHistoryWidget.h \
     $$PWD/Controls.h \
     $$PWD/FileBlameWidget.h \
     $$PWD/FileHistoryWidget.h \
@@ -11,6 +12,7 @@ HEADERS += \
     $$PWD/GitQlientStyles.h
 
 SOURCES += \
+    $$PWD/CommitHistoryWidget.cpp \
     $$PWD/Controls.cpp \
     $$PWD/FileBlameWidget.cpp \
     $$PWD/FileHistoryWidget.cpp \

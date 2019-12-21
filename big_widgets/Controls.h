@@ -35,7 +35,6 @@ class Controls : public QFrame
 signals:
    void signalGoBack();
    void signalGoBlame();
-   void signalGoToSha(const QString &sha);
    void signalRepositoryUpdated();
 
 public:
@@ -50,13 +49,11 @@ private:
    QSharedPointer<Git> mGit;
    QToolButton *mHome = nullptr;
    QToolButton *mBlame = nullptr;
-   QToolButton *mGoToBtn = nullptr;
    QToolButton *mPullBtn = nullptr;
    QToolButton *mPushBtn = nullptr;
    QToolButton *mStashBtn = nullptr;
    QToolButton *mRefreshBtn = nullptr;
 
-   void openGoToDialog();
    void pullCurrentBranch();
    void pushCurrentBranch();
    void stashCurrentWork();

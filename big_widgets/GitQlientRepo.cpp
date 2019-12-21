@@ -5,9 +5,8 @@
 #include <BranchesWidget.h>
 #include <WorkInProgressWidget.h>
 #include <CommitInfoWidget.h>
-#include <RepositoryViewDelegate.h>
 #include <CommitHistoryColumns.h>
-#include <CommitHistoryModel.h>
+#include <CommitHistoryWidget.h>
 #include <CommitHistoryView.h>
 #include <git.h>
 #include <QLogger.h>
@@ -34,8 +33,7 @@ using namespace QLogger;
 GitQlientRepo::GitQlientRepo(QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
-   , mRepositoryModel(new CommitHistoryModel(mGit))
-   , mRepositoryView(new CommitHistoryView(mGit))
+   , mRepoWidget(new CommitHistoryWidget(mGit))
    , commitStackedWidget(new QStackedWidget())
    , centerStackedWidget(new QStackedWidget())
    , mainStackedLayout(new QStackedLayout())
@@ -54,17 +52,13 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
 
-   mRepositoryView->setObjectName("mainRepoView");
-   mRepositoryView->setModel(mRepositoryModel);
-   mRepositoryView->setItemDelegate(new RepositoryViewDelegate(mGit, mRepositoryView));
-
    commitStackedWidget->setCurrentIndex(0);
    commitStackedWidget->addWidget(mRevisionWidget);
    commitStackedWidget->addWidget(mCommitWidget);
    commitStackedWidget->setFixedWidth(310);
 
    centerStackedWidget->setCurrentIndex(0);
-   centerStackedWidget->addWidget(mRepositoryView);
+   centerStackedWidget->addWidget(mRepoWidget);
    centerStackedWidget->addWidget(mFullDiffWidget);
    centerStackedWidget->addWidget(mFileDiffWidget);
    centerStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -100,21 +94,19 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    });
    connect(mControls, &Controls::signalGoBlame, this, [this]() { mainStackedLayout->setCurrentIndex(1); });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
-   connect(mControls, &Controls::signalGoToSha, mRepositoryView, &CommitHistoryView::focusOnCommit);
-   connect(mControls, &Controls::signalGoToSha, this, &GitQlientRepo::onCommitSelected);
 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &GitQlientRepo::updateCache);
    connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &GitQlientRepo::updateCache);
-   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepoWidget, &CommitHistoryWidget::focusOnCommit);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &GitQlientRepo::onCommitSelected);
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
 
-   connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &GitQlientRepo::updateCache);
-   connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
-   connect(mRepositoryView, &CommitHistoryView::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
-   connect(mRepositoryView, &CommitHistoryView::clicked, this, &GitQlientRepo::onCommitClicked);
-   connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &GitQlientRepo::openCommitDiff);
-   connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
+   connect(mRepoWidget, &CommitHistoryWidget::signalGoToSha, this, &GitQlientRepo::onCommitSelected);
+   connect(mRepoWidget, &CommitHistoryWidget::signalViewUpdated, this, &GitQlientRepo::updateCache);
+   connect(mRepoWidget, &CommitHistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
+   connect(mRepoWidget, &CommitHistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
+   connect(mRepoWidget, &CommitHistoryWidget::clicked, this, &GitQlientRepo::onCommitSelected);
+   connect(mRepoWidget, &CommitHistoryWidget::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
 
    connect(fileHistoryWidget, &FileHistoryWidget::showFileDiff, this, &GitQlientRepo::onFileDiffRequested);
    connect(fileHistoryWidget, &FileHistoryWidget::showFileDiff, this,
@@ -155,7 +147,7 @@ void GitQlientRepo::updateCache()
    {
       QLog_Debug("UI", QString("Updating the GitQlient UI"));
 
-      mRepositoryView->clear();
+      mRepoWidget->clear();
 
       mGit->loadRepository(mCurrentDir);
 
@@ -164,7 +156,7 @@ void GitQlientRepo::updateCache()
       const auto commitStackedIndex = commitStackedWidget->currentIndex();
       const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : ZERO_SHA;
 
-      mRepositoryView->focusOnCommit(currentSha);
+      mRepoWidget->focusOnCommit(currentSha);
 
       if (commitStackedIndex == 1)
          mCommitWidget->configure(currentSha);
@@ -292,7 +284,7 @@ void GitQlientRepo::clearWindow()
    mCommitWidget->clear();
    mRevisionWidget->clear();
 
-   mRepositoryView->clear();
+   mRepoWidget->clear();
    mFullDiffWidget->clear();
    mFileDiffWidget->clear();
    mBranchesWidget->clear();
@@ -306,7 +298,7 @@ void GitQlientRepo::setWidgetsEnabled(bool enabled)
    mCommitWidget->setEnabled(enabled);
    mRevisionWidget->setEnabled(enabled);
    commitStackedWidget->setEnabled(enabled);
-   mRepositoryView->setEnabled(enabled);
+   mRepoWidget->setEnabled(enabled);
    mFullDiffWidget->setEnabled(enabled);
    mFileDiffWidget->setEnabled(enabled);
    mBranchesWidget->setEnabled(enabled);
@@ -336,7 +328,7 @@ void GitQlientRepo::closeProgressDialog()
 
 void GitQlientRepo::openCommitDiff()
 {
-   const auto currentSha = mRepositoryView->getCurrentSha();
+   const auto currentSha = mRepoWidget->getCurrentSha();
 
    if (!(currentSha == ZERO_SHA && mGit->isNothingToCommit()))
    {
@@ -362,13 +354,6 @@ void GitQlientRepo::changesCommitted(bool ok)
    }
    else
       QMessageBox::critical(this, tr("Commit error"), tr("Failed to commit changes"));
-}
-
-void GitQlientRepo::onCommitClicked(const QModelIndex &index)
-{
-   const auto sha = mGit->getCommitInfoByRow(index.row()).sha();
-
-   onCommitSelected(sha);
 }
 
 void GitQlientRepo::onCommitSelected(const QString &goToSha)

@@ -20,7 +20,6 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    , mGit(git)
    , mHome(new QToolButton())
    , mBlame(new QToolButton())
-   , mGoToBtn(new QToolButton())
    , mPullBtn(new QToolButton())
    , mPushBtn(new QToolButton())
    , mStashBtn(new QToolButton())
@@ -35,11 +34,6 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    mBlame->setIconSize(QSize(22, 22));
    mBlame->setText("Blame");
    mBlame->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-
-   mGoToBtn->setIcon(QIcon(":/icons/go_to"));
-   mGoToBtn->setIconSize(QSize(22, 22));
-   mGoToBtn->setText(tr("Go to..."));
-   mGoToBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
    const auto menu = new QMenu(mPullBtn);
 
@@ -93,27 +87,21 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    const auto verticalFrame2 = new QFrame();
    verticalFrame2->setObjectName("orangeSeparator");
 
-   const auto verticalFrame3 = new QFrame();
-   verticalFrame3->setObjectName("orangeSeparator");
-
    const auto hLayout = new QHBoxLayout(this);
    hLayout->setContentsMargins(10, 10, 10, 10);
    hLayout->addStretch();
    hLayout->addWidget(mHome);
    hLayout->addWidget(mBlame);
    hLayout->addWidget(verticalFrame);
-   hLayout->addWidget(mGoToBtn);
-   hLayout->addWidget(verticalFrame2);
    hLayout->addWidget(mPullBtn);
    hLayout->addWidget(mPushBtn);
    hLayout->addWidget(mStashBtn);
-   hLayout->addWidget(verticalFrame3);
+   hLayout->addWidget(verticalFrame2);
    hLayout->addWidget(mRefreshBtn);
    hLayout->addStretch();
 
    connect(mHome, &QToolButton::clicked, this, &Controls::signalGoBack);
    connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
-   connect(mGoToBtn, &QToolButton::clicked, this, &Controls::openGoToDialog);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
 
@@ -123,34 +111,10 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
 void Controls::enableButtons(bool enabled)
 {
    mHome->setEnabled(enabled);
-   mGoToBtn->setEnabled(enabled);
    mPullBtn->setEnabled(enabled);
    mPushBtn->setEnabled(enabled);
    mStashBtn->setEnabled(enabled);
    mRefreshBtn->setEnabled(enabled);
-}
-
-void Controls::openGoToDialog()
-{
-   const auto gotoDlg = new QDialog();
-
-   setStyleSheet(GitQlientStyles::getStyles());
-
-   gotoDlg->setWindowFlags(Qt::FramelessWindowHint);
-   gotoDlg->setWindowModality(Qt::ApplicationModal);
-   gotoDlg->setAttribute(Qt::WA_DeleteOnClose);
-
-   const auto goToSha = new QLineEdit();
-
-   const auto goToShaLayout = new QVBoxLayout(gotoDlg);
-   goToShaLayout->setContentsMargins(20, 20, 20, 20);
-   goToShaLayout->setSpacing(10);
-   goToShaLayout->addWidget(new QLabel(tr("Write the SHA and press enter. To exit, press Esc or Alt+F4.")));
-   goToShaLayout->addWidget(goToSha);
-
-   connect(goToSha, &QLineEdit::returnPressed, this, [this, goToSha]() { emit signalGoToSha(goToSha->text()); });
-   connect(goToSha, &QLineEdit::returnPressed, gotoDlg, &QDialog::close);
-   gotoDlg->exec();
 }
 
 void Controls::pullCurrentBranch()

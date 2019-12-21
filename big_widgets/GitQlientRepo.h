@@ -35,8 +35,7 @@ class WorkInProgressWidget;
 class CommitInfoWidget;
 class FullDiffWidget;
 class FileDiffWidget;
-class CommitHistoryModel;
-class CommitHistoryView;
+class CommitHistoryWidget;
 class RevsView;
 class BranchesWidget;
 class FileHistoryWidget;
@@ -80,8 +79,7 @@ private:
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    QString mCurrentDir;
    QSharedPointer<Git> mGit;
-   CommitHistoryModel *mRepositoryModel = nullptr;
-   CommitHistoryView *mRepositoryView = nullptr;
+   CommitHistoryWidget *mRepoWidget = nullptr;
    QStackedWidget *commitStackedWidget = nullptr;
    QStackedWidget *centerStackedWidget = nullptr;
    QStackedLayout *mainStackedLayout = nullptr;
@@ -104,7 +102,6 @@ private:
    void openCommitDiff();
    void openCommitCompareDiff(const QStringList &shas);
    void changesCommitted(bool ok);
-   void onCommitClicked(const QModelIndex &index);
    void onCommitSelected(const QString &goToSha);
    void onAmendCommit(const QString &sha);
    void onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file);

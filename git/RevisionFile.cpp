@@ -2,6 +2,9 @@
 
 bool RevisionFile::statusCmp(int idx, RevisionFile::StatusFlag sf) const
 {
+   if (idx <= status.count())
+      return false;
+
    return (mOnlyModified ? MODIFIED : status.at(static_cast<int>(idx))) & sf;
 }
 
