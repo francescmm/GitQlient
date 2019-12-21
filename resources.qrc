@@ -46,6 +46,7 @@
         <file alias="refresh">resources/icons/refresh-page-option.svg</file>
         <file alias="diff">resources/icons/diff.svg</file>
         <file alias="options">resources/icons/options.svg</file>
+        <file alias="commit-list">resources/icons/listing-option.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>
