@@ -45,7 +45,7 @@ void DiffWidget::configure(const QString &currentSha, const QString &previousSha
           "UI",
           QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
 
-      centerStackedWidget->setCurrentIndex(2);
+      centerStackedWidget->setCurrentIndex(1);
    }
    else
       QMessageBox::information(this, tr("No modifications"), tr("There are no content modifications for this file"));
