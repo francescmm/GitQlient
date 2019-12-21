@@ -1,5 +1,4 @@
-#ifndef COMMITHISTORYWIDGET_H
-#define COMMITHISTORYWIDGET_H
+#pragma once
 
 #include <QFrame>
 
@@ -52,5 +51,3 @@ private:
    void commitSelected(const QModelIndex &index);
    void openDiff(const QModelIndex &index);
 };
-
-#endif // COMMITHISTORYWIDGET_H

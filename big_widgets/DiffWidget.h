@@ -1,5 +1,4 @@
-#ifndef DIFFWIDGET_H
-#define DIFFWIDGET_H
+#pragma once
 
 #include <QFrame>
 
@@ -24,5 +23,3 @@ private:
    FullDiffWidget *mFullDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;
 };
-
-#endif // DIFFWIDGET_H
