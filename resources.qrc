@@ -44,6 +44,8 @@
         <file alias="blame">resources/icons/blame.svg</file>
         <file alias="options">resources/icons/cog-wheel-silhouette.svg</file>
         <file alias="refresh">resources/icons/refresh-page-option.svg</file>
+        <file alias="diff">resources/icons/diff.svg</file>
+        <file alias="options">resources/icons/options.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>
