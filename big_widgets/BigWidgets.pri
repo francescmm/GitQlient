@@ -3,6 +3,7 @@ INCLUDEPATH += $$PWD
 HEADERS += \
     $$PWD/CommitHistoryWidget.h \
     $$PWD/Controls.h \
+    $$PWD/DiffWidget.h \
     $$PWD/FileBlameWidget.h \
     $$PWD/FileHistoryWidget.h \
     $$PWD/FullDiffWidget.h \
@@ -14,6 +15,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/CommitHistoryWidget.cpp \
     $$PWD/Controls.cpp \
+    $$PWD/DiffWidget.cpp \
     $$PWD/FileBlameWidget.cpp \
     $$PWD/FileHistoryWidget.cpp \
     $$PWD/FullDiffWidget.cpp \
