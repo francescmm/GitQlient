@@ -8,8 +8,6 @@
 #include <CommitHistoryView.h>
 #include <git.h>
 #include <QLogger.h>
-#include <FileDiffWidget.h>
-#include <FullDiffWidget.h>
 #include <BlameWidget.h>
 #include <CommitInfo.h>
 #include <ProgressDlg.h>
@@ -33,12 +31,9 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
    , mRepoWidget(new CommitHistoryWidget(mGit))
-   , centerStackedWidget(new QStackedWidget())
    , mainStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGit))
-   , mDiffWidget(new DiffWidget())
-   , mFullDiffWidget(new FullDiffWidget(mGit))
-   , mFileDiffWidget(new FileDiffWidget(mGit))
+   , mDiffWidget(new DiffWidget(mGit))
    , mBlameWidget(new BlameWidget(mGit))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
@@ -48,15 +43,10 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
 
-   centerStackedWidget->setCurrentIndex(0);
-   centerStackedWidget->addWidget(mRepoWidget);
-   centerStackedWidget->addWidget(mFullDiffWidget);
-   centerStackedWidget->addWidget(mFileDiffWidget);
-   centerStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-   mainStackedLayout->addWidget(centerStackedWidget);
+   mainStackedLayout->addWidget(mRepoWidget);
    mainStackedLayout->addWidget(mDiffWidget);
    mainStackedLayout->addWidget(mBlameWidget);
+   mainStackedLayout->setCurrentIndex(0);
 
    const auto gridLayout = new QGridLayout(this);
    gridLayout->setSpacing(0);
@@ -70,10 +60,7 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
    connect(mAutoFilesUpdate, &QTimer::timeout, this, &GitQlientRepo::updateUiFromWatcher);
 
-   connect(mControls, &Controls::signalGoRepo, this, [this]() {
-      centerStackedWidget->setCurrentIndex(0);
-      mainStackedLayout->setCurrentWidget(centerStackedWidget);
-   });
+   connect(mControls, &Controls::signalGoRepo, this, [this]() { mainStackedLayout->setCurrentWidget(mRepoWidget); });
    connect(mControls, &Controls::signalGoBlame, this, [this]() { mainStackedLayout->setCurrentWidget(mBlameWidget); });
    connect(mControls, &Controls::signalGoDiff, this, [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
@@ -82,18 +69,24 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mRepoWidget, &CommitHistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
    connect(mRepoWidget, &CommitHistoryWidget::signalViewUpdated, this, &GitQlientRepo::updateCache);
    connect(mRepoWidget, &CommitHistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
+   connect(mRepoWidget, &CommitHistoryWidget::signalOpenDiff, this,
+           [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
    connect(mRepoWidget, &CommitHistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
-   connect(mRepoWidget, &CommitHistoryWidget::signalShowDiff, this,
-           [this](const QString &fileName) { onFileDiffRequested("", "", fileName); });
+   connect(mRepoWidget, &CommitHistoryWidget::signalShowDiff, this, [this](const QString &fileName) {
+      mainStackedLayout->setCurrentWidget(mDiffWidget);
+      mDiffWidget->configure("", "", fileName);
+   });
    connect(mRepoWidget, &CommitHistoryWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mRepoWidget, &CommitHistoryWidget::signalUpdateUi, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mRepoWidget, &CommitHistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
-   connect(mRepoWidget, &CommitHistoryWidget::signalOpenFileCommit, this, &GitQlientRepo::onFileDiffRequested);
+   connect(mRepoWidget, &CommitHistoryWidget::signalOpenFileCommit, mDiffWidget, &DiffWidget::configure);
+   connect(mRepoWidget, &CommitHistoryWidget::signalOpenFileCommit, this,
+           [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
 
-   connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::onFileDiffRequested);
+   connect(mBlameWidget, &BlameWidget::showFileDiff, mDiffWidget, &DiffWidget::configure);
    connect(mBlameWidget, &BlameWidget::showFileDiff, this,
            [this](const QString &sha, const QString &, const QString &) {
-              mainStackedLayout->setCurrentIndex(0);
+              mainStackedLayout->setCurrentWidget(mDiffWidget);
               mRepoWidget->onCommitSelected(sha);
            });
 
@@ -126,8 +119,7 @@ void GitQlientRepo::updateCache()
 
       mRepoWidget->reload();
 
-      if (centerStackedWidget->currentIndex() == 1)
-         openCommitDiff();
+      openCommitDiff();
    }
 }
 
@@ -139,8 +131,7 @@ void GitQlientRepo::updateUiFromWatcher()
 
    mRepoWidget->updateUiFromWatcher();
 
-   if (centerStackedWidget->currentIndex() == 1)
-      openCommitDiff();
+   openCommitDiff();
 }
 
 void GitQlientRepo::setRepository(const QString &newDir)
@@ -170,8 +161,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
          mRepoWidget->reload();
 
          mBlameWidget->init(newDir);
-
-         centerStackedWidget->setCurrentIndex(0);
 
          mControls->enableButtons(true);
 
@@ -238,11 +227,8 @@ void GitQlientRepo::clearWindow()
 {
    blockSignals(true);
 
-   centerStackedWidget->setCurrentIndex(0);
-
    mRepoWidget->clear();
-   mFullDiffWidget->clear();
-   mFileDiffWidget->clear();
+   mDiffWidget->clear();
 
    blockSignals(false);
 }
@@ -251,8 +237,7 @@ void GitQlientRepo::setWidgetsEnabled(bool enabled)
 {
    mControls->enableButtons(enabled);
    mRepoWidget->setEnabled(enabled);
-   mFullDiffWidget->setEnabled(enabled);
-   mFileDiffWidget->setEnabled(enabled);
+   mDiffWidget->setEnabled(enabled);
 }
 
 void GitQlientRepo::showFileHistory(const QString &fileName)
@@ -284,15 +269,13 @@ void GitQlientRepo::openCommitDiff()
    if (!(currentSha == ZERO_SHA && mGit->isNothingToCommit()))
    {
       const auto rev = mGit->getCommitInfo(currentSha);
-      mFullDiffWidget->loadDiff(currentSha, rev.parent(0));
-      centerStackedWidget->setCurrentIndex(1);
+      mDiffWidget->reload(currentSha, rev.parent(0));
    }
 }
 
 void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
 {
-   mFullDiffWidget->loadDiff(shas.last(), shas.first());
-   centerStackedWidget->setCurrentIndex(1);
+   mDiffWidget->reload(shas.last(), shas.first());
 }
 
 void GitQlientRepo::changesCommitted(bool ok)
@@ -300,26 +283,10 @@ void GitQlientRepo::changesCommitted(bool ok)
    if (ok)
    {
       updateCache();
-      centerStackedWidget->setCurrentIndex(0);
+      mainStackedLayout->setCurrentWidget(mRepoWidget);
    }
    else
       QMessageBox::critical(this, tr("Commit error"), tr("Failed to commit changes"));
-}
-
-void GitQlientRepo::onFileDiffRequested(const QString &currentSha, const QString &previousSha, const QString &file)
-{
-   const auto fileWithModifications = mFileDiffWidget->configure(currentSha, previousSha, file);
-
-   if (fileWithModifications)
-   {
-      QLog_Info(
-          "UI",
-          QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
-
-      centerStackedWidget->setCurrentIndex(2);
-   }
-   else
-      QMessageBox::information(this, tr("No modifications"), tr("There are no content modifications for this file"));
 }
 
 void GitQlientRepo::closeEvent(QCloseEvent *ce)
