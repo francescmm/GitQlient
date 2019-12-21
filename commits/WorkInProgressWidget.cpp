@@ -505,6 +505,7 @@ void WorkInProgressWidget::clear()
    ui->untrackedFilesList->clear();
    ui->unstagedFilesList->clear();
    ui->stagedFilesList->clear();
+   mCurrentFilesCache.clear();
    ui->leCommitTitle->clear();
    ui->leAuthorName->clear();
    ui->leAuthorEmail->clear();

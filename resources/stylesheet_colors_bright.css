@@ -63,14 +63,14 @@ CommitInfoWidget #labelSha
     background-color: #202122;
 }
 
-WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, FileHistoryWidget > QTreeView
+WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
 {
    color: black;
    background-color: white;
    border: 1px solid #202122;
 }
 
-QListWidget::item, FileHistoryWidget > QTreeView::item
+QListWidget::item, BlameWidget > QTreeView::item
 {
     background-color: white;
     color: black;
@@ -81,12 +81,12 @@ QTreeView::branch
     background-color: #2E2F30;
 }
 
-QListWidget::item:hover, FileHistoryWidget > QTreeView::item:hover
+QListWidget::item:hover, BlameWidget > QTreeView::item:hover
 {
    background:#C6C6C7;
 }
 
-QListWidget::item:focus, FileHistoryWidget > QTreeView::item:focus
+QListWidget::item:focus, BlameWidget > QTreeView::item:focus
 {
    background-color: #A6A6A7;
 }

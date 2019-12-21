@@ -62,13 +62,13 @@ CommitInfoWidget #labelSha
     background-color: #202122;
 }
 
-WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, FileHistoryWidget > QTreeView
+WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
 {
    color: white;
    background-color: #2E2F30;
 }
 
-QListWidget::item, FileHistoryWidget > QTreeView::item
+QListWidget::item, BlameWidget > QTreeView::item
 {
     background-color: #2E2F30;
 }
@@ -78,12 +78,12 @@ QTreeView::branch
     background-color: #2E2F30;
 }
 
-QListWidget::item:hover, FileHistoryWidget > QTreeView::item:hover
+QListWidget::item:hover, BlameWidget > QTreeView::item:hover
 {
    background:#363637;
 }
 
-QListWidget::item:focus, FileHistoryWidget > QTreeView::item:focus
+QListWidget::item:focus, BlameWidget > QTreeView::item:focus
 {
    background-color: #3C3D3D;
 }
@@ -416,7 +416,7 @@ FileBlameWidget
     background-color: #2E2F30;
 }
 
-FileHistoryWidget > QTabWidget, QTabWidget#HistoryTab:pane
+BlameWidget > QTabWidget, QTabWidget#HistoryTab:pane
 {
     background-color: #2E2F30;
     border: 0;

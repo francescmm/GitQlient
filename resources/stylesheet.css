@@ -53,13 +53,13 @@ CommitInfoWidget #labelSha
     font-family: Ubuntu Mono;
 }
 
-WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, FileHistoryWidget > QTreeView
+WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
 {
    border: 0;
    outline: 0;
  }
 
-QListWidget::item, FileHistoryWidget > QTreeView::item
+QListWidget::item, BlameWidget > QTreeView::item
 {
    padding-left: 7px;
    padding-right: 7px;
@@ -87,7 +87,7 @@ BranchesWidget
     padding: 0;
 }
 
-QListWidget::item:focus, FileHistoryWidget > QTreeView::item:focus
+QListWidget::item:focus, BlameWidget > QTreeView::item:focus
 {
    border: 0;
 }
