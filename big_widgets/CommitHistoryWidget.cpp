@@ -65,7 +65,7 @@ void CommitHistoryWidget::commitSelected(const QModelIndex &index)
 {
    const auto sha = mRepositoryModel->sha(index.row());
 
-   emit clicked(sha);
+   emit signalGoToSha(sha);
 }
 
 void CommitHistoryWidget::openDiff(const QModelIndex &index)

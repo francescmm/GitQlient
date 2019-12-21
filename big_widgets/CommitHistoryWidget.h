@@ -17,7 +17,6 @@ signals:
    void signalOpenDiff(const QString &sha);
    void signalOpenCompareDiff(const QStringList &sha);
    void signalAmendCommit(const QString &sha);
-   void clicked(const QString &sha);
    void signalGoToSha(const QString &sha);
 
 public:
