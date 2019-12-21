@@ -22,7 +22,18 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
    centerStackedWidget->addWidget(mFileDiffWidget);
    centerStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+   const auto diffButtonsContainer = new QVBoxLayout();
+   diffButtonsContainer->setContentsMargins(QMargins());
+   diffButtonsContainer->setSpacing(5);
+
+   const auto diffsLayout = new QVBoxLayout();
+   diffsLayout->setContentsMargins(QMargins());
+   diffsLayout->setSpacing(10);
+   diffsLayout->addLayout(diffButtonsContainer);
+
    const auto layout = new QHBoxLayout();
+   layout->setContentsMargins(QMargins());
+   layout->addLayout(diffsLayout);
    layout->addWidget(centerStackedWidget);
 
    setLayout(layout);
