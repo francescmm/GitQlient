@@ -90,7 +90,7 @@ private:
    FullDiffWidget *mFullDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
-   FileHistoryWidget *mFileBlameWidget = nullptr;
+   FileHistoryWidget *mBlameWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    GitQlientRepoConfig mConfig;

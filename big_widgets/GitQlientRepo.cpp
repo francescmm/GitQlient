@@ -44,7 +44,7 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    , mDiffWidget(new DiffWidget())
    , mFullDiffWidget(new FullDiffWidget(mGit))
    , mFileDiffWidget(new FileDiffWidget(mGit))
-   , mFileBlameWidget(new FileHistoryWidget(mGit))
+   , mBlameWidget(new FileHistoryWidget(mGit))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
@@ -74,7 +74,7 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
 
    mainStackedLayout->addWidget(centerWidget);
    mainStackedLayout->addWidget(mDiffWidget);
-   mainStackedLayout->addWidget(mFileBlameWidget);
+   mainStackedLayout->addWidget(mBlameWidget);
 
    const auto gridLayout = new QGridLayout(this);
    gridLayout->setSpacing(0);
@@ -92,8 +92,7 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
       centerStackedWidget->setCurrentIndex(0);
       mainStackedLayout->setCurrentIndex(0);
    });
-   connect(mControls, &Controls::signalGoBlame, this,
-           [this]() { mainStackedLayout->setCurrentWidget(mFileBlameWidget); });
+   connect(mControls, &Controls::signalGoBlame, this, [this]() { mainStackedLayout->setCurrentWidget(mBlameWidget); });
    connect(mControls, &Controls::signalGoDiff, this, [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
 
@@ -105,8 +104,8 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mRepoWidget, &CommitHistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
    connect(mRepoWidget, &CommitHistoryWidget::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
 
-   connect(mFileBlameWidget, &FileHistoryWidget::showFileDiff, this, &GitQlientRepo::onFileDiffRequested);
-   connect(mFileBlameWidget, &FileHistoryWidget::showFileDiff, this,
+   connect(mBlameWidget, &FileHistoryWidget::showFileDiff, this, &GitQlientRepo::onFileDiffRequested);
+   connect(mBlameWidget, &FileHistoryWidget::showFileDiff, this,
            [this](const QString &sha, const QString &, const QString &) {
               mainStackedLayout->setCurrentIndex(0);
               onCommitSelected(sha);
@@ -207,7 +206,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          mRepoWidget->reload();
 
-         mFileBlameWidget->init(newDir);
+         mBlameWidget->init(newDir);
 
          centerStackedWidget->setCurrentIndex(0);
          commitStackedWidget->setCurrentIndex(1);
@@ -302,8 +301,8 @@ void GitQlientRepo::setWidgetsEnabled(bool enabled)
 
 void GitQlientRepo::showFileHistory(const QString &fileName)
 {
-   mFileBlameWidget->showFileHistory(fileName);
-   mainStackedLayout->setCurrentWidget(mFileBlameWidget);
+   mBlameWidget->showFileHistory(fileName);
+   mainStackedLayout->setCurrentWidget(mBlameWidget);
 }
 
 void GitQlientRepo::updateProgressDialog()
