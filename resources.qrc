@@ -42,7 +42,7 @@
         <file alias="left-arrow">resources/icons/left-arrow.svg</file>
         <file alias="right-arrow">resources/icons/right-arrow.svg</file>
         <file alias="blame">resources/icons/blame.svg</file>
-        <file alias="options">resources/icons/cog-wheel-silhouette.svg</file>
+        <file alias="config">resources/icons/cog-wheel-silhouette.svg</file>
         <file alias="refresh">resources/icons/refresh-page-option.svg</file>
         <file alias="diff">resources/icons/diff.svg</file>
         <file alias="options">resources/icons/options.svg</file>
