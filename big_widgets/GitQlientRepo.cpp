@@ -93,6 +93,10 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
       mainStackedLayout->setCurrentIndex(0);
    });
    connect(mControls, &Controls::signalGoBlame, this, [this]() { mainStackedLayout->setCurrentIndex(1); });
+   connect(mControls, &Controls::signalGoDiff, this, [this]() {
+      centerStackedWidget->setCurrentIndex(1);
+      mainStackedLayout->setCurrentIndex(0);
+   });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &GitQlientRepo::updateCache);
