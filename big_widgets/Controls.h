@@ -33,7 +33,8 @@ class Controls : public QFrame
    Q_OBJECT
 
 signals:
-   void signalGoBack();
+   void signalGoRepo();
+   void signalGoDiff();
    void signalGoBlame();
    void signalRepositoryUpdated();
 
@@ -47,7 +48,8 @@ public:
 private:
    QString mCurrentSha;
    QSharedPointer<Git> mGit;
-   QToolButton *mHome = nullptr;
+   QToolButton *mHistory = nullptr;
+   QToolButton *mDiff = nullptr;
    QToolButton *mBlame = nullptr;
    QToolButton *mPullBtn = nullptr;
    QToolButton *mPushBtn = nullptr;

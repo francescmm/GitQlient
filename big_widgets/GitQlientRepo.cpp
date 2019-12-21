@@ -88,7 +88,7 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
    connect(mAutoFilesUpdate, &QTimer::timeout, this, &GitQlientRepo::updateUiFromWatcher);
 
-   connect(mControls, &Controls::signalGoBack, this, [this]() {
+   connect(mControls, &Controls::signalGoRepo, this, [this]() {
       centerStackedWidget->setCurrentIndex(0);
       mainStackedLayout->setCurrentIndex(0);
    });

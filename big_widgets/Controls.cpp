@@ -18,17 +18,23 @@
 Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
-   , mHome(new QToolButton())
+   , mHistory(new QToolButton())
+   , mDiff(new QToolButton())
    , mBlame(new QToolButton())
    , mPullBtn(new QToolButton())
    , mPushBtn(new QToolButton())
    , mStashBtn(new QToolButton())
    , mRefreshBtn(new QToolButton())
 {
-   mHome->setIcon(QIcon(":/icons/git_orange"));
-   mHome->setIconSize(QSize(22, 22));
-   mHome->setText("Repo view");
-   mHome->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mHistory->setIcon(QIcon(":/icons/git_orange"));
+   mHistory->setIconSize(QSize(22, 22));
+   mHistory->setText("Repo view");
+   mHistory->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+   mDiff->setIcon(QIcon(":/icons/diff"));
+   mDiff->setIconSize(QSize(22, 22));
+   mDiff->setText("Diff");
+   mDiff->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
    mBlame->setIcon(QIcon(":/icons/blame"));
    mBlame->setIconSize(QSize(22, 22));
@@ -90,7 +96,8 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    const auto hLayout = new QHBoxLayout(this);
    hLayout->setContentsMargins(10, 10, 10, 10);
    hLayout->addStretch();
-   hLayout->addWidget(mHome);
+   hLayout->addWidget(mHistory);
+   hLayout->addWidget(mDiff);
    hLayout->addWidget(mBlame);
    hLayout->addWidget(verticalFrame);
    hLayout->addWidget(mPullBtn);
@@ -100,7 +107,8 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    hLayout->addWidget(mRefreshBtn);
    hLayout->addStretch();
 
-   connect(mHome, &QToolButton::clicked, this, &Controls::signalGoBack);
+   connect(mHistory, &QToolButton::clicked, this, &Controls::signalGoRepo);
+   connect(mDiff, &QToolButton::clicked, this, &Controls::signalGoDiff);
    connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
@@ -110,7 +118,7 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
 
 void Controls::enableButtons(bool enabled)
 {
-   mHome->setEnabled(enabled);
+   mHistory->setEnabled(enabled);
    mPullBtn->setEnabled(enabled);
    mPushBtn->setEnabled(enabled);
    mStashBtn->setEnabled(enabled);
