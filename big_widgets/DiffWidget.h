@@ -22,9 +22,10 @@ public:
    void loadCommitDiff(const QString &sha, const QString &parentSha);
 
 private:
+   QSharedPointer<Git> mGit;
    QStackedWidget *centerStackedWidget = nullptr;
    FullDiffWidget *mFullDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;
-   QMap<QString, DiffButton *> mDiffButtons;
+   QMap<QString, QPair<QFrame *, DiffButton *>> mDiffButtons;
    QVBoxLayout *mDiffButtonsContainer = nullptr;
 };

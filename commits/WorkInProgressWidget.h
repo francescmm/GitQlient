@@ -41,7 +41,7 @@ class WorkInProgressWidget : public QWidget
    Q_OBJECT
 
 signals:
-   void signalShowDiff(const QString &fileName);
+   void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName);
    void signalChangesCommitted(bool commited);
    void signalCheckoutPerformed(bool success);
    void signalShowFileHistory(const QString &fileName);

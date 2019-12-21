@@ -14,6 +14,7 @@ using namespace QLogger;
 
 DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
+   , mGit(git)
    , centerStackedWidget(new QStackedWidget())
    , mFullDiffWidget(new FullDiffWidget(git))
    , mFileDiffWidget(new FileDiffWidget(git))
@@ -43,23 +44,43 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
 void DiffWidget::clear() const
 {
    centerStackedWidget->setCurrentIndex(0);
+
+   /*
+   for (auto values : mDiffButtons)
+   {
+      if (dynamic_cast<FileDiffWidget *>(values.first))
+         dynamic_cast<FileDiffWidget *>(values.first)->clear();
+      else if (dynamic_cast<FullDiffWidget *>(values.first))
+         dynamic_cast<FullDiffWidget *>(values.first)->clear();
+   }
+   */
+
    mFullDiffWidget->clear();
    mFileDiffWidget->clear();
 }
 
 void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
-   const auto fileWithModifications = mFileDiffWidget->configure(currentSha, previousSha, file);
+   const auto id = QString("%1 (%2 \u2194 %3)").arg(file.split("/").last(), currentSha.left(6), previousSha.left(6));
 
-   if (fileWithModifications)
+   if (!mDiffButtons.contains(id))
    {
       QLog_Info(
           "UI",
           QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
 
-      const auto diffButton = new DiffButton(file);
-      mDiffButtonsContainer->addWidget(diffButton);
-      mDiffButtons.insert(file, diffButton);
+      const auto fileDiffWidget = new FileDiffWidget(mGit);
+      const auto fileWithModifications = fileDiffWidget->configure(currentSha, previousSha, file);
+
+      if (fileWithModifications)
+      {
+         const auto diffButton = new DiffButton(id, ":/icons/file");
+         mDiffButtonsContainer->addWidget(diffButton);
+         mDiffButtons.insert(id, { fileDiffWidget, diffButton });
+      }
+      else
+         delete fileDiffWidget;
+
       centerStackedWidget->setCurrentIndex(1);
    }
    else
@@ -68,6 +89,17 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
 
 void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 {
+   const auto id = QString("Complete (%1 \u2194 %2)").arg(sha.left(6), parentSha.left(6));
 
-   mFullDiffWidget->loadDiff(sha, parentSha);
+   if (!mDiffButtons.contains(id))
+   {
+      const auto fullDiffWidget = new FullDiffWidget(mGit);
+      fullDiffWidget->loadDiff(sha, parentSha);
+
+      const auto diffButton = new DiffButton(id, ":/icons/commit-list");
+      mDiffButtonsContainer->addWidget(diffButton);
+      mDiffButtons.insert(id, { fullDiffWidget, diffButton });
+   }
+   else if (dynamic_cast<FullDiffWidget *>(mDiffButtons.value(id).first))
+      dynamic_cast<FullDiffWidget *>(mDiffButtons.value(id).first)->loadDiff(sha, parentSha);
 }

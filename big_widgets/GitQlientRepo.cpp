@@ -72,10 +72,9 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mRepoWidget, &CommitHistoryWidget::signalOpenDiff, this,
            [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
    connect(mRepoWidget, &CommitHistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
-   connect(mRepoWidget, &CommitHistoryWidget::signalShowDiff, this, [this](const QString &fileName) {
-      mainStackedLayout->setCurrentWidget(mDiffWidget);
-      mDiffWidget->loadFileDiff("", "", fileName);
-   });
+   connect(mRepoWidget, &CommitHistoryWidget::signalShowDiff, mDiffWidget, &DiffWidget::loadFileDiff);
+   connect(mRepoWidget, &CommitHistoryWidget::signalShowDiff, this,
+           [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
    connect(mRepoWidget, &CommitHistoryWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mRepoWidget, &CommitHistoryWidget::signalUpdateUi, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mRepoWidget, &CommitHistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);

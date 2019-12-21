@@ -317,7 +317,7 @@ void WorkInProgressWidget::showUnstagedMenu(const QPoint &pos)
       const auto unsolvedConflicts = item->data(Qt::UserRole + 1).toBool();
       const auto contextMenu = new UnstagedFilesContextMenu(mGit, fileName, unsolvedConflicts, this);
       connect(contextMenu, &UnstagedFilesContextMenu::signalShowDiff, this,
-              [this, fileName]() { signalShowDiff(fileName); });
+              [this, fileName]() { emit signalShowDiff(ZERO_SHA, mGit->getCommitInfo(ZERO_SHA).parent(0), fileName); });
       connect(contextMenu, &UnstagedFilesContextMenu::signalCommitAll, this,
               &WorkInProgressWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedFilesContextMenu::signalRevertAll, this, &WorkInProgressWidget::revertAllChanges);
@@ -367,7 +367,8 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
       const auto fileName = item->toolTip();
       const auto menu = new QMenu(this);
       const auto action = menu->addAction("See changes");
-      connect(action, &QAction::triggered, this, [this, fileName]() { emit signalShowDiff(fileName); });
+      connect(action, &QAction::triggered, this,
+              [this, fileName]() { emit signalShowDiff(ZERO_SHA, mGit->getCommitInfo(ZERO_SHA).parent(0), fileName); });
 
       const auto parentPos = ui->stagedFilesList->mapToParent(pos);
       menu->popup(mapToGlobal(parentPos));

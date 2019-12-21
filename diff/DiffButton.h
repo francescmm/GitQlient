@@ -2,8 +2,23 @@
 
 #include <QFrame>
 
+class QPushButton;
+
 class DiffButton : public QFrame
 {
+   Q_OBJECT
+
+signals:
+   void clicked();
+
 public:
-   explicit DiffButton(const QString &text, QWidget *parent = nullptr);
+   explicit DiffButton(const QString &text, const QString &icon, QWidget *parent = nullptr);
+
+protected:
+   void mousePressEvent(QMouseEvent *e) override;
+   void mouseReleaseEvent(QMouseEvent *e) override;
+
+private:
+   bool mPressed = false;
+   QPushButton *mCloseBtn = nullptr;
 };

@@ -23,7 +23,7 @@ signals:
    void signalGoToSha(const QString &sha);
    void signalUpdateCache();
    void signalOpenSubmodule(const QString &submodule);
-   void signalShowDiff(const QString &fileName);
+   void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName);
    void signalChangesCommitted(bool commited);
    void signalShowFileHistory(const QString &fileName);
    void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file);
