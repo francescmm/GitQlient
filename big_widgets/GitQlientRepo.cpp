@@ -16,6 +16,7 @@
 #include <CommitInfo.h>
 #include <ProgressDlg.h>
 #include <GitConfigDlg.h>
+#include <DiffWidget.h>
 
 #include <QFileSystemModel>
 #include <QTimer>
@@ -40,6 +41,7 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    , mControls(new Controls(mGit))
    , mCommitWidget(new WorkInProgressWidget(mGit))
    , mRevisionWidget(new CommitInfoWidget(mGit))
+   , mDiffWidget(new DiffWidget())
    , mFullDiffWidget(new FullDiffWidget(mGit))
    , mFileDiffWidget(new FileDiffWidget(mGit))
    , mFileBlameWidget(new FileHistoryWidget(mGit))
@@ -71,6 +73,7 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    centerWidget->setLayout(centerLayout);
 
    mainStackedLayout->addWidget(centerWidget);
+   mainStackedLayout->addWidget(mDiffWidget);
    mainStackedLayout->addWidget(mFileBlameWidget);
 
    const auto gridLayout = new QGridLayout(this);
@@ -89,11 +92,9 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
       centerStackedWidget->setCurrentIndex(0);
       mainStackedLayout->setCurrentIndex(0);
    });
-   connect(mControls, &Controls::signalGoBlame, this, [this]() { mainStackedLayout->setCurrentIndex(1); });
-   connect(mControls, &Controls::signalGoDiff, this, [this]() {
-      centerStackedWidget->setCurrentIndex(1);
-      mainStackedLayout->setCurrentIndex(0);
-   });
+   connect(mControls, &Controls::signalGoBlame, this,
+           [this]() { mainStackedLayout->setCurrentWidget(mFileBlameWidget); });
+   connect(mControls, &Controls::signalGoDiff, this, [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
 
    connect(mRepoWidget, &CommitHistoryWidget::signalUpdateCache, this, &GitQlientRepo::updateCache);

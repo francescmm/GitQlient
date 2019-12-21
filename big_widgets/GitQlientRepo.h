@@ -41,6 +41,7 @@ class FileHistoryWidget;
 class FileDiffHighlighter;
 class QTimer;
 class ProgressDlg;
+class DiffWidget;
 
 namespace Ui
 {
@@ -85,7 +86,7 @@ private:
    Controls *mControls = nullptr;
    WorkInProgressWidget *mCommitWidget = nullptr;
    CommitInfoWidget *mRevisionWidget = nullptr;
-   RevsView *rv = nullptr;
+   DiffWidget *mDiffWidget = nullptr;
    FullDiffWidget *mFullDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
