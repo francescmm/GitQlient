@@ -35,7 +35,7 @@ class CommitHistoryView;
 class QTabWidget;
 class QModelIndex;
 
-class FileHistoryWidget : public QFrame
+class BlameWidget : public QFrame
 {
    Q_OBJECT
 
@@ -43,7 +43,7 @@ signals:
    void showFileDiff(const QString &sha, const QString &parentSha, const QString &file);
 
 public:
-   explicit FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit BlameWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
 
    void init(const QString &workingDirectory);
    void showFileHistory(const QModelIndex &index);

@@ -1,4 +1,4 @@
-#include "FileHistoryWidget.h"
+#include "BlameWidget.h"
 
 #include <git.h>
 #include <FileBlameWidget.h>
@@ -18,7 +18,7 @@
 #include <QClipboard>
 #include <QTabWidget>
 
-FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *parent)
+BlameWidget::BlameWidget(const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , fileSystemModel(new QFileSystemModel())
@@ -40,9 +40,8 @@ FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *pa
    mRepoView->setSelectionMode(QAbstractItemView::SingleSelection);
    mRepoView->setContextMenuPolicy(Qt::CustomContextMenu);
    mRepoView->activateFilter(true);
-   connect(mRepoView, &CommitHistoryView::customContextMenuRequested, this, &FileHistoryWidget::showRepoViewMenu);
-   connect(mRepoView, &CommitHistoryView::clicked, this,
-           qOverload<const QModelIndex &>(&FileHistoryWidget::reloadBlame));
+   connect(mRepoView, &CommitHistoryView::customContextMenuRequested, this, &BlameWidget::showRepoViewMenu);
+   connect(mRepoView, &CommitHistoryView::clicked, this, qOverload<const QModelIndex &>(&BlameWidget::reloadBlame));
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
@@ -53,8 +52,7 @@ FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *pa
    fileSystemView->header()->setSectionHidden(2, true);
    fileSystemView->header()->setSectionHidden(3, true);
    fileSystemView->setContextMenuPolicy(Qt::CustomContextMenu);
-   connect(fileSystemView, &QTreeView::clicked, this,
-           qOverload<const QModelIndex &>(&FileHistoryWidget::showFileHistory));
+   connect(fileSystemView, &QTreeView::clicked, this, qOverload<const QModelIndex &>(&BlameWidget::showFileHistory));
 
    const auto historyBlameLayout = new QGridLayout(this);
    historyBlameLayout->setContentsMargins(QMargins());
@@ -63,7 +61,7 @@ FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *pa
    historyBlameLayout->addWidget(mTabWidget, 0, 1, 2, 1);
 
    mTabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-   connect(mTabWidget, &QTabWidget::currentChanged, this, &FileHistoryWidget::reloadHistory);
+   connect(mTabWidget, &QTabWidget::currentChanged, this, &BlameWidget::reloadHistory);
 
    connect(mTabWidget, &QTabWidget::tabCloseRequested, mTabWidget, [this](int index) {
       auto widget = mTabWidget->widget(index);
@@ -72,14 +70,14 @@ FileHistoryWidget::FileHistoryWidget(const QSharedPointer<Git> &git, QWidget *pa
    });
 }
 
-void FileHistoryWidget::init(const QString &workingDirectory)
+void BlameWidget::init(const QString &workingDirectory)
 {
    mWorkingDirectory = workingDirectory;
    fileSystemModel->setRootPath(workingDirectory);
    fileSystemView->setRootIndex(fileSystemModel->index(workingDirectory));
 }
 
-void FileHistoryWidget::showFileHistory(const QString &filePath)
+void BlameWidget::showFileHistory(const QString &filePath)
 {
    if (!mTabsMap.contains(filePath))
    {
@@ -111,7 +109,7 @@ void FileHistoryWidget::showFileHistory(const QString &filePath)
       mTabWidget->setCurrentWidget(mTabsMap.value(filePath));
 }
 
-void FileHistoryWidget::reloadBlame(const QModelIndex &index)
+void BlameWidget::reloadBlame(const QModelIndex &index)
 {
    const auto blameWidget = qobject_cast<FileBlameWidget *>(mTabWidget->currentWidget());
 
@@ -125,7 +123,7 @@ void FileHistoryWidget::reloadBlame(const QModelIndex &index)
    }
 }
 
-void FileHistoryWidget::reloadHistory(int tabIndex)
+void BlameWidget::reloadHistory(int tabIndex)
 {
    if (tabIndex >= 0)
    {
@@ -160,7 +158,7 @@ void FileHistoryWidget::reloadHistory(int tabIndex)
    }
 }
 
-void FileHistoryWidget::showFileHistory(const QModelIndex &index)
+void BlameWidget::showFileHistory(const QModelIndex &index)
 {
    auto item = fileSystemModel->fileInfo(index);
 
@@ -168,7 +166,7 @@ void FileHistoryWidget::showFileHistory(const QModelIndex &index)
       showFileHistory(item.filePath());
 }
 
-void FileHistoryWidget::showRepoViewMenu(const QPoint &pos)
+void BlameWidget::showRepoViewMenu(const QPoint &pos)
 {
    const auto sha = mRepoView->getCurrentSha();
    const auto menu = new QMenu(this);

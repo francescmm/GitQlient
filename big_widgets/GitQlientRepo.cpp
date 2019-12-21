@@ -12,7 +12,7 @@
 #include <QLogger.h>
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
-#include <FileHistoryWidget.h>
+#include <BlameWidget.h>
 #include <CommitInfo.h>
 #include <ProgressDlg.h>
 #include <GitConfigDlg.h>
@@ -44,7 +44,7 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    , mDiffWidget(new DiffWidget())
    , mFullDiffWidget(new FullDiffWidget(mGit))
    , mFileDiffWidget(new FileDiffWidget(mGit))
-   , mBlameWidget(new FileHistoryWidget(mGit))
+   , mBlameWidget(new BlameWidget(mGit))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
@@ -104,8 +104,8 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mRepoWidget, &CommitHistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
    connect(mRepoWidget, &CommitHistoryWidget::signalAmendCommit, this, &GitQlientRepo::onAmendCommit);
 
-   connect(mBlameWidget, &FileHistoryWidget::showFileDiff, this, &GitQlientRepo::onFileDiffRequested);
-   connect(mBlameWidget, &FileHistoryWidget::showFileDiff, this,
+   connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::onFileDiffRequested);
+   connect(mBlameWidget, &BlameWidget::showFileDiff, this,
            [this](const QString &sha, const QString &, const QString &) {
               mainStackedLayout->setCurrentIndex(0);
               onCommitSelected(sha);

@@ -1,11 +1,11 @@
 INCLUDEPATH += $$PWD
 
 HEADERS += \
+    $$PWD/BlameWidget.h \
     $$PWD/CommitHistoryWidget.h \
     $$PWD/Controls.h \
     $$PWD/DiffWidget.h \
     $$PWD/FileBlameWidget.h \
-    $$PWD/FileHistoryWidget.h \
     $$PWD/FullDiffWidget.h \
     $$PWD/GitQlient.h \
     $$PWD/GitQlientRepo.h \
@@ -13,11 +13,11 @@ HEADERS += \
     $$PWD/GitQlientStyles.h
 
 SOURCES += \
+    $$PWD/BlameWidget.cpp \
     $$PWD/CommitHistoryWidget.cpp \
     $$PWD/Controls.cpp \
     $$PWD/DiffWidget.cpp \
     $$PWD/FileBlameWidget.cpp \
-    $$PWD/FileHistoryWidget.cpp \
     $$PWD/FullDiffWidget.cpp \
     $$PWD/GitQlient.cpp \
     $$PWD/GitQlientRepo.cpp \

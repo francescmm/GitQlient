@@ -37,7 +37,7 @@ class FullDiffWidget;
 class FileDiffWidget;
 class CommitHistoryWidget;
 class RevsView;
-class FileHistoryWidget;
+class BlameWidget;
 class FileDiffHighlighter;
 class QTimer;
 class ProgressDlg;
@@ -90,7 +90,7 @@ private:
    FullDiffWidget *mFullDiffWidget = nullptr;
    FileDiffWidget *mFileDiffWidget = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
-   FileHistoryWidget *mBlameWidget = nullptr;
+   BlameWidget *mBlameWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    GitQlientRepoConfig mConfig;
