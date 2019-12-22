@@ -40,19 +40,25 @@ DiffButton::DiffButton(const QString &text, const QString &icon, QWidget *parent
    setLayout(layout);
 }
 
+void DiffButton::setSelected()
+{
+   setProperty("pressed", true);
+   style()->polish(this);
+}
+
 void DiffButton::mousePressEvent(QMouseEvent *e)
 {
    mPressed = rect().contains(e->pos()) && e->button() == Qt::LeftButton;
+
+   if (mPressed)
+      emit clicked();
 
    setProperty("pressed", mPressed);
    style()->polish(this);
 }
 
-void DiffButton::mouseReleaseEvent(QMouseEvent *e)
+void DiffButton::setUnselected()
 {
-   if (mPressed && rect().contains(e->pos()) && e->button() == Qt::LeftButton)
-      emit clicked();
-
    mPressed = false;
 
    setProperty("pressed", false);

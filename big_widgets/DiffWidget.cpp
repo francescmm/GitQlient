@@ -19,6 +19,17 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
 {
    centerStackedWidget->setCurrentIndex(0);
    centerStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+   connect(centerStackedWidget, &QStackedWidget::currentChanged, this, [this](int index) {
+      const auto widget = centerStackedWidget->widget(index);
+
+      for (const auto buttons : qAsConst(mDiffButtons))
+      {
+         if (buttons.first == widget)
+            buttons.second->setSelected();
+         else
+            buttons.second->setUnselected();
+      }
+   });
 
    mDiffButtonsContainer = new QVBoxLayout();
    mDiffButtonsContainer->setContentsMargins(QMargins());
@@ -80,8 +91,18 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
       if (fileWithModifications)
       {
          const auto diffButton = new DiffButton(id, ":/icons/file");
-         connect(diffButton, &DiffButton::clicked, this,
-                 [this, fileDiffWidget]() { centerStackedWidget->setCurrentWidget(fileDiffWidget); });
+         diffButton->setSelected();
+
+         for (const auto buttons : qAsConst(mDiffButtons))
+            buttons.second->setUnselected();
+
+         connect(diffButton, &DiffButton::clicked, this, [this, fileDiffWidget, diffButton]() {
+            centerStackedWidget->setCurrentWidget(fileDiffWidget);
+
+            for (const auto buttons : qAsConst(mDiffButtons))
+               if (buttons.second != diffButton)
+                  buttons.second->setUnselected();
+         });
          connect(diffButton, &DiffButton::destroyed, [this, id, fileDiffWidget]() {
             centerStackedWidget->removeWidget(fileDiffWidget);
             delete fileDiffWidget;
@@ -111,8 +132,18 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       fullDiffWidget->loadDiff(sha, parentSha);
 
       const auto diffButton = new DiffButton(id, ":/icons/commit-list");
-      connect(diffButton, &DiffButton::clicked, this,
-              [this, fullDiffWidget]() { centerStackedWidget->setCurrentWidget(fullDiffWidget); });
+      diffButton->setSelected();
+
+      for (const auto buttons : qAsConst(mDiffButtons))
+         buttons.second->setUnselected();
+
+      connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton]() {
+         centerStackedWidget->setCurrentWidget(fullDiffWidget);
+
+         for (const auto buttons : qAsConst(mDiffButtons))
+            if (buttons.second != diffButton)
+               buttons.second->setUnselected();
+      });
       connect(diffButton, &DiffButton::destroyed, [this, id, fullDiffWidget]() {
          centerStackedWidget->removeWidget(fullDiffWidget);
          delete fullDiffWidget;

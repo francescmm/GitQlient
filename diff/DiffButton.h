@@ -13,10 +13,11 @@ signals:
 
 public:
    explicit DiffButton(const QString &text, const QString &icon, QWidget *parent = nullptr);
+   void setSelected();
+   void setUnselected();
 
 protected:
    void mousePressEvent(QMouseEvent *e) override;
-   void mouseReleaseEvent(QMouseEvent *e) override;
 
 private:
    bool mPressed = false;
