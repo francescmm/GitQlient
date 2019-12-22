@@ -42,6 +42,14 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
    setLayout(layout);
 }
 
+void DiffWidget::reload()
+{
+   if (const auto fileDiff = dynamic_cast<FileDiffWidget *>(centerStackedWidget->currentWidget()))
+      fileDiff->reload();
+   else if (const auto fullDiff = dynamic_cast<FullDiffWidget *>(centerStackedWidget->currentWidget()))
+      fullDiff->reload();
+}
+
 void DiffWidget::clear() const
 {
    centerStackedWidget->setCurrentIndex(0);

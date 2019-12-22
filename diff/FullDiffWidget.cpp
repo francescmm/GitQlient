@@ -73,6 +73,11 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent)
    setTextInteractionFlags(Qt::TextSelectableByMouse);
 }
 
+void FullDiffWidget::reload()
+{
+   loadDiff(mCurrentSha, mPreviousSha);
+}
+
 void FullDiffWidget::processData(const QString &fileChunk)
 {
    if (mPreviousDiffText != fileChunk)
@@ -95,7 +100,10 @@ void FullDiffWidget::processData(const QString &fileChunk)
 
 void FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
 {
-   const auto ret = mGit->getCommitDiff(sha, diffToSha);
+   mCurrentSha = sha;
+   mPreviousSha = diffToSha;
+
+   const auto ret = mGit->getCommitDiff(mCurrentSha, mPreviousSha);
 
    if (ret.success)
       processData(ret.output.toString());

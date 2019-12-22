@@ -118,7 +118,7 @@ void GitQlientRepo::updateCache()
 
       mRepoWidget->reload();
 
-      openCommitDiff();
+      mDiffWidget->reload();
    }
 }
 
@@ -130,7 +130,7 @@ void GitQlientRepo::updateUiFromWatcher()
 
    mRepoWidget->updateUiFromWatcher();
 
-   openCommitDiff();
+   mDiffWidget->reload();
 }
 
 void GitQlientRepo::setRepository(const QString &newDir)

@@ -22,7 +22,6 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<Git> &git, QWidget *parent)
    const auto vLayout = new QHBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
    vLayout->setSpacing(0);
-   // vLayout->addLayout(controlsLayout);
    vLayout->addWidget(mDiffView);
 }
 
@@ -31,9 +30,17 @@ void FileDiffWidget::clear()
    mDiffView->clear();
 }
 
+bool FileDiffWidget::reload()
+{
+   return configure(mCurrentSha, mPreviousSha, mCurrentFile);
+}
+
 bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file)
 {
    mCurrentFile = file;
+   mCurrentSha = currentSha;
+   mPreviousSha = previousSha;
+
    auto destFile = file;
 
    if (destFile.contains("-->"))

@@ -16,6 +16,7 @@ class DiffWidget : public QFrame
 
 public:
    explicit DiffWidget(const QSharedPointer<Git> git, QWidget *parent = nullptr);
+   void reload();
 
    void clear() const;
    void loadFileDiff(const QString &sha, const QString &previousSha, const QString &file);

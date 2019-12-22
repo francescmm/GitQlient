@@ -41,12 +41,14 @@ class FullDiffWidget : public QTextEdit
 
 public:
    explicit FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
-
+   void reload();
    void loadDiff(const QString &sha, const QString &diffToSha);
 
 private:
    friend class DiffHighlighter;
    QSharedPointer<Git> mGit;
+   QString mCurrentSha;
+   QString mPreviousSha;
 
    void processData(const QString &fileChunk);
 
