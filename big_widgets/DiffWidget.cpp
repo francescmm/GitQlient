@@ -16,12 +16,8 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , centerStackedWidget(new QStackedWidget())
-   , mFullDiffWidget(new FullDiffWidget(git))
-   , mFileDiffWidget(new FileDiffWidget(git))
 {
    centerStackedWidget->setCurrentIndex(0);
-   centerStackedWidget->addWidget(mFullDiffWidget);
-   centerStackedWidget->addWidget(mFileDiffWidget);
    centerStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
    mDiffButtonsContainer = new QVBoxLayout();
@@ -44,10 +40,13 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
 
 void DiffWidget::reload()
 {
-   if (const auto fileDiff = dynamic_cast<FileDiffWidget *>(centerStackedWidget->currentWidget()))
-      fileDiff->reload();
-   else if (const auto fullDiff = dynamic_cast<FullDiffWidget *>(centerStackedWidget->currentWidget()))
-      fullDiff->reload();
+   if (centerStackedWidget->count() > 0)
+   {
+      if (const auto fileDiff = dynamic_cast<FileDiffWidget *>(centerStackedWidget->currentWidget()))
+         fileDiff->reload();
+      else if (const auto fullDiff = dynamic_cast<FullDiffWidget *>(centerStackedWidget->currentWidget()))
+         fullDiff->reload();
+   }
 }
 
 void DiffWidget::clear() const
@@ -63,9 +62,6 @@ void DiffWidget::clear() const
          dynamic_cast<FullDiffWidget *>(values.first)->clear();
    }
    */
-
-   mFullDiffWidget->clear();
-   mFileDiffWidget->clear();
 }
 
 void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
@@ -84,8 +80,13 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
       if (fileWithModifications)
       {
          const auto diffButton = new DiffButton(id, ":/icons/file");
-         connect(diffButton, &DiffButton::clicked, this, []() {});
-         connect(diffButton, &DiffButton::destroyed, []() {});
+         connect(diffButton, &DiffButton::clicked, this,
+                 [this, fileDiffWidget]() { centerStackedWidget->setCurrentWidget(fileDiffWidget); });
+         connect(diffButton, &DiffButton::destroyed, [this, id, fileDiffWidget]() {
+            centerStackedWidget->removeWidget(fileDiffWidget);
+            delete fileDiffWidget;
+            mDiffButtons.remove(id);
+         });
 
          mDiffButtonsContainer->addWidget(diffButton);
          mDiffButtons.insert(id, { fileDiffWidget, diffButton });
@@ -110,8 +111,13 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       fullDiffWidget->loadDiff(sha, parentSha);
 
       const auto diffButton = new DiffButton(id, ":/icons/commit-list");
-      connect(diffButton, &DiffButton::clicked, this, []() {});
-      connect(diffButton, &DiffButton::destroyed, []() {});
+      connect(diffButton, &DiffButton::clicked, this,
+              [this, fullDiffWidget]() { centerStackedWidget->setCurrentWidget(fullDiffWidget); });
+      connect(diffButton, &DiffButton::destroyed, [this, id, fullDiffWidget]() {
+         centerStackedWidget->removeWidget(fullDiffWidget);
+         delete fullDiffWidget;
+         mDiffButtons.remove(id);
+      });
       mDiffButtonsContainer->addWidget(diffButton);
       mDiffButtons.insert(id, { fullDiffWidget, diffButton });
 

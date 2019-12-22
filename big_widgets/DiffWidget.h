@@ -5,8 +5,6 @@
 
 class Git;
 class QStackedWidget;
-class FullDiffWidget;
-class FileDiffWidget;
 class DiffButton;
 class QVBoxLayout;
 
@@ -25,8 +23,6 @@ public:
 private:
    QSharedPointer<Git> mGit;
    QStackedWidget *centerStackedWidget = nullptr;
-   FullDiffWidget *mFullDiffWidget = nullptr;
-   FileDiffWidget *mFileDiffWidget = nullptr;
    QMap<QString, QPair<QFrame *, DiffButton *>> mDiffButtons;
    QVBoxLayout *mDiffButtonsContainer = nullptr;
 };
