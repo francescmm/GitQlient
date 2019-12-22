@@ -6,7 +6,6 @@ HEADERS += \
     $$PWD/Controls.h \
     $$PWD/DiffWidget.h \
     $$PWD/FileBlameWidget.h \
-    $$PWD/FullDiffWidget.h \
     $$PWD/GitQlient.h \
     $$PWD/GitQlientRepo.h \
     $$PWD/GitQlientSettings.h \
@@ -18,7 +17,6 @@ SOURCES += \
     $$PWD/Controls.cpp \
     $$PWD/DiffWidget.cpp \
     $$PWD/FileBlameWidget.cpp \
-    $$PWD/FullDiffWidget.cpp \
     $$PWD/GitQlient.cpp \
     $$PWD/GitQlientRepo.cpp \
     $$PWD/GitQlientSettings.cpp \
