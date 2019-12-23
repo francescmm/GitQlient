@@ -153,7 +153,7 @@ void CommitHistoryWidget::onCommitSelected(const QString &goToSha)
    if (isWip)
       mCommitWidget->configure(goToSha);
    else
-      mRevisionWidget->setCurrentCommitSha(goToSha);
+      mRevisionWidget->configure(goToSha);
 }
 
 void CommitHistoryWidget::onAmendCommit(const QString &sha)

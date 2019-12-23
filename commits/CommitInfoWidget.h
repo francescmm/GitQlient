@@ -41,7 +41,7 @@ signals:
 public:
    explicit CommitInfoWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
 
-   void setCurrentCommitSha(const QString &sha);
+   void configure(const QString &sha);
    QString getCurrentCommitSha() const;
    void clear();
 

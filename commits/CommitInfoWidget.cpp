@@ -84,7 +84,7 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<Git> &git, QWidget *pare
    connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitInfoWidget::signalShowFileHistory);
 }
 
-void CommitInfoWidget::setCurrentCommitSha(const QString &sha)
+void CommitInfoWidget::configure(const QString &sha)
 {
    if (sha == mCurrentSha)
       return;
