@@ -37,6 +37,8 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
    mDiffButtonsContainer->setContentsMargins(QMargins());
    mDiffButtonsContainer->setSpacing(5);
 
+   mCommitDiffWidget->setVisible(false);
+
    const auto diffsLayout = new QVBoxLayout();
    diffsLayout->setContentsMargins(QMargins());
    diffsLayout->setSpacing(10);
@@ -112,6 +114,9 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
             centerStackedWidget->removeWidget(fileDiffWidget);
             delete fileDiffWidget;
             mDiffButtons.remove(id);
+
+            if (mDiffButtons.count() == 0)
+               mCommitDiffWidget->setVisible(false);
          });
 
          mDiffButtonsContainer->addWidget(diffButton);
@@ -121,6 +126,7 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
          centerStackedWidget->setCurrentIndex(index);
 
          mCommitDiffWidget->configure(currentSha, previousSha);
+         mCommitDiffWidget->setVisible(true);
       }
       else
       {
@@ -167,6 +173,9 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
          centerStackedWidget->removeWidget(fullDiffWidget);
          delete fullDiffWidget;
          mDiffButtons.remove(id);
+
+         if (mDiffButtons.count() == 0)
+            mCommitDiffWidget->setVisible(false);
       });
       mDiffButtonsContainer->addWidget(diffButton);
       mDiffButtons.insert(id, { fullDiffWidget, diffButton });
@@ -175,6 +184,7 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       centerStackedWidget->setCurrentIndex(index);
 
       mCommitDiffWidget->configure(sha, parentSha);
+      mCommitDiffWidget->setVisible(true);
    }
    else
    {
