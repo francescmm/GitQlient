@@ -28,6 +28,13 @@
 class QToolButton;
 class Git;
 
+enum class ControlsMainViews
+{
+   HISTORY,
+   DIFF,
+   BLAME
+};
+
 class Controls : public QFrame
 {
    Q_OBJECT
@@ -40,7 +47,7 @@ signals:
 
 public:
    explicit Controls(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
-
+   void toggleButton(ControlsMainViews view);
    void setCurrentSha(const QString &sha) { mCurrentSha = sha; }
    void enableButtons(bool enabled);
    void fetchAll();

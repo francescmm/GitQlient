@@ -26,16 +26,19 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    , mStashBtn(new QToolButton())
    , mRefreshBtn(new QToolButton())
 {
+   mHistory->setCheckable(true);
    mHistory->setIcon(QIcon(":/icons/git_orange"));
    mHistory->setIconSize(QSize(22, 22));
    mHistory->setText("Repo view");
    mHistory->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
+   mDiff->setCheckable(true);
    mDiff->setIcon(QIcon(":/icons/diff"));
    mDiff->setIconSize(QSize(22, 22));
    mDiff->setText("Diff");
    mDiff->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
+   mBlame->setCheckable(true);
    mBlame->setIcon(QIcon(":/icons/blame"));
    mBlame->setIconSize(QSize(22, 22));
    mBlame->setText("Blame");
@@ -108,12 +111,54 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    hLayout->addStretch();
 
    connect(mHistory, &QToolButton::clicked, this, &Controls::signalGoRepo);
+   connect(mHistory, &QToolButton::toggled, this, [this](bool checked) {
+      mDiff->blockSignals(true);
+      mDiff->setChecked(!checked);
+      mDiff->blockSignals(false);
+      mBlame->blockSignals(true);
+      mBlame->setChecked(!checked);
+      mBlame->blockSignals(false);
+   });
    connect(mDiff, &QToolButton::clicked, this, &Controls::signalGoDiff);
+   connect(mDiff, &QToolButton::toggled, this, [this](bool checked) {
+      mHistory->blockSignals(true);
+      mHistory->setChecked(!checked);
+      mHistory->blockSignals(false);
+      mBlame->blockSignals(true);
+      mBlame->setChecked(!checked);
+      mBlame->blockSignals(false);
+   });
    connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
+   connect(mBlame, &QToolButton::toggled, this, [this](bool checked) {
+      mHistory->blockSignals(true);
+      mHistory->setChecked(!checked);
+      mHistory->blockSignals(false);
+      mDiff->blockSignals(true);
+      mDiff->setChecked(!checked);
+      mDiff->blockSignals(false);
+   });
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
 
    enableButtons(false);
+}
+
+void Controls::toggleButton(ControlsMainViews view)
+{
+   switch (view)
+   {
+      case ControlsMainViews::HISTORY:
+         mHistory->setChecked(true);
+         break;
+      case ControlsMainViews::DIFF:
+         mDiff->setChecked(true);
+         break;
+      case ControlsMainViews::BLAME:
+         mBlame->setChecked(true);
+         break;
+      default:
+         break;
+   }
 }
 
 void Controls::enableButtons(bool enabled)

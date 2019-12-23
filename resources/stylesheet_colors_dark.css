@@ -16,6 +16,11 @@ QToolButton
     color: white;
 }
 
+QToolButton:checked
+{
+   background-color: #202122;
+}
+
 QToolButton::menu-button {
     background-color: #404142;
 }

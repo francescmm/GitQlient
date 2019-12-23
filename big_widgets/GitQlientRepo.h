@@ -98,6 +98,9 @@ private:
    void showFileHistory(const QString &fileName);
    void updateProgressDialog();
    void closeProgressDialog();
+   void showHistoryView();
+   void showBlameView();
+   void showDiffView();
 
    // End of MainWindow refactor
    bool isMatch(const QString &sha, const QString &f, int cn, const QMap<QString, bool> &sm);

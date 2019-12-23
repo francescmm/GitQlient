@@ -40,6 +40,7 @@ BlameWidget::BlameWidget(const QSharedPointer<Git> &git, QWidget *parent)
    mRepoView->setSelectionMode(QAbstractItemView::SingleSelection);
    mRepoView->setContextMenuPolicy(Qt::CustomContextMenu);
    mRepoView->activateFilter(true);
+   mRepoView->filterBySha({});
    connect(mRepoView, &CommitHistoryView::customContextMenuRequested, this, &BlameWidget::showRepoViewMenu);
    connect(mRepoView, &CommitHistoryView::clicked, this, qOverload<const QModelIndex &>(&BlameWidget::reloadBlame));
 
