@@ -98,6 +98,7 @@ private:
    void showFileHistory(const QString &fileName);
    void updateProgressDialog();
    void closeProgressDialog();
+   void loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
    void showHistoryView();
    void showBlameView();
    void showDiffView();

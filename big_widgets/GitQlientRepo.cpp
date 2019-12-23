@@ -71,16 +71,13 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mRepoWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
    connect(mRepoWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::showDiffView);
    connect(mRepoWidget, &HistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
-   connect(mRepoWidget, &HistoryWidget::signalShowDiff, mDiffWidget, &DiffWidget::loadFileDiff);
-   connect(mRepoWidget, &HistoryWidget::signalShowDiff, this, &GitQlientRepo::showDiffView);
+   connect(mRepoWidget, &HistoryWidget::signalShowDiff, this, &GitQlientRepo::loadFileDiff);
    connect(mRepoWidget, &HistoryWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mRepoWidget, &HistoryWidget::signalUpdateUi, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mRepoWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
-   connect(mRepoWidget, &HistoryWidget::signalOpenFileCommit, mDiffWidget, &DiffWidget::loadFileDiff);
-   connect(mRepoWidget, &HistoryWidget::signalOpenFileCommit, this, &GitQlientRepo::showDiffView);
+   connect(mRepoWidget, &HistoryWidget::signalOpenFileCommit, this, &GitQlientRepo::loadFileDiff);
 
-   connect(mBlameWidget, &BlameWidget::showFileDiff, mDiffWidget, &DiffWidget::loadFileDiff);
-   connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::showDiffView);
+   connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::loadFileDiff);
 
    connect(mGit.get(), &Git::signalLoadingStarted, this, &GitQlientRepo::updateProgressDialog, Qt::DirectConnection);
    connect(mGit.get(), &Git::signalLoadingFinished, this, &GitQlientRepo::closeProgressDialog, Qt::DirectConnection);
@@ -253,6 +250,14 @@ void GitQlientRepo::updateProgressDialog()
 void GitQlientRepo::closeProgressDialog()
 {
    mProgressDlg->close();
+}
+
+void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
+{
+   const auto loaded = mDiffWidget->loadFileDiff(currentSha, previousSha, file);
+
+   if (loaded)
+      showDiffView();
 }
 
 void GitQlientRepo::showHistoryView()

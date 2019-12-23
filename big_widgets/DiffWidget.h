@@ -18,7 +18,7 @@ public:
    void reload();
 
    void clear() const;
-   void loadFileDiff(const QString &sha, const QString &previousSha, const QString &file);
+   bool loadFileDiff(const QString &sha, const QString &previousSha, const QString &file);
    void loadCommitDiff(const QString &sha, const QString &parentSha);
 
 private:

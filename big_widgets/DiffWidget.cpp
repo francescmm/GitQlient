@@ -62,7 +62,10 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
 
    setLayout(layout);
 
-   connect(mCommitDiffWidget, &CommitDiffWidget::signalOpenFileCommit, this, &DiffWidget::loadFileDiff);
+   connect(mCommitDiffWidget, &CommitDiffWidget::signalOpenFileCommit, this,
+           [this](const QString &currentSha, const QString &previousSha, const QString &file) {
+              loadFileDiff(currentSha, previousSha, file);
+           });
 }
 
 void DiffWidget::reload()
@@ -81,7 +84,7 @@ void DiffWidget::clear() const
    centerStackedWidget->setCurrentIndex(0);
 }
 
-void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
+bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
    const auto id = QString("%1 (%2 \u2194 %3)").arg(file.split("/").last(), currentSha.left(6), previousSha.left(6));
 
@@ -127,11 +130,15 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
 
          mCommitDiffWidget->configure(currentSha, previousSha);
          mCommitDiffWidget->setVisible(true);
+
+         return true;
       }
       else
       {
          QMessageBox::information(this, tr("No modifications"), tr("There are no content modifications for this file"));
          delete fileDiffWidget;
+
+         return false;
       }
    }
    else
@@ -144,6 +151,8 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
       diff->reload();
       pair.second->setSelected();
       centerStackedWidget->setCurrentWidget(diff);
+
+      return true;
    }
 }
 
