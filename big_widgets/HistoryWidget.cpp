@@ -22,14 +22,14 @@ HistoryWidget::HistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
    , mRepositoryView(new CommitHistoryView(git))
    , mBranchesWidget(new BranchesWidget(git))
    , mGoToSha(new QLineEdit())
-   , commitStackedWidget(new QStackedWidget())
+   , mCommitStackedWidget(new QStackedWidget())
    , mCommitWidget(new WorkInProgressWidget(git))
    , mRevisionWidget(new CommitInfoWidget(git))
 {
-   commitStackedWidget->setCurrentIndex(0);
-   commitStackedWidget->addWidget(mRevisionWidget);
-   commitStackedWidget->addWidget(mCommitWidget);
-   commitStackedWidget->setFixedWidth(310);
+   mCommitStackedWidget->setCurrentIndex(0);
+   mCommitStackedWidget->addWidget(mRevisionWidget);
+   mCommitStackedWidget->addWidget(mCommitWidget);
+   mCommitStackedWidget->setFixedWidth(310);
 
    connect(mCommitWidget, &WorkInProgressWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
    connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
@@ -67,7 +67,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
    layout->setSpacing(15);
-   layout->addWidget(commitStackedWidget);
+   layout->addWidget(mCommitStackedWidget);
    layout->addLayout(viewLayout);
    layout->addWidget(mBranchesWidget);
 
@@ -81,14 +81,14 @@ void HistoryWidget::clear()
    mCommitWidget->clear();
    mRevisionWidget->clear();
 
-   commitStackedWidget->setCurrentIndex(commitStackedWidget->currentIndex());
+   mCommitStackedWidget->setCurrentIndex(mCommitStackedWidget->currentIndex());
 }
 
 void HistoryWidget::reload()
 {
    mBranchesWidget->showBranches();
 
-   const auto commitStackedIndex = commitStackedWidget->currentIndex();
+   const auto commitStackedIndex = mCommitStackedWidget->currentIndex();
    const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : ZERO_SHA;
 
    focusOnCommit(currentSha);
@@ -99,7 +99,7 @@ void HistoryWidget::reload()
 
 void HistoryWidget::updateUiFromWatcher()
 {
-   const auto commitStackedIndex = commitStackedWidget->currentIndex();
+   const auto commitStackedIndex = mCommitStackedWidget->currentIndex();
 
    if (commitStackedIndex == 1 && !mCommitWidget->isAmendActive())
       mCommitWidget->configure(ZERO_SHA);
@@ -142,7 +142,7 @@ void HistoryWidget::openDiff(const QModelIndex &index)
 void HistoryWidget::onCommitSelected(const QString &goToSha)
 {
    const auto isWip = goToSha == ZERO_SHA;
-   commitStackedWidget->setCurrentIndex(isWip);
+   mCommitStackedWidget->setCurrentIndex(isWip);
 
    QLog_Info("UI", QString("Selected commit {%1}").arg(goToSha));
 
@@ -154,6 +154,6 @@ void HistoryWidget::onCommitSelected(const QString &goToSha)
 
 void HistoryWidget::onAmendCommit(const QString &sha)
 {
-   commitStackedWidget->setCurrentIndex(1);
+   mCommitStackedWidget->setCurrentIndex(1);
    mCommitWidget->configure(sha);
 }

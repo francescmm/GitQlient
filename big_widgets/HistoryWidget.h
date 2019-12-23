@@ -43,7 +43,7 @@ private:
    CommitHistoryView *mRepositoryView = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;
    QLineEdit *mGoToSha = nullptr;
-   QStackedWidget *commitStackedWidget = nullptr;
+   QStackedWidget *mCommitStackedWidget = nullptr;
    WorkInProgressWidget *mCommitWidget = nullptr;
    CommitInfoWidget *mRevisionWidget = nullptr;
 

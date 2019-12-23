@@ -31,7 +31,7 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
    , mRepoWidget(new HistoryWidget(mGit))
-   , mainStackedLayout(new QStackedLayout())
+   , mStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGit))
    , mDiffWidget(new DiffWidget(mGit))
    , mBlameWidget(new BlameWidget(mGit))
@@ -43,16 +43,16 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
 
-   mainStackedLayout->addWidget(mRepoWidget);
-   mainStackedLayout->addWidget(mDiffWidget);
-   mainStackedLayout->addWidget(mBlameWidget);
+   mStackedLayout->addWidget(mRepoWidget);
+   mStackedLayout->addWidget(mDiffWidget);
+   mStackedLayout->addWidget(mBlameWidget);
    showHistoryView();
 
    const auto gridLayout = new QGridLayout(this);
    gridLayout->setSpacing(0);
    gridLayout->setContentsMargins(10, 0, 10, 10);
    gridLayout->addWidget(mControls, 0, 1);
-   gridLayout->addLayout(mainStackedLayout, 1, 0, 1, 3);
+   gridLayout->addLayout(mStackedLayout, 1, 0, 1, 3);
 
    mAutoFetch->setInterval(mConfig.mAutoFetchSecs * 1000);
    mAutoFilesUpdate->setInterval(mConfig.mAutoFileUpdateSecs * 1000);
@@ -262,19 +262,19 @@ void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previ
 
 void GitQlientRepo::showHistoryView()
 {
-   mainStackedLayout->setCurrentWidget(mRepoWidget);
+   mStackedLayout->setCurrentWidget(mRepoWidget);
    mControls->toggleButton(ControlsMainViews::HISTORY);
 }
 
 void GitQlientRepo::showBlameView()
 {
-   mainStackedLayout->setCurrentWidget(mBlameWidget);
+   mStackedLayout->setCurrentWidget(mBlameWidget);
    mControls->toggleButton(ControlsMainViews::BLAME);
 }
 
 void GitQlientRepo::showDiffView()
 {
-   mainStackedLayout->setCurrentWidget(mDiffWidget);
+   mStackedLayout->setCurrentWidget(mDiffWidget);
    mControls->toggleButton(ControlsMainViews::DIFF);
 }
 

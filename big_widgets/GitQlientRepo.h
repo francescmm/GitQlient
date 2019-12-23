@@ -76,7 +76,7 @@ private:
    QString mCurrentDir;
    QSharedPointer<Git> mGit;
    HistoryWidget *mRepoWidget = nullptr;
-   QStackedLayout *mainStackedLayout = nullptr;
+   QStackedLayout *mStackedLayout = nullptr;
    Controls *mControls = nullptr;
    DiffWidget *mDiffWidget = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
