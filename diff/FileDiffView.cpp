@@ -59,7 +59,7 @@ void FileDiffView::resizeEvent(QResizeEvent *e)
 void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
    QPainter painter(mLineNumberArea);
-   painter.fillRect(event->rect(), QColor("#202122"));
+   painter.fillRect(event->rect(), QColor("#2E2F30"));
 
    auto block = firstVisibleBlock();
    auto blockNumber = block.blockNumber();
