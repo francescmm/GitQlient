@@ -224,7 +224,7 @@ QHeaderView:section
 
 /**  END  QHeaderView **/
 
-BranchDlg > QLineEdit, CommitHistoryWidget > QLineEdit
+BranchDlg > QLineEdit, HistoryWidget > QLineEdit
 {
     border-width: 1px;
     border-style: solid;

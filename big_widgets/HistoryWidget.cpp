@@ -1,4 +1,4 @@
-#include "CommitHistoryWidget.h"
+#include "HistoryWidget.h"
 
 #include <CommitHistoryModel.h>
 #include <CommitHistoryView.h>
@@ -16,7 +16,7 @@
 
 using namespace QLogger;
 
-CommitHistoryWidget::CommitHistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
+HistoryWidget::HistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
    , mRepositoryModel(new CommitHistoryModel(git))
    , mRepositoryView(new CommitHistoryView(git))
@@ -31,36 +31,32 @@ CommitHistoryWidget::CommitHistoryWidget(const QSharedPointer<Git> git, QWidget 
    commitStackedWidget->addWidget(mCommitWidget);
    commitStackedWidget->setFixedWidth(310);
 
-   connect(mCommitWidget, &WorkInProgressWidget::signalShowDiff, this, &CommitHistoryWidget::signalShowDiff);
-   connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this,
-           &CommitHistoryWidget::signalChangesCommitted);
-   connect(mCommitWidget, &WorkInProgressWidget::signalCheckoutPerformed, this, &CommitHistoryWidget::signalUpdateUi);
-   connect(mCommitWidget, &WorkInProgressWidget::signalShowFileHistory, this,
-           &CommitHistoryWidget::signalShowFileHistory);
-   connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &CommitHistoryWidget::signalOpenFileCommit);
-   connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this,
-           &CommitHistoryWidget::signalShowFileHistory);
+   connect(mCommitWidget, &WorkInProgressWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
+   connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
+   connect(mCommitWidget, &WorkInProgressWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
+   connect(mCommitWidget, &WorkInProgressWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
+   connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalOpenFileCommit);
+   connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
 
    mGoToSha->setPlaceholderText(tr("Press Enter to focus on SHA..."));
-   connect(mGoToSha, &QLineEdit::returnPressed, this, &CommitHistoryWidget::goToSha);
+   connect(mGoToSha, &QLineEdit::returnPressed, this, &HistoryWidget::goToSha);
 
    mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setItemDelegate(new RepositoryViewDelegate(git, mRepositoryView));
    mRepositoryView->setEnabled(true);
 
-   connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &CommitHistoryWidget::signalViewUpdated);
-   connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, &CommitHistoryWidget::signalOpenDiff);
-   connect(mRepositoryView, &CommitHistoryView::signalOpenCompareDiff, this,
-           &CommitHistoryWidget::signalOpenCompareDiff);
-   connect(mRepositoryView, &CommitHistoryView::clicked, this, &CommitHistoryWidget::commitSelected);
-   connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &CommitHistoryWidget::openDiff);
-   connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &CommitHistoryWidget::onAmendCommit);
+   connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &HistoryWidget::signalViewUpdated);
+   connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, &HistoryWidget::signalOpenDiff);
+   connect(mRepositoryView, &CommitHistoryView::signalOpenCompareDiff, this, &HistoryWidget::signalOpenCompareDiff);
+   connect(mRepositoryView, &CommitHistoryView::clicked, this, &HistoryWidget::commitSelected);
+   connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &HistoryWidget::openDiff);
+   connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &HistoryWidget::onAmendCommit);
 
-   connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &CommitHistoryWidget::signalUpdateCache);
-   connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &CommitHistoryWidget::signalUpdateCache);
+   connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &HistoryWidget::signalUpdateCache);
+   connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::signalUpdateCache);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
-   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &CommitHistoryWidget::signalGoToSha);
-   connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &CommitHistoryWidget::signalOpenSubmodule);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &HistoryWidget::signalGoToSha);
+   connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &HistoryWidget::signalOpenSubmodule);
 
    const auto viewLayout = new QVBoxLayout();
    viewLayout->setContentsMargins(QMargins());
@@ -78,7 +74,7 @@ CommitHistoryWidget::CommitHistoryWidget(const QSharedPointer<Git> git, QWidget 
    setLayout(layout);
 }
 
-void CommitHistoryWidget::clear()
+void HistoryWidget::clear()
 {
    mRepositoryView->clear();
    mBranchesWidget->clear();
@@ -88,7 +84,7 @@ void CommitHistoryWidget::clear()
    commitStackedWidget->setCurrentIndex(commitStackedWidget->currentIndex());
 }
 
-void CommitHistoryWidget::reload()
+void HistoryWidget::reload()
 {
    mBranchesWidget->showBranches();
 
@@ -101,7 +97,7 @@ void CommitHistoryWidget::reload()
       mCommitWidget->configure(currentSha);
 }
 
-void CommitHistoryWidget::updateUiFromWatcher()
+void HistoryWidget::updateUiFromWatcher()
 {
    const auto commitStackedIndex = commitStackedWidget->currentIndex();
 
@@ -109,17 +105,17 @@ void CommitHistoryWidget::updateUiFromWatcher()
       mCommitWidget->configure(ZERO_SHA);
 }
 
-void CommitHistoryWidget::focusOnCommit(const QString &sha)
+void HistoryWidget::focusOnCommit(const QString &sha)
 {
    mRepositoryView->focusOnCommit(sha);
 }
 
-QString CommitHistoryWidget::getCurrentSha() const
+QString HistoryWidget::getCurrentSha() const
 {
    return mRepositoryView->getCurrentSha();
 }
 
-void CommitHistoryWidget::goToSha()
+void HistoryWidget::goToSha()
 {
    const auto sha = mGoToSha->text();
    mRepositoryView->focusOnCommit(sha);
@@ -129,21 +125,21 @@ void CommitHistoryWidget::goToSha()
    onCommitSelected(sha);
 }
 
-void CommitHistoryWidget::commitSelected(const QModelIndex &index)
+void HistoryWidget::commitSelected(const QModelIndex &index)
 {
    const auto sha = mRepositoryModel->sha(index.row());
 
    onCommitSelected(sha);
 }
 
-void CommitHistoryWidget::openDiff(const QModelIndex &index)
+void HistoryWidget::openDiff(const QModelIndex &index)
 {
    const auto sha = mRepositoryModel->sha(index.row());
 
    emit signalOpenDiff(sha);
 }
 
-void CommitHistoryWidget::onCommitSelected(const QString &goToSha)
+void HistoryWidget::onCommitSelected(const QString &goToSha)
 {
    const auto isWip = goToSha == ZERO_SHA;
    commitStackedWidget->setCurrentIndex(isWip);
@@ -156,7 +152,7 @@ void CommitHistoryWidget::onCommitSelected(const QString &goToSha)
       mRevisionWidget->configure(goToSha);
 }
 
-void CommitHistoryWidget::onAmendCommit(const QString &sha)
+void HistoryWidget::onAmendCommit(const QString &sha)
 {
    commitStackedWidget->setCurrentIndex(1);
    mCommitWidget->configure(sha);

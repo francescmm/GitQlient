@@ -4,7 +4,7 @@
 #include <Controls.h>
 #include <BranchesWidget.h>
 #include <CommitHistoryColumns.h>
-#include <CommitHistoryWidget.h>
+#include <HistoryWidget.h>
 #include <CommitHistoryView.h>
 #include <git.h>
 #include <QLogger.h>
@@ -30,7 +30,7 @@ using namespace QLogger;
 GitQlientRepo::GitQlientRepo(QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
-   , mRepoWidget(new CommitHistoryWidget(mGit))
+   , mRepoWidget(new HistoryWidget(mGit))
    , mainStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGit))
    , mDiffWidget(new DiffWidget(mGit))
@@ -65,21 +65,21 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mControls, &Controls::signalGoDiff, this, [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
 
-   connect(mRepoWidget, &CommitHistoryWidget::signalUpdateCache, this, &GitQlientRepo::updateCache);
-   connect(mRepoWidget, &CommitHistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
-   connect(mRepoWidget, &CommitHistoryWidget::signalViewUpdated, this, &GitQlientRepo::updateCache);
-   connect(mRepoWidget, &CommitHistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
-   connect(mRepoWidget, &CommitHistoryWidget::signalOpenDiff, this,
+   connect(mRepoWidget, &HistoryWidget::signalUpdateCache, this, &GitQlientRepo::updateCache);
+   connect(mRepoWidget, &HistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
+   connect(mRepoWidget, &HistoryWidget::signalViewUpdated, this, &GitQlientRepo::updateCache);
+   connect(mRepoWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
+   connect(mRepoWidget, &HistoryWidget::signalOpenDiff, this,
            [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
-   connect(mRepoWidget, &CommitHistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
-   connect(mRepoWidget, &CommitHistoryWidget::signalShowDiff, mDiffWidget, &DiffWidget::loadFileDiff);
-   connect(mRepoWidget, &CommitHistoryWidget::signalShowDiff, this,
+   connect(mRepoWidget, &HistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
+   connect(mRepoWidget, &HistoryWidget::signalShowDiff, mDiffWidget, &DiffWidget::loadFileDiff);
+   connect(mRepoWidget, &HistoryWidget::signalShowDiff, this,
            [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
-   connect(mRepoWidget, &CommitHistoryWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
-   connect(mRepoWidget, &CommitHistoryWidget::signalUpdateUi, this, &GitQlientRepo::updateUiFromWatcher);
-   connect(mRepoWidget, &CommitHistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
-   connect(mRepoWidget, &CommitHistoryWidget::signalOpenFileCommit, mDiffWidget, &DiffWidget::loadFileDiff);
-   connect(mRepoWidget, &CommitHistoryWidget::signalOpenFileCommit, this,
+   connect(mRepoWidget, &HistoryWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
+   connect(mRepoWidget, &HistoryWidget::signalUpdateUi, this, &GitQlientRepo::updateUiFromWatcher);
+   connect(mRepoWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
+   connect(mRepoWidget, &HistoryWidget::signalOpenFileCommit, mDiffWidget, &DiffWidget::loadFileDiff);
+   connect(mRepoWidget, &HistoryWidget::signalOpenFileCommit, this,
            [this]() { mainStackedLayout->setCurrentWidget(mDiffWidget); });
 
    connect(mBlameWidget, &BlameWidget::showFileDiff, mDiffWidget, &DiffWidget::loadFileDiff);

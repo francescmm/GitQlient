@@ -11,7 +11,7 @@ class QStackedWidget;
 class WorkInProgressWidget;
 class CommitInfoWidget;
 
-class CommitHistoryWidget : public QFrame
+class HistoryWidget : public QFrame
 {
    Q_OBJECT
 
@@ -29,7 +29,7 @@ signals:
    void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file);
 
 public:
-   explicit CommitHistoryWidget(const QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit HistoryWidget(const QSharedPointer<Git> git, QWidget *parent = nullptr);
    void clear();
    void reload();
    void updateUiFromWatcher();

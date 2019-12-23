@@ -31,7 +31,7 @@ class QFileSystemWatcher;
 class QStackedWidget;
 class QStackedLayout;
 class Controls;
-class CommitHistoryWidget;
+class HistoryWidget;
 class RevsView;
 class BlameWidget;
 class FileDiffHighlighter;
@@ -75,7 +75,7 @@ private:
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    QString mCurrentDir;
    QSharedPointer<Git> mGit;
-   CommitHistoryWidget *mRepoWidget = nullptr;
+   HistoryWidget *mRepoWidget = nullptr;
    QStackedLayout *mainStackedLayout = nullptr;
    Controls *mControls = nullptr;
    DiffWidget *mDiffWidget = nullptr;
