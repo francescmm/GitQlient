@@ -503,8 +503,14 @@ QProgressBar::chunk
 
 DiffButton
 {
-   min-width: 350px;
-   max-width: 350px;
+   max-height: 30px;
+   min-height: 30px;
+}
+
+DiffWidget > QScrollArea
+{
+   min-width: 375px;
+   max-width: 375px;
 }
 
 

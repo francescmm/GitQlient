@@ -479,3 +479,8 @@ DiffButton[pressed="true"]
    background-color: #202122;
 }
 
+#DiffButtonsFrame
+{
+   background-color: #404142;
+}
+

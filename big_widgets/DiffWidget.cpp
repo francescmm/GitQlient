@@ -10,6 +10,7 @@
 #include <QStackedWidget>
 #include <QMessageBox>
 #include <QHBoxLayout>
+#include <QScrollArea>
 
 using namespace QLogger;
 
@@ -33,17 +34,25 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
       }
    });
 
-   mDiffButtonsContainer = new QVBoxLayout();
+   mCommitDiffWidget->setVisible(false);
+
+   const auto diffButtonsFrame = new QFrame();
+   diffButtonsFrame->setObjectName("DiffButtonsFrame");
+   mDiffButtonsContainer = new QVBoxLayout(diffButtonsFrame);
    mDiffButtonsContainer->setContentsMargins(QMargins());
    mDiffButtonsContainer->setSpacing(5);
+   mDiffButtonsContainer->setAlignment(Qt::AlignTop);
 
-   mCommitDiffWidget->setVisible(false);
+   const auto scrollArea = new QScrollArea();
+   scrollArea->setWidget(diffButtonsFrame);
+   scrollArea->setWidgetResizable(true);
+   scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 
    const auto diffsLayout = new QVBoxLayout();
    diffsLayout->setContentsMargins(QMargins());
    diffsLayout->setSpacing(10);
-   diffsLayout->addLayout(mDiffButtonsContainer);
-   diffsLayout->addStretch();
+   diffsLayout->addWidget(scrollArea);
+   // diffsLayout->addStretch();
    diffsLayout->addWidget(mCommitDiffWidget);
 
    const auto layout = new QHBoxLayout();
@@ -70,16 +79,6 @@ void DiffWidget::reload()
 void DiffWidget::clear() const
 {
    centerStackedWidget->setCurrentIndex(0);
-
-   /*
-   for (auto values : mDiffButtons)
-   {
-      if (dynamic_cast<FileDiffWidget *>(values.first))
-         dynamic_cast<FileDiffWidget *>(values.first)->clear();
-      else if (dynamic_cast<FullDiffWidget *>(values.first))
-         dynamic_cast<FullDiffWidget *>(values.first)->clear();
-   }
-   */
 }
 
 void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
