@@ -58,6 +58,7 @@ private:
    QTabWidget *mTabWidget = nullptr;
    QString mWorkingDirectory;
    QMap<QString, FileBlameWidget *> mTabsMap;
+   int mSelectedRow = -1;
 
    void showFileSystemContextMenu(const QPoint &pos);
    void showRepoViewMenu(const QPoint &pos);

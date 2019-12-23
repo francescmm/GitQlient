@@ -111,6 +111,7 @@ void BlameWidget::showFileHistory(const QString &filePath)
 
 void BlameWidget::reloadBlame(const QModelIndex &index)
 {
+   mSelectedRow = index.row();
    const auto blameWidget = qobject_cast<FileBlameWidget *>(mTabWidget->currentWidget());
 
    if (blameWidget)
@@ -168,16 +169,17 @@ void BlameWidget::showFileHistory(const QModelIndex &index)
 
 void BlameWidget::showRepoViewMenu(const QPoint &pos)
 {
-   const auto sha = mRepoView->getCurrentSha();
+   const auto shaColumnIndex = static_cast<int>(CommitHistoryColumns::SHA);
+   const auto sha = mRepoView->model()->index(mSelectedRow, shaColumnIndex).data().toString();
+   const auto previousSha = mRepoView->model()->index(mSelectedRow + 1, shaColumnIndex).data().toString();
    const auto menu = new QMenu(this);
    const auto copyShaAction = menu->addAction(tr("Copy SHA"));
    connect(copyShaAction, &QAction::triggered, this, [sha]() { QApplication::clipboard()->setText(sha); });
 
    const auto fileDiff = menu->addAction(tr("Show file diff"));
-   connect(fileDiff, &QAction::triggered, this, [this, sha]() {
-      const auto parentSha = mGit->getCommitInfo(sha).parent(0);
+   connect(fileDiff, &QAction::triggered, this, [this, sha, previousSha]() {
       const auto currentFile = qobject_cast<FileBlameWidget *>(mTabWidget->currentWidget())->getCurrentFile();
-      emit showFileDiff(sha, parentSha, currentFile);
+      emit showFileDiff(sha, previousSha, currentFile);
    });
 
    menu->exec(mRepoView->viewport()->mapToGlobal(pos));
