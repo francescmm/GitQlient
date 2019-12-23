@@ -111,7 +111,7 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
                if (buttons.second != diffButton)
                   buttons.second->setUnselected();
          });
-         connect(diffButton, &DiffButton::destroyed, [this, id, fileDiffWidget]() {
+         connect(diffButton, &DiffButton::destroyed, this, [this, id, fileDiffWidget]() {
             centerStackedWidget->removeWidget(fileDiffWidget);
             delete fileDiffWidget;
             mDiffButtons.remove(id);
@@ -171,7 +171,7 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
             if (buttons.second != diffButton)
                buttons.second->setUnselected();
       });
-      connect(diffButton, &DiffButton::destroyed, [this, id, fullDiffWidget]() {
+      connect(diffButton, &DiffButton::destroyed, this, [this, id, fullDiffWidget]() {
          centerStackedWidget->removeWidget(fullDiffWidget);
          delete fullDiffWidget;
          mDiffButtons.remove(id);
