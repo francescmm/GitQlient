@@ -175,7 +175,7 @@ QList<QString> CommitHistoryView::getSelectedShaList() const
       const auto sha = mCommitHistoryModel->sha(index.row());
       const auto dtStr
           = mCommitHistoryModel->index(index.row(), static_cast<int>(CommitHistoryColumns::DATE)).data().toString();
-      const auto dt = QDateTime::fromString(dtStr, "dd/MM/yyyy hh:mm");
+      const auto dt = QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm");
 
       shas.insert(dt, sha);
       auto ret = mGit->getBranchesOfCommit(sha);
