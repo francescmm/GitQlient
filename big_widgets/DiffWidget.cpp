@@ -105,6 +105,7 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
 
          connect(diffButton, &DiffButton::clicked, this, [this, fileDiffWidget, diffButton]() {
             centerStackedWidget->setCurrentWidget(fileDiffWidget);
+            mCommitDiffWidget->configure(fileDiffWidget->getCurrentSha(), fileDiffWidget->getPreviousSha());
 
             for (const auto buttons : qAsConst(mDiffButtons))
                if (buttons.second != diffButton)
@@ -149,7 +150,7 @@ void DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
 
 void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 {
-   const auto id = QString("Complete (%1 \u2194 %2)").arg(sha.left(6), parentSha.left(6));
+   const auto id = QString("Commit diff (%1 \u2194 %2)").arg(sha.left(6), parentSha.left(6));
 
    if (!mDiffButtons.contains(id))
    {
@@ -164,6 +165,7 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 
       connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton]() {
          centerStackedWidget->setCurrentWidget(fullDiffWidget);
+         mCommitDiffWidget->configure(fullDiffWidget->getCurrentSha(), fullDiffWidget->getPreviousSha());
 
          for (const auto buttons : qAsConst(mDiffButtons))
             if (buttons.second != diffButton)

@@ -275,6 +275,8 @@ void GitQlientRepo::openCommitDiff()
 void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
 {
    mDiffWidget->loadCommitDiff(shas.last(), shas.first());
+
+   mainStackedLayout->setCurrentWidget(mDiffWidget);
 }
 
 void GitQlientRepo::changesCommitted(bool ok)

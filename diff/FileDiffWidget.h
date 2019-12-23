@@ -40,6 +40,8 @@ public:
    bool reload();
    bool configure(const QString &currentSha, const QString &previousSha, const QString &file);
    QString getCurrentFile() const { return mCurrentFile; }
+   QString getCurrentSha() const { return mCurrentSha; }
+   QString getPreviousSha() const { return mPreviousSha; }
 
 private:
    QString mCurrentFile;

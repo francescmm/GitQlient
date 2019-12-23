@@ -43,6 +43,8 @@ public:
    explicit FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
    void reload();
    void loadDiff(const QString &sha, const QString &diffToSha);
+   QString getCurrentSha() const { return mCurrentSha; }
+   QString getPreviousSha() const { return mPreviousSha; }
 
 private:
    friend class DiffHighlighter;
