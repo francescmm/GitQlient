@@ -278,9 +278,9 @@ void WorkInProgressWidget::addFileToCommitList(QListWidgetItem *item)
 
 void WorkInProgressWidget::revertAllChanges()
 {
-   auto i = ui->unstagedFilesList->count();
+   auto i = ui->unstagedFilesList->count() - 1;
 
-   for (; ++i >= 0; ++i)
+   for (; i >= 0; --i)
    {
       const auto fileName = ui->unstagedFilesList->takeItem(i)->data(Qt::DisplayRole).toString();
       const auto ret = mGit->resetFile(fileName);
