@@ -56,7 +56,7 @@ CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoW
     background-color: #606162;
 }
 
-CommitInfoWidget #labelSha
+#labelSha
 {
     color: #D89000;
     background-color: #202122;

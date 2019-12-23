@@ -10,6 +10,9 @@ class CommitDiffWidget : public QFrame
 {
    Q_OBJECT
 
+signals:
+   void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file);
+
 public:
    explicit CommitDiffWidget(QSharedPointer<Git> git, QWidget *parent = nullptr);
 

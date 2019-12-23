@@ -7,6 +7,7 @@ class Git;
 class QStackedWidget;
 class DiffButton;
 class QVBoxLayout;
+class CommitDiffWidget;
 
 class DiffWidget : public QFrame
 {
@@ -25,4 +26,5 @@ private:
    QStackedWidget *centerStackedWidget = nullptr;
    QMap<QString, QPair<QFrame *, DiffButton *>> mDiffButtons;
    QVBoxLayout *mDiffButtonsContainer = nullptr;
+   CommitDiffWidget *mCommitDiffWidget = nullptr;
 };

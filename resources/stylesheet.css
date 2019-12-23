@@ -46,11 +46,17 @@ CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoW
     padding: 10px;
 }
 
-CommitInfoWidget #labelSha
+#labelSha
 {
     padding: 8px 10px 8px 10px;
     font-weight: bold;
     font-family: Ubuntu Mono;
+}
+
+CommitDiffWidget
+{
+   max-height: 350px;
+   min-height: 350px;
 }
 
 WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView

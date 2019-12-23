@@ -13,6 +13,18 @@ CommitDiffWidget::CommitDiffWidget(QSharedPointer<Git> git, QWidget *parent)
    , mSecondSha(new QLabel())
    , fileListWidget(new FileListWidget(mGit))
 {
+   mFirstSha->setObjectName("labelSha");
+   mFirstSha->setAlignment(Qt::AlignCenter);
+
+   mSecondSha->setObjectName("labelSha");
+   mSecondSha->setAlignment(Qt::AlignCenter);
+
+   QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+   sizePolicy.setHorizontalStretch(0);
+   sizePolicy.setVerticalStretch(0);
+   sizePolicy.setHeightForWidth(fileListWidget->sizePolicy().hasHeightForWidth());
+   fileListWidget->setSizePolicy(sizePolicy);
+
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->setSpacing(10);
@@ -22,7 +34,8 @@ CommitDiffWidget::CommitDiffWidget(QSharedPointer<Git> git, QWidget *parent)
    layout->addWidget(mSecondSha);
    layout->addWidget(fileListWidget);
 
-   connect(fileListWidget, &FileListWidget::itemDoubleClicked, this, [](QListWidgetItem *) {});
+   connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
+           [this](QListWidgetItem *item) { emit signalOpenFileCommit(mFirstShaStr, mSecondShaStr, item->text()); });
 }
 
 void CommitDiffWidget::configure(const QString &firstSha, const QString &secondSha)
