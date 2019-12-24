@@ -28,16 +28,14 @@
 class Git;
 class QCloseEvent;
 class QFileSystemWatcher;
-class QStackedWidget;
 class QStackedLayout;
 class Controls;
 class HistoryWidget;
-class RevsView;
+class DiffWidget;
 class BlameWidget;
-class FileDiffHighlighter;
+class MergeWidget;
 class QTimer;
 class ProgressDlg;
-class DiffWidget;
 
 namespace Ui
 {
@@ -72,19 +70,19 @@ protected:
    void closeEvent(QCloseEvent *ce) override;
 
 private:
-   FileDiffHighlighter *mDiffHighlighter = nullptr;
    QString mCurrentDir;
+   GitQlientRepoConfig mConfig;
    QSharedPointer<Git> mGit;
-   HistoryWidget *mRepoWidget = nullptr;
-   QStackedLayout *mStackedLayout = nullptr;
    Controls *mControls = nullptr;
+   QStackedLayout *mStackedLayout = nullptr;
+   HistoryWidget *mRepoWidget = nullptr;
    DiffWidget *mDiffWidget = nullptr;
-   QFileSystemWatcher *mGitWatcher = nullptr;
    BlameWidget *mBlameWidget = nullptr;
+   MergeWidget *mMergeWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
-   GitQlientRepoConfig mConfig;
    ProgressDlg *mProgressDlg = nullptr;
+   QFileSystemWatcher *mGitWatcher = nullptr;
 
    void updateCache();
    void updateUiFromWatcher();

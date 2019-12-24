@@ -1,18 +1,17 @@
 #include "GitQlientRepo.h"
 
-#include <GitQlientSettings.h>
-#include <Controls.h>
-#include <BranchesWidget.h>
-#include <CommitHistoryColumns.h>
-#include <HistoryWidget.h>
-#include <CommitHistoryView.h>
 #include <git.h>
-#include <QLogger.h>
-#include <BlameWidget.h>
 #include <CommitInfo.h>
 #include <ProgressDlg.h>
 #include <GitConfigDlg.h>
+#include <GitQlientSettings.h>
+#include <Controls.h>
+#include <HistoryWidget.h>
 #include <DiffWidget.h>
+#include <BlameWidget.h>
+#include <MergeWidget.h>
+
+#include <QLogger.h>
 
 #include <QFileSystemModel>
 #include <QTimer>
@@ -30,11 +29,12 @@ using namespace QLogger;
 GitQlientRepo::GitQlientRepo(QWidget *parent)
    : QFrame(parent)
    , mGit(new Git())
-   , mRepoWidget(new HistoryWidget(mGit))
-   , mStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGit))
+   , mStackedLayout(new QStackedLayout())
+   , mRepoWidget(new HistoryWidget(mGit))
    , mDiffWidget(new DiffWidget(mGit))
    , mBlameWidget(new BlameWidget(mGit))
+   , mMergeWidget(new MergeWidget(mGit))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {

@@ -8,7 +8,8 @@ HEADERS += \
     $$PWD/GitQlientRepo.h \
     $$PWD/GitQlientSettings.h \
     $$PWD/GitQlientStyles.h \
-    $$PWD/HistoryWidget.h
+    $$PWD/HistoryWidget.h \
+    $$PWD/MergeWidget.h
 
 SOURCES += \
     $$PWD/BlameWidget.cpp \
@@ -18,4 +19,5 @@ SOURCES += \
     $$PWD/GitQlientRepo.cpp \
     $$PWD/GitQlientSettings.cpp \
     $$PWD/GitQlientStyles.cpp \
-    $$PWD/HistoryWidget.cpp
+    $$PWD/HistoryWidget.cpp \
+    $$PWD/MergeWidget.cpp

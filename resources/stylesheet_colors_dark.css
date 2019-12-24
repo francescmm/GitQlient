@@ -143,12 +143,12 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget, WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription
+FullDiffWidget, #leCommitTitle, #teDescription
 {
     border-color: #202122
 }
 
-WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription, #leGitCommand
+#leCommitTitle, #teDescription, #leGitCommand
 {
     background-color: #606162;
     color: white;

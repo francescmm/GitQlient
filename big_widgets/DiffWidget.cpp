@@ -38,6 +38,7 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
 
    const auto diffButtonsFrame = new QFrame();
    diffButtonsFrame->setObjectName("DiffButtonsFrame");
+
    mDiffButtonsContainer = new QVBoxLayout(diffButtonsFrame);
    mDiffButtonsContainer->setContentsMargins(QMargins());
    mDiffButtonsContainer->setSpacing(5);
@@ -52,7 +53,6 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
    diffsLayout->setContentsMargins(QMargins());
    diffsLayout->setSpacing(10);
    diffsLayout->addWidget(scrollArea);
-   // diffsLayout->addStretch();
    diffsLayout->addWidget(mCommitDiffWidget);
 
    const auto layout = new QHBoxLayout();
