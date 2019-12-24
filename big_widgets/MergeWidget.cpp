@@ -158,17 +158,20 @@ void MergeWidget::fillButtonFileList(const RevisionFile &files)
 
 void MergeWidget::changeDiffView(bool fileBtnChecked)
 {
-   const auto end = mConflictButtons.constEnd();
-
-   for (auto iter = mConflictButtons.constBegin(); iter != end; ++iter)
+   if (fileBtnChecked)
    {
-      if (iter.key() != sender())
+      const auto end = mConflictButtons.constEnd();
+
+      for (auto iter = mConflictButtons.constBegin(); iter != end; ++iter)
       {
-         iter.key()->blockSignals(true);
-         iter.key()->setChecked(!fileBtnChecked);
-         iter.key()->blockSignals(false);
+         if (iter.key() != sender())
+         {
+            iter.key()->blockSignals(true);
+            iter.key()->setChecked(false);
+            iter.key()->blockSignals(false);
+         }
+         else
+            mCenterStackedWidget->setCurrentWidget(iter.value());
       }
-      else if (fileBtnChecked)
-         mCenterStackedWidget->setCurrentWidget(iter.value());
    }
 }
