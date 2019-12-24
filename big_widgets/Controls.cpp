@@ -147,6 +147,8 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
 
    enableButtons(false);
+
+   connect(mGit.get(), &Git::signalMergeConflicts, this, &Controls::activateMergeWarning);
 }
 
 void Controls::toggleButton(ControlsMainViews view)
@@ -198,9 +200,9 @@ void Controls::fetchAll()
       emit signalRepositoryUpdated();
 }
 
-void Controls::setMergeStatus(bool isMergePending)
+void Controls::activateMergeWarning()
 {
-   mMergeWarning->setVisible(isMergePending);
+   mMergeWarning->setVisible(true);
 }
 
 void Controls::pushCurrentBranch()

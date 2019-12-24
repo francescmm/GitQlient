@@ -55,6 +55,7 @@ signals:
    void cancelAllProcesses();
    void signalLoadingStarted();
    void signalLoadingFinished();
+   void signalMergeConflicts();
    void signalCloningProgress(QString stepDescription, int value);
 
 public:

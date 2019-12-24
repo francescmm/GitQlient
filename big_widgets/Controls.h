@@ -53,7 +53,7 @@ public:
    void setCurrentSha(const QString &sha) { mCurrentSha = sha; }
    void enableButtons(bool enabled);
    void fetchAll();
-   void setMergeStatus(bool isMergePending);
+   void activateMergeWarning();
 
 private:
    QString mCurrentSha;
