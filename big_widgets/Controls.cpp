@@ -6,14 +6,9 @@
 #include <QApplication>
 #include <QToolButton>
 #include <QHBoxLayout>
-#include <QLineEdit>
 #include <QMenu>
-#include <QDir>
-#include <QFileDialog>
-#include <QLabel>
-#include <QApplication>
-#include <QDesktopWidget>
 #include <QMessageBox>
+#include <QPushButton>
 
 Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
@@ -25,6 +20,7 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    , mPushBtn(new QToolButton())
    , mStashBtn(new QToolButton())
    , mRefreshBtn(new QToolButton())
+   , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
 {
    mHistory->setCheckable(true);
    mHistory->setIcon(QIcon(":/icons/git_orange"));
@@ -96,8 +92,8 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    const auto verticalFrame2 = new QFrame();
    verticalFrame2->setObjectName("orangeSeparator");
 
-   const auto hLayout = new QHBoxLayout(this);
-   hLayout->setContentsMargins(10, 10, 10, 10);
+   const auto hLayout = new QHBoxLayout();
+   hLayout->setContentsMargins(QMargins());
    hLayout->addStretch();
    hLayout->addWidget(mHistory);
    hLayout->addWidget(mDiff);
@@ -109,6 +105,15 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    hLayout->addWidget(verticalFrame2);
    hLayout->addWidget(mRefreshBtn);
    hLayout->addStretch();
+
+   mMergeWarning->setObjectName("MergeWarningButton");
+   mMergeWarning->setVisible(false);
+
+   const auto vLayout = new QVBoxLayout(this);
+   vLayout->setContentsMargins(0, 10, 0, 10);
+   vLayout->setSpacing(10);
+   vLayout->addLayout(hLayout);
+   vLayout->addWidget(mMergeWarning);
 
    connect(mHistory, &QToolButton::clicked, this, &Controls::signalGoRepo);
    connect(mHistory, &QToolButton::toggled, this, [this](bool checked) {
@@ -139,6 +144,7 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    });
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
+   connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
 
    enableButtons(false);
 }
@@ -190,6 +196,11 @@ void Controls::fetchAll()
 
    if (ret)
       emit signalRepositoryUpdated();
+}
+
+void Controls::setMergeStatus(bool isMergePending)
+{
+   mMergeWarning->setVisible(isMergePending);
 }
 
 void Controls::pushCurrentBranch()

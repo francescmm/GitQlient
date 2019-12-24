@@ -27,6 +27,7 @@
 
 class QToolButton;
 class Git;
+class QPushButton;
 
 enum class ControlsMainViews
 {
@@ -43,6 +44,7 @@ signals:
    void signalGoRepo();
    void signalGoDiff();
    void signalGoBlame();
+   void signalGoMerge();
    void signalRepositoryUpdated();
 
 public:
@@ -51,6 +53,7 @@ public:
    void setCurrentSha(const QString &sha) { mCurrentSha = sha; }
    void enableButtons(bool enabled);
    void fetchAll();
+   void setMergeStatus(bool isMergePending);
 
 private:
    QString mCurrentSha;
@@ -62,6 +65,7 @@ private:
    QToolButton *mPushBtn = nullptr;
    QToolButton *mStashBtn = nullptr;
    QToolButton *mRefreshBtn = nullptr;
+   QPushButton *mMergeWarning = nullptr;
 
    void pullCurrentBranch();
    void pushCurrentBranch();

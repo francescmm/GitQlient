@@ -48,11 +48,11 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    mStackedLayout->addWidget(mBlameWidget);
    showHistoryView();
 
-   const auto gridLayout = new QGridLayout(this);
-   gridLayout->setSpacing(0);
-   gridLayout->setContentsMargins(10, 0, 10, 10);
-   gridLayout->addWidget(mControls, 0, 1);
-   gridLayout->addLayout(mStackedLayout, 1, 0, 1, 3);
+   const auto mainLayout = new QVBoxLayout(this);
+   mainLayout->setSpacing(0);
+   mainLayout->setContentsMargins(10, 0, 10, 10);
+   mainLayout->addWidget(mControls);
+   mainLayout->addLayout(mStackedLayout);
 
    mAutoFetch->setInterval(mConfig.mAutoFetchSecs * 1000);
    mAutoFilesUpdate->setInterval(mConfig.mAutoFileUpdateSecs * 1000);

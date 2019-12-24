@@ -3,12 +3,6 @@ ClickableFrame
     padding: 5px;
 }
 
-Controls
-{
-    max-height: 80px;
-    min-height: 80px;
-}
-
 Controls > QToolButton
 {
     max-width: 65px;
