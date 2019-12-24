@@ -51,7 +51,7 @@ MergeWidget::MergeWidget(const QSharedPointer<Git> git, QWidget *parent)
    autoMergedScrollArea->setWidgetResizable(true);
    autoMergedScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 
-   mCommitTitle->setObjectName(QString::fromUtf8("leCommitTitle"));
+   mCommitTitle->setObjectName("leCommitTitle");
 
    mDescription->setMaximumHeight(125);
    mDescription->setPlaceholderText("Description");
@@ -128,27 +128,47 @@ void MergeWidget::fillButtonFileList(const RevisionFile &files)
 {
    for (auto i = 0; i < files.count(); ++i)
    {
-      const auto isConflict = files.statusCmp(i, RevisionFile::CONFLICT);
       const auto fileName = mGit->filePath(files, i);
       const auto fileBtn = new QPushButton(fileName);
+      fileBtn->setObjectName("FileBtn");
+      fileBtn->setCheckable(true);
 
-      if (isConflict)
+      connect(fileBtn, &QPushButton::toggled, this, &MergeWidget::changeDiffView);
+
+      const auto fileDiffWidget = new FileDiffWidget(mGit);
+      fileDiffWidget->configure(ZERO_SHA, mGit->getCommitInfo(ZERO_SHA).parent(0), fileName);
+
+      mConflictButtons.insert(fileBtn, fileDiffWidget);
+
+      const auto index = mCenterStackedWidget->addWidget(fileDiffWidget);
+
+      if (files.statusCmp(i, RevisionFile::CONFLICT))
       {
          mConflictBtnContainer->addWidget(fileBtn);
 
-         const auto fileDiffWidget = new FileDiffWidget(mGit);
-         const auto fileWithModifications
-             = fileDiffWidget->configure(ZERO_SHA, mGit->getCommitInfo(ZERO_SHA).parent(0), fileName);
+         fileBtn->setChecked(true);
 
-         if (fileWithModifications)
-         {
-            const auto index = mCenterStackedWidget->addWidget(fileDiffWidget);
-
-            if (mCenterStackedWidget->count() == 0)
-               mCenterStackedWidget->setCurrentIndex(index);
-         }
+         if (mCenterStackedWidget->count() == 0)
+            mCenterStackedWidget->setCurrentIndex(index);
       }
       else
          mAutoMergedBtnContainer->addWidget(fileBtn);
+   }
+}
+
+void MergeWidget::changeDiffView(bool fileBtnChecked)
+{
+   const auto end = mConflictButtons.constEnd();
+
+   for (auto iter = mConflictButtons.constBegin(); iter != end; ++iter)
+   {
+      if (iter.key() != sender())
+      {
+         iter.key()->blockSignals(true);
+         iter.key()->setChecked(!fileBtnChecked);
+         iter.key()->blockSignals(false);
+      }
+      else if (fileBtnChecked)
+         mCenterStackedWidget->setCurrentWidget(iter.value());
    }
 }

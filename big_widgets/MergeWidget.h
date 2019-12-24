@@ -11,6 +11,7 @@ class MergeInfoWidget;
 class QLineEdit;
 class QTextEdit;
 class RevisionFile;
+class FileDiffWidget;
 
 class MergeWidget : public QFrame
 {
@@ -32,7 +33,8 @@ private:
    QTextEdit *mDescription = nullptr;
    QPushButton *mMergeBtn = nullptr;
    QPushButton *mAbortBtn = nullptr;
-   QMap<QString, QPushButton *> mConflictButtons;
+   QMap<QPushButton *, FileDiffWidget *> mConflictButtons;
 
    void fillButtonFileList(const RevisionFile &files);
+   void changeDiffView(bool fileBtnChecked);
 };
