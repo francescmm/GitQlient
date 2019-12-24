@@ -491,12 +491,12 @@ DiffButton[pressed="true"]
    background-color: rgba(255, 85, 85, 0.45);
 }
 
-#MergeWarningButton:hover, QPushButton#Abort
+#MergeWarningButton:hover, QPushButton#Abort:hover
 {
    background-color: rgba(255, 85, 85, 0.65);
 }
 
-#MergeWarningButton:pressed, QPushButton#Abort
+#MergeWarningButton:pressed, QPushButton#Abort:pressed
 {
    background-color: rgba(255, 85, 85, 0.55);
 }
@@ -508,14 +508,14 @@ QPushButton#Merge
    background-color: rgba(141, 201, 68, 0.45);
 }
 
-QPushButton#Merge
+QPushButton#Merge:hover
 {
-   background-color: rgba(141, 201, 68, 0.45);
+   background-color: rgba(141, 201, 68, 0.65);
 }
 
-QPushButton#Merge
+QPushButton#Merge:pressed
 {
-   background-color: rgba(141, 201, 68, 0.45);
+   background-color: rgba(141, 201, 68, 0.55);
 }
 
 #FilesListTitle
