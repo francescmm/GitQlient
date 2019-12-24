@@ -10,6 +10,7 @@ class QStackedWidget;
 class MergeInfoWidget;
 class QLineEdit;
 class QTextEdit;
+class RevisionFile;
 
 class MergeWidget : public QFrame
 {
@@ -19,6 +20,8 @@ signals:
 
 public:
    explicit MergeWidget(const QSharedPointer<Git> git, QWidget *parent = nullptr);
+
+   void configure();
 
 private:
    QSharedPointer<Git> mGit;
@@ -30,4 +33,6 @@ private:
    QPushButton *mMergeBtn = nullptr;
    QPushButton *mAbortBtn = nullptr;
    QMap<QString, QPushButton *> mConflictButtons;
+
+   void fillButtonFileList(const RevisionFile &files);
 };

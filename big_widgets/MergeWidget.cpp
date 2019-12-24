@@ -1,6 +1,8 @@
 #include "MergeWidget.h"
 
+#include <git.h>
 #include <FileDiffWidget.h>
+#include <CommitInfo.h>
 
 #include <QPushButton>
 #include <QLineEdit>
@@ -9,6 +11,7 @@
 #include <QLabel>
 #include <QScrollArea>
 #include <QStackedWidget>
+#include <QFile>
 
 MergeWidget::MergeWidget(const QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
@@ -16,7 +19,7 @@ MergeWidget::MergeWidget(const QSharedPointer<Git> git, QWidget *parent)
    , mCenterStackedWidget(new QStackedWidget())
    , mCommitTitle(new QLineEdit())
    , mDescription(new QTextEdit())
-   , mMergeBtn(new QPushButton(tr("Merge & Commit")))
+   , mMergeBtn(new QPushButton(tr("Merge && Commit")))
    , mAbortBtn(new QPushButton(tr("Abort merge")))
 {
    mCenterStackedWidget->setCurrentIndex(0);
@@ -49,11 +52,16 @@ MergeWidget::MergeWidget(const QSharedPointer<Git> git, QWidget *parent)
    autoMergedScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 
    mCommitTitle->setObjectName(QString::fromUtf8("leCommitTitle"));
+
    mDescription->setMaximumHeight(125);
-   mDescription->setObjectName(QString::fromUtf8("teDescription"));
+   mDescription->setPlaceholderText("Description");
+   mDescription->setObjectName("teDescription");
    mDescription->setLineWrapMode(QTextEdit::WidgetWidth);
    mDescription->setReadOnly(false);
    mDescription->setAcceptRichText(false);
+
+   mAbortBtn->setObjectName("Abort");
+   mMergeBtn->setObjectName("Merge");
 
    const auto mergeBtnLayout = new QHBoxLayout();
    mergeBtnLayout->setContentsMargins(QMargins());
@@ -61,8 +69,7 @@ MergeWidget::MergeWidget(const QSharedPointer<Git> git, QWidget *parent)
    mergeBtnLayout->addStretch();
    mergeBtnLayout->addWidget(mMergeBtn);
 
-   const auto mergeInfoWidget = new QFrame();
-   const auto mergeInfoLayout = new QVBoxLayout(mergeInfoWidget);
+   const auto mergeInfoLayout = new QVBoxLayout();
    mergeInfoLayout->setContentsMargins(QMargins());
    mergeInfoLayout->setSpacing(0);
    mergeInfoLayout->addWidget(mCommitTitle);
@@ -70,18 +77,78 @@ MergeWidget::MergeWidget(const QSharedPointer<Git> git, QWidget *parent)
    mergeInfoLayout->addSpacerItem(new QSpacerItem(1, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
    mergeInfoLayout->addLayout(mergeBtnLayout);
 
-   const auto mergeLayout = new QVBoxLayout();
+   const auto mergeFrame = new QFrame();
+   mergeFrame->setObjectName("mergeFrame");
+
+   const auto conflictsLabel = new QLabel(tr("Files with conflicts"));
+   conflictsLabel->setObjectName("FilesListTitle");
+
+   const auto automergeLabel = new QLabel(tr("Merged files"));
+   automergeLabel->setObjectName("FilesListTitle");
+
+   const auto mergeLayout = new QVBoxLayout(mergeFrame);
    mergeLayout->setContentsMargins(QMargins());
-   mergeLayout->setSpacing(10);
+   mergeLayout->setSpacing(0);
+   mergeLayout->addWidget(conflictsLabel);
    mergeLayout->addWidget(conflictScrollArea);
+   mergeLayout->addSpacerItem(new QSpacerItem(1, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
+   mergeLayout->addWidget(automergeLabel);
    mergeLayout->addWidget(autoMergedScrollArea);
-   mergeLayout->addWidget(mergeInfoWidget);
+   mergeLayout->addSpacerItem(new QSpacerItem(1, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
+   mergeLayout->addLayout(mergeInfoLayout);
 
    const auto layout = new QHBoxLayout(this);
    layout->setContentsMargins(QMargins());
-   layout->addLayout(mergeInfoLayout);
+   layout->addWidget(mergeFrame);
    layout->addWidget(mCenterStackedWidget);
 
    connect(mAbortBtn, &QPushButton::clicked, this, []() {});
    connect(mMergeBtn, &QPushButton::clicked, this, []() {});
+}
+
+void MergeWidget::configure()
+{
+   const auto files = mGit->getWipFiles();
+
+   QFile mergeMsg(mGit->getGitDir() + "/MERGE_MSG");
+
+   if (mergeMsg.open(QIODevice::ReadOnly))
+   {
+      const auto summary = mergeMsg.readLine().trimmed();
+      const auto description = mergeMsg.readAll().trimmed();
+      mCommitTitle->setText(summary);
+      mDescription->setText(description);
+      mergeMsg.close();
+   }
+
+   fillButtonFileList(files);
+}
+
+void MergeWidget::fillButtonFileList(const RevisionFile &files)
+{
+   for (auto i = 0; i < files.count(); ++i)
+   {
+      const auto isConflict = files.statusCmp(i, RevisionFile::CONFLICT);
+      const auto fileName = mGit->filePath(files, i);
+      const auto fileBtn = new QPushButton(fileName);
+
+      if (isConflict)
+      {
+         mConflictBtnContainer->addWidget(fileBtn);
+
+         const auto fileDiffWidget = new FileDiffWidget(mGit);
+         const auto fileWithModifications
+             = fileDiffWidget->configure(ZERO_SHA, mGit->getCommitInfo(ZERO_SHA).parent(0), fileName);
+
+         if (fileWithModifications)
+         {
+            const auto index = mCenterStackedWidget->addWidget(fileDiffWidget);
+
+            if (mCenterStackedWidget->count() == 0)
+               mCenterStackedWidget->setCurrentIndex(index);
+         }
+      }
+      else
+         mAutoMergedBtnContainer->addWidget(fileBtn);
+   }
 }

@@ -100,6 +100,8 @@ private:
    void showHistoryView();
    void showBlameView();
    void showDiffView();
+   void showWarningMerge(const QString &mergeDesc);
+   void showMergeView();
 
    // End of MainWindow refactor
    bool isMatch(const QString &sha, const QString &f, int cn, const QMap<QString, bool> &sm);

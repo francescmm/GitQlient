@@ -150,7 +150,7 @@ FullDiffWidget, WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDesc
     border-color: #202122
 }
 
-WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription, #leGitCommand
+WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription
 {
     background-color: #C6C6C7;
     color: black;
@@ -167,11 +167,6 @@ QLabel#lCounter
     border-color: #202122;
     border-bottom-color: #404141;
     color: #606162;
-}
-
-#leGitCommand
-{
-    border-color: #606162;
 }
 
 WorkInProgressWidget > QFrame#stagedFiles, WorkInProgressWidget > QFrame#unstagedFiles, WorkInProgressWidget > QFrame#untrackedFiles
@@ -192,7 +187,7 @@ FileDiffWidget, FileDiffWidget > QPushButton
     background-color: #202122;
 }
 
-WorkInProgressWidget > QLineEdit, #leGitCommand
+WorkInProgressWidget > QLineEdit
 {
     border-bottom-color: #404142;
 }

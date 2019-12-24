@@ -55,7 +55,7 @@ signals:
    void cancelAllProcesses();
    void signalLoadingStarted();
    void signalLoadingFinished();
-   void signalMergeConflicts();
+   void signalMergeConflicts(const QString &mergeDescription);
    void signalCloningProgress(QString stepDescription, int value);
 
 public:
@@ -72,6 +72,7 @@ public:
    void setWorkingDirectory(const QString &wd) { mWorkingDir = wd; }
    bool loadRepository(const QString &wd);
    QString getWorkingDir() const { return mWorkingDir; }
+   QString getGitDir() const { return mGitDir; }
    bool clone(const QString &url, const QString &fullPath);
    bool initRepo(const QString &fullPath);
    GitUserInfo getGlobalUserInfo() const;

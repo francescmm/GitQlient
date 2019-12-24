@@ -25,12 +25,15 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
    connect(centerStackedWidget, &QStackedWidget::currentChanged, this, [this](int index) {
       const auto widget = centerStackedWidget->widget(index);
 
-      for (const auto buttons : qAsConst(mDiffButtons))
+      if (widget)
       {
-         if (buttons.first == widget)
-            buttons.second->setSelected();
-         else
-            buttons.second->setUnselected();
+         for (const auto buttons : qAsConst(mDiffButtons))
+         {
+            if (buttons.first == widget)
+               buttons.second->setSelected();
+            else
+               buttons.second->setUnselected();
+         }
       }
    });
 

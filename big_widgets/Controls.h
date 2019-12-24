@@ -33,7 +33,8 @@ enum class ControlsMainViews
 {
    HISTORY,
    DIFF,
-   BLAME
+   BLAME,
+   MERGE
 };
 
 class Controls : public QFrame

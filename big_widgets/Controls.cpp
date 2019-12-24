@@ -164,6 +164,11 @@ void Controls::toggleButton(ControlsMainViews view)
       case ControlsMainViews::BLAME:
          mBlame->setChecked(true);
          break;
+      case ControlsMainViews::MERGE:
+         mHistory->setChecked(true);
+         mHistory->blockSignals(true);
+         mHistory->setChecked(false);
+         mHistory->blockSignals(false);
       default:
          break;
    }

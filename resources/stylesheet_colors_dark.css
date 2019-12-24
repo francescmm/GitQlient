@@ -148,7 +148,7 @@ FullDiffWidget, #leCommitTitle, #teDescription
     border-color: #202122
 }
 
-#leCommitTitle, #teDescription, #leGitCommand
+#leCommitTitle, #teDescription
 {
     background-color: #606162;
     color: white;
@@ -167,11 +167,6 @@ QLabel#lCounter
     color: #A3A3A4;
 }
 
-#leGitCommand
-{
-    border-color: #606162;
-}
-
 WorkInProgressWidget > QFrame#stagedFiles, WorkInProgressWidget > QFrame#unstagedFiles, WorkInProgressWidget > QFrame#untrackedFiles
 {
     background: #202122;
@@ -188,7 +183,7 @@ FileDiffWidget, FileDiffWidget > QPushButton
     background-color: #202122;
 }
 
-WorkInProgressWidget > QLineEdit, #leGitCommand
+#leCommitTitle
 {
     border-bottom-color: #404142;
 }
@@ -489,19 +484,43 @@ DiffButton[pressed="true"]
    background-color: #404142;
 }
 
-#MergeWarningButton
+#MergeWarningButton, QPushButton#Abort
 {
-   border: 1px solid #FF5555;
+   border-style: solid;
+   border-color: #FF5555;
    background-color: rgba(255, 85, 85, 0.45);
 }
 
-#MergeWarningButton:hover
+#MergeWarningButton:hover, QPushButton#Abort
 {
    background-color: rgba(255, 85, 85, 0.65);
 }
 
-#MergeWarningButton:pressed
+#MergeWarningButton:pressed, QPushButton#Abort
 {
    background-color: rgba(255, 85, 85, 0.55);
+}
+
+QPushButton#Merge
+{
+   border-style: solid;
+   border-color: #8DC944;
+   background-color: rgba(141, 201, 68, 0.45);
+}
+
+QPushButton#Merge
+{
+   background-color: rgba(141, 201, 68, 0.45);
+}
+
+QPushButton#Merge
+{
+   background-color: rgba(141, 201, 68, 0.45);
+}
+
+#FilesListTitle
+{
+    color: white;
+    background-color: #202122;
 }
 

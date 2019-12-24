@@ -369,12 +369,14 @@ GitExecResult Git::merge(const QString &into, QStringList sources)
    if (!ret.first)
       return ret;
 
-   const auto ret2 = run(QString("git merge -q ") + sources.join(" "));
+   const auto mergeReturn = run(QString("git merge -q ") + sources.join(" "));
 
-   if (ret2.first)
-      emit signalMergeConflicts();
+   updateWipRevision();
 
-   return ret2;
+   if (!mergeReturn.first || (mergeReturn.first && mergeReturn.second.contains("merge failed", Qt::CaseInsensitive)))
+      emit signalMergeConflicts(mergeReturn.second);
+
+   return mergeReturn;
 }
 
 const QStringList Git::getOtherFiles(const QStringList &selFiles)

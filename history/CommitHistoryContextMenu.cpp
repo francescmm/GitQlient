@@ -308,14 +308,7 @@ void CommitHistoryContextMenu::merge(const QString &branchFrom)
    const auto outputStr = ret.output.toString();
 
    if (ret.success)
-   {
       emit signalRepositoryUpdated();
-
-      if (!outputStr.isEmpty())
-         QMessageBox::information(parentWidget(), tr("Merge status"), outputStr);
-   }
-   else
-      QMessageBox::critical(parentWidget(), tr("Merge failed"), outputStr);
 }
 
 void CommitHistoryContextMenu::addBranchActions(const QString &sha)

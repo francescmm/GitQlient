@@ -141,13 +141,13 @@ QMenu::separator
 
 /**  END  RepositoryContextMenu **/
 
-FullDiffWidget, WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription
+FullDiffWidget, #leCommitTitle, #teDescription
 {
     border-width: 1px;
     border-style: solid;
 }
 
-WorkInProgressWidget > #leCommitTitle
+#leCommitTitle
 {
     border-right: 0;
 }
@@ -174,12 +174,6 @@ QLabel#lCounter
     qproperty-alignment: AlignCenter;
 }
 
-#leGitCommand
-{
-    border-width: 1px;
-    border-style: solid;
-}
-
 WorkInProgressWidget > QFrame#stagedFiles, WorkInProgressWidget > QFrame#unstagedFiles, WorkInProgressWidget > QFrame#untrackedFiles
 {
     max-height: 30px;
@@ -191,7 +185,7 @@ FileDiffView
     font-family: "Ubuntu Mono";
 }
 
-WorkInProgressWidget > QLineEdit, #leGitCommand
+#leCommitTitle
 {
     border-bottom-width: 1px;
     border-bottom-style: solid;
@@ -200,7 +194,7 @@ WorkInProgressWidget > QLineEdit, #leGitCommand
     padding-left: 10px;
 }
 
-WorkInProgressWidget > #teDescription, #outputTerminal
+#teDescription, #outputTerminal
 {
     border-top: none;
     padding-left: 8px;
@@ -506,5 +500,32 @@ DiffWidget > QScrollArea
    min-width: 375px;
    max-width: 375px;
 }
+
+#mergeFrame
+{
+   max-width: 450px;
+   min-width: 450px;
+}
+
+#MergeWarningButton, QPushButton#Abort, QPushButton#Merge
+{
+   border-width: 1px;
+}
+
+QPushButton#Abort, QPushButton#Merge
+{
+   max-height: 30px;
+   min-height: 30px;
+   max-width: 125px;
+   min-width: 125px;
+}
+
+#FilesListTitle
+{
+   padding: 5px;
+   max-height: 30px;
+   min-height: 30px;
+}
+
 
 

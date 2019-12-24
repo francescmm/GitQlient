@@ -159,7 +159,7 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWid
 {
    for (auto i = 0; i < files.count(); ++i)
    {
-      auto fileName = mGit->filePath(files, i);
+      const auto fileName = mGit->filePath(files, i);
 
       if (!mCurrentFilesCache.contains(fileName))
       {
