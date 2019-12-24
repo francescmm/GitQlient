@@ -527,5 +527,8 @@ QPushButton#Abort, QPushButton#Merge
    min-height: 30px;
 }
 
-
+MergeWidget > #leCommitTitle
+{
+   border-right: 1px;
+}
 

@@ -143,12 +143,12 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget, #leCommitTitle, #teDescription
+FullDiffWidget, WorkInProgressWidget > QLineEdit, #leCommitTitle, #teDescription
 {
     border-color: #202122
 }
 
-#leCommitTitle, #teDescription
+WorkInProgressWidget > QLineEdit, #leCommitTitle, #teDescription
 {
     background-color: #606162;
     color: white;
@@ -522,5 +522,15 @@ QPushButton#Merge:pressed
 {
     color: white;
     background-color: #202122;
+}
+
+#FileBtn:pressed, #FileBtn:checked
+{
+   background-color: #606162;
+}
+
+#FileBtn:hover
+{
+   background-color: #202122;
 }
 
