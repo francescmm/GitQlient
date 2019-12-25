@@ -18,6 +18,7 @@ class MergeWidget : public QFrame
    Q_OBJECT
 
 signals:
+   void signalMergeFinished();
 
 public:
    explicit MergeWidget(const QSharedPointer<Git> git, QWidget *parent = nullptr);
@@ -37,4 +38,7 @@ private:
 
    void fillButtonFileList(const RevisionFile &files);
    void changeDiffView(bool fileBtnChecked);
+   void abort();
+   void commit();
+   void removeMergeComponents();
 };

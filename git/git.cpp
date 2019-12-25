@@ -379,6 +379,11 @@ GitExecResult Git::merge(const QString &into, QStringList sources)
    return mergeReturn;
 }
 
+GitExecResult Git::abortMerge() const
+{
+   return run("git merge --abort");
+}
+
 const QStringList Git::getOtherFiles(const QStringList &selFiles)
 {
    RevisionFile files = getWipFiles(); // files != nullptr

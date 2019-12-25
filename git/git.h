@@ -179,6 +179,7 @@ public:
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
    GitExecResult merge(const QString &into, QStringList sources);
+   GitExecResult abortMerge() const;
 
    const QString filePath(const RevisionFile &rf, int i) const;
    QPair<bool, QString> run(const QString &cmd) const;

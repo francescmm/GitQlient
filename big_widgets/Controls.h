@@ -55,6 +55,7 @@ public:
    void enableButtons(bool enabled);
    void fetchAll();
    void activateMergeWarning();
+   void disableMergeWarning();
 
 private:
    QString mCurrentSha;

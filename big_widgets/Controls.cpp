@@ -210,6 +210,11 @@ void Controls::activateMergeWarning()
    mMergeWarning->setVisible(true);
 }
 
+void Controls::disableMergeWarning()
+{
+   mMergeWarning->setVisible(false);
+}
+
 void Controls::pushCurrentBranch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));

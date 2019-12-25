@@ -12,6 +12,7 @@
 #include <QScrollArea>
 #include <QStackedWidget>
 #include <QFile>
+#include <QMessageBox>
 
 MergeWidget::MergeWidget(const QSharedPointer<Git> git, QWidget *parent)
    : QFrame(parent)
@@ -102,8 +103,8 @@ MergeWidget::MergeWidget(const QSharedPointer<Git> git, QWidget *parent)
    layout->addWidget(mergeFrame);
    layout->addWidget(mCenterStackedWidget);
 
-   connect(mAbortBtn, &QPushButton::clicked, this, []() {});
-   connect(mMergeBtn, &QPushButton::clicked, this, []() {});
+   connect(mAbortBtn, &QPushButton::clicked, this, &MergeWidget::abort);
+   connect(mMergeBtn, &QPushButton::clicked, this, &MergeWidget::commit);
 }
 
 void MergeWidget::configure()
@@ -174,4 +175,40 @@ void MergeWidget::changeDiffView(bool fileBtnChecked)
             mCenterStackedWidget->setCurrentWidget(iter.value());
       }
    }
+}
+
+void MergeWidget::abort()
+{
+   const auto ret = mGit->abortMerge();
+
+   if (!ret.success)
+      QMessageBox::warning(this, tr("Error aborting!"),
+                           tr("The git command throuwn an error: %1").arg(ret.output.toString()));
+   else
+   {
+      removeMergeComponents();
+
+      emit signalMergeFinished();
+   }
+}
+
+void MergeWidget::commit() {}
+
+void MergeWidget::removeMergeComponents()
+{
+   const auto end = mConflictButtons.constEnd();
+
+   for (auto iter = mConflictButtons.constBegin(); iter != end; ++iter)
+   {
+      mCenterStackedWidget->removeWidget(iter.value());
+      iter.value()->setParent(nullptr);
+      delete iter.value();
+
+      iter.key()->setParent(nullptr);
+      delete iter.key();
+   }
+
+   mConflictButtons.clear();
+   mCommitTitle->clear();
+   mDescription->clear();
 }
