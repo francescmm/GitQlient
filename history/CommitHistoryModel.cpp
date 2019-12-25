@@ -97,20 +97,20 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    QString auxMessage;
    const auto sha = r.sha();
 
-   if ((mGit->checkRef(sha) & Git::CUR_BRANCH) && mGit->getCurrentBranchName().isEmpty())
+   if ((mGit->checkRef(sha) & CUR_BRANCH) && mGit->getCurrentBranchName().isEmpty())
       auxMessage.append("<p>Status: <b>detached</b></p>");
 
-   const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
+   const auto localBranches = mGit->getRefNames(sha, BRANCH);
 
    if (!localBranches.isEmpty())
       auxMessage.append(QString("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
 
-   const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
+   const auto remoteBranches = mGit->getRefNames(sha, RMT_BRANCH);
 
    if (!remoteBranches.isEmpty())
       auxMessage.append(QString("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
 
-   const auto tags = mGit->getRefNames(sha, Git::TAG);
+   const auto tags = mGit->getRefNames(sha, TAG);
 
    if (!tags.isEmpty())
       auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));

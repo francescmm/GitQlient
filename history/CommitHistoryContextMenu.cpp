@@ -322,8 +322,8 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 {
    auto isCommitInCurrentBranch = false;
    const auto currentBranch = mGit->getCurrentBranchName();
-   const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
-   const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
+   const auto remoteBranches = mGit->getRefNames(sha, RMT_BRANCH);
+   const auto localBranches = mGit->getRefNames(sha, BRANCH);
    auto branches = localBranches;
 
    for (const auto &branch : remoteBranches)

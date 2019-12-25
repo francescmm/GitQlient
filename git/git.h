@@ -13,6 +13,7 @@
 #include <QSharedPointer>
 
 #include <RevisionFile.h>
+#include <ReferenceType.h>
 
 template<class, class>
 struct QPair;
@@ -152,18 +153,6 @@ public:
    GitExecResult getBaseDir(const QString &wd);
    /*  END  GENERAL REPO */
 
-   enum RefType
-   {
-      TAG = 1,
-      BRANCH = 2,
-      RMT_BRANCH = 4,
-      CUR_BRANCH = 8,
-      REF = 16,
-      APPLIED = 32,
-      UN_APPLIED = 64,
-      ANY_REF = 127
-   };
-
    bool isNothingToCommit();
 
    GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
@@ -187,22 +176,6 @@ private:
    bool setGitDbDir(const QString &wd);
    void processRevision(const QByteArray &ba);
    bool loadCurrentBranch();
-
-   struct Reference
-   {
-      Reference() {}
-
-      void configure(const QString &refName, bool isCurrentBranch, const QString &prevRefSha);
-
-      uint type = 0;
-      QStringList branches;
-      QStringList remoteBranches;
-      QStringList tags;
-      QStringList refs;
-      QString tagObj; // TODO support more then one obj
-      QString tagMsg;
-      QString stgitPatch;
-   };
 
    struct WorkingDirInfo
    {
@@ -228,7 +201,6 @@ private:
       QVector<int> rfDirs;
       QVector<int> rfNames;
    };
-   FileNamesLoader fileLoader;
 
    bool updateIndex(const QStringList &selFiles);
    int findFileIndex(const RevisionFile &rf, const QString &name);
@@ -248,13 +220,12 @@ private:
    static const QString quote(const QString &nm);
    static const QString quote(const QStringList &sl);
    void setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
-   Reference *lookupOrAddReference(const QString &sha);
 
    bool isLoading = false;
    QString mWorkingDir;
    QString mGitDir;
    QString mCurrentBranchName;
-   QHash<QString, Reference> mRefsShaMap;
+
    QVector<QString> mFileNames;
    QVector<QString> mDirNames;
    QHash<QString, int> mFileNamesMap; // quick lookup file name

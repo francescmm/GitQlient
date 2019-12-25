@@ -26,6 +26,7 @@
 #include <RevisionFile.h>
 #include <lanes.h>
 #include <CommitInfo.h>
+#include <Reference.h>
 
 #include <QObject>
 #include <QHash>
@@ -43,17 +44,22 @@ public:
    explicit RevisionsCache(QObject *parent = nullptr);
    void configure(int numElementsToStore);
    int count() const { return mCommits.count(); }
+   int countReferences() const { return mRefsShaMap.count(); }
 
    CommitInfo getCommitInfoByRow(int row) const;
    CommitInfo getCommitInfo(const QString &sha) const;
    RevisionFile getRevisionFile(const QString &sha) const { return mRevsFiles.value(sha); }
+   Reference getReference(const QString &sha) const { return mRefsShaMap.value(sha, Reference()); }
 
    void insertCommitInfo(CommitInfo rev);
    void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevsFiles.insert(sha, file); }
+   void insertReference(const QString &sha, Reference ref);
    void updateWipCommit(CommitInfo rev);
 
    void clear();
    void clearRevisionFile() { mRevsFiles.clear(); }
+   void clearReferences() { mRefsShaMap.clear(); }
+   void removeReference(const QString &sha) { mRefsShaMap.remove(sha); }
 
    bool containsRevisionFile(const QString &sha) const { return mRevsFiles.contains(sha); }
 
@@ -61,6 +67,7 @@ private:
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo *> revs;
    QHash<QString, RevisionFile> mRevsFiles;
+   QHash<QString, Reference> mRefsShaMap;
    Lanes lns;
    bool mCacheLocked = true;
 

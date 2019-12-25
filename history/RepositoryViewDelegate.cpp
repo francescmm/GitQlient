@@ -340,24 +340,24 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
    if (ref_types != 0)
    {
-      if (ref_types & Git::CUR_BRANCH && currentBranch.isEmpty())
+      if (ref_types & CUR_BRANCH && currentBranch.isEmpty())
          markValues.insert("detached", GitQlientStyles::getDetachedColor());
 
-      const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
+      const auto localBranches = mGit->getRefNames(sha, BRANCH);
       for (const auto &branch : localBranches)
          markValues.insert(branch,
                            branch == currentBranch ? GitQlientStyles::getCurrentBranchColor()
                                                    : GitQlientStyles::getLocalBranchColor());
 
-      const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
+      const auto remoteBranches = mGit->getRefNames(sha, RMT_BRANCH);
       for (const auto &branch : remoteBranches)
          markValues.insert(branch, QColor("#011f4b"));
 
-      const auto tags = mGit->getRefNames(sha, Git::TAG);
+      const auto tags = mGit->getRefNames(sha, TAG);
       for (const auto &tag : tags)
          markValues.insert(tag, GitQlientStyles::getTagColor());
 
-      const auto refs = mGit->getRefNames(sha, Git::REF);
+      const auto refs = mGit->getRefNames(sha, REF);
       for (const auto &ref : refs)
          markValues.insert(ref, GitQlientStyles::getRefsColor());
    }

@@ -71,6 +71,11 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
    }
 }
 
+void RevisionsCache::insertReference(const QString &sha, Reference ref)
+{
+   mRefsShaMap[sha] = std::move(ref);
+}
+
 void RevisionsCache::updateWipCommit(CommitInfo rev)
 {
    if (!mCacheLocked)

@@ -81,8 +81,9 @@ const QString Git::quote(const QStringList &sl)
 
 uint Git::checkRef(const QString &sha, uint mask) const
 {
-   QHash<QString, Reference>::const_iterator it(mRefsShaMap.constFind(sha));
-   return (it != mRefsShaMap.constEnd() ? (*it).type & mask : 0);
+   const auto ref = mRevCache->getReference(sha);
+
+   return ref.isValid() ? ref.type & mask : 0;
 }
 
 const QStringList Git::getRefNames(const QString &sha, uint mask) const
@@ -91,7 +92,7 @@ const QStringList Git::getRefNames(const QString &sha, uint mask) const
    if (!checkRef(sha, mask))
       return result;
 
-   const Reference &rf = mRefsShaMap[sha];
+   const auto rf = mRevCache->getReference(sha);
 
    if (mask & TAG)
       result << rf.tags;
@@ -754,14 +755,6 @@ GitExecResult Git::getBaseDir(const QString &wd)
    return qMakePair(ret.first, baseDir);
 }
 
-Git::Reference *Git::lookupOrAddReference(const QString &sha)
-{
-   QHash<QString, Reference>::iterator it(mRefsShaMap.find(sha));
-   if (it == mRefsShaMap.end())
-      it = mRefsShaMap.insert(sha, Reference());
-   return &(*it);
-}
-
 bool Git::loadCurrentBranch()
 {
    const auto ret2 = run("git branch");
@@ -785,46 +778,6 @@ bool Git::loadCurrentBranch()
    return true;
 }
 
-void Git::Reference::configure(const QString &refName, bool isCurrentBranch, const QString &prevRefSha)
-{
-   if (refName.startsWith("refs/tags/"))
-   {
-      if (refName.endsWith("^{}"))
-      {
-         // we assume that a tag dereference follows strictly
-         // the corresponding tag object in rLst. So the
-         // last added tag is a tag object, not a commit object
-         tags.append(refName.mid(10, refName.length() - 13));
-
-         // store tag object. Will be used to fetching
-         // tag message (if any) when necessary.
-         tagObj = prevRefSha;
-      }
-      else
-         tags.append(refName.mid(10));
-
-      type |= TAG;
-   }
-   else if (refName.startsWith("refs/heads/"))
-   {
-      branches.append(refName.mid(11));
-      type |= BRANCH;
-
-      if (isCurrentBranch)
-         type |= CUR_BRANCH;
-   }
-   else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
-   {
-      remoteBranches.append(refName.mid(13));
-      type |= RMT_BRANCH;
-   }
-   else if (!refName.startsWith("refs/bases/") && !refName.endsWith("HEAD"))
-   {
-      refs.append(refName);
-      type |= REF;
-   }
-}
-
 bool Git::getRefs()
 {
    const auto branchLoaded = loadCurrentBranch();
@@ -835,7 +788,7 @@ bool Git::getRefs()
 
       if (ret3.first)
       {
-         mRefsShaMap.clear();
+         mRevCache->clearReferences();
 
          const auto ret = getLastCommitOfBranch("HEAD");
 
@@ -849,21 +802,23 @@ bool Git::getRefs()
             const auto refName = reference.mid(41);
 
             // one Revision could have many tags
-            const auto cur = lookupOrAddReference(revSha);
+            auto cur = mRevCache->getReference(revSha);
+            cur.configure(refName, curBranchSHA == revSha, prevRefSha);
 
-            cur->configure(refName, curBranchSHA == revSha, prevRefSha);
+            mRevCache->insertReference(revSha, std::move(cur));
 
             if (refName.startsWith("refs/tags/") && refName.endsWith("^{}") && !prevRefSha.isEmpty())
-               mRefsShaMap.remove(prevRefSha);
+               mRevCache->removeReference(prevRefSha);
 
             prevRefSha = revSha;
          }
 
          // mark current head (even when detached)
-         auto cur = lookupOrAddReference(curBranchSHA);
-         cur->type |= CUR_BRANCH;
+         auto cur = mRevCache->getReference(curBranchSHA);
+         cur.type |= CUR_BRANCH;
+         mRevCache->insertReference(curBranchSHA, std::move(cur));
 
-         return !mRefsShaMap.empty();
+         return mRevCache->countReferences() > 0;
       }
    }
 
