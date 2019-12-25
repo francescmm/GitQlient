@@ -69,7 +69,6 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
    connect(mRepoWidget, &HistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
    connect(mRepoWidget, &HistoryWidget::signalViewUpdated, this, &GitQlientRepo::updateCache);
    connect(mRepoWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
-   connect(mRepoWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::showDiffView);
    connect(mRepoWidget, &HistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
    connect(mRepoWidget, &HistoryWidget::signalShowDiff, this, &GitQlientRepo::loadFileDiff);
    connect(mRepoWidget, &HistoryWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
@@ -287,6 +286,8 @@ void GitQlientRepo::openCommitDiff()
       const auto rev = mGit->getCommitInfo(currentSha);
       mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
    }
+
+   showDiffView();
 }
 
 void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
