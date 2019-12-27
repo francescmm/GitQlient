@@ -137,7 +137,8 @@ public:
 
    /* START COMMIT INFO */
    QPair<QString, QString> getSplitCommitMsg(const QString &sha);
-   bool resetFile(const QString &fileName);
+   bool checkoutFile(const QString &fileName);
+   GitExecResult resetFile(const QString &fileName);
    GitExecResult blame(const QString &file, const QString &commitFrom);
    GitExecResult history(const QString &file);
    /* END COMMIT INFO */

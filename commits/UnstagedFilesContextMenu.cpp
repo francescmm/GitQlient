@@ -35,7 +35,7 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<Git> &gi
 
       if (msgBoxRet == QMessageBox::Yes)
       {
-         const auto ret = mGit->resetFile(mFileName);
+         const auto ret = mGit->checkoutFile(mFileName);
 
          emit signalCheckedOut(ret);
       }

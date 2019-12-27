@@ -197,12 +197,17 @@ bool Git::isNothingToCommit()
    return rf.count() == workingDirInfo.otherFiles.count();
 }
 
-bool Git::resetFile(const QString &fileName)
+bool Git::checkoutFile(const QString &fileName)
 {
    if (fileName.isEmpty())
       return false;
 
    return run(QString("git checkout %1").arg(fileName)).first;
+}
+
+GitExecResult Git::resetFile(const QString &fileName)
+{
+   return run(QString("git reset %1").arg(fileName));
 }
 
 GitExecResult Git::blame(const QString &file, const QString &commitFrom)

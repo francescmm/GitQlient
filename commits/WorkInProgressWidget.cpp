@@ -283,7 +283,7 @@ void WorkInProgressWidget::revertAllChanges()
    for (; i >= 0; --i)
    {
       const auto fileName = ui->unstagedFilesList->takeItem(i)->data(Qt::DisplayRole).toString();
-      const auto ret = mGit->resetFile(fileName);
+      const auto ret = mGit->checkoutFile(fileName);
 
       emit signalCheckoutPerformed(ret);
    }
@@ -294,16 +294,20 @@ void WorkInProgressWidget::removeFileFromCommitList(QListWidgetItem *item)
    if (item->flags() & Qt::ItemIsSelectable)
    {
       const auto itemOriginalList = qvariant_cast<QListWidget *>(item->data(Qt::UserRole));
-      const auto row = ui->stagedFilesList->row(item);
 
-      if (item->data(Qt::UserRole + 1).toBool())
-         item->setText(item->text().append(" (conflicts)"));
+      if (sender() != itemOriginalList)
+      {
+         const auto row = ui->stagedFilesList->row(item);
 
-      ui->stagedFilesList->takeItem(row);
-      itemOriginalList->addItem(item);
-      ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-      ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-      ui->pbCommit->setDisabled(ui->stagedFilesList->count() == 0);
+         if (item->data(Qt::UserRole + 1).toBool())
+            item->setText(item->text().append(" (conflicts)"));
+
+         ui->stagedFilesList->takeItem(row);
+         itemOriginalList->addItem(item);
+         ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+         ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
+         ui->pbCommit->setDisabled(ui->stagedFilesList->count() == 0);
+      }
    }
 }
 
@@ -366,9 +370,23 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
    {
       const auto fileName = item->toolTip();
       const auto menu = new QMenu(this);
-      const auto action = menu->addAction("See changes");
-      connect(action, &QAction::triggered, this,
+      const auto diffAction = menu->addAction("See changes");
+      connect(diffAction, &QAction::triggered, this,
               [this, fileName]() { emit signalShowDiff(ZERO_SHA, mGit->getCommitInfo(ZERO_SHA).parent(0), fileName); });
+
+      if (item->flags() & Qt::ItemIsSelectable)
+      {
+         const auto itemOriginalList = qvariant_cast<QListWidget *>(item->data(Qt::UserRole));
+
+         if (sender() == itemOriginalList)
+         {
+            const auto resetAction = menu->addAction("Reset");
+            connect(resetAction, &QAction::triggered, this, [this, fileName] {
+               const auto ret = mGit->resetFile(fileName);
+               emit signalCheckoutPerformed(ret.success);
+            });
+         }
+      }
 
       const auto parentPos = ui->stagedFilesList->mapToParent(pos);
       menu->popup(mapToGlobal(parentPos));
