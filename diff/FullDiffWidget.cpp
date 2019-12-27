@@ -75,7 +75,8 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent)
 
 void FullDiffWidget::reload()
 {
-   loadDiff(mCurrentSha, mPreviousSha);
+   if (mCurrentSha != ZERO_SHA)
+      loadDiff(mCurrentSha, mPreviousSha);
 }
 
 void FullDiffWidget::processData(const QString &fileChunk)
@@ -83,7 +84,8 @@ void FullDiffWidget::processData(const QString &fileChunk)
    if (mPreviousDiffText != fileChunk)
    {
       mPreviousDiffText = fileChunk;
-      auto pos = verticalScrollBar()->value();
+
+      const auto pos = verticalScrollBar()->value();
 
       setUpdatesEnabled(false);
 

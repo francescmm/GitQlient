@@ -4,6 +4,7 @@
 #include <FullDiffWidget.h>
 #include <DiffButton.h>
 #include <CommitDiffWidget.h>
+#include <git.h>
 
 #include <QLogger.h>
 
@@ -149,6 +150,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
       const auto &pair = mDiffButtons.value(id);
       const auto diff = dynamic_cast<FileDiffWidget *>(pair.first);
       diff->reload();
+
       pair.second->setSelected();
       centerStackedWidget->setCurrentWidget(diff);
 

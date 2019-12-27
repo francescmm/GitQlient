@@ -5,6 +5,7 @@
 
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QScrollBar>
 
 FileDiffWidget::FileDiffWidget(const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
@@ -32,7 +33,10 @@ void FileDiffWidget::clear()
 
 bool FileDiffWidget::reload()
 {
-   return configure(mCurrentSha, mPreviousSha, mCurrentFile);
+   if (mCurrentSha == ZERO_SHA)
+      return configure(mCurrentSha, mPreviousSha, mCurrentFile);
+
+   return false;
 }
 
 bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file)
@@ -56,10 +60,15 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    {
       text = lines.join("\n");
 
+      const auto pos = mDiffView->verticalScrollBar()->value();
       mDiffView->setPlainText(text);
 
       mRowIndex = 0;
       mDiffHighlighter->resetState();
+
+      mDiffView->moveCursor(QTextCursor::Start);
+
+      mDiffView->verticalScrollBar()->setValue(pos);
 
       return true;
    }
