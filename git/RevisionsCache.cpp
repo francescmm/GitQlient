@@ -1,4 +1,6 @@
-﻿#include "RevisionsCache.h"
+#include "RevisionsCache.h"
+
+#include <WorkingDirInfo.h>
 
 RevisionsCache::RevisionsCache(QObject *parent)
    : QObject(parent)
@@ -76,17 +78,21 @@ void RevisionsCache::insertReference(const QString &sha, Reference ref)
    mRefsShaMap[sha] = std::move(ref);
 }
 
-void RevisionsCache::updateWipCommit(CommitInfo rev)
+void RevisionsCache::updateWipCommit(CommitInfo c, const WorkingDirInfo &wd)
 {
+   const auto fakeRevFile = fakeWorkDirRevFile(wd);
+
+   insertRevisionFile(c.sha(), fakeRevFile);
+
    if (!mCacheLocked)
    {
-      updateLanes(rev, lns);
+      updateLanes(c, lns);
 
-      if (mCommits[rev.orderIdx])
-         rev.lanes = mCommits[rev.orderIdx]->lanes;
+      if (mCommits[c.orderIdx])
+         c.lanes = mCommits[c.orderIdx]->lanes;
 
-      const auto sha = rev.sha();
-      const auto commit = new CommitInfo(std::move(rev));
+      const auto sha = c.sha();
+      const auto commit = new CommitInfo(std::move(c));
 
       delete mCommits[commit->orderIdx];
       mCommits[commit->orderIdx] = commit;
@@ -133,12 +139,225 @@ void RevisionsCache::updateLanes(CommitInfo &c, Lanes &lns)
       lns.afterBranch();
 }
 
+RevisionFile RevisionsCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
+{
+   RevisionFile rf;
+   auto parNum = 1;
+   const auto lines = buf.split("\n", QString::SkipEmptyParts);
+
+   for (auto line : lines)
+   {
+      if (line[0] == ':') // avoid sha's in merges output
+      {
+         if (line[1] == ':')
+         { // it's a combined merge
+            /* For combined merges rename/copy information is useless
+             * because nor the original file name, nor similarity info
+             * is given, just the status tracks that in the left/right
+             * branch a renamed/copy occurred (as example status could
+             * be RM or MR). For visualization purposes we could consider
+             * the file as modified
+             */
+            if (fl.rf != &rf)
+            {
+               flushFileNames(fl);
+               fl.rf = &rf;
+            }
+            appendFileName(line.section('\t', -1), fl);
+            rf.setStatus("M");
+            rf.mergeParent.append(parNum);
+         }
+         else
+         {
+            if (line.at(98) == '\t') // Faster parsing in normal case
+            {
+               if (fl.rf != &rf)
+               {
+                  flushFileNames(fl);
+                  fl.rf = &rf;
+               }
+               appendFileName(line.mid(99), fl);
+               rf.setStatus(line.at(97));
+               rf.mergeParent.append(parNum);
+            }
+            else // It's a rename or a copy, we are not in fast path now!
+               setExtStatus(rf, line.mid(97), parNum, fl);
+         }
+      }
+      else
+         ++parNum;
+   }
+
+   return rf;
+}
+
+void RevisionsCache::appendFileName(const QString &name, FileNamesLoader &fl)
+{
+   int idx = name.lastIndexOf('/') + 1;
+   const QString &dr = name.left(idx);
+   const QString &nm = name.mid(idx);
+
+   auto it = mDirNames.indexOf(dr);
+   if (it == -1)
+   {
+      int idx = mDirNames.count();
+      mDirNames.append(dr);
+      fl.rfDirs.append(idx);
+   }
+   else
+      fl.rfDirs.append(it);
+
+   it = mFileNames.indexOf(nm);
+   if (it == -1)
+   {
+      int idx = mFileNames.count();
+      mFileNames.append(nm);
+      fl.rfNames.append(idx);
+   }
+   else
+      fl.rfNames.append(it);
+
+   fl.files.append(name);
+}
+
+void RevisionsCache::flushFileNames(FileNamesLoader &fl)
+{
+   if (!fl.rf)
+      return;
+
+   for (auto i = 0; i < fl.rfNames.count(); ++i)
+   {
+      const auto dirName = mDirNames.at(fl.rfDirs.at(i));
+      const auto fileName = mFileNames.at(fl.rfNames.at(i));
+
+      if (!fl.rf->mFiles.contains(dirName + fileName))
+         fl.rf->mFiles.append(dirName + fileName);
+   }
+
+   fl.rfNames.clear();
+   fl.rf = nullptr;
+}
+
+int RevisionsCache::findFileIndex(const RevisionFile &rf, const QString &name)
+{
+   if (name.isEmpty())
+      return -1;
+
+   const auto idx = name.lastIndexOf('/') + 1;
+   const auto dr = name.left(idx);
+   const auto nm = name.mid(idx);
+
+   // return rf.mFiles.indexOf(name);
+   const auto found = rf.mFiles.indexOf(name);
+   return found;
+}
+
+void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
+{
+   const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
+   if (sl.count() != 3)
+      return;
+
+   // we want store extra info with format "orig --> dest (Rxx%)"
+   // but git give us something like "Rxx\t<orig>\t<dest>"
+   QString type = sl[0];
+   type.remove(0, 1);
+   const QString &orig = sl[1];
+   const QString &dest = sl[2];
+   const QString extStatusInfo(orig + " --> " + dest + " (" + QString::number(type.toInt()) + "%)");
+
+   /*
+    NOTE: we set rf.extStatus size equal to position of latest
+          copied/renamed file. So it can have size lower then
+          rf.count() if after copied/renamed file there are
+          others. Here we have no possibility to know final
+          dimension of this RefFile. We are still in parsing.
+ */
+
+   // simulate new file
+   if (fl.rf != &rf)
+   {
+      flushFileNames(fl);
+      fl.rf = &rf;
+   }
+   appendFileName(dest, fl);
+   rf.mergeParent.append(parNum);
+   rf.setStatus(RevisionFile::NEW);
+   rf.appendExtStatus(extStatusInfo);
+
+   // simulate deleted orig file only in case of rename
+   if (type.at(0) == 'R')
+   { // renamed file
+      if (fl.rf != &rf)
+      {
+         flushFileNames(fl);
+         fl.rf = &rf;
+      }
+      appendFileName(orig, fl);
+      rf.mergeParent.append(parNum);
+      rf.setStatus(RevisionFile::DELETED);
+      rf.appendExtStatus(extStatusInfo);
+   }
+   rf.setOnlyModified(false);
+}
+
 void RevisionsCache::clear()
 {
    mCacheLocked = true;
+
+   mDirNames.clear();
+   mFileNames.clear();
 
    // qDeleteAll(mCommits);
    // mCommits.clear();
    lns.clear();
    revs.clear();
+}
+
+RevisionFile RevisionsCache::fakeWorkDirRevFile(const WorkingDirInfo &wd)
+{
+   FileNamesLoader fl;
+   RevisionFile rf = parseDiffFormat(wd.diffIndex, fl);
+   rf.setOnlyModified(false);
+
+   for (auto it : wd.otherFiles)
+   {
+      if (fl.rf != &rf)
+      {
+         flushFileNames(fl);
+         fl.rf = &rf;
+      }
+
+      appendFileName(it, fl);
+      rf.setStatus(RevisionFile::UNKNOWN);
+      rf.mergeParent.append(1);
+   }
+
+   RevisionFile cachedFiles = parseDiffFormat(wd.diffIndexCached, fl);
+   flushFileNames(fl);
+
+   for (auto i = 0; i < rf.count(); i++)
+   {
+      if (findFileIndex(cachedFiles, rf.getFile(i)) != -1)
+      {
+         if (cachedFiles.statusCmp(i, RevisionFile::CONFLICT))
+            rf.appendStatus(i, RevisionFile::CONFLICT);
+
+         rf.appendStatus(i, RevisionFile::IN_INDEX);
+      }
+   }
+
+   return rf;
+}
+
+RevisionFile RevisionsCache::parseDiff(const QString &sha, const QString &logDiff)
+{
+   FileNamesLoader fl;
+
+   RevisionFile rf = parseDiffFormat(logDiff, fl);
+   flushFileNames(fl);
+
+   insertRevisionFile(sha, rf);
+
+   return rf;
 }

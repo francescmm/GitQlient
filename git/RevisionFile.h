@@ -20,22 +20,11 @@ public:
 
    RevisionFile() = default;
 
-   /* This QByteArray keeps indices in some dir and names vectors,
-    * defined outside RevisionFile. Paths are splitted in dir and file
-    * name, first all the dirs are listed then the file names to
-    * achieve a better compression when saved to disk.
-    * A single QByteArray is used instead of two vectors because it's
-    * much faster to load from disk when using a QDataStream
-    */
-   QByteArray pathsIdx;
-
-   int dirAt(int idx) const { return ((const int *)pathsIdx.constData())[idx]; }
-   int nameAt(int idx) const { return ((const int *)pathsIdx.constData())[count() + idx]; }
-
    QVector<int> mergeParent;
+   QVector<QString> mFiles;
 
    // helper functions
-   int count() const { return pathsIdx.size() / (sizeof(int) * 2); }
+   int count() const { return mFiles.count(); }
    bool statusCmp(int idx, StatusFlag sf) const;
    const QString extendedStatus(int idx) const;
    void setStatus(const QString &rowSt);
@@ -46,6 +35,7 @@ public:
    void setOnlyModified(bool onlyModified) { mOnlyModified = onlyModified; }
    int getFilesCount() const { return status.size(); }
    void appendExtStatus(const QString &file) { extStatus.append(file); }
+   QString getFile(int index) const { return mFiles.at(index); }
 
 private:
    // friend class Git;

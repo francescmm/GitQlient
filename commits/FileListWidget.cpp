@@ -70,13 +70,13 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
                const auto fileRename = files.extendedStatus(i);
 
                clr = fileRename.isEmpty() ? GitQlientStyles::getGreen() : GitQlientStyles::getBlue();
-               fileName = fileRename.isEmpty() ? mGit->filePath(files, i) : fileRename;
+               fileName = fileRename.isEmpty() ? files.getFile(i) : fileRename;
             }
             else
             {
                clr = files.statusCmp(i, RevisionFile::DELETED) ? GitQlientStyles::getRed()
                                                                : GitQlientStyles::getTextColor();
-               fileName = mGit->filePath(files, i);
+               fileName = files.getFile(i);
             }
 
             addItem(fileName, clr);

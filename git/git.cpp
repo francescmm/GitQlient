@@ -112,11 +112,6 @@ const QStringList Git::getRefNames(const QString &sha, uint mask) const
    return result;
 }
 
-const QString Git::filePath(const RevisionFile &rf, int i) const
-{
-   return mDirNames[rf.dirAt(i)] + mFileNames[rf.nameAt(i)];
-}
-
 CommitInfo Git::getCommitInfo(const QString &sha) const
 {
    return mRevCache->getCommitInfo(sha);
@@ -131,27 +126,6 @@ QPair<bool, QString> Git::run(const QString &runCmd) const
    const auto ret = p.run(runCmd, runOutput);
 
    return qMakePair(ret, runOutput);
-}
-
-int Git::findFileIndex(const RevisionFile &rf, const QString &name)
-{
-   if (name.isEmpty())
-      return -1;
-
-   const auto idx = name.lastIndexOf('/') + 1;
-   const auto dr = name.left(idx);
-   const auto nm = name.mid(idx);
-
-   for (int i = 0, cnt = rf.count(); i < cnt; ++i)
-   {
-      const auto isRevFile = mFileNames[rf.nameAt(i)];
-      const auto isRevDir = mDirNames[rf.dirAt(i)];
-
-      if (isRevFile == nm && isRevDir == dr)
-         return i;
-   }
-
-   return -1;
 }
 
 GitExecResult Git::getCommitDiff(const QString &sha, const QString &diffToSha)
@@ -257,49 +231,6 @@ bool Git::submoduleRemove(const QString &)
    return false;
 }
 
-RevisionFile Git::insertNewFiles(const QString &sha, const QString &data)
-{
-   /* we use an independent FileNamesLoader to avoid data
-    * corruption if we are loading file names in background
-    */
-   FileNamesLoader fl;
-
-   RevisionFile rf;
-   parseDiffFormat(rf, data, fl);
-   flushFileNames(fl);
-
-   mRevCache->insertRevisionFile(sha, rf);
-
-   return rf;
-}
-
-bool Git::runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutput)
-{
-   /* Under some cases git could warn out:
-
-       "too many files, skipping inexact rename detection"
-
-    So if this occurs fallback on NO rename detection.
- */
-   QString cmd(runCmd); // runCmd must be without -C option
-   cmd.replace("git diff-tree", "git diff-tree -C");
-
-   const auto renameDetection = run(cmd);
-
-   *runOutput = renameDetection.second;
-
-   if (!renameDetection.first) // retry without rename detection
-   {
-      const auto ret2 = run(runCmd);
-      if (ret2.first)
-         *runOutput = ret2.second;
-
-      return ret2.first;
-   }
-
-   return true;
-}
-
 RevisionFile Git::getWipFiles()
 {
    return mRevCache->getRevisionFile(ZERO_SHA); // ZERO_SHA search arrives here
@@ -322,7 +253,7 @@ RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha, boo
       return RevisionFile();
 
    QString mySha;
-   QString runCmd = QString("git diff-tree --no-color -r -m ");
+   QString runCmd = QString("git diff-tree -C --no-color -r -m ");
 
    if (r.parentsCount() > 1 && diffToSha.isEmpty() && allFiles)
    {
@@ -338,12 +269,9 @@ RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha, boo
    if (mRevCache->containsRevisionFile(mySha))
       return mRevCache->getRevisionFile(mySha);
 
-   QString runOutput;
+   const auto ret = run(runCmd);
 
-   if (runDiffTreeWithRenameDetection(runCmd, &runOutput))
-      return insertNewFiles(mySha, runOutput);
-
-   return RevisionFile();
+   return ret.first ? mRevCache->parseDiff(sha, ret.second) : RevisionFile();
 }
 
 bool Git::resetCommits(int parentDepth)
@@ -384,7 +312,7 @@ const QStringList Git::getOtherFiles(const QStringList &selFiles)
    QStringList notSelFiles;
    for (auto i = 0; i < files.count(); ++i)
    {
-      const QString &fp = filePath(files, i);
+      const QString &fp = files.getFile(i);
       if (selFiles.indexOf(fp) == -1 && files.statusCmp(i, RevisionFile::IN_INDEX))
          notSelFiles.append(fp);
    }
@@ -399,7 +327,7 @@ bool Git::updateIndex(const QStringList &selFiles)
 
    for (auto it : selFiles)
    {
-      const auto idx = findFileIndex(files, it);
+      const auto idx = mRevCache->findFileIndex(files, it);
 
       idx != -1 && files.statusCmp(idx, RevisionFile::DELETED) ? toRemove << it : toAdd << it;
    }
@@ -847,38 +775,6 @@ const QStringList Git::getOthersFiles()
    return runOutput.split('\n', QString::SkipEmptyParts);
 }
 
-RevisionFile Git::fakeWorkDirRevFile(const WorkingDirInfo &wd)
-{
-   FileNamesLoader fl;
-   RevisionFile rf;
-   parseDiffFormat(rf, wd.diffIndex, fl);
-   rf.setOnlyModified(false);
-
-   for (auto it : wd.otherFiles)
-   {
-      appendFileName(rf, it, fl);
-      rf.setStatus(RevisionFile::UNKNOWN);
-      rf.mergeParent.append(1);
-   }
-
-   RevisionFile cachedFiles;
-   parseDiffFormat(cachedFiles, wd.diffIndexCached, fl);
-   flushFileNames(fl);
-
-   for (auto i = 0; i < rf.count(); i++)
-   {
-      if (findFileIndex(cachedFiles, filePath(rf, i)) != -1)
-      {
-         if (cachedFiles.statusCmp(i, RevisionFile::CONFLICT))
-            rf.appendStatus(i, RevisionFile::CONFLICT);
-
-         rf.appendStatus(i, RevisionFile::IN_INDEX);
-      }
-   }
-
-   return rf;
-}
-
 void Git::updateWipRevision()
 {
    const auto ret = run("git status");
@@ -915,101 +811,11 @@ void Git::updateWipRevision()
    workingDirInfo.otherFiles = getOthersFiles();
 
    // now mockup a RevisionFile
-   mRevCache->insertRevisionFile(ZERO_SHA, fakeWorkDirRevFile(workingDirInfo));
-
-   // then mockup the corresponding Revision
-   const QString &log = (isNothingToCommit() ? QString("No local changes") : QString("Local changes"));
-
+   const auto log = isNothingToCommit() ? QString("No local changes") : QString("Local changes");
    CommitInfo c(ZERO_SHA, { head }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, status, 0);
    c.isDiffCache = true;
 
-   mRevCache->updateWipCommit(std::move(c));
-}
-
-void Git::parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl)
-{
-   if (line[1] == ':')
-   { // it's a combined merge
-      /* For combined merges rename/copy information is useless
-       * because nor the original file name, nor similarity info
-       * is given, just the status tracks that in the left/right
-       * branch a renamed/copy occurred (as example status could
-       * be RM or MR). For visualization purposes we could consider
-       * the file as modified
-       */
-      appendFileName(rf, line.section('\t', -1), fl);
-      rf.setStatus("M");
-      rf.mergeParent.append(parNum);
-   }
-   else
-   { // faster parsing in normal case
-      if (line.at(98) == '\t')
-      {
-         appendFileName(rf, line.mid(99), fl);
-         rf.setStatus(line.at(97));
-         rf.mergeParent.append(parNum);
-      }
-      else
-         // it's a rename or a copy, we are not in fast path now!
-         setExtStatus(rf, line.mid(97), parNum, fl);
-   }
-}
-
-void Git::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
-{
-   const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
-   if (sl.count() != 3)
-      return;
-
-   // we want store extra info with format "orig --> dest (Rxx%)"
-   // but git give us something like "Rxx\t<orig>\t<dest>"
-   QString type = sl[0];
-   type.remove(0, 1);
-   const QString &orig = sl[1];
-   const QString &dest = sl[2];
-   const QString extStatusInfo(orig + " --> " + dest + " (" + QString::number(type.toInt()) + "%)");
-
-   /*
-    NOTE: we set rf.extStatus size equal to position of latest
-          copied/renamed file. So it can have size lower then
-          rf.count() if after copied/renamed file there are
-          others. Here we have no possibility to know final
-          dimension of this RefFile. We are still in parsing.
- */
-
-   // simulate new file
-   appendFileName(rf, dest, fl);
-   rf.mergeParent.append(parNum);
-   rf.setStatus(RevisionFile::NEW);
-   rf.appendExtStatus(extStatusInfo);
-
-   // simulate deleted orig file only in case of rename
-   if (type.at(0) == 'R')
-   { // renamed file
-      appendFileName(rf, orig, fl);
-      rf.mergeParent.append(parNum);
-      rf.setStatus(RevisionFile::DELETED);
-      rf.appendExtStatus(extStatusInfo);
-   }
-   rf.setOnlyModified(false);
-}
-
-// CT TODO utility function; can go elsewhere
-void Git::parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl)
-{
-   int parNum = 1, startPos = 0, endPos = buf.indexOf('\n');
-
-   while (endPos != -1)
-   {
-      const QString &line = buf.mid(startPos, endPos - startPos);
-      if (line[0] == ':') // avoid sha's in merges output
-         parseDiffFormatLine(rf, line, parNum, fl);
-      else
-         parNum++;
-
-      startPos = endPos + 1;
-      endPos = buf.indexOf('\n', endPos + 99);
-   }
+   mRevCache->updateWipCommit(std::move(c), workingDirInfo);
 }
 
 bool Git::checkoutRevisions()
@@ -1110,14 +916,6 @@ void Git::clearRevs()
    workingDirInfo.clear();
 }
 
-void Git::clearFileNames()
-{
-   mFileNamesMap.clear();
-   mDirNamesMap.clear();
-   mDirNames.clear();
-   mFileNames.clear();
-}
-
 bool Git::loadRepository(const QString &wd)
 {
    if (!isLoading)
@@ -1126,7 +924,6 @@ bool Git::loadRepository(const QString &wd)
 
       // normally called when changing git directory. Must be called after stop()
       clearRevs();
-      clearFileNames();
 
       const auto isGIT = setGitDbDir(wd);
 
@@ -1178,63 +975,6 @@ void Git::processRevision(const QByteArray &ba)
    isLoading = false;
 
    emit signalLoadingFinished();
-}
-
-void Git::flushFileNames(FileNamesLoader &fl)
-{
-   if (!fl.rf)
-      return;
-
-   QByteArray &b = fl.rf->pathsIdx;
-   QVector<int> &dirs = fl.rfDirs;
-
-   b.clear();
-   b.resize(2 * dirs.size() * static_cast<int>(sizeof(int)));
-
-   int *d = (int *)(b.data());
-
-   for (int i = 0; i < dirs.size(); i++)
-   {
-      d[i] = dirs.at(i);
-      d[dirs.size() + i] = fl.rfNames.at(i);
-   }
-   dirs.clear();
-   fl.rfNames.clear();
-   fl.rf = nullptr;
-}
-
-void Git::appendFileName(RevisionFile &rf, const QString &name, FileNamesLoader &fl)
-{
-   if (fl.rf != &rf)
-   {
-      flushFileNames(fl);
-      fl.rf = &rf;
-   }
-   int idx = name.lastIndexOf('/') + 1;
-   const QString &dr = name.left(idx);
-   const QString &nm = name.mid(idx);
-
-   QHash<QString, int>::const_iterator it(mDirNamesMap.constFind(dr));
-   if (it == mDirNamesMap.constEnd())
-   {
-      int idx = mDirNames.count();
-      mDirNamesMap.insert(dr, idx);
-      mDirNames.append(dr);
-      fl.rfDirs.append(idx);
-   }
-   else
-      fl.rfDirs.append(*it);
-
-   it = mFileNamesMap.constFind(nm);
-   if (it == mFileNamesMap.constEnd())
-   {
-      int idx = mFileNames.count();
-      mFileNamesMap.insert(nm, idx);
-      mFileNames.append(nm);
-      fl.rfNames.append(idx);
-   }
-   else
-      fl.rfNames.append(*it);
 }
 
 bool GitUserInfo::isValid() const

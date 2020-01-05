@@ -32,6 +32,7 @@
 #include <QHash>
 
 class Git;
+struct WorkingDirInfo;
 
 class RevisionsCache : public QObject
 {
@@ -54,7 +55,7 @@ public:
    void insertCommitInfo(CommitInfo rev);
    void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevsFiles.insert(sha, file); }
    void insertReference(const QString &sha, Reference ref);
-   void updateWipCommit(CommitInfo rev);
+   void updateWipCommit(CommitInfo c, const WorkingDirInfo &wd);
 
    void clear();
    void clearRevisionFile() { mRevsFiles.clear(); }
@@ -63,13 +64,36 @@ public:
 
    bool containsRevisionFile(const QString &sha) const { return mRevsFiles.contains(sha); }
 
+   RevisionFile parseDiff(const QString &sha, const QString &logDiff);
+   int findFileIndex(const RevisionFile &rf, const QString &name);
+
 private:
+   struct FileNamesLoader
+   {
+      FileNamesLoader()
+         : rf(nullptr)
+      {
+      }
+
+      RevisionFile *rf;
+      QVector<int> rfDirs;
+      QVector<int> rfNames;
+      QVector<QString> files;
+   };
+
+   bool mCacheLocked = true;
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo *> revs;
    QHash<QString, RevisionFile> mRevsFiles;
    QHash<QString, Reference> mRefsShaMap;
    Lanes lns;
-   bool mCacheLocked = true;
+   QVector<QString> mDirNames;
+   QVector<QString> mFileNames;
 
+   RevisionFile fakeWorkDirRevFile(const WorkingDirInfo &wd);
    void updateLanes(CommitInfo &c, Lanes &lns);
+   RevisionFile parseDiffFormat(const QString &buf, FileNamesLoader &fl);
+   void appendFileName(const QString &name, FileNamesLoader &fl);
+   void flushFileNames(FileNamesLoader &fl);
+   void setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
 };

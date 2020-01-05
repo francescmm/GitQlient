@@ -7,13 +7,14 @@
 #ifndef GIT_H
 #define GIT_H
 
+#include <WorkingDirInfo.h>
+#include <RevisionFile.h>
+#include <ReferenceType.h>
+
 #include <QObject>
 #include <QVariant>
 #include <QVector>
 #include <QSharedPointer>
-
-#include <RevisionFile.h>
-#include <ReferenceType.h>
 
 template<class, class>
 struct QPair;
@@ -168,70 +169,29 @@ public:
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
    GitExecResult merge(const QString &into, QStringList sources);
 
-   const QString filePath(const RevisionFile &rf, int i) const;
    QPair<bool, QString> run(const QString &cmd) const;
 
    void updateWipRevision();
 
 private:
-   bool setGitDbDir(const QString &wd);
-   void processRevision(const QByteArray &ba);
-   bool loadCurrentBranch();
-
-   struct WorkingDirInfo
-   {
-      void clear()
-      {
-         diffIndex = diffIndexCached = "";
-         otherFiles.clear();
-      }
-      QString diffIndex;
-      QString diffIndexCached;
-      QStringList otherFiles;
-   };
-   WorkingDirInfo workingDirInfo;
-
-   struct FileNamesLoader
-   {
-      FileNamesLoader()
-         : rf(nullptr)
-      {
-      }
-
-      RevisionFile *rf;
-      QVector<int> rfDirs;
-      QVector<int> rfNames;
-   };
-
-   bool updateIndex(const QStringList &selFiles);
-   int findFileIndex(const RevisionFile &rf, const QString &name);
-   bool getRefs();
-   void clearRevs();
-   void clearFileNames();
-   bool checkoutRevisions();
-   void parseDiffFormat(RevisionFile &rf, const QString &buf, FileNamesLoader &fl);
-   void parseDiffFormatLine(RevisionFile &rf, const QString &line, int parNum, FileNamesLoader &fl);
-   RevisionFile fakeWorkDirRevFile(const WorkingDirInfo &wd);
-   RevisionFile insertNewFiles(const QString &sha, const QString &data);
-   bool runDiffTreeWithRenameDetection(const QString &runCmd, QString *runOutput);
-   const QStringList getOthersFiles();
-   const QStringList getOtherFiles(const QStringList &selFiles);
-   void appendFileName(RevisionFile &rf, const QString &name, FileNamesLoader &fl);
-   void flushFileNames(FileNamesLoader &fl);
-   static const QString quote(const QString &nm);
-   static const QString quote(const QStringList &sl);
-   void setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
-
    bool isLoading = false;
    QString mWorkingDir;
    QString mGitDir;
    QString mCurrentBranchName;
-
-   QVector<QString> mFileNames;
-   QVector<QString> mDirNames;
-   QHash<QString, int> mFileNamesMap; // quick lookup file name
-   QHash<QString, int> mDirNamesMap; // quick lookup directory name
    QSharedPointer<RevisionsCache> mRevCache;
+   WorkingDirInfo workingDirInfo;
+
+   bool setGitDbDir(const QString &wd);
+   void processRevision(const QByteArray &ba);
+   bool loadCurrentBranch();
+   bool updateIndex(const QStringList &selFiles);
+   bool getRefs();
+   void clearRevs();
+   bool checkoutRevisions();
+   const QStringList getOthersFiles();
+   const QStringList getOtherFiles(const QStringList &selFiles);
+   static const QString quote(const QString &nm);
+   static const QString quote(const QStringList &sl);
 };
 
 #endif
