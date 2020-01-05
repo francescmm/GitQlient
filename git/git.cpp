@@ -31,8 +31,6 @@
 
 using namespace QLogger;
 
-static const QString GIT_LOG_FORMAT = "%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b";
-
 namespace
 {
 #ifndef Q_OS_WIN32
@@ -61,22 +59,8 @@ bool writeToFile(const QString &fileName, const QString &data)
 }
 
 Git::Git()
-   : QObject()
-   , mRevCache(new RevisionsCache())
+   : GitBase()
 {
-}
-
-const QString Git::quote(const QString &nm)
-{
-   return ("$" + nm + "$");
-}
-
-// CT TODO utility function; can go elsewhere
-const QString Git::quote(const QStringList &sl)
-{
-   QString q(sl.join(QString("$%1$").arg(' ')));
-   q.prepend("$").append("$");
-   return q;
 }
 
 uint Git::checkRef(const QString &sha, uint mask) const
@@ -117,17 +101,6 @@ CommitInfo Git::getCommitInfo(const QString &sha) const
    return mRevCache->getCommitInfo(sha);
 }
 
-QPair<bool, QString> Git::run(const QString &runCmd) const
-{
-   QString runOutput;
-   GitSyncProcess p(mWorkingDir);
-   connect(this, &Git::cancelAllProcesses, &p, &AGitProcess::onCancel);
-
-   const auto ret = p.run(runCmd, runOutput);
-
-   return qMakePair(ret, runOutput);
-}
-
 GitExecResult Git::getCommitDiff(const QString &sha, const QString &diffToSha)
 {
    if (!sha.isEmpty())
@@ -160,15 +133,6 @@ QString Git::getFileDiff(const QString &currentSha, const QString &previousSha, 
       return ret.second;
 
    return QString();
-}
-
-bool Git::isNothingToCommit()
-{
-   if (!mRevCache->containsRevisionFile(ZERO_SHA))
-      return true;
-
-   const auto rf = mRevCache->getRevisionFile(ZERO_SHA);
-   return rf.count() == workingDirInfo.otherFiles.count();
 }
 
 bool Git::checkoutFile(const QString &fileName)
@@ -645,190 +609,6 @@ QVector<QString> Git::getStashes()
    return stashes;
 }
 
-bool Git::setGitDbDir(const QString &wd)
-{
-   auto tmp = mWorkingDir;
-   mWorkingDir = wd;
-
-   const auto success = run("git rev-parse --git-dir"); // run under newWorkDir
-   mWorkingDir = tmp;
-
-   const auto runOutput = success.second.trimmed();
-
-   if (success.first)
-   {
-      QDir d(runOutput.startsWith("/") ? runOutput : wd + "/" + runOutput);
-      mGitDir = d.absolutePath();
-   }
-
-   return success.first;
-}
-
-GitExecResult Git::getBaseDir(const QString &wd)
-{
-   auto tmp = mWorkingDir;
-   mWorkingDir = wd;
-
-   const auto ret = run("git rev-parse --show-cdup");
-   mWorkingDir = tmp;
-
-   auto baseDir = wd;
-
-   if (ret.first)
-   {
-      QDir d(QString("%1/%2").arg(wd, ret.second.trimmed()));
-      baseDir = d.absolutePath();
-   }
-
-   return qMakePair(ret.first, baseDir);
-}
-
-bool Git::loadCurrentBranch()
-{
-   const auto ret2 = run("git branch");
-
-   if (!ret2.first)
-      return false;
-
-   const auto branches = ret2.second.trimmed().split('\n');
-   for (auto branch : branches)
-   {
-      if (branch.startsWith("*"))
-      {
-         mCurrentBranchName = branch.remove("*").trimmed();
-         break;
-      }
-   }
-
-   if (mCurrentBranchName.contains(" detached "))
-      mCurrentBranchName = "";
-
-   return true;
-}
-
-bool Git::getRefs()
-{
-   const auto branchLoaded = loadCurrentBranch();
-
-   if (branchLoaded)
-   {
-      const auto ret3 = run("git show-ref -d");
-
-      if (ret3.first)
-      {
-         mRevCache->clearReferences();
-
-         const auto ret = getLastCommitOfBranch("HEAD");
-
-         QString prevRefSha;
-         const auto curBranchSHA = ret.output.toString();
-         const auto referencesList = ret3.second.split('\n', QString::SkipEmptyParts);
-
-         for (auto reference : referencesList)
-         {
-            const auto revSha = reference.left(40);
-            const auto refName = reference.mid(41);
-
-            // one Revision could have many tags
-            auto cur = mRevCache->getReference(revSha);
-            cur.configure(refName, curBranchSHA == revSha, prevRefSha);
-
-            mRevCache->insertReference(revSha, std::move(cur));
-
-            if (refName.startsWith("refs/tags/") && refName.endsWith("^{}") && !prevRefSha.isEmpty())
-               mRevCache->removeReference(prevRefSha);
-
-            prevRefSha = revSha;
-         }
-
-         // mark current head (even when detached)
-         auto cur = mRevCache->getReference(curBranchSHA);
-         cur.type |= CUR_BRANCH;
-         mRevCache->insertReference(curBranchSHA, std::move(cur));
-
-         return mRevCache->countReferences() > 0;
-      }
-   }
-
-   return false;
-}
-
-const QStringList Git::getOthersFiles()
-{
-   // add files present in working directory but not in git archive
-
-   QString runCmd("git ls-files --others");
-   QString exFile(".git/info/exclude");
-   QString path = QString("%1/%2").arg(mWorkingDir, exFile);
-
-   if (QFile::exists(path))
-      runCmd.append(" --exclude-from=" + quote(exFile));
-
-   runCmd.append(" --exclude-per-directory=" + quote(".gitignore"));
-
-   const auto runOutput = run(runCmd).second;
-   return runOutput.split('\n', QString::SkipEmptyParts);
-}
-
-void Git::updateWipRevision()
-{
-   const auto ret = run("git status");
-   if (!ret.first) // git status refreshes the index, run as first
-      return;
-
-   QString status = ret.second;
-
-   const auto ret2 = run("git rev-parse --revs-only HEAD");
-   if (!ret2.first)
-      return;
-
-   QString head = ret2.second;
-
-   head = head.trimmed();
-   if (!head.isEmpty())
-   { // repository initialized but still no history
-      const auto ret3 = run("git diff-index " + head);
-
-      if (!ret3.first)
-         return;
-
-      workingDirInfo.diffIndex = ret3.second;
-
-      // check for files already updated in cache, we will
-      // save this information in status third field
-      const auto ret4 = run("git diff-index --cached " + head);
-      if (!ret4.first)
-         return;
-
-      workingDirInfo.diffIndexCached = ret4.second;
-   }
-   // get any file not in tree
-   workingDirInfo.otherFiles = getOthersFiles();
-
-   // now mockup a RevisionFile
-   const auto log = isNothingToCommit() ? QString("No local changes") : QString("Local changes");
-   CommitInfo c(ZERO_SHA, { head }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, status, 0);
-   c.isDiffCache = true;
-
-   mRevCache->updateWipCommit(std::move(c), workingDirInfo);
-}
-
-bool Git::checkoutRevisions()
-{
-   auto baseCmd = QString("git log --date-order --no-color --log-size --parents --boundary -z --pretty=format:")
-                      .append(GIT_LOG_FORMAT)
-                      .append(" --all");
-
-   const auto requestor = new GitRequestorProcess(mWorkingDir);
-   connect(requestor, &GitRequestorProcess::procDataReady, this, &Git::processRevision);
-   connect(this, &Git::cancelAllProcesses, requestor, &AGitProcess::onCancel);
-
-   QString buf;
-   const auto ret = requestor->run(baseCmd, buf);
-
-   return ret;
-}
-
 bool Git::clone(const QString &url, const QString &fullPath)
 {
    const auto asyncRun = new GitCloneProcess(mWorkingDir);
@@ -902,74 +682,6 @@ CommitInfo Git::getCommitInfoByRow(int row) const
 CommitInfo Git::getCommitInfo(const QString &sha)
 {
    return mRevCache->getCommitInfo(sha);
-}
-
-void Git::clearRevs()
-{
-   mRevCache->clear();
-   mRevCache->clearRevisionFile();
-   workingDirInfo.clear();
-}
-
-bool Git::loadRepository(const QString &wd)
-{
-   if (!isLoading)
-   {
-      QLog_Info("Git", "Initializing Git...");
-
-      // normally called when changing git directory. Must be called after stop()
-      clearRevs();
-
-      const auto isGIT = setGitDbDir(wd);
-
-      if (!isGIT)
-         return false;
-
-      isLoading = true;
-
-      const auto ret = getBaseDir(wd);
-
-      if (ret.success)
-         mWorkingDir = ret.output.toString();
-
-      getRefs();
-
-      checkoutRevisions();
-
-      QLog_Info("Git", "... Git init finished");
-
-      return true;
-   }
-
-   return false;
-}
-
-void Git::processRevision(const QByteArray &ba)
-{
-   QByteArray auxBa = ba;
-   const auto commits = ba.split('\000');
-   const auto totalCommits = commits.count();
-   auto count = 1;
-
-   mRevCache->configure(totalCommits);
-
-   emit signalLoadingStarted();
-
-   updateWipRevision();
-
-   for (const auto &commitInfo : commits)
-   {
-      CommitInfo revision(commitInfo, count++);
-
-      if (revision.isValid())
-         mRevCache->insertCommitInfo(std::move(revision));
-      else
-         break;
-   }
-
-   isLoading = false;
-
-   emit signalLoadingFinished();
 }
 
 bool GitUserInfo::isValid() const

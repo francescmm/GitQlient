@@ -10,8 +10,8 @@
 #include <WorkingDirInfo.h>
 #include <RevisionFile.h>
 #include <ReferenceType.h>
+#include <GitBase.h>
 
-#include <QObject>
 #include <QVariant>
 #include <QVector>
 #include <QSharedPointer>
@@ -22,32 +22,6 @@ struct QPair;
 class RevisionsCache;
 class CommitInfo;
 
-static const QString ZERO_SHA = "0000000000000000000000000000000000000000";
-
-struct GitExecResult
-{
-   GitExecResult() = default;
-   GitExecResult(const QPair<bool, QVariant> &result)
-      : success(result.first)
-      , output(result.second)
-   {
-   }
-   GitExecResult(const QPair<bool, QString> &result)
-      : success(result.first)
-      , output(result.second)
-   {
-   }
-   GitExecResult &operator=(const QPair<bool, QString> &result)
-   {
-      success = result.first;
-      output = result.second;
-
-      return *this;
-   }
-   bool success;
-   QVariant output;
-};
-
 struct GitUserInfo
 {
    QString mUserName;
@@ -56,14 +30,11 @@ struct GitUserInfo
    bool isValid() const;
 };
 
-class Git : public QObject
+class Git : public GitBase
 {
    Q_OBJECT
 
 signals:
-   void cancelAllProcesses();
-   void signalLoadingStarted();
-   void signalLoadingFinished();
    void signalCloningProgress(QString stepDescription, int value);
 
 public:
@@ -77,9 +48,6 @@ public:
    explicit Git();
 
    /* START Git CONFIGURATION */
-   void setWorkingDirectory(const QString &wd) { mWorkingDir = wd; }
-   bool loadRepository(const QString &wd);
-   QString getWorkingDir() const { return mWorkingDir; }
    bool clone(const QString &url, const QString &fullPath);
    bool initRepo(const QString &fullPath);
    GitUserInfo getGlobalUserInfo() const;
@@ -107,7 +75,6 @@ public:
    GitExecResult getBranchesOfCommit(const QString &sha);
    GitExecResult getLastCommitOfBranch(const QString &branch);
    GitExecResult prune();
-   const QString getCurrentBranchName() const { return mCurrentBranchName; }
 
    /* END BRANCHES */
 
@@ -158,8 +125,6 @@ public:
    bool submoduleRemove(const QString &submodule);
    /*  END  SUBMODULES */
 
-   bool isNothingToCommit();
-
    GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
    QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 
@@ -172,30 +137,12 @@ public:
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
    GitExecResult merge(const QString &into, QStringList sources);
 
-   QPair<bool, QString> run(const QString &cmd) const;
-
-   void updateWipRevision();
-
 private:
-   bool isLoading = false;
-   QString mWorkingDir;
-   QString mGitDir;
-   QString mCurrentBranchName;
-   QSharedPointer<RevisionsCache> mRevCache;
-   WorkingDirInfo workingDirInfo;
-
    bool setGitDbDir(const QString &wd);
-   void processRevision(const QByteArray &ba);
-   bool loadCurrentBranch();
-   bool updateIndex(const QStringList &selFiles);
-   bool getRefs();
-   void clearRevs();
-   bool checkoutRevisions();
-   const QStringList getOthersFiles();
-   const QStringList getOtherFiles(const QStringList &selFiles);
-   static const QString quote(const QString &nm);
-   static const QString quote(const QStringList &sl);
    GitExecResult getBaseDir(const QString &wd);
+   bool updateIndex(const QStringList &selFiles);
+
+   const QStringList getOtherFiles(const QStringList &selFiles);
 };
 
 #endif
