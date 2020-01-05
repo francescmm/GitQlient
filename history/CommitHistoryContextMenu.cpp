@@ -135,7 +135,7 @@ void CommitHistoryContextMenu::stashPush()
 {
    const auto ret = mGit->stash();
 
-   if (ret)
+   if (ret.success)
       emit signalRepositoryUpdated();
 }
 

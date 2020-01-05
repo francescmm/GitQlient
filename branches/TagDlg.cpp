@@ -41,9 +41,9 @@ void TagDlg::accept()
       tagMessage = tagMessage.trimmed();
 
       QByteArray output;
-      auto ret = mGit->addTag(tagName, tagMessage, mSha, output);
+      auto ret = mGit->addTag(tagName, tagMessage, mSha);
 
-      if (ret)
+      if (ret.success)
          QDialog::accept();
    }
 }

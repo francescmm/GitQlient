@@ -208,7 +208,7 @@ void Controls::stashCurrentWork()
 {
    const auto ret = mGit->stash();
 
-   if (ret)
+   if (ret.success)
       emit signalRepositoryUpdated();
 }
 

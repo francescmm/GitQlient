@@ -434,7 +434,7 @@ void BranchesWidget::showTagsContextMenu(const QPoint &p)
       const auto ret = mGit->removeTag(tagName, isRemote);
       QApplication::restoreOverrideCursor();
 
-      if (ret)
+      if (ret.success)
          emit signalBranchesUpdated();
    });
 
@@ -442,11 +442,10 @@ void BranchesWidget::showTagsContextMenu(const QPoint &p)
    pushTagAction->setEnabled(!isRemote);
    connect(pushTagAction, &QAction::triggered, this, [this, tagName]() {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      QByteArray ba;
-      const auto ret = mGit->pushTag(tagName, ba);
+      const auto ret = mGit->pushTag(tagName);
       QApplication::restoreOverrideCursor();
 
-      if (ret)
+      if (ret.success)
          emit signalBranchesUpdated();
    });
 

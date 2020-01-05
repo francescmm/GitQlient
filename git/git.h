@@ -37,6 +37,13 @@ struct GitExecResult
       , output(result.second)
    {
    }
+   GitExecResult &operator=(const QPair<bool, QString> &result)
+   {
+      success = result.first;
+      output = result.second;
+
+      return *this;
+   }
    bool success;
    QVariant output;
 };
@@ -107,14 +114,20 @@ public:
    /* START TAGS */
    QVector<QString> getTags() const;
    QVector<QString> getLocalTags() const;
-   bool addTag(const QString &tagName, const QString &tagMessage, const QString &sha, QByteArray &output);
-   bool removeTag(const QString &tagName, bool remote);
-   bool pushTag(const QString &tagName, QByteArray &output);
+   GitExecResult addTag(const QString &tagName, const QString &tagMessage, const QString &sha);
+   GitExecResult removeTag(const QString &tagName, bool remote);
+   GitExecResult pushTag(const QString &tagName);
    GitExecResult getTagCommit(const QString &tagName);
    /*  END  TAGS */
 
    /* START STASHES */
    QVector<QString> getStashes();
+   GitExecResult pop() const;
+   GitExecResult stash();
+   GitExecResult stashBranch(const QString &stashId, const QString &branchName);
+   GitExecResult stashDrop(const QString &stashId);
+   GitExecResult stashClear();
+   bool resetCommit(const QString &sha, CommitResetType type);
    /*  END  STASHES */
 
    /* START COMMIT WORK */
@@ -125,12 +138,6 @@ public:
    GitExecResult pull();
    bool fetch();
    GitExecResult cherryPickCommit(const QString &sha);
-   GitExecResult pop() const;
-   bool stash();
-   GitExecResult stashBranch(const QString &stashId, const QString &branchName);
-   GitExecResult stashDrop(const QString &stashId);
-   GitExecResult stashClear();
-   bool resetCommit(const QString &sha, CommitResetType type);
    bool resetCommits(int parentDepth);
    GitExecResult checkoutCommit(const QString &sha);
    GitExecResult markFileAsResolved(const QString &fileName);
@@ -150,10 +157,6 @@ public:
    bool submoduleUpdate(const QString &submodule);
    bool submoduleRemove(const QString &submodule);
    /*  END  SUBMODULES */
-
-   /* START GENERAL REPO */
-   GitExecResult getBaseDir(const QString &wd);
-   /*  END  GENERAL REPO */
 
    bool isNothingToCommit();
 
@@ -192,6 +195,7 @@ private:
    const QStringList getOtherFiles(const QStringList &selFiles);
    static const QString quote(const QString &nm);
    static const QString quote(const QStringList &sl);
+   GitExecResult getBaseDir(const QString &wd);
 };
 
 #endif

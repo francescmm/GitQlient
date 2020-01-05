@@ -331,6 +331,7 @@ bool Git::updateIndex(const QStringList &selFiles)
 
       idx != -1 && files.statusCmp(idx, RevisionFile::DELETED) ? toRemove << it : toAdd << it;
    }
+
    if (!toRemove.isEmpty() && !run("git rm --cached --ignore-unmatch -- " + quote(toRemove)).first)
       return false;
 
@@ -443,9 +444,9 @@ GitExecResult Git::pop() const
    return run("git stash pop");
 }
 
-bool Git::stash()
+GitExecResult Git::stash()
 {
-   return run("git stash").first;
+   return run("git stash");
 }
 
 GitExecResult Git::stashBranch(const QString &stashId, const QString &branchName)
@@ -590,33 +591,27 @@ QVector<QString> Git::getLocalTags() const
    return tags;
 }
 
-bool Git::addTag(const QString &tagName, const QString &tagMessage, const QString &sha, QByteArray &output)
+GitExecResult Git::addTag(const QString &tagName, const QString &tagMessage, const QString &sha)
 {
-   const auto ret = run(QString("git tag -a %1 %2 -m \"%3\"").arg(tagName).arg(sha).arg(tagMessage));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git tag -a %1 %2 -m \"%3\"").arg(tagName).arg(sha).arg(tagMessage));
 }
 
-bool Git::removeTag(const QString &tagName, bool remote)
+GitExecResult Git::removeTag(const QString &tagName, bool remote)
 {
-   auto ret = false;
+   GitExecResult ret;
 
    if (remote)
-      ret = run(QString("git push origin --delete %1").arg(tagName)).first;
+      ret = run(QString("git push origin --delete %1").arg(tagName));
 
-   if (!remote || (remote && ret))
-      ret = run(QString("git tag -d %1").arg(tagName)).first;
+   if (!remote || (remote && ret.success))
+      ret = run(QString("git tag -d %1").arg(tagName));
 
    return ret;
 }
 
-bool Git::pushTag(const QString &tagName, QByteArray &output)
+GitExecResult Git::pushTag(const QString &tagName)
 {
-   const auto ret = run(QString("git push origin %1").arg(tagName));
-   output = ret.second.toUtf8();
-
-   return ret.first;
+   return run(QString("git push origin %1").arg(tagName));
 }
 
 GitExecResult Git::getTagCommit(const QString &tagName)
