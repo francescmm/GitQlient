@@ -315,9 +315,9 @@ void RevisionsCache::clear()
 
    mDirNames.clear();
    mFileNames.clear();
+   mRevsFiles.clear();
+   mRefsShaMap.clear();
 
-   // qDeleteAll(mCommits);
-   // mCommits.clear();
    lns.clear();
    revs.clear();
 }

@@ -197,17 +197,12 @@ bool Git::submoduleRemove(const QString &)
 
 RevisionFile Git::getWipFiles()
 {
-   return mRevCache->getRevisionFile(ZERO_SHA); // ZERO_SHA search arrives here
+   return mRevCache->getRevisionFile(ZERO_SHA);
 }
 
 RevisionFile Git::getCommitFiles(const QString &sha) const
 {
-   const auto r = mRevCache->getCommitInfo(sha);
-
-   if (r.parentsCount() != 0 && mRevCache->containsRevisionFile(sha))
-      return mRevCache->getRevisionFile(sha);
-
-   return RevisionFile();
+   return mRevCache->getRevisionFile(sha);
 }
 
 RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha, bool allFiles)
@@ -682,4 +677,12 @@ CommitInfo Git::getCommitInfo(const QString &sha)
 bool GitUserInfo::isValid() const
 {
    return !mUserEmail.isNull() && !mUserEmail.isEmpty() && !mUserName.isNull() && !mUserName.isEmpty();
+}
+
+// CT TODO utility function; can go elsewhere
+const QString Git::quote(const QStringList &sl)
+{
+   QString q(sl.join(QString("$%1$").arg(' ')));
+   q.prepend("$").append("$");
+   return q;
 }

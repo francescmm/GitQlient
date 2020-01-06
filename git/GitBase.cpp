@@ -33,8 +33,7 @@ bool GitBase::loadRepository(const QString &wd)
    {
       QLog_Info("Git", "Initializing Git...");
 
-      // normally called when changing git directory. Must be called after stop()
-      clearRevs();
+      mRevCache->clear();
 
       const auto isGIT = setGitDbDir(wd);
 
@@ -55,12 +54,6 @@ bool GitBase::loadRepository(const QString &wd)
    }
 
    return false;
-}
-
-void GitBase::clearRevs()
-{
-   mRevCache->clear();
-   mRevCache->clearRevisionFile();
 }
 
 bool GitBase::setGitDbDir(const QString &wd)
@@ -112,8 +105,6 @@ bool GitBase::loadReferences()
 
       if (ret3.first)
       {
-         mRevCache->clearReferences();
-
          auto ret = run("git rev-parse HEAD");
 
          if (ret.first)
@@ -256,12 +247,4 @@ QVector<QString> GitBase::getUntrackedFiles() const
    runCmd.append(QString(" --exclude-per-directory=$%1$").arg(".gitignore"));
 
    return run(runCmd).second.split('\n', QString::SkipEmptyParts).toVector();
-}
-
-// CT TODO utility function; can go elsewhere
-const QString GitBase::quote(const QStringList &sl)
-{
-   QString q(sl.join(QString("$%1$").arg(' ')));
-   q.prepend("$").append("$");
-   return q;
 }

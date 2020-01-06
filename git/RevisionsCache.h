@@ -46,6 +46,8 @@ signals:
 public:
    explicit RevisionsCache(QObject *parent = nullptr);
    void configure(int numElementsToStore);
+   void clear();
+
    int count() const { return mCommits.count(); }
    int countReferences() const { return mRefsShaMap.count(); }
 
@@ -59,9 +61,6 @@ public:
    void insertReference(const QString &sha, Reference ref);
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 
-   void clear();
-   void clearRevisionFile() { mRevsFiles.clear(); }
-   void clearReferences() { mRefsShaMap.clear(); }
    void removeReference(const QString &sha) { mRefsShaMap.remove(sha); }
 
    bool containsRevisionFile(const QString &sha) const { return mRevsFiles.contains(sha); }

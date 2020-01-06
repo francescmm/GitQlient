@@ -138,6 +138,7 @@ public:
 
 private:
    bool updateIndex(const QStringList &selFiles);
+   static const QString quote(const QStringList &sl);
 };
 
 #endif

@@ -45,13 +45,8 @@ public:
    bool loadRepository(const QString &wd);
    QString getWorkingDir() const { return mWorkingDir; }
    QString getCurrentBranchName() const { return mCurrentBranchName; }
-
-   // To review
    void updateWipRevision();
    bool pendingLocalChanges();
-
-   // To remove
-   static const QString quote(const QStringList &sl);
 
 protected:
    QSharedPointer<RevisionsCache> mRevCache;
@@ -63,7 +58,6 @@ protected:
    QPair<bool, QString> run(const QString &cmd) const;
 
 private:
-   void clearRevs();
    bool setGitDbDir(const QString &wd);
    void setBaseDir(const QString &wd);
    bool loadReferences();
