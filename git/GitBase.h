@@ -50,7 +50,6 @@ public:
 
 protected:
    QSharedPointer<RevisionsCache> mRevCache;
-   bool isLoading = false;
    QString mWorkingDir;
    QString mGitDir;
    QString mCurrentBranchName;
@@ -58,6 +57,8 @@ protected:
    QPair<bool, QString> run(const QString &cmd) const;
 
 private:
+   bool mIsLoading = false;
+
    bool setGitDbDir(const QString &wd);
    void setBaseDir(const QString &wd);
    bool loadReferences();

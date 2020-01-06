@@ -31,33 +31,6 @@
 
 using namespace QLogger;
 
-namespace
-{
-#ifndef Q_OS_WIN32
-#   include <sys/types.h> // used by chmod()
-#   include <sys/stat.h> // used by chmod()
-#endif
-
-bool writeToFile(const QString &fileName, const QString &data)
-{
-   QFile file(fileName);
-   if (!file.open(QIODevice::WriteOnly))
-      return false;
-
-   QString data2(data);
-   QTextStream stream(&file);
-
-#ifdef Q_OS_WIN32
-   data2.replace("\r\n", "\n"); // change windows CRLF to linux
-   data2.replace("\n", "\r\n"); // then change all linux CRLF to windows
-#endif
-   stream << data2;
-   file.close();
-
-   return true;
-}
-}
-
 Git::Git()
    : GitBase()
 {
@@ -289,10 +262,6 @@ bool Git::updateIndex(const QStringList &selFiles)
 
 bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, const QString &author)
 {
-   const QString msgFile(mGitDir + "/qgit_cmt_msg.txt");
-   if (!writeToFile(msgFile, msg)) // early skip
-      return false;
-
    // add user selectable commit options
    QString cmtOptions;
 
@@ -318,11 +287,9 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
 
    // call git reset to remove not selected files from index
    if ((!notSel.empty() && !run("git reset -- " + quote(notSel)).first) || !updateIndex(selFiles)
-       || !run(QString("git commit" + cmtOptions + " -F $%1$").arg(msgFile)).first
+       || !run(QString("git commit" + cmtOptions + " -m \"%1\"").arg(msg)).first
        || (!notSel.empty() && !updateIndex(notSel)))
    {
-      QDir dir(mWorkingDir);
-      dir.remove(msgFile);
       ret = false;
    }
 

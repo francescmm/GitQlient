@@ -29,7 +29,7 @@ QPair<bool, QString> GitBase::run(const QString &runCmd) const
 
 bool GitBase::loadRepository(const QString &wd)
 {
-   if (!isLoading)
+   if (!mIsLoading)
    {
       QLog_Info("Git", "Initializing Git...");
 
@@ -40,7 +40,7 @@ bool GitBase::loadRepository(const QString &wd)
       if (!isGIT)
          return false;
 
-      isLoading = true;
+      mIsLoading = true;
 
       setBaseDir(wd);
 
@@ -203,7 +203,7 @@ void GitBase::processRevision(const QByteArray &ba)
          break;
    }
 
-   isLoading = false;
+   mIsLoading = false;
 
    emit signalLoadingFinished();
 }
