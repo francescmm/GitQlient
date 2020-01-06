@@ -1,6 +1,5 @@
 #include "GitBase.h"
 
-#include <RevisionsCache.h>
 #include <GitRequestorProcess.h>
 #include <GitSyncProcess.h>
 
@@ -48,7 +47,7 @@ bool GitBase::loadRepository(const QString &wd)
 
       loadReferences();
 
-      loadRevisions();
+      requestRevisions();
 
       QLog_Info("Git", "... Git init finished");
 
@@ -62,7 +61,6 @@ void GitBase::clearRevs()
 {
    mRevCache->clear();
    mRevCache->clearRevisionFile();
-   workingDirInfo.clear();
 }
 
 bool GitBase::setGitDbDir(const QString &wd)
@@ -177,7 +175,7 @@ bool GitBase::loadCurrentBranch()
    return true;
 }
 
-void GitBase::loadRevisions()
+void GitBase::requestRevisions()
 {
    const auto baseCmd = QString("git log --date-order --no-color --log-size --parents --boundary -z --pretty=format:")
                             .append(GIT_LOG_FORMAT)
@@ -221,76 +219,43 @@ void GitBase::processRevision(const QByteArray &ba)
 
 void GitBase::updateWipRevision()
 {
-   const auto ret = run("git status");
-   if (!ret.first) // git status refreshes the index, run as first
-      return;
+   mRevCache->setUntrackedFilesList(getUntrackedFiles());
 
-   QString status = ret.second;
+   const auto ret = run("git rev-parse --revs-only HEAD");
 
-   const auto ret2 = run("git rev-parse --revs-only HEAD");
-   if (!ret2.first)
-      return;
+   if (ret.first)
+   {
+      const auto parentSha = ret.second.trimmed();
 
-   QString head = ret2.second;
+      const auto ret3 = run(QString("git diff-index %1").arg(parentSha));
+      const auto diffIndex = ret3.first ? ret3.second : QString();
 
-   head = head.trimmed();
-   if (!head.isEmpty())
-   { // repository initialized but still no history
-      const auto ret3 = run("git diff-index " + head);
+      const auto ret4 = run(QString("git diff-index --cached %1").arg(parentSha));
+      const auto diffIndexCached = ret4.first ? ret4.second : QString();
 
-      if (!ret3.first)
-         return;
-
-      workingDirInfo.diffIndex = ret3.second;
-
-      // check for files already updated in cache, we will
-      // save this information in status third field
-      const auto ret4 = run("git diff-index --cached " + head);
-      if (!ret4.first)
-         return;
-
-      workingDirInfo.diffIndexCached = ret4.second;
+      mRevCache->updateWipCommit(parentSha, diffIndex, diffIndexCached);
    }
-   // get any file not in tree
-   workingDirInfo.otherFiles = getOthersFiles();
-
-   // now mockup a RevisionFile
-   const auto log = isNothingToCommit() ? QString("No local changes") : QString("Local changes");
-   CommitInfo c(ZERO_SHA, { head }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, status, 0);
-   c.isDiffCache = true;
-
-   mRevCache->updateWipCommit(std::move(c), workingDirInfo);
 }
 
-bool GitBase::isNothingToCommit()
+bool GitBase::pendingLocalChanges()
 {
-   if (!mRevCache->containsRevisionFile(ZERO_SHA))
-      return true;
-
-   const auto rf = mRevCache->getRevisionFile(ZERO_SHA);
-   return rf.count() == workingDirInfo.otherFiles.count();
+   return mRevCache->pendingLocalChanges();
 }
 
-QStringList GitBase::getOthersFiles()
+QVector<QString> GitBase::getUntrackedFiles() const
 {
    // add files present in working directory but not in git archive
 
-   QString runCmd("git ls-files --others");
-   QString exFile(".git/info/exclude");
-   QString path = QString("%1/%2").arg(mWorkingDir, exFile);
+   auto runCmd = QString("git ls-files --others");
+   const auto exFile = QString(".git/info/exclude");
+   const auto path = QString("%1/%2").arg(mWorkingDir, exFile);
 
    if (QFile::exists(path))
-      runCmd.append(" --exclude-from=" + quote(exFile));
+      runCmd.append(QString(" --exclude-from=$%1$").arg(exFile));
 
-   runCmd.append(" --exclude-per-directory=" + quote(".gitignore"));
+   runCmd.append(QString(" --exclude-per-directory=$%1$").arg(".gitignore"));
 
-   const auto runOutput = run(runCmd).second;
-   return runOutput.split('\n', QString::SkipEmptyParts);
-}
-
-const QString GitBase::quote(const QString &nm)
-{
-   return ("$" + nm + "$");
+   return run(runCmd).second.split('\n', QString::SkipEmptyParts).toVector();
 }
 
 // CT TODO utility function; can go elsewhere

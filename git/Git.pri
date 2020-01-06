@@ -12,7 +12,6 @@ HEADERS += \
     $$PWD/ReferenceType.h \
     $$PWD/RevisionFile.h \
     $$PWD/RevisionsCache.h \
-    $$PWD/WorkingDirInfo.h \
     $$PWD/git.h \
     $$PWD/lanes.h
 
@@ -27,6 +26,5 @@ SOURCES += \
     $$PWD/Reference.cpp \
     $$PWD/RevisionFile.cpp \
     $$PWD/RevisionsCache.cpp \
-    $$PWD/WorkingDirInfo.cpp \
     $$PWD/git.cpp \
     $$PWD/lanes.cpp

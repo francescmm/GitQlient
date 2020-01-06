@@ -1,7 +1,5 @@
 #include "RevisionsCache.h"
 
-#include <WorkingDirInfo.h>
-
 RevisionsCache::RevisionsCache(QObject *parent)
    : QObject(parent)
 {
@@ -78,14 +76,18 @@ void RevisionsCache::insertReference(const QString &sha, Reference ref)
    mRefsShaMap[sha] = std::move(ref);
 }
 
-void RevisionsCache::updateWipCommit(CommitInfo c, const WorkingDirInfo &wd)
+void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
 {
-   const auto fakeRevFile = fakeWorkDirRevFile(wd);
+   const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
 
-   insertRevisionFile(c.sha(), fakeRevFile);
+   insertRevisionFile(ZERO_SHA, fakeRevFile);
 
    if (!mCacheLocked)
    {
+      const auto log = fakeRevFile.count() == mUntrackedfiles.count() ? "No local changes" : "Local changes";
+      CommitInfo c(ZERO_SHA, { parentSha }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, "", 0);
+      c.isDiffCache = true;
+
       updateLanes(c, lns);
 
       if (mCommits[c.orderIdx])
@@ -252,6 +254,12 @@ int RevisionsCache::findFileIndex(const RevisionFile &rf, const QString &name)
    return found;
 }
 
+bool RevisionsCache::pendingLocalChanges() const
+{
+   const auto rf = getRevisionFile(ZERO_SHA);
+   return mRevsFiles.value(ZERO_SHA).count() == mUntrackedfiles.count();
+}
+
 void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
    const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
@@ -314,13 +322,13 @@ void RevisionsCache::clear()
    revs.clear();
 }
 
-RevisionFile RevisionsCache::fakeWorkDirRevFile(const WorkingDirInfo &wd)
+RevisionFile RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
 {
    FileNamesLoader fl;
-   RevisionFile rf = parseDiffFormat(wd.diffIndex, fl);
+   RevisionFile rf = parseDiffFormat(diffIndex, fl);
    rf.setOnlyModified(false);
 
-   for (auto it : wd.otherFiles)
+   for (auto it : qAsConst(mUntrackedfiles))
    {
       if (fl.rf != &rf)
       {
@@ -333,7 +341,7 @@ RevisionFile RevisionsCache::fakeWorkDirRevFile(const WorkingDirInfo &wd)
       rf.mergeParent.append(1);
    }
 
-   RevisionFile cachedFiles = parseDiffFormat(wd.diffIndexCached, fl);
+   RevisionFile cachedFiles = parseDiffFormat(diffIndexCache, fl);
    flushFileNames(fl);
 
    for (auto i = 0; i < rf.count(); i++)

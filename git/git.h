@@ -7,7 +7,6 @@
 #ifndef GIT_H
 #define GIT_H
 
-#include <WorkingDirInfo.h>
 #include <RevisionFile.h>
 #include <ReferenceType.h>
 #include <GitBase.h>
@@ -138,11 +137,7 @@ public:
    GitExecResult merge(const QString &into, QStringList sources);
 
 private:
-   bool setGitDbDir(const QString &wd);
-   GitExecResult getBaseDir(const QString &wd);
    bool updateIndex(const QStringList &selFiles);
-
-   const QStringList getOtherFiles(const QStringList &selFiles);
 };
 
 #endif

@@ -256,7 +256,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          QColor color;
          if (i == activeLane)
          {
-            if (r.sha() == ZERO_SHA && !mGit->isNothingToCommit())
+            if (r.sha() == ZERO_SHA && !mGit->pendingLocalChanges())
                color = QColor("#D89000");
             else
                color = activeColor;

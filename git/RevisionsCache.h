@@ -34,6 +34,8 @@
 class Git;
 struct WorkingDirInfo;
 
+static const QString ZERO_SHA = "0000000000000000000000000000000000000000";
+
 class RevisionsCache : public QObject
 {
    Q_OBJECT
@@ -55,7 +57,7 @@ public:
    void insertCommitInfo(CommitInfo rev);
    void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevsFiles.insert(sha, file); }
    void insertReference(const QString &sha, Reference ref);
-   void updateWipCommit(CommitInfo c, const WorkingDirInfo &wd);
+   void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 
    void clear();
    void clearRevisionFile() { mRevsFiles.clear(); }
@@ -66,6 +68,9 @@ public:
 
    RevisionFile parseDiff(const QString &sha, const QString &logDiff);
    int findFileIndex(const RevisionFile &rf, const QString &name);
+
+   void setUntrackedFilesList(const QVector<QString> &untrackedFiles) { mUntrackedfiles = untrackedFiles; }
+   bool pendingLocalChanges() const;
 
 private:
    struct FileNamesLoader
@@ -89,8 +94,9 @@ private:
    Lanes lns;
    QVector<QString> mDirNames;
    QVector<QString> mFileNames;
+   QVector<QString> mUntrackedfiles;
 
-   RevisionFile fakeWorkDirRevFile(const WorkingDirInfo &wd);
+   RevisionFile fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
    void updateLanes(CommitInfo &c, Lanes &lns);
    RevisionFile parseDiffFormat(const QString &buf, FileNamesLoader &fl);
    void appendFileName(const QString &name, FileNamesLoader &fl);

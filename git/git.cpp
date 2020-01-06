@@ -270,19 +270,6 @@ GitExecResult Git::merge(const QString &into, QStringList sources)
    return run(QString("git merge -q ") + sources.join(" "));
 }
 
-const QStringList Git::getOtherFiles(const QStringList &selFiles)
-{
-   RevisionFile files = getWipFiles(); // files != nullptr
-   QStringList notSelFiles;
-   for (auto i = 0; i < files.count(); ++i)
-   {
-      const QString &fp = files.getFile(i);
-      if (selFiles.indexOf(fp) == -1 && files.statusCmp(i, RevisionFile::IN_INDEX))
-         notSelFiles.append(fp);
-   }
-   return notSelFiles;
-}
-
 bool Git::updateIndex(const QStringList &selFiles)
 {
    const auto files = getWipFiles(); // files != nullptr
@@ -325,11 +312,19 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    bool ret = true;
 
    // get not selected files but updated in index to restore at the end
-   const QStringList notSel(getOtherFiles(selFiles));
+   RevisionFile files = getWipFiles(); // files != nullptr
+   QStringList notSel;
+   for (auto i = 0; i < files.count(); ++i)
+   {
+      const QString &fp = files.getFile(i);
+      if (selFiles.indexOf(fp) == -1 && files.statusCmp(i, RevisionFile::IN_INDEX))
+         notSel.append(fp);
+   }
 
    // call git reset to remove not selected files from index
    if ((!notSel.empty() && !run("git reset -- " + quote(notSel)).first) || !updateIndex(selFiles)
-       || !run("git commit" + cmtOptions + " -F " + quote(msgFile)).first || (!notSel.empty() && !updateIndex(notSel)))
+       || !run(QString("git commit" + cmtOptions + " -F $%1$").arg(msgFile)).first
+       || (!notSel.empty() && !updateIndex(notSel)))
    {
       QDir dir(mWorkingDir);
       dir.remove(msgFile);

@@ -23,15 +23,11 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <WorkingDirInfo.h>
 #include <GitExecResult.h>
+#include <RevisionsCache.h>
 
 #include <QObject>
 #include <QSharedPointer>
-
-class RevisionsCache;
-
-static const QString ZERO_SHA = "0000000000000000000000000000000000000000";
 
 class GitBase : public QObject
 {
@@ -52,10 +48,9 @@ public:
 
    // To review
    void updateWipRevision();
-   bool isNothingToCommit();
+   bool pendingLocalChanges();
 
    // To remove
-   static const QString quote(const QString &nm);
    static const QString quote(const QStringList &sl);
 
 protected:
@@ -63,7 +58,6 @@ protected:
    bool isLoading = false;
    QString mWorkingDir;
    QString mGitDir;
-   WorkingDirInfo workingDirInfo;
    QString mCurrentBranchName;
 
    QPair<bool, QString> run(const QString &cmd) const;
@@ -74,7 +68,7 @@ private:
    void setBaseDir(const QString &wd);
    bool loadReferences();
    bool loadCurrentBranch();
-   void loadRevisions();
+   void requestRevisions();
    void processRevision(const QByteArray &ba);
-   QStringList getOthersFiles();
+   QVector<QString> getUntrackedFiles() const;
 };

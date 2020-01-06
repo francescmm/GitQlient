@@ -42,7 +42,6 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
       }
 
       const auto commitAction = addAction("See diff");
-      commitAction->setDisabled(sha == ZERO_SHA && mGit->isNothingToCommit());
       connect(commitAction, &QAction::triggered, this, [this]() { emit signalOpenDiff(mShas.first()); });
 
       if (sha != ZERO_SHA)

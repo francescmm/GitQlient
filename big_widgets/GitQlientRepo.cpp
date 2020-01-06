@@ -280,12 +280,9 @@ void GitQlientRepo::showDiffView()
 void GitQlientRepo::openCommitDiff()
 {
    const auto currentSha = mRepoWidget->getCurrentSha();
+   const auto rev = mGit->getCommitInfo(currentSha);
 
-   if (!(currentSha == ZERO_SHA && mGit->isNothingToCommit()))
-   {
-      const auto rev = mGit->getCommitInfo(currentSha);
-      mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
-   }
+   mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
 
    showDiffView();
 }
