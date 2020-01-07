@@ -34,27 +34,39 @@ class GitBase : public QObject
    Q_OBJECT
 
 signals:
-   void cancelAllProcesses();
+   void cancelAllProcesses(QPrivateSignal);
+
+public:
+   explicit GitBase(const QString &workingDirectory = QString(), QObject *parent = nullptr);
+   explicit GitBase(QSharedPointer<RevisionsCache> cache, const QString &workingDirectory, QObject *parent = nullptr);
+   QPair<bool, QString> run(const QString &cmd) const;
+   QString getWorkingDir() const { return mWorkingDirectory; }
+
+   void cancelAll();
+
+protected:
+   QSharedPointer<RevisionsCache> mRevCache;
+   QString mWorkingDirectory;
+};
+
+class GitRepoLoader : public GitBase
+{
+   Q_OBJECT
+
+signals:
    void signalLoadingStarted();
    void signalLoadingFinished();
 
 public:
-   explicit GitBase(QObject *parent = nullptr);
-   explicit GitBase(const QString &workingDirectory, QObject *parent = nullptr);
+   explicit GitRepoLoader(QSharedPointer<RevisionsCache> cache, const QString &workingDirectory,
+                          QObject *parent = nullptr);
    bool loadRepository();
-   QString getWorkingDir() const { return mWorkingDirectory; }
    void updateWipRevision();
 
-protected:
-   QScopedPointer<RevisionsCache> mRevCache;
-   QString mWorkingDirectory;
-
-   QPair<bool, QString> run(const QString &cmd) const;
-
 private:
-   bool mIsLoading = false;
+   bool mLocked = false;
 
-   bool configureRepoDirectory(const QString &wd);
+   bool configureRepoDirectory();
    void loadReferences();
    void requestRevisions();
    void processRevision(const QByteArray &ba);

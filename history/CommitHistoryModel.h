@@ -46,11 +46,11 @@ public:
    int rowCount(const QModelIndex &par = QModelIndex()) const override;
    bool hasChildren(const QModelIndex &par = QModelIndex()) const override;
    int columnCount(const QModelIndex &) const override { return mColumns.count(); }
+   void onNewRevisions();
 
 private:
    QSharedPointer<Git> mGit;
 
-   void onNewRevisions();
    QVariant getToolTipData(const CommitInfo &r) const;
    QVariant getDisplayData(const CommitInfo &rev, int column) const;
 

@@ -35,6 +35,7 @@ class Git : public GitBase
 
 signals:
    void signalCloningProgress(QString stepDescription, int value);
+   void signalWipUpdated();
 
 public:
    enum class CommitResetType
@@ -44,8 +45,8 @@ public:
       HARD
    };
 
-   explicit Git();
    explicit Git(const QString &workingDirectory);
+   explicit Git(QSharedPointer<RevisionsCache> cache, const QString &workingDirectory);
 
    /* START Git CONFIGURATION */
    bool clone(const QString &url, const QString &fullPath);

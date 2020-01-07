@@ -31,13 +31,13 @@
 
 using namespace QLogger;
 
-Git::Git()
-   : GitBase()
+Git::Git(const QString &workingDirectory)
+   : GitBase(workingDirectory)
 {
 }
 
-Git::Git(const QString &workingDirectory)
-   : GitBase(workingDirectory)
+Git::Git(QSharedPointer<RevisionsCache> cache, const QString &workingDirectory)
+   : GitBase(cache, workingDirectory)
 {
 }
 
@@ -228,7 +228,7 @@ GitExecResult Git::markFileAsResolved(const QString &fileName)
    const auto ret = run(QString("git add %1").arg(fileName));
 
    if (ret.first)
-      updateWipRevision();
+      emit signalWipUpdated();
 
    return ret;
 }
@@ -326,7 +326,8 @@ GitExecResult Git::exportPatch(const QStringList &shaList)
          const auto newFileName = QString("%1-%2").arg(number, text);
          files.append(newFileName);
 
-         QFile::rename(QString("%1/%2").arg(mWorkingDirectory, filename), QString("%1/%2").arg(mWorkingDirectory, newFileName));
+         QFile::rename(QString("%1/%2").arg(mWorkingDirectory, filename),
+                       QString("%1/%2").arg(mWorkingDirectory, newFileName));
          ++val;
       }
    }

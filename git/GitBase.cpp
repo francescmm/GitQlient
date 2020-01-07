@@ -10,15 +10,15 @@ using namespace QLogger;
 
 static const QString GIT_LOG_FORMAT = "%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b";
 
-GitBase::GitBase(QObject *parent)
+GitBase::GitBase(const QString &workingDirectory, QObject *parent)
    : QObject(parent)
-   , mRevCache(new RevisionsCache())
+   , mWorkingDirectory(workingDirectory)
 {
 }
 
-GitBase::GitBase(const QString &workingDirectory, QObject *parent)
+GitBase::GitBase(QSharedPointer<RevisionsCache> cache, const QString &workingDirectory, QObject *parent)
    : QObject(parent)
-   , mRevCache(new RevisionsCache())
+   , mRevCache(cache)
    , mWorkingDirectory(workingDirectory)
 {
 }
@@ -34,9 +34,19 @@ QPair<bool, QString> GitBase::run(const QString &runCmd) const
    return qMakePair(ret, runOutput);
 }
 
-bool GitBase::loadRepository()
+void GitBase::cancelAll()
 {
-   if (mIsLoading)
+   emit cancelAllProcesses(QPrivateSignal());
+}
+
+GitRepoLoader::GitRepoLoader(QSharedPointer<RevisionsCache> cache, const QString &workingDirectory, QObject *parent)
+   : GitBase(cache, workingDirectory, parent)
+{
+}
+
+bool GitRepoLoader::loadRepository()
+{
+   if (mLocked)
       QLog_Warning("Git", "Git is currently loading data.");
    else
    {
@@ -48,9 +58,9 @@ bool GitBase::loadRepository()
 
          mRevCache->clear();
 
-         mIsLoading = true;
+         mLocked = true;
 
-         if (configureRepoDirectory(mWorkingDirectory))
+         if (configureRepoDirectory())
          {
             loadReferences();
 
@@ -68,29 +78,22 @@ bool GitBase::loadRepository()
    return false;
 }
 
-bool GitBase::configureRepoDirectory(const QString &wd)
+bool GitRepoLoader::configureRepoDirectory()
 {
-   if (mWorkingDirectory != wd)
+   const auto ret = run("git rev-parse --show-cdup");
+
+   if (ret.first)
    {
-      mWorkingDirectory = wd;
+      QDir d(QString("%1/%2").arg(mWorkingDirectory, ret.second.trimmed()));
+      mWorkingDirectory = d.absolutePath();
 
-      const auto ret = run("git rev-parse --show-cdup");
-
-      if (ret.first)
-      {
-         QDir d(QString("%1/%2").arg(wd, ret.second.trimmed()));
-         mWorkingDirectory = d.absolutePath();
-
-         return true;
-      }
-
-      return false;
+      return true;
    }
 
-   return true;
+   return false;
 }
 
-void GitBase::loadReferences()
+void GitRepoLoader::loadReferences()
 {
    const auto ret3 = run("git show-ref -d");
 
@@ -129,21 +132,21 @@ void GitBase::loadReferences()
    }
 }
 
-void GitBase::requestRevisions()
+void GitRepoLoader::requestRevisions()
 {
    const auto baseCmd = QString("git log --date-order --no-color --log-size --parents --boundary -z --pretty=format:")
                             .append(GIT_LOG_FORMAT)
                             .append(" --all");
 
    const auto requestor = new GitRequestorProcess(mWorkingDirectory);
-   connect(requestor, &GitRequestorProcess::procDataReady, this, &GitBase::processRevision);
-   connect(this, &GitBase::cancelAllProcesses, requestor, &AGitProcess::onCancel);
+   connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevision);
+   connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
 
    QString buf;
    requestor->run(baseCmd, buf);
 }
 
-void GitBase::processRevision(const QByteArray &ba)
+void GitRepoLoader::processRevision(const QByteArray &ba)
 {
    QByteArray auxBa = ba;
    const auto commits = ba.split('\000');
@@ -166,12 +169,12 @@ void GitBase::processRevision(const QByteArray &ba)
          break;
    }
 
-   mIsLoading = false;
+   mLocked = false;
 
    emit signalLoadingFinished();
 }
 
-void GitBase::updateWipRevision()
+void GitRepoLoader::updateWipRevision()
 {
    mRevCache->setUntrackedFilesList(getUntrackedFiles());
 
@@ -191,7 +194,7 @@ void GitBase::updateWipRevision()
    }
 }
 
-QVector<QString> GitBase::getUntrackedFiles() const
+QVector<QString> GitRepoLoader::getUntrackedFiles() const
 {
    // add files present in working directory but not in git archive
 

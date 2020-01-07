@@ -29,7 +29,9 @@ using namespace QLogger;
 
 GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    : QFrame(parent)
-   , mGit(new Git(repoPath))
+   , mGitQlientCache(new RevisionsCache())
+   , mGitLoader(new GitRepoLoader(mGitQlientCache, repoPath))
+   , mGit(new Git(mGitQlientCache, repoPath))
    , mRepoWidget(new HistoryWidget(mGit))
    , mStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGit))
@@ -78,8 +80,12 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::loadFileDiff);
 
-   connect(mGit.get(), &Git::signalLoadingStarted, this, &GitQlientRepo::updateProgressDialog, Qt::DirectConnection);
-   connect(mGit.get(), &Git::signalLoadingFinished, this, &GitQlientRepo::closeProgressDialog, Qt::DirectConnection);
+   connect(mGitLoader.get(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::updateProgressDialog,
+           Qt::DirectConnection);
+   connect(mGitLoader.get(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished,
+           Qt::DirectConnection);
+   connect(mGit.get(), &Git::signalWipUpdated, mGitLoader.get(), &GitRepoLoader::updateWipRevision,
+           Qt::DirectConnection);
 
    setRepository(repoPath);
 }
@@ -105,7 +111,7 @@ void GitQlientRepo::updateCache()
 
       mRepoWidget->clear();
 
-      mGit->loadRepository();
+      mGitLoader->loadRepository();
 
       mRepoWidget->reload();
 
@@ -117,7 +123,7 @@ void GitQlientRepo::updateUiFromWatcher()
 {
    QLog_Info("UI", QString("Updating the GitQlient UI from watcher"));
 
-   mGit->updateWipRevision();
+   mGitLoader->updateWipRevision();
 
    mRepoWidget->updateUiFromWatcher();
 
@@ -130,9 +136,9 @@ void GitQlientRepo::setRepository(const QString &newDir)
    {
       QLog_Info("UI", QString("Loading repository at {%1}...").arg(newDir));
 
-      emit mGit->cancelAllProcesses();
+      mGit->cancelAll();
 
-      const auto ok = mGit->loadRepository();
+      const auto ok = mGitLoader->loadRepository();
 
       if (ok)
       {
@@ -248,9 +254,10 @@ void GitQlientRepo::updateProgressDialog()
    }
 }
 
-void GitQlientRepo::closeProgressDialog()
+void GitQlientRepo::onRepoLoadFinished()
 {
    mProgressDlg->close();
+   mRepoWidget->onNewRevisions();
 }
 
 void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
@@ -324,7 +331,7 @@ void GitQlientRepo::closeEvent(QCloseEvent *ce)
    emit closeAllWindows();
    hide();
 
-   emit mGit->cancelAllProcesses();
+   mGit->cancelAll();
 
    QWidget::closeEvent(ce);
 }

@@ -35,6 +35,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
    connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
    connect(mCommitWidget, &WorkInProgressWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
    connect(mCommitWidget, &WorkInProgressWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
+
    connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalOpenFileCommit);
    connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
 
@@ -113,6 +114,11 @@ void HistoryWidget::focusOnCommit(const QString &sha)
 QString HistoryWidget::getCurrentSha() const
 {
    return mRepositoryView->getCurrentSha();
+}
+
+void HistoryWidget::onNewRevisions()
+{
+   mRepositoryModel->onNewRevisions();
 }
 
 void HistoryWidget::goToSha()

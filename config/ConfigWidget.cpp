@@ -23,7 +23,7 @@ using namespace QLogger;
 
 ConfigWidget::ConfigWidget(QWidget *parent)
    : QFrame(parent)
-   , mGit(new Git())
+   , mGit(new Git(""))
    , mOpenRepo(new QPushButton(tr("Open existing repo")))
    , mCloneRepo(new QPushButton(tr("Clone new repo")))
    , mInitRepo(new QPushButton(tr("Init new repo")))

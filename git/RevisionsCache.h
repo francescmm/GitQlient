@@ -36,6 +36,32 @@ struct WorkingDirInfo;
 
 static const auto ZERO_SHA = QString("0000000000000000000000000000000000000000");
 
+struct FileNamesLoader
+{
+   FileNamesLoader()
+      : rf(nullptr)
+   {
+   }
+
+   RevisionFile *rf;
+   QVector<int> rfDirs;
+   QVector<int> rfNames;
+   QVector<QString> files;
+};
+
+struct GitQlientCacheData
+{
+   bool mCacheLocked = true;
+   QVector<CommitInfo *> mCommits;
+   QHash<QString, CommitInfo *> revs;
+   QHash<QString, RevisionFile> mRevsFiles;
+   QHash<QString, Reference> mRefsShaMap;
+   Lanes lns;
+   QVector<QString> mDirNames;
+   QVector<QString> mFileNames;
+   QVector<QString> mUntrackedfiles;
+};
+
 class RevisionsCache : public QObject
 {
    Q_OBJECT
@@ -48,52 +74,34 @@ public:
    void configure(int numElementsToStore);
    void clear();
 
-   int count() const { return mCommits.count(); }
-   int countReferences() const { return mRefsShaMap.count(); }
+   int count() const { return mCacheData.mCommits.count(); }
+   int countReferences() const { return mCacheData.mRefsShaMap.count(); }
 
    CommitInfo getCommitInfoByRow(int row) const;
    CommitInfo getCommitInfo(const QString &sha) const;
-   RevisionFile getRevisionFile(const QString &sha) const { return mRevsFiles.value(sha); }
-   Reference getReference(const QString &sha) const { return mRefsShaMap.value(sha, Reference()); }
+   RevisionFile getRevisionFile(const QString &sha) const { return mCacheData.mRevsFiles.value(sha); }
+   Reference getReference(const QString &sha) const { return mCacheData.mRefsShaMap.value(sha, Reference()); }
 
    void insertCommitInfo(CommitInfo rev);
-   void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevsFiles.insert(sha, file); }
+   void insertRevisionFile(const QString &sha, const RevisionFile &file) { mCacheData.mRevsFiles.insert(sha, file); }
    void insertReference(const QString &sha, Reference ref);
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 
-   void removeReference(const QString &sha) { mRefsShaMap.remove(sha); }
+   void removeReference(const QString &sha) { mCacheData.mRefsShaMap.remove(sha); }
 
-   bool containsRevisionFile(const QString &sha) const { return mRevsFiles.contains(sha); }
+   bool containsRevisionFile(const QString &sha) const { return mCacheData.mRevsFiles.contains(sha); }
 
    RevisionFile parseDiff(const QString &sha, const QString &logDiff);
    int findFileIndex(const RevisionFile &rf, const QString &name);
 
-   void setUntrackedFilesList(const QVector<QString> &untrackedFiles) { mUntrackedfiles = untrackedFiles; }
+   void setUntrackedFilesList(const QVector<QString> &untrackedFiles) { mCacheData.mUntrackedfiles = untrackedFiles; }
    bool pendingLocalChanges() const;
 
+   GitQlientCacheData data() const { return mCacheData; }
+   void setData(const GitQlientCacheData &data) { mCacheData = data; }
+
 private:
-   struct FileNamesLoader
-   {
-      FileNamesLoader()
-         : rf(nullptr)
-      {
-      }
-
-      RevisionFile *rf;
-      QVector<int> rfDirs;
-      QVector<int> rfNames;
-      QVector<QString> files;
-   };
-
-   bool mCacheLocked = true;
-   QVector<CommitInfo *> mCommits;
-   QHash<QString, CommitInfo *> revs;
-   QHash<QString, RevisionFile> mRevsFiles;
-   QHash<QString, Reference> mRefsShaMap;
-   Lanes lns;
-   QVector<QString> mDirNames;
-   QVector<QString> mFileNames;
-   QVector<QString> mUntrackedfiles;
+   GitQlientCacheData mCacheData;
 
    RevisionFile fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
    void updateLanes(CommitInfo &c, Lanes &lns);

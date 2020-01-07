@@ -25,6 +25,8 @@
 
 #include <QFrame>
 
+class RevisionsCache;
+class GitRepoLoader;
 class Git;
 class QCloseEvent;
 class QFileSystemWatcher;
@@ -74,6 +76,8 @@ protected:
 private:
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    QString mCurrentDir;
+   QSharedPointer<RevisionsCache> mGitQlientCache;
+   QSharedPointer<GitRepoLoader> mGitLoader;
    QSharedPointer<Git> mGit;
    HistoryWidget *mRepoWidget = nullptr;
    QStackedLayout *mStackedLayout = nullptr;
@@ -97,7 +101,7 @@ private:
    void executeCommand();
    void showFileHistory(const QString &fileName);
    void updateProgressDialog();
-   void closeProgressDialog();
+   void onRepoLoadFinished();
    void loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
    void showHistoryView();
    void showBlameView();

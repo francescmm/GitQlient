@@ -37,6 +37,7 @@ public:
    void onCommitSelected(const QString &goToSha);
    void onAmendCommit(const QString &sha);
    QString getCurrentSha() const;
+   void onNewRevisions();
 
 private:
    CommitHistoryModel *mRepositoryModel = nullptr;
