@@ -7,4 +7,9 @@ include($$PWD/diff/Diff.pri)
 include($$PWD/git/Git.pri)
 include($$PWD/history/History.pri)
 
+DEFINES += \
+    VER=\\\"$$VERSION\\\" \
+    APP_NAME=\\\"$$TARGET\\\"
 
+RESOURCES += \
+    $$PWD/resources.qrc

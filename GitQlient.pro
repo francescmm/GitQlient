@@ -32,6 +32,3 @@ else:VERSION = 1.0.0
 DEFINES += \
     VER=\\\"$$VERSION\\\" \
     APP_NAME=\\\"$$TARGET\\\"
-
-RESOURCES += \
-    $$PWD/resources.qrc

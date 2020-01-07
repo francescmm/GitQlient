@@ -84,8 +84,11 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 
    if (!mCacheLocked)
    {
-      const auto log = fakeRevFile.count() == mUntrackedfiles.count() ? "No local changes" : "Local changes";
-      CommitInfo c(ZERO_SHA, { parentSha }, "-", QDateTime::currentDateTime().toSecsSinceEpoch(), log, "", 0);
+      QString longLog;
+      const auto author = QString("-");
+      const auto log
+          = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
+      CommitInfo c(ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log, longLog, 0);
       c.isDiffCache = true;
 
       updateLanes(c, lns);
