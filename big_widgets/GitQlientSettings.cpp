@@ -1,5 +1,7 @@
 #include "GitQlientSettings.h"
 
+#include <QVector>
+
 void GitQlientSettings::setValue(const QString &key, const QVariant &value)
 {
    QSettings::setValue(key, value);
