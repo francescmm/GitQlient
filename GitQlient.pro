@@ -28,7 +28,3 @@ OTHER_FILES += $$PWD/Tasks.txt \
 
 win32:VERSION = 1.0.0.0
 else:VERSION = 1.0.0
-
-DEFINES += \
-    VER=\\\"$$VERSION\\\" \
-    APP_NAME=\\\"$$TARGET\\\"
