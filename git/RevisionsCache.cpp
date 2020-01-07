@@ -52,7 +52,7 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
 {
    if (!mCacheLocked && !mCommitsMap.contains(rev.sha()))
    {
-      updateLanes(rev, mLanes);
+      updateLanes(rev);
 
       const auto commit = new CommitInfo(rev);
 
@@ -91,7 +91,7 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
       CommitInfo c(ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log, longLog, 0);
       c.isDiffCache = true;
 
-      updateLanes(c, mLanes);
+      updateLanes(c);
 
       if (mCommits[c.orderIdx])
          c.lanes = mCommits[c.orderIdx]->lanes;
@@ -106,42 +106,42 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
    }
 }
 
-void RevisionsCache::updateLanes(CommitInfo &c, Lanes &lns)
+void RevisionsCache::updateLanes(CommitInfo &c)
 {
    const auto sha = c.sha();
 
-   if (lns.isEmpty())
-      lns.init(c.sha());
+   if (mLanes.isEmpty())
+      mLanes.init(c.sha());
 
    bool isDiscontinuity;
-   bool isFork = lns.isFork(sha, isDiscontinuity);
+   bool isFork = mLanes.isFork(sha, isDiscontinuity);
    bool isMerge = (c.parentsCount() > 1);
    bool isInitial = (c.parentsCount() == 0);
 
    if (isDiscontinuity)
-      lns.changeActiveLane(sha); // uses previous isBoundary state
+      mLanes.changeActiveLane(sha); // uses previous isBoundary state
 
-   lns.setBoundary(c.isBoundary()); // update must be here
+   mLanes.setBoundary(c.isBoundary()); // update must be here
 
    if (isFork)
-      lns.setFork(sha);
+      mLanes.setFork(sha);
    if (isMerge)
-      lns.setMerge(c.parents());
+      mLanes.setMerge(c.parents());
    if (isInitial)
-      lns.setInitial();
+      mLanes.setInitial();
 
-   lns.setLanes(c.lanes); // here lanes are snapshotted
+   mLanes.setLanes(c.lanes); // here lanes are snapshotted
 
-   const QString &nextSha = (isInitial) ? "" : QString(c.parent(0));
+   const auto nextSha = isInitial ? QString() : c.parent(0);
 
-   lns.nextParent(nextSha);
+   mLanes.nextParent(nextSha);
 
    if (isMerge)
-      lns.afterMerge();
+      mLanes.afterMerge();
    if (isFork)
-      lns.afterFork();
-   if (lns.isBranch())
-      lns.afterBranch();
+      mLanes.afterFork();
+   if (mLanes.isBranch())
+      mLanes.afterBranch();
 }
 
 RevisionFile RevisionsCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)

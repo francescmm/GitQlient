@@ -240,7 +240,7 @@ void Lanes::afterBranch()
 
 void Lanes::nextParent(const QString &sha)
 {
-   nextShaVec[activeLane] = (boundary ? "" : sha);
+   nextShaVec[activeLane] = boundary ? QString() : sha;
 }
 
 int Lanes::findNextSha(const QString &next, int pos)

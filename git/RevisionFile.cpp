@@ -2,10 +2,10 @@
 
 bool RevisionFile::statusCmp(int idx, RevisionFile::StatusFlag sf) const
 {
-   if (idx >= status.count())
+   if (idx >= mFileStatus.count())
       return false;
 
-   return (mOnlyModified ? MODIFIED : status.at(static_cast<int>(idx))) & sf;
+   return (mOnlyModified ? MODIFIED : mFileStatus.at(static_cast<int>(idx))) & sf;
 }
 
 const QString RevisionFile::extendedStatus(int idx) const
@@ -15,7 +15,7 @@ const QString RevisionFile::extendedStatus(int idx) const
          that could be lower then count(), so we have to explicitly check for
          an out of bound condition.
       */
-   return !extStatus.isEmpty() && idx < extStatus.count() ? extStatus.at(idx) : "";
+   return !mRenamedFiles.isEmpty() && idx < mRenamedFiles.count() ? mRenamedFiles.at(idx) : "";
 }
 
 void RevisionFile::setStatus(const QString &rowSt)
@@ -24,34 +24,34 @@ void RevisionFile::setStatus(const QString &rowSt)
    {
       case 'M':
       case 'T':
-         status.append(RevisionFile::MODIFIED);
+         mFileStatus.append(RevisionFile::MODIFIED);
          break;
       case 'U':
-         status.append(RevisionFile::MODIFIED);
-         status[status.count() - 1] |= RevisionFile::CONFLICT;
+         mFileStatus.append(RevisionFile::MODIFIED);
+         mFileStatus[mFileStatus.count() - 1] |= RevisionFile::CONFLICT;
          mOnlyModified = false;
          break;
       case 'D':
-         status.append(RevisionFile::DELETED);
+         mFileStatus.append(RevisionFile::DELETED);
          mOnlyModified = false;
          break;
       case 'A':
-         status.append(RevisionFile::NEW);
+         mFileStatus.append(RevisionFile::NEW);
          mOnlyModified = false;
          break;
       case '?':
-         status.append(RevisionFile::UNKNOWN);
+         mFileStatus.append(RevisionFile::UNKNOWN);
          mOnlyModified = false;
          break;
       default:
-         status.append(RevisionFile::MODIFIED);
+         mFileStatus.append(RevisionFile::MODIFIED);
          break;
    }
 }
 
 void RevisionFile::setStatus(RevisionFile::StatusFlag flag)
 {
-   status.append(flag);
+   mFileStatus.append(flag);
 
    if (flag == RevisionFile::DELETED || flag == RevisionFile::NEW || flag == RevisionFile::UNKNOWN)
       mOnlyModified = false;
@@ -59,10 +59,10 @@ void RevisionFile::setStatus(RevisionFile::StatusFlag flag)
 
 void RevisionFile::setStatus(int pos, RevisionFile::StatusFlag flag)
 {
-   status[pos] = flag;
+   mFileStatus[pos] = flag;
 }
 
 void RevisionFile::appendStatus(int pos, RevisionFile::StatusFlag flag)
 {
-   status[pos] |= flag;
+   mFileStatus[pos] |= flag;
 }

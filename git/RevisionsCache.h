@@ -96,7 +96,7 @@ private:
    };
 
    RevisionFile fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
-   void updateLanes(CommitInfo &c, Lanes &mLanes);
+   void updateLanes(CommitInfo &c);
    RevisionFile parseDiffFormat(const QString &buf, FileNamesLoader &fl);
    void appendFileName(const QString &name, FileNamesLoader &fl);
    void flushFileNames(FileNamesLoader &fl);
