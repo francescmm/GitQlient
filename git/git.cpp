@@ -337,12 +337,12 @@ bool Git::apply(const QString &fileName, bool asCommit)
 
 GitExecResult Git::push(bool force)
 {
-   const auto ret = run(QString("git push ").append(force ? QString("--force") : QString()));
+   return run(QString("git push ").append(force ? QString("--force") : QString()));
+}
 
-   if (ret.second.contains("has no upstream branch"))
-      return run(QString("git push --set-upstream origin %1").arg(mCurrentBranchName));
-
-   return ret;
+GitExecResult Git::pushUpstream(const QString &branchName)
+{
+   return run(QString("git push --set-upstream origin %1").arg(branchName));
 }
 
 GitExecResult Git::pull()
@@ -474,6 +474,13 @@ GitExecResult Git::getLastCommitOfBranch(const QString &branch)
 GitExecResult Git::prune()
 {
    return run("git remote prune origin");
+}
+
+QString Git::getCurrentBranch() const
+{
+   const auto ret = run("git rev-parse --abbrev-ref HEAD");
+
+   return ret.first ? ret.second.trimmed() : QString();
 }
 
 QVector<QString> Git::getTags() const

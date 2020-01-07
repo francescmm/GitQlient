@@ -72,7 +72,15 @@ void BranchContextMenu::push()
    const auto ret = mConfig.mGit->push();
    QApplication::restoreOverrideCursor();
 
-   if (ret.success)
+   if (ret.output.toString().contains("has no upstream branch"))
+   {
+      BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::PUSH_UPSTREAM, mConfig.mGit });
+      const auto ret = dlg.exec();
+
+      if (ret == QDialog::Accepted)
+         emit signalBranchesUpdated();
+   }
+   else if (ret.success)
       emit signalBranchesUpdated();
    else
       QMessageBox::critical(this, tr("Push failed"), ret.output.toString());

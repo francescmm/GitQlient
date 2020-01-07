@@ -39,6 +39,11 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
       setWindowTitle("Stash branch");
       // ui->leOldName->setHidden(true);
    }
+   else if (mConfig.mDialogMode == BranchDlgMode::PUSH_UPSTREAM)
+   {
+      setWindowTitle("Push upstream branch");
+      ui->pbAccept->setText(tr("Push"));
+   }
 
    connect(ui->leNewName, &QLineEdit::editingFinished, this, &BranchDlg::checkNewBranchName);
    connect(ui->leNewName, &QLineEdit::returnPressed, this, &BranchDlg::accept);
@@ -75,6 +80,8 @@ void BranchDlg::accept()
          mConfig.mGit->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::STASH_BRANCH)
          mConfig.mGit->stashBranch(ui->leOldName->text(), ui->leNewName->text());
+      else if (mConfig.mDialogMode == BranchDlgMode::PUSH_UPSTREAM)
+         mConfig.mGit->pushUpstream(ui->leNewName->text());
 
       QApplication::restoreOverrideCursor();
 

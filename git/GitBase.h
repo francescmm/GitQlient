@@ -44,25 +44,20 @@ public:
    void setWorkingDirectory(const QString &wd) { mWorkingDir = wd; }
    bool loadRepository(const QString &wd);
    QString getWorkingDir() const { return mWorkingDir; }
-   QString getCurrentBranchName() const { return mCurrentBranchName; }
    void updateWipRevision();
    bool pendingLocalChanges();
 
 protected:
    QSharedPointer<RevisionsCache> mRevCache;
    QString mWorkingDir;
-   QString mGitDir;
-   QString mCurrentBranchName;
 
    QPair<bool, QString> run(const QString &cmd) const;
 
 private:
    bool mIsLoading = false;
 
-   bool setGitDbDir(const QString &wd);
-   void setBaseDir(const QString &wd);
-   bool loadReferences();
-   bool loadCurrentBranch();
+   bool configureRepoDirectory(const QString &wd);
+   void loadReferences();
    void requestRevisions();
    void processRevision(const QByteArray &ba);
    QVector<QString> getUntrackedFiles() const;

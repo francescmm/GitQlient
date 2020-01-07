@@ -97,7 +97,7 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    QString auxMessage;
    const auto sha = r.sha();
 
-   if ((mGit->checkRef(sha) & CUR_BRANCH) && mGit->getCurrentBranchName().isEmpty())
+   if ((mGit->checkRef(sha) & CUR_BRANCH) && mGit->getCurrentBranch().isEmpty())
       auxMessage.append("<p>Status: <b>detached</b></p>");
 
    const auto localBranches = mGit->getRefNames(sha, BRANCH);

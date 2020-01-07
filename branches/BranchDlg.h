@@ -38,7 +38,8 @@ enum class BranchDlgMode
    CREATE_CHECKOUT,
    CREATE_FROM_COMMIT,
    RENAME,
-   STASH_BRANCH
+   STASH_BRANCH,
+   PUSH_UPSTREAM
 };
 
 struct BranchDlgConfig

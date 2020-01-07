@@ -74,7 +74,7 @@ public:
    GitExecResult getBranchesOfCommit(const QString &sha);
    GitExecResult getLastCommitOfBranch(const QString &branch);
    GitExecResult prune();
-
+   QString getCurrentBranch() const;
    /* END BRANCHES */
 
    /* START TAGS */
@@ -101,6 +101,7 @@ public:
    GitExecResult exportPatch(const QStringList &shaList);
    bool apply(const QString &fileName, bool asCommit = false);
    GitExecResult push(bool force = false);
+   GitExecResult pushUpstream(const QString &branchName);
    GitExecResult pull();
    bool fetch();
    GitExecResult cherryPickCommit(const QString &sha);

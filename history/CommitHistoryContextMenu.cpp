@@ -62,7 +62,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          addBranchActions(sha);
 
-         const auto ret = mGit->getLastCommitOfBranch(mGit->getCurrentBranchName());
+         const auto ret = mGit->getLastCommitOfBranch(mGit->getCurrentBranch());
 
          if (ret.success)
          {
@@ -248,7 +248,16 @@ void CommitHistoryContextMenu::push()
    const auto ret = mGit->push();
    QApplication::restoreOverrideCursor();
 
-   if (ret.success)
+   if (ret.output.toString().contains("has no upstream branch"))
+   {
+      const auto currentBranch = mGit->getCurrentBranch();
+      BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mGit });
+      const auto ret = dlg.exec();
+
+      if (ret == QDialog::Accepted)
+         emit signalRepositoryUpdated();
+   }
+   else if (ret.success)
       emit signalRepositoryUpdated();
    else
       QMessageBox::critical(this, tr("Error while pushin"), ret.output.toString());
@@ -300,7 +309,7 @@ void CommitHistoryContextMenu::resetHard()
 void CommitHistoryContextMenu::merge(const QString &branchFrom)
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto currentBranch = mGit->getCurrentBranchName();
+   const auto currentBranch = mGit->getCurrentBranch();
    const auto ret = mGit->merge(currentBranch, { branchFrom });
    QApplication::restoreOverrideCursor();
 
@@ -320,7 +329,7 @@ void CommitHistoryContextMenu::merge(const QString &branchFrom)
 void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 {
    auto isCommitInCurrentBranch = false;
-   const auto currentBranch = mGit->getCurrentBranchName();
+   const auto currentBranch = mGit->getCurrentBranch();
    const auto remoteBranches = mGit->getRefNames(sha, RMT_BRANCH);
    const auto localBranches = mGit->getRefNames(sha, BRANCH);
    auto branches = localBranches;

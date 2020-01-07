@@ -336,7 +336,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 {
    QMap<QString, QColor> markValues;
    auto ref_types = mGit->checkRef(sha);
-   const auto currentBranch = mGit->getCurrentBranchName();
+   const auto currentBranch = mGit->getCurrentBranch();
 
    if (ref_types != 0)
    {

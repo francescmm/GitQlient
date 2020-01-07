@@ -2,6 +2,7 @@
 
 #include <git.h>
 #include <GitQlientStyles.h>
+#include <BranchDlg.h>
 
 #include <QApplication>
 #include <QToolButton>
@@ -198,7 +199,16 @@ void Controls::pushCurrentBranch()
    const auto ret = mGit->push();
    QApplication::restoreOverrideCursor();
 
-   if (ret.success)
+   if (ret.output.toString().contains("has no upstream branch"))
+   {
+      const auto currentBranch = mGit->getCurrentBranch();
+      BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mGit });
+      const auto dlgRet = dlg.exec();
+
+      if (dlgRet == QDialog::Accepted)
+         emit signalRepositoryUpdated();
+   }
+   else if (ret.success)
       emit signalRepositoryUpdated();
    else
       QMessageBox::critical(this, tr("Error while pushing"), ret.output.toString());

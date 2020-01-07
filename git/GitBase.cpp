@@ -35,135 +35,82 @@ bool GitBase::loadRepository(const QString &wd)
 
       mRevCache->clear();
 
-      const auto isGIT = setGitDbDir(wd);
-
-      if (!isGIT)
-         return false;
-
       mIsLoading = true;
 
-      setBaseDir(wd);
-
-      loadReferences();
-
-      requestRevisions();
-
-      QLog_Info("Git", "... Git init finished");
-
-      return true;
-   }
-
-   return false;
-}
-
-bool GitBase::setGitDbDir(const QString &wd)
-{
-   auto tmp = mWorkingDir;
-   mWorkingDir = wd;
-
-   const auto success = run("git rev-parse --git-dir"); // run under newWorkDir
-   mWorkingDir = tmp;
-
-   const auto runOutput = success.second.trimmed();
-
-   if (success.first)
-   {
-      QDir d(runOutput.startsWith("/") ? runOutput : wd + "/" + runOutput);
-      mGitDir = d.absolutePath();
-   }
-
-   return success.first;
-}
-
-void GitBase::setBaseDir(const QString &wd)
-{
-   auto tmp = mWorkingDir;
-   mWorkingDir = wd;
-
-   const auto ret = run("git rev-parse --show-cdup");
-   mWorkingDir = tmp;
-
-   auto baseDir = wd;
-
-   if (ret.first)
-   {
-      QDir d(QString("%1/%2").arg(wd, ret.second.trimmed()));
-      baseDir = d.absolutePath();
-   }
-
-   if (ret.first)
-      mWorkingDir = baseDir;
-}
-
-bool GitBase::loadReferences()
-{
-   const auto branchLoaded = loadCurrentBranch();
-
-   if (branchLoaded)
-   {
-      const auto ret3 = run("git show-ref -d");
-
-      if (ret3.first)
+      if (configureRepoDirectory(wd))
       {
-         auto ret = run("git rev-parse HEAD");
+         loadReferences();
 
-         if (ret.first)
-            ret.second.remove(ret.second.count() - 1, ret.second.count());
+         requestRevisions();
 
-         QString prevRefSha;
-         const auto curBranchSHA = ret.second;
-         const auto referencesList = ret3.second.split('\n', QString::SkipEmptyParts);
+         QLog_Info("Git", "... Git init finished");
 
-         for (auto reference : referencesList)
-         {
-            const auto revSha = reference.left(40);
-            const auto refName = reference.mid(41);
-
-            // one Revision could have many tags
-            auto cur = mRevCache->getReference(revSha);
-            cur.configure(refName, curBranchSHA == revSha, prevRefSha);
-
-            mRevCache->insertReference(revSha, std::move(cur));
-
-            if (refName.startsWith("refs/tags/") && refName.endsWith("^{}") && !prevRefSha.isEmpty())
-               mRevCache->removeReference(prevRefSha);
-
-            prevRefSha = revSha;
-         }
-
-         // mark current head (even when detached)
-         auto cur = mRevCache->getReference(curBranchSHA);
-         cur.type |= CUR_BRANCH;
-         mRevCache->insertReference(curBranchSHA, std::move(cur));
-
-         return mRevCache->countReferences() > 0;
+         return true;
       }
    }
 
    return false;
 }
 
-bool GitBase::loadCurrentBranch()
+bool GitBase::configureRepoDirectory(const QString &wd)
 {
-   const auto ret2 = run("git branch");
+   if (mWorkingDir != wd)
+   {
+      mWorkingDir = wd;
 
-   if (!ret2.first)
+      const auto ret = run("git rev-parse --show-cdup");
+
+      if (ret.first)
+      {
+         QDir d(QString("%1/%2").arg(wd, ret.second.trimmed()));
+         mWorkingDir = d.absolutePath();
+
+         return true;
+      }
+
       return false;
-
-   const auto branches = ret2.second.trimmed().split('\n');
-   for (auto branch : branches)
-   {
-      if (branch.startsWith("*"))
-      {
-         mCurrentBranchName = branch.remove("*").trimmed();
-         break;
-      }
    }
-
-   if (mCurrentBranchName.contains(" detached "))
-      mCurrentBranchName = "";
 
    return true;
+}
+
+void GitBase::loadReferences()
+{
+   const auto ret3 = run("git show-ref -d");
+
+   if (ret3.first)
+   {
+      auto ret = run("git rev-parse HEAD");
+
+      if (ret.first)
+         ret.second.remove(ret.second.count() - 1, ret.second.count());
+
+      QString prevRefSha;
+      const auto curBranchSHA = ret.second;
+      const auto referencesList = ret3.second.split('\n', QString::SkipEmptyParts);
+
+      for (auto reference : referencesList)
+      {
+         const auto revSha = reference.left(40);
+         const auto refName = reference.mid(41);
+
+         // one Revision could have many tags
+         auto cur = mRevCache->getReference(revSha);
+         cur.configure(refName, curBranchSHA == revSha, prevRefSha);
+
+         mRevCache->insertReference(revSha, std::move(cur));
+
+         if (refName.startsWith("refs/tags/") && refName.endsWith("^{}") && !prevRefSha.isEmpty())
+            mRevCache->removeReference(prevRefSha);
+
+         prevRefSha = revSha;
+      }
+
+      // mark current head (even when detached)
+      auto cur = mRevCache->getReference(curBranchSHA);
+      cur.type |= CUR_BRANCH;
+      mRevCache->insertReference(curBranchSHA, std::move(cur));
+   }
 }
 
 void GitBase::requestRevisions()
