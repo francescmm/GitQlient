@@ -11,7 +11,7 @@ void RevisionsCache::configure(int numElementsToStore)
    {
       // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
       mCommits.resize(numElementsToStore + 1);
-      revs.reserve(numElementsToStore + 1);
+      mCommitsMap.reserve(numElementsToStore + 1);
    }
 
    mCacheLocked = false;
@@ -30,16 +30,16 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
    {
       CommitInfo *c;
 
-      c = revs.value(sha, nullptr);
+      c = mCommitsMap.value(sha, nullptr);
 
       if (c == nullptr)
       {
-         const auto shas = revs.keys();
+         const auto shas = mCommitsMap.keys();
          const auto it = std::find_if(shas.cbegin(), shas.cend(),
                                       [sha](const QString &shaToCompare) { return shaToCompare.startsWith(sha); });
 
          if (it != shas.cend())
-            return *revs.value(*it);
+            return *mCommitsMap.value(*it);
       }
       else
          return *c;
@@ -50,9 +50,9 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 
 void RevisionsCache::insertCommitInfo(CommitInfo rev)
 {
-   if (!mCacheLocked && !revs.contains(rev.sha()))
+   if (!mCacheLocked && !mCommitsMap.contains(rev.sha()))
    {
-      updateLanes(rev, lns);
+      updateLanes(rev, mLanes);
 
       const auto commit = new CommitInfo(rev);
 
@@ -64,16 +64,16 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
          mCommits[rev.orderIdx] = commit;
       }
 
-      revs.insert(rev.sha(), commit);
+      mCommitsMap.insert(rev.sha(), commit);
 
-      if (revs.contains(rev.parent(0)))
-         revs.remove(rev.parent(0));
+      if (mCommitsMap.contains(rev.parent(0)))
+         mCommitsMap.remove(rev.parent(0));
    }
 }
 
 void RevisionsCache::insertReference(const QString &sha, Reference ref)
 {
-   mRefsShaMap[sha] = std::move(ref);
+   mReferencesMap[sha] = std::move(ref);
 }
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
@@ -91,7 +91,7 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
       CommitInfo c(ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log, longLog, 0);
       c.isDiffCache = true;
 
-      updateLanes(c, lns);
+      updateLanes(c, mLanes);
 
       if (mCommits[c.orderIdx])
          c.lanes = mCommits[c.orderIdx]->lanes;
@@ -102,7 +102,7 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
       delete mCommits[commit->orderIdx];
       mCommits[commit->orderIdx] = commit;
 
-      revs.insert(sha, commit);
+      mCommitsMap.insert(sha, commit);
    }
 }
 
@@ -260,7 +260,7 @@ int RevisionsCache::findFileIndex(const RevisionFile &rf, const QString &name)
 bool RevisionsCache::pendingLocalChanges() const
 {
    const auto rf = getRevisionFile(ZERO_SHA);
-   return mRevsFiles.value(ZERO_SHA).count() == mUntrackedfiles.count();
+   return mRevisionFilesMap.value(ZERO_SHA).count() == mUntrackedfiles.count();
 }
 
 void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
@@ -317,10 +317,10 @@ void RevisionsCache::clear()
    mCacheLocked = true;
    mDirNames.clear();
    mFileNames.clear();
-   mRevsFiles.clear();
-   mRefsShaMap.clear();
-   lns.clear();
-   revs.clear();
+   mRevisionFilesMap.clear();
+   mReferencesMap.clear();
+   mLanes.clear();
+   mCommitsMap.clear();
 }
 
 RevisionFile RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)

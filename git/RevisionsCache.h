@@ -49,21 +49,21 @@ public:
    void clear();
 
    int count() const { return mCommits.count(); }
-   int countReferences() const { return mRefsShaMap.count(); }
+   int countReferences() const { return mReferencesMap.count(); }
 
    CommitInfo getCommitInfoByRow(int row) const;
    CommitInfo getCommitInfo(const QString &sha) const;
-   RevisionFile getRevisionFile(const QString &sha) const { return mRevsFiles.value(sha); }
-   Reference getReference(const QString &sha) const { return mRefsShaMap.value(sha, Reference()); }
+   RevisionFile getRevisionFile(const QString &sha) const { return mRevisionFilesMap.value(sha); }
+   Reference getReference(const QString &sha) const { return mReferencesMap.value(sha, Reference()); }
 
    void insertCommitInfo(CommitInfo rev);
-   void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevsFiles.insert(sha, file); }
+   void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevisionFilesMap.insert(sha, file); }
    void insertReference(const QString &sha, Reference ref);
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 
-   void removeReference(const QString &sha) { mRefsShaMap.remove(sha); }
+   void removeReference(const QString &sha) { mReferencesMap.remove(sha); }
 
-   bool containsRevisionFile(const QString &sha) const { return mRevsFiles.contains(sha); }
+   bool containsRevisionFile(const QString &sha) const { return mRevisionFilesMap.contains(sha); }
 
    RevisionFile parseDiff(const QString &sha, const QString &logDiff);
    int findFileIndex(const RevisionFile &rf, const QString &name);
@@ -74,10 +74,10 @@ public:
 private:
    bool mCacheLocked = true;
    QVector<CommitInfo *> mCommits;
-   QHash<QString, CommitInfo *> revs;
-   QHash<QString, RevisionFile> mRevsFiles;
-   QHash<QString, Reference> mRefsShaMap;
-   Lanes lns;
+   QHash<QString, CommitInfo *> mCommitsMap;
+   QHash<QString, RevisionFile> mRevisionFilesMap;
+   QHash<QString, Reference> mReferencesMap;
+   Lanes mLanes;
    QVector<QString> mDirNames;
    QVector<QString> mFileNames;
    QVector<QString> mUntrackedfiles;
@@ -96,7 +96,7 @@ private:
    };
 
    RevisionFile fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
-   void updateLanes(CommitInfo &c, Lanes &lns);
+   void updateLanes(CommitInfo &c, Lanes &mLanes);
    RevisionFile parseDiffFormat(const QString &buf, FileNamesLoader &fl);
    void appendFileName(const QString &name, FileNamesLoader &fl);
    void flushFileNames(FileNamesLoader &fl);
