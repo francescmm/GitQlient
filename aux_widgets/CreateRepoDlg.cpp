@@ -100,8 +100,7 @@ void CreateRepoDlg::accept()
       {
          if (ui->cbGitUser->isChecked())
          {
-            Git git;
-            git.setWorkingDirectory(fullPath);
+            Git git(fullPath);
             git.setLocalUserInfo({ ui->leGitName->text(), ui->leGitEmail->text() });
          }
 

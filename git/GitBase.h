@@ -40,15 +40,13 @@ signals:
 
 public:
    explicit GitBase(QObject *parent = nullptr);
-
-   void setWorkingDirectory(const QString &wd) { mWorkingDir = wd; }
+   explicit GitBase(const QString &workingDirectory, QObject *parent = nullptr);
    bool loadRepository(const QString &wd);
    QString getWorkingDir() const { return mWorkingDir; }
    void updateWipRevision();
-   bool pendingLocalChanges();
 
 protected:
-   QSharedPointer<RevisionsCache> mRevCache;
+   QScopedPointer<RevisionsCache> mRevCache;
    QString mWorkingDir;
 
    QPair<bool, QString> run(const QString &cmd) const;

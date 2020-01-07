@@ -36,6 +36,11 @@ Git::Git()
 {
 }
 
+Git::Git(const QString &workingDirectory)
+   : GitBase(workingDirectory)
+{
+}
+
 uint Git::checkRef(const QString &sha, uint mask) const
 {
    const auto ref = mRevCache->getReference(sha);
@@ -226,6 +231,11 @@ GitExecResult Git::markFileAsResolved(const QString &fileName)
       updateWipRevision();
 
    return ret;
+}
+
+bool Git::pendingLocalChanges()
+{
+   return mRevCache->pendingLocalChanges();
 }
 
 GitExecResult Git::merge(const QString &into, QStringList sources)

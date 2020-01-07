@@ -45,6 +45,7 @@ public:
    };
 
    explicit Git();
+   explicit Git(const QString &workingDirectory);
 
    /* START Git CONFIGURATION */
    bool clone(const QString &url, const QString &fullPath);
@@ -108,6 +109,7 @@ public:
    bool resetCommits(int parentDepth);
    GitExecResult checkoutCommit(const QString &sha);
    GitExecResult markFileAsResolved(const QString &fileName);
+   bool pendingLocalChanges();
    /* END COMMIT WORK */
 
    /* START COMMIT INFO */

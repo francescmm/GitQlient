@@ -16,6 +16,13 @@ GitBase::GitBase(QObject *parent)
 {
 }
 
+GitBase::GitBase(const QString &workingDirectory, QObject *parent)
+   : QObject(parent)
+   , mRevCache(new RevisionsCache())
+   , mWorkingDir(workingDirectory)
+{
+}
+
 QPair<bool, QString> GitBase::run(const QString &runCmd) const
 {
    QString runOutput;
@@ -173,11 +180,6 @@ void GitBase::updateWipRevision()
 
       mRevCache->updateWipCommit(parentSha, diffIndex, diffIndexCached);
    }
-}
-
-bool GitBase::pendingLocalChanges()
-{
-   return mRevCache->pendingLocalChanges();
 }
 
 QVector<QString> GitBase::getUntrackedFiles() const
