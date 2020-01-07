@@ -326,7 +326,7 @@ GitExecResult Git::exportPatch(const QStringList &shaList)
          const auto newFileName = QString("%1-%2").arg(number, text);
          files.append(newFileName);
 
-         QFile::rename(QString("%1/%2").arg(mWorkingDir, filename), QString("%1/%2").arg(mWorkingDir, newFileName));
+         QFile::rename(QString("%1/%2").arg(mWorkingDirectory, filename), QString("%1/%2").arg(mWorkingDirectory, newFileName));
          ++val;
       }
    }
@@ -585,7 +585,7 @@ QVector<QString> Git::getStashes()
 
 bool Git::clone(const QString &url, const QString &fullPath)
 {
-   const auto asyncRun = new GitCloneProcess(mWorkingDir);
+   const auto asyncRun = new GitCloneProcess(mWorkingDirectory);
    connect(asyncRun, &GitCloneProcess::signalProgress, this, &Git::signalCloningProgress, Qt::DirectConnection);
 
    QString buffer;

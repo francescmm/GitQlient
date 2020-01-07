@@ -27,9 +27,9 @@
 
 using namespace QLogger;
 
-GitQlientRepo::GitQlientRepo(QWidget *parent)
+GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    : QFrame(parent)
-   , mGit(new Git())
+   , mGit(new Git(repoPath))
    , mRepoWidget(new HistoryWidget(mGit))
    , mStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGit))
@@ -80,6 +80,8 @@ GitQlientRepo::GitQlientRepo(QWidget *parent)
 
    connect(mGit.get(), &Git::signalLoadingStarted, this, &GitQlientRepo::updateProgressDialog, Qt::DirectConnection);
    connect(mGit.get(), &Git::signalLoadingFinished, this, &GitQlientRepo::closeProgressDialog, Qt::DirectConnection);
+
+   setRepository(repoPath);
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
@@ -103,7 +105,7 @@ void GitQlientRepo::updateCache()
 
       mRepoWidget->clear();
 
-      mGit->loadRepository(mCurrentDir);
+      mGit->loadRepository();
 
       mRepoWidget->reload();
 
@@ -130,7 +132,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
       emit mGit->cancelAllProcesses();
 
-      const auto ok = mGit->loadRepository(newDir);
+      const auto ok = mGit->loadRepository();
 
       if (ok)
       {

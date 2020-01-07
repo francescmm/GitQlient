@@ -19,14 +19,14 @@ GitBase::GitBase(QObject *parent)
 GitBase::GitBase(const QString &workingDirectory, QObject *parent)
    : QObject(parent)
    , mRevCache(new RevisionsCache())
-   , mWorkingDir(workingDirectory)
+   , mWorkingDirectory(workingDirectory)
 {
 }
 
 QPair<bool, QString> GitBase::run(const QString &runCmd) const
 {
    QString runOutput;
-   GitSyncProcess p(mWorkingDir);
+   GitSyncProcess p(mWorkingDirectory);
    connect(this, &GitBase::cancelAllProcesses, &p, &AGitProcess::onCancel);
 
    const auto ret = p.run(runCmd, runOutput);
@@ -34,25 +34,34 @@ QPair<bool, QString> GitBase::run(const QString &runCmd) const
    return qMakePair(ret, runOutput);
 }
 
-bool GitBase::loadRepository(const QString &wd)
+bool GitBase::loadRepository()
 {
-   if (!mIsLoading)
+   if (mIsLoading)
+      QLog_Warning("Git", "Git is currently loading data.");
+   else
    {
-      QLog_Info("Git", "Initializing Git...");
-
-      mRevCache->clear();
-
-      mIsLoading = true;
-
-      if (configureRepoDirectory(wd))
+      if (mWorkingDirectory.isEmpty())
+         QLog_Error("Git", "No working directory set.");
+      else
       {
-         loadReferences();
+         QLog_Info("Git", "Initializing Git...");
 
-         requestRevisions();
+         mRevCache->clear();
 
-         QLog_Info("Git", "... Git init finished");
+         mIsLoading = true;
 
-         return true;
+         if (configureRepoDirectory(mWorkingDirectory))
+         {
+            loadReferences();
+
+            requestRevisions();
+
+            QLog_Info("Git", "... Git init finished");
+
+            return true;
+         }
+         else
+            QLog_Error("Git", "The working directory is not a Git repository.");
       }
    }
 
@@ -61,16 +70,16 @@ bool GitBase::loadRepository(const QString &wd)
 
 bool GitBase::configureRepoDirectory(const QString &wd)
 {
-   if (mWorkingDir != wd)
+   if (mWorkingDirectory != wd)
    {
-      mWorkingDir = wd;
+      mWorkingDirectory = wd;
 
       const auto ret = run("git rev-parse --show-cdup");
 
       if (ret.first)
       {
          QDir d(QString("%1/%2").arg(wd, ret.second.trimmed()));
-         mWorkingDir = d.absolutePath();
+         mWorkingDirectory = d.absolutePath();
 
          return true;
       }
@@ -126,7 +135,7 @@ void GitBase::requestRevisions()
                             .append(GIT_LOG_FORMAT)
                             .append(" --all");
 
-   const auto requestor = new GitRequestorProcess(mWorkingDir);
+   const auto requestor = new GitRequestorProcess(mWorkingDirectory);
    connect(requestor, &GitRequestorProcess::procDataReady, this, &GitBase::processRevision);
    connect(this, &GitBase::cancelAllProcesses, requestor, &AGitProcess::onCancel);
 
@@ -188,7 +197,7 @@ QVector<QString> GitBase::getUntrackedFiles() const
 
    auto runCmd = QString("git ls-files --others");
    const auto exFile = QString(".git/info/exclude");
-   const auto path = QString("%1/%2").arg(mWorkingDir, exFile);
+   const auto path = QString("%1/%2").arg(mWorkingDirectory, exFile);
 
    if (QFile::exists(path))
       runCmd.append(QString(" --exclude-from=$%1$").arg(exFile));
