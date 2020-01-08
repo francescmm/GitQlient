@@ -41,6 +41,7 @@ public:
    QPair<bool, QString> run(const QString &cmd) const;
    QString getWorkingDir() const { return mWorkingDirectory; }
    void setWorkingDir(const QString &workingDir) { mWorkingDirectory = workingDir; }
+   QString getCurrentBranch() const;
 
 protected:
    QString mWorkingDirectory;

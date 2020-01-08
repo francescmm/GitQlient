@@ -45,8 +45,11 @@ public:
    bool loadRepository();
    void updateWipRevision();
    void cancelAll();
+   void setShowAll(bool showAll = true) { mShowAll = showAll; }
+   bool showsAll() const { return mShowAll; }
 
 private:
+   bool mShowAll = true;
    bool mLocked = false;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<RevisionsCache> mRevCache;

@@ -492,9 +492,7 @@ GitExecResult Git::prune()
 
 QString Git::getCurrentBranch() const
 {
-   const auto ret = mGitBase->run("git rev-parse --abbrev-ref HEAD");
-
-   return ret.first ? ret.second.trimmed() : QString();
+   return mGitBase->getCurrentBranch();
 }
 
 QVector<QString> Git::getTags() const

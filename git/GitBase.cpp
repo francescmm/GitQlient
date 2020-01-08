@@ -24,3 +24,10 @@ QPair<bool, QString> GitBase::run(const QString &runCmd) const
 
    return qMakePair(ret, runOutput);
 }
+
+QString GitBase::getCurrentBranch() const
+{
+   const auto ret = run("git rev-parse --abbrev-ref HEAD");
+
+   return ret.first ? ret.second.trimmed() : QString();
+}
