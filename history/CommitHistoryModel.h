@@ -46,7 +46,7 @@ public:
    int rowCount(const QModelIndex &par = QModelIndex()) const override;
    bool hasChildren(const QModelIndex &par = QModelIndex()) const override;
    int columnCount(const QModelIndex &) const override { return mColumns.count(); }
-   void onNewRevisions();
+   void onNewRevisions(int totalCommits);
 
 private:
    QSharedPointer<Git> mGit;

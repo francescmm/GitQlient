@@ -131,9 +131,9 @@ QString HistoryWidget::getCurrentSha() const
    return mRepositoryView->getCurrentSha();
 }
 
-void HistoryWidget::onNewRevisions()
+void HistoryWidget::onNewRevisions(int totalCommits)
 {
-   mRepositoryModel->onNewRevisions();
+   mRepositoryModel->onNewRevisions(totalCommits);
 }
 
 void HistoryWidget::goToSha()

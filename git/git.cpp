@@ -585,11 +585,6 @@ QVector<QString> Git::getStashes()
    return stashes;
 }
 
-int Git::totalCommits() const
-{
-   return mCache->count();
-}
-
 CommitInfo Git::getCommitInfoByRow(int row) const
 {
    return mCache->getCommitInfoByRow(row);

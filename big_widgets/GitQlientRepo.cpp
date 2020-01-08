@@ -158,7 +158,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          emit signalRepoOpened();
 
-         mCurrentDir = mGit->getWorkingDir();
+         mCurrentDir = mGitBase->getWorkingDir();
          setWidgetsEnabled(true);
 
          setWatcher();
@@ -270,7 +270,7 @@ void GitQlientRepo::updateProgressDialog()
 void GitQlientRepo::onRepoLoadFinished()
 {
    mProgressDlg->close();
-   mRepoWidget->onNewRevisions();
+   mRepoWidget->onNewRevisions(mGitQlientCache->count());
 }
 
 void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
@@ -302,7 +302,7 @@ void GitQlientRepo::showDiffView()
 void GitQlientRepo::openCommitDiff()
 {
    const auto currentSha = mRepoWidget->getCurrentSha();
-   const auto rev = mGit->getCommitInfo(currentSha);
+   const auto rev = mGitQlientCache->getCommitInfo(currentSha);
 
    mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
 

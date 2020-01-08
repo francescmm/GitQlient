@@ -43,12 +43,12 @@ void CommitHistoryModel::clear()
 {
    beginResetModel();
    curFNames.clear();
-   rowCnt = mGit->totalCommits();
+   rowCnt = 0;
    endResetModel();
    emit headerDataChanged(Qt::Horizontal, 0, 5);
 }
 
-void CommitHistoryModel::onNewRevisions()
+void CommitHistoryModel::onNewRevisions(int totalCommits)
 {
    // do not process revisions if there are possible renamed points
    // or pending renamed patch to apply
@@ -56,7 +56,7 @@ void CommitHistoryModel::onNewRevisions()
       return;
 
    // do not attempt to insert 0 rows since the inclusive range would be invalid
-   const auto revisionsCount = mGit->totalCommits();
+   const auto revisionsCount = totalCommits;
    if (rowCnt == revisionsCount)
    {
       beginResetModel();

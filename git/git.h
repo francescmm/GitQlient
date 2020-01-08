@@ -40,7 +40,6 @@ public:
    explicit Git(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent = nullptr);
 
    /* START CACHE */
-   int totalCommits() const;
    CommitInfo getCommitInfoByRow(int row) const;
    CommitInfo getCommitInfo(const QString &sha);
    /*  END  CACHE */
