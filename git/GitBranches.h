@@ -23,26 +23,19 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QDialog>
+#include <GitExecResult.h>
 
-class GitSubmodules;
+#include <QSharedPointer>
 
-namespace Ui
+class GitBase;
+
+class GitBranches
 {
-class AddSubmoduleDlg;
-}
-
-class AddSubmoduleDlg : public QDialog
-{
-   Q_OBJECT
-
 public:
-   explicit AddSubmoduleDlg(const QSharedPointer<GitSubmodules> &git, QWidget *parent = nullptr);
-   ~AddSubmoduleDlg() override;
-
-   void accept() override;
+   GitBranches(const QSharedPointer<GitBase> &gitBase);
+   GitExecResult getBranches();
+   GitExecResult getDistanceBetweenBranches(bool toMaster, const QString &right);
 
 private:
-   Ui::AddSubmoduleDlg *ui;
-   QSharedPointer<GitSubmodules> mGit;
+   QSharedPointer<GitBase> mGitBase;
 };

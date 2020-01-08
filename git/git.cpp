@@ -32,7 +32,7 @@
 
 using namespace QLogger;
 
-Git::Git(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent)
+Git::Git(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent)
    : QObject(parent)
    , mGitBase(gitBase)
    , mCache(cache)
@@ -94,36 +94,6 @@ GitExecResult Git::blame(const QString &file, const QString &commitFrom)
 GitExecResult Git::history(const QString &file)
 {
    return mGitBase->run(QString("git log --follow --pretty=%H %1").arg(file));
-}
-
-QVector<QString> Git::getSubmodules()
-{
-   QVector<QString> submodulesList;
-   const auto ret = mGitBase->run("git config --file .gitmodules --name-only --get-regexp path");
-   if (ret.first)
-   {
-      const auto submodules = ret.second.split('\n');
-      for (auto submodule : submodules)
-         if (!submodule.isEmpty() && submodule != "\n")
-            submodulesList.append(submodule.split('.').at(1));
-   }
-
-   return submodulesList;
-}
-
-bool Git::submoduleAdd(const QString &url, const QString &name)
-{
-   return mGitBase->run(QString("git submodule add %1 %2").arg(url).arg(name)).first;
-}
-
-bool Git::submoduleUpdate(const QString &)
-{
-   return mGitBase->run("git submodule update --init --recursive").first;
-}
-
-bool Git::submoduleRemove(const QString &)
-{
-   return false;
 }
 
 RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha)
@@ -384,22 +354,6 @@ GitExecResult Git::removeRemoteBranch(const QString &branchName)
    return mGitBase->run(QString("git push --delete origin %1").arg(branchName));
 }
 
-GitExecResult Git::getBranches()
-{
-   return mGitBase->run(QString("git branch -a"));
-}
-
-GitExecResult Git::getDistanceBetweenBranches(bool toMaster, const QString &right)
-{
-   const QString firstArg = toMaster ? QString::fromUtf8("--left-right") : QString::fromUtf8("");
-   const QString gitCmd = QString("git rev-list %1 --count %2...%3")
-                              .arg(firstArg)
-                              .arg(toMaster ? QString::fromUtf8("origin/master") : QString::fromUtf8("origin/%3"))
-                              .arg(right);
-
-   return mGitBase->run(gitCmd);
-}
-
 GitExecResult Git::getBranchesOfCommit(const QString &sha)
 {
    return mGitBase->run(QString("git branch --contains %1 --all").arg(sha));
@@ -423,96 +377,6 @@ GitExecResult Git::prune()
 QString Git::getCurrentBranch() const
 {
    return mGitBase->getCurrentBranch();
-}
-
-QVector<QString> Git::getTags() const
-{
-   const auto ret = mGitBase->run("git tag");
-
-   QVector<QString> tags;
-
-   if (ret.first)
-   {
-      const auto tagsTmp = ret.second.split("\n");
-
-      for (auto tag : tagsTmp)
-         if (tag != "\n" && !tag.isEmpty())
-            tags.append(tag);
-   }
-
-   return tags;
-}
-
-QVector<QString> Git::getLocalTags() const
-{
-   const auto ret = mGitBase->run("git push --tags --dry-run");
-
-   QVector<QString> tags;
-
-   if (ret.first)
-   {
-      const auto tagsTmp = ret.second.split("\n");
-
-      for (auto tag : tagsTmp)
-         if (tag != "\n" && !tag.isEmpty() && tag.contains("[new tag]"))
-            tags.append(tag.split(" -> ").last());
-   }
-
-   return tags;
-}
-
-GitExecResult Git::addTag(const QString &tagName, const QString &tagMessage, const QString &sha)
-{
-   return mGitBase->run(QString("git tag -a %1 %2 -m \"%3\"").arg(tagName).arg(sha).arg(tagMessage));
-}
-
-GitExecResult Git::removeTag(const QString &tagName, bool remote)
-{
-   GitExecResult ret;
-
-   if (remote)
-      ret = mGitBase->run(QString("git push origin --delete %1").arg(tagName));
-
-   if (!remote || (remote && ret.success))
-      ret = mGitBase->run(QString("git tag -d %1").arg(tagName));
-
-   return ret;
-}
-
-GitExecResult Git::pushTag(const QString &tagName)
-{
-   return mGitBase->run(QString("git push origin %1").arg(tagName));
-}
-
-GitExecResult Git::getTagCommit(const QString &tagName)
-{
-   const auto ret = mGitBase->run(QString("git rev-list -n 1 %1").arg(tagName));
-   QString output = ret.second;
-
-   if (ret.first)
-   {
-      output.remove(output.count() - 2, output.count() - 1);
-   }
-
-   return qMakePair(ret.first, output);
-}
-
-QVector<QString> Git::getStashes()
-{
-   const auto ret = mGitBase->run("git stash list");
-
-   QVector<QString> stashes;
-
-   if (ret.first)
-   {
-      const auto tagsTmp = ret.second.split("\n");
-
-      for (auto tag : tagsTmp)
-         if (tag != "\n" && !tag.isEmpty())
-            stashes.append(tag);
-   }
-
-   return stashes;
 }
 
 // CT TODO utility function; can go elsewhere

@@ -23,26 +23,26 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QDialog>
+#include <GitExecResult.h>
 
-class GitSubmodules;
+#include <QVector>
+#include <QString>
+#include <QSharedPointer>
 
-namespace Ui
+class GitBase;
+
+class GitTags
 {
-class AddSubmoduleDlg;
-}
-
-class AddSubmoduleDlg : public QDialog
-{
-   Q_OBJECT
-
 public:
-   explicit AddSubmoduleDlg(const QSharedPointer<GitSubmodules> &git, QWidget *parent = nullptr);
-   ~AddSubmoduleDlg() override;
+   explicit GitTags(const QSharedPointer<GitBase> &gitBase);
 
-   void accept() override;
+   QVector<QString> getTags() const;
+   QVector<QString> getLocalTags() const;
+   GitExecResult addTag(const QString &tagName, const QString &tagMessage, const QString &sha);
+   GitExecResult removeTag(const QString &tagName, bool remote);
+   GitExecResult pushTag(const QString &tagName);
+   GitExecResult getTagCommit(const QString &tagName);
 
 private:
-   Ui::AddSubmoduleDlg *ui;
-   QSharedPointer<GitSubmodules> mGit;
+   QSharedPointer<GitBase> mGitBase;
 };

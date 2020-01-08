@@ -23,26 +23,17 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QDialog>
+#include <QSharedPointer>
 
-class GitSubmodules;
+class GitBase;
 
-namespace Ui
+class GitStashes
 {
-class AddSubmoduleDlg;
-}
-
-class AddSubmoduleDlg : public QDialog
-{
-   Q_OBJECT
-
 public:
-   explicit AddSubmoduleDlg(const QSharedPointer<GitSubmodules> &git, QWidget *parent = nullptr);
-   ~AddSubmoduleDlg() override;
+   GitStashes(const QSharedPointer<GitBase> &gitBase);
 
-   void accept() override;
+   QVector<QString> getStashes();
 
 private:
-   Ui::AddSubmoduleDlg *ui;
-   QSharedPointer<GitSubmodules> mGit;
+   QSharedPointer<GitBase> mGitBase;
 };

@@ -8,6 +8,7 @@
 #include <CommitInfoWidget.h>
 #include <CommitInfo.h>
 #include <GitQlientSettings.h>
+#include <GitBase.h>
 #include "git.h"
 
 #include <QLogger.h>
@@ -24,7 +25,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    : QFrame(parent)
    , mRepositoryModel(new CommitHistoryModel(cache, git))
    , mRepositoryView(new CommitHistoryView(cache, git))
-   , mBranchesWidget(new BranchesWidget(git))
+   , mBranchesWidget(new BranchesWidget(QSharedPointer<GitBase>::create(git->getWorkingDir())))
    , mGoToSha(new QLineEdit())
    , mCommitStackedWidget(new QStackedWidget())
    , mCommitWidget(new WorkInProgressWidget(cache, git))

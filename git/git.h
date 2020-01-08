@@ -37,7 +37,8 @@ public:
       HARD
    };
 
-   explicit Git(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent = nullptr);
+   explicit Git(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> cache,
+                QObject *parent = nullptr);
 
    /* START BRANCHES */
    GitExecResult createBranchFromAnotherBranch(const QString &oldName, const QString &newName);
@@ -47,25 +48,13 @@ public:
    GitExecResult renameBranch(const QString &oldName, const QString &newName);
    GitExecResult removeLocalBranch(const QString &branchName);
    GitExecResult removeRemoteBranch(const QString &branchName);
-   GitExecResult getBranches();
-   GitExecResult getDistanceBetweenBranches(bool toMaster, const QString &right);
    GitExecResult getBranchesOfCommit(const QString &sha);
    GitExecResult getLastCommitOfBranch(const QString &branch);
    GitExecResult prune();
    QString getCurrentBranch() const;
    /* END BRANCHES */
 
-   /* START TAGS */
-   QVector<QString> getTags() const;
-   QVector<QString> getLocalTags() const;
-   GitExecResult addTag(const QString &tagName, const QString &tagMessage, const QString &sha);
-   GitExecResult removeTag(const QString &tagName, bool remote);
-   GitExecResult pushTag(const QString &tagName);
-   GitExecResult getTagCommit(const QString &tagName);
-   /*  END  TAGS */
-
    /* START STASHES */
-   QVector<QString> getStashes();
    GitExecResult pop() const;
    GitExecResult stash();
    GitExecResult stashBranch(const QString &stashId, const QString &branchName);
@@ -94,13 +83,6 @@ public:
    GitExecResult blame(const QString &file, const QString &commitFrom);
    GitExecResult history(const QString &file);
    /* END COMMIT INFO */
-
-   /* START SUBMODULES */
-   QVector<QString> getSubmodules();
-   bool submoduleAdd(const QString &url, const QString &name);
-   bool submoduleUpdate(const QString &submodule);
-   bool submoduleRemove(const QString &submodule);
-   /*  END  SUBMODULES */
 
    GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
    QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);

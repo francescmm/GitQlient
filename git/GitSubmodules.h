@@ -23,26 +23,21 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QDialog>
+#include <GitExecResult.h>
 
-class GitSubmodules;
+#include <QSharedPointer>
 
-namespace Ui
+class GitBase;
+
+class GitSubmodules
 {
-class AddSubmoduleDlg;
-}
-
-class AddSubmoduleDlg : public QDialog
-{
-   Q_OBJECT
-
 public:
-   explicit AddSubmoduleDlg(const QSharedPointer<GitSubmodules> &git, QWidget *parent = nullptr);
-   ~AddSubmoduleDlg() override;
-
-   void accept() override;
+   GitSubmodules(const QSharedPointer<GitBase> &gitBase);
+   QVector<QString> getSubmodules();
+   bool submoduleAdd(const QString &url, const QString &name);
+   bool submoduleUpdate(const QString &submodule);
+   bool submoduleRemove(const QString &submodule);
 
 private:
-   Ui::AddSubmoduleDlg *ui;
-   QSharedPointer<GitSubmodules> mGit;
+   QSharedPointer<GitBase> mGitBase;
 };

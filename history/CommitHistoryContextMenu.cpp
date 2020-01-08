@@ -1,6 +1,7 @@
 #include "CommitHistoryContextMenu.h"
 
 #include <git.h>
+#include <GitBase.h>
 #include <WorkInProgressWidget.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
@@ -161,7 +162,7 @@ void CommitHistoryContextMenu::createBranch()
 
 void CommitHistoryContextMenu::createTag()
 {
-   TagDlg dlg(mGit, mShas.first());
+   TagDlg dlg(QSharedPointer<GitBase>::create(mGit->getWorkingDir()), mShas.first());
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
