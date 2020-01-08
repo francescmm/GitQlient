@@ -3,6 +3,7 @@
 
 #include <git.h>
 #include <GitBase.h>
+#include <GitConfig.h>
 #include <GitQlientStyles.h>
 #include <GitQlientSettings.h>
 
@@ -102,8 +103,7 @@ void CreateRepoDlg::accept()
          if (ui->cbGitUser->isChecked())
          {
             const auto gitBase = QSharedPointer<GitBase>::create(fullPath);
-            const auto cache = QSharedPointer<RevisionsCache>::create();
-            QScopedPointer<Git> git(new Git(gitBase, cache));
+            QScopedPointer<GitConfig> git(new GitConfig(gitBase));
 
             git->setLocalUserInfo({ ui->leGitName->text(), ui->leGitEmail->text() });
          }

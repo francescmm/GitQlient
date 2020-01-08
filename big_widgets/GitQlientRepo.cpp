@@ -6,8 +6,6 @@
 #include <CommitHistoryColumns.h>
 #include <HistoryWidget.h>
 #include <CommitHistoryView.h>
-#include <git.h>
-#include <GitRepoLoader.h>
 #include <QLogger.h>
 #include <BlameWidget.h>
 #include <CommitInfo.h>
@@ -15,6 +13,10 @@
 #include <GitConfigDlg.h>
 #include <DiffWidget.h>
 #include <RevisionsCache.h>
+
+#include <git.h>
+#include <GitRepoLoader.h>
+#include <GitConfig.h>
 #include <GitBase.h>
 
 #include <QFileSystemModel>
@@ -168,11 +170,13 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          QLog_Info("UI", "... repository loaded successfully");
 
-         if (!mGit->getGlobalUserInfo().isValid())
+         QScopedPointer<GitConfig> git(new GitConfig(mGitBase));
+
+         if (!git->getGlobalUserInfo().isValid())
          {
             QLog_Info("UI", QString("Configuring Git..."));
 
-            GitConfigDlg configDlg(mGit);
+            GitConfigDlg configDlg(mGitBase);
 
             configDlg.exec();
 

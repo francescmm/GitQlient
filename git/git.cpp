@@ -601,52 +601,6 @@ bool Git::initRepo(const QString &fullPath)
    return mGitBase->run(QString("git init %1").arg(fullPath)).first;
 }
 
-GitUserInfo Git::getGlobalUserInfo() const
-{
-   GitUserInfo userInfo;
-
-   const auto nameRequest = mGitBase->run("git config --get --global user.name");
-
-   if (nameRequest.first)
-      userInfo.mUserName = nameRequest.second.trimmed();
-
-   const auto emailRequest = mGitBase->run("git config --get --global user.email");
-
-   if (emailRequest.first)
-      userInfo.mUserEmail = emailRequest.second.trimmed();
-
-   return userInfo;
-}
-
-void Git::setGlobalUserInfo(const GitUserInfo &info)
-{
-   mGitBase->run(QString("git config --global user.name \"%1\"").arg(info.mUserName));
-   mGitBase->run(QString("git config --global user.email %1").arg(info.mUserEmail));
-}
-
-GitUserInfo Git::getLocalUserInfo() const
-{
-   GitUserInfo userInfo;
-
-   const auto nameRequest = mGitBase->run("git config --get --local user.name");
-
-   if (nameRequest.first)
-      userInfo.mUserName = nameRequest.second.trimmed();
-
-   const auto emailRequest = mGitBase->run("git config --get --local user.email");
-
-   if (emailRequest.first)
-      userInfo.mUserEmail = emailRequest.second.trimmed();
-
-   return userInfo;
-}
-
-void Git::setLocalUserInfo(const GitUserInfo &info)
-{
-   mGitBase->run(QString("git config --local user.name \"%1\"").arg(info.mUserName));
-   mGitBase->run(QString("git config --local user.email %1").arg(info.mUserEmail));
-}
-
 int Git::totalCommits() const
 {
    return mCache->count();
@@ -660,11 +614,6 @@ CommitInfo Git::getCommitInfoByRow(int row) const
 CommitInfo Git::getCommitInfo(const QString &sha)
 {
    return mCache->getCommitInfo(sha);
-}
-
-bool GitUserInfo::isValid() const
-{
-   return !mUserEmail.isNull() && !mUserEmail.isEmpty() && !mUserName.isNull() && !mUserName.isEmpty();
 }
 
 // CT TODO utility function; can go elsewhere

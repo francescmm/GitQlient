@@ -5,6 +5,7 @@ HEADERS += \
     $$PWD/CommitInfo.h \
     $$PWD/GitBase.h \
     $$PWD/GitCloneProcess.h \
+    $$PWD/GitConfig.h \
     $$PWD/GitExecResult.h \
     $$PWD/GitRepoLoader.h \
     $$PWD/GitRequestorProcess.h \
@@ -21,6 +22,7 @@ SOURCES += \
     $$PWD/CommitInfo.cpp \
     $$PWD/GitBase.cpp \
     $$PWD/GitCloneProcess.cpp \
+    $$PWD/GitConfig.cpp \
     $$PWD/GitExecResult.cpp \
     $$PWD/GitRepoLoader.cpp \
     $$PWD/GitRequestorProcess.cpp \
