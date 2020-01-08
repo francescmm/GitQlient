@@ -23,7 +23,6 @@ using namespace QLogger;
 
 ConfigWidget::ConfigWidget(QWidget *parent)
    : QFrame(parent)
-   , mGit(new Git(""))
    , mOpenRepo(new QPushButton(tr("Open existing repo")))
    , mCloneRepo(new QPushButton(tr("Clone new repo")))
    , mInitRepo(new QPushButton(tr("Init new repo")))
@@ -90,6 +89,10 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    connect(mOpenRepo, &QPushButton::clicked, this, &ConfigWidget::openRepo);
    connect(mCloneRepo, &QPushButton::clicked, this, &ConfigWidget::cloneRepo);
    connect(mInitRepo, &QPushButton::clicked, this, &ConfigWidget::initRepo);
+
+   const auto gitBase(QSharedPointer<GitBase>::create(""));
+   const auto cache(QSharedPointer<RevisionsCache>::create());
+   mGit = QSharedPointer<Git>::create(gitBase, cache);
    connect(mGit.get(), &Git::signalCloningProgress, this, &ConfigWidget::updateProgressDialog, Qt::DirectConnection);
 }
 

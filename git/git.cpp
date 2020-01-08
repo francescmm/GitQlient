@@ -31,19 +31,16 @@
 
 using namespace QLogger;
 
-Git::Git(const QString &workingDirectory)
-   : GitBase(workingDirectory)
-{
-}
-
-Git::Git(QSharedPointer<RevisionsCache> cache, const QString &workingDirectory)
-   : GitBase(cache, workingDirectory)
+Git::Git(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent)
+   : QObject(parent)
+   , mGitBase(gitBase)
+   , mCache(cache)
 {
 }
 
 uint Git::checkRef(const QString &sha, uint mask) const
 {
-   const auto ref = mRevCache->getReference(sha);
+   const auto ref = mCache->getReference(sha);
 
    return ref.isValid() ? ref.type & mask : 0;
 }
@@ -54,7 +51,7 @@ const QStringList Git::getRefNames(const QString &sha, uint mask) const
    if (!checkRef(sha, mask))
       return result;
 
-   const auto rf = mRevCache->getReference(sha);
+   const auto rf = mCache->getReference(sha);
 
    if (mask & TAG)
       result << rf.tags;
@@ -76,7 +73,7 @@ const QStringList Git::getRefNames(const QString &sha, uint mask) const
 
 CommitInfo Git::getCommitInfo(const QString &sha) const
 {
-   return mRevCache->getCommitInfo(sha);
+   return mCache->getCommitInfo(sha);
 }
 
 GitExecResult Git::getCommitDiff(const QString &sha, const QString &diffToSha)
@@ -89,7 +86,7 @@ GitExecResult Git::getCommitDiff(const QString &sha, const QString &diffToSha)
       {
          runCmd = "git diff-tree --no-color -r --patch-with-stat -C -m ";
 
-         if (mRevCache->getCommitInfo(sha).parentsCount() == 0)
+         if (mCache->getCommitInfo(sha).parentsCount() == 0)
             runCmd.append("--root ");
 
          runCmd.append(QString("%1 %2").arg(diffToSha, sha)); // diffToSha could be empty
@@ -97,7 +94,7 @@ GitExecResult Git::getCommitDiff(const QString &sha, const QString &diffToSha)
       else
          runCmd = "git diff-index --no-color -r -m --patch-with-stat HEAD";
 
-      return run(runCmd);
+      return mGitBase->run(runCmd);
    }
    return qMakePair(false, QString());
 }
@@ -105,7 +102,7 @@ GitExecResult Git::getCommitDiff(const QString &sha, const QString &diffToSha)
 QString Git::getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
    QByteArray output;
-   const auto ret = run(QString("git diff -U15000 %1 %2 %3").arg(previousSha, currentSha, file));
+   const auto ret = mGitBase->run(QString("git diff -U15000 %1 %2 %3").arg(previousSha, currentSha, file));
 
    if (ret.first)
       return ret.second;
@@ -118,27 +115,27 @@ bool Git::checkoutFile(const QString &fileName)
    if (fileName.isEmpty())
       return false;
 
-   return run(QString("git checkout %1").arg(fileName)).first;
+   return mGitBase->run(QString("git checkout %1").arg(fileName)).first;
 }
 
 GitExecResult Git::resetFile(const QString &fileName)
 {
-   return run(QString("git reset %1").arg(fileName));
+   return mGitBase->run(QString("git reset %1").arg(fileName));
 }
 
 GitExecResult Git::blame(const QString &file, const QString &commitFrom)
 {
-   return run(QString("git annotate %1 %2").arg(file, commitFrom));
+   return mGitBase->run(QString("git annotate %1 %2").arg(file, commitFrom));
 }
 
 GitExecResult Git::history(const QString &file)
 {
-   return run(QString("git log --follow --pretty=%H %1").arg(file));
+   return mGitBase->run(QString("git log --follow --pretty=%H %1").arg(file));
 }
 
 QPair<QString, QString> Git::getSplitCommitMsg(const QString &sha)
 {
-   const auto c = mRevCache->getCommitInfo(sha);
+   const auto c = mCache->getCommitInfo(sha);
 
    return qMakePair(c.shortLog(), c.longLog().trimmed());
 }
@@ -146,7 +143,7 @@ QPair<QString, QString> Git::getSplitCommitMsg(const QString &sha)
 QVector<QString> Git::getSubmodules()
 {
    QVector<QString> submodulesList;
-   const auto ret = run("git config --file .gitmodules --name-only --get-regexp path");
+   const auto ret = mGitBase->run("git config --file .gitmodules --name-only --get-regexp path");
    if (ret.first)
    {
       const auto submodules = ret.second.split('\n');
@@ -160,12 +157,12 @@ QVector<QString> Git::getSubmodules()
 
 bool Git::submoduleAdd(const QString &url, const QString &name)
 {
-   return run(QString("git submodule add %1 %2").arg(url).arg(name)).first;
+   return mGitBase->run(QString("git submodule add %1 %2").arg(url).arg(name)).first;
 }
 
 bool Git::submoduleUpdate(const QString &)
 {
-   return run("git submodule update --init --recursive").first;
+   return mGitBase->run("git submodule update --init --recursive").first;
 }
 
 bool Git::submoduleRemove(const QString &)
@@ -175,17 +172,17 @@ bool Git::submoduleRemove(const QString &)
 
 RevisionFile Git::getWipFiles()
 {
-   return mRevCache->getRevisionFile(ZERO_SHA);
+   return mCache->getRevisionFile(ZERO_SHA);
 }
 
 RevisionFile Git::getCommitFiles(const QString &sha) const
 {
-   return mRevCache->getRevisionFile(sha);
+   return mCache->getRevisionFile(sha);
 }
 
 RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha, bool allFiles)
 {
-   const auto r = mRevCache->getCommitInfo(sha);
+   const auto r = mCache->getCommitInfo(sha);
    if (r.parentsCount() == 0)
       return RevisionFile();
 
@@ -203,29 +200,29 @@ RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha, boo
       runCmd.append(diffToSha + " " + sha);
    }
 
-   if (mRevCache->containsRevisionFile(mySha))
-      return mRevCache->getRevisionFile(mySha);
+   if (mCache->containsRevisionFile(mySha))
+      return mCache->getRevisionFile(mySha);
 
-   const auto ret = run(runCmd);
+   const auto ret = mGitBase->run(runCmd);
 
-   return ret.first ? mRevCache->parseDiff(sha, ret.second) : RevisionFile();
+   return ret.first ? mCache->parseDiff(sha, ret.second) : RevisionFile();
 }
 
 bool Git::resetCommits(int parentDepth)
 {
    QString runCmd("git reset --soft HEAD~");
    runCmd.append(QString::number(parentDepth));
-   return run(runCmd).first;
+   return mGitBase->run(runCmd).first;
 }
 
 GitExecResult Git::checkoutCommit(const QString &sha)
 {
-   return run(QString("git checkout %1").arg(sha));
+   return mGitBase->run(QString("git checkout %1").arg(sha));
 }
 
 GitExecResult Git::markFileAsResolved(const QString &fileName)
 {
-   const auto ret = run(QString("git add %1").arg(fileName));
+   const auto ret = mGitBase->run(QString("git add %1").arg(fileName));
 
    if (ret.first)
       emit signalWipUpdated();
@@ -235,17 +232,22 @@ GitExecResult Git::markFileAsResolved(const QString &fileName)
 
 bool Git::pendingLocalChanges()
 {
-   return mRevCache->pendingLocalChanges();
+   return mCache->pendingLocalChanges();
 }
 
 GitExecResult Git::merge(const QString &into, QStringList sources)
 {
-   const auto ret = run(QString("git checkout -q %1").arg(into));
+   const auto ret = mGitBase->run(QString("git checkout -q %1").arg(into));
 
    if (!ret.first)
       return ret;
 
-   return run(QString("git merge -q ") + sources.join(" "));
+   return mGitBase->run(QString("git merge -q ") + sources.join(" "));
+}
+
+QString Git::getWorkingDir() const
+{
+   return mGitBase->getWorkingDir();
 }
 
 bool Git::updateIndex(const QStringList &selFiles)
@@ -256,15 +258,15 @@ bool Git::updateIndex(const QStringList &selFiles)
 
    for (auto it : selFiles)
    {
-      const auto idx = mRevCache->findFileIndex(files, it);
+      const auto idx = mCache->findFileIndex(files, it);
 
       idx != -1 && files.statusCmp(idx, RevisionFile::DELETED) ? toRemove << it : toAdd << it;
    }
 
-   if (!toRemove.isEmpty() && !run("git rm --cached --ignore-unmatch -- " + quote(toRemove)).first)
+   if (!toRemove.isEmpty() && !mGitBase->run("git rm --cached --ignore-unmatch -- " + quote(toRemove)).first)
       return false;
 
-   if (!toAdd.isEmpty() && !run("git add -- " + quote(toAdd)).first)
+   if (!toAdd.isEmpty() && !mGitBase->run("git add -- " + quote(toAdd)).first)
       return false;
 
    return true;
@@ -296,8 +298,8 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    }
 
    // call git reset to remove not selected files from index
-   if ((!notSel.empty() && !run("git reset -- " + quote(notSel)).first) || !updateIndex(selFiles)
-       || !run(QString("git commit" + cmtOptions + " -m \"%1\"").arg(msg)).first
+   if ((!notSel.empty() && !mGitBase->run("git reset -- " + quote(notSel)).first) || !updateIndex(selFiles)
+       || !mGitBase->run(QString("git commit" + cmtOptions + " -m \"%1\"").arg(msg)).first
        || (!notSel.empty() && !updateIndex(notSel)))
    {
       ret = false;
@@ -313,7 +315,7 @@ GitExecResult Git::exportPatch(const QStringList &shaList)
 
    for (const auto &sha : shaList)
    {
-      const auto ret = run(QString("git format-patch -1 %1").arg(sha));
+      const auto ret = mGitBase->run(QString("git format-patch -1 %1").arg(sha));
 
       if (!ret.first)
          break;
@@ -326,8 +328,8 @@ GitExecResult Git::exportPatch(const QStringList &shaList)
          const auto newFileName = QString("%1-%2").arg(number, text);
          files.append(newFileName);
 
-         QFile::rename(QString("%1/%2").arg(mWorkingDirectory, filename),
-                       QString("%1/%2").arg(mWorkingDirectory, newFileName));
+         QFile::rename(QString("%1/%2").arg(mGitBase->getWorkingDir(), filename),
+                       QString("%1/%2").arg(mGitBase->getWorkingDir(), newFileName));
          ++val;
       }
    }
@@ -341,59 +343,59 @@ GitExecResult Git::exportPatch(const QStringList &shaList)
 bool Git::apply(const QString &fileName, bool asCommit)
 {
    const auto cmd = asCommit ? QString("git am --signof") : QString("git apply");
-   const auto ret = run(QString("%1 %2").arg(cmd, fileName));
+   const auto ret = mGitBase->run(QString("%1 %2").arg(cmd, fileName));
 
    return ret.first;
 }
 
 GitExecResult Git::push(bool force)
 {
-   return run(QString("git push ").append(force ? QString("--force") : QString()));
+   return mGitBase->run(QString("git push ").append(force ? QString("--force") : QString()));
 }
 
 GitExecResult Git::pushUpstream(const QString &branchName)
 {
-   return run(QString("git push --set-upstream origin %1").arg(branchName));
+   return mGitBase->run(QString("git push --set-upstream origin %1").arg(branchName));
 }
 
 GitExecResult Git::pull()
 {
-   return run("git pull");
+   return mGitBase->run("git pull");
 }
 
 bool Git::fetch()
 {
-   return run("git fetch --all --tags --prune --force").first;
+   return mGitBase->run("git fetch --all --tags --prune --force").first;
 }
 
 GitExecResult Git::cherryPickCommit(const QString &sha)
 {
-   return run(QString("git cherry-pick %1").arg(sha));
+   return mGitBase->run(QString("git cherry-pick %1").arg(sha));
 }
 
 GitExecResult Git::pop() const
 {
-   return run("git stash pop");
+   return mGitBase->run("git stash pop");
 }
 
 GitExecResult Git::stash()
 {
-   return run("git stash");
+   return mGitBase->run("git stash");
 }
 
 GitExecResult Git::stashBranch(const QString &stashId, const QString &branchName)
 {
-   return run(QString("git stash branch %1 %2").arg(branchName, stashId));
+   return mGitBase->run(QString("git stash branch %1 %2").arg(branchName, stashId));
 }
 
 GitExecResult Git::stashDrop(const QString &stashId)
 {
-   return run(QString("git stash drop -q %1").arg(stashId));
+   return mGitBase->run(QString("git stash drop -q %1").arg(stashId));
 }
 
 GitExecResult Git::stashClear()
 {
-   return run("git stash clear");
+   return mGitBase->run("git stash clear");
 }
 
 bool Git::resetCommit(const QString &sha, Git::CommitResetType type)
@@ -413,47 +415,47 @@ bool Git::resetCommit(const QString &sha, Git::CommitResetType type)
          break;
    }
 
-   return run(QString("git reset --%1 %2").arg(typeStr, sha)).first;
+   return mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha)).first;
 }
 
 GitExecResult Git::createBranchFromAnotherBranch(const QString &oldName, const QString &newName)
 {
-   return run(QString("git branch %1 %2").arg(newName, oldName));
+   return mGitBase->run(QString("git branch %1 %2").arg(newName, oldName));
 }
 
 GitExecResult Git::createBranchAtCommit(const QString &commitSha, const QString &branchName)
 {
-   return run(QString("git branch %1 %2").arg(branchName, commitSha));
+   return mGitBase->run(QString("git branch %1 %2").arg(branchName, commitSha));
 }
 
 GitExecResult Git::checkoutRemoteBranch(const QString &branchName)
 {
-   return run(QString("git checkout -q %1").arg(branchName));
+   return mGitBase->run(QString("git checkout -q %1").arg(branchName));
 }
 
 GitExecResult Git::checkoutNewLocalBranch(const QString &branchName)
 {
-   return run(QString("git checkout -b %1").arg(branchName));
+   return mGitBase->run(QString("git checkout -b %1").arg(branchName));
 }
 
 GitExecResult Git::renameBranch(const QString &oldName, const QString &newName)
 {
-   return run(QString("git branch -m %1 %2").arg(oldName, newName));
+   return mGitBase->run(QString("git branch -m %1 %2").arg(oldName, newName));
 }
 
 GitExecResult Git::removeLocalBranch(const QString &branchName)
 {
-   return run(QString("git branch -D %1").arg(branchName));
+   return mGitBase->run(QString("git branch -D %1").arg(branchName));
 }
 
 GitExecResult Git::removeRemoteBranch(const QString &branchName)
 {
-   return run(QString("git push --delete origin %1").arg(branchName));
+   return mGitBase->run(QString("git push --delete origin %1").arg(branchName));
 }
 
 GitExecResult Git::getBranches()
 {
-   return run(QString("git branch -a"));
+   return mGitBase->run(QString("git branch -a"));
 }
 
 GitExecResult Git::getDistanceBetweenBranches(bool toMaster, const QString &right)
@@ -464,17 +466,17 @@ GitExecResult Git::getDistanceBetweenBranches(bool toMaster, const QString &righ
                               .arg(toMaster ? QString::fromUtf8("origin/master") : QString::fromUtf8("origin/%3"))
                               .arg(right);
 
-   return run(gitCmd);
+   return mGitBase->run(gitCmd);
 }
 
 GitExecResult Git::getBranchesOfCommit(const QString &sha)
 {
-   return run(QString("git branch --contains %1 --all").arg(sha));
+   return mGitBase->run(QString("git branch --contains %1 --all").arg(sha));
 }
 
 GitExecResult Git::getLastCommitOfBranch(const QString &branch)
 {
-   auto ret = run(QString("git rev-parse %1").arg(branch));
+   auto ret = mGitBase->run(QString("git rev-parse %1").arg(branch));
 
    if (ret.first)
       ret.second.remove(ret.second.count() - 1, ret.second.count());
@@ -484,19 +486,19 @@ GitExecResult Git::getLastCommitOfBranch(const QString &branch)
 
 GitExecResult Git::prune()
 {
-   return run("git remote prune origin");
+   return mGitBase->run("git remote prune origin");
 }
 
 QString Git::getCurrentBranch() const
 {
-   const auto ret = run("git rev-parse --abbrev-ref HEAD");
+   const auto ret = mGitBase->run("git rev-parse --abbrev-ref HEAD");
 
    return ret.first ? ret.second.trimmed() : QString();
 }
 
 QVector<QString> Git::getTags() const
 {
-   const auto ret = run("git tag");
+   const auto ret = mGitBase->run("git tag");
 
    QVector<QString> tags;
 
@@ -514,7 +516,7 @@ QVector<QString> Git::getTags() const
 
 QVector<QString> Git::getLocalTags() const
 {
-   const auto ret = run("git push --tags --dry-run");
+   const auto ret = mGitBase->run("git push --tags --dry-run");
 
    QVector<QString> tags;
 
@@ -532,7 +534,7 @@ QVector<QString> Git::getLocalTags() const
 
 GitExecResult Git::addTag(const QString &tagName, const QString &tagMessage, const QString &sha)
 {
-   return run(QString("git tag -a %1 %2 -m \"%3\"").arg(tagName).arg(sha).arg(tagMessage));
+   return mGitBase->run(QString("git tag -a %1 %2 -m \"%3\"").arg(tagName).arg(sha).arg(tagMessage));
 }
 
 GitExecResult Git::removeTag(const QString &tagName, bool remote)
@@ -540,22 +542,22 @@ GitExecResult Git::removeTag(const QString &tagName, bool remote)
    GitExecResult ret;
 
    if (remote)
-      ret = run(QString("git push origin --delete %1").arg(tagName));
+      ret = mGitBase->run(QString("git push origin --delete %1").arg(tagName));
 
    if (!remote || (remote && ret.success))
-      ret = run(QString("git tag -d %1").arg(tagName));
+      ret = mGitBase->run(QString("git tag -d %1").arg(tagName));
 
    return ret;
 }
 
 GitExecResult Git::pushTag(const QString &tagName)
 {
-   return run(QString("git push origin %1").arg(tagName));
+   return mGitBase->run(QString("git push origin %1").arg(tagName));
 }
 
 GitExecResult Git::getTagCommit(const QString &tagName)
 {
-   const auto ret = run(QString("git rev-list -n 1 %1").arg(tagName));
+   const auto ret = mGitBase->run(QString("git rev-list -n 1 %1").arg(tagName));
    QString output = ret.second;
 
    if (ret.first)
@@ -568,7 +570,7 @@ GitExecResult Git::getTagCommit(const QString &tagName)
 
 QVector<QString> Git::getStashes()
 {
-   const auto ret = run("git stash list");
+   const auto ret = mGitBase->run("git stash list");
 
    QVector<QString> stashes;
 
@@ -586,7 +588,7 @@ QVector<QString> Git::getStashes()
 
 bool Git::clone(const QString &url, const QString &fullPath)
 {
-   const auto asyncRun = new GitCloneProcess(mWorkingDirectory);
+   const auto asyncRun = new GitCloneProcess(mGitBase->getWorkingDir());
    connect(asyncRun, &GitCloneProcess::signalProgress, this, &Git::signalCloningProgress, Qt::DirectConnection);
 
    QString buffer;
@@ -595,19 +597,19 @@ bool Git::clone(const QString &url, const QString &fullPath)
 
 bool Git::initRepo(const QString &fullPath)
 {
-   return run(QString("git init %1").arg(fullPath)).first;
+   return mGitBase->run(QString("git init %1").arg(fullPath)).first;
 }
 
 GitUserInfo Git::getGlobalUserInfo() const
 {
    GitUserInfo userInfo;
 
-   const auto nameRequest = run("git config --get --global user.name");
+   const auto nameRequest = mGitBase->run("git config --get --global user.name");
 
    if (nameRequest.first)
       userInfo.mUserName = nameRequest.second.trimmed();
 
-   const auto emailRequest = run("git config --get --global user.email");
+   const auto emailRequest = mGitBase->run("git config --get --global user.email");
 
    if (emailRequest.first)
       userInfo.mUserEmail = emailRequest.second.trimmed();
@@ -617,20 +619,20 @@ GitUserInfo Git::getGlobalUserInfo() const
 
 void Git::setGlobalUserInfo(const GitUserInfo &info)
 {
-   run(QString("git config --global user.name \"%1\"").arg(info.mUserName));
-   run(QString("git config --global user.email %1").arg(info.mUserEmail));
+   mGitBase->run(QString("git config --global user.name \"%1\"").arg(info.mUserName));
+   mGitBase->run(QString("git config --global user.email %1").arg(info.mUserEmail));
 }
 
 GitUserInfo Git::getLocalUserInfo() const
 {
    GitUserInfo userInfo;
 
-   const auto nameRequest = run("git config --get --local user.name");
+   const auto nameRequest = mGitBase->run("git config --get --local user.name");
 
    if (nameRequest.first)
       userInfo.mUserName = nameRequest.second.trimmed();
 
-   const auto emailRequest = run("git config --get --local user.email");
+   const auto emailRequest = mGitBase->run("git config --get --local user.email");
 
    if (emailRequest.first)
       userInfo.mUserEmail = emailRequest.second.trimmed();
@@ -640,23 +642,23 @@ GitUserInfo Git::getLocalUserInfo() const
 
 void Git::setLocalUserInfo(const GitUserInfo &info)
 {
-   run(QString("git config --local user.name \"%1\"").arg(info.mUserName));
-   run(QString("git config --local user.email %1").arg(info.mUserEmail));
+   mGitBase->run(QString("git config --local user.name \"%1\"").arg(info.mUserName));
+   mGitBase->run(QString("git config --local user.email %1").arg(info.mUserEmail));
 }
 
 int Git::totalCommits() const
 {
-   return mRevCache->count();
+   return mCache->count();
 }
 
 CommitInfo Git::getCommitInfoByRow(int row) const
 {
-   return mRevCache->getCommitInfoByRow(row);
+   return mCache->getCommitInfoByRow(row);
 }
 
 CommitInfo Git::getCommitInfo(const QString &sha)
 {
-   return mRevCache->getCommitInfo(sha);
+   return mCache->getCommitInfo(sha);
 }
 
 bool GitUserInfo::isValid() const

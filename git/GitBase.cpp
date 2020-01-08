@@ -16,13 +16,6 @@ GitBase::GitBase(const QString &workingDirectory, QObject *parent)
 {
 }
 
-GitBase::GitBase(QSharedPointer<RevisionsCache> cache, const QString &workingDirectory, QObject *parent)
-   : QObject(parent)
-   , mRevCache(cache)
-   , mWorkingDirectory(workingDirectory)
-{
-}
-
 QPair<bool, QString> GitBase::run(const QString &runCmd) const
 {
    QString runOutput;
@@ -34,13 +27,10 @@ QPair<bool, QString> GitBase::run(const QString &runCmd) const
    return qMakePair(ret, runOutput);
 }
 
-void GitBase::cancelAll()
-{
-   emit cancelAllProcesses(QPrivateSignal());
-}
-
-GitRepoLoader::GitRepoLoader(QSharedPointer<RevisionsCache> cache, const QString &workingDirectory, QObject *parent)
-   : GitBase(cache, workingDirectory, parent)
+GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent)
+   : QObject(parent)
+   , mGitBase(gitBase)
+   , mRevCache(cache)
 {
 }
 
@@ -50,7 +40,7 @@ bool GitRepoLoader::loadRepository()
       QLog_Warning("Git", "Git is currently loading data.");
    else
    {
-      if (mWorkingDirectory.isEmpty())
+      if (mGitBase->getWorkingDir().isEmpty())
          QLog_Error("Git", "No working directory set.");
       else
       {
@@ -80,12 +70,12 @@ bool GitRepoLoader::loadRepository()
 
 bool GitRepoLoader::configureRepoDirectory()
 {
-   const auto ret = run("git rev-parse --show-cdup");
+   const auto ret = mGitBase->run("git rev-parse --show-cdup");
 
    if (ret.first)
    {
-      QDir d(QString("%1/%2").arg(mWorkingDirectory, ret.second.trimmed()));
-      mWorkingDirectory = d.absolutePath();
+      QDir d(QString("%1/%2").arg(mGitBase->getWorkingDir(), ret.second.trimmed()));
+      mGitBase->setWorkingDir(d.absolutePath());
 
       return true;
    }
@@ -95,11 +85,11 @@ bool GitRepoLoader::configureRepoDirectory()
 
 void GitRepoLoader::loadReferences()
 {
-   const auto ret3 = run("git show-ref -d");
+   const auto ret3 = mGitBase->run("git show-ref -d");
 
    if (ret3.first)
    {
-      auto ret = run("git rev-parse HEAD");
+      auto ret = mGitBase->run("git rev-parse HEAD");
 
       if (ret.first)
          ret.second.remove(ret.second.count() - 1, ret.second.count());
@@ -138,7 +128,7 @@ void GitRepoLoader::requestRevisions()
                             .append(GIT_LOG_FORMAT)
                             .append(" --all");
 
-   const auto requestor = new GitRequestorProcess(mWorkingDirectory);
+   const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());
    connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevision);
    connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
 
@@ -178,16 +168,16 @@ void GitRepoLoader::updateWipRevision()
 {
    mRevCache->setUntrackedFilesList(getUntrackedFiles());
 
-   const auto ret = run("git rev-parse --revs-only HEAD");
+   const auto ret = mGitBase->run("git rev-parse --revs-only HEAD");
 
    if (ret.first)
    {
       const auto parentSha = ret.second.trimmed();
 
-      const auto ret3 = run(QString("git diff-index %1").arg(parentSha));
+      const auto ret3 = mGitBase->run(QString("git diff-index %1").arg(parentSha));
       const auto diffIndex = ret3.first ? ret3.second : QString();
 
-      const auto ret4 = run(QString("git diff-index --cached %1").arg(parentSha));
+      const auto ret4 = mGitBase->run(QString("git diff-index --cached %1").arg(parentSha));
       const auto diffIndexCached = ret4.first ? ret4.second : QString();
 
       mRevCache->updateWipCommit(parentSha, diffIndex, diffIndexCached);
@@ -200,12 +190,17 @@ QVector<QString> GitRepoLoader::getUntrackedFiles() const
 
    auto runCmd = QString("git ls-files --others");
    const auto exFile = QString(".git/info/exclude");
-   const auto path = QString("%1/%2").arg(mWorkingDirectory, exFile);
+   const auto path = QString("%1/%2").arg(mGitBase->getWorkingDir(), exFile);
 
    if (QFile::exists(path))
       runCmd.append(QString(" --exclude-from=$%1$").arg(exFile));
 
    runCmd.append(QString(" --exclude-per-directory=$%1$").arg(".gitignore"));
 
-   return run(runCmd).second.split('\n', QString::SkipEmptyParts).toVector();
+   return mGitBase->run(runCmd).second.split('\n', QString::SkipEmptyParts).toVector();
+}
+
+void GitRepoLoader::cancelAll()
+{
+   emit cancelAllProcesses(QPrivateSignal());
 }

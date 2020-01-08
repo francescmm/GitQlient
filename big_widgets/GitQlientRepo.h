@@ -25,6 +25,7 @@
 
 #include <QFrame>
 
+class GitBase;
 class RevisionsCache;
 class GitRepoLoader;
 class Git;
@@ -77,6 +78,7 @@ private:
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    QString mCurrentDir;
    QSharedPointer<RevisionsCache> mGitQlientCache;
+   QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitRepoLoader> mGitLoader;
    QSharedPointer<Git> mGit;
    HistoryWidget *mRepoWidget = nullptr;

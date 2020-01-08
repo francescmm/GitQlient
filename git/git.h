@@ -29,7 +29,7 @@ struct GitUserInfo
    bool isValid() const;
 };
 
-class Git : public GitBase
+class Git : public QObject
 {
    Q_OBJECT
 
@@ -45,8 +45,7 @@ public:
       HARD
    };
 
-   explicit Git(const QString &workingDirectory);
-   explicit Git(QSharedPointer<RevisionsCache> cache, const QString &workingDirectory);
+   explicit Git(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent = nullptr);
 
    /* START Git CONFIGURATION */
    bool clone(const QString &url, const QString &fullPath);
@@ -140,7 +139,12 @@ public:
    const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
    GitExecResult merge(const QString &into, QStringList sources);
 
+   QString getWorkingDir() const;
+
 private:
+   QSharedPointer<GitBase> mGitBase;
+   QSharedPointer<RevisionsCache> mCache;
+
    bool updateIndex(const QStringList &selFiles);
    static const QString quote(const QStringList &sl);
 };

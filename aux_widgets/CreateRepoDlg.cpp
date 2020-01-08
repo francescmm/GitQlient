@@ -100,8 +100,11 @@ void CreateRepoDlg::accept()
       {
          if (ui->cbGitUser->isChecked())
          {
-            Git git(fullPath);
-            git.setLocalUserInfo({ ui->leGitName->text(), ui->leGitEmail->text() });
+            const auto gitBase = QSharedPointer<GitBase>::create(fullPath);
+            const auto cache = QSharedPointer<RevisionsCache>::create();
+            QScopedPointer<Git> git(new Git(gitBase, cache));
+
+            git->setLocalUserInfo({ ui->leGitName->text(), ui->leGitEmail->text() });
          }
 
          if (ui->chbOpen->isChecked())

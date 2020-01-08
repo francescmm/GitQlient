@@ -30,8 +30,9 @@ using namespace QLogger;
 GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    : QFrame(parent)
    , mGitQlientCache(new RevisionsCache())
-   , mGitLoader(new GitRepoLoader(mGitQlientCache, repoPath))
-   , mGit(new Git(mGitQlientCache, repoPath))
+   , mGitBase(new GitBase(repoPath))
+   , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache))
+   , mGit(new Git(mGitBase, mGitQlientCache))
    , mRepoWidget(new HistoryWidget(mGit))
    , mStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGit))
@@ -136,7 +137,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
    {
       QLog_Info("UI", QString("Loading repository at {%1}...").arg(newDir));
 
-      mGit->cancelAll();
+      mGitLoader->cancelAll();
 
       const auto ok = mGitLoader->loadRepository();
 
@@ -331,7 +332,7 @@ void GitQlientRepo::closeEvent(QCloseEvent *ce)
    emit closeAllWindows();
    hide();
 
-   mGit->cancelAll();
+   mGitLoader->cancelAll();
 
    QWidget::closeEvent(ce);
 }
