@@ -489,3 +489,8 @@ DiffButton[pressed="true"]
    background-color: #404142;
 }
 
+QCheckBox
+{
+    color: white;
+}
+

@@ -73,6 +73,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mControls, &Controls::signalGoDiff, this, &GitQlientRepo::showDiffView);
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
 
+   connect(mRepoWidget, &HistoryWidget::signalAllBranchesActive, mGitLoader.get(), &GitRepoLoader::setShowAll);
+   connect(mRepoWidget, &HistoryWidget::signalAllBranchesActive, this, &GitQlientRepo::updateCache);
    connect(mRepoWidget, &HistoryWidget::signalUpdateCache, this, &GitQlientRepo::updateCache);
    connect(mRepoWidget, &HistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
    connect(mRepoWidget, &HistoryWidget::signalViewUpdated, this, &GitQlientRepo::updateCache);
@@ -92,6 +94,9 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
            Qt::DirectConnection);
    connect(mGit.get(), &Git::signalWipUpdated, mGitLoader.get(), &GitRepoLoader::updateWipRevision,
            Qt::DirectConnection);
+
+   GitQlientSettings settings;
+   mGitLoader->setShowAll(settings.value("ShowAllBranches", true).toBool());
 
    setRepository(repoPath);
 }

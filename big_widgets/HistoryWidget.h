@@ -27,6 +27,7 @@ signals:
    void signalChangesCommitted(bool commited);
    void signalShowFileHistory(const QString &fileName);
    void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file);
+   void signalAllBranchesActive(bool showAll);
 
 public:
    explicit HistoryWidget(const QSharedPointer<Git> git, QWidget *parent = nullptr);
@@ -51,4 +52,5 @@ private:
    void goToSha();
    void commitSelected(const QModelIndex &index);
    void openDiff(const QModelIndex &index);
+   void onShowAllUpdated(bool showAll);
 };

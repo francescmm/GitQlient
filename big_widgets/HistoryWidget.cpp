@@ -7,6 +7,7 @@
 #include <WorkInProgressWidget.h>
 #include <CommitInfoWidget.h>
 #include <CommitInfo.h>
+#include <GitQlientSettings.h>
 #include "git.h"
 
 #include <QLogger.h>
@@ -14,6 +15,7 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QStackedWidget>
+#include <QCheckBox>
 
 using namespace QLogger;
 
@@ -60,10 +62,22 @@ HistoryWidget::HistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &HistoryWidget::signalGoToSha);
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &HistoryWidget::signalOpenSubmodule);
 
+   GitQlientSettings settings;
+
+   const auto chShowAllBranches = new QCheckBox(tr("Show all branches"));
+   chShowAllBranches->setChecked(settings.value("ShowAllBranches", true).toBool());
+   connect(chShowAllBranches, &QCheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
+
+   const auto graphOptionsLayout = new QHBoxLayout();
+   graphOptionsLayout->setContentsMargins(QMargins());
+   graphOptionsLayout->setSpacing(10);
+   graphOptionsLayout->addWidget(mGoToSha);
+   graphOptionsLayout->addWidget(chShowAllBranches);
+
    const auto viewLayout = new QVBoxLayout();
    viewLayout->setContentsMargins(QMargins());
    viewLayout->setSpacing(5);
-   viewLayout->addWidget(mGoToSha);
+   viewLayout->addLayout(graphOptionsLayout);
    viewLayout->addWidget(mRepositoryView);
 
    const auto layout = new QHBoxLayout();
@@ -144,6 +158,14 @@ void HistoryWidget::openDiff(const QModelIndex &index)
    const auto sha = mRepositoryModel->sha(index.row());
 
    emit signalOpenDiff(sha);
+}
+
+void HistoryWidget::onShowAllUpdated(bool showAll)
+{
+   GitQlientSettings settings;
+   settings.setValue("ShowAllBranches", showAll);
+
+   emit signalAllBranchesActive(showAll);
 }
 
 void HistoryWidget::onCommitSelected(const QString &goToSha)
