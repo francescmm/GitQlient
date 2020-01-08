@@ -136,7 +136,10 @@ void WorkInProgressWidget::resetInfo(bool force)
       QPair<QString, QString> logMessage;
 
       if (mIsAmend)
-         logMessage = mGit->getSplitCommitMsg(mCurrentSha);
+      {
+         const auto revInfo = mGit->getCommitInfo(mCurrentSha);
+         logMessage = qMakePair(revInfo.shortLog(), revInfo.longLog().trimmed());
+      }
 
       msg = logMessage.second.trimmed();
 

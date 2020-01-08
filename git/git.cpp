@@ -81,19 +81,19 @@ GitExecResult Git::getCommitDiff(const QString &sha, const QString &diffToSha)
 {
    if (!sha.isEmpty())
    {
-      QString runCmd;
+      QString runCmd = QString("git diff-tree --no-color -r --patch-with-stat -m");
 
       if (sha != CommitInfo::ZERO_SHA)
       {
-         runCmd = "git diff-tree --no-color -r --patch-with-stat -C -m ";
+         runCmd += " -C ";
 
-         if (mCache->getCommitInfo(sha).parentsCount() == 0)
-            runCmd.append("--root ");
+         if (diffToSha.isEmpty())
+            runCmd += " --root ";
 
          runCmd.append(QString("%1 %2").arg(diffToSha, sha)); // diffToSha could be empty
       }
       else
-         runCmd = "git diff-index --no-color -r -m --patch-with-stat HEAD";
+         runCmd += " HEAD ";
 
       return mGitBase->run(runCmd);
    }
@@ -132,13 +132,6 @@ GitExecResult Git::blame(const QString &file, const QString &commitFrom)
 GitExecResult Git::history(const QString &file)
 {
    return mGitBase->run(QString("git log --follow --pretty=%H %1").arg(file));
-}
-
-QPair<QString, QString> Git::getSplitCommitMsg(const QString &sha)
-{
-   const auto c = mCache->getCommitInfo(sha);
-
-   return qMakePair(c.shortLog(), c.longLog().trimmed());
 }
 
 QVector<QString> Git::getSubmodules()

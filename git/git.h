@@ -95,7 +95,6 @@ public:
    /* END COMMIT WORK */
 
    /* START COMMIT INFO */
-   QPair<QString, QString> getSplitCommitMsg(const QString &sha);
    bool checkoutFile(const QString &fileName);
    GitExecResult resetFile(const QString &fileName);
    GitExecResult blame(const QString &file, const QString &commitFrom);
