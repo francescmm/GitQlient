@@ -34,8 +34,6 @@
 class Git;
 struct WorkingDirInfo;
 
-static const auto ZERO_SHA = QString("0000000000000000000000000000000000000000");
-
 class RevisionsCache : public QObject
 {
    Q_OBJECT

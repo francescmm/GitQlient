@@ -256,7 +256,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          QColor color;
          if (i == activeLane)
          {
-            if (r.sha() == ZERO_SHA && !mGit->pendingLocalChanges())
+            if (r.sha() == CommitInfo::ZERO_SHA && !mGit->pendingLocalChanges())
                color = QColor("#D89000");
             else
                color = activeColor;
@@ -296,7 +296,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
             default:
                break;
          }
-         paintGraphLane(p, ln, laneHeadPresent, x1, x2, color, activeColor, back, r.sha() == ZERO_SHA);
+         paintGraphLane(p, ln, laneHeadPresent, x1, x2, color, activeColor, back, r.sha() == CommitInfo::ZERO_SHA);
 
          if (mView->hasActiveFilter())
             break;

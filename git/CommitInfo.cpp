@@ -2,6 +2,8 @@
 
 #include <QStringList>
 
+const QString CommitInfo::ZERO_SHA = QString("0000000000000000000000000000000000000000");
+
 CommitInfo::CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
                        const QString &log, const QString &longLog, int idx)
 {

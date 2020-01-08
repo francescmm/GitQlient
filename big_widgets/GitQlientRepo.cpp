@@ -7,12 +7,15 @@
 #include <HistoryWidget.h>
 #include <CommitHistoryView.h>
 #include <git.h>
+#include <GitRepoLoader.h>
 #include <QLogger.h>
 #include <BlameWidget.h>
 #include <CommitInfo.h>
 #include <ProgressDlg.h>
 #include <GitConfigDlg.h>
 #include <DiffWidget.h>
+#include <RevisionsCache.h>
+#include <GitBase.h>
 
 #include <QFileSystemModel>
 #include <QTimer>
@@ -153,7 +156,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          setWatcher();
 
-         mRepoWidget->onCommitSelected(ZERO_SHA);
+         mRepoWidget->onCommitSelected(CommitInfo::ZERO_SHA);
 
          mRepoWidget->reload();
 

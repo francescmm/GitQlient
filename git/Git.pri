@@ -6,6 +6,7 @@ HEADERS += \
     $$PWD/GitBase.h \
     $$PWD/GitCloneProcess.h \
     $$PWD/GitExecResult.h \
+    $$PWD/GitRepoLoader.h \
     $$PWD/GitRequestorProcess.h \
     $$PWD/GitSyncProcess.h \
     $$PWD/Reference.h \
@@ -21,6 +22,7 @@ SOURCES += \
     $$PWD/GitBase.cpp \
     $$PWD/GitCloneProcess.cpp \
     $$PWD/GitExecResult.cpp \
+    $$PWD/GitRepoLoader.cpp \
     $$PWD/GitRequestorProcess.cpp \
     $$PWD/GitSyncProcess.cpp \
     $$PWD/Reference.cpp \

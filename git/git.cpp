@@ -14,6 +14,7 @@
 #include <GitSyncProcess.h>
 #include <GitCloneProcess.h>
 #include <GitRequestorProcess.h>
+#include <GitBase.h>
 
 #include <QApplication>
 #include <QDir>
@@ -82,7 +83,7 @@ GitExecResult Git::getCommitDiff(const QString &sha, const QString &diffToSha)
    {
       QString runCmd;
 
-      if (sha != ZERO_SHA)
+      if (sha != CommitInfo::ZERO_SHA)
       {
          runCmd = "git diff-tree --no-color -r --patch-with-stat -C -m ";
 
@@ -172,7 +173,7 @@ bool Git::submoduleRemove(const QString &)
 
 RevisionFile Git::getWipFiles()
 {
-   return mCache->getRevisionFile(ZERO_SHA);
+   return mCache->getRevisionFile(CommitInfo::ZERO_SHA);
 }
 
 RevisionFile Git::getCommitFiles(const QString &sha) const
@@ -194,7 +195,7 @@ RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha, boo
       mySha = QString("ALL_MERGE_FILES" + QString(sha));
       runCmd.append(sha);
    }
-   else if (!diffToSha.isEmpty() && (sha != ZERO_SHA))
+   else if (!diffToSha.isEmpty() && (sha != CommitInfo::ZERO_SHA))
    {
       mySha = sha;
       runCmd.append(diffToSha + " " + sha);

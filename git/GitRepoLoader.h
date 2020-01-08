@@ -23,25 +23,37 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <GitExecResult.h>
-#include <RevisionsCache.h>
-
 #include <QObject>
 #include <QSharedPointer>
+#include <QVector>
 
-class GitBase : public QObject
+class GitBase;
+class RevisionsCache;
+
+class GitRepoLoader : public QObject
 {
    Q_OBJECT
 
 signals:
+   void signalLoadingStarted();
+   void signalLoadingFinished();
    void cancelAllProcesses(QPrivateSignal);
 
 public:
-   explicit GitBase(const QString &workingDirectory, QObject *parent = nullptr);
-   QPair<bool, QString> run(const QString &cmd) const;
-   QString getWorkingDir() const { return mWorkingDirectory; }
-   void setWorkingDir(const QString &workingDir) { mWorkingDirectory = workingDir; }
+   explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache,
+                          QObject *parent = nullptr);
+   bool loadRepository();
+   void updateWipRevision();
+   void cancelAll();
 
-protected:
-   QString mWorkingDirectory;
+private:
+   bool mLocked = false;
+   QSharedPointer<GitBase> mGitBase;
+   QSharedPointer<RevisionsCache> mRevCache;
+
+   bool configureRepoDirectory();
+   void loadReferences();
+   void requestRevisions();
+   void processRevision(const QByteArray &ba);
+   QVector<QString> getUntrackedFiles() const;
 };

@@ -6,6 +6,7 @@
 #include <BranchesWidget.h>
 #include <WorkInProgressWidget.h>
 #include <CommitInfoWidget.h>
+#include <CommitInfo.h>
 #include "git.h"
 
 #include <QLogger.h>
@@ -90,7 +91,7 @@ void HistoryWidget::reload()
    mBranchesWidget->showBranches();
 
    const auto commitStackedIndex = mCommitStackedWidget->currentIndex();
-   const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : ZERO_SHA;
+   const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : CommitInfo::ZERO_SHA;
 
    focusOnCommit(currentSha);
 
@@ -103,7 +104,7 @@ void HistoryWidget::updateUiFromWatcher()
    const auto commitStackedIndex = mCommitStackedWidget->currentIndex();
 
    if (commitStackedIndex == 1 && !mCommitWidget->isAmendActive())
-      mCommitWidget->configure(ZERO_SHA);
+      mCommitWidget->configure(CommitInfo::ZERO_SHA);
 }
 
 void HistoryWidget::focusOnCommit(const QString &sha)
@@ -147,7 +148,7 @@ void HistoryWidget::openDiff(const QModelIndex &index)
 
 void HistoryWidget::onCommitSelected(const QString &goToSha)
 {
-   const auto isWip = goToSha == ZERO_SHA;
+   const auto isWip = goToSha == CommitInfo::ZERO_SHA;
    mCommitStackedWidget->setCurrentIndex(isWip);
 
    QLog_Info("UI", QString("Selected commit {%1}").arg(goToSha));

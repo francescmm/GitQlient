@@ -78,7 +78,7 @@ void WorkInProgressWidget::configure(const QString &sha)
 
 void WorkInProgressWidget::resetInfo(bool force)
 {
-   mIsAmend = mCurrentSha != ZERO_SHA;
+   mIsAmend = mCurrentSha != CommitInfo::ZERO_SHA;
 
    QLog_Info("UI",
              QString("Configuring commit widget with sha {%1} as {%2}")
@@ -320,8 +320,9 @@ void WorkInProgressWidget::showUnstagedMenu(const QPoint &pos)
       const auto fileName = item->toolTip();
       const auto unsolvedConflicts = item->data(Qt::UserRole + 1).toBool();
       const auto contextMenu = new UnstagedFilesContextMenu(mGit, fileName, unsolvedConflicts, this);
-      connect(contextMenu, &UnstagedFilesContextMenu::signalShowDiff, this,
-              [this, fileName]() { emit signalShowDiff(ZERO_SHA, mGit->getCommitInfo(ZERO_SHA).parent(0), fileName); });
+      connect(contextMenu, &UnstagedFilesContextMenu::signalShowDiff, this, [this, fileName]() {
+         emit signalShowDiff(CommitInfo::ZERO_SHA, mGit->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+      });
       connect(contextMenu, &UnstagedFilesContextMenu::signalCommitAll, this,
               &WorkInProgressWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedFilesContextMenu::signalRevertAll, this, &WorkInProgressWidget::revertAllChanges);
@@ -371,8 +372,9 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
       const auto fileName = item->toolTip();
       const auto menu = new QMenu(this);
       const auto diffAction = menu->addAction("See changes");
-      connect(diffAction, &QAction::triggered, this,
-              [this, fileName]() { emit signalShowDiff(ZERO_SHA, mGit->getCommitInfo(ZERO_SHA).parent(0), fileName); });
+      connect(diffAction, &QAction::triggered, this, [this, fileName]() {
+         emit signalShowDiff(CommitInfo::ZERO_SHA, mGit->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+      });
 
       if (item->flags() & Qt::ItemIsSelectable)
       {

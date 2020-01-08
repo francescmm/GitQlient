@@ -2,6 +2,7 @@
 #include "ui_CreateRepoDlg.h"
 
 #include <git.h>
+#include <GitBase.h>
 #include <GitQlientStyles.h>
 #include <GitQlientSettings.h>
 

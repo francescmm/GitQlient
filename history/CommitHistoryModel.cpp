@@ -116,7 +116,7 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    QDateTime d;
    d.setSecsSinceEpoch(r.authorDate().toUInt());
 
-   return sha == ZERO_SHA
+   return sha == CommitInfo::ZERO_SHA
        ? QString()
        : QString("<p>%1 - %2<p></p>%3</p>%4")
              .arg(r.author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);

@@ -9,7 +9,7 @@
 
 #include <RevisionFile.h>
 #include <ReferenceType.h>
-#include <GitBase.h>
+#include <GitExecResult.h>
 
 #include <QVariant>
 #include <QVector>
@@ -18,6 +18,7 @@
 template<class, class>
 struct QPair;
 
+class GitBase;
 class RevisionsCache;
 class CommitInfo;
 

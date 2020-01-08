@@ -94,7 +94,7 @@ void CommitInfoWidget::configure(const QString &sha)
    mCurrentSha = sha;
    mParentSha = sha;
 
-   if (sha != ZERO_SHA and !sha.isEmpty())
+   if (sha != CommitInfo::ZERO_SHA and !sha.isEmpty())
    {
       const auto currentRev = mGit->getCommitInfo(sha);
 

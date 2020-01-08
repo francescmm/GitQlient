@@ -4,6 +4,7 @@
 #include <WorkInProgressWidget.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
+#include <CommitInfo.h>
 
 #include <QMessageBox>
 #include <QApplication>
@@ -32,7 +33,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
    {
       const auto sha = mShas.first();
 
-      if (sha == ZERO_SHA)
+      if (sha == CommitInfo::ZERO_SHA)
       {
          const auto stashAction = addAction("Push stash");
          connect(stashAction, &QAction::triggered, this, &CommitHistoryContextMenu::stashPush);
@@ -44,7 +45,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
       const auto commitAction = addAction("See diff");
       connect(commitAction, &QAction::triggered, this, [this]() { emit signalOpenDiff(mShas.first()); });
 
-      if (sha != ZERO_SHA)
+      if (sha != CommitInfo::ZERO_SHA)
       {
          const auto createBranchAction = addAction("Create branch here");
          connect(createBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::createBranch);
@@ -117,7 +118,7 @@ void CommitHistoryContextMenu::createMultipleShasMenu()
       connect(diffAction, &QAction::triggered, this, [this]() { emit signalOpenCompareDiff(mShas); });
    }
 
-   if (!mShas.contains(ZERO_SHA))
+   if (!mShas.contains(CommitInfo::ZERO_SHA))
    {
       const auto exportAsPatchAction = addAction("Export as patch");
       connect(exportAsPatchAction, &QAction::triggered, this, &CommitHistoryContextMenu::exportAsPatch);

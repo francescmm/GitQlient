@@ -6,6 +6,7 @@
 #include <ProgressDlg.h>
 #include <GitQlientSettings.h>
 #include <ClickableFrame.h>
+#include <GitBase.h>
 
 #include <QPushButton>
 #include <QGridLayout>

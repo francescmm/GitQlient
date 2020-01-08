@@ -1,6 +1,7 @@
 #include "FileDiffWidget.h"
-#include "FileDiffView.h"
-#include "FileDiffHighlighter.h"
+#include <FileDiffView.h>
+#include <FileDiffHighlighter.h>
+#include <CommitInfo.h>
 #include "git.h"
 
 #include <QHBoxLayout>
@@ -33,7 +34,7 @@ void FileDiffWidget::clear()
 
 bool FileDiffWidget::reload()
 {
-   if (mCurrentSha == ZERO_SHA)
+   if (mCurrentSha == CommitInfo::ZERO_SHA)
       return configure(mCurrentSha, mPreviousSha, mCurrentFile);
 
    return false;
@@ -50,7 +51,7 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    if (destFile.contains("-->"))
       destFile = destFile.split("--> ").last().split("(").first().trimmed();
 
-   auto text = mGit->getFileDiff(currentSha == ZERO_SHA ? QString() : currentSha, previousSha, destFile);
+   auto text = mGit->getFileDiff(currentSha == CommitInfo::ZERO_SHA ? QString() : currentSha, previousSha, destFile);
    auto lines = text.split("\n");
 
    for (auto i = 0; !lines.isEmpty() && i < 5; ++i)

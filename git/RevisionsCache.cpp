@@ -80,7 +80,7 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 {
    const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
 
-   insertRevisionFile(ZERO_SHA, fakeRevFile);
+   insertRevisionFile(CommitInfo::ZERO_SHA, fakeRevFile);
 
    if (!mCacheLocked)
    {
@@ -88,7 +88,8 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
       const auto author = QString("-");
       const auto log
           = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
-      CommitInfo c(ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log, longLog, 0);
+      CommitInfo c(CommitInfo::ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log,
+                   longLog, 0);
       c.isDiffCache = true;
 
       updateLanes(c);
@@ -259,8 +260,8 @@ int RevisionsCache::findFileIndex(const RevisionFile &rf, const QString &name)
 
 bool RevisionsCache::pendingLocalChanges() const
 {
-   const auto rf = getRevisionFile(ZERO_SHA);
-   return mRevisionFilesMap.value(ZERO_SHA).count() == mUntrackedfiles.count();
+   const auto rf = getRevisionFile(CommitInfo::ZERO_SHA);
+   return mRevisionFilesMap.value(CommitInfo::ZERO_SHA).count() == mUntrackedfiles.count();
 }
 
 void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)

@@ -55,6 +55,8 @@ public:
    int orderIdx = -1;
    bool isDiffCache = false;
 
+   static const QString ZERO_SHA;
+
 private:
    QChar mBoundaryInfo;
    QString mSha;

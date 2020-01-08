@@ -75,7 +75,7 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent)
 
 void FullDiffWidget::reload()
 {
-   if (mCurrentSha != ZERO_SHA)
+   if (mCurrentSha != CommitInfo::ZERO_SHA)
       loadDiff(mCurrentSha, mPreviousSha);
 }
 
