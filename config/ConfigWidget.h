@@ -27,7 +27,7 @@
 
 class QPushButton;
 class QButtonGroup;
-class Git;
+class GitConfig;
 class ProgressDlg;
 class GitQlientSettings;
 class QVBoxLayout;
@@ -46,7 +46,7 @@ public:
    void updateRecentProjectsList();
 
 private:
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitConfig> mGit;
    QPushButton *mOpenRepo = nullptr;
    QPushButton *mCloneRepo = nullptr;
    QPushButton *mInitRepo = nullptr;
@@ -62,5 +62,5 @@ private:
    void initRepo();
    QWidget *createConfigWidget();
    QWidget *createRecentProjectsPage();
-   void updateProgressDialog(const QString &stepDescription, int value);
+   void updateProgressDialog(QString stepDescription, int value);
 };

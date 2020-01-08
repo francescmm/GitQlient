@@ -27,7 +27,6 @@ class Git : public QObject
    Q_OBJECT
 
 signals:
-   void signalCloningProgress(QString stepDescription, int value);
    void signalWipUpdated();
 
 public:
@@ -39,11 +38,6 @@ public:
    };
 
    explicit Git(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent = nullptr);
-
-   /* START Git CONFIGURATION */
-   bool clone(const QString &url, const QString &fullPath);
-   bool initRepo(const QString &fullPath);
-   /* END Git CONFIGURATION */
 
    /* START CACHE */
    int totalCommits() const;

@@ -587,20 +587,6 @@ QVector<QString> Git::getStashes()
    return stashes;
 }
 
-bool Git::clone(const QString &url, const QString &fullPath)
-{
-   const auto asyncRun = new GitCloneProcess(mGitBase->getWorkingDir());
-   connect(asyncRun, &GitCloneProcess::signalProgress, this, &Git::signalCloningProgress, Qt::DirectConnection);
-
-   QString buffer;
-   return asyncRun->run(QString("git clone --progress %1 %2").arg(url, fullPath), buffer);
-}
-
-bool Git::initRepo(const QString &fullPath)
-{
-   return mGitBase->run(QString("git init %1").arg(fullPath)).first;
-}
-
 int Git::totalCommits() const
 {
    return mCache->count();

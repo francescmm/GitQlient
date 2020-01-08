@@ -25,6 +25,7 @@
 
 #include <QSharedPointer>
 #include <QString>
+#include <QObject>
 
 class GitBase;
 
@@ -36,15 +37,22 @@ struct GitUserInfo
    bool isValid() const;
 };
 
-class GitConfig
+class GitConfig : public QObject
 {
+   Q_OBJECT
+
+signals:
+   void signalCloningProgress(QString stepDescription, int value);
+
 public:
-   explicit GitConfig(QSharedPointer<GitBase> gitBase);
+   explicit GitConfig(QSharedPointer<GitBase> gitBase, QObject *parent = nullptr);
 
    GitUserInfo getGlobalUserInfo() const;
    void setGlobalUserInfo(const GitUserInfo &info);
    GitUserInfo getLocalUserInfo() const;
    void setLocalUserInfo(const GitUserInfo &info);
+   bool clone(const QString &url, const QString &fullPath);
+   bool initRepo(const QString &fullPath);
 
 private:
    QSharedPointer<GitBase> mGitBase;
