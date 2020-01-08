@@ -39,17 +39,10 @@ Git::Git(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, 
 {
 }
 
-uint Git::checkRef(const QString &sha, uint mask) const
-{
-   const auto ref = mCache->getReference(sha);
-
-   return ref.isValid() ? ref.type & mask : 0;
-}
-
 const QStringList Git::getRefNames(const QString &sha, uint mask) const
 {
    QStringList result;
-   if (!checkRef(sha, mask))
+   if (!mCache->checkRef(sha, mask))
       return result;
 
    const auto rf = mCache->getReference(sha);

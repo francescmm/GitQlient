@@ -264,6 +264,13 @@ bool RevisionsCache::pendingLocalChanges() const
    return mRevisionFilesMap.value(CommitInfo::ZERO_SHA).count() == mUntrackedfiles.count();
 }
 
+uint RevisionsCache::checkRef(const QString &sha, uint mask) const
+{
+   const auto ref = getReference(sha);
+
+   return ref.isValid() ? ref.type & mask : 0;
+}
+
 void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
    const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));

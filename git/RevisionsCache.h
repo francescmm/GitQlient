@@ -69,6 +69,8 @@ public:
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles) { mUntrackedfiles = untrackedFiles; }
    bool pendingLocalChanges() const;
 
+   uint checkRef(const QString &sha, uint mask = ANY_REF) const;
+
 private:
    bool mCacheLocked = true;
    QVector<CommitInfo *> mCommits;

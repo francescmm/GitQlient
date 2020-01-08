@@ -2,6 +2,7 @@
 
 #include <QFrame>
 
+class RevisionsCache;
 class Git;
 class CommitHistoryModel;
 class CommitHistoryView;
@@ -30,7 +31,8 @@ signals:
    void signalAllBranchesActive(bool showAll);
 
 public:
-   explicit HistoryWidget(const QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> git,
+                          QWidget *parent = nullptr);
    void clear();
    void reload();
    void updateUiFromWatcher();

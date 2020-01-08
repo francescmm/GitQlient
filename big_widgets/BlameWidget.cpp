@@ -18,11 +18,11 @@
 #include <QClipboard>
 #include <QTabWidget>
 
-BlameWidget::BlameWidget(const QSharedPointer<Git> &git, QWidget *parent)
+BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , fileSystemModel(new QFileSystemModel())
-   , mRepoModel(new CommitHistoryModel(mGit))
+   , mRepoModel(new CommitHistoryModel(cache, mGit))
    , mRepoView(new CommitHistoryView(mGit))
    , fileSystemView(new QTreeView())
    , mTabWidget(new QTabWidget())
@@ -33,7 +33,7 @@ BlameWidget::BlameWidget(const QSharedPointer<Git> &git, QWidget *parent)
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::GRAPH), true);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::DATE), true);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::AUTHOR), true);
-   mRepoView->setItemDelegate(new RepositoryViewDelegate(mGit, mRepoView));
+   mRepoView->setItemDelegate(new RepositoryViewDelegate(cache, mGit, mRepoView));
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(450);
    mRepoView->setSelectionBehavior(QAbstractItemView::SelectRows);

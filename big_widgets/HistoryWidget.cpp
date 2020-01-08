@@ -19,9 +19,10 @@
 
 using namespace QLogger;
 
-HistoryWidget::HistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
+HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> git,
+                             QWidget *parent)
    : QFrame(parent)
-   , mRepositoryModel(new CommitHistoryModel(git))
+   , mRepositoryModel(new CommitHistoryModel(cache, git))
    , mRepositoryView(new CommitHistoryView(git))
    , mBranchesWidget(new BranchesWidget(git))
    , mGoToSha(new QLineEdit())
@@ -46,7 +47,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
    connect(mGoToSha, &QLineEdit::returnPressed, this, &HistoryWidget::goToSha);
 
    mRepositoryView->setModel(mRepositoryModel);
-   mRepositoryView->setItemDelegate(new RepositoryViewDelegate(git, mRepositoryView));
+   mRepositoryView->setItemDelegate(new RepositoryViewDelegate(cache, git, mRepositoryView));
    mRepositoryView->setEnabled(true);
 
    connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &HistoryWidget::signalViewUpdated);

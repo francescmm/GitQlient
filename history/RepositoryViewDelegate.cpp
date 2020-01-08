@@ -1,20 +1,23 @@
 ﻿#include "RepositoryViewDelegate.h"
 
-#include <git.h>
 #include <GitQlientStyles.h>
 #include <lanes.h>
 #include <CommitInfo.h>
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryView.h>
 #include <CommitHistoryModel.h>
+#include <RevisionsCache.h>
+#include <git.h>
 
 #include <QSortFilterProxyModel>
 #include <QPainter>
 
 static const int MIN_VIEW_WIDTH_PX = 480;
 
-RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<Git> &git, CommitHistoryView *view)
-   : mGit(git)
+RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<RevisionsCache> &cache,
+                                               const QSharedPointer<Git> &git, CommitHistoryView *view)
+   : mCache(cache)
+   , mGit(git)
    , mView(view)
 {
 }
@@ -314,7 +317,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto offset = 0;
 
-   if (mGit->checkRef(sha) > 0 && !mView->hasActiveFilter())
+   if (mCache->checkRef(sha) > 0 && !mView->hasActiveFilter())
    {
       offset = 5;
       paintTagBranch(p, opt, offset, sha);
@@ -335,7 +338,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
                                             const QString &sha) const
 {
    QMap<QString, QColor> markValues;
-   auto ref_types = mGit->checkRef(sha);
+   auto ref_types = mCache->checkRef(sha);
    const auto currentBranch = mGit->getCurrentBranch();
 
    if (ref_types != 0)

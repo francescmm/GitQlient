@@ -26,6 +26,7 @@
 #include <QFrame>
 #include <QMap>
 
+class RevisionsCache;
 class Git;
 class QFileSystemModel;
 class FileBlameWidget;
@@ -43,7 +44,8 @@ signals:
    void showFileDiff(const QString &sha, const QString &parentSha, const QString &file);
 
 public:
-   explicit BlameWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+                        QWidget *parent = nullptr);
 
    void init(const QString &workingDirectory);
    void showFileHistory(const QModelIndex &index);

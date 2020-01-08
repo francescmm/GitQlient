@@ -2,12 +2,15 @@
 
 #include <CommitHistoryColumns.h>
 #include <CommitInfo.h>
+#include <RevisionsCache.h>
 #include <git.h>
 
 #include <QDateTime>
 
-CommitHistoryModel::CommitHistoryModel(const QSharedPointer<Git> &git, QObject *p)
+CommitHistoryModel::CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+                                       QObject *p)
    : QAbstractItemModel(p)
+   , mCache(cache)
    , mGit(git)
 {
    mColumns.insert(CommitHistoryColumns::GRAPH, "Graph");
@@ -95,7 +98,7 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    QString auxMessage;
    const auto sha = r.sha();
 
-   if ((mGit->checkRef(sha) & CUR_BRANCH) && mGit->getCurrentBranch().isEmpty())
+   if ((mCache->checkRef(sha) & CUR_BRANCH) && mGit->getCurrentBranch().isEmpty())
       auxMessage.append("<p>Status: <b>detached</b></p>");
 
    const auto localBranches = mGit->getRefNames(sha, BRANCH);
