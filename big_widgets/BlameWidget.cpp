@@ -23,7 +23,7 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    , mGit(git)
    , fileSystemModel(new QFileSystemModel())
    , mRepoModel(new CommitHistoryModel(cache, mGit))
-   , mRepoView(new CommitHistoryView(mGit))
+   , mRepoView(new CommitHistoryView(cache, mGit))
    , fileSystemView(new QTreeView())
    , mTabWidget(new QTabWidget())
 {

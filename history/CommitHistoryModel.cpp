@@ -101,17 +101,17 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    if ((mCache->checkRef(sha) & CUR_BRANCH) && mGit->getCurrentBranch().isEmpty())
       auxMessage.append("<p>Status: <b>detached</b></p>");
 
-   const auto localBranches = mGit->getRefNames(sha, BRANCH);
+   const auto localBranches = mCache->getRefNames(sha, BRANCH);
 
    if (!localBranches.isEmpty())
       auxMessage.append(QString("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
 
-   const auto remoteBranches = mGit->getRefNames(sha, RMT_BRANCH);
+   const auto remoteBranches = mCache->getRefNames(sha, RMT_BRANCH);
 
    if (!remoteBranches.isEmpty())
       auxMessage.append(QString("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
 
-   const auto tags = mGit->getRefNames(sha, TAG);
+   const auto tags = mCache->getRefNames(sha, TAG);
 
    if (!tags.isEmpty())
       auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));
@@ -152,7 +152,7 @@ QVariant CommitHistoryModel::data(const QModelIndex &index, int role) const
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
       return QVariant();
 
-   const auto r = mGit->getCommitInfoByRow(index.row());
+   const auto r = mCache->getCommitInfoByRow(index.row());
 
    if (role == Qt::ToolTipRole)
       return getToolTipData(r);

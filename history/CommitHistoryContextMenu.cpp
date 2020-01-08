@@ -5,6 +5,7 @@
 #include <BranchDlg.h>
 #include <TagDlg.h>
 #include <CommitInfo.h>
+#include <RevisionsCache.h>
 
 #include <QMessageBox>
 #include <QApplication>
@@ -15,9 +16,11 @@
 
 using namespace QLogger;
 
-CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<Git> &git, const QStringList &shas,
+CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<RevisionsCache> &cache,
+                                                   const QSharedPointer<Git> &git, const QStringList &shas,
                                                    QWidget *parent)
    : QMenu(parent)
+   , mCache(cache)
    , mGit(git)
    , mShas(shas)
 {
@@ -331,8 +334,8 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 {
    auto isCommitInCurrentBranch = false;
    const auto currentBranch = mGit->getCurrentBranch();
-   const auto remoteBranches = mGit->getRefNames(sha, RMT_BRANCH);
-   const auto localBranches = mGit->getRefNames(sha, BRANCH);
+   const auto remoteBranches = mCache->getRefNames(sha, RMT_BRANCH);
+   const auto localBranches = mCache->getRefNames(sha, BRANCH);
    auto branches = localBranches;
 
    for (const auto &branch : remoteBranches)

@@ -41,7 +41,7 @@ public:
 
    /* START CACHE */
    CommitInfo getCommitInfoByRow(int row) const;
-   CommitInfo getCommitInfo(const QString &sha);
+   CommitInfo getCommitInfo(const QString &sha) const;
    /*  END  CACHE */
 
    /* START BRANCHES */
@@ -115,8 +115,6 @@ public:
    RevisionFile getCommitFiles(const QString &sha) const;
    RevisionFile getDiffFiles(const QString &sha, const QString &sha2, bool all = false);
 
-   CommitInfo getCommitInfo(const QString &sha) const;
-   const QStringList getRefNames(const QString &sha, uint mask = ANY_REF) const;
    GitExecResult merge(const QString &into, QStringList sources);
 
    QString getWorkingDir() const;

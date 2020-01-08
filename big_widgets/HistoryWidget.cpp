@@ -23,7 +23,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
                              QWidget *parent)
    : QFrame(parent)
    , mRepositoryModel(new CommitHistoryModel(cache, git))
-   , mRepositoryView(new CommitHistoryView(git))
+   , mRepositoryView(new CommitHistoryView(cache, git))
    , mBranchesWidget(new BranchesWidget(git))
    , mGoToSha(new QLineEdit())
    , mCommitStackedWidget(new QStackedWidget())

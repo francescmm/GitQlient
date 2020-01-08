@@ -23,8 +23,10 @@ Author: Marco Costalba (C) 2005-2007
 #include <QLogger.h>
 using namespace QLogger;
 
-CommitHistoryView::CommitHistoryView(const QSharedPointer<Git> &git, QWidget *parent)
+CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+                                     QWidget *parent)
    : QTreeView(parent)
+   , mCache(cache)
    , mGit(git)
 {
    setEnabled(false);
@@ -145,7 +147,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
 
       if (!shas.isEmpty())
       {
-         const auto menu = new CommitHistoryContextMenu(mGit, shas, this);
+         const auto menu = new CommitHistoryContextMenu(mCache, mGit, shas, this);
          connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,

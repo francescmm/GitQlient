@@ -271,6 +271,32 @@ uint RevisionsCache::checkRef(const QString &sha, uint mask) const
    return ref.isValid() ? ref.type & mask : 0;
 }
 
+const QStringList RevisionsCache::getRefNames(const QString &sha, uint mask) const
+{
+   QStringList result;
+   if (!checkRef(sha, mask))
+      return result;
+
+   const auto rf = getReference(sha);
+
+   if (mask & TAG)
+      result << rf.tags;
+
+   if (mask & BRANCH)
+      result << rf.branches;
+
+   if (mask & RMT_BRANCH)
+      result << rf.remoteBranches;
+
+   if (mask & REF)
+      result << rf.refs;
+
+   if (mask == APPLIED || mask == UN_APPLIED)
+      result << QStringList(rf.stgitPatch);
+
+   return result;
+}
+
 void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
    const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));

@@ -39,37 +39,6 @@ Git::Git(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, 
 {
 }
 
-const QStringList Git::getRefNames(const QString &sha, uint mask) const
-{
-   QStringList result;
-   if (!mCache->checkRef(sha, mask))
-      return result;
-
-   const auto rf = mCache->getReference(sha);
-
-   if (mask & TAG)
-      result << rf.tags;
-
-   if (mask & BRANCH)
-      result << rf.branches;
-
-   if (mask & RMT_BRANCH)
-      result << rf.remoteBranches;
-
-   if (mask & REF)
-      result << rf.refs;
-
-   if (mask == APPLIED || mask == UN_APPLIED)
-      result << QStringList(rf.stgitPatch);
-
-   return result;
-}
-
-CommitInfo Git::getCommitInfo(const QString &sha) const
-{
-   return mCache->getCommitInfo(sha);
-}
-
 GitExecResult Git::getCommitDiff(const QString &sha, const QString &diffToSha)
 {
    if (!sha.isEmpty())
@@ -576,7 +545,7 @@ CommitInfo Git::getCommitInfoByRow(int row) const
    return mCache->getCommitInfoByRow(row);
 }
 
-CommitInfo Git::getCommitInfo(const QString &sha)
+CommitInfo Git::getCommitInfo(const QString &sha) const
 {
    return mCache->getCommitInfo(sha);
 }
