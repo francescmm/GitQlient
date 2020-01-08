@@ -25,6 +25,7 @@
 
 #include <QWidget>
 
+class RevisionsCache;
 class Git;
 class QLabel;
 class FileListWidget;
@@ -39,13 +40,15 @@ signals:
    void signalShowFileHistory(const QString &fileName);
 
 public:
-   explicit CommitInfoWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+                             QWidget *parent = nullptr);
 
    void configure(const QString &sha);
    QString getCurrentCommitSha() const;
    void clear();
 
 private:
+   QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<Git> mGit;
    QString mCurrentSha;
    QString mParentSha;

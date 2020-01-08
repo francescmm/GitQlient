@@ -20,10 +20,11 @@
 
 BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git, QWidget *parent)
    : QFrame(parent)
+   , mCache(cache)
    , mGit(git)
    , fileSystemModel(new QFileSystemModel())
-   , mRepoModel(new CommitHistoryModel(cache, mGit))
-   , mRepoView(new CommitHistoryView(cache, mGit))
+   , mRepoModel(new CommitHistoryModel(mCache, mGit))
+   , mRepoView(new CommitHistoryView(mCache, mGit))
    , fileSystemView(new QTreeView())
    , mTabWidget(new QTabWidget())
 {
@@ -92,7 +93,7 @@ void BlameWidget::showFileHistory(const QString &filePath)
          mRepoView->blockSignals(false);
 
          const auto previousSha = shaHistory.count() > 1 ? shaHistory.at(1) : QString(tr("No info"));
-         const auto fileBlameWidget = new FileBlameWidget(mGit);
+         const auto fileBlameWidget = new FileBlameWidget(mCache, mGit);
 
          fileBlameWidget->setup(filePath, shaHistory.constFirst(), previousSha);
          connect(fileBlameWidget, &FileBlameWidget::signalCommitSelected, mRepoView, &CommitHistoryView::focusOnCommit);
@@ -108,6 +109,11 @@ void BlameWidget::showFileHistory(const QString &filePath)
    }
    else
       mTabWidget->setCurrentWidget(mTabsMap.value(filePath));
+}
+
+void BlameWidget::onNewRevisions(int totalCommits)
+{
+   mRepoModel->onNewRevisions(totalCommits);
 }
 
 void BlameWidget::reloadBlame(const QModelIndex &index)

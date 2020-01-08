@@ -39,11 +39,6 @@ public:
 
    explicit Git(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent = nullptr);
 
-   /* START CACHE */
-   CommitInfo getCommitInfoByRow(int row) const;
-   CommitInfo getCommitInfo(const QString &sha) const;
-   /*  END  CACHE */
-
    /* START BRANCHES */
    GitExecResult createBranchFromAnotherBranch(const QString &oldName, const QString &newName);
    GitExecResult createBranchAtCommit(const QString &commitSha, const QString &branchName);
@@ -91,7 +86,6 @@ public:
    bool resetCommits(int parentDepth);
    GitExecResult checkoutCommit(const QString &sha);
    GitExecResult markFileAsResolved(const QString &fileName);
-   bool pendingLocalChanges();
    /* END COMMIT WORK */
 
    /* START COMMIT INFO */
@@ -111,9 +105,7 @@ public:
    GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
    QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 
-   RevisionFile getWipFiles();
-   RevisionFile getCommitFiles(const QString &sha) const;
-   RevisionFile getDiffFiles(const QString &sha, const QString &sha2, bool all = false);
+   RevisionFile getDiffFiles(const QString &sha, const QString &sha2);
 
    GitExecResult merge(const QString &into, QStringList sources);
 
@@ -123,7 +115,7 @@ private:
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<RevisionsCache> mCache;
 
-   bool updateIndex(const QStringList &selFiles);
+   bool updateIndex(const RevisionFile &files, const QStringList &selFiles);
    static const QString quote(const QStringList &sl);
 };
 

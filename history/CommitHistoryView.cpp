@@ -15,6 +15,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <ShaFilterProxyModel.h>
 #include <git.h>
 #include <CommitInfo.h>
+#include <RevisionsCache.h>
 
 #include <QHeaderView>
 #include <QSettings>
@@ -118,7 +119,7 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 
    QModelIndex index;
-   auto row = mGit->getCommitInfo(mCurrentSha).orderIdx;
+   auto row = mCache->getCommitInfo(mCurrentSha).orderIdx;
 
    if (mIsFiltering)
    {

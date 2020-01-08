@@ -7,6 +7,7 @@
 #include <RevisionFile.h>
 #include <UnstagedFilesContextMenu.h>
 #include <FileListDelegate.h>
+#include <RevisionsCache.h>
 
 #include <QDir>
 #include <QKeyEvent>
@@ -31,9 +32,11 @@ const int WorkInProgressWidget::kMaxTitleChars = 50;
 
 QString WorkInProgressWidget::lastMsgBeforeError;
 
-WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<Git> &git, QWidget *parent)
+WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+                                           QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::WorkInProgressWidget)
+   , mCache(cache)
    , mGit(git)
 {
    ui->setupUi(this);
@@ -103,13 +106,13 @@ void WorkInProgressWidget::resetInfo(bool force)
    // set-up files list
    if (mIsAmend)
    {
-      const auto revInfo = mGit->getCommitInfo(mCurrentSha);
+      const auto revInfo = mCache->getCommitInfo(mCurrentSha);
       const auto author = revInfo.author().split("<");
       ui->leAuthorName->setText(author.first());
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
    }
 
-   const auto files = mGit->getWipFiles();
+   const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA);
 
    if (!force || (mIsAmend && force))
       prepareCache();
@@ -121,7 +124,7 @@ void WorkInProgressWidget::resetInfo(bool force)
 
    if (mIsAmend)
    {
-      const auto amendFiles = mGit->getCommitFiles(mCurrentSha);
+      const auto amendFiles = mCache->getRevisionFile(mCurrentSha);
       insertFilesInList(amendFiles, ui->stagedFilesList);
    }
 
@@ -137,7 +140,7 @@ void WorkInProgressWidget::resetInfo(bool force)
 
       if (mIsAmend)
       {
-         const auto revInfo = mGit->getCommitInfo(mCurrentSha);
+         const auto revInfo = mCache->getCommitInfo(mCurrentSha);
          logMessage = qMakePair(revInfo.shortLog(), revInfo.longLog().trimmed());
       }
 
@@ -324,7 +327,7 @@ void WorkInProgressWidget::showUnstagedMenu(const QPoint &pos)
       const auto unsolvedConflicts = item->data(Qt::UserRole + 1).toBool();
       const auto contextMenu = new UnstagedFilesContextMenu(mGit, fileName, unsolvedConflicts, this);
       connect(contextMenu, &UnstagedFilesContextMenu::signalShowDiff, this, [this, fileName]() {
-         emit signalShowDiff(CommitInfo::ZERO_SHA, mGit->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+         emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
       });
       connect(contextMenu, &UnstagedFilesContextMenu::signalCommitAll, this,
               &WorkInProgressWidget::addAllFilesToCommitList);
@@ -376,7 +379,7 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
       const auto menu = new QMenu(this);
       const auto diffAction = menu->addAction("See changes");
       connect(diffAction, &QAction::triggered, this, [this, fileName]() {
-         emit signalShowDiff(CommitInfo::ZERO_SHA, mGit->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+         emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
       });
 
       if (item->flags() & Qt::ItemIsSelectable)

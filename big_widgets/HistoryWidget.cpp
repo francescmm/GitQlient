@@ -27,8 +27,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    , mBranchesWidget(new BranchesWidget(git))
    , mGoToSha(new QLineEdit())
    , mCommitStackedWidget(new QStackedWidget())
-   , mCommitWidget(new WorkInProgressWidget(git))
-   , mRevisionWidget(new CommitInfoWidget(git))
+   , mCommitWidget(new WorkInProgressWidget(cache, git))
+   , mRevisionWidget(new CommitInfoWidget(cache, git))
 {
    mCommitStackedWidget->setCurrentIndex(0);
    mCommitStackedWidget->addWidget(mRevisionWidget);

@@ -50,8 +50,10 @@ public:
    void init(const QString &workingDirectory);
    void showFileHistory(const QModelIndex &index);
    void showFileHistory(const QString &filePath);
+   void onNewRevisions(int totalCommits);
 
 private:
+   QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<Git> mGit;
    QFileSystemModel *fileSystemModel = nullptr;
    CommitHistoryModel *mRepoModel = nullptr;

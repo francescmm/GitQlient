@@ -52,7 +52,7 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 {
    clear();
 
-   const auto files = mGit->getDiffFiles(currentSha, compareToSha, true);
+   const auto files = mGit->getDiffFiles(currentSha, compareToSha);
 
    if (files.count() != 0)
    {

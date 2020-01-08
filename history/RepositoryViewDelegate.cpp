@@ -212,7 +212,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
 
-   const auto r = mGit->getCommitInfoByRow(row);
+   const auto r = mCache->getCommitInfoByRow(row);
 
    if (r.sha().isEmpty())
       return;
@@ -259,7 +259,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          QColor color;
          if (i == activeLane)
          {
-            if (r.sha() == CommitInfo::ZERO_SHA && !mGit->pendingLocalChanges())
+            if (r.sha() == CommitInfo::ZERO_SHA && !mCache->pendingLocalChanges())
                color = QColor("#D89000");
             else
                color = activeColor;
@@ -310,7 +310,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
-   const auto sha = mGit->getCommitInfoByRow(index.row()).sha();
+   const auto sha = mCache->getCommitInfoByRow(index.row()).sha();
 
    if (sha.isEmpty())
       return;

@@ -1,5 +1,6 @@
 #include <CommitInfoWidget.h>
 
+#include <RevisionsCache.h>
 #include <CommitInfo.h>
 #include <FileListWidget.h>
 #include <git.h>
@@ -12,8 +13,10 @@
 
 using namespace QLogger;
 
-CommitInfoWidget::CommitInfoWidget(const QSharedPointer<Git> &git, QWidget *parent)
+CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+                                   QWidget *parent)
    : QWidget(parent)
+   , mCache(cache)
    , mGit(git)
    , labelSha(new QLabel())
    , labelTitle(new QLabel())
@@ -96,7 +99,7 @@ void CommitInfoWidget::configure(const QString &sha)
 
    if (sha != CommitInfo::ZERO_SHA and !sha.isEmpty())
    {
-      const auto currentRev = mGit->getCommitInfo(sha);
+      const auto currentRev = mCache->getCommitInfo(sha);
 
       if (!currentRev.sha().isEmpty())
       {

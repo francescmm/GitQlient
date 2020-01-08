@@ -270,7 +270,11 @@ void GitQlientRepo::updateProgressDialog()
 void GitQlientRepo::onRepoLoadFinished()
 {
    mProgressDlg->close();
-   mRepoWidget->onNewRevisions(mGitQlientCache->count());
+
+   const auto totalCommits = mGitQlientCache->count();
+
+   mRepoWidget->onNewRevisions(totalCommits);
+   mBlameWidget->onNewRevisions(totalCommits);
 }
 
 void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)

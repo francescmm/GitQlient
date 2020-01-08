@@ -1,5 +1,6 @@
 ﻿#include "FileBlameWidget.h"
 
+#include <RevisionsCache.h>
 #include <FileDiffView.h>
 #include <git.h>
 #include <CommitInfo.h>
@@ -22,8 +23,10 @@ qint64 kSecondsOldest = QDateTime::currentDateTime().toSecsSinceEpoch();
 qint64 kIncrementSecs = 0;
 }
 
-FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent)
+FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+                                 QWidget *parent)
    : QFrame(parent)
+   , mCache(cache)
    , mGit(git)
    , mAnotation(new QFrame())
    , mCurrentSha(new QLabel())
@@ -109,7 +112,7 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
    for (const auto &line : lines)
    {
       const auto fields = line.split("\t");
-      const auto revision = mGit->getCommitInfo(fields.at(0));
+      const auto revision = mCache->getCommitInfo(fields.at(0));
       const auto dt = QDateTime::fromString(fields.at(2), Qt::ISODate);
       const auto &lineNumAndContent = fields.at(3);
       const auto divisorChar = lineNumAndContent.indexOf(")");
@@ -245,7 +248,7 @@ QLabel *FileBlameWidget::createAuthorLabel(const QString &author, bool isFirst)
 
 ClickableFrame *FileBlameWidget::createMessageLabel(const QString &sha, bool isFirst)
 {
-   const auto revision = mGit->getCommitInfo(sha);
+   const auto revision = mCache->getCommitInfo(sha);
    auto commitMsg = QString("Local changes");
 
    if (!revision.sha().isEmpty())

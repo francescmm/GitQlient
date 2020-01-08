@@ -126,38 +126,19 @@ bool Git::submoduleRemove(const QString &)
    return false;
 }
 
-RevisionFile Git::getWipFiles()
-{
-   return mCache->getRevisionFile(CommitInfo::ZERO_SHA);
-}
-
-RevisionFile Git::getCommitFiles(const QString &sha) const
-{
-   return mCache->getRevisionFile(sha);
-}
-
-RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha, bool allFiles)
+RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha)
 {
    const auto r = mCache->getCommitInfo(sha);
    if (r.parentsCount() == 0)
       return RevisionFile();
 
-   QString mySha;
+   if (mCache->containsRevisionFile(sha))
+      return mCache->getRevisionFile(sha);
+
    QString runCmd = QString("git diff-tree -C --no-color -r -m ");
 
-   if (r.parentsCount() > 1 && diffToSha.isEmpty() && allFiles)
-   {
-      mySha = QString("ALL_MERGE_FILES" + QString(sha));
-      runCmd.append(sha);
-   }
-   else if (!diffToSha.isEmpty() && (sha != CommitInfo::ZERO_SHA))
-   {
-      mySha = sha;
+   if (!diffToSha.isEmpty() && sha != CommitInfo::ZERO_SHA)
       runCmd.append(diffToSha + " " + sha);
-   }
-
-   if (mCache->containsRevisionFile(mySha))
-      return mCache->getRevisionFile(mySha);
 
    const auto ret = mGitBase->run(runCmd);
 
@@ -186,11 +167,6 @@ GitExecResult Git::markFileAsResolved(const QString &fileName)
    return ret;
 }
 
-bool Git::pendingLocalChanges()
-{
-   return mCache->pendingLocalChanges();
-}
-
 GitExecResult Git::merge(const QString &into, QStringList sources)
 {
    const auto ret = mGitBase->run(QString("git checkout -q %1").arg(into));
@@ -206,10 +182,8 @@ QString Git::getWorkingDir() const
    return mGitBase->getWorkingDir();
 }
 
-bool Git::updateIndex(const QStringList &selFiles)
+bool Git::updateIndex(const RevisionFile &files, const QStringList &selFiles)
 {
-   const auto files = getWipFiles(); // files != nullptr
-
    QStringList toAdd, toRemove;
 
    for (auto it : selFiles)
@@ -244,7 +218,7 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    bool ret = true;
 
    // get not selected files but updated in index to restore at the end
-   RevisionFile files = getWipFiles(); // files != nullptr
+   const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA);
    QStringList notSel;
    for (auto i = 0; i < files.count(); ++i)
    {
@@ -254,9 +228,10 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    }
 
    // call git reset to remove not selected files from index
-   if ((!notSel.empty() && !mGitBase->run("git reset -- " + quote(notSel)).first) || !updateIndex(selFiles)
+   const auto updIdx = updateIndex(files, selFiles);
+   if ((!notSel.empty() && !mGitBase->run("git reset -- " + quote(notSel)).first) || !updIdx
        || !mGitBase->run(QString("git commit" + cmtOptions + " -m \"%1\"").arg(msg)).first
-       || (!notSel.empty() && !updateIndex(notSel)))
+       || (!notSel.empty() && !updIdx))
    {
       ret = false;
    }
@@ -538,16 +513,6 @@ QVector<QString> Git::getStashes()
    }
 
    return stashes;
-}
-
-CommitInfo Git::getCommitInfoByRow(int row) const
-{
-   return mCache->getCommitInfoByRow(row);
-}
-
-CommitInfo Git::getCommitInfo(const QString &sha) const
-{
-   return mCache->getCommitInfo(sha);
 }
 
 // CT TODO utility function; can go elsewhere

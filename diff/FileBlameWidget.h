@@ -30,6 +30,7 @@ class Git;
 class QScrollArea;
 class ClickableFrame;
 class QLabel;
+class RevisionsCache;
 
 class FileBlameWidget : public QFrame
 {
@@ -39,7 +40,8 @@ signals:
    void signalCommitSelected(const QString &sha);
 
 public:
-   explicit FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+                            QWidget *parent = nullptr);
 
    void setup(const QString &fileName, const QString &currentSha, const QString &previousSha);
    void reload(const QString &currentSha, const QString &previousSha);
@@ -47,6 +49,7 @@ public:
    QString getCurrentFile() const { return mCurrentFile; }
 
 private:
+   const QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<Git> mGit;
    QFrame *mAnotation = nullptr;
    QLabel *mCurrentSha = nullptr;
