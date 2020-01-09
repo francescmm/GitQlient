@@ -16,9 +16,11 @@
 #include <QMenu>
 #include <QItemDelegate>
 
-FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, QWidget *p)
+FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, const QSharedPointer<RevisionsCache> &cache,
+                               QWidget *p)
    : QListWidget(p)
    , mGit(git)
+   , mCache(cache)
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
    setItemDelegate(new FileListDelegate(this));
@@ -53,8 +55,15 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 {
    clear();
 
-   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
-   const auto files = git->getDiffFiles(currentSha, compareToSha);
+   RevisionFile files;
+
+   if (mCache->containsRevisionFile(currentSha, compareToSha))
+      files = mCache->getRevisionFile(currentSha, compareToSha);
+   else
+   {
+      QScopedPointer<Git> git(new Git(mGit, mCache));
+      files = git->getDiffFiles(currentSha, compareToSha);
+   }
 
    if (files.count() != 0)
    {

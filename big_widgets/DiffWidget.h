@@ -8,13 +8,15 @@ class QStackedWidget;
 class DiffButton;
 class QVBoxLayout;
 class CommitDiffWidget;
+class RevisionsCache;
 
 class DiffWidget : public QFrame
 {
    Q_OBJECT
 
 public:
-   explicit DiffWidget(const QSharedPointer<GitBase> git, QWidget *parent = nullptr);
+   explicit DiffWidget(const QSharedPointer<GitBase> git, const QSharedPointer<RevisionsCache> &cache,
+                       QWidget *parent = nullptr);
    void reload();
 
    void clear() const;

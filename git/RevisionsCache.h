@@ -50,19 +50,26 @@ public:
 
    CommitInfo getCommitInfoByRow(int row) const;
    CommitInfo getCommitInfo(const QString &sha) const;
-   RevisionFile getRevisionFile(const QString &sha) const { return mRevisionFilesMap.value(sha); }
+   RevisionFile getRevisionFile(const QString &sha1, const QString &sha2) const
+   {
+      return mRevisionFilesMap.value(qMakePair(sha1, sha2));
+   }
    Reference getReference(const QString &sha) const { return mReferencesMap.value(sha, Reference()); }
 
    void insertCommitInfo(CommitInfo rev);
-   void insertRevisionFile(const QString &sha, const RevisionFile &file) { mRevisionFilesMap.insert(sha, file); }
+
+   void insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFile &file);
    void insertReference(const QString &sha, Reference ref);
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 
    void removeReference(const QString &sha) { mReferencesMap.remove(sha); }
 
-   bool containsRevisionFile(const QString &sha) const { return mRevisionFilesMap.contains(sha); }
+   bool containsRevisionFile(const QString &sha1, const QString &sha2) const
+   {
+      return mRevisionFilesMap.contains(qMakePair(sha1, sha2));
+   }
 
-   RevisionFile parseDiff(const QString &sha, const QString &logDiff);
+   RevisionFile parseDiff(const QString &logDiff);
    int findFileIndex(const RevisionFile &rf, const QString &name);
 
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles) { mUntrackedfiles = untrackedFiles; }
@@ -75,7 +82,7 @@ private:
    bool mCacheLocked = true;
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo *> mCommitsMap;
-   QHash<QString, RevisionFile> mRevisionFilesMap;
+   QHash<QPair<QString, QString>, RevisionFile> mRevisionFilesMap;
    QHash<QString, Reference> mReferencesMap;
    Lanes mLanes;
    QVector<QString> mDirNames;

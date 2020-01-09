@@ -42,11 +42,12 @@ Git::Git(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> 
 RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha)
 {
    const auto r = mCache->getCommitInfo(sha);
+
    if (r.parentsCount() == 0)
       return RevisionFile();
 
-   if (mCache->containsRevisionFile(sha))
-      return mCache->getRevisionFile(sha);
+   if (mCache->containsRevisionFile(sha, diffToSha))
+      return mCache->getRevisionFile(sha, diffToSha);
 
    QString runCmd = QString("git diff-tree -C --no-color -r -m ");
 
@@ -55,7 +56,15 @@ RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha)
 
    const auto ret = mGitBase->run(runCmd);
 
-   return ret.first ? mCache->parseDiff(sha, ret.second) : RevisionFile();
+   RevisionFile rf;
+
+   if (ret.first)
+   {
+      rf = mCache->parseDiff(ret.second);
+      mCache->insertRevisionFile(sha, diffToSha, rf);
+   }
+
+   return rf;
 }
 
 bool Git::updateIndex(const RevisionFile &files, const QStringList &selFiles)
@@ -94,7 +103,8 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    bool ret = true;
 
    // get not selected files but updated in index to restore at the end
-   const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA);
+   const auto commit = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
+   const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
    QStringList notSel;
    for (auto i = 0; i < files.count(); ++i)
    {

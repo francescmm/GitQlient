@@ -6,12 +6,13 @@
 #include <QVBoxLayout>
 #include <QLabel>
 
-CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, QWidget *parent)
+CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, const QSharedPointer<RevisionsCache> &cache,
+                                   QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mFirstSha(new QLabel())
    , mSecondSha(new QLabel())
-   , fileListWidget(new FileListWidget(mGit))
+   , fileListWidget(new FileListWidget(mGit, cache))
 {
    mFirstSha->setObjectName("labelSha");
    mFirstSha->setAlignment(Qt::AlignCenter);

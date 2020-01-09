@@ -33,7 +33,7 @@ GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffT
          runCmd.append(QString("%1 %2").arg(diffToSha, sha)); // diffToSha could be empty
       }
       else
-         runCmd += " HEAD ";
+         runCmd = "git diff HEAD ";
 
       return mGitBase->run(runCmd);
    }

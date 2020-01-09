@@ -24,7 +24,7 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    , labelAuthor(new QLabel())
    , labelDateTime(new QLabel())
    , labelEmail(new QLabel())
-   , fileListWidget(new FileListWidget(mGit))
+   , fileListWidget(new FileListWidget(mGit, cache))
    , labelModCount(new QLabel())
 {
    labelSha->setObjectName("labelSha");

@@ -71,6 +71,12 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
    }
 }
 
+void RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFile &file)
+{
+   if (!sha1.isEmpty() && !sha2.isEmpty())
+      mRevisionFilesMap.insert(qMakePair(sha1, sha2), file);
+}
+
 void RevisionsCache::insertReference(const QString &sha, Reference ref)
 {
    mReferencesMap[sha] = std::move(ref);
@@ -78,9 +84,19 @@ void RevisionsCache::insertReference(const QString &sha, Reference ref)
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
 {
+   auto iter = mRevisionFilesMap.begin();
+
+   while (iter != mRevisionFilesMap.end())
+   {
+      if (iter.key().first == CommitInfo::ZERO_SHA || iter.key().second == CommitInfo::ZERO_SHA)
+         iter = mRevisionFilesMap.erase(iter);
+      else
+         ++iter;
+   }
+
    const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
 
-   insertRevisionFile(CommitInfo::ZERO_SHA, fakeRevFile);
+   insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
 
    if (!mCacheLocked)
    {
@@ -260,8 +276,9 @@ int RevisionsCache::findFileIndex(const RevisionFile &rf, const QString &name)
 
 bool RevisionsCache::pendingLocalChanges() const
 {
-   const auto rf = getRevisionFile(CommitInfo::ZERO_SHA);
-   return mRevisionFilesMap.value(CommitInfo::ZERO_SHA).count() == mUntrackedfiles.count();
+   const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA);
+   const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
+   return rf.count() == mUntrackedfiles.count();
 }
 
 uint RevisionsCache::checkRef(const QString &sha, uint mask) const
@@ -393,14 +410,12 @@ RevisionFile RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const 
    return rf;
 }
 
-RevisionFile RevisionsCache::parseDiff(const QString &sha, const QString &logDiff)
+RevisionFile RevisionsCache::parseDiff(const QString &logDiff)
 {
    FileNamesLoader fl;
 
-   RevisionFile rf = parseDiffFormat(logDiff, fl);
+   const auto rf = parseDiffFormat(logDiff, fl);
    flushFileNames(fl);
-
-   insertRevisionFile(sha, rf);
 
    return rf;
 }

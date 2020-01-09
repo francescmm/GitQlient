@@ -75,10 +75,13 @@ WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> 
 
 void WorkInProgressWidget::configure(const QString &sha)
 {
-   const auto shaChange = mCurrentSha != sha;
-   mCurrentSha = sha;
+   if (mCache->getCommitInfo(sha).parentsCount() > 0)
+   {
+      const auto shaChange = mCurrentSha != sha;
+      mCurrentSha = sha;
 
-   resetInfo(shaChange);
+      resetInfo(shaChange);
+   }
 }
 
 void WorkInProgressWidget::resetInfo(bool force)
@@ -106,15 +109,24 @@ void WorkInProgressWidget::resetInfo(bool force)
    ui->pbCommit->setText(mIsAmend ? QString("Amend") : QString("Commit"));
 
    // set-up files list
+   const auto revInfo = mCache->getCommitInfo(mCurrentSha);
+
    if (mIsAmend)
    {
-      const auto revInfo = mCache->getCommitInfo(mCurrentSha);
       const auto author = revInfo.author().split("<");
       ui->leAuthorName->setText(author.first());
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
    }
 
-   const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA);
+   RevisionFile files;
+
+   if (mCache->containsRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0)))
+      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
+   else
+   {
+      QScopedPointer<Git> git(new Git(mGit, mCache));
+      files = git->getDiffFiles(CommitInfo::ZERO_SHA, revInfo.parent(0));
+   }
 
    if (!force || (mIsAmend && force))
       prepareCache();
@@ -126,7 +138,7 @@ void WorkInProgressWidget::resetInfo(bool force)
 
    if (mIsAmend)
    {
-      const auto amendFiles = mCache->getRevisionFile(mCurrentSha);
+      const auto amendFiles = mCache->getRevisionFile(mCurrentSha, revInfo.parent(0));
       insertFilesInList(amendFiles, ui->stagedFilesList);
    }
 

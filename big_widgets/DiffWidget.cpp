@@ -15,18 +15,18 @@
 
 using namespace QLogger;
 
-DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QWidget *parent)
+DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, const QSharedPointer<RevisionsCache> &cache, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , centerStackedWidget(new QStackedWidget())
-   , mCommitDiffWidget(new CommitDiffWidget(mGit))
+   , mCommitDiffWidget(new CommitDiffWidget(mGit, cache))
 {
    centerStackedWidget->setCurrentIndex(0);
    centerStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
    connect(centerStackedWidget, &QStackedWidget::currentChanged, this, [this](int index) {
       const auto widget = centerStackedWidget->widget(index);
 
-      for (const auto buttons : qAsConst(mDiffButtons))
+      for (const auto &buttons : qAsConst(mDiffButtons))
       {
          if (buttons.first == widget)
             buttons.second->setSelected();
