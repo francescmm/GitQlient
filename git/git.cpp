@@ -39,29 +39,14 @@ Git::Git(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> 
 {
 }
 
-RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha)
+GitExecResult Git::getDiffFiles(const QString &sha, const QString &diffToSha)
 {
-   const auto r = mCache->getCommitInfo(sha);
-
-   if (r.parentsCount() == 0)
-      return RevisionFile();
-
    QString runCmd = QString("git diff-tree -C --no-color -r -m ");
 
    if (!diffToSha.isEmpty() && sha != CommitInfo::ZERO_SHA)
       runCmd.append(diffToSha + " " + sha);
 
-   const auto ret = mGitBase->run(runCmd);
-
-   RevisionFile rf;
-
-   if (ret.first)
-   {
-      rf = mCache->parseDiff(ret.second);
-      mCache->insertRevisionFile(sha, diffToSha, rf);
-   }
-
-   return rf;
+   return mGitBase->run(runCmd);
 }
 
 bool Git::updateIndex(const RevisionFile &files, const QStringList &selFiles)

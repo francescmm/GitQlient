@@ -31,7 +31,7 @@ public:
                 QObject *parent = nullptr);
 
    bool commitFiles(QStringList &files, const QString &msg, bool amend, const QString &author = QString());
-   RevisionFile getDiffFiles(const QString &sha, const QString &sha2);
+   GitExecResult getDiffFiles(const QString &sha, const QString &sha2);
 
 private:
    QSharedPointer<GitBase> mGitBase;

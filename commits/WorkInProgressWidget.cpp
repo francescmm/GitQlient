@@ -122,10 +122,16 @@ void WorkInProgressWidget::resetInfo(bool force)
 
    if (mCache->containsRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0)))
       files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
-   else
+   else if (revInfo.parentsCount() > 0)
    {
       QScopedPointer<Git> git(new Git(mGit, mCache));
-      files = git->getDiffFiles(CommitInfo::ZERO_SHA, revInfo.parent(0));
+      const auto ret = git->getDiffFiles(CommitInfo::ZERO_SHA, revInfo.parent(0));
+
+      if (ret.success)
+      {
+         const auto rf = mCache->parseDiff(ret.output.toString());
+         mCache->insertRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0), rf);
+      }
    }
 
    if (!force || (mIsAmend && force))

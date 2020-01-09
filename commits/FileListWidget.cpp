@@ -59,10 +59,16 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 
    if (mCache->containsRevisionFile(currentSha, compareToSha))
       files = mCache->getRevisionFile(currentSha, compareToSha);
-   else
+   else if (mCache->getCommitInfo(currentSha).parentsCount() > 0)
    {
       QScopedPointer<Git> git(new Git(mGit, mCache));
-      files = git->getDiffFiles(currentSha, compareToSha);
+      const auto ret = git->getDiffFiles(currentSha, compareToSha);
+
+      if (ret.success)
+      {
+         const auto rf = mCache->parseDiff(ret.output.toString());
+         mCache->insertRevisionFile(currentSha, compareToSha, rf);
+      }
    }
 
    if (files.count() != 0)
