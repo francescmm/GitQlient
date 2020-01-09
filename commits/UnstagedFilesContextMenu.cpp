@@ -3,6 +3,7 @@
 #include <git.h>
 #include <GitBase.h>
 #include <GitSyncProcess.h>
+#include <GitLocal.h>
 
 #include <QFile>
 #include <QDir>
@@ -21,7 +22,7 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<GitBase>
    if (hasConflicts)
    {
       connect(addAction("Mark as resolved"), &QAction::triggered, this, [this] {
-         QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+         QScopedPointer<GitLocal> git(new GitLocal(mGit));
          const auto ret = git->markFileAsResolved(mFileName);
 
          if (ret.success)
@@ -37,7 +38,7 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<GitBase>
 
       if (msgBoxRet == QMessageBox::Yes)
       {
-         QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+         QScopedPointer<GitLocal> git(new GitLocal(mGit));
          const auto ret = git->checkoutFile(mFileName);
 
          emit signalCheckedOut(ret);

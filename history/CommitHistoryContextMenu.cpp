@@ -1,5 +1,6 @@
 #include "CommitHistoryContextMenu.h"
 
+#include <GitLocal.h>
 #include <GitPatches.h>
 #include <GitBase.h>
 #include <GitStashes.h>
@@ -222,7 +223,7 @@ void CommitHistoryContextMenu::checkoutCommit()
    const auto sha = mShas.first();
    QLog_Info("UI", QString("Checking out the commit {%1}").arg(sha));
 
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitLocal> git(new GitLocal(mGit));
    const auto ret = git->checkoutCommit(sha);
 
    if (ret.success)
@@ -233,7 +234,7 @@ void CommitHistoryContextMenu::checkoutCommit()
 
 void CommitHistoryContextMenu::cherryPickCommit()
 {
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitLocal> git(new GitLocal(mGit));
    const auto ret = git->cherryPickCommit(mShas.first());
 
    if (ret.success)
@@ -305,17 +306,17 @@ void CommitHistoryContextMenu::fetch()
 
 void CommitHistoryContextMenu::resetSoft()
 {
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitLocal> git(new GitLocal(mGit));
 
-   if (git->resetCommit(mShas.first(), Git::CommitResetType::SOFT))
+   if (git->resetCommit(mShas.first(), GitLocal::CommitResetType::SOFT))
       emit signalRepositoryUpdated();
 }
 
 void CommitHistoryContextMenu::resetMixed()
 {
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitLocal> git(new GitLocal(mGit));
 
-   if (git->resetCommit(mShas.first(), Git::CommitResetType::MIXED))
+   if (git->resetCommit(mShas.first(), GitLocal::CommitResetType::MIXED))
       emit signalRepositoryUpdated();
 }
 
@@ -327,9 +328,9 @@ void CommitHistoryContextMenu::resetHard()
 
    if (retMsg == QMessageBox::Ok)
    {
-      QScopedPointer<Git> git(new Git(mGit, mCache));
+      QScopedPointer<GitLocal> git(new GitLocal(mGit));
 
-      if (git->resetCommit(mShas.first(), Git::CommitResetType::HARD))
+      if (git->resetCommit(mShas.first(), GitLocal::CommitResetType::HARD))
          emit signalRepositoryUpdated();
    }
 }

@@ -30,24 +30,12 @@ signals:
    void signalWipUpdated();
 
 public:
-   enum class CommitResetType
-   {
-      SOFT,
-      MIXED,
-      HARD
-   };
-
    explicit Git(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> cache,
                 QObject *parent = nullptr);
 
    /* START LOCAL */
    bool commitFiles(QStringList &files, const QString &msg, bool amend, const QString &author = QString());
-   GitExecResult cherryPickCommit(const QString &sha);
-   GitExecResult checkoutCommit(const QString &sha);
-   GitExecResult markFileAsResolved(const QString &fileName);
-   bool checkoutFile(const QString &fileName);
-   GitExecResult resetFile(const QString &fileName);
-   bool resetCommit(const QString &sha, CommitResetType type);
+
    /* END LOCAL */
 
    /* START COMMIT INFO */

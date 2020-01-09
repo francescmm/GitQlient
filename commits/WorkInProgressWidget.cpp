@@ -2,6 +2,7 @@
 #include <ui_WorkInProgressWidget.h>
 
 #include <GitBase.h>
+#include <GitLocal.h>
 #include <git.h>
 #include <GitQlientStyles.h>
 #include <CommitInfo.h>
@@ -290,7 +291,7 @@ void WorkInProgressWidget::revertAllChanges()
    for (; i >= 0; --i)
    {
       const auto fileName = ui->unstagedFilesList->takeItem(i)->data(Qt::DisplayRole).toString();
-      QScopedPointer<Git> git(new Git(mGit, mCache));
+      QScopedPointer<GitLocal> git(new GitLocal(mGit));
       const auto ret = git->checkoutFile(fileName);
 
       emit signalCheckoutPerformed(ret);
@@ -392,7 +393,7 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
          {
             const auto resetAction = menu->addAction("Reset");
             connect(resetAction, &QAction::triggered, this, [this, fileName] {
-               QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+               QScopedPointer<GitLocal> git(new GitLocal(mGit));
                const auto ret = git->resetFile(fileName);
                emit signalCheckoutPerformed(ret.success);
             });

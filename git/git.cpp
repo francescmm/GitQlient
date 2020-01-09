@@ -73,19 +73,6 @@ QString Git::getFileDiff(const QString &currentSha, const QString &previousSha, 
    return QString();
 }
 
-bool Git::checkoutFile(const QString &fileName)
-{
-   if (fileName.isEmpty())
-      return false;
-
-   return mGitBase->run(QString("git checkout %1").arg(fileName)).first;
-}
-
-GitExecResult Git::resetFile(const QString &fileName)
-{
-   return mGitBase->run(QString("git reset %1").arg(fileName));
-}
-
 GitExecResult Git::blame(const QString &file, const QString &commitFrom)
 {
    return mGitBase->run(QString("git annotate %1 %2").arg(file, commitFrom));
@@ -113,21 +100,6 @@ RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha)
    const auto ret = mGitBase->run(runCmd);
 
    return ret.first ? mCache->parseDiff(sha, ret.second) : RevisionFile();
-}
-
-GitExecResult Git::checkoutCommit(const QString &sha)
-{
-   return mGitBase->run(QString("git checkout %1").arg(sha));
-}
-
-GitExecResult Git::markFileAsResolved(const QString &fileName)
-{
-   const auto ret = mGitBase->run(QString("git add %1").arg(fileName));
-
-   if (ret.first)
-      emit signalWipUpdated();
-
-   return ret;
 }
 
 bool Git::updateIndex(const RevisionFile &files, const QStringList &selFiles)
@@ -185,31 +157,6 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    }
 
    return ret;
-}
-
-GitExecResult Git::cherryPickCommit(const QString &sha)
-{
-   return mGitBase->run(QString("git cherry-pick %1").arg(sha));
-}
-
-bool Git::resetCommit(const QString &sha, CommitResetType type)
-{
-   QString typeStr;
-
-   switch (type)
-   {
-      case CommitResetType::SOFT:
-         typeStr = "soft";
-         break;
-      case CommitResetType::MIXED:
-         typeStr = "mixed";
-         break;
-      case CommitResetType::HARD:
-         typeStr = "hard";
-         break;
-   }
-
-   return mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha)).first;
 }
 
 // CT TODO utility function; can go elsewhere
