@@ -26,25 +26,11 @@ class Git : public QObject
 {
    Q_OBJECT
 
-signals:
-   void signalWipUpdated();
-
 public:
    explicit Git(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> cache,
                 QObject *parent = nullptr);
 
-   /* START LOCAL */
    bool commitFiles(QStringList &files, const QString &msg, bool amend, const QString &author = QString());
-
-   /* END LOCAL */
-
-   /* START COMMIT INFO */
-   GitExecResult blame(const QString &file, const QString &commitFrom);
-   GitExecResult history(const QString &file);
-   /* END COMMIT INFO */
-
-   GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
-   QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
    RevisionFile getDiffFiles(const QString &sha, const QString &sha2);
 
 private:

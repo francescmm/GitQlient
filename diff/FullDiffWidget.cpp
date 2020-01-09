@@ -1,7 +1,7 @@
 #include "FullDiffWidget.h"
 
 #include <CommitInfo.h>
-#include <git.h>
+#include <GitHistory.h>
 #include <GitQlientStyles.h>
 #include <RevisionsCache.h>
 
@@ -106,7 +106,7 @@ void FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
    mCurrentSha = sha;
    mPreviousSha = diffToSha;
 
-   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitHistory> git(new GitHistory(mGit));
    const auto ret = git->getCommitDiff(mCurrentSha, mPreviousSha);
 
    if (ret.success)

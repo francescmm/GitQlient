@@ -8,6 +8,7 @@ HEADERS += \
     $$PWD/GitCloneProcess.h \
     $$PWD/GitConfig.h \
     $$PWD/GitExecResult.h \
+    $$PWD/GitHistory.h \
     $$PWD/GitLocal.h \
     $$PWD/GitPatches.h \
     $$PWD/GitRemote.h \
@@ -32,6 +33,7 @@ SOURCES += \
     $$PWD/GitCloneProcess.cpp \
     $$PWD/GitConfig.cpp \
     $$PWD/GitExecResult.cpp \
+    $$PWD/GitHistory.cpp \
     $$PWD/GitLocal.cpp \
     $$PWD/GitPatches.cpp \
     $$PWD/GitRemote.cpp \

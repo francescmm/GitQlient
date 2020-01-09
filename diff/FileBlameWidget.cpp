@@ -2,7 +2,7 @@
 
 #include <RevisionsCache.h>
 #include <FileDiffView.h>
-#include <git.h>
+#include <GitHistory.h>
 #include <CommitInfo.h>
 #include <ClickableFrame.h>
 
@@ -75,7 +75,7 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, co
 void FileBlameWidget::setup(const QString &fileName, const QString &currentSha, const QString &previousSha)
 {
    mCurrentFile = fileName;
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitHistory> git(new GitHistory(mGit));
    const auto ret = git->blame(mCurrentFile, currentSha);
 
    if (ret.success && !ret.output.toString().startsWith("fatal:"))

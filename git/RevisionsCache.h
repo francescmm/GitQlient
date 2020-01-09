@@ -31,7 +31,6 @@
 #include <QObject>
 #include <QHash>
 
-class Git;
 struct WorkingDirInfo;
 
 class RevisionsCache : public QObject

@@ -3,7 +3,8 @@
 #include <GitBase.h>
 
 GitLocal::GitLocal(const QSharedPointer<GitBase> &gitBase)
-   : mGitBase(gitBase)
+   : QObject()
+   , mGitBase(gitBase)
 {
 }
 
@@ -21,10 +22,8 @@ GitExecResult GitLocal::markFileAsResolved(const QString &fileName)
 {
    const auto ret = mGitBase->run(QString("git add %1").arg(fileName));
 
-   /*
    if (ret.first)
       emit signalWipUpdated();
-*/
 
    return ret;
 }

@@ -29,28 +29,15 @@
 
 class GitBase;
 
-class GitLocal : public QObject
+class GitHistory
 {
-   Q_OBJECT
-
-signals:
-   void signalWipUpdated();
-
 public:
-   enum class CommitResetType
-   {
-      SOFT,
-      MIXED,
-      HARD
-   };
+   explicit GitHistory(const QSharedPointer<GitBase> &gitBase);
 
-   explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
-   GitExecResult cherryPickCommit(const QString &sha);
-   GitExecResult checkoutCommit(const QString &sha);
-   GitExecResult markFileAsResolved(const QString &fileName);
-   bool checkoutFile(const QString &fileName);
-   GitExecResult resetFile(const QString &fileName);
-   bool resetCommit(const QString &sha, CommitResetType type);
+   GitExecResult blame(const QString &file, const QString &commitFrom);
+   GitExecResult history(const QString &file);
+   GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
+   QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 
 private:
    QSharedPointer<GitBase> mGitBase;

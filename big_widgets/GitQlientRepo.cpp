@@ -92,9 +92,10 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
            Qt::DirectConnection);
    connect(mGitLoader.get(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished,
            Qt::DirectConnection);
+   /*
    connect(mGit.get(), &Git::signalWipUpdated, mGitLoader.get(), &GitRepoLoader::updateWipRevision,
            Qt::DirectConnection);
-
+*/
    GitQlientSettings settings;
    mGitLoader->setShowAll(settings.value("ShowAllBranches", true).toBool());
 

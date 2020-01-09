@@ -1,6 +1,6 @@
 #include "BlameWidget.h"
 
-#include <git.h>
+#include <GitHistory.h>
 #include <FileBlameWidget.h>
 #include <BranchesViewDelegate.h>
 #include <RepositoryViewDelegate.h>
@@ -84,7 +84,7 @@ void BlameWidget::showFileHistory(const QString &filePath)
 {
    if (!mTabsMap.contains(filePath))
    {
-      QScopedPointer<Git> git(new Git(mGit, mCache));
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
       const auto ret = git->history(filePath);
 
       if (ret.success)
@@ -141,7 +141,7 @@ void BlameWidget::reloadHistory(int tabIndex)
       const auto sha = blameWidget->getCurrentSha();
       const auto file = blameWidget->getCurrentFile();
 
-      QScopedPointer<Git> git(new Git(mGit, mCache));
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
       const auto ret = git->history(file);
 
       if (ret.success)

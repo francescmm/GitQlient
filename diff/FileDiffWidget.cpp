@@ -1,9 +1,10 @@
 #include "FileDiffWidget.h"
+
+#include <GitHistory.h>
 #include <FileDiffView.h>
 #include <FileDiffHighlighter.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
-#include "git.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -52,7 +53,7 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    if (destFile.contains("-->"))
       destFile = destFile.split("--> ").last().split("(").first().trimmed();
 
-   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitHistory> git(new GitHistory(mGit));
    auto text = git->getFileDiff(currentSha == CommitInfo::ZERO_SHA ? QString() : currentSha, previousSha, destFile);
    auto lines = text.split("\n");
 
