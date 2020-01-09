@@ -251,7 +251,7 @@ void WorkInProgressWidget::clearCache()
 
 void WorkInProgressWidget::addAllFilesToCommitList()
 {
-   auto i = ui->unstagedFilesList->count();
+   auto i = ui->unstagedFilesList->count() - 1;
 
    for (; i >= 0; --i)
    {
