@@ -23,7 +23,7 @@ qint64 kSecondsOldest = QDateTime::currentDateTime().toSecsSinceEpoch();
 qint64 kIncrementSecs = 0;
 }
 
-FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
@@ -75,7 +75,8 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, co
 void FileBlameWidget::setup(const QString &fileName, const QString &currentSha, const QString &previousSha)
 {
    mCurrentFile = fileName;
-   const auto ret = mGit->blame(mCurrentFile, currentSha);
+   QScopedPointer<Git> git(new Git(mGit, mCache));
+   const auto ret = git->blame(mCurrentFile, currentSha);
 
    if (ret.success && !ret.output.toString().startsWith("fatal:"))
    {

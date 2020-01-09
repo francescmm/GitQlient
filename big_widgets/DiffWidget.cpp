@@ -15,7 +15,7 @@
 
 using namespace QLogger;
 
-DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
+DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , centerStackedWidget(new QStackedWidget())

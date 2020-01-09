@@ -1,13 +1,14 @@
 #include "UnstagedFilesContextMenu.h"
 
 #include <git.h>
+#include <GitBase.h>
 #include <GitSyncProcess.h>
 
 #include <QFile>
 #include <QDir>
 #include <QMessageBox>
 
-UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<Git> &git, const QString &fileName,
+UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<GitBase> &git, const QString &fileName,
                                                    bool hasConflicts, QWidget *parent)
    : QMenu(parent)
    , mGit(git)
@@ -20,7 +21,8 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<Git> &gi
    if (hasConflicts)
    {
       connect(addAction("Mark as resolved"), &QAction::triggered, this, [this] {
-         const auto ret = mGit->markFileAsResolved(mFileName);
+         QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+         const auto ret = git->markFileAsResolved(mFileName);
 
          if (ret.success)
             emit signalConflictsResolved();
@@ -35,7 +37,8 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<Git> &gi
 
       if (msgBoxRet == QMessageBox::Yes)
       {
-         const auto ret = mGit->checkoutFile(mFileName);
+         QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+         const auto ret = git->checkoutFile(mFileName);
 
          emit signalCheckedOut(ret);
       }

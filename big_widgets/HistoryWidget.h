@@ -3,7 +3,7 @@
 #include <QFrame>
 
 class RevisionsCache;
-class Git;
+class GitBase;
 class CommitHistoryModel;
 class CommitHistoryView;
 class QLineEdit;
@@ -31,7 +31,7 @@ signals:
    void signalAllBranchesActive(bool showAll);
 
 public:
-   explicit HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> git,
+   explicit HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
                           QWidget *parent = nullptr);
    void clear();
    void reload();

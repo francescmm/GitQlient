@@ -254,11 +254,6 @@ GitExecResult Git::push(bool force)
    return mGitBase->run(QString("git push ").append(force ? QString("--force") : QString()));
 }
 
-GitExecResult Git::pushUpstream(const QString &branchName)
-{
-   return mGitBase->run(QString("git push --set-upstream origin %1").arg(branchName));
-}
-
 GitExecResult Git::pull()
 {
    return mGitBase->run("git pull");
@@ -274,32 +269,7 @@ GitExecResult Git::cherryPickCommit(const QString &sha)
    return mGitBase->run(QString("git cherry-pick %1").arg(sha));
 }
 
-GitExecResult Git::pop() const
-{
-   return mGitBase->run("git stash pop");
-}
-
-GitExecResult Git::stash()
-{
-   return mGitBase->run("git stash");
-}
-
-GitExecResult Git::stashBranch(const QString &stashId, const QString &branchName)
-{
-   return mGitBase->run(QString("git stash branch %1 %2").arg(branchName, stashId));
-}
-
-GitExecResult Git::stashDrop(const QString &stashId)
-{
-   return mGitBase->run(QString("git stash drop -q %1").arg(stashId));
-}
-
-GitExecResult Git::stashClear()
-{
-   return mGitBase->run("git stash clear");
-}
-
-bool Git::resetCommit(const QString &sha, Git::CommitResetType type)
+bool Git::resetCommit(const QString &sha, CommitResetType type)
 {
    QString typeStr;
 
@@ -317,56 +287,6 @@ bool Git::resetCommit(const QString &sha, Git::CommitResetType type)
    }
 
    return mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha)).first;
-}
-
-GitExecResult Git::createBranchFromAnotherBranch(const QString &oldName, const QString &newName)
-{
-   return mGitBase->run(QString("git branch %1 %2").arg(newName, oldName));
-}
-
-GitExecResult Git::createBranchAtCommit(const QString &commitSha, const QString &branchName)
-{
-   return mGitBase->run(QString("git branch %1 %2").arg(branchName, commitSha));
-}
-
-GitExecResult Git::checkoutRemoteBranch(const QString &branchName)
-{
-   return mGitBase->run(QString("git checkout -q %1").arg(branchName));
-}
-
-GitExecResult Git::checkoutNewLocalBranch(const QString &branchName)
-{
-   return mGitBase->run(QString("git checkout -b %1").arg(branchName));
-}
-
-GitExecResult Git::renameBranch(const QString &oldName, const QString &newName)
-{
-   return mGitBase->run(QString("git branch -m %1 %2").arg(oldName, newName));
-}
-
-GitExecResult Git::removeLocalBranch(const QString &branchName)
-{
-   return mGitBase->run(QString("git branch -D %1").arg(branchName));
-}
-
-GitExecResult Git::removeRemoteBranch(const QString &branchName)
-{
-   return mGitBase->run(QString("git push --delete origin %1").arg(branchName));
-}
-
-GitExecResult Git::getBranchesOfCommit(const QString &sha)
-{
-   return mGitBase->run(QString("git branch --contains %1 --all").arg(sha));
-}
-
-GitExecResult Git::getLastCommitOfBranch(const QString &branch)
-{
-   auto ret = mGitBase->run(QString("git rev-parse %1").arg(branch));
-
-   if (ret.first)
-      ret.second.remove(ret.second.count() - 1, ret.second.count());
-
-   return ret;
 }
 
 GitExecResult Git::prune()

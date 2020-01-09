@@ -5,6 +5,7 @@
 #include <FileListDelegate.h>
 #include <git.h>
 #include <GitQlientStyles.h>
+#include <RevisionsCache.h>
 
 #include <QApplication>
 #include <QDrag>
@@ -15,7 +16,7 @@
 #include <QMenu>
 #include <QItemDelegate>
 
-FileListWidget::FileListWidget(const QSharedPointer<Git> &git, QWidget *p)
+FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, QWidget *p)
    : QListWidget(p)
    , mGit(git)
 {
@@ -52,7 +53,8 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 {
    clear();
 
-   const auto files = mGit->getDiffFiles(currentSha, compareToSha);
+   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto files = git->getDiffFiles(currentSha, compareToSha);
 
    if (files.count() != 0)
    {

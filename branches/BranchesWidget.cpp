@@ -27,10 +27,8 @@ using namespace QLogger;
 BranchesWidget::BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
-   , mLocalBranchesTree(
-         new BranchTreeWidget(QSharedPointer<Git>::create(mGit, QSharedPointer<RevisionsCache>::create())))
-   , mRemoteBranchesTree(
-         new BranchTreeWidget(QSharedPointer<Git>::create(mGit, QSharedPointer<RevisionsCache>::create())))
+   , mLocalBranchesTree(new BranchTreeWidget(mGit))
+   , mRemoteBranchesTree(new BranchTreeWidget(mGit))
    , mTagsList(new QListWidget())
    , mStashesList(new QListWidget())
    , mSubmodulesList(new QListWidget())
@@ -475,8 +473,7 @@ void BranchesWidget::showStashesContextMenu(const QPoint &p)
 
    if (index.isValid())
    {
-      const auto git = QSharedPointer<Git>::create(mGit, QSharedPointer<RevisionsCache>::create());
-      const auto menu = new StashesContextMenu(git, index.data(Qt::UserRole).toString(), this);
+      const auto menu = new StashesContextMenu(mGit, index.data(Qt::UserRole).toString(), this);
       connect(menu, &StashesContextMenu::signalUpdateView, this, &BranchesWidget::signalBranchesUpdated);
       connect(menu, &StashesContextMenu::signalContentRemoved, this, &BranchesWidget::signalBranchesUpdated);
       menu->exec(mStashesList->viewport()->mapToGlobal(p));

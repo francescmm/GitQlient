@@ -25,7 +25,7 @@
 
 #include <QListWidget>
 
-class Git;
+class GitBase;
 
 class FileListWidget : public QListWidget
 {
@@ -35,11 +35,11 @@ signals:
    void signalShowFileHistory(const QString &fileName);
 
 public:
-   explicit FileListWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit FileListWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    void insertFiles(const QString &currentSha, const QString &compareToSha);
 
 private:
-   QSharedPointer<Git> mGit = nullptr;
+   QSharedPointer<GitBase> mGit = nullptr;
 
    void showContextMenu(const QPoint &);
    void addItem(const QString &label, const QColor &clr);

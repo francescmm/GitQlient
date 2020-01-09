@@ -30,7 +30,7 @@ namespace Ui
 class BranchDlg;
 }
 
-class Git;
+class GitBase;
 
 enum class BranchDlgMode
 {
@@ -46,7 +46,7 @@ struct BranchDlgConfig
 {
    QString mCurrentBranchName;
    BranchDlgMode mDialogMode;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
 };
 
 class BranchDlg : public QDialog

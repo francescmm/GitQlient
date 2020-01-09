@@ -25,7 +25,7 @@
 
 #include <QMenu>
 
-class Git;
+class GitBase;
 
 class UnstagedFilesContextMenu : public QMenu
 {
@@ -40,11 +40,11 @@ signals:
    void signalConflictsResolved();
 
 public:
-   explicit UnstagedFilesContextMenu(const QSharedPointer<Git> &git, const QString &fileName, bool hasConflicts,
+   explicit UnstagedFilesContextMenu(const QSharedPointer<GitBase> &git, const QString &fileName, bool hasConflicts,
                                      QWidget *parent = nullptr);
 
 private:
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
    QString mFileName;
 
    bool addEntryToGitIgnore(const QString &entry);

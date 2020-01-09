@@ -1,6 +1,8 @@
 #include "Controls.h"
 
 #include <git.h>
+#include <GitBase.h>
+#include <GitStashes.h>
 #include <GitQlientStyles.h>
 #include <BranchDlg.h>
 
@@ -16,7 +18,7 @@
 #include <QDesktopWidget>
 #include <QMessageBox>
 
-Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
+Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mHistory(new QToolButton())
@@ -174,7 +176,8 @@ void Controls::enableButtons(bool enabled)
 void Controls::pullCurrentBranch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->pull();
+   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto ret = git->pull();
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
@@ -186,7 +189,8 @@ void Controls::pullCurrentBranch()
 void Controls::fetchAll()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->fetch();
+   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto ret = git->fetch();
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -196,12 +200,14 @@ void Controls::fetchAll()
 void Controls::pushCurrentBranch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->push();
+   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto ret = git->push();
    QApplication::restoreOverrideCursor();
 
    if (ret.output.toString().contains("has no upstream branch"))
    {
-      const auto currentBranch = mGit->getCurrentBranch();
+      QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+      const auto currentBranch = git->getCurrentBranch();
       BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mGit });
       const auto dlgRet = dlg.exec();
 
@@ -216,7 +222,8 @@ void Controls::pushCurrentBranch()
 
 void Controls::stashCurrentWork()
 {
-   const auto ret = mGit->stash();
+   QScopedPointer<GitStashes> git(new GitStashes(mGit));
+   const auto ret = git->stash();
 
    if (ret.success)
       emit signalRepositoryUpdated();
@@ -224,7 +231,8 @@ void Controls::stashCurrentWork()
 
 void Controls::popStashedWork()
 {
-   const auto ret = mGit->pop();
+   QScopedPointer<GitStashes> git(new GitStashes(mGit));
+   const auto ret = git->pop();
 
    if (ret.success)
       emit signalRepositoryUpdated();
@@ -235,7 +243,8 @@ void Controls::popStashedWork()
 void Controls::pruneBranches()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->prune();
+   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto ret = git->prune();
    QApplication::restoreOverrideCursor();
 
    if (ret.success)

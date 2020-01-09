@@ -3,6 +3,7 @@
 #include <CommitInfo.h>
 #include <git.h>
 #include <GitQlientStyles.h>
+#include <RevisionsCache.h>
 
 #include <QScrollBar>
 #include <QTextCharFormat>
@@ -57,7 +58,7 @@ void DiffHighlighter::highlightBlock(const QString &text)
       setFormat(0, text.length(), myFormat);
 }
 
-FullDiffWidget::FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent)
+FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QTextEdit(parent)
    , mGit(git)
 {
@@ -105,7 +106,8 @@ void FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
    mCurrentSha = sha;
    mPreviousSha = diffToSha;
 
-   const auto ret = mGit->getCommitDiff(mCurrentSha, mPreviousSha);
+   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto ret = git->getCommitDiff(mCurrentSha, mPreviousSha);
 
    if (ret.success)
       processData(ret.output.toString());

@@ -8,6 +8,7 @@
 #include <CommitHistoryModel.h>
 #include <RevisionsCache.h>
 #include <git.h>
+#include <GitBase.h>
 
 #include <QSortFilterProxyModel>
 #include <QPainter>
@@ -15,7 +16,7 @@
 static const int MIN_VIEW_WIDTH_PX = 480;
 
 RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<RevisionsCache> &cache,
-                                               const QSharedPointer<Git> &git, CommitHistoryView *view)
+                                               const QSharedPointer<GitBase> &git, CommitHistoryView *view)
    : mCache(cache)
    , mGit(git)
    , mView(view)

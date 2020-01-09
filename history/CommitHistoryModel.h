@@ -27,7 +27,7 @@
 #include <QSharedPointer>
 
 class RevisionsCache;
-class Git;
+class GitBase;
 class CommitInfo;
 enum class CommitHistoryColumns;
 
@@ -35,7 +35,7 @@ class CommitHistoryModel : public QAbstractItemModel
 {
    Q_OBJECT
 public:
-   explicit CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+   explicit CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                QObject *parent = nullptr);
    ~CommitHistoryModel() override;
    void clear();
@@ -52,7 +52,7 @@ public:
 
 private:
    QSharedPointer<RevisionsCache> mCache;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
 
    QVariant getToolTipData(const CommitInfo &r) const;
    QVariant getDisplayData(const CommitInfo &rev, int column) const;

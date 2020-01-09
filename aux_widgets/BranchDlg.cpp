@@ -1,7 +1,8 @@
 #include "BranchDlg.h"
 #include "ui_BranchDlg.h"
 
-#include <git.h>
+#include <GitBranches.h>
+#include <GitStashes.h>
 #include <GitQlientStyles.h>
 
 #include <QFile>
@@ -70,18 +71,23 @@ void BranchDlg::accept()
    {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
+      QScopedPointer<GitBranches> git(new GitBranches(mConfig.mGit));
+
       if (mConfig.mDialogMode == BranchDlgMode::CREATE)
-         mConfig.mGit->createBranchFromAnotherBranch(ui->leOldName->text(), ui->leNewName->text());
+         git->createBranchFromAnotherBranch(ui->leOldName->text(), ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::CREATE_CHECKOUT)
-         mConfig.mGit->checkoutNewLocalBranch(ui->leNewName->text());
+         git->checkoutNewLocalBranch(ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::RENAME)
-         mConfig.mGit->renameBranch(ui->leOldName->text(), ui->leNewName->text());
+         git->renameBranch(ui->leOldName->text(), ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::CREATE_FROM_COMMIT)
-         mConfig.mGit->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text());
+         git->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::STASH_BRANCH)
-         mConfig.mGit->stashBranch(ui->leOldName->text(), ui->leNewName->text());
+      {
+         QScopedPointer<GitStashes> git(new GitStashes(mConfig.mGit));
+         git->stashBranch(ui->leOldName->text(), ui->leNewName->text());
+      }
       else if (mConfig.mDialogMode == BranchDlgMode::PUSH_UPSTREAM)
-         mConfig.mGit->pushUpstream(ui->leNewName->text());
+         git->pushUpstream(ui->leNewName->text());
 
       QApplication::restoreOverrideCursor();
 

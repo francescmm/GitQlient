@@ -3,11 +3,11 @@
 #include <CommitHistoryColumns.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
-#include <git.h>
+#include <GitBase.h>
 
 #include <QDateTime>
 
-CommitHistoryModel::CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+CommitHistoryModel::CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                        QObject *p)
    : QAbstractItemModel(p)
    , mCache(cache)

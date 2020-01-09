@@ -1,12 +1,13 @@
 #include "BranchTreeWidget.h"
 
-#include <git.h>
+#include <GitBranches.h>
+#include <GitBase.h>
 #include <BranchContextMenu.h>
 
 #include <QApplication>
 #include <QMessageBox>
 
-BranchTreeWidget::BranchTreeWidget(const QSharedPointer<Git> &git, QWidget *parent)
+BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QTreeWidget(parent)
    , mGit(git)
 {
@@ -38,7 +39,8 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
    if (item->data(0, Qt::UserRole + 2).toBool())
    {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      const auto ret = mGit->checkoutRemoteBranch(item->data(0, Qt::UserRole + 1).toString().remove("origin/"));
+      QScopedPointer<GitBranches> git(new GitBranches(mGit));
+      const auto ret = git->checkoutRemoteBranch(item->data(0, Qt::UserRole + 1).toString().remove("origin/"));
       QApplication::restoreOverrideCursor();
 
       if (ret.success)
@@ -53,7 +55,8 @@ void BranchTreeWidget::selectCommit(QTreeWidgetItem *item)
    if (item->data(0, Qt::UserRole + 2).toBool())
    {
       const auto branchName = item->data(0, Qt::UserRole + 1).toString();
-      const auto ret = mGit->getLastCommitOfBranch(branchName);
+      QScopedPointer<GitBranches> git(new GitBranches(mGit));
+      const auto ret = git->getLastCommitOfBranch(branchName);
 
       emit signalSelectCommit(ret.output.toString());
    }

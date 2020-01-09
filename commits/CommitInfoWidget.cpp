@@ -13,7 +13,7 @@
 
 using namespace QLogger;
 
-CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                    QWidget *parent)
    : QWidget(parent)
    , mCache(cache)

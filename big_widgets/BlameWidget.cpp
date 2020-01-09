@@ -18,7 +18,8 @@
 #include <QClipboard>
 #include <QTabWidget>
 
-BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git, QWidget *parent)
+BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                         QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
@@ -83,7 +84,8 @@ void BlameWidget::showFileHistory(const QString &filePath)
 {
    if (!mTabsMap.contains(filePath))
    {
-      const auto ret = mGit->history(filePath);
+      QScopedPointer<Git> git(new Git(mGit, mCache));
+      const auto ret = git->history(filePath);
 
       if (ret.success)
       {
@@ -139,7 +141,8 @@ void BlameWidget::reloadHistory(int tabIndex)
       const auto sha = blameWidget->getCurrentSha();
       const auto file = blameWidget->getCurrentFile();
 
-      const auto ret = mGit->history(file);
+      QScopedPointer<Git> git(new Git(mGit, mCache));
+      const auto ret = git->history(file);
 
       if (ret.success)
       {

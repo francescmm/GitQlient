@@ -20,7 +20,7 @@
 
 using namespace QLogger;
 
-HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> git,
+HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
                              QWidget *parent)
    : QFrame(parent)
    , mRepositoryModel(new CommitHistoryModel(cache, git))

@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 
-CommitDiffWidget::CommitDiffWidget(QSharedPointer<Git> git, QWidget *parent)
+CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mFirstSha(new QLabel())

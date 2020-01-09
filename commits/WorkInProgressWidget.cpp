@@ -1,6 +1,7 @@
 #include <WorkInProgressWidget.h>
 #include <ui_WorkInProgressWidget.h>
 
+#include <GitBase.h>
 #include <git.h>
 #include <GitQlientStyles.h>
 #include <CommitInfo.h>
@@ -32,8 +33,8 @@ const int WorkInProgressWidget::kMaxTitleChars = 50;
 
 QString WorkInProgressWidget::lastMsgBeforeError;
 
-WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
-                                           QWidget *parent)
+WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache,
+                                           const QSharedPointer<GitBase> &git, QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::WorkInProgressWidget)
    , mCache(cache)
@@ -289,7 +290,8 @@ void WorkInProgressWidget::revertAllChanges()
    for (; i >= 0; --i)
    {
       const auto fileName = ui->unstagedFilesList->takeItem(i)->data(Qt::DisplayRole).toString();
-      const auto ret = mGit->checkoutFile(fileName);
+      QScopedPointer<Git> git(new Git(mGit, mCache));
+      const auto ret = git->checkoutFile(fileName);
 
       emit signalCheckoutPerformed(ret);
    }
@@ -390,7 +392,8 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
          {
             const auto resetAction = menu->addAction("Reset");
             connect(resetAction, &QAction::triggered, this, [this, fileName] {
-               const auto ret = mGit->resetFile(fileName);
+               QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+               const auto ret = git->resetFile(fileName);
                emit signalCheckoutPerformed(ret.success);
             });
          }
@@ -481,7 +484,8 @@ bool WorkInProgressWidget::commitChanges()
       else if (checkMsg(msg))
       {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         const auto ok = mGit->commitFiles(selFiles, msg, false);
+         QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+         const auto ok = git->commitFiles(selFiles, msg, false);
          QApplication::restoreOverrideCursor();
 
          lastMsgBeforeError = (ok ? "" : msg);
@@ -515,7 +519,8 @@ bool WorkInProgressWidget::amendChanges()
          const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         const auto ok = mGit->commitFiles(selFiles, msg, true, author);
+         QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+         const auto ok = git->commitFiles(selFiles, msg, true, author);
          QApplication::restoreOverrideCursor();
 
          emit signalChangesCommitted(ok);

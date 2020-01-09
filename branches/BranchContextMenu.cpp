@@ -1,6 +1,8 @@
 #include "BranchContextMenu.h"
 
 #include <BranchDlg.h>
+#include <GitBranches.h>
+#include <GitBase.h>
 #include <git.h>
 
 #include <QApplication>
@@ -45,7 +47,8 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
 void BranchContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mConfig.mGit->pull();
+   QScopedPointer<Git> git(new Git(mConfig.mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto ret = git->pull();
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
@@ -57,7 +60,8 @@ void BranchContextMenu::pull()
 void BranchContextMenu::fetch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mConfig.mGit->fetch();
+   QScopedPointer<Git> git(new Git(mConfig.mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto ret = git->fetch();
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -69,7 +73,8 @@ void BranchContextMenu::fetch()
 void BranchContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mConfig.mGit->push();
+   QScopedPointer<Git> git(new Git(mConfig.mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto ret = git->push();
    QApplication::restoreOverrideCursor();
 
    if (ret.output.toString().contains("has no upstream branch"))
@@ -89,7 +94,8 @@ void BranchContextMenu::push()
 void BranchContextMenu::pushForce()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mConfig.mGit->push(true);
+   QScopedPointer<Git> git(new Git(mConfig.mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto ret = git->push(true);
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
@@ -120,7 +126,8 @@ void BranchContextMenu::merge()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    const auto currentBranch = mConfig.currentBranch;
-   const auto ret = mConfig.mGit->merge(currentBranch, { mConfig.branchSelected });
+   QScopedPointer<Git> git(new Git(mConfig.mGit, QSharedPointer<RevisionsCache>::create()));
+   const auto ret = git->merge(currentBranch, { mConfig.branchSelected });
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
@@ -156,9 +163,10 @@ void BranchContextMenu::deleteBranch()
 
       if (ret == QMessageBox::Ok)
       {
+         QScopedPointer<GitBranches> git(new GitBranches(mConfig.mGit));
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         const auto ret2 = mConfig.isLocal ? mConfig.mGit->removeLocalBranch(mConfig.branchSelected)
-                                           : mConfig.mGit->removeRemoteBranch(mConfig.branchSelected);
+         const auto ret2 = mConfig.isLocal ? git->removeLocalBranch(mConfig.branchSelected)
+                                           : git->removeRemoteBranch(mConfig.branchSelected);
          QApplication::restoreOverrideCursor();
 
          if (ret2.success)

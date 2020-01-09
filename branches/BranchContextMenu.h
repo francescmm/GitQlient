@@ -25,14 +25,14 @@
 
 #include <QMenu>
 
-class Git;
+class GitBase;
 
 struct BranchContextMenuConfig
 {
    QString currentBranch;
    QString branchSelected;
    bool isLocal;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
 };
 
 class BranchContextMenu : public QMenu

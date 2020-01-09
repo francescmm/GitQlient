@@ -24,3 +24,28 @@ QVector<QString> GitStashes::getStashes()
 
    return stashes;
 }
+
+GitExecResult GitStashes::pop() const
+{
+   return mGitBase->run("git stash pop");
+}
+
+GitExecResult GitStashes::stash()
+{
+   return mGitBase->run("git stash");
+}
+
+GitExecResult GitStashes::stashBranch(const QString &stashId, const QString &branchName)
+{
+   return mGitBase->run(QString("git stash branch %1 %2").arg(branchName, stashId));
+}
+
+GitExecResult GitStashes::stashDrop(const QString &stashId)
+{
+   return mGitBase->run(QString("git stash drop -q %1").arg(stashId));
+}
+
+GitExecResult GitStashes::stashClear()
+{
+   return mGitBase->run("git stash clear");
+}

@@ -2,6 +2,8 @@
 
 #include <git.h>
 #include <GitBase.h>
+#include <GitStashes.h>
+#include <GitBranches.h>
 #include <WorkInProgressWidget.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
@@ -12,13 +14,14 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QFileDialog>
+#include <QProcess>
 
 #include <QLogger.h>
 
 using namespace QLogger;
 
 CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<RevisionsCache> &cache,
-                                                   const QSharedPointer<Git> &git, const QStringList &shas,
+                                                   const QSharedPointer<GitBase> &git, const QStringList &shas,
                                                    QWidget *parent)
    : QMenu(parent)
    , mCache(cache)
@@ -67,7 +70,8 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          addBranchActions(sha);
 
-         const auto ret = mGit->getLastCommitOfBranch(mGit->getCurrentBranch());
+         QScopedPointer<GitBranches> git(new GitBranches(mGit));
+         const auto ret = git->getLastCommitOfBranch(mGit->getCurrentBranch());
 
          if (ret.success)
          {
@@ -137,7 +141,8 @@ void CommitHistoryContextMenu::createMultipleShasMenu()
 
 void CommitHistoryContextMenu::stashPush()
 {
-   const auto ret = mGit->stash();
+   QScopedPointer<GitStashes> git(new GitStashes(mGit));
+   const auto ret = git->stash();
 
    if (ret.success)
       emit signalRepositoryUpdated();
@@ -145,7 +150,8 @@ void CommitHistoryContextMenu::stashPush()
 
 void CommitHistoryContextMenu::stashPop()
 {
-   const auto ret = mGit->pop();
+   QScopedPointer<GitStashes> git(new GitStashes(mGit));
+   const auto ret = git->pop();
 
    if (ret.success)
       emit signalRepositoryUpdated();
@@ -153,7 +159,7 @@ void CommitHistoryContextMenu::stashPop()
 
 void CommitHistoryContextMenu::createBranch()
 {
-   BranchDlg dlg({ mShas.first(), BranchDlgMode::CREATE_FROM_COMMIT, QSharedPointer<Git>(mGit) });
+   BranchDlg dlg({ mShas.first(), BranchDlgMode::CREATE_FROM_COMMIT, mGit });
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
@@ -169,10 +175,10 @@ void CommitHistoryContextMenu::createTag()
       emit signalRepositoryUpdated();
 }
 
-#include <QProcess>
 void CommitHistoryContextMenu::exportAsPatch()
 {
-   const auto ret = mGit->exportPatch(mShas);
+   QScopedPointer<Git> git(new Git(mGit, mCache));
+   const auto ret = git->exportPatch(mShas);
 
    if (ret.success)
    {
@@ -203,7 +209,8 @@ void CommitHistoryContextMenu::exportAsPatch()
 void CommitHistoryContextMenu::checkoutBranch()
 {
    const auto branchName = qobject_cast<QAction *>(sender())->text();
-   mGit->checkoutRemoteBranch(branchName);
+   QScopedPointer<GitBranches> git(new GitBranches(mGit));
+   git->checkoutRemoteBranch(branchName);
 
    emit signalRepositoryUpdated();
 }
@@ -213,7 +220,8 @@ void CommitHistoryContextMenu::checkoutCommit()
    const auto sha = mShas.first();
    QLog_Info("UI", QString("Checking out the commit {%1}").arg(sha));
 
-   const auto ret = mGit->checkoutCommit(sha);
+   QScopedPointer<Git> git(new Git(mGit, mCache));
+   const auto ret = git->checkoutCommit(sha);
 
    if (ret.success)
       emit signalRepositoryUpdated();
@@ -223,7 +231,8 @@ void CommitHistoryContextMenu::checkoutCommit()
 
 void CommitHistoryContextMenu::cherryPickCommit()
 {
-   const auto ret = mGit->cherryPickCommit(mShas.first());
+   QScopedPointer<Git> git(new Git(mGit, mCache));
+   const auto ret = git->cherryPickCommit(mShas.first());
 
    if (ret.success)
       emit signalRepositoryUpdated();
@@ -234,23 +243,26 @@ void CommitHistoryContextMenu::cherryPickCommit()
 void CommitHistoryContextMenu::applyPatch()
 {
    const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
+   QScopedPointer<Git> git(new Git(mGit, mCache));
 
-   if (!fileName.isEmpty() && mGit->apply(fileName))
+   if (!fileName.isEmpty() && git->apply(fileName))
       emit signalRepositoryUpdated();
 }
 
 void CommitHistoryContextMenu::applyCommit()
 {
    const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
+   QScopedPointer<Git> git(new Git(mGit, mCache));
 
-   if (!fileName.isEmpty() && mGit->apply(fileName, true))
+   if (!fileName.isEmpty() && git->apply(fileName, true))
       emit signalRepositoryUpdated();
 }
 
 void CommitHistoryContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->push();
+   QScopedPointer<Git> git(new Git(mGit, mCache));
+   const auto ret = git->push();
    QApplication::restoreOverrideCursor();
 
    if (ret.output.toString().contains("has no upstream branch"))
@@ -271,7 +283,8 @@ void CommitHistoryContextMenu::push()
 void CommitHistoryContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->pull();
+   QScopedPointer<Git> git(new Git(mGit, mCache));
+   const auto ret = git->pull();
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
@@ -282,19 +295,25 @@ void CommitHistoryContextMenu::pull()
 
 void CommitHistoryContextMenu::fetch()
 {
-   if (mGit->fetch())
+   QScopedPointer<Git> git(new Git(mGit, mCache));
+
+   if (git->fetch())
       emit signalRepositoryUpdated();
 }
 
 void CommitHistoryContextMenu::resetSoft()
 {
-   if (mGit->resetCommit(mShas.first(), Git::CommitResetType::SOFT))
+   QScopedPointer<Git> git(new Git(mGit, mCache));
+
+   if (git->resetCommit(mShas.first(), Git::CommitResetType::SOFT))
       emit signalRepositoryUpdated();
 }
 
 void CommitHistoryContextMenu::resetMixed()
 {
-   if (mGit->resetCommit(mShas.first(), Git::CommitResetType::MIXED))
+   QScopedPointer<Git> git(new Git(mGit, mCache));
+
+   if (git->resetCommit(mShas.first(), Git::CommitResetType::MIXED))
       emit signalRepositoryUpdated();
 }
 
@@ -306,7 +325,9 @@ void CommitHistoryContextMenu::resetHard()
 
    if (retMsg == QMessageBox::Ok)
    {
-      if (mGit->resetCommit(mShas.first(), Git::CommitResetType::HARD))
+      QScopedPointer<Git> git(new Git(mGit, mCache));
+
+      if (git->resetCommit(mShas.first(), Git::CommitResetType::HARD))
          emit signalRepositoryUpdated();
    }
 }
@@ -314,8 +335,9 @@ void CommitHistoryContextMenu::resetHard()
 void CommitHistoryContextMenu::merge(const QString &branchFrom)
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   QScopedPointer<Git> git(new Git(mGit, mCache));
    const auto currentBranch = mGit->getCurrentBranch();
-   const auto ret = mGit->merge(currentBranch, { branchFrom });
+   const auto ret = git->merge(currentBranch, { branchFrom });
    QApplication::restoreOverrideCursor();
 
    const auto outputStr = ret.output.toString();

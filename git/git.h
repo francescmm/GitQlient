@@ -40,27 +40,10 @@ public:
    explicit Git(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> cache,
                 QObject *parent = nullptr);
 
-   /* START BRANCHES */
-   GitExecResult createBranchFromAnotherBranch(const QString &oldName, const QString &newName);
-   GitExecResult createBranchAtCommit(const QString &commitSha, const QString &branchName);
-   GitExecResult checkoutRemoteBranch(const QString &branchName);
-   GitExecResult checkoutNewLocalBranch(const QString &branchName);
-   GitExecResult renameBranch(const QString &oldName, const QString &newName);
-   GitExecResult removeLocalBranch(const QString &branchName);
-   GitExecResult removeRemoteBranch(const QString &branchName);
-   GitExecResult getBranchesOfCommit(const QString &sha);
-   GitExecResult getLastCommitOfBranch(const QString &branch);
-   GitExecResult prune();
    QString getCurrentBranch() const;
-   /* END BRANCHES */
 
    /* START STASHES */
-   GitExecResult pop() const;
-   GitExecResult stash();
-   GitExecResult stashBranch(const QString &stashId, const QString &branchName);
-   GitExecResult stashDrop(const QString &stashId);
-   GitExecResult stashClear();
-   bool resetCommit(const QString &sha, CommitResetType type);
+
    /*  END  STASHES */
 
    /* START COMMIT WORK */
@@ -68,7 +51,6 @@ public:
    GitExecResult exportPatch(const QStringList &shaList);
    bool apply(const QString &fileName, bool asCommit = false);
    GitExecResult push(bool force = false);
-   GitExecResult pushUpstream(const QString &branchName);
    GitExecResult pull();
    bool fetch();
    GitExecResult cherryPickCommit(const QString &sha);
@@ -82,8 +64,10 @@ public:
    GitExecResult resetFile(const QString &fileName);
    GitExecResult blame(const QString &file, const QString &commitFrom);
    GitExecResult history(const QString &file);
+   bool resetCommit(const QString &sha, CommitResetType type);
    /* END COMMIT INFO */
 
+   GitExecResult prune();
    GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
    QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
 

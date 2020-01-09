@@ -26,7 +26,7 @@
 #include <QMenu>
 
 class RevisionsCache;
-class Git;
+class GitBase;
 
 class CommitHistoryContextMenu : public QMenu
 {
@@ -39,12 +39,12 @@ signals:
    void signalAmendCommit(const QString &sha);
 
 public:
-   explicit CommitHistoryContextMenu(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+   explicit CommitHistoryContextMenu(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                      const QStringList &shas, QWidget *parent = nullptr);
 
 private:
    QSharedPointer<RevisionsCache> mCache;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
    QStringList mShas;
 
    void createIndividualShaMenu();

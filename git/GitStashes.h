@@ -23,6 +23,8 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <GitExecResult.h>
+
 #include <QSharedPointer>
 
 class GitBase;
@@ -33,6 +35,11 @@ public:
    GitStashes(const QSharedPointer<GitBase> &gitBase);
 
    QVector<QString> getStashes();
+   GitExecResult pop() const;
+   GitExecResult stash();
+   GitExecResult stashBranch(const QString &stashId, const QString &branchName);
+   GitExecResult stashDrop(const QString &stashId);
+   GitExecResult stashClear();
 
 private:
    QSharedPointer<GitBase> mGitBase;

@@ -29,7 +29,7 @@
 class QListWidget;
 class QListWidgetItem;
 class RevisionsCache;
-class Git;
+class GitBase;
 class RevisionFile;
 
 namespace Ui
@@ -48,7 +48,7 @@ signals:
    void signalShowFileHistory(const QString &fileName);
 
 public:
-   explicit WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+   explicit WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent = nullptr);
 
    void configure(const QString &sha);
@@ -59,7 +59,7 @@ private:
    bool mIsAmend = false;
    Ui::WorkInProgressWidget *ui = nullptr;
    QSharedPointer<RevisionsCache> mCache;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
    QString mCurrentSha;
    QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;
 

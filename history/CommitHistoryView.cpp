@@ -14,6 +14,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <RepositoryViewDelegate.h>
 #include <ShaFilterProxyModel.h>
 #include <git.h>
+#include <GitBranches.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
 
@@ -24,7 +25,7 @@ Author: Marco Costalba (C) 2005-2007
 #include <QLogger.h>
 using namespace QLogger;
 
-CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<Git> &git,
+CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                      QWidget *parent)
    : QTreeView(parent)
    , mCache(cache)
@@ -181,7 +182,9 @@ QList<QString> CommitHistoryView::getSelectedShaList() const
       const auto dt = QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm");
 
       shas.insert(dt, sha);
-      auto ret = mGit->getBranchesOfCommit(sha);
+      QScopedPointer<GitBranches> git(new GitBranches(mGit));
+      const auto ret = git->getBranchesOfCommit(sha);
+
       auto branches = ret.output.toString().trimmed().split("\n ");
       std::sort(branches.begin(), branches.end());
       godVector.append(branches.toVector());
