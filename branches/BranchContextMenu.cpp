@@ -3,7 +3,7 @@
 #include <BranchDlg.h>
 #include <GitBranches.h>
 #include <GitBase.h>
-#include <git.h>
+#include <GitRemote.h>
 
 #include <QApplication>
 #include <QMessageBox>
@@ -47,7 +47,7 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
 void BranchContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mConfig.mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
    const auto ret = git->pull();
    QApplication::restoreOverrideCursor();
 
@@ -60,7 +60,7 @@ void BranchContextMenu::pull()
 void BranchContextMenu::fetch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mConfig.mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
    const auto ret = git->fetch();
    QApplication::restoreOverrideCursor();
 
@@ -73,7 +73,7 @@ void BranchContextMenu::fetch()
 void BranchContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mConfig.mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
    const auto ret = git->push();
    QApplication::restoreOverrideCursor();
 
@@ -94,7 +94,7 @@ void BranchContextMenu::push()
 void BranchContextMenu::pushForce()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mConfig.mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
    const auto ret = git->push(true);
    QApplication::restoreOverrideCursor();
 
@@ -126,7 +126,7 @@ void BranchContextMenu::merge()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    const auto currentBranch = mConfig.currentBranch;
-   QScopedPointer<Git> git(new Git(mConfig.mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
    const auto ret = git->merge(currentBranch, { mConfig.branchSelected });
    QApplication::restoreOverrideCursor();
 

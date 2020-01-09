@@ -40,34 +40,24 @@ public:
    explicit Git(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> cache,
                 QObject *parent = nullptr);
 
-   /* START COMMIT WORK */
+   /* START LOCAL */
    bool commitFiles(QStringList &files, const QString &msg, bool amend, const QString &author = QString());
-   GitExecResult exportPatch(const QStringList &shaList);
-   bool apply(const QString &fileName, bool asCommit = false);
-   GitExecResult push(bool force = false);
-   GitExecResult pull();
-   bool fetch();
    GitExecResult cherryPickCommit(const QString &sha);
-   bool resetCommits(int parentDepth);
    GitExecResult checkoutCommit(const QString &sha);
    GitExecResult markFileAsResolved(const QString &fileName);
-   /* END COMMIT WORK */
-
-   /* START COMMIT INFO */
    bool checkoutFile(const QString &fileName);
    GitExecResult resetFile(const QString &fileName);
+   bool resetCommit(const QString &sha, CommitResetType type);
+   /* END LOCAL */
+
+   /* START COMMIT INFO */
    GitExecResult blame(const QString &file, const QString &commitFrom);
    GitExecResult history(const QString &file);
-   bool resetCommit(const QString &sha, CommitResetType type);
    /* END COMMIT INFO */
 
-   GitExecResult prune();
    GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
    QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
-
    RevisionFile getDiffFiles(const QString &sha, const QString &sha2);
-
-   GitExecResult merge(const QString &into, QStringList sources);
 
 private:
    QSharedPointer<GitBase> mGitBase;

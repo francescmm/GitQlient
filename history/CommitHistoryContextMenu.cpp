@@ -1,9 +1,11 @@
 #include "CommitHistoryContextMenu.h"
 
-#include <git.h>
+#include <GitPatches.h>
 #include <GitBase.h>
 #include <GitStashes.h>
 #include <GitBranches.h>
+#include <GitRemote.h>
+#include <git.h>
 #include <WorkInProgressWidget.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
@@ -177,7 +179,7 @@ void CommitHistoryContextMenu::createTag()
 
 void CommitHistoryContextMenu::exportAsPatch()
 {
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitPatches> git(new GitPatches(mGit));
    const auto ret = git->exportPatch(mShas);
 
    if (ret.success)
@@ -243,25 +245,25 @@ void CommitHistoryContextMenu::cherryPickCommit()
 void CommitHistoryContextMenu::applyPatch()
 {
    const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
-   if (!fileName.isEmpty() && git->apply(fileName))
+   if (!fileName.isEmpty() && git->applyPatch(fileName))
       emit signalRepositoryUpdated();
 }
 
 void CommitHistoryContextMenu::applyCommit()
 {
    const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
-   if (!fileName.isEmpty() && git->apply(fileName, true))
+   if (!fileName.isEmpty() && git->applyPatch(fileName, true))
       emit signalRepositoryUpdated();
 }
 
 void CommitHistoryContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
    const auto ret = git->push();
    QApplication::restoreOverrideCursor();
 
@@ -283,7 +285,7 @@ void CommitHistoryContextMenu::push()
 void CommitHistoryContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
    const auto ret = git->pull();
    QApplication::restoreOverrideCursor();
 
@@ -295,7 +297,7 @@ void CommitHistoryContextMenu::pull()
 
 void CommitHistoryContextMenu::fetch()
 {
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
 
    if (git->fetch())
       emit signalRepositoryUpdated();
@@ -335,7 +337,7 @@ void CommitHistoryContextMenu::resetHard()
 void CommitHistoryContextMenu::merge(const QString &branchFrom)
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mGit, mCache));
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
    const auto currentBranch = mGit->getCurrentBranch();
    const auto ret = git->merge(currentBranch, { branchFrom });
    QApplication::restoreOverrideCursor();

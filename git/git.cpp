@@ -115,13 +115,6 @@ RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha)
    return ret.first ? mCache->parseDiff(sha, ret.second) : RevisionFile();
 }
 
-bool Git::resetCommits(int parentDepth)
-{
-   QString runCmd("git reset --soft HEAD~");
-   runCmd.append(QString::number(parentDepth));
-   return mGitBase->run(runCmd).first;
-}
-
 GitExecResult Git::checkoutCommit(const QString &sha)
 {
    return mGitBase->run(QString("git checkout %1").arg(sha));
@@ -135,16 +128,6 @@ GitExecResult Git::markFileAsResolved(const QString &fileName)
       emit signalWipUpdated();
 
    return ret;
-}
-
-GitExecResult Git::merge(const QString &into, QStringList sources)
-{
-   const auto ret = mGitBase->run(QString("git checkout -q %1").arg(into));
-
-   if (!ret.first)
-      return ret;
-
-   return mGitBase->run(QString("git merge -q ") + sources.join(" "));
 }
 
 bool Git::updateIndex(const RevisionFile &files, const QStringList &selFiles)
@@ -204,61 +187,6 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    return ret;
 }
 
-GitExecResult Git::exportPatch(const QStringList &shaList)
-{
-   auto val = 1;
-   QStringList files;
-
-   for (const auto &sha : shaList)
-   {
-      const auto ret = mGitBase->run(QString("git format-patch -1 %1").arg(sha));
-
-      if (!ret.first)
-         break;
-      else
-      {
-         auto filename = ret.second;
-         filename = filename.remove("\n");
-         const auto text = filename.mid(filename.indexOf("-") + 1);
-         const auto number = QString("%1").arg(val, 4, 10, QChar('0'));
-         const auto newFileName = QString("%1-%2").arg(number, text);
-         files.append(newFileName);
-
-         QFile::rename(QString("%1/%2").arg(mGitBase->getWorkingDir(), filename),
-                       QString("%1/%2").arg(mGitBase->getWorkingDir(), newFileName));
-         ++val;
-      }
-   }
-
-   if (val != shaList.count())
-      QLog_Error("Git", QString("Problem generating patches. Stop after {%1} iterations").arg(val));
-
-   return qMakePair(true, QVariant(files));
-}
-
-bool Git::apply(const QString &fileName, bool asCommit)
-{
-   const auto cmd = asCommit ? QString("git am --signof") : QString("git apply");
-   const auto ret = mGitBase->run(QString("%1 %2").arg(cmd, fileName));
-
-   return ret.first;
-}
-
-GitExecResult Git::push(bool force)
-{
-   return mGitBase->run(QString("git push ").append(force ? QString("--force") : QString()));
-}
-
-GitExecResult Git::pull()
-{
-   return mGitBase->run("git pull");
-}
-
-bool Git::fetch()
-{
-   return mGitBase->run("git fetch --all --tags --prune --force").first;
-}
-
 GitExecResult Git::cherryPickCommit(const QString &sha)
 {
    return mGitBase->run(QString("git cherry-pick %1").arg(sha));
@@ -282,11 +210,6 @@ bool Git::resetCommit(const QString &sha, CommitResetType type)
    }
 
    return mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha)).first;
-}
-
-GitExecResult Git::prune()
-{
-   return mGitBase->run("git remote prune origin");
 }
 
 // CT TODO utility function; can go elsewhere

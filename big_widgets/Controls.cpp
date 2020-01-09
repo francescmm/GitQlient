@@ -1,9 +1,9 @@
 #include "Controls.h"
 
-#include <git.h>
 #include <GitBase.h>
 #include <GitStashes.h>
 #include <GitQlientStyles.h>
+#include <GitRemote.h>
 #include <BranchDlg.h>
 
 #include <QApplication>
@@ -176,7 +176,7 @@ void Controls::enableButtons(bool enabled)
 void Controls::pullCurrentBranch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
    const auto ret = git->pull();
    QApplication::restoreOverrideCursor();
 
@@ -189,7 +189,7 @@ void Controls::pullCurrentBranch()
 void Controls::fetchAll()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
    const auto ret = git->fetch();
    QApplication::restoreOverrideCursor();
 
@@ -200,7 +200,7 @@ void Controls::fetchAll()
 void Controls::pushCurrentBranch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
    const auto ret = git->push();
    QApplication::restoreOverrideCursor();
 
@@ -242,7 +242,7 @@ void Controls::popStashedWork()
 void Controls::pruneBranches()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
    const auto ret = git->prune();
    QApplication::restoreOverrideCursor();
 
