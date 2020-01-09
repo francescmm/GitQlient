@@ -147,11 +147,6 @@ GitExecResult Git::merge(const QString &into, QStringList sources)
    return mGitBase->run(QString("git merge -q ") + sources.join(" "));
 }
 
-QString Git::getWorkingDir() const
-{
-   return mGitBase->getWorkingDir();
-}
-
 bool Git::updateIndex(const RevisionFile &files, const QStringList &selFiles)
 {
    QStringList toAdd, toRemove;
@@ -292,11 +287,6 @@ bool Git::resetCommit(const QString &sha, CommitResetType type)
 GitExecResult Git::prune()
 {
    return mGitBase->run("git remote prune origin");
-}
-
-QString Git::getCurrentBranch() const
-{
-   return mGitBase->getCurrentBranch();
 }
 
 // CT TODO utility function; can go elsewhere

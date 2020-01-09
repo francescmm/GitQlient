@@ -206,8 +206,7 @@ void Controls::pushCurrentBranch()
 
    if (ret.output.toString().contains("has no upstream branch"))
    {
-      QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
-      const auto currentBranch = git->getCurrentBranch();
+      const auto currentBranch = mGit->getCurrentBranch();
       BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mGit });
       const auto dlgRet = dlg.exec();
 

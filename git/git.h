@@ -40,12 +40,6 @@ public:
    explicit Git(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> cache,
                 QObject *parent = nullptr);
 
-   QString getCurrentBranch() const;
-
-   /* START STASHES */
-
-   /*  END  STASHES */
-
    /* START COMMIT WORK */
    bool commitFiles(QStringList &files, const QString &msg, bool amend, const QString &author = QString());
    GitExecResult exportPatch(const QStringList &shaList);
@@ -74,8 +68,6 @@ public:
    RevisionFile getDiffFiles(const QString &sha, const QString &sha2);
 
    GitExecResult merge(const QString &into, QStringList sources);
-
-   QString getWorkingDir() const;
 
 private:
    QSharedPointer<GitBase> mGitBase;
