@@ -46,9 +46,6 @@ RevisionFile Git::getDiffFiles(const QString &sha, const QString &diffToSha)
    if (r.parentsCount() == 0)
       return RevisionFile();
 
-   if (mCache->containsRevisionFile(sha, diffToSha))
-      return mCache->getRevisionFile(sha, diffToSha);
-
    QString runCmd = QString("git diff-tree -C --no-color -r -m ");
 
    if (!diffToSha.isEmpty() && sha != CommitInfo::ZERO_SHA)
