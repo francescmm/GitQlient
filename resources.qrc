@@ -47,6 +47,9 @@
         <file alias="diff">resources/icons/diff.svg</file>
         <file alias="options">resources/icons/options.svg</file>
         <file alias="commit-list">resources/icons/listing-option.svg</file>
+        <file alias="GitQlientLogo">resources/icons/GitQlientLogo.png</file>
+        <file alias="GitQlientLogoSVG">resources/icons/GitQlientLogo.svg</file>
+        <file alias="GitQlientLogoIco">resources/icons/GitQlientLogo.ico</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>
@@ -54,5 +57,6 @@
         <file alias="colors_dark">resources/stylesheet_colors_dark.css</file>
         <file alias="Ubuntu">resources/Ubuntu.ttf</file>
         <file alias="UbuntuMono">resources/UbuntuMono.ttf</file>
+        <file>resources.rc</file>
     </qresource>
 </RCC>

@@ -13,3 +13,5 @@ DEFINES += \
 
 RESOURCES += \
     $$PWD/resources.qrc
+
+RC_FILE = resources.rc
