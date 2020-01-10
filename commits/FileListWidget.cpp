@@ -3,7 +3,7 @@
 #include <FileContextMenu.h>
 #include <RevisionFile.h>
 #include <FileListDelegate.h>
-#include <GitRepoLoader.h>
+#include <GitHistory.h>
 #include <GitQlientStyles.h>
 #include <RevisionsCache.h>
 
@@ -59,11 +59,16 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 
    if (mCache->containsRevisionFile(currentSha, compareToSha))
       files = mCache->getRevisionFile(currentSha, compareToSha);
-   else if (mCache->getCommitInfo(currentSha).parentsCount() > 0)
+   else if (!compareToSha.isEmpty())
    {
-      QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));
-      git->updateWipRevision();
-      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, compareToSha);
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
+      const auto ret = git->getDiffFiles(currentSha, compareToSha);
+
+      if (ret.success)
+      {
+         files = mCache->parseDiff(ret.output.toString());
+         mCache->insertRevisionFile(currentSha, compareToSha, files);
+      }
    }
 
    if (files.count() != 0)
