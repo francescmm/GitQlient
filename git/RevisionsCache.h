@@ -70,7 +70,6 @@ public:
    }
 
    RevisionFile parseDiff(const QString &logDiff);
-   int findFileIndex(const RevisionFile &rf, const QString &name);
 
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles) { mUntrackedfiles = untrackedFiles; }
    bool pendingLocalChanges() const;

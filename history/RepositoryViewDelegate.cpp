@@ -7,7 +7,6 @@
 #include <CommitHistoryView.h>
 #include <CommitHistoryModel.h>
 #include <RevisionsCache.h>
-#include <git.h>
 #include <GitBase.h>
 
 #include <QSortFilterProxyModel>

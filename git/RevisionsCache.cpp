@@ -261,20 +261,6 @@ void RevisionsCache::flushFileNames(FileNamesLoader &fl)
    fl.rf = nullptr;
 }
 
-int RevisionsCache::findFileIndex(const RevisionFile &rf, const QString &name)
-{
-   if (name.isEmpty())
-      return -1;
-
-   const auto idx = name.lastIndexOf('/') + 1;
-   const auto dr = name.left(idx);
-   const auto nm = name.mid(idx);
-
-   // return rf.mFiles.indexOf(name);
-   const auto found = rf.mFiles.indexOf(name);
-   return found;
-}
-
 bool RevisionsCache::pendingLocalChanges() const
 {
    const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA);
@@ -399,7 +385,7 @@ RevisionFile RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const 
 
    for (auto i = 0; i < rf.count(); i++)
    {
-      if (findFileIndex(cachedFiles, rf.getFile(i)) != -1)
+      if (cachedFiles.mFiles.indexOf(rf.getFile(i)) != -1)
       {
          if (cachedFiles.statusCmp(i, RevisionFile::CONFLICT))
             rf.appendStatus(i, RevisionFile::CONFLICT);

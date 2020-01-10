@@ -2,6 +2,16 @@
 
 #include <GitBase.h>
 
+namespace
+{
+static QString quote(const QStringList &sl)
+{
+   QString q(sl.join(QString("$%1$").arg(' ')));
+   q.prepend("$").append("$");
+   return q;
+}
+}
+
 GitLocal::GitLocal(const QSharedPointer<GitBase> &gitBase)
    : QObject()
    , mGitBase(gitBase)
@@ -59,4 +69,77 @@ bool GitLocal::resetCommit(const QString &sha, CommitResetType type)
    }
 
    return mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha)).first;
+}
+
+GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFile &allCommitFiles, const QString &msg,
+                                    bool amend, const QString &author)
+{
+   // add user selectable commit options
+   QString cmtOptions;
+
+   if (amend)
+   {
+      cmtOptions.append(" --amend");
+
+      if (!author.isEmpty())
+         cmtOptions.append(QString(" --author \"%1\"").arg(author));
+   }
+
+   QStringList notSel;
+
+   for (auto i = 0; i < allCommitFiles.count(); ++i)
+   {
+      const QString &fp = allCommitFiles.getFile(i);
+      if (selFiles.indexOf(fp) == -1 && allCommitFiles.statusCmp(i, RevisionFile::IN_INDEX))
+         notSel.append(fp);
+   }
+
+   if (!notSel.empty())
+   {
+      const auto ret = mGitBase->run("git reset -- " + quote(notSel));
+
+      if (!ret.first)
+         return ret;
+   }
+
+   // call git reset to remove not selected files from index
+   const auto updIdx = updateIndex(allCommitFiles, selFiles);
+
+   if (!updIdx.success)
+      return updIdx;
+
+   return mGitBase->run(QString("git commit" + cmtOptions + " -m \"%1\"").arg(msg));
+}
+
+GitExecResult GitLocal::updateIndex(const RevisionFile &files, const QStringList &selFiles)
+{
+   QStringList toAdd, toRemove;
+
+   for (auto file : selFiles)
+   {
+      const auto index = files.mFiles.indexOf(file);
+
+      if (index != -1 && files.statusCmp(index, RevisionFile::DELETED))
+         toRemove << file;
+      else
+         toAdd << file;
+   }
+
+   if (!toRemove.isEmpty())
+   {
+      const auto ret = mGitBase->run("git rm --cached --ignore-unmatch -- " + quote(toRemove));
+
+      if (!ret.first)
+         return ret;
+   }
+
+   if (!toAdd.isEmpty())
+   {
+      const auto ret = mGitBase->run("git add -- " + quote(toAdd));
+
+      if (!ret.first)
+         return ret;
+   }
+
+   return GitExecResult(true, "Indexes updated");
 }

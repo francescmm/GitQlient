@@ -1,6 +1,5 @@
 #include "CommitDiffWidget.h"
 
-#include <git.h>
 #include <FileListWidget.h>
 
 #include <QVBoxLayout>

@@ -28,7 +28,6 @@
 class GitBase;
 class RevisionsCache;
 class GitRepoLoader;
-class Git;
 class QCloseEvent;
 class QFileSystemWatcher;
 class QStackedWidget;
@@ -80,7 +79,6 @@ private:
    QSharedPointer<RevisionsCache> mGitQlientCache;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitRepoLoader> mGitLoader;
-   QSharedPointer<Git> mGit;
    HistoryWidget *mRepoWidget = nullptr;
    QStackedLayout *mStackedLayout = nullptr;
    Controls *mControls = nullptr;

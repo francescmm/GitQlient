@@ -1,10 +1,9 @@
 #include <WorkInProgressWidget.h>
 #include <ui_WorkInProgressWidget.h>
 
-#include <GitHistory.h>
+#include <GitRepoLoader.h>
 #include <GitBase.h>
 #include <GitLocal.h>
-#include <git.h>
 #include <GitQlientStyles.h>
 #include <CommitInfo.h>
 #include <RevisionFile.h>
@@ -125,14 +124,9 @@ void WorkInProgressWidget::resetInfo(bool force)
       files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
    else if (revInfo.parentsCount() > 0)
    {
-      QScopedPointer<GitHistory> git(new GitHistory(mGit));
-      const auto ret = git->getDiffFiles(CommitInfo::ZERO_SHA, revInfo.parent(0));
-
-      if (ret.success)
-      {
-         files = mCache->parseDiff(ret.output.toString());
-         mCache->insertRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0), files);
-      }
+      QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));
+      git->updateWipRevision();
+      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
    }
 
    if (!force || (mIsAmend && force))
@@ -503,14 +497,19 @@ bool WorkInProgressWidget::commitChanges()
                               tr("There are files with conflicts. Please, resolve the conflicts first."));
       else if (checkMsg(msg))
       {
+         const auto revInfo = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
+         QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
+         gitLoader->updateWipRevision();
+         const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
+
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QScopedPointer<Git> git(new Git(mGit, mCache));
-         const auto ok = git->commitFiles(selFiles, msg, false);
+         QScopedPointer<GitLocal> git(new GitLocal(mGit));
+         const auto ret = git->commitFiles(selFiles, files, msg, false);
          QApplication::restoreOverrideCursor();
 
-         lastMsgBeforeError = (ok ? "" : msg);
+         lastMsgBeforeError = (ret.success ? "" : msg);
 
-         emit signalChangesCommitted(ok);
+         emit signalChangesCommitted(ret.success);
 
          done = true;
 
@@ -538,12 +537,17 @@ bool WorkInProgressWidget::amendChanges()
       {
          const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
 
+         const auto revInfo = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
+         QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
+         gitLoader->updateWipRevision();
+         const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
+
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QScopedPointer<Git> git(new Git(mGit, mCache));
-         const auto ok = git->commitFiles(selFiles, msg, true, author);
+         QScopedPointer<GitLocal> git(new GitLocal(mGit));
+         const auto ret = git->commitFiles(selFiles, files, msg, true, author);
          QApplication::restoreOverrideCursor();
 
-         emit signalChangesCommitted(ok);
+         emit signalChangesCommitted(ret.success);
 
          done = true;
       }

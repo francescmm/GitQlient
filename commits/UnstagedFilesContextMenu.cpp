@@ -1,6 +1,5 @@
 #include "UnstagedFilesContextMenu.h"
 
-#include <git.h>
 #include <GitBase.h>
 #include <GitSyncProcess.h>
 #include <GitLocal.h>

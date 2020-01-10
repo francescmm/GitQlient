@@ -1,7 +1,5 @@
 #include "AGitProcess.h"
 
-#include "git.h"
-
 #include <QTemporaryFile>
 #include <QTextStream>
 

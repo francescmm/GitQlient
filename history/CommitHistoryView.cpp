@@ -5,7 +5,6 @@
 #include <CommitHistoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
 #include <ShaFilterProxyModel.h>
-#include <git.h>
 #include <GitBranches.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>

@@ -2,7 +2,6 @@
 
 #include <BranchDlg.h>
 #include <GitStashes.h>
-#include <git.h>
 
 #include <QMessageBox>
 

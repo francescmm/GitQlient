@@ -14,7 +14,6 @@
 #include <DiffWidget.h>
 #include <RevisionsCache.h>
 
-#include <git.h>
 #include <GitRepoLoader.h>
 #include <GitConfig.h>
 #include <GitBase.h>
@@ -37,7 +36,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mGitQlientCache(new RevisionsCache())
    , mGitBase(new GitBase(repoPath))
    , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache))
-   , mGit(new Git(mGitBase, mGitQlientCache))
    , mRepoWidget(new HistoryWidget(mGitQlientCache, mGitBase))
    , mStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGitBase))

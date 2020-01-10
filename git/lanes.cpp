@@ -8,7 +8,6 @@
 */
 #include <QStringList>
 #include "lanes.h"
-#include <git.h>
 
 void Lanes::init(const QString &expectedSha)
 {

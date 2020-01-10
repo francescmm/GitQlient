@@ -9,7 +9,6 @@
 #include <CommitInfo.h>
 #include <GitQlientSettings.h>
 #include <GitBase.h>
-#include "git.h"
 
 #include <QLogger.h>
 

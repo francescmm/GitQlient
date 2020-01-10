@@ -5,7 +5,6 @@
 #include <GitTags.h>
 #include <GitSubmodules.h>
 #include <GitStashes.h>
-#include <git.h>
 #include <BranchesViewDelegate.h>
 #include <ClickableFrame.h>
 #include <AddSubmoduleDlg.h>

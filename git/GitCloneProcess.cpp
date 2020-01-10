@@ -1,7 +1,5 @@
 #include "GitCloneProcess.h"
 
-#include "git.h"
-
 GitCloneProcess::GitCloneProcess(const QString &workingDir)
    : AGitProcess(workingDir)
 {

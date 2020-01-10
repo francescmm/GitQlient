@@ -3,7 +3,6 @@
 #include <RevisionsCache.h>
 #include <CommitInfo.h>
 #include <FileListWidget.h>
-#include <git.h>
 
 #include <QLabel>
 #include <QVBoxLayout>

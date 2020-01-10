@@ -4,7 +4,6 @@
 #include <FullDiffWidget.h>
 #include <DiffButton.h>
 #include <CommitDiffWidget.h>
-#include <git.h>
 
 #include <QLogger.h>
 

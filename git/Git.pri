@@ -22,7 +22,6 @@ HEADERS += \
     $$PWD/ReferenceType.h \
     $$PWD/RevisionFile.h \
     $$PWD/RevisionsCache.h \
-    $$PWD/git.h \
     $$PWD/lanes.h
 
 SOURCES += \
@@ -46,5 +45,4 @@ SOURCES += \
     $$PWD/Reference.cpp \
     $$PWD/RevisionFile.cpp \
     $$PWD/RevisionsCache.cpp \
-    $$PWD/git.cpp \
     $$PWD/lanes.cpp
