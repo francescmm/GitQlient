@@ -257,6 +257,7 @@ void RevisionsCache::flushFileNames(FileNamesLoader &fl)
    }
 
    fl.rfNames.clear();
+   fl.rfDirs.clear();
    fl.rf = nullptr;
 }
 

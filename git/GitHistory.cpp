@@ -50,3 +50,13 @@ QString GitHistory::getFileDiff(const QString &currentSha, const QString &previo
 
    return QString();
 }
+
+GitExecResult GitHistory::getDiffFiles(const QString &sha, const QString &diffToSha)
+{
+   QString runCmd = QString("git diff-tree -C --no-color -r -m ");
+
+   if (!diffToSha.isEmpty() && sha != CommitInfo::ZERO_SHA)
+      runCmd.append(diffToSha + " " + sha);
+
+   return mGitBase->run(runCmd);
+}

@@ -38,6 +38,7 @@ public:
    GitExecResult history(const QString &file);
    GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
    QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
+   GitExecResult getDiffFiles(const QString &sha, const QString &diffToSha);
 
 private:
    QSharedPointer<GitBase> mGitBase;

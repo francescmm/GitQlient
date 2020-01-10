@@ -1,6 +1,7 @@
 #include <WorkInProgressWidget.h>
 #include <ui_WorkInProgressWidget.h>
 
+#include <GitHistory.h>
 #include <GitBase.h>
 #include <GitLocal.h>
 #include <git.h>
@@ -124,13 +125,13 @@ void WorkInProgressWidget::resetInfo(bool force)
       files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
    else if (revInfo.parentsCount() > 0)
    {
-      QScopedPointer<Git> git(new Git(mGit, mCache));
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
       const auto ret = git->getDiffFiles(CommitInfo::ZERO_SHA, revInfo.parent(0));
 
       if (ret.success)
       {
-         const auto rf = mCache->parseDiff(ret.output.toString());
-         mCache->insertRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0), rf);
+         files = mCache->parseDiff(ret.output.toString());
+         mCache->insertRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0), files);
       }
    }
 
@@ -503,7 +504,7 @@ bool WorkInProgressWidget::commitChanges()
       else if (checkMsg(msg))
       {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+         QScopedPointer<Git> git(new Git(mGit, mCache));
          const auto ok = git->commitFiles(selFiles, msg, false);
          QApplication::restoreOverrideCursor();
 
@@ -538,7 +539,7 @@ bool WorkInProgressWidget::amendChanges()
          const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QScopedPointer<Git> git(new Git(mGit, QSharedPointer<RevisionsCache>::create()));
+         QScopedPointer<Git> git(new Git(mGit, mCache));
          const auto ok = git->commitFiles(selFiles, msg, true, author);
          QApplication::restoreOverrideCursor();
 

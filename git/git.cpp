@@ -15,6 +15,7 @@
 #include <GitCloneProcess.h>
 #include <GitRequestorProcess.h>
 #include <GitBase.h>
+#include <GitHistory.h>
 
 #include <QApplication>
 #include <QDir>
@@ -37,16 +38,6 @@ Git::Git(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> 
    , mGitBase(gitBase)
    , mCache(cache)
 {
-}
-
-GitExecResult Git::getDiffFiles(const QString &sha, const QString &diffToSha)
-{
-   QString runCmd = QString("git diff-tree -C --no-color -r -m ");
-
-   if (!diffToSha.isEmpty() && sha != CommitInfo::ZERO_SHA)
-      runCmd.append(diffToSha + " " + sha);
-
-   return mGitBase->run(runCmd);
 }
 
 bool Git::updateIndex(const RevisionFile &files, const QStringList &selFiles)
@@ -88,6 +79,7 @@ bool Git::commitFiles(QStringList &selFiles, const QString &msg, bool amend, con
    const auto commit = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
    const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
    QStringList notSel;
+
    for (auto i = 0; i < files.count(); ++i)
    {
       const QString &fp = files.getFile(i);
