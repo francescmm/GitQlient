@@ -51,7 +51,7 @@ bool GitLocal::checkoutFile(const QString &fileName)
 {
    if (fileName.isEmpty())
    {
-      QLog_Warning("Git", QString("Executing checkoutFile with an empty file.").arg(branchName));
+      QLog_Warning("Git", QString("Executing checkoutFile with an empty file.").arg(fileName));
 
       return false;
    }
