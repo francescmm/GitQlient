@@ -102,6 +102,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
 {
+   QLog_Debug("UI", QString("Setting GitQlientRepo configuration."));
+
    mConfig = config;
 
    mAutoFetch->stop();
@@ -172,8 +174,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          mAutoFilesUpdate->start();
 
-         QLog_Info("UI", "... repository loaded successfully");
-
          QScopedPointer<GitConfig> git(new GitConfig(mGitBase));
 
          if (!git->getGlobalUserInfo().isValid())
@@ -186,9 +186,13 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
             QLog_Info("UI", QString("... Git configured!"));
          }
+
+         QLog_Info("UI", "... repository loaded successfully");
       }
       else
       {
+         QLog_Error("Git", QString("There was an error during the repository load!"));
+
          mCurrentDir = "";
          clearWindow();
          setWidgetsEnabled(false);
@@ -211,15 +215,15 @@ void GitQlientRepo::close()
 
 void GitQlientRepo::setWatcher()
 {
-   mGitWatcher = new QFileSystemWatcher(this);
-   connect(mGitWatcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
+   const auto gitWatcher = new QFileSystemWatcher(this);
+   connect(gitWatcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
       if (!path.endsWith(".autosave") and !path.endsWith(".tmp") and !path.endsWith(".user"))
          updateUiFromWatcher();
    });
 
    QLog_Info("UI", QString("Setting the file watcher for dir {%1}").arg(mCurrentDir));
 
-   mGitWatcher->addPath(mCurrentDir);
+   gitWatcher->addPath(mCurrentDir);
 
    QDirIterator it(mCurrentDir, QDirIterator::Subdirectories);
    while (it.hasNext())
@@ -227,7 +231,7 @@ void GitQlientRepo::setWatcher()
       const auto dir = it.next();
 
       if (it.fileInfo().isDir() and !dir.endsWith(".") and !dir.endsWith(".."))
-         mGitWatcher->addPath(dir);
+         gitWatcher->addPath(dir);
    }
 }
 
@@ -334,17 +338,8 @@ void GitQlientRepo::closeEvent(QCloseEvent *ce)
 {
    QLog_Info("UI", QString("Closing GitQlient for repository {%1}").arg(mCurrentDir));
 
-   // lastWindowClosed() signal is emitted by close(), after sending
-   // closeEvent(), so we need to close _here_ all secondary windows before
-   // the close() method checks for lastWindowClosed flag to avoid missing
-   // the signal and stay in the main loop forever, because lastWindowClosed()
-   // signal is connected to qApp->quit()
-   //
-   // note that we cannot rely on setting 'this' parent in secondary windows
-   // because when close() is called children are still alive and, finally,
-   // when children are deleted, d'tor do not call close() anymore. So we miss
-   // lastWindowClosed() signal in this case.
    emit closeAllWindows();
+
    hide();
 
    mGitLoader->cancelAll();

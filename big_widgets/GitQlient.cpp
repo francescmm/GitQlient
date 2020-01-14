@@ -61,7 +61,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
 GitQlient::~GitQlient()
 {
-   QLog_Info("UI", "*            Closing GitQlient            *");
+   QLog_Info("UI", "*            Closing GitQlient            *\n\n");
 }
 
 void GitQlient::openRepo()

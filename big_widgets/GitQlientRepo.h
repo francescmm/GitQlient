@@ -29,7 +29,6 @@ class GitBase;
 class RevisionsCache;
 class GitRepoLoader;
 class QCloseEvent;
-class QFileSystemWatcher;
 class QStackedWidget;
 class QStackedLayout;
 class Controls;
@@ -83,7 +82,6 @@ private:
    QStackedLayout *mStackedLayout = nullptr;
    Controls *mControls = nullptr;
    DiffWidget *mDiffWidget = nullptr;
-   QFileSystemWatcher *mGitWatcher = nullptr;
    BlameWidget *mBlameWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
