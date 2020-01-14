@@ -1,5 +1,9 @@
 #include "RevisionsCache.h"
 
+#include <QLogger.h>
+
+using namespace QLogger;
+
 RevisionsCache::RevisionsCache(QObject *parent)
    : QObject(parent)
 {
@@ -57,9 +61,15 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
       const auto commit = new CommitInfo(rev);
 
       if (rev.orderIdx >= mCommits.count())
+      {
+         QLog_Debug("Git", QString("Adding commit with sha {%1}.").arg(commit->sha()));
+
          mCommits.insert(rev.orderIdx, commit);
+      }
       else if (!(mCommits[rev.orderIdx] && *mCommits[rev.orderIdx] == *commit))
       {
+         QLog_Debug("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
+
          delete mCommits[rev.orderIdx];
          mCommits[rev.orderIdx] = commit;
       }
