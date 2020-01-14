@@ -28,7 +28,7 @@
 #include <QSharedPointer>
 
 class GitBase;
-class RevisionFile;
+class RevisionFiles;
 
 class GitLocal : public QObject
 {
@@ -52,11 +52,11 @@ public:
    bool checkoutFile(const QString &fileName);
    GitExecResult resetFile(const QString &fileName);
    bool resetCommit(const QString &sha, CommitResetType type);
-   GitExecResult commitFiles(QStringList &selFiles, const RevisionFile &allCommitFiles, const QString &msg, bool amend,
+   GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg, bool amend,
                              const QString &author = QString());
 
 private:
    QSharedPointer<GitBase> mGitBase;
 
-   GitExecResult updateIndex(const RevisionFile &files, const QStringList &selFiles);
+   GitExecResult updateIndex(const RevisionFiles &files, const QStringList &selFiles);
 };

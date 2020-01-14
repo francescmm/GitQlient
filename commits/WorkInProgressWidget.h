@@ -30,7 +30,7 @@ class QListWidget;
 class QListWidgetItem;
 class RevisionsCache;
 class GitBase;
-class RevisionFile;
+class RevisionFiles;
 
 namespace Ui
 {
@@ -63,7 +63,7 @@ private:
    QString mCurrentSha;
    QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;
 
-   void insertFilesInList(const RevisionFile &files, QListWidget *fileList);
+   void insertFilesInList(const RevisionFiles &files, QListWidget *fileList);
    void prepareCache();
    void clearCache();
    void addAllFilesToCommitList();

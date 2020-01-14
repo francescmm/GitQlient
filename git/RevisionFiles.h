@@ -3,7 +3,7 @@
 #include <QByteArray>
 #include <QVector>
 
-class RevisionFile
+class RevisionFiles
 {
 public:
    enum StatusFlag
@@ -18,7 +18,7 @@ public:
       CONFLICT = 128
    };
 
-   RevisionFile() = default;
+   RevisionFiles() = default;
 
    QVector<int> mergeParent;
    QVector<QString> mFiles;
@@ -28,9 +28,9 @@ public:
    bool statusCmp(int idx, StatusFlag sf) const;
    const QString extendedStatus(int idx) const;
    void setStatus(const QString &rowSt);
-   void setStatus(RevisionFile::StatusFlag flag);
-   void setStatus(int pos, RevisionFile::StatusFlag flag);
-   void appendStatus(int pos, RevisionFile::StatusFlag flag);
+   void setStatus(RevisionFiles::StatusFlag flag);
+   void setStatus(int pos, RevisionFiles::StatusFlag flag);
+   void appendStatus(int pos, RevisionFiles::StatusFlag flag);
    int getStatus(int pos) const { return mFileStatus.at(pos); }
    void setOnlyModified(bool onlyModified) { mOnlyModified = onlyModified; }
    int getFilesCount() const { return mFileStatus.size(); }

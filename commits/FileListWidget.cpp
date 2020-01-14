@@ -1,7 +1,7 @@
 #include "FileListWidget.h"
 
 #include <FileContextMenu.h>
-#include <RevisionFile.h>
+#include <RevisionFiles.h>
 #include <FileListDelegate.h>
 #include <GitRepoLoader.h>
 #include <GitQlientStyles.h>
@@ -55,7 +55,7 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 {
    clear();
 
-   RevisionFile files;
+   RevisionFiles files;
 
    if (mCache->containsRevisionFile(currentSha, compareToSha))
       files = mCache->getRevisionFile(currentSha, compareToSha);
@@ -72,12 +72,12 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 
       for (auto i = 0; i < files.count(); ++i)
       {
-         if (!files.statusCmp(i, RevisionFile::UNKNOWN))
+         if (!files.statusCmp(i, RevisionFiles::UNKNOWN))
          {
             QColor clr;
             QString fileName;
 
-            if (files.statusCmp(i, RevisionFile::NEW))
+            if (files.statusCmp(i, RevisionFiles::NEW))
             {
                const auto fileRename = files.extendedStatus(i);
 
@@ -86,7 +86,7 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
             }
             else
             {
-               clr = files.statusCmp(i, RevisionFile::DELETED) ? GitQlientStyles::getRed()
+               clr = files.statusCmp(i, RevisionFiles::DELETED) ? GitQlientStyles::getRed()
                                                                : GitQlientStyles::getTextColor();
                fileName = files.getFile(i);
             }

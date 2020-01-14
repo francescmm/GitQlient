@@ -81,7 +81,7 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
    }
 }
 
-void RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFile &file)
+void RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)
 {
    if (!sha1.isEmpty() && !sha2.isEmpty())
       mRevisionFilesMap.insert(qMakePair(sha1, sha2), file);
@@ -171,9 +171,9 @@ void RevisionsCache::updateLanes(CommitInfo &c)
       mLanes.afterBranch();
 }
 
-RevisionFile RevisionsCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
+RevisionFiles RevisionsCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
 {
-   RevisionFile rf;
+   RevisionFiles rf;
    auto parNum = 1;
    const auto lines = buf.split("\n", QString::SkipEmptyParts);
 
@@ -311,7 +311,7 @@ const QStringList RevisionsCache::getRefNames(const QString &sha, uint mask) con
    return result;
 }
 
-void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
+void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
    const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
    if (sl.count() != 3)
@@ -341,7 +341,7 @@ void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int pa
    }
    appendFileName(dest, fl);
    rf.mergeParent.append(parNum);
-   rf.setStatus(RevisionFile::NEW);
+   rf.setStatus(RevisionFiles::NEW);
    rf.appendExtStatus(extStatusInfo);
 
    // simulate deleted orig file only in case of rename
@@ -354,7 +354,7 @@ void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int pa
       }
       appendFileName(orig, fl);
       rf.mergeParent.append(parNum);
-      rf.setStatus(RevisionFile::DELETED);
+      rf.setStatus(RevisionFiles::DELETED);
       rf.appendExtStatus(extStatusInfo);
    }
    rf.setOnlyModified(false);
@@ -371,10 +371,10 @@ void RevisionsCache::clear()
    mCommitsMap.clear();
 }
 
-RevisionFile RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
+RevisionFiles RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
 {
    FileNamesLoader fl;
-   RevisionFile rf = parseDiffFormat(diffIndex, fl);
+   RevisionFiles rf = parseDiffFormat(diffIndex, fl);
    rf.setOnlyModified(false);
 
    for (auto it : qAsConst(mUntrackedfiles))
@@ -386,28 +386,28 @@ RevisionFile RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const 
       }
 
       appendFileName(it, fl);
-      rf.setStatus(RevisionFile::UNKNOWN);
+      rf.setStatus(RevisionFiles::UNKNOWN);
       rf.mergeParent.append(1);
    }
 
-   RevisionFile cachedFiles = parseDiffFormat(diffIndexCache, fl);
+   RevisionFiles cachedFiles = parseDiffFormat(diffIndexCache, fl);
    flushFileNames(fl);
 
    for (auto i = 0; i < rf.count(); i++)
    {
       if (cachedFiles.mFiles.indexOf(rf.getFile(i)) != -1)
       {
-         if (cachedFiles.statusCmp(i, RevisionFile::CONFLICT))
-            rf.appendStatus(i, RevisionFile::CONFLICT);
+         if (cachedFiles.statusCmp(i, RevisionFiles::CONFLICT))
+            rf.appendStatus(i, RevisionFiles::CONFLICT);
 
-         rf.appendStatus(i, RevisionFile::IN_INDEX);
+         rf.appendStatus(i, RevisionFiles::IN_INDEX);
       }
    }
 
    return rf;
 }
 
-RevisionFile RevisionsCache::parseDiff(const QString &logDiff)
+RevisionFiles RevisionsCache::parseDiff(const QString &logDiff)
 {
    FileNamesLoader fl;
 
