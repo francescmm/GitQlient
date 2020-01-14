@@ -45,16 +45,13 @@ public:
    void configure(int numElementsToStore);
    void clear();
 
-   int count() const { return mCommits.count(); }
-   int countReferences() const { return mReferencesMap.count(); }
+   int count() const;
+   int countReferences() const;
 
    CommitInfo getCommitInfoByRow(int row) const;
    CommitInfo getCommitInfo(const QString &sha) const;
-   RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const
-   {
-      return mRevisionFilesMap.value(qMakePair(sha1, sha2));
-   }
-   Reference getReference(const QString &sha) const { return mReferencesMap.value(sha, Reference()); }
+   RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
+   Reference getReference(const QString &sha) const;
 
    void insertCommitInfo(CommitInfo rev);
 
@@ -62,16 +59,13 @@ public:
    void insertReference(const QString &sha, Reference ref);
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 
-   void removeReference(const QString &sha) { mReferencesMap.remove(sha); }
+   void removeReference(const QString &sha);
 
-   bool containsRevisionFile(const QString &sha1, const QString &sha2) const
-   {
-      return mRevisionFilesMap.contains(qMakePair(sha1, sha2));
-   }
+   bool containsRevisionFile(const QString &sha1, const QString &sha2) const;
 
    RevisionFiles parseDiff(const QString &logDiff);
 
-   void setUntrackedFilesList(const QVector<QString> &untrackedFiles) { mUntrackedfiles = untrackedFiles; }
+   void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
    bool pendingLocalChanges() const;
 
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;

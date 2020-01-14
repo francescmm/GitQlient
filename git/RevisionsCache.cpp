@@ -11,6 +11,8 @@ RevisionsCache::RevisionsCache(QObject *parent)
 
 void RevisionsCache::configure(int numElementsToStore)
 {
+   QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(numElementsToStore));
+
    if (mCommits.isEmpty())
    {
       // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
@@ -32,29 +34,30 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 {
    if (!sha.isEmpty())
    {
-      CommitInfo *c;
-
-      c = mCommitsMap.value(sha, nullptr);
-
-      if (c == nullptr)
-      {
-         const auto shas = mCommitsMap.keys();
-         const auto it = std::find_if(shas.cbegin(), shas.cend(),
-                                      [sha](const QString &shaToCompare) { return shaToCompare.startsWith(sha); });
-
-         if (it != shas.cend())
-            return *mCommitsMap.value(*it);
-      }
-      else
-         return *c;
+      const auto c = mCommitsMap.value(sha, nullptr);
+      return *c;
    }
 
    return CommitInfo();
 }
 
+RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString &sha2) const
+{
+   return mRevisionFilesMap.value(qMakePair(sha1, sha2));
+}
+
+Reference RevisionsCache::getReference(const QString &sha) const
+{
+   return mReferencesMap.value(sha, Reference());
+}
+
 void RevisionsCache::insertCommitInfo(CommitInfo rev)
 {
-   if (!mCacheLocked && !mCommitsMap.contains(rev.sha()))
+   if (mCacheLocked)
+      QLog_Warning("Git", QString("The cache is currently locked."));
+   else if (mCommitsMap.contains(rev.sha()))
+      QLog_Info("Git", QString("The commit with SHA {%1} is already in the cache.").arg(rev.sha()));
+   else
    {
       updateLanes(rev);
 
@@ -83,17 +86,23 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
 
 void RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)
 {
+   QLog_Debug("Git", QString("Adding the revisions files between {%1} and {%2}.").arg(sha1, sha2));
+
    if (!sha1.isEmpty() && !sha2.isEmpty())
       mRevisionFilesMap.insert(qMakePair(sha1, sha2), file);
 }
 
 void RevisionsCache::insertReference(const QString &sha, Reference ref)
 {
+   QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
+
    mReferencesMap[sha] = std::move(ref);
 }
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
 {
+   QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
+
    auto iter = mRevisionFilesMap.begin();
 
    while (iter != mRevisionFilesMap.end())
@@ -133,9 +142,21 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
    }
 }
 
+void RevisionsCache::removeReference(const QString &sha)
+{
+   mReferencesMap.remove(sha);
+}
+
+bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
+{
+   return mRevisionFilesMap.contains(qMakePair(sha1, sha2));
+}
+
 void RevisionsCache::updateLanes(CommitInfo &c)
 {
    const auto sha = c.sha();
+
+   QLog_Debug("Git", QString("Updating the lanes for SHA {%1}.").arg(sha));
 
    if (mLanes.isEmpty())
       mLanes.init(c.sha());
@@ -371,6 +392,16 @@ void RevisionsCache::clear()
    mCommitsMap.clear();
 }
 
+int RevisionsCache::count() const
+{
+   return mCommits.count();
+}
+
+int RevisionsCache::countReferences() const
+{
+   return mReferencesMap.count();
+}
+
 RevisionFiles RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
 {
    FileNamesLoader fl;
@@ -415,4 +446,9 @@ RevisionFiles RevisionsCache::parseDiff(const QString &logDiff)
    flushFileNames(fl);
 
    return rf;
+}
+
+void RevisionsCache::setUntrackedFilesList(const QVector<QString> &untrackedFiles)
+{
+   mUntrackedfiles = untrackedFiles;
 }
