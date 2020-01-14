@@ -35,6 +35,10 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
    if (!sha.isEmpty())
    {
       const auto c = mCommitsMap.value(sha, nullptr);
+
+      if (c == nullptr)
+         return CommitInfo();
+
       return *c;
    }
 
