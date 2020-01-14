@@ -14,6 +14,8 @@ GitPatches::GitPatches(const QSharedPointer<GitBase> &gitBase)
 
 GitExecResult GitPatches::exportPatch(const QStringList &shaList)
 {
+   QLog_Debug("Git", QString("Executing exportPatch: {%1}").arg(shaList.join(",")));
+
    auto val = 1;
    QStringList files;
 
@@ -46,6 +48,9 @@ GitExecResult GitPatches::exportPatch(const QStringList &shaList)
 
 bool GitPatches::applyPatch(const QString &fileName, bool asCommit)
 {
+   QLog_Debug("Git",
+              QString("Executing applyPatch: {%1} %2").arg(fileName, asCommit ? QString("as commit.") : QString()));
+
    const auto cmd = asCommit ? QString("git am --signof") : QString("git apply");
    const auto ret = mGitBase->run(QString("%1 %2").arg(cmd, fileName));
 

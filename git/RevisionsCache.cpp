@@ -1,5 +1,9 @@
 #include "RevisionsCache.h"
 
+#include <QLogger.h>
+
+using namespace QLogger;
+
 RevisionsCache::RevisionsCache(QObject *parent)
    : QObject(parent)
 {
@@ -7,6 +11,8 @@ RevisionsCache::RevisionsCache(QObject *parent)
 
 void RevisionsCache::configure(int numElementsToStore)
 {
+   QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(numElementsToStore));
+
    if (mCommits.isEmpty())
    {
       // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
@@ -28,38 +34,49 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 {
    if (!sha.isEmpty())
    {
-      CommitInfo *c;
-
-      c = mCommitsMap.value(sha, nullptr);
+      const auto c = mCommitsMap.value(sha, nullptr);
 
       if (c == nullptr)
-      {
-         const auto shas = mCommitsMap.keys();
-         const auto it = std::find_if(shas.cbegin(), shas.cend(),
-                                      [sha](const QString &shaToCompare) { return shaToCompare.startsWith(sha); });
+         return CommitInfo();
 
-         if (it != shas.cend())
-            return *mCommitsMap.value(*it);
-      }
-      else
-         return *c;
+      return *c;
    }
 
    return CommitInfo();
 }
 
+RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString &sha2) const
+{
+   return mRevisionFilesMap.value(qMakePair(sha1, sha2));
+}
+
+Reference RevisionsCache::getReference(const QString &sha) const
+{
+   return mReferencesMap.value(sha, Reference());
+}
+
 void RevisionsCache::insertCommitInfo(CommitInfo rev)
 {
-   if (!mCacheLocked && !mCommitsMap.contains(rev.sha()))
+   if (mCacheLocked)
+      QLog_Warning("Git", QString("The cache is currently locked."));
+   else if (mCommitsMap.contains(rev.sha()))
+      QLog_Info("Git", QString("The commit with SHA {%1} is already in the cache.").arg(rev.sha()));
+   else
    {
       updateLanes(rev);
 
       const auto commit = new CommitInfo(rev);
 
       if (rev.orderIdx >= mCommits.count())
+      {
+         QLog_Debug("Git", QString("Adding commit with sha {%1}.").arg(commit->sha()));
+
          mCommits.insert(rev.orderIdx, commit);
+      }
       else if (!(mCommits[rev.orderIdx] && *mCommits[rev.orderIdx] == *commit))
       {
+         QLog_Debug("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
+
          delete mCommits[rev.orderIdx];
          mCommits[rev.orderIdx] = commit;
       }
@@ -71,19 +88,25 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
    }
 }
 
-void RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFile &file)
+void RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)
 {
+   QLog_Debug("Git", QString("Adding the revisions files between {%1} and {%2}.").arg(sha1, sha2));
+
    if (!sha1.isEmpty() && !sha2.isEmpty())
       mRevisionFilesMap.insert(qMakePair(sha1, sha2), file);
 }
 
 void RevisionsCache::insertReference(const QString &sha, Reference ref)
 {
+   QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
+
    mReferencesMap[sha] = std::move(ref);
 }
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
 {
+   QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
+
    auto iter = mRevisionFilesMap.begin();
 
    while (iter != mRevisionFilesMap.end())
@@ -123,9 +146,21 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
    }
 }
 
+void RevisionsCache::removeReference(const QString &sha)
+{
+   mReferencesMap.remove(sha);
+}
+
+bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
+{
+   return mRevisionFilesMap.contains(qMakePair(sha1, sha2));
+}
+
 void RevisionsCache::updateLanes(CommitInfo &c)
 {
    const auto sha = c.sha();
+
+   QLog_Debug("Git", QString("Updating the lanes for SHA {%1}.").arg(sha));
 
    if (mLanes.isEmpty())
       mLanes.init(c.sha());
@@ -161,9 +196,9 @@ void RevisionsCache::updateLanes(CommitInfo &c)
       mLanes.afterBranch();
 }
 
-RevisionFile RevisionsCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
+RevisionFiles RevisionsCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
 {
-   RevisionFile rf;
+   RevisionFiles rf;
    auto parNum = 1;
    const auto lines = buf.split("\n", QString::SkipEmptyParts);
 
@@ -301,7 +336,7 @@ const QStringList RevisionsCache::getRefNames(const QString &sha, uint mask) con
    return result;
 }
 
-void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
+void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
    const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
    if (sl.count() != 3)
@@ -331,7 +366,7 @@ void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int pa
    }
    appendFileName(dest, fl);
    rf.mergeParent.append(parNum);
-   rf.setStatus(RevisionFile::NEW);
+   rf.setStatus(RevisionFiles::NEW);
    rf.appendExtStatus(extStatusInfo);
 
    // simulate deleted orig file only in case of rename
@@ -344,7 +379,7 @@ void RevisionsCache::setExtStatus(RevisionFile &rf, const QString &rowSt, int pa
       }
       appendFileName(orig, fl);
       rf.mergeParent.append(parNum);
-      rf.setStatus(RevisionFile::DELETED);
+      rf.setStatus(RevisionFiles::DELETED);
       rf.appendExtStatus(extStatusInfo);
    }
    rf.setOnlyModified(false);
@@ -361,10 +396,20 @@ void RevisionsCache::clear()
    mCommitsMap.clear();
 }
 
-RevisionFile RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
+int RevisionsCache::count() const
+{
+   return mCommits.count();
+}
+
+int RevisionsCache::countReferences() const
+{
+   return mReferencesMap.count();
+}
+
+RevisionFiles RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
 {
    FileNamesLoader fl;
-   RevisionFile rf = parseDiffFormat(diffIndex, fl);
+   RevisionFiles rf = parseDiffFormat(diffIndex, fl);
    rf.setOnlyModified(false);
 
    for (auto it : qAsConst(mUntrackedfiles))
@@ -376,28 +421,28 @@ RevisionFile RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const 
       }
 
       appendFileName(it, fl);
-      rf.setStatus(RevisionFile::UNKNOWN);
+      rf.setStatus(RevisionFiles::UNKNOWN);
       rf.mergeParent.append(1);
    }
 
-   RevisionFile cachedFiles = parseDiffFormat(diffIndexCache, fl);
+   RevisionFiles cachedFiles = parseDiffFormat(diffIndexCache, fl);
    flushFileNames(fl);
 
    for (auto i = 0; i < rf.count(); i++)
    {
       if (cachedFiles.mFiles.indexOf(rf.getFile(i)) != -1)
       {
-         if (cachedFiles.statusCmp(i, RevisionFile::CONFLICT))
-            rf.appendStatus(i, RevisionFile::CONFLICT);
+         if (cachedFiles.statusCmp(i, RevisionFiles::CONFLICT))
+            rf.appendStatus(i, RevisionFiles::CONFLICT);
 
-         rf.appendStatus(i, RevisionFile::IN_INDEX);
+         rf.appendStatus(i, RevisionFiles::IN_INDEX);
       }
    }
 
    return rf;
 }
 
-RevisionFile RevisionsCache::parseDiff(const QString &logDiff)
+RevisionFiles RevisionsCache::parseDiff(const QString &logDiff)
 {
    FileNamesLoader fl;
 
@@ -405,4 +450,9 @@ RevisionFile RevisionsCache::parseDiff(const QString &logDiff)
    flushFileNames(fl);
 
    return rf;
+}
+
+void RevisionsCache::setUntrackedFilesList(const QVector<QString> &untrackedFiles)
+{
+   mUntrackedfiles = untrackedFiles;
 }

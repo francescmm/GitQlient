@@ -6,7 +6,7 @@
 #include <GitLocal.h>
 #include <GitQlientStyles.h>
 #include <CommitInfo.h>
-#include <RevisionFile.h>
+#include <RevisionFiles.h>
 #include <UnstagedFilesContextMenu.h>
 #include <FileListDelegate.h>
 #include <RevisionsCache.h>
@@ -118,7 +118,7 @@ void WorkInProgressWidget::resetInfo(bool force)
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
    }
 
-   RevisionFile files;
+   RevisionFiles files;
 
    if (mCache->containsRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0)))
       files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
@@ -176,7 +176,7 @@ void WorkInProgressWidget::resetInfo(bool force)
    ui->pbCommit->setEnabled(ui->stagedFilesList->count());
 }
 
-void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWidget *fileList)
+void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWidget *fileList)
 {
    for (auto i = 0; i < files.count(); ++i)
    {
@@ -184,9 +184,9 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWid
 
       if (!mCurrentFilesCache.contains(fileName))
       {
-         const auto isUnknown = files.statusCmp(i, RevisionFile::UNKNOWN);
-         const auto isInIndex = files.statusCmp(i, RevisionFile::IN_INDEX);
-         const auto isConflict = files.statusCmp(i, RevisionFile::CONFLICT);
+         const auto isUnknown = files.statusCmp(i, RevisionFiles::UNKNOWN);
+         const auto isInIndex = files.statusCmp(i, RevisionFiles::IN_INDEX);
+         const auto isConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
          const auto untrackedFile = !isInIndex && isUnknown;
          const auto staged = isInIndex && !isUnknown && !isConflict;
 
@@ -209,9 +209,9 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFile &files, QListWid
          }
 
          QColor myColor;
-         const auto isDeleted = files.statusCmp(i, RevisionFile::DELETED);
+         const auto isDeleted = files.statusCmp(i, RevisionFiles::DELETED);
 
-         if ((files.statusCmp(i, RevisionFile::NEW) || isUnknown || isInIndex) && !untrackedFile && !isDeleted
+         if ((files.statusCmp(i, RevisionFiles::NEW) || isUnknown || isInIndex) && !untrackedFile && !isDeleted
              && !isConflict)
             myColor = GitQlientStyles::getGreen();
          else if (isConflict)

@@ -61,7 +61,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
 GitQlient::~GitQlient()
 {
-   QLog_Info("UI", "*            Closing GitQlient            *");
+   QLog_Info("UI", "*            Closing GitQlient            *\n\n");
 }
 
 void GitQlient::openRepo()
@@ -113,7 +113,21 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
             repos.append(arguments.at(i));
       }
       else
+      {
+         if (arguments.at(i) == "-logLevel")
+         {
+            const auto logLevel = arguments.at(++i).toInt();
+
+            if (logLevel >= static_cast<int>(QLogger::LogLevel::Trace)
+                && logLevel <= static_cast<int>(QLogger::LogLevel::Fatal))
+            {
+               const auto logger = QLoggerManager::getInstance();
+               logger->overwriteLogLevel(static_cast<LogLevel>(logLevel));
+            }
+         }
+
          ++i;
+      }
    }
 
    return repos;

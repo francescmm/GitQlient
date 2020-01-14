@@ -20,7 +20,7 @@ HEADERS += \
     $$PWD/GitTags.h \
     $$PWD/Reference.h \
     $$PWD/ReferenceType.h \
-    $$PWD/RevisionFile.h \
+    $$PWD/RevisionFiles.h \
     $$PWD/RevisionsCache.h \
     $$PWD/lanes.h
 
@@ -43,6 +43,6 @@ SOURCES += \
     $$PWD/GitSyncProcess.cpp \
     $$PWD/GitTags.cpp \
     $$PWD/Reference.cpp \
-    $$PWD/RevisionFile.cpp \
+    $$PWD/RevisionFiles.cpp \
     $$PWD/RevisionsCache.cpp \
     $$PWD/lanes.cpp

@@ -55,6 +55,8 @@ bool GitRepoLoader::loadRepository()
 
 bool GitRepoLoader::configureRepoDirectory()
 {
+   QLog_Debug("Git", "Configuring repository directory.");
+
    const auto ret = mGitBase->run("git rev-parse --show-cdup");
 
    if (ret.first)
@@ -70,6 +72,8 @@ bool GitRepoLoader::configureRepoDirectory()
 
 void GitRepoLoader::loadReferences()
 {
+   QLog_Debug("Git", "Loading references.");
+
    const auto ret3 = mGitBase->run("git show-ref -d");
 
    if (ret3.first)
@@ -109,6 +113,8 @@ void GitRepoLoader::loadReferences()
 
 void GitRepoLoader::requestRevisions()
 {
+   QLog_Debug("Git", "Loading revisions.");
+
    const auto baseCmd = QString("git log --date-order --no-color --log-size --parents --boundary -z --pretty=format:")
                             .append(GIT_LOG_FORMAT)
                             .append(mShowAll ? QString("--all") : mGitBase->getCurrentBranch());
@@ -123,14 +129,20 @@ void GitRepoLoader::requestRevisions()
 
 void GitRepoLoader::processRevision(const QByteArray &ba)
 {
+   QLog_Debug("Git", "Processing revisions...");
+
    QByteArray auxBa = ba;
    const auto commits = ba.split('\000');
    const auto totalCommits = commits.count();
    auto count = 1;
 
+   QLog_Debug("Git", QString("There are {%1} commits to process.").arg(totalCommits));
+
    mRevCache->configure(totalCommits);
 
    emit signalLoadingStarted();
+
+   QLog_Debug("Git", QString("Adding the WIP commit."));
 
    updateWipRevision();
 
@@ -151,6 +163,8 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
 void GitRepoLoader::updateWipRevision()
 {
+   QLog_Debug("Git", QString("Executing updateWipRevision."));
+
    mRevCache->setUntrackedFilesList(getUntrackedFiles());
 
    const auto ret = mGitBase->run("git rev-parse --revs-only HEAD");
@@ -171,7 +185,7 @@ void GitRepoLoader::updateWipRevision()
 
 QVector<QString> GitRepoLoader::getUntrackedFiles() const
 {
-   // add files present in working directory but not in git archive
+   QLog_Debug("Git", QString("Executing getUntrackedFiles."));
 
    auto runCmd = QString("git ls-files --others");
    const auto exFile = QString(".git/info/exclude");

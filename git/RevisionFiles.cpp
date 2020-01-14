@@ -1,6 +1,6 @@
-#include "RevisionFile.h"
+#include "RevisionFiles.h"
 
-bool RevisionFile::statusCmp(int idx, RevisionFile::StatusFlag sf) const
+bool RevisionFiles::statusCmp(int idx, RevisionFiles::StatusFlag sf) const
 {
    if (idx >= mFileStatus.count())
       return false;
@@ -8,7 +8,7 @@ bool RevisionFile::statusCmp(int idx, RevisionFile::StatusFlag sf) const
    return (mOnlyModified ? MODIFIED : mFileStatus.at(static_cast<int>(idx))) & sf;
 }
 
-const QString RevisionFile::extendedStatus(int idx) const
+const QString RevisionFiles::extendedStatus(int idx) const
 {
    /*
          rf.extStatus has size equal to position of latest copied/renamed file,
@@ -18,51 +18,51 @@ const QString RevisionFile::extendedStatus(int idx) const
    return !mRenamedFiles.isEmpty() && idx < mRenamedFiles.count() ? mRenamedFiles.at(idx) : "";
 }
 
-void RevisionFile::setStatus(const QString &rowSt)
+void RevisionFiles::setStatus(const QString &rowSt)
 {
    switch (rowSt.at(0).toLatin1())
    {
       case 'M':
       case 'T':
-         mFileStatus.append(RevisionFile::MODIFIED);
+         mFileStatus.append(RevisionFiles::MODIFIED);
          break;
       case 'U':
-         mFileStatus.append(RevisionFile::MODIFIED);
-         mFileStatus[mFileStatus.count() - 1] |= RevisionFile::CONFLICT;
+         mFileStatus.append(RevisionFiles::MODIFIED);
+         mFileStatus[mFileStatus.count() - 1] |= RevisionFiles::CONFLICT;
          mOnlyModified = false;
          break;
       case 'D':
-         mFileStatus.append(RevisionFile::DELETED);
+         mFileStatus.append(RevisionFiles::DELETED);
          mOnlyModified = false;
          break;
       case 'A':
-         mFileStatus.append(RevisionFile::NEW);
+         mFileStatus.append(RevisionFiles::NEW);
          mOnlyModified = false;
          break;
       case '?':
-         mFileStatus.append(RevisionFile::UNKNOWN);
+         mFileStatus.append(RevisionFiles::UNKNOWN);
          mOnlyModified = false;
          break;
       default:
-         mFileStatus.append(RevisionFile::MODIFIED);
+         mFileStatus.append(RevisionFiles::MODIFIED);
          break;
    }
 }
 
-void RevisionFile::setStatus(RevisionFile::StatusFlag flag)
+void RevisionFiles::setStatus(RevisionFiles::StatusFlag flag)
 {
    mFileStatus.append(flag);
 
-   if (flag == RevisionFile::DELETED || flag == RevisionFile::NEW || flag == RevisionFile::UNKNOWN)
+   if (flag == RevisionFiles::DELETED || flag == RevisionFiles::NEW || flag == RevisionFiles::UNKNOWN)
       mOnlyModified = false;
 }
 
-void RevisionFile::setStatus(int pos, RevisionFile::StatusFlag flag)
+void RevisionFiles::setStatus(int pos, RevisionFiles::StatusFlag flag)
 {
    mFileStatus[pos] = flag;
 }
 
-void RevisionFile::appendStatus(int pos, RevisionFile::StatusFlag flag)
+void RevisionFiles::appendStatus(int pos, RevisionFiles::StatusFlag flag)
 {
    mFileStatus[pos] |= flag;
 }

@@ -43,9 +43,10 @@ CommitInfo::CommitInfo(const QByteArray &b, int idx)
 
 bool CommitInfo::operator==(const CommitInfo &commit) const
 {
-   return mSha == commit.mSha && mParentsSha == commit.mParentsSha && mCommitter == commit.mCommitter
-       && mAuthor == commit.mAuthor && mCommitDate == commit.mCommitDate && mShortLog == commit.mShortLog
-       && mLongLog == commit.mLongLog && orderIdx == commit.orderIdx && lanes == commit.lanes;
+   return (mSha == commit.mSha || mSha.startsWith(commit.sha()) || commit.sha().startsWith(mSha))
+       && mParentsSha == commit.mParentsSha && mCommitter == commit.mCommitter && mAuthor == commit.mAuthor
+       && mCommitDate == commit.mCommitDate && mShortLog == commit.mShortLog && mLongLog == commit.mLongLog
+       && orderIdx == commit.orderIdx && lanes == commit.lanes;
 }
 
 bool CommitInfo::operator!=(const CommitInfo &commit) const
