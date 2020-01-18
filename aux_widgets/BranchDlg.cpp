@@ -18,32 +18,32 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
    ui->setupUi(this);
    ui->leOldName->setText(mConfig.mCurrentBranchName);
 
-   if (mConfig.mDialogMode == BranchDlgMode::CREATE)
-      setWindowTitle("Create branch");
-   else if (mConfig.mDialogMode == BranchDlgMode::RENAME)
+   switch (mConfig.mDialogMode)
    {
-      ui->pbAccept->setText(tr("Rename"));
-      setWindowTitle("Rename branch");
-   }
-   else if (mConfig.mDialogMode == BranchDlgMode::CREATE_CHECKOUT)
-   {
-      setWindowTitle("Create and checkout branch");
-      ui->leOldName->setHidden(true);
-   }
-   else if (mConfig.mDialogMode == BranchDlgMode::CREATE_FROM_COMMIT)
-   {
-      setWindowTitle("Create branch at commit");
-      ui->leOldName->setHidden(true);
-   }
-   else if (mConfig.mDialogMode == BranchDlgMode::STASH_BRANCH)
-   {
-      setWindowTitle("Stash branch");
-      // ui->leOldName->setHidden(true);
-   }
-   else if (mConfig.mDialogMode == BranchDlgMode::PUSH_UPSTREAM)
-   {
-      setWindowTitle("Push upstream branch");
-      ui->pbAccept->setText(tr("Push"));
+      case BranchDlgMode::CREATE:
+         setWindowTitle("Create branch");
+         break;
+      case BranchDlgMode::RENAME:
+         ui->pbAccept->setText(tr("Rename"));
+         setWindowTitle("Rename branch");
+         break;
+      case BranchDlgMode::CREATE_CHECKOUT:
+         setWindowTitle("Create and checkout branch");
+         ui->leOldName->setHidden(true);
+         break;
+      case BranchDlgMode::CREATE_FROM_COMMIT:
+         setWindowTitle("Create branch at commit");
+         ui->leOldName->setHidden(true);
+         break;
+      case BranchDlgMode::STASH_BRANCH:
+         setWindowTitle("Stash branch");
+         break;
+      case BranchDlgMode::PUSH_UPSTREAM:
+         setWindowTitle("Push upstream branch");
+         ui->pbAccept->setText(tr("Push"));
+         break;
+      default:
+         break;
    }
 
    connect(ui->leNewName, &QLineEdit::editingFinished, this, &BranchDlg::checkNewBranchName);
@@ -59,13 +59,13 @@ BranchDlg::~BranchDlg()
 
 void BranchDlg::checkNewBranchName()
 {
-   if (ui->leNewName->text() == ui->leOldName->text())
+   if (ui->leNewName->text() == ui->leOldName->text() && mConfig.mDialogMode == BranchDlgMode::PUSH_UPSTREAM)
       ui->leNewName->setStyleSheet("border: 1px solid red;");
 }
 
 void BranchDlg::accept()
 {
-   if (ui->leNewName->text() == ui->leOldName->text())
+   if (ui->leNewName->text() == ui->leOldName->text() && mConfig.mDialogMode == BranchDlgMode::PUSH_UPSTREAM)
       ui->leNewName->setStyleSheet("border: 1px solid red;");
    else
    {
