@@ -84,12 +84,7 @@ GitExecResult GitTags::getTagCommit(const QString &tagName)
    QLog_Debug("Git", QString("Executing getTagCommit: {%1}").arg(tagName));
 
    const auto ret = mGitBase->run(QString("git rev-list -n 1 %1").arg(tagName));
-   QString output = ret.second;
-
-   if (ret.first)
-   {
-      output.remove(output.count() - 2, output.count() - 1);
-   }
+   const auto output = ret.second.trimmed();
 
    return qMakePair(ret.first, output);
 }

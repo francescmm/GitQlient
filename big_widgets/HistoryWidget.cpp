@@ -44,7 +44,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
 
    mGoToSha->setPlaceholderText(tr("Press Enter to focus on SHA..."));
-   connect(mGoToSha, &QLineEdit::returnPressed, this, &HistoryWidget::goToSha);
+   connect(mGoToSha, &QLineEdit::returnPressed, this, qOverload<>(&HistoryWidget::goToSha));
 
    mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setItemDelegate(new RepositoryViewDelegate(cache, git, mRepositoryView));
@@ -60,7 +60,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &HistoryWidget::signalUpdateCache);
    connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::signalUpdateCache);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
-   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &HistoryWidget::signalGoToSha);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this,
+           qOverload<const QString &>(&HistoryWidget::goToSha));
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &HistoryWidget::signalOpenSubmodule);
 
    GitQlientSettings settings;
@@ -140,6 +141,12 @@ void HistoryWidget::onNewRevisions(int totalCommits)
 void HistoryWidget::goToSha()
 {
    const auto sha = mGoToSha->text();
+
+   goToSha(sha);
+}
+
+void HistoryWidget::goToSha(const QString &sha)
+{
    mRepositoryView->focusOnCommit(sha);
 
    mGoToSha->clear();

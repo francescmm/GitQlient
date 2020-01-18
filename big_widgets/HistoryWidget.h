@@ -21,7 +21,6 @@ signals:
    void signalUpdateUi();
    void signalOpenDiff(const QString &sha);
    void signalOpenCompareDiff(const QStringList &sha);
-   void signalGoToSha(const QString &sha);
    void signalUpdateCache();
    void signalOpenSubmodule(const QString &submodule);
    void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName);
@@ -52,6 +51,7 @@ private:
    CommitInfoWidget *mRevisionWidget = nullptr;
 
    void goToSha();
+   void goToSha(const QString &sha);
    void commitSelected(const QModelIndex &index);
    void openDiff(const QModelIndex &index);
    void onShowAllUpdated(bool showAll);
