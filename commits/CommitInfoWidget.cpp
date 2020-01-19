@@ -138,6 +138,9 @@ QString CommitInfoWidget::getCurrentCommitSha() const
 
 void CommitInfoWidget::clear()
 {
+   mCurrentSha = QString();
+   mParentSha = QString();
+
    fileListWidget->clear();
    labelSha->clear();
    labelEmail->clear();
