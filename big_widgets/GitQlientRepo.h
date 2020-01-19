@@ -78,7 +78,7 @@ private:
    QSharedPointer<RevisionsCache> mGitQlientCache;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitRepoLoader> mGitLoader;
-   HistoryWidget *mRepoWidget = nullptr;
+   HistoryWidget *mHistoryWidget = nullptr;
    QStackedLayout *mStackedLayout = nullptr;
    Controls *mControls = nullptr;
    DiffWidget *mDiffWidget = nullptr;
