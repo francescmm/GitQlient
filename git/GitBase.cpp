@@ -38,7 +38,7 @@ QPair<bool, QString> GitBase::run(const QString &runCmd) const
 
 QString GitBase::getCurrentBranch() const
 {
-   QLog_Debug("Git", "Executing getCurrentBranch");
+   QLog_Trace("Git", "Executing getCurrentBranch");
 
    const auto ret = run("git rev-parse --abbrev-ref HEAD");
 

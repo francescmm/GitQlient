@@ -75,7 +75,7 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
       }
       else if (!(mCommits[rev.orderIdx] && *mCommits[rev.orderIdx] == *commit))
       {
-         QLog_Debug("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
+         QLog_Trace("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
 
          delete mCommits[rev.orderIdx];
          mCommits[rev.orderIdx] = commit;
@@ -160,7 +160,7 @@ void RevisionsCache::updateLanes(CommitInfo &c)
 {
    const auto sha = c.sha();
 
-   QLog_Debug("Git", QString("Updating the lanes for SHA {%1}.").arg(sha));
+   QLog_Trace("Git", QString("Updating the lanes for SHA {%1}.").arg(sha));
 
    if (mLanes.isEmpty())
       mLanes.init(c.sha());
