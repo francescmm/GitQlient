@@ -94,8 +94,13 @@ void GitQlient::setArgumentsPostInit(const QStringList &arguments)
 
 QStringList GitQlient::parseArguments(const QStringList &arguments)
 {
+   auto logLevel = LogLevel::Info;
+#ifdef DEBUG
+   logLevel = LogLevel::Debug;
+#endif
+
    const auto manager = QLoggerManager::getInstance();
-   manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
+   manager->addDestination("GitQlient.log", { "UI", "Git" }, logLevel);
 
    if (arguments.contains("-noLog"))
       QLoggerManager::getInstance()->pause();
