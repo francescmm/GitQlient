@@ -55,7 +55,7 @@ public:
 
    void insertCommitInfo(CommitInfo rev);
 
-   void insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
+   bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    void insertReference(const QString &sha, Reference ref);
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 

@@ -19,6 +19,8 @@ public:
    };
 
    RevisionFiles() = default;
+   bool operator==(const RevisionFiles &revFiles) const;
+   bool operator!=(const RevisionFiles &revFiles) const;
 
    QVector<int> mergeParent;
    QVector<QString> mFiles;

@@ -88,12 +88,20 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
    }
 }
 
-void RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)
+bool RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)
 {
-   QLog_Debug("Git", QString("Adding the revisions files between {%1} and {%2}.").arg(sha1, sha2));
+   const auto key = qMakePair(sha1, sha2);
 
-   if (!sha1.isEmpty() && !sha2.isEmpty())
-      mRevisionFilesMap.insert(qMakePair(sha1, sha2), file);
+   if (!sha1.isEmpty() && !sha2.isEmpty() && mRevisionFilesMap.value(key) != file)
+   {
+      QLog_Debug("Git", QString("Adding the revisions files between {%1} and {%2}.").arg(sha1, sha2));
+
+      mRevisionFilesMap.insert(key, file);
+
+      return true;
+   }
+
+   return false;
 }
 
 void RevisionsCache::insertReference(const QString &sha, Reference ref)
@@ -107,19 +115,23 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 {
    QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
 
-   auto iter = mRevisionFilesMap.begin();
-
-   while (iter != mRevisionFilesMap.end())
-   {
-      if (iter.key().first == CommitInfo::ZERO_SHA || iter.key().second == CommitInfo::ZERO_SHA)
-         iter = mRevisionFilesMap.erase(iter);
-      else
-         ++iter;
-   }
-
+   const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
    const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
+   const auto revFileExists = mRevisionFilesMap.contains(key);
+   const auto changed = insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
 
-   insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
+   if (revFileExists && changed)
+   {
+      auto iter = mRevisionFilesMap.begin();
+
+      while (iter != mRevisionFilesMap.end())
+      {
+         if (iter.key().first == CommitInfo::ZERO_SHA || iter.key().second == CommitInfo::ZERO_SHA)
+            iter = mRevisionFilesMap.erase(iter);
+         else
+            ++iter;
+      }
+   }
 
    if (!mCacheLocked)
    {

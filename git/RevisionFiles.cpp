@@ -1,5 +1,16 @@
 #include "RevisionFiles.h"
 
+bool RevisionFiles::operator==(const RevisionFiles &revFiles) const
+{
+   return mFiles == revFiles.mFiles && mOnlyModified == revFiles.mOnlyModified && mergeParent == revFiles.mergeParent
+       && mFileStatus == revFiles.mFileStatus && mRenamedFiles == revFiles.mRenamedFiles;
+}
+
+bool RevisionFiles::operator!=(const RevisionFiles &revFiles) const
+{
+   return !(*this == revFiles);
+}
+
 bool RevisionFiles::statusCmp(int idx, RevisionFiles::StatusFlag sf) const
 {
    if (idx >= mFileStatus.count())
