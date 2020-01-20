@@ -141,30 +141,31 @@ void HistoryWidget::onNewRevisions(int totalCommits)
 
 void HistoryWidget::search()
 {
-   // First we try with the SHA, otherwise the log
-
    const auto text = mSearchInput->text();
 
-   auto commitInfo = mCache->getCommitInfo(text);
-
-   if (commitInfo.isValid())
-      goToSha(text);
-   else
+   if (!text.isEmpty())
    {
-      auto selectedItems = mRepositoryView->selectedIndexes();
-      auto startingRow = 0;
-
-      if (!selectedItems.isEmpty())
-      {
-         std::sort(selectedItems.begin(), selectedItems.end(),
-                   [](const QModelIndex index1, const QModelIndex index2) { return index1.row() <= index2.row(); });
-         startingRow = selectedItems.constFirst().row();
-      }
-
-      commitInfo = mCache->getCommitInfoByField(CommitInfo::Field::SHORT_LOG, text, startingRow + 1);
+      auto commitInfo = mCache->getCommitInfo(text);
 
       if (commitInfo.isValid())
-         goToSha(commitInfo.sha());
+         goToSha(text);
+      else
+      {
+         auto selectedItems = mRepositoryView->selectedIndexes();
+         auto startingRow = 0;
+
+         if (!selectedItems.isEmpty())
+         {
+            std::sort(selectedItems.begin(), selectedItems.end(),
+                      [](const QModelIndex index1, const QModelIndex index2) { return index1.row() <= index2.row(); });
+            startingRow = selectedItems.constFirst().row();
+         }
+
+         commitInfo = mCache->getCommitInfoByField(CommitInfo::Field::SHORT_LOG, text, startingRow + 1);
+
+         if (commitInfo.isValid())
+            goToSha(commitInfo.sha());
+      }
    }
 }
 
