@@ -10,6 +10,7 @@
 #include <UnstagedMenu.h>
 #include <FileListDelegate.h>
 #include <RevisionsCache.h>
+#include <FileWidget.h>
 
 #include <QDir>
 #include <QKeyEvent>
@@ -189,6 +190,7 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          const auto untrackedFile = !isInIndex && isUnknown;
          const auto staged = isInIndex && !isUnknown && !isConflict;
 
+         auto iconPath = QString(":/icons/add_tab");
          QListWidgetItem *item = nullptr;
 
          if (untrackedFile)
@@ -198,6 +200,7 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          }
          else if (staged)
          {
+            iconPath = QString(":/icons/remove_tab");
             item = new QListWidgetItem(ui->stagedFilesList);
             item->setData(Qt::UserRole, QVariant::fromValue(ui->stagedFilesList));
          }
@@ -205,17 +208,6 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          {
             item = new QListWidgetItem(fileList);
             item->setData(Qt::UserRole, QVariant::fromValue(fileList));
-
-            const auto itemWidget = new QFrame();
-            const auto itemLayout = new QHBoxLayout(itemWidget);
-            itemLayout->setContentsMargins(QMargins());
-            const auto button = new QPushButton(QIcon(":/icons/add_tab"), "");
-            button->setStyleSheet("max-width: 17px; min-width: 17px; max-height: 15px; min-height: 15px;");
-            connect(button, &QPushButton::clicked, this, [this, item]() { addFileToCommitList(item); });
-            itemLayout->addWidget(button);
-            itemLayout->addWidget(new QLabel(fileName));
-
-            fileList->setItemWidget(item, itemWidget);
          }
 
          QColor myColor;
@@ -236,7 +228,7 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          else
             myColor = GitQlientStyles::getTextColor();
 
-         // item->setText(fileName);
+         item->setText(fileName);
          item->setToolTip(fileName);
          item->setForeground(myColor);
 
@@ -247,6 +239,12 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
 
          if (item->data(Qt::UserRole + 1).toBool())
             item->setText(item->text().append(" (conflicts)"));
+
+         const auto fileWidget = new FileWidget(iconPath, item->text());
+         connect(fileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
+
+         qvariant_cast<QListWidget *>(item->data(Qt::UserRole))->setItemWidget(item, fileWidget);
+         item->setText("");
       }
       else
          mCurrentFilesCache[fileName].first = true;
@@ -279,11 +277,13 @@ void WorkInProgressWidget::addAllFilesToCommitList()
 
    for (; i >= 0; --i)
    {
-      auto item = ui->unstagedFilesList->takeItem(i);
+      const auto item = ui->unstagedFilesList->takeItem(i);
+      const auto fileWidget = qobject_cast<FileWidget *>(ui->unstagedFilesList->itemWidget(item));
       ui->stagedFilesList->addItem(item);
+      ui->stagedFilesList->setItemWidget(item, fileWidget);
 
       if (item->data(Qt::UserRole + 1).toBool())
-         item->setText(item->text().remove("(conflicts)").trimmed());
+         fileWidget->setText(fileWidget->text().remove("(conflicts)").trimmed());
    }
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
@@ -305,11 +305,15 @@ void WorkInProgressWidget::addFileToCommitList(QListWidgetItem *item)
 {
    const auto fileList = qvariant_cast<QListWidget *>(item->data(Qt::UserRole));
    const auto row = fileList->row(item);
+   const auto fileWidget = qobject_cast<FileWidget *>(fileList->itemWidget(item));
+
+   fileList->removeItemWidget(item);
    fileList->takeItem(row);
    ui->stagedFilesList->addItem(item);
+   ui->stagedFilesList->setItemWidget(item, fileWidget);
 
    if (item->data(Qt::UserRole + 1).toBool())
-      item->setText(item->text().remove("(conflicts)").trimmed());
+      fileWidget->setText(fileWidget->text().remove("(conflicts)").trimmed());
 
    ui->lUntrackedCount->setText(QString("(%1)").arg(ui->untrackedFilesList->count()));
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
@@ -336,16 +340,22 @@ void WorkInProgressWidget::removeFileFromCommitList(QListWidgetItem *item)
    if (item->flags() & Qt::ItemIsSelectable)
    {
       const auto itemOriginalList = qvariant_cast<QListWidget *>(item->data(Qt::UserRole));
+      const auto currentList = qobject_cast<QListWidget *>(sender());
 
-      if (sender() != itemOriginalList)
+      if (currentList != itemOriginalList)
       {
          const auto row = ui->stagedFilesList->row(item);
+         const auto fileWidget = qobject_cast<FileWidget *>(currentList->itemWidget(item));
 
          if (item->data(Qt::UserRole + 1).toBool())
-            item->setText(item->text().append(" (conflicts)"));
+            fileWidget->setText(fileWidget->text().append(" (conflicts)"));
 
-         ui->stagedFilesList->takeItem(row);
+         ui->stagedFilesList->removeItemWidget(item);
+         const auto item = ui->stagedFilesList->takeItem(row);
+
          itemOriginalList->addItem(item);
+         itemOriginalList->setItemWidget(item, fileWidget);
+
          ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
          ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
          ui->pbCommit->setDisabled(ui->stagedFilesList->count() == 0);
@@ -369,8 +379,10 @@ void WorkInProgressWidget::showUnstagedMenu(const QPoint &pos)
       connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &WorkInProgressWidget::signalShowFileHistory);
       connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
       connect(contextMenu, &UnstagedMenu::signalConflictsResolved, this, [this, item] {
+         const auto fileWidget = qobject_cast<FileWidget *>(ui->unstagedFilesList->itemWidget(item));
+
          item->setData(Qt::UserRole + 1, false);
-         item->setText(item->text().remove("(conflicts)").trimmed());
+         item->setText(fileWidget->text().remove("(conflicts)").trimmed());
          item->setForeground(GitQlientStyles::getGreen());
          resetInfo();
       });
@@ -456,7 +468,10 @@ QStringList WorkInProgressWidget::getFiles()
    const auto totalItems = ui->stagedFilesList->count();
 
    for (auto i = 0; i < totalItems; ++i)
-      selFiles.append(ui->stagedFilesList->item(i)->text());
+   {
+      const auto fileWidget = static_cast<FileWidget *>(ui->stagedFilesList->itemWidget(ui->stagedFilesList->item(i)));
+      selFiles.append(fileWidget->text());
+   }
 
    return selFiles;
 }
