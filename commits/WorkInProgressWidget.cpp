@@ -17,7 +17,6 @@
 #include <QMessageBox>
 #include <QRegExp>
 #include <QScrollBar>
-#include <QSettings>
 #include <QTextCodec>
 #include <QToolTip>
 #include <QListWidgetItem>

@@ -1,12 +1,9 @@
 #include <QApplication>
-#include <QSettings>
 #include <QFontDatabase>
 #include <QIcon>
 
 #include <GitQlient.h>
 #include <QLogger.h>
-
-#include <QDebug>
 
 using namespace QLogger;
 

@@ -11,7 +11,6 @@
 #include <QPushButton>
 #include <QGridLayout>
 #include <QFileDialog>
-#include <QSettings>
 #include <QButtonGroup>
 #include <QStackedWidget>
 #include <QStyle>

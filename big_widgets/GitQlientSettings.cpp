@@ -18,7 +18,7 @@ void GitQlientSettings::setProjectOpened(const QString &projectPath)
    if (projects.contains(projectPath))
    {
       const auto index = projects.indexOf(projectPath);
-      timesUsed[index] = count + timesUsed[index].toInt();
+      timesUsed[index] = QString::number(count + timesUsed[index].toInt());
    }
    else
    {
