@@ -33,11 +33,22 @@ void GitQlientSettings::setProjectOpened(const QString &projectPath)
 QVector<QString> GitQlientSettings::getRecentProjects() const
 {
    const auto projects = QSettings::value("recentProjects", QStringList()).toStringList();
+   const auto timesUsed = QSettings::value("recentProjectsCount", QString()).toList();
+
+   QMap<int, QString> projectOrderedByUse;
+
+   const auto projectsCount = projects.count();
+   const auto timesCount = timesUsed.count();
+
+   for (auto i = 0; i < projectsCount && i < timesCount; ++i)
+      projectOrderedByUse.insert(timesUsed.at(i).toInt(), projects.at(i));
+
    QVector<QString> recentProjects;
-   const auto end = std::min(projects.size(), 5);
+   const auto end = std::min(projectOrderedByUse.count(), 5);
+   const auto orderedProjects = projectOrderedByUse.values();
 
    for (auto i = 0; i < end; ++i)
-      recentProjects.append(projects.at(i));
+      recentProjects.append(orderedProjects.at(orderedProjects.count() - 1 - i));
 
    return recentProjects;
 }
