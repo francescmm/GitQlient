@@ -53,6 +53,7 @@ public:
    void clear();
    void focusOnCommit(const QString &goToSha);
    QString getCurrentSha() const { return mCurrentSha; }
+   QModelIndexList selectedIndexes() const override;
 
 private:
    QSharedPointer<RevisionsCache> mCache;

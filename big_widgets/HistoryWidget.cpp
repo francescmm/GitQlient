@@ -22,10 +22,11 @@ using namespace QLogger;
 HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
                              QWidget *parent)
    : QFrame(parent)
+   , mCache(cache)
    , mRepositoryModel(new CommitHistoryModel(cache, git))
    , mRepositoryView(new CommitHistoryView(cache, git))
    , mBranchesWidget(new BranchesWidget(QSharedPointer<GitBase>::create(git->getWorkingDir())))
-   , mGoToSha(new QLineEdit())
+   , mSearchInput(new QLineEdit())
    , mCommitStackedWidget(new QStackedWidget())
    , mCommitWidget(new WorkInProgressWidget(cache, git))
    , mRevisionWidget(new CommitInfoWidget(cache, git))
@@ -43,8 +44,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalOpenFileCommit);
    connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
 
-   mGoToSha->setPlaceholderText(tr("Press Enter to focus on SHA..."));
-   connect(mGoToSha, &QLineEdit::returnPressed, this, qOverload<>(&HistoryWidget::goToSha));
+   mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
+   connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
    mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setItemDelegate(new RepositoryViewDelegate(cache, git, mRepositoryView));
@@ -73,7 +74,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    const auto graphOptionsLayout = new QHBoxLayout();
    graphOptionsLayout->setContentsMargins(QMargins());
    graphOptionsLayout->setSpacing(10);
-   graphOptionsLayout->addWidget(mGoToSha);
+   graphOptionsLayout->addWidget(mSearchInput);
    graphOptionsLayout->addWidget(chShowAllBranches);
 
    const auto viewLayout = new QVBoxLayout();
@@ -138,18 +139,38 @@ void HistoryWidget::onNewRevisions(int totalCommits)
    mRepositoryModel->onNewRevisions(totalCommits);
 }
 
-void HistoryWidget::goToSha()
+void HistoryWidget::search()
 {
-   const auto sha = mGoToSha->text();
+   // First we try with the SHA, otherwise the log
 
-   goToSha(sha);
+   const auto text = mSearchInput->text();
+
+   auto commitInfo = mCache->getCommitInfo(text);
+
+   if (commitInfo.isValid())
+      goToSha(text);
+   else
+   {
+      auto selectedItems = mRepositoryView->selectedIndexes();
+      auto startingRow = 0;
+
+      if (!selectedItems.isEmpty())
+      {
+         std::sort(selectedItems.begin(), selectedItems.end(),
+                   [](const QModelIndex index1, const QModelIndex index2) { return index1.row() <= index2.row(); });
+         startingRow = selectedItems.constFirst().row();
+      }
+
+      commitInfo = mCache->getCommitInfoByField(CommitInfo::Field::SHORT_LOG, text, startingRow + 1);
+
+      if (commitInfo.isValid())
+         goToSha(commitInfo.sha());
+   }
 }
 
 void HistoryWidget::goToSha(const QString &sha)
 {
    mRepositoryView->focusOnCommit(sha);
-
-   mGoToSha->clear();
 
    onCommitSelected(sha);
 }

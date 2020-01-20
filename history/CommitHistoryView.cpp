@@ -132,6 +132,11 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
    }
 }
 
+QModelIndexList CommitHistoryView::selectedIndexes() const
+{
+   return QTreeView::selectedIndexes();
+}
+
 void CommitHistoryView::showContextMenu(const QPoint &pos)
 {
    if (!mIsFiltering)

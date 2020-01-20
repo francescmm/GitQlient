@@ -48,8 +48,9 @@ public:
    int count() const;
    int countReferences() const;
 
-   CommitInfo getCommitInfoByRow(int row) const;
    CommitInfo getCommitInfo(const QString &sha) const;
+   CommitInfo getCommitInfoByRow(int row) const;
+   CommitInfo getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint = 0);
    RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
    Reference getReference(const QString &sha) const;
 
@@ -101,4 +102,6 @@ private:
    void appendFileName(const QString &name, FileNamesLoader &fl);
    void flushFileNames(FileNamesLoader &fl);
    void setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
+   QVector<CommitInfo *>::const_iterator searchCommit(CommitInfo::Field field, const QString &text,
+                                                      int startingPoint = 0) const;
 };

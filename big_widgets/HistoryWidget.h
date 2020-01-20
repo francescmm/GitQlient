@@ -42,15 +42,16 @@ public:
    void onNewRevisions(int totalCommits);
 
 private:
+   QSharedPointer<RevisionsCache> mCache;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;
-   QLineEdit *mGoToSha = nullptr;
+   QLineEdit *mSearchInput = nullptr;
    QStackedWidget *mCommitStackedWidget = nullptr;
    WorkInProgressWidget *mCommitWidget = nullptr;
    CommitInfoWidget *mRevisionWidget = nullptr;
 
-   void goToSha();
+   void search();
    void goToSha(const QString &sha);
    void commitSelected(const QModelIndex &index);
    void openDiff(const QModelIndex &index);

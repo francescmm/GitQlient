@@ -30,6 +30,16 @@ CommitInfo RevisionsCache::getCommitInfoByRow(int row) const
    return commit ? *commit : CommitInfo();
 }
 
+CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint)
+{
+   auto commitIter = searchCommit(field, text, startingPoint);
+
+   if (commitIter == mCommits.constEnd() && startingPoint > 0)
+      commitIter = searchCommit(field, text);
+
+   return commitIter != mCommits.constEnd() ? **commitIter : CommitInfo();
+}
+
 CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 {
    if (!sha.isEmpty())
@@ -395,6 +405,13 @@ void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int p
       rf.appendExtStatus(extStatusInfo);
    }
    rf.setOnlyModified(false);
+}
+
+QVector<CommitInfo *>::const_iterator RevisionsCache::searchCommit(CommitInfo::Field field, const QString &text,
+                                                                   const int startingPoint) const
+{
+   return std::find_if(mCommits.constBegin() + startingPoint, mCommits.constEnd(),
+                       [field, text](CommitInfo *info) { return info->getFieldStr(field).contains(text); });
 }
 
 void RevisionsCache::clear()
