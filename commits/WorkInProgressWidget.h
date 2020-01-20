@@ -67,6 +67,8 @@ private:
    void prepareCache();
    void clearCache();
    void addAllFilesToCommitList();
+   void onOpenDiffRequested(QListWidgetItem *item);
+   void requestDiff(const QString &fileName);
    void addFileToCommitList(QListWidgetItem *item);
    void revertAllChanges();
    void removeFileFromCommitList(QListWidgetItem *item);

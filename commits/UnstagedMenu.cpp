@@ -1,4 +1,4 @@
-#include "UnstagedFilesContextMenu.h"
+#include "UnstagedMenu.h"
 
 #include <GitBase.h>
 #include <GitSyncProcess.h>
@@ -8,13 +8,14 @@
 #include <QDir>
 #include <QMessageBox>
 
-UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<GitBase> &git, const QString &fileName,
-                                                   bool hasConflicts, QWidget *parent)
+UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, bool hasConflicts,
+                           QWidget *parent)
    : QMenu(parent)
    , mGit(git)
    , mFileName(fileName)
 {
-   connect(addAction("See changes"), &QAction::triggered, this, &UnstagedFilesContextMenu::signalShowDiff);
+   connect(addAction("See changes"), &QAction::triggered, this, [this]() { emit signalShowDiff(mFileName); });
+   connect(addAction("Blame"), &QAction::triggered, this, [this]() { emit signalShowFileHistory(mFileName); });
 
    addSeparator();
 
@@ -31,6 +32,8 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<GitBase>
       addSeparator();
    }
 
+   connect(addAction("Stage file"), &QAction::triggered, this, &UnstagedMenu::signalStageFile);
+
    connect(addAction("Revert file changes"), &QAction::triggered, this, [this]() {
       const auto msgBoxRet
           = QMessageBox::question(this, tr("Ignoring file"), tr("Are you sure you want to revert the changes?"));
@@ -43,8 +46,6 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<GitBase>
          emit signalCheckedOut(ret);
       }
    });
-
-   connect(addAction("Blame"), &QAction::triggered, this, &UnstagedFilesContextMenu::signalShowFileHistory);
 
    connect(addAction("Ignore file"), &QAction::triggered, this, [this]() {
       const auto ret = QMessageBox::question(this, tr("Ignoring file"),
@@ -83,7 +84,7 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<GitBase>
 
    addSeparator();
 
-   connect(addAction("Add all files to commit"), &QAction::triggered, this, &UnstagedFilesContextMenu::signalCommitAll);
+   connect(addAction("Add all files to commit"), &QAction::triggered, this, &UnstagedMenu::signalCommitAll);
    connect(addAction("Revert all changes"), &QAction::triggered, this, [this]() {
       const auto msgBoxRet = QMessageBox::question(this, tr("Ignoring file"),
                                                    tr("Are you sure you want to add the file to the black list?"));
@@ -92,7 +93,7 @@ UnstagedFilesContextMenu::UnstagedFilesContextMenu(const QSharedPointer<GitBase>
    });
 }
 
-bool UnstagedFilesContextMenu::addEntryToGitIgnore(const QString &entry)
+bool UnstagedMenu::addEntryToGitIgnore(const QString &entry)
 {
    auto entryAdded = false;
    QDir d(mGit->getWorkingDir());

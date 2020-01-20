@@ -8,7 +8,7 @@ HEADERS += \
     $$PWD/FileContextMenu.h \
     $$PWD/FileListDelegate.h \
     $$PWD/FileListWidget.h \
-    $$PWD/UnstagedFilesContextMenu.h \
+    $$PWD/UnstagedMenu.h \
     $$PWD/WorkInProgressWidget.h
 
 SOURCES += \
@@ -16,5 +16,5 @@ SOURCES += \
     $$PWD/FileContextMenu.cpp \
     $$PWD/FileListDelegate.cpp \
     $$PWD/FileListWidget.cpp \
-    $$PWD/UnstagedFilesContextMenu.cpp \
+    $$PWD/UnstagedMenu.cpp \
     $$PWD/WorkInProgressWidget.cpp

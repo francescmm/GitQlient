@@ -7,7 +7,7 @@
 #include <GitQlientStyles.h>
 #include <CommitInfo.h>
 #include <RevisionFiles.h>
-#include <UnstagedFilesContextMenu.h>
+#include <UnstagedMenu.h>
 #include <FileListDelegate.h>
 #include <RevisionsCache.h>
 
@@ -62,14 +62,14 @@ WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> 
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &WorkInProgressWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &WorkInProgressWidget::applyChanges);
    connect(ui->pbCommit, &QPushButton::clicked, this, &WorkInProgressWidget::applyChanges);
-   connect(ui->untrackedFilesList, &QListWidget::itemClicked, this, &WorkInProgressWidget::addFileToCommitList);
+   connect(ui->untrackedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
    connect(ui->untrackedFilesList, &QListWidget::customContextMenuRequested, this,
            &WorkInProgressWidget::showUntrackedMenu);
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
            &WorkInProgressWidget::showUnstagedMenu);
    connect(ui->stagedFilesList, &QListWidget::customContextMenuRequested, this, &WorkInProgressWidget::showStagedMenu);
-   connect(ui->unstagedFilesList, &QListWidget::itemClicked, this, &WorkInProgressWidget::addFileToCommitList);
-   connect(ui->stagedFilesList, &QListWidget::itemClicked, this, &WorkInProgressWidget::removeFileFromCommitList);
+   connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
+   connect(ui->stagedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
 }
 
 void WorkInProgressWidget::configure(const QString &sha)
@@ -280,9 +280,19 @@ void WorkInProgressWidget::addAllFilesToCommitList()
    ui->pbCommit->setEnabled(ui->stagedFilesList->count() > 0);
 }
 
+void WorkInProgressWidget::onOpenDiffRequested(QListWidgetItem *item)
+{
+   requestDiff(item->toolTip());
+}
+
+void WorkInProgressWidget::requestDiff(const QString &fileName)
+{
+   emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+}
+
 void WorkInProgressWidget::addFileToCommitList(QListWidgetItem *item)
 {
-   const auto fileList = dynamic_cast<QListWidget *>(sender());
+   const auto fileList = qvariant_cast<QListWidget *>(item->data(Qt::UserRole));
    const auto row = fileList->row(item);
    fileList->takeItem(row);
    ui->stagedFilesList->addItem(item);
@@ -340,18 +350,14 @@ void WorkInProgressWidget::showUnstagedMenu(const QPoint &pos)
    {
       const auto fileName = item->toolTip();
       const auto unsolvedConflicts = item->data(Qt::UserRole + 1).toBool();
-      const auto contextMenu = new UnstagedFilesContextMenu(mGit, fileName, unsolvedConflicts, this);
-      connect(contextMenu, &UnstagedFilesContextMenu::signalShowDiff, this, [this, fileName]() {
-         emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
-      });
-      connect(contextMenu, &UnstagedFilesContextMenu::signalCommitAll, this,
-              &WorkInProgressWidget::addAllFilesToCommitList);
-      connect(contextMenu, &UnstagedFilesContextMenu::signalRevertAll, this, &WorkInProgressWidget::revertAllChanges);
-      connect(contextMenu, &UnstagedFilesContextMenu::signalCheckedOut, this,
-              &WorkInProgressWidget::signalCheckoutPerformed);
-      connect(contextMenu, &UnstagedFilesContextMenu::signalShowFileHistory, this,
-              [this, fileName]() { emit signalShowFileHistory(fileName); });
-      connect(contextMenu, &UnstagedFilesContextMenu::signalConflictsResolved, this, [this, item] {
+      const auto contextMenu = new UnstagedMenu(mGit, fileName, unsolvedConflicts, this);
+      connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &WorkInProgressWidget::requestDiff);
+      connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &WorkInProgressWidget::addAllFilesToCommitList);
+      connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &WorkInProgressWidget::revertAllChanges);
+      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &WorkInProgressWidget::signalCheckoutPerformed);
+      connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &WorkInProgressWidget::signalShowFileHistory);
+      connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
+      connect(contextMenu, &UnstagedMenu::signalConflictsResolved, this, [this, item] {
          item->setData(Qt::UserRole + 1, false);
          item->setText(item->text().remove("(conflicts)").trimmed());
          item->setForeground(GitQlientStyles::getGreen());
@@ -371,6 +377,8 @@ void WorkInProgressWidget::showUntrackedMenu(const QPoint &pos)
    {
       const auto fileName = item->toolTip();
       const auto contextMenu = new QMenu(this);
+      connect(contextMenu->addAction(tr("Stage file")), &QAction::triggered, this,
+              [this, item]() { addFileToCommitList(item); });
       connect(contextMenu->addAction(tr("Delete file")), &QAction::triggered, this, [this, fileName]() {
          QProcess p;
          p.setWorkingDirectory(mGit->getWorkingDir());
@@ -392,10 +400,6 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
    {
       const auto fileName = item->toolTip();
       const auto menu = new QMenu(this);
-      const auto diffAction = menu->addAction("See changes");
-      connect(diffAction, &QAction::triggered, this, [this, fileName]() {
-         emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
-      });
 
       if (item->flags() & Qt::ItemIsSelectable)
       {
@@ -409,6 +413,19 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
                const auto ret = git->resetFile(fileName);
                emit signalCheckoutPerformed(ret.success);
             });
+         }
+         else
+         {
+            connect(menu->addAction("Unstage file"), &QAction::triggered, this,
+                    [this, item] { removeFileFromCommitList(item); });
+
+            if (itemOriginalList != ui->untrackedFilesList)
+            {
+               connect(menu->addAction("See changes"), &QAction::triggered, this, [this, fileName]() {
+                  emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0),
+                                      fileName);
+               });
+            }
          }
       }
 

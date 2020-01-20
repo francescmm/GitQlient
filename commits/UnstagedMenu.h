@@ -27,21 +27,22 @@
 
 class GitBase;
 
-class UnstagedFilesContextMenu : public QMenu
+class UnstagedMenu : public QMenu
 {
    Q_OBJECT
 
 signals:
-   void signalShowDiff();
+   void signalShowDiff(const QString &fileName);
    void signalCommitAll();
    void signalRevertAll();
    void signalCheckedOut(bool success);
-   void signalShowFileHistory();
+   void signalShowFileHistory(const QString &fileName);
    void signalConflictsResolved();
+   void signalStageFile();
 
 public:
-   explicit UnstagedFilesContextMenu(const QSharedPointer<GitBase> &git, const QString &fileName, bool hasConflicts,
-                                     QWidget *parent = nullptr);
+   explicit UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, bool hasConflicts,
+                         QWidget *parent = nullptr);
 
 private:
    QSharedPointer<GitBase> mGit;
