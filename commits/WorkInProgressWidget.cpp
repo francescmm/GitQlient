@@ -205,6 +205,17 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          {
             item = new QListWidgetItem(fileList);
             item->setData(Qt::UserRole, QVariant::fromValue(fileList));
+
+            const auto itemWidget = new QFrame();
+            const auto itemLayout = new QHBoxLayout(itemWidget);
+            itemLayout->setContentsMargins(QMargins());
+            const auto button = new QPushButton(QIcon(":/icons/add_tab"), "");
+            button->setStyleSheet("max-width: 17px; min-width: 17px; max-height: 15px; min-height: 15px;");
+            connect(button, &QPushButton::clicked, this, [this, item]() { addFileToCommitList(item); });
+            itemLayout->addWidget(button);
+            itemLayout->addWidget(new QLabel(fileName));
+
+            fileList->setItemWidget(item, itemWidget);
          }
 
          QColor myColor;
@@ -225,7 +236,7 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          else
             myColor = GitQlientStyles::getTextColor();
 
-         item->setText(fileName);
+         // item->setText(fileName);
          item->setToolTip(fileName);
          item->setForeground(myColor);
 
