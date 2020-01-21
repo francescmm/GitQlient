@@ -47,7 +47,9 @@
         <file alias="diff">resources/icons/diff.svg</file>
         <file alias="options">resources/icons/options.svg</file>
         <file alias="commit-list">resources/icons/listing-option.svg</file>
-        <file alias="GitQlientLogo">resources/icons/GitQlientLogo.png</file>
+        <file alias="GitQlientLogoMedium">resources/icons/GitQlientLogoMedium.png</file>
+        <file alias="GitQlientLogo">resources/icons/GitQlientLogoLarge.png</file>
+        <file alias="GitQlientLogo32">resources/icons/GitQlientLogo32.png</file>
         <file alias="GitQlientLogoSVG">resources/icons/GitQlientLogo.svg</file>
         <file alias="GitQlientLogoIco">resources/icons/GitQlientLogo.ico</file>
     </qresource>
