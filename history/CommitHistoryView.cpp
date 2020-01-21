@@ -38,6 +38,12 @@ void CommitHistoryView::setModel(QAbstractItemModel *model)
    mCommitHistoryModel = dynamic_cast<CommitHistoryModel *>(model);
    QTreeView::setModel(model);
    setupGeometry();
+   connect(this->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+           [this](const QItemSelection &selected, const QItemSelection &) {
+              const auto indexes = selected.indexes();
+              if (!indexes.isEmpty())
+                 scrollTo(indexes.first());
+           });
 }
 
 void CommitHistoryView::filterBySha(const QStringList &shaList)
@@ -110,7 +116,6 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
 
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 
-   QModelIndex index;
    auto row = mCache->getCommitInfo(mCurrentSha).orderIdx;
 
    if (mIsFiltering)
@@ -118,18 +123,13 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
       const auto sourceIndex = mProxyModel->sourceModel()->index(row, 0);
       row = mProxyModel->mapFromSource(sourceIndex).row();
    }
-   else
-      index = mCommitHistoryModel->index(row, 0);
 
    clearSelection();
 
-   QModelIndex newIndex = model()->index(row, 0);
+   const auto index = model()->index(row, 0);
 
-   if (newIndex.isValid())
-   {
-      setCurrentIndex(newIndex);
-      scrollTo(newIndex);
-   }
+   setCurrentIndex(index);
+   scrollTo(currentIndex());
 }
 
 QModelIndexList CommitHistoryView::selectedIndexes() const
