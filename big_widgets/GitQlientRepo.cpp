@@ -84,6 +84,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mHistoryWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mHistoryWidget, &HistoryWidget::signalOpenFileCommit, this, &GitQlientRepo::loadFileDiff);
 
+   connect(mDiffWidget, &DiffWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
+
    connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::loadFileDiff);
 
    connect(mGitLoader.get(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::updateProgressDialog,

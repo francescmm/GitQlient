@@ -66,6 +66,8 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, const QSharedPointer<R
            [this](const QString &currentSha, const QString &previousSha, const QString &file) {
               loadFileDiff(currentSha, previousSha, file);
            });
+
+   connect(mCommitDiffWidget, &CommitDiffWidget::signalShowFileHistory, this, &DiffWidget::signalShowFileHistory);
 }
 
 void DiffWidget::reload()

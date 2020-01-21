@@ -36,6 +36,7 @@ CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, const QSharedPoi
 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { emit signalOpenFileCommit(mFirstShaStr, mSecondShaStr, item->text()); });
+   connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitDiffWidget::signalShowFileHistory);
 }
 
 void CommitDiffWidget::configure(const QString &firstSha, const QString &secondSha)

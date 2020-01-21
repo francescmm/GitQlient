@@ -13,6 +13,7 @@ class CommitDiffWidget : public QFrame
 
 signals:
    void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file);
+   void signalShowFileHistory(const QString &fileName);
 
 public:
    explicit CommitDiffWidget(QSharedPointer<GitBase> git, const QSharedPointer<RevisionsCache> &cache,
