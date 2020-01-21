@@ -28,8 +28,6 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
          if (ret.success)
             emit signalConflictsResolved();
       });
-
-      addSeparator();
    }
 
    connect(addAction("Stage file"), &QAction::triggered, this, &UnstagedMenu::signalStageFile);
@@ -46,6 +44,8 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
          emit signalCheckedOut(ret);
       }
    });
+
+   addSeparator();
 
    connect(addAction("Ignore file"), &QAction::triggered, this, [this]() {
       const auto ret = QMessageBox::question(this, tr("Ignoring file"),
