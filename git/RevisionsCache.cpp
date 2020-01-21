@@ -47,7 +47,16 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
       const auto c = mCommitsMap.value(sha, nullptr);
 
       if (c == nullptr)
+      {
+         const auto shas = mCommitsMap.keys();
+         const auto it = std::find_if(shas.cbegin(), shas.cend(),
+                                      [sha](const QString &shaToCompare) { return shaToCompare.startsWith(sha); });
+
+         if (it != shas.cend())
+            return *mCommitsMap.value(*it);
+
          return CommitInfo();
+      }
 
       return *c;
    }
