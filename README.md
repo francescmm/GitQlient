@@ -51,6 +51,8 @@ GitQlient started as a fork from QGit. Despite it has changed a lot, there is so
 
 Even when is 100% transformed is nice to thanks those that make the original QGit possible. Please check the QGit contributors list [on GitHub](https://github.com/feinstaub/qgit/graphs/contributors)!
 
+The app icon is custom made, but the other in-app icons are made by [Dave Gandy](https://twitter.com/davegandy) from [FontAwesome](https://fontawesome.com/).
+
 ## License
 
 GitQlient is released under LGPLv2+. However some parts of the old QGit are GPLv2 so for the moment the code is stacked with that.
