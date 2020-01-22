@@ -515,8 +515,10 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
       connect(openSubmoduleAction, &QAction::triggered, this,
               [this, submoduleName]() { emit signalOpenSubmodule(submoduleName); });
 
+      /*
       const auto deleteSubmoduleAction = menu->addAction(tr("Delete"));
       connect(deleteSubmoduleAction, &QAction::triggered, this, []() {});
+      */
    }
 
    menu->exec(mSubmodulesList->viewport()->mapToGlobal(p));
