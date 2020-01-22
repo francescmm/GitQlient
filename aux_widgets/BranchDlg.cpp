@@ -59,13 +59,13 @@ BranchDlg::~BranchDlg()
 
 void BranchDlg::checkNewBranchName()
 {
-   if (ui->leNewName->text() == ui->leOldName->text() && mConfig.mDialogMode == BranchDlgMode::PUSH_UPSTREAM)
+   if (ui->leNewName->text() == ui->leOldName->text() && mConfig.mDialogMode != BranchDlgMode::PUSH_UPSTREAM)
       ui->leNewName->setStyleSheet("border: 1px solid red;");
 }
 
 void BranchDlg::accept()
 {
-   if (ui->leNewName->text() == ui->leOldName->text() && mConfig.mDialogMode == BranchDlgMode::PUSH_UPSTREAM)
+   if (ui->leNewName->text() == ui->leOldName->text() && mConfig.mDialogMode != BranchDlgMode::PUSH_UPSTREAM)
       ui->leNewName->setStyleSheet("border: 1px solid red;");
    else
    {
