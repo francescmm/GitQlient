@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <QFrame>
+#include <QIcon>
 
 class QPushButton;
 class QLabel;
@@ -36,11 +37,13 @@ signals:
    void clicked();
 
 public:
+   explicit FileWidget(const QIcon &icon, const QString &text, QWidget *parent = nullptr);
    explicit FileWidget(const QString &icon, const QString &text, QWidget *parent = nullptr);
    QString text() const;
    void setText(const QString &text);
 
 private:
+   QIcon mIcon;
    QPushButton *mButton = nullptr;
    QLabel *mText = nullptr;
 };
