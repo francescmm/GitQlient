@@ -21,7 +21,12 @@ GitExecResult GitHistory::history(const QString &file)
 {
    QLog_Debug("Git", QString("Executing history: {%1}").arg(file));
 
-   return mGitBase->run(QString("git log --follow --pretty=%H %1").arg(file));
+   auto ret = mGitBase->run(QString("git log --follow --pretty=%H %1").arg(file));
+
+   if (ret.first && ret.second.isEmpty())
+      ret.first = false;
+
+   return ret;
 }
 
 GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffToSha)
