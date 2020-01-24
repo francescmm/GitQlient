@@ -204,7 +204,7 @@ void WorkInProgressWidget::resetFile(QListWidgetItem *item)
          const auto isInIndex = files.statusCmp(i, RevisionFiles::IN_INDEX);
          const auto untrackedFile = !isInIndex && isUnknown;
          const auto row = ui->stagedFilesList->row(item);
-         const auto iconPath = ":/icons/add";
+         const auto iconPath = QString(":/icons/add");
 
          if (isInIndex)
          {
