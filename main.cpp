@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
    QFontDatabase::addApplicationFont(":/UbuntuMono");
 
    GitQlient mainWin(arguments);
+
    mainWin.showMaximized();
 
    const auto ret = app.exec();
