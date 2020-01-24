@@ -38,6 +38,7 @@ public:
    int getFilesCount() const { return mFileStatus.size(); }
    void appendExtStatus(const QString &file) { mRenamedFiles.append(file); }
    QString getFile(int index) const { return mFiles.at(index); }
+   bool containsFile(const QString &fileName) { return mFiles.contains(fileName); }
 
 private:
    // Status information is splitted in a flags vector and in a string

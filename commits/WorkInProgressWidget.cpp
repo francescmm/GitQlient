@@ -183,6 +183,56 @@ void WorkInProgressWidget::resetInfo(bool force)
    ui->pbCommit->setEnabled(ui->stagedFilesList->count());
 }
 
+void WorkInProgressWidget::resetFile(QListWidgetItem *item)
+{
+   QScopedPointer<GitLocal> git(new GitLocal(mGit));
+   const auto ret = git->resetFile(item->toolTip());
+
+   if (ret.success)
+      emit signalCheckoutPerformed(ret.success);
+
+   const auto revInfo = mCache->getCommitInfo(mCurrentSha);
+   const auto files = mCache->getRevisionFile(mCurrentSha, revInfo.parent(0));
+
+   for (auto i = 0; i < files.count(); ++i)
+   {
+      auto fileName = files.getFile(i);
+
+      if (fileName == item->toolTip())
+      {
+         const auto isUnknown = files.statusCmp(i, RevisionFiles::UNKNOWN);
+         const auto isInIndex = files.statusCmp(i, RevisionFiles::IN_INDEX);
+         const auto untrackedFile = !isInIndex && isUnknown;
+         const auto row = ui->stagedFilesList->row(item);
+         const auto iconPath = ":/icons/add";
+
+         if (isInIndex)
+         {
+            item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(ui->unstagedFilesList));
+
+            ui->stagedFilesList->takeItem(row);
+            ui->unstagedFilesList->addItem(item);
+
+            const auto fileWidget = new FileWidget(iconPath, item->toolTip());
+            connect(fileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
+            ui->unstagedFilesList->setItemWidget(item, fileWidget);
+         }
+         else if (untrackedFile)
+         {
+            item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(ui->untrackedFilesList));
+
+            ui->stagedFilesList->takeItem(row);
+            ui->untrackedFilesList->addItem(item);
+
+            const auto fileWidget = new FileWidget(iconPath, item->toolTip());
+            connect(fileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
+
+            ui->untrackedFilesList->setItemWidget(item, fileWidget);
+         }
+      }
+   }
+}
+
 void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWidget *fileList)
 {
    for (auto i = 0; i < files.count(); ++i)
@@ -207,7 +257,7 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          }
          else if (staged)
          {
-            iconPath = QString();
+            iconPath = QString(":/icons/remove");
             item = new QListWidgetItem(ui->stagedFilesList);
             item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(ui->stagedFilesList));
          }
@@ -253,7 +303,11 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          }
 
          const auto fileWidget = new FileWidget(iconPath, item->text());
-         connect(fileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
+
+         if (staged)
+            connect(fileWidget, &FileWidget::clicked, this, [this, item]() { resetFile(item); });
+         else
+            connect(fileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
 
          qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole))->setItemWidget(item, fileWidget);
          item->setText("");
@@ -450,11 +504,7 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
          if (sender() == itemOriginalList)
          {
             const auto resetAction = menu->addAction("Reset");
-            connect(resetAction, &QAction::triggered, this, [this, fileName] {
-               QScopedPointer<GitLocal> git(new GitLocal(mGit));
-               const auto ret = git->resetFile(fileName);
-               emit signalCheckoutPerformed(ret.success);
-            });
+            connect(resetAction, &QAction::triggered, this, [this, item] { resetFile(item); });
          }
          else
          {

@@ -83,6 +83,7 @@ private:
    void updateCounter(const QString &text);
    bool hasConflicts();
    void resetInfo(bool force = true);
+   void resetFile(QListWidgetItem *item);
 
    static QString lastMsgBeforeError;
    static const int kMaxTitleChars;
