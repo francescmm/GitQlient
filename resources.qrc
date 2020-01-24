@@ -53,6 +53,7 @@
         <file alias="GitQlientLogoSVG">resources/icons/GitQlientLogo.svg</file>
         <file alias="GitQlientLogoIco">resources/icons/GitQlientLogo.ico</file>
         <file alias="remove">resources/icons/remove.svg</file>
+        <file alias="add">resources/icons/add.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

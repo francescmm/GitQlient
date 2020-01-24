@@ -197,7 +197,7 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          const auto untrackedFile = !isInIndex && isUnknown;
          const auto staged = isInIndex && !isUnknown && !isConflict;
 
-         auto iconPath = QString(":/icons/add_tab");
+         auto iconPath = QString(":/icons/add");
          QListWidgetItem *item = nullptr;
 
          if (untrackedFile)
@@ -362,7 +362,7 @@ void WorkInProgressWidget::removeFileFromCommitList(QListWidgetItem *item)
       const auto itemOriginalList = qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole));
       const auto row = ui->stagedFilesList->row(item);
       const auto fileWidget = qobject_cast<FileWidget *>(ui->stagedFilesList->itemWidget(item));
-      const auto newFileWidget = new FileWidget(":/icons/add_tab", fileWidget->text());
+      const auto newFileWidget = new FileWidget(":/icons/add", fileWidget->text());
       connect(newFileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
 
       if (item->data(GitQlientRole::U_IsConflict).toBool())

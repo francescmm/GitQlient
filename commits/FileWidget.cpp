@@ -12,7 +12,7 @@ FileWidget::FileWidget(const QIcon &icon, const QString &text, QWidget *parent)
 {
    const auto itemLayout = new QHBoxLayout(this);
    itemLayout->setContentsMargins(QMargins());
-   mButton->setStyleSheet("max-width: 17px; min-width: 17px; max-height: 15px; min-height: 15px;");
+   mButton->setStyleSheet("max-width: 10px; min-width: 10px; max-height: 15px; min-height: 15px;");
 
    itemLayout->addWidget(mButton);
    itemLayout->addWidget(mText);
@@ -22,21 +22,8 @@ FileWidget::FileWidget(const QIcon &icon, const QString &text, QWidget *parent)
 }
 
 FileWidget::FileWidget(const QString &icon, const QString &text, QWidget *parent)
-   : QFrame(parent)
-   , mIcon(QIcon(icon))
-   , mButton(new QPushButton(mIcon, ""))
-   , mText(new QLabel(text))
+   : FileWidget(QIcon(icon), text, parent)
 {
-   const auto itemLayout = new QHBoxLayout(this);
-   itemLayout->setContentsMargins(QMargins());
-   // const auto button = new QPushButton(QIcon(":/icons/add_tab"), "");
-   mButton->setStyleSheet("max-width: 17px; min-width: 17px; max-height: 15px; min-height: 15px;");
-
-   itemLayout->addWidget(mButton);
-   itemLayout->addWidget(mText);
-
-   if (!icon.isEmpty())
-      connect(mButton, &QPushButton::clicked, this, [this]() { emit clicked(); });
 }
 
 QString FileWidget::text() const
