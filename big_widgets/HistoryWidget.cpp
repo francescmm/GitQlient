@@ -9,6 +9,7 @@
 #include <CommitInfo.h>
 #include <GitQlientSettings.h>
 #include <GitBase.h>
+#include <GitBranches.h>
 
 #include <QLogger.h>
 
@@ -22,6 +23,7 @@ using namespace QLogger;
 HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
                              QWidget *parent)
    : QFrame(parent)
+   , mGit(git)
    , mCache(cache)
    , mRepositoryModel(new CommitHistoryModel(cache, git))
    , mRepositoryView(new CommitHistoryView(cache, git))
@@ -30,6 +32,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    , mCommitStackedWidget(new QStackedWidget())
    , mCommitWidget(new WorkInProgressWidget(cache, git))
    , mRevisionWidget(new CommitInfoWidget(cache, git))
+   , mChShowAllBranches(new QCheckBox(tr("Show all branches")))
 {
    mCommitStackedWidget->setCurrentIndex(0);
    mCommitStackedWidget->addWidget(mRevisionWidget);
@@ -59,7 +62,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &HistoryWidget::onAmendCommit);
 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &HistoryWidget::signalUpdateCache);
-   connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::signalUpdateCache);
+   connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::onBranchCheckout);
+
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this,
            qOverload<const QString &>(&HistoryWidget::goToSha));
@@ -67,15 +71,14 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
 
    GitQlientSettings settings;
 
-   const auto chShowAllBranches = new QCheckBox(tr("Show all branches"));
-   chShowAllBranches->setChecked(settings.value("ShowAllBranches", true).toBool());
-   connect(chShowAllBranches, &QCheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
+   mChShowAllBranches->setChecked(settings.value("ShowAllBranches", true).toBool());
+   connect(mChShowAllBranches, &QCheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
 
    const auto graphOptionsLayout = new QHBoxLayout();
    graphOptionsLayout->setContentsMargins(QMargins());
    graphOptionsLayout->setSpacing(10);
    graphOptionsLayout->addWidget(mSearchInput);
-   graphOptionsLayout->addWidget(chShowAllBranches);
+   graphOptionsLayout->addWidget(mChShowAllBranches);
 
    const auto viewLayout = new QVBoxLayout();
    viewLayout->setContentsMargins(QMargins());
@@ -196,6 +199,17 @@ void HistoryWidget::onShowAllUpdated(bool showAll)
    settings.setValue("ShowAllBranches", showAll);
 
    emit signalAllBranchesActive(showAll);
+}
+
+void HistoryWidget::onBranchCheckout()
+{
+   QScopedPointer<GitBranches> gitBranches(new GitBranches(mGit));
+   const auto ret = gitBranches->getLastCommitOfBranch(mGit->getCurrentBranch());
+
+   if (mChShowAllBranches->isChecked())
+      mRepositoryView->focusOnCommit(ret.output.toString());
+   else
+      emit signalUpdateCache();
 }
 
 void HistoryWidget::onCommitSelected(const QString &goToSha)

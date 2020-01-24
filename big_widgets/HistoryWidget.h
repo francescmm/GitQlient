@@ -11,6 +11,7 @@ class BranchesWidget;
 class QStackedWidget;
 class WorkInProgressWidget;
 class CommitInfoWidget;
+class QCheckBox;
 
 class HistoryWidget : public QFrame
 {
@@ -42,6 +43,7 @@ public:
    void onNewRevisions(int totalCommits);
 
 private:
+   QSharedPointer<GitBase> mGit;
    QSharedPointer<RevisionsCache> mCache;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;
@@ -50,10 +52,12 @@ private:
    QStackedWidget *mCommitStackedWidget = nullptr;
    WorkInProgressWidget *mCommitWidget = nullptr;
    CommitInfoWidget *mRevisionWidget = nullptr;
+   QCheckBox *mChShowAllBranches = nullptr;
 
    void search();
    void goToSha(const QString &sha);
    void commitSelected(const QModelIndex &index);
    void openDiff(const QModelIndex &index);
    void onShowAllUpdated(bool showAll);
+   void onBranchCheckout();
 };
