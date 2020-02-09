@@ -1,11 +1,3 @@
-/*
-        Description: qgit revision list view
-
-Author: Marco Costalba (C) 2005-2007
-
-             Copyright: See COPYING file that comes with this distribution
-
-                             */
 #include "CommitHistoryView.h"
 
 #include <CommitHistoryModel.h>
@@ -13,8 +5,9 @@ Author: Marco Costalba (C) 2005-2007
 #include <CommitHistoryContextMenu.h>
 #include <RepositoryViewDelegate.h>
 #include <ShaFilterProxyModel.h>
-#include <git.h>
+#include <GitBranches.h>
 #include <CommitInfo.h>
+#include <RevisionsCache.h>
 
 #include <QHeaderView>
 #include <QSettings>
@@ -23,8 +16,10 @@ Author: Marco Costalba (C) 2005-2007
 #include <QLogger.h>
 using namespace QLogger;
 
-CommitHistoryView::CommitHistoryView(const QSharedPointer<Git> &git, QWidget *parent)
+CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                                     QWidget *parent)
    : QTreeView(parent)
+   , mCache(cache)
    , mGit(git)
 {
    setEnabled(false);
@@ -43,6 +38,12 @@ void CommitHistoryView::setModel(QAbstractItemModel *model)
    mCommitHistoryModel = dynamic_cast<CommitHistoryModel *>(model);
    QTreeView::setModel(model);
    setupGeometry();
+   connect(this->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+           [this](const QItemSelection &selected, const QItemSelection &) {
+              const auto indexes = selected.indexes();
+              if (!indexes.isEmpty())
+                 scrollTo(indexes.first());
+           });
 }
 
 void CommitHistoryView::filterBySha(const QStringList &shaList)
@@ -115,26 +116,25 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
 
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 
-   QModelIndex index;
-   auto row = mGit->getCommitInfo(mCurrentSha).orderIdx;
+   auto row = mCache->getCommitInfo(mCurrentSha).orderIdx;
 
    if (mIsFiltering)
    {
       const auto sourceIndex = mProxyModel->sourceModel()->index(row, 0);
       row = mProxyModel->mapFromSource(sourceIndex).row();
    }
-   else
-      index = mCommitHistoryModel->index(row, 0);
 
    clearSelection();
 
-   QModelIndex newIndex = model()->index(row, 0);
+   const auto index = model()->index(row, 0);
 
-   if (newIndex.isValid())
-   {
-      setCurrentIndex(newIndex);
-      scrollTo(newIndex);
-   }
+   setCurrentIndex(index);
+   scrollTo(currentIndex());
+}
+
+QModelIndexList CommitHistoryView::selectedIndexes() const
+{
+   return QTreeView::selectedIndexes();
 }
 
 void CommitHistoryView::showContextMenu(const QPoint &pos)
@@ -145,7 +145,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
 
       if (!shas.isEmpty())
       {
-         const auto menu = new CommitHistoryContextMenu(mGit, shas, this);
+         const auto menu = new CommitHistoryContextMenu(mCache, mGit, shas, this);
          connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,
@@ -178,7 +178,9 @@ QList<QString> CommitHistoryView::getSelectedShaList() const
       const auto dt = QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm");
 
       shas.insert(dt, sha);
-      auto ret = mGit->getBranchesOfCommit(sha);
+      QScopedPointer<GitBranches> git(new GitBranches(mGit));
+      const auto ret = git->getBranchesOfCommit(sha);
+
       auto branches = ret.output.toString().trimmed().split("\n ");
       std::sort(branches.begin(), branches.end());
       godVector.append(branches.toVector());

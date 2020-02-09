@@ -29,7 +29,7 @@ class BranchTreeWidget;
 class QListWidget;
 class QListWidgetItem;
 class QLabel;
-class Git;
+class GitBase;
 
 class BranchesWidget : public QFrame
 {
@@ -40,14 +40,15 @@ signals:
    void signalBranchCheckedOut();
    void signalSelectCommit(const QString &sha);
    void signalOpenSubmodule(const QString &submoduleName);
+   void signalMergeRequired(const QString &currentBranch, const QString &fromBranch);
 
 public:
-   explicit BranchesWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    void showBranches();
    void clear();
 
 private:
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
    BranchTreeWidget *mLocalBranchesTree = nullptr;
    BranchTreeWidget *mRemoteBranchesTree = nullptr;
    QListWidget *mTagsList = nullptr;

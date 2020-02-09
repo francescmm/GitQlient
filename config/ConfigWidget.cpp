@@ -2,19 +2,21 @@
 
 #include <GeneralConfigPage.h>
 #include <CreateRepoDlg.h>
-#include <git.h>
 #include <ProgressDlg.h>
 #include <GitQlientSettings.h>
 #include <ClickableFrame.h>
+#include <GitBase.h>
+#include <GitConfig.h>
 
 #include <QPushButton>
 #include <QGridLayout>
 #include <QFileDialog>
-#include <QSettings>
 #include <QButtonGroup>
 #include <QStackedWidget>
 #include <QStyle>
 #include <QLabel>
+#include <QApplication>
+
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -23,7 +25,6 @@ using namespace QLogger;
 
 ConfigWidget::ConfigWidget(QWidget *parent)
    : QFrame(parent)
-   , mGit(new Git())
    , mOpenRepo(new QPushButton(tr("Open existing repo")))
    , mCloneRepo(new QPushButton(tr("Clone new repo")))
    , mInitRepo(new QPushButton(tr("Init new repo")))
@@ -90,7 +91,12 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    connect(mOpenRepo, &QPushButton::clicked, this, &ConfigWidget::openRepo);
    connect(mCloneRepo, &QPushButton::clicked, this, &ConfigWidget::cloneRepo);
    connect(mInitRepo, &QPushButton::clicked, this, &ConfigWidget::initRepo);
-   connect(mGit.get(), &Git::signalCloningProgress, this, &ConfigWidget::updateProgressDialog, Qt::DirectConnection);
+
+   const auto gitBase(QSharedPointer<GitBase>::create(""));
+   mGit = QSharedPointer<GitConfig>::create(gitBase);
+
+   connect(mGit.get(), &GitConfig::signalCloningProgress, this, &ConfigWidget::updateProgressDialog,
+           Qt::DirectConnection);
 }
 
 ConfigWidget::~ConfigWidget()
@@ -113,6 +119,7 @@ void ConfigWidget::cloneRepo()
 {
    CreateRepoDlg cloneDlg(CreateRepoDlgType::CLONE, mGit);
    connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, [this](const QString &path) { mPathToOpen = path; });
+
    if (cloneDlg.exec() == QDialog::Accepted)
    {
       mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, 100, false, false);
@@ -222,7 +229,7 @@ QWidget *ConfigWidget::createRecentProjectsPage()
    return mInnerWidget;
 }
 
-void ConfigWidget::updateProgressDialog(const QString &stepDescription, int value)
+void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
 {
    if (value >= 0)
    {

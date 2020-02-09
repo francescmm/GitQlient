@@ -26,7 +26,7 @@
 #include <QSyntaxHighlighter>
 #include <QTextEdit>
 
-class Git;
+class GitBase;
 
 class DiffHighlighter : public QSyntaxHighlighter
 {
@@ -40,7 +40,7 @@ class FullDiffWidget : public QTextEdit
    Q_OBJECT
 
 public:
-   explicit FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    void reload();
    void loadDiff(const QString &sha, const QString &diffToSha);
    QString getCurrentSha() const { return mCurrentSha; }
@@ -48,7 +48,7 @@ public:
 
 private:
    friend class DiffHighlighter;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
    QString mCurrentSha;
    QString mPreviousSha;
 

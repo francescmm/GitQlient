@@ -1,11 +1,11 @@
 #include "StashesContextMenu.h"
 
 #include <BranchDlg.h>
-#include <git.h>
+#include <GitStashes.h>
 
 #include <QMessageBox>
 
-StashesContextMenu::StashesContextMenu(const QSharedPointer<Git> &git, const QString &stashId, QWidget *parent)
+StashesContextMenu::StashesContextMenu(const QSharedPointer<GitBase> &git, const QString &stashId, QWidget *parent)
    : QMenu(parent)
    , mGit(git)
    , mStashId(stashId)
@@ -26,7 +26,8 @@ void StashesContextMenu::branch()
 
 void StashesContextMenu::drop()
 {
-   const auto ret = mGit->stashDrop(mStashId);
+   QScopedPointer<GitStashes> git(new GitStashes(mGit));
+   const auto ret = git->stashDrop(mStashId);
 
    if (ret.success)
       emit signalUpdateView();
@@ -36,7 +37,8 @@ void StashesContextMenu::drop()
 
 void StashesContextMenu::clear()
 {
-   const auto ret = mGit->stashClear();
+   QScopedPointer<GitStashes> git(new GitStashes(mGit));
+   const auto ret = git->stashClear();
 
    if (ret.success)
       emit signalUpdateView();

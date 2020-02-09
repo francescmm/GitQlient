@@ -6,25 +6,37 @@
 #include <BranchesWidget.h>
 #include <WorkInProgressWidget.h>
 #include <CommitInfoWidget.h>
-#include "git.h"
+#include <CommitInfo.h>
+#include <GitQlientSettings.h>
+#include <GitBase.h>
+#include <GitBranches.h>
+#include <GitRepoLoader.h>
+#include <GitRemote.h>
 
 #include <QLogger.h>
 
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QStackedWidget>
+#include <QCheckBox>
+#include <QMessageBox>
+#include <QApplication>
 
 using namespace QLogger;
 
-HistoryWidget::HistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
+HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
+                             QWidget *parent)
    : QFrame(parent)
-   , mRepositoryModel(new CommitHistoryModel(git))
-   , mRepositoryView(new CommitHistoryView(git))
-   , mBranchesWidget(new BranchesWidget(git))
-   , mGoToSha(new QLineEdit())
+   , mGit(git)
+   , mCache(cache)
+   , mRepositoryModel(new CommitHistoryModel(cache, git))
+   , mRepositoryView(new CommitHistoryView(cache, git))
+   , mBranchesWidget(new BranchesWidget(QSharedPointer<GitBase>::create(git->getWorkingDir())))
+   , mSearchInput(new QLineEdit())
    , mCommitStackedWidget(new QStackedWidget())
-   , mCommitWidget(new WorkInProgressWidget(git))
-   , mRevisionWidget(new CommitInfoWidget(git))
+   , mCommitWidget(new WorkInProgressWidget(cache, git))
+   , mRevisionWidget(new CommitInfoWidget(cache, git))
+   , mChShowAllBranches(new QCheckBox(tr("Show all branches")))
 {
    mCommitStackedWidget->setCurrentIndex(0);
    mCommitStackedWidget->addWidget(mRevisionWidget);
@@ -35,14 +47,15 @@ HistoryWidget::HistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
    connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
    connect(mCommitWidget, &WorkInProgressWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
    connect(mCommitWidget, &WorkInProgressWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
+
    connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalOpenFileCommit);
    connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
 
-   mGoToSha->setPlaceholderText(tr("Press Enter to focus on SHA..."));
-   connect(mGoToSha, &QLineEdit::returnPressed, this, &HistoryWidget::goToSha);
+   mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
+   connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
    mRepositoryView->setModel(mRepositoryModel);
-   mRepositoryView->setItemDelegate(new RepositoryViewDelegate(git, mRepositoryView));
+   mRepositoryView->setItemDelegate(new RepositoryViewDelegate(cache, git, mRepositoryView));
    mRepositoryView->setEnabled(true);
 
    connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &HistoryWidget::signalViewUpdated);
@@ -53,15 +66,54 @@ HistoryWidget::HistoryWidget(const QSharedPointer<Git> git, QWidget *parent)
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &HistoryWidget::onAmendCommit);
 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &HistoryWidget::signalUpdateCache);
-   connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::signalUpdateCache);
+   connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::onBranchCheckout);
+
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
-   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &HistoryWidget::signalGoToSha);
+   connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this,
+           qOverload<const QString &>(&HistoryWidget::goToSha));
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &HistoryWidget::signalOpenSubmodule);
+   connect(mBranchesWidget, &BranchesWidget::signalMergeRequired, this,
+           [this](const QString &current, const QString &from) {
+              QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+              QScopedPointer<GitRemote> git(new GitRemote(mGit));
+              const auto ret = git->merge(current, { from });
+
+              QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
+              gitLoader->updateWipRevision();
+
+              QApplication::restoreOverrideCursor();
+
+              if (!ret.success || (ret.success && ret.output.toString().contains("merge failed", Qt::CaseInsensitive)))
+              {
+                 QMessageBox::critical(parentWidget(), tr("Merge failed"), ret.output.toString());
+                 emit signalMergeConflicts(ret.output.toString());
+              }
+              else
+              {
+                 emit signalUpdateCache();
+
+                 const auto outputStr = ret.output.toString();
+
+                 if (!outputStr.isEmpty())
+                    QMessageBox::information(parentWidget(), tr("Merge status"), outputStr);
+              }
+           });
+
+   GitQlientSettings settings;
+
+   mChShowAllBranches->setChecked(settings.value("ShowAllBranches", true).toBool());
+   connect(mChShowAllBranches, &QCheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
+
+   const auto graphOptionsLayout = new QHBoxLayout();
+   graphOptionsLayout->setContentsMargins(QMargins());
+   graphOptionsLayout->setSpacing(10);
+   graphOptionsLayout->addWidget(mSearchInput);
+   graphOptionsLayout->addWidget(mChShowAllBranches);
 
    const auto viewLayout = new QVBoxLayout();
    viewLayout->setContentsMargins(QMargins());
    viewLayout->setSpacing(5);
-   viewLayout->addWidget(mGoToSha);
+   viewLayout->addLayout(graphOptionsLayout);
    viewLayout->addWidget(mRepositoryView);
 
    const auto layout = new QHBoxLayout();
@@ -89,7 +141,7 @@ void HistoryWidget::reload()
    mBranchesWidget->showBranches();
 
    const auto commitStackedIndex = mCommitStackedWidget->currentIndex();
-   const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : ZERO_SHA;
+   const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : CommitInfo::ZERO_SHA;
 
    focusOnCommit(currentSha);
 
@@ -102,7 +154,7 @@ void HistoryWidget::updateUiFromWatcher()
    const auto commitStackedIndex = mCommitStackedWidget->currentIndex();
 
    if (commitStackedIndex == 1 && !mCommitWidget->isAmendActive())
-      mCommitWidget->configure(ZERO_SHA);
+      mCommitWidget->configure(CommitInfo::ZERO_SHA);
 }
 
 void HistoryWidget::focusOnCommit(const QString &sha)
@@ -115,12 +167,44 @@ QString HistoryWidget::getCurrentSha() const
    return mRepositoryView->getCurrentSha();
 }
 
-void HistoryWidget::goToSha()
+void HistoryWidget::onNewRevisions(int totalCommits)
 {
-   const auto sha = mGoToSha->text();
-   mRepositoryView->focusOnCommit(sha);
+   mRepositoryModel->onNewRevisions(totalCommits);
+}
 
-   mGoToSha->clear();
+void HistoryWidget::search()
+{
+   const auto text = mSearchInput->text();
+
+   if (!text.isEmpty())
+   {
+      auto commitInfo = mCache->getCommitInfo(text);
+
+      if (commitInfo.isValid())
+         goToSha(text);
+      else
+      {
+         auto selectedItems = mRepositoryView->selectedIndexes();
+         auto startingRow = 0;
+
+         if (!selectedItems.isEmpty())
+         {
+            std::sort(selectedItems.begin(), selectedItems.end(),
+                      [](const QModelIndex index1, const QModelIndex index2) { return index1.row() <= index2.row(); });
+            startingRow = selectedItems.constFirst().row();
+         }
+
+         commitInfo = mCache->getCommitInfoByField(CommitInfo::Field::SHORT_LOG, text, startingRow + 1);
+
+         if (commitInfo.isValid())
+            goToSha(commitInfo.sha());
+      }
+   }
+}
+
+void HistoryWidget::goToSha(const QString &sha)
+{
+   mRepositoryView->focusOnCommit(sha);
 
    onCommitSelected(sha);
 }
@@ -139,9 +223,31 @@ void HistoryWidget::openDiff(const QModelIndex &index)
    emit signalOpenDiff(sha);
 }
 
+void HistoryWidget::onShowAllUpdated(bool showAll)
+{
+   GitQlientSettings settings;
+   settings.setValue("ShowAllBranches", showAll);
+
+   emit signalAllBranchesActive(showAll);
+}
+
+void HistoryWidget::onBranchCheckout()
+{
+   QScopedPointer<GitBranches> gitBranches(new GitBranches(mGit));
+   const auto ret = gitBranches->getLastCommitOfBranch(mGit->getCurrentBranch());
+
+   if (mChShowAllBranches->isChecked())
+   {
+      mRepositoryView->focusOnCommit(ret.output.toString());
+      mBranchesWidget->showBranches();
+   }
+   else
+      emit signalUpdateCache();
+}
+
 void HistoryWidget::onCommitSelected(const QString &goToSha)
 {
-   const auto isWip = goToSha == ZERO_SHA;
+   const auto isWip = goToSha == CommitInfo::ZERO_SHA;
    mCommitStackedWidget->setCurrentIndex(isWip);
 
    QLog_Info("UI", QString("Selected commit {%1}").arg(goToSha));

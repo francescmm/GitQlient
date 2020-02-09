@@ -1,8 +1,8 @@
 #include <CommitInfoWidget.h>
 
+#include <RevisionsCache.h>
 #include <CommitInfo.h>
 #include <FileListWidget.h>
-#include <git.h>
 
 #include <QLabel>
 #include <QVBoxLayout>
@@ -12,8 +12,10 @@
 
 using namespace QLogger;
 
-CommitInfoWidget::CommitInfoWidget(const QSharedPointer<Git> &git, QWidget *parent)
+CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                                   QWidget *parent)
    : QWidget(parent)
+   , mCache(cache)
    , mGit(git)
    , labelSha(new QLabel())
    , labelTitle(new QLabel())
@@ -21,7 +23,7 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<Git> &git, QWidget *pare
    , labelAuthor(new QLabel())
    , labelDateTime(new QLabel())
    , labelEmail(new QLabel())
-   , fileListWidget(new FileListWidget(mGit))
+   , fileListWidget(new FileListWidget(mGit, cache))
    , labelModCount(new QLabel())
 {
    labelSha->setObjectName("labelSha");
@@ -94,9 +96,9 @@ void CommitInfoWidget::configure(const QString &sha)
    mCurrentSha = sha;
    mParentSha = sha;
 
-   if (sha != ZERO_SHA and !sha.isEmpty())
+   if (sha != CommitInfo::ZERO_SHA and !sha.isEmpty())
    {
-      const auto currentRev = mGit->getCommitInfo(sha);
+      const auto currentRev = mCache->getCommitInfo(sha);
 
       if (!currentRev.sha().isEmpty())
       {
@@ -136,6 +138,9 @@ QString CommitInfoWidget::getCurrentCommitSha() const
 
 void CommitInfoWidget::clear()
 {
+   mCurrentSha = QString();
+   mParentSha = QString();
+
    fileListWidget->clear();
    labelSha->clear();
    labelEmail->clear();

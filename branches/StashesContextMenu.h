@@ -25,7 +25,7 @@
 
 #include <QMenu>
 
-class Git;
+class GitBase;
 
 class StashesContextMenu : public QMenu
 {
@@ -36,10 +36,10 @@ signals:
    void signalUpdateView();
 
 public:
-   explicit StashesContextMenu(const QSharedPointer<Git> &git, const QString &stashId, QWidget *parent = nullptr);
+   explicit StashesContextMenu(const QSharedPointer<GitBase> &git, const QString &stashId, QWidget *parent = nullptr);
 
 private:
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
    QString mStashId;
 
    void drop();

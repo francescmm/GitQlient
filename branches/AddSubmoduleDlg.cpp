@@ -1,12 +1,12 @@
 #include "AddSubmoduleDlg.h"
 #include "ui_AddSubmoduleDlg.h"
 
-#include <git.h>
+#include <GitSubmodules.h>
 
 #include <QFile>
 #include <QDir>
 
-AddSubmoduleDlg::AddSubmoduleDlg(const QSharedPointer<Git> &git, QWidget *parent)
+AddSubmoduleDlg::AddSubmoduleDlg(const QSharedPointer<GitSubmodules> &git, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::AddSubmoduleDlg)
    , mGit(git)

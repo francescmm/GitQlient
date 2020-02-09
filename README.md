@@ -34,6 +34,7 @@ GitQlient can be executed from command line with additional params. Please take 
 | Command  | Desciption  |
 |---|---|
 | -noLog  | Disables the log system for the current execution  |
+| -logLevel | Sets the log level for GitQlient. It expects a numeric: 0 (Trace), 1 (Debug), 2 (Info), 3 (Warning), 4 (Error) and 5 (Fatal). |
 | -repos  | Provides a list separated with blank spaces for the different repositories that will be open at startup. <br> Ex: ```-repos /path/to/repo1 /path/to/repo2```  |
 
 ## Setup & Building the code
@@ -49,6 +50,8 @@ The current contribution guidelines are in progress. They will be updated in its
 GitQlient started as a fork from QGit. Despite it has changed a lot, there is some of the original code still, mainly the Git core functionality.
 
 Even when is 100% transformed is nice to thanks those that make the original QGit possible. Please check the QGit contributors list [on GitHub](https://github.com/feinstaub/qgit/graphs/contributors)!
+
+The app icon is custom made, but the other in-app icons are made by [Dave Gandy](https://twitter.com/davegandy) from [FontAwesome](https://fontawesome.com/).
 
 ## License
 

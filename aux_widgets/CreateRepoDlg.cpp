@@ -1,13 +1,14 @@
 #include "CreateRepoDlg.h"
 #include "ui_CreateRepoDlg.h"
 
-#include <git.h>
+#include <GitBase.h>
+#include <GitConfig.h>
 #include <GitQlientStyles.h>
 #include <GitQlientSettings.h>
 
 #include <QFileDialog>
 
-CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, const QSharedPointer<Git> &git, QWidget *parent)
+CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> git, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::CreateRepoDlg)
    , mType(type)
@@ -99,11 +100,7 @@ void CreateRepoDlg::accept()
       if (ret)
       {
          if (ui->cbGitUser->isChecked())
-         {
-            Git git;
-            git.setWorkingDirectory(fullPath);
-            git.setLocalUserInfo({ ui->leGitName->text(), ui->leGitEmail->text() });
-         }
+            mGit->setLocalUserInfo({ ui->leGitName->text(), ui->leGitEmail->text() });
 
          if (ui->chbOpen->isChecked())
             emit signalOpenWhenFinish(fullPath);

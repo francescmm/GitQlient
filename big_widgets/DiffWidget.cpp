@@ -14,11 +14,11 @@
 
 using namespace QLogger;
 
-DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
+DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, const QSharedPointer<RevisionsCache> &cache, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , centerStackedWidget(new QStackedWidget())
-   , mCommitDiffWidget(new CommitDiffWidget(mGit))
+   , mCommitDiffWidget(new CommitDiffWidget(mGit, cache))
 {
    centerStackedWidget->setCurrentIndex(0);
    centerStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -69,6 +69,8 @@ DiffWidget::DiffWidget(const QSharedPointer<Git> git, QWidget *parent)
            [this](const QString &currentSha, const QString &previousSha, const QString &file) {
               loadFileDiff(currentSha, previousSha, file);
            });
+
+   connect(mCommitDiffWidget, &CommitDiffWidget::signalShowFileHistory, this, &DiffWidget::signalShowFileHistory);
 }
 
 void DiffWidget::reload()
@@ -152,6 +154,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
       const auto &pair = mDiffButtons.value(id);
       const auto diff = dynamic_cast<FileDiffWidget *>(pair.first);
       diff->reload();
+
       pair.second->setSelected();
       centerStackedWidget->setCurrentWidget(diff);
 

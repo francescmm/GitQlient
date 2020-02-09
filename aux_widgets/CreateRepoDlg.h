@@ -25,7 +25,7 @@
 
 #include <QDialog>
 
-class Git;
+class GitConfig;
 
 namespace Ui
 {
@@ -46,7 +46,7 @@ signals:
    void signalOpenWhenFinish(const QString &path);
 
 public:
-   explicit CreateRepoDlg(CreateRepoDlgType type, const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> git, QWidget *parent = nullptr);
    ~CreateRepoDlg() override;
 
    void accept() override;
@@ -54,7 +54,7 @@ public:
 private:
    Ui::CreateRepoDlg *ui;
    CreateRepoDlgType mType;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitConfig> mGit;
 
    void selectFolder();
    void addDefaultName(const QString &url);

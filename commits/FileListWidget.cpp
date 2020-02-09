@@ -1,10 +1,11 @@
 #include "FileListWidget.h"
 
 #include <FileContextMenu.h>
-#include <RevisionFile.h>
+#include <RevisionFiles.h>
 #include <FileListDelegate.h>
-#include <git.h>
+#include <GitHistory.h>
 #include <GitQlientStyles.h>
+#include <RevisionsCache.h>
 
 #include <QApplication>
 #include <QDrag>
@@ -15,9 +16,11 @@
 #include <QMenu>
 #include <QItemDelegate>
 
-FileListWidget::FileListWidget(const QSharedPointer<Git> &git, QWidget *p)
+FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, const QSharedPointer<RevisionsCache> &cache,
+                               QWidget *p)
    : QListWidget(p)
    , mGit(git)
+   , mCache(cache)
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
    setItemDelegate(new FileListDelegate(this));
@@ -52,7 +55,21 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 {
    clear();
 
-   const auto files = mGit->getDiffFiles(currentSha, compareToSha, true);
+   RevisionFiles files;
+
+   if (mCache->containsRevisionFile(currentSha, compareToSha))
+      files = mCache->getRevisionFile(currentSha, compareToSha);
+   else if (!compareToSha.isEmpty())
+   {
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
+      const auto ret = git->getDiffFiles(currentSha, compareToSha);
+
+      if (ret.success)
+      {
+         files = mCache->parseDiff(ret.output.toString());
+         mCache->insertRevisionFile(currentSha, compareToSha, files);
+      }
+   }
 
    if (files.count() != 0)
    {
@@ -60,23 +77,23 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 
       for (auto i = 0; i < files.count(); ++i)
       {
-         if (!files.statusCmp(i, RevisionFile::UNKNOWN))
+         if (!files.statusCmp(i, RevisionFiles::UNKNOWN))
          {
             QColor clr;
             QString fileName;
 
-            if (files.statusCmp(i, RevisionFile::NEW))
+            if (files.statusCmp(i, RevisionFiles::NEW))
             {
                const auto fileRename = files.extendedStatus(i);
 
                clr = fileRename.isEmpty() ? GitQlientStyles::getGreen() : GitQlientStyles::getBlue();
-               fileName = fileRename.isEmpty() ? mGit->filePath(files, i) : fileRename;
+               fileName = fileRename.isEmpty() ? files.getFile(i) : fileRename;
             }
             else
             {
-               clr = files.statusCmp(i, RevisionFile::DELETED) ? GitQlientStyles::getRed()
+               clr = files.statusCmp(i, RevisionFiles::DELETED) ? GitQlientStyles::getRed()
                                                                : GitQlientStyles::getTextColor();
-               fileName = mGit->filePath(files, i);
+               fileName = files.getFile(i);
             }
 
             addItem(fileName, clr);

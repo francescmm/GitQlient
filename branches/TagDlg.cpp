@@ -1,12 +1,12 @@
 #include "TagDlg.h"
 #include "ui_TagDlg.h"
 
-#include <git.h>
+#include <GitTags.h>
 #include <GitQlientStyles.h>
 
 #include <QFile>
 
-TagDlg::TagDlg(const QSharedPointer<Git> &git, const QString &sha, QWidget *parent)
+TagDlg::TagDlg(const QSharedPointer<GitBase> &git, const QString &sha, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::TagDlg)
    , mGit(git)
@@ -40,10 +40,10 @@ void TagDlg::accept()
 
       tagMessage = tagMessage.trimmed();
 
-      QByteArray output;
-      auto ret = mGit->addTag(tagName, tagMessage, mSha, output);
+      QScopedPointer<GitTags> git(new GitTags(mGit));
+      auto ret = git->addTag(tagName, tagMessage, mSha);
 
-      if (ret)
+      if (ret.success)
          QDialog::accept();
    }
 }

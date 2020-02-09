@@ -1,17 +1,17 @@
 #include "CommitDiffWidget.h"
 
-#include <git.h>
 #include <FileListWidget.h>
 
 #include <QVBoxLayout>
 #include <QLabel>
 
-CommitDiffWidget::CommitDiffWidget(QSharedPointer<Git> git, QWidget *parent)
+CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, const QSharedPointer<RevisionsCache> &cache,
+                                   QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mFirstSha(new QLabel())
    , mSecondSha(new QLabel())
-   , fileListWidget(new FileListWidget(mGit))
+   , fileListWidget(new FileListWidget(mGit, cache))
 {
    mFirstSha->setObjectName("labelSha");
    mFirstSha->setAlignment(Qt::AlignCenter);
@@ -36,6 +36,7 @@ CommitDiffWidget::CommitDiffWidget(QSharedPointer<Git> git, QWidget *parent)
 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { emit signalOpenFileCommit(mFirstShaStr, mSecondShaStr, item->text()); });
+   connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitDiffWidget::signalShowFileHistory);
 }
 
 void CommitDiffWidget::configure(const QString &firstSha, const QString &secondSha)

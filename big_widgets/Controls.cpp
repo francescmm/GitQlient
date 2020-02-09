@@ -1,7 +1,10 @@
 #include "Controls.h"
 
-#include <git.h>
+#include <GitBase.h>
+#include <GitStashes.h>
 #include <GitQlientStyles.h>
+#include <GitRemote.h>
+#include <BranchDlg.h>
 
 #include <QApplication>
 #include <QToolButton>
@@ -10,7 +13,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
+Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mHistory(new QToolButton())
@@ -147,8 +150,6 @@ Controls::Controls(const QSharedPointer<Git> &git, QWidget *parent)
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
 
    enableButtons(false);
-
-   connect(mGit.get(), &Git::signalMergeConflicts, this, &Controls::activateMergeWarning);
 }
 
 void Controls::toggleButton(ControlsMainViews view)
@@ -186,7 +187,8 @@ void Controls::enableButtons(bool enabled)
 void Controls::pullCurrentBranch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->pull();
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   const auto ret = git->pull();
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
@@ -198,7 +200,8 @@ void Controls::pullCurrentBranch()
 void Controls::fetchAll()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->fetch();
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   const auto ret = git->fetch();
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -218,10 +221,20 @@ void Controls::disableMergeWarning()
 void Controls::pushCurrentBranch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->push();
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   const auto ret = git->push();
    QApplication::restoreOverrideCursor();
 
-   if (ret.success)
+   if (ret.output.toString().contains("has no upstream branch"))
+   {
+      const auto currentBranch = mGit->getCurrentBranch();
+      BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mGit });
+      const auto dlgRet = dlg.exec();
+
+      if (dlgRet == QDialog::Accepted)
+         emit signalRepositoryUpdated();
+   }
+   else if (ret.success)
       emit signalRepositoryUpdated();
    else
       QMessageBox::critical(this, tr("Error while pushing"), ret.output.toString());
@@ -229,15 +242,17 @@ void Controls::pushCurrentBranch()
 
 void Controls::stashCurrentWork()
 {
-   const auto ret = mGit->stash();
+   QScopedPointer<GitStashes> git(new GitStashes(mGit));
+   const auto ret = git->stash();
 
-   if (ret)
+   if (ret.success)
       emit signalRepositoryUpdated();
 }
 
 void Controls::popStashedWork()
 {
-   const auto ret = mGit->pop();
+   QScopedPointer<GitStashes> git(new GitStashes(mGit));
+   const auto ret = git->pop();
 
    if (ret.success)
       emit signalRepositoryUpdated();
@@ -248,7 +263,8 @@ void Controls::popStashedWork()
 void Controls::pruneBranches()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mGit->prune();
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   const auto ret = git->prune();
    QApplication::restoreOverrideCursor();
 
    if (ret.success)

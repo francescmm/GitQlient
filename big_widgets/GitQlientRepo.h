@@ -25,7 +25,9 @@
 
 #include <QFrame>
 
-class Git;
+class GitBase;
+class RevisionsCache;
+class GitRepoLoader;
 class QCloseEvent;
 class QFileSystemWatcher;
 class QStackedLayout;
@@ -58,7 +60,7 @@ signals:
    void signalRepoOpened();
 
 public:
-   explicit GitQlientRepo(QWidget *parent = nullptr);
+   explicit GitQlientRepo(const QString &repoPath, QWidget *parent = nullptr);
 
    bool isOpened();
    void setConfig(const GitQlientRepoConfig &config);
@@ -72,9 +74,12 @@ protected:
 private:
    QString mCurrentDir;
    GitQlientRepoConfig mConfig;
-   QSharedPointer<Git> mGit;
-   Controls *mControls = nullptr;
+   QSharedPointer<RevisionsCache> mGitQlientCache;
+   QSharedPointer<GitBase> mGitBase;
+   QSharedPointer<GitRepoLoader> mGitLoader;
+   HistoryWidget *mHistoryWidget = nullptr;
    QStackedLayout *mStackedLayout = nullptr;
+   Controls *mControls = nullptr;
    HistoryWidget *mRepoWidget = nullptr;
    DiffWidget *mDiffWidget = nullptr;
    BlameWidget *mBlameWidget = nullptr;
@@ -95,7 +100,7 @@ private:
    void executeCommand();
    void showFileHistory(const QString &fileName);
    void updateProgressDialog();
-   void closeProgressDialog();
+   void onRepoLoadFinished();
    void loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
    void showHistoryView();
    void showBlameView();

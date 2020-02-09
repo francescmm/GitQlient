@@ -26,7 +26,8 @@
 #include <QFrame>
 #include <QMap>
 
-class Git;
+class RevisionsCache;
+class GitBase;
 class QFileSystemModel;
 class FileBlameWidget;
 class QTreeView;
@@ -43,14 +44,17 @@ signals:
    void showFileDiff(const QString &sha, const QString &parentSha, const QString &file);
 
 public:
-   explicit BlameWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                        QWidget *parent = nullptr);
 
    void init(const QString &workingDirectory);
    void showFileHistory(const QModelIndex &index);
    void showFileHistory(const QString &filePath);
+   void onNewRevisions(int totalCommits);
 
 private:
-   QSharedPointer<Git> mGit;
+   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitBase> mGit;
    QFileSystemModel *fileSystemModel = nullptr;
    CommitHistoryModel *mRepoModel = nullptr;
    CommitHistoryView *mRepoView = nullptr;

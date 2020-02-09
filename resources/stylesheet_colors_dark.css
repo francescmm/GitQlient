@@ -534,3 +534,9 @@ QPushButton#Merge:pressed
    background-color: #202122;
 }
 
+QCheckBox
+{
+    color: white;
+
+}
+

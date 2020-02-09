@@ -1,6 +1,6 @@
 #include "BlameWidget.h"
 
-#include <git.h>
+#include <GitHistory.h>
 #include <FileBlameWidget.h>
 #include <BranchesViewDelegate.h>
 #include <RepositoryViewDelegate.h>
@@ -18,12 +18,14 @@
 #include <QClipboard>
 #include <QTabWidget>
 
-BlameWidget::BlameWidget(const QSharedPointer<Git> &git, QWidget *parent)
+BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                         QWidget *parent)
    : QFrame(parent)
+   , mCache(cache)
    , mGit(git)
    , fileSystemModel(new QFileSystemModel())
-   , mRepoModel(new CommitHistoryModel(mGit))
-   , mRepoView(new CommitHistoryView(mGit))
+   , mRepoModel(new CommitHistoryModel(mCache, mGit))
+   , mRepoView(new CommitHistoryView(mCache, mGit))
    , fileSystemView(new QTreeView())
    , mTabWidget(new QTabWidget())
 {
@@ -33,7 +35,7 @@ BlameWidget::BlameWidget(const QSharedPointer<Git> &git, QWidget *parent)
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::GRAPH), true);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::DATE), true);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::AUTHOR), true);
-   mRepoView->setItemDelegate(new RepositoryViewDelegate(mGit, mRepoView));
+   mRepoView->setItemDelegate(new RepositoryViewDelegate(cache, mGit, mRepoView));
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(450);
    mRepoView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -82,7 +84,8 @@ void BlameWidget::showFileHistory(const QString &filePath)
 {
    if (!mTabsMap.contains(filePath))
    {
-      const auto ret = mGit->history(filePath);
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
+      const auto ret = git->history(filePath);
 
       if (ret.success)
       {
@@ -92,7 +95,7 @@ void BlameWidget::showFileHistory(const QString &filePath)
          mRepoView->blockSignals(false);
 
          const auto previousSha = shaHistory.count() > 1 ? shaHistory.at(1) : QString(tr("No info"));
-         const auto fileBlameWidget = new FileBlameWidget(mGit);
+         const auto fileBlameWidget = new FileBlameWidget(mCache, mGit);
 
          fileBlameWidget->setup(filePath, shaHistory.constFirst(), previousSha);
          connect(fileBlameWidget, &FileBlameWidget::signalCommitSelected, mRepoView, &CommitHistoryView::focusOnCommit);
@@ -108,6 +111,11 @@ void BlameWidget::showFileHistory(const QString &filePath)
    }
    else
       mTabWidget->setCurrentWidget(mTabsMap.value(filePath));
+}
+
+void BlameWidget::onNewRevisions(int totalCommits)
+{
+   mRepoModel->onNewRevisions(totalCommits);
 }
 
 void BlameWidget::reloadBlame(const QModelIndex &index)
@@ -133,7 +141,8 @@ void BlameWidget::reloadHistory(int tabIndex)
       const auto sha = blameWidget->getCurrentSha();
       const auto file = blameWidget->getCurrentFile();
 
-      const auto ret = mGit->history(file);
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
+      const auto ret = git->history(file);
 
       if (ret.success)
       {

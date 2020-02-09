@@ -2,12 +2,15 @@
 
 #include <CommitHistoryColumns.h>
 #include <CommitInfo.h>
-#include <git.h>
+#include <RevisionsCache.h>
+#include <GitBase.h>
 
 #include <QDateTime>
 
-CommitHistoryModel::CommitHistoryModel(const QSharedPointer<Git> &git, QObject *p)
+CommitHistoryModel::CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                                       QObject *p)
    : QAbstractItemModel(p)
+   , mCache(cache)
    , mGit(git)
 {
    mColumns.insert(CommitHistoryColumns::GRAPH, "Graph");
@@ -16,8 +19,6 @@ CommitHistoryModel::CommitHistoryModel(const QSharedPointer<Git> &git, QObject *
    mColumns.insert(CommitHistoryColumns::LOG, "Log");
    mColumns.insert(CommitHistoryColumns::AUTHOR, "Author");
    mColumns.insert(CommitHistoryColumns::DATE, "Date");
-
-   connect(mGit.get(), &Git::signalLoadingFinished, this, &CommitHistoryModel::onNewRevisions);
 }
 
 CommitHistoryModel::~CommitHistoryModel()
@@ -45,12 +46,12 @@ void CommitHistoryModel::clear()
 {
    beginResetModel();
    curFNames.clear();
-   rowCnt = mGit->totalCommits();
+   rowCnt = 0;
    endResetModel();
    emit headerDataChanged(Qt::Horizontal, 0, 5);
 }
 
-void CommitHistoryModel::onNewRevisions()
+void CommitHistoryModel::onNewRevisions(int totalCommits)
 {
    // do not process revisions if there are possible renamed points
    // or pending renamed patch to apply
@@ -58,7 +59,7 @@ void CommitHistoryModel::onNewRevisions()
       return;
 
    // do not attempt to insert 0 rows since the inclusive range would be invalid
-   const auto revisionsCount = mGit->totalCommits();
+   const auto revisionsCount = totalCommits;
    if (rowCnt == revisionsCount)
    {
       beginResetModel();
@@ -97,20 +98,20 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    QString auxMessage;
    const auto sha = r.sha();
 
-   if ((mGit->checkRef(sha) & Git::CUR_BRANCH) && mGit->getCurrentBranchName().isEmpty())
+   if ((mCache->checkRef(sha) & CUR_BRANCH) && mGit->getCurrentBranch().isEmpty())
       auxMessage.append("<p>Status: <b>detached</b></p>");
 
-   const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
+   const auto localBranches = mCache->getRefNames(sha, BRANCH);
 
    if (!localBranches.isEmpty())
       auxMessage.append(QString("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
 
-   const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
+   const auto remoteBranches = mCache->getRefNames(sha, RMT_BRANCH);
 
    if (!remoteBranches.isEmpty())
       auxMessage.append(QString("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
 
-   const auto tags = mGit->getRefNames(sha, Git::TAG);
+   const auto tags = mCache->getRefNames(sha, TAG);
 
    if (!tags.isEmpty())
       auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));
@@ -118,7 +119,7 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    QDateTime d;
    d.setSecsSinceEpoch(r.authorDate().toUInt());
 
-   return sha == ZERO_SHA
+   return sha == CommitInfo::ZERO_SHA
        ? QString()
        : QString("<p>%1 - %2<p></p>%3</p>%4")
              .arg(r.author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
@@ -151,7 +152,7 @@ QVariant CommitHistoryModel::data(const QModelIndex &index, int role) const
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
       return QVariant();
 
-   const auto r = mGit->getCommitInfoByRow(index.row());
+   const auto r = mCache->getCommitInfoByRow(index.row());
 
    if (role == Qt::ToolTipRole)
       return getToolTipData(r);

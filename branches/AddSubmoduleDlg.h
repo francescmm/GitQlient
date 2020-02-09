@@ -25,7 +25,7 @@
 
 #include <QDialog>
 
-class Git;
+class GitSubmodules;
 
 namespace Ui
 {
@@ -37,12 +37,12 @@ class AddSubmoduleDlg : public QDialog
    Q_OBJECT
 
 public:
-   explicit AddSubmoduleDlg(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit AddSubmoduleDlg(const QSharedPointer<GitSubmodules> &git, QWidget *parent = nullptr);
    ~AddSubmoduleDlg() override;
 
    void accept() override;
 
 private:
    Ui::AddSubmoduleDlg *ui;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitSubmodules> mGit;
 };

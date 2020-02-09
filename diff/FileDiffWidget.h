@@ -28,14 +28,14 @@
 class FileDiffHighlighter;
 class FileDiffView;
 class QPushButton;
-class Git;
+class GitBase;
 
 class FileDiffWidget : public QFrame
 {
    Q_OBJECT
 
 public:
-   explicit FileDiffWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit FileDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    void clear();
    bool reload();
    bool configure(const QString &currentSha, const QString &previousSha, const QString &file);
@@ -47,7 +47,7 @@ private:
    QString mCurrentFile;
    QString mCurrentSha;
    QString mPreviousSha;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    FileDiffView *mDiffView = nullptr;
    QPushButton *mGoPrevious = nullptr;

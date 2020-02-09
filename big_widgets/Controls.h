@@ -26,8 +26,8 @@
 #include <QFrame>
 
 class QToolButton;
-class Git;
 class QPushButton;
+class GitBase;
 
 enum class ControlsMainViews
 {
@@ -49,7 +49,7 @@ signals:
    void signalRepositoryUpdated();
 
 public:
-   explicit Controls(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit Controls(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    void toggleButton(ControlsMainViews view);
    void setCurrentSha(const QString &sha) { mCurrentSha = sha; }
    void enableButtons(bool enabled);
@@ -59,7 +59,7 @@ public:
 
 private:
    QString mCurrentSha;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
    QToolButton *mHistory = nullptr;
    QToolButton *mDiff = nullptr;
    QToolButton *mBlame = nullptr;

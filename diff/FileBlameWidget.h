@@ -26,10 +26,11 @@
 #include <QFrame>
 #include <QDateTime>
 
-class Git;
+class GitBase;
 class QScrollArea;
 class ClickableFrame;
 class QLabel;
+class RevisionsCache;
 
 class FileBlameWidget : public QFrame
 {
@@ -39,7 +40,8 @@ signals:
    void signalCommitSelected(const QString &sha);
 
 public:
-   explicit FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                            QWidget *parent = nullptr);
 
    void setup(const QString &fileName, const QString &currentSha, const QString &previousSha);
    void reload(const QString &currentSha, const QString &previousSha);
@@ -47,7 +49,8 @@ public:
    QString getCurrentFile() const { return mCurrentFile; }
 
 private:
-   QSharedPointer<Git> mGit;
+   const QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitBase> mGit;
    QFrame *mAnotation = nullptr;
    QLabel *mCurrentSha = nullptr;
    QLabel *mPreviousSha = nullptr;

@@ -1,8 +1,9 @@
 #include "FullDiffWidget.h"
 
 #include <CommitInfo.h>
-#include <git.h>
+#include <GitHistory.h>
 #include <GitQlientStyles.h>
+#include <RevisionsCache.h>
 
 #include <QScrollBar>
 #include <QTextCharFormat>
@@ -57,7 +58,7 @@ void DiffHighlighter::highlightBlock(const QString &text)
       setFormat(0, text.length(), myFormat);
 }
 
-FullDiffWidget::FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent)
+FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QTextEdit(parent)
    , mGit(git)
 {
@@ -75,7 +76,8 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<Git> &git, QWidget *parent)
 
 void FullDiffWidget::reload()
 {
-   loadDiff(mCurrentSha, mPreviousSha);
+   if (mCurrentSha != CommitInfo::ZERO_SHA)
+      loadDiff(mCurrentSha, mPreviousSha);
 }
 
 void FullDiffWidget::processData(const QString &fileChunk)
@@ -83,7 +85,8 @@ void FullDiffWidget::processData(const QString &fileChunk)
    if (mPreviousDiffText != fileChunk)
    {
       mPreviousDiffText = fileChunk;
-      auto pos = verticalScrollBar()->value();
+
+      const auto pos = verticalScrollBar()->value();
 
       setUpdatesEnabled(false);
 
@@ -103,7 +106,8 @@ void FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
    mCurrentSha = sha;
    mPreviousSha = diffToSha;
 
-   const auto ret = mGit->getCommitDiff(mCurrentSha, mPreviousSha);
+   QScopedPointer<GitHistory> git(new GitHistory(mGit));
+   const auto ret = git->getCommitDiff(mCurrentSha, mPreviousSha);
 
    if (ret.success)
       processData(ret.output.toString());

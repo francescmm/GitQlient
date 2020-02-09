@@ -26,7 +26,8 @@
 #include <QStyledItemDelegate>
 
 class CommitHistoryView;
-class Git;
+class RevisionsCache;
+class GitBase;
 
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
@@ -38,7 +39,8 @@ class RepositoryViewDelegate : public QStyledItemDelegate
    Q_OBJECT
 
 public:
-   RepositoryViewDelegate(const QSharedPointer<Git> &git, CommitHistoryView *view);
+   RepositoryViewDelegate(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                          CommitHistoryView *view);
 
    virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const override;
    virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override
@@ -47,7 +49,8 @@ public:
    }
 
 private:
-   QSharedPointer<Git> mGit;
+   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitBase> mGit;
    CommitHistoryView *mView = nullptr;
    int diffTargetRow = -1;
 

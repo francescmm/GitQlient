@@ -1,8 +1,10 @@
 #include "MergeWidget.h"
 
-#include <git.h>
+#include <GitBase.h>
+#include <GitRemote.h>
 #include <FileDiffWidget.h>
 #include <CommitInfo.h>
+#include <RevisionFiles.h>
 
 #include <QPushButton>
 #include <QLineEdit>
@@ -14,8 +16,10 @@
 #include <QFile>
 #include <QMessageBox>
 
-MergeWidget::MergeWidget(const QSharedPointer<Git> git, QWidget *parent)
+MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, const QSharedPointer<GitBase> &git,
+                         QWidget *parent)
    : QFrame(parent)
+   , mGitQlientCache(gitQlientCache)
    , mGit(git)
    , mCenterStackedWidget(new QStackedWidget())
    , mCommitTitle(new QLineEdit())
@@ -107,11 +111,9 @@ MergeWidget::MergeWidget(const QSharedPointer<Git> git, QWidget *parent)
    connect(mMergeBtn, &QPushButton::clicked, this, &MergeWidget::commit);
 }
 
-void MergeWidget::configure()
+void MergeWidget::configure(const RevisionFiles &files)
 {
-   const auto files = mGit->getWipFiles();
-
-   QFile mergeMsg(mGit->getGitDir() + "/MERGE_MSG");
+   QFile mergeMsg(mGit->getWorkingDir() + "/.git/MERGE_MSG");
 
    if (mergeMsg.open(QIODevice::ReadOnly))
    {
@@ -125,25 +127,26 @@ void MergeWidget::configure()
    fillButtonFileList(files);
 }
 
-void MergeWidget::fillButtonFileList(const RevisionFile &files)
+void MergeWidget::fillButtonFileList(const RevisionFiles &files)
 {
    for (auto i = 0; i < files.count(); ++i)
    {
-      const auto fileName = mGit->filePath(files, i);
+      const auto fileName = files.getFile(i);
       const auto fileBtn = new QPushButton(fileName);
       fileBtn->setObjectName("FileBtn");
       fileBtn->setCheckable(true);
 
       connect(fileBtn, &QPushButton::toggled, this, &MergeWidget::changeDiffView);
 
+      const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
       const auto fileDiffWidget = new FileDiffWidget(mGit);
-      fileDiffWidget->configure(ZERO_SHA, mGit->getCommitInfo(ZERO_SHA).parent(0), fileName);
+      fileDiffWidget->configure(CommitInfo::ZERO_SHA, wip.parent(0), fileName);
 
       mConflictButtons.insert(fileBtn, fileDiffWidget);
 
       const auto index = mCenterStackedWidget->addWidget(fileDiffWidget);
 
-      if (files.statusCmp(i, RevisionFile::CONFLICT))
+      if (files.statusCmp(i, RevisionFiles::CONFLICT))
       {
          mConflictBtnContainer->addWidget(fileBtn);
 
@@ -179,7 +182,8 @@ void MergeWidget::changeDiffView(bool fileBtnChecked)
 
 void MergeWidget::abort()
 {
-   const auto ret = mGit->abortMerge();
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   const auto ret = git->abortMerge();
 
    if (!ret.success)
       QMessageBox::warning(this, tr("Error aborting!"),

@@ -3,7 +3,7 @@
 #include <QByteArray>
 #include <QVector>
 
-class RevisionFile
+class RevisionFiles
 {
 public:
    enum StatusFlag
@@ -18,38 +18,29 @@ public:
       CONFLICT = 128
    };
 
-   RevisionFile() = default;
-
-   /* This QByteArray keeps indices in some dir and names vectors,
-    * defined outside RevisionFile. Paths are splitted in dir and file
-    * name, first all the dirs are listed then the file names to
-    * achieve a better compression when saved to disk.
-    * A single QByteArray is used instead of two vectors because it's
-    * much faster to load from disk when using a QDataStream
-    */
-   QByteArray pathsIdx;
-
-   int dirAt(int idx) const { return ((const int *)pathsIdx.constData())[idx]; }
-   int nameAt(int idx) const { return ((const int *)pathsIdx.constData())[count() + idx]; }
+   RevisionFiles() = default;
+   bool operator==(const RevisionFiles &revFiles) const;
+   bool operator!=(const RevisionFiles &revFiles) const;
 
    QVector<int> mergeParent;
+   QVector<QString> mFiles;
 
    // helper functions
-   int count() const { return pathsIdx.size() / (sizeof(int) * 2); }
+   int count() const { return mFiles.count(); }
    bool statusCmp(int idx, StatusFlag sf) const;
    const QString extendedStatus(int idx) const;
    void setStatus(const QString &rowSt);
-   void setStatus(RevisionFile::StatusFlag flag);
-   void setStatus(int pos, RevisionFile::StatusFlag flag);
-   void appendStatus(int pos, RevisionFile::StatusFlag flag);
-   int getStatus(int pos) const { return status.at(pos); }
+   void setStatus(RevisionFiles::StatusFlag flag);
+   void setStatus(int pos, RevisionFiles::StatusFlag flag);
+   void appendStatus(int pos, RevisionFiles::StatusFlag flag);
+   int getStatus(int pos) const { return mFileStatus.at(pos); }
    void setOnlyModified(bool onlyModified) { mOnlyModified = onlyModified; }
-   int getFilesCount() const { return status.size(); }
-   void appendExtStatus(const QString &file) { extStatus.append(file); }
+   int getFilesCount() const { return mFileStatus.size(); }
+   void appendExtStatus(const QString &file) { mRenamedFiles.append(file); }
+   QString getFile(int index) const { return mFiles.at(index); }
+   bool containsFile(const QString &fileName) { return mFiles.contains(fileName); }
 
 private:
-   // friend class Git;
-
    // Status information is splitted in a flags vector and in a string
    // vector in 'status' are stored flags according to the info returned
    // by 'git diff-tree' without -C option.
@@ -61,6 +52,6 @@ private:
    // When status of all the files is 'modified' then onlyModified is
    // set, this let us to do some optimization in this common case
    bool mOnlyModified = true;
-   QVector<int> status;
-   QVector<QString> extStatus;
+   QVector<int> mFileStatus;
+   QVector<QString> mRenamedFiles;
 };

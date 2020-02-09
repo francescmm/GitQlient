@@ -1,20 +1,23 @@
 ﻿#include "RepositoryViewDelegate.h"
 
-#include <git.h>
 #include <GitQlientStyles.h>
 #include <lanes.h>
 #include <CommitInfo.h>
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryView.h>
 #include <CommitHistoryModel.h>
+#include <RevisionsCache.h>
+#include <GitBase.h>
 
 #include <QSortFilterProxyModel>
 #include <QPainter>
 
 static const int MIN_VIEW_WIDTH_PX = 480;
 
-RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<Git> &git, CommitHistoryView *view)
-   : mGit(git)
+RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<RevisionsCache> &cache,
+                                               const QSharedPointer<GitBase> &git, CommitHistoryView *view)
+   : mCache(cache)
+   , mGit(git)
    , mView(view)
 {
 }
@@ -209,7 +212,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
 
-   const auto r = mGit->getCommitInfoByRow(row);
+   const auto r = mCache->getCommitInfoByRow(row);
 
    if (r.sha().isEmpty())
       return;
@@ -256,7 +259,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          QColor color;
          if (i == activeLane)
          {
-            if (r.sha() == ZERO_SHA && !mGit->isNothingToCommit())
+            if (r.sha() == CommitInfo::ZERO_SHA && !mCache->pendingLocalChanges())
                color = QColor("#D89000");
             else
                color = activeColor;
@@ -296,7 +299,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
             default:
                break;
          }
-         paintGraphLane(p, ln, laneHeadPresent, x1, x2, color, activeColor, back, r.sha() == ZERO_SHA);
+         paintGraphLane(p, ln, laneHeadPresent, x1, x2, color, activeColor, back, r.sha() == CommitInfo::ZERO_SHA);
 
          if (mView->hasActiveFilter())
             break;
@@ -307,14 +310,14 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
-   const auto sha = mGit->getCommitInfoByRow(index.row()).sha();
+   const auto sha = mCache->getCommitInfoByRow(index.row()).sha();
 
    if (sha.isEmpty())
       return;
 
    auto offset = 0;
 
-   if (mGit->checkRef(sha) > 0 && !mView->hasActiveFilter())
+   if (mCache->checkRef(sha) > 0 && !mView->hasActiveFilter())
    {
       offset = 5;
       paintTagBranch(p, opt, offset, sha);
@@ -335,29 +338,29 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
                                             const QString &sha) const
 {
    QMap<QString, QColor> markValues;
-   auto ref_types = mGit->checkRef(sha);
-   const auto currentBranch = mGit->getCurrentBranchName();
+   auto ref_types = mCache->checkRef(sha);
+   const auto currentBranch = mGit->getCurrentBranch();
 
    if (ref_types != 0)
    {
-      if (ref_types & Git::CUR_BRANCH && currentBranch.isEmpty())
+      if (ref_types & CUR_BRANCH && currentBranch.isEmpty())
          markValues.insert("detached", GitQlientStyles::getDetachedColor());
 
-      const auto localBranches = mGit->getRefNames(sha, Git::BRANCH);
+      const auto localBranches = mCache->getRefNames(sha, BRANCH);
       for (const auto &branch : localBranches)
          markValues.insert(branch,
                            branch == currentBranch ? GitQlientStyles::getCurrentBranchColor()
                                                    : GitQlientStyles::getLocalBranchColor());
 
-      const auto remoteBranches = mGit->getRefNames(sha, Git::RMT_BRANCH);
+      const auto remoteBranches = mCache->getRefNames(sha, RMT_BRANCH);
       for (const auto &branch : remoteBranches)
          markValues.insert(branch, QColor("#011f4b"));
 
-      const auto tags = mGit->getRefNames(sha, Git::TAG);
+      const auto tags = mCache->getRefNames(sha, TAG);
       for (const auto &tag : tags)
          markValues.insert(tag, GitQlientStyles::getTagColor());
 
-      const auto refs = mGit->getRefNames(sha, Git::REF);
+      const auto refs = mCache->getRefNames(sha, REF);
       for (const auto &ref : refs)
          markValues.insert(ref, GitQlientStyles::getRefsColor());
    }

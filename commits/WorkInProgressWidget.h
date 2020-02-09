@@ -28,8 +28,9 @@
 
 class QListWidget;
 class QListWidgetItem;
-class Git;
-class RevisionFile;
+class RevisionsCache;
+class GitBase;
+class RevisionFiles;
 
 namespace Ui
 {
@@ -47,7 +48,8 @@ signals:
    void signalShowFileHistory(const QString &fileName);
 
 public:
-   explicit WorkInProgressWidget(const QSharedPointer<Git> &git, QWidget *parent = nullptr);
+   explicit WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                                 QWidget *parent = nullptr);
 
    void configure(const QString &sha);
    void clear();
@@ -56,14 +58,17 @@ public:
 private:
    bool mIsAmend = false;
    Ui::WorkInProgressWidget *ui = nullptr;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitBase> mGit;
    QString mCurrentSha;
    QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;
 
-   void insertFilesInList(const RevisionFile &files, QListWidget *fileList);
+   void insertFilesInList(const RevisionFiles &files, QListWidget *fileList);
    void prepareCache();
    void clearCache();
    void addAllFilesToCommitList();
+   void onOpenDiffRequested(QListWidgetItem *item);
+   void requestDiff(const QString &fileName);
    void addFileToCommitList(QListWidgetItem *item);
    void revertAllChanges();
    void removeFileFromCommitList(QListWidgetItem *item);
@@ -78,6 +83,7 @@ private:
    void updateCounter(const QString &text);
    bool hasConflicts();
    void resetInfo(bool force = true);
+   void resetFile(QListWidgetItem *item);
 
    static QString lastMsgBeforeError;
    static const int kMaxTitleChars;

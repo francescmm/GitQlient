@@ -360,6 +360,7 @@ QScrollBar:horizontal
 QScrollBar::handle:vertical
 {
     width: 14px;
+    min-height: 10px;
     border-width: 1px;
     border-style: solid;
     border-right: 0;
@@ -369,6 +370,7 @@ QScrollBar::handle:vertical
 QScrollBar::handle:horizontal
 {
     height: 14px;
+    min-width: 10px;
     border-width: 1px;
     border-style: solid;
     border-top: 0;

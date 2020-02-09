@@ -1,7 +1,5 @@
 #include "AGitProcess.h"
 
-#include "git.h"
-
 #include <QTemporaryFile>
 #include <QTextStream>
 
@@ -142,7 +140,7 @@ bool AGitProcess::execute(const QString &command)
       processStarted = waitForStarted();
 
       if (!processStarted)
-         QLog_Warning("Git", QString("Unable to start the process:\n\n%1\n\n").arg(mCommand));
+         QLog_Warning("Git", QString("Unable to start the process:\n%1\nMore info:\n%2").arg(mCommand, errorString()));
    }
 
    return processStarted;
@@ -154,20 +152,13 @@ void AGitProcess::onFinished(int, QProcess::ExitStatus exitStatus)
 
    mErrorOutput = QString::fromUtf8(errorOutput);
    mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error")
-       || errorOutput.contains("could not read Username");
+       || errorOutput.toLower().contains("could not read username");
 
-   if (!mRealError && mRunOutput)
-      mRunOutput->append(readAllStandardOutput() + mErrorOutput);
-
-   if (mRealError)
+   if (mRunOutput)
    {
-      const auto command = QString("%1 %2").arg(program(), arguments().join(" "));
-      const auto errorText = QString("An error occurred while executing command {%1}").arg(command);
-
-      if (mRunOutput)
+      if (mRealError)
          *mRunOutput = mErrorOutput;
-
-      QLog_Warning("Git", errorText);
-      QLog_Info("Git", QString("%1\n\nGit says: \n\n%2").arg(errorText, mErrorOutput));
+      else
+         mRunOutput->append(readAllStandardOutput() + mErrorOutput);
    }
 }

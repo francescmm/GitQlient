@@ -23,29 +23,24 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QMenu>
+#include <GitExecResult.h>
 
-class Git;
+#include <QSharedPointer>
 
-class UnstagedFilesContextMenu : public QMenu
+class GitBase;
+
+class GitRemote
 {
-   Q_OBJECT
-
-signals:
-   void signalShowDiff();
-   void signalCommitAll();
-   void signalRevertAll();
-   void signalCheckedOut(bool success);
-   void signalShowFileHistory();
-   void signalConflictsResolved();
-
 public:
-   explicit UnstagedFilesContextMenu(const QSharedPointer<Git> &git, const QString &fileName, bool hasConflicts,
-                                     QWidget *parent = nullptr);
+   explicit GitRemote(const QSharedPointer<GitBase> &gitBase);
+
+   GitExecResult push(bool force = false);
+   GitExecResult pull();
+   bool fetch();
+   GitExecResult prune();
+   GitExecResult merge(const QString &into, QStringList sources);
+   GitExecResult abortMerge() const;
 
 private:
-   QSharedPointer<Git> mGit;
-   QString mFileName;
-
-   bool addEntryToGitIgnore(const QString &entry);
+   QSharedPointer<GitBase> mGitBase;
 };

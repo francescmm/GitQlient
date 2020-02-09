@@ -1,7 +1,9 @@
 #include "BranchContextMenu.h"
 
 #include <BranchDlg.h>
-#include <git.h>
+#include <GitBranches.h>
+#include <GitBase.h>
+#include <GitRemote.h>
 
 #include <QApplication>
 #include <QMessageBox>
@@ -45,7 +47,8 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
 void BranchContextMenu::pull()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mConfig.mGit->pull();
+   QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
+   const auto ret = git->pull();
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
@@ -57,7 +60,8 @@ void BranchContextMenu::pull()
 void BranchContextMenu::fetch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mConfig.mGit->fetch();
+   QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
+   const auto ret = git->fetch();
    QApplication::restoreOverrideCursor();
 
    if (ret)
@@ -69,10 +73,19 @@ void BranchContextMenu::fetch()
 void BranchContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mConfig.mGit->push();
+   QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
+   const auto ret = git->push();
    QApplication::restoreOverrideCursor();
 
-   if (ret.success)
+   if (ret.output.toString().contains("has no upstream branch"))
+   {
+      BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::PUSH_UPSTREAM, mConfig.mGit });
+      const auto ret = dlg.exec();
+
+      if (ret == QDialog::Accepted)
+         emit signalBranchesUpdated();
+   }
+   else if (ret.success)
       emit signalBranchesUpdated();
    else
       QMessageBox::critical(this, tr("Push failed"), ret.output.toString());
@@ -81,7 +94,8 @@ void BranchContextMenu::push()
 void BranchContextMenu::pushForce()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto ret = mConfig.mGit->push(true);
+   QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
+   const auto ret = git->push(true);
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
@@ -110,22 +124,7 @@ void BranchContextMenu::createCheckoutBranch()
 
 void BranchContextMenu::merge()
 {
-   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   const auto currentBranch = mConfig.currentBranch;
-   const auto ret = mConfig.mGit->merge(currentBranch, { mConfig.branchSelected });
-   QApplication::restoreOverrideCursor();
-
-   if (ret.success)
-   {
-      emit signalBranchesUpdated();
-
-      const auto outputStr = ret.output.toString();
-
-      if (!outputStr.isEmpty())
-         QMessageBox::information(parentWidget(), tr("Merge status"), outputStr);
-   }
-   else
-      QMessageBox::critical(parentWidget(), tr("Merge failed"), ret.output.toString());
+   emit signalMergeRequired(mConfig.currentBranch, mConfig.branchSelected);
 }
 
 void BranchContextMenu::rename()
@@ -148,9 +147,10 @@ void BranchContextMenu::deleteBranch()
 
       if (ret == QMessageBox::Ok)
       {
+         QScopedPointer<GitBranches> git(new GitBranches(mConfig.mGit));
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         const auto ret2 = mConfig.isLocal ? mConfig.mGit->removeLocalBranch(mConfig.branchSelected)
-                                           : mConfig.mGit->removeRemoteBranch(mConfig.branchSelected);
+         const auto ret2 = mConfig.isLocal ? git->removeLocalBranch(mConfig.branchSelected)
+                                           : git->removeRemoteBranch(mConfig.branchSelected);
          QApplication::restoreOverrideCursor();
 
          if (ret2.success)

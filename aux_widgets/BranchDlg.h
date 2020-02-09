@@ -30,7 +30,7 @@ namespace Ui
 class BranchDlg;
 }
 
-class Git;
+class GitBase;
 
 enum class BranchDlgMode
 {
@@ -38,14 +38,15 @@ enum class BranchDlgMode
    CREATE_CHECKOUT,
    CREATE_FROM_COMMIT,
    RENAME,
-   STASH_BRANCH
+   STASH_BRANCH,
+   PUSH_UPSTREAM
 };
 
 struct BranchDlgConfig
 {
    QString mCurrentBranchName;
    BranchDlgMode mDialogMode;
-   QSharedPointer<Git> mGit;
+   QSharedPointer<GitBase> mGit;
 };
 
 class BranchDlg : public QDialog

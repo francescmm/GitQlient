@@ -2,6 +2,8 @@
 
 #include <QStringList>
 
+const QString CommitInfo::ZERO_SHA = QString("0000000000000000000000000000000000000000");
+
 CommitInfo::CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
                        const QString &log, const QString &longLog, int idx)
 {
@@ -41,14 +43,38 @@ CommitInfo::CommitInfo(const QByteArray &b, int idx)
 
 bool CommitInfo::operator==(const CommitInfo &commit) const
 {
-   return mSha == commit.mSha && mParentsSha == commit.mParentsSha && mCommitter == commit.mCommitter
-       && mAuthor == commit.mAuthor && mCommitDate == commit.mCommitDate && mShortLog == commit.mShortLog
-       && mLongLog == commit.mLongLog && orderIdx == commit.orderIdx && lanes == commit.lanes;
+   return (mSha == commit.mSha || mSha.startsWith(commit.sha()) || commit.sha().startsWith(mSha))
+       && mParentsSha == commit.mParentsSha && mCommitter == commit.mCommitter && mAuthor == commit.mAuthor
+       && mCommitDate == commit.mCommitDate && mShortLog == commit.mShortLog && mLongLog == commit.mLongLog
+       && orderIdx == commit.orderIdx && lanes == commit.lanes;
 }
 
 bool CommitInfo::operator!=(const CommitInfo &commit) const
 {
    return !(*this == commit);
+}
+
+QString CommitInfo::getFieldStr(CommitInfo::Field field) const
+{
+   switch (field)
+   {
+      case CommitInfo::Field::SHA:
+         return sha();
+      case CommitInfo::Field::PARENTS_SHA:
+         return parents().join(",");
+      case CommitInfo::Field::COMMITER:
+         return committer();
+      case CommitInfo::Field::AUTHOR:
+         return author();
+      case CommitInfo::Field::DATE:
+         return authorDate();
+      case CommitInfo::Field::SHORT_LOG:
+         return shortLog();
+      case CommitInfo::Field::LONG_LOG:
+         return longLog();
+      default:
+         return QString();
+   }
 }
 
 bool CommitInfo::isValid() const

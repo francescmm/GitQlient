@@ -3,15 +3,16 @@
 #include <QFrame>
 #include <QMap>
 
-class Git;
+class GitBase;
 class QVBoxLayout;
 class QPushButton;
 class QStackedWidget;
 class MergeInfoWidget;
 class QLineEdit;
 class QTextEdit;
-class RevisionFile;
 class FileDiffWidget;
+class RevisionFiles;
+class RevisionsCache;
 
 class MergeWidget : public QFrame
 {
@@ -21,12 +22,14 @@ signals:
    void signalMergeFinished();
 
 public:
-   explicit MergeWidget(const QSharedPointer<Git> git, QWidget *parent = nullptr);
+   explicit MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, const QSharedPointer<GitBase> &git,
+                        QWidget *parent = nullptr);
 
-   void configure();
+   void configure(const RevisionFiles &files);
 
 private:
-   QSharedPointer<Git> mGit;
+   QSharedPointer<RevisionsCache> mGitQlientCache;
+   QSharedPointer<GitBase> mGit;
    QVBoxLayout *mConflictBtnContainer = nullptr;
    QVBoxLayout *mAutoMergedBtnContainer = nullptr;
    QStackedWidget *mCenterStackedWidget = nullptr;
@@ -36,7 +39,7 @@ private:
    QPushButton *mAbortBtn = nullptr;
    QMap<QPushButton *, FileDiffWidget *> mConflictButtons;
 
-   void fillButtonFileList(const RevisionFile &files);
+   void fillButtonFileList(const RevisionFiles &files);
    void changeDiffView(bool fileBtnChecked);
    void abort();
    void commit();

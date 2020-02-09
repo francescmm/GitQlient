@@ -61,7 +61,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
 GitQlient::~GitQlient()
 {
-   QLog_Info("UI", "*            Closing GitQlient            *");
+   QLog_Info("UI", "*            Closing GitQlient            *\n\n");
 }
 
 void GitQlient::openRepo()
@@ -94,8 +94,13 @@ void GitQlient::setArgumentsPostInit(const QStringList &arguments)
 
 QStringList GitQlient::parseArguments(const QStringList &arguments)
 {
+   auto logLevel = LogLevel::Info;
+#ifdef DEBUG
+   logLevel = LogLevel::Debug;
+#endif
+
    const auto manager = QLoggerManager::getInstance();
-   manager->addDestination("GitQlient.log", { "UI", "Git" }, LogLevel::Debug);
+   manager->addDestination("GitQlient.log", { "UI", "Git" }, logLevel);
 
    if (arguments.contains("-noLog"))
       QLoggerManager::getInstance()->pause();
@@ -113,7 +118,21 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
             repos.append(arguments.at(i));
       }
       else
+      {
+         if (arguments.at(i) == "-logLevel")
+         {
+            const auto logLevel = arguments.at(++i).toInt();
+
+            if (logLevel >= static_cast<int>(QLogger::LogLevel::Trace)
+                && logLevel <= static_cast<int>(QLogger::LogLevel::Fatal))
+            {
+               const auto logger = QLoggerManager::getInstance();
+               logger->overwriteLogLevel(static_cast<LogLevel>(logLevel));
+            }
+         }
+
          ++i;
+      }
    }
 
    return repos;
@@ -123,11 +142,8 @@ void GitQlient::addRepoTab(const QString &repoPath)
 {
    if (!mCurrentRepos.contains(repoPath))
    {
-      const auto newRepo = new GitQlientRepo();
+      const auto newRepo = new GitQlientRepo(repoPath);
       connect(newRepo, &GitQlientRepo::signalRepoOpened, mConfigWidget, &ConfigWidget::updateRecentProjectsList);
-
-      newRepo->setRepository(repoPath);
-
       connect(newRepo, &GitQlientRepo::signalOpenSubmodule, this, [this](const QString &repoName) {
          const auto currentDir = dynamic_cast<GitQlientRepo *>(sender())->currentDir();
 

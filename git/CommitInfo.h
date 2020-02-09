@@ -32,12 +32,24 @@ enum class LaneType;
 class CommitInfo
 {
 public:
+   enum class Field
+   {
+      SHA,
+      PARENTS_SHA,
+      COMMITER,
+      AUTHOR,
+      DATE,
+      SHORT_LOG,
+      LONG_LOG
+   };
+
    CommitInfo() = default;
    CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
               const QString &log, const QString &longLog, int idx);
    CommitInfo(const QByteArray &b, int idx);
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;
+   QString getFieldStr(CommitInfo::Field field) const;
    bool isBoundary() const { return mBoundaryInfo == '-'; }
    int parentsCount() const { return mParentsSha.count(); }
    QString parent(int idx) const { return mParentsSha.count() > idx ? mParentsSha.at(idx) : QString(); }
@@ -54,6 +66,8 @@ public:
    QVector<LaneType> lanes;
    int orderIdx = -1;
    bool isDiffCache = false;
+
+   static const QString ZERO_SHA;
 
 private:
    QChar mBoundaryInfo;

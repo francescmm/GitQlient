@@ -1,7 +1,8 @@
 ﻿#include "FileBlameWidget.h"
 
+#include <RevisionsCache.h>
 #include <FileDiffView.h>
-#include <git.h>
+#include <GitHistory.h>
 #include <CommitInfo.h>
 #include <ClickableFrame.h>
 
@@ -22,8 +23,10 @@ qint64 kSecondsOldest = QDateTime::currentDateTime().toSecsSinceEpoch();
 qint64 kIncrementSecs = 0;
 }
 
-FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent)
+FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                                 QWidget *parent)
    : QFrame(parent)
+   , mCache(cache)
    , mGit(git)
    , mAnotation(new QFrame())
    , mCurrentSha(new QLabel())
@@ -72,7 +75,8 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<Git> &git, QWidget *parent
 void FileBlameWidget::setup(const QString &fileName, const QString &currentSha, const QString &previousSha)
 {
    mCurrentFile = fileName;
-   const auto ret = mGit->blame(mCurrentFile, currentSha);
+   QScopedPointer<GitHistory> git(new GitHistory(mGit));
+   const auto ret = git->blame(mCurrentFile, currentSha);
 
    if (ret.success && !ret.output.toString().startsWith("fatal:"))
    {
@@ -109,7 +113,7 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
    for (const auto &line : lines)
    {
       const auto fields = line.split("\t");
-      const auto revision = mGit->getCommitInfo(fields.at(0));
+      const auto revision = mCache->getCommitInfo(fields.at(0));
       const auto dt = QDateTime::fromString(fields.at(2), Qt::ISODate);
       const auto &lineNumAndContent = fields.at(3);
       const auto divisorChar = lineNumAndContent.indexOf(")");
@@ -118,7 +122,7 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
 
       annotations.append({ revision.sha(), QString(fields.at(1)).remove("("), dt, lineText.toInt(), content });
 
-      if (fields.at(0) != ZERO_SHA)
+      if (fields.at(0) != CommitInfo::ZERO_SHA)
       {
          const auto dtSinceEpoch = dt.toSecsSinceEpoch();
 
@@ -199,7 +203,7 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
 
 QLabel *FileBlameWidget::createDateLabel(const Annotation &annotation, bool isFirst)
 {
-   auto isWip = annotation.sha == ZERO_SHA;
+   auto isWip = annotation.sha == CommitInfo::ZERO_SHA;
    QString when;
 
    if (!isWip)
@@ -245,7 +249,7 @@ QLabel *FileBlameWidget::createAuthorLabel(const QString &author, bool isFirst)
 
 ClickableFrame *FileBlameWidget::createMessageLabel(const QString &sha, bool isFirst)
 {
-   const auto revision = mGit->getCommitInfo(sha);
+   const auto revision = mCache->getCommitInfo(sha);
    auto commitMsg = QString("Local changes");
 
    if (!revision.sha().isEmpty())
@@ -276,7 +280,7 @@ QLabel *FileBlameWidget::createNumLabel(const Annotation &annotation, int row)
    numberLabel->setObjectName("numberLabel");
    numberLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 
-   if (annotation.sha != ZERO_SHA)
+   if (annotation.sha != CommitInfo::ZERO_SHA)
    {
       const auto dtSinceEpoch = annotation.dateTime.toSecsSinceEpoch();
       const auto colorIndex = qCeil((kSecondsNewest - dtSinceEpoch) / kIncrementSecs);

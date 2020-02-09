@@ -1,6 +1,10 @@
 # General stuff
 CONFIG += qt warn_on c++17
+
+greaterThan(QT_MINOR_VERSION, 12) {
 QMAKE_CXXFLAGS += -Werror
+}
+
 TARGET = GitQlient
 QT += widgets core
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -29,9 +33,6 @@ OTHER_FILES += $$PWD/Tasks.txt \
 win32:VERSION = 1.0.0.0
 else:VERSION = 1.0.0
 
-DEFINES += \
-    VER=\\\"$$VERSION\\\" \
-    APP_NAME=\\\"$$TARGET\\\"
-
-RESOURCES += \
-    $$PWD/resources.qrc
+debug {
+   DEFINES += DEBUG
+}
