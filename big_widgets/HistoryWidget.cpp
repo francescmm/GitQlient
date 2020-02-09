@@ -207,12 +207,9 @@ void HistoryWidget::onBranchCheckout()
    const auto ret = gitBranches->getLastCommitOfBranch(mGit->getCurrentBranch());
 
    if (mChShowAllBranches->isChecked())
-   {
       mRepositoryView->focusOnCommit(ret.output.toString());
-      mBranchesWidget->showBranches();
-   }
-   else
-      emit signalUpdateCache();
+
+   emit signalUpdateCache();
 }
 
 void HistoryWidget::onCommitSelected(const QString &goToSha)
