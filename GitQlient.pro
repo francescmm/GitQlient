@@ -1,6 +1,10 @@
 # General stuff
 CONFIG += qt warn_on c++17
+
+greaterThan(QT_MINOR_VERSION, 12) {
 QMAKE_CXXFLAGS += -Werror
+}
+
 TARGET = GitQlient
 QT += widgets core
 DEFINES += QT_DEPRECATED_WARNINGS
