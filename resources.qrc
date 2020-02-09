@@ -1,0 +1,66 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="git_pull">resources/icons/git_pull.svg</file>
+        <file alias="git_push">resources/icons/git_push.svg</file>
+        <file alias="git_stash">resources/icons/git_stash.svg</file>
+        <file alias="git_pop">resources/icons/git_stash_pop.svg</file>
+        <file alias="go_to">resources/icons/go_to.svg</file>
+        <file alias="git">resources/icons/git.svg</file>
+        <file alias="git_orange">resources/icons/git_orange.svg</file>
+        <file alias="server">resources/icons/server.svg</file>
+        <file alias="stashes">resources/icons/stashes.svg</file>
+        <file alias="folder">resources/icons/folder.svg</file>
+        <file alias="local">resources/icons/local.svg</file>
+        <file alias="tags">resources/icons/tags.svg</file>
+        <file alias="file">resources/icons/file.svg</file>
+        <file alias="git_prune">resources/icons/git_prune.svg</file>
+        <file alias="pull_request">resources/icons/pull_requests.svg</file>
+        <file alias="arrow_down">resources/icons/arrow_down.svg</file>
+        <file alias="arrow_up">resources/icons/arrow_up.svg</file>
+        <file alias="staged">resources/icons/files_staged.svg</file>
+        <file alias="unstaged">resources/icons/files_unstaged.svg</file>
+        <file alias="submodules">resources/icons/submodules.svg</file>
+        <file alias="back">resources/icons/back.svg</file>
+        <file alias="go_down">resources/icons/go_down.svg</file>
+        <file alias="go_up">resources/icons/go_up.svg</file>
+        <file alias="home">resources/icons/home.svg</file>
+        <file alias="terminal">resources/icons/terminal.svg</file>
+        <file alias="open_repo">resources/icons/open_repo.svg</file>
+        <file alias="warning_error">resources/icons/warning_error.svg</file>
+        <file alias="close">resources/icons/remove-symbol.svg</file>
+        <file alias="close_hover">resources/icons/remove-symbol_hover.svg</file>
+        <file alias="close_press">resources/icons/remove-symbol_press.svg</file>
+        <file alias="add_tab">resources/icons/add_tab.svg</file>
+        <file alias="folder_indicator">resources/icons/folder_indicator.svg</file>
+        <file alias="repo_indicator">resources/icons/git_orange_indicator.svg</file>
+        <file alias="untracked">resources/icons/untracked.svg</file>
+        <file alias="git_apply">resources/icons/apply.svg</file>
+        <file alias="sign-in">resources/icons/sign-in.svg</file>
+        <file alias="squash">resources/icons/squash.svg</file>
+        <file alias="down-arrow">resources/icons/down-arrow.svg</file>
+        <file alias="up-arrow">resources/icons/up-arrow.svg</file>
+        <file alias="left-arrow">resources/icons/left-arrow.svg</file>
+        <file alias="right-arrow">resources/icons/right-arrow.svg</file>
+        <file alias="blame">resources/icons/blame.svg</file>
+        <file alias="config">resources/icons/cog-wheel-silhouette.svg</file>
+        <file alias="refresh">resources/icons/refresh-page-option.svg</file>
+        <file alias="diff">resources/icons/diff.svg</file>
+        <file alias="options">resources/icons/options.svg</file>
+        <file alias="commit-list">resources/icons/listing-option.svg</file>
+        <file alias="GitQlientLogoMedium">resources/icons/GitQlientLogoMedium.png</file>
+        <file alias="GitQlientLogo">resources/icons/GitQlientLogoLarge.png</file>
+        <file alias="GitQlientLogo32">resources/icons/GitQlientLogo32.png</file>
+        <file alias="GitQlientLogoSVG">resources/icons/GitQlientLogo.svg</file>
+        <file alias="GitQlientLogoIco">resources/icons/GitQlientLogo.ico</file>
+        <file alias="remove">resources/icons/remove.svg</file>
+        <file alias="add">resources/icons/add.svg</file>
+    </qresource>
+    <qresource prefix="/">
+        <file alias="stylesheet">resources/stylesheet.css</file>
+        <file alias="colors_bright">resources/stylesheet_colors_bright.css</file>
+        <file alias="colors_dark">resources/stylesheet_colors_dark.css</file>
+        <file alias="Ubuntu">resources/Ubuntu.ttf</file>
+        <file alias="UbuntuMono">resources/UbuntuMono.ttf</file>
+        <file>resources.rc</file>
+    </qresource>
+</RCC>

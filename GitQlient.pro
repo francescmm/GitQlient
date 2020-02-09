@@ -1,6 +1,10 @@
 # General stuff
 CONFIG += qt warn_on c++17
+
+greaterThan(QT_MINOR_VERSION, 12) {
 QMAKE_CXXFLAGS += -Werror
+}
+
 TARGET = GitQlient
 QT += widgets core
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -14,11 +18,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 # project files
 SOURCES += main.cpp
 
-include(app/GitQlient.pri)
+include(App.pri)
 include(QLogger/QLogger.pri)
 
-INCLUDEPATH += QLogger \
-    app
+INCLUDEPATH += QLogger
 
 OTHER_FILES += $$PWD/Tasks.txt \
     $$PWD/LICENSE \
@@ -26,3 +29,10 @@ OTHER_FILES += $$PWD/Tasks.txt \
     $$PWD/CONTRIBUTING.md \
     $$PWD/SETUP_BUILD.md \
     $$PWD/.travis.yml
+
+win32:VERSION = 1.0.0.0
+else:VERSION = 1.0.0
+
+debug {
+   DEFINES += DEBUG
+}
