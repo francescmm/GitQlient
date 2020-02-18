@@ -23,6 +23,25 @@
 
 using namespace QLogger;
 
+namespace
+{
+QTreeWidgetItem *getChild(QTreeWidgetItem *parent, const QString &childName)
+{
+   QTreeWidgetItem *child = nullptr;
+
+   if (parent)
+   {
+      const auto childrenCount = parent->childCount();
+
+      for (auto i = 0; i < childrenCount; ++i)
+         if (parent->child(i)->text(0) == childName)
+            child = parent->child(i);
+   }
+
+   return child;
+}
+}
+
 BranchesWidget::BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
@@ -257,23 +276,40 @@ void BranchesWidget::processLocalBranch(QString branch)
       isCurrentBranch = true;
    }
 
+   QString current;
    QTreeWidgetItem *parent = nullptr;
    auto folders = branch.split("/");
    branch = folders.takeLast();
 
    for (const auto &folder : folders)
    {
-      const auto childs = mLocalBranchesTree->findItems(folder, Qt::MatchExactly);
-      if (childs.isEmpty())
+      QTreeWidgetItem *child = nullptr;
+
+      if (parent)
+         child = getChild(parent, folder);
+      else
       {
-         QTreeWidgetItem *item = nullptr;
-         parent ? item = new QTreeWidgetItem(parent) : item = new QTreeWidgetItem(mLocalBranchesTree);
+         for (auto i = 0; i < mLocalBranchesTree->topLevelItemCount(); ++i)
+            if (mLocalBranchesTree->topLevelItem(i)->text(0) == folder)
+               child = mLocalBranchesTree->topLevelItem(i);
+      }
+
+      if (!child)
+      {
+         const auto item = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem();
          item->setText(0, folder);
 
+         if (!parent)
+            mLocalBranchesTree->addTopLevelItem(item);
+
          parent = item;
+         current = parent->text(0);
       }
       else
-         parent = childs.first();
+      {
+         parent = child;
+         current = parent->text(0);
+      }
    }
 
    auto item = new QTreeWidgetItem(parent);
