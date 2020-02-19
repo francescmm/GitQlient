@@ -343,16 +343,9 @@ void WorkInProgressWidget::addAllFilesToCommitList()
 
    for (; i >= 0; --i)
    {
-      const auto item = ui->unstagedFilesList->takeItem(i);
-      const auto fileWidget = qobject_cast<FileWidget *>(ui->unstagedFilesList->itemWidget(item));
-      ui->stagedFilesList->addItem(item);
-      ui->stagedFilesList->setItemWidget(item, fileWidget);
+      const auto item = ui->unstagedFilesList->item(i);
 
-      if (item->data(GitQlientRole::U_IsConflict).toBool())
-      {
-         fileWidget->setText(fileWidget->text().remove("(conflicts)").trimmed());
-         item->setData(GitQlientRole::U_Name, fileWidget->text().remove("(conflicts)").trimmed());
-      }
+      addFileToCommitList(item);
    }
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
