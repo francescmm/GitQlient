@@ -20,6 +20,7 @@ signals:
 public:
    explicit DiffWidget(const QSharedPointer<GitBase> git, const QSharedPointer<RevisionsCache> &cache,
                        QWidget *parent = nullptr);
+   ~DiffWidget();
    void reload();
 
    void clear() const;

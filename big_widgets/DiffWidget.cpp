@@ -70,6 +70,11 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, const QSharedPointer<R
    connect(mCommitDiffWidget, &CommitDiffWidget::signalShowFileHistory, this, &DiffWidget::signalShowFileHistory);
 }
 
+DiffWidget::~DiffWidget()
+{
+   mDiffButtons.clear();
+}
+
 void DiffWidget::reload()
 {
    if (centerStackedWidget->count() > 0)
