@@ -22,6 +22,12 @@ RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<RevisionsCac
 {
 }
 
+RepositoryViewDelegate::~RepositoryViewDelegate()
+{
+   mCache.reset();
+   mGit.reset();
+}
+
 void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
    p->setRenderHints(QPainter::Antialiasing);

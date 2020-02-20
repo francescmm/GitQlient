@@ -49,6 +49,7 @@ WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> 
    , mGit(git)
 {
    ui->setupUi(this);
+   setAttribute(Qt::WA_DeleteOnClose);
 
    ui->unstagedFilesList->setItemDelegate(new FileListDelegate(this));
    ui->stagedFilesList->setItemDelegate(new FileListDelegate(this));
@@ -78,6 +79,13 @@ WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> 
    connect(ui->stagedFilesList, &QListWidget::customContextMenuRequested, this, &WorkInProgressWidget::showStagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
    connect(ui->stagedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
+}
+
+WorkInProgressWidget::~WorkInProgressWidget()
+{
+   mGit.reset();
+   mCache.reset();
+   delete ui;
 }
 
 void WorkInProgressWidget::configure(const QString &sha)

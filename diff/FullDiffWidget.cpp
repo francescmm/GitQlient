@@ -3,7 +3,6 @@
 #include <CommitInfo.h>
 #include <GitHistory.h>
 #include <GitQlientStyles.h>
-#include <RevisionsCache.h>
 
 #include <QScrollBar>
 #include <QTextCharFormat>
@@ -62,6 +61,8 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *pare
    : QTextEdit(parent)
    , mGit(git)
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    diffHighlighter = new DiffHighlighter(this);
 
    QFont font;
@@ -72,6 +73,11 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *pare
    setLineWrapMode(QTextEdit::NoWrap);
    setReadOnly(true);
    setTextInteractionFlags(Qt::TextSelectableByMouse);
+}
+
+FullDiffWidget::~FullDiffWidget()
+{
+   mGit.reset();
 }
 
 void FullDiffWidget::reload()

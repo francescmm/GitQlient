@@ -15,8 +15,14 @@ static const QString GIT_LOG_FORMAT = "%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b 
 GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent)
    : QObject(parent)
    , mGitBase(gitBase)
-   , mRevCache(cache)
+   , mRevCache(std::move(cache))
 {
+}
+
+GitRepoLoader::~GitRepoLoader()
+{
+   mGitBase.reset();
+   mRevCache.reset();
 }
 
 bool GitRepoLoader::loadRepository()

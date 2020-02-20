@@ -3,7 +3,6 @@
 #include <CommitHistoryModel.h>
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryContextMenu.h>
-#include <RepositoryViewDelegate.h>
 #include <ShaFilterProxyModel.h>
 #include <GitBranches.h>
 #include <CommitInfo.h>
@@ -27,6 +26,8 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache
    setItemsExpandable(false);
    setMouseTracking(true);
    setSelectionMode(QAbstractItemView::ExtendedSelection);
+   setAttribute(Qt::WA_DeleteOnClose);
+
    header()->setSortIndicatorShown(false);
 
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
@@ -71,6 +72,9 @@ CommitHistoryView::~CommitHistoryView()
 {
    QSettings s;
    s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
+
+   mGit.reset();
+   mCache.reset();
 }
 
 void CommitHistoryView::setupGeometry()

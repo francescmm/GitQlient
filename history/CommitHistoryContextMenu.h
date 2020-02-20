@@ -42,6 +42,8 @@ public:
    explicit CommitHistoryContextMenu(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                      const QStringList &shas, QWidget *parent = nullptr);
 
+   ~CommitHistoryContextMenu();
+
 private:
    QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;

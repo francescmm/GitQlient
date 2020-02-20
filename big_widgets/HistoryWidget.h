@@ -12,6 +12,7 @@ class QStackedWidget;
 class WorkInProgressWidget;
 class CommitInfoWidget;
 class QCheckBox;
+class RepositoryViewDelegate;
 
 class HistoryWidget : public QFrame
 {
@@ -33,6 +34,7 @@ signals:
 public:
    explicit HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
                           QWidget *parent = nullptr);
+   ~HistoryWidget();
    void clear();
    void reload();
    void updateUiFromWatcher();
@@ -53,6 +55,7 @@ private:
    WorkInProgressWidget *mCommitWidget = nullptr;
    CommitInfoWidget *mRevisionWidget = nullptr;
    QCheckBox *mChShowAllBranches = nullptr;
+   RepositoryViewDelegate *mItemDelegate = nullptr;
 
    void search();
    void goToSha(const QString &sha);

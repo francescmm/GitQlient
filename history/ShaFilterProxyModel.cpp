@@ -6,6 +6,7 @@ ShaFilterProxyModel::ShaFilterProxyModel(QObject *parent)
    : QSortFilterProxyModel(parent)
 {
 }
+
 bool ShaFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
 

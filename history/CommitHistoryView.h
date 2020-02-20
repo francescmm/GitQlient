@@ -43,8 +43,9 @@ signals:
 public:
    explicit CommitHistoryView(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                               QWidget *parent = nullptr);
-   void setModel(QAbstractItemModel *model) override;
    ~CommitHistoryView() override;
+
+   void setModel(QAbstractItemModel *model) override;
    QList<QString> getSelectedShaList() const;
    void filterBySha(const QStringList &shaList);
    void activateFilter(bool activate) { mIsFiltering = activate; }

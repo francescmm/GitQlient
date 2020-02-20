@@ -16,16 +16,22 @@
 #include <QMenu>
 #include <QItemDelegate>
 
-FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, const QSharedPointer<RevisionsCache> &cache,
-                               QWidget *p)
+FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache, QWidget *p)
    : QListWidget(p)
    , mGit(git)
-   , mCache(cache)
+   , mCache(std::move(cache))
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
    setItemDelegate(new FileListDelegate(this));
+   setAttribute(Qt::WA_DeleteOnClose);
 
    connect(this, &FileListWidget::customContextMenuRequested, this, &FileListWidget::showContextMenu);
+}
+
+FileListWidget::~FileListWidget()
+{
+   mGit.reset();
+   mCache.reset();
 }
 
 void FileListWidget::addItem(const QString &label, const QColor &clr)
@@ -92,7 +98,7 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
             else
             {
                clr = files.statusCmp(i, RevisionFiles::DELETED) ? GitQlientStyles::getRed()
-                                                               : GitQlientStyles::getTextColor();
+                                                                : GitQlientStyles::getTextColor();
                fileName = files.getFile(i);
             }
 

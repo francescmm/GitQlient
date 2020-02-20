@@ -25,15 +25,17 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)
-   , mRepositoryModel(new CommitHistoryModel(cache, git))
-   , mRepositoryView(new CommitHistoryView(cache, git))
-   , mBranchesWidget(new BranchesWidget(QSharedPointer<GitBase>::create(git->getWorkingDir())))
+   , mRepositoryModel(new CommitHistoryModel(mCache, git))
+   , mRepositoryView(new CommitHistoryView(mCache, git))
+   , mBranchesWidget(new BranchesWidget(git))
    , mSearchInput(new QLineEdit())
    , mCommitStackedWidget(new QStackedWidget())
-   , mCommitWidget(new WorkInProgressWidget(cache, git))
-   , mRevisionWidget(new CommitInfoWidget(cache, git))
+   , mCommitWidget(new WorkInProgressWidget(mCache, git))
+   , mRevisionWidget(new CommitInfoWidget(mCache, git))
    , mChShowAllBranches(new QCheckBox(tr("Show all branches")))
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    mCommitStackedWidget->setCurrentIndex(0);
    mCommitStackedWidget->addWidget(mRevisionWidget);
    mCommitStackedWidget->addWidget(mCommitWidget);
@@ -51,7 +53,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
    mRepositoryView->setModel(mRepositoryModel);
-   mRepositoryView->setItemDelegate(new RepositoryViewDelegate(cache, git, mRepositoryView));
+   mRepositoryView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, git, mRepositoryView));
    mRepositoryView->setEnabled(true);
 
    connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &HistoryWidget::signalViewUpdated);
@@ -94,6 +96,15 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    layout->addWidget(mBranchesWidget);
 
    setLayout(layout);
+}
+
+HistoryWidget::~HistoryWidget()
+{
+   delete mItemDelegate;
+   mGit.reset();
+   mCache.reset();
+
+   delete mRepositoryModel;
 }
 
 void HistoryWidget::clear()

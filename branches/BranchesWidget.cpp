@@ -9,7 +9,6 @@
 #include <ClickableFrame.h>
 #include <AddSubmoduleDlg.h>
 #include <StashesContextMenu.h>
-#include <RevisionsCache.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -56,6 +55,8 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *pare
    , mSubmodulesCount(new QLabel("(0)"))
    , mSubmodulesArrow(new QLabel())
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    mLocalBranchesTree->setLocalRepo(true);
    // mLocalBranchesTree->setColumnHidden(0, true);
    mLocalBranchesTree->setMouseTracking(true);

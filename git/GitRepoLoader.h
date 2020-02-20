@@ -42,6 +42,8 @@ signals:
 public:
    explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache,
                           QObject *parent = nullptr);
+   ~GitRepoLoader();
+
    bool loadRepository();
    void updateWipRevision();
    void cancelAll();

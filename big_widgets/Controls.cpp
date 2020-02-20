@@ -29,6 +29,8 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    , mStashBtn(new QToolButton())
    , mRefreshBtn(new QToolButton())
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    mHistory->setCheckable(true);
    mHistory->setIcon(QIcon(":/icons/git_orange"));
    mHistory->setIconSize(QSize(22, 22));

@@ -23,9 +23,11 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    , labelAuthor(new QLabel())
    , labelDateTime(new QLabel())
    , labelEmail(new QLabel())
-   , fileListWidget(new FileListWidget(mGit, cache))
+   , fileListWidget(new FileListWidget(mGit, mCache))
    , labelModCount(new QLabel())
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    labelSha->setObjectName("labelSha");
    labelSha->setAlignment(Qt::AlignCenter);
    labelSha->setWordWrap(true);
@@ -84,6 +86,12 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { emit signalOpenFileCommit(mCurrentSha, mParentSha, item->text()); });
    connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitInfoWidget::signalShowFileHistory);
+}
+
+CommitInfoWidget::~CommitInfoWidget()
+{
+   mCache.reset();
+   mGit.reset();
 }
 
 void CommitInfoWidget::configure(const QString &sha)

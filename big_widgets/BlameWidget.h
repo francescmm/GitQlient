@@ -35,6 +35,7 @@ class CommitHistoryModel;
 class CommitHistoryView;
 class QTabWidget;
 class QModelIndex;
+class RepositoryViewDelegate;
 
 class BlameWidget : public QFrame
 {
@@ -46,6 +47,7 @@ signals:
 public:
    explicit BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                         QWidget *parent = nullptr);
+   ~BlameWidget();
 
    void init(const QString &workingDirectory);
    void showFileHistory(const QModelIndex &index);
@@ -62,6 +64,7 @@ private:
    QTabWidget *mTabWidget = nullptr;
    QString mWorkingDirectory;
    QMap<QString, FileBlameWidget *> mTabsMap;
+   RepositoryViewDelegate *mItemDelegate = nullptr;
    int mSelectedRow = -1;
 
    void showFileSystemContextMenu(const QPoint &pos);

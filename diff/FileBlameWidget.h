@@ -43,13 +43,15 @@ public:
    explicit FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                             QWidget *parent = nullptr);
 
+   ~FileBlameWidget();
+
    void setup(const QString &fileName, const QString &currentSha, const QString &previousSha);
    void reload(const QString &currentSha, const QString &previousSha);
    QString getCurrentSha() const;
    QString getCurrentFile() const { return mCurrentFile; }
 
 private:
-   const QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
    QFrame *mAnotation = nullptr;
    QLabel *mCurrentSha = nullptr;

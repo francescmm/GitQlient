@@ -51,6 +51,8 @@ public:
    explicit WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent = nullptr);
 
+   ~WorkInProgressWidget();
+
    void configure(const QString &sha);
    void clear();
    bool isAmendActive() const { return mIsAmend; }

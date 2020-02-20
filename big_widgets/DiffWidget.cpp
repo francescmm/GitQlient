@@ -14,12 +14,14 @@
 
 using namespace QLogger;
 
-DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, const QSharedPointer<RevisionsCache> &cache, QWidget *parent)
+DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , centerStackedWidget(new QStackedWidget())
-   , mCommitDiffWidget(new CommitDiffWidget(mGit, cache))
+   , mCommitDiffWidget(new CommitDiffWidget(mGit, std::move(cache)))
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    centerStackedWidget->setCurrentIndex(0);
    centerStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
    connect(centerStackedWidget, &QStackedWidget::currentChanged, this, [this](int index) {
@@ -73,6 +75,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, const QSharedPointer<R
 DiffWidget::~DiffWidget()
 {
    mDiffButtons.clear();
+   mGit.reset();
 }
 
 void DiffWidget::reload()

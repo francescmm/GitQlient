@@ -44,6 +44,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    QLog_Info("UI", QString("Initializing GitQlient"));
 
    setObjectName("mainWindow");
@@ -97,6 +99,13 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    mGitLoader->setShowAll(settings.value("ShowAllBranches", true).toBool());
 
    setRepository(repoPath);
+}
+
+GitQlientRepo::~GitQlientRepo()
+{
+   mGitLoader.reset();
+   mGitQlientCache.reset();
+   mGitBase.reset();
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)

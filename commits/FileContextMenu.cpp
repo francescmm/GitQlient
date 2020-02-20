@@ -7,9 +7,10 @@
 FileContextMenu::FileContextMenu(const QString &file, QWidget *parent)
    : QMenu(parent)
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    const auto fileHistoryAction = addAction(tr("History"));
    fileHistoryAction->setEnabled(false);
-   // connect(fileHistoryAction, &QAction::triggered, this, &FileList::executeAction);
 
    connect(addAction(tr("Blame")), &QAction::triggered, this, &FileContextMenu::signalShowFileHistory);
 

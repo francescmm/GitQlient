@@ -4,7 +4,6 @@
 #include <FileDiffView.h>
 #include <FileDiffHighlighter.h>
 #include <CommitInfo.h>
-#include <RevisionsCache.h>
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -18,6 +17,8 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QWidget *pare
    , mGoNext(new QPushButton())
 
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    mDiffHighlighter = new FileDiffHighlighter(mDiffView->document());
 
    mGoPrevious->setIcon(QIcon(":/icons/go_up"));

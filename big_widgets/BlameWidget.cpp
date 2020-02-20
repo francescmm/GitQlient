@@ -35,7 +35,7 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::GRAPH), true);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::DATE), true);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::AUTHOR), true);
-   mRepoView->setItemDelegate(new RepositoryViewDelegate(cache, mGit, mRepoView));
+   mRepoView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, mGit, mRepoView));
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(450);
    mRepoView->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -71,6 +71,16 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
       mTabWidget->removeTab(index);
       delete widget;
    });
+
+   setAttribute(Qt::WA_DeleteOnClose);
+}
+
+BlameWidget::~BlameWidget()
+{
+   delete mRepoModel;
+   mCache.reset();
+   mGit.reset();
+   delete mItemDelegate;
 }
 
 void BlameWidget::init(const QString &workingDirectory)

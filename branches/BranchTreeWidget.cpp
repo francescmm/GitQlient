@@ -12,6 +12,7 @@ BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitBase> &git, QWidget *
    , mGit(git)
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
+   setAttribute(Qt::WA_DeleteOnClose);
 
    connect(this, &BranchTreeWidget::customContextMenuRequested, this, &BranchTreeWidget::showBranchesContextMenu);
    connect(this, &BranchTreeWidget::itemClicked, this, &BranchTreeWidget::selectCommit);

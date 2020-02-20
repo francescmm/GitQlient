@@ -62,6 +62,7 @@ signals:
 
 public:
    explicit GitQlientRepo(const QString &repoPath, QWidget *parent = nullptr);
+   ~GitQlientRepo();
 
    bool isOpened();
    void setConfig(const GitQlientRepoConfig &config);

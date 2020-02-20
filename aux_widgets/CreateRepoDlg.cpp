@@ -34,6 +34,8 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
    GitQlientSettings settings;
    const auto configGitUser = settings.value("GitConfigRepo", true).toBool();
    ui->cbGitUser->setChecked(configGitUser);
+
+   setAttribute(Qt::WA_DeleteOnClose);
 }
 
 CreateRepoDlg::~CreateRepoDlg()

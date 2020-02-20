@@ -32,6 +32,8 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, co
    , mCurrentSha(new QLabel())
    , mPreviousSha(new QLabel())
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    mAnotation->setObjectName("AnnotationFrame");
 
    auto initialLayout = new QGridLayout(mAnotation);
@@ -70,6 +72,12 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, co
    layout->setSpacing(10);
    layout->addLayout(shasLayout);
    layout->addWidget(mScrollArea);
+}
+
+FileBlameWidget::~FileBlameWidget()
+{
+   mGit.reset();
+   mCache.reset();
 }
 
 void FileBlameWidget::setup(const QString &fileName, const QString &currentSha, const QString &previousSha)

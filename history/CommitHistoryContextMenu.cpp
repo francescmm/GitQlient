@@ -30,10 +30,18 @@ CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<Revision
    , mGit(git)
    , mShas(shas)
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    if (shas.count() == 1)
       createIndividualShaMenu();
    else
       createMultipleShasMenu();
+}
+
+CommitHistoryContextMenu::~CommitHistoryContextMenu()
+{
+   mCache.reset();
+   mGit.reset();
 }
 
 void CommitHistoryContextMenu::createIndividualShaMenu()
