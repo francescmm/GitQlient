@@ -26,8 +26,6 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    , mRepos(new QTabWidget())
    , mConfigWidget(new ConfigWidget())
 {
-   setAttribute(Qt::WA_DeleteOnClose);
-
    const auto repos = parseArguments(arguments);
 
    QLog_Info("UI", "*******************************************");
@@ -202,6 +200,5 @@ void GitQlient::closeTab(int tabIndex)
 
    mCurrentRepos.remove(repoToRemove->currentDir());
    mRepos->removeTab(tabIndex);
-   repoToRemove->setParent(nullptr);
    repoToRemove->close();
 }
