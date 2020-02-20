@@ -83,8 +83,6 @@ WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> 
 
 WorkInProgressWidget::~WorkInProgressWidget()
 {
-   mGit.reset();
-   mCache.reset();
    delete ui;
 }
 

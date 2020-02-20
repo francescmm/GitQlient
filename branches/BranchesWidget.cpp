@@ -58,7 +58,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *pare
    setAttribute(Qt::WA_DeleteOnClose);
 
    mLocalBranchesTree->setLocalRepo(true);
-   // mLocalBranchesTree->setColumnHidden(0, true);
    mLocalBranchesTree->setMouseTracking(true);
    mLocalBranchesTree->setItemDelegate(new BranchesViewDelegate());
    mLocalBranchesTree->setColumnCount(3);

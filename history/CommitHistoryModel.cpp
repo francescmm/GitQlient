@@ -24,8 +24,6 @@ CommitHistoryModel::CommitHistoryModel(const QSharedPointer<RevisionsCache> &cac
 CommitHistoryModel::~CommitHistoryModel()
 {
    clear();
-   mCache.reset();
-   mGit.reset();
 }
 
 int CommitHistoryModel::rowCount(const QModelIndex &parent) const

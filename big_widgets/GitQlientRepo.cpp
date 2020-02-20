@@ -103,9 +103,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
 GitQlientRepo::~GitQlientRepo()
 {
-   mGitLoader.reset();
-   mGitQlientCache.reset();
-   mGitBase.reset();
+   delete mAutoFetch;
+   delete mAutoFilesUpdate;
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)

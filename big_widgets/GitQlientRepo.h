@@ -35,7 +35,6 @@ class Controls;
 class HistoryWidget;
 class RevsView;
 class BlameWidget;
-class FileDiffHighlighter;
 class QTimer;
 class ProgressDlg;
 class DiffWidget;
@@ -74,7 +73,6 @@ protected:
    void closeEvent(QCloseEvent *ce) override;
 
 private:
-   FileDiffHighlighter *mDiffHighlighter = nullptr;
    QString mCurrentDir;
    QSharedPointer<RevisionsCache> mGitQlientCache;
    QSharedPointer<GitBase> mGitBase;

@@ -19,8 +19,6 @@ public:
    explicit CommitDiffWidget(QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache,
                              QWidget *parent = nullptr);
 
-   ~CommitDiffWidget() { mGit.reset(); }
-
    void configure(const QString &firstSha, const QString &secondSha);
 
 private:

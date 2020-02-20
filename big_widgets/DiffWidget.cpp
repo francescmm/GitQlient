@@ -24,17 +24,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
 
    centerStackedWidget->setCurrentIndex(0);
    centerStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-   connect(centerStackedWidget, &QStackedWidget::currentChanged, this, [this](int index) {
-      const auto widget = centerStackedWidget->widget(index);
-
-      for (const auto &buttons : qAsConst(mDiffButtons))
-      {
-         if (buttons.first == widget)
-            buttons.second->setSelected();
-         else
-            buttons.second->setUnselected();
-      }
-   });
+   connect(centerStackedWidget, &QStackedWidget::currentChanged, this, &DiffWidget::changeSelection);
 
    mCommitDiffWidget->setVisible(false);
 
@@ -75,7 +65,6 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
 DiffWidget::~DiffWidget()
 {
    mDiffButtons.clear();
-   mGit.reset();
 }
 
 void DiffWidget::reload()
@@ -217,5 +206,18 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       diff->reload();
       pair.second->setSelected();
       centerStackedWidget->setCurrentWidget(diff);
+   }
+}
+
+void DiffWidget::changeSelection(int index)
+{
+   const auto widget = centerStackedWidget->widget(index);
+
+   for (const auto &buttons : qAsConst(mDiffButtons))
+   {
+      if (buttons.first == widget)
+         buttons.second->setSelected();
+      else
+         buttons.second->setUnselected();
    }
 }

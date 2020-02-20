@@ -28,12 +28,6 @@ FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    connect(this, &FileListWidget::customContextMenuRequested, this, &FileListWidget::showContextMenu);
 }
 
-FileListWidget::~FileListWidget()
-{
-   mGit.reset();
-   mCache.reset();
-}
-
 void FileListWidget::addItem(const QString &label, const QColor &clr)
 {
    const auto item = new QListWidgetItem(label, this);

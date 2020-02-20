@@ -72,9 +72,6 @@ CommitHistoryView::~CommitHistoryView()
 {
    QSettings s;
    s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
-
-   mGit.reset();
-   mCache.reset();
 }
 
 void CommitHistoryView::setupGeometry()

@@ -20,7 +20,8 @@ signals:
 public:
    explicit DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache,
                        QWidget *parent = nullptr);
-   ~DiffWidget();
+   ~DiffWidget() override;
+
    void reload();
 
    void clear() const;
@@ -33,4 +34,6 @@ private:
    QMap<QString, QPair<QFrame *, DiffButton *>> mDiffButtons;
    QVBoxLayout *mDiffButtonsContainer = nullptr;
    CommitDiffWidget *mCommitDiffWidget = nullptr;
+
+   void changeSelection(int index);
 };

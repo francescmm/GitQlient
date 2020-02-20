@@ -88,12 +88,6 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitInfoWidget::signalShowFileHistory);
 }
 
-CommitInfoWidget::~CommitInfoWidget()
-{
-   mCache.reset();
-   mGit.reset();
-}
-
 void CommitInfoWidget::configure(const QString &sha)
 {
    if (sha == mCurrentSha)

@@ -38,7 +38,6 @@ signals:
 public:
    explicit FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
                            QWidget *parent = nullptr);
-   ~FileListWidget();
 
    void insertFiles(const QString &currentSha, const QString &compareToSha);
 

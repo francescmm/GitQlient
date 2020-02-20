@@ -19,12 +19,6 @@ GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<Rev
 {
 }
 
-GitRepoLoader::~GitRepoLoader()
-{
-   mGitBase.reset();
-   mRevCache.reset();
-}
-
 bool GitRepoLoader::loadRepository()
 {
    if (mLocked)

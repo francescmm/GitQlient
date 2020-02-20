@@ -74,12 +74,6 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, co
    layout->addWidget(mScrollArea);
 }
 
-FileBlameWidget::~FileBlameWidget()
-{
-   mGit.reset();
-   mCache.reset();
-}
-
 void FileBlameWidget::setup(const QString &fileName, const QString &currentSha, const QString &previousSha)
 {
    mCurrentFile = fileName;

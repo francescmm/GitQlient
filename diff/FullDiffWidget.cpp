@@ -75,11 +75,6 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *pare
    setTextInteractionFlags(Qt::TextSelectableByMouse);
 }
 
-FullDiffWidget::~FullDiffWidget()
-{
-   mGit.reset();
-}
-
 void FullDiffWidget::reload()
 {
    if (mCurrentSha != CommitInfo::ZERO_SHA)

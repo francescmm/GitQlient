@@ -48,7 +48,6 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
-   // fileSystemView->setItemDelegate(new BranchesViewDelegate());
    fileSystemView->setModel(fileSystemModel);
    fileSystemView->setMaximumWidth(450);
    fileSystemView->header()->setSectionHidden(1, true);
@@ -78,9 +77,8 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
 BlameWidget::~BlameWidget()
 {
    delete mRepoModel;
-   mCache.reset();
-   mGit.reset();
    delete mItemDelegate;
+   delete fileSystemModel;
 }
 
 void BlameWidget::init(const QString &workingDirectory)

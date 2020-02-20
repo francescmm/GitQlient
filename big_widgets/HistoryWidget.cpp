@@ -101,9 +101,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
 HistoryWidget::~HistoryWidget()
 {
    delete mItemDelegate;
-   mGit.reset();
-   mCache.reset();
-
    delete mRepositoryModel;
 }
 

@@ -42,8 +42,6 @@ public:
    RepositoryViewDelegate(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                           CommitHistoryView *view);
 
-   ~RepositoryViewDelegate();
-
    virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const override;
    virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override
    {

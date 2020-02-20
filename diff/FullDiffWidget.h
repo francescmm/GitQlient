@@ -41,7 +41,6 @@ class FullDiffWidget : public QTextEdit
 
 public:
    explicit FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
-   ~FullDiffWidget();
 
    void reload();
    void loadDiff(const QString &sha, const QString &diffToSha);

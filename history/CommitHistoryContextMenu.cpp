@@ -38,12 +38,6 @@ CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<Revision
       createMultipleShasMenu();
 }
 
-CommitHistoryContextMenu::~CommitHistoryContextMenu()
-{
-   mCache.reset();
-   mGit.reset();
-}
-
 void CommitHistoryContextMenu::createIndividualShaMenu()
 {
    if (mShas.count() == 1)
