@@ -132,14 +132,15 @@ void WorkInProgressWidget::resetInfo(bool force)
    }
 
    RevisionFiles files;
+   const auto wipCommit = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   if (mCache->containsRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0)))
-      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
+   if (mCache->containsRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0)))
+      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
    else if (revInfo.parentsCount() > 0)
    {
       QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));
       git->updateWipRevision();
-      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
+      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
    }
 
    if (!force || (mIsAmend && force))
