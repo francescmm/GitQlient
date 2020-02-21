@@ -28,6 +28,6 @@ deploy:
   draft: true
   on:
     condition: $TRAVIS_OS_NAME = linux
-    #tags: true
+    tags: true
     repo: francescmm/GitQlient
-    branch: feature/AppImage
+    branch: master
