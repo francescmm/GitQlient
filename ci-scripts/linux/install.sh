@@ -1,3 +1,4 @@
+sudo apt-get -qq update
 sudo apt-get -qq install libgl1-mesa-dev
 sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
 sudo add-apt-repository -y ppa:jonathonf/gcc-7.1
