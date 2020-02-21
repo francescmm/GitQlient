@@ -30,8 +30,10 @@ OTHER_FILES += $$PWD/Tasks.txt \
     $$PWD/SETUP_BUILD.md \
     $$PWD/.travis.yml
 
-win32:VERSION = 1.0.0.0
-else:VERSION = 1.0.0
+VERSION = 1.0.0
+
+DEFINES += \
+    VER=\\\"$$VERSION\\\"
 
 debug {
    DEFINES += DEBUG

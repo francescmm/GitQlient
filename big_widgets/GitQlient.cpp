@@ -30,7 +30,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
    QLog_Info("UI", "*******************************************");
    QLog_Info("UI", "*          GitQlient has started          *");
-   QLog_Info("UI", QString("*                 %1                 *").arg(VER));
+   QLog_Info("UI", QString("*                  %1                  *").arg(VER));
    QLog_Info("UI", "*******************************************");
 
    QFile styles(":/stylesheet");

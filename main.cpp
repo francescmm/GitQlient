@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 
    QApplication::setOrganizationName("CescSoftware");
    QApplication::setOrganizationDomain("francescmm.com");
-   QApplication::setApplicationName(APP_NAME);
+   QApplication::setApplicationName("GitQlient");
    QApplication::setWindowIcon(QIcon(":/icons/GitQlientLogoIco"));
 
    QFontDatabase::addApplicationFont(":/Ubuntu");
