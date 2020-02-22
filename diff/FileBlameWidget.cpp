@@ -12,6 +12,8 @@
 #include <QtMath>
 #include <QMessageBox>
 
+#include <array>
+
 namespace
 {
 const int kTotalColors = 8;

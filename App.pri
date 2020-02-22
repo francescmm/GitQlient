@@ -10,4 +10,4 @@ include($$PWD/history/History.pri)
 RESOURCES += \
     $$PWD/resources.qrc
 
-RC_FILE = resources.rc
+RC_FILE = $$PWD/resources.rc
