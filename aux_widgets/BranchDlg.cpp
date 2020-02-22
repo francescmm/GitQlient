@@ -50,8 +50,6 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
    connect(ui->leNewName, &QLineEdit::returnPressed, this, &BranchDlg::accept);
    connect(ui->pbAccept, &QPushButton::clicked, this, &BranchDlg::accept);
    connect(ui->pbCancel, &QPushButton::clicked, this, &BranchDlg::reject);
-
-   setAttribute(Qt::WA_DeleteOnClose);
 }
 
 BranchDlg::~BranchDlg()

@@ -11,8 +11,6 @@ AddSubmoduleDlg::AddSubmoduleDlg(const QSharedPointer<GitSubmodules> &git, QWidg
    , ui(new Ui::AddSubmoduleDlg)
    , mGit(git)
 {
-   setAttribute(Qt::WA_DeleteOnClose);
-
    ui->setupUi(this);
 
    connect(ui->lePath, &QLineEdit::returnPressed, this, &AddSubmoduleDlg::accept);

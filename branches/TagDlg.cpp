@@ -12,7 +12,6 @@ TagDlg::TagDlg(const QSharedPointer<GitBase> &git, const QString &sha, QWidget *
    , mGit(git)
    , mSha(sha)
 {
-   setAttribute(Qt::WA_DeleteOnClose);
    setStyleSheet(GitQlientStyles::getStyles());
 
    ui->setupUi(this);
