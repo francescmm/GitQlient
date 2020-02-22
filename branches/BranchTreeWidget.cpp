@@ -58,11 +58,5 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 void BranchTreeWidget::selectCommit(QTreeWidgetItem *item)
 {
    if (item->data(0, Qt::UserRole + 2).toBool())
-   {
-      const auto branchName = item->data(0, Qt::UserRole + 1).toString();
-      QScopedPointer<GitBranches> git(new GitBranches(mGit));
-      const auto ret = git->getLastCommitOfBranch(branchName);
-
-      emit signalSelectCommit(ret.output.toString());
-   }
+      emit signalSelectCommit(item->data(0, Qt::UserRole + 3).toString());
 }

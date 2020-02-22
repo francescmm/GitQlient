@@ -65,6 +65,10 @@ void BranchesViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &o, con
    QFontMetrics fm(newOpt.font);
 
    newOpt.font.setBold(i.data(Qt::UserRole).toBool());
+
+   if (i.data().toString() == "detached")
+      newOpt.font.setItalic(true);
+
    p->setFont(newOpt.font);
 
    const auto elidedText = fm.elidedText(i.data().toString(), Qt::ElideRight, newOpt.rect.width());
