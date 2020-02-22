@@ -54,11 +54,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
 
    setLayout(layout);
 
-   connect(mCommitDiffWidget, &CommitDiffWidget::signalOpenFileCommit, this,
-           [this](const QString &currentSha, const QString &previousSha, const QString &file) {
-              loadFileDiff(currentSha, previousSha, file);
-           });
-
+   connect(mCommitDiffWidget, &CommitDiffWidget::signalOpenFileCommit, this, &DiffWidget::loadFileDiff);
    connect(mCommitDiffWidget, &CommitDiffWidget::signalShowFileHistory, this, &DiffWidget::signalShowFileHistory);
 }
 
@@ -101,14 +97,14 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
          const auto diffButton = new DiffButton(id, ":/icons/file");
          diffButton->setSelected();
 
-         for (const auto buttons : qAsConst(mDiffButtons))
+         for (const auto &buttons : qAsConst(mDiffButtons))
             buttons.second->setUnselected();
 
          connect(diffButton, &DiffButton::clicked, this, [this, fileDiffWidget, diffButton]() {
             centerStackedWidget->setCurrentWidget(fileDiffWidget);
             mCommitDiffWidget->configure(fileDiffWidget->getCurrentSha(), fileDiffWidget->getPreviousSha());
 
-            for (const auto buttons : qAsConst(mDiffButtons))
+            for (const auto &buttons : qAsConst(mDiffButtons))
                if (buttons.second != diffButton)
                   buttons.second->setUnselected();
          });
@@ -118,7 +114,10 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
             mDiffButtons.remove(id);
 
             if (mDiffButtons.count() == 0)
+            {
                mCommitDiffWidget->setVisible(false);
+               emit signalDiffEmpty();
+            }
          });
 
          mDiffButtonsContainer->addWidget(diffButton);
@@ -142,7 +141,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
    }
    else
    {
-      for (const auto buttons : qAsConst(mDiffButtons))
+      for (const auto &buttons : qAsConst(mDiffButtons))
          buttons.second->setUnselected();
 
       const auto &pair = mDiffButtons.value(id);
@@ -168,14 +167,14 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       const auto diffButton = new DiffButton(id, ":/icons/commit-list");
       diffButton->setSelected();
 
-      for (const auto buttons : qAsConst(mDiffButtons))
+      for (const auto &buttons : qAsConst(mDiffButtons))
          buttons.second->setUnselected();
 
       connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton]() {
          centerStackedWidget->setCurrentWidget(fullDiffWidget);
          mCommitDiffWidget->configure(fullDiffWidget->getCurrentSha(), fullDiffWidget->getPreviousSha());
 
-         for (const auto buttons : qAsConst(mDiffButtons))
+         for (const auto &buttons : qAsConst(mDiffButtons))
             if (buttons.second != diffButton)
                buttons.second->setUnselected();
       });
@@ -185,7 +184,10 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
          mDiffButtons.remove(id);
 
          if (mDiffButtons.count() == 0)
+         {
             mCommitDiffWidget->setVisible(false);
+            emit signalDiffEmpty();
+         }
       });
       mDiffButtonsContainer->addWidget(diffButton);
       mDiffButtons.insert(id, { fullDiffWidget, diffButton });
@@ -198,7 +200,7 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
    }
    else
    {
-      for (const auto buttons : qAsConst(mDiffButtons))
+      for (const auto &buttons : qAsConst(mDiffButtons))
          buttons.second->setUnselected();
 
       const auto &pair = mDiffButtons.value(id);

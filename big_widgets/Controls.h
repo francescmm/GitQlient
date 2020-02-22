@@ -51,6 +51,9 @@ public:
    void setCurrentSha(const QString &sha) { mCurrentSha = sha; }
    void enableButtons(bool enabled);
    void fetchAll();
+   void disableDiff();
+   void enableDiff();
+   ControlsMainViews getCurrentSelectedButton() const;
 
 private:
    QString mCurrentSha;

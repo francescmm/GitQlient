@@ -87,6 +87,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mHistoryWidget, &HistoryWidget::signalOpenFileCommit, this, &GitQlientRepo::loadFileDiff);
 
    connect(mDiffWidget, &DiffWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
+   connect(mDiffWidget, &DiffWidget::signalDiffEmpty, mControls, &Controls::disableDiff);
+   connect(mDiffWidget, &DiffWidget::signalDiffEmpty, this, &GitQlientRepo::showPreviousView);
 
    connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::loadFileDiff);
 
@@ -292,25 +294,40 @@ void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previ
    const auto loaded = mDiffWidget->loadFileDiff(currentSha, previousSha, file);
 
    if (loaded)
+   {
+      mControls->enableDiff();
       showDiffView();
+   }
 }
 
 void GitQlientRepo::showHistoryView()
 {
+   mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
+
    mStackedLayout->setCurrentWidget(mHistoryWidget);
    mControls->toggleButton(ControlsMainViews::HISTORY);
 }
 
 void GitQlientRepo::showBlameView()
 {
+   mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
+
    mStackedLayout->setCurrentWidget(mBlameWidget);
    mControls->toggleButton(ControlsMainViews::BLAME);
 }
 
 void GitQlientRepo::showDiffView()
 {
+   mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
+
    mStackedLayout->setCurrentWidget(mDiffWidget);
    mControls->toggleButton(ControlsMainViews::DIFF);
+}
+
+void GitQlientRepo::showPreviousView()
+{
+   mStackedLayout->setCurrentWidget(mPreviousView.second);
+   mControls->toggleButton(mPreviousView.first);
 }
 
 void GitQlientRepo::openCommitDiff()
@@ -319,6 +336,7 @@ void GitQlientRepo::openCommitDiff()
    const auto rev = mGitQlientCache->getCommitInfo(currentSha);
 
    mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
+   mControls->enableDiff();
 
    showDiffView();
 }
@@ -326,7 +344,7 @@ void GitQlientRepo::openCommitDiff()
 void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
 {
    mDiffWidget->loadCommitDiff(shas.last(), shas.first());
-
+   mControls->enableDiff();
    showDiffView();
 }
 

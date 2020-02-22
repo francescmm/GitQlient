@@ -42,6 +42,7 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    mDiff->setIconSize(QSize(22, 22));
    mDiff->setText("Diff");
    mDiff->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mDiff->setEnabled(false);
 
    mBlame->setCheckable(true);
    mBlame->setIcon(QIcon(":/icons/blame"));
@@ -197,6 +198,21 @@ void Controls::fetchAll()
 
    if (ret)
       emit signalRepositoryUpdated();
+}
+
+void Controls::disableDiff()
+{
+   mDiff->setDisabled(true);
+}
+
+void Controls::enableDiff()
+{
+   mDiff->setEnabled(true);
+}
+
+ControlsMainViews Controls::getCurrentSelectedButton() const
+{
+   return mBlame->isChecked() ? ControlsMainViews::BLAME : ControlsMainViews::HISTORY;
 }
 
 void Controls::pushCurrentBranch()

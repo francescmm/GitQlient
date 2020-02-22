@@ -16,6 +16,7 @@ class DiffWidget : public QFrame
 
 signals:
    void signalShowFileHistory(const QString &fileName);
+   void signalDiffEmpty();
 
 public:
    explicit DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache,
