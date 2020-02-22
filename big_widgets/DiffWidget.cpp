@@ -61,6 +61,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
 DiffWidget::~DiffWidget()
 {
    mDiffButtons.clear();
+   blockSignals(true);
 }
 
 void DiffWidget::reload()
