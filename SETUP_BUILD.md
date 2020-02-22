@@ -4,7 +4,7 @@
 
 ### Qt
 
-GitQlient is being developed with [Qt 5.13](https://www.qt.io/download-qt-installer). Despite is not tested, any versions from 5.9 should be ok.
+GitQlient is being developed with the latest version of Qt, currently [Qt 5.14](https://www.qt.io/download-qt-installer). Despite is not tested, any versions from 5.12 should be ok.
 
 The plan for the near future is to test for every major version from 5.9 to the latest.
 
