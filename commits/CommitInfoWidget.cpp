@@ -98,7 +98,7 @@ void CommitInfoWidget::configure(const QString &sha)
    mCurrentSha = sha;
    mParentSha = sha;
 
-   if (sha != CommitInfo::ZERO_SHA and !sha.isEmpty())
+   if (sha != CommitInfo::ZERO_SHA && !sha.isEmpty())
    {
       const auto currentRev = mCache->getCommitInfo(sha);
 

@@ -226,7 +226,7 @@ void GitQlientRepo::setWatcher()
 {
    const auto gitWatcher = new QFileSystemWatcher(this);
    connect(gitWatcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
-      if (!path.endsWith(".autosave") and !path.endsWith(".tmp") and !path.endsWith(".user"))
+      if (!path.endsWith(".autosave") && !path.endsWith(".tmp") && !path.endsWith(".user"))
          updateUiFromWatcher();
    });
 
@@ -239,7 +239,7 @@ void GitQlientRepo::setWatcher()
    {
       const auto dir = it.next();
 
-      if (it.fileInfo().isDir() and !dir.endsWith(".") and !dir.endsWith(".."))
+      if (it.fileInfo().isDir() && !dir.endsWith(".") && !dir.endsWith(".."))
          gitWatcher->addPath(dir);
    }
 }
