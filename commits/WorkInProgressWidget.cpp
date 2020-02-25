@@ -194,10 +194,6 @@ void WorkInProgressWidget::resetFile(QListWidgetItem *item)
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
    const auto ret = git->resetFile(item->toolTip());
-
-   if (ret.success)
-      emit signalCheckoutPerformed(ret.success);
-
    const auto revInfo = mCache->getCommitInfo(mCurrentSha);
    const auto files = mCache->getRevisionFile(mCurrentSha, revInfo.parent(0));
 
@@ -238,6 +234,9 @@ void WorkInProgressWidget::resetFile(QListWidgetItem *item)
          }
       }
    }
+
+   if (ret.success)
+      emit signalUpdateWip();
 }
 
 void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWidget *fileList)

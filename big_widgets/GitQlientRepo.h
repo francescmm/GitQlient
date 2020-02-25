@@ -107,6 +107,7 @@ private:
    void showBlameView();
    void showDiffView();
    void showPreviousView();
+   void updateWip();
 
    // End of MainWindow refactor
    bool isMatch(const QString &sha, const QString &f, int cn, const QMap<QString, bool> &sm);

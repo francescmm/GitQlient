@@ -30,12 +30,14 @@ signals:
    void signalShowFileHistory(const QString &fileName);
    void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file);
    void signalAllBranchesActive(bool showAll);
+   void signalUpdateWip();
 
 public:
    explicit HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
                           QWidget *parent = nullptr);
    ~HistoryWidget();
    void clear();
+   void resetWip();
    void reload();
    void updateUiFromWatcher();
    void focusOnCommit(const QString &sha);

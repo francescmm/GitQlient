@@ -45,6 +45,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
    connect(mCommitWidget, &WorkInProgressWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
    connect(mCommitWidget, &WorkInProgressWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
+   connect(mCommitWidget, &WorkInProgressWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
 
    connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalOpenFileCommit);
    connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
@@ -107,11 +108,16 @@ HistoryWidget::~HistoryWidget()
 void HistoryWidget::clear()
 {
    mRepositoryView->clear();
+   resetWip();
    mBranchesWidget->clear();
-   mCommitWidget->clear();
    mRevisionWidget->clear();
 
    mCommitStackedWidget->setCurrentIndex(mCommitStackedWidget->currentIndex());
+}
+
+void HistoryWidget::resetWip()
+{
+   mCommitWidget->clear();
 }
 
 void HistoryWidget::reload()

@@ -85,6 +85,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mHistoryWidget, &HistoryWidget::signalUpdateUi, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mHistoryWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mHistoryWidget, &HistoryWidget::signalOpenFileCommit, this, &GitQlientRepo::loadFileDiff);
+   connect(mHistoryWidget, &HistoryWidget::signalUpdateWip, this, &GitQlientRepo::updateWip);
 
    connect(mDiffWidget, &DiffWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mDiffWidget, &DiffWidget::signalDiffEmpty, mControls, &Controls::disableDiff);
@@ -328,6 +329,13 @@ void GitQlientRepo::showPreviousView()
 {
    mStackedLayout->setCurrentWidget(mPreviousView.second);
    mControls->toggleButton(mPreviousView.first);
+}
+
+void GitQlientRepo::updateWip()
+{
+   mHistoryWidget->resetWip();
+   mGitLoader.get()->updateWipRevision();
+   mHistoryWidget->updateUiFromWatcher();
 }
 
 void GitQlientRepo::openCommitDiff()
