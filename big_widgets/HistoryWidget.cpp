@@ -232,19 +232,26 @@ void HistoryWidget::mergeBranch(const QString &origin, const QString &destinatio
 
    QApplication::restoreOverrideCursor();
 
-   if (!ret.success || (ret.success && ret.output.toString().contains("merge failed", Qt::CaseInsensitive)))
+   if (ret.output.toString().contains("merge failed", Qt::CaseInsensitive))
    {
       QMessageBox::critical(parentWidget(), tr("Merge failed"), ret.output.toString());
+
       emit signalMergeConflicts(ret.output.toString());
    }
    else
    {
-      emit signalUpdateCache();
-
       const auto outputStr = ret.output.toString();
 
       if (!outputStr.isEmpty())
-         QMessageBox::information(parentWidget(), tr("Merge status"), outputStr);
+      {
+         if (ret.success)
+         {
+            emit signalUpdateCache();
+            QMessageBox::information(parentWidget(), tr("Merge status"), outputStr);
+         }
+         else
+            QMessageBox::warning(parentWidget(), tr("Merge status"), outputStr);
+      }
    }
 }
 
