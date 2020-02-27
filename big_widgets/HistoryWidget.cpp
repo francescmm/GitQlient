@@ -236,7 +236,7 @@ void HistoryWidget::mergeBranch(const QString &origin, const QString &destinatio
    {
       QMessageBox::critical(parentWidget(), tr("Merge failed"), ret.output.toString());
 
-      emit signalMergeConflicts(ret.output.toString());
+      emit signalMergeConflicts();
    }
    else
    {

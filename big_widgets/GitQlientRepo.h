@@ -105,7 +105,7 @@ private:
    void showHistoryView();
    void showBlameView();
    void showDiffView();
-   void showWarningMerge(const QString &mergeDesc);
+   void showWarningMerge();
    void showMergeView();
 
    // End of MainWindow refactor

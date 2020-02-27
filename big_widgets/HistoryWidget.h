@@ -29,7 +29,7 @@ signals:
    void signalShowFileHistory(const QString &fileName);
    void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file);
    void signalAllBranchesActive(bool showAll);
-   void signalMergeConflicts(const QString &mergeConflictMessage);
+   void signalMergeConflicts();
 
 public:
    explicit HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,

@@ -317,19 +317,14 @@ void GitQlientRepo::showDiffView()
    mControls->toggleButton(ControlsMainViews::DIFF);
 }
 
-void GitQlientRepo::showWarningMerge(const QString &mergeDesc)
+void GitQlientRepo::showWarningMerge()
 {
-   const auto ret = QMessageBox::critical(parentWidget(), tr("Merge failed!"), mergeDesc);
+   showMergeView();
 
-   if (ret == QMessageBox::Ok)
-   {
-      showMergeView();
+   const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
+   const auto file = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
-      const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
-      const auto file = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
-
-      mMergeWidget->configure(file);
-   }
+   mMergeWidget->configure(file);
 }
 
 void GitQlientRepo::showMergeView()
