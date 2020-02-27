@@ -1,4 +1,6 @@
-# GitQlient
+![GitQLient logo](https://github.com/francescmm/GitQlient/blob/master/resources/icons/GitQlientLogo48.png "GitQlient")
+
+# GitQlient: Multi-platform Git client written with Qt
 [![Build status](https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient/branch/master)
 [![Build Status](https://travis-ci.org/francescmm/GitQlient.svg?branch=master)](https://travis-ci.org/francescmm/GitQlient)
 
