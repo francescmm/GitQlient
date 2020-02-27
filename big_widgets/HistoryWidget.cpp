@@ -72,32 +72,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this,
            qOverload<const QString &>(&HistoryWidget::goToSha));
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &HistoryWidget::signalOpenSubmodule);
-   connect(mBranchesWidget, &BranchesWidget::signalMergeRequired, this,
-           [this](const QString &current, const QString &from) {
-              QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-              QScopedPointer<GitRemote> git(new GitRemote(mGit));
-              const auto ret = git->merge(current, { from });
-
-              QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
-              gitLoader->updateWipRevision();
-
-              QApplication::restoreOverrideCursor();
-
-              if (!ret.success || (ret.success && ret.output.toString().contains("merge failed", Qt::CaseInsensitive)))
-              {
-                 QMessageBox::critical(parentWidget(), tr("Merge failed"), ret.output.toString());
-                 emit signalMergeConflicts(ret.output.toString());
-              }
-              else
-              {
-                 emit signalUpdateCache();
-
-                 const auto outputStr = ret.output.toString();
-
-                 if (!outputStr.isEmpty())
-                    QMessageBox::information(parentWidget(), tr("Merge status"), outputStr);
-              }
-           });
+   connect(mBranchesWidget, &BranchesWidget::signalMergeRequired, this, &HistoryWidget::mergeBranch);
 
    GitQlientSettings settings;
 
@@ -243,6 +218,33 @@ void HistoryWidget::onBranchCheckout()
    }
    else
       emit signalUpdateCache();
+}
+
+void HistoryWidget::mergeBranch(const QString &origin, const QString &destination)
+{
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   const auto ret = git->merge(destination, { origin });
+
+   QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
+   gitLoader->updateWipRevision();
+
+   QApplication::restoreOverrideCursor();
+
+   if (!ret.success || (ret.success && ret.output.toString().contains("merge failed", Qt::CaseInsensitive)))
+   {
+      QMessageBox::critical(parentWidget(), tr("Merge failed"), ret.output.toString());
+      emit signalMergeConflicts(ret.output.toString());
+   }
+   else
+   {
+      emit signalUpdateCache();
+
+      const auto outputStr = ret.output.toString();
+
+      if (!outputStr.isEmpty())
+         QMessageBox::information(parentWidget(), tr("Merge status"), outputStr);
+   }
 }
 
 void HistoryWidget::onCommitSelected(const QString &goToSha)
