@@ -339,13 +339,8 @@ void CommitHistoryContextMenu::merge(const QString &branchFrom)
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
    const auto currentBranch = mGit->getCurrentBranch();
-   const auto ret = git->merge(currentBranch, { branchFrom });
-   QApplication::restoreOverrideCursor();
 
-   const auto outputStr = ret.output.toString();
-
-   if (ret.success)
-      emit signalRepositoryUpdated();
+   emit signalMergeRequired(currentBranch, branchFrom);
 }
 
 void CommitHistoryContextMenu::addBranchActions(const QString &sha)

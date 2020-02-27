@@ -37,6 +37,7 @@ signals:
    void signalOpenDiff(const QString &sha);
    void signalOpenCompareDiff(const QStringList &sha);
    void signalAmendCommit(const QString &sha);
+   void signalMergeRequired(const QString &origin, const QString &destination);
 
 public:
    explicit CommitHistoryContextMenu(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,

@@ -151,6 +151,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
          connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,
                  &CommitHistoryView::signalOpenCompareDiff);
          connect(menu, &CommitHistoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
+         connect(menu, &CommitHistoryContextMenu::signalMergeRequired, this, &CommitHistoryView::signalMergeRequired);
          menu->exec(viewport()->mapToGlobal(pos));
       }
       else
