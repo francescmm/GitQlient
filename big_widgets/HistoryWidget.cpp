@@ -221,11 +221,11 @@ void HistoryWidget::onBranchCheckout()
       emit signalUpdateCache();
 }
 
-void HistoryWidget::mergeBranch(const QString &origin, const QString &destination)
+void HistoryWidget::mergeBranch(const QString &current, const QString &branchToMerge)
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
-   const auto ret = git->merge(destination, { origin });
+   const auto ret = git->merge(current, { branchToMerge });
 
    QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
    gitLoader->updateWipRevision();

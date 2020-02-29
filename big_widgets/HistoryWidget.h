@@ -61,5 +61,5 @@ private:
    void openDiff(const QModelIndex &index);
    void onShowAllUpdated(bool showAll);
    void onBranchCheckout();
-   void mergeBranch(const QString &origin, const QString &destination);
+   void mergeBranch(const QString &current, const QString &branchToMerge);
 };
