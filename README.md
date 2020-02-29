@@ -1,8 +1,10 @@
-# GitQlient
+![GitQLient logo](https://github.com/francescmm/GitQlient/blob/master/resources/icons/GitQlientLogo96.png "GitQlient")
+
+# GitQlient: Multi-platform Git client written with Qt
 [![Build status](https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient/branch/master)
 [![Build Status](https://travis-ci.org/francescmm/GitQlient.svg?branch=master)](https://travis-ci.org/francescmm/GitQlient)
 
-GitQlient is Git client that was forked from QGit. Nowadays still have some old functionality mainly in the core parts.
+GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client originally forked from QGit. Nowadays it just keeps some old functionality to store the data that is used to later paint the repo tree.
 
 GitQlient is not only a refactor of the UI but it also does a big refactor on the core parts. The original plan was to modernize the UI, move to C++17 standard and remove old bad practices to be compliant with the C++ Guidelines.
 
@@ -23,9 +25,9 @@ Following there are some of the new features:
 
 ## Releases
 
-Right now GitQlient is under development. That means that there are no stable releases so far.
+GitQlient is always under development, but you can find the releases in the [Releases page](https://github.com/francescmm/GitQlient/releases).
 
-Releases will be marked with a tag and they will be shown in the [Releases page](https://github.com/francescmm/GitQlient/releases). It is planned to release for Linux, MacOs and Windows. However, take into account that the development environment is based on Linux and it will be the first platform released.
+It is planned to release for Linux, MacOs and Windows. However, take into account that the development environment is based on Linux and it will be the first platform released.
 
 ## Params for command line execution
 
@@ -39,11 +41,11 @@ GitQlient can be executed from command line with additional params. Please take 
 
 ## Setup & Building the code
 
-GitQlient is really easy to set up and build. You just need to follow [the guide](https://github.com/francescmm/GitQlient/blob/master/SETUP_BUILD.md).
+GitQlient is really easy to set up and build. You just need to follow [the guide](https://github.com/francescmm/GitQlient/blob/master/docs/SETUP_BUILD.md).
 
 ## Contributions
 
-The current contribution guidelines are in progress. They will be updated in its [own guideline](https://github.com/francescmm/GitQlient/blob/master/CONTRIBUTING.md).
+The current contribution guidelines are in progress. They will be updated in its [own guideline](https://github.com/francescmm/GitQlient/blob/master/docs/CONTRIBUTING.md).
 
 ## Recognition
 

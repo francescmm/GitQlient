@@ -33,12 +33,12 @@ If you're familiar with Qt and/or C++, you can go directly to the [features](htt
 
 First of all, you must [fork GitQlient](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) and clone into your computer. In addition, you must have configured the original GitQlient repository to upstream:
 
-```git remote add upstream https://github.com/Stellarium/stellarium.git```
+```git remote add upstream https://github.com/francescmm/GitQlient.git```
 
 When you start with an issue, make sure you create a branch from master:
 
-```git checkout master
-git pull upstream master
+```git checkout dev
+git pull upstream dev
 git checkout -b nameOfMyBranch
 ```
 
