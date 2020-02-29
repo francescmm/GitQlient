@@ -132,11 +132,10 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
    for (auto i = 0; i < files.count(); ++i)
    {
       const auto fileName = files.getFile(i);
-      const auto fileBtn = new QPushButton(fileName);
+      const auto fileBtn = new ConflictButton(fileName);
       fileBtn->setObjectName("FileBtn");
-      fileBtn->setCheckable(true);
 
-      connect(fileBtn, &QPushButton::toggled, this, &MergeWidget::changeDiffView);
+      connect(fileBtn, &ConflictButton::changeDiffView, this, &MergeWidget::changeDiffView);
 
       const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
       const auto fileDiffWidget = new FileDiffWidget(mGit);
@@ -196,7 +195,23 @@ void MergeWidget::abort()
    }
 }
 
-void MergeWidget::commit() {}
+void MergeWidget::commit()
+{
+   /*
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   const auto ret = git->applyMerge();
+
+   if (!ret.success)
+      QMessageBox::warning(this, tr("Error merging!"),
+                           tr("The git command throuwn an error: %1").arg(ret.output.toString()));
+   else
+   {
+      removeMergeComponents();
+
+      emit signalMergeFinished();
+   }
+*/
+}
 
 void MergeWidget::removeMergeComponents()
 {
@@ -215,4 +230,31 @@ void MergeWidget::removeMergeComponents()
    mConflictButtons.clear();
    mCommitTitle->clear();
    mDescription->clear();
+}
+
+ConflictButton::ConflictButton(const QString &filename, QWidget *parent)
+   : QFrame(parent)
+   , mFile(new QPushButton(filename))
+   , mResolve(new QPushButton())
+   , mUpdate(new QPushButton())
+{
+   mFile->setCheckable(true);
+   mResolve->setIcon(QIcon(":/icons/check"));
+   mResolve->setFixedSize(30, 30);
+   mUpdate->setIcon(QIcon(":/icons/refresh"));
+   mUpdate->setFixedSize(30, 30);
+
+   const auto layout = new QHBoxLayout(this);
+   layout->setSpacing(0);
+   layout->setContentsMargins(QMargins());
+   layout->addWidget(mFile);
+   layout->addWidget(mUpdate);
+   layout->addWidget(mResolve);
+
+   connect(mFile, &QPushButton::toggled, this, &ConflictButton::changeDiffView);
+}
+
+void ConflictButton::setChecked(bool checked)
+{
+   mFile->setChecked(checked);
 }

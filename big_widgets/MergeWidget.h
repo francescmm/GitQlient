@@ -14,6 +14,24 @@ class FileDiffWidget;
 class RevisionFiles;
 class RevisionsCache;
 
+class ConflictButton : public QFrame
+{
+   Q_OBJECT
+
+signals:
+   void changeDiffView(bool checked);
+
+public:
+   explicit ConflictButton(const QString &filename, QWidget *parent = nullptr);
+
+   void setChecked(bool checked);
+
+private:
+   QPushButton *mFile = nullptr;
+   QPushButton *mResolve = nullptr;
+   QPushButton *mUpdate = nullptr;
+};
+
 class MergeWidget : public QFrame
 {
    Q_OBJECT
@@ -37,7 +55,7 @@ private:
    QTextEdit *mDescription = nullptr;
    QPushButton *mMergeBtn = nullptr;
    QPushButton *mAbortBtn = nullptr;
-   QMap<QPushButton *, FileDiffWidget *> mConflictButtons;
+   QMap<ConflictButton *, FileDiffWidget *> mConflictButtons;
 
    void fillButtonFileList(const RevisionFiles &files);
    void changeDiffView(bool fileBtnChecked);
