@@ -23,11 +23,11 @@ include(QLogger/QLogger.pri)
 
 INCLUDEPATH += QLogger
 
-OTHER_FILES += $$PWD/Tasks.txt \
+OTHER_FILES += \
     $$PWD/LICENSE \
     $$PWD/README.md \
-    $$PWD/CONTRIBUTING.md \
-    $$PWD/SETUP_BUILD.md \
+    $$PWD/docs/CONTRIBUTING.md \
+    $$PWD/docs/SETUP_BUILD.md \
     $$PWD/.travis.yml
 
 VERSION = 1.0.0

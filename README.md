@@ -39,11 +39,11 @@ GitQlient can be executed from command line with additional params. Please take 
 
 ## Setup & Building the code
 
-GitQlient is really easy to set up and build. You just need to follow [the guide](https://github.com/francescmm/GitQlient/blob/master/SETUP_BUILD.md).
+GitQlient is really easy to set up and build. You just need to follow [the guide](https://github.com/francescmm/GitQlient/blob/master/docs/SETUP_BUILD.md).
 
 ## Contributions
 
-The current contribution guidelines are in progress. They will be updated in its [own guideline](https://github.com/francescmm/GitQlient/blob/master/CONTRIBUTING.md).
+The current contribution guidelines are in progress. They will be updated in its [own guideline](https://github.com/francescmm/GitQlient/blob/master/docs/CONTRIBUTING.md).
 
 ## Recognition
 
