@@ -12,6 +12,7 @@
 #include <GitBranches.h>
 #include <GitRepoLoader.h>
 #include <GitRemote.h>
+#include <GitMerge.h>
 
 #include <QLogger.h>
 
@@ -224,7 +225,7 @@ void HistoryWidget::onBranchCheckout()
 void HistoryWidget::mergeBranch(const QString &current, const QString &branchToMerge)
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   QScopedPointer<GitMerge> git(new GitMerge(mGit, mCache));
    const auto ret = git->merge(current, { branchToMerge });
 
    QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));

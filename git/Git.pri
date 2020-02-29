@@ -10,6 +10,7 @@ HEADERS += \
     $$PWD/GitExecResult.h \
     $$PWD/GitHistory.h \
     $$PWD/GitLocal.h \
+    $$PWD/GitMerge.h \
     $$PWD/GitPatches.h \
     $$PWD/GitRemote.h \
     $$PWD/GitRepoLoader.h \
@@ -34,6 +35,7 @@ SOURCES += \
     $$PWD/GitExecResult.cpp \
     $$PWD/GitHistory.cpp \
     $$PWD/GitLocal.cpp \
+    $$PWD/GitMerge.cpp \
     $$PWD/GitPatches.cpp \
     $$PWD/GitRemote.cpp \
     $$PWD/GitRepoLoader.cpp \

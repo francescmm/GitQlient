@@ -1,6 +1,7 @@
 #include "MergeWidget.h"
 
 #include <GitBase.h>
+#include <GitMerge.h>
 #include <GitRemote.h>
 #include <FileDiffWidget.h>
 #include <CommitInfo.h>
@@ -182,7 +183,7 @@ void MergeWidget::changeDiffView(bool fileBtnChecked)
 
 void MergeWidget::abort()
 {
-   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
    const auto ret = git->abortMerge();
 
    if (!ret.success)
@@ -198,7 +199,7 @@ void MergeWidget::abort()
 
 void MergeWidget::commit()
 {
-   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
    const auto ret = git->applyMerge();
 
    if (!ret.success)

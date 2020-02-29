@@ -37,25 +37,3 @@ GitExecResult GitRemote::prune()
 
    return mGitBase->run("git remote prune origin");
 }
-
-GitExecResult GitRemote::merge(const QString &into, QStringList sources)
-{
-   QLog_Debug("Git", QString("Executing merge: {%1} into {%2}").arg(sources.join(","), into));
-
-   const auto ret = mGitBase->run(QString("git checkout -q %1").arg(into));
-
-   if (!ret.first)
-      return ret;
-
-   return mGitBase->run(QString("git merge -q ") + sources.join(" "));
-}
-
-GitExecResult GitRemote::abortMerge() const
-{
-   return mGitBase->run("git merge --abort");
-}
-
-GitExecResult GitRemote::applyMerge() const
-{
-   return mGitBase->run("git commit --no-edit");
-}
