@@ -54,3 +54,8 @@ GitExecResult GitRemote::abortMerge() const
 {
    return mGitBase->run("git merge --abort");
 }
+
+GitExecResult GitRemote::applyMerge() const
+{
+   return mGitBase->run("git commit --no-edit");
+}
