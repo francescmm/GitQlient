@@ -197,7 +197,6 @@ void MergeWidget::abort()
 
 void MergeWidget::commit()
 {
-   /*
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
    const auto ret = git->applyMerge();
 
@@ -210,7 +209,6 @@ void MergeWidget::commit()
 
       emit signalMergeFinished();
    }
-*/
 }
 
 void MergeWidget::removeMergeComponents()
