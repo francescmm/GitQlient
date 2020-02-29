@@ -19,17 +19,23 @@ class ConflictButton : public QFrame
    Q_OBJECT
 
 signals:
-   void changeDiffView(bool checked);
+   void toggled(bool checked);
+   void resolved();
+   void updateRequested();
 
 public:
-   explicit ConflictButton(const QString &filename, QWidget *parent = nullptr);
+   explicit ConflictButton(const QString &filename, bool inConflict, QWidget *parent = nullptr);
 
    void setChecked(bool checked);
 
 private:
+   QString mFileName;
    QPushButton *mFile = nullptr;
    QPushButton *mResolve = nullptr;
    QPushButton *mUpdate = nullptr;
+
+   void setInConflict(bool inConflict);
+   void resolveConflict();
 };
 
 class MergeWidget : public QFrame
@@ -62,4 +68,6 @@ private:
    void abort();
    void commit();
    void removeMergeComponents();
+   void onConflictResolved();
+   void onUpdateRequested();
 };

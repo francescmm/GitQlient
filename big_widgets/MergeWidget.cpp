@@ -131,11 +131,14 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
 {
    for (auto i = 0; i < files.count(); ++i)
    {
+      const auto fileInConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
       const auto fileName = files.getFile(i);
-      const auto fileBtn = new ConflictButton(fileName);
+      const auto fileBtn = new ConflictButton(fileName, fileInConflict);
       fileBtn->setObjectName("FileBtn");
 
-      connect(fileBtn, &ConflictButton::changeDiffView, this, &MergeWidget::changeDiffView);
+      connect(fileBtn, &ConflictButton::toggled, this, &MergeWidget::changeDiffView);
+      connect(fileBtn, &ConflictButton::updateRequested, this, &MergeWidget::onUpdateRequested);
+      connect(fileBtn, &ConflictButton::resolved, this, &MergeWidget::onConflictResolved);
 
       const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
       const auto fileDiffWidget = new FileDiffWidget(mGit);
@@ -145,11 +148,9 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
 
       const auto index = mCenterStackedWidget->addWidget(fileDiffWidget);
 
-      if (files.statusCmp(i, RevisionFiles::CONFLICT))
+      if (fileInConflict)
       {
          mConflictBtnContainer->addWidget(fileBtn);
-
-         fileBtn->setChecked(true);
 
          if (mCenterStackedWidget->count() == 0)
             mCenterStackedWidget->setCurrentIndex(index);
@@ -230,13 +231,30 @@ void MergeWidget::removeMergeComponents()
    mDescription->clear();
 }
 
-ConflictButton::ConflictButton(const QString &filename, QWidget *parent)
+void MergeWidget::onConflictResolved()
+{
+   const auto conflictButton = qobject_cast<ConflictButton *>(sender());
+   mAutoMergedBtnContainer->addWidget(conflictButton);
+
+   mConflictButtons.value(conflictButton)->reload();
+}
+
+void MergeWidget::onUpdateRequested()
+{
+   const auto conflictButton = qobject_cast<ConflictButton *>(sender());
+   mConflictButtons.value(conflictButton)->reload();
+}
+
+ConflictButton::ConflictButton(const QString &filename, bool inConflict, QWidget *parent)
    : QFrame(parent)
-   , mFile(new QPushButton(filename))
+   , mFileName(filename)
+   , mFile(new QPushButton(mFileName))
    , mResolve(new QPushButton())
    , mUpdate(new QPushButton())
 {
    mFile->setCheckable(true);
+   mFile->setChecked(inConflict);
+
    mResolve->setIcon(QIcon(":/icons/check"));
    mResolve->setFixedSize(30, 30);
    mUpdate->setIcon(QIcon(":/icons/refresh"));
@@ -249,10 +267,27 @@ ConflictButton::ConflictButton(const QString &filename, QWidget *parent)
    layout->addWidget(mUpdate);
    layout->addWidget(mResolve);
 
-   connect(mFile, &QPushButton::toggled, this, &ConflictButton::changeDiffView);
+   mUpdate->setVisible(inConflict);
+   mResolve->setVisible(inConflict);
+
+   connect(mFile, &QPushButton::toggled, this, &ConflictButton::toggled);
+   connect(mResolve, &QPushButton::clicked, this, &ConflictButton::resolveConflict);
+   connect(mUpdate, &QPushButton::clicked, this, [this]() { emit updateRequested(); });
 }
 
 void ConflictButton::setChecked(bool checked)
 {
    mFile->setChecked(checked);
+}
+
+void ConflictButton::setInConflict(bool inConflict)
+{
+   mUpdate->setVisible(inConflict);
+   mResolve->setVisible(inConflict);
+}
+
+void ConflictButton::resolveConflict()
+{
+   setInConflict(false);
+   emit resolved();
 }
