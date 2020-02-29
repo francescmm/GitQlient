@@ -3,6 +3,7 @@
 #include <GitBase.h>
 #include <GitMerge.h>
 #include <GitRemote.h>
+#include <GitLocal.h>
 #include <FileDiffWidget.h>
 #include <CommitInfo.h>
 #include <RevisionFiles.h>
@@ -134,7 +135,7 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
    {
       const auto fileInConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
       const auto fileName = files.getFile(i);
-      const auto fileBtn = new ConflictButton(fileName, fileInConflict);
+      const auto fileBtn = new ConflictButton(fileName, fileInConflict, mGit);
       fileBtn->setObjectName("FileBtn");
 
       connect(fileBtn, &ConflictButton::toggled, this, &MergeWidget::changeDiffView);
@@ -246,8 +247,10 @@ void MergeWidget::onUpdateRequested()
    mConflictButtons.value(conflictButton)->reload();
 }
 
-ConflictButton::ConflictButton(const QString &filename, bool inConflict, QWidget *parent)
+ConflictButton::ConflictButton(const QString &filename, bool inConflict, const QSharedPointer<GitBase> &git,
+                               QWidget *parent)
    : QFrame(parent)
+   , mGit(git)
    , mFileName(filename)
    , mFile(new QPushButton(mFileName))
    , mResolve(new QPushButton())
@@ -289,6 +292,12 @@ void ConflictButton::setInConflict(bool inConflict)
 
 void ConflictButton::resolveConflict()
 {
-   setInConflict(false);
-   emit resolved();
+   QScopedPointer<GitLocal> git(new GitLocal(mGit));
+   const auto ret = git->markFileAsResolved(mFileName);
+
+   if (ret.success)
+   {
+      setInConflict(false);
+      emit resolved();
+   }
 }

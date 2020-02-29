@@ -24,11 +24,13 @@ signals:
    void updateRequested();
 
 public:
-   explicit ConflictButton(const QString &filename, bool inConflict, QWidget *parent = nullptr);
+   explicit ConflictButton(const QString &filename, bool inConflict, const QSharedPointer<GitBase> &git,
+                           QWidget *parent = nullptr);
 
    void setChecked(bool checked);
 
 private:
+   QSharedPointer<GitBase> mGit;
    QString mFileName;
    QPushButton *mFile = nullptr;
    QPushButton *mResolve = nullptr;
