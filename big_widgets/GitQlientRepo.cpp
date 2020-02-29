@@ -102,7 +102,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::loadFileDiff);
 
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, &GitQlientRepo::showHistoryView);
-   connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, &GitQlientRepo::updateUiFromWatcher);
+   connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, &GitQlientRepo::updateCache);
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, mControls, &Controls::disableMergeWarning);
 
    connect(mGitLoader.get(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::updateProgressDialog,
