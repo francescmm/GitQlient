@@ -25,6 +25,8 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    , mApply(new QPushButton(tr("Apply")))
 
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    GitQlientSettings settings;
 
    mAutoFetch->setRange(0, 60);

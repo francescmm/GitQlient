@@ -30,6 +30,8 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    , mInitRepo(new QPushButton(tr("Init new repo")))
    , mSettings(new GitQlientSettings())
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    mOpenRepo->setObjectName("bigButton");
    mCloneRepo->setObjectName("bigButton");
    mInitRepo->setObjectName("bigButton");

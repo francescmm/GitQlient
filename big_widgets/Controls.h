@@ -56,6 +56,9 @@ public:
    void fetchAll();
    void activateMergeWarning();
    void disableMergeWarning();
+   void disableDiff();
+   void enableDiff();
+   ControlsMainViews getCurrentSelectedButton() const;
 
 private:
    QString mCurrentSha;

@@ -10,6 +10,8 @@ StashesContextMenu::StashesContextMenu(const QSharedPointer<GitBase> &git, const
    , mGit(git)
    , mStashId(stashId)
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    connect(addAction("Branch"), &QAction::triggered, this, &StashesContextMenu::branch);
    connect(addAction("Drop"), &QAction::triggered, this, &StashesContextMenu::drop);
    connect(addAction("Clear all"), &QAction::triggered, this, &StashesContextMenu::clear);

@@ -42,6 +42,8 @@ signals:
 
 public:
    explicit RevisionsCache(QObject *parent = nullptr);
+   ~RevisionsCache();
+
    void configure(int numElementsToStore);
    void clear();
 

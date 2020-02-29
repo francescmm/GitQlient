@@ -25,6 +25,8 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    , mRefreshBtn(new QToolButton())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    mHistory->setCheckable(true);
    mHistory->setIcon(QIcon(":/icons/git_orange"));
    mHistory->setIconSize(QSize(22, 22));
@@ -36,6 +38,7 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    mDiff->setIconSize(QSize(22, 22));
    mDiff->setText("Diff");
    mDiff->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mDiff->setEnabled(false);
 
    mBlame->setCheckable(true);
    mBlame->setIcon(QIcon(":/icons/blame"));
@@ -216,6 +219,21 @@ void Controls::activateMergeWarning()
 void Controls::disableMergeWarning()
 {
    mMergeWarning->setVisible(false);
+}
+
+void Controls::disableDiff()
+{
+   mDiff->setDisabled(true);
+}
+
+void Controls::enableDiff()
+{
+   mDiff->setEnabled(true);
+}
+
+ControlsMainViews Controls::getCurrentSelectedButton() const
+{
+   return mBlame->isChecked() ? ControlsMainViews::BLAME : ControlsMainViews::HISTORY;
 }
 
 void Controls::pushCurrentBranch()

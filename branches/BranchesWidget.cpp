@@ -9,7 +9,6 @@
 #include <ClickableFrame.h>
 #include <AddSubmoduleDlg.h>
 #include <StashesContextMenu.h>
-#include <RevisionsCache.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -22,6 +21,25 @@
 #include <QLogger.h>
 
 using namespace QLogger;
+
+namespace
+{
+QTreeWidgetItem *getChild(QTreeWidgetItem *parent, const QString &childName)
+{
+   QTreeWidgetItem *child = nullptr;
+
+   if (parent)
+   {
+      const auto childrenCount = parent->childCount();
+
+      for (auto i = 0; i < childrenCount; ++i)
+         if (parent->child(i)->text(0) == childName)
+            child = parent->child(i);
+   }
+
+   return child;
+}
+}
 
 BranchesWidget::BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
@@ -37,8 +55,9 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *pare
    , mSubmodulesCount(new QLabel("(0)"))
    , mSubmodulesArrow(new QLabel())
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    mLocalBranchesTree->setLocalRepo(true);
-   // mLocalBranchesTree->setColumnHidden(0, true);
    mLocalBranchesTree->setMouseTracking(true);
    mLocalBranchesTree->setItemDelegate(new BranchesViewDelegate());
    mLocalBranchesTree->setColumnCount(3);
@@ -251,31 +270,58 @@ void BranchesWidget::processLocalBranch(QString branch)
 
    auto fullBranchName = branch;
    auto isCurrentBranch = false;
+   QString sha;
 
    if (branch.startsWith('*'))
    {
       branch.replace('*', "");
       fullBranchName.replace('*', "");
       isCurrentBranch = true;
+
+      if (fullBranchName.startsWith("(HEADdetachedat"))
+      {
+         auto shortSha = fullBranchName.remove("(HEADdetachedat");
+         sha = shortSha.remove(")");
+
+         fullBranchName = "detached";
+         branch = "detached";
+      }
+   }
+   else
+   {
+      QScopedPointer<GitBranches> git(new GitBranches(mGit));
+      sha = git->getLastCommitOfBranch(fullBranchName).output.toString();
    }
 
    QTreeWidgetItem *parent = nullptr;
    auto folders = branch.split("/");
    branch = folders.takeLast();
 
-   for (const auto &folder : folders)
+   for (const auto &folder : qAsConst(folders))
    {
-      const auto childs = mLocalBranchesTree->findItems(folder, Qt::MatchExactly);
-      if (childs.isEmpty())
+      QTreeWidgetItem *child = nullptr;
+
+      if (parent)
+         child = getChild(parent, folder);
+      else
       {
-         QTreeWidgetItem *item = nullptr;
-         parent ? item = new QTreeWidgetItem(parent) : item = new QTreeWidgetItem(mLocalBranchesTree);
+         for (auto i = 0; i < mLocalBranchesTree->topLevelItemCount(); ++i)
+            if (mLocalBranchesTree->topLevelItem(i)->text(0) == folder)
+               child = mLocalBranchesTree->topLevelItem(i);
+      }
+
+      if (!child)
+      {
+         const auto item = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem();
          item->setText(0, folder);
+
+         if (!parent)
+            mLocalBranchesTree->addTopLevelItem(item);
 
          parent = item;
       }
       else
-         parent = childs.first();
+         parent = child;
    }
 
    auto item = new QTreeWidgetItem(parent);
@@ -284,29 +330,34 @@ void BranchesWidget::processLocalBranch(QString branch)
    item->setData(0, Qt::UserRole, isCurrentBranch);
    item->setData(0, Qt::UserRole + 1, fullBranchName);
    item->setData(0, Qt::UserRole + 2, true);
+   item->setData(0, Qt::UserRole + 3, sha);
    item->setData(0, Qt::ToolTipRole, fullBranchName);
 
    QLog_Debug("UI", QString("Calculating distances..."));
 
    QScopedPointer<GitBranches> git(new GitBranches(mGit));
 
-   auto distance = git->getDistanceBetweenBranches(true, fullBranchName).output.toString();
-   distance.replace('\n', "");
-   distance.replace('\t', "\u2193 - ");
-   distance.append("\u2191");
-   item->setText(1, distance);
+   auto distanceToMaster = QString("Local");
+   auto distanceToOrigin = QString("Local");
 
-   distance = git->getDistanceBetweenBranches(false, fullBranchName).output.toString();
-
-   if (!distance.contains("fatal"))
+   if (fullBranchName != "detached")
    {
-      distance.replace('\n', "");
-      distance.append("\u2191");
-   }
-   else
-      distance = "Local";
+      distanceToMaster = git->getDistanceBetweenBranches(true, fullBranchName).output.toString();
+      distanceToMaster.replace('\n', "");
+      distanceToMaster.replace('\t', "\u2193 - ");
+      distanceToMaster.append("\u2191");
 
-   item->setText(2, distance);
+      distanceToOrigin = git->getDistanceBetweenBranches(false, fullBranchName).output.toString();
+
+      if (!distanceToOrigin.contains("fatal"))
+      {
+         distanceToOrigin.replace('\n', "");
+         distanceToOrigin.append("\u2191");
+      }
+   }
+
+   item->setText(1, distanceToMaster);
+   item->setText(2, distanceToOrigin);
 
    mLocalBranchesTree->addTopLevelItem(item);
 

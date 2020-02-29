@@ -39,6 +39,8 @@ class MergeWidget;
 class QTimer;
 class ProgressDlg;
 
+enum class ControlsMainViews;
+
 namespace Ui
 {
 class MainWindow;
@@ -61,6 +63,7 @@ signals:
 
 public:
    explicit GitQlientRepo(const QString &repoPath, QWidget *parent = nullptr);
+   ~GitQlientRepo() override;
 
    bool isOpened();
    void setConfig(const GitQlientRepoConfig &config);
@@ -88,6 +91,7 @@ private:
    QTimer *mAutoFilesUpdate = nullptr;
    ProgressDlg *mProgressDlg = nullptr;
    QFileSystemWatcher *mGitWatcher = nullptr;
+   QPair<ControlsMainViews, QWidget *> mPreviousView;
 
    void updateCache();
    void updateUiFromWatcher();
@@ -107,6 +111,8 @@ private:
    void showDiffView();
    void showWarningMerge();
    void showMergeView();
+   void showPreviousView();
+   void updateWip();
 
    // End of MainWindow refactor
    bool isMatch(const QString &sha, const QString &f, int cn, const QMap<QString, bool> &sm);

@@ -14,6 +14,8 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
    , mGit(git)
    , mFileName(fileName)
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    connect(addAction("See changes"), &QAction::triggered, this, [this]() { emit signalShowDiff(mFileName); });
    connect(addAction("Blame"), &QAction::triggered, this, [this]() { emit signalShowFileHistory(mFileName); });
 

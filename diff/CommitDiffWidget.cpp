@@ -5,14 +5,15 @@
 #include <QVBoxLayout>
 #include <QLabel>
 
-CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, const QSharedPointer<RevisionsCache> &cache,
-                                   QWidget *parent)
+CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mFirstSha(new QLabel())
    , mSecondSha(new QLabel())
-   , fileListWidget(new FileListWidget(mGit, cache))
+   , fileListWidget(new FileListWidget(mGit, std::move(cache)))
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    mFirstSha->setObjectName("labelSha");
    mFirstSha->setAlignment(Qt::AlignCenter);
 

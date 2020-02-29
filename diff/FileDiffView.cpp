@@ -9,6 +9,7 @@ FileDiffView::FileDiffView(QWidget *parent)
    : QPlainTextEdit(parent)
    , mLineNumberArea(new LineNumberArea(this))
 {
+   setAttribute(Qt::WA_DeleteOnClose);
    setReadOnly(true);
 
    connect(this, &FileDiffView::blockCountChanged, this, &FileDiffView::updateLineNumberAreaWidth);

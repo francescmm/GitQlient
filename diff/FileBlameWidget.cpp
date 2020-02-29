@@ -12,6 +12,8 @@
 #include <QtMath>
 #include <QMessageBox>
 
+#include <array>
+
 namespace
 {
 const int kTotalColors = 8;
@@ -32,6 +34,8 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, co
    , mCurrentSha(new QLabel())
    , mPreviousSha(new QLabel())
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    mAnotation->setObjectName("AnnotationFrame");
 
    auto initialLayout = new QGridLayout(mAnotation);

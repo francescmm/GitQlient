@@ -48,6 +48,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    QLog_Info("UI", QString("Initializing GitQlient"));
 
    setObjectName("mainWindow");
@@ -91,8 +93,11 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mHistoryWidget, &HistoryWidget::signalOpenFileCommit, this, &GitQlientRepo::loadFileDiff);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, mControls, &Controls::activateMergeWarning);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, this, &GitQlientRepo::showWarningMerge);
+   connect(mHistoryWidget, &HistoryWidget::signalUpdateWip, this, &GitQlientRepo::updateWip);
 
    connect(mDiffWidget, &DiffWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
+   connect(mDiffWidget, &DiffWidget::signalDiffEmpty, mControls, &Controls::disableDiff);
+   connect(mDiffWidget, &DiffWidget::signalDiffEmpty, this, &GitQlientRepo::showPreviousView);
 
    connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::loadFileDiff);
 
@@ -109,6 +114,12 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    mGitLoader->setShowAll(settings.value("ShowAllBranches", true).toBool());
 
    setRepository(repoPath);
+}
+
+GitQlientRepo::~GitQlientRepo()
+{
+   delete mAutoFetch;
+   delete mAutoFilesUpdate;
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
@@ -228,7 +239,7 @@ void GitQlientRepo::setWatcher()
 {
    const auto gitWatcher = new QFileSystemWatcher(this);
    connect(gitWatcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
-      if (!path.endsWith(".autosave") and !path.endsWith(".tmp") and !path.endsWith(".user"))
+      if (!path.endsWith(".autosave") && !path.endsWith(".tmp") && !path.endsWith(".user"))
          updateUiFromWatcher();
    });
 
@@ -241,7 +252,7 @@ void GitQlientRepo::setWatcher()
    {
       const auto dir = it.next();
 
-      if (it.fileInfo().isDir() and !dir.endsWith(".") and !dir.endsWith(".."))
+      if (it.fileInfo().isDir() && !dir.endsWith(".") && !dir.endsWith(".."))
          gitWatcher->addPath(dir);
    }
 }
@@ -296,23 +307,32 @@ void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previ
    const auto loaded = mDiffWidget->loadFileDiff(currentSha, previousSha, file);
 
    if (loaded)
+   {
+      mControls->enableDiff();
       showDiffView();
+   }
 }
 
 void GitQlientRepo::showHistoryView()
 {
+   mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
+
    mStackedLayout->setCurrentWidget(mHistoryWidget);
    mControls->toggleButton(ControlsMainViews::HISTORY);
 }
 
 void GitQlientRepo::showBlameView()
 {
+   mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
+
    mStackedLayout->setCurrentWidget(mBlameWidget);
    mControls->toggleButton(ControlsMainViews::BLAME);
 }
 
 void GitQlientRepo::showDiffView()
 {
+   mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
+
    mStackedLayout->setCurrentWidget(mDiffWidget);
    mControls->toggleButton(ControlsMainViews::DIFF);
 }
@@ -333,12 +353,26 @@ void GitQlientRepo::showMergeView()
    mControls->toggleButton(ControlsMainViews::MERGE);
 }
 
+void GitQlientRepo::showPreviousView()
+{
+   mStackedLayout->setCurrentWidget(mPreviousView.second);
+   mControls->toggleButton(mPreviousView.first);
+}
+
+void GitQlientRepo::updateWip()
+{
+   mHistoryWidget->resetWip();
+   mGitLoader.get()->updateWipRevision();
+   mHistoryWidget->updateUiFromWatcher();
+}
+
 void GitQlientRepo::openCommitDiff()
 {
    const auto currentSha = mHistoryWidget->getCurrentSha();
    const auto rev = mGitQlientCache->getCommitInfo(currentSha);
 
    mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
+   mControls->enableDiff();
 
    showDiffView();
 }
@@ -346,7 +380,7 @@ void GitQlientRepo::openCommitDiff()
 void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
 {
    mDiffWidget->loadCommitDiff(shas.last(), shas.first());
-
+   mControls->enableDiff();
    showDiffView();
 }
 

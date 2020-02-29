@@ -9,6 +9,15 @@ RevisionsCache::RevisionsCache(QObject *parent)
 {
 }
 
+RevisionsCache::~RevisionsCache()
+{
+   for (auto commit : mCommits)
+      delete commit;
+
+   mCommits.clear();
+   mCommitsMap.clear();
+}
+
 void RevisionsCache::configure(int numElementsToStore)
 {
    QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(numElementsToStore));

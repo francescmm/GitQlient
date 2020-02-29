@@ -49,7 +49,7 @@ public:
    QString getCurrentFile() const { return mCurrentFile; }
 
 private:
-   const QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
    QFrame *mAnotation = nullptr;
    QLabel *mCurrentSha = nullptr;

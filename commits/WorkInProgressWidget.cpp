@@ -49,6 +49,7 @@ WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> 
    , mGit(git)
 {
    ui->setupUi(this);
+   setAttribute(Qt::WA_DeleteOnClose);
 
    ui->unstagedFilesList->setItemDelegate(new FileListDelegate(this));
    ui->stagedFilesList->setItemDelegate(new FileListDelegate(this));
@@ -78,6 +79,11 @@ WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> 
    connect(ui->stagedFilesList, &QListWidget::customContextMenuRequested, this, &WorkInProgressWidget::showStagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
    connect(ui->stagedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
+}
+
+WorkInProgressWidget::~WorkInProgressWidget()
+{
+   delete ui;
 }
 
 void WorkInProgressWidget::configure(const QString &sha)
@@ -126,14 +132,15 @@ void WorkInProgressWidget::resetInfo(bool force)
    }
 
    RevisionFiles files;
+   const auto wipCommit = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   if (mCache->containsRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0)))
-      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
+   if (mCache->containsRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0)))
+      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
    else if (revInfo.parentsCount() > 0)
    {
       QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));
       git->updateWipRevision();
-      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
+      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
    }
 
    if (!force || (mIsAmend && force))
@@ -187,10 +194,6 @@ void WorkInProgressWidget::resetFile(QListWidgetItem *item)
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
    const auto ret = git->resetFile(item->toolTip());
-
-   if (ret.success)
-      emit signalCheckoutPerformed(ret.success);
-
    const auto revInfo = mCache->getCommitInfo(mCurrentSha);
    const auto files = mCache->getRevisionFile(mCurrentSha, revInfo.parent(0));
 
@@ -231,6 +234,9 @@ void WorkInProgressWidget::resetFile(QListWidgetItem *item)
          }
       }
    }
+
+   if (ret.success)
+      emit signalUpdateWip();
 }
 
 void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWidget *fileList)
@@ -343,16 +349,9 @@ void WorkInProgressWidget::addAllFilesToCommitList()
 
    for (; i >= 0; --i)
    {
-      const auto item = ui->unstagedFilesList->takeItem(i);
-      const auto fileWidget = qobject_cast<FileWidget *>(ui->unstagedFilesList->itemWidget(item));
-      ui->stagedFilesList->addItem(item);
-      ui->stagedFilesList->setItemWidget(item, fileWidget);
+      const auto item = ui->unstagedFilesList->item(i);
 
-      if (item->data(GitQlientRole::U_IsConflict).toBool())
-      {
-         fileWidget->setText(fileWidget->text().remove("(conflicts)").trimmed());
-         item->setData(GitQlientRole::U_Name, fileWidget->text().remove("(conflicts)").trimmed());
-      }
+      addFileToCommitList(item);
    }
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));

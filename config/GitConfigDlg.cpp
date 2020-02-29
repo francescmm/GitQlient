@@ -13,6 +13,7 @@ GitConfigDlg::GitConfigDlg(const QSharedPointer<GitBase> &gitBase, QWidget *pare
    ui->setupUi(this);
 
    setWindowFlags(Qt::FramelessWindowHint);
+   setAttribute(Qt::WA_DeleteOnClose);
    setStyleSheet(GitQlientStyles::getStyles());
 
    QScopedPointer<GitConfig> git(new GitConfig(mGit));

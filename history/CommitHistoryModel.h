@@ -38,6 +38,7 @@ public:
    explicit CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                QObject *parent = nullptr);
    ~CommitHistoryModel() override;
+
    void clear();
    QString sha(int row) const;
 

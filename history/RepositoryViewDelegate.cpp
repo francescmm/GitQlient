@@ -343,7 +343,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
    if (ref_types != 0)
    {
-      if (ref_types & CUR_BRANCH && currentBranch.isEmpty())
+      if (ref_types & CUR_BRANCH && (currentBranch.isEmpty() || currentBranch == "HEAD"))
          markValues.insert("detached", GitQlientStyles::getDetachedColor());
 
       const auto localBranches = mCache->getRefNames(sha, BRANCH);
@@ -371,7 +371,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
    for (auto mapIt = markValues.constBegin(); mapIt != mapEnd; ++mapIt)
    {
-      const auto isCurrentSpot = (mapIt.key() == "detached" && currentBranch.isEmpty()) || mapIt.key() == currentBranch;
+      const auto isCurrentSpot = mapIt.key() == "detached" || mapIt.key() == currentBranch;
       o.font.setBold(isCurrentSpot);
 
       const auto nameToDisplay = showMinimal ? QString(". . .") : mapIt.key();

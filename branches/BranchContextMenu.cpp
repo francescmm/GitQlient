@@ -14,6 +14,8 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
    : QMenu(parent)
    , mConfig(std::move(config))
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    if (mConfig.isLocal)
    {
       connect(addAction("Pull"), &QAction::triggered, this, &BranchContextMenu::pull);

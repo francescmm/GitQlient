@@ -46,10 +46,13 @@ signals:
    void signalChangesCommitted(bool commited);
    void signalCheckoutPerformed(bool success);
    void signalShowFileHistory(const QString &fileName);
+   void signalUpdateWip();
 
 public:
    explicit WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent = nullptr);
+
+   ~WorkInProgressWidget();
 
    void configure(const QString &sha);
    void clear();

@@ -7,6 +7,7 @@
 ClickableFrame::ClickableFrame(QWidget *parent)
    : QFrame(parent)
 {
+   setAttribute(Qt::WA_DeleteOnClose);
 }
 
 ClickableFrame::ClickableFrame(const QString &text, Qt::Alignment alignment, QWidget *parent)

@@ -16,7 +16,7 @@ signals:
    void signalShowFileHistory(const QString &fileName);
 
 public:
-   explicit CommitDiffWidget(QSharedPointer<GitBase> git, const QSharedPointer<RevisionsCache> &cache,
+   explicit CommitDiffWidget(QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache,
                              QWidget *parent = nullptr);
 
    void configure(const QString &firstSha, const QString &secondSha);

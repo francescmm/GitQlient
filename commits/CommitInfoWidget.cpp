@@ -23,9 +23,11 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    , labelAuthor(new QLabel())
    , labelDateTime(new QLabel())
    , labelEmail(new QLabel())
-   , fileListWidget(new FileListWidget(mGit, cache))
+   , fileListWidget(new FileListWidget(mGit, mCache))
    , labelModCount(new QLabel())
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    labelSha->setObjectName("labelSha");
    labelSha->setAlignment(Qt::AlignCenter);
    labelSha->setWordWrap(true);
@@ -96,7 +98,7 @@ void CommitInfoWidget::configure(const QString &sha)
    mCurrentSha = sha;
    mParentSha = sha;
 
-   if (sha != CommitInfo::ZERO_SHA and !sha.isEmpty())
+   if (sha != CommitInfo::ZERO_SHA && !sha.isEmpty())
    {
       const auto currentRev = mCache->getCommitInfo(sha);
 
