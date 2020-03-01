@@ -326,9 +326,15 @@ QMessageBox
     color: white;
 }
 
-QScrollBar:vertical, QScrollBar:horizontal
+QScrollBar:vertical
 {
     border-left-color: #202122;
+    background-color: transparent;
+}
+
+QScrollBar:horizontal
+{
+    border-top-color: #202122;
     background-color: transparent;
 }
 
