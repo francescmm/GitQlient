@@ -8,7 +8,6 @@
 #include <CommitInfo.h>
 #include <RevisionFiles.h>
 #include <UnstagedMenu.h>
-#include <FileListDelegate.h>
 #include <RevisionsCache.h>
 #include <FileWidget.h>
 
@@ -50,10 +49,6 @@ WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> 
 {
    ui->setupUi(this);
    setAttribute(Qt::WA_DeleteOnClose);
-
-   ui->unstagedFilesList->setItemDelegate(new FileListDelegate(this));
-   ui->stagedFilesList->setItemDelegate(new FileListDelegate(this));
-   ui->untrackedFilesList->setItemDelegate(new FileListDelegate(this));
 
    ui->lCounter->setText(QString::number(kMaxTitleChars));
    ui->leCommitTitle->setMaxLength(kMaxTitleChars);
@@ -317,6 +312,7 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
 
          qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole))->setItemWidget(item, fileWidget);
          item->setText("");
+         item->setSizeHint(fileWidget->sizeHint());
       }
       else
          mCurrentFilesCache[fileName].first = true;

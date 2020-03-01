@@ -12,7 +12,7 @@ FileWidget::FileWidget(const QIcon &icon, const QString &text, QWidget *parent)
 {
    const auto itemLayout = new QHBoxLayout(this);
    itemLayout->setContentsMargins(QMargins());
-   mButton->setStyleSheet("max-width: 10px; min-width: 10px; max-height: 15px; min-height: 15px;");
+   mButton->setStyleSheet("max-width: 15px; min-width: 15px; max-height: 15px; min-height: 15px;");
 
    itemLayout->addWidget(mButton);
    itemLayout->addWidget(mText);
@@ -34,4 +34,12 @@ QString FileWidget::text() const
 void FileWidget::setText(const QString &text)
 {
    mText->setText(text);
+}
+
+QSize FileWidget::sizeHint() const
+{
+   auto size = QFrame::sizeHint();
+   size.setWidth(size.width() + layout()->spacing());
+
+   return size;
 }

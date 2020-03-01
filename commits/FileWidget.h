@@ -41,6 +41,7 @@ public:
    explicit FileWidget(const QString &icon, const QString &text, QWidget *parent = nullptr);
    QString text() const;
    void setText(const QString &text);
+   QSize sizeHint() const override;
 
 private:
    QIcon mIcon;
