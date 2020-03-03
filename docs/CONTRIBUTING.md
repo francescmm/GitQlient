@@ -3,10 +3,10 @@ GitQlient is free software and that means that the code and the use its free! Bu
 
 I'd like to have as many imputs as possible so I can provide as many features as possible. For that reason I hope this guideline gives you an overview of how to contribute.
 
-It doesn't matter what yo know or not, there is allways a way to help or contribute. May be you don't know how to code in C++ or Qt, but UX is another field. Or maybe you prefer to provide ideas about what you would like to have.
+It doesn't matter what do you know or not, there is always a way to help or contribute. May be you don't know how to code in C++ or Qt, but UX is another field. Or maybe you prefer to provide ideas about what you would like to have.
 
 ## Reporting errors
-My intention is to use the features that GitHub provides. So the [Issues page](https://github.com/francescmm/GitQlient/issues) and the [Projects page](https://github.com/francescmm/GitQlient/projects) are two options to start with. I you prefer to report bugs or requests features, you can use the Issues tab and add a new issue with a label. [Every label](https://github.com/francescmm/GitQlient/labels) has a description but if you're not sure, don't worry, you can leave it empty. The current labels are:
+I'm using the features that GitHub provides. So the [Issues page](https://github.com/francescmm/GitQlient/issues) and the [Projects page](https://github.com/francescmm/GitQlient/projects) are two options to start with. I you prefer to report bugs or requests features, you can use the Issues tab and add a new issue with a label. [Every label](https://github.com/francescmm/GitQlient/labels) has a description but if you're not sure, don't worry, you can leave it empty. The current labels are:
 
 - Rookie task: Perfect dev task to start to know GitQlient
 - Task: Task that should be solved in a single commit but is not a rookie task

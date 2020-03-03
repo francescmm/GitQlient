@@ -26,9 +26,8 @@ INCLUDEPATH += QLogger
 OTHER_FILES += \
     $$PWD/LICENSE \
     $$PWD/README.md \
-    $$PWD/docs/CONTRIBUTING.md \
-    $$PWD/docs/SETUP_BUILD.md \
-    $$PWD/.travis.yml
+    $$PWD/.travis.yml \
+    $$PWD/docs/*.md
 
 VERSION = 1.0.0
 

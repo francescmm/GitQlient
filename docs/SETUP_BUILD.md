@@ -4,23 +4,23 @@
 
 ### Qt
 
-GitQlient is being developed with the latest version of Qt, currently [Qt 5.13](https://www.qt.io/download-qt-installer). Despite is not tested, any versions from 5.12 should be ok.
+GitQlient releases are built with the latest version of Qt, currently [Qt 5.14](https://www.qt.io/download-qt-installer). However, any version above the last LTS (Qt 5.12) is guaranteed to compile.
 
-The plan for the near future is to test for every major version from 5.9 to the latest.
+The plan for the near future is to test for every major version from Qt 5.12 to the latest.
 
 ### Git
 
-Since GitQlient it's a Git client, you will need to have Git installed and added to the path.
+GitQlient is not using any library to access Git commands. For that reason, you will need to have Git installed and added to the path.
 
 ## Submodules
 
-For now, GitQlient has only one dependency and that's [QLogger](https://github.com/francescmm/QLogger).
+For now, GitQlient has only one dependency and that's [QLogger](https://github.com/francescmm/QLogger) what it's just two files!
 
 Remember that the first time you will need to initialize the submodule and update it from time to time.
 
 ## Steps
 
-If you just want to play with it a bit with GitQlient or just build it for your own environment, you will need to do:
+If you want to play a bit with GitQlient or just build it for your own environment, you will have to do:
 
 1. Clone the repository:
 
@@ -41,3 +41,5 @@ If you just want to play with it a bit with GitQlient or just build it for your 
 4. Run make in the main repository folder to compile the code:
 
     ```make```
+
+5. Note: By default ```make install``` puts the executable in ```$HOME/GitQlient/bin```.
