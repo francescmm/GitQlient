@@ -48,11 +48,11 @@ GitQlient can be executed from command line with additional params. Please take 
 
 ## Setup & Building the code
 
-GitQlient is really easy to set up and build. You just need to follow [the guide](https://github.com/francescmm/GitQlient/blob/master/docs/SETUP_BUILD.md).
+GitQlient is really easy to set up and build. You just need to follow [the guide](docs/SETUP_BUILD.md).
 
 ## Contributing
 
-The current contribution guidelines are in progress. They will be updated in its [own guideline](https://github.com/francescmm/GitQlient/blob/master/docs/CONTRIBUTING.md).
+The current contribution guidelines are in progress. They will be updated in its [own guideline](docs/CONTRIBUTING.md).
 
 ## Credits
 
@@ -66,4 +66,4 @@ The app icon is custom made, but the other in-app icons are made by [Dave Gandy]
 
 GitQlient is released under LGPLv2+. However some parts of the old QGit are GPLv2 so for the moment the code is stacked with that.
 
-If you are interested, here is [the license](https://github.com/francescmm/GitQlient/blob/master/LICENSE)
+If you are interested, here is [the license](LICENSE)
