@@ -4,17 +4,9 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient/branch/master)
 [![Build Status](https://travis-ci.org/francescmm/GitQlient.svg?branch=master)](https://travis-ci.org/francescmm/GitQlient)
 
-GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client originally forked from QGit. Nowadays it just keeps some old functionality to store the data that is used to later paint the repo tree.
+GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client originally forked from QGit. Nowadays it goes beyond of just a fork and adds a lot of new functionality.  Some of the major feature you can find are:
 
-GitQlient is not only a refactor of the UI but it also does a big refactor on the core parts. The original plan was to modernize the UI, move to C++17 standard and remove old bad practices to be compliant with the C++ Guidelines.
-
-Following there are some of the new features:
-
-1. Better UI experience
-    1. Easy access to the main Git actions
-    2. Better code separation between Views and Models
-    3. Simplification of the different options we have keeping it to what a Git client is
-2. New features:
+1. New features:
     1. Easy access to remote actions like: push, pull, submodules management and branches
     2. Branches management
     3. Tags and stashes management
@@ -22,6 +14,10 @@ Following there are some of the new features:
     5. Allow to open several repositories in the same window
     6. Better visualization of the commits and the work in progress
     7. Better visualization of the repository view
+2. Improved UI experience
+    1. Easy access to the main Git actions
+    2. Better code separation between Views and Models
+    3. Simplification of the different options one can do, keeping it to what a Git client is
 
 ## Sreenshots
 Here are some screenshots of the first release to show you how it looks like. The main window is formed by the repository graph, information about the branches, tags and submodules, and detailed description of a commit or the current work in progress:
@@ -39,7 +35,8 @@ GitQlient is always under development, but you can find the releases in the [Rel
 
 It is planned to release for Linux, MacOs and Windows. However, take into account that the development environment is based on Linux and it will be the first platform released.
 
-## Params for command line execution
+## Installation instructions & running
+Please check the [Installation guide](docs/INSTALLATION.md) and the [Quick Start Guide](docs/QUICK_START_GUIDE.md)
 
 GitQlient can be executed from command line with additional params. Please take a look to the following table:
 
@@ -53,11 +50,11 @@ GitQlient can be executed from command line with additional params. Please take 
 
 GitQlient is really easy to set up and build. You just need to follow [the guide](https://github.com/francescmm/GitQlient/blob/master/docs/SETUP_BUILD.md).
 
-## Contributions
+## Contributing
 
 The current contribution guidelines are in progress. They will be updated in its [own guideline](https://github.com/francescmm/GitQlient/blob/master/docs/CONTRIBUTING.md).
 
-## Recognition
+## Credits
 
 GitQlient started as a fork from QGit. Despite it has changed a lot, there is some of the original code still, mainly the Git core functionality.
 
