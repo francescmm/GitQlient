@@ -23,6 +23,16 @@ Following there are some of the new features:
     6. Better visualization of the commits and the work in progress
     7. Better visualization of the repository view
 
+## Sreenshots
+Here are some screenshots of the first release to show you how it looks like. The main window is formed by the repository graph, information about the branches, tags and submodules, and detailed description of a commit or the current work in progress:
+![GitQlient main window](https://www.francescmm.com/wp-content/uploads/2020/02/image.png "GitQlient main window")
+
+By using the context menu over or with double-clicking the file name in the commit info panel or in the work in progress panel, you will be able to see the diff of that specific file. By the other hand, if you double-click commit or go through the context menu of the repository view, you can have a diff of a commit compared to its parent. If you want to compare two different commits, just select them and check the Diff option in the context menu:
+![GitQlient diff window](https://www.francescmm.com/wp-content/uploads/2020/02/image-2.png "GitQlient diff window")
+
+Another important screen is the History&Blame window. There you can follow the history of a file, and blame it through it:
+![GitQlient blame window](https://www.francescmm.com/wp-content/uploads/2020/02/image-3.png "GitQlient blame window")
+
 ## Releases
 
 GitQlient is always under development, but you can find the releases in the [Releases page](https://github.com/francescmm/GitQlient/releases).
