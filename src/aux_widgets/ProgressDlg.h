@@ -25,14 +25,43 @@
 
 #include <QProgressDialog>
 
+/**
+ * @brief This is a re-implementation of the QProgressDialog to better suite styles and special behaviour flags.
+ *
+ * @class ProgressDlg ProgressDlg.h "ProgressDlg.h"
+ */
 class ProgressDlg : public QProgressDialog
 {
 public:
+   /**
+    * @brief Default constructor of the class.
+    *
+    * @param labelText The text that will be shown.
+    * @param cancelButtonText Cancel button text.
+    * @param minimum Minimum value.
+    * @param maximum Maximum value.
+    * @param autoReset Tells the progress dialog if it should automatically reset.
+    * @param autoClose Tells the progress dialog if it should automatically close.
+    */
    explicit ProgressDlg(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum,
                         bool autoReset, bool autoClose);
 
+   /**
+    * @brief Detects the press event to avoid closing the dialog when the Esc key is pressed.
+    *
+    * @param e The press event
+    */
    void keyPressEvent(QKeyEvent *e) override;
+   /**
+    * @brief Detects the close event to filter the close event and only close the dialog if the user clicked on the
+    * button.
+    *
+    * @param e The close event
+    */
    void closeEvent(QCloseEvent *e) override;
+   /**
+    * @brief Closes the dialog by user's action.
+    */
    void close();
 
 private:
