@@ -33,7 +33,6 @@ int CommitHistoryModel::rowCount(const QModelIndex &parent) const
 
 bool CommitHistoryModel::hasChildren(const QModelIndex &parent) const
 {
-
    return !parent.isValid();
 }
 

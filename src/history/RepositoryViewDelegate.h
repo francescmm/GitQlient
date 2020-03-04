@@ -42,11 +42,8 @@ public:
    RepositoryViewDelegate(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                           CommitHistoryView *view);
 
-   virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const override;
-   virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override
-   {
-      return QSize(LANE_WIDTH, ROW_HEIGHT);
-   }
+   void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const override;
+   QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override;
 
 private:
    QSharedPointer<RevisionsCache> mCache;

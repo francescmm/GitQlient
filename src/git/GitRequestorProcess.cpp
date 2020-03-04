@@ -15,7 +15,6 @@ bool GitRequestorProcess::run(const QString &command, QString &)
 
    if (mTempFile->open()) // to read the file name
    {
-
       setStandardOutputFile(mTempFile->fileName());
       mTempFile->close();
 

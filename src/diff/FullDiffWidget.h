@@ -32,7 +32,7 @@ class DiffHighlighter : public QSyntaxHighlighter
 {
 public:
    DiffHighlighter(QTextEdit *p);
-   virtual void highlightBlock(const QString &text) override;
+   void highlightBlock(const QString &text) override;
 };
 
 class FullDiffWidget : public QTextEdit
