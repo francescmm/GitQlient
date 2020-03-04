@@ -161,6 +161,12 @@ QString HistoryWidget::getCurrentSha() const
 void HistoryWidget::onNewRevisions(int totalCommits)
 {
    mRepositoryModel->onNewRevisions(totalCommits);
+
+   onCommitSelected(CommitInfo::ZERO_SHA);
+
+   mRepositoryView->selectionModel()->select(
+       QItemSelection(mRepositoryModel->index(0, 0), mRepositoryModel->index(0, mRepositoryModel->columnCount() - 1)),
+       QItemSelectionModel::Select);
 }
 
 void HistoryWidget::search()
