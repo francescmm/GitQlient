@@ -73,3 +73,17 @@ bool GitConfig::initRepo(const QString &fullPath)
 {
    return mGitBase->run(QString("git init %1").arg(fullPath)).first;
 }
+
+GitExecResult GitConfig::getLocalConfig() const
+{
+   const auto ret = mGitBase->run("git config --list");
+
+   return ret;
+}
+
+GitExecResult GitConfig::getGlobalConfig() const
+{
+   const auto ret = mGitBase->run("git config --global --list");
+
+   return ret;
+}
