@@ -32,17 +32,42 @@ class ProgressDlg;
 class GitQlientSettings;
 class QVBoxLayout;
 
+/*!
+ \brief The ConfigWidget is the widget shown when the user access it from the tool icon. It gives the options of
+ initiate, clone and open repositories and also provides the layout to access the general GitQlient configuration.
+
+The widget also shows the list of most open repositories.
+
+*/
 class ConfigWidget : public QFrame
 {
    Q_OBJECT
 
 signals:
+   /*!
+    \brief Signal triggered when the user tries to open a new repository.
+
+    \param repoPath The repository full path.
+   */
    void signalOpenRepo(const QString &repoPath);
 
 public:
+   /*!
+    \brief Default constructor.
+
+    \param parent The parent widget if needed.
+   */
    explicit ConfigWidget(QWidget *parent = nullptr);
+   /*!
+    \brief Destructor.
+
+   */
    ~ConfigWidget() override;
 
+   /*!
+    \brief Updates the most opened projects list.
+
+   */
    void updateRecentProjectsList();
 
 private:
@@ -57,10 +82,38 @@ private:
    QVBoxLayout *mRecentProjectsLayout = nullptr;
    QWidget *mInnerWidget = nullptr;
 
+   /*!
+    \brief Opens a alredy cloned repository.
+
+   */
    void openRepo();
+   /*!
+    \brief Clones a new repository.
+
+   */
    void cloneRepo();
+   /*!
+    \brief Initiates a new local repository.
+
+   */
    void initRepo();
+   /*!
+    \brief creates the config widget.
+
+    \return QWidget The resultant widget.
+   */
    QWidget *createConfigWidget();
+   /*!
+    \brief Creates the recent projects page.
+
+    \return QWidget The resultant widget.
+   */
    QWidget *createRecentProjectsPage();
+   /*!
+    \brief Updates the progress dialog for cloning repos.
+
+    \param stepDescription The description step.
+    \param value The numeric value.
+   */
    void updateProgressDialog(QString stepDescription, int value);
 };

@@ -31,11 +31,25 @@ class QComboBox;
 class QLabel;
 class QPushButton;
 
+/*!
+ \brief The GeneralConfigPage shows the available configuration for GitQlient. The configurable options are the
+following:
+- Auto-fetch: The user can configure the interval where the auto-fetch runs. It performs a git fetch.
+- Auto-prune: The user can configure the interval where GitQlient performs a prune.
+- Disable logs: The user can enable or disable logs.
+- Log level: The user can configure the level of the logs for GitQlient.
+
+*/
 class GeneralConfigPage : public QFrame
 {
    Q_OBJECT
 
 public:
+   /*!
+    \brief Default constructor.
+
+    \param parent The parent widget if needed.
+   */
    explicit GeneralConfigPage(QWidget *parent = nullptr);
 
 private:
@@ -48,6 +62,14 @@ private:
    QPushButton *mReset = nullptr;
    QPushButton *mApply = nullptr;
 
+   /*!
+    \brief Reset the changes to its default value.
+
+   */
    void resetChanges();
+   /*!
+    \brief Applies the changes into the settings system.
+
+   */
    void applyChanges();
 };
