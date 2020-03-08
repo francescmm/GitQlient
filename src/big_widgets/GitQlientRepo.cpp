@@ -229,11 +229,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
    }
 }
 
-void GitQlientRepo::close()
-{
-   QWidget::close();
-}
-
 void GitQlientRepo::setWatcher()
 {
    const auto gitWatcher = new QFileSystemWatcher(this);
@@ -365,9 +360,8 @@ void GitQlientRepo::updateWip()
    mHistoryWidget->updateUiFromWatcher();
 }
 
-void GitQlientRepo::openCommitDiff()
+void GitQlientRepo::openCommitDiff(const QString currentSha)
 {
-   const auto currentSha = mHistoryWidget->getCurrentSha();
    const auto rev = mGitQlientCache->getCommitInfo(currentSha);
 
    mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
@@ -397,10 +391,6 @@ void GitQlientRepo::changesCommitted(bool ok)
 void GitQlientRepo::closeEvent(QCloseEvent *ce)
 {
    QLog_Info("UI", QString("Closing GitQlient for repository {%1}").arg(mCurrentDir));
-
-   emit closeAllWindows();
-
-   hide();
 
    mGitLoader->cancelAll();
 
