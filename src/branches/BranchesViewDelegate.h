@@ -27,11 +27,32 @@
 
 class QPainter;
 
+/*!
+ \brief BranchesViewDelegate is the delegate in charge of painting how the branches are display in the BranchTreeWidget.
+
+*/
 class BranchesViewDelegate : public QStyledItemDelegate
 {
 public:
+   /*!
+    \brief Default constructor.
+
+    \param parent The parent widget if needed.
+   */
    explicit BranchesViewDelegate(QObject *parent = nullptr);
 
+   /*!
+    \brief Overrided paint method used to display different colors when mouse actions happen.
+
+    \param p The painter device.
+    \param o The style options of the item.
+    \param i The item data
+   */
    void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const override;
+   /*!
+    \brief Overrided method that returns the size of the row, both height and width.
+
+    \return QSize The width and height of the row.
+   */
    QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override;
 };

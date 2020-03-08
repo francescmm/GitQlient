@@ -32,16 +32,44 @@ namespace Ui
 class TagDlg;
 }
 
+/*!
+ \brief The TagDlg class helps the user to create both local and remote tags in the repository.
+
+*/
 class TagDlg : public QDialog
 {
    Q_OBJECT
 
 public:
+   /*!
+    \brief The default constructor.
+
+    \param git The git object to perform Git operations.
+    \param sha The sha where the tag will be created.
+    \param parent The parent widget if needed.
+   */
    explicit TagDlg(const QSharedPointer<GitBase> &git, const QString &sha, QWidget *parent = nullptr);
-   TagDlg(const TagDlg &tag) = delete;
-   TagDlg &operator=(const TagDlg &tag) = delete;
+   /*!
+    \brief Deleted copy constructor
+
+   */
+   TagDlg(const TagDlg &) = delete;
+   /*!
+    \brief Deleted assignment operator.
+
+    \return TagDlg &operator A new TagDlg object.
+   */
+   TagDlg &operator=(const TagDlg &) = delete;
+   /*!
+    \brief Destructor.
+
+   */
    ~TagDlg() override;
 
+   /*!
+    \brief Validates the data input by the user and performs the git add tag action.
+
+   */
    void accept() override;
 
 private:

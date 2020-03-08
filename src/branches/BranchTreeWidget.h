@@ -27,25 +27,75 @@
 
 class GitBase;
 
+/*!
+ \brief The BranchTreeWidget class shows all the information regarding the branches and its position respect master and
+ its remote branch.
+
+*/
 class BranchTreeWidget : public QTreeWidget
 {
    Q_OBJECT
 
 signals:
+   /*!
+    \brief Signal triggered when a branch has been updated and requires a GitQlient UI refresh.
+
+   */
    void signalBranchesUpdated();
+   /*!
+    \brief Signal triggered when a branch is checked out and requires a GitQlient UI refresh.
+
+   */
    void signalBranchCheckedOut();
+   /*!
+    \brief Signal triggered when the user selects a commit via branch or tag selection.
+
+    \param sha The selected sha.
+   */
    void signalSelectCommit(const QString &sha);
+   /*!
+    \brief Signal triggered when a merge is required.
+
+    \param currentBranch The current branch.
+    \param fromBranch The branch to merge into the current one.
+   */
    void signalMergeRequired(const QString &currentBranch, const QString &fromBranch);
 
 public:
+   /*!
+    \brief Default constructor.
+
+    \param git The git object to perform Git operations.
+    \param parent The parent widget if needed.
+   */
    explicit BranchTreeWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   /*!
+    \brief Configures the widget to be the local branches widget.
+
+    \param isLocal True if the current widget shows local branches, otherwise false.
+   */
    void setLocalRepo(const bool isLocal) { mLocal = isLocal; }
 
 private:
    bool mLocal = false;
    QSharedPointer<GitBase> mGit;
 
+   /*!
+    \brief Shows the context menu.
+
+    \param pos The position of the menu.
+   */
    void showBranchesContextMenu(const QPoint &pos);
+   /*!
+    \brief Checks out the branch selected by the \p item.
+
+    \param item The item that contains the data of the branch.
+   */
    void checkoutBranch(QTreeWidgetItem *item);
+   /*!
+    \brief Selects the commit of the given \p item branch.
+
+    \param item The item that contains the data of the branch selected to extract the commit SHA.
+   */
    void selectCommit(QTreeWidgetItem *item);
 };

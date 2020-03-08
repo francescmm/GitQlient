@@ -27,6 +27,11 @@
 
 class GitBase;
 
+/*!
+ \brief The BranchContextMenuConfig contains the necessary information to initialize the BranchContextMenu. It includes
+ information about the current branch, the selected branch in the view and the git object to perform the Git actions.
+
+*/
 struct BranchContextMenuConfig
 {
    QString currentBranch;
@@ -35,28 +40,92 @@ struct BranchContextMenuConfig
    QSharedPointer<GitBase> mGit;
 };
 
+/*!
+ \brief The BranchContextMenuConfig creates the context menu for the BranchTreeWidget. In this context menu all the
+ possible actions regarding branches and it's workload are performed. This includes pushing pending commits to remote
+ branches.
+
+*/
 class BranchContextMenu : public QMenu
 {
    Q_OBJECT
 
 signals:
+   /*!
+    \brief Signal triggered when the branches have been updated and the GitQlient UI needs a refresh.
+
+   */
    void signalBranchesUpdated();
+   /*!
+    \brief Signal triggered when a branch has been checked out.
+
+   */
    void signalCheckoutBranch();
+   /*!
+    \brief Signal triggered when the user wants to perform a merge. This action takes a \p fromBranch to merge it into
+    our \ref currentBranch. In case of conflict, it will be handle elsewhere.
+
+    \param currentBranch The current working branch.
+    \param fromBranch The branch to be merge into the current branch.
+   */
    void signalMergeRequired(const QString &currentBranch, const QString &fromBranch);
 
 public:
+   /*!
+    \brief Default constructor.
+
+    \param config The data to configure the context menu.
+    \param parent The parent widget if needed.
+   */
    explicit BranchContextMenu(BranchContextMenuConfig config, QWidget *parent = nullptr);
 
 private:
    BranchContextMenuConfig mConfig;
 
+   /*!
+    \brief Pulls the current branch.
+
+   */
    void pull();
+   /*!
+    \brief Fetches all the changes from the remote repo. This includes gathering all tags as well, pruning and forcing
+    the pruning.
+
+   */
    void fetch();
+   /*!
+    \brief Pushes all the local changes to the remote repo.
+
+   */
    void push();
+   /*!
+    \brief Pushes force all the local changes into the remote repo.
+
+   */
    void pushForce();
+   /*!
+    \brief Creates a branch locally.
+
+   */
    void createBranch();
+   /*!
+    \brief Creates a new local branch and checks it out.
+
+   */
    void createCheckoutBranch();
+   /*!
+    \brief Tries to merge the selected branch in the BranchTreeWidget into the current branch.
+
+   */
    void merge();
+   /*!
+    \brief Renames the selected branch.
+
+   */
    void rename();
+   /*!
+    \brief Deletes the selected branch. It will fail if the branch to remove is the current one.
+
+   */
    void deleteBranch();
 };
