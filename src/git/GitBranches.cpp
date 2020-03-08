@@ -1,6 +1,7 @@
 #include "GitBranches.h"
 
 #include <GitBase.h>
+#include <GitConfig.h>
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -24,10 +25,15 @@ GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QStri
                   .arg(toMaster ? QString("master") : QString("%1"))
                   .arg(right));
 
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+
+   const auto ret = gitConfig->getRemoteForBranch(toMaster ? QString("master") : right);
+
    const QString firstArg = toMaster ? QString("--left-right") : QString();
-   const QString gitCmd = QString("git rev-list %1 --count %2...%3")
+   const QString gitCmd = QString("git rev-list %1 --count %2/%3...%4")
                               .arg(firstArg)
-                              .arg(toMaster ? QString("origin/master") : QString("origin/%3"))
+                              .arg(ret.output.toString())
+                              .arg(toMaster ? QString("master") : right)
                               .arg(right);
 
    return mGitBase->run(gitCmd);

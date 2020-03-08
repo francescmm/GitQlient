@@ -57,6 +57,7 @@ public:
    bool initRepo(const QString &fullPath);
    GitExecResult getLocalConfig() const;
    GitExecResult getGlobalConfig() const;
+   GitExecResult getRemoteForBranch(const QString &branch);
 
 private:
    QSharedPointer<GitBase> mGitBase;

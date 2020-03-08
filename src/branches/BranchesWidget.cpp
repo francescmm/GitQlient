@@ -347,10 +347,11 @@ void BranchesWidget::processLocalBranch(QString branch)
       distanceToMaster.replace('\t', "\u2193 - ");
       distanceToMaster.append("\u2191");
 
-      distanceToOrigin = git->getDistanceBetweenBranches(false, fullBranchName).output.toString();
+      const auto toOrigin = git->getDistanceBetweenBranches(false, fullBranchName).output.toString();
 
-      if (!distanceToOrigin.contains("fatal"))
+      if (!toOrigin.contains("fatal"))
       {
+         distanceToOrigin = toOrigin;
          distanceToOrigin.replace('\n', "");
          distanceToOrigin.append("\u2191");
       }
