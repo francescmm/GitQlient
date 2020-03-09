@@ -69,7 +69,6 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
       mDiffView->setPlainText(text);
 
       mRowIndex = 0;
-      mDiffHighlighter->resetState();
 
       mDiffView->moveCursor(QTextCursor::Start);
 

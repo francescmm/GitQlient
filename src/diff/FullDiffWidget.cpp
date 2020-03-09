@@ -8,12 +8,12 @@
 #include <QTextCharFormat>
 #include <QTextCodec>
 
-DiffHighlighter::DiffHighlighter(QTextEdit *p)
+FullDiffWidget::DiffHighlighter::DiffHighlighter(QTextEdit *p)
    : QSyntaxHighlighter(p)
 {
 }
 
-void DiffHighlighter::highlightBlock(const QString &text)
+void FullDiffWidget::DiffHighlighter::highlightBlock(const QString &text)
 {
    // state is used to count paragraphs, starting from 0
    setCurrentBlockState(previousBlockState() + 1);

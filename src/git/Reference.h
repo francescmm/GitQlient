@@ -17,7 +17,7 @@ struct Reference
    QStringList remoteBranches;
    QStringList tags;
    QStringList refs;
-   QString tagObj; // TODO support more then one obj
+   QString tagObj;
    QString tagMsg;
    QString stgitPatch;
 };

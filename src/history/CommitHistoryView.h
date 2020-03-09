@@ -30,31 +30,116 @@ class GitBase;
 class CommitHistoryModel;
 class ShaFilterProxyModel;
 
+/**
+ * @brief The CommitHistoryView is the class that represents the View in a MVC pattern. It shows the data provided by
+ * the model regarding the repository graph and the commit information.
+ *
+ * @class CommitHistoryView CommitHistoryView.h "CommitHistoryView.h"
+ */
 class CommitHistoryView : public QTreeView
 {
    Q_OBJECT
 
 signals:
+   /**
+    * @brief Signal triggered when some action in the context menu things the main UI needs an update.
+    */
    void signalViewUpdated();
+   /*!
+    \brief Signal triggered when the user wants to open the diff of a commit compared to its parent.
+
+    \param sha The SHA to diff.
+   */
    void signalOpenDiff(const QString &sha);
+   /*!
+    \brief Signal triggered when the user whants to diff the shas in the list. This signal is only emited if the user
+    selected two SHAs.
+
+    \param sha The shas to diff between.
+   */
    void signalOpenCompareDiff(const QStringList &sha);
+   /*!
+    \brief Signal triggered when the user wants to amend a commit.
+
+    \param sha The SHA of the commit to amend.
+   */
    void signalAmendCommit(const QString &sha);
+   /*!
+    \brief Signal triggered when a merge has been requested. Since it involves a lot of changes at UI level this action
+    is not performed here.
+
+    \param origin The branch to merge from.
+    \param destination The branch to merge into.
+   */
    void signalMergeRequired(const QString &origin, const QString &destination);
 
 public:
+   /**
+    * @brief Default constructor.
+    *
+    * @param cache The internal cache for the current repository.
+    * @param git The git object to perform Git commands.
+    * @param parent The parent widget if needed.
+    */
    explicit CommitHistoryView(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                               QWidget *parent = nullptr);
+   /**
+    * @brief Destructor.
+    */
    ~CommitHistoryView() override;
 
+   /**
+    * @brief Sets the model that will be used by the view.
+    *
+    * @param model Model to set into the view.
+    */
    void setModel(QAbstractItemModel *model) override;
+   /**
+    * @brief Returns the list of SHAs that the user has selected in the view.
+    *
+    * @return QList<QString> Gets the selected SHA list.
+    */
    QList<QString> getSelectedShaList() const;
+   /**
+    * @brief If the view has a filter active this method tells the filter which SHAs are going to be shown.
+    *
+    * @param shaList List of SHA to pass to the filter.
+    */
    void filterBySha(const QStringList &shaList);
+   /**
+    * @brief Activates/deactivates filtering in the view.
+    *
+    * @param activate True to activate the filter. Otherwise false,
+    */
    void activateFilter(bool activate) { mIsFiltering = activate; }
+   /**
+    * @brief Tells if the user has any active filter.
+    *
+    * @return bool Returns true if the widget is actively filtering. Otherwise, false.
+    */
    bool hasActiveFilter() const { return mIsFiltering; }
 
+   /**
+    * @brief Clears any selection or data in the view.
+    */
    void clear();
+   /**
+    * @brief Puts the focus (and selectes) the given SHA.
+    *
+    * @param goToSha The SHA to select.
+    */
    void focusOnCommit(const QString &goToSha);
+   /**
+    * @brief Gets the current selected SHA.
+    *
+    * @return QString Returns the current selected SHA.
+    */
    QString getCurrentSha() const { return mCurrentSha; }
+   /**
+    * @brief Overrided function to make it public. Useful to retrieve the indexes when a search is done.
+    *
+    * @return QModelIndexList The list of selected indexes.
+    */
    QModelIndexList selectedIndexes() const override;
 
 private:
@@ -65,8 +150,28 @@ private:
    bool mIsFiltering = false;
    QString mCurrentSha;
 
-   void showContextMenu(const QPoint &);
+   /**
+    * @brief Shows the context menu for the CommitHistoryView.
+    *
+    * @param p The point where the context menu will be shown.
+    */
+   void showContextMenu(const QPoint &p);
+   /**
+    * @brief Saves the state of the header (width of the columns, which columns, etc) when the widget is going to be
+    * destroyed.
+    */
    void saveHeaderState();
+   /**
+    * @brief Configures the tree view and how the columns look like.
+    *
+    * @fn setupGeometry
+    */
    void setupGeometry();
-   void currentChanged(const QModelIndex &, const QModelIndex &) override;
+   /**
+    * @brief Stores the new selected SHA.
+    *
+    * @param index The index that changed. Used to retrieve the row.
+    * @param parent The parent of the index. Not used.
+    */
+   void currentChanged(const QModelIndex &index, const QModelIndex &parent) override;
 };

@@ -28,33 +28,69 @@
 
 class GitBase;
 
-class DiffHighlighter : public QSyntaxHighlighter
-{
-public:
-   DiffHighlighter(QTextEdit *p);
-   virtual void highlightBlock(const QString &text) override;
-};
+/*!
+ \brief The FullDiffWidget class is an overload class inherited from QTextEdit that process the output from a diff for a
+ full commit diff. It includes a highlighter for the lines that are added, removed and to differentiate where a file
+ diff chuck starts.
 
+*/
 class FullDiffWidget : public QTextEdit
 {
    Q_OBJECT
 
 public:
+   /*!
+    \brief Default constructor.
+
+    \param git The git object to perform Git operations.
+    \param parent The parent widget if needed.
+   */
    explicit FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
 
+   /*!
+    \brief Reloads the current diff in case the user loaded the work in progress as base commit.
+
+   */
    void reload();
+   /*!
+    \brief Loads a diff for a specific commit SHA respect another commit SHA.
+
+    \param sha The base commit SHA.
+    \param diffToSha The commit SHA to comapre to.
+   */
    void loadDiff(const QString &sha, const QString &diffToSha);
+   /*!
+    \brief Gets the base commit SHA.
+
+    \return QString The base commit SHA.
+   */
    QString getCurrentSha() const { return mCurrentSha; }
+   /*!
+    \brief Gets the commit SHA that is used to compare agains the base.
+
+    \return QString The commit SHA that is used to compare to the base SHA.
+   */
    QString getPreviousSha() const { return mPreviousSha; }
 
 private:
-   friend class DiffHighlighter;
    QSharedPointer<GitBase> mGit;
    QString mCurrentSha;
    QString mPreviousSha;
+   QString mPreviousDiffText;
 
-   void processData(const QString &fileChunk);
+   class DiffHighlighter : public QSyntaxHighlighter
+   {
+   public:
+      DiffHighlighter(QTextEdit *p);
+      void highlightBlock(const QString &text) override;
+   };
 
    DiffHighlighter *diffHighlighter = nullptr;
-   QString mPreviousDiffText;
+
+   /*!
+    \brief Method that processes the data from the Git diff command.
+
+    \param fileChunk The file chuck to compare.
+   */
+   void processData(const QString &fileChunk);
 };

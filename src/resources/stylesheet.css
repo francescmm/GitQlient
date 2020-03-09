@@ -42,7 +42,7 @@ CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoW
 
 #labelSha
 {
-    padding: 8px 10px 8px 10px;
+    padding: 8px 10px;
     font-weight: bold;
     font-family: Ubuntu Mono;
 }
@@ -152,11 +152,6 @@ FullDiffWidget, #leCommitTitle, #teDescription
     border-style: solid;
 }
 
-#leCommitTitle
-{
-    border-right: 0;
-}
-
 WorkInProgressWidget > #leAuthorName
 {
     border-bottom-width: 1px;
@@ -192,6 +187,7 @@ FileDiffView
 
 #leCommitTitle
 {
+    border-right: 0;
     border-bottom-width: 1px;
     border-bottom-style: solid;
     max-height: 30px;
@@ -212,7 +208,7 @@ QHeaderView:section
     border: 0;
     border-right-width: 1px;
     border-right-style: solid;
-    padding: 5px 15px 5px 15px;
+    padding: 5px 15px;
 }
 
 /**  END  QHeaderView **/
@@ -233,11 +229,7 @@ BranchDlg > QLineEdit, HistoryWidget > QLineEdit
    min-height: 25px;
    max-width: 31px;
    min-width: 31px;
-}
-
-#openNewRepo
-{
-    padding-left: 10px;
+   padding-left: 10px;
 }
 
 QTabWidget::pane
@@ -348,7 +340,7 @@ QScrollBar:vertical
 {
     border: 0;
     width: 16px;
-    margin: 16px 0 16px 0;
+    margin: 16px 0;
     border-left-width: 1px;
     border-left-style: solid;
 }
@@ -359,7 +351,7 @@ QScrollBar:horizontal
     border-top-width: 1px;
     border-top-style: solid;
     height: 16px;
-    margin: 0 16px 0 16px;
+    margin: 0 16px;
 }
 
 QScrollBar::handle:vertical

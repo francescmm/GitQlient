@@ -48,7 +48,6 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       paintLog(p, newOpt, index);
    else
    {
-
       p->setPen(GitQlientStyles::getTextColor());
       newOpt.rect.setX(newOpt.rect.x() + 10);
 
@@ -66,6 +65,11 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()),
                   QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
    }
+}
+
+QSize RepositoryViewDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
+{
+   return QSize(LANE_WIDTH, ROW_HEIGHT);
 }
 
 void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool laneHeadPresent, int x1, int x2,

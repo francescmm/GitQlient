@@ -25,39 +25,74 @@
 
 #include <QPlainTextEdit>
 
-class LineNumberArea;
+/*!
+ \brief The FileDiffView is an overload QPlainTextEdit class used to show the contents of a file diff between two
+ commits.
 
+*/
 class FileDiffView : public QPlainTextEdit
 {
    Q_OBJECT
 
 public:
+   /*!
+    \brief Default constructor.
+
+    \param parent The parent widget if needed.
+   */
    FileDiffView(QWidget *parent = nullptr);
 
-   void lineNumberAreaPaintEvent(QPaintEvent *event);
-   int lineNumberAreaWidth();
-
 protected:
+   /*!
+    \brief Overloaded method to process the resize event. Used to set an updated geometry to the line number area.
+
+    \param event The resize event.
+   */
    void resizeEvent(QResizeEvent *event) override;
 
-private slots:
+private:
+   /*!
+    \brief Updates the line number area width based on the number of the line.
+
+    \param newBlockCount The number of the line.
+   */
    void updateLineNumberAreaWidth(int newBlockCount);
-   void updateLineNumberArea(const QRect &, int);
+   /*!
+    \brief Updates the line number area whenever the QPlainTextEdit emits the updateRequest signal.
+
+    \param rect The rect area that was updated.
+    \param dy The increment.
+   */
+   void updateLineNumberArea(const QRect &rect, int dy);
+
+   /*!
+    \brief Method called by the line number area to paint the content of the QPlainTextEdit.
+
+    \param event The paint event.
+    */
+   void lineNumberAreaPaintEvent(QPaintEvent *event);
+
+   /*!
+    \brief Returns the width of the line number area.
+
+    \return int The width in pixels.
+    */
+   int lineNumberAreaWidth();
 
 private:
+   class LineNumberArea : public QWidget
+   {
+   public:
+      LineNumberArea(FileDiffView *editor);
+
+      QSize sizeHint() const override;
+
+   protected:
+      void paintEvent(QPaintEvent *event) override;
+
+   private:
+      FileDiffView *fileDiffWidget;
+   };
+
    LineNumberArea *mLineNumberArea;
-};
-
-class LineNumberArea : public QWidget
-{
-public:
-   LineNumberArea(FileDiffView *editor);
-
-   QSize sizeHint() const override;
-
-protected:
-   void paintEvent(QPaintEvent *event) override;
-
-private:
-   FileDiffView *fileDiffWidget;
 };

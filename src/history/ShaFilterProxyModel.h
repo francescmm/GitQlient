@@ -25,20 +25,54 @@
 
 #include <QSortFilterProxyModel>
 
+/**
+ * @brief The ShaFilterProxyModel class is an overload of the QSortFilterProxyModel that takes a list of shas to act as
+ * a filter between a view and a QAbstractiItemModel.
+ *
+ */
 class ShaFilterProxyModel : public QSortFilterProxyModel
 {
    Q_OBJECT
 
 public:
+   /**
+    * @brief Default constructor.
+    *
+    * @param parent The parent widget if needed.
+    */
    explicit ShaFilterProxyModel(QObject *parent = nullptr);
 
+   /**
+    * @brief Sets the list of accepted SHAs that will be shown in the source model.
+    *
+    * @param acceptedShaList The SHAs list.
+    */
    void setAcceptedSha(const QStringList &acceptedShaList) { mAcceptedShas = acceptedShaList; }
+   /**
+    * @brief Starts the reset of the model
+    *
+    */
    void beginResetModel() { QSortFilterProxyModel::beginResetModel(); }
+   /**
+    * @brief Ends the reset of the model.
+    *
+    */
    void endResetModel() { QSortFilterProxyModel::endResetModel(); }
 
 protected:
+   /**
+    * @brief This method is the actual filter functionality. Given the source row and the source index it retrieves the
+    * sha and checks if it's among the accepted SHAs in the list.
+    *
+    * @param sourceRow The source row number.
+    * @param sourceParent The source index.
+    * @return bool Returns true if the source row should be shown in the view.
+    */
    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
 private:
+   /**
+    * @brief mAcceptedShas List of accepted shas.
+    */
    QStringList mAcceptedShas;
 };

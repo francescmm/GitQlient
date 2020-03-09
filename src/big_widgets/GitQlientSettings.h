@@ -26,17 +26,49 @@
 #include <QSettings>
 #include <QVector>
 
+/*!
+ \brief The GitQlientSettings is an overloaded implementation of the QSettings that tries to help the user when a config
+ parameter is modified by triggering a signal to notify the UI.
+
+*/
 class GitQlientSettings : public QSettings
 {
    Q_OBJECT
 
 signals:
+   /*!
+    \brief Signal triggered when a value in the settings is changed. Only triggered if the value is changed using this
+    class.
+
+    \param key The key whose value changed.
+    \param value The new value for the key.
+   */
    void valueChanged(const QString &key, const QVariant &value);
 
 public:
+   /*!
+    \brief Default constructor.
+
+   */
    GitQlientSettings() = default;
 
+   /*!
+    \brief Sets a value for a given \p key.
+
+    \param key The key.
+    \param value The new value for the key.
+   */
    void setValue(const QString &key, const QVariant &value);
+   /*!
+    \brief Stores that a project is opened. This is used to recalculate which projects are the most used.
+
+    \param projectPath The project path of the repository.
+   */
    void setProjectOpened(const QString &projectPath);
+   /*!
+    \brief Gets all the most used projects.
+
+    \return QVector<QString> Projects list.
+   */
    QVector<QString> getRecentProjects() const;
 };

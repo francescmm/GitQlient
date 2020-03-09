@@ -52,7 +52,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mCommitWidget, &WorkInProgressWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
    connect(mCommitWidget, &WorkInProgressWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
 
-   connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalOpenFileCommit);
+   connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalShowDiff);
    connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
 
    mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
