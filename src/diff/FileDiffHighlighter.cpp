@@ -40,8 +40,3 @@ void FileDiffHighlighter::highlightBlock(const QString &text)
          setFormat(0, text.length(), myFormat);
    }
 }
-
-void FileDiffHighlighter::resetState()
-{
-   mFirstModificationFound = false;
-}

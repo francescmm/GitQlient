@@ -30,18 +30,55 @@ class FileDiffView;
 class QPushButton;
 class GitBase;
 
+/*!
+ \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
+ specific file.
+
+ \class FileDiffWidget FileDiffWidget.h "FileDiffWidget.h"
+*/
 class FileDiffWidget : public QFrame
 {
    Q_OBJECT
 
 public:
+   /*!
+    \brief Default constructor.
+
+    \param git The git object to perform Git operations.
+    \param parent The parent widget if needed.
+   */
    explicit FileDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
 
+   /*!
+    \brief Clears the current information on the diff view.
+   */
    void clear();
+   /*!
+    \brief Reloads the information currently displayed in the diff view. The relaod only is applied if the current file
+    could change, that is if the user is watching the work in progress state. \return bool Returns true if the reload
+    was done, otherwise false.
+   */
    bool reload();
+   /*!
+    \brief Configures the diff view with the two commits that will be compared and the file that will be applied.
+
+    \param currentSha The base SHA.
+    \param previousSha The SHA to compare to.
+    \param file The file that will show the diff.
+    \return bool Returns true if the configuration was applied, otherwise false.
+   */
    bool configure(const QString &currentSha, const QString &previousSha, const QString &file);
-   QString getCurrentFile() const { return mCurrentFile; }
+   /*!
+    \brief Gets the current SHA.
+
+    \return QString The current SHA.
+   */
    QString getCurrentSha() const { return mCurrentSha; }
+   /*!
+    \brief Gets the SHA agains the diff is comparing to.
+
+    \return QString The SHA that the diff is compared to.
+   */
    QString getPreviousSha() const { return mPreviousSha; }
 
 private:
