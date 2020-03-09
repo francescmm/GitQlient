@@ -30,7 +30,7 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    mHistory->setCheckable(true);
    mHistory->setIcon(QIcon(":/icons/git_orange"));
    mHistory->setIconSize(QSize(22, 22));
-   mHistory->setText("Repo view");
+   mHistory->setText("View");
    mHistory->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
    mDiff->setCheckable(true);

@@ -83,7 +83,9 @@ WorkInProgressWidget::~WorkInProgressWidget()
 
 void WorkInProgressWidget::configure(const QString &sha)
 {
-   if (mCache->getCommitInfo(sha).parentsCount() > 0)
+   const auto wipCommit = mCache->getCommitInfo(sha);
+
+   if (wipCommit.parentsCount() > 0)
    {
       const auto shaChange = mCurrentSha != sha;
       mCurrentSha = sha;

@@ -27,6 +27,8 @@
 #include <QString>
 #include <QObject>
 
+#include <GitExecResult.h>
+
 class GitBase;
 
 struct GitUserInfo
@@ -53,6 +55,8 @@ public:
    void setLocalUserInfo(const GitUserInfo &info);
    bool clone(const QString &url, const QString &fullPath);
    bool initRepo(const QString &fullPath);
+   GitExecResult getLocalConfig() const;
+   GitExecResult getGlobalConfig() const;
 
 private:
    QSharedPointer<GitBase> mGitBase;

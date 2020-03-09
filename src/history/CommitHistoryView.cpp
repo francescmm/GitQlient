@@ -102,8 +102,6 @@ void CommitHistoryView::setupGeometry()
 void CommitHistoryView::currentChanged(const QModelIndex &index, const QModelIndex &)
 {
    mCurrentSha = model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
-
-   emit clicked(index);
 }
 
 void CommitHistoryView::clear()

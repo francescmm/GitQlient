@@ -145,10 +145,15 @@ public:
     * @param totalCommits
     */
    void onNewRevisions(int totalCommits);
+   /*!
+    * \brief Gets the number of columns in the model.
+    * \return The number of columns.
+    */
+   int columnCount() const { return mColumns.count(); }
 
 private:
-   QSharedPointer<RevisionsCache> mCache; /**< TODO: describe */
-   QSharedPointer<GitBase> mGit; /**< TODO: describe */
+   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitBase> mGit;
 
    /**
     * @brief
@@ -168,10 +173,10 @@ private:
     */
    QVariant getDisplayData(const CommitInfo &rev, int column) const;
 
-   QMap<CommitHistoryColumns, QString> mColumns; /**< TODO: describe */
-   int earlyOutputCnt = 0; /**< TODO: describe */
-   int rowCnt = 0; /**< TODO: describe */
-   QStringList curFNames; /**< TODO: describe */
-   QStringList renamedRevs; /**< TODO: describe */
-   QHash<QString, QString> renamedPatches; /**< TODO: describe */
+   QMap<CommitHistoryColumns, QString> mColumns;
+   int earlyOutputCnt = 0;
+   int rowCnt = 0;
+   QStringList curFNames;
+   QStringList renamedRevs;
+   QHash<QString, QString> renamedPatches;
 };

@@ -185,8 +185,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          setWatcher();
 
-         mHistoryWidget->onCommitSelected(CommitInfo::ZERO_SHA);
-
          mHistoryWidget->reload();
 
          mBlameWidget->init(newDir);
