@@ -90,7 +90,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mHistoryWidget, &HistoryWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
    connect(mHistoryWidget, &HistoryWidget::signalUpdateUi, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mHistoryWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
-   connect(mHistoryWidget, &HistoryWidget::signalOpenFileCommit, this, &GitQlientRepo::loadFileDiff);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, mControls, &Controls::activateMergeWarning);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, this, &GitQlientRepo::showWarningMerge);
    connect(mHistoryWidget, &HistoryWidget::signalUpdateWip, this, &GitQlientRepo::updateWip);
@@ -230,11 +229,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
    }
 }
 
-void GitQlientRepo::close()
-{
-   QWidget::close();
-}
-
 void GitQlientRepo::setWatcher()
 {
    const auto gitWatcher = new QFileSystemWatcher(this);
@@ -366,9 +360,8 @@ void GitQlientRepo::updateWip()
    mHistoryWidget->updateUiFromWatcher();
 }
 
-void GitQlientRepo::openCommitDiff()
+void GitQlientRepo::openCommitDiff(const QString currentSha)
 {
-   const auto currentSha = mHistoryWidget->getCurrentSha();
    const auto rev = mGitQlientCache->getCommitInfo(currentSha);
 
    mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
@@ -398,10 +391,6 @@ void GitQlientRepo::changesCommitted(bool ok)
 void GitQlientRepo::closeEvent(QCloseEvent *ce)
 {
    QLog_Info("UI", QString("Closing GitQlient for repository {%1}").arg(mCurrentDir));
-
-   emit closeAllWindows();
-
-   hide();
 
    mGitLoader->cancelAll();
 

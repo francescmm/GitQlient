@@ -29,6 +29,10 @@ class QToolButton;
 class QPushButton;
 class GitBase;
 
+/*!
+ \brief Enum used to configure the different views handled by the Controls widget.
+
+*/
 enum class ControlsMainViews
 {
    HISTORY,
@@ -37,27 +41,98 @@ enum class ControlsMainViews
    MERGE
 };
 
+/*!
+ \brief The Controls class creates the layout to store all the buttons that acts over the UI current view and the most
+ used Git actions.
+
+*/
 class Controls : public QFrame
 {
    Q_OBJECT
 
 signals:
+   /*!
+    \brief Signal triggered when the user whants to go to the main repository view.
+
+   */
    void signalGoRepo();
+   /*!
+    \brief Signal triggered when the user selects the diff view.
+
+   */
    void signalGoDiff();
+   /*!
+    \brief Signal triggered when the user selects the Blame&History view.
+
+   */
    void signalGoBlame();
+   /*!
+    \brief Signal triggered when the user selects the merge conflict resolution view.
+
+   */
    void signalGoMerge();
+   /*!
+    \brief Signal triggered when the user manually forces a refresh of the repository data.
+
+   */
    void signalRepositoryUpdated();
 
 public:
+   /*!
+    \brief Default constructor.
+
+    \param git The git object to perform Git operations.
+    \param parent The parent widget if needed.
+   */
    explicit Controls(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   /*!
+    \brief Process the toggled button and triggers its corresponding action.
+
+    \param view The view the user selected.
+   */
    void toggleButton(ControlsMainViews view);
+   /*!
+    \brief Sets the current SHA.
+
+    \param sha The SHA hash.
+   */
    void setCurrentSha(const QString &sha) { mCurrentSha = sha; }
+   /*!
+    \brief Set all the buttons as enabled.
+
+    \param enabled True to enable, false otherwise.
+   */
    void enableButtons(bool enabled);
+   /*!
+    \brief Performs the fetch action. Can be triggered manually or by a timer.
+
+   */
    void fetchAll();
+   /*!
+    \brief Activates the merge warning frame.
+
+   */
    void activateMergeWarning();
+   /*!
+    \brief Disables the merge warning frame.
+
+   */
    void disableMergeWarning();
+   /*!
+    \brief Disables the diff button and view.
+
+   */
    void disableDiff();
+   /*!
+    \brief Enables the diff button and view.
+
+   */
    void enableDiff();
+   /*!
+    \brief Gets the current selected button/view.
+
+    \return ControlsMainViews The value of the current selected button.
+   */
    ControlsMainViews getCurrentSelectedButton() const;
 
 private:
@@ -72,9 +147,29 @@ private:
    QToolButton *mRefreshBtn = nullptr;
    QPushButton *mMergeWarning = nullptr;
 
+   /*!
+    \brief Pulls the current branch.
+
+   */
    void pullCurrentBranch();
+   /*!
+    \brief Pushes the current local branch changes.
+
+   */
    void pushCurrentBranch();
+   /*!
+    \brief Stashes the current work.
+
+   */
    void stashCurrentWork();
+   /*!
+    \brief Pops the latest stashed work in the current branch.
+
+   */
    void popStashedWork();
+   /*!
+    \brief Prunes all branches, tags and stashes.
+
+   */
    void pruneBranches();
 };

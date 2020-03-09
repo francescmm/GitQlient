@@ -42,18 +42,18 @@ public:
    /*!
     \brief Default constructor.
 
-    \param git The git object to execute Git commands.
-    \param cache The internal cache for the current repository.
+    \param git The git object to perform Git operations.
+    \param cache The repository internal cache.
     \param parent The parent widget if needed.
    */
    explicit CommitDiffWidget(QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache,
                              QWidget *parent = nullptr);
 
    /*!
-    \brief Configures the widget to open a diff between two commits.
+    \brief Configures the widget by passing the two SHAs that will be compared.
 
-    \param firstSha The base commit.
-    \param secondSha The commit we want to compare to.
+    \param firstSha The first SHA or base.
+    \param secondSha The second SHA.
    */
    void configure(const QString &firstSha, const QString &secondSha);
 

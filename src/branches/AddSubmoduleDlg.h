@@ -32,14 +32,33 @@ namespace Ui
 class AddSubmoduleDlg;
 }
 
+/**
+ * @brief AddSubmoduleDlg creates a dialog for the user to add a new submodule in the current repository.
+ *
+ */
 class AddSubmoduleDlg : public QDialog
 {
    Q_OBJECT
 
 public:
+   /**
+    * @brief Default constructor.
+    *
+    * @param git The git object to execute Git commands.
+    * @param parent The parent widget if needed.
+    */
    explicit AddSubmoduleDlg(const QSharedPointer<GitSubmodules> &git, QWidget *parent = nullptr);
+   /**
+    * @brief Destructor.
+    *
+    */
    ~AddSubmoduleDlg() override;
 
+   /**
+    * @brief When the user clicks the Ok/Accept button, it triggers the \ref accept method that validates the data and
+    * tries to perform the Git action.If it's successfully executed, it will close the dialog.
+    *
+    */
    void accept() override;
 
 private:

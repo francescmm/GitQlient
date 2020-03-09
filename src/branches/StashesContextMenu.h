@@ -27,22 +27,53 @@
 
 class GitBase;
 
+/*!
+ \brief The StashesContextMenu shows the different options that can be performed to the stashes.
+
+*/
 class StashesContextMenu : public QMenu
 {
    Q_OBJECT
 
 signals:
+   /*!
+    \brief Signal triggered if a stash was removed.
+
+   */
    void signalContentRemoved();
+   /*!
+    \brief Signal triggered when the main GitQlient UI needs to be udpated because of a change in the stashes.
+
+   */
    void signalUpdateView();
 
 public:
+   /*!
+    \brief Default constructor.
+
+    \param git The git object to perform Git operations.
+    \param stashId The stash ID that will be used to perform operations into.
+    \param parent The parent widget if needed.
+   */
    explicit StashesContextMenu(const QSharedPointer<GitBase> &git, const QString &stashId, QWidget *parent = nullptr);
 
 private:
    QSharedPointer<GitBase> mGit;
    QString mStashId;
 
+   /*!
+    \brief Drops a stash.
+
+   */
    void drop();
+   /*!
+    \brief Clears the stash.
+
+   */
    void clear();
+   /*!
+    \brief Creates a branch where the stash is located.
+
+   */
    void branch();
 };
