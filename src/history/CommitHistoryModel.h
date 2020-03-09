@@ -29,15 +29,11 @@
 class RevisionsCache;
 class GitBase;
 class CommitInfo;
-/**
- * @brief
- *
- * @enum CommitHistoryColumns
- */
 enum class CommitHistoryColumns;
 
 /**
- * @brief
+ * @brief The CommitHistoryModel contains the data model (is the Model in the MVC pattern) that will be diplayed by the
+ * view.
  *
  * @class CommitHistoryModel CommitHistoryModel.h "CommitHistoryModel.h"
  */
@@ -46,103 +42,90 @@ class CommitHistoryModel : public QAbstractItemModel
    Q_OBJECT
 public:
    /**
-    * @brief
+    * @brief The default constructor.
     *
-    * @fn CommitHistoryModel
-    * @param cache
-    * @param git
-    * @param parent
+    * @param cache The internal cache of the current repository.
+    * @param git The git object to execute Git operations.
+    * @param parent The parent widget if needed.
     */
    explicit CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                QObject *parent = nullptr);
    /**
-    * @brief
-    *
-    * @fn ~CommitHistoryModel
+    * @brief The destructor
     */
    ~CommitHistoryModel() override;
 
    /**
-    * @brief
-    *
-    * @fn clear
+    * @brief Clears the contents without deleting the cache.
     */
    void clear();
    /**
-    * @brief
+    * @brief Method used to retrieve the sha of a specific row. The view access this method instead of the internal
+    * cache becuase the row could change when a pxoxy filter is used between the View and the Model data.
     *
-    * @fn sha
-    * @param row
-    * @return QString
+    * @param row The row to get the SHA from.
+    * @return QString The SHA.
     */
    QString sha(int row) const;
 
    /**
-    * @brief
+    * @brief Returns the data stored under the given \p role for the item referred to by the \p index
     *
-    * @fn data
-    * @param index
-    * @param role
-    * @return QVariant
+    * @param index The index to get the data from.
+    * @param role The role from where to extrat the data.
+    * @return QVariant The data value.
     */
    QVariant data(const QModelIndex &index, int role) const override;
    /**
-    * @brief
+    * @brief Returns the header data for a specific column.
     *
-    * @fn headerData
-    * @param s
-    * @param o
-    * @param role
-    * @return QVariant
+    * @param s The column.
+    * @param o The orientation. Refers to what header to extract the data: Horizontal or Vertical.
+    * @param role The role from where to extract the data.
+    * @return QVariant The data.
     */
    QVariant headerData(int s, Qt::Orientation o, int role = Qt::DisplayRole) const override;
    /**
-    * @brief
+    * @brief Returns the index of the item in the model specified by the given row, column and parent index
     *
-    * @fn index
-    * @param r
-    * @param c
-    * @param par
-    * @return QModelIndex
+    * @param r The row number.
+    * @param c The column number.
+    * @param par The parent index.
+    * @return QModelIndex The index.
     */
    QModelIndex index(int r, int c, const QModelIndex &par = QModelIndex()) const override;
    /**
-    * @brief
+    * @brief Returns the parent of the model item with the given index. If the item has no parent, an invalid
+    * QModelIndex is returned.
     *
-    * @fn parent
-    * @param index
-    * @return QModelIndex
+    * @param index The index.
+    * @return QModelIndex The parent of the given \p index.
     */
    QModelIndex parent(const QModelIndex &index) const override;
    /**
-    * @brief
+    * @brief Returns the number of rows of an index.
     *
-    * @fn rowCount
-    * @param par
-    * @return int
+    * @param par The index to retrieve the rows.
+    * @return int The number of rows.
     */
    int rowCount(const QModelIndex &par = QModelIndex()) const override;
    /**
-    * @brief
+    * @brief Returns if an index contains children.
     *
-    * @fn hasChildren
-    * @param par
-    * @return bool
+    * @param par The index.
+    * @return bool True if has children, otherwise false.
     */
    bool hasChildren(const QModelIndex &par = QModelIndex()) const override;
    /**
-    * @brief
+    * @brief Returns the number of columns of the model.
     *
-    * @fn columnCount
-    * @param
-    * @return int
+    * @return int The number of columns.
     */
    int columnCount(const QModelIndex &) const override { return mColumns.count(); }
    /**
-    * @brief
+    * @brief Resets the model when new revisions are available.
     *
-    * @fn onNewRevisions
-    * @param totalCommits
+    * @param totalCommits The total of new revisions.
     */
    void onNewRevisions(int totalCommits);
    /*!
@@ -156,20 +139,18 @@ private:
    QSharedPointer<GitBase> mGit;
 
    /**
-    * @brief
+    * @brief Returns the tool tip data.
     *
-    * @fn getToolTipData
-    * @param r
-    * @return QVariant
+    * @param r The commit to generate the tooltip data.
+    * @return QVariant The tool tip data.
     */
    QVariant getToolTipData(const CommitInfo &r) const;
    /**
-    * @brief
+    * @brief Returns the data that will be display for every \p column.
     *
-    * @fn getDisplayData
-    * @param rev
-    * @param column
-    * @return QVariant
+    * @param rev The commit infor to retrieve the data that will be displayed.
+    * @param column The column where the data will be shown.
+    * @return QVariant The data to be shown.
     */
    QVariant getDisplayData(const CommitInfo &rev, int column) const;
 

@@ -31,7 +31,8 @@ class CommitHistoryModel;
 class ShaFilterProxyModel;
 
 /**
- * @brief
+ * @brief The CommitHistoryView is the class that represents the View in a MVC pattern. It shows the data provided by
+ * the model regarding the repository graph and the commit information.
  *
  * @class CommitHistoryView CommitHistoryView.h "CommitHistoryView.h"
  */
