@@ -63,13 +63,24 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    historyBlameLayout->addWidget(mTabWidget, 0, 1, 2, 1);
 
    mTabWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-   connect(mTabWidget, &QTabWidget::currentChanged, this, &BlameWidget::reloadHistory);
 
    connect(mTabWidget, &QTabWidget::tabCloseRequested, mTabWidget, [this](int index) {
-      auto widget = mTabWidget->widget(index);
+      if (index == mLastTabIndex)
+      {
+         fileSystemView->clearSelection();
+         mRepoView->blockSignals(true);
+         mRepoView->filterBySha({});
+         mRepoView->blockSignals(false);
+      }
+
+      auto widget = qobject_cast<FileBlameWidget *>(mTabWidget->widget(index));
       mTabWidget->removeTab(index);
+      const auto key = mTabsMap.key(widget);
+      mTabsMap.remove(key);
+
       delete widget;
    });
+   connect(mTabWidget, &QTabWidget::currentChanged, this, &BlameWidget::reloadHistory);
 
    setAttribute(Qt::WA_DeleteOnClose);
 }
@@ -114,6 +125,7 @@ void BlameWidget::showFileHistory(const QString &filePath)
          mTabWidget->setCurrentIndex(index);
          mTabWidget->blockSignals(false);
 
+         mLastTabIndex = index;
          mTabsMap.insert(filePath, fileBlameWidget);
       }
    }
@@ -145,6 +157,8 @@ void BlameWidget::reloadHistory(int tabIndex)
 {
    if (tabIndex >= 0)
    {
+      mLastTabIndex = tabIndex;
+
       const auto blameWidget = qobject_cast<FileBlameWidget *>(mTabWidget->widget(tabIndex));
       const auto sha = blameWidget->getCurrentSha();
       const auto file = blameWidget->getCurrentFile();

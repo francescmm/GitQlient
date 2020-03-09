@@ -113,6 +113,7 @@ private:
    QMap<QString, FileBlameWidget *> mTabsMap;
    RepositoryViewDelegate *mItemDelegate = nullptr;
    int mSelectedRow = -1;
+   int mLastTabIndex = 0;
 
    /**
     * @brief Opens the blame for a given index from the file system model. This method configures both the history view,
