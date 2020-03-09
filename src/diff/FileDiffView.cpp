@@ -84,18 +84,18 @@ void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
    }
 }
 
-LineNumberArea::LineNumberArea(FileDiffView *editor)
+FileDiffView::LineNumberArea::LineNumberArea(FileDiffView *editor)
    : QWidget(editor)
 {
    fileDiffWidget = editor;
 }
 
-QSize LineNumberArea::sizeHint() const
+QSize FileDiffView::LineNumberArea::sizeHint() const
 {
    return { fileDiffWidget->lineNumberAreaWidth(), 0 };
 }
 
-void LineNumberArea::paintEvent(QPaintEvent *event)
+void FileDiffView::LineNumberArea::paintEvent(QPaintEvent *event)
 {
    fileDiffWidget->lineNumberAreaPaintEvent(event);
 }
