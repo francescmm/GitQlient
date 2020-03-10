@@ -65,8 +65,8 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *pare
    const auto localHeader = mLocalBranchesTree->headerItem();
    localHeader->setText(0, QString("   %1").arg(tr("Local")));
    localHeader->setIcon(0, QIcon(":/icons/local"));
-   localHeader->setText(1, tr("To master"));
-   localHeader->setText(2, tr("To origin"));
+   localHeader->setText(1, tr("Master"));
+   localHeader->setText(2, tr("Origin"));
 
    mRemoteBranchesTree->setColumnCount(1);
    mRemoteBranchesTree->setMouseTracking(true);
@@ -363,15 +363,19 @@ void BranchesWidget::processLocalBranch(QString branch)
 
    QScopedPointer<GitBranches> git(new GitBranches(mGit));
 
-   auto distanceToMaster = QString("Local");
+   auto distanceToMaster = QString("Not found");
    auto distanceToOrigin = QString("Local");
 
    if (fullBranchName != "detached")
    {
-      distanceToMaster = git->getDistanceBetweenBranches(true, fullBranchName).output.toString();
-      distanceToMaster.replace('\n', "");
-      distanceToMaster.replace('\t', "\u2193 - ");
-      distanceToMaster.append("\u2191");
+      const auto toMaster = git->getDistanceBetweenBranches(true, fullBranchName).output.toString();
+
+      if (!toMaster.contains("fatal"))
+      {
+         distanceToMaster.replace('\n', "");
+         distanceToMaster.replace('\t', "\u2193 - ");
+         distanceToMaster.append("\u2191");
+      }
 
       const auto toOrigin = git->getDistanceBetweenBranches(false, fullBranchName).output.toString();
 
@@ -379,7 +383,7 @@ void BranchesWidget::processLocalBranch(QString branch)
       {
          distanceToOrigin = toOrigin;
          distanceToOrigin.replace('\n', "");
-         distanceToOrigin.append("\u2191");
+         distanceToOrigin.append("\u2193");
       }
    }
 

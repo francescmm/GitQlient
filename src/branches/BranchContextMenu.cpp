@@ -140,8 +140,9 @@ void BranchContextMenu::rename()
 
 void BranchContextMenu::deleteBranch()
 {
-   if (mConfig.branchSelected == "master")
-      QMessageBox::critical(this, tr("Delete master?!"), tr("You are not allowed to delete master."), QMessageBox::Ok);
+   if (!mConfig.isLocal && mConfig.branchSelected == "master")
+      QMessageBox::critical(this, tr("Delete master?!"), tr("You are not allowed to delete remote master."),
+                            QMessageBox::Ok);
    else
    {
       auto ret = QMessageBox::warning(this, tr("Delete branch!"), tr("Are you sure you want to delete the branch?"),
