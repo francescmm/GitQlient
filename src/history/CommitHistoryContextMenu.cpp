@@ -212,11 +212,16 @@ void CommitHistoryContextMenu::exportAsPatch()
 
 void CommitHistoryContextMenu::checkoutBranch()
 {
-   const auto branchName = qobject_cast<QAction *>(sender())->text();
-   QScopedPointer<GitBranches> git(new GitBranches(mGit));
-   git->checkoutRemoteBranch(branchName);
+   auto branchName = qobject_cast<QAction *>(sender())->text();
+   branchName.remove("origin/");
 
-   emit signalRepositoryUpdated();
+   QScopedPointer<GitBranches> git(new GitBranches(mGit));
+   const auto ret = git->checkoutRemoteBranch(branchName);
+
+   if (ret.success)
+      emit signalRepositoryUpdated();
+   else
+      QMessageBox::critical(this, tr("Checkout error"), ret.output.toString());
 }
 
 void CommitHistoryContextMenu::checkoutCommit()
