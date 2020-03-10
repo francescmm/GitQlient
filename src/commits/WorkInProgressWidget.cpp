@@ -398,7 +398,7 @@ void WorkInProgressWidget::revertAllChanges()
 
    for (; i >= 0; --i)
    {
-      const auto fileName = ui->unstagedFilesList->takeItem(i)->data(Qt::DisplayRole).toString();
+      const auto fileName = ui->unstagedFilesList->takeItem(i)->toolTip();
       QScopedPointer<GitLocal> git(new GitLocal(mGit));
       const auto ret = git->checkoutFile(fileName);
 
