@@ -16,7 +16,7 @@ else: unix:!android: target.path = /$$(HOME)/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 # project files
-SOURCES += main.cpp
+SOURCES += src/main.cpp
 
 include(src/App.pri)
 include(QLogger/QLogger.pri)
