@@ -293,6 +293,7 @@ void BranchesWidget::processLocalBranch(QString branch)
       sha = git->getLastCommitOfBranch(fullBranchName).output.toString();
    }
 
+   QVector<QTreeWidgetItem *> parents;
    QTreeWidgetItem *parent = nullptr;
    auto folders = branch.split("/");
    branch = folders.takeLast();
@@ -302,12 +303,20 @@ void BranchesWidget::processLocalBranch(QString branch)
       QTreeWidgetItem *child = nullptr;
 
       if (parent)
+      {
          child = getChild(parent, folder);
+         parents.append(child);
+      }
       else
       {
          for (auto i = 0; i < mLocalBranchesTree->topLevelItemCount(); ++i)
+         {
             if (mLocalBranchesTree->topLevelItem(i)->text(0) == folder)
+            {
                child = mLocalBranchesTree->topLevelItem(i);
+               parents.append(child);
+            }
+         }
       }
 
       if (!child)
@@ -319,9 +328,13 @@ void BranchesWidget::processLocalBranch(QString branch)
             mLocalBranchesTree->addTopLevelItem(item);
 
          parent = item;
+         parents.append(parent);
       }
       else
+      {
          parent = child;
+         parents.append(child);
+      }
    }
 
    auto item = new QTreeWidgetItem(parent);
@@ -332,6 +345,19 @@ void BranchesWidget::processLocalBranch(QString branch)
    item->setData(0, Qt::UserRole + 2, true);
    item->setData(0, Qt::UserRole + 3, sha);
    item->setData(0, Qt::ToolTipRole, fullBranchName);
+
+   if (isCurrentBranch)
+   {
+      item->setSelected(true);
+
+      for (const auto parent : parents)
+      {
+         mLocalBranchesTree->setCurrentItem(item);
+         mLocalBranchesTree->expandItem(parent);
+         const auto indexToScroll = mLocalBranchesTree->currentIndex();
+         mLocalBranchesTree->scrollTo(indexToScroll);
+      }
+   }
 
    QLog_Debug("UI", QString("Calculating distances..."));
 
