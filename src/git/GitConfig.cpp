@@ -87,3 +87,29 @@ GitExecResult GitConfig::getGlobalConfig() const
 
    return ret;
 }
+
+GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
+{
+   const auto config = getLocalConfig();
+
+   if (config.success)
+   {
+      const auto values = config.output.toString().split('\n', QString::SkipEmptyParts);
+      const auto configKey = QString("branch.%1.remote=").arg(branch);
+      QString configValue;
+
+      for (const auto &value : values)
+      {
+         if (value.startsWith(configKey))
+         {
+            configValue = value.split("=").last();
+            break;
+         }
+      }
+
+      if (!configValue.isEmpty())
+         return { true, configValue };
+   }
+
+   return GitExecResult();
+}
