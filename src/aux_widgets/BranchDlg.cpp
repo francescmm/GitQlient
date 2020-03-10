@@ -18,6 +18,8 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
    ui->setupUi(this);
    ui->leOldName->setText(mConfig.mCurrentBranchName);
 
+   ui->chbCopyRemote->setHidden(true);
+
    switch (mConfig.mDialogMode)
    {
       case BranchDlgMode::CREATE:
@@ -39,6 +41,8 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
          setWindowTitle("Stash branch");
          break;
       case BranchDlgMode::PUSH_UPSTREAM:
+         ui->chbCopyRemote->setVisible(true);
+         connect(ui->chbCopyRemote, &QCheckBox::clicked, this, &BranchDlg::copyBranchName);
          setWindowTitle("Push upstream branch");
          ui->pbAccept->setText(tr("Push"));
          break;
@@ -93,4 +97,10 @@ void BranchDlg::accept()
 
       QDialog::accept();
    }
+}
+
+void BranchDlg::copyBranchName()
+{
+   const auto remote = ui->leOldName->text();
+   ui->leNewName->setText(remote);
 }

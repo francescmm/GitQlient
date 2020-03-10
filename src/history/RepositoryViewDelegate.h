@@ -62,13 +62,13 @@ public:
     * @param o The style options of the item.
     * @param i The index with the item data.
     */
-   virtual void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const override;
+   void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const override;
    /**
     * @brief The size hint returns the width and height for rendering purposes.
     *
     * @return QSize returns the size of a row.
     */
-   virtual QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override;
+   QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override;
 
 private:
    QSharedPointer<RevisionsCache> mCache;
