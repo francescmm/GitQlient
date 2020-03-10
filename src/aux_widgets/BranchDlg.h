@@ -115,4 +115,10 @@ private:
     * @brief Executes the Git actions based on the configuration once the validation as taken place.
     */
    void accept() override;
+
+   /**
+    * @brief copyBranchName Copies the current remote branch name into the line edit so the user doesn't have to type
+    * it.
+    */
+   void copyBranchName();
 };
