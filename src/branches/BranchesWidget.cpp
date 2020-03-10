@@ -372,6 +372,7 @@ void BranchesWidget::processLocalBranch(QString branch)
 
       if (!toMaster.contains("fatal"))
       {
+         distanceToMaster = toMaster;
          distanceToMaster.replace('\n', "");
          distanceToMaster.replace('\t', "\u2193 - ");
          distanceToMaster.append("\u2191");
