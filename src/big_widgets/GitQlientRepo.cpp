@@ -20,6 +20,7 @@
 #include <GitRepoLoader.h>
 #include <GitConfig.h>
 #include <GitBase.h>
+#include <GitHistory.h>
 
 #include <QFileSystemModel>
 #include <QTimer>
@@ -92,6 +93,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mHistoryWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, mControls, &Controls::activateMergeWarning);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, this, &GitQlientRepo::showWarningMerge);
+   connect(mHistoryWidget, &HistoryWidget::signalConflict, mControls, &Controls::activateMergeWarning);
+   connect(mHistoryWidget, &HistoryWidget::signalConflict, this, &GitQlientRepo::showWarningConflict);
    connect(mHistoryWidget, &HistoryWidget::signalUpdateWip, this, &GitQlientRepo::updateWip);
 
    connect(mDiffWidget, &DiffWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
@@ -337,6 +340,19 @@ void GitQlientRepo::showWarningMerge()
    const auto file = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
    mMergeWidget->configure(file);
+}
+
+void GitQlientRepo::showWarningConflict()
+{
+   showMergeView();
+
+   const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
+
+   QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGitBase, mGitQlientCache));
+   git->updateWipRevision();
+   const auto files = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+
+   mMergeWidget->configure(files);
 }
 
 void GitQlientRepo::showMergeView()

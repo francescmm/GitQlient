@@ -72,6 +72,10 @@ signals:
     \param destination The branch to merge into.
    */
    void signalMergeRequired(const QString &origin, const QString &destination);
+   /*!
+    * \brief signalConflict Signal triggered when trying to cherry-pick or pull and a conflict happens.
+    */
+   void signalConflict();
 
 public:
    /**

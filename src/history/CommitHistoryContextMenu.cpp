@@ -246,7 +246,16 @@ void CommitHistoryContextMenu::cherryPickCommit()
    if (ret.success)
       emit signalRepositoryUpdated();
    else
-      QMessageBox::critical(this, tr("Error while cherry-pick"), ret.output.toString());
+   {
+      const auto errorMsg = ret.output.toString();
+
+      if (errorMsg.toLower().contains("error: could not apply") && errorMsg.toLower().contains("causing a conflict"))
+      {
+         emit signalConflict();
+      }
+      else
+         QMessageBox::critical(this, tr("Error while cherry-pick"), errorMsg);
+   }
 }
 
 void CommitHistoryContextMenu::applyPatch()

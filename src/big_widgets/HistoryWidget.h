@@ -119,12 +119,14 @@ signals:
    void signalAllBranchesActive(bool showAll);
    /*!
     \brief Signal triggered when the user performs a merge and it contains conflicts.
-
    */
    void signalMergeConflicts();
    /*!
+    * \brief signalConflict Signal triggered when trying to cherry-pick or pull and a conflict happens.
+    */
+   void signalConflict();
+   /*!
     \brief Signal triggered  when the WIP needs to be updated.
-
    */
    void signalUpdateWip();
 
