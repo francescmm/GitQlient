@@ -21,7 +21,6 @@
 #include <GitConfig.h>
 #include <GitBase.h>
 
-#include <QFileSystemModel>
 #include <QTimer>
 #include <QDirIterator>
 #include <QFileSystemWatcher>
