@@ -145,21 +145,9 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 
    const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
    const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
-   const auto revFileExists = mRevisionFilesMap.contains(key);
-   const auto changed = insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
 
-   if (revFileExists && changed)
-   {
-      auto iter = mRevisionFilesMap.begin();
-
-      while (iter != mRevisionFilesMap.end())
-      {
-         if (iter.key().first == CommitInfo::ZERO_SHA || iter.key().second == CommitInfo::ZERO_SHA)
-            iter = mRevisionFilesMap.erase(iter);
-         else
-            ++iter;
-      }
-   }
+   mRevisionFilesMap.contains(key);
+   insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
 
    if (!mCacheLocked)
    {
