@@ -126,6 +126,10 @@ signals:
     */
    void signalCherryPickConflict();
    /*!
+    * \brief signalPullConflict Signal triggered when trying to pull and a conflict happens.
+    */
+   void signalPullConflict();
+   /*!
     \brief Signal triggered  when the WIP needs to be updated.
    */
    void signalUpdateWip();

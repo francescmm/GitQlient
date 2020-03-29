@@ -188,6 +188,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *pare
    connect(mLocalBranchesTree, &BranchTreeWidget::signalBranchCheckedOut, this,
            &BranchesWidget::signalBranchCheckedOut);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
+   connect(mLocalBranchesTree, &BranchTreeWidget::signalPullConflict, this, &BranchesWidget::signalPullConflict);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, mLocalBranchesTree,
            &BranchTreeWidget::clearSelection);

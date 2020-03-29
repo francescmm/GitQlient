@@ -71,6 +71,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mRepositoryView, &CommitHistoryView::signalMergeRequired, this, &HistoryWidget::mergeBranch);
    connect(mRepositoryView, &CommitHistoryView::signalCherryPickConflict, this,
            &HistoryWidget::signalCherryPickConflict);
+   connect(mRepositoryView, &CommitHistoryView::signalPullConflict, this, &HistoryWidget::signalPullConflict);
 
    mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, git, mRepositoryView));
@@ -84,6 +85,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
            qOverload<const QString &>(&HistoryWidget::goToSha));
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &HistoryWidget::signalOpenSubmodule);
    connect(mBranchesWidget, &BranchesWidget::signalMergeRequired, this, &HistoryWidget::mergeBranch);
+   connect(mBranchesWidget, &BranchesWidget::signalPullConflict, this, &HistoryWidget::signalPullConflict);
 
    GitQlientSettings settings;
 

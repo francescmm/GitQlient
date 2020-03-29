@@ -35,6 +35,7 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
       connect(menu, &BranchContextMenu::signalBranchesUpdated, this, &BranchTreeWidget::signalBranchesUpdated);
       connect(menu, &BranchContextMenu::signalCheckoutBranch, this, [this, item]() { checkoutBranch(item); });
       connect(menu, &BranchContextMenu::signalMergeRequired, this, &BranchTreeWidget::signalMergeRequired);
+      connect(menu, &BranchContextMenu::signalPullConflict, this, &BranchTreeWidget::signalPullConflict);
 
       menu->exec(viewport()->mapToGlobal(pos));
    }

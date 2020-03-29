@@ -71,9 +71,13 @@ signals:
    */
    void signalMergeRequired(const QString &origin, const QString &destination);
    /*!
-    * \brief signalConflict Signal triggered when trying to cherry-pick or pull and a conflict happens.
+    * \brief signalConflict Signal triggered when trying to cherry-pick and a conflict happens.
     */
    void signalCherryPickConflict();
+   /*!
+    * \brief signalPullConflict Signal triggered when trying to pull and a conflict happens.
+    */
+   void signalPullConflict();
 
 public:
    /*!

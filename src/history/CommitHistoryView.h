@@ -76,6 +76,10 @@ signals:
     * \brief signalConflict Signal triggered when trying to cherry-pick or pull and a conflict happens.
     */
    void signalCherryPickConflict();
+   /*!
+    * \brief signalPullConflict Signal triggered when trying to pull and a conflict happens.
+    */
+   void signalPullConflict();
 
 public:
    /**

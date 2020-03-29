@@ -155,6 +155,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
          connect(menu, &CommitHistoryContextMenu::signalMergeRequired, this, &CommitHistoryView::signalMergeRequired);
          connect(menu, &CommitHistoryContextMenu::signalCherryPickConflict, this,
                  &CommitHistoryView::signalCherryPickConflict);
+         connect(menu, &CommitHistoryContextMenu::signalPullConflict, this, &CommitHistoryView::signalPullConflict);
          menu->exec(viewport()->mapToGlobal(pos));
       }
       else

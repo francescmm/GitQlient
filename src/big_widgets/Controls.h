@@ -76,6 +76,10 @@ signals:
 
    */
    void signalRepositoryUpdated();
+   /*!
+    * \brief Signal triggered when trying to pull and a conflict happens.
+    */
+   void signalPullConflict();
 
 public:
    /*!

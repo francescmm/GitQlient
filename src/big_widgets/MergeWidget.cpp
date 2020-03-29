@@ -191,6 +191,7 @@ void MergeWidget::abort()
 
    switch (mReason)
    {
+      case ConflictReason::Pull:
       case ConflictReason::Merge: {
          QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
          ret = git->abortMerge();
@@ -201,8 +202,6 @@ void MergeWidget::abort()
          ret = git->cherryPickAbort();
          break;
       }
-      case ConflictReason::Pull:
-         break;
       default:
          break;
    }
@@ -224,6 +223,7 @@ void MergeWidget::commit()
 
    switch (mReason)
    {
+      case ConflictReason::Pull:
       case ConflictReason::Merge: {
          QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
          ret = git->applyMerge();
@@ -234,8 +234,6 @@ void MergeWidget::commit()
          ret = git->cherryPickContinue();
          break;
       }
-      case ConflictReason::Pull:
-         break;
       default:
          break;
    }
