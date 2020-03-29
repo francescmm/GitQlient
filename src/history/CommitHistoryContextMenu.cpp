@@ -251,7 +251,7 @@ void CommitHistoryContextMenu::cherryPickCommit()
 
       if (errorMsg.toLower().contains("error: could not apply") && errorMsg.toLower().contains("causing a conflict"))
       {
-         emit signalConflict();
+         emit signalCherryPickConflict();
       }
       else
          QMessageBox::critical(this, tr("Error while cherry-pick"), errorMsg);

@@ -232,7 +232,7 @@ private:
     * \brief Configures the merge widget when a conflict happens and is not a merge. The conflicts are shown in the
     * merge view.
     */
-   void showWarningConflict();
+   void showCherryPickConflict();
    /*!
     \brief Shows the merge view.
 
