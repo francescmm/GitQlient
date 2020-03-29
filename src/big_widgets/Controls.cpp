@@ -5,6 +5,7 @@
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
 #include <BranchDlg.h>
+#include <RepoConfigDlg.h>
 
 #include <QApplication>
 #include <QToolButton>
@@ -23,6 +24,7 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    , mPushBtn(new QToolButton())
    , mStashBtn(new QToolButton())
    , mRefreshBtn(new QToolButton())
+   , mConfigBtn(new QToolButton())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -92,6 +94,11 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    mRefreshBtn->setText(tr("Refresh"));
    mRefreshBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
 
+   mConfigBtn->setIcon(QIcon(":/icons/config"));
+   mConfigBtn->setIconSize(QSize(22, 22));
+   mConfigBtn->setText(tr("Config"));
+   mConfigBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
    const auto verticalFrame = new QFrame();
    verticalFrame->setObjectName("orangeSeparator");
 
@@ -111,6 +118,7 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    hLayout->addWidget(verticalFrame2);
    hLayout->addWidget(mRefreshBtn);
    hLayout->addStretch();
+   hLayout->addWidget(mConfigBtn);
 
    mMergeWarning->setObjectName("MergeWarningButton");
    mMergeWarning->setVisible(false);
@@ -150,6 +158,7 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    });
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
+   connect(mConfigBtn, &QToolButton::clicked, this, &Controls::showConfigDlg);
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
 
    enableButtons(false);
@@ -294,4 +303,10 @@ void Controls::pruneBranches()
 
    if (ret.success)
       emit signalRepositoryUpdated();
+}
+
+void Controls::showConfigDlg()
+{
+   const auto configDlg = new RepoConfigDlg(mGit, this);
+   configDlg->exec();
 }

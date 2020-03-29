@@ -37,6 +37,11 @@ void GitConfig::setGlobalUserInfo(const GitUserInfo &info)
    mGitBase->run(QString("git config --global user.email %1").arg(info.mUserEmail));
 }
 
+GitExecResult GitConfig::setGlobalData(const QString &key, const QString &value)
+{
+   return mGitBase->run(QString("git config --global %1 \"%2\"").arg(key, value));
+}
+
 GitUserInfo GitConfig::getLocalUserInfo() const
 {
    GitUserInfo userInfo;
@@ -60,6 +65,11 @@ void GitConfig::setLocalUserInfo(const GitUserInfo &info)
    mGitBase->run(QString("git config --local user.email %1").arg(info.mUserEmail));
 }
 
+GitExecResult GitConfig::setLocalData(const QString &key, const QString &value)
+{
+   return mGitBase->run(QString("git config --local %1 \"%2\"").arg(key, value));
+}
+
 bool GitConfig::clone(const QString &url, const QString &fullPath)
 {
    const auto asyncRun = new GitCloneProcess(mGitBase->getWorkingDir());
@@ -76,7 +86,7 @@ bool GitConfig::initRepo(const QString &fullPath)
 
 GitExecResult GitConfig::getLocalConfig() const
 {
-   const auto ret = mGitBase->run("git config --list");
+   const auto ret = mGitBase->run("git config --local --list");
 
    return ret;
 }

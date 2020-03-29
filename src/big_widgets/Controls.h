@@ -149,6 +149,7 @@ private:
    QToolButton *mPushBtn = nullptr;
    QToolButton *mStashBtn = nullptr;
    QToolButton *mRefreshBtn = nullptr;
+   QToolButton *mConfigBtn = nullptr;
    QPushButton *mMergeWarning = nullptr;
 
    /*!
@@ -176,4 +177,8 @@ private:
 
    */
    void pruneBranches();
+   /*!
+    * \brief Shows the config dialog for both Local and Global user data.
+    */
+   void showConfigDlg();
 };
