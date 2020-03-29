@@ -5,13 +5,11 @@
 #include <BranchesWidget.h>
 #include <CommitHistoryColumns.h>
 #include <HistoryWidget.h>
-#include <CommitHistoryView.h>
 #include <QLogger.h>
 #include <BlameWidget.h>
 #include <CommitInfo.h>
 #include <ProgressDlg.h>
 #include <GitConfigDlg.h>
-#include <GitQlientSettings.h>
 #include <Controls.h>
 #include <HistoryWidget.h>
 #include <DiffWidget.h>
@@ -22,7 +20,6 @@
 #include <GitBase.h>
 #include <GitHistory.h>
 
-#include <QFileSystemModel>
 #include <QTimer>
 #include <QDirIterator>
 #include <QFileSystemWatcher>
@@ -122,6 +119,7 @@ GitQlientRepo::~GitQlientRepo()
 {
    delete mAutoFetch;
    delete mAutoFilesUpdate;
+   delete mGitWatcher;
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
@@ -232,15 +230,15 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
 void GitQlientRepo::setWatcher()
 {
-   const auto gitWatcher = new QFileSystemWatcher(this);
-   connect(gitWatcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
+   mGitWatcher = new QFileSystemWatcher(this);
+   connect(mGitWatcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
       if (!path.endsWith(".autosave") && !path.endsWith(".tmp") && !path.endsWith(".user"))
          updateUiFromWatcher();
    });
 
    QLog_Info("UI", QString("Setting the file watcher for dir {%1}").arg(mCurrentDir));
 
-   gitWatcher->addPath(mCurrentDir);
+   mGitWatcher->addPath(mCurrentDir);
 
    QDirIterator it(mCurrentDir, QDirIterator::Subdirectories);
    while (it.hasNext())
@@ -248,7 +246,7 @@ void GitQlientRepo::setWatcher()
       const auto dir = it.next();
 
       if (it.fileInfo().isDir() && !dir.endsWith(".") && !dir.endsWith(".."))
-         gitWatcher->addPath(dir);
+         mGitWatcher->addPath(dir);
    }
 }
 
