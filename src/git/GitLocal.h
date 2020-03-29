@@ -48,6 +48,7 @@ public:
    explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
    GitExecResult cherryPickCommit(const QString &sha) const;
    GitExecResult cherryPickAbort() const;
+   GitExecResult cherryPickContinue() const;
    GitExecResult checkoutCommit(const QString &sha) const;
    GitExecResult markFileAsResolved(const QString &fileName) const;
    bool checkoutFile(const QString &fileName) const;

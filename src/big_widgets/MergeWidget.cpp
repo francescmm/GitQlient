@@ -114,8 +114,10 @@ MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, c
    connect(mMergeBtn, &QPushButton::clicked, this, &MergeWidget::commit);
 }
 
-void MergeWidget::configure(const RevisionFiles &files)
+void MergeWidget::configure(const RevisionFiles &files, ConflictReason reason)
 {
+   mReason = reason;
+
    QFile mergeMsg(mGit->getWorkingDir() + "/.git/MERGE_MSG");
 
    if (mergeMsg.open(QIODevice::ReadOnly))
@@ -185,12 +187,29 @@ void MergeWidget::changeDiffView(bool fileBtnChecked)
 
 void MergeWidget::abort()
 {
-   QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
-   const auto ret = git->abortMerge();
+   GitExecResult ret;
+
+   switch (mReason)
+   {
+      case ConflictReason::Merge: {
+         QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
+         ret = git->abortMerge();
+         break;
+      }
+      case ConflictReason::CherryPick: {
+         QScopedPointer<GitLocal> git(new GitLocal(mGit));
+         ret = git->cherryPickAbort();
+         break;
+      }
+      case ConflictReason::Pull:
+         break;
+      default:
+         break;
+   }
 
    if (!ret.success)
       QMessageBox::warning(this, tr("Error aborting!"),
-                           tr("The git command throuwn an error: %1").arg(ret.output.toString()));
+                           tr("The git command thrown an error: %1").arg(ret.output.toString()));
    else
    {
       removeMergeComponents();
@@ -201,8 +220,25 @@ void MergeWidget::abort()
 
 void MergeWidget::commit()
 {
-   QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
-   const auto ret = git->applyMerge();
+   GitExecResult ret;
+
+   switch (mReason)
+   {
+      case ConflictReason::Merge: {
+         QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
+         ret = git->applyMerge();
+         break;
+      }
+      case ConflictReason::CherryPick: {
+         QScopedPointer<GitLocal> git(new GitLocal(mGit));
+         ret = git->cherryPickContinue();
+         break;
+      }
+      case ConflictReason::Pull:
+         break;
+      default:
+         break;
+   }
 
    if (!ret.success)
       QMessageBox::warning(this, tr("Error merging!"),

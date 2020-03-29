@@ -35,6 +35,13 @@ GitExecResult GitLocal::cherryPickAbort() const
    return mGitBase->run("git cherry-pick --abort");
 }
 
+GitExecResult GitLocal::cherryPickContinue() const
+{
+   QLog_Debug("Git", QString("Applying cherryPick"));
+
+   return mGitBase->run("git cherry-pick --continue");
+}
+
 GitExecResult GitLocal::checkoutCommit(const QString &sha) const
 {
    QLog_Debug("Git", QString("Executing checkoutCommit: {%1}").arg(sha));

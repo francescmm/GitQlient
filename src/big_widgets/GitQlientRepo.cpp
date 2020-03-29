@@ -337,7 +337,7 @@ void GitQlientRepo::showWarningMerge()
    const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
    const auto file = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
-   mMergeWidget->configure(file);
+   mMergeWidget->configure(file, MergeWidget::ConflictReason::Merge);
 }
 
 void GitQlientRepo::showWarningConflict()
@@ -350,7 +350,7 @@ void GitQlientRepo::showWarningConflict()
    git->updateWipRevision();
    const auto files = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
-   mMergeWidget->configure(files);
+   mMergeWidget->configure(files, MergeWidget::ConflictReason::CherryPick);
 }
 
 void GitQlientRepo::showMergeView()
