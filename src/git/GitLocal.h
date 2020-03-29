@@ -35,7 +35,7 @@ class GitLocal : public QObject
    Q_OBJECT
 
 signals:
-   void signalWipUpdated();
+   void signalWipUpdated() const;
 
 public:
    enum class CommitResetType
@@ -46,17 +46,18 @@ public:
    };
 
    explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
-   GitExecResult cherryPickCommit(const QString &sha);
-   GitExecResult checkoutCommit(const QString &sha);
-   GitExecResult markFileAsResolved(const QString &fileName);
-   bool checkoutFile(const QString &fileName);
-   GitExecResult resetFile(const QString &fileName);
-   bool resetCommit(const QString &sha, CommitResetType type);
+   GitExecResult cherryPickCommit(const QString &sha) const;
+   GitExecResult cherryPickAbort() const;
+   GitExecResult checkoutCommit(const QString &sha) const;
+   GitExecResult markFileAsResolved(const QString &fileName) const;
+   bool checkoutFile(const QString &fileName) const;
+   GitExecResult resetFile(const QString &fileName) const;
+   bool resetCommit(const QString &sha, CommitResetType type) const;
    GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg, bool amend,
-                             const QString &author = QString());
+                             const QString &author = QString()) const;
 
 private:
    QSharedPointer<GitBase> mGitBase;
 
-   GitExecResult updateIndex(const RevisionFiles &files, const QStringList &selFiles);
+   GitExecResult updateIndex(const RevisionFiles &files, const QStringList &selFiles) const;
 };

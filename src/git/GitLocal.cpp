@@ -21,21 +21,28 @@ GitLocal::GitLocal(const QSharedPointer<GitBase> &gitBase)
 {
 }
 
-GitExecResult GitLocal::cherryPickCommit(const QString &sha)
+GitExecResult GitLocal::cherryPickCommit(const QString &sha) const
 {
    QLog_Debug("Git", QString("Executing cherryPickCommit: {%1}").arg(sha));
 
    return mGitBase->run(QString("git cherry-pick %1").arg(sha));
 }
 
-GitExecResult GitLocal::checkoutCommit(const QString &sha)
+GitExecResult GitLocal::cherryPickAbort() const
+{
+   QLog_Debug("Git", QString("Aborting cherryPick"));
+
+   return mGitBase->run("git cherry-pick --abort");
+}
+
+GitExecResult GitLocal::checkoutCommit(const QString &sha) const
 {
    QLog_Debug("Git", QString("Executing checkoutCommit: {%1}").arg(sha));
 
    return mGitBase->run(QString("git checkout %1").arg(sha));
 }
 
-GitExecResult GitLocal::markFileAsResolved(const QString &fileName)
+GitExecResult GitLocal::markFileAsResolved(const QString &fileName) const
 {
    QLog_Debug("Git", QString("Executing markFileAsResolved: {%1}").arg(fileName));
 
@@ -47,7 +54,7 @@ GitExecResult GitLocal::markFileAsResolved(const QString &fileName)
    return ret;
 }
 
-bool GitLocal::checkoutFile(const QString &fileName)
+bool GitLocal::checkoutFile(const QString &fileName) const
 {
    if (fileName.isEmpty())
    {
@@ -61,14 +68,14 @@ bool GitLocal::checkoutFile(const QString &fileName)
    return mGitBase->run(QString("git checkout %1").arg(fileName)).first;
 }
 
-GitExecResult GitLocal::resetFile(const QString &fileName)
+GitExecResult GitLocal::resetFile(const QString &fileName) const
 {
    QLog_Debug("Git", QString("Executing resetFile: {%1}").arg(fileName));
 
    return mGitBase->run(QString("git reset %1").arg(fileName));
 }
 
-bool GitLocal::resetCommit(const QString &sha, CommitResetType type)
+bool GitLocal::resetCommit(const QString &sha, CommitResetType type) const
 {
    QString typeStr;
 
@@ -91,7 +98,7 @@ bool GitLocal::resetCommit(const QString &sha, CommitResetType type)
 }
 
 GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
-                                    bool amend, const QString &author)
+                                    bool amend, const QString &author) const
 {
    // add user selectable commit options
    QString cmtOptions;
@@ -132,7 +139,7 @@ GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &
    return mGitBase->run(QString("git commit" + cmtOptions + " -m \"%1\"").arg(msg));
 }
 
-GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringList &selFiles)
+GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringList &selFiles) const
 {
    QStringList toAdd, toRemove;
 
