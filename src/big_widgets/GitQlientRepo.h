@@ -29,7 +29,6 @@ class GitBase;
 class RevisionsCache;
 class GitRepoLoader;
 class QCloseEvent;
-class QFileSystemWatcher;
 class QStackedLayout;
 class Controls;
 class HistoryWidget;
@@ -138,7 +137,6 @@ private:
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    ProgressDlg *mProgressDlg = nullptr;
-   QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
 
    /*!
