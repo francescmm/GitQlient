@@ -58,18 +58,22 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
-   mRepositoryView->setModel(mRepositoryModel);
-   mRepositoryView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, git, mRepositoryView));
-   mRepositoryView->setEnabled(true);
-
    connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &HistoryWidget::signalViewUpdated);
    connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, &HistoryWidget::signalOpenDiff);
    connect(mRepositoryView, &CommitHistoryView::signalOpenCompareDiff, this, &HistoryWidget::signalOpenCompareDiff);
    connect(mRepositoryView, &CommitHistoryView::clicked, this, &HistoryWidget::commitSelected);
+   connect(mRepositoryView, &CommitHistoryView::customContextMenuRequested, this, [this](const QPoint &pos) {
+      const auto rowIndex = mRepositoryView->indexAt(pos);
+      commitSelected(rowIndex);
+   });
    connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &HistoryWidget::openDiff);
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &HistoryWidget::onAmendCommit);
    connect(mRepositoryView, &CommitHistoryView::signalMergeRequired, this, &HistoryWidget::mergeBranch);
    connect(mRepositoryView, &CommitHistoryView::signalConflict, this, &HistoryWidget::signalConflict);
+
+   mRepositoryView->setModel(mRepositoryModel);
+   mRepositoryView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, git, mRepositoryView));
+   mRepositoryView->setEnabled(true);
 
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &HistoryWidget::signalUpdateCache);
    connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::onBranchCheckout);

@@ -202,7 +202,11 @@ void BlameWidget::showFileHistory(const QModelIndex &index)
 void BlameWidget::showRepoViewMenu(const QPoint &pos)
 {
    const auto shaColumnIndex = static_cast<int>(CommitHistoryColumns::SHA);
-   const auto sha = mRepoView->model()->index(mSelectedRow, shaColumnIndex).data().toString();
+   const auto modelIndex = mRepoView->model()->index(mSelectedRow, shaColumnIndex);
+
+   reloadBlame(modelIndex);
+
+   const auto sha = modelIndex.data().toString();
    const auto previousSha = mRepoView->model()->index(mSelectedRow + 1, shaColumnIndex).data().toString();
    const auto menu = new QMenu(this);
    const auto copyShaAction = menu->addAction(tr("Copy SHA"));
