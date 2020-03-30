@@ -29,7 +29,7 @@
 #include <QObject>
 #include <QSharedPointer>
 
-class GitBase : public QObject
+class GitBase final : public QObject
 {
    Q_OBJECT
 
@@ -38,11 +38,18 @@ signals:
 
 public:
    explicit GitBase(const QString &workingDirectory, QObject *parent = nullptr);
+
    QPair<bool, QString> run(const QString &cmd) const;
-   QString getWorkingDir() const { return mWorkingDirectory; }
-   void setWorkingDir(const QString &workingDir) { mWorkingDirectory = workingDir; }
-   QString getCurrentBranch() const;
+
+   QString getWorkingDir() const;
+
+   void setWorkingDir(const QString &workingDir);
+
+   void updateCurrentBranch();
+
+   QString getCurrentBranch();
 
 protected:
    QString mWorkingDirectory;
+   QString mCurrentBranch;
 };
