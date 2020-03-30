@@ -146,15 +146,14 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
    const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
    const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
 
-   mRevisionFilesMap.contains(key);
    insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
 
    if (!mCacheLocked)
    {
-      QString longLog;
+      const QString longLog;
       const auto author = QString("-");
       const auto log
-          = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
+         = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
       CommitInfo c(CommitInfo::ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log,
                    longLog, 0);
       c.isDiffCache = true;
@@ -444,10 +443,11 @@ int RevisionsCache::countReferences() const
 RevisionFiles RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
 {
    FileNamesLoader fl;
-   RevisionFiles rf = parseDiffFormat(diffIndex, fl);
+   auto rf = parseDiffFormat(diffIndex, fl);
+   fl.rf = &rf;
    rf.setOnlyModified(false);
 
-   for (auto it : qAsConst(mUntrackedfiles))
+   for (const auto &it : qAsConst(mUntrackedfiles))
    {
       if (fl.rf != &rf)
       {
@@ -481,7 +481,8 @@ RevisionFiles RevisionsCache::parseDiff(const QString &logDiff)
 {
    FileNamesLoader fl;
 
-   const auto rf = parseDiffFormat(logDiff, fl);
+   auto rf = parseDiffFormat(logDiff, fl);
+   fl.rf = &rf;
    flushFileNames(fl);
 
    return rf;
