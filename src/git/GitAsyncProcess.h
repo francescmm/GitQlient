@@ -23,36 +23,19 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <GitExecResult.h>
-#include <RevisionsCache.h>
+#include <AGitProcess.h>
 
-#include <QObject>
-#include <QSharedPointer>
-
-class GitBase final : public QObject
+class GitAsyncProcess : public AGitProcess
 {
    Q_OBJECT
 
 signals:
-   void cancelAllProcesses(QPrivateSignal);
-   void signalResultReady(GitExecResult result);
+   void signalDataReady(GitExecResult result);
 
 public:
-   explicit GitBase(const QString &workingDirectory, QObject *parent = nullptr);
+   explicit GitAsyncProcess(const QString &workingDir);
+   GitExecResult run(const QString &command) override;
 
-   GitExecResult run(const QString &cmd) const;
-
-   bool runAsync(const QString &cmd) const;
-
-   QString getWorkingDir() const;
-
-   void setWorkingDir(const QString &workingDir);
-
-   void updateCurrentBranch();
-
-   QString getCurrentBranch();
-
-protected:
-   QString mWorkingDirectory;
-   QString mCurrentBranch;
+private:
+   void onFinished(int code, QProcess::ExitStatus exitStatus) override;
 };

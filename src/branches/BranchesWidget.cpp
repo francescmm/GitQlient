@@ -362,35 +362,48 @@ void BranchesWidget::processLocalBranch(QString branch)
 
    QLog_Debug("UI", QString("Calculating distances..."));
 
-   QScopedPointer<GitBranches> git(new GitBranches(mGit));
-
    auto distanceToMaster = QString("Not found");
    auto distanceToOrigin = QString("Local");
 
    if (fullBranchName != "detached")
    {
-      const auto toMaster = git->getDistanceBetweenBranches(true, fullBranchName).output.toString();
+      const auto git = new GitBranches(mGit);
+      git->getDistanceBetweenBranchesAsync(true, fullBranchName);
+      connect(git, &GitBranches::signalDistanceBetweenBranches, this, [item, git](GitExecResult result) {
+         auto distanceToMaster = QString("Not found");
+         const auto toMaster = result.output.toString();
 
-      if (!toMaster.contains("fatal"))
-      {
-         distanceToMaster = toMaster;
-         distanceToMaster.replace('\n', "");
-         distanceToMaster.replace('\t', "\u2193 - ");
-         distanceToMaster.append("\u2191");
-      }
+         if (!toMaster.contains("fatal"))
+         {
+            distanceToMaster = toMaster;
+            distanceToMaster.replace('\n', "");
+            distanceToMaster.replace('\t', "\u2193 - ");
+            distanceToMaster.append("\u2191");
+         }
 
-      const auto toOrigin = git->getDistanceBetweenBranches(false, fullBranchName).output.toString();
+         item->setText(1, distanceToMaster);
 
-      if (!toOrigin.contains("fatal"))
-      {
-         distanceToOrigin = toOrigin;
-         distanceToOrigin.replace('\n', "");
-         distanceToOrigin.append("\u2193");
-      }
+         git->deleteLater();
+      });
+
+      const auto git2 = new GitBranches(mGit);
+      git2->getDistanceBetweenBranchesAsync(false, fullBranchName);
+      connect(git2, &GitBranches::signalDistanceBetweenBranches, this, [item, git2](GitExecResult result) {
+         auto distanceToOrigin = QString("Local");
+         const auto toOrigin = result.output.toString();
+
+         if (!toOrigin.contains("fatal"))
+         {
+            distanceToOrigin = toOrigin;
+            distanceToOrigin.replace('\n', "");
+            distanceToOrigin.append("\u2193");
+         }
+
+         item->setText(2, distanceToOrigin);
+
+         git2->deleteLater();
+      });
    }
-
-   item->setText(1, distanceToMaster);
-   item->setText(2, distanceToOrigin);
 
    mLocalBranchesTree->addTopLevelItem(item);
 

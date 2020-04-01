@@ -47,6 +47,15 @@ GitExecResult GitBase::run(const QString &cmd) const
    return ret;
 }
 
+bool GitBase::runAsync(const QString &cmd) const
+{
+   const auto p = new GitAsyncProcess(mWorkingDirectory);
+   connect(this, &GitBase::cancelAllProcesses, p, &AGitProcess::onCancel);
+   connect(p, &GitAsyncProcess::signalDataReady, this, &GitBase::signalResultReady);
+
+   return p->run(cmd).success;
+}
+
 void GitBase::updateCurrentBranch()
 {
    QLog_Trace("Git", "Updating the current branch");

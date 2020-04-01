@@ -18,7 +18,7 @@ GitExecResult GitBranches::getBranches()
    return mGitBase->run(QString("git branch -a"));
 }
 
-GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QString &right)
+bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &right)
 {
    QLog_Debug("Git",
               QString("Executing getDistanceBetweenBranches: {origin/%1} and {%2}")
@@ -36,7 +36,9 @@ GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QStri
                               .arg(toMaster ? QString("master") : right)
                               .arg(right);
 
-   return mGitBase->run(gitCmd);
+   connect(mGitBase.get(), &GitBase::signalResultReady, this, &GitBranches::signalDistanceBetweenBranches);
+
+   return mGitBase->runAsync(gitCmd);
 }
 
 GitExecResult GitBranches::createBranchFromAnotherBranch(const QString &oldName, const QString &newName)
