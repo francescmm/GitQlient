@@ -16,9 +16,9 @@ QVector<QString> GitSubmodules::getSubmodules()
 
    QVector<QString> submodulesList;
    const auto ret = mGitBase->run("git config --file .gitmodules --name-only --get-regexp path");
-   if (ret.first)
+   if (ret.success)
    {
-      const auto submodules = ret.second.split('\n');
+      const auto submodules = ret.output.toString().split('\n');
       for (auto submodule : submodules)
          if (!submodule.isEmpty() && submodule != "\n")
             submodulesList.append(submodule.split('.').at(1));
@@ -31,14 +31,14 @@ bool GitSubmodules::submoduleAdd(const QString &url, const QString &name)
 {
    QLog_Debug("Git", QString("Executing submoduleAdd: {%1} {%2}").arg(url, name));
 
-   return mGitBase->run(QString("git submodule add %1 %2").arg(url).arg(name)).first;
+   return mGitBase->run(QString("git submodule add %1 %2").arg(url).arg(name)).success;
 }
 
 bool GitSubmodules::submoduleUpdate(const QString &)
 {
    QLog_Debug("Git", QString("Executing submoduleUpdate"));
 
-   return mGitBase->run("git submodule update --init --recursive").first;
+   return mGitBase->run("git submodule update --init --recursive").success;
 }
 
 bool GitSubmodules::submoduleRemove(const QString &)

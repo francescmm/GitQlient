@@ -39,7 +39,7 @@ signals:
 public:
    explicit GitBase(const QString &workingDirectory, QObject *parent = nullptr);
 
-   QPair<bool, QString> run(const QString &cmd) const;
+   GitExecResult run(const QString &cmd) const;
 
    QString getWorkingDir() const;
 

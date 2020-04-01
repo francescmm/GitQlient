@@ -55,7 +55,7 @@ GitExecResult GitLocal::markFileAsResolved(const QString &fileName) const
 
    const auto ret = mGitBase->run(QString("git add %1").arg(fileName));
 
-   if (ret.first)
+   if (ret.success)
       emit signalWipUpdated();
 
    return ret;
@@ -72,7 +72,7 @@ bool GitLocal::checkoutFile(const QString &fileName) const
 
    QLog_Debug("Git", QString("Executing checkoutFile: {%1}").arg(fileName));
 
-   return mGitBase->run(QString("git checkout %1").arg(fileName)).first;
+   return mGitBase->run(QString("git checkout %1").arg(fileName)).success;
 }
 
 GitExecResult GitLocal::resetFile(const QString &fileName) const
@@ -101,7 +101,7 @@ bool GitLocal::resetCommit(const QString &sha, CommitResetType type) const
 
    QLog_Debug("Git", QString("Executing resetCommit: {%1} type {%2}").arg(sha, typeStr));
 
-   return mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha)).first;
+   return mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha)).success;
 }
 
 GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
@@ -131,7 +131,7 @@ GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &
    {
       const auto ret = mGitBase->run("git reset -- " + quote(notSel));
 
-      if (!ret.first)
+      if (!ret.success)
          return ret;
    }
 
@@ -164,7 +164,7 @@ GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringLis
    {
       const auto ret = mGitBase->run("git rm --cached --ignore-unmatch -- " + quote(toRemove));
 
-      if (!ret.first)
+      if (!ret.success)
          return ret;
    }
 
@@ -172,7 +172,7 @@ GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringLis
    {
       const auto ret = mGitBase->run("git add -- " + quote(toAdd));
 
-      if (!ret.first)
+      if (!ret.success)
          return ret;
    }
 

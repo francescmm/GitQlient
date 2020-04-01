@@ -25,6 +25,8 @@
 
 #include <QProcess>
 
+#include <GitExecResult.h>
+
 class AGitProcess : public QProcess
 {
    Q_OBJECT
@@ -35,11 +37,11 @@ signals:
 public:
    explicit AGitProcess(const QString &workingDir);
 
-   virtual bool run(const QString &command, QString &output) = 0;
+   virtual GitExecResult run(const QString &command) = 0;
    void onCancel();
 
 protected:
-   QString *mRunOutput = nullptr;
+   QString mRunOutput;
    QString mWorkingDirectory;
    QString mErrorOutput;
    QString mCommand;

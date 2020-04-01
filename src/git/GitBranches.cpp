@@ -59,7 +59,7 @@ GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
 
    const auto ret = mGitBase->run(QString("git checkout -q %1").arg(branchName));
 
-   if (ret.first)
+   if (ret.success)
       mGitBase->updateCurrentBranch();
 
    return ret;
@@ -71,7 +71,7 @@ GitExecResult GitBranches::checkoutNewLocalBranch(const QString &branchName)
 
    const auto ret = mGitBase->run(QString("git checkout -b %1").arg(branchName));
 
-   if (ret.first)
+   if (ret.success)
       mGitBase->updateCurrentBranch();
 
    return ret;
@@ -83,7 +83,7 @@ GitExecResult GitBranches::renameBranch(const QString &oldName, const QString &n
 
    const auto ret = mGitBase->run(QString("git branch -m %1 %2").arg(oldName, newName));
 
-   if (ret.first)
+   if (ret.success)
       mGitBase->updateCurrentBranch();
 
    return ret;
@@ -116,8 +116,8 @@ GitExecResult GitBranches::getLastCommitOfBranch(const QString &branch)
 
    auto ret = mGitBase->run(QString("git rev-parse %1").arg(branch));
 
-   if (ret.first)
-      ret.second.remove(ret.second.count() - 1, ret.second.count());
+   if (ret.success)
+      ret.output = ret.output.toString().trimmed();
 
    return ret;
 }

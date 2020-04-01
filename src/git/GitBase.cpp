@@ -1,6 +1,7 @@
 #include "GitBase.h"
 
 #include <GitSyncProcess.h>
+#include <GitAsyncProcess.h>
 
 #include <QLogger.h>
 
@@ -24,16 +25,17 @@ void GitBase::setWorkingDir(const QString &workingDir)
    mWorkingDirectory = workingDir;
 }
 
-QPair<bool, QString> GitBase::run(const QString &cmd) const
+GitExecResult GitBase::run(const QString &cmd) const
 {
-   QString runOutput;
    GitSyncProcess p(mWorkingDirectory);
    connect(this, &GitBase::cancelAllProcesses, &p, &AGitProcess::onCancel);
 
-   const auto ret = p.run(cmd, runOutput);
+   const auto ret = p.run(cmd);
+   const auto runOutput = ret.output.toString();
 
-   if (ret)
+   if (ret.success)
    {
+
       if (runOutput.contains("fatal:"))
          QLog_Info("Git", QString("Git command {%1} reported issues:\n%2").arg(cmd, runOutput));
       else
@@ -42,7 +44,7 @@ QPair<bool, QString> GitBase::run(const QString &cmd) const
    else
       QLog_Warning("Git", QString("Git command {%1} has errors:\n%2").arg(cmd, runOutput));
 
-   return qMakePair(ret, runOutput);
+   return ret;
 }
 
 void GitBase::updateCurrentBranch()
@@ -51,7 +53,7 @@ void GitBase::updateCurrentBranch()
 
    const auto ret = run("git rev-parse --abbrev-ref HEAD");
 
-   mCurrentBranch = ret.first ? ret.second.trimmed() : QString();
+   mCurrentBranch = ret.success ? ret.output.toString().trimmed() : QString();
 }
 
 QString GitBase::getCurrentBranch()

@@ -23,11 +23,11 @@ GitExecResult GitPatches::exportPatch(const QStringList &shaList)
    {
       const auto ret = mGitBase->run(QString("git format-patch -1 %1").arg(sha));
 
-      if (!ret.first)
+      if (!ret.success)
          break;
       else
       {
-         auto filename = ret.second;
+         auto filename = ret.output.toString();
          filename = filename.remove("\n");
          const auto text = filename.mid(filename.indexOf("-") + 1);
          const auto number = QString("%1").arg(val, 4, 10, QChar('0'));
@@ -54,5 +54,5 @@ bool GitPatches::applyPatch(const QString &fileName, bool asCommit)
    const auto cmd = asCommit ? QString("git am --signof") : QString("git apply");
    const auto ret = mGitBase->run(QString("%1 %2").arg(cmd, fileName));
 
-   return ret.first;
+   return ret.success;
 }

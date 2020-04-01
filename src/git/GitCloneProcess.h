@@ -35,7 +35,7 @@ signals:
 public:
    explicit GitCloneProcess(const QString &workingDir);
 
-   bool run(const QString &command, QString &output) override;
+   GitExecResult run(const QString &command) override;
 
 private:
    void onReadyStandardError();

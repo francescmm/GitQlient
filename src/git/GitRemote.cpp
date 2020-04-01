@@ -28,7 +28,7 @@ bool GitRemote::fetch()
 {
    QLog_Debug("Git", QString("Executing fetch with prune"));
 
-   return mGitBase->run("git fetch --all --tags --prune --force").first;
+   return mGitBase->run("git fetch --all --tags --prune --force").success;
 }
 
 GitExecResult GitRemote::prune()

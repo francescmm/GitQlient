@@ -23,8 +23,8 @@ GitExecResult GitHistory::history(const QString &file)
 
    auto ret = mGitBase->run(QString("git log --follow --pretty=%H %1").arg(file));
 
-   if (ret.first && ret.second.isEmpty())
-      ret.first = false;
+   if (ret.success && ret.output.toString().isEmpty())
+      ret.success = false;
 
    return ret;
 }
@@ -63,8 +63,8 @@ QString GitHistory::getFileDiff(const QString &currentSha, const QString &previo
 
    const auto ret = mGitBase->run(QString("git diff -U15000 %1 %2 %3").arg(previousSha, currentSha, file));
 
-   if (ret.first)
-      return ret.second;
+   if (ret.success)
+      return ret.output.toString();
 
    return QString();
 }

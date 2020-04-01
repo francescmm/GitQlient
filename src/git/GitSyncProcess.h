@@ -30,5 +30,5 @@ class GitSyncProcess final : public AGitProcess
 public:
    GitSyncProcess(const QString &workingDir);
 
-   bool run(const QString &command, QString &output) override;
+   GitExecResult run(const QString &command) override;
 };

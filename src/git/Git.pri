@@ -3,6 +3,7 @@ INCLUDEPATH += $$PWD
 HEADERS += \
     $$PWD/AGitProcess.h \
     $$PWD/CommitInfo.h \
+    $$PWD/GitAsyncProcess.h \
     $$PWD/GitBase.h \
     $$PWD/GitBranches.h \
     $$PWD/GitCloneProcess.h \
@@ -28,6 +29,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/AGitProcess.cpp \
     $$PWD/CommitInfo.cpp \
+    $$PWD/GitAsyncProcess.cpp \
     $$PWD/GitBase.cpp \
     $$PWD/GitBranches.cpp \
     $$PWD/GitCloneProcess.cpp \

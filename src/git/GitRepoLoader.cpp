@@ -59,9 +59,9 @@ bool GitRepoLoader::configureRepoDirectory()
 
    const auto ret = mGitBase->run("git rev-parse --show-cdup");
 
-   if (ret.first)
+   if (ret.success)
    {
-      QDir d(QString("%1/%2").arg(mGitBase->getWorkingDir(), ret.second.trimmed()));
+      QDir d(QString("%1/%2").arg(mGitBase->getWorkingDir(), ret.output.toString().trimmed()));
       mGitBase->setWorkingDir(d.absolutePath());
 
       return true;
@@ -76,16 +76,16 @@ void GitRepoLoader::loadReferences()
 
    const auto ret3 = mGitBase->run("git show-ref -d");
 
-   if (ret3.first)
+   if (ret3.success)
    {
       auto ret = mGitBase->run("git rev-parse HEAD");
 
-      if (ret.first)
-         ret.second.remove(ret.second.count() - 1, ret.second.count());
+      if (ret.success)
+         ret.output = ret.output.toString().trimmed();
 
       QString prevRefSha;
-      const auto curBranchSHA = ret.second;
-      const auto referencesList = ret3.second.split('\n', QString::SkipEmptyParts);
+      const auto curBranchSHA = ret.output.toString();
+      const auto referencesList = ret3.output.toString().split('\n', QString::SkipEmptyParts);
 
       for (auto reference : referencesList)
       {
@@ -123,8 +123,7 @@ void GitRepoLoader::requestRevisions()
    connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevision);
    connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
 
-   QString buf;
-   requestor->run(baseCmd, buf);
+   requestor->run(baseCmd);
 }
 
 void GitRepoLoader::processRevision(const QByteArray &ba)
@@ -169,15 +168,15 @@ void GitRepoLoader::updateWipRevision()
 
    const auto ret = mGitBase->run("git rev-parse --revs-only HEAD");
 
-   if (ret.first)
+   if (ret.success)
    {
-      const auto parentSha = ret.second.trimmed();
+      const auto parentSha = ret.output.toString().trimmed();
 
       const auto ret3 = mGitBase->run(QString("git diff-index %1").arg(parentSha));
-      const auto diffIndex = ret3.first ? ret3.second : QString();
+      const auto diffIndex = ret3.success ? ret3.output.toString() : QString();
 
       const auto ret4 = mGitBase->run(QString("git diff-index --cached %1").arg(parentSha));
-      const auto diffIndexCached = ret4.first ? ret4.second : QString();
+      const auto diffIndexCached = ret4.success ? ret4.output.toString() : QString();
 
       mRevCache->updateWipCommit(parentSha, diffIndex, diffIndexCached);
    }
@@ -196,7 +195,7 @@ QVector<QString> GitRepoLoader::getUntrackedFiles() const
 
    runCmd.append(QString(" --exclude-per-directory=$%1$").arg(".gitignore"));
 
-   return mGitBase->run(runCmd).second.split('\n', QString::SkipEmptyParts).toVector();
+   return mGitBase->run(runCmd).output.toString().split('\n', QString::SkipEmptyParts).toVector();
 }
 
 void GitRepoLoader::cancelAll()

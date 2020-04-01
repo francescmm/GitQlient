@@ -18,9 +18,9 @@ QVector<QString> GitTags::getTags() const
 
    QVector<QString> tags;
 
-   if (ret.first)
+   if (ret.success)
    {
-      const auto tagsTmp = ret.second.split("\n");
+      const auto tagsTmp = ret.output.toString().split("\n");
 
       for (auto tag : tagsTmp)
          if (tag != "\n" && !tag.isEmpty())
@@ -38,9 +38,9 @@ QVector<QString> GitTags::getLocalTags() const
 
    QVector<QString> tags;
 
-   if (ret.first)
+   if (ret.success)
    {
-      const auto tagsTmp = ret.second.split("\n");
+      const auto tagsTmp = ret.output.toString().split("\n");
 
       for (auto tag : tagsTmp)
          if (tag != "\n" && !tag.isEmpty() && tag.contains("[new tag]"))
@@ -84,7 +84,7 @@ GitExecResult GitTags::getTagCommit(const QString &tagName)
    QLog_Debug("Git", QString("Executing getTagCommit: {%1}").arg(tagName));
 
    const auto ret = mGitBase->run(QString("git rev-list -n 1 %1").arg(tagName));
-   const auto output = ret.second.trimmed();
+   const auto output = ret.output.toString().trimmed();
 
-   return qMakePair(ret.first, output);
+   return qMakePair(ret.success, output);
 }

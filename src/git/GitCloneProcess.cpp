@@ -7,9 +7,9 @@ GitCloneProcess::GitCloneProcess(const QString &workingDir)
            Qt::DirectConnection);
 }
 
-bool GitCloneProcess::run(const QString &command, QString &)
+GitExecResult GitCloneProcess::run(const QString &command)
 {
-   return execute(command);
+   return { execute(command), "" };
 }
 
 void GitCloneProcess::onReadyStandardError()
