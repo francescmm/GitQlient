@@ -1,0 +1,4 @@
+# GitQlient User Manual
+
+# Abstract
+
