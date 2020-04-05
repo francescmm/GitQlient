@@ -18,7 +18,7 @@ This was one feature, but there are several other. Some of them are application-
 
 ***But, what that means exactly?***
 
-There are several things, but I feel that two in particular are missed most of the time. The first one is a good documentation. I'm not talking only about adding Doxygen documentation to the header files or the APIs. I mean also to provide documentation about **how** is designed the application and **why** I did it in that way. I'd like that this technical documentation helps whoever wants to contribute to the project.
+There are several things, but I feel that two in particular are missed most of the time. The first one is a good documentation. I'm not talking only about adding Doxygen documentation to the header files or the APIs. I mean also to provide documentation about **how** the application is designed and **why** I did it in that way. I'd like that this technical documentation helps whoever wants to contribute to the project.
 
 The second thing I've been missing is a proper User Manual. After several years in the software industry, I'm aware that one thing is writing the code of an application and another completely different is to be able to explain how to use it. When I write the code of a project or a feature, I don't need to write a User Manual to know how it works; I've created it!
 
@@ -60,6 +60,8 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 ## <a name="the-three-view"></a>The Tree View
 
+![GitQlient - The Tree View](https://www.francescmm.com/wp-content/uploads/2020/02/image.png "GitQlient main window")
+
 ### The repository graph tree
 
 #### Commit selection
@@ -92,11 +94,15 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 ## <a name="the-diff-view"></a>The Diff View
 
+![GitQlient - The Diff View](https://www.francescmm.com/wp-content/uploads/2020/02/image-2.png "GitQlient diff window")
+
 ### Commit diff view
 
 ### File diff view
 
 ## <a name="the-blame-history-view"></a>The Blame & History View
+
+![GitQlient - The Blame & History View](https://www.francescmm.com/wp-content/uploads/2020/02/image-3.png "GitQlient blame window")
 
 ### The file view
 
