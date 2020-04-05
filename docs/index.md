@@ -60,7 +60,7 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 ## <a name="the-three-view"></a>The Tree View
 
-![GitQlient - The Tree View](https://www.francescmm.com/wp-content/uploads/2020/02/image.png "GitQlient main window")
+![GitQlient - The Tree View](https://www.francescmm.com/wp-content/uploads/2020/02/image.png "GitQlient - The Tree View")
 
 ### The repository graph tree
 
@@ -94,7 +94,7 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 ## <a name="the-diff-view"></a>The Diff View
 
-![GitQlient - The Diff View](https://www.francescmm.com/wp-content/uploads/2020/02/image-2.png "GitQlient diff window")
+![GitQlient - The Diff View](https://www.francescmm.com/wp-content/uploads/2020/02/image-2.png "GitQlient - The Diff View")
 
 ### Commit diff view
 
@@ -102,7 +102,7 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 ## <a name="the-blame-history-view"></a>The Blame & History View
 
-![GitQlient - The Blame & History View](https://www.francescmm.com/wp-content/uploads/2020/02/image-3.png "GitQlient blame window")
+![GitQlient - The Blame & History View](https://www.francescmm.com/wp-content/uploads/2020/02/image-3.png "GitQlient - The Blame & History View")
 
 ### The file view
 
