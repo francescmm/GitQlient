@@ -16,7 +16,7 @@ After that, I felt free to open the gates for the big new features that I was ac
 
 This was one feature, but there are several other. Some of them are application-based but other's are related with the spirit of the open source.
 
-But, what that means exactly?
+***But, what that means exactly?***
 
 There are several things, but I feel that two in particular are missed most of the time. The first one is a good documentation. I'm not talking only about adding Doxygen documentation to the header files or the APIs. I mean also to provide documentation about **how** is designed the application and **why** I did it in that way. I'd like that this technical documentation helps whoever wants to contribute to the project.
 
@@ -58,7 +58,7 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 # Quick access actions
 
-# The Tree View
+# <a name="the-three-view"></a>The Tree View
 
 ## The repository graph tree
 
