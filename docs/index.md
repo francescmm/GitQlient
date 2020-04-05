@@ -40,7 +40,7 @@ GitQlient is divided in three big sections split by their functionality:
 
 - [The Tree View (or Main Repository View)](#the-three-view)
 - [The Diff View](#the-diff-view)
-- [The Blame & History View](#the-blame-and-history-view)
+- [The Blame & History View](#the-blame-history-view)
 
 These views, when enabled, can be accessed by the Controls placed at the top of the repository window.
 
@@ -90,13 +90,13 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 ### Submodules
 
-# The Diff View
+# <a name="the-diff-view"></a>The Diff View
 
 ## Commit diff view
 
 ## File diff view
 
-# The Blame and History View
+# <a name="the-blame-history-view"></a>The Blame & History View
 
 ## The file view
 
@@ -104,7 +104,7 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 ## The history view
 
-# The Merge View
+# <a name="the-merge-view"></a>The Merge View
 
 # Appendix A: Releases
 
