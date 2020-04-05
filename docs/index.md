@@ -12,7 +12,9 @@ The original idea was to provide a GUI-oriented Git client that was easy to inte
 
 The primarily idea behind GitQlient was to modernize the old code that QGit is based on and provide a easy UI/UX that I was actually missing on other clients. That was achieved in the version 1.0.0 of GitQlientPlugin in December. On that version, some features that were not part of QGit were included to make it easier to handle the Git repository.
 
-After that, I felt free to open the gates for the big new features that I was actually missing in some of the Git clients I was using. Some of the features are meant to be application-based but other's are related with the spirit of the open source.
+After that, I felt free to open the gates for the big new features that I was actually missing in some of the Git clients I was using. Among the features I was missing, one in particular was really painful: most of the apps only allow one repository opened at the same time. That's why I decided to include the feature of **multiple repositories in the same view** as part of GitQlient since version 1.0.0.
+
+This was one feature, but there are several other. Some of them are application-based but other's are related with the spirit of the open source.
 
 But, what that means exactly?
 
@@ -32,6 +34,18 @@ Here you can find all the specific glossary that will be used in this document r
 
 # How to use GitQlient
 
+As we've seen in the introduction, GitQlient support multiple repositories opened at the same time. All repositories are managed in the same isolted way. All the features of GitQlient will be presented along the User Manual: all of them apply to all the opened repositories.
+
+GitQlient is divided in three big sections split by their functionality:
+
+- [The Tree View (or Main Repository View)](#the-three-view)
+- [The Diff View](#the-diff-view)
+- [The Blame & History View](#the-blame-and-history-view)
+
+These views, when enabled, can be accessed by the Controls placed at the top of the repository window.
+
+There is another view but is not accessible always: it is the [*Merge View*](#the-merge-view). This is only triggered when GitQlient detects that there is a conflict caused by a merge, cherry-pick or pull action.
+
 ## Initial screen
 
 ## GitQlient configuration
@@ -44,7 +58,7 @@ Here you can find all the specific glossary that will be used in this document r
 
 # Quick access actions
 
-# Main repository view
+# The Tree View
 
 ## The repository graph tree
 
@@ -76,13 +90,13 @@ Here you can find all the specific glossary that will be used in this document r
 
 ### Submodules
 
-# Diff view
+# The Diff View
 
 ## Commit diff view
 
 ## File diff view
 
-# Blame & History view
+# The Blame and History View
 
 ## The file view
 
@@ -90,7 +104,7 @@ Here you can find all the specific glossary that will be used in this document r
 
 ## The history view
 
-# Merge view
+# The Merge View
 
 # Appendix A: Releases
 
