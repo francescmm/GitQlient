@@ -24,11 +24,15 @@ But, what happens if you want to introduce as much people as possible? Well, the
 
 This document tries to cover exactly this area.
 
-## Glosary
+## Glossary
 
-# User Manual
+Here you can find all the specific glossary that will be used in this document referring to GitQlient:
 
-# Initial screen
+- **WIP**: Work in progress. Usually refers to the local modification in files of the repository that are not committed yet.
+
+# How to use GitQlient
+
+## Initial screen
 
 ## GitQlient configuration
 
