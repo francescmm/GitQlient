@@ -27,6 +27,7 @@
 
 class GitBase;
 class RevisionsCache;
+class FileListDelegate;
 
 class FileListWidget : public QListWidget
 {
@@ -38,12 +39,14 @@ signals:
 public:
    explicit FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
                            QWidget *parent = nullptr);
+   ~FileListWidget() override;
 
    void insertFiles(const QString &currentSha, const QString &compareToSha);
 
 private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<RevisionsCache> mCache;
+   FileListDelegate *mFileDelegate = nullptr;
 
    void showContextMenu(const QPoint &);
    void addItem(const QString &label, const QColor &clr);

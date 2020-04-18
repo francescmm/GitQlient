@@ -22,10 +22,15 @@ FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mCache(std::move(cache))
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
-   setItemDelegate(new FileListDelegate(this));
+   setItemDelegate(mFileDelegate = new FileListDelegate(this));
    setAttribute(Qt::WA_DeleteOnClose);
 
    connect(this, &FileListWidget::customContextMenuRequested, this, &FileListWidget::showContextMenu);
+}
+
+FileListWidget::~FileListWidget()
+{
+   delete mFileDelegate;
 }
 
 void FileListWidget::addItem(const QString &label, const QColor &clr)
