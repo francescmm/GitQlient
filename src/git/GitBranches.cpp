@@ -18,7 +18,7 @@ GitExecResult GitBranches::getBranches()
    return mGitBase->run(QString("git branch -a"));
 }
 
-GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QString &right)
+bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &right)
 {
    QLog_Debug("Git",
               QString("Executing getDistanceBetweenBranches: {origin/%1} and {%2}")
@@ -36,7 +36,9 @@ GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QStri
                               .arg(toMaster ? QString("master") : right)
                               .arg(right);
 
-   return mGitBase->run(gitCmd);
+   connect(mGitBase.get(), &GitBase::signalResultReady, this, &GitBranches::signalDistanceBetweenBranches);
+
+   return mGitBase->runAsync(gitCmd);
 }
 
 GitExecResult GitBranches::createBranchFromAnotherBranch(const QString &oldName, const QString &newName)
@@ -57,21 +59,36 @@ GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
 {
    QLog_Debug("Git", QString("Executing checkoutRemoteBranch: {%1}").arg(branchName));
 
-   return mGitBase->run(QString("git checkout -q %1").arg(branchName));
+   const auto ret = mGitBase->run(QString("git checkout -q %1").arg(branchName));
+
+   if (ret.success)
+      mGitBase->updateCurrentBranch();
+
+   return ret;
 }
 
 GitExecResult GitBranches::checkoutNewLocalBranch(const QString &branchName)
 {
    QLog_Debug("Git", QString("Executing checkoutNewLocalBranch: {%1}").arg(branchName));
 
-   return mGitBase->run(QString("git checkout -b %1").arg(branchName));
+   const auto ret = mGitBase->run(QString("git checkout -b %1").arg(branchName));
+
+   if (ret.success)
+      mGitBase->updateCurrentBranch();
+
+   return ret;
 }
 
 GitExecResult GitBranches::renameBranch(const QString &oldName, const QString &newName)
 {
    QLog_Debug("Git", QString("Executing renameBranch: {%1} at {%2}").arg(oldName, newName));
 
-   return mGitBase->run(QString("git branch -m %1 %2").arg(oldName, newName));
+   const auto ret = mGitBase->run(QString("git branch -m %1 %2").arg(oldName, newName));
+
+   if (ret.success)
+      mGitBase->updateCurrentBranch();
+
+   return ret;
 }
 
 GitExecResult GitBranches::removeLocalBranch(const QString &branchName)
@@ -101,8 +118,8 @@ GitExecResult GitBranches::getLastCommitOfBranch(const QString &branch)
 
    auto ret = mGitBase->run(QString("git rev-parse %1").arg(branch));
 
-   if (ret.first)
-      ret.second.remove(ret.second.count() - 1, ret.second.count());
+   if (ret.success)
+      ret.output = ret.output.toString().trimmed();
 
    return ret;
 }

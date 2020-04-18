@@ -8,11 +8,8 @@ GitSyncProcess::GitSyncProcess(const QString &workingDir)
 {
 }
 
-bool GitSyncProcess::run(const QString &command, QString &output)
+GitExecResult GitSyncProcess::run(const QString &command)
 {
-   mRunOutput = &output;
-   mRunOutput->clear();
-
    const auto processStarted = execute(command);
 
    if (processStarted)
@@ -20,5 +17,5 @@ bool GitSyncProcess::run(const QString &command, QString &output)
 
    close();
 
-   return !mRealError;
+   return { !mRealError, mRunOutput };
 }

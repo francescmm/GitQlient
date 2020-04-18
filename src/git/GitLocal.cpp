@@ -21,33 +21,47 @@ GitLocal::GitLocal(const QSharedPointer<GitBase> &gitBase)
 {
 }
 
-GitExecResult GitLocal::cherryPickCommit(const QString &sha)
+GitExecResult GitLocal::cherryPickCommit(const QString &sha) const
 {
    QLog_Debug("Git", QString("Executing cherryPickCommit: {%1}").arg(sha));
 
    return mGitBase->run(QString("git cherry-pick %1").arg(sha));
 }
 
-GitExecResult GitLocal::checkoutCommit(const QString &sha)
+GitExecResult GitLocal::cherryPickAbort() const
+{
+   QLog_Debug("Git", QString("Aborting cherryPick"));
+
+   return mGitBase->run("git cherry-pick --abort");
+}
+
+GitExecResult GitLocal::cherryPickContinue() const
+{
+   QLog_Debug("Git", QString("Applying cherryPick"));
+
+   return mGitBase->run("git cherry-pick --continue");
+}
+
+GitExecResult GitLocal::checkoutCommit(const QString &sha) const
 {
    QLog_Debug("Git", QString("Executing checkoutCommit: {%1}").arg(sha));
 
    return mGitBase->run(QString("git checkout %1").arg(sha));
 }
 
-GitExecResult GitLocal::markFileAsResolved(const QString &fileName)
+GitExecResult GitLocal::markFileAsResolved(const QString &fileName) const
 {
    QLog_Debug("Git", QString("Executing markFileAsResolved: {%1}").arg(fileName));
 
    const auto ret = mGitBase->run(QString("git add %1").arg(fileName));
 
-   if (ret.first)
+   if (ret.success)
       emit signalWipUpdated();
 
    return ret;
 }
 
-bool GitLocal::checkoutFile(const QString &fileName)
+bool GitLocal::checkoutFile(const QString &fileName) const
 {
    if (fileName.isEmpty())
    {
@@ -58,17 +72,17 @@ bool GitLocal::checkoutFile(const QString &fileName)
 
    QLog_Debug("Git", QString("Executing checkoutFile: {%1}").arg(fileName));
 
-   return mGitBase->run(QString("git checkout %1").arg(fileName)).first;
+   return mGitBase->run(QString("git checkout %1").arg(fileName)).success;
 }
 
-GitExecResult GitLocal::resetFile(const QString &fileName)
+GitExecResult GitLocal::resetFile(const QString &fileName) const
 {
    QLog_Debug("Git", QString("Executing resetFile: {%1}").arg(fileName));
 
    return mGitBase->run(QString("git reset %1").arg(fileName));
 }
 
-bool GitLocal::resetCommit(const QString &sha, CommitResetType type)
+bool GitLocal::resetCommit(const QString &sha, CommitResetType type) const
 {
    QString typeStr;
 
@@ -87,11 +101,11 @@ bool GitLocal::resetCommit(const QString &sha, CommitResetType type)
 
    QLog_Debug("Git", QString("Executing resetCommit: {%1} type {%2}").arg(sha, typeStr));
 
-   return mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha)).first;
+   return mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha)).success;
 }
 
 GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
-                                    bool amend, const QString &author)
+                                    bool amend, const QString &author) const
 {
    // add user selectable commit options
    QString cmtOptions;
@@ -117,7 +131,7 @@ GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &
    {
       const auto ret = mGitBase->run("git reset -- " + quote(notSel));
 
-      if (!ret.first)
+      if (!ret.success)
          return ret;
    }
 
@@ -132,7 +146,7 @@ GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &
    return mGitBase->run(QString("git commit" + cmtOptions + " -m \"%1\"").arg(msg));
 }
 
-GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringList &selFiles)
+GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringList &selFiles) const
 {
    QStringList toAdd, toRemove;
 
@@ -150,7 +164,7 @@ GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringLis
    {
       const auto ret = mGitBase->run("git rm --cached --ignore-unmatch -- " + quote(toRemove));
 
-      if (!ret.first)
+      if (!ret.success)
          return ret;
    }
 
@@ -158,7 +172,7 @@ GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringLis
    {
       const auto ret = mGitBase->run("git add -- " + quote(toAdd));
 
-      if (!ret.first)
+      if (!ret.success)
          return ret;
    }
 

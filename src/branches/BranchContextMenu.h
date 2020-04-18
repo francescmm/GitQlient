@@ -69,6 +69,10 @@ signals:
     \param fromBranch The branch to be merge into the current branch.
    */
    void signalMergeRequired(const QString &currentBranch, const QString &fromBranch);
+   /*!
+    * \brief signalPullConflict Signal triggered when trying to pull and a conflict happens.
+    */
+   void signalPullConflict();
 
 public:
    /*!

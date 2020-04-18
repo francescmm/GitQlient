@@ -56,7 +56,14 @@ void BranchContextMenu::pull()
    if (ret.success)
       emit signalBranchesUpdated();
    else
-      QMessageBox::critical(this, tr("Pull failed"), ret.output.toString());
+   {
+      const auto errorMsg = ret.output.toString();
+
+      if (errorMsg.toLower().contains("error: could not apply") && errorMsg.toLower().contains("causing a conflict"))
+         emit signalPullConflict();
+      else
+         QMessageBox::critical(this, tr("Error while pulling"), errorMsg);
+   }
 }
 
 void BranchContextMenu::fetch()

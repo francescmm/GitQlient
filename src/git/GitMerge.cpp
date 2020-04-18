@@ -18,12 +18,12 @@ GitExecResult GitMerge::merge(const QString &into, QStringList sources)
 
    const auto retCheckout = mGitBase->run(QString("git checkout -q %1").arg(into));
 
-   if (!retCheckout.first)
+   if (!retCheckout.success)
       return retCheckout;
 
    const auto retMerge = mGitBase->run(QString("git merge -q ") + sources.join(" "));
 
-   if (retMerge.first)
+   if (retMerge.success)
    {
       QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGitBase, mCache));
       gitLoader->updateWipRevision();

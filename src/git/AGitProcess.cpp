@@ -112,8 +112,7 @@ void AGitProcess::onReadyStandardOutput()
    {
       const auto standardOutput = readAllStandardOutput();
 
-      if (mRunOutput)
-         mRunOutput->append(QString::fromUtf8(standardOutput));
+      mRunOutput.append(QString::fromUtf8(standardOutput));
 
       emit procDataReady(standardOutput);
    }
@@ -154,11 +153,8 @@ void AGitProcess::onFinished(int, QProcess::ExitStatus exitStatus)
    mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error")
        || errorOutput.toLower().contains("could not read username");
 
-   if (mRunOutput)
-   {
-      if (mRealError)
-         *mRunOutput = mErrorOutput;
-      else
-         mRunOutput->append(readAllStandardOutput() + mErrorOutput);
-   }
+   if (mRealError)
+      mRunOutput = mErrorOutput;
+   else
+      mRunOutput.append(readAllStandardOutput() + mErrorOutput);
 }

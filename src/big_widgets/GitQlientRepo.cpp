@@ -5,13 +5,11 @@
 #include <BranchesWidget.h>
 #include <CommitHistoryColumns.h>
 #include <HistoryWidget.h>
-#include <CommitHistoryView.h>
 #include <QLogger.h>
 #include <BlameWidget.h>
 #include <CommitInfo.h>
 #include <ProgressDlg.h>
 #include <GitConfigDlg.h>
-#include <GitQlientSettings.h>
 #include <Controls.h>
 #include <HistoryWidget.h>
 #include <DiffWidget.h>
@@ -20,8 +18,8 @@
 #include <GitRepoLoader.h>
 #include <GitConfig.h>
 #include <GitBase.h>
+#include <GitHistory.h>
 
-#include <QFileSystemModel>
 #include <QTimer>
 #include <QDirIterator>
 #include <QFileSystemWatcher>
@@ -78,6 +76,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mControls, &Controls::signalGoDiff, this, &GitQlientRepo::showDiffView);
    connect(mControls, &Controls::signalGoMerge, this, &GitQlientRepo::showMergeView);
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
+   connect(mControls, &Controls::signalPullConflict, mControls, &Controls::activateMergeWarning);
+   connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showPullConflict);
 
    connect(mHistoryWidget, &HistoryWidget::signalAllBranchesActive, mGitLoader.get(), &GitRepoLoader::setShowAll);
    connect(mHistoryWidget, &HistoryWidget::signalAllBranchesActive, this, &GitQlientRepo::updateCache);
@@ -92,6 +92,10 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mHistoryWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, mControls, &Controls::activateMergeWarning);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, this, &GitQlientRepo::showWarningMerge);
+   connect(mHistoryWidget, &HistoryWidget::signalCherryPickConflict, mControls, &Controls::activateMergeWarning);
+   connect(mHistoryWidget, &HistoryWidget::signalCherryPickConflict, this, &GitQlientRepo::showCherryPickConflict);
+   connect(mHistoryWidget, &HistoryWidget::signalPullConflict, mControls, &Controls::activateMergeWarning);
+   connect(mHistoryWidget, &HistoryWidget::signalPullConflict, this, &GitQlientRepo::showPullConflict);
    connect(mHistoryWidget, &HistoryWidget::signalUpdateWip, this, &GitQlientRepo::updateWip);
 
    connect(mDiffWidget, &DiffWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
@@ -119,6 +123,7 @@ GitQlientRepo::~GitQlientRepo()
 {
    delete mAutoFetch;
    delete mAutoFilesUpdate;
+   delete mGitWatcher;
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
@@ -229,15 +234,15 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
 void GitQlientRepo::setWatcher()
 {
-   const auto gitWatcher = new QFileSystemWatcher(this);
-   connect(gitWatcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
+   mGitWatcher = new QFileSystemWatcher(this);
+   connect(mGitWatcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
       if (!path.endsWith(".autosave") && !path.endsWith(".tmp") && !path.endsWith(".user"))
          updateUiFromWatcher();
    });
 
    QLog_Info("UI", QString("Setting the file watcher for dir {%1}").arg(mCurrentDir));
 
-   gitWatcher->addPath(mCurrentDir);
+   mGitWatcher->addPath(mCurrentDir);
 
    QDirIterator it(mCurrentDir, QDirIterator::Subdirectories);
    while (it.hasNext())
@@ -245,7 +250,7 @@ void GitQlientRepo::setWatcher()
       const auto dir = it.next();
 
       if (it.fileInfo().isDir() && !dir.endsWith(".") && !dir.endsWith(".."))
-         gitWatcher->addPath(dir);
+         mGitWatcher->addPath(dir);
    }
 }
 
@@ -334,9 +339,41 @@ void GitQlientRepo::showWarningMerge()
    showMergeView();
 
    const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
+
+   QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGitBase, mGitQlientCache));
+   git->updateWipRevision();
+
    const auto file = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
-   mMergeWidget->configure(file);
+   mMergeWidget->configure(file, MergeWidget::ConflictReason::Merge);
+}
+
+void GitQlientRepo::showCherryPickConflict()
+{
+   showMergeView();
+
+   const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
+
+   QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGitBase, mGitQlientCache));
+   git->updateWipRevision();
+
+   const auto files = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+
+   mMergeWidget->configure(files, MergeWidget::ConflictReason::CherryPick);
+}
+
+void GitQlientRepo::showPullConflict()
+{
+   showMergeView();
+
+   const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
+
+   QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGitBase, mGitQlientCache));
+   git->updateWipRevision();
+
+   const auto files = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+
+   mMergeWidget->configure(files, MergeWidget::ConflictReason::Pull);
 }
 
 void GitQlientRepo::showMergeView()

@@ -116,17 +116,30 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
 
    for (const auto &line : lines)
    {
-      const auto fields = line.split("\t");
-      const auto revision = mCache->getCommitInfo(fields.at(0));
-      const auto dt = QDateTime::fromString(fields.at(2), Qt::ISODate);
-      const auto &lineNumAndContent = fields.at(3);
+      auto start = 0;
+      auto indexOfTab = line.indexOf('\t');
+      const auto shortSha = line.mid(start, indexOfTab);
+      const auto revision = mCache->getCommitInfo(shortSha);
+
+      start = indexOfTab + 1;
+      indexOfTab = line.indexOf('\t', start);
+      const auto name = line.mid(start, indexOfTab - start).remove("(");
+
+      start = indexOfTab + 1;
+      indexOfTab = line.indexOf('\t', start);
+      const auto dtValue = line.mid(start, indexOfTab - start);
+      const auto dt = QDateTime::fromString(dtValue, Qt::ISODate);
+
+      start = indexOfTab + 1;
+
+      const auto lineNumAndContent = line.mid(start);
       const auto divisorChar = lineNumAndContent.indexOf(")");
       const auto lineText = lineNumAndContent.mid(0, divisorChar);
       const auto content = lineNumAndContent.mid(divisorChar + 1, lineNumAndContent.count() - lineText.count() - 1);
 
-      annotations.append({ revision.sha(), QString(fields.at(1)).remove("("), dt, lineText.toInt(), content });
+      annotations.append({ revision.sha(), name, dt, lineText.toInt(), content });
 
-      if (fields.at(0) != CommitInfo::ZERO_SHA)
+      if (revision.sha() != CommitInfo::ZERO_SHA)
       {
          const auto dtSinceEpoch = dt.toSecsSinceEpoch();
 

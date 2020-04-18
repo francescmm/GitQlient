@@ -6,7 +6,7 @@ GitRequestorProcess::GitRequestorProcess(const QString &workingDir)
 {
 }
 
-bool GitRequestorProcess::run(const QString &command, QString &)
+GitExecResult GitRequestorProcess::run(const QString &command)
 {
    auto ret = false;
 
@@ -21,7 +21,7 @@ bool GitRequestorProcess::run(const QString &command, QString &)
       ret = execute(command);
    }
 
-   return ret;
+   return { ret, "" };
 }
 
 void GitRequestorProcess::onFinished(int, QProcess::ExitStatus)

@@ -59,6 +59,13 @@ signals:
    void signalMergeFinished();
 
 public:
+   enum class ConflictReason
+   {
+      Merge,
+      CherryPick,
+      Pull
+   };
+
    /**
     * @brief Default constructor.
     *
@@ -74,7 +81,7 @@ public:
     *
     * @param files The RevisionFiles data.
     */
-   void configure(const RevisionFiles &files);
+   void configure(const RevisionFiles &files, ConflictReason reason);
 
 private:
    QSharedPointer<RevisionsCache> mGitQlientCache;
@@ -87,6 +94,7 @@ private:
    QPushButton *mMergeBtn = nullptr;
    QPushButton *mAbortBtn = nullptr;
    QMap<ConflictButton *, FileDiffWidget *> mConflictButtons;
+   ConflictReason mReason = ConflictReason::Merge;
 
    /**
     * @brief Fills both lists of ConflictButton.

@@ -18,9 +18,9 @@ QVector<QString> GitStashes::getStashes()
 
    QVector<QString> stashes;
 
-   if (ret.first)
+   if (ret.success)
    {
-      const auto tagsTmp = ret.second.split("\n");
+      const auto tagsTmp = ret.output.toString().split("\n");
 
       for (auto tag : tagsTmp)
          if (tag != "\n" && !tag.isEmpty())

@@ -224,13 +224,23 @@ private:
    */
    void showDiffView();
    /*!
-    \brief Shows the warning merge.
+    \brief Configures the merge widget to show the conflicts in that view.
 
    */
    void showWarningMerge();
    /*!
-    \brief Shows the merge view.
+    * \brief Configures the merge widget when a conflict happens and is due to a cherry-pick. The conflicts are shown in
+    * the merge view.
+    */
+   void showCherryPickConflict();
+   /*!
+    * \brief Configures the merge widget when a conflict happens and is due to a pull. The conflicts are shown in the
+    * merge view.
+    */
+   void showPullConflict();
 
+   /*!
+    \brief Shows the merge view.
    */
    void showMergeView();
    /*!

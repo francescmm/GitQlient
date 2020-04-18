@@ -1,7 +1,7 @@
 #include "GitBase.h"
 
-#include <GitRequestorProcess.h>
 #include <GitSyncProcess.h>
+#include <GitAsyncProcess.h>
 
 #include <QLogger.h>
 
@@ -15,32 +15,62 @@ GitBase::GitBase(const QString &workingDirectory, QObject *parent)
 {
 }
 
-QPair<bool, QString> GitBase::run(const QString &runCmd) const
+QString GitBase::getWorkingDir() const
 {
-   QString runOutput;
+   return mWorkingDirectory;
+}
+
+void GitBase::setWorkingDir(const QString &workingDir)
+{
+   mWorkingDirectory = workingDir;
+}
+
+GitExecResult GitBase::run(const QString &cmd) const
+{
    GitSyncProcess p(mWorkingDirectory);
    connect(this, &GitBase::cancelAllProcesses, &p, &AGitProcess::onCancel);
 
-   const auto ret = p.run(runCmd, runOutput);
+   const auto ret = p.run(cmd);
+   const auto runOutput = ret.output.toString();
 
-   if (ret)
+   if (ret.success)
    {
+
       if (runOutput.contains("fatal:"))
-         QLog_Info("Git", QString("Git command {%1} reported issues:\n%2").arg(runCmd, runOutput));
+         QLog_Info("Git", QString("Git command {%1} reported issues:\n%2").arg(cmd, runOutput));
       else
-         QLog_Trace("Git", QString("Git command {%1} executed successfully.").arg(runCmd));
+         QLog_Trace("Git", QString("Git command {%1} executed successfully.").arg(cmd));
    }
    else
-      QLog_Warning("Git", QString("Git command {%1} has errors:\n%2").arg(runCmd, runOutput));
+      QLog_Warning("Git", QString("Git command {%1} has errors:\n%2").arg(cmd, runOutput));
 
-   return qMakePair(ret, runOutput);
+   return ret;
 }
 
-QString GitBase::getCurrentBranch() const
+bool GitBase::runAsync(const QString &cmd) const
 {
-   QLog_Trace("Git", "Executing getCurrentBranch");
+   const auto p = new GitAsyncProcess(mWorkingDirectory);
+   connect(this, &GitBase::cancelAllProcesses, p, &AGitProcess::onCancel);
+   connect(p, &GitAsyncProcess::signalDataReady, this, &GitBase::signalResultReady);
+
+   return p->run(cmd).success;
+}
+
+void GitBase::updateCurrentBranch()
+{
+   QLog_Trace("Git", "Updating the current branch");
 
    const auto ret = run("git rev-parse --abbrev-ref HEAD");
 
-   return ret.first ? ret.second.trimmed() : QString();
+   mCurrentBranch = ret.success ? ret.output.toString().trimmed() : QString();
+}
+
+QString GitBase::getCurrentBranch()
+{
+   QLog_Trace("Git", "Executing getCurrentBranch");
+
+   if (mCurrentBranch.isEmpty())
+      updateCurrentBranch();
+
+   return mCurrentBranch;
 }

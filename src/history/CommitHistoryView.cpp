@@ -31,11 +31,13 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache
    header()->setSortIndicatorShown(false);
 
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
-   connect(this, &CommitHistoryView::customContextMenuRequested, this, &CommitHistoryView::showContextMenu);
 }
 
 void CommitHistoryView::setModel(QAbstractItemModel *model)
 {
+   connect(this, &CommitHistoryView::customContextMenuRequested, this, &CommitHistoryView::showContextMenu,
+           Qt::UniqueConnection);
+
    mCommitHistoryModel = dynamic_cast<CommitHistoryModel *>(model);
    QTreeView::setModel(model);
    setupGeometry();
@@ -151,6 +153,9 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
                  &CommitHistoryView::signalOpenCompareDiff);
          connect(menu, &CommitHistoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
          connect(menu, &CommitHistoryContextMenu::signalMergeRequired, this, &CommitHistoryView::signalMergeRequired);
+         connect(menu, &CommitHistoryContextMenu::signalCherryPickConflict, this,
+                 &CommitHistoryView::signalCherryPickConflict);
+         connect(menu, &CommitHistoryContextMenu::signalPullConflict, this, &CommitHistoryView::signalPullConflict);
          menu->exec(viewport()->mapToGlobal(pos));
       }
       else

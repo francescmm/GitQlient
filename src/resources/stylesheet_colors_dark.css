@@ -540,3 +540,13 @@ QCheckBox
 
 }
 
+RepoConfigDlg
+{
+   background-color: #2E2F30;
+}
+
+QLineEdit
+{
+   color: white;
+}
+
