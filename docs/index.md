@@ -60,7 +60,7 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 ## <a name="the-three-view"></a>The Tree View
 
-![GitQlient - The Tree View](https://www.francescmm.com/wp-content/uploads/2020/02/image.png "GitQlient - The Tree View")
+![GitQlient - The Tree View](_assets/3_the_tree_view.png "GitQlient - The Tree View")
 
 ### The repository graph tree
 
