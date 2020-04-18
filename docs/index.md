@@ -47,8 +47,23 @@ These views, when enabled, can be accessed by the Controls placed at the top of 
 There is another view but is not accessible always: it is the [*Merge View*](#the-merge-view). This is only triggered when GitQlient detects that there is a conflict caused by a merge, cherry-pick or pull action.
 
 ## Initial screen
+When GitQlient is opened, the first screen that is shown is the *Initial screen*. It contains buttons to handle repositories and three different widgets:
+
+- GitQlient configuration
+- Most used repositories
+- Recently opened repositories
+
+![GitQlient - Initial screen](/GitQlient/assets/1_initial_screen.png "GitQlient - Initial screen")GitQlient - Initial screen
 
 ### GitQlient configuration
+
+In the GitQlient configuration, the user can change some internal parameters that GitQlient uses to update the view and internal data. The available options are:
+
+- Auto-Fetch interval: defined in minutes (from 0 to 60) this interval is used to fetch automatically the changes in the remote repository.
+- Auto-Prune: if active, GitQlient will perform prune actions when it does the automatic fetch.
+- Disable logs: if active, it disables GitQlient logs.
+- Log level: Allows the user to choose the threshold of the levels that GitQlient will write. The higher level, the lesser amount of logs.
+- Auto-format files (not operative): if active, every time that the user commits, it will perform an auto-formating of the code. The formatting will be done by using clang and the clang-format file defined at the root of the repository.
 
 ### Initializing a new repository
 
@@ -60,7 +75,7 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 ## <a name="the-three-view"></a>The Tree View
 
-![GitQlient - The Tree View](/GitQlient/assets/3_the_tree_view.png "GitQlient - The Tree View")
+![GitQlient - The Tree View](/GitQlient/assets/3_the_tree_view.png "GitQlient - The Tree View")GitQlient - The Tree View
 
 ### The repository graph tree
 
