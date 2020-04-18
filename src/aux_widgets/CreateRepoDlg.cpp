@@ -18,6 +18,9 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
 
    ui->setupUi(this);
 
+   if (mType == CreateRepoDlgType::INIT)
+      ui->leURL->setHidden(true);
+
    const auto operation = mType == CreateRepoDlgType::INIT ? QString("init") : QString("clone");
    const auto checkText = ui->chbOpen->text().arg(operation);
    ui->chbOpen->setText(checkText);

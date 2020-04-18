@@ -67,11 +67,67 @@ In the GitQlient configuration, the user can change some internal parameters tha
 
 ### Initializing a new repository
 
+To create a new local repository the option *Init new repo* opens a dialog to set all the information that Git needs. This contains:
+
+- Destination of the repository (where it will be stored locally)
+- Repository name: the name of the repository (refers to the folder name of the project)
+
+In addition the Git user can be configured and by checking the checkbox GitQlient will open the repository after it's created.
+
+![GitQlient - Init new repo](/GitQlient/assets/1_init_repo.png "GitQlient - Init new repo")GitQlient - Init new repo
+
 ### Cloning a remote repository
+
+To clone an existing remote repository we have to select the option *Clone new repo*. It will show a dialog that ask for all the necessary data that Git needs to clone a repo. That is:
+
+- Repository destination: where the repository will be stored.
+- URL: The remote URL for the repository.
+- Repository name: it's automatically filled with the repo name from the URL, but can be changed if wanted.
+
+In addition, there are two options after the clone action takes place:
+
+- Checkbox to open the repo in GitQlient.
+- Checkbox to store the user data for this repository.
+
+![GitQlient - Clone repository](/GitQlient/assets/1_clone_repo.png "GitQlient - Clone repository")GitQlient - Clone repository
 
 ### Open an existing repository
 
+If the user wants to open an already cloned repository, the button *Open existing repo" openes the file explorer of the OS to select the folder that contains the repository:
+
+![GitQlient - Open repository](/GitQlient/assets/1_open_repo.png "GitQlient - Open repository")GitQlient - Open repository
+
+In addition to this, the user can select any of the projects listed in the *Most used repos* list or in the *Recent repos" list:
+
+![GitQlient - Open repository](/GitQlient/assets/1_open_repo_2.png "GitQlient - Open repository")GitQlient - Open repository
+
 ## Quick access actions
+
+Once we have selected and opened our repo, the new view shows in first place a series of controls to manage the most used actions done in Git. This controls are organized horizontally as sqaured buttons as the following image shows:
+
+![GitQlient - Quick access actions](/GitQlient/assets/2_quick_access_actions.png "GitQlient - Quick access actions")GitQlient - Quick access actions
+
+The first three buttons reference the different views of GitQlient. They allow you to navigate GitQlient in a simple and easy way. The button changes its color when the view it refers is being dispayed:
+
+- View: This is the main view and shows the tree view, information about the commits, the WIP, branches, tags, stashes and submodules.
+- Diff: This options is disabled by default and is only active when a diff is opened. When active, it shows the opened diffs we have.
+- Blame: The blame option shows the view there you can see the commit history of any file, the blame for each selected file and a view of the files in the current repository folder.
+
+After that, we can see the main three Git commands we will use. These are placed here to make you easier to sync the data between the remote and the local repository. Some buttons have an arrow that indicates that they have several options. Press the arrow to select the desired Git command:
+
+- Pull: By default, it performs a Git Pull command. When the dropdown menu is pressed we can find other options:
+
+![GitQlient - Pull options](/GitQlient/assets/2_pull_options.png "GitQlient - Pull options")GitQlient - Pull options
+
+- Push: It performs the regular push (not *forced*) command.
+- Stash: It does not have a default command. Instead you have to press the dropdown menu to see the different options:
+
+![GitQlient - Stash options](/GitQlient/assets/2_stash_options.png "GitQlient - Stash options")GitQlient - Stash options
+
+- Refresh: This option performs a deep refresh of the repository cache. It reloads cache, views and branches information. This is quite costly so have it on mind when you trigger it. It's usually helpful to use when you have performed Git actions outside GitQlient.
+- Config: The last option opens the repository config dialog. For now, it shows the user data for the current repository:
+
+![GitQlient - Repository config](/GitQlient/assets/2_repo_config.png "GitQlient - Repository config")GitQlient - Repository config
 
 ## <a name="the-three-view"></a>The Tree View
 
