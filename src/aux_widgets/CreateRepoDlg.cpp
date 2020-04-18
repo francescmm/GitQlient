@@ -22,6 +22,9 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
    const auto checkText = ui->chbOpen->text().arg(operation);
    ui->chbOpen->setText(checkText);
 
+   setWindowTitle(
+       QString("%1 repository").arg(mType == CreateRepoDlgType::INIT ? QString("Initialize") : QString("Clone")));
+
    connect(ui->leURL, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
    connect(ui->leURL, &QLineEdit::textChanged, this, &CreateRepoDlg::addDefaultName);
    connect(ui->pbBrowse, &QPushButton::clicked, this, &CreateRepoDlg::selectFolder);

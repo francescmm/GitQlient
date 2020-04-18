@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>437</width>
-    <height>248</height>
+    <height>256</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Create tag</string>
+   <string/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="0" colspan="3">
