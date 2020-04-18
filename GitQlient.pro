@@ -28,6 +28,7 @@ OTHER_FILES += \
     $$PWD/README.md \
     $$PWD/docs/CONTRIBUTING.md \
     $$PWD/docs/SETUP_BUILD.md \
+    $$PWD/docs/index.md \
     $$PWD/.travis.yml
 
 VERSION = 1.0.0
