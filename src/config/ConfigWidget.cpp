@@ -141,8 +141,8 @@ QWidget *ConfigWidget::createConfigWidget()
 {
    mBtnGroup = new QButtonGroup();
    mBtnGroup->addButton(new QPushButton(tr("General")), 0);
-   mBtnGroup->addButton(new QPushButton(tr("Recent repos")), 1);
-   mBtnGroup->addButton(new QPushButton(tr("Most used repos")), 2);
+   mBtnGroup->addButton(new QPushButton(tr("Most used repos")), 1);
+   mBtnGroup->addButton(new QPushButton(tr("Recent repos")), 2);
 
    const auto firstBtn = mBtnGroup->button(1);
    firstBtn->setProperty("selected", true);
