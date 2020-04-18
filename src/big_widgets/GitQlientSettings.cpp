@@ -11,6 +11,31 @@ void GitQlientSettings::setValue(const QString &key, const QVariant &value)
 
 void GitQlientSettings::setProjectOpened(const QString &projectPath)
 {
+   saveMostUsedProjects(projectPath);
+
+   saveRecentProjects(projectPath);
+}
+
+void GitQlientSettings::saveRecentProjects(const QString &projectPath)
+{
+   auto usedProjects = getMostUsedProjects();
+
+   if (usedProjects.contains(projectPath))
+   {
+      const auto index = usedProjects.indexOf(projectPath);
+      usedProjects.takeAt(index);
+   }
+
+   usedProjects.prepend(projectPath);
+
+   while (!usedProjects.isEmpty() && usedProjects.count() >= 5)
+      usedProjects.removeLast();
+
+   GitQlientSettings::setValue("usedProjects", usedProjects);
+}
+
+void GitQlientSettings::saveMostUsedProjects(const QString &projectPath)
+{
    auto projects = QSettings::value("recentProjects", QStringList()).toStringList();
    auto timesUsed = QSettings::value("recentProjectsCount", QString()).toList();
    int count = 1;
@@ -51,4 +76,9 @@ QVector<QString> GitQlientSettings::getRecentProjects() const
       recentProjects.append(orderedProjects.at(orderedProjects.count() - 1 - i));
 
    return recentProjects;
+}
+
+QStringList GitQlientSettings::getMostUsedProjects() const
+{
+   return QSettings::value("usedProjects", QStringList()).toStringList();
 }

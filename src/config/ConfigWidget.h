@@ -80,7 +80,9 @@ private:
    QString mPathToOpen;
    GitQlientSettings *mSettings = nullptr;
    QVBoxLayout *mRecentProjectsLayout = nullptr;
+   QVBoxLayout *mUsedProjectsLayout = nullptr;
    QWidget *mInnerWidget = nullptr;
+   QWidget *mMostUsedInnerWidget = nullptr;
 
    /*!
     \brief Opens a alredy cloned repository.
@@ -109,6 +111,14 @@ private:
     \return QWidget The resultant widget.
    */
    QWidget *createRecentProjectsPage();
+
+   /*!
+    \brief Creates the most used projects page.
+
+   \return QWidget The resultant widget.
+    */
+   QWidget *createUsedProjectsPage();
+
    /*!
     \brief Updates the progress dialog for cloning repos.
 

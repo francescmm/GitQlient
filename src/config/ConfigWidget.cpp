@@ -142,6 +142,7 @@ QWidget *ConfigWidget::createConfigWidget()
    mBtnGroup = new QButtonGroup();
    mBtnGroup->addButton(new QPushButton(tr("General")), 0);
    mBtnGroup->addButton(new QPushButton(tr("Recent repos")), 1);
+   mBtnGroup->addButton(new QPushButton(tr("Most used repos")), 2);
 
    const auto firstBtn = mBtnGroup->button(1);
    firstBtn->setProperty("selected", true);
@@ -169,15 +170,20 @@ QWidget *ConfigWidget::createConfigWidget()
    buttonsLayout->addStretch();
 
    const auto projectsFrame = new QFrame();
-
    mRecentProjectsLayout = new QVBoxLayout(projectsFrame);
    mRecentProjectsLayout->setContentsMargins(QMargins());
    mRecentProjectsLayout->addWidget(createRecentProjectsPage());
+
+   const auto usedProjectsFrame = new QFrame();
+   mUsedProjectsLayout = new QVBoxLayout(usedProjectsFrame);
+   mUsedProjectsLayout->setContentsMargins(QMargins());
+   mUsedProjectsLayout->addWidget(createUsedProjectsPage());
 
    const auto stackedWidget = new QStackedWidget();
    stackedWidget->setMinimumHeight(300);
    stackedWidget->addWidget(new GeneralConfigPage());
    stackedWidget->addWidget(projectsFrame);
+   stackedWidget->addWidget(usedProjectsFrame);
    stackedWidget->setCurrentIndex(1);
 
    connect(mBtnGroup, qOverload<int>(&QButtonGroup::buttonClicked), this, [this, stackedWidget](int index) {
@@ -229,6 +235,31 @@ QWidget *ConfigWidget::createRecentProjectsPage()
    innerLayout->addStretch();
 
    return mInnerWidget;
+}
+
+QWidget *ConfigWidget::createUsedProjectsPage()
+{
+   delete mMostUsedInnerWidget;
+   mMostUsedInnerWidget = new QFrame();
+   mMostUsedInnerWidget->setObjectName("recentProjects");
+
+   const auto innerLayout = new QVBoxLayout(mMostUsedInnerWidget);
+   innerLayout->setSpacing(0);
+
+   const auto projects = mSettings->getMostUsedProjects();
+
+   for (auto project : projects)
+   {
+      const auto projectName = project.mid(project.lastIndexOf("/") + 1);
+      const auto labelText = QString("%1 <%2>").arg(projectName, project);
+      const auto clickableFrame = new ClickableFrame(labelText, Qt::AlignLeft);
+      connect(clickableFrame, &ClickableFrame::clicked, this, [this, project]() { emit signalOpenRepo(project); });
+      innerLayout->addWidget(clickableFrame);
+   }
+
+   innerLayout->addStretch();
+
+   return mMostUsedInnerWidget;
 }
 
 void ConfigWidget::updateProgressDialog(QString stepDescription, int value)

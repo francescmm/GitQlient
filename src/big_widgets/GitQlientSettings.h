@@ -66,9 +66,25 @@ public:
    */
    void setProjectOpened(const QString &projectPath);
    /*!
-    \brief Gets all the most used projects.
+    * \brief saveRecentProjects Saves the project in \p projectPath in the recent projects config value.
+    * \param projectPath The project path to save.
+    */
+   void saveRecentProjects(const QString &projectPath);
+   /*!
+    * \brief saveMostUsedProjects Saves the project in \p projectPath in the most used projects config value.
+    * \param projectPath The project path to save.
+    */
+   void saveMostUsedProjects(const QString &projectPath);
+   /*!
+    \brief Gets all the recent used projects.
 
     \return QVector<QString> Projects list.
    */
    QVector<QString> getRecentProjects() const;
+   /*!
+    \brief Gets all the most used projects.
+
+    \return QStringList Projects list.
+    */
+   QStringList getMostUsedProjects() const;
 };
