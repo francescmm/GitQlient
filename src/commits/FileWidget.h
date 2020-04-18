@@ -42,6 +42,7 @@ public:
    QString text() const;
    void setText(const QString &text);
    QSize sizeHint() const override;
+   void setTextColor(const QColor &color) const;
 
 private:
    QIcon mIcon;

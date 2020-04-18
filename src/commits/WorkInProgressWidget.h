@@ -87,6 +87,7 @@ private:
    bool hasConflicts();
    void resetInfo(bool force = true);
    void resetFile(QListWidgetItem *item);
+   QColor getColorForFile(const RevisionFiles &files, int index) const;
 
    static QString lastMsgBeforeError;
    static const int kMaxTitleChars;

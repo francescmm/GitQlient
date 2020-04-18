@@ -214,6 +214,8 @@ void WorkInProgressWidget::resetFile(QListWidgetItem *item)
             ui->unstagedFilesList->addItem(item);
 
             const auto fileWidget = new FileWidget(iconPath, item->toolTip());
+            fileWidget->setTextColor(item->foreground().color());
+
             connect(fileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
             ui->unstagedFilesList->setItemWidget(item, fileWidget);
          }
@@ -225,8 +227,9 @@ void WorkInProgressWidget::resetFile(QListWidgetItem *item)
             ui->untrackedFilesList->addItem(item);
 
             const auto fileWidget = new FileWidget(iconPath, item->toolTip());
-            connect(fileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
+            fileWidget->setTextColor(item->foreground().color());
 
+            connect(fileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
             ui->untrackedFilesList->setItemWidget(item, fileWidget);
          }
       }
@@ -234,6 +237,32 @@ void WorkInProgressWidget::resetFile(QListWidgetItem *item)
 
    if (ret.success)
       emit signalUpdateWip();
+}
+
+QColor WorkInProgressWidget::getColorForFile(const RevisionFiles &files, int index) const
+{
+   const auto isUnknown = files.statusCmp(index, RevisionFiles::UNKNOWN);
+   const auto isInIndex = files.statusCmp(index, RevisionFiles::IN_INDEX);
+   const auto isConflict = files.statusCmp(index, RevisionFiles::CONFLICT);
+   const auto untrackedFile = !isInIndex && isUnknown;
+
+   QColor myColor;
+   const auto isDeleted = files.statusCmp(index, RevisionFiles::DELETED);
+
+   if (isConflict)
+   {
+      myColor = GitQlientStyles::getBlue();
+   }
+   else if (isDeleted)
+      myColor = GitQlientStyles::getRed();
+   else if (untrackedFile)
+      myColor = GitQlientStyles::getOrange();
+   else if (files.statusCmp(index, RevisionFiles::NEW) || isUnknown || isInIndex)
+      myColor = GitQlientStyles::getGreen();
+   else
+      myColor = GitQlientStyles::getTextColor();
+
+   return myColor;
 }
 
 void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWidget *fileList)
@@ -250,7 +279,6 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          const auto untrackedFile = !isInIndex && isUnknown;
          const auto staged = isInIndex && !isUnknown && !isConflict;
 
-         auto iconPath = QString(":/icons/add");
          QListWidgetItem *item = nullptr;
 
          if (untrackedFile)
@@ -260,7 +288,6 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          }
          else if (staged)
          {
-            iconPath = QString(":/icons/remove");
             item = new QListWidgetItem(ui->stagedFilesList);
             item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(ui->stagedFilesList));
          }
@@ -270,28 +297,12 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
             item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(fileList));
          }
 
-         QColor myColor;
-         const auto isDeleted = files.statusCmp(i, RevisionFiles::DELETED);
-
-         if ((files.statusCmp(i, RevisionFiles::NEW) || isUnknown || isInIndex) && !untrackedFile && !isDeleted
-             && !isConflict)
-            myColor = GitQlientStyles::getGreen();
-         else if (isConflict)
-         {
-            myColor = GitQlientStyles::getBlue();
+         if (isConflict)
             item->setData(GitQlientRole::U_IsConflict, true);
-         }
-         else if (isDeleted)
-            myColor = GitQlientStyles::getRed();
-         else if (untrackedFile)
-            myColor = GitQlientStyles::getOrange();
-         else
-            myColor = GitQlientStyles::getTextColor();
 
          item->setText(fileName);
          item->setData(GitQlientRole::U_Name, fileName);
          item->setToolTip(fileName);
-         item->setForeground(myColor);
 
          if (mIsAmend && fileList == ui->stagedFilesList)
             item->setFlags(item->flags() & (~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled));
@@ -305,7 +316,12 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
             item->setData(GitQlientRole::U_Name, newName);
          }
 
+         const auto iconPath = !untrackedFile && staged ? QString(":/icons/remove") : QString(":/icons/add");
          const auto fileWidget = new FileWidget(iconPath, item->text());
+
+         const auto textColor = getColorForFile(files, i);
+         fileWidget->setTextColor(textColor);
+         item->setForeground(textColor);
 
          if (staged)
             connect(fileWidget, &FileWidget::clicked, this, [this, item]() { resetFile(item); });
@@ -373,6 +389,8 @@ void WorkInProgressWidget::addFileToCommitList(QListWidgetItem *item)
    const auto row = fileList->row(item);
    const auto fileWidget = qobject_cast<FileWidget *>(fileList->itemWidget(item));
    const auto newFileWidget = new FileWidget(":/icons/remove", fileWidget->text());
+   newFileWidget->setTextColor(item->foreground().color());
+
    connect(newFileWidget, &FileWidget::clicked, this, [this, item]() { removeFileFromCommitList(item); });
 
    fileList->removeItemWidget(item);
@@ -414,6 +432,8 @@ void WorkInProgressWidget::removeFileFromCommitList(QListWidgetItem *item)
       const auto row = ui->stagedFilesList->row(item);
       const auto fileWidget = qobject_cast<FileWidget *>(ui->stagedFilesList->itemWidget(item));
       const auto newFileWidget = new FileWidget(":/icons/add", fileWidget->text());
+      newFileWidget->setTextColor(item->foreground().color());
+
       connect(newFileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
 
       if (item->data(GitQlientRole::U_IsConflict).toBool())

@@ -43,3 +43,8 @@ QSize FileWidget::sizeHint() const
 
    return size;
 }
+
+void FileWidget::setTextColor(const QColor &color) const
+{
+   mText->setStyleSheet(QString("color: %1").arg(color.name()));
+}
