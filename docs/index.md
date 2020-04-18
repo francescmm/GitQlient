@@ -60,7 +60,7 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 ## <a name="the-three-view"></a>The Tree View
 
-![GitQlient - The Tree View](/assets/3_the_tree_view.png "GitQlient - The Tree View")
+![GitQlient - The Tree View](/GitQlient/assets/3_the_tree_view.png "GitQlient - The Tree View")
 
 ### The repository graph tree
 
