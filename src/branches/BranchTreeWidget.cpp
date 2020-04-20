@@ -51,18 +51,20 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
       const auto ret = git->checkoutRemoteBranch(item->data(0, Qt::UserRole + 1).toString().remove("origin/"));
       QApplication::restoreOverrideCursor();
 
+      const auto output = ret.output.toString();
+
       if (ret.success)
       {
          QRegExp rx("by \\d+ commits");
-         rx.indexIn(ret.output.toString());
+         rx.indexIn(output);
          auto value = rx.capturedTexts().first().split(" ");
 
-         if (value.count() == 3)
+         if (value.count() == 3 && output.toLower().contains("your branch is behind"))
          {
             const auto commits = value.at(1).toUInt();
             (void)commits;
 
-            PullDlg pull(ret.output.toString());
+            PullDlg pull(output.split('\n').first());
 
             pull.exec();
          }
@@ -70,7 +72,7 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
          emit signalBranchCheckedOut();
       }
       else
-         QMessageBox::critical(this, tr("Checkout branch error"), ret.output.toString());
+         QMessageBox::critical(this, tr("Checkout branch error"), output);
    }
 }
 

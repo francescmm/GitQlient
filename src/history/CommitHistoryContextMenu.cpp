@@ -218,6 +218,7 @@ void CommitHistoryContextMenu::checkoutBranch()
 
    QScopedPointer<GitBranches> git(new GitBranches(mGit));
    const auto ret = git->checkoutRemoteBranch(branchName);
+   const auto output = ret.output.toString();
 
    if (ret.success)
    {
@@ -225,12 +226,12 @@ void CommitHistoryContextMenu::checkoutBranch()
       rx.indexIn(ret.output.toString());
       auto value = rx.capturedTexts().first().split(" ");
 
-      if (value.count() == 3)
+      if (value.count() == 3 && output.toLower().contains("your branch is behind"))
       {
          const auto commits = value.at(1).toUInt();
          (void)commits;
 
-         PullDlg pull(ret.output.toString());
+         PullDlg pull(output.split('\n').first());
 
          pull.exec();
       }
