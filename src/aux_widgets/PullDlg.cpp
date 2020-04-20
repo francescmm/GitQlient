@@ -1,6 +1,8 @@
 #include "PullDlg.h"
 #include "ui_PullDlg.h"
 
+#include <GitQlientStyles.h>
+
 #include <QPushButton>
 
 PullDlg::PullDlg(const QString &text, QWidget *parent)
@@ -11,6 +13,8 @@ PullDlg::PullDlg(const QString &text, QWidget *parent)
 
    ui->lText->setText(text);
    ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Pull");
+
+   setStyleSheet(GitQlientStyles::getStyles());
 }
 
 PullDlg::~PullDlg()

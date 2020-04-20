@@ -531,3 +531,11 @@ MergeWidget > #leCommitTitle
    border-right: 1px;
 }
 
+PullDlg
+{
+   max-height: 150px;
+   min-height: 150px;
+   max-width: 500px;
+   min-width: 500px;
+}
+
