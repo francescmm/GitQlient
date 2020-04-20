@@ -61,16 +61,6 @@ GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
 
    const auto ret = mGitBase->run(QString("git checkout %1").arg(branchName));
 
-   QRegExp rx("by \\d+ commits");
-   rx.indexIn(ret.output.toString());
-   auto value = rx.capturedTexts().first().split(" ");
-
-   if (value.count() == 3)
-   {
-      const auto commits = value.at(1).toUInt();
-      (void)commits;
-   }
-
    if (ret.success)
       mGitBase->updateCurrentBranch();
 

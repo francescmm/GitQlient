@@ -3,6 +3,7 @@
 #include <GitBranches.h>
 #include <GitBase.h>
 #include <BranchContextMenu.h>
+#include <PullDlg.h>
 
 #include <QApplication>
 #include <QMessageBox>
@@ -51,7 +52,23 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
       QApplication::restoreOverrideCursor();
 
       if (ret.success)
+      {
+         QRegExp rx("by \\d+ commits");
+         rx.indexIn(ret.output.toString());
+         auto value = rx.capturedTexts().first().split(" ");
+
+         if (value.count() == 3)
+         {
+            const auto commits = value.at(1).toUInt();
+            (void)commits;
+
+            PullDlg pull(ret.output.toString());
+
+            pull.exec();
+         }
+
          emit signalBranchCheckedOut();
+      }
       else
          QMessageBox::critical(this, tr("Checkout branch error"), ret.output.toString());
    }

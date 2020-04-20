@@ -11,6 +11,7 @@
 #include <TagDlg.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
+#include <PullDlg.h>
 
 #include <QMessageBox>
 #include <QApplication>
@@ -219,7 +220,23 @@ void CommitHistoryContextMenu::checkoutBranch()
    const auto ret = git->checkoutRemoteBranch(branchName);
 
    if (ret.success)
+   {
+      QRegExp rx("by \\d+ commits");
+      rx.indexIn(ret.output.toString());
+      auto value = rx.capturedTexts().first().split(" ");
+
+      if (value.count() == 3)
+      {
+         const auto commits = value.at(1).toUInt();
+         (void)commits;
+
+         PullDlg pull(ret.output.toString());
+
+         pull.exec();
+      }
+
       emit signalRepositoryUpdated();
+   }
    else
       QMessageBox::critical(this, tr("Checkout error"), ret.output.toString());
 }
