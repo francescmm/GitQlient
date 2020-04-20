@@ -3,6 +3,7 @@ INCLUDEPATH += $$PWD
 FORMS += \
     $$PWD/BranchDlg.ui \
     $$PWD/CreateRepoDlg.ui \
+    $$PWD/PullDlg.ui \
     $$PWD/RepoConfigDlg.ui
 
 HEADERS += \
@@ -11,6 +12,7 @@ HEADERS += \
     $$PWD/ConflictButton.h \
     $$PWD/CreateRepoDlg.h \
     $$PWD/ProgressDlg.h \
+    $$PWD/PullDlg.h \
     $$PWD/RepoConfigDlg.h
 
 SOURCES += \
@@ -19,4 +21,5 @@ SOURCES += \
     $$PWD/ConflictButton.cpp \
     $$PWD/CreateRepoDlg.cpp \
     $$PWD/ProgressDlg.cpp \
+    $$PWD/PullDlg.cpp \
     $$PWD/RepoConfigDlg.cpp
