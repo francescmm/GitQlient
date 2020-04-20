@@ -2,6 +2,7 @@
 #include "ui_PullDlg.h"
 
 #include <GitQlientStyles.h>
+#include <GitRemote.h>
 
 #include <QPushButton>
 
@@ -21,3 +22,5 @@ PullDlg::~PullDlg()
 {
    delete ui;
 }
+
+void PullDlg::accept() {}

@@ -16,6 +16,8 @@ public:
    explicit PullDlg(const QString &text, QWidget *parent = nullptr);
    ~PullDlg();
 
+   void accept() override;
+
 private:
    Ui::PullDlg *ui;
 };
