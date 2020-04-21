@@ -225,6 +225,7 @@ void CommitHistoryContextMenu::checkoutBranch()
       QRegExp rx("by \\d+ commits");
       rx.indexIn(ret.output.toString());
       auto value = rx.capturedTexts().first().split(" ");
+      auto uiUpdateRequested = true;
 
       if (value.count() == 3 && output.toLower().contains("your branch is behind"))
       {
@@ -233,10 +234,15 @@ void CommitHistoryContextMenu::checkoutBranch()
 
          PullDlg pull(mGit, output.split('\n').first());
 
-         pull.exec();
+         connect(&pull, &PullDlg::signalRepositoryUpdated, this, &CommitHistoryContextMenu::signalRepositoryUpdated);
+         connect(&pull, &PullDlg::signalPullConflict, this, &CommitHistoryContextMenu::signalPullConflict);
+
+         if (pull.exec() == QDialog::Accepted)
+            uiUpdateRequested = true;
       }
 
-      emit signalRepositoryUpdated();
+      if (!uiUpdateRequested)
+         emit signalRepositoryUpdated();
    }
    else
       QMessageBox::critical(this, tr("Checkout error"), ret.output.toString());

@@ -58,6 +58,7 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
          QRegExp rx("by \\d+ commits");
          rx.indexIn(output);
          auto value = rx.capturedTexts().first().split(" ");
+         auto uiUpdateRequested = false;
 
          if (value.count() == 3 && output.toLower().contains("your branch is behind"))
          {
@@ -65,11 +66,15 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
             (void)commits;
 
             PullDlg pull(mGit, output.split('\n').first());
+            connect(&pull, &PullDlg::signalRepositoryUpdated, this, &BranchTreeWidget::signalBranchCheckedOut);
+            connect(&pull, &PullDlg::signalPullConflict, this, &BranchTreeWidget::signalPullConflict);
 
-            pull.exec();
+            if (pull.exec() == QDialog::Accepted)
+               uiUpdateRequested = true;
          }
 
-         emit signalBranchCheckedOut();
+         if (!uiUpdateRequested)
+            emit signalBranchCheckedOut();
       }
       else
          QMessageBox::critical(this, tr("Checkout branch error"), output);
