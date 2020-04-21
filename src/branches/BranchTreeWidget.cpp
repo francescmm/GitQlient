@@ -64,7 +64,7 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
             const auto commits = value.at(1).toUInt();
             (void)commits;
 
-            PullDlg pull(output.split('\n').first());
+            PullDlg pull(mGit, output.split('\n').first());
 
             pull.exec();
          }
