@@ -168,18 +168,18 @@ Over the selection you can perform different actions:
 
 * On commit selected:
     - If the commit is the last one you will find the following options:
-    ![GitQlient - Options for last commit](/GitQlient/assets/3_current_options.png "GitQlient - Options for last commit")GitQlient - Options for last commit
+    ![GitQlient - Options for last commit](/GitQlient/assets/3_current_options.png "GitQlient - Options for last commit")
     - If the selection is the work in progress:
-    ![GitQlient - WIP options](/GitQlient/assets/3_wip_options.png "GitQlient - WIP options")GitQlient - WIP options
+    ![GitQlient - WIP options](/GitQlient/assets/3_wip_options.png "GitQlient - WIP options")
     - If the commit is the last commit of a different branch:
-    ![GitQlient - Branch commit options](/GitQlient/assets/3_branch_options.png "GitQlient - Branch commit options")GitQlient - Branch commit options
+    ![GitQlient - Branch commit options](/GitQlient/assets/3_branch_options.png "GitQlient - Branch commit options")
     - If the commit select is in a different branch and is not the last one, you will have the same options that before but without the *Checkout branch...* and *Merge* options.
 
 ### WIP view
 
 When you select the first entry in the graphic tree view when the text says *Local changes*, it will show the information of your local uncommited changes in a widget on the left side of the graphic view:
 
-![GitQlient - WIP view](/GitQlient/assets/3_wip_view.png "GitQlient - WIP view")GitQlient - WIP view
+![GitQlient - WIP view](/GitQlient/assets/3_wip_view.png "GitQlient - WIP view")
 
 This view is divided in four sections. The first list shows the files that are untracked in your local repository. The second list shows the files that have local modifications. Following that you will find the third list with the changes that are already added to the next commit. Finally in the bottom of the view, you have two input controls where you can add the title of the commit (up to 50 characters), the description for long explanatory texts and a button to commit.
 
@@ -211,7 +211,7 @@ The same view applies when you want to amend a commit. The only difference is th
 
 When you select any commit in the graphic tree view, the information about that commit will be displayed in the left side of the window.
 
-![GitQlient - Commit info view](/GitQlient/assets/3_commit_info_view.png "GitQlient - Commit info view")GitQlient - Commit info view
+![GitQlient - Commit info view](/GitQlient/assets/3_commit_info_view.png "GitQlient - Commit info view")
 
 The commit info view is divided in two main sections: the information about the commit, and the list of files that were modified in that commit.
 
