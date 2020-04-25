@@ -24,7 +24,7 @@ The second thing I've been missing is a proper User Manual. After several years 
 
 But, what happens if you want to introduce as much people as possible? Well, then we need a User Manual that tells them exactly how things work. What options they have and how to deal with possible mistakes or errors.
 
-This document tries to cover exactly this area.
+This document tries to cover exactly that.
 
 ## Glossary
 
@@ -34,9 +34,9 @@ Here you can find all the specific glossary that will be used in this document r
 
 # How to use GitQlient
 
-As we've seen in the introduction, GitQlient support multiple repositories opened at the same time. All repositories are managed in the same isolated way. All the features of GitQlient will be presented along the User Manual: all of them apply to all the opened repositories.
+As I explained in the introduction, GitQlient support multiple repositories opened at the same time. All repositories are managed in the same isolated way. All the features of GitQlient will be presented along the User Manual: all of them apply to all the opened repositories individually. Unfortunately there are no cross-repository features.
 
-GitQlient is divided in three big sections split by their functionality:
+Since the beginning I divided GitQlient three big sections depending on their functionality:
 
 - [The Tree View (or Main Repository View)](#the-three-view)
 - [The Diff View](#the-diff-view)
@@ -44,10 +44,10 @@ GitQlient is divided in three big sections split by their functionality:
 
 These views, when enabled, can be accessed by the Controls placed at the top of the repository window.
 
-There is another view but is not accessible always: it is the [*Merge View*](#the-merge-view). This is only triggered when GitQlient detects that there is a conflict caused by a merge, cherry-pick or pull action.
+There is another view but is not accessible always: it is the [*Merge View*](#the-merge-view). This view is visible and accessible when GitQlient detects that there is a conflict caused by a merge, cherry-pick, or pull action.
 
 ## Initial screen
-When GitQlient is opened, the first screen that is shown is the *Initial screen*. It contains buttons to handle repositories and three different widgets:
+The first screen you will see when opening GitQlient is the *Initial screen*. It contains buttons to handle repositories and three different widgets:
 
 - GitQlient configuration
 - Most used repositories
@@ -57,28 +57,28 @@ When GitQlient is opened, the first screen that is shown is the *Initial screen*
 
 ### GitQlient configuration
 
-In the GitQlient configuration, the user can change some internal parameters that GitQlient uses to update the view and internal data. The available options are:
+In the GitQlient configuration, you can change some internal parameters that GitQlient uses to update the view and internal data. The available options are:
 
 - Auto-Fetch interval: defined in minutes (from 0 to 60) this interval is used to fetch automatically the changes in the remote repository.
 - Auto-Prune: if active, GitQlient will perform prune actions when it does the automatic fetch.
 - Disable logs: if active, it disables GitQlient logs.
-- Log level: Allows the user to choose the threshold of the levels that GitQlient will write. The higher level, the lesser amount of logs.
-- Auto-format files (not operative): if active, every time that the user commits, it will perform an auto-formating of the code. The formatting will be done by using clang and the clang-format file defined at the root of the repository.
+- Log level: Allows you to choose the threshold of the levels that GitQlient will write. The higher level, the lesser amount of logs.
+- Auto-format files (not operative): if active, every time that you make a commit, it will perform an auto-formating of the code. The formatting will be done by using clang and the clang-format file defined at the root of the repository.
 
 ### Initializing a new repository
 
-To create a new local repository the option *Init new repo* opens a dialog to set all the information that Git needs. This contains:
+To create a new local repository you have to click over the option *Init new repo*. It opens a dialog to set all the information that Git needs. This is:
 
 - Destination of the repository (where it will be stored locally)
 - Repository name: the name of the repository (refers to the folder name of the project)
 
-In addition the Git user can be configured and by checking the checkbox GitQlient will open the repository after it's created.
+In addition, you can configure the Git user by checking the checkbox GitQlient will open the repository after it's created.
 
 ![GitQlient - Init new repo](/GitQlient/assets/1_init_repo.png "GitQlient - Init new repo")GitQlient - Init new repo
 
 ### Cloning a remote repository
 
-To clone an existing remote repository we have to select the option *Clone new repo*. It will show a dialog that ask for all the necessary data that Git needs to clone a repo. That is:
+To clone an existing remote repository you have to select the option *Clone new repo*. After clicking the button, it will show a dialog that ask for all the necessary data that Git needs to clone a repo. That is:
 
 - Repository destination: where the repository will be stored.
 - URL: The remote URL for the repository.
@@ -93,17 +93,17 @@ In addition, there are two options after the clone action takes place:
 
 ### Open an existing repository
 
-If the user wants to open an already cloned repository, the button *Open existing repo" openes the file explorer of the OS to select the folder that contains the repository:
+If you want to open an already cloned repository, the button *Open existing repo" openes the file explorer of the OS to select the folder that contains the repository:
 
 ![GitQlient - Open repository](/GitQlient/assets/1_open_repo.png "GitQlient - Open repository")GitQlient - Open repository
 
-In addition to this, the user can select any of the projects listed in the *Most used repos* list or in the *Recent repos" list:
+In addition to this, you can select any of the projects listed in the *Most used repos* list or in the *Recent repos" list:
 
 ![GitQlient - Open repository](/GitQlient/assets/1_open_repo_2.png "GitQlient - Open repository")GitQlient - Open repository
 
 ## Quick access actions
 
-Once we have selected and opened our repo, the new view shows in first place a series of controls to manage the most used actions done in Git. This controls are organized horizontally as sqaured buttons as the following image shows:
+Once you have selected and opened our repo, the new view shows in first place a series of controls to manage the most used actions done in Git. This controls are organized horizontally as sqaured buttons as the following image shows:
 
 ![GitQlient - Quick access actions](/GitQlient/assets/2_quick_access_actions.png "GitQlient - Quick access actions")GitQlient - Quick access actions
 
@@ -113,21 +113,30 @@ The first three buttons reference the different views of GitQlient. They allow y
 - Diff: This options is disabled by default and is only active when a diff is opened. When active, it shows the opened diffs we have.
 - Blame: The blame option shows the view there you can see the commit history of any file, the blame for each selected file and a view of the files in the current repository folder.
 
-After that, we can see the main three Git commands we will use. These are placed here to make you easier to sync the data between the remote and the local repository. Some buttons have an arrow that indicates that they have several options. Press the arrow to select the desired Git command:
+After that, you can find three buttons that trigger three of the most used Git commands. These are placed here to make you easier to sync the data between the remote and the local repository. Some buttons have an arrow that indicates that the buttons have several options. Press the arrow to select the desired Git command:
 
-- Pull: By default, it performs a Git Pull command. When the dropdown menu is pressed we can find other options:
+- Pull: By default, it performs a Git Pull command. When the dropdown menu is pressed you will find find other options:
 
 ![GitQlient - Pull options](/GitQlient/assets/2_pull_options.png "GitQlient - Pull options")GitQlient - Pull options
+
+    - Fetch all: Fetches branches, commits and tags. If your current branch is behind the remote branch after fetching, GitQlient will ask if you want to pull the new changes.
+    - Pull: This is the default behaviour.
+    - Prune: Prunes all remote deleted tags and branches.
 
 - Push: It performs the regular push (not *forced*) command.
 - Stash: It does not have a default command. Instead you have to press the dropdown menu to see the different options:
 
 ![GitQlient - Stash options](/GitQlient/assets/2_stash_options.png "GitQlient - Stash options")GitQlient - Stash options
 
-- Refresh: This option performs a deep refresh of the repository cache. It reloads cache, views and branches information. This is quite costly so have it on mind when you trigger it. It's usually helpful to use when you have performed Git actions outside GitQlient.
+    - Stash push: Pushes the stash to your local repository.
+    - Stash pop: Pops the latest stash that you pushed.
+
+- Refresh: This option performs a deep refresh of the repository cache. It reloads cache, views and branches information. This is costly so please take it into account when you trigger it. It's usually helpful to use if you have performed Git actions outside GitQlient and you want to sync.
 - Config: The last option opens the repository config dialog. For now, it shows the user data for the current repository:
 
 ![GitQlient - Repository config](/GitQlient/assets/2_repo_config.png "GitQlient - Repository config")GitQlient - Repository config
+
+The repository configuration dialog shows the configuration of your .gitconfig file. For the moment only the options about the current user are displayed. You can modify them, of course.
 
 ## <a name="the-three-view"></a>The Tree View
 
