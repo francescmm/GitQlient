@@ -2,15 +2,15 @@
 #include "ui_AddSubmoduleDlg.h"
 
 #include <GitSubmodules.h>
-
-#include <QFile>
-#include <QDir>
+#include <GitQlientStyles.h>
 
 AddSubmoduleDlg::AddSubmoduleDlg(const QSharedPointer<GitSubmodules> &git, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::AddSubmoduleDlg)
    , mGit(git)
 {
+   setStyleSheet(GitQlientStyles::getStyles());
+
    ui->setupUi(this);
 
    connect(ui->lePath, &QLineEdit::returnPressed, this, &AddSubmoduleDlg::accept);
