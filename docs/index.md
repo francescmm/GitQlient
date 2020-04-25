@@ -226,13 +226,49 @@ After that you can find the list of files that were modified.
 
 ### Branches information panel
 
-#### Local branches
+The branches information panel is located at the right side of the graphic tree view. It shows information about branches (both local and remote), tags, stashes and submodules.
 
-#### Remote branches
+Starting from top to bottom, you can find the local and remote branches view:
 
-#### Stashes
+![GitQlient - Branches view](/GitQlient/assets/3_branches.png "GitQlient - Branches view")GitQlient - Branches view
 
-#### Submodules
+You can perform the following actions:
+* Double click a branch to check it out.
+* Single click a branch to position the selection of the tree view on the commit of that branch.
+* Right click on a branch to show the context menu.
+
+The context menu will vary in case you select your current branch or not. If the current branch is **not** selected, it will show the *Merge* action. In the case that display the conext menu of your current branch, the *push* and *push force* options will be displayed.
+
+The branches are grouped by their path as if it was a file system path. That means that every word followed by a slash will be treated as folder:
+
+![GitQlient - Local branches current branch options](/GitQlient/assets/3_local_branches_current.png "GitQlient - Local branches current branch options")GitQlient - Local branches current branch options
+
+In the right columns you can find information about the distance in commits from the branch to the local *master* branch and the distance in commits from the branch to its origin branch.
+
+The next view is the tags view. It shows all the tags and differentiates those that are already pushed and the local ones.
+
+![GitQlient - Tags](/GitQlient/assets/3_tags.png "GitQlient - Tags")GitQlient - Tags
+
+As the branches, it has the same click behaviour. The context menu provides the following options:
+* Remove tag: removes the selected tag.
+* Push: pushes a local tag to the remote repository.
+
+The next view is the stashes. As the branches, it has the same click behaviour. The context menu provides the following options:
+* Branch: creates a branch on that stash.
+* Drop: drops the selected stash.
+* Clear all: drops all the stashes.
+
+![GitQlient - Stashes](/GitQlient/assets/3_stashes.png "GitQlient - Stashes")GitQlient - Stashes
+
+Finally, the last view is the submoules view. Since a submodule is basically a link to another repository the click behaviour changes a bit.
+
+* Add a submodule: To add a submodule, right click on the background of the list. This will show the *Add* option. After selecting it, GitQlient will show a dialog where you can add the URL and the name of the submodule.
+* Open a submodule: If you want to open a submodule in a new GitQlient view, you can double click over it or choos *Open* in the context menu.
+* Update a submodule: To update a submodule, please select *Update* in the context menu.
+
+### Fold behaviour
+
+It is possible to fold the tags, stashes and submodules view. Just click over the title of the list and it will fold. To unfold, click over the header again. This will give you more space if you want to concentrate in the branches.
 
 ## <a name="the-diff-view"></a>The Diff View
 
