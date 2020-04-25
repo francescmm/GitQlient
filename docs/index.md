@@ -142,25 +142,72 @@ The repository configuration dialog shows the configuration of your .gitconfig f
 
 ![GitQlient - The Tree View](/GitQlient/assets/3_the_tree_view.png "GitQlient - The Tree View")GitQlient - The Tree View
 
+The tree view is divided in three different sections:
+* In the center you can find the graphic representation of the repository tree.
+* In the right side, GitQlient displayes information about the local & remote branches, tags, stashes and submodules.
+* In the left side, GitQlient shows the information about the commit you select in the tree view. It will vary depending on if you select the work in progress or a commit.
+
 ### The repository graph tree
+
+The repository graph tree is as it's name says: the graphical representation in a form of a tree of the state of your repository. It shows all the branches with their branch names, tags and stashes.
+
+By default, the order is done by date but in future release will be configurable.
+
+In the top of the view you can find a long control to input text. There you can search a specific commit by its SHA or by the commit message. At the end of the input control, you will find a checkbox that when it's active the view shows all the branches. In case you want to work only with your current checked out branch, you can uncheck it and the view will be updated.
 
 #### Commit selection
 
-##### Options
+The tree view supports multi-selection and the context menu will vary depending on how many commits you select. The different actions you can do to a commit are:
 
-#### Contextual menu options
+* Double click a commit: It opens the commit diff between the double clicked one and its direct parent.
+* Single click: allows multiple selection by using the Shift key (range selection between 2 commits cliked), accumulative individual selection with the Control key, and click and slide that will select all the commits between the press and the release of the mouse.
 
-##### Options for the WIP
+If you select two commits, you will be able to see the diff between them by selecting that option in the contextual menu.
 
-##### Options for the last commit
+Over the selection you can perform different actions:
 
-##### Options other commits
+* On commit selected:
+    - If the commit is the last one you will find the following options:
+    ![GitQlient - Options for last commit](/GitQlient/assets/3_current_options.png "GitQlient - Options for last commit")GitQlient - Options for last commit
+    - If the selection is the work in progress:
+    ![GitQlient - WIP options](/GitQlient/assets/3_wip_options.png "GitQlient - WIP options")GitQlient - WIP options
+    - If the commit is the last commit of a different branch:
+    ![GitQlient - Branch commit options](/GitQlient/assets/3_branch_options.png "GitQlient - Branch commit options")GitQlient - Branch commit options
+    - If the commit select is in a different branch and is not the last one, you will have the same options that before but without the *Checkout branch...* and *Merge* options.
 
-### Viewing the changes of a commit
+### WIP view
 
-#### WIP view
+When you select the first entry in the graphic tree view when the text says *Local changes*, it will show the information of your local uncommited changes in a widget on the left side of the graphic view:
 
-#### Commit info view
+![GitQlient - WIP view](/GitQlient/assets/3_wip_view.png "GitQlient - WIP view")GitQlient - WIP view
+
+This view is divided in four sections. The first list shows the files that are untracked in your local repository. The second list shows the files that have local modifications. Following that you will find the third list with the changes that are already added to the next commit. Finally in the bottom of the view, you have two input controls where you can add the title of the commit (up to 50 characters), the description for long explanatory texts and a button to commit.
+
+To change the status of a file you can press the plus/minus button or open the contextual menu. The contextual menu will vary depending on the view:
+
+Untracked options:
+* Stage file: Moves the file to the stage list.
+* Delete file: Deletes the file **without** confirmation. The reason is that it's an action not that common and you can recover the file most of the time.
+
+Unstaged options:
+* See changes: Opens the diff view with the changes between the current work and the last commit.
+* Blame: Opens the blame and history view showing the selected file.
+* Stage file: Moves the file to the stage list.
+* Revert file changes: Reverts all the changes of the file selected.
+* Ignore file: Adds the file name to the ignore list of Git.
+* Ignore extension: Adds the file extension to the ignore list of Git.
+* Add all files to commit: Moves all files in the list to the staged list.
+* Revert all changes: Reverts all the changes in all the files.
+
+Staged options:
+* Unstage file: Moves the file to its previous list. When amending it moves the file to the unstaged list.
+* See changes: Opens the diff view with the changes between the current work and the last commit.
+
+#### Amending a commit
+
+The same view applies when you want to amend a commit. The only difference is that the title and description will be filled with the information from the commit you are amending, and the button will change its text to *Amend*.
+
+### Commit info view
 
 ### Branches information panel
 
