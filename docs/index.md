@@ -209,6 +209,21 @@ The same view applies when you want to amend a commit. The only difference is th
 
 ### Commit info view
 
+When you select any commit in the graphic tree view, the information about that commit will be displayed in the left side of the window.
+
+![GitQlient - Commit info view](/GitQlient/assets/3_commit_info_view.png "GitQlient - Commit info view")GitQlient - Commit info view
+
+The commit info view is divided in two main sections: the information about the commit, and the list of files that were modified in that commit.
+
+Starting from the top of the view you can find the commit SHA followed by the title, the description, and then, the information about the user that made the commit.
+
+After that you can find the list of files that were modified.
+* Double click if you want to open the diff of that file compared to its previous commit or the other commit selected.
+* Right click to see the options in the context menu:
+    - Blame: Shows the blame of that file starting on the commit selected.
+    - Diff: Shows the diff of that file.
+    - Copy path: Copies the absolute path where the file is located.
+
 ### Branches information panel
 
 #### Local branches
