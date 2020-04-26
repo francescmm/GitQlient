@@ -38,7 +38,7 @@ As I explained in the introduction, GitQlient support multiple repositories open
 
 Since the beginning I divided GitQlient three big sections depending on their functionality:
 
-- [The Tree View (or Main Repository View)](#the-three-view)
+- [The Tree View (or Main Repository View)](#the-tree-view)
 - [The Diff View](#the-diff-view)
 - [The Blame & History View](#the-blame-history-view)
 
@@ -65,7 +65,12 @@ The first screen you will see when opening GitQlient is the *Initial screen*. It
 
 ![GitQlient - Initial screen](/GitQlient/assets/1_initial_screen.png "GitQlient - Initial screen")
 
-## GitQlient configuration
+1. [GitQlient configuration](#gitqlient-configuration)
+2. [Initializing a new repository](#init-repo)
+3. [Cloning a remote repository](#clone-repo)
+4. [Open an existing repository](#open-repo)
+
+## <a name="gitqlient-configuration"></a>GitQlient configuration
 
 In the GitQlient configuration, you can change some internal parameters that GitQlient uses to update the view and internal data. The available options are:
 
@@ -75,7 +80,7 @@ In the GitQlient configuration, you can change some internal parameters that Git
 - Log level: Allows you to choose the threshold of the levels that GitQlient will write. The higher level, the lesser amount of logs.
 - Auto-format files (not operative): if active, every time that you make a commit, it will perform an auto-formating of the code. The formatting will be done by using clang and the clang-format file defined at the root of the repository.
 
-## Initializing a new repository
+## <a name="init-repo"></a>Initializing a new repository
 
 To create a new local repository you have to click over the option *Init new repo*. It opens a dialog to set all the information that Git needs. This is:
 
@@ -86,7 +91,7 @@ In addition, you can configure the Git user by checking the checkbox GitQlient w
 
 ![GitQlient - Init new repo](/GitQlient/assets/1_init_repo.png "GitQlient - Init new repo")
 
-## Cloning a remote repository
+## <a name="clone-repo"></a>Cloning a remote repository
 
 To clone an existing remote repository you have to select the option *Clone new repo*. After clicking the button, it will show a dialog that ask for all the necessary data that Git needs to clone a repo. That is:
 
@@ -101,7 +106,7 @@ In addition, there are two options after the clone action takes place:
 
 ![GitQlient - Clone repository](/GitQlient/assets/1_clone_repo.png "GitQlient - Clone repository")
 
-## Open an existing repository
+## <a name="open-repo"></a>Open an existing repository
 
 If you want to open an already cloned repository, the button *Open existing repo" openes the file explorer of the OS to select the folder that contains the repository:
 
@@ -148,7 +153,7 @@ After that, you can find three buttons that trigger three of the most used Git c
 
 The repository configuration dialog shows the configuration of your .gitconfig file. For the moment only the options about the current user are displayed. You can modify them, of course.
 
-# <a name="the-three-view"></a>The Tree View
+# <a name="the-tree-view"></a>The Tree View
 
 ![GitQlient - The Tree View](/GitQlient/assets/3_the_tree_view.png "GitQlient - The Tree View")
 
@@ -157,7 +162,13 @@ The tree view is divided in three different sections:
 * In the right side, GitQlient displayes information about the local & remote branches, tags, stashes and submodules.
 * In the left side, GitQlient shows the information about the commit you select in the tree view. It will vary depending on if you select the work in progress or a commit.
 
-## The repository graph tree
+1. [The repository graph tree](#graph-view)
+2. [WIP view](#wip-view)
+3. [Amending a commit](#amend-view)
+4. [Commit info view](#commit-view)
+4. [Branches information panel](#branches-view)
+
+## <a name="graph-view"></a>The repository graph tree
 
 The repository graph tree is as it's name says: the graphical representation in a form of a tree of the state of your repository. It shows all the branches with their branch names, tags and stashes.
 
@@ -185,7 +196,7 @@ Over the selection you can perform different actions:
     ![GitQlient - Branch commit options](/GitQlient/assets/3_branch_options.png "GitQlient - Branch commit options")
     - If the commit select is in a different branch and is not the last one, you will have the same options that before but without the *Checkout branch...* and *Merge* options.
 
-## WIP view
+## <a name="wip-view"></a>WIP view
 
 When you select the first entry in the graphic tree view when the text says *Local changes*, it will show the information of your local uncommited changes in a widget on the left side of the graphic view:
 
@@ -213,7 +224,7 @@ Staged options:
 * Unstage file: Moves the file to its previous list. When amending it moves the file to the unstaged list.
 * See changes: Opens the diff view with the changes between the current work and the last commit.
 
-## Amending a commit
+## <a name="amend-view"></a>Amending a commit
 
 The same view applies when you want to amend a commit it just have some minor differences.
 
@@ -223,7 +234,7 @@ The *Cancel* button closes the interactive view of an amend and returns to the n
 
 ![GitQlient - Amend a commit](/GitQlient/assets/3_amend.png "GitQlient - Amend a commit")
 
-## Commit info view
+## <a name="commit-view"></a>Commit info view
 
 When you select any commit in the graphic tree view, the information about that commit will be displayed in the left side of the window.
 
@@ -240,7 +251,7 @@ After that you can find the list of files that were modified.
     - Diff: Shows the diff of that file.
     - Copy path: Copies the absolute path where the file is located.
 
-## Branches information panel
+## <a name="branches-view"></a>Branches information panel
 
 The branches information panel is located at the right side of the graphic tree view. It shows information about branches (both local and remote), tags, stashes and submodules.
 
@@ -282,7 +293,7 @@ Finally, the last view is the submoules view. Since a submodule is basically a l
 * Open a submodule: If you want to open a submodule in a new GitQlient view, you can double click over it or choos *Open* in the context menu.
 * Update a submodule: To update a submodule, please select *Update* in the context menu.
 
-## Fold behaviour
+### Fold behaviour
 
 It is possible to fold the tags, stashes and submodules view. Just click over the title of the list and it will fold. To unfold, click over the header again. This will give you more space if you want to concentrate in the branches.
 
