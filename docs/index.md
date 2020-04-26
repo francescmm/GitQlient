@@ -288,7 +288,24 @@ It is possible to fold the tags, stashes and submodules view. Just click over th
 
 # <a name="the-diff-view"></a>The Diff View
 
-![GitQlient - The Diff View](https://www.francescmm.com/wp-content/uploads/2020/02/image-2.png "GitQlient - The Diff View")
+![GitQlient - The Diff View](/GitQlient/assets/4_diff_view.png "GitQlient - The Diff View")
+
+The diff view is formed by three different components:
+
+- The file/commit diff
+- The diff buttons
+- The commit diff list
+
+Indistinctly on how you open the diff view (by double-clicking a commit or by context menu), one diff implies two commits. And that's what is shown in the view.
+
+However, in GitQlient I didn't want just to throw all the information in the same view and let the user deal with it. Instead, I wanted to provide an easy way to access all the diffs you open and make it easier to navigate between them and their files.
+
+To achieve that you will find in the top left corner a space reserved for the diff buttons. The diff buttons are the list of already opened diffs you have done. In the list there can be two different types of diffs:
+
+- Commit: Shows an icon that simulates a list and the text is always *Commit diff* followed by the two commits that are compared.
+- File: Shows the icon of a file followed by the name of the file and the two commits that are compared in that diff.
+
+![GitQlient - Diff buttons](/GitQlient/assets/4_diff_buttons.png "GitQlient - Diff buttons")
 
 ## Commit diff view
 
