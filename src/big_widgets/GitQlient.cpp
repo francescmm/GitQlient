@@ -143,7 +143,6 @@ void GitQlient::addRepoTab(const QString &repoPath)
    if (!mCurrentRepos.contains(repoPath))
    {
       const auto newRepo = new GitQlientRepo(repoPath);
-      connect(newRepo, &GitQlientRepo::signalRepoOpened, mConfigWidget, &ConfigWidget::updateRecentProjectsList);
       connect(newRepo, &GitQlientRepo::signalOpenSubmodule, this, [this](const QString &repoName) {
          const auto currentDir = dynamic_cast<GitQlientRepo *>(sender())->currentDir();
 
@@ -153,6 +152,8 @@ void GitQlient::addRepoTab(const QString &repoPath)
 
          addRepoTab(submoduleDir);
       });
+
+      mConfigWidget->onRepoOpened();
 
       const auto repoName = newRepo->currentDir().contains("/") ? newRepo->currentDir().split("/").last() : "No repo";
       const auto index = mRepos->addTab(newRepo, repoName);

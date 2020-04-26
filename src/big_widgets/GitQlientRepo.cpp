@@ -183,8 +183,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
          GitQlientSettings settings;
          settings.setProjectOpened(newDir);
 
-         emit signalRepoOpened();
-
          mCurrentDir = mGitBase->getWorkingDir();
          setWidgetsEnabled(true);
 

@@ -74,12 +74,6 @@ signals:
     \param submoduleName The submodule name.
    */
    void signalOpenSubmodule(const QString &submoduleName);
-   /*!
-    \brief Signal triggered when the GitQlientRepo class is properly configured and the repository is opened. It servers
-    to update the recent projects list.
-
-   */
-   void signalRepoOpened();
 
 public:
    /*!

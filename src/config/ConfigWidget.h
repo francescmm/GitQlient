@@ -65,10 +65,11 @@ public:
    ~ConfigWidget() override;
 
    /*!
-    \brief Updates the most opened projects list.
-
-   */
-   void updateRecentProjectsList();
+    * \brief onRepoOpened Increments the uses of the repo in the settings to update the lists.
+    *
+    * \param repo The absolute path to the repo.
+    */
+   void onRepoOpened();
 
 private:
    QSharedPointer<GitConfig> mGit;

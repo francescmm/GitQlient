@@ -281,7 +281,9 @@ void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
    mProgressDlg->repaint();
 }
 
-void ConfigWidget::updateRecentProjectsList()
+void ConfigWidget::onRepoOpened()
 {
+   mSettings->sync();
    mRecentProjectsLayout->addWidget(createRecentProjectsPage());
+   mUsedProjectsLayout->addWidget(createUsedProjectsPage());
 }

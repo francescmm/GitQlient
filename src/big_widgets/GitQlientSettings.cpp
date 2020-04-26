@@ -18,7 +18,7 @@ void GitQlientSettings::setProjectOpened(const QString &projectPath)
 
 void GitQlientSettings::saveRecentProjects(const QString &projectPath)
 {
-   auto usedProjects = getMostUsedProjects();
+   auto usedProjects = QSettings::value("usedProjects", QStringList()).toStringList();
 
    if (usedProjects.contains(projectPath))
    {
@@ -28,7 +28,7 @@ void GitQlientSettings::saveRecentProjects(const QString &projectPath)
 
    usedProjects.prepend(projectPath);
 
-   while (!usedProjects.isEmpty() && usedProjects.count() >= 5)
+   while (!usedProjects.isEmpty() && usedProjects.count() > 5)
       usedProjects.removeLast();
 
    GitQlientSettings::setValue("usedProjects", usedProjects);
@@ -37,7 +37,7 @@ void GitQlientSettings::saveRecentProjects(const QString &projectPath)
 void GitQlientSettings::saveMostUsedProjects(const QString &projectPath)
 {
    auto projects = QSettings::value("recentProjects", QStringList()).toStringList();
-   auto timesUsed = QSettings::value("recentProjectsCount", QString()).toList();
+   auto timesUsed = QSettings::value("recentProjectsCount", QList<QVariant>()).toList();
    int count = 1;
 
    if (projects.contains(projectPath))
@@ -60,7 +60,7 @@ QVector<QString> GitQlientSettings::getRecentProjects() const
    const auto projects = QSettings::value("recentProjects", QStringList()).toStringList();
    const auto timesUsed = QSettings::value("recentProjectsCount", QString()).toList();
 
-   QMap<int, QString> projectOrderedByUse;
+   QMultiMap<int, QString> projectOrderedByUse;
 
    const auto projectsCount = projects.count();
    const auto timesCount = timesUsed.count();
@@ -80,5 +80,13 @@ QVector<QString> GitQlientSettings::getRecentProjects() const
 
 QStringList GitQlientSettings::getMostUsedProjects() const
 {
-   return QSettings::value("usedProjects", QStringList()).toStringList();
+   auto projects = QSettings::value("usedProjects", QStringList()).toStringList();
+
+   QStringList recentProjects;
+   const auto end = std::min(projects.count(), 5);
+
+   for (auto i = 0; i < end; ++i)
+      recentProjects.append(projects.takeFirst());
+
+   return recentProjects;
 }
