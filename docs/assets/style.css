@@ -10,7 +10,7 @@ section
 }
 
 
-header ol li{
+header li{
 list-style-type: value;
 width: 100%;
 height: 20px;
@@ -24,7 +24,7 @@ border: 0;
 box-shadow: 0
 }
 
-header ol li:hover{
+header li:hover{
 background: none !important;
 font-weight:normal;
 text-shadow: 0;
