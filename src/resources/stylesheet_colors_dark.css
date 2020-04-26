@@ -137,7 +137,7 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget, WorkInProgressWidget > QLineEdit, #leCommitTitle, #teDescription
+FullDiffWidget, WorkInProgressWidget > QLineEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-color: #202122
 }
@@ -484,36 +484,36 @@ DiffButton[pressed="true"]
    background-color: #404142;
 }
 
-#MergeWarningButton, QPushButton#Abort
+#MergeWarningButton, QPushButton#Abort, QPushButton#pbCancelAmend
 {
    border-style: solid;
    border-color: #FF5555;
    background-color: rgba(255, 85, 85, 0.45);
 }
 
-#MergeWarningButton:hover, QPushButton#Abort:hover
+#MergeWarningButton:hover, QPushButton#Abort:hover, QPushButton#pbCancelAmend:hover
 {
    background-color: rgba(255, 85, 85, 0.65);
 }
 
-#MergeWarningButton:pressed, QPushButton#Abort:pressed
+#MergeWarningButton:pressed, QPushButton#Abort:pressed, QPushButton#pbCancelAmend:pressed
 {
    background-color: rgba(255, 85, 85, 0.55);
 }
 
-QPushButton#Merge
+QPushButton#Merge, QPushButton#pbCommit
 {
    border-style: solid;
    border-color: #8DC944;
    background-color: rgba(141, 201, 68, 0.45);
 }
 
-QPushButton#Merge:hover
+QPushButton#Merge:hover, QPushButton#pbCommit:hover
 {
    background-color: rgba(141, 201, 68, 0.65);
 }
 
-QPushButton#Merge:pressed
+QPushButton#Merge:pressed, QPushButton#pbCommit:pressed
 {
    background-color: rgba(141, 201, 68, 0.55);
 }

@@ -47,6 +47,7 @@ signals:
    void signalCheckoutPerformed(bool success);
    void signalShowFileHistory(const QString &fileName);
    void signalUpdateWip();
+   void signalCancelAmend(const QString &commitSha);
 
 public:
    explicit WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,

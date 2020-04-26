@@ -97,12 +97,17 @@ QListWidget::item:focus, BlameWidget > QTreeView::item:focus
    border: 0;
 }
 
-WorkInProgressWidget > #pbCommit
+WorkInProgressWidget > #pbCommit, WorkInProgressWidget > #pbCancelAmend
 {
     max-height: 30px;
     min-height: 30px;
 }
 
+WorkInProgressWidget > #pbCancelAmend
+{
+    padding-left: 10px;
+    padding-right: 10px;
+}
 
 CommitInfoWidget, WorkInProgressWidget
 {
@@ -146,7 +151,7 @@ QMenu::separator
 
 /**  END  RepositoryContextMenu **/
 
-FullDiffWidget, #leCommitTitle, #teDescription
+FullDiffWidget, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-width: 1px;
     border-style: solid;
@@ -154,13 +159,19 @@ FullDiffWidget, #leCommitTitle, #teDescription
 
 WorkInProgressWidget > #leAuthorName
 {
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
+    max-height: 30px;
+    min-height: 30px;
+    padding-left: 10px;
 }
 
 WorkInProgressWidget > #leAuthorEmail
 {
+    border-top-width: none;
+    border-top-style: none;
     border-top: 0;
+    max-height: 30px;
+    min-height: 30px;
+    padding-left: 10px;
 }
 
 QLabel#lCounter

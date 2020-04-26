@@ -74,6 +74,9 @@ WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> 
    connect(ui->stagedFilesList, &QListWidget::customContextMenuRequested, this, &WorkInProgressWidget::showStagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
    connect(ui->stagedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
+   connect(ui->pbCancelAmend, &QPushButton::clicked, this, [this]() { emit signalCancelAmend(mCurrentSha); });
+
+   ui->pbCancelAmend->setVisible(false);
 }
 
 WorkInProgressWidget::~WorkInProgressWidget()
@@ -96,6 +99,8 @@ void WorkInProgressWidget::configure(const QString &sha)
 
 void WorkInProgressWidget::resetInfo(bool force)
 {
+   const auto wasAmend = mIsAmend;
+
    mIsAmend = mCurrentSha != CommitInfo::ZERO_SHA;
 
    QLog_Info("UI",
@@ -104,7 +109,7 @@ void WorkInProgressWidget::resetInfo(bool force)
 
    blockSignals(true);
 
-   if (mIsAmend)
+   if (mIsAmend || wasAmend)
    {
       mCurrentFilesCache.clear();
       ui->untrackedFilesList->clear();
@@ -114,6 +119,7 @@ void WorkInProgressWidget::resetInfo(bool force)
 
    ui->leAuthorName->setVisible(mIsAmend);
    ui->leAuthorEmail->setVisible(mIsAmend);
+   ui->pbCancelAmend->setVisible(mIsAmend);
    blockSignals(false);
 
    ui->pbCommit->setText(mIsAmend ? QString("Amend") : QString("Commit"));
