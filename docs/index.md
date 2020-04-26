@@ -342,18 +342,26 @@ It doesn't matter what yo know or not, there is always a way to help or contribu
 4. [Code guidelines](#code-guidelines)
 
 ## <a name="reporting-errors">Reporting errors
-My intention is to use the features that GitHub provides. So the [Issues page](https://github.com/francescmm/GitQlient/issues) and the [Projects page](https://github.com/francescmm/GitQlient/projects) are two options to start with. I you prefer to report bugs or requests features, you can use the Issues tab and add a new issue with a label. [Every label](https://github.com/francescmm/GitQlient/labels) has a description but if you're not sure, don't worry, you can leave it empty. The current labels are:
+My intention is to use the features that GitHub provides. So the [Issues page](https://github.com/francescmm/GitQlient/issues) and the [Projects page](https://github.com/francescmm/GitQlient/projects) are two options to start with. I you prefer to report bugs or requests features, you can use the Issues tab and add a new issue with a label. [Every label](https://github.com/francescmm/GitQlient/labels) has a description but if you're not sure, don't worry, you can leave it empty.
 
-- Rookie task: Perfect development task to start to know GitQlient
-- Task: Task that should be solved in a single commit but is not a rookie task
-- Feature: I want this amazing feature!
-- Improvement: Extend functionality or improve performance of a specific topic
-- Critical bug: Bug that makes GitQlient to crash
-- Bug: Bug that makes GitQlient unstable. It doesn't crash
-- Documentation: The issue is only about documentation
-- Ready to review: The issue is ready to review
+Labels you can use when opening an issue:
 
-As soon as I see need of more I'll add them.
+- **Bug**: Bug that makes GitQlient unstable. It doesn't crash.
+- **Critical bug**: Bug that makes GitQlient to crash.
+- **Documentation**: The issue is only about documentation.
+- **Feature**: I want this amazing feature!
+- **Improvement**: Extend functionality or improve performance of a specific topic.
+- **Testing**: Testing related task.
+
+Tags I will use to add additional information:
+
+- **Invalid**: The issue is invalid. It could be that the behaviour is the desired, the information incorrect, etc.
+- **More info needed**: This issue needs more information prior to investigation.
+- **On investigation**: This issue is being investigated to see what the root problem is.
+- **Ready to review**: Call to action: the issue is ready to review! Used to notify the person that opened the issue that is ready to be reviewed.
+- **Rookie task**: Perfect development task to start to know GitQlient.
+- **Solved**: This issues has been solved!
+- **Task**: Task that is not a development issue.
 
 If you want to report a bug, please make sure to verify that it exists in the latest commit of master or in the current version.
 
@@ -376,6 +384,7 @@ git checkout -b nameOfMyBranch
 Ideally, your branch name should have the following schema:
 
 - feature/short-feature-title
+- improvement/short-improvement-title
 - bug/short-bug-title
 - critical/short-critical-bug-title
 
