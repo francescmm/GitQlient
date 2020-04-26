@@ -336,7 +336,12 @@ I'd like to have as many inputs as possible so I can provide as many features as
 
 It doesn't matter what yo know or not, there is always a way to help or contribute. May be you don't know how to code in C++ or Qt, but UX is another field. Or maybe you prefer to provide ideas about what you would like to have.
 
-## Reporting errors
+1. [Reporting errors](#reporting-errors)
+2. [Code contributions](#code-contributions)
+3. [Code style](#code-style)
+4. [Code guidelines](#code-guidelines)
+
+## <a name="reporting-errors">Reporting errors
 My intention is to use the features that GitHub provides. So the [Issues page](https://github.com/francescmm/GitQlient/issues) and the [Projects page](https://github.com/francescmm/GitQlient/projects) are two options to start with. I you prefer to report bugs or requests features, you can use the Issues tab and add a new issue with a label. [Every label](https://github.com/francescmm/GitQlient/labels) has a description but if you're not sure, don't worry, you can leave it empty. The current labels are:
 
 - Rookie task: Perfect development task to start to know GitQlient
@@ -352,7 +357,7 @@ As soon as I see need of more I'll add them.
 
 If you want to report a bug, please make sure to verify that it exists in the latest commit of master or in the current version.
 
-## Implementing features or fixing bugs
+## <a name="code-contributions">Implementing features or fixing bugs
 If you want to implement a new feature or solve bugs in the Issues page, you can pick it up there and start coding!
 
 If you're familiar with Qt and/or C++, you can go directly to the [features](https://github.com/francescmm/GitQlient/labels/Feature) or the [bugs](https://github.com/francescmm/GitQlient/labels/Bug). Otherwise, the [rookie tasks](https://github.com/francescmm/GitQlient/labels/Rookie%20task) are a nice way to start.
@@ -378,13 +383,13 @@ Following these formats makes it a lot easier to know what you want to achieve a
 
 Once you are done with your changes and you have pushed them to your branch, you can create a [Pull Request](https://github.com/francescmm/GitQlient/pulls). Remember to add a good title and description. And don't forget to add the label!
 
-## Code style
+## <a name="code-style">Code style
 
 GitQlient follows the [Qt Code Style](https://wiki.qt.io/Qt_Coding_Style) as well as the [Coding Conventions](https://wiki.qt.io/Qt_Coding_Style) when they are not against the C++ Core Guidelines. In fact, there is a .clang-format file in the GitQlient repository you can use to format your code.
 
 I don't mind that you have your own style when coding: it's easier to do it with your own style! However, before the code goes to the Pull Request you should format it so it looks as the code in the repo.
 
-## Code guidelines
+## <a name="code-guidelines">Code guidelines
 Some time ago, [Bjarne Stroustrup](http://www.stroustrup.com) and [Herb Sutter](http://herbsutter.com/) started an amazing project called [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines). I know that is a large document and I don't expect that anybody reads the whole thing or memorizes it. I won't.
 
 But in case of doubt, is the place where we should look on how to do things or why some things are done in the way they are. Having this kind of guidelines is the best way to avoid gut feelings regarding code.
