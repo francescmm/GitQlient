@@ -1,12 +1,12 @@
 header
 {
-    width: 400px;
+    width: 400px !important;
 }
 
 section
 {
-    float: left;
-    margin-left: 500px;
+    float: left !important;
+    margin-left: 500px !important;
 }
 
 
