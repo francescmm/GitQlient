@@ -53,7 +53,7 @@ The first screen you will see when opening GitQlient is the *Initial screen*. It
 - Most used repositories
 - Recently opened repositories
 
-![GitQlient - Initial screen](/GitQlient/assets/1_initial_screen.png "GitQlient - Initial screen")GitQlient - Initial screen
+![GitQlient - Initial screen](/GitQlient/assets/1_initial_screen.png "GitQlient - Initial screen")
 
 ### GitQlient configuration
 
@@ -74,7 +74,7 @@ To create a new local repository you have to click over the option *Init new rep
 
 In addition, you can configure the Git user by checking the checkbox GitQlient will open the repository after it's created.
 
-![GitQlient - Init new repo](/GitQlient/assets/1_init_repo.png "GitQlient - Init new repo")GitQlient - Init new repo
+![GitQlient - Init new repo](/GitQlient/assets/1_init_repo.png "GitQlient - Init new repo")
 
 ### Cloning a remote repository
 
@@ -89,23 +89,23 @@ In addition, there are two options after the clone action takes place:
 - Checkbox to open the repo in GitQlient.
 - Checkbox to store the user data for this repository.
 
-![GitQlient - Clone repository](/GitQlient/assets/1_clone_repo.png "GitQlient - Clone repository")GitQlient - Clone repository
+![GitQlient - Clone repository](/GitQlient/assets/1_clone_repo.png "GitQlient - Clone repository")
 
 ### Open an existing repository
 
 If you want to open an already cloned repository, the button *Open existing repo" openes the file explorer of the OS to select the folder that contains the repository:
 
-![GitQlient - Open repository](/GitQlient/assets/1_open_repo.png "GitQlient - Open repository")GitQlient - Open repository
+![GitQlient - Open repository](/GitQlient/assets/1_open_repo.png "GitQlient - Open repository")
 
 In addition to this, you can select any of the projects listed in the *Most used repos* list or in the *Recent repos" list:
 
-![GitQlient - Open repository](/GitQlient/assets/1_open_repo_2.png "GitQlient - Open repository")GitQlient - Open repository
+![GitQlient - Open repository](/GitQlient/assets/1_open_repo_2.png "GitQlient - Open repository")
 
 ## Quick access actions
 
 Once you have selected and opened our repo, the new view shows in first place a series of controls to manage the most used actions done in Git. This controls are organized horizontally as sqaured buttons as the following image shows:
 
-![GitQlient - Quick access actions](/GitQlient/assets/2_quick_access_actions.png "GitQlient - Quick access actions")GitQlient - Quick access actions
+![GitQlient - Quick access actions](/GitQlient/assets/2_quick_access_actions.png "GitQlient - Quick access actions")
 
 The first three buttons reference the different views of GitQlient. They allow you to navigate GitQlient in a simple and easy way. The button changes its color when the view it refers is being dispayed:
 
@@ -117,7 +117,7 @@ After that, you can find three buttons that trigger three of the most used Git c
 
 - Pull: By default, it performs a Git Pull command. When the dropdown menu is pressed you will find find other options:
 
-![GitQlient - Pull options](/GitQlient/assets/2_pull_options.png "GitQlient - Pull options")GitQlient - Pull options
+![GitQlient - Pull options](/GitQlient/assets/2_pull_options.png "GitQlient - Pull options")
 
     - Fetch all: Fetches branches, commits and tags. If your current branch is behind the remote branch after fetching, GitQlient will ask if you want to pull the new changes.
     - Pull: This is the default behaviour.
@@ -126,7 +126,7 @@ After that, you can find three buttons that trigger three of the most used Git c
 - Push: It performs the regular push (not *forced*) command.
 - Stash: It does not have a default command. Instead you have to press the dropdown menu to see the different options:
 
-![GitQlient - Stash options](/GitQlient/assets/2_stash_options.png "GitQlient - Stash options")GitQlient - Stash options
+![GitQlient - Stash options](/GitQlient/assets/2_stash_options.png "GitQlient - Stash options")
 
     - Stash push: Pushes the stash to your local repository.
     - Stash pop: Pops the latest stash that you pushed.
@@ -134,13 +134,13 @@ After that, you can find three buttons that trigger three of the most used Git c
 - Refresh: This option performs a deep refresh of the repository cache. It reloads cache, views and branches information. This is costly so please take it into account when you trigger it. It's usually helpful to use if you have performed Git actions outside GitQlient and you want to sync.
 - Config: The last option opens the repository config dialog. For now, it shows the user data for the current repository:
 
-![GitQlient - Repository config](/GitQlient/assets/2_repo_config.png "GitQlient - Repository config")GitQlient - Repository config
+![GitQlient - Repository config](/GitQlient/assets/2_repo_config.png "GitQlient - Repository config")
 
 The repository configuration dialog shows the configuration of your .gitconfig file. For the moment only the options about the current user are displayed. You can modify them, of course.
 
 ## <a name="the-three-view"></a>The Tree View
 
-![GitQlient - The Tree View](/GitQlient/assets/3_the_tree_view.png "GitQlient - The Tree View")GitQlient - The Tree View
+![GitQlient - The Tree View](/GitQlient/assets/3_the_tree_view.png "GitQlient - The Tree View")
 
 The tree view is divided in three different sections:
 * In the center you can find the graphic representation of the repository tree.
@@ -230,7 +230,7 @@ The branches information panel is located at the right side of the graphic tree 
 
 Starting from top to bottom, you can find the local and remote branches view:
 
-![GitQlient - Branches view](/GitQlient/assets/3_branches.png "GitQlient - Branches view")GitQlient - Branches view
+![GitQlient - Branches view](/GitQlient/assets/3_branches.png "GitQlient - Branches view")
 
 You can perform the following actions:
 * Double click a branch to check it out.
@@ -241,13 +241,13 @@ The context menu will vary in case you select your current branch or not. If the
 
 The branches are grouped by their path as if it was a file system path. That means that every word followed by a slash will be treated as folder:
 
-![GitQlient - Local branches current branch options](/GitQlient/assets/3_local_branches_current.png "GitQlient - Local branches current branch options")GitQlient - Local branches current branch options
+![GitQlient - Local branches current branch options](/GitQlient/assets/3_local_branches_current.png "GitQlient - Local branches current branch options")
 
 In the right columns you can find information about the distance in commits from the branch to the local *master* branch and the distance in commits from the branch to its origin branch.
 
 The next view is the tags view. It shows all the tags and differentiates those that are already pushed and the local ones.
 
-![GitQlient - Tags](/GitQlient/assets/3_tags.png "GitQlient - Tags")GitQlient - Tags
+![GitQlient - Tags](/GitQlient/assets/3_tags.png "GitQlient - Tags")
 
 As the branches, it has the same click behaviour. The context menu provides the following options:
 * Remove tag: removes the selected tag.
@@ -258,7 +258,7 @@ The next view is the stashes. As the branches, it has the same click behaviour. 
 * Drop: drops the selected stash.
 * Clear all: drops all the stashes.
 
-![GitQlient - Stashes](/GitQlient/assets/3_stashes.png "GitQlient - Stashes")GitQlient - Stashes
+![GitQlient - Stashes](/GitQlient/assets/3_stashes.png "GitQlient - Stashes")
 
 Finally, the last view is the submoules view. Since a submodule is basically a link to another repository the click behaviour changes a bit.
 
