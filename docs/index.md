@@ -32,7 +32,7 @@ Here you can find all the specific glossary that will be used in this document r
 
 - **WIP**: Work in progress. Usually refers to the local modification in files of the repository that are not committed yet.
 
-## How to use GitQlient
+## What is included in GitQlient
 
 As I explained in the introduction, GitQlient support multiple repositories opened at the same time. All repositories are managed in the same isolated way. All the features of GitQlient will be presented along the User Manual: all of them apply to all the opened repositories individually. Unfortunately there are no cross-repository features.
 
@@ -45,6 +45,16 @@ Since the beginning I divided GitQlient three big sections depending on their fu
 These views, when enabled, can be accessed by the Controls placed at the top of the repository window.
 
 There is another view but is not accessible always: it is the [*Merge View*](#the-merge-view). This view is visible and accessible when GitQlient detects that there is a conflict caused by a merge, cherry-pick, or pull action.
+
+## Executing GitQlient from console
+
+GitQlient can be executed from command line with additional params. Please take a look to the following table:
+
+| Command  | Desciption  |
+|---|---|
+| -noLog  | Disables the log system for the current execution  |
+| -logLevel | Sets the log level for GitQlient. It expects a numeric: 0 (Trace), 1 (Debug), 2 (Info), 3 (Warning), 4 (Error) and 5 (Fatal). |
+| -repos  | Provides a list separated with blank spaces for the different repositories that will be open at startup. <br> Ex: ```-repos /path/to/repo1 /path/to/repo2```  |
 
 # <a name="initial-screen"></a>Initial screen
 The first screen you will see when opening GitQlient is the *Initial screen*. It contains buttons to handle repositories and three different widgets:
@@ -296,8 +306,6 @@ GitQlient is always under development, but you can find the releases in the [Rel
 It is planned to release for Linux, MacOs and Windows. However, take into account that the development environment is based on Linux and it will be the first platform released.
 
 # <a name="appendix-b-build"></a>Appendix B: Build form source
-
-## Set up & Build the code
 
 GitQlient is being developed with the latest version of Qt, currently [Qt 5.13](https://www.qt.io/download-qt-installer). Despite is not tested, any versions from 5.12 should be okay. The plan for the near future is to test for every major version from 5.9 to the latest.
 
