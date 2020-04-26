@@ -122,8 +122,8 @@ void MergeWidget::configure(const RevisionFiles &files, ConflictReason reason)
 
    if (mergeMsg.open(QIODevice::ReadOnly))
    {
-      const auto summary = mergeMsg.readLine().trimmed();
-      const auto description = mergeMsg.readAll().trimmed();
+      const auto summary = QString::fromUtf8(mergeMsg.readLine()).trimmed();
+      const auto description = QString::fromUtf8(mergeMsg.readAll()).trimmed();
       mCommitTitle->setText(summary);
       mDescription->setText(description);
       mergeMsg.close();
