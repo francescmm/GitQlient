@@ -2,7 +2,7 @@
 layout: default
 ---
 
-# GitQlient User Manual
+# <a name="home"></a>GitQlient User Manual
 
 ## Introduction
 
