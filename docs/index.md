@@ -213,9 +213,15 @@ Staged options:
 * Unstage file: Moves the file to its previous list. When amending it moves the file to the unstaged list.
 * See changes: Opens the diff view with the changes between the current work and the last commit.
 
-### Amending a commit
+## Amending a commit
 
-The same view applies when you want to amend a commit. The only difference is that the title and description will be filled with the information from the commit you are amending, and the button will change its text to *Amend*.
+The same view applies when you want to amend a commit it just have some minor differences.
+
+One difference is that the title and description will be filled with the information from the commit you are amending. Another difference is that the confirmation button will change its text to *Amend* and a *Cancel* button will be displayed.
+
+The *Cancel* button closes the interactive view of an amend and returns to the normal *Commit info view*.
+
+![GitQlient - Amend a commit](/GitQlient/assets/3_amend.png "GitQlient - Amend a commit")
 
 ## Commit info view
 
