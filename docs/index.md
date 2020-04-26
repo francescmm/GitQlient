@@ -305,11 +305,22 @@ To achieve that you will find in the top left corner a space reserved for the di
 - Commit: Shows an icon that simulates a list and the text is always *Commit diff* followed by the two commits that are compared.
 - File: Shows the icon of a file followed by the name of the file and the two commits that are compared in that diff.
 
+To close the button just press the cross at the end of it. Once you close the last button the view will automatically close and return to the previous window you were.
+
 ![GitQlient - Diff buttons](/GitQlient/assets/4_diff_buttons.png "GitQlient - Diff buttons")
 
-## Commit diff view
+When click on a button, it will show the diff of that file or commit in the view. In addition it will reload the files list in the bottom left corner. The files shown there are those that had changes between the commits selected. To open the diff of one of these files, just double click the file. You also can open the blame by accessing through the context menu.
 
-## File diff view
+![GitQlient - Commit diff files list](/GitQlient/assets/4_diff_buttons.png "GitQlient - Commit diff files list")
+
+Finally, both in the commit and file diff the text have different colors.
+
+![GitQlient - Diff colors schema](/GitQlient/assets/4_diff_colors_schema.png "GitQlient - Diff colors schema")
+
+- The red color is used to indicate which lines have been removed.
+- The green color is used to indicate which lines have been added.
+- The blue color is used to show the file name and the commit SHAs.
+- The orange color is used to emphasize the line where the changes start.
 
 # <a name="the-blame-history-view"></a>The Blame & History View
 
