@@ -8,3 +8,26 @@ section
     float: left;
     margin-left: 500px;
 }
+
+
+header ol li{
+list-style-type: value;
+width: 100%;
+height: 20px;
+margin-bottom: 0;
+line-height: 0;
+padding: 0;
+background: none !important;
+border-radius: 0;
+border: 0;
+-webkit-box-shadow: 0;
+box-shadow: 0
+}
+
+header ol li:hover{
+background: none !important;
+font-weight:normal;
+text-shadow: 0;
+padding: 0;
+height: 20px;
+}

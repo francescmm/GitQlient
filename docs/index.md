@@ -32,7 +32,7 @@ Here you can find all the specific glossary that will be used in this document r
 
 - **WIP**: Work in progress. Usually refers to the local modification in files of the repository that are not committed yet.
 
-# How to use GitQlient
+## How to use GitQlient
 
 As I explained in the introduction, GitQlient support multiple repositories opened at the same time. All repositories are managed in the same isolated way. All the features of GitQlient will be presented along the User Manual: all of them apply to all the opened repositories individually. Unfortunately there are no cross-repository features.
 
@@ -46,7 +46,7 @@ These views, when enabled, can be accessed by the Controls placed at the top of 
 
 There is another view but is not accessible always: it is the [*Merge View*](#the-merge-view). This view is visible and accessible when GitQlient detects that there is a conflict caused by a merge, cherry-pick, or pull action.
 
-## Initial screen
+# <a name="initial-screen"></a>Initial screen
 The first screen you will see when opening GitQlient is the *Initial screen*. It contains buttons to handle repositories and three different widgets:
 
 - GitQlient configuration
@@ -55,7 +55,7 @@ The first screen you will see when opening GitQlient is the *Initial screen*. It
 
 ![GitQlient - Initial screen](/GitQlient/assets/1_initial_screen.png "GitQlient - Initial screen")
 
-### GitQlient configuration
+## GitQlient configuration
 
 In the GitQlient configuration, you can change some internal parameters that GitQlient uses to update the view and internal data. The available options are:
 
@@ -65,7 +65,7 @@ In the GitQlient configuration, you can change some internal parameters that Git
 - Log level: Allows you to choose the threshold of the levels that GitQlient will write. The higher level, the lesser amount of logs.
 - Auto-format files (not operative): if active, every time that you make a commit, it will perform an auto-formating of the code. The formatting will be done by using clang and the clang-format file defined at the root of the repository.
 
-### Initializing a new repository
+## Initializing a new repository
 
 To create a new local repository you have to click over the option *Init new repo*. It opens a dialog to set all the information that Git needs. This is:
 
@@ -76,7 +76,7 @@ In addition, you can configure the Git user by checking the checkbox GitQlient w
 
 ![GitQlient - Init new repo](/GitQlient/assets/1_init_repo.png "GitQlient - Init new repo")
 
-### Cloning a remote repository
+## Cloning a remote repository
 
 To clone an existing remote repository you have to select the option *Clone new repo*. After clicking the button, it will show a dialog that ask for all the necessary data that Git needs to clone a repo. That is:
 
@@ -91,7 +91,7 @@ In addition, there are two options after the clone action takes place:
 
 ![GitQlient - Clone repository](/GitQlient/assets/1_clone_repo.png "GitQlient - Clone repository")
 
-### Open an existing repository
+## Open an existing repository
 
 If you want to open an already cloned repository, the button *Open existing repo" openes the file explorer of the OS to select the folder that contains the repository:
 
@@ -101,7 +101,7 @@ In addition to this, you can select any of the projects listed in the *Most used
 
 ![GitQlient - Open repository](/GitQlient/assets/1_open_repo_2.png "GitQlient - Open repository")
 
-## Quick access actions
+# <a name="quick-access-actions"></a>Quick access actions
 
 Once you have selected and opened our repo, the new view shows in first place a series of controls to manage the most used actions done in Git. This controls are organized horizontally as sqaured buttons as the following image shows:
 
@@ -138,7 +138,7 @@ After that, you can find three buttons that trigger three of the most used Git c
 
 The repository configuration dialog shows the configuration of your .gitconfig file. For the moment only the options about the current user are displayed. You can modify them, of course.
 
-## <a name="the-three-view"></a>The Tree View
+# <a name="the-three-view"></a>The Tree View
 
 ![GitQlient - The Tree View](/GitQlient/assets/3_the_tree_view.png "GitQlient - The Tree View")
 
@@ -147,7 +147,7 @@ The tree view is divided in three different sections:
 * In the right side, GitQlient displayes information about the local & remote branches, tags, stashes and submodules.
 * In the left side, GitQlient shows the information about the commit you select in the tree view. It will vary depending on if you select the work in progress or a commit.
 
-### The repository graph tree
+## The repository graph tree
 
 The repository graph tree is as it's name says: the graphical representation in a form of a tree of the state of your repository. It shows all the branches with their branch names, tags and stashes.
 
@@ -155,7 +155,7 @@ By default, the order is done by date but in future release will be configurable
 
 In the top of the view you can find a long control to input text. There you can search a specific commit by its SHA or by the commit message. At the end of the input control, you will find a checkbox that when it's active the view shows all the branches. In case you want to work only with your current checked out branch, you can uncheck it and the view will be updated.
 
-#### Commit selection
+### Commit selection
 
 The tree view supports multi-selection and the context menu will vary depending on how many commits you select. The different actions you can do to a commit are:
 
@@ -175,7 +175,7 @@ Over the selection you can perform different actions:
     ![GitQlient - Branch commit options](/GitQlient/assets/3_branch_options.png "GitQlient - Branch commit options")
     - If the commit select is in a different branch and is not the last one, you will have the same options that before but without the *Checkout branch...* and *Merge* options.
 
-### WIP view
+## WIP view
 
 When you select the first entry in the graphic tree view when the text says *Local changes*, it will show the information of your local uncommited changes in a widget on the left side of the graphic view:
 
@@ -203,11 +203,11 @@ Staged options:
 * Unstage file: Moves the file to its previous list. When amending it moves the file to the unstaged list.
 * See changes: Opens the diff view with the changes between the current work and the last commit.
 
-#### Amending a commit
+### Amending a commit
 
 The same view applies when you want to amend a commit. The only difference is that the title and description will be filled with the information from the commit you are amending, and the button will change its text to *Amend*.
 
-### Commit info view
+## Commit info view
 
 When you select any commit in the graphic tree view, the information about that commit will be displayed in the left side of the window.
 
@@ -224,7 +224,7 @@ After that you can find the list of files that were modified.
     - Diff: Shows the diff of that file.
     - Copy path: Copies the absolute path where the file is located.
 
-### Branches information panel
+## Branches information panel
 
 The branches information panel is located at the right side of the graphic tree view. It shows information about branches (both local and remote), tags, stashes and submodules.
 
@@ -266,38 +266,38 @@ Finally, the last view is the submoules view. Since a submodule is basically a l
 * Open a submodule: If you want to open a submodule in a new GitQlient view, you can double click over it or choos *Open* in the context menu.
 * Update a submodule: To update a submodule, please select *Update* in the context menu.
 
-### Fold behaviour
+## Fold behaviour
 
 It is possible to fold the tags, stashes and submodules view. Just click over the title of the list and it will fold. To unfold, click over the header again. This will give you more space if you want to concentrate in the branches.
 
-## <a name="the-diff-view"></a>The Diff View
+# <a name="the-diff-view"></a>The Diff View
 
 ![GitQlient - The Diff View](https://www.francescmm.com/wp-content/uploads/2020/02/image-2.png "GitQlient - The Diff View")
 
-### Commit diff view
+## Commit diff view
 
-### File diff view
+## File diff view
 
-## <a name="the-blame-history-view"></a>The Blame & History View
+# <a name="the-blame-history-view"></a>The Blame & History View
 
 ![GitQlient - The Blame & History View](https://www.francescmm.com/wp-content/uploads/2020/02/image-3.png "GitQlient - The Blame & History View")
 
-### The file view
+## The file view
 
-### The blame view
+## The blame view
 
-### The history view
+## The history view
 
-## <a name="the-merge-view"></a>The Merge View
+# <a name="the-merge-view"></a>The Merge View
 
-## <a name="appendix-a-release"></a>Appendix A: Releases
+# <a name="appendix-a-releases"></a>Appendix A: Releases
 GitQlient is always under development, but you can find the releases in the [Releases page](https://github.com/francescmm/GitQlient/releases).
 
 It is planned to release for Linux, MacOs and Windows. However, take into account that the development environment is based on Linux and it will be the first platform released.
 
-## <a name="appendix-b-build"></a>Appendix B: Build form source
+# <a name="appendix-b-build"></a>Appendix B: Build form source
 
-### Set up & Build the code
+## Set up & Build the code
 
 GitQlient is being developed with the latest version of Qt, currently [Qt 5.13](https://www.qt.io/download-qt-installer). Despite is not tested, any versions from 5.12 should be okay. The plan for the near future is to test for every major version from 5.9 to the latest.
 
@@ -329,14 +329,14 @@ If you just want to play with it a bit with GitQlient or just build it for your 
 
     ```make```
 
-## <a name="appendix-c-contributing"> Appendix C: Contributing
+# <a name="appendix-c-contributing"> Appendix C: Contributing
 GitQlient is free software and that means that the code and the use its free! But I don't want to build something only that fits me.
 
 I'd like to have as many inputs as possible so I can provide as many features as possible. For that reason I hope this guideline gives you an overview of how to contribute.
 
 It doesn't matter what yo know or not, there is always a way to help or contribute. May be you don't know how to code in C++ or Qt, but UX is another field. Or maybe you prefer to provide ideas about what you would like to have.
 
-#### Reporting errors
+## Reporting errors
 My intention is to use the features that GitHub provides. So the [Issues page](https://github.com/francescmm/GitQlient/issues) and the [Projects page](https://github.com/francescmm/GitQlient/projects) are two options to start with. I you prefer to report bugs or requests features, you can use the Issues tab and add a new issue with a label. [Every label](https://github.com/francescmm/GitQlient/labels) has a description but if you're not sure, don't worry, you can leave it empty. The current labels are:
 
 - Rookie task: Perfect development task to start to know GitQlient
@@ -352,7 +352,7 @@ As soon as I see need of more I'll add them.
 
 If you want to report a bug, please make sure to verify that it exists in the latest commit of master or in the current version.
 
-#### Implementing features or fixing bugs
+## Implementing features or fixing bugs
 If you want to implement a new feature or solve bugs in the Issues page, you can pick it up there and start coding!
 
 If you're familiar with Qt and/or C++, you can go directly to the [features](https://github.com/francescmm/GitQlient/labels/Feature) or the [bugs](https://github.com/francescmm/GitQlient/labels/Bug). Otherwise, the [rookie tasks](https://github.com/francescmm/GitQlient/labels/Rookie%20task) are a nice way to start.
@@ -378,25 +378,25 @@ Following these formats makes it a lot easier to know what you want to achieve a
 
 Once you are done with your changes and you have pushed them to your branch, you can create a [Pull Request](https://github.com/francescmm/GitQlient/pulls). Remember to add a good title and description. And don't forget to add the label!
 
-#### Code style
+## Code style
 
 GitQlient follows the [Qt Code Style](https://wiki.qt.io/Qt_Coding_Style) as well as the [Coding Conventions](https://wiki.qt.io/Qt_Coding_Style) when they are not against the C++ Core Guidelines. In fact, there is a .clang-format file in the GitQlient repository you can use to format your code.
 
 I don't mind that you have your own style when coding: it's easier to do it with your own style! However, before the code goes to the Pull Request you should format it so it looks as the code in the repo.
 
-#### Code guidelines
+## Code guidelines
 Some time ago, [Bjarne Stroustrup](http://www.stroustrup.com) and [Herb Sutter](http://herbsutter.com/) started an amazing project called [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines). I know that is a large document and I don't expect that anybody reads the whole thing or memorizes it. I won't.
 
 But in case of doubt, is the place where we should look on how to do things or why some things are done in the way they are. Having this kind of guidelines is the best way to avoid gut feelings regarding code.
 
-## <a name="appendix-d-recognition"></a>Appendix D: Recognition
+# <a name="appendix-d-recognition"></a>Appendix D: Recognition
 GitQlient started as a fork from QGit. Despite it has changed a lot, there is some of the original code still, mainly the Git core functionality.
 
 Even when is 100% transformed is nice to thanks those that make the original QGit possible. Please check the QGit contributors list [on GitHub](https://github.com/feinstaub/qgit/graphs/contributors)!
 
 The app icon is custom made, but the other in-app icons are made by [Dave Gandy](https://twitter.com/davegandy) from [FontAwesome](https://fontawesome.com/).
 
-## <a name="appendix-e-License"></a>Appendix E: License
+# <a name="appendix-e-license"></a>Appendix E: License
 *GitQlient is an application to manage and operate one or several Git repositories. With GitQlient you will be able to add commits, branches and manage all the options Git provides.*
 
 *Copyright (C) 2020  Francesc Martinez*
