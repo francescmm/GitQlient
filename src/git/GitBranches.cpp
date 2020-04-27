@@ -36,7 +36,7 @@ bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &
                               .arg(toMaster ? QString("master") : right)
                               .arg(right);
 
-   connect(mGitBase.get(), &GitBase::signalResultReady, this, &GitBranches::signalDistanceBetweenBranches);
+   connect(mGitBase.data(), &GitBase::signalResultReady, this, &GitBranches::signalDistanceBetweenBranches);
 
    return mGitBase->runAsync(gitCmd);
 }
