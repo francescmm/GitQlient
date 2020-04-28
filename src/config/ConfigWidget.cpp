@@ -97,7 +97,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    const auto gitBase(QSharedPointer<GitBase>::create(""));
    mGit = QSharedPointer<GitConfig>::create(gitBase);
 
-   connect(mGit.get(), &GitConfig::signalCloningProgress, this, &ConfigWidget::updateProgressDialog,
+   connect(mGit.data(), &GitConfig::signalCloningProgress, this, &ConfigWidget::updateProgressDialog,
            Qt::DirectConnection);
 }
 

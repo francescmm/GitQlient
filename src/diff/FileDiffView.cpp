@@ -29,7 +29,15 @@ int FileDiffView::lineNumberAreaWidth()
       ++digits;
    }
 
-   return 8 + fontMetrics().horizontalAdvance(QLatin1Char('9')) * digits;
+   int width;
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+   width = fontMetrics().horizontalAdvance(QLatin1Char('9'));
+#else
+   width = fontMetrics().boundingRect(QLatin1Char('9')).width();
+#endif
+
+   return 8 + width * digits;
 }
 
 void FileDiffView::updateLineNumberAreaWidth(int /* newBlockCount */)
