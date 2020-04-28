@@ -254,22 +254,24 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
                  || lanes[i + 1] == LaneType::JOIN_L || lanes[i + 1] == LaneType::JOIN_R);
       }
 
+      if (mView->hasActiveFilter())
+         x2 = LANE_WIDTH;
+
       x1 = x2 - LANE_WIDTH;
 
       auto ln = mView->hasActiveFilter() ? LaneType::ACTIVE : lanes[i];
 
       if (ln != LaneType::EMPTY)
       {
-         QColor color;
-         if (i == activeLane)
+         auto color = activeColor;
+
+         if (!mView->hasActiveFilter())
          {
-            if (r.sha() == CommitInfo::ZERO_SHA && !mCache->pendingLocalChanges())
+            if (i != activeLane)
+               color = GitQlientStyles::getBranchColorAt(i % GitQlientStyles::getTotalBranchColors());
+            else if (r.sha() == CommitInfo::ZERO_SHA && !mCache->pendingLocalChanges())
                color = QColor("#D89000");
-            else
-               color = activeColor;
          }
-         else
-            color = GitQlientStyles::getBranchColorAt(i % GitQlientStyles::getTotalBranchColors());
 
          switch (ln)
          {
