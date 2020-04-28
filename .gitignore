@@ -4,3 +4,16 @@
 *.AppImage
 usr/*
 
+/*.o
+/GitQlient
+/logs
+/Makefile
+/moc_*.*
+/qrc_resources.cpp
+/ui_*.h
+
+/.*
+!/.clang-format
+!/.gitignore
+!/.gitmodules
+!/.travis.yml
