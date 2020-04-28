@@ -1,14 +1,3 @@
-header
-{
-    width: 400px !important;
-}
-
-section
-{
-    float: left !important;
-    margin-left: 500px !important;
-}
-
 
 header li{
 list-style-type: decimal;
