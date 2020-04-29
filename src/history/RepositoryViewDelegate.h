@@ -92,6 +92,7 @@ private:
     * @param index The index with the item data.
     */
    void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &index) const;
+
    /**
     * @brief Specialization method called by @ref paintGrapth that does the actual lane painting.
     *
@@ -107,6 +108,7 @@ private:
     */
    void paintGraphLane(QPainter *p, const LaneType type, bool laneHeadPresent, int x1, int x2, const QColor &col,
                        const QColor &activeCol, const QColor &mergeColor, bool isWip = false) const;
+
    /**
     * @brief Specialized method that paints a tag in the commit message column.
     *
@@ -116,4 +118,7 @@ private:
     * @param sha The SHA reference to paint. It can be local branch, remote branch, tag or it could be detached.
     */
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
+
+   QColor getMergeColor(LaneType ln, const QVector<LaneType> &lanes, int currentLane, const QColor &defaultColor,
+                        bool &isSet) const;
 };

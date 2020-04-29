@@ -210,6 +210,46 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
    }
 }
 
+QColor RepositoryViewDelegate::getMergeColor(const LaneType ln, const QVector<LaneType> &lanes, int currentLane,
+                                             const QColor &defaultColor, bool &isSet) const
+{
+   auto mergeColor = GitQlientStyles::getBranchColorAt((lanes.count() - 1) % GitQlientStyles::getTotalBranchColors());
+
+   switch (ln)
+   {
+      case LaneType::HEAD_L:
+      case LaneType::HEAD_R:
+      case LaneType::TAIL_L:
+      case LaneType::TAIL_R:
+      case LaneType::MERGE_FORK_L:
+      case LaneType::JOIN_R:
+         if (!isSet)
+         {
+            isSet = true;
+            mergeColor = defaultColor;
+         }
+         break;
+      case LaneType::JOIN_L:
+         if (!isSet)
+         {
+            for (auto laneCount = 0; laneCount < currentLane; ++laneCount)
+            {
+               if (lanes[laneCount] == LaneType::JOIN_L)
+               {
+                  mergeColor = GitQlientStyles::getBranchColorAt(laneCount % GitQlientStyles::getTotalBranchColors());
+                  isSet = true;
+                  break;
+               }
+            }
+         }
+         break;
+      default:
+         break;
+   }
+
+   return mergeColor;
+}
+
 void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
    const auto row = mView->hasActiveFilter()
@@ -225,90 +265,56 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    p->setClipRect(opt.rect, Qt::IntersectClip);
    p->translate(opt.rect.topLeft());
 
-   const QVector<LaneType> &lanes(r.lanes);
-   auto laneNum = lanes.count();
-   auto activeLane = 0;
-
-   for (int i = 0; i < laneNum && !mView->hasActiveFilter(); i++)
+   if (mView->hasActiveFilter())
    {
-      if (isActive(lanes[i]))
-      {
-         activeLane = i;
-         break;
-      }
+      const auto activeColor = GitQlientStyles::getBranchColorAt(0);
+      paintGraphLane(p, LaneType::ACTIVE, false, 0, LANE_WIDTH, activeColor, activeColor, activeColor, false);
    }
-
-   auto x1 = 0;
-   // const auto maxWidth = opt.rect.width();
-   const auto activeColor = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
-   auto back = GitQlientStyles::getBranchColorAt((laneNum - 1) % GitQlientStyles::getTotalBranchColors());
-   auto isSet = false;
-   auto laneHeadPresent = false;
-
-   for (auto i = laneNum - 1, x2 = LANE_WIDTH * laneNum; i >= 0; --i, x2 -= LANE_WIDTH)
+   else
    {
-      if (!laneHeadPresent)
+      auto laneNum = r.lanes.count();
+      auto activeLane = 0;
+      for (int i = 0; i < laneNum; i++)
       {
-         laneHeadPresent = i < laneNum - 1
-             && (lanes[i + 1] == LaneType::HEAD || lanes[i + 1] == LaneType::HEAD_L || lanes[i + 1] == LaneType::HEAD_R
-                 || lanes[i + 1] == LaneType::JOIN_L || lanes[i + 1] == LaneType::JOIN_R);
+         if (isActive(r.lanes[i]))
+         {
+            activeLane = i;
+            break;
+         }
       }
 
-      if (mView->hasActiveFilter())
-         x2 = LANE_WIDTH;
+      const auto activeColor = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
 
-      x1 = x2 - LANE_WIDTH;
+      auto isSet = false;
+      auto x = LANE_WIDTH * laneNum;
+      auto laneHeadPresent = false;
+      const auto isWip = r.sha() == CommitInfo::ZERO_SHA;
 
-      auto ln = mView->hasActiveFilter() ? LaneType::ACTIVE : lanes[i];
-
-      if (ln != LaneType::EMPTY)
+      for (auto i = laneNum - 1; i >= 0; --i, x -= LANE_WIDTH)
       {
-         auto color = activeColor;
-
-         if (!mView->hasActiveFilter())
+         if (!laneHeadPresent)
          {
+            laneHeadPresent = i < laneNum - 1
+                && (r.lanes[i + 1] == LaneType::HEAD || r.lanes[i + 1] == LaneType::HEAD_L
+                    || r.lanes[i + 1] == LaneType::HEAD_R || r.lanes[i + 1] == LaneType::JOIN_L
+                    || r.lanes[i + 1] == LaneType::JOIN_R);
+         }
+
+         const auto ln = r.lanes[i];
+
+         if (ln != LaneType::EMPTY)
+         {
+            auto color = activeColor;
+
             if (i != activeLane)
                color = GitQlientStyles::getBranchColorAt(i % GitQlientStyles::getTotalBranchColors());
-            else if (r.sha() == CommitInfo::ZERO_SHA && !mCache->pendingLocalChanges())
+            else if (isWip && !mCache->pendingLocalChanges())
                color = QColor("#D89000");
-         }
 
-         switch (ln)
-         {
-            case LaneType::HEAD_L:
-            case LaneType::HEAD_R:
-            case LaneType::TAIL_L:
-            case LaneType::TAIL_R:
-            case LaneType::MERGE_FORK_L:
-            case LaneType::JOIN_R:
-               if (!isSet)
-               {
-                  isSet = true;
-                  back = color;
-               }
-               break;
-            case LaneType::MERGE_FORK_R:
-            case LaneType::JOIN_L:
-               if (!isSet)
-               {
-                  for (auto laneCount = 0; laneCount < i; ++laneCount)
-                  {
-                     if (lanes[laneCount] == LaneType::JOIN_L)
-                     {
-                        back = GitQlientStyles::getBranchColorAt(laneCount % GitQlientStyles::getTotalBranchColors());
-                        isSet = true;
-                        break;
-                     }
-                  }
-               }
-               break;
-            default:
-               break;
-         }
-         paintGraphLane(p, ln, laneHeadPresent, x1, x2, color, activeColor, back, r.sha() == CommitInfo::ZERO_SHA);
+            const auto mergeColor = getMergeColor(ln, r.lanes, i, color, isSet);
 
-         if (mView->hasActiveFilter())
-            break;
+            paintGraphLane(p, ln, laneHeadPresent, x - LANE_WIDTH, x, color, activeColor, mergeColor, isWip);
+         }
       }
    }
    p->restore();
