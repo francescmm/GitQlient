@@ -64,6 +64,12 @@ signals:
     */
    void showFileDiff(const QString &sha, const QString &parentSha, const QString &file);
 
+   /**
+    * @brief Signal triggered when the user wants to see the diff of the selected SHA compared to its first parent.
+    * @param sha The selected commit SHA.
+    */
+   void signalOpenDiff(const QString &sha);
+
 public:
    /**
     * @brief Constructor.
@@ -144,4 +150,11 @@ private:
     * @param tabIndex The new tab index selected.
     */
    void reloadHistory(int tabIndex);
+
+   /*!
+     \brief Retrieves the SHA from the QModelIndex and triggers the \ref signalOpenDiff signal.
+
+     \param index The index from the model.
+    */
+   void openDiff(const QModelIndex &index);
 };
