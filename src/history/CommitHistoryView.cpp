@@ -73,22 +73,26 @@ void CommitHistoryView::filterBySha(const QStringList &shaList)
 CommitHistoryView::~CommitHistoryView()
 {
    QSettings s;
-   s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
+   s.setValue(QString("%1").arg(objectName()), header()->saveState());
 }
 
 void CommitHistoryView::setupGeometry()
 {
    QSettings s;
-   const auto previousState = s.value(QString("RepositoryView::%1").arg(objectName()), QByteArray()).toByteArray();
+   const auto previousState = s.value(QString("%1").arg(objectName()), QByteArray()).toByteArray();
 
    if (previousState.isEmpty())
    {
       const auto hv = header();
-      hv->setCascadingSectionResizes(true);
+      hv->setMinimumSectionSize(75);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::SHA), 75);
       hv->resizeSection(static_cast<int>(CommitHistoryColumns::GRAPH), 120);
       hv->resizeSection(static_cast<int>(CommitHistoryColumns::AUTHOR), 160);
       hv->resizeSection(static_cast<int>(CommitHistoryColumns::DATE), 125);
       hv->resizeSection(static_cast<int>(CommitHistoryColumns::SHA), 75);
+      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::AUTHOR), QHeaderView::Fixed);
+      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::DATE), QHeaderView::Fixed);
+      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::SHA), QHeaderView::Fixed);
       hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::LOG), QHeaderView::Stretch);
       hv->setStretchLastSection(false);
 

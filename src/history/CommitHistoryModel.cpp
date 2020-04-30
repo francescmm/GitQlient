@@ -13,8 +13,8 @@ CommitHistoryModel::CommitHistoryModel(const QSharedPointer<RevisionsCache> &cac
    , mCache(cache)
    , mGit(git)
 {
-   mColumns.insert(CommitHistoryColumns::GRAPH, "Graph");
    mColumns.insert(CommitHistoryColumns::ID, "Id");
+   mColumns.insert(CommitHistoryColumns::GRAPH, "Graph");
    mColumns.insert(CommitHistoryColumns::SHA, "Sha");
    mColumns.insert(CommitHistoryColumns::LOG, "Log");
    mColumns.insert(CommitHistoryColumns::AUTHOR, "Author");

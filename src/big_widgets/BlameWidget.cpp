@@ -30,7 +30,7 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    , mTabWidget(new QTabWidget())
 {
    mTabWidget->setObjectName("HistoryTab");
-   mRepoView->setObjectName("blameRepoView");
+   mRepoView->setObjectName("blameGraphView");
    mRepoView->setModel(mRepoModel);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::GRAPH), true);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::DATE), true);
