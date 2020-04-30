@@ -170,7 +170,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
 void CommitHistoryView::saveHeaderState()
 {
    QSettings s;
-   s.setValue(QString("RepositoryView::%1").arg(objectName()), header()->saveState());
+   s.setValue(QString("%1").arg(objectName()), header()->saveState());
 }
 
 QList<QString> CommitHistoryView::getSelectedShaList() const
