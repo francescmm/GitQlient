@@ -328,22 +328,54 @@ When click on a button, it will show the diff of that file or commit in the view
 
 Finally, both in the commit and file diff the text have different colors.
 
-![GitQlient - Diff colors schema](/GitQlient/assets/4_diff_colors_schema.png "GitQlient - Diff colors schema")
+![GitQlient - Diff colors schema](/GitQlient/assets/4_diff_color_schema.png "GitQlient - Diff colors schema")
 
 - The red color is used to indicate which lines have been removed.
 - The green color is used to indicate which lines have been added.
 - The blue color is used to show the file name and the commit SHAs.
 - The orange color is used to emphasize the line where the changes start.
 
+In the lower part ther eis the commit diff list. It shows all the files that were modified between the two selected commits, or the WIP and the last commit. The SHAs are shown in the top of the list and they pop up a tooltip with the basic commit metadata (author, date and short log message).
+
 # <a name="the-blame-history-view"></a>The Blame & History View
 
-![GitQlient - The Blame & History View](https://www.francescmm.com/wp-content/uploads/2020/02/image-3.png "GitQlient - The Blame & History View")
+The Blame&History aims to be an easy to access view where you can both see the blame of a file and also when the file has been modified.
 
-## The file view
+For that purpose the view is divided in 3 different parts:
+
+- The file system view
+- The commit history
+- The file blame view
+
+![GitQlient - The Blame & History View](/GitQlient/assets/5_blame_view.png "GitQlient - The Blame & History View")
+
+## The file system view
+
+The file system view shows all the files that are part of the current repository. When you select one of the files, its commit history will be displayed in the commit history view and its in-depth blame will be shown in the blame view.
+
+Every time you select a different file its blame will be open in a new tab in the blame view.
+
+## The commit history view
+
+The commit history view is a simplified graph view as in the main window but it only shows the commits where the file previously selected in the file system view is modified.
+
+You can navigate through the commit history and by a single click, the view of the blame will change to the file on that specific commit, refreshing the view. With a dobule click on the commit line, you will open the commit information in the diff view. It is done so you can see what were the differences between that commit and its previous one.
+
+By using the context menu, you can open the diff of this file between the current selected commit and it's previous one.
+
+![GitQlient - The History View](/GitQlient/assets/5_commits_view.png "GitQlient - The History View")
 
 ## The blame view
 
-## The history view
+This is the central part and the one that give more information. In the blame view we have as many tabs as files we've opened and the commit history will change when we change the blame view.
+
+In the top part of the Blame view we find the two commits that are being compared. That will change if you select a different commit in the commit history. Under that, you will see the blame of the file where the modifications are grouped by date. In the right part, between the commit metadata and the file blame, you will find a small *decoration* in blue. This can be gradualy painted and this indicates how recent or old a specific line is.
+
+The ligh blue color indicates the oldest lines whereas the darkes blue tells that those lines where more recently modified.
+
+The log message is clickable and when you clicking on it will focus the commit in the history view. This tries to be a little help to locate the commit and make it easier to compare.
+
+![GitQlient - The Blame View](/GitQlient/assets/5_file_blame_view.png "GitQlient - The Blame View")
 
 # <a name="the-merge-view"></a>The Merge View
 
