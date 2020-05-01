@@ -227,7 +227,8 @@ void BlameWidget::showRepoViewMenu(const QPoint &pos)
 
 void BlameWidget::openDiff(const QModelIndex &index)
 {
-   const auto sha = mRepoModel->sha(index.row());
+   const auto sha
+       = mRepoView->model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
 
    emit signalOpenDiff(sha);
 }
