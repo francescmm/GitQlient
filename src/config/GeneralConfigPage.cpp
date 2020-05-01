@@ -60,7 +60,8 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
 
    mAutoFormat->setChecked(settings.value("autoFormat", true).toBool());
 
-   mExternalEditor = new QLineEdit("nano");
+   mExternalEditor = new QLineEdit(
+       settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString());
 
    connect(mReset, &QPushButton::clicked, this, &GeneralConfigPage::resetChanges);
 
@@ -104,7 +105,8 @@ void GeneralConfigPage::resetChanges()
    mDisableLogs->setChecked(settings.value("logsDisabled", false).toBool());
    mLevelCombo->setCurrentIndex(settings.value("logsLevel", 2).toInt());
    mAutoFormat->setChecked(settings.value("autoFormat", true).toBool());
-   mExternalEditor->setText(settings.value("externalEditor", "nano").toString());
+   mExternalEditor->setText(
+       settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString());
 
    QTimer::singleShot(3000, [this]() { mStatusLabel->setText(""); });
    mStatusLabel->setText(tr("Changes reseted"));
@@ -118,7 +120,7 @@ void GeneralConfigPage::applyChanges()
    settings.setValue("logsDisabled", mDisableLogs->isChecked());
    settings.setValue("logsLevel", mLevelCombo->currentIndex());
    settings.setValue("autoFormat", mAutoFormat->isChecked());
-   settings.setValue("externalEditor", mExternalEditor->text());
+   settings.setValue(GitQlientSettings::ExternalEditorKey, mExternalEditor->text());
 
    QTimer::singleShot(3000, [this]() { mStatusLabel->setText(""); });
    mStatusLabel->setText(tr("Changes applied"));

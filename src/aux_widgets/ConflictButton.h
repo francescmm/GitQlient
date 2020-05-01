@@ -81,6 +81,7 @@ private:
    QSharedPointer<GitBase> mGit;
    QString mFileName;
    QPushButton *mFile = nullptr;
+   QPushButton *mEdit = nullptr;
    QPushButton *mResolve = nullptr;
    QPushButton *mUpdate = nullptr;
 
@@ -95,4 +96,9 @@ private:
     *
     */
    void resolveConflict();
+
+   /**
+    * @brief openFileEditor Opens the external file editor.
+    */
+   void openFileEditor();
 };
