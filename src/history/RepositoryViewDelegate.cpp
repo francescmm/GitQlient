@@ -210,12 +210,12 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
    }
 }
 
-QColor RepositoryViewDelegate::getMergeColor(const LaneType ln, const QVector<LaneType> &lanes, int currentLane,
-                                             const QColor &defaultColor, bool &isSet) const
+QColor RepositoryViewDelegate::getMergeColor(const LaneType currentLane, const QVector<LaneType> &lanes,
+                                             int currentLaneIndex, const QColor &defaultColor, bool &isSet) const
 {
    auto mergeColor = GitQlientStyles::getBranchColorAt((lanes.count() - 1) % GitQlientStyles::getTotalBranchColors());
 
-   switch (ln)
+   switch (currentLane)
    {
       case LaneType::HEAD_L:
       case LaneType::HEAD_R:
@@ -223,23 +223,17 @@ QColor RepositoryViewDelegate::getMergeColor(const LaneType ln, const QVector<La
       case LaneType::TAIL_R:
       case LaneType::MERGE_FORK_L:
       case LaneType::JOIN_R:
-         if (!isSet)
-         {
-            isSet = true;
-            mergeColor = defaultColor;
-         }
+         isSet = true;
+         mergeColor = defaultColor;
          break;
       case LaneType::JOIN_L:
-         if (!isSet)
+         for (auto laneCount = 0; laneCount < currentLaneIndex; ++laneCount)
          {
-            for (auto laneCount = 0; laneCount < currentLane; ++laneCount)
+            if (lanes[laneCount] == LaneType::JOIN_L)
             {
-               if (lanes[laneCount] == LaneType::JOIN_L)
-               {
-                  mergeColor = GitQlientStyles::getBranchColorAt(laneCount % GitQlientStyles::getTotalBranchColors());
-                  isSet = true;
-                  break;
-               }
+               mergeColor = GitQlientStyles::getBranchColorAt(laneCount % GitQlientStyles::getTotalBranchColors());
+               isSet = true;
+               break;
             }
          }
          break;
@@ -272,9 +266,10 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    }
    else
    {
-      auto laneNum = r.lanes.count();
+      const auto laneNum = r.lanes.count();
       auto activeLane = 0;
-      for (int i = 0; i < laneNum; i++)
+
+      for (int i = 0; i < laneNum && !mView->hasActiveFilter(); i++)
       {
          if (isActive(r.lanes[i]))
          {
@@ -284,25 +279,26 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       }
 
       const auto activeColor = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
-
-      auto isSet = false;
-      auto x = LANE_WIDTH * laneNum;
-      auto laneHeadPresent = false;
       const auto isWip = r.sha() == CommitInfo::ZERO_SHA;
+      auto x1 = 0;
+      auto isSet = false;
+      auto laneHeadPresent = false;
+      auto mergeColor = GitQlientStyles::getBranchColorAt((laneNum - 1) % GitQlientStyles::getTotalBranchColors());
 
-      for (auto i = laneNum - 1; i >= 0; --i, x -= LANE_WIDTH)
+      for (auto i = laneNum - 1, x2 = LANE_WIDTH * laneNum; i >= 0; --i, x2 -= LANE_WIDTH)
       {
-         if (!laneHeadPresent)
+         x1 = x2 - LANE_WIDTH;
+
+         auto &currentLane = r.lanes[i];
+
+         if (!laneHeadPresent && i < laneNum - 1)
          {
-            laneHeadPresent = i < laneNum - 1
-                && (r.lanes[i + 1] == LaneType::HEAD || r.lanes[i + 1] == LaneType::HEAD_L
-                    || r.lanes[i + 1] == LaneType::HEAD_R || r.lanes[i + 1] == LaneType::JOIN_L
-                    || r.lanes[i + 1] == LaneType::JOIN_R);
+            auto &prevLane = r.lanes[i + 1];
+            laneHeadPresent = prevLane == LaneType::HEAD || prevLane == LaneType::HEAD_L || prevLane == LaneType::HEAD_R
+                || prevLane == LaneType::JOIN_L || prevLane == LaneType::JOIN_R;
          }
 
-         const auto ln = r.lanes[i];
-
-         if (ln != LaneType::EMPTY)
+         if (currentLane != LaneType::EMPTY)
          {
             auto color = activeColor;
 
@@ -311,9 +307,13 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
             else if (isWip && !mCache->pendingLocalChanges())
                color = QColor("#D89000");
 
-            const auto mergeColor = getMergeColor(ln, r.lanes, i, color, isSet);
+            if (!isSet)
+               mergeColor = getMergeColor(currentLane, r.lanes, i, color, isSet);
 
-            paintGraphLane(p, ln, laneHeadPresent, x - LANE_WIDTH, x, color, activeColor, mergeColor, isWip);
+            paintGraphLane(p, currentLane, laneHeadPresent, x1, x2, color, activeColor, mergeColor, isWip);
+
+            if (mView->hasActiveFilter())
+               break;
          }
       }
    }

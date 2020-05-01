@@ -119,6 +119,6 @@ private:
     */
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
 
-   QColor getMergeColor(LaneType ln, const QVector<LaneType> &lanes, int currentLane, const QColor &defaultColor,
-                        bool &isSet) const;
+   QColor getMergeColor(const LaneType currentLane, const QVector<LaneType> &lanes, int currentLaneIndex,
+                        const QColor &defaultColor, bool &isSet) const;
 };
