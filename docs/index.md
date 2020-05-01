@@ -371,11 +371,11 @@ This is the central part and the one that give more information. In the blame vi
 
 In the top part of the Blame view we find the two commits that are being compared. That will change if you select a different commit in the commit history. Under that, you will see the blame of the file where the modifications are grouped by date. In the right part, between the commit metadata and the file blame, you will find a small *decoration* in blue. This can be gradualy painted and this indicates how recent or old a specific line is.
 
+![GitQlient - The Blame View](/GitQlient/assets/5_file_blame_view.png "GitQlient - The Blame View")
+
 The ligh blue color indicates the oldest lines whereas the darkes blue tells that those lines where more recently modified.
 
 The log message is clickable and when you clicking on it will focus the commit in the history view. This tries to be a little help to locate the commit and make it easier to compare.
-
-![GitQlient - The Blame View](/GitQlient/assets/5_file_blame_view.png "GitQlient - The Blame View")
 
 # <a name="the-merge-view"></a>The Merge View
 
