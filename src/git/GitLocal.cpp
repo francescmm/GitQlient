@@ -46,7 +46,12 @@ GitExecResult GitLocal::checkoutCommit(const QString &sha) const
 {
    QLog_Debug("Git", QString("Executing checkoutCommit: {%1}").arg(sha));
 
-   return mGitBase->run(QString("git checkout %1").arg(sha));
+   const auto ret = mGitBase->run(QString("git checkout %1").arg(sha));
+
+   if (ret.success)
+      mGitBase->updateCurrentBranch();
+
+   return ret;
 }
 
 GitExecResult GitLocal::markFileAsResolved(const QString &fileName) const
