@@ -82,6 +82,7 @@ public:
 
 private:
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<RevisionsCache> mCache;
    QLabel *mFirstSha = nullptr;
    QLabel *mSecondSha = nullptr;
    FileListWidget *fileListWidget = nullptr;
