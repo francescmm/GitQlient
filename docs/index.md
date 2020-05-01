@@ -176,6 +176,8 @@ By default, the order is done by date but in future release will be configurable
 
 In the top of the view you can find a long control to input text. There you can search a specific commit by its SHA or by the commit message. At the end of the input control, you will find a checkbox that when it's active the view shows all the branches. In case you want to work only with your current checked out branch, you can uncheck it and the view will be updated.
 
+You can interact with the header of the graph view. That includes re-ordering all the columns and resizing the Graph column only. The log column will stretch automatically but all columns will keep a minimum size so the text is readable. In addition, the tool tip information is enabled in every line of the view. It will show the commit SHA, the user and date of the commit and if available, the branches on that commit.
+
 ### Commit selection
 
 The tree view supports multi-selection and the context menu will vary depending on how many commits you select. The different actions you can do to a commit are:
