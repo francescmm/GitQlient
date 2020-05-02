@@ -28,15 +28,15 @@ bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &
 
    const auto ret = gitConfig->getRemoteForBranch(toMaster ? QString("master") : right);
 
-   const QString firstArg = toMaster ? QString("--left-right") : QString();
-   const QString gitCmd = QString("git rev-list %1 --count %2/%3...%4")
-                              .arg(firstArg, ret.output.toString(), toMaster ? QString("master") : right, right);
-
    const auto gitBase = new GitBase(mGitBase->getWorkingDir());
    connect(gitBase, &GitBase::signalResultReady, this, [this, gitBase](GitExecResult result) {
       emit signalDistanceBetweenBranches(result);
       gitBase->deleteLater();
    });
+
+   const auto gitCmd = QString("git rev-list %1 --count %2/%3...%4")
+                           .arg(toMaster ? QString("--left-right") : QString(), ret.output.toString(),
+                                toMaster ? QString("master") : right, right);
 
    return gitBase->runAsync(gitCmd);
 }
