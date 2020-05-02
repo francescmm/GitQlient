@@ -28,17 +28,25 @@ bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &
 
    const auto ret = gitConfig->getRemoteForBranch(toMaster ? QString("master") : right);
 
-   const auto gitBase = new GitBase(mGitBase->getWorkingDir());
-   connect(gitBase, &GitBase::signalResultReady, this, [this, gitBase](GitExecResult result) {
-      emit signalDistanceBetweenBranches(result);
-      gitBase->deleteLater();
-   });
+   if (!toMaster && right == "master")
+   {
+      emit signalDistanceBetweenBranches({ false, "Same branch" });
 
-   const auto gitCmd = QString("git rev-list %1 --count %2/%3...%4")
-                           .arg(toMaster ? QString("--left-right") : QString(), ret.output.toString(),
-                                toMaster ? QString("master") : right, right);
+      return true;
+   }
+   else
+   {
+      const auto gitBase = new GitBase(mGitBase->getWorkingDir());
+      connect(gitBase, &GitBase::signalResultReady, this, [this, gitBase](GitExecResult result) {
+         emit signalDistanceBetweenBranches(result);
+         gitBase->deleteLater();
+      });
 
-   return gitBase->runAsync(gitCmd);
+      const auto gitCmd = QString("git rev-list %1 --count %2/%3...%4")
+                              .arg("--left-right", ret.output.toString(), toMaster ? QString("master") : right, right);
+
+      return gitBase->runAsync(gitCmd);
+   }
 }
 
 GitExecResult GitBranches::createBranchFromAnotherBranch(const QString &oldName, const QString &newName)

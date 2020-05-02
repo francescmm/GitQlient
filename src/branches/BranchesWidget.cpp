@@ -365,7 +365,6 @@ void BranchesWidget::processLocalBranch(QString branch)
    if (fullBranchName != "detached")
    {
       const auto git = new GitBranches(mGit);
-      git->getDistanceBetweenBranchesAsync(true, fullBranchName);
       connect(git, &GitBranches::signalDistanceBetweenBranches, this, [item, git](GitExecResult result) {
          auto distanceToMaster = QString("Not found");
          const auto toMaster = result.output.toString();
@@ -382,24 +381,28 @@ void BranchesWidget::processLocalBranch(QString branch)
 
          git->deleteLater();
       });
+      git->getDistanceBetweenBranchesAsync(true, fullBranchName);
 
       const auto git2 = new GitBranches(mGit);
-      git2->getDistanceBetweenBranchesAsync(false, fullBranchName);
       connect(git2, &GitBranches::signalDistanceBetweenBranches, this, [item, git2](GitExecResult result) {
          auto distanceToOrigin = QString("Local");
          const auto toOrigin = result.output.toString();
 
-         if (!toOrigin.contains("fatal"))
+         if (!result.success && toOrigin.contains("Same branch", Qt::CaseInsensitive))
+            distanceToOrigin = "-";
+         else if (!toOrigin.contains("fatal"))
          {
             distanceToOrigin = toOrigin;
             distanceToOrigin.replace('\n', "");
-            distanceToOrigin.append("\u2193");
+            distanceToOrigin.replace('\t', "\u2193 - ");
+            distanceToOrigin.append("\u2191");
          }
 
          item->setText(2, distanceToOrigin);
 
          git2->deleteLater();
       });
+      git2->getDistanceBetweenBranchesAsync(false, fullBranchName);
    }
 
    mLocalBranchesTree->addTopLevelItem(item);
