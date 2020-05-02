@@ -91,9 +91,9 @@ public:
    /**
     * @brief ExternalEditorKey The key for the external editor settings.
     */
-   static const char *ExternalEditorKey;
+   static const QString ExternalEditorKey;
    /**
     * @brief ExternalEditorValue The value for the external editor settings key.
     */
-   static const char *ExternalEditorValue;
+   static const QString ExternalEditorValue;
 };

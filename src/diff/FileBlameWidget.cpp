@@ -17,9 +17,9 @@
 namespace
 {
 const int kTotalColors = 8;
-const std::array<const char *, kTotalColors> kBorderColors { "25, 65, 99",    "36, 95, 146",  "44, 116, 177",
-                                                             "56, 136, 205",  "87, 155, 213", "118, 174, 221",
-                                                             "150, 192, 221", "197, 220, 240" };
+const std::array<QString, kTotalColors> kBorderColors { "25, 65, 99",    "36, 95, 146",  "44, 116, 177",
+                                                        "56, 136, 205",  "87, 155, 213", "118, 174, 221",
+                                                        "150, 192, 221", "197, 220, 240" };
 qint64 kSecondsNewest = 0;
 qint64 kSecondsOldest = QDateTime::currentDateTime().toSecsSinceEpoch();
 qint64 kIncrementSecs = 0;
