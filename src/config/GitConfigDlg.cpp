@@ -27,7 +27,7 @@ GitConfigDlg::GitConfigDlg(const QSharedPointer<GitBase> &gitBase, QWidget *pare
    ui->leLocalName->setText(localConfig.mUserName);
 
    connect(ui->checkBox, &QCheckBox::stateChanged, this, &GitConfigDlg::copyGlobalSettings);
-   connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &GitConfigDlg::accepted);
+   connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &GitConfigDlg::accept);
 }
 
 GitConfigDlg::~GitConfigDlg()
@@ -35,7 +35,7 @@ GitConfigDlg::~GitConfigDlg()
    delete ui;
 }
 
-void GitConfigDlg::accepted()
+void GitConfigDlg::accept()
 {
    QScopedPointer<GitConfig> git(new GitConfig(mGit));
 

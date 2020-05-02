@@ -59,8 +59,11 @@ void BranchContextMenu::pull()
    {
       const auto errorMsg = ret.output.toString();
 
-      if (errorMsg.toLower().contains("error: could not apply") && errorMsg.toLower().contains("causing a conflict"))
+      if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
+          && errorMsg.contains("causing a conflict", Qt::CaseInsensitive))
+      {
          emit signalPullConflict();
+      }
       else
          QMessageBox::critical(this, tr("Error while pulling"), errorMsg);
    }

@@ -62,7 +62,6 @@ RepoConfigDlg::~RepoConfigDlg()
 void RepoConfigDlg::addUserConfig(const QStringList &elements, QGridLayout *layout)
 {
    auto row = 1;
-   const auto configKey = QString("user.");
 
    for (const auto &element : elements)
    {

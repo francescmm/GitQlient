@@ -22,8 +22,7 @@ bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &
 {
    QLog_Debug("Git",
               QString("Executing getDistanceBetweenBranches: {origin/%1} and {%2}")
-                  .arg(toMaster ? QString("master") : QString("%1"))
-                  .arg(right));
+                  .arg(toMaster ? QString("master") : QString("%1"), right));
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
 
@@ -31,10 +30,7 @@ bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &
 
    const QString firstArg = toMaster ? QString("--left-right") : QString();
    const QString gitCmd = QString("git rev-list %1 --count %2/%3...%4")
-                              .arg(firstArg)
-                              .arg(ret.output.toString())
-                              .arg(toMaster ? QString("master") : right)
-                              .arg(right);
+                              .arg(firstArg, ret.output.toString(), toMaster ? QString("master") : right, right);
 
    connect(mGitBase.data(), &GitBase::signalResultReady, this, &GitBranches::signalDistanceBetweenBranches);
 

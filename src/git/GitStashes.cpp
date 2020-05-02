@@ -22,7 +22,7 @@ QVector<QString> GitStashes::getStashes()
    {
       const auto tagsTmp = ret.output.toString().split("\n");
 
-      for (auto tag : tagsTmp)
+      for (const auto &tag : tagsTmp)
          if (tag != "\n" && !tag.isEmpty())
             stashes.append(tag);
    }

@@ -62,7 +62,7 @@ private:
     \brief Validates the data input by the user and stores it if correct.
 
    */
-   void accepted();
+   void accept() override;
    /*!
     \brief Copies the global settings into the local ones.
 

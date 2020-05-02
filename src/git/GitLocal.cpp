@@ -155,7 +155,7 @@ GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringLis
 {
    QStringList toAdd, toRemove;
 
-   for (auto file : selFiles)
+   for (const auto &file : selFiles)
    {
       const auto index = files.mFiles.indexOf(file);
 

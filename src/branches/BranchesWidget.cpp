@@ -362,9 +362,6 @@ void BranchesWidget::processLocalBranch(QString branch)
 
    QLog_Debug("UI", QString("Calculating distances..."));
 
-   auto distanceToMaster = QString("Not found");
-   auto distanceToOrigin = QString("Local");
-
    if (fullBranchName != "detached")
    {
       const auto git = new GitBranches(mGit);

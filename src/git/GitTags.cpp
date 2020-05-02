@@ -22,7 +22,7 @@ QVector<QString> GitTags::getTags() const
    {
       const auto tagsTmp = ret.output.toString().split("\n");
 
-      for (auto tag : tagsTmp)
+      for (const auto &tag : tagsTmp)
          if (tag != "\n" && !tag.isEmpty())
             tags.append(tag);
    }
@@ -42,7 +42,7 @@ QVector<QString> GitTags::getLocalTags() const
    {
       const auto tagsTmp = ret.output.toString().split("\n");
 
-      for (auto tag : tagsTmp)
+      for (const auto &tag : tagsTmp)
          if (tag != "\n" && !tag.isEmpty() && tag.contains("[new tag]"))
             tags.append(tag.split(" -> ").last());
    }
@@ -54,7 +54,7 @@ GitExecResult GitTags::addTag(const QString &tagName, const QString &tagMessage,
 {
    QLog_Debug("Git", QString("Executing addTag: {%1}").arg(tagName));
 
-   return mGitBase->run(QString("git tag -a %1 %2 -m \"%3\"").arg(tagName).arg(sha).arg(tagMessage));
+   return mGitBase->run(QString("git tag -a %1 %2 -m \"%3\"").arg(tagName, sha, tagMessage));
 }
 
 GitExecResult GitTags::removeTag(const QString &tagName, bool remote)

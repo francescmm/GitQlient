@@ -224,10 +224,10 @@ void CommitHistoryContextMenu::checkoutBranch()
    {
       QRegExp rx("by \\d+ commits");
       rx.indexIn(ret.output.toString());
-      auto value = rx.capturedTexts().first().split(" ");
+      auto value = rx.capturedTexts().constFirst().split(" ");
       auto uiUpdateRequested = true;
 
-      if (value.count() == 3 && output.toLower().contains("your branch is behind"))
+      if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
       {
          const auto commits = value.at(1).toUInt();
          (void)commits;
@@ -273,8 +273,11 @@ void CommitHistoryContextMenu::cherryPickCommit()
    {
       const auto errorMsg = ret.output.toString();
 
-      if (errorMsg.toLower().contains("error: could not apply") && errorMsg.toLower().contains("causing a conflict"))
+      if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
+          && errorMsg.contains("causing a conflict", Qt::CaseInsensitive))
+      {
          emit signalCherryPickConflict();
+      }
       else
          QMessageBox::critical(this, tr("Error while cherry-pick"), errorMsg);
    }
@@ -333,8 +336,11 @@ void CommitHistoryContextMenu::pull()
    {
       const auto errorMsg = ret.output.toString();
 
-      if (errorMsg.toLower().contains("error: could not apply") && errorMsg.toLower().contains("causing a conflict"))
+      if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
+          && errorMsg.contains("causing a conflict", Qt::CaseInsensitive))
+      {
          emit signalPullConflict();
+      }
       else
          QMessageBox::critical(this, tr("Error while pulling"), errorMsg);
    }

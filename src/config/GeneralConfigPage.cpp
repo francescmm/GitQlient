@@ -108,7 +108,8 @@ void GeneralConfigPage::resetChanges()
    mExternalEditor->setText(
        settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString());
 
-   QTimer::singleShot(3000, [this]() { mStatusLabel->setText(""); });
+   QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
+
    mStatusLabel->setText(tr("Changes reseted"));
 }
 
@@ -122,7 +123,7 @@ void GeneralConfigPage::applyChanges()
    settings.setValue("autoFormat", mAutoFormat->isChecked());
    settings.setValue(GitQlientSettings::ExternalEditorKey, mExternalEditor->text());
 
-   QTimer::singleShot(3000, [this]() { mStatusLabel->setText(""); });
+   QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
    mStatusLabel->setText(tr("Changes applied"));
 
    const auto logger = QLoggerManager::getInstance();
