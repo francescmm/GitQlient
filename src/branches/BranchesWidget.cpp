@@ -278,15 +278,15 @@ void BranchesWidget::processLocalBranch(QString branch)
       branch.replace('*', "");
       fullBranchName.replace('*', "");
       isCurrentBranch = true;
+   }
 
-      if (fullBranchName.startsWith("(HEADdetachedat"))
-      {
-         auto shortSha = fullBranchName.remove("(HEADdetachedat");
-         sha = shortSha.remove(")");
+   if (fullBranchName.startsWith("(HEADdetachedat"))
+   {
+      auto shortSha = fullBranchName.remove("(HEADdetachedat");
+      sha = shortSha.remove(")");
 
-         fullBranchName = "detached";
-         branch = "detached";
-      }
+      fullBranchName = "detached";
+      branch = "detached";
    }
    else
    {
@@ -447,6 +447,9 @@ void BranchesWidget::processRemoteBranch(QString branch)
       }
    }
 
+   QScopedPointer<GitBranches> git(new GitBranches(mGit));
+   const auto sha = git->getLastCommitOfBranch(fullBranchName).output.toString();
+
    QLog_Debug("UI", QString("Adding remote branch {%1}").arg(branch));
 
    const auto item = new QTreeWidgetItem(parent);
@@ -454,6 +457,7 @@ void BranchesWidget::processRemoteBranch(QString branch)
    item->setText(0, branch);
    item->setData(0, Qt::UserRole + 1, fullBranchName);
    item->setData(0, Qt::UserRole + 2, true);
+   item->setData(0, Qt::UserRole + 3, sha);
    item->setData(0, Qt::ToolTipRole, fullBranchName);
 }
 
