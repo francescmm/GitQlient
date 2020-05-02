@@ -44,7 +44,7 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    mRepoView->activateFilter(true);
    mRepoView->filterBySha({});
    connect(mRepoView, &CommitHistoryView::customContextMenuRequested, this, &BlameWidget::showRepoViewMenu);
-   connect(mRepoView, &CommitHistoryView::clicked, this, qOverload<const QModelIndex &>(&BlameWidget::reloadBlame));
+   connect(mRepoView, &CommitHistoryView::clicked, this, &BlameWidget::reloadBlame);
    connect(mRepoView, &CommitHistoryView::doubleClicked, this, &BlameWidget::openDiff);
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
@@ -55,7 +55,7 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    fileSystemView->header()->setSectionHidden(2, true);
    fileSystemView->header()->setSectionHidden(3, true);
    fileSystemView->setContextMenuPolicy(Qt::CustomContextMenu);
-   connect(fileSystemView, &QTreeView::clicked, this, qOverload<const QModelIndex &>(&BlameWidget::showFileHistory));
+   connect(fileSystemView, &QTreeView::clicked, this, &BlameWidget::showFileHistoryByIndex);
 
    const auto historyBlameLayout = new QGridLayout(this);
    historyBlameLayout->setContentsMargins(QMargins());
@@ -192,7 +192,7 @@ void BlameWidget::reloadHistory(int tabIndex)
    }
 }
 
-void BlameWidget::showFileHistory(const QModelIndex &index)
+void BlameWidget::showFileHistoryByIndex(const QModelIndex &index)
 {
    auto item = fileSystemModel->fileInfo(index);
 

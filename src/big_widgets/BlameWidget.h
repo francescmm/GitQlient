@@ -128,7 +128,7 @@ private:
     *
     * @param index The index from the file system model.
     */
-   void showFileHistory(const QModelIndex &index);
+   void showFileHistoryByIndex(const QModelIndex &index);
    /**
     * @brief Shows the context menu for the history view.
     *
