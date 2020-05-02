@@ -32,9 +32,13 @@ bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &
    const QString gitCmd = QString("git rev-list %1 --count %2/%3...%4")
                               .arg(firstArg, ret.output.toString(), toMaster ? QString("master") : right, right);
 
-   connect(mGitBase.data(), &GitBase::signalResultReady, this, &GitBranches::signalDistanceBetweenBranches);
+   const auto gitBase = new GitBase(mGitBase->getWorkingDir());
+   connect(gitBase, &GitBase::signalResultReady, this, [this, gitBase](GitExecResult result) {
+      emit signalDistanceBetweenBranches(result);
+      gitBase->deleteLater();
+   });
 
-   return mGitBase->runAsync(gitCmd);
+   return gitBase->runAsync(gitCmd);
 }
 
 GitExecResult GitBranches::createBranchFromAnotherBranch(const QString &oldName, const QString &newName)
