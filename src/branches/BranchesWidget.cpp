@@ -377,7 +377,8 @@ void BranchesWidget::processLocalBranch(QString branch)
             distanceToMaster.append("\u2191");
          }
 
-         item->setText(1, distanceToMaster);
+         if (item)
+            item->setText(1, distanceToMaster);
 
          git->deleteLater();
       });
@@ -398,7 +399,8 @@ void BranchesWidget::processLocalBranch(QString branch)
             distanceToOrigin.append("\u2191");
          }
 
-         item->setText(2, distanceToOrigin);
+         if (item)
+            item->setText(2, distanceToOrigin);
 
          git2->deleteLater();
       });
