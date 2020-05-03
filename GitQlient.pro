@@ -29,7 +29,7 @@ OTHER_FILES += \
     $$PWD/.travis.yml \
     $$PWD/docs/*.md
 
-VERSION = 1.0.0
+VERSION = 1.1.0
 
 DEFINES += \
     VER=\\\"$$VERSION\\\"
