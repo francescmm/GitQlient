@@ -33,6 +33,11 @@ signals:
    void signalOpenFileDiff();
    void signalShowFileHistory();
 
+   /**
+    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
+    */
+   void signalEditFile();
+
 public:
    explicit FileContextMenu(const QString &file, QWidget *parent = nullptr);
 };

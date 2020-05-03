@@ -1,8 +1,9 @@
 #include "FileContextMenu.h"
 
+#include <GitQlientSettings.h>
+
 #include <QApplication>
 #include <QClipboard>
-#include <QSettings>
 
 FileContextMenu::FileContextMenu(const QString &file, QWidget *parent)
    : QMenu(parent)
@@ -16,6 +17,13 @@ FileContextMenu::FileContextMenu(const QString &file, QWidget *parent)
 
    const auto fileDiffAction = addAction(tr("Diff"));
    connect(fileDiffAction, &QAction::triggered, this, &FileContextMenu::signalOpenFileDiff);
+
+   addSeparator();
+
+   GitQlientSettings settings;
+
+   if (!settings.value("isGitQlient", false).toBool())
+      connect(addAction("Edit file"), &QAction::triggered, this, [this]() { emit signalEditFile(); });
 
    addSeparator();
 

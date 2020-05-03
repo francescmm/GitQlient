@@ -468,6 +468,8 @@ void WorkInProgressWidget::showUnstagedMenu(const QPoint &pos)
       const auto fileName = item->toolTip();
       const auto unsolvedConflicts = item->data(GitQlientRole::U_IsConflict).toBool();
       const auto contextMenu = new UnstagedMenu(mGit, fileName, unsolvedConflicts, this);
+      connect(contextMenu, &UnstagedMenu::signalEditFile, this,
+              [this, fileName]() { emit signalEditFile(mGit->getWorkingDir() + "/" + fileName, 0, 0); });
       connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &WorkInProgressWidget::requestDiff);
       connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &WorkInProgressWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &WorkInProgressWidget::revertAllChanges);

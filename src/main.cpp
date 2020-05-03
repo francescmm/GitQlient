@@ -4,6 +4,7 @@
 
 #include <GitQlient.h>
 #include <QLogger.h>
+#include <GitQlientSettings.h>
 
 using namespace QLogger;
 
@@ -26,6 +27,9 @@ int main(int argc, char *argv[])
 
    QFontDatabase::addApplicationFont(":/Ubuntu");
    QFontDatabase::addApplicationFont(":/UbuntuMono");
+
+   GitQlientSettings settings;
+   settings.setValue("isGitQlient", true);
 
    GitQlient mainWin(arguments);
 

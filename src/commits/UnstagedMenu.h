@@ -37,6 +37,7 @@ signals:
    void signalRevertAll();
    void signalCheckedOut(bool success);
    void signalShowFileHistory(const QString &fileName);
+   void signalEditFile();
    void signalConflictsResolved();
    void signalStageFile();
 

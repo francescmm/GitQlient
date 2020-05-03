@@ -75,31 +75,36 @@ void ConflictButton::openFileEditor()
 {
    const auto fullPath = QString(mGit->getWorkingDir() + "/" + mFileName);
 
-   // get external diff viewer command
    GitQlientSettings settings;
-   const auto editor
-       = settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString();
 
-   auto processCmd = editor;
-
-   if (!editor.contains("%1"))
-      processCmd.append(" %1");
-
-   processCmd = processCmd.arg(fullPath);
-
-   const auto externalEditor = new QProcess();
-   connect(externalEditor, SIGNAL(finished(int, QProcess::ExitStatus)), externalEditor, SLOT(deleteLater()));
-
-   externalEditor->setWorkingDirectory(mGit->getWorkingDir());
-
-   externalEditor->start(processCmd);
-
-   if (!externalEditor->waitForStarted(10000))
+   if (!settings.value("isGitQlient", false).toBool())
+      emit signalEditFile(fullPath, 0, 0);
+   else
    {
-      QString text = QString("Cannot start external editor: %1.").arg(editor);
+      const auto editor
+          = settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString();
 
-      QLog_Error("UI", text);
+      auto processCmd = editor;
 
-      delete externalEditor;
+      if (!editor.contains("%1"))
+         processCmd.append(" %1");
+
+      processCmd = processCmd.arg(fullPath);
+
+      const auto externalEditor = new QProcess();
+      connect(externalEditor, SIGNAL(finished(int, QProcess::ExitStatus)), externalEditor, SLOT(deleteLater()));
+
+      externalEditor->setWorkingDirectory(mGit->getWorkingDir());
+
+      externalEditor->start(processCmd);
+
+      if (!externalEditor->waitForStarted(10000))
+      {
+         QString text = QString("Cannot start external editor: %1.").arg(editor);
+
+         QLog_Error("UI", text);
+
+         delete externalEditor;
+      }
    }
 }

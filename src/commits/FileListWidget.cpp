@@ -6,6 +6,7 @@
 #include <GitHistory.h>
 #include <GitQlientStyles.h>
 #include <RevisionsCache.h>
+#include <GitBase.h>
 
 #include <QApplication>
 #include <QDrag>
@@ -52,6 +53,8 @@ void FileListWidget::showContextMenu(const QPoint &pos)
               [this, fileName]() { emit signalShowFileHistory(fileName); });
       connect(menu, &FileContextMenu::signalOpenFileDiff, this,
               [this, item] { emit QListWidget::itemDoubleClicked(item); });
+      connect(menu, &FileContextMenu::signalEditFile, this,
+              [this, fileName]() { emit signalEditFile(mGit->getWorkingDir() + "/" + fileName, 0, 0); });
       menu->exec(viewport()->mapToGlobal(pos));
    }
 }

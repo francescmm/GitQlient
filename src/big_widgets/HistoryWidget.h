@@ -99,6 +99,15 @@ signals:
     \param fileName The file name for the diff.
    */
    void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName);
+
+   /**
+    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
+    * @param fileName The file name
+    * @param line The line
+    * @param column The column
+    */
+   void signalEditFile(const QString &fileName, int line, int column);
+
    /*!
     \brief Signal triggered when changes are commited.
 

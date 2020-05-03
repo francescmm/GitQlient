@@ -54,12 +54,21 @@ signals:
     \param file The file to show the diff.
    */
    void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file);
+
    /*!
     \brief Signal triggered when the user whats to see the blame history for a given file.
 
     \param fileName The file name to blame.
    */
    void signalShowFileHistory(const QString &fileName);
+
+   /**
+    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
+    * @param fileName The file name
+    * @param line The line
+    * @param column The column
+    */
+   void signalEditFile(const QString &fileName, int line, int column);
 
 public:
    /*!
