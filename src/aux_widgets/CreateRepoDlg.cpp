@@ -97,7 +97,14 @@ void CreateRepoDlg::accept()
 
       auto ret = false;
       if (mType == CreateRepoDlgType::CLONE)
+      {
+         QDir dir(fullPath);
+
+         if (!dir.exists())
+            dir.mkpath(fullPath);
+
          ret = mGit->clone(url, fullPath);
+      }
       else if (mType == CreateRepoDlgType::INIT)
          ret = mGit->initRepo(fullPath);
 
