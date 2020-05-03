@@ -54,9 +54,28 @@ public:
    */
    ~GitConfigDlg() override;
 
+   /**
+    * @brief Detects the press event to avoid closing the dialog when the Esc key is pressed.
+    *
+    * @param e The press event
+    */
+   void keyPressEvent(QKeyEvent *e) override;
+   /**
+    * @brief Detects the close event to filter the close event and only close the dialog if the user clicked on the
+    * button.
+    *
+    * @param e The close event
+    */
+   void closeEvent(QCloseEvent *e) override;
+   /**
+    * @brief Closes the dialog by user's action.
+    */
+   void close();
+
 private:
    Ui::GitConfigDlg *ui;
    QSharedPointer<GitBase> mGit;
+   bool mPrepareToClose = false;
 
    /*!
     \brief Validates the data input by the user and stores it if correct.

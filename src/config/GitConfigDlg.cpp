@@ -5,6 +5,9 @@
 #include <GitConfig.h>
 #include <GitQlientStyles.h>
 
+#include <QCloseEvent>
+#include <QKeyEvent>
+
 GitConfigDlg::GitConfigDlg(const QSharedPointer<GitBase> &gitBase, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::GitConfigDlg)
@@ -33,6 +36,31 @@ GitConfigDlg::GitConfigDlg(const QSharedPointer<GitBase> &gitBase, QWidget *pare
 GitConfigDlg::~GitConfigDlg()
 {
    delete ui;
+}
+
+void GitConfigDlg::keyPressEvent(QKeyEvent *e)
+{
+   const auto key = e->key();
+
+   if (key == Qt::Key_Escape)
+      return;
+
+   QDialog::keyPressEvent(e);
+}
+
+void GitConfigDlg::closeEvent(QCloseEvent *e)
+{
+   if (!mPrepareToClose)
+      e->ignore();
+   else
+      QDialog::closeEvent(e);
+}
+
+void GitConfigDlg::close()
+{
+   mPrepareToClose = true;
+
+   QDialog::close();
 }
 
 void GitConfigDlg::accepted()
