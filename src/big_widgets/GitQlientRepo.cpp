@@ -199,7 +199,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          QScopedPointer<GitConfig> git(new GitConfig(mGitBase));
 
-         if (!git->getGlobalUserInfo().isValid())
+         if (!git->getGlobalUserInfo().isValid() && !git->getLocalUserInfo().isValid())
          {
             QLog_Info("UI", QString("Configuring Git..."));
 
