@@ -55,8 +55,8 @@ public:
    GitUserInfo getLocalUserInfo() const;
    void setLocalUserInfo(const GitUserInfo &info);
    GitExecResult setLocalData(const QString &key, const QString &value);
-   bool clone(const QString &url, const QString &fullPath);
-   bool initRepo(const QString &fullPath);
+   GitExecResult clone(const QString &url, const QString &fullPath);
+   GitExecResult initRepo(const QString &fullPath);
    GitExecResult getLocalConfig() const;
    GitExecResult getGlobalConfig() const;
    GitExecResult getRemoteForBranch(const QString &branch);

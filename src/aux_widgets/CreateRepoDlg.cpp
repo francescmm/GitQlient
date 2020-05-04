@@ -7,6 +7,10 @@
 #include <GitQlientSettings.h>
 
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QLogger.h>
+
+using namespace QLogger;
 
 CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> git, QWidget *parent)
    : QDialog(parent)
@@ -39,7 +43,9 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
 
    GitQlientSettings settings;
    const auto configGitUser = settings.value("GitConfigRepo", true).toBool();
+
    ui->cbGitUser->setChecked(configGitUser);
+   showGitControls();
 }
 
 CreateRepoDlg::~CreateRepoDlg()
@@ -95,9 +101,13 @@ void CreateRepoDlg::accept()
 
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-      auto ret = false;
+      GitExecResult ret;
+      QString actionApplied;
+
       if (mType == CreateRepoDlgType::CLONE)
       {
+         actionApplied = "clone";
+
          QDir dir(fullPath);
 
          if (!dir.exists())
@@ -106,11 +116,14 @@ void CreateRepoDlg::accept()
          ret = mGit->clone(url, fullPath);
       }
       else if (mType == CreateRepoDlgType::INIT)
+      {
+         actionApplied = "init";
          ret = mGit->initRepo(fullPath);
+      }
 
       QApplication::restoreOverrideCursor();
 
-      if (ret)
+      if (ret.success)
       {
          if (ui->cbGitUser->isChecked())
             mGit->setLocalUserInfo({ ui->leGitName->text(), ui->leGitEmail->text() });
@@ -119,6 +132,14 @@ void CreateRepoDlg::accept()
             emit signalOpenWhenFinish(fullPath);
 
          QDialog::accept();
+      }
+      else
+      {
+         const auto msg = ret.output.toString();
+
+         QMessageBox::critical(this, tr("Error when %1").arg(actionApplied), msg);
+
+         QLog_Error("UI", msg);
       }
    }
 }

@@ -70,24 +70,24 @@ GitExecResult GitConfig::setLocalData(const QString &key, const QString &value)
    return mGitBase->run(QString("git config --local %1 \"%2\"").arg(key, value));
 }
 
-bool GitConfig::clone(const QString &url, const QString &fullPath)
+GitExecResult GitConfig::clone(const QString &url, const QString &fullPath)
 {
    const auto asyncRun = new GitCloneProcess(mGitBase->getWorkingDir());
    connect(asyncRun, &GitCloneProcess::signalProgress, this, &GitConfig::signalCloningProgress, Qt::DirectConnection);
 
    mGitBase->setWorkingDir(fullPath);
 
-   return asyncRun->run(QString("git clone --progress %1 %2").arg(url, fullPath)).success;
+   return asyncRun->run(QString("git clone --progress %1 %2").arg(url, fullPath));
 }
 
-bool GitConfig::initRepo(const QString &fullPath)
+GitExecResult GitConfig::initRepo(const QString &fullPath)
 {
    const auto ret = mGitBase->run(QString("git init %1").arg(fullPath));
 
    if (ret.success)
       mGitBase->setWorkingDir(fullPath);
 
-   return ret.success;
+   return ret;
 }
 
 GitExecResult GitConfig::getLocalConfig() const
