@@ -90,11 +90,10 @@ void CreateRepoDlg::showGitControls()
 
 void CreateRepoDlg::accept()
 {
-   auto url = ui->leURL->text();
    auto path = ui->lePath->text();
    auto repoName = ui->leRepoName->text();
 
-   if (!url.isEmpty() && !path.isEmpty() && !repoName.isEmpty())
+   if (!path.isEmpty() && !repoName.isEmpty())
    {
       repoName.replace(" ", "\\ ");
       const auto fullPath = path.append("/").append(repoName);
@@ -106,14 +105,27 @@ void CreateRepoDlg::accept()
 
       if (mType == CreateRepoDlgType::CLONE)
       {
-         actionApplied = "clone";
+         const auto url = ui->leURL->text();
 
-         QDir dir(fullPath);
+         if (!url.isEmpty())
+         {
+            actionApplied = "clone";
 
-         if (!dir.exists())
-            dir.mkpath(fullPath);
+            QDir dir(fullPath);
 
-         ret = mGit->clone(url, fullPath);
+            if (!dir.exists())
+               dir.mkpath(fullPath);
+
+            ret = mGit->clone(url, fullPath);
+         }
+         else
+         {
+            const auto msg = QString("You need to provider a URL to clone a repository.");
+
+            QMessageBox::critical(this, tr("Nor URL provided"), msg);
+
+            QLog_Error("UI", msg);
+         }
       }
       else if (mType == CreateRepoDlgType::INIT)
       {
