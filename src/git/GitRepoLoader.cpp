@@ -10,7 +10,7 @@
 
 using namespace QLogger;
 
-static const QString GIT_LOG_FORMAT = "%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ";
+static const QString GIT_LOG_FORMAT("%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ");
 
 GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent)
    : QObject(parent)
@@ -87,7 +87,7 @@ void GitRepoLoader::loadReferences()
       const auto curBranchSHA = ret.output.toString();
       const auto referencesList = ret3.output.toString().split('\n', QString::SkipEmptyParts);
 
-      for (auto reference : referencesList)
+      for (const auto &reference : referencesList)
       {
          const auto revSha = reference.left(40);
          const auto refName = reference.mid(41);
@@ -130,7 +130,6 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 {
    QLog_Debug("Git", "Processing revisions...");
 
-   QByteArray auxBa = ba;
    const auto commits = ba.split('\000');
    const auto totalCommits = commits.count();
    auto count = 1;

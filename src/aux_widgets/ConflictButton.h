@@ -58,6 +58,14 @@ signals:
     */
    void updateRequested();
 
+   /**
+    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
+    * @param fileName The file name
+    * @param line The line
+    * @param column The column
+    */
+   void signalEditFile(const QString &fileName, int line, int column);
+
 public:
    /**
     * @brief Default constructor.
@@ -81,6 +89,7 @@ private:
    QSharedPointer<GitBase> mGit;
    QString mFileName;
    QPushButton *mFile = nullptr;
+   QPushButton *mEdit = nullptr;
    QPushButton *mResolve = nullptr;
    QPushButton *mUpdate = nullptr;
 
@@ -95,4 +104,9 @@ private:
     *
     */
    void resolveConflict();
+
+   /**
+    * @brief openFileEditor Opens the external file editor.
+    */
+   void openFileEditor();
 };

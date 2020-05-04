@@ -74,6 +74,13 @@ signals:
     \param submoduleName The submodule name.
    */
    void signalOpenSubmodule(const QString &submoduleName);
+   /**
+    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
+    * @param fileName The file name
+    * @param line The line
+    * @param column The column
+    */
+   void signalEditFile(const QString &fileName, int line, int column);
 
 public:
    /*!

@@ -38,6 +38,9 @@ class ConfigWidget;
 class GitQlient : public QWidget
 {
    Q_OBJECT
+signals:
+   void signalEditDocument(const QString &fileName, int line, int column);
+
 public:
    /*!
     \brief Default constructor. Creates an empty GitQlient instance.

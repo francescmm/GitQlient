@@ -46,7 +46,12 @@ GitExecResult GitLocal::checkoutCommit(const QString &sha) const
 {
    QLog_Debug("Git", QString("Executing checkoutCommit: {%1}").arg(sha));
 
-   return mGitBase->run(QString("git checkout %1").arg(sha));
+   const auto ret = mGitBase->run(QString("git checkout %1").arg(sha));
+
+   if (ret.success)
+      mGitBase->updateCurrentBranch();
+
+   return ret;
 }
 
 GitExecResult GitLocal::markFileAsResolved(const QString &fileName) const
@@ -150,7 +155,7 @@ GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringLis
 {
    QStringList toAdd, toRemove;
 
-   for (auto file : selFiles)
+   for (const auto &file : selFiles)
    {
       const auto index = files.mFiles.indexOf(file);
 

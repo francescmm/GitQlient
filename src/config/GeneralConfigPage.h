@@ -30,6 +30,7 @@ class QCheckBox;
 class QComboBox;
 class QLabel;
 class QPushButton;
+class QLineEdit;
 
 /*!
  \brief The GeneralConfigPage shows the available configuration for GitQlient. The configurable options are the
@@ -59,6 +60,7 @@ private:
    QComboBox *mLevelCombo = nullptr;
    QCheckBox *mAutoFormat = nullptr;
    QLabel *mStatusLabel = nullptr;
+   QLineEdit *mExternalEditor = nullptr;
    QPushButton *mReset = nullptr;
    QPushButton *mApply = nullptr;
 

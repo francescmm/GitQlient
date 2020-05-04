@@ -65,10 +65,10 @@ signals:
    void showFileDiff(const QString &sha, const QString &parentSha, const QString &file);
 
    /**
-    * @brief Signal triggered when the user wants to see the diff of the selected SHA compared to its first parent.
-    * @param sha The selected commit SHA.
+    * @brief Signal triggered when the user wants to see the diff of the selected SHA compared to its previous one.
+    * @param shas The selected commit SHA and its previous one.
     */
-   void signalOpenDiff(const QString &sha);
+   void signalOpenDiff(const QStringList &shas);
 
 public:
    /**
@@ -128,7 +128,7 @@ private:
     *
     * @param index The index from the file system model.
     */
-   void showFileHistory(const QModelIndex &index);
+   void showFileHistoryByIndex(const QModelIndex &index);
    /**
     * @brief Shows the context menu for the history view.
     *

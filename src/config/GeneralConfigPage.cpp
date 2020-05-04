@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QLineEdit>
 
 using namespace QLogger;
 
@@ -59,6 +60,9 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
 
    mAutoFormat->setChecked(settings.value("autoFormat", true).toBool());
 
+   mExternalEditor = new QLineEdit(
+       settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString());
+
    connect(mReset, &QPushButton::clicked, this, &GeneralConfigPage::resetChanges);
 
    connect(mApply, &QPushButton::clicked, this, &GeneralConfigPage::applyChanges);
@@ -72,22 +76,25 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    buttonsLayout->addStretch();
    buttonsLayout->addWidget(mApply);
 
+   auto row = 0;
    const auto layout = new QGridLayout(this);
    layout->setContentsMargins(20, 20, 20, 20);
    layout->setSpacing(20);
    layout->setAlignment(Qt::AlignTop);
    layout->addLayout(fetchLayoutLabel, 0, 0);
-   layout->addLayout(fetchLayout, 0, 1);
-   layout->addWidget(new QLabel(tr("Auto-Prune")), 2, 0);
-   layout->addWidget(mAutoPrune, 2, 1);
-   layout->addWidget(new QLabel(tr("Disable logs")), 3, 0);
-   layout->addWidget(mDisableLogs, 3, 1);
-   layout->addWidget(new QLabel(tr("Set log level")), 4, 0);
-   layout->addWidget(mLevelCombo, 4, 1);
-   layout->addWidget(new QLabel(tr("Auto-Format files")), 5, 0);
-   layout->addWidget(mAutoFormat, 5, 1);
-   layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 6, 0, 1, 2);
-   layout->addLayout(buttonsLayout, 7, 0, 1, 2);
+   layout->addLayout(fetchLayout, row, 1);
+   layout->addWidget(new QLabel(tr("Auto-Prune")), ++row, 0);
+   layout->addWidget(mAutoPrune, row, 1);
+   layout->addWidget(new QLabel(tr("Disable logs")), ++row, 0);
+   layout->addWidget(mDisableLogs, row, 1);
+   layout->addWidget(new QLabel(tr("Set log level")), ++row, 0);
+   layout->addWidget(mLevelCombo, row, 1);
+   layout->addWidget(new QLabel(tr("Auto-Format files")), ++row, 0);
+   layout->addWidget(mAutoFormat, row, 1);
+   layout->addWidget(new QLabel(tr("External editor")), ++row, 0);
+   layout->addWidget(mExternalEditor, row, 1);
+   layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), ++row, 0, 1, 2);
+   layout->addLayout(buttonsLayout, ++row, 0, 1, 2);
 }
 
 void GeneralConfigPage::resetChanges()
@@ -98,8 +105,11 @@ void GeneralConfigPage::resetChanges()
    mDisableLogs->setChecked(settings.value("logsDisabled", false).toBool());
    mLevelCombo->setCurrentIndex(settings.value("logsLevel", 2).toInt());
    mAutoFormat->setChecked(settings.value("autoFormat", true).toBool());
+   mExternalEditor->setText(
+       settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString());
 
-   QTimer::singleShot(3000, [this]() { mStatusLabel->setText(""); });
+   QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
+
    mStatusLabel->setText(tr("Changes reseted"));
 }
 
@@ -111,8 +121,9 @@ void GeneralConfigPage::applyChanges()
    settings.setValue("logsDisabled", mDisableLogs->isChecked());
    settings.setValue("logsLevel", mLevelCombo->currentIndex());
    settings.setValue("autoFormat", mAutoFormat->isChecked());
+   settings.setValue(GitQlientSettings::ExternalEditorKey, mExternalEditor->text());
 
-   QTimer::singleShot(3000, [this]() { mStatusLabel->setText(""); });
+   QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
    mStatusLabel->setText(tr("Changes applied"));
 
    const auto logger = QLoggerManager::getInstance();

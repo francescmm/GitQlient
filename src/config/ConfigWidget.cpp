@@ -186,19 +186,20 @@ QWidget *ConfigWidget::createConfigWidget()
    stackedWidget->addWidget(usedProjectsFrame);
    stackedWidget->setCurrentIndex(1);
 
-   connect(mBtnGroup, qOverload<int>(&QButtonGroup::buttonClicked), this, [this, stackedWidget](int index) {
-      const auto selectedBtn = mBtnGroup->button(index);
-      const auto buttons = mBtnGroup->buttons();
+   connect(mBtnGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this,
+           [this, stackedWidget](int index) {
+              const auto selectedBtn = mBtnGroup->button(index);
+              const auto buttons = mBtnGroup->buttons();
 
-      for (auto btn : buttons)
-      {
-         btn->setProperty("selected", selectedBtn == btn);
-         btn->style()->unpolish(btn);
-         btn->style()->polish(btn);
-      }
+              for (auto btn : buttons)
+              {
+                 btn->setProperty("selected", selectedBtn == btn);
+                 btn->style()->unpolish(btn);
+                 btn->style()->polish(btn);
+              }
 
-      stackedWidget->setCurrentIndex(index);
-   });
+              stackedWidget->setCurrentIndex(index);
+           });
 
    const auto tabWidget = new QFrame();
    tabWidget->setObjectName("tabWidget");

@@ -144,6 +144,7 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
       connect(fileBtn, &ConflictButton::toggled, this, &MergeWidget::changeDiffView);
       connect(fileBtn, &ConflictButton::updateRequested, this, &MergeWidget::onUpdateRequested);
       connect(fileBtn, &ConflictButton::resolved, this, &MergeWidget::onConflictResolved);
+      connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::signalEditFile);
 
       const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
       const auto fileDiffWidget = new FileDiffWidget(mGit);

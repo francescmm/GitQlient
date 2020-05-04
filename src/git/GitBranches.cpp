@@ -22,23 +22,31 @@ bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &
 {
    QLog_Debug("Git",
               QString("Executing getDistanceBetweenBranches: {origin/%1} and {%2}")
-                  .arg(toMaster ? QString("master") : QString("%1"))
-                  .arg(right));
+                  .arg(toMaster ? QString("master") : QString("%1"), right));
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
 
    const auto ret = gitConfig->getRemoteForBranch(toMaster ? QString("master") : right);
 
-   const QString firstArg = toMaster ? QString("--left-right") : QString();
-   const QString gitCmd = QString("git rev-list %1 --count %2/%3...%4")
-                              .arg(firstArg)
-                              .arg(ret.output.toString())
-                              .arg(toMaster ? QString("master") : right)
-                              .arg(right);
+   if (!toMaster && right == "master")
+   {
+      emit signalDistanceBetweenBranches({ false, "Same branch" });
 
-   connect(mGitBase.data(), &GitBase::signalResultReady, this, &GitBranches::signalDistanceBetweenBranches);
+      return true;
+   }
+   else
+   {
+      const auto gitBase = new GitBase(mGitBase->getWorkingDir());
+      connect(gitBase, &GitBase::signalResultReady, this, [this, gitBase](GitExecResult result) {
+         emit signalDistanceBetweenBranches(result);
+         gitBase->deleteLater();
+      });
 
-   return mGitBase->runAsync(gitCmd);
+      const auto gitCmd = QString("git rev-list %1 --count %2/%3...%4")
+                              .arg("--left-right", ret.output.toString(), toMaster ? QString("master") : right, right);
+
+      return gitBase->runAsync(gitCmd);
+   }
 }
 
 GitExecResult GitBranches::createBranchFromAnotherBranch(const QString &oldName, const QString &newName)

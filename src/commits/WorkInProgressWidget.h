@@ -49,6 +49,14 @@ signals:
    void signalUpdateWip();
    void signalCancelAmend(const QString &commitSha);
 
+   /**
+    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
+    * @param fileName The file name
+    * @param line The line
+    * @param column The column
+    */
+   void signalEditFile(const QString &fileName, int line, int column);
+
 public:
    explicit WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent = nullptr);

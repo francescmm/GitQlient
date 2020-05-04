@@ -30,7 +30,7 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    , mTabWidget(new QTabWidget())
 {
    mTabWidget->setObjectName("HistoryTab");
-   mRepoView->setObjectName("blameRepoView");
+   mRepoView->setObjectName("blameGraphView");
    mRepoView->setModel(mRepoModel);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::GRAPH), true);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::DATE), true);
@@ -44,7 +44,7 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    mRepoView->activateFilter(true);
    mRepoView->filterBySha({});
    connect(mRepoView, &CommitHistoryView::customContextMenuRequested, this, &BlameWidget::showRepoViewMenu);
-   connect(mRepoView, &CommitHistoryView::clicked, this, qOverload<const QModelIndex &>(&BlameWidget::reloadBlame));
+   connect(mRepoView, &CommitHistoryView::clicked, this, &BlameWidget::reloadBlame);
    connect(mRepoView, &CommitHistoryView::doubleClicked, this, &BlameWidget::openDiff);
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
@@ -55,7 +55,7 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    fileSystemView->header()->setSectionHidden(2, true);
    fileSystemView->header()->setSectionHidden(3, true);
    fileSystemView->setContextMenuPolicy(Qt::CustomContextMenu);
-   connect(fileSystemView, &QTreeView::clicked, this, qOverload<const QModelIndex &>(&BlameWidget::showFileHistory));
+   connect(fileSystemView, &QTreeView::clicked, this, &BlameWidget::showFileHistoryByIndex);
 
    const auto historyBlameLayout = new QGridLayout(this);
    historyBlameLayout->setContentsMargins(QMargins());
@@ -192,7 +192,7 @@ void BlameWidget::reloadHistory(int tabIndex)
    }
 }
 
-void BlameWidget::showFileHistory(const QModelIndex &index)
+void BlameWidget::showFileHistoryByIndex(const QModelIndex &index)
 {
    auto item = fileSystemModel->fileInfo(index);
 
@@ -220,14 +220,19 @@ void BlameWidget::showRepoViewMenu(const QPoint &pos)
    });
 
    const auto commitDiff = menu->addAction(tr("Show commit diff"));
-   connect(commitDiff, &QAction::triggered, this, [this, sha]() { emit signalOpenDiff(sha); });
+   connect(commitDiff, &QAction::triggered, this, [this, sha, previousSha]() {
+      emit signalOpenDiff({ previousSha, sha });
+   });
 
    menu->exec(mRepoView->viewport()->mapToGlobal(pos));
 }
 
 void BlameWidget::openDiff(const QModelIndex &index)
 {
-   const auto sha = mRepoModel->sha(index.row());
+   const auto sha
+       = mRepoView->model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+   const auto previousSha
+       = mRepoView->model()->index(index.row() + 1, static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
 
-   emit signalOpenDiff(sha);
+   emit signalOpenDiff({ previousSha, sha });
 }

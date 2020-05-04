@@ -86,6 +86,7 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { emit signalOpenFileCommit(mCurrentSha, mParentSha, item->text()); });
    connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitInfoWidget::signalShowFileHistory);
+   connect(fileListWidget, &FileListWidget::signalEditFile, this, &CommitInfoWidget::signalEditFile);
 }
 
 void CommitInfoWidget::configure(const QString &sha)

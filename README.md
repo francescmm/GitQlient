@@ -24,3 +24,7 @@ GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git 
 Please, if you have any doubts about how to use it or you just want to know all you can do with GitQlient, take a look to [the user manual in here](https://francescmm.github.io/GitQlient).
 
 It is planned to release for Linux, MacOs and Windows. However, take into account that the development environment is based on Linux and it will be the first platform released.
+
+## Development documentation
+
+I'm aware that developers may like to have some more information beyond the User Manual. Whether you want to collaborate in the development or just to know how GitQlient works I think it's nice to have some development documentation. In the [Wiki section](https://github.com/francescmm/GitQlient/wiki) I will release class diagramas, sequence diagrams as well as the Release Plan an features. Take a look!

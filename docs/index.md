@@ -40,7 +40,7 @@ Since the beginning I divided GitQlient three big sections depending on their fu
 
 - [The Tree View (or Main Repository View)](#the-tree-view)
 - [The Diff View](#the-diff-view)
-- [The Blame & History View](#the-blame-history-view)
+- [The Blame &amp; History View](#the-blame-history-view)
 
 These views, when enabled, can be accessed by the Controls placed at the top of the repository window.
 
@@ -79,6 +79,7 @@ In the GitQlient configuration, you can change some internal parameters that Git
 - Disable logs: if active, it disables GitQlient logs.
 - Log level: Allows you to choose the threshold of the levels that GitQlient will write. The higher level, the lesser amount of logs.
 - Auto-format files (not operative): if active, every time that you make a commit, it will perform an auto-formating of the code. The formatting will be done by using clang and the clang-format file defined at the root of the repository.
+- External editor: application that will be used to open files to edit them.
 
 ## <a name="init-repo"></a>Initializing a new repository
 
@@ -159,7 +160,7 @@ The repository configuration dialog shows the configuration of your .gitconfig f
 
 The tree view is divided in three different sections:
 * In the center you can find the graphic representation of the repository tree.
-* In the right side, GitQlient displayes information about the local & remote branches, tags, stashes and submodules.
+* In the right side, GitQlient displayes information about the local &amp; remote branches, tags, stashes and submodules.
 * In the left side, GitQlient shows the information about the commit you select in the tree view. It will vary depending on if you select the work in progress or a commit.
 
 1. [The repository graph tree](#graph-view)
@@ -175,6 +176,8 @@ The repository graph tree is as it's name says: the graphical representation in 
 By default, the order is done by date but in future release will be configurable.
 
 In the top of the view you can find a long control to input text. There you can search a specific commit by its SHA or by the commit message. At the end of the input control, you will find a checkbox that when it's active the view shows all the branches. In case you want to work only with your current checked out branch, you can uncheck it and the view will be updated.
+
+You can interact with the header of the graph view. That includes re-ordering all the columns and resizing the Graph column only. The log column will stretch automatically but all columns will keep a minimum size so the text is readable. In addition, the tool tip information is enabled in every line of the view. It will show the commit SHA, the user and date of the commit and if available, the branches on that commit.
 
 ### Commit selection
 
@@ -326,24 +329,93 @@ When click on a button, it will show the diff of that file or commit in the view
 
 Finally, both in the commit and file diff the text have different colors.
 
-![GitQlient - Diff colors schema](/GitQlient/assets/4_diff_colors_schema.png "GitQlient - Diff colors schema")
+![GitQlient - Diff colors schema](/GitQlient/assets/4_diff_color_schema.png "GitQlient - Diff colors schema")
 
 - The red color is used to indicate which lines have been removed.
 - The green color is used to indicate which lines have been added.
 - The blue color is used to show the file name and the commit SHAs.
 - The orange color is used to emphasize the line where the changes start.
 
-# <a name="the-blame-history-view"></a>The Blame & History View
+In the lower part ther eis the commit diff list. It shows all the files that were modified between the two selected commits, or the WIP and the last commit. The SHAs are shown in the top of the list and they pop up a tooltip with the basic commit metadata (author, date and short log message).
 
-![GitQlient - The Blame & History View](https://www.francescmm.com/wp-content/uploads/2020/02/image-3.png "GitQlient - The Blame & History View")
+# <a name="the-blame-history-view"></a>The Blame &amp; History View
 
-## The file view
+The Blame&amp;History aims to be an easy to access view where you can both see the blame of a file and also when the file has been modified.
+
+For that purpose the view is divided in 3 different parts:
+
+- The file system view
+- The commit history
+- The file blame view
+
+![GitQlient - The Blame &amp; History View](/GitQlient/assets/5_blame_view.png "GitQlient - The Blame &amp; History View")
+
+## The file system view
+
+The file system view shows all the files that are part of the current repository. When you select one of the files, its commit history will be displayed in the commit history view and its in-depth blame will be shown in the blame view.
+
+Every time you select a different file its blame will be open in a new tab in the blame view.
+
+## The commit history view
+
+The commit history view is a simplified graph view as in the main window but it only shows the commits where the file previously selected in the file system view is modified.
+
+You can navigate through the commit history and by a single click, the view of the blame will change to the file on that specific commit, refreshing the view. With a dobule click on the commit line, you will open the commit information in the diff view. It is done so you can see what were the differences between that commit and its previous one.
+
+By using the context menu, you can open the diff of this file between the current selected commit and it's previous one.
+
+![GitQlient - The History View](/GitQlient/assets/5_commits_view.png "GitQlient - The History View")
 
 ## The blame view
 
-## The history view
+This is the central part and the one that give more information. In the blame view we have as many tabs as files we've opened and the commit history will change when we change the blame view.
+
+In the top part of the Blame view we find the two commits that are being compared. That will change if you select a different commit in the commit history. Under that, you will see the blame of the file where the modifications are grouped by date. In the right part, between the commit metadata and the file blame, you will find a small *decoration* in blue. This can be gradualy painted and this indicates how recent or old a specific line is.
+
+![GitQlient - The Blame View](/GitQlient/assets/5_file_blame_view.png "GitQlient - The Blame View")
+
+The ligh blue color indicates the oldest lines whereas the darkes blue tells that those lines where more recently modified.
+
+The log message is clickable and when you clicking on it will focus the commit in the history view. This tries to be a little help to locate the commit and make it easier to compare.
 
 # <a name="the-merge-view"></a>The Merge View
+
+The merge view it's special since it isn't accessible as a regular view. It's only triggered when GitQlient detects that a merge, pull or cherry-pick has conflicts.
+
+When that happens it usually starts with a warning message:
+
+![GitQlient - Merge warning message](/GitQlient/assets/6_merge_warning.png "GitQlient - Merge warning message")
+
+Once you exit the dialog you will be automatically redirected to the Merge view:
+
+![GitQlient - Merge view](/GitQlient/assets/6_merge_view.png "GitQlient - Merge view")
+
+As you can see, once this view is activated a red banner will appear under the quick access buttons. It will remain there until the merge is done. It doesn't mean you cannot do other Git actions. But you won't be able to push anything until solved. Of course, you can still navigate between all the other views.
+
+## How to return to the merge view from other views
+
+To return to the merge view you just need to click on the red banner.
+
+## Structure of the merge view
+
+The merge view is divided in two different sections:
+
+- The merge manager
+- The file diff view
+
+The merge manager is divided in three sub-sections. In the top left you can see the list of files in conflict. Every file will be a row in that list followed by two small buttons.
+
+![GitQlient - Merge conflict button](/GitQlient/assets/6_merge_conflict_button.png "GitQlient - Conflict button")
+
+To show a file, you need to click over the file name (red ellipse). Once clicked, the diff view will change to show that file.
+
+**Important note:** GitQlient in the current version (1.1.0) doens't allow to edit the files inside. To fix a file you need to edit it in a separated editor. To do that, press the file icon (orange ellipse).
+
+Once you fix all the conflicts in the file, you can mark it as solved by clicking the check button (green ellipse). That will add the file to the list below (Merged files).
+
+In case you want to refresh the diff view, you can click the update button (blue ellipse).
+
+Finally, when all the conflicts are solved, you can press the **Merge &amp; Commit" green button. That will commit the changes. By the other hand, if you want to abort the merge you can bress "Abort merge" and it will undo any changes you have done.
 
 # <a name="appendix-a-releases"></a>Appendix A: Releases
 GitQlient is always under development, but you can find the releases in the [Releases page](https://github.com/francescmm/GitQlient/releases).

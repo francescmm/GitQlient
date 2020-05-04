@@ -278,15 +278,15 @@ void BranchesWidget::processLocalBranch(QString branch)
       branch.replace('*', "");
       fullBranchName.replace('*', "");
       isCurrentBranch = true;
+   }
 
-      if (fullBranchName.startsWith("(HEADdetachedat"))
-      {
-         auto shortSha = fullBranchName.remove("(HEADdetachedat");
-         sha = shortSha.remove(")");
+   if (fullBranchName.startsWith("(HEADdetachedat"))
+   {
+      auto shortSha = fullBranchName.remove("(HEADdetachedat");
+      sha = shortSha.remove(")");
 
-         fullBranchName = "detached";
-         branch = "detached";
-      }
+      fullBranchName = "detached";
+      branch = "detached";
    }
    else
    {
@@ -362,13 +362,9 @@ void BranchesWidget::processLocalBranch(QString branch)
 
    QLog_Debug("UI", QString("Calculating distances..."));
 
-   auto distanceToMaster = QString("Not found");
-   auto distanceToOrigin = QString("Local");
-
    if (fullBranchName != "detached")
    {
       const auto git = new GitBranches(mGit);
-      git->getDistanceBetweenBranchesAsync(true, fullBranchName);
       connect(git, &GitBranches::signalDistanceBetweenBranches, this, [item, git](GitExecResult result) {
          auto distanceToMaster = QString("Not found");
          const auto toMaster = result.output.toString();
@@ -381,28 +377,34 @@ void BranchesWidget::processLocalBranch(QString branch)
             distanceToMaster.append("\u2191");
          }
 
-         item->setText(1, distanceToMaster);
+         if (item)
+            item->setText(1, distanceToMaster);
 
          git->deleteLater();
       });
+      git->getDistanceBetweenBranchesAsync(true, fullBranchName);
 
       const auto git2 = new GitBranches(mGit);
-      git2->getDistanceBetweenBranchesAsync(false, fullBranchName);
       connect(git2, &GitBranches::signalDistanceBetweenBranches, this, [item, git2](GitExecResult result) {
          auto distanceToOrigin = QString("Local");
          const auto toOrigin = result.output.toString();
 
-         if (!toOrigin.contains("fatal"))
+         if (!result.success && toOrigin.contains("Same branch", Qt::CaseInsensitive))
+            distanceToOrigin = "-";
+         else if (!toOrigin.contains("fatal"))
          {
             distanceToOrigin = toOrigin;
             distanceToOrigin.replace('\n', "");
-            distanceToOrigin.append("\u2193");
+            distanceToOrigin.replace('\t', "\u2193 - ");
+            distanceToOrigin.append("\u2191");
          }
 
-         item->setText(2, distanceToOrigin);
+         if (item)
+            item->setText(2, distanceToOrigin);
 
          git2->deleteLater();
       });
+      git2->getDistanceBetweenBranchesAsync(false, fullBranchName);
    }
 
    mLocalBranchesTree->addTopLevelItem(item);
@@ -447,6 +449,9 @@ void BranchesWidget::processRemoteBranch(QString branch)
       }
    }
 
+   QScopedPointer<GitBranches> git(new GitBranches(mGit));
+   const auto sha = git->getLastCommitOfBranch(fullBranchName).output.toString();
+
    QLog_Debug("UI", QString("Adding remote branch {%1}").arg(branch));
 
    const auto item = new QTreeWidgetItem(parent);
@@ -454,6 +459,7 @@ void BranchesWidget::processRemoteBranch(QString branch)
    item->setText(0, branch);
    item->setData(0, Qt::UserRole + 1, fullBranchName);
    item->setData(0, Qt::UserRole + 2, true);
+   item->setData(0, Qt::UserRole + 3, sha);
    item->setData(0, Qt::ToolTipRole, fullBranchName);
 }
 

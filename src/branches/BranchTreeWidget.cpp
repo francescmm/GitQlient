@@ -57,10 +57,10 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
       {
          QRegExp rx("by \\d+ commits");
          rx.indexIn(output);
-         auto value = rx.capturedTexts().first().split(" ");
+         auto value = rx.capturedTexts().constFirst().split(" ");
          auto uiUpdateRequested = false;
 
-         if (value.count() == 3 && output.toLower().contains("your branch is behind"))
+         if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
          {
             const auto commits = value.at(1).toUInt();
             (void)commits;

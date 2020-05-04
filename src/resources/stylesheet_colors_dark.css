@@ -302,6 +302,13 @@ GeneralConfigPage, #recentProjects
     background-color: #606162;
 }
 
+GeneralConfigPage > QLineEdit
+{
+    border-color: #202122;
+    background-color: #2E2F30;
+    color: white;
+}
+
 QDialog
 {
     background-color: #404142;
