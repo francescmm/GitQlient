@@ -144,7 +144,7 @@ QWidget *ConfigWidget::createConfigWidget()
    mBtnGroup->addButton(new QPushButton(tr("Most used repos")), 1);
    mBtnGroup->addButton(new QPushButton(tr("Recent repos")), 2);
 
-   const auto firstBtn = mBtnGroup->button(1);
+   const auto firstBtn = mBtnGroup->button(2);
    firstBtn->setProperty("selected", true);
    firstBtn->style()->unpolish(firstBtn);
    firstBtn->style()->polish(firstBtn);
@@ -174,17 +174,17 @@ QWidget *ConfigWidget::createConfigWidget()
    mRecentProjectsLayout->setContentsMargins(QMargins());
    mRecentProjectsLayout->addWidget(createRecentProjectsPage());
 
-   const auto usedProjectsFrame = new QFrame();
-   mUsedProjectsLayout = new QVBoxLayout(usedProjectsFrame);
+   const auto mostUsedProjectsFrame = new QFrame();
+   mUsedProjectsLayout = new QVBoxLayout(mostUsedProjectsFrame);
    mUsedProjectsLayout->setContentsMargins(QMargins());
    mUsedProjectsLayout->addWidget(createUsedProjectsPage());
 
    const auto stackedWidget = new QStackedWidget();
    stackedWidget->setMinimumHeight(300);
    stackedWidget->addWidget(new GeneralConfigPage());
+   stackedWidget->addWidget(mostUsedProjectsFrame);
    stackedWidget->addWidget(projectsFrame);
-   stackedWidget->addWidget(usedProjectsFrame);
-   stackedWidget->setCurrentIndex(1);
+   stackedWidget->setCurrentIndex(2);
 
    connect(mBtnGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this,
            [this, stackedWidget](int index) {
@@ -235,6 +235,17 @@ QWidget *ConfigWidget::createRecentProjectsPage()
 
    innerLayout->addStretch();
 
+   const auto clear = new QPushButton("Clear list");
+   clear->setObjectName("warnButton");
+   connect(clear, &QPushButton::clicked, this, [this]() {
+      mSettings->sync();
+      mSettings->clearRecentProjects();
+
+      mRecentProjectsLayout->addWidget(createRecentProjectsPage());
+   });
+
+   innerLayout->addWidget(clear);
+
    return mInnerWidget;
 }
 
@@ -259,6 +270,17 @@ QWidget *ConfigWidget::createUsedProjectsPage()
    }
 
    innerLayout->addStretch();
+
+   const auto clear = new QPushButton("Clear list");
+   clear->setObjectName("warnButton");
+   connect(clear, &QPushButton::clicked, this, [this]() {
+      mSettings->sync();
+      mSettings->clearMostUsedProjects();
+
+      mUsedProjectsLayout->addWidget(createUsedProjectsPage());
+   });
+
+   innerLayout->addWidget(clear);
 
    return mMostUsedInnerWidget;
 }

@@ -19,9 +19,22 @@ void GitQlientSettings::setProjectOpened(const QString &projectPath)
    saveRecentProjects(projectPath);
 }
 
+QStringList GitQlientSettings::getRecentProjects() const
+{
+   auto projects = QSettings::value("Config/RecentProjects", QStringList()).toStringList();
+
+   QStringList recentProjects;
+   const auto end = std::min(projects.count(), 5);
+
+   for (auto i = 0; i < end; ++i)
+      recentProjects.append(projects.takeFirst());
+
+   return recentProjects;
+}
+
 void GitQlientSettings::saveRecentProjects(const QString &projectPath)
 {
-   auto usedProjects = QSettings::value("usedProjects", QStringList()).toStringList();
+   auto usedProjects = QSettings::value("Config/RecentProjects", QStringList()).toStringList();
 
    if (usedProjects.contains(projectPath))
    {
@@ -34,34 +47,44 @@ void GitQlientSettings::saveRecentProjects(const QString &projectPath)
    while (!usedProjects.isEmpty() && usedProjects.count() > 5)
       usedProjects.removeLast();
 
-   GitQlientSettings::setValue("usedProjects", usedProjects);
+   GitQlientSettings::setValue("Config/RecentProjects", usedProjects);
+}
+
+void GitQlientSettings::clearRecentProjects()
+{
+   remove("Config/RecentProjects");
 }
 
 void GitQlientSettings::saveMostUsedProjects(const QString &projectPath)
 {
-   auto projects = QSettings::value("recentProjects", QStringList()).toStringList();
-   auto timesUsed = QSettings::value("recentProjectsCount", QList<QVariant>()).toList();
-   int count = 1;
+   auto projects = QSettings::value("Config/UsedProjects", QStringList()).toStringList();
+   auto timesUsed = QSettings::value("Config/UsedProjectsCount", QList<QVariant>()).toList();
 
    if (projects.contains(projectPath))
    {
       const auto index = projects.indexOf(projectPath);
-      timesUsed[index] = QString::number(count + timesUsed[index].toInt());
+      timesUsed[index] = QString::number(timesUsed[index].toInt() + 1);
    }
    else
    {
       projects.append(projectPath);
-      timesUsed.append(count);
+      timesUsed.append(1);
    }
 
-   GitQlientSettings::setValue("recentProjects", projects);
-   GitQlientSettings::setValue("recentProjectsCount", timesUsed);
+   GitQlientSettings::setValue("Config/UsedProjects", projects);
+   GitQlientSettings::setValue("Config/UsedProjectsCount", timesUsed);
 }
 
-QVector<QString> GitQlientSettings::getRecentProjects() const
+void GitQlientSettings::clearMostUsedProjects()
 {
-   const auto projects = QSettings::value("recentProjects", QStringList()).toStringList();
-   const auto timesUsed = QSettings::value("recentProjectsCount", QString()).toList();
+   remove("Config/UsedProjects");
+   remove("Config/UsedProjectsCount");
+}
+
+QStringList GitQlientSettings::getMostUsedProjects() const
+{
+   const auto projects = QSettings::value("Config/UsedProjects", QStringList()).toStringList();
+   const auto timesUsed = QSettings::value("Config/UsedProjectsCount", QString()).toList();
 
    QMultiMap<int, QString> projectOrderedByUse;
 
@@ -71,25 +94,12 @@ QVector<QString> GitQlientSettings::getRecentProjects() const
    for (auto i = 0; i < projectsCount && i < timesCount; ++i)
       projectOrderedByUse.insert(timesUsed.at(i).toInt(), projects.at(i));
 
-   QVector<QString> recentProjects;
+   QStringList recentProjects;
    const auto end = std::min(projectOrderedByUse.count(), 5);
    const auto orderedProjects = projectOrderedByUse.values();
 
    for (auto i = 0; i < end; ++i)
       recentProjects.append(orderedProjects.at(orderedProjects.count() - 1 - i));
-
-   return recentProjects;
-}
-
-QStringList GitQlientSettings::getMostUsedProjects() const
-{
-   auto projects = QSettings::value("usedProjects", QStringList()).toStringList();
-
-   QStringList recentProjects;
-   const auto end = std::min(projects.count(), 5);
-
-   for (auto i = 0; i < end; ++i)
-      recentProjects.append(projects.takeFirst());
 
    return recentProjects;
 }

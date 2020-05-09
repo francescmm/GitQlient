@@ -491,19 +491,19 @@ DiffButton[pressed="true"]
    background-color: #404142;
 }
 
-#MergeWarningButton, QPushButton#Abort, QPushButton#pbCancelAmend
+#MergeWarningButton, QPushButton#warnButton, QPushButton#Abort, QPushButton#pbCancelAmend
 {
    border-style: solid;
    border-color: #FF5555;
    background-color: rgba(255, 85, 85, 0.45);
 }
 
-#MergeWarningButton:hover, QPushButton#Abort:hover, QPushButton#pbCancelAmend:hover
+#MergeWarningButton:hover, QPushButton#warnButton:hover, QPushButton#Abort:hover, QPushButton#pbCancelAmend:hover
 {
    background-color: rgba(255, 85, 85, 0.65);
 }
 
-#MergeWarningButton:pressed, QPushButton#Abort:pressed, QPushButton#pbCancelAmend:pressed
+#MergeWarningButton:pressed, QPushButton#warnButton:pressed, QPushButton#Abort:pressed, QPushButton#pbCancelAmend:pressed
 {
    background-color: rgba(255, 85, 85, 0.55);
 }

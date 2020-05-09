@@ -517,7 +517,7 @@ DiffWidget > QScrollArea
    min-width: 450px;
 }
 
-#MergeWarningButton, QPushButton#Abort, QPushButton#Merge
+#MergeWarningButton, QPushButton#warnButton, QPushButton#Abort, QPushButton#Merge
 {
    border-width: 1px;
 }
