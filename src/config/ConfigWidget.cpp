@@ -16,12 +16,11 @@
 #include <QStyle>
 #include <QLabel>
 #include <QApplication>
+#include <QMessageBox>
 
 #include <QLogger.h>
 
 using namespace QLogger;
-
-#include <QDebug>
 
 ConfigWidget::ConfigWidget(QWidget *parent)
    : QFrame(parent)
@@ -52,6 +51,14 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    repoOptionsLayout->addWidget(mCloneRepo);
    repoOptionsLayout->addWidget(mInitRepo);
    repoOptionsLayout->addWidget(line);
+
+   const auto sha = QString("%1").arg(SHA_VER);
+   const auto version
+       = new ClickableFrame(QString("About GitQlient v%1 ...").arg(VER), Qt::AlignLeft | Qt::AlignVCenter);
+   version->setLinkStyle();
+   connect(version, &ClickableFrame::clicked, this, &ConfigWidget::showAbout);
+   version->setToolTip(sha);
+   repoOptionsLayout->addWidget(version);
    repoOptionsLayout->addStretch();
 
    const auto usedSubtitle = new QLabel(tr("Configuration"));
@@ -302,6 +309,24 @@ void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
 
    mProgressDlg->setLabelText(stepDescription);
    mProgressDlg->repaint();
+}
+
+void ConfigWidget::showAbout()
+{
+   const QString aboutMsg
+       = "GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client. "
+         "With GitQlient you will be able to add commits, branches and manage all the options Git provides. <br><br>"
+         "Once a fork of QGit, GitQlient has followed is own path and is currently develop and maintain by Francesc M. "
+         "You can download the code from <a href='https://github.com/francescmm/GitQlient'>GitHub</a>. If you find any "
+         "bug or problem, please report it in <a href='https://github.com/francescmm/GitQlient/issues'>the issues "
+         "page</a> so I can fix it as soon as possible.<br><br>"
+         "If you want to integrate GitQlient into QtCreator, there I also provide a plugin that you can download from "
+         "<a href='https://github.com/francescmm/GitQlientPlugin/releases'>here</a>. Just make sure you pick the right "
+         "version and follow the instructions in the main page of the repo.<br><br>"
+         "GitQlient can be compiled from Qt 5.9 on.<br><br>"
+         "Copyright &copy; 2019 - 2020 GitQlient (Francesc Martínez)";
+
+   QMessageBox::about(this, tr("About GitQlient v%1").arg(VER), aboutMsg);
 }
 
 void ConfigWidget::onRepoOpened()

@@ -25,6 +25,8 @@
 
 #include <QFrame>
 
+class QLabel;
+
 /**
  * @brief The ClickableFrame class is simple widget to make QLabel clickable and at the same time give the hability to
  * customize its look & feel. The behaviour is so simplified that only has a @p clicked() signal to notify the user that
@@ -61,6 +63,11 @@ public:
     */
    explicit ClickableFrame(const QString &text, Qt::Alignment alignment, QWidget *parent = nullptr);
 
+   /**
+    * @brief setLinkStyle Sets the text of the widget overlined when hover.
+    */
+   void setLinkStyle() { mHasLinkStyles = true; }
+
 protected:
    /**
     * @brief Detects the press event to prepare the click signal.
@@ -75,6 +82,20 @@ protected:
     */
    void mouseReleaseEvent(QMouseEvent *e) override;
 
+   /**
+    * @brief enterEvent Detects the enter event and in case the link style is enabled it applies it.
+    * @param event The event.
+    */
+   void enterEvent(QEvent *event) override;
+
+   /**
+    * @brief leaveEvent Detects the leave event and in case the link style is enabled it removes the underline.
+    * @param event
+    */
+   void leaveEvent(QEvent *event) override;
+
 private:
    bool mPressed = false;
+   bool mHasLinkStyles = false;
+   QLabel *mText = nullptr;
 };

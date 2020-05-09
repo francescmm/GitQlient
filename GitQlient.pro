@@ -31,8 +31,11 @@ OTHER_FILES += \
 
 VERSION = 1.1.0
 
+GQ_SHA = $$system(git rev-parse HEAD)
+
 DEFINES += \
-    VER=\\\"$$VERSION\\\"
+    VER=\\\"$$VERSION\\\" \
+    SHA_VER=\\\"$$GQ_SHA\\\"
 
 debug {
    DEFINES += DEBUG

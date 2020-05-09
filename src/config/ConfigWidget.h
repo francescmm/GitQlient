@@ -127,4 +127,9 @@ private:
     \param value The numeric value.
    */
    void updateProgressDialog(QString stepDescription, int value);
+
+   /**
+    * @brief showAbout Shows GitQlient about info.
+    */
+   void showAbout();
 };

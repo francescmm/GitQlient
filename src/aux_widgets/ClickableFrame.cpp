@@ -3,6 +3,7 @@
 #include <QMouseEvent>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QStyle>
 
 ClickableFrame::ClickableFrame(QWidget *parent)
    : QFrame(parent)
@@ -16,7 +17,7 @@ ClickableFrame::ClickableFrame(const QString &text, Qt::Alignment alignment, QWi
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(2, 2, 2, 2);
    layout->setSpacing(0);
-   layout->addWidget(new QLabel(text));
+   layout->addWidget(mText = new QLabel(text));
    layout->setAlignment(alignment);
 }
 
@@ -29,4 +30,28 @@ void ClickableFrame::mouseReleaseEvent(QMouseEvent *e)
 {
    if (mPressed && rect().contains(e->pos()) && e->button() == Qt::LeftButton)
       emit clicked();
+}
+
+void ClickableFrame::enterEvent(QEvent *event)
+{
+   if (mHasLinkStyles)
+   {
+      QFont f = mText->font();
+      f.setUnderline(true);
+      mText->setFont(f);
+   }
+
+   QFrame::enterEvent(event);
+}
+
+void ClickableFrame::leaveEvent(QEvent *event)
+{
+   if (mHasLinkStyles)
+   {
+      QFont f = mText->font();
+      f.setUnderline(false);
+      mText->setFont(f);
+   }
+
+   QFrame::leaveEvent(event);
 }
