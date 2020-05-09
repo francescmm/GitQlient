@@ -7,6 +7,10 @@
 #include <GitQlientSettings.h>
 
 #include <QFileDialog>
+#include <QMessageBox>
+#include <QLogger.h>
+
+using namespace QLogger;
 
 CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> git, QWidget *parent)
    : QDialog(parent)
@@ -39,7 +43,9 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
 
    GitQlientSettings settings;
    const auto configGitUser = settings.value("GitConfigRepo", true).toBool();
+
    ui->cbGitUser->setChecked(configGitUser);
+   showGitControls();
 }
 
 CreateRepoDlg::~CreateRepoDlg()
@@ -84,26 +90,52 @@ void CreateRepoDlg::showGitControls()
 
 void CreateRepoDlg::accept()
 {
-   auto url = ui->leURL->text();
    auto path = ui->lePath->text();
    auto repoName = ui->leRepoName->text();
 
-   if (!url.isEmpty() && !path.isEmpty() && !repoName.isEmpty())
+   if (!path.isEmpty() && !repoName.isEmpty())
    {
       repoName.replace(" ", "\\ ");
       const auto fullPath = path.append("/").append(repoName);
 
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-      auto ret = false;
+      GitExecResult ret;
+      QString actionApplied;
+
       if (mType == CreateRepoDlgType::CLONE)
-         ret = mGit->clone(url, fullPath);
+      {
+         const auto url = ui->leURL->text();
+
+         if (!url.isEmpty())
+         {
+            actionApplied = "clone";
+
+            QDir dir(fullPath);
+
+            if (!dir.exists())
+               dir.mkpath(fullPath);
+
+            ret = mGit->clone(url, fullPath);
+         }
+         else
+         {
+            const auto msg = QString("You need to provider a URL to clone a repository.");
+
+            QMessageBox::critical(this, tr("Nor URL provided"), msg);
+
+            QLog_Error("UI", msg);
+         }
+      }
       else if (mType == CreateRepoDlgType::INIT)
+      {
+         actionApplied = "init";
          ret = mGit->initRepo(fullPath);
+      }
 
       QApplication::restoreOverrideCursor();
 
-      if (ret)
+      if (ret.success)
       {
          if (ui->cbGitUser->isChecked())
             mGit->setLocalUserInfo({ ui->leGitName->text(), ui->leGitEmail->text() });
@@ -112,6 +144,14 @@ void CreateRepoDlg::accept()
             emit signalOpenWhenFinish(fullPath);
 
          QDialog::accept();
+      }
+      else
+      {
+         const auto msg = ret.output.toString();
+
+         QMessageBox::critical(this, tr("Error when %1").arg(actionApplied), msg);
+
+         QLog_Error("UI", msg);
       }
    }
 }

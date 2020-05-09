@@ -29,7 +29,7 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
       auto currentBranch = mGit->getCurrentBranch();
       auto selectedBranch = item->data(0, Qt::UserRole + 1).toString();
 
-      if (!mLocal)
+      if (mLocal)
          selectedBranch = selectedBranch.remove("origin/");
 
       const auto menu = new BranchContextMenu({ currentBranch, selectedBranch, mLocal, mGit }, this);
