@@ -20,6 +20,8 @@ HEADERS += \
     $$PWD/GitSubmodules.h \
     $$PWD/GitSyncProcess.h \
     $$PWD/GitTags.h \
+    $$PWD/Lane.h \
+    $$PWD/LaneType.h \
     $$PWD/Reference.h \
     $$PWD/ReferenceType.h \
     $$PWD/RevisionFiles.h \
@@ -46,6 +48,7 @@ SOURCES += \
     $$PWD/GitSubmodules.cpp \
     $$PWD/GitSyncProcess.cpp \
     $$PWD/GitTags.cpp \
+    $$PWD/Lane.cpp \
     $$PWD/Reference.cpp \
     $$PWD/RevisionFiles.cpp \
     $$PWD/RevisionsCache.cpp \

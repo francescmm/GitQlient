@@ -1,7 +1,8 @@
 ﻿#include "RepositoryViewDelegate.h"
 
 #include <GitQlientStyles.h>
-#include <lanes.h>
+#include <Lane.h>
+#include <LaneType.h>
 #include <CommitInfo.h>
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryView.h>
@@ -72,7 +73,7 @@ QSize RepositoryViewDelegate::sizeHint(const QStyleOptionViewItem &, const QMode
    return QSize(LANE_WIDTH, ROW_HEIGHT);
 }
 
-void RepositoryViewDelegate::paintGraphLane(QPainter *p, Lane lane, bool laneHeadPresent, int x1, int x2,
+void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool laneHeadPresent, int x1, int x2,
                                             const QColor &col, const QColor &activeCol, const QColor &mergeColor,
                                             bool isWip) const
 {
@@ -210,7 +211,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, Lane lane, bool laneHea
    }
 }
 
-QColor RepositoryViewDelegate::getMergeColor(const Lane currentLane, const CommitInfo &commit, int currentLaneIndex,
+QColor RepositoryViewDelegate::getMergeColor(const Lane &currentLane, const CommitInfo &commit, int currentLaneIndex,
                                              const QColor &defaultColor, bool &isSet) const
 {
    auto mergeColor

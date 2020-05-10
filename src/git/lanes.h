@@ -10,7 +10,9 @@
 #include <QString>
 #include <QVector>
 
-class QStringList;
+#include <Lane.h>
+
+enum class LaneType;
 
 //
 //  At any given time, the Lanes class represents a single revision (row) of the history graph.
@@ -22,59 +24,6 @@ class QStringList;
 //
 //  The ListView class is responsible for rendering the glyphs.
 //
-
-enum class LaneType
-{
-   EMPTY,
-   ACTIVE,
-   NOT_ACTIVE,
-   MERGE_FORK,
-   MERGE_FORK_R,
-   MERGE_FORK_L,
-   JOIN,
-   JOIN_R,
-   JOIN_L,
-   HEAD,
-   HEAD_R,
-   HEAD_L,
-   TAIL,
-   TAIL_R,
-   TAIL_L,
-   CROSS,
-   CROSS_EMPTY,
-   INITIAL,
-   BRANCH,
-   BOUNDARY,
-   BOUNDARY_C, // corresponds to MERGE_FORK
-   BOUNDARY_R, // corresponds to MERGE_FORK_R
-   BOUNDARY_L, // corresponds to MERGE_FORK_L
-
-   LANE_TYPES_NUM
-};
-
-class Lane
-{
-public:
-   Lane(LaneType type);
-
-   bool operator==(const Lane &lane) const { return mType == lane.mType; }
-
-   bool isHead() const;
-   bool isTail() const;
-   bool isJoin() const;
-   bool isFreeLane() const;
-   bool isBoundary() const;
-   bool isMerge() const;
-   bool isActive() const;
-   bool equals(LaneType type) const { return mType == type; }
-   LaneType getType() const { return mType; }
-
-   void setBoundary() { mType = LaneType::BOUNDARY; };
-   void setType(LaneType type) { mType = type; }
-
-private:
-   LaneType mType;
-};
 
 class Lanes
 {

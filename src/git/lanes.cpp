@@ -6,8 +6,10 @@
         Copyright: See COPYING file that comes with this distribution
 
 */
-#include <QStringList>
 #include "lanes.h"
+#include <LaneType.h>
+
+#include <QStringList>
 
 void Lanes::init(const QString &expectedSha)
 {
@@ -292,46 +294,4 @@ int Lanes::add(const LaneType type, const QString &next, int pos)
 bool Lanes::isNode(Lane lane) const
 {
    return lane.equals(NODE) || lane.equals(NODE_R) || lane.equals(NODE_L);
-}
-
-Lane::Lane(LaneType type)
-   : mType(type)
-{
-}
-
-bool Lane::isHead() const
-{
-   return mType == LaneType::HEAD || mType == LaneType::HEAD_R || mType == LaneType::HEAD_L;
-}
-
-bool Lane::isTail() const
-{
-   return mType == LaneType::TAIL || mType == LaneType::TAIL_R || mType == LaneType::TAIL_L;
-}
-
-bool Lane::isJoin() const
-{
-   return mType == LaneType::JOIN || mType == LaneType::JOIN_R || mType == LaneType::JOIN_L;
-}
-
-bool Lane::isFreeLane() const
-{
-   return mType == LaneType::NOT_ACTIVE || mType == LaneType::CROSS || isJoin();
-}
-
-bool Lane::isBoundary() const
-{
-   return mType == LaneType::BOUNDARY || mType == LaneType::BOUNDARY_C || mType == LaneType::BOUNDARY_R
-       || mType == LaneType::BOUNDARY_L;
-}
-
-bool Lane::isMerge() const
-{
-   return mType == LaneType::MERGE_FORK || mType == LaneType::MERGE_FORK_R || mType == LaneType::MERGE_FORK_L
-       || isBoundary();
-}
-
-bool Lane::isActive() const
-{
-   return mType == LaneType::ACTIVE || mType == LaneType::INITIAL || mType == LaneType::BRANCH || isMerge();
 }
