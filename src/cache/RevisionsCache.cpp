@@ -85,10 +85,9 @@ RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString
    return mRevisionFilesMap.value(qMakePair(sha1, sha2));
 }
 
-Reference RevisionsCache::getReference(const QString &sha) const
+References RevisionsCache::getReference(const QString &sha) const
 {
-   return mCommitsMap.contains(sha) ? mCommitsMap[sha]->mReferences
-                                    : Reference(); // return mReferencesMap.value(sha, Reference());
+   return mCommitsMap.contains(sha) ? mCommitsMap[sha]->getReferences() : References();
 }
 
 void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
@@ -140,11 +139,11 @@ bool RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2
    return false;
 }
 
-void RevisionsCache::insertReference(const QString &sha, Reference ref)
+void RevisionsCache::insertReference(const QString &sha, References ref)
 {
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-   mCommitsMap[sha]->mReferences = std::move(ref);
+   mCommitsMap[sha]->addReferences(std::move(ref));
 
    if (!mReferences.contains(mCommitsMap[sha]))
       mReferences.append(mCommitsMap[sha]);
@@ -188,7 +187,7 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 
 void RevisionsCache::removeReference(const QString &sha)
 {
-   mCommitsMap[sha]->mReferences = Reference();
+   mCommitsMap[sha]->addReferences(References());
 }
 
 bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
@@ -370,7 +369,7 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const
    QVector<QPair<QString, QStringList>> tags;
 
    for (auto commit : mReferences)
-      tags.append(QPair<QString, QStringList>(commit->sha(), commit->mReferences.tags));
+      tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences().tags));
 
    return tags;
 }

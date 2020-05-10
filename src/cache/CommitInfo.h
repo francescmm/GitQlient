@@ -28,7 +28,7 @@
 #include <QDateTime>
 
 #include <Lane.h>
-#include <Reference.h>
+#include <References.h>
 
 class CommitInfo
 {
@@ -74,9 +74,10 @@ public:
    int getLanesCount() const { return mLanes.count(); }
    int getActiveLane() const;
 
-   static const QString ZERO_SHA;
+   void addReferences(const References &refs) { mReferences = refs; }
+   References getReferences() const { return mReferences; }
 
-   Reference mReferences;
+   static const QString ZERO_SHA;
 
 private:
    QChar mBoundaryInfo;
@@ -89,4 +90,5 @@ private:
    QString mLongLog;
    QString mDiff;
    QVector<Lane> mLanes;
+   References mReferences;
 };

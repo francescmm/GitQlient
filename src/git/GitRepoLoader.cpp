@@ -92,7 +92,7 @@ void GitRepoLoader::loadReferences()
 
          if (!refName.startsWith("refs/tags/") || (refName.startsWith("refs/tags/") && refName.endsWith("^{}")))
          {
-            Reference cur = mRevCache->getReference(revSha);
+            auto cur = mRevCache->getReference(revSha);
             cur.configure(refName, curBranchSHA == revSha, prevRefSha);
 
             mRevCache->insertReference(revSha, std::move(cur));

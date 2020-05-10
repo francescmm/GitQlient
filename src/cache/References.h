@@ -5,9 +5,9 @@
 #include <QString>
 #include <QStringList>
 
-struct Reference
+struct References
 {
-   Reference() = default;
+   References() = default;
 
    void configure(const QString &refName, bool isCurrentBranch, const QString &prevRefSha);
    bool isValid() const { return type != 0; }

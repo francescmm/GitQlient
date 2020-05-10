@@ -1,8 +1,8 @@
-#include "Reference.h"
+#include "References.h"
 
 #include <ReferenceType.h>
 
-void Reference::configure(const QString &refName, bool isCurrentBranch, const QString &prevRefSha)
+void References::configure(const QString &refName, bool isCurrentBranch, const QString &prevRefSha)
 {
    if (refName.startsWith("refs/tags/"))
    {
