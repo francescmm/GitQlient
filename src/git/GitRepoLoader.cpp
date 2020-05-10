@@ -143,10 +143,10 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    for (const auto &commitInfo : commits)
    {
-      CommitInfo revision(commitInfo, count++);
+      CommitInfo revision(commitInfo);
 
       if (revision.isValid())
-         mRevCache->insertCommitInfo(std::move(revision));
+         mRevCache->insertCommitInfo(std::move(revision), count++);
       else
          break;
    }

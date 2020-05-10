@@ -40,6 +40,12 @@ CommitInfo RevisionsCache::getCommitInfoByRow(int row) const
    return commit ? *commit : CommitInfo();
 }
 
+int RevisionsCache::getCommitPos(const QString &sha) const
+{
+   const auto commit = mCommitsMap.value(sha, nullptr);
+   return mCommits.indexOf(commit);
+}
+
 CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint)
 {
    auto commitIter = searchCommit(field, text, startingPoint);
@@ -85,7 +91,7 @@ Reference RevisionsCache::getReference(const QString &sha) const
                                     : Reference(); // return mReferencesMap.value(sha, Reference());
 }
 
-void RevisionsCache::insertCommitInfo(CommitInfo rev)
+void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 {
    if (mCacheLocked)
       QLog_Warning("Git", QString("The cache is currently locked."));
@@ -97,18 +103,18 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
 
       const auto commit = new CommitInfo(rev);
 
-      if (rev.orderIdx >= mCommits.count())
+      if (orderIdx >= mCommits.count())
       {
          QLog_Debug("Git", QString("Adding commit with sha {%1}.").arg(commit->sha()));
 
-         mCommits.insert(rev.orderIdx, commit);
+         mCommits.append(commit);
       }
-      else if (!(mCommits[rev.orderIdx] && *mCommits[rev.orderIdx] == *commit))
+      else if (!(mCommits[orderIdx] && *mCommits[orderIdx] == *commit))
       {
          QLog_Trace("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
 
-         delete mCommits[rev.orderIdx];
-         mCommits[rev.orderIdx] = commit;
+         delete mCommits[orderIdx];
+         mCommits[orderIdx] = commit;
       }
 
       mCommitsMap.insert(rev.sha(), commit);
@@ -160,22 +166,21 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
       const auto log
           = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
       CommitInfo c(CommitInfo::ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log,
-                   longLog, 0);
-      c.isDiffCache = true;
+                   longLog);
 
       if (mLanes.isEmpty())
          mLanes.init(c.sha());
 
       c.setLanes(calculateLanes(c));
 
-      if (mCommits[c.orderIdx])
-         c.setLanes(mCommits[c.orderIdx]->getLanes());
+      if (mCommits[0])
+         c.setLanes(mCommits[0]->getLanes());
 
       const auto sha = c.sha();
       const auto commit = new CommitInfo(std::move(c));
 
-      delete mCommits[commit->orderIdx];
-      mCommits[commit->orderIdx] = commit;
+      delete mCommits[0];
+      mCommits[0] = commit;
 
       mCommitsMap.insert(sha, commit);
    }

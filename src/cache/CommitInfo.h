@@ -45,9 +45,9 @@ public:
    };
 
    CommitInfo() = default;
-   CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
-              const QString &log, const QString &longLog, int idx);
-   CommitInfo(const QByteArray &b, int idx);
+   explicit CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
+                       const QString &log, const QString &longLog);
+   explicit CommitInfo(const QByteArray &b);
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;
 
@@ -73,9 +73,6 @@ public:
    Lane getLane(int i) const { return mLanes.at(i); }
    int getLanesCount() const { return mLanes.count(); }
    int getActiveLane() const;
-
-   int orderIdx = -1;
-   bool isDiffCache = false;
 
    static const QString ZERO_SHA;
 
