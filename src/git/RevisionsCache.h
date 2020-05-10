@@ -99,11 +99,12 @@ private:
    };
 
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
-   void updateLanes(CommitInfo &c);
+   QVector<Lane> calculateLanes(const CommitInfo &c);
    RevisionFiles parseDiffFormat(const QString &buf, FileNamesLoader &fl);
    void appendFileName(const QString &name, FileNamesLoader &fl);
    void flushFileNames(FileNamesLoader &fl);
    void setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
    QVector<CommitInfo *>::const_iterator searchCommit(CommitInfo::Field field, const QString &text,
                                                       int startingPoint = 0) const;
+   void resetLanes(const CommitInfo &c, bool isFork);
 };

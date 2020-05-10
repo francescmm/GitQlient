@@ -91,7 +91,7 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev)
       QLog_Info("Git", QString("The commit with SHA {%1} is already in the cache.").arg(rev.sha()));
    else
    {
-      updateLanes(rev);
+      rev.setLanes(calculateLanes(rev));
 
       const auto commit = new CommitInfo(rev);
 
@@ -158,7 +158,10 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
                    longLog, 0);
       c.isDiffCache = true;
 
-      updateLanes(c);
+      if (mLanes.isEmpty())
+         mLanes.init(c.sha());
+
+      c.setLanes(calculateLanes(c));
 
       if (mCommits[c.orderIdx])
          c.setLanes(mCommits[c.orderIdx]->getLanes());
@@ -183,19 +186,15 @@ bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sh
    return mRevisionFilesMap.contains(qMakePair(sha1, sha2));
 }
 
-void RevisionsCache::updateLanes(CommitInfo &c)
+QVector<Lane> RevisionsCache::calculateLanes(const CommitInfo &c)
 {
    const auto sha = c.sha();
 
    QLog_Trace("Git", QString("Updating the lanes for SHA {%1}.").arg(sha));
 
-   if (mLanes.isEmpty())
-      mLanes.init(c.sha());
-
    bool isDiscontinuity;
    bool isFork = mLanes.isFork(sha, isDiscontinuity);
-   bool isMerge = (c.parentsCount() > 1);
-   bool isInitial = (c.parentsCount() == 0);
+   bool isMerge = c.parentsCount() > 1;
 
    if (isDiscontinuity)
       mLanes.changeActiveLane(sha); // uses previous isBoundary state
@@ -206,21 +205,14 @@ void RevisionsCache::updateLanes(CommitInfo &c)
       mLanes.setFork(sha);
    if (isMerge)
       mLanes.setMerge(c.parents());
-   if (isInitial)
+   if (c.parentsCount() == 0)
       mLanes.setInitial();
 
-   const auto nextSha = isInitial ? QString() : c.parent(0);
+   const auto lanes = mLanes.getLanes();
 
-   c.setLanes(mLanes.getLanes());
+   resetLanes(c, isFork);
 
-   mLanes.nextParent(nextSha);
-
-   if (isMerge)
-      mLanes.afterMerge();
-   if (isFork)
-      mLanes.afterFork();
-   if (mLanes.isBranch())
-      mLanes.afterBranch();
+   return lanes;
 }
 
 RevisionFiles RevisionsCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
@@ -417,6 +409,20 @@ QVector<CommitInfo *>::const_iterator RevisionsCache::searchCommit(CommitInfo::F
 {
    return std::find_if(mCommits.constBegin() + startingPoint, mCommits.constEnd(),
                        [field, text](CommitInfo *info) { return info->getFieldStr(field).contains(text); });
+}
+
+void RevisionsCache::resetLanes(const CommitInfo &c, bool isFork)
+{
+   const auto nextSha = c.parentsCount() == 0 ? QString() : c.parent(0);
+
+   mLanes.nextParent(nextSha);
+
+   if (c.parentsCount() > 1)
+      mLanes.afterMerge();
+   if (isFork)
+      mLanes.afterFork();
+   if (mLanes.isBranch())
+      mLanes.afterBranch();
 }
 
 void RevisionsCache::clear()
