@@ -173,6 +173,12 @@ public:
 
    */
    void reload();
+
+   /**
+    * @brief loadBranches Loads the information on the branches widget: branches, tags, stashes and submodules.
+    */
+   void loadBranches();
+
    /*!
     \brief If the current view is the WIP widget, updates it.
 

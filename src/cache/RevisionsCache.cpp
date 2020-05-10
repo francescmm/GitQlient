@@ -16,6 +16,7 @@ RevisionsCache::~RevisionsCache()
 
    mCommits.clear();
    mCommitsMap.clear();
+   mReferences.clear();
 }
 
 void RevisionsCache::configure(int numElementsToStore)
@@ -359,6 +360,16 @@ const QStringList RevisionsCache::getRefNames(const QString &sha, uint mask) con
    return result;
 }
 
+QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const
+{
+   QVector<QPair<QString, QStringList>> tags;
+
+   for (auto commit : mReferences)
+      tags.append(QPair<QString, QStringList>(commit->sha(), commit->mReferences.tags));
+
+   return tags;
+}
+
 void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
    const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
@@ -437,6 +448,7 @@ void RevisionsCache::clear()
    mRevisionFilesMap.clear();
    mLanes.clear();
    mCommitsMap.clear();
+   mReferences.clear();
 }
 
 int RevisionsCache::count() const

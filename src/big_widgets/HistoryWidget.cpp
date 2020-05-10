@@ -32,7 +32,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    , mCache(cache)
    , mRepositoryModel(new CommitHistoryModel(mCache, git))
    , mRepositoryView(new CommitHistoryView(mCache, git))
-   , mBranchesWidget(new BranchesWidget(git))
+   , mBranchesWidget(new BranchesWidget(mCache, git))
    , mSearchInput(new QLineEdit())
    , mCommitStackedWidget(new QStackedWidget())
    , mCommitWidget(new WorkInProgressWidget(mCache, git))
@@ -149,6 +149,11 @@ void HistoryWidget::reload()
 
    if (commitStackedIndex == 1)
       mCommitWidget->configure(currentSha);
+}
+
+void HistoryWidget::loadBranches()
+{
+   mBranchesWidget->showBranches();
 }
 
 void HistoryWidget::updateUiFromWatcher()

@@ -71,6 +71,7 @@ public:
 
    uint checkRef(const QString &sha, uint mask = ANY_REF) const;
    const QStringList getRefNames(const QString &sha, uint mask) const;
+   QVector<QPair<QString, QStringList>> getTags() const;
 
 private:
    bool mCacheLocked = true;

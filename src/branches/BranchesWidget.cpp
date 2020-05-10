@@ -9,6 +9,8 @@
 #include <ClickableFrame.h>
 #include <AddSubmoduleDlg.h>
 #include <StashesContextMenu.h>
+#include <RevisionsCache.h>
+#include <GitQlientTreeWidgetItem.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -41,8 +43,10 @@ QTreeWidgetItem *getChild(QTreeWidgetItem *parent, const QString &childName)
 }
 }
 
-BranchesWidget::BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
+BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                               QWidget *parent)
    : QFrame(parent)
+   , mCache(cache)
    , mGit(git)
    , mLocalBranchesTree(new BranchTreeWidget(mGit))
    , mRemoteBranchesTree(new BranchTreeWidget(mGit))
@@ -338,7 +342,7 @@ void BranchesWidget::processLocalBranch(QString branch)
       }
    }
 
-   auto item = new QTreeWidgetItem(parent);
+   auto item = new GitQlientTreeWidgetItem(parent);
    item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
    item->setText(0, branch);
    item->setData(0, Qt::UserRole, isCurrentBranch);
@@ -365,45 +369,14 @@ void BranchesWidget::processLocalBranch(QString branch)
    if (fullBranchName != "detached")
    {
       const auto git = new GitBranches(mGit);
-      connect(git, &GitBranches::signalDistanceBetweenBranches, this, [item, git](GitExecResult result) {
-         auto distanceToMaster = QString("Not found");
-         const auto toMaster = result.output.toString();
+      connect(git, &GitBranches::signalDistanceBetweenBranches, item, &GitQlientTreeWidgetItem::distancesToMaster);
+      connect(git, &GitBranches::signalDistanceBetweenBranches, git, &GitBranches::deleteLater);
 
-         if (!toMaster.contains("fatal"))
-         {
-            distanceToMaster = toMaster;
-            distanceToMaster.replace('\n', "");
-            distanceToMaster.replace('\t', "\u2193 - ");
-            distanceToMaster.append("\u2191");
-         }
-
-         if (item)
-            item->setText(1, distanceToMaster);
-
-         git->deleteLater();
-      });
       git->getDistanceBetweenBranchesAsync(true, fullBranchName);
 
       const auto git2 = new GitBranches(mGit);
-      connect(git2, &GitBranches::signalDistanceBetweenBranches, this, [item, git2](GitExecResult result) {
-         auto distanceToOrigin = QString("Local");
-         const auto toOrigin = result.output.toString();
-
-         if (!result.success && toOrigin.contains("Same branch", Qt::CaseInsensitive))
-            distanceToOrigin = "-";
-         else if (!toOrigin.contains("fatal"))
-         {
-            distanceToOrigin = toOrigin;
-            distanceToOrigin.replace('\n', "");
-            distanceToOrigin.replace('\t', "\u2193 - ");
-            distanceToOrigin.append("\u2191");
-         }
-
-         if (item)
-            item->setText(2, distanceToOrigin);
-
-         git2->deleteLater();
-      });
+      connect(git2, &GitBranches::signalDistanceBetweenBranches, item, &GitQlientTreeWidgetItem::distancesToOrigin);
+      connect(git2, &GitBranches::signalDistanceBetweenBranches, git2, &GitBranches::deleteLater);
       git2->getDistanceBetweenBranchesAsync(false, fullBranchName);
    }
 
@@ -466,25 +439,29 @@ void BranchesWidget::processRemoteBranch(QString branch)
 void BranchesWidget::processTags()
 {
    QScopedPointer<GitTags> git(new GitTags(mGit));
-   const auto tags = git->getTags();
    const auto localTags = git->getLocalTags();
+   const auto tags = mCache->getTags();
 
    QLog_Info("UI", QString("Fetching {%1} tags").arg(tags.count()));
 
-   for (auto tag : tags)
+   for (const auto &tag : tags)
    {
-      const auto item = new QListWidgetItem();
-      item->setData(Qt::UserRole, tag);
-      item->setData(Qt::UserRole + 1, true);
-
-      if (localTags.contains(tag))
+      for (auto tagName : tag.second)
       {
-         tag += " (local)";
-         item->setData(Qt::UserRole + 1, false);
-      }
+         const auto item = new QListWidgetItem();
+         item->setData(Qt::UserRole, tagName);
+         item->setData(Qt::UserRole + 1, true);
+         item->setData(Qt::UserRole + 2, tag.first);
 
-      item->setText(tag);
-      mTagsList->addItem(item);
+         if (localTags.contains(tagName))
+         {
+            tagName += " (local)";
+            item->setData(Qt::UserRole + 1, false);
+         }
+
+         item->setText(tagName);
+         mTagsList->addItem(item);
+      }
    }
 
    mTagsCount->setText(QString("(%1)").arg(tags.count()));
@@ -655,10 +632,7 @@ void BranchesWidget::onSubmodulesHeaderClicked()
 
 void BranchesWidget::onTagClicked(QListWidgetItem *item)
 {
-   QScopedPointer<GitTags> git(new GitTags(mGit));
-   const auto sha = git->getTagCommit(item->text()).output.toString();
-
-   emit signalSelectCommit(sha);
+   emit signalSelectCommit(item->data(Qt::UserRole + 2).toString());
 }
 
 void BranchesWidget::onStashClicked(QListWidgetItem *item)

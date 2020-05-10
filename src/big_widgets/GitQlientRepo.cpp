@@ -192,8 +192,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
          setWatcher();
 
-         mHistoryWidget->reload();
-
          mBlameWidget->init(newDir);
 
          mControls->enableButtons(true);
@@ -297,6 +295,7 @@ void GitQlientRepo::onRepoLoadFinished()
 
    const auto totalCommits = mGitQlientCache->count();
 
+   mHistoryWidget->loadBranches();
    mHistoryWidget->onNewRevisions(totalCommits);
    mBlameWidget->onNewRevisions(totalCommits);
 }
