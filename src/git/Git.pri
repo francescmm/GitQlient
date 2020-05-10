@@ -2,7 +2,6 @@ INCLUDEPATH += $$PWD
 
 HEADERS += \
     $$PWD/AGitProcess.h \
-    $$PWD/CommitInfo.h \
     $$PWD/GitAsyncProcess.h \
     $$PWD/GitBase.h \
     $$PWD/GitBranches.h \
@@ -19,18 +18,10 @@ HEADERS += \
     $$PWD/GitStashes.h \
     $$PWD/GitSubmodules.h \
     $$PWD/GitSyncProcess.h \
-    $$PWD/GitTags.h \
-    $$PWD/Lane.h \
-    $$PWD/LaneType.h \
-    $$PWD/Reference.h \
-    $$PWD/ReferenceType.h \
-    $$PWD/RevisionFiles.h \
-    $$PWD/RevisionsCache.h \
-    $$PWD/lanes.h
+    $$PWD/GitTags.h
 
 SOURCES += \
     $$PWD/AGitProcess.cpp \
-    $$PWD/CommitInfo.cpp \
     $$PWD/GitAsyncProcess.cpp \
     $$PWD/GitBase.cpp \
     $$PWD/GitBranches.cpp \
@@ -47,9 +38,4 @@ SOURCES += \
     $$PWD/GitStashes.cpp \
     $$PWD/GitSubmodules.cpp \
     $$PWD/GitSyncProcess.cpp \
-    $$PWD/GitTags.cpp \
-    $$PWD/Lane.cpp \
-    $$PWD/Reference.cpp \
-    $$PWD/RevisionFiles.cpp \
-    $$PWD/RevisionsCache.cpp \
-    $$PWD/lanes.cpp
+    $$PWD/GitTags.cpp
