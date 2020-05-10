@@ -227,6 +227,7 @@ QColor RepositoryViewDelegate::getMergeColor(const Lane currentLane, const Commi
          isSet = true;
          mergeColor = defaultColor;
          break;
+      case LaneType::MERGE_FORK_R:
       case LaneType::JOIN_L:
          for (auto laneCount = 0; laneCount < currentLaneIndex; ++laneCount)
          {
