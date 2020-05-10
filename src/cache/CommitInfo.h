@@ -27,7 +27,8 @@
 #include <QStringList>
 #include <QDateTime>
 
-#include <lanes.h>
+#include <Lane.h>
+#include <Reference.h>
 
 class CommitInfo
 {
@@ -77,6 +78,8 @@ public:
    bool isDiffCache = false;
 
    static const QString ZERO_SHA;
+
+   Reference mReferences;
 
 private:
    QChar mBoundaryInfo;

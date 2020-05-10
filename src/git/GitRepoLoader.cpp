@@ -37,8 +37,6 @@ bool GitRepoLoader::loadRepository()
 
          if (configureRepoDirectory())
          {
-            loadReferences();
-
             requestRevisions();
 
             QLog_Info("Git", "... Git init finished");
@@ -92,14 +90,13 @@ void GitRepoLoader::loadReferences()
          const auto revSha = reference.left(40);
          const auto refName = reference.mid(41);
 
-         // one Revision could have many tags
-         auto cur = mRevCache->getReference(revSha);
-         cur.configure(refName, curBranchSHA == revSha, prevRefSha);
+         if (!refName.startsWith("refs/tags/") || (refName.startsWith("refs/tags/") && refName.endsWith("^{}")))
+         {
+            Reference cur = mRevCache->getReference(revSha);
+            cur.configure(refName, curBranchSHA == revSha, prevRefSha);
 
-         mRevCache->insertReference(revSha, std::move(cur));
-
-         if (refName.startsWith("refs/tags/") && refName.endsWith("^{}") && !prevRefSha.isEmpty())
-            mRevCache->removeReference(prevRefSha);
+            mRevCache->insertReference(revSha, std::move(cur));
+         }
 
          prevRefSha = revSha;
       }
@@ -155,6 +152,8 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
    }
 
    mLocked = false;
+
+   loadReferences();
 
    emit signalLoadingFinished();
 }

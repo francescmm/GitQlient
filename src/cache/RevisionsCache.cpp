@@ -80,7 +80,8 @@ RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString
 
 Reference RevisionsCache::getReference(const QString &sha) const
 {
-   return mReferencesMap.value(sha, Reference());
+   return mCommitsMap.contains(sha) ? mCommitsMap[sha]->mReferences
+                                    : Reference(); // return mReferencesMap.value(sha, Reference());
 }
 
 void RevisionsCache::insertCommitInfo(CommitInfo rev)
@@ -136,7 +137,10 @@ void RevisionsCache::insertReference(const QString &sha, Reference ref)
 {
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-   mReferencesMap[sha] = std::move(ref);
+   mCommitsMap[sha]->mReferences = std::move(ref);
+
+   if (!mReferences.contains(mCommitsMap[sha]))
+      mReferences.append(mCommitsMap[sha]);
 }
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
@@ -178,7 +182,7 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 
 void RevisionsCache::removeReference(const QString &sha)
 {
-   mReferencesMap.remove(sha);
+   mCommitsMap[sha]->mReferences = Reference();
 }
 
 bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
@@ -431,7 +435,6 @@ void RevisionsCache::clear()
    mDirNames.clear();
    mFileNames.clear();
    mRevisionFilesMap.clear();
-   mReferencesMap.clear();
    mLanes.clear();
    mCommitsMap.clear();
 }
@@ -439,11 +442,6 @@ void RevisionsCache::clear()
 int RevisionsCache::count() const
 {
    return mCommits.count();
-}
-
-int RevisionsCache::countReferences() const
-{
-   return mReferencesMap.count();
 }
 
 RevisionFiles RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)

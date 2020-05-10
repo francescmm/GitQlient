@@ -26,7 +26,6 @@
 #include <RevisionFiles.h>
 #include <lanes.h>
 #include <CommitInfo.h>
-#include <Reference.h>
 
 #include <QObject>
 #include <QHash>
@@ -48,7 +47,6 @@ public:
    void clear();
 
    int count() const;
-   int countReferences() const;
 
    CommitInfo getCommitInfo(const QString &sha) const;
    CommitInfo getCommitInfoByRow(int row) const;
@@ -79,7 +77,7 @@ private:
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo *> mCommitsMap;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
-   QHash<QString, Reference> mReferencesMap;
+   QVector<CommitInfo *> mReferences;
    Lanes mLanes;
    QVector<QString> mDirNames;
    QVector<QString> mFileNames;
