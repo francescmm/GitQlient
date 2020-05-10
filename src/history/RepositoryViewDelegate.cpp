@@ -72,7 +72,7 @@ QSize RepositoryViewDelegate::sizeHint(const QStyleOptionViewItem &, const QMode
    return QSize(LANE_WIDTH, ROW_HEIGHT);
 }
 
-void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool laneHeadPresent, int x1, int x2,
+void RepositoryViewDelegate::paintGraphLane(QPainter *p, Lane lane, bool laneHeadPresent, int x1, int x2,
                                             const QColor &col, const QColor &activeCol, const QColor &mergeColor,
                                             bool isWip) const
 {
@@ -95,7 +95,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
    lanePen.setBrush(col);
    p->setPen(lanePen);
 
-   switch (type)
+   switch (lane.getType())
    {
       case LaneType::JOIN:
       case LaneType::JOIN_R:
@@ -124,7 +124,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
    }
 
    // vertical line
-   switch (type)
+   switch (lane.getType())
    {
       case LaneType::ACTIVE:
       case LaneType::NOT_ACTIVE:
@@ -151,7 +151,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
 
    // center symbol, e.g. rect or ellipse
    auto isCommit = false;
-   switch (type)
+   switch (lane.getType())
    {
       case LaneType::HEAD:
       case LaneType::INITIAL:
@@ -184,7 +184,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
    p->setPen(lanePen);
 
    // horizontal line
-   switch (type)
+   switch (lane.getType())
    {
       case LaneType::MERGE_FORK:
       case LaneType::JOIN:
@@ -210,12 +210,13 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, LaneType type, bool lan
    }
 }
 
-QColor RepositoryViewDelegate::getMergeColor(const LaneType currentLane, const QVector<LaneType> &lanes,
-                                             int currentLaneIndex, const QColor &defaultColor, bool &isSet) const
+QColor RepositoryViewDelegate::getMergeColor(const Lane currentLane, const CommitInfo &commit, int currentLaneIndex,
+                                             const QColor &defaultColor, bool &isSet) const
 {
-   auto mergeColor = GitQlientStyles::getBranchColorAt((lanes.count() - 1) % GitQlientStyles::getTotalBranchColors());
+   auto mergeColor
+       = GitQlientStyles::getBranchColorAt((commit.getLanesCount() - 1) % GitQlientStyles::getTotalBranchColors());
 
-   switch (currentLane)
+   switch (currentLane.getType())
    {
       case LaneType::HEAD_L:
       case LaneType::HEAD_R:
@@ -229,7 +230,7 @@ QColor RepositoryViewDelegate::getMergeColor(const LaneType currentLane, const Q
       case LaneType::JOIN_L:
          for (auto laneCount = 0; laneCount < currentLaneIndex; ++laneCount)
          {
-            if (lanes[laneCount] == LaneType::JOIN_L)
+            if (commit.getLane(laneCount).equals(LaneType::JOIN_L))
             {
                mergeColor = GitQlientStyles::getBranchColorAt(laneCount % GitQlientStyles::getTotalBranchColors());
                isSet = true;
@@ -266,18 +267,8 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    }
    else
    {
-      const auto laneNum = r.lanes.count();
-      auto activeLane = 0;
-
-      for (int i = 0; i < laneNum && !mView->hasActiveFilter(); i++)
-      {
-         if (isActive(r.lanes[i]))
-         {
-            activeLane = i;
-            break;
-         }
-      }
-
+      const auto laneNum = r.getLanesCount();
+      const auto activeLane = r.getActiveLane();
       const auto activeColor = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
       const auto isWip = r.sha() == CommitInfo::ZERO_SHA;
       auto x1 = 0;
@@ -289,16 +280,16 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       {
          x1 = x2 - LANE_WIDTH;
 
-         auto &currentLane = r.lanes[i];
+         auto currentLane = r.getLane(i);
 
          if (!laneHeadPresent && i < laneNum - 1)
          {
-            auto &prevLane = r.lanes[i + 1];
-            laneHeadPresent = prevLane == LaneType::HEAD || prevLane == LaneType::HEAD_L || prevLane == LaneType::HEAD_R
-                || prevLane == LaneType::JOIN_L || prevLane == LaneType::JOIN_R;
+            auto prevLane = r.getLane(i + 1);
+            laneHeadPresent
+                = prevLane.isHead() || prevLane.equals(LaneType::JOIN_R) || prevLane.equals(LaneType::JOIN_L);
          }
 
-         if (currentLane != LaneType::EMPTY)
+         if (!currentLane.equals(LaneType::EMPTY))
          {
             auto color = activeColor;
 
@@ -308,7 +299,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
                color = QColor("#D89000");
 
             if (!isSet)
-               mergeColor = getMergeColor(currentLane, r.lanes, i, color, isSet);
+               mergeColor = getMergeColor(currentLane, r, i, color, isSet);
 
             paintGraphLane(p, currentLane, laneHeadPresent, x1, x2, color, activeColor, mergeColor, isWip);
 

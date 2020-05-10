@@ -23,6 +23,9 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <lanes.h>
+#include <CommitInfo.h>
+
 #include <QStyledItemDelegate>
 
 class CommitHistoryView;
@@ -31,8 +34,6 @@ class GitBase;
 
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
-
-enum class LaneType;
 
 /**
  * @brief The RepositoryViewDelegate class is the delegate overloads the paint functionality in the RepositoryView. This
@@ -106,7 +107,7 @@ private:
     * @param mergeColor Color of the lane where the merge comes from in case the commit is a end-merge point.
     * @param isWip Tells the method if it's the WIP commit so it's painted differently.
     */
-   void paintGraphLane(QPainter *p, const LaneType type, bool laneHeadPresent, int x1, int x2, const QColor &col,
+   void paintGraphLane(QPainter *p, Lane type, bool laneHeadPresent, int x1, int x2, const QColor &col,
                        const QColor &activeCol, const QColor &mergeColor, bool isWip = false) const;
 
    /**
@@ -119,6 +120,6 @@ private:
     */
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
 
-   QColor getMergeColor(const LaneType currentLane, const QVector<LaneType> &lanes, int currentLaneIndex,
-                        const QColor &defaultColor, bool &isSet) const;
+   QColor getMergeColor(Lane currentLane, const CommitInfo &commit, int currentLaneIndex, const QColor &defaultColor,
+                        bool &isSet) const;
 };

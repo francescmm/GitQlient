@@ -52,41 +52,34 @@ enum class LaneType
    LANE_TYPES_NUM
 };
 
-// graph helpers
-inline bool isHead(const LaneType x)
+class Lane
 {
-   return (x == LaneType::HEAD || x == LaneType::HEAD_R || x == LaneType::HEAD_L);
-}
-inline bool isTail(const LaneType x)
-{
-   return (x == LaneType::TAIL || x == LaneType::TAIL_R || x == LaneType::TAIL_L);
-}
-inline bool isJoin(const LaneType x)
-{
-   return (x == LaneType::JOIN || x == LaneType::JOIN_R || x == LaneType::JOIN_L);
-}
-inline bool isFreeLane(const LaneType x)
-{
-   return (x == LaneType::NOT_ACTIVE || x == LaneType::CROSS || isJoin(x));
-}
-inline bool isBoundary(const LaneType x)
-{
-   return (x == LaneType::BOUNDARY || x == LaneType::BOUNDARY_C || x == LaneType::BOUNDARY_R
-           || x == LaneType::BOUNDARY_L);
-}
-inline bool isMerge(const LaneType x)
-{
-   return (x == LaneType::MERGE_FORK || x == LaneType::MERGE_FORK_R || x == LaneType::MERGE_FORK_L || isBoundary(x));
-}
-inline bool isActive(const LaneType x)
-{
-   return (x == LaneType::ACTIVE || x == LaneType::INITIAL || x == LaneType::BRANCH || isMerge(x));
-}
+public:
+   Lane(LaneType type);
+
+   bool operator==(const Lane &lane) const { return mType == lane.mType; }
+
+   bool isHead() const;
+   bool isTail() const;
+   bool isJoin() const;
+   bool isFreeLane() const;
+   bool isBoundary() const;
+   bool isMerge() const;
+   bool isActive() const;
+   bool equals(LaneType type) const { return mType == type; }
+   LaneType getType() const { return mType; }
+
+   void setBoundary() { mType = LaneType::BOUNDARY; };
+   void setType(LaneType type) { mType = type; }
+
+private:
+   LaneType mType;
+};
 
 class Lanes
 {
 public:
-   Lanes() {} // init() will setup us later, when data is available
+   Lanes() { } // init() will setup us later, when data is available
    bool isEmpty() { return typeVec.empty(); }
    void init(const QString &expectedSha);
    void clear();
@@ -101,16 +94,17 @@ public:
    bool isBranch();
    void afterBranch();
    void nextParent(const QString &sha);
-   void setLanes(QVector<LaneType> &ln) { ln = typeVec; } // O(1) vector is implicitly shared
+   void setLanes(QVector<Lane> &ln) { ln = typeVec; } // O(1) vector is implicitly shared
+   QVector<Lane> getLanes() const { return typeVec; }
 
 private:
    int findNextSha(const QString &next, int pos);
    int findType(LaneType type, int pos);
    int add(LaneType type, const QString &next, int pos);
-   bool isNode(LaneType laneType) const;
+   bool isNode(Lane lane) const;
 
    int activeLane;
-   QVector<LaneType> typeVec; // Describes which glyphs should be drawn.
+   QVector<Lane> typeVec; // Describes which glyphs should be drawn.
    QVector<QString> nextShaVec; // The sha1 hashes of the next commit to appear in each lane (column).
    bool boundary;
    LaneType NODE, NODE_L, NODE_R;

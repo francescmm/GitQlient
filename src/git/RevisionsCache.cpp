@@ -161,7 +161,7 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
       updateLanes(c);
 
       if (mCommits[c.orderIdx])
-         c.lanes = mCommits[c.orderIdx]->lanes;
+         c.setLanes(mCommits[c.orderIdx]->getLanes());
 
       const auto sha = c.sha();
       const auto commit = new CommitInfo(std::move(c));
@@ -209,9 +209,9 @@ void RevisionsCache::updateLanes(CommitInfo &c)
    if (isInitial)
       mLanes.setInitial();
 
-   mLanes.setLanes(c.lanes); // here lanes are snapshotted
-
    const auto nextSha = isInitial ? QString() : c.parent(0);
+
+   c.setLanes(mLanes.getLanes());
 
    mLanes.nextParent(nextSha);
 

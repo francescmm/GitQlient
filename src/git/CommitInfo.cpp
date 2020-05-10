@@ -46,7 +46,7 @@ bool CommitInfo::operator==(const CommitInfo &commit) const
    return (mSha == commit.mSha || mSha.startsWith(commit.sha()) || commit.sha().startsWith(mSha))
        && mParentsSha == commit.mParentsSha && mCommitter == commit.mCommitter && mAuthor == commit.mAuthor
        && mCommitDate == commit.mCommitDate && mShortLog == commit.mShortLog && mLongLog == commit.mLongLog
-       && orderIdx == commit.orderIdx && lanes == commit.lanes;
+       && orderIdx == commit.orderIdx && mLanes == commit.mLanes;
 }
 
 bool CommitInfo::operator!=(const CommitInfo &commit) const
@@ -82,4 +82,19 @@ bool CommitInfo::isValid() const
    QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
 
    return !mSha.isEmpty() && hexMatcher.exactMatch(mSha);
+}
+
+int CommitInfo::getActiveLane() const
+{
+   auto i = 0;
+
+   for (auto lane : mLanes)
+   {
+      if (lane.isActive())
+         return i;
+      else
+         ++i;
+   }
+
+   return -1;
 }
