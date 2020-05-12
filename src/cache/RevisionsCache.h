@@ -74,6 +74,8 @@ public:
    const QStringList getRefNames(const QString &sha, uint mask) const;
    QVector<QPair<QString, QStringList>> getTags() const;
 
+   QString getCommitForBranch(const QString &branch, bool local = true) const;
+
 private:
    bool mCacheLocked = true;
    QVector<CommitInfo *> mCommits;

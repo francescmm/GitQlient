@@ -155,8 +155,6 @@ void GitQlientRepo::updateCache()
 
       mGitLoader->loadRepository();
 
-      mHistoryWidget->reload();
-
       mDiffWidget->reload();
    }
 }

@@ -374,6 +374,24 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const
    return tags;
 }
 
+QString RevisionsCache::getCommitForBranch(const QString &branch, bool local) const
+{
+   QString sha;
+
+   for (auto commit : mReferences)
+   {
+      const auto branches = local ? commit->getReferences().branches : commit->getReferences().remoteBranches;
+
+      if (branches.contains(branch))
+      {
+         sha = commit->sha();
+         break;
+      }
+   }
+
+   return sha;
+}
+
 void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
    const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
