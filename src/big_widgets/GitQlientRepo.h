@@ -54,7 +54,7 @@ struct GitQlientRepoConfig
 {
    int mAutoFetchSecs = 300; /*!< The auto-fetch interval in seconds. Default value: 300. */
    int mAutoFileUpdateSecs
-       = 10; /*!< The interval where GitQlient retrieves information from disk for the current WIP. Default: 10 secs.*/
+       = 60; /*!< The interval where GitQlient retrieves information from disk for the current WIP. Default: 10 secs.*/
 };
 
 /*!
