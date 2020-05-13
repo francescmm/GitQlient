@@ -83,7 +83,7 @@ private:
     * @param o The style options of the item.
     * @param i The index with the item data.
     */
-   void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
+   void paintLog(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit, const QString &text) const;
    /**
     * @brief Method that sets up the configuration to paint the lane for the commit graph representation.
     *
@@ -91,7 +91,7 @@ private:
     * @param o The style options of the item.
     * @param index The index with the item data.
     */
-   void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &index) const;
+   void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit) const;
 
    /**
     * @brief Specialization method called by @ref paintGrapth that does the actual lane painting.

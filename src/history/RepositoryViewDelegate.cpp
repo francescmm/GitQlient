@@ -43,10 +43,19 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       p->fillRect(newOpt.rect, c);
    }
 
+   const auto row = mView->hasActiveFilter()
+       ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
+       : index.row();
+
+   const auto commit = mCache->getCommitInfoByRow(row);
+
+   if (commit.sha().isEmpty())
+      return;
+
    if (index.column() == static_cast<int>(CommitHistoryColumns::GRAPH))
-      paintGraph(p, newOpt, index);
+      paintGraph(p, newOpt, commit);
    else if (index.column() == static_cast<int>(CommitHistoryColumns::LOG))
-      paintLog(p, newOpt, index);
+      paintLog(p, newOpt, commit, index.data().toString());
    else
    {
       p->setPen(GitQlientStyles::getTextColor());
@@ -247,17 +256,8 @@ QColor RepositoryViewDelegate::getMergeColor(const Lane &currentLane, const Comm
    return mergeColor;
 }
 
-void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
+void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem &opt, const CommitInfo &commit) const
 {
-   const auto row = mView->hasActiveFilter()
-       ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
-       : index.row();
-
-   const auto r = mCache->getCommitInfoByRow(row);
-
-   if (r.sha().isEmpty())
-      return;
-
    p->save();
    p->setClipRect(opt.rect, Qt::IntersectClip);
    p->translate(opt.rect.topLeft());
@@ -269,10 +269,10 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    }
    else
    {
-      const auto laneNum = r.getLanesCount();
-      const auto activeLane = r.getActiveLane();
+      const auto laneNum = commit.getLanesCount();
+      const auto activeLane = commit.getActiveLane();
       const auto activeColor = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
-      const auto isWip = r.sha() == CommitInfo::ZERO_SHA;
+      const auto isWip = commit.sha() == CommitInfo::ZERO_SHA;
       auto x1 = 0;
       auto isSet = false;
       auto laneHeadPresent = false;
@@ -282,11 +282,11 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       {
          x1 = x2 - LANE_WIDTH;
 
-         auto currentLane = r.getLane(i);
+         auto currentLane = commit.getLane(i);
 
          if (!laneHeadPresent && i < laneNum - 1)
          {
-            auto prevLane = r.getLane(i + 1);
+            auto prevLane = commit.getLane(i + 1);
             laneHeadPresent
                 = prevLane.isHead() || prevLane.equals(LaneType::JOIN_R) || prevLane.equals(LaneType::JOIN_L);
          }
@@ -301,7 +301,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
                color = QColor("#D89000");
 
             if (!isSet)
-               mergeColor = getMergeColor(currentLane, r, i, color, isSet);
+               mergeColor = getMergeColor(currentLane, commit, i, color, isSet);
 
             paintGraphLane(p, currentLane, laneHeadPresent, x1, x2, color, activeColor, mergeColor, isWip);
 
@@ -313,16 +313,17 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    p->restore();
 }
 
-void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
+void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const CommitInfo &commit,
+                                      const QString &text) const
 {
-   const auto sha = mCache->getCommitInfoByRow(index.row()).sha();
+   const auto sha = commit.sha();
 
    if (sha.isEmpty())
       return;
 
    auto offset = 0;
 
-   if (mCache->checkRef(sha) > 0 && !mView->hasActiveFilter())
+   if ((commit.getReferences().type & ANY_REF) > 0 && !mView->hasActiveFilter())
    {
       offset = 5;
       paintTagBranch(p, opt, offset, sha);
@@ -335,7 +336,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    p->setFont(newOpt.font);
    p->setPen(GitQlientStyles::getTextColor());
-   p->drawText(newOpt.rect, fm.elidedText(index.data().toString(), Qt::ElideRight, newOpt.rect.width()),
+   p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()),
                QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
 }
 
@@ -343,29 +344,31 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
                                             const QString &sha) const
 {
    QMap<QString, QColor> markValues;
-   auto ref_types = mCache->checkRef(sha);
    const auto currentBranch = mGit->getCurrentBranch();
+   const auto commit = mCache->getCommitInfo(sha);
+   auto ref_types = commit.getReferences().type;
 
    if (ref_types != 0)
    {
+      const auto references = commit.getReferences();
       if (ref_types & CUR_BRANCH && (currentBranch.isEmpty() || currentBranch == "HEAD"))
          markValues.insert("detached", GitQlientStyles::getDetachedColor());
 
-      const auto localBranches = mCache->getRefNames(sha, BRANCH);
+      const auto localBranches = references.branches;
       for (const auto &branch : localBranches)
          markValues.insert(branch,
                            branch == currentBranch ? GitQlientStyles::getCurrentBranchColor()
                                                    : GitQlientStyles::getLocalBranchColor());
 
-      const auto remoteBranches = mCache->getRefNames(sha, RMT_BRANCH);
+      const auto remoteBranches = references.remoteBranches;
       for (const auto &branch : remoteBranches)
          markValues.insert(branch, QColor("#011f4b"));
 
-      const auto tags = mCache->getRefNames(sha, TAG);
+      const auto tags = references.tags;
       for (const auto &tag : tags)
          markValues.insert(tag, GitQlientStyles::getTagColor());
 
-      const auto refs = mCache->getRefNames(sha, REF);
+      const auto refs = references.refs;
       for (const auto &ref : refs)
          markValues.insert(ref, GitQlientStyles::getRefsColor());
    }

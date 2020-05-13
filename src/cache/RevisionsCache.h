@@ -70,8 +70,6 @@ public:
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
    bool pendingLocalChanges() const;
 
-   uint checkRef(const QString &sha, uint mask = ANY_REF) const;
-   const QStringList getRefNames(const QString &sha, uint mask) const;
    QVector<QPair<QString, QStringList>> getTags() const;
 
    QString getCommitForBranch(const QString &branch, bool local = true) const;
