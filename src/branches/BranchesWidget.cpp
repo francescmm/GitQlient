@@ -293,7 +293,7 @@ void BranchesWidget::processLocalBranch(QString branch)
       branch = "detached";
    }
    else
-      sha = mCache->getCommitForBranch(fullBranchName, false);
+      sha = mCache->getCommitForBranch(fullBranchName, true);
 
    QVector<QTreeWidgetItem *> parents;
    QTreeWidgetItem *parent = nullptr;
@@ -435,7 +435,8 @@ void BranchesWidget::processRemoteBranch(QString branch)
 void BranchesWidget::processTags()
 {
    QScopedPointer<GitTags> git(new GitTags(mGit));
-   const auto localTags = git->getLocalTags();
+   // const auto localTags = git->getLocalTags();
+   QVector<QString> localTags;
    const auto tags = mCache->getTags();
 
    QLog_Info("UI", QString("Fetching {%1} tags").arg(tags.count()));
