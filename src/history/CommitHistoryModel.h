@@ -50,10 +50,6 @@ public:
     */
    explicit CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                QObject *parent = nullptr);
-   /**
-    * @brief The destructor
-    */
-   ~CommitHistoryModel() override;
 
    /**
     * @brief Clears the contents without deleting the cache.
@@ -155,9 +151,4 @@ private:
    QVariant getDisplayData(const CommitInfo &rev, int column) const;
 
    QMap<CommitHistoryColumns, QString> mColumns;
-   int earlyOutputCnt = 0;
-   int rowCnt = 0;
-   QStringList curFNames;
-   QStringList renamedRevs;
-   QHash<QString, QString> renamedPatches;
 };

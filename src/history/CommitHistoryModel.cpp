@@ -21,14 +21,9 @@ CommitHistoryModel::CommitHistoryModel(const QSharedPointer<RevisionsCache> &cac
    mColumns.insert(CommitHistoryColumns::DATE, "Date");
 }
 
-CommitHistoryModel::~CommitHistoryModel()
-{
-   clear();
-}
-
 int CommitHistoryModel::rowCount(const QModelIndex &parent) const
 {
-   return !parent.isValid() ? rowCnt : 0;
+   return !parent.isValid() ? mCache->count() : 0;
 }
 
 bool CommitHistoryModel::hasChildren(const QModelIndex &parent) const
@@ -44,31 +39,18 @@ QString CommitHistoryModel::sha(int row) const
 void CommitHistoryModel::clear()
 {
    beginResetModel();
-   curFNames.clear();
-   rowCnt = 0;
    endResetModel();
    emit headerDataChanged(Qt::Horizontal, 0, 5);
 }
 
 void CommitHistoryModel::onNewRevisions(int totalCommits)
 {
-   // do not process revisions if there are possible renamed points
-   // or pending renamed patch to apply
-   if (!renamedRevs.isEmpty() || !renamedPatches.isEmpty())
-      return;
-
-   // do not attempt to insert 0 rows since the inclusive range would be invalid
    const auto revisionsCount = totalCommits;
-   if (rowCnt == revisionsCount)
-   {
-      beginResetModel();
-      endResetModel();
-      return;
-   }
 
-   beginInsertRows(QModelIndex(), rowCnt, revisionsCount - 1);
-   rowCnt = revisionsCount;
+   beginResetModel();
+   beginInsertRows(QModelIndex(), 0, revisionsCount - 1);
    endInsertRows();
+   endResetModel();
 }
 
 QVariant CommitHistoryModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -81,10 +63,7 @@ QVariant CommitHistoryModel::headerData(int section, Qt::Orientation orientation
 
 QModelIndex CommitHistoryModel::index(int row, int column, const QModelIndex &) const
 {
-   if (row < 0 || row >= rowCnt)
-      return QModelIndex();
-
-   return createIndex(row, column, nullptr);
+   return row >= 0 && row < mCache->count() ? createIndex(row, column, nullptr) : QModelIndex();
 }
 
 QModelIndex CommitHistoryModel::parent(const QModelIndex &) const
@@ -97,20 +76,20 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    QString auxMessage;
    const auto sha = r.sha();
 
-   if ((mCache->checkRef(sha) & CUR_BRANCH) && mGit->getCurrentBranch().isEmpty())
+   if ((r.getReferences().type & ANY_REF & CUR_BRANCH) && mGit->getCurrentBranch().isEmpty())
       auxMessage.append("<p>Status: <b>detached</b></p>");
 
-   const auto localBranches = mCache->getRefNames(sha, BRANCH);
+   const auto localBranches = r.getReferences().branches;
 
    if (!localBranches.isEmpty())
       auxMessage.append(QString("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
 
-   const auto remoteBranches = mCache->getRefNames(sha, RMT_BRANCH);
+   const auto remoteBranches = r.getReferences().remoteBranches;
 
    if (!remoteBranches.isEmpty())
       auxMessage.append(QString("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
 
-   const auto tags = mCache->getRefNames(sha, TAG);
+   const auto tags = r.getReferences().tags;
 
    if (!tags.isEmpty())
       auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));

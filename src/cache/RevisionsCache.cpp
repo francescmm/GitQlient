@@ -326,42 +326,16 @@ void RevisionsCache::flushFileNames(FileNamesLoader &fl)
 
 bool RevisionsCache::pendingLocalChanges() const
 {
-   const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA);
-   const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
-   return rf.count() == mUntrackedfiles.count();
-}
+   auto localChanges = false;
 
-uint RevisionsCache::checkRef(const QString &sha, uint mask) const
-{
-   const auto ref = getReference(sha);
+   if (!mCacheLocked)
+   {
+      const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA);
+      const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
+      localChanges = rf.count() == mUntrackedfiles.count();
+   }
 
-   return ref.isValid() ? ref.type & mask : 0;
-}
-
-const QStringList RevisionsCache::getRefNames(const QString &sha, uint mask) const
-{
-   QStringList result;
-   if (!checkRef(sha, mask))
-      return result;
-
-   const auto rf = getReference(sha);
-
-   if (mask & TAG)
-      result << rf.tags;
-
-   if (mask & BRANCH)
-      result << rf.branches;
-
-   if (mask & RMT_BRANCH)
-      result << rf.remoteBranches;
-
-   if (mask & REF)
-      result << rf.refs;
-
-   if (mask == APPLIED || mask == UN_APPLIED)
-      result << QStringList(rf.stgitPatch);
-
-   return result;
+   return localChanges;
 }
 
 QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const

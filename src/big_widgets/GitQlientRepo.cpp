@@ -151,8 +151,6 @@ void GitQlientRepo::updateCache()
    {
       QLog_Debug("UI", QString("Updating the GitQlient UI"));
 
-      mHistoryWidget->clear();
-
       mGitLoader->loadRepository();
 
       mDiffWidget->reload();

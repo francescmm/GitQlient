@@ -34,10 +34,14 @@ GitExecResult GitMerge::merge(const QString &into, QStringList sources)
 
 GitExecResult GitMerge::abortMerge() const
 {
+   QLog_Debug("Git", QString("Merge aborted"));
+
    return mGitBase->run("git merge --abort");
 }
 
 GitExecResult GitMerge::applyMerge() const
 {
+   QLog_Debug("Git", QString("Merge commit"));
+
    return mGitBase->run("git commit --no-edit");
 }
