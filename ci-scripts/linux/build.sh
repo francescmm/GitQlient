@@ -5,6 +5,8 @@ export PATH=$QTDIR/bin:$PATH;
 export QT_PLUGIN_PATH=$PWD/qt5/plugins;
 mkdir build
 cd build
+g++ --version
+qmake --version
 $QTDIR/bin/qmake ../GitQlient.pro
 make -j 4
 mkdir -p ../AppImage/GitQlient/usr/bin
