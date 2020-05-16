@@ -14,7 +14,7 @@ matrix:
   - os: osx
     osx_image: xcode11.2
   - os: linux
-    compiler: gcc-9
+    compiler: gcc
 before_deploy:
   - git config --local user.name "Francesc Martinez"
   - git config --local user.email "francescmm@gmail.com"
