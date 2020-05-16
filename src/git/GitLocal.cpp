@@ -106,7 +106,12 @@ bool GitLocal::resetCommit(const QString &sha, CommitResetType type) const
 
    QLog_Debug("Git", QString("Executing resetCommit: {%1} type {%2}").arg(sha, typeStr));
 
-   return mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha)).success;
+   const auto ret = mGitBase->run(QString("git reset --%1 %2").arg(typeStr, sha));
+
+   if (ret.success)
+      emit signalWipUpdated();
+
+   return ret.success;
 }
 
 GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,

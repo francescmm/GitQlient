@@ -76,7 +76,7 @@ void GitRepoLoader::loadReferences()
 
    if (ret3.success)
    {
-      auto ret = mGitBase->run("git rev-parse HEAD");
+      auto ret = mGitBase->getLastCommit();
 
       if (ret.success)
          ret.output = ret.output.toString().trimmed();
@@ -91,20 +91,10 @@ void GitRepoLoader::loadReferences()
          const auto refName = reference.mid(41);
 
          if (!refName.startsWith("refs/tags/") || (refName.startsWith("refs/tags/") && refName.endsWith("^{}")))
-         {
-            auto cur = mRevCache->getReference(revSha);
-            cur.configure(refName, curBranchSHA == revSha, prevRefSha);
-
-            mRevCache->insertReference(revSha, std::move(cur));
-         }
+            mRevCache->insertReference(revSha, refName);
 
          prevRefSha = revSha;
       }
-
-      // mark current head (even when detached)
-      auto cur = mRevCache->getReference(curBranchSHA);
-      cur.type |= CUR_BRANCH;
-      mRevCache->insertReference(curBranchSHA, std::move(cur));
    }
 }
 

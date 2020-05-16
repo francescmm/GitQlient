@@ -1,23 +1,27 @@
 #pragma once
 
-#include <ReferenceType.h>
-
-#include <QString>
+#include <QMap>
 #include <QStringList>
 
-struct References
+class References
 {
-   References() = default;
+public:
+   enum class Type
+   {
+      Tag,
+      LocalBranch,
+      RemoteBranches,
+      Applied,
+      UnApplied,
+      AnyRef
+   };
 
-   void configure(const QString &refName, bool isCurrentBranch, const QString &prevRefSha);
-   bool isValid() const { return type != 0; }
+   void addReference(Type type, const QString &value);
 
-   uint type = 0;
-   QStringList branches;
-   QStringList remoteBranches;
-   QStringList tags;
-   QStringList refs;
-   QString tagObj;
-   QString tagMsg;
-   QString stgitPatch;
+   QStringList getReferences(Type type) const;
+
+   bool isEmpty() const { return mReferences.isEmpty(); }
+
+private:
+   QMap<Type, QStringList> mReferences;
 };

@@ -27,24 +27,12 @@ bool Lane::isFreeLane() const
    return mType == LaneType::NOT_ACTIVE || mType == LaneType::CROSS || isJoin();
 }
 
-bool Lane::isBoundary() const
-{
-   return mType == LaneType::BOUNDARY || mType == LaneType::BOUNDARY_C || mType == LaneType::BOUNDARY_R
-       || mType == LaneType::BOUNDARY_L;
-}
-
 bool Lane::isMerge() const
 {
-   return mType == LaneType::MERGE_FORK || mType == LaneType::MERGE_FORK_R || mType == LaneType::MERGE_FORK_L
-       || isBoundary();
+   return mType == LaneType::MERGE_FORK || mType == LaneType::MERGE_FORK_R || mType == LaneType::MERGE_FORK_L;
 }
 
 bool Lane::isActive() const
 {
    return mType == LaneType::ACTIVE || mType == LaneType::INITIAL || mType == LaneType::BRANCH || isMerge();
-}
-
-void Lane::setBoundary()
-{
-   mType = LaneType::BOUNDARY;
 }

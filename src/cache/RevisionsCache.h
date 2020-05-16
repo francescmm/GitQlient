@@ -53,12 +53,11 @@ public:
    int getCommitPos(const QString &sha) const;
    CommitInfo getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint = 0);
    RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
-   References getReference(const QString &sha) const;
 
    void insertCommitInfo(CommitInfo rev, int orderIdx);
 
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
-   void insertReference(const QString &sha, References ref);
+   void insertReference(const QString &sha, const QString &reference);
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 
    void removeReference(const QString &sha);

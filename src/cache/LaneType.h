@@ -21,9 +21,5 @@ enum class LaneType
    CROSS_EMPTY,
    INITIAL,
    BRANCH,
-   BOUNDARY,
-   BOUNDARY_C, // corresponds to MERGE_FORK
-   BOUNDARY_R, // corresponds to MERGE_FORK_R
-   BOUNDARY_L, // corresponds to MERGE_FORK_L
    LANE_TYPES_NUM
 };
