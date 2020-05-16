@@ -49,8 +49,8 @@ macos{
 	dmg.commands += macdeployqt $$BUNDLE_FILENAME &&
 	dmg.commands += create-dmg \
 			--volname $${TARGET} \
-			--background $${PWD}/dmg_bg.png \
-			--icon $${BUNDLE_FILENAME} 150 218 \
+			--background $${PWD}/src/resources/dmg_bg.png \
+         --icon $${BUNDLE_FILENAME} 150 218 \
 			--window-pos 200 120 \
 			--window-size 600 450 \
 			--icon-size 100 \
