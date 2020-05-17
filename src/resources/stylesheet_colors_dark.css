@@ -50,7 +50,7 @@ QLabel
     color: white;
 }
 
-CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoWidget > #labelDescription
+#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
 {
     background-color: #606162;
 }
@@ -172,7 +172,12 @@ CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedF
     color: white;
 }
 
-FileDiffWidget, FileDiffWidget > QPushButton
+FileDiffWidget
+{
+    background-color: #404142;
+}
+
+FileDiffWidget > QPushButton
 {
     background-color: #202122;
 }

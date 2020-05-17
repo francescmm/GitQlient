@@ -17,8 +17,9 @@ using namespace QLogger;
 DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
+   , mCache(cache)
    , centerStackedWidget(new QStackedWidget())
-   , mCommitDiffWidget(new CommitDiffWidget(mGit, std::move(cache)))
+   , mCommitDiffWidget(new CommitDiffWidget(mGit, mCache))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -91,7 +92,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
           "UI",
           QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
 
-      const auto fileDiffWidget = new FileDiffWidget(mGit);
+      const auto fileDiffWidget = new FileDiffWidget(mGit, mCache);
       const auto fileWithModifications = fileDiffWidget->configure(currentSha, previousSha, file);
 
       if (fileWithModifications)

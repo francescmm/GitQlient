@@ -29,6 +29,8 @@ class FileDiffHighlighter;
 class FileDiffView;
 class QPushButton;
 class GitBase;
+class QLabel;
+class RevisionsCache;
 
 /*!
  \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
@@ -47,7 +49,8 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit FileDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+                           QWidget *parent = nullptr);
 
    /*!
     \brief Clears the current information on the diff view.
@@ -86,10 +89,21 @@ private:
    QString mCurrentSha;
    QString mPreviousSha;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<RevisionsCache> mCache;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    FileDiffView *mDiffView = nullptr;
    QPushButton *mGoPrevious = nullptr;
    QPushButton *mGoNext = nullptr;
+   QLabel *mLabelCurrentSha = nullptr;
+   QLabel *mLabelCurrentTitle = nullptr;
+   QLabel *mLabelCurrentAuthor = nullptr;
+   QLabel *mLabelCurrentDateTime = nullptr;
+   QLabel *mLabelCurrentEmail = nullptr;
+   QLabel *mLabelPreviousSha = nullptr;
+   QLabel *mLabelPreviousTitle = nullptr;
+   QLabel *mLabelPreviousAuthor = nullptr;
+   QLabel *mLabelPreviousDateTime = nullptr;
+   QLabel *mLabelPreviousEmail = nullptr;
    QVector<int> mModifications;
    int mRowIndex = 0;
    int mDestRow = 0;

@@ -52,12 +52,12 @@ QLabel
     color: black;
 }
 
-CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoWidget > #labelDescription
+#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
 {
     background-color: #606162;
 }
 
-CommitInfoWidget #labelSha
+#labelSha
 {
     color: #D89000;
     background-color: #202122;

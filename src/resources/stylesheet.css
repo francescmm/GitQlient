@@ -35,7 +35,7 @@ QPushButton:hover
     font-size: 10pt;
 }
 
-CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoWidget > #labelDescription
+#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
 {
     padding: 10px;
 }
