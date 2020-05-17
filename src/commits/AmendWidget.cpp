@@ -11,20 +11,11 @@
 #include <UnstagedMenu.h>
 #include <RevisionsCache.h>
 #include <FileWidget.h>
+#include <GitQlientRole.h>
 
-#include <QDir>
-#include <QKeyEvent>
-#include <QMenu>
 #include <QMessageBox>
 #include <QRegExp>
-#include <QScrollBar>
-#include <QTextCodec>
-#include <QToolTip>
 #include <QListWidgetItem>
-#include <QTextStream>
-#include <QProcess>
-#include <QItemDelegate>
-#include <QPainter>
 
 #include <QLogger.h>
 
@@ -33,13 +24,6 @@ using namespace QLogger;
 const int AmendWidget::kMaxTitleChars = 50;
 
 QString AmendWidget::lastMsgBeforeError;
-
-enum GitQlientRole
-{
-   U_ListRole = Qt::UserRole,
-   U_IsConflict,
-   U_Name
-};
 
 AmendWidget::AmendWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                          QWidget *parent)
@@ -64,15 +48,20 @@ AmendWidget::AmendWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    QIcon untrackedIcon(":/icons/untracked");
    ui->untrackedFilesIcon->setPixmap(untrackedIcon.pixmap(15, 15));
 
+   ui->untrackedFilesList->setWorkingDirectory(mGit->getWorkingDir());
+
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &AmendWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &AmendWidget::amendChanges);
    connect(ui->pbCommit, &QPushButton::clicked, this, &AmendWidget::amendChanges);
-   connect(ui->untrackedFilesList, &QListWidget::itemDoubleClicked, this, &AmendWidget::onOpenDiffRequested);
-   connect(ui->untrackedFilesList, &QListWidget::customContextMenuRequested, this, &AmendWidget::showUntrackedMenu);
+   connect(ui->untrackedFilesList, &UntrackedFilesList::signalShowDiff, this, &AmendWidget::requestDiff);
+   connect(ui->untrackedFilesList, &UntrackedFilesList::signalStageFile, this, &AmendWidget::addFileToCommitList);
+   connect(ui->untrackedFilesList, &UntrackedFilesList::signalCheckoutPerformed, this,
+           &AmendWidget::signalCheckoutPerformed);
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this, &AmendWidget::showUnstagedMenu);
-   connect(ui->stagedFilesList, &QListWidget::customContextMenuRequested, this, &AmendWidget::showStagedMenu);
-   connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this, &AmendWidget::onOpenDiffRequested);
-   connect(ui->stagedFilesList, &QListWidget::itemDoubleClicked, this, &AmendWidget::onOpenDiffRequested);
+   connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
+           [this](QListWidgetItem *item) { requestDiff(item->toolTip()); });
+   connect(ui->stagedFilesList, &StagedFilesList::signalResetFile, this, &AmendWidget::resetFile);
+   connect(ui->stagedFilesList, &StagedFilesList::signalShowDiff, this, &AmendWidget::requestDiff);
    connect(ui->pbCancelAmend, &QPushButton::clicked, this, [this]() { emit signalCancelAmend(mCurrentSha); });
 
    ui->pbCommit->setText(tr("Amend"));
@@ -228,6 +217,26 @@ QColor AmendWidget::getColorForFile(const RevisionFiles &files, int index) const
    return myColor;
 }
 
+void AmendWidget::prepareCache()
+{
+   for (auto file = mCurrentFilesCache.begin(); file != mCurrentFilesCache.end(); ++file)
+      file.value().first = false;
+}
+
+void AmendWidget::clearCache()
+{
+   for (auto it = mCurrentFilesCache.begin(); it != mCurrentFilesCache.end();)
+   {
+      if (!it.value().first)
+      {
+         delete it.value().second;
+         it = mCurrentFilesCache.erase(it);
+      }
+      else
+         ++it;
+   }
+}
+
 void AmendWidget::insertFiles(const RevisionFiles &files, QListWidget *fileList)
 {
    for (auto i = 0; i < files.count(); ++i)
@@ -292,50 +301,19 @@ void AmendWidget::insertFiles(const RevisionFiles &files, QListWidget *fileList)
    }
 }
 
-void AmendWidget::prepareCache()
-{
-   for (auto file = mCurrentFilesCache.begin(); file != mCurrentFilesCache.end(); ++file)
-      file.value().first = false;
-}
-
-void AmendWidget::clearCache()
-{
-   for (auto it = mCurrentFilesCache.begin(); it != mCurrentFilesCache.end();)
-   {
-      if (!it.value().first)
-      {
-         delete it.value().second;
-         it = mCurrentFilesCache.erase(it);
-      }
-      else
-         ++it;
-   }
-}
-
 void AmendWidget::addAllFilesToCommitList()
 {
-   auto i = ui->unstagedFilesList->count() - 1;
-
-   for (; i >= 0; --i)
-   {
-      const auto item = ui->unstagedFilesList->item(i);
-
-      addFileToCommitList(item);
-   }
+   for (auto i = ui->unstagedFilesList->count() - 1; i >= 0; --i)
+      addFileToCommitList(ui->unstagedFilesList->item(i));
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->pbCommit->setEnabled(ui->stagedFilesList->count() > 0);
 }
 
-void AmendWidget::onOpenDiffRequested(QListWidgetItem *item)
-{
-   requestDiff(item->toolTip());
-}
-
 void AmendWidget::requestDiff(const QString &fileName)
 {
-   emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+   emit signalShowDiff(CommitInfo::ZERO_SHA, mCurrentSha, fileName);
 }
 
 void AmendWidget::addFileToCommitList(QListWidgetItem *item)
@@ -367,16 +345,16 @@ void AmendWidget::addFileToCommitList(QListWidgetItem *item)
 
 void AmendWidget::revertAllChanges()
 {
-   auto i = ui->unstagedFilesList->count() - 1;
+   auto needsUpdate = false;
 
-   for (; i >= 0; --i)
+   for (auto i = ui->unstagedFilesList->count() - 1; i >= 0; --i)
    {
-      const auto fileName = ui->unstagedFilesList->takeItem(i)->toolTip();
       QScopedPointer<GitLocal> git(new GitLocal(mGit));
-      const auto ret = git->checkoutFile(fileName);
-
-      emit signalCheckoutPerformed(ret);
+      needsUpdate |= git->checkoutFile(ui->unstagedFilesList->takeItem(i)->toolTip());
    }
+
+   if (needsUpdate)
+      emit signalCheckoutPerformed();
 }
 
 void AmendWidget::removeFileFromCommitList(QListWidgetItem *item)
@@ -405,92 +383,6 @@ void AmendWidget::removeFileFromCommitList(QListWidgetItem *item)
       ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
       ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
       ui->pbCommit->setDisabled(ui->stagedFilesList->count() == 0);
-   }
-}
-
-void AmendWidget::showUnstagedMenu(const QPoint &pos)
-{
-   const auto item = ui->unstagedFilesList->itemAt(pos);
-
-   if (item)
-   {
-      const auto fileName = item->toolTip();
-      const auto unsolvedConflicts = item->data(GitQlientRole::U_IsConflict).toBool();
-      const auto contextMenu = new UnstagedMenu(mGit, fileName, unsolvedConflicts, this);
-      connect(contextMenu, &UnstagedMenu::signalEditFile, this,
-              [this, fileName]() { emit signalEditFile(mGit->getWorkingDir() + "/" + fileName, 0, 0); });
-      connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &AmendWidget::requestDiff);
-      connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &AmendWidget::addAllFilesToCommitList);
-      connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &AmendWidget::revertAllChanges);
-      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &AmendWidget::signalCheckoutPerformed);
-      connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &AmendWidget::signalShowFileHistory);
-      connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
-
-      const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
-      contextMenu->popup(mapToGlobal(parentPos));
-   }
-}
-
-void AmendWidget::showUntrackedMenu(const QPoint &pos)
-{
-   const auto item = ui->untrackedFilesList->itemAt(pos);
-
-   if (item)
-   {
-      const auto fileName = item->toolTip();
-      const auto contextMenu = new QMenu(this);
-      connect(contextMenu->addAction(tr("Stage file")), &QAction::triggered, this,
-              [this, item]() { addFileToCommitList(item); });
-      connect(contextMenu->addAction(tr("Delete file")), &QAction::triggered, this, [this, fileName]() {
-         QProcess p;
-         p.setWorkingDirectory(mGit->getWorkingDir());
-         p.start(QString("rm -rf %1").arg(fileName));
-         if (p.waitForFinished())
-            emit this->signalCheckoutPerformed(true);
-      });
-
-      const auto parentPos = ui->untrackedFilesList->mapToParent(pos);
-      contextMenu->popup(mapToGlobal(parentPos));
-   }
-}
-
-void AmendWidget::showStagedMenu(const QPoint &pos)
-{
-   const auto item = ui->stagedFilesList->itemAt(pos);
-
-   if (item)
-   {
-      const auto fileName = item->toolTip();
-      const auto menu = new QMenu(this);
-
-      if (item->flags() & Qt::ItemIsSelectable)
-      {
-         const auto itemOriginalList = qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole));
-
-         if (sender() == itemOriginalList)
-         {
-            const auto resetAction = menu->addAction("Reset");
-            connect(resetAction, &QAction::triggered, this, [this, item] { resetFile(item); });
-         }
-         else
-         {
-            /*
-            connect(menu->addAction("Unstage file"), &QAction::triggered, this,
-                    [this, item] { removeFileFromCommitList(item); });
-            */
-
-            if (itemOriginalList != ui->untrackedFilesList)
-            {
-               connect(menu->addAction("See changes"), &QAction::triggered, this, [this, fileName]() {
-                  emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0),
-                                      fileName);
-               });
-            }
-         }
-      }
-
-      const auto parentPos = ui->stagedFilesList->mapToParent(pos);
-      menu->popup(mapToGlobal(parentPos));
    }
 }
 
@@ -550,10 +442,8 @@ bool AmendWidget::hasConflicts()
    const auto files = mCurrentFilesCache.values();
 
    for (const auto &pair : files)
-   {
       if (pair.second->data(GitQlientRole::U_IsConflict).toBool())
          return true;
-   }
 
    return false;
 }
@@ -568,16 +458,16 @@ bool AmendWidget::amendChanges()
       QString msg;
 
       if (hasConflicts())
+      {
          QMessageBox::warning(this, tr("Impossible to commit"),
                               tr("There are files with conflicts. Please, resolve the conflicts first."));
+      }
       else if (checkMsg(msg))
       {
-         const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
-
-         const auto revInfo = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
          QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
          gitLoader->updateWipRevision();
-         const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
+         const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, mCurrentSha);
+         const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          QScopedPointer<GitLocal> git(new GitLocal(mGit));
@@ -607,4 +497,27 @@ void AmendWidget::clear()
    ui->lStagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->lUntrackedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+}
+
+void AmendWidget::showUnstagedMenu(const QPoint &pos)
+{
+   const auto item = ui->unstagedFilesList->itemAt(pos);
+
+   if (item)
+   {
+      const auto fileName = item->toolTip();
+      const auto unsolvedConflicts = item->data(GitQlientRole::U_IsConflict).toBool();
+      const auto contextMenu = new UnstagedMenu(mGit, fileName, unsolvedConflicts, this);
+      connect(contextMenu, &UnstagedMenu::signalEditFile, this,
+              [this, fileName]() { emit signalEditFile(mGit->getWorkingDir() + "/" + fileName, 0, 0); });
+      connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &AmendWidget::requestDiff);
+      connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &AmendWidget::addAllFilesToCommitList);
+      connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &AmendWidget::revertAllChanges);
+      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &AmendWidget::signalCheckoutPerformed);
+      connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &AmendWidget::signalShowFileHistory);
+      connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
+
+      const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
+      contextMenu->popup(mapToGlobal(parentPos));
+   }
 }

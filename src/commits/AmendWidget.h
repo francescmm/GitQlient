@@ -44,7 +44,7 @@ class AmendWidget : public QWidget
 signals:
    void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName);
    void signalChangesCommitted(bool commited);
-   void signalCheckoutPerformed(bool success);
+   void signalCheckoutPerformed();
    void signalShowFileHistory(const QString &fileName);
    void signalUpdateWip();
    void signalCancelAmend(const QString &commitSha);
@@ -74,25 +74,22 @@ private:
    QString mCurrentSha;
    QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;
 
-   void insertFiles(const RevisionFiles &files, QListWidget *fileList);
    void prepareCache();
    void clearCache();
+   void insertFiles(const RevisionFiles &files, QListWidget *fileList);
    void addAllFilesToCommitList();
-   void onOpenDiffRequested(QListWidgetItem *item);
    void requestDiff(const QString &fileName);
    void addFileToCommitList(QListWidgetItem *item);
    void revertAllChanges();
    void removeFileFromCommitList(QListWidgetItem *item);
    bool amendChanges();
-   void showUnstagedMenu(const QPoint &pos);
-   void showUntrackedMenu(const QPoint &pos);
-   void showStagedMenu(const QPoint &pos);
    QStringList getFiles();
    bool checkMsg(QString &msg);
    void updateCounter(const QString &text);
    bool hasConflicts();
    void resetFile(QListWidgetItem *item);
    QColor getColorForFile(const RevisionFiles &files, int index) const;
+   void showUnstagedMenu(const QPoint &pos);
 
    static QString lastMsgBeforeError;
    static const int kMaxTitleChars;
