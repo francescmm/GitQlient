@@ -54,8 +54,9 @@ public:
    bool checkoutFile(const QString &fileName) const;
    GitExecResult resetFile(const QString &fileName) const;
    bool resetCommit(const QString &sha, CommitResetType type) const;
-   GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg, bool amend,
-                             const QString &author = QString()) const;
+   GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg) const;
+   GitExecResult ammendCommit(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
+                              const QString &author = QString()) const;
 
 private:
    QSharedPointer<GitBase> mGitBase;

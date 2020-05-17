@@ -592,7 +592,7 @@ bool WorkInProgressWidget::commitChanges()
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          QScopedPointer<GitLocal> git(new GitLocal(mGit));
-         const auto ret = git->commitFiles(selFiles, files, msg, false);
+         const auto ret = git->commitFiles(selFiles, files, msg);
          QApplication::restoreOverrideCursor();
 
          lastMsgBeforeError = (ret.success ? "" : msg);

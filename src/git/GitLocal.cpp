@@ -114,19 +114,45 @@ bool GitLocal::resetCommit(const QString &sha, CommitResetType type) const
    return ret.success;
 }
 
-GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
-                                    bool amend, const QString &author) const
+GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles,
+                                    const QString &msg) const
+{
+   QStringList notSel;
+
+   for (auto i = 0; i < allCommitFiles.count(); ++i)
+   {
+      const QString &fp = allCommitFiles.getFile(i);
+      if (selFiles.indexOf(fp) == -1 && allCommitFiles.statusCmp(i, RevisionFiles::IN_INDEX))
+         notSel.append(fp);
+   }
+
+   if (!notSel.empty())
+   {
+      const auto ret = mGitBase->run("git reset -- " + quote(notSel));
+
+      if (!ret.success)
+         return ret;
+   }
+
+   // call git reset to remove not selected files from index
+   const auto updIdx = updateIndex(allCommitFiles, selFiles);
+
+   if (!updIdx.success)
+      return updIdx;
+
+   QLog_Debug("Git", QString("Commiting files"));
+
+   return mGitBase->run(QString("git commit -m \"%1\"").arg(msg));
+}
+
+GitExecResult GitLocal::ammendCommit(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
+                                     const QString &author) const
 {
    // add user selectable commit options
    QString cmtOptions;
 
-   if (amend)
-   {
-      cmtOptions.append(" --amend");
-
-      if (!author.isEmpty())
-         cmtOptions.append(QString(" --author \"%1\"").arg(author));
-   }
+   if (!author.isEmpty())
+      cmtOptions.append(QString(" --author \"%1\"").arg(author));
 
    QStringList notSel;
 
@@ -151,9 +177,9 @@ GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &
    if (!updIdx.success)
       return updIdx;
 
-   QLog_Debug("Git", QString("Executing commitFiles: mode {%1}").arg(amend ? QString("amend") : QString("normal")));
+   QLog_Debug("Git", QString("Amending files"));
 
-   return mGitBase->run(QString("git commit" + cmtOptions + " -m \"%1\"").arg(msg));
+   return mGitBase->run(QString("git commit --amend" + cmtOptions + " -m \"%1\"").arg(msg));
 }
 
 GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringList &selFiles) const
