@@ -57,11 +57,11 @@ AmendWidget::AmendWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    connect(ui->untrackedFilesList, &UntrackedFilesList::signalStageFile, this, &AmendWidget::addFileToCommitList);
    connect(ui->untrackedFilesList, &UntrackedFilesList::signalCheckoutPerformed, this,
            &AmendWidget::signalCheckoutPerformed);
+   connect(ui->stagedFilesList, &StagedFilesList::signalResetFile, this, &AmendWidget::resetFile);
+   connect(ui->stagedFilesList, &StagedFilesList::signalShowDiff, this, &AmendWidget::requestDiff);
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this, &AmendWidget::showUnstagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { requestDiff(item->toolTip()); });
-   connect(ui->stagedFilesList, &StagedFilesList::signalResetFile, this, &AmendWidget::resetFile);
-   connect(ui->stagedFilesList, &StagedFilesList::signalShowDiff, this, &AmendWidget::requestDiff);
    connect(ui->pbCancelAmend, &QPushButton::clicked, this, [this]() { emit signalCancelAmend(mCurrentSha); });
 
    ui->pbCommit->setText(tr("Amend"));
@@ -439,9 +439,7 @@ void AmendWidget::updateCounter(const QString &text)
 
 bool AmendWidget::hasConflicts()
 {
-   const auto files = mCurrentFilesCache.values();
-
-   for (const auto &pair : files)
+   for (const auto &pair : mCurrentFilesCache.values())
       if (pair.second->data(GitQlientRole::U_IsConflict).toBool())
          return true;
 

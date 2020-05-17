@@ -44,7 +44,7 @@ class WorkInProgressWidget : public QWidget
 signals:
    void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName);
    void signalChangesCommitted(bool commited);
-   void signalCheckoutPerformed(bool success);
+   void signalCheckoutPerformed();
    void signalShowFileHistory(const QString &fileName);
    void signalUpdateWip();
    void signalCancelAmend(const QString &commitSha);
@@ -73,24 +73,20 @@ private:
    QString mCurrentSha;
    QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;
 
-   void insertFilesInList(const RevisionFiles &files, QListWidget *fileList);
+   void insertFiles(const RevisionFiles &files, QListWidget *fileList);
    void prepareCache();
    void clearCache();
    void addAllFilesToCommitList();
-   void onOpenDiffRequested(QListWidgetItem *item);
    void requestDiff(const QString &fileName);
    void addFileToCommitList(QListWidgetItem *item);
    void revertAllChanges();
    void removeFileFromCommitList(QListWidgetItem *item);
    bool commitChanges();
    void showUnstagedMenu(const QPoint &pos);
-   void showUntrackedMenu(const QPoint &pos);
-   void showStagedMenu(const QPoint &pos);
    QStringList getFiles();
    bool checkMsg(QString &msg);
    void updateCounter(const QString &text);
    bool hasConflicts();
-   void resetInfo(bool force = true);
    void resetFile(QListWidgetItem *item);
    QColor getColorForFile(const RevisionFiles &files, int index) const;
 
