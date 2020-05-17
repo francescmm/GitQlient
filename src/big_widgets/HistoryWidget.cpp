@@ -5,6 +5,7 @@
 #include <RepositoryViewDelegate.h>
 #include <BranchesWidget.h>
 #include <WorkInProgressWidget.h>
+#include <AmendWidget.h>
 #include <CommitInfoWidget.h>
 #include <CommitInfo.h>
 #include <GitQlientSettings.h>
@@ -35,28 +36,38 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    , mBranchesWidget(new BranchesWidget(mCache, git))
    , mSearchInput(new QLineEdit())
    , mCommitStackedWidget(new QStackedWidget())
-   , mCommitWidget(new WorkInProgressWidget(mCache, git))
-   , mRevisionWidget(new CommitInfoWidget(mCache, git))
+   , mWipWidget(new WorkInProgressWidget(mCache, git))
+   , mAmendWidget(new AmendWidget(mCache, git))
+   , mCommitInfoWidget(new CommitInfoWidget(mCache, git))
    , mChShowAllBranches(new QCheckBox(tr("Show all branches")))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
    mCommitStackedWidget->setCurrentIndex(0);
-   mCommitStackedWidget->addWidget(mRevisionWidget);
-   mCommitStackedWidget->addWidget(mCommitWidget);
+   mCommitStackedWidget->addWidget(mCommitInfoWidget);
+   mCommitStackedWidget->addWidget(mWipWidget);
+   mCommitStackedWidget->addWidget(mAmendWidget);
    mCommitStackedWidget->setFixedWidth(310);
 
-   connect(mCommitWidget, &WorkInProgressWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
-   connect(mCommitWidget, &WorkInProgressWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
-   connect(mCommitWidget, &WorkInProgressWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
-   connect(mCommitWidget, &WorkInProgressWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
-   connect(mCommitWidget, &WorkInProgressWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
-   connect(mCommitWidget, &WorkInProgressWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
-   connect(mCommitWidget, &WorkInProgressWidget::signalCancelAmend, this, &HistoryWidget::onCommitSelected);
+   connect(mWipWidget, &WorkInProgressWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
+   connect(mWipWidget, &WorkInProgressWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
+   connect(mWipWidget, &WorkInProgressWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
+   connect(mWipWidget, &WorkInProgressWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
+   connect(mWipWidget, &WorkInProgressWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
+   connect(mWipWidget, &WorkInProgressWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
+   connect(mWipWidget, &WorkInProgressWidget::signalCancelAmend, this, &HistoryWidget::onCommitSelected);
 
-   connect(mRevisionWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalShowDiff);
-   connect(mRevisionWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
-   connect(mRevisionWidget, &CommitInfoWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
+   connect(mAmendWidget, &AmendWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
+   connect(mAmendWidget, &AmendWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
+   connect(mAmendWidget, &AmendWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
+   connect(mAmendWidget, &AmendWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
+   connect(mAmendWidget, &AmendWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
+   connect(mAmendWidget, &AmendWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
+   connect(mAmendWidget, &AmendWidget::signalCancelAmend, this, &HistoryWidget::onCommitSelected);
+
+   connect(mCommitInfoWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalShowDiff);
+   connect(mCommitInfoWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
+   connect(mCommitInfoWidget, &CommitInfoWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
 
    mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
@@ -128,27 +139,15 @@ void HistoryWidget::clear()
    mRepositoryView->clear();
    resetWip();
    mBranchesWidget->clear();
-   mRevisionWidget->clear();
+   mCommitInfoWidget->clear();
+   mAmendWidget->clear();
 
    mCommitStackedWidget->setCurrentIndex(mCommitStackedWidget->currentIndex());
 }
 
 void HistoryWidget::resetWip()
 {
-   mCommitWidget->clear();
-}
-
-void HistoryWidget::reload()
-{
-   mBranchesWidget->showBranches();
-
-   const auto commitStackedIndex = mCommitStackedWidget->currentIndex();
-   const auto currentSha = commitStackedIndex == 0 ? mRevisionWidget->getCurrentCommitSha() : CommitInfo::ZERO_SHA;
-
-   focusOnCommit(currentSha);
-
-   if (commitStackedIndex == 1)
-      mCommitWidget->configure(currentSha);
+   mWipWidget->clear();
 }
 
 void HistoryWidget::loadBranches()
@@ -160,8 +159,10 @@ void HistoryWidget::updateUiFromWatcher()
 {
    const auto commitStackedIndex = mCommitStackedWidget->currentIndex();
 
-   if (commitStackedIndex == 1 && !mCommitWidget->isAmendActive())
-      mCommitWidget->configure(CommitInfo::ZERO_SHA);
+   if (commitStackedIndex == 1)
+      mWipWidget->configure(CommitInfo::ZERO_SHA);
+   else if (commitStackedIndex == 2)
+      mAmendWidget->reload();
 }
 
 void HistoryWidget::focusOnCommit(const QString &sha)
@@ -297,13 +298,13 @@ void HistoryWidget::onCommitSelected(const QString &goToSha)
    QLog_Info("UI", QString("Selected commit {%1}").arg(goToSha));
 
    if (isWip)
-      mCommitWidget->configure(goToSha);
+      mWipWidget->configure(goToSha);
    else
-      mRevisionWidget->configure(goToSha);
+      mCommitInfoWidget->configure(goToSha);
 }
 
 void HistoryWidget::onAmendCommit(const QString &sha)
 {
-   mCommitStackedWidget->setCurrentIndex(1);
-   mCommitWidget->configure(sha);
+   mCommitStackedWidget->setCurrentIndex(2);
+   mAmendWidget->configure(sha);
 }

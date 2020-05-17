@@ -6,7 +6,6 @@
 #include <GitStashes.h>
 #include <GitBranches.h>
 #include <GitRemote.h>
-#include <WorkInProgressWidget.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
 #include <CommitInfo.h>

@@ -478,7 +478,7 @@
         <string>Commit selected files</string>
        </property>
        <property name="text">
-        <string>&amp;Commit</string>
+        <string>&amp;Amend</string>
        </property>
        <property name="shortcut">
         <string>Alt+C</string>

@@ -37,7 +37,7 @@ namespace Ui
 class WorkInProgressWidget;
 }
 
-class WorkInProgressWidget : public QWidget
+class AmendWidget : public QWidget
 {
    Q_OBJECT
 
@@ -58,11 +58,12 @@ signals:
    void signalEditFile(const QString &fileName, int line, int column);
 
 public:
-   explicit WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
-                                 QWidget *parent = nullptr);
+   explicit AmendWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                        QWidget *parent = nullptr);
 
-   ~WorkInProgressWidget();
+   ~AmendWidget();
 
+   void reload();
    void configure(const QString &sha);
    void clear();
 
@@ -82,7 +83,7 @@ private:
    void addFileToCommitList(QListWidgetItem *item);
    void revertAllChanges();
    void removeFileFromCommitList(QListWidgetItem *item);
-   bool commitChanges();
+   bool amendChanges();
    void showUnstagedMenu(const QPoint &pos);
    void showUntrackedMenu(const QPoint &pos);
    void showStagedMenu(const QPoint &pos);
@@ -90,7 +91,6 @@ private:
    bool checkMsg(QString &msg);
    void updateCounter(const QString &text);
    bool hasConflicts();
-   void resetInfo(bool force = true);
    void resetFile(QListWidgetItem *item);
    QColor getColorForFile(const RevisionFiles &files, int index) const;
 

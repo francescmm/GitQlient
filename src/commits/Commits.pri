@@ -4,6 +4,7 @@ FORMS += \
     $$PWD/WorkInProgressWidget.ui
 
 HEADERS += \
+    $$PWD/AmendWidget.h \
     $$PWD/CommitInfoWidget.h \
     $$PWD/FileContextMenu.h \
     $$PWD/FileListDelegate.h \
@@ -13,6 +14,7 @@ HEADERS += \
     $$PWD/WorkInProgressWidget.h
 
 SOURCES += \
+    $$PWD/AmendWidget.cpp \
     $$PWD/CommitInfoWidget.cpp \
     $$PWD/FileContextMenu.cpp \
     $$PWD/FileListDelegate.cpp \

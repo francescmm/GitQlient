@@ -53,7 +53,7 @@ CommitDiffWidget
    min-height: 350px;
 }
 
-WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
+WorkInProgressWidget > QListWidget, AmendWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
 {
    border: 0;
    outline: 0;
@@ -70,7 +70,7 @@ QListWidget::item, BlameWidget > QTreeView::item
    max-height: 25px;
 }
 
-WorkInProgressWidget > QListWidget::item
+WorkInProgressWidget > QListWidget::item, AmendWidget > QListWidget::item
 {
    padding: 0;
 }
@@ -97,25 +97,25 @@ QListWidget::item:focus, BlameWidget > QTreeView::item:focus
    border: 0;
 }
 
-WorkInProgressWidget > #pbCommit, WorkInProgressWidget > #pbCancelAmend
+WorkInProgressWidget > #pbCommit, AmendWidget > #pbCancelAmend, AmendWidget > #pbCommit
 {
     max-height: 30px;
     min-height: 30px;
 }
 
-WorkInProgressWidget > #pbCancelAmend
+AmendWidget > #pbCancelAmend
 {
     padding-left: 10px;
     padding-right: 10px;
 }
 
-CommitInfoWidget, WorkInProgressWidget
+CommitInfoWidget, WorkInProgressWidget, AmendWidget
 {
     max-width: 300px;
     min-width: 300px;
 }
 
-WorkInProgressWidget > QListWidget
+WorkInProgressWidget > QListWidget, AmendWidget > QListWidget
 {
     border-width: 1px;
     border-style: solid;
@@ -157,14 +157,14 @@ FullDiffWidget, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
     border-style: solid;
 }
 
-WorkInProgressWidget > #leAuthorName
+AmendWidget > #leAuthorName
 {
     max-height: 30px;
     min-height: 30px;
     padding-left: 10px;
 }
 
-WorkInProgressWidget > #leAuthorEmail
+AmendWidget > #leAuthorEmail
 {
     border-top-width: none;
     border-top-style: none;
@@ -185,6 +185,7 @@ QLabel#lCounter
     qproperty-alignment: AlignCenter;
 }
 
+AmendWidget > QFrame#stagedFiles, AmendWidget > QFrame#unstagedFiles, AmendWidget > QFrame#untrackedFiles,
 WorkInProgressWidget > QFrame#stagedFiles, WorkInProgressWidget > QFrame#unstagedFiles, WorkInProgressWidget > QFrame#untrackedFiles
 {
     max-height: 30px;

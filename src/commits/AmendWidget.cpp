@@ -1,4 +1,4 @@
-#include <WorkInProgressWidget.h>
+#include <AmendWidget.h>
 #include <ui_WorkInProgressWidget.h>
 
 #include <GitRepoLoader.h>
@@ -29,9 +29,9 @@
 
 using namespace QLogger;
 
-const int WorkInProgressWidget::kMaxTitleChars = 50;
+const int AmendWidget::kMaxTitleChars = 50;
 
-QString WorkInProgressWidget::lastMsgBeforeError;
+QString AmendWidget::lastMsgBeforeError;
 
 enum GitQlientRole
 {
@@ -40,8 +40,8 @@ enum GitQlientRole
    U_Name
 };
 
-WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache,
-                                           const QSharedPointer<GitBase> &git, QWidget *parent)
+AmendWidget::AmendWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                         QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::WorkInProgressWidget)
    , mCache(cache)
@@ -63,97 +63,98 @@ WorkInProgressWidget::WorkInProgressWidget(const QSharedPointer<RevisionsCache> 
    QIcon untrackedIcon(":/icons/untracked");
    ui->untrackedFilesIcon->setPixmap(untrackedIcon.pixmap(15, 15));
 
-   connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &WorkInProgressWidget::updateCounter);
-   connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &WorkInProgressWidget::commitChanges);
-   connect(ui->pbCommit, &QPushButton::clicked, this, &WorkInProgressWidget::commitChanges);
-   connect(ui->untrackedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
-   connect(ui->untrackedFilesList, &QListWidget::customContextMenuRequested, this,
-           &WorkInProgressWidget::showUntrackedMenu);
-   connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
-           &WorkInProgressWidget::showUnstagedMenu);
-   connect(ui->stagedFilesList, &QListWidget::customContextMenuRequested, this, &WorkInProgressWidget::showStagedMenu);
-   connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
-   connect(ui->stagedFilesList, &QListWidget::itemDoubleClicked, this, &WorkInProgressWidget::onOpenDiffRequested);
+   connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &AmendWidget::updateCounter);
+   connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &AmendWidget::amendChanges);
+   connect(ui->pbCommit, &QPushButton::clicked, this, &AmendWidget::amendChanges);
+   connect(ui->untrackedFilesList, &QListWidget::itemDoubleClicked, this, &AmendWidget::onOpenDiffRequested);
+   connect(ui->untrackedFilesList, &QListWidget::customContextMenuRequested, this, &AmendWidget::showUntrackedMenu);
+   connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this, &AmendWidget::showUnstagedMenu);
+   connect(ui->stagedFilesList, &QListWidget::customContextMenuRequested, this, &AmendWidget::showStagedMenu);
+   connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this, &AmendWidget::onOpenDiffRequested);
+   connect(ui->stagedFilesList, &QListWidget::itemDoubleClicked, this, &AmendWidget::onOpenDiffRequested);
+   connect(ui->pbCancelAmend, &QPushButton::clicked, this, [this]() { emit signalCancelAmend(mCurrentSha); });
 
-   ui->pbCancelAmend->setVisible(false);
-   ui->leAuthorName->setVisible(false);
-   ui->leAuthorEmail->setVisible(false);
-   ui->pbCommit->setText(tr("Commit"));
+   ui->pbCommit->setText(tr("Amend"));
 }
 
-WorkInProgressWidget::~WorkInProgressWidget()
+AmendWidget::~AmendWidget()
 {
    delete ui;
 }
 
-void WorkInProgressWidget::configure(const QString &sha)
+void AmendWidget::reload()
 {
-   const auto wipCommit = mCache->getCommitInfo(sha);
+   configure(mCurrentSha);
+}
 
-   if (wipCommit.parentsCount() > 0)
+void AmendWidget::configure(const QString &sha)
+{
+   const auto commit = mCache->getCommitInfo(sha);
+
+   if (commit.parentsCount() > 0)
    {
-      const auto shaChange = mCurrentSha != sha;
       mCurrentSha = sha;
 
-      resetInfo(shaChange);
-   }
-}
+      QLog_Info("UI", QString("Configuring commit widget with sha {%1} as amend").arg(mCurrentSha));
 
-void WorkInProgressWidget::resetInfo(bool force)
-{
-   QLog_Info("UI", QString("Configuring commit widget with sha {%1} as wip").arg(mCurrentSha));
+      blockSignals(true);
+      mCurrentFilesCache.clear();
+      ui->untrackedFilesList->clear();
+      ui->unstagedFilesList->clear();
+      ui->stagedFilesList->clear();
+      blockSignals(false);
 
-   // set-up files list
-   const auto revInfo = mCache->getCommitInfo(mCurrentSha);
+      // set-up files list
+      const auto author = commit.author().split("<");
+      ui->leAuthorName->setText(author.first());
+      ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
 
-   RevisionFiles files;
-   const auto wipCommit = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
+      RevisionFiles files;
+      const auto wipCommit = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   if (mCache->containsRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0)))
-      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
-   else if (revInfo.parentsCount() > 0)
-   {
-      QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));
-      git->updateWipRevision();
-      files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
-   }
+      if (mCache->containsRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0)))
+         files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+      else if (commit.parentsCount() > 0)
+      {
+         QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));
+         git->updateWipRevision();
+         files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+      }
 
-   if (!force)
       prepareCache();
 
-   insertFilesInList(files, ui->unstagedFilesList);
+      insertFilesInList(files, ui->unstagedFilesList);
 
-   if (!force)
       clearCache();
 
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
+      const auto amendFiles = mCache->getRevisionFile(mCurrentSha, commit.parent(0));
+      insertFilesInList(amendFiles, ui->stagedFilesList);
 
-   // compute cursor offsets. Take advantage of fixed width font
-   QString msg;
+      ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+      ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
 
-   if (lastMsgBeforeError.isEmpty())
-   {
-      QPair<QString, QString> logMessage;
+      // compute cursor offsets. Take advantage of fixed width font
+      QString msg = lastMsgBeforeError;
 
-      msg = logMessage.second.trimmed();
+      if (lastMsgBeforeError.isEmpty())
+      {
+         QPair<QString, QString> logMessage;
 
-      if (force)
+         const auto revInfo = mCache->getCommitInfo(mCurrentSha);
+         logMessage = qMakePair(revInfo.shortLog(), revInfo.longLog().trimmed());
+
+         msg = logMessage.second.trimmed();
+
          ui->leCommitTitle->setText(logMessage.first);
-   }
-   else
-      msg = lastMsgBeforeError;
+      }
 
-   if (force)
-   {
       ui->teDescription->setPlainText(msg);
       ui->teDescription->moveCursor(QTextCursor::Start);
+      ui->pbCommit->setEnabled(ui->stagedFilesList->count());
    }
-
-   ui->pbCommit->setEnabled(ui->stagedFilesList->count());
 }
 
-void WorkInProgressWidget::resetFile(QListWidgetItem *item)
+void AmendWidget::resetFile(QListWidgetItem *item)
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
    const auto ret = git->resetFile(item->toolTip());
@@ -205,7 +206,7 @@ void WorkInProgressWidget::resetFile(QListWidgetItem *item)
       emit signalUpdateWip();
 }
 
-QColor WorkInProgressWidget::getColorForFile(const RevisionFiles &files, int index) const
+QColor AmendWidget::getColorForFile(const RevisionFiles &files, int index) const
 {
    const auto isUnknown = files.statusCmp(index, RevisionFiles::UNKNOWN);
    const auto isInIndex = files.statusCmp(index, RevisionFiles::IN_INDEX);
@@ -231,7 +232,7 @@ QColor WorkInProgressWidget::getColorForFile(const RevisionFiles &files, int ind
    return myColor;
 }
 
-void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWidget *fileList)
+void AmendWidget::insertFilesInList(const RevisionFiles &files, QListWidget *fileList)
 {
    for (auto i = 0; i < files.count(); ++i)
    {
@@ -270,6 +271,9 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
          item->setData(GitQlientRole::U_Name, fileName);
          item->setToolTip(fileName);
 
+         if (fileList == ui->stagedFilesList)
+            item->setFlags(item->flags() & (~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled));
+
          mCurrentFilesCache.insert(fileName, qMakePair(true, item));
 
          if (item->data(GitQlientRole::U_IsConflict).toBool())
@@ -300,13 +304,13 @@ void WorkInProgressWidget::insertFilesInList(const RevisionFiles &files, QListWi
    }
 }
 
-void WorkInProgressWidget::prepareCache()
+void AmendWidget::prepareCache()
 {
    for (auto file = mCurrentFilesCache.begin(); file != mCurrentFilesCache.end(); ++file)
       file.value().first = false;
 }
 
-void WorkInProgressWidget::clearCache()
+void AmendWidget::clearCache()
 {
    for (auto it = mCurrentFilesCache.begin(); it != mCurrentFilesCache.end();)
    {
@@ -320,7 +324,7 @@ void WorkInProgressWidget::clearCache()
    }
 }
 
-void WorkInProgressWidget::addAllFilesToCommitList()
+void AmendWidget::addAllFilesToCommitList()
 {
    auto i = ui->unstagedFilesList->count() - 1;
 
@@ -336,17 +340,17 @@ void WorkInProgressWidget::addAllFilesToCommitList()
    ui->pbCommit->setEnabled(ui->stagedFilesList->count() > 0);
 }
 
-void WorkInProgressWidget::onOpenDiffRequested(QListWidgetItem *item)
+void AmendWidget::onOpenDiffRequested(QListWidgetItem *item)
 {
    requestDiff(item->toolTip());
 }
 
-void WorkInProgressWidget::requestDiff(const QString &fileName)
+void AmendWidget::requestDiff(const QString &fileName)
 {
    emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
 }
 
-void WorkInProgressWidget::addFileToCommitList(QListWidgetItem *item)
+void AmendWidget::addFileToCommitList(QListWidgetItem *item)
 {
    const auto fileList = qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole));
    const auto row = fileList->row(item);
@@ -373,7 +377,7 @@ void WorkInProgressWidget::addFileToCommitList(QListWidgetItem *item)
    ui->pbCommit->setEnabled(true);
 }
 
-void WorkInProgressWidget::revertAllChanges()
+void AmendWidget::revertAllChanges()
 {
    auto i = ui->unstagedFilesList->count() - 1;
 
@@ -387,7 +391,7 @@ void WorkInProgressWidget::revertAllChanges()
    }
 }
 
-void WorkInProgressWidget::removeFileFromCommitList(QListWidgetItem *item)
+void AmendWidget::removeFileFromCommitList(QListWidgetItem *item)
 {
    if (item->flags() & Qt::ItemIsSelectable)
    {
@@ -416,7 +420,7 @@ void WorkInProgressWidget::removeFileFromCommitList(QListWidgetItem *item)
    }
 }
 
-void WorkInProgressWidget::showUnstagedMenu(const QPoint &pos)
+void AmendWidget::showUnstagedMenu(const QPoint &pos)
 {
    const auto item = ui->unstagedFilesList->itemAt(pos);
 
@@ -427,27 +431,19 @@ void WorkInProgressWidget::showUnstagedMenu(const QPoint &pos)
       const auto contextMenu = new UnstagedMenu(mGit, fileName, unsolvedConflicts, this);
       connect(contextMenu, &UnstagedMenu::signalEditFile, this,
               [this, fileName]() { emit signalEditFile(mGit->getWorkingDir() + "/" + fileName, 0, 0); });
-      connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &WorkInProgressWidget::requestDiff);
-      connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &WorkInProgressWidget::addAllFilesToCommitList);
-      connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &WorkInProgressWidget::revertAllChanges);
-      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &WorkInProgressWidget::signalCheckoutPerformed);
-      connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &WorkInProgressWidget::signalShowFileHistory);
+      connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &AmendWidget::requestDiff);
+      connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &AmendWidget::addAllFilesToCommitList);
+      connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &AmendWidget::revertAllChanges);
+      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &AmendWidget::signalCheckoutPerformed);
+      connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &AmendWidget::signalShowFileHistory);
       connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
-      connect(contextMenu, &UnstagedMenu::signalConflictsResolved, this, [this, item] {
-         const auto fileWidget = qobject_cast<FileWidget *>(ui->unstagedFilesList->itemWidget(item));
-
-         item->setData(GitQlientRole::U_IsConflict, false);
-         item->setText(fileWidget->text().remove("(conflicts)").trimmed());
-         item->setForeground(GitQlientStyles::getGreen());
-         resetInfo();
-      });
 
       const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
       contextMenu->popup(mapToGlobal(parentPos));
    }
 }
 
-void WorkInProgressWidget::showUntrackedMenu(const QPoint &pos)
+void AmendWidget::showUntrackedMenu(const QPoint &pos)
 {
    const auto item = ui->untrackedFilesList->itemAt(pos);
 
@@ -470,7 +466,7 @@ void WorkInProgressWidget::showUntrackedMenu(const QPoint &pos)
    }
 }
 
-void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
+void AmendWidget::showStagedMenu(const QPoint &pos)
 {
    const auto item = ui->stagedFilesList->itemAt(pos);
 
@@ -490,8 +486,10 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
          }
          else
          {
+            /*
             connect(menu->addAction("Unstage file"), &QAction::triggered, this,
                     [this, item] { removeFileFromCommitList(item); });
+            */
 
             if (itemOriginalList != ui->untrackedFilesList)
             {
@@ -508,7 +506,7 @@ void WorkInProgressWidget::showStagedMenu(const QPoint &pos)
    }
 }
 
-QStringList WorkInProgressWidget::getFiles()
+QStringList AmendWidget::getFiles()
 {
    QStringList selFiles;
    const auto totalItems = ui->stagedFilesList->count();
@@ -522,7 +520,7 @@ QStringList WorkInProgressWidget::getFiles()
    return selFiles;
 }
 
-bool WorkInProgressWidget::checkMsg(QString &msg)
+bool AmendWidget::checkMsg(QString &msg)
 {
    const auto title = ui->leCommitTitle->text();
 
@@ -554,12 +552,12 @@ bool WorkInProgressWidget::checkMsg(QString &msg)
    return true;
 }
 
-void WorkInProgressWidget::updateCounter(const QString &text)
+void AmendWidget::updateCounter(const QString &text)
 {
    ui->lCounter->setText(QString::number(kMaxTitleChars - text.count()));
 }
 
-bool WorkInProgressWidget::hasConflicts()
+bool AmendWidget::hasConflicts()
 {
    const auto files = mCurrentFilesCache.values();
 
@@ -572,19 +570,22 @@ bool WorkInProgressWidget::hasConflicts()
    return false;
 }
 
-bool WorkInProgressWidget::commitChanges()
+bool AmendWidget::amendChanges()
 {
-   QString msg;
    QStringList selFiles = getFiles();
    auto done = false;
 
    if (!selFiles.isEmpty())
    {
+      QString msg;
+
       if (hasConflicts())
          QMessageBox::warning(this, tr("Impossible to commit"),
                               tr("There are files with conflicts. Please, resolve the conflicts first."));
       else if (checkMsg(msg))
       {
+         const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
+
          const auto revInfo = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
          QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
          gitLoader->updateWipRevision();
@@ -592,30 +593,27 @@ bool WorkInProgressWidget::commitChanges()
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          QScopedPointer<GitLocal> git(new GitLocal(mGit));
-         const auto ret = git->commitFiles(selFiles, files, msg, false);
+         const auto ret = git->commitFiles(selFiles, files, msg, true, author);
          QApplication::restoreOverrideCursor();
-
-         lastMsgBeforeError = (ret.success ? "" : msg);
 
          emit signalChangesCommitted(ret.success);
 
          done = true;
-
-         ui->leCommitTitle->clear();
-         ui->teDescription->clear();
       }
    }
 
    return done;
 }
 
-void WorkInProgressWidget::clear()
+void AmendWidget::clear()
 {
    ui->untrackedFilesList->clear();
    ui->unstagedFilesList->clear();
    ui->stagedFilesList->clear();
    mCurrentFilesCache.clear();
    ui->leCommitTitle->clear();
+   ui->leAuthorName->clear();
+   ui->leAuthorEmail->clear();
    ui->teDescription->clear();
    ui->pbCommit->setEnabled(false);
    ui->lStagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
