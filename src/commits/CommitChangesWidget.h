@@ -34,10 +34,10 @@ class RevisionFiles;
 
 namespace Ui
 {
-class WorkInProgressWidget;
+class CommitChangesWidget;
 }
 
-class WorkInProgressWidget : public QWidget
+class CommitChangesWidget : public QWidget
 {
    Q_OBJECT
 
@@ -58,37 +58,39 @@ signals:
    void signalEditFile(const QString &fileName, int line, int column);
 
 public:
-   explicit WorkInProgressWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
-                                 QWidget *parent = nullptr);
+   explicit CommitChangesWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                                QWidget *parent = nullptr);
 
-   ~WorkInProgressWidget();
+   ~CommitChangesWidget();
 
-   void configure(const QString &sha);
-   void clear();
+   virtual void configure(const QString &sha) = 0;
+   virtual void reload() final;
+   virtual void clear() final;
 
-private:
-   Ui::WorkInProgressWidget *ui = nullptr;
+protected:
+   Ui::CommitChangesWidget *ui = nullptr;
    QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
    QString mCurrentSha;
    QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;
 
-   void insertFiles(const RevisionFiles &files, QListWidget *fileList);
-   void prepareCache();
-   void clearCache();
-   void addAllFilesToCommitList();
-   void requestDiff(const QString &fileName);
-   void addFileToCommitList(QListWidgetItem *item);
-   void revertAllChanges();
-   void removeFileFromCommitList(QListWidgetItem *item);
-   bool commitChanges();
-   void showUnstagedMenu(const QPoint &pos);
-   QStringList getFiles();
-   bool checkMsg(QString &msg);
-   void updateCounter(const QString &text);
-   bool hasConflicts();
-   void resetFile(QListWidgetItem *item);
-   QColor getColorForFile(const RevisionFiles &files, int index) const;
+   virtual bool commitChanges() = 0;
+   virtual void showUnstagedMenu(const QPoint &pos) = 0;
+
+   virtual void insertFiles(const RevisionFiles &files, QListWidget *fileList) final;
+   virtual void prepareCache() final;
+   virtual void clearCache() final;
+   virtual void addAllFilesToCommitList() final;
+   virtual void requestDiff(const QString &fileName) final;
+   virtual void addFileToCommitList(QListWidgetItem *item) final;
+   virtual void revertAllChanges() final;
+   virtual void removeFileFromCommitList(QListWidgetItem *item) final;
+   virtual QStringList getFiles() final;
+   virtual bool checkMsg(QString &msg) final;
+   virtual void updateCounter(const QString &text) final;
+   virtual bool hasConflicts() final;
+   virtual void resetFile(QListWidgetItem *item) final;
+   virtual QColor getColorForFile(const RevisionFiles &files, int index) const final;
 
    static QString lastMsgBeforeError;
    static const int kMaxTitleChars;

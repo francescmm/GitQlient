@@ -25,27 +25,30 @@
 
 #include <CommitChangesWidget.h>
 
+class QListWidget;
+class QListWidgetItem;
+class RevisionsCache;
+class GitBase;
+class RevisionFiles;
+
 namespace Ui
 {
 class CommitChangesWidget;
 }
 
-class AmendWidget : public CommitChangesWidget
+class WipWidget : public CommitChangesWidget
 {
    Q_OBJECT
 
 public:
-   explicit AmendWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
-                        QWidget *parent = nullptr);
+   explicit WipWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                      QWidget *parent = nullptr);
 
-   ~AmendWidget() = default;
+   ~WipWidget() = default;
 
    void configure(const QString &sha) override;
 
 private:
    bool commitChanges() override;
    void showUnstagedMenu(const QPoint &pos) override;
-
-   static QString lastMsgBeforeError;
-   static const int kMaxTitleChars;
 };

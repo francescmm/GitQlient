@@ -1,10 +1,11 @@
 INCLUDEPATH += $$PWD
 
 FORMS += \
-    $$PWD/WorkInProgressWidget.ui
+    $$PWD/CommitChangesWidget.ui
 
 HEADERS += \
     $$PWD/AmendWidget.h \
+    $$PWD/CommitChangesWidget.h \
     $$PWD/CommitInfoWidget.h \
     $$PWD/FileContextMenu.h \
     $$PWD/FileListDelegate.h \
@@ -14,10 +15,11 @@ HEADERS += \
     $$PWD/StagedFilesList.h \
     $$PWD/UnstagedMenu.h \
     $$PWD/UntrackedFilesList.h \
-    $$PWD/WorkInProgressWidget.h
+    $$PWD/WipWidget.h
 
 SOURCES += \
     $$PWD/AmendWidget.cpp \
+    $$PWD/CommitChangesWidget.cpp \
     $$PWD/CommitInfoWidget.cpp \
     $$PWD/FileContextMenu.cpp \
     $$PWD/FileListDelegate.cpp \
@@ -26,4 +28,4 @@ SOURCES += \
     $$PWD/StagedFilesList.cpp \
     $$PWD/UnstagedMenu.cpp \
     $$PWD/UntrackedFilesList.cpp \
-    $$PWD/WorkInProgressWidget.cpp
+    $$PWD/WipWidget.cpp

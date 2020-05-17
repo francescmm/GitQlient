@@ -61,7 +61,7 @@ CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoW
     background-color: #202122;
 }
 
-WorkInProgressWidget > QListWidget, AmendWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
+CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
 {
    color: white;
    background-color: #2E2F30;
@@ -92,17 +92,17 @@ QListWidget::item:disabled
     color: #606162;
 }
 
-CommitHistoryView, FullDiffWidget, AmendWidget > QListWidget, WorkInProgressWidget > QListWidget, FileListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget, CommitChangesWidget > QListWidget, FileListWidget, QTreeWidget
 {
     background-color: #2E2F30;
 }
 
-CommitHistoryView, FullDiffWidget, WorkInProgressWidget > QListWidget, QTreeWidget, AmendWidget > QListWidget
+CommitHistoryView, FullDiffWidget, CommitChangesWidget > QListWidget, QTreeWidget
 {
     color: white;
 }
 
-WorkInProgressWidget > QListWidget, AmendWidget > QListWidget
+CommitChangesWidget > QListWidget
 {
     border-color: #202122;
 }
@@ -137,18 +137,18 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget, AmendWidget > QLineEdit, WorkInProgressWidget > QLineEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget, CommitChangesWidget > QLineEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-color: #202122
 }
 
-AmendWidget > QLineEdit, WorkInProgressWidget > QLineEdit, #leCommitTitle, #teDescription
+CommitChangesWidget > QLineEdit, #leCommitTitle, #teDescription
 {
     background-color: #606162;
     color: white;
 }
 
-AmendWidget > #leAuthorName
+CommitChangesWidget > #leAuthorName
 {
     border-bottom-color: #404142;
 }
@@ -161,8 +161,7 @@ QLabel#lCounter
     color: #A3A3A4;
 }
 
-AmendWidget > QFrame#stagedFiles, AmendWidget > QFrame#unstagedFiles, AmendWidget > QFrame#untrackedFiles,
-WorkInProgressWidget > QFrame#stagedFiles, WorkInProgressWidget > QFrame#unstagedFiles, WorkInProgressWidget > QFrame#untrackedFiles
+CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles
 {
     background: #202122;
 }

@@ -4,7 +4,7 @@
 #include <CommitHistoryView.h>
 #include <RepositoryViewDelegate.h>
 #include <BranchesWidget.h>
-#include <WorkInProgressWidget.h>
+#include <WipWidget.h>
 #include <AmendWidget.h>
 #include <CommitInfoWidget.h>
 #include <CommitInfo.h>
@@ -36,7 +36,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    , mBranchesWidget(new BranchesWidget(mCache, git))
    , mSearchInput(new QLineEdit())
    , mCommitStackedWidget(new QStackedWidget())
-   , mWipWidget(new WorkInProgressWidget(mCache, git))
+   , mWipWidget(new WipWidget(mCache, git))
    , mAmendWidget(new AmendWidget(mCache, git))
    , mCommitInfoWidget(new CommitInfoWidget(mCache, git))
    , mChShowAllBranches(new QCheckBox(tr("Show all branches")))
@@ -49,13 +49,13 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    mCommitStackedWidget->addWidget(mAmendWidget);
    mCommitStackedWidget->setFixedWidth(310);
 
-   connect(mWipWidget, &WorkInProgressWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
-   connect(mWipWidget, &WorkInProgressWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
-   connect(mWipWidget, &WorkInProgressWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
-   connect(mWipWidget, &WorkInProgressWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
-   connect(mWipWidget, &WorkInProgressWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
-   connect(mWipWidget, &WorkInProgressWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
-   connect(mWipWidget, &WorkInProgressWidget::signalCancelAmend, this, &HistoryWidget::onCommitSelected);
+   connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
+   connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
+   connect(mWipWidget, &WipWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
+   connect(mWipWidget, &WipWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
+   connect(mWipWidget, &WipWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
+   connect(mWipWidget, &WipWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
+   connect(mWipWidget, &WipWidget::signalCancelAmend, this, &HistoryWidget::onCommitSelected);
 
    connect(mAmendWidget, &AmendWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
    connect(mAmendWidget, &AmendWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
