@@ -145,15 +145,9 @@ GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &
    return mGitBase->run(QString("git commit -m \"%1\"").arg(msg));
 }
 
-GitExecResult GitLocal::ammendCommit(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
-                                     const QString &author) const
+GitExecResult GitLocal::ammendCommit(const QStringList &selFiles, const RevisionFiles &allCommitFiles,
+                                     const QString &msg, const QString &author) const
 {
-   // add user selectable commit options
-   QString cmtOptions;
-
-   if (!author.isEmpty())
-      cmtOptions.append(QString(" --author \"%1\"").arg(author));
-
    QStringList notSel;
 
    for (auto i = 0; i < allCommitFiles.count(); ++i)
@@ -178,6 +172,11 @@ GitExecResult GitLocal::ammendCommit(QStringList &selFiles, const RevisionFiles 
       return updIdx;
 
    QLog_Debug("Git", QString("Amending files"));
+
+   QString cmtOptions;
+
+   if (!author.isEmpty())
+      cmtOptions.append(QString(" --author \"%1\"").arg(author));
 
    return mGitBase->run(QString("git commit --amend" + cmtOptions + " -m \"%1\"").arg(msg));
 }

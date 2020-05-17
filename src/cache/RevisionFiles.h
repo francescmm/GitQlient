@@ -2,6 +2,7 @@
 
 #include <QByteArray>
 #include <QVector>
+#include <QStringList>
 
 class RevisionFiles
 {
@@ -38,6 +39,7 @@ public:
    int getFilesCount() const { return mFileStatus.size(); }
    void appendExtStatus(const QString &file) { mRenamedFiles.append(file); }
    QString getFile(int index) const { return mFiles.at(index); }
+   QStringList getFiles() const { return mFiles.toList(); }
    bool containsFile(const QString &fileName) { return mFiles.contains(fileName); }
 
 private:

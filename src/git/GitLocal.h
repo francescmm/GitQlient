@@ -55,7 +55,7 @@ public:
    GitExecResult resetFile(const QString &fileName) const;
    bool resetCommit(const QString &sha, CommitResetType type) const;
    GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg) const;
-   GitExecResult ammendCommit(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
+   GitExecResult ammendCommit(const QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
                               const QString &author = QString()) const;
 
 private:
