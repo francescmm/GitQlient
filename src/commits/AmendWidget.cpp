@@ -4,6 +4,7 @@
 #include <GitRepoLoader.h>
 #include <GitBase.h>
 #include <GitLocal.h>
+#include <GitHistory.h>
 #include <GitQlientStyles.h>
 #include <CommitInfo.h>
 #include <RevisionFiles.h>
@@ -91,11 +92,27 @@ void AmendWidget::configure(const QString &sha)
 {
    const auto commit = mCache->getCommitInfo(sha);
 
-   if (commit.parentsCount() > 0)
+   if (commit.parentsCount() <= 0)
+      return;
+
+   if (!mCache->containsRevisionFile(CommitInfo::ZERO_SHA, sha))
    {
+      QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));
+      git->updateWipRevision();
+   }
+
+   const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, sha);
+   const auto amendFiles = mCache->getRevisionFile(sha, commit.parent(0));
+
+   if (mCurrentSha != sha)
+   {
+      QLog_Info("UI", QString("Amending sha {%1}.").arg(mCurrentSha));
+
       mCurrentSha = sha;
 
-      QLog_Info("UI", QString("Configuring commit widget with sha {%1} as amend").arg(mCurrentSha));
+      const auto author = commit.author().split("<");
+      ui->leAuthorName->setText(author.first());
+      ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
 
       blockSignals(true);
       mCurrentFilesCache.clear();
@@ -104,54 +121,33 @@ void AmendWidget::configure(const QString &sha)
       ui->stagedFilesList->clear();
       blockSignals(false);
 
-      // set-up files list
-      const auto author = commit.author().split("<");
-      ui->leAuthorName->setText(author.first());
-      ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
-
-      RevisionFiles files;
-      const auto wipCommit = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
-
-      if (mCache->containsRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0)))
-         files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
-      else if (commit.parentsCount() > 0)
-      {
-         QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));
-         git->updateWipRevision();
-         files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
-      }
+      insertFiles(files, ui->unstagedFilesList);
+      insertFiles(amendFiles, ui->stagedFilesList);
+   }
+   else
+   {
+      QLog_Info("UI", QString("Updating files for SHA {%1}").arg(mCurrentSha));
 
       prepareCache();
 
-      insertFilesInList(files, ui->unstagedFilesList);
+      insertFiles(files, ui->unstagedFilesList);
 
       clearCache();
 
-      const auto amendFiles = mCache->getRevisionFile(mCurrentSha, commit.parent(0));
-      insertFilesInList(amendFiles, ui->stagedFilesList);
-
-      ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-      ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-
-      // compute cursor offsets. Take advantage of fixed width font
-      QString msg = lastMsgBeforeError;
-
-      if (lastMsgBeforeError.isEmpty())
-      {
-         QPair<QString, QString> logMessage;
-
-         const auto revInfo = mCache->getCommitInfo(mCurrentSha);
-         logMessage = qMakePair(revInfo.shortLog(), revInfo.longLog().trimmed());
-
-         msg = logMessage.second.trimmed();
-
-         ui->leCommitTitle->setText(logMessage.first);
-      }
-
-      ui->teDescription->setPlainText(msg);
-      ui->teDescription->moveCursor(QTextCursor::Start);
-      ui->pbCommit->setEnabled(ui->stagedFilesList->count());
+      insertFiles(amendFiles, ui->stagedFilesList);
    }
+
+   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
+
+   if (lastMsgBeforeError.isEmpty())
+   {
+      ui->teDescription->setPlainText(commit.longLog().trimmed());
+      ui->leCommitTitle->setText(commit.shortLog());
+   }
+
+   ui->teDescription->moveCursor(QTextCursor::Start);
+   ui->pbCommit->setEnabled(ui->stagedFilesList->count());
 }
 
 void AmendWidget::resetFile(QListWidgetItem *item)
@@ -232,7 +228,7 @@ QColor AmendWidget::getColorForFile(const RevisionFiles &files, int index) const
    return myColor;
 }
 
-void AmendWidget::insertFilesInList(const RevisionFiles &files, QListWidget *fileList)
+void AmendWidget::insertFiles(const RevisionFiles &files, QListWidget *fileList)
 {
    for (auto i = 0; i < files.count(); ++i)
    {
@@ -246,47 +242,39 @@ void AmendWidget::insertFilesInList(const RevisionFiles &files, QListWidget *fil
          const auto untrackedFile = !isInIndex && isUnknown;
          const auto staged = isInIndex && !isUnknown && !isConflict;
 
-         QListWidgetItem *item = nullptr;
+         auto parent = fileList;
 
          if (untrackedFile)
-         {
-            item = new QListWidgetItem(ui->untrackedFilesList);
-            item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(ui->untrackedFilesList));
-         }
+            parent = ui->untrackedFilesList;
          else if (staged)
-         {
-            item = new QListWidgetItem(ui->stagedFilesList);
-            item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(ui->stagedFilesList));
-         }
-         else
-         {
-            item = new QListWidgetItem(fileList);
-            item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(fileList));
-         }
+            parent = ui->stagedFilesList;
 
-         if (isConflict)
-            item->setData(GitQlientRole::U_IsConflict, true);
-
-         item->setText(fileName);
+         auto item = new QListWidgetItem(fileList);
+         item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(parent));
          item->setData(GitQlientRole::U_Name, fileName);
-         item->setToolTip(fileName);
 
          if (fileList == ui->stagedFilesList)
             item->setFlags(item->flags() & (~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled));
 
          mCurrentFilesCache.insert(fileName, qMakePair(true, item));
 
-         if (item->data(GitQlientRole::U_IsConflict).toBool())
+         if (isConflict)
          {
-            const auto newName = item->text().append(" (conflicts)");
+            item->setData(GitQlientRole::U_IsConflict, isConflict);
+
+            const auto newName = fileName + QString(" (conflicts");
             item->setText(newName);
             item->setData(GitQlientRole::U_Name, newName);
          }
+         else
+            item->setText(fileName);
 
-         const auto iconPath = !untrackedFile && staged ? QString(":/icons/remove") : QString(":/icons/add");
-         const auto fileWidget = new FileWidget(iconPath, item->text());
+         item->setToolTip(fileName);
 
+         const auto fileWidget = new FileWidget(
+             !untrackedFile && staged ? QString(":/icons/remove") : QString(":/icons/add"), item->text());
          const auto textColor = getColorForFile(files, i);
+
          fileWidget->setTextColor(textColor);
          item->setForeground(textColor);
 
@@ -295,7 +283,7 @@ void AmendWidget::insertFilesInList(const RevisionFiles &files, QListWidget *fil
          else
             connect(fileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
 
-         qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole))->setItemWidget(item, fileWidget);
+         fileList->setItemWidget(item, fileWidget);
          item->setText("");
          item->setSizeHint(fileWidget->sizeHint());
       }
