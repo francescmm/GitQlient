@@ -4,7 +4,6 @@
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryContextMenu.h>
 #include <ShaFilterProxyModel.h>
-#include <GitBranches.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
 
@@ -187,10 +186,11 @@ QList<QString> CommitHistoryView::getSelectedShaList() const
       const auto dt = QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm");
 
       shas.insert(dt, sha);
-      QScopedPointer<GitBranches> git(new GitBranches(mGit));
-      const auto ret = git->getBranchesOfCommit(sha);
 
-      auto branches = ret.output.toString().trimmed().split("\n ");
+      const auto commit = mCache->getCommitInfo(sha);
+      auto branches = commit.getReferences(References::Type::LocalBranch)
+          + commit.getReferences(References::Type::RemoteBranches);
+
       std::sort(branches.begin(), branches.end());
       godVector.append(branches.toVector());
    }
