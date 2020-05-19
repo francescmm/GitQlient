@@ -48,9 +48,6 @@ int RevisionsCache::getCommitPos(const QString &sha) const
 
 CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint)
 {
-   if (mCacheLocked)
-      return CommitInfo();
-
    auto commitIter = searchCommit(field, text, startingPoint);
 
    if (commitIter == mCommits.constEnd() && startingPoint > 0)
@@ -61,9 +58,6 @@ CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const Q
 
 CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 {
-   if (mCacheLocked)
-      return CommitInfo();
-
    if (!sha.isEmpty())
    {
       const auto c = mCommitsMap.value(sha, nullptr);
@@ -88,9 +82,6 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 
 RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString &sha2) const
 {
-   if (mCacheLocked)
-      return RevisionFiles();
-
    return mRevisionFilesMap.value(qMakePair(sha1, sha2));
 }
 
@@ -149,14 +140,10 @@ void RevisionsCache::insertReference(const QString &sha, const QString &referenc
 {
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-   if (mCommitsMap.contains(sha))
-   {
+   mCommitsMap[sha]->addReference(reference);
 
-      mCommitsMap[sha]->addReference(reference);
-
-      if (!mReferences.contains(mCommitsMap[sha]))
-         mReferences.append(mCommitsMap[sha]);
-   }
+   if (!mReferences.contains(mCommitsMap[sha]))
+      mReferences.append(mCommitsMap[sha]);
 }
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
@@ -199,15 +186,11 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 
 void RevisionsCache::removeReference(const QString &sha)
 {
-   if (!mCacheLocked)
-      mCommitsMap[sha]->addReferences(References());
+   mCommitsMap[sha]->addReferences(References());
 }
 
 bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
 {
-   if (mCacheLocked)
-      return false;
-
    return mRevisionFilesMap.contains(qMakePair(sha1, sha2));
 }
 
@@ -356,9 +339,8 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const
 {
    QVector<QPair<QString, QStringList>> tags;
 
-   if (!mCacheLocked)
-      for (auto commit : mReferences)
-         tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::Tag)));
+   for (auto commit : mReferences)
+      tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::Tag)));
 
    return tags;
 }
@@ -367,18 +349,15 @@ QString RevisionsCache::getCommitForBranch(const QString &branch, bool local) co
 {
    QString sha;
 
-   if (!mCacheLocked)
+   for (auto commit : mReferences)
    {
-      for (auto commit : mReferences)
-      {
-         const auto branches
-             = commit->getReferences(local ? References::Type::LocalBranch : References::Type::RemoteBranches);
+      const auto branches
+          = commit->getReferences(local ? References::Type::LocalBranch : References::Type::RemoteBranches);
 
-         if (branches.contains(branch))
-         {
-            sha = commit->sha();
-            break;
-         }
+      if (branches.contains(branch))
+      {
+         sha = commit->sha();
+         break;
       }
    }
 
