@@ -48,6 +48,9 @@ int RevisionsCache::getCommitPos(const QString &sha) const
 
 CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint)
 {
+   if (mCacheLocked)
+      return CommitInfo();
+
    auto commitIter = searchCommit(field, text, startingPoint);
 
    if (commitIter == mCommits.constEnd() && startingPoint > 0)
@@ -58,6 +61,9 @@ CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const Q
 
 CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 {
+   if (mCacheLocked)
+      return CommitInfo();
+
    if (!sha.isEmpty())
    {
       const auto c = mCommitsMap.value(sha, nullptr);
@@ -82,6 +88,9 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 
 RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString &sha2) const
 {
+   if (mCacheLocked)
+      return RevisionFiles();
+
    return mRevisionFilesMap.value(qMakePair(sha1, sha2));
 }
 
@@ -107,7 +116,9 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
       {
          QLog_Trace("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
 
-         delete mCommits[orderIdx];
+         if (mCommits[orderIdx])
+            delete mCommits[orderIdx];
+
          mCommits[orderIdx] = commit;
       }
 
@@ -138,10 +149,14 @@ void RevisionsCache::insertReference(const QString &sha, const QString &referenc
 {
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-   mCommitsMap[sha]->addReference(reference);
+   if (mCommitsMap.contains(sha))
+   {
 
-   if (!mReferences.contains(mCommitsMap[sha]))
-      mReferences.append(mCommitsMap[sha]);
+      mCommitsMap[sha]->addReference(reference);
+
+      if (!mReferences.contains(mCommitsMap[sha]))
+         mReferences.append(mCommitsMap[sha]);
+   }
 }
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
@@ -173,7 +188,9 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
       const auto sha = c.sha();
       const auto commit = new CommitInfo(std::move(c));
 
-      delete mCommits[0];
+      if (mCommits[0])
+         delete mCommits[0];
+
       mCommits[0] = commit;
 
       mCommitsMap.insert(sha, commit);
@@ -182,11 +199,15 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 
 void RevisionsCache::removeReference(const QString &sha)
 {
-   mCommitsMap[sha]->addReferences(References());
+   if (!mCacheLocked)
+      mCommitsMap[sha]->addReferences(References());
 }
 
 bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
 {
+   if (mCacheLocked)
+      return false;
+
    return mRevisionFilesMap.contains(qMakePair(sha1, sha2));
 }
 
@@ -335,8 +356,9 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const
 {
    QVector<QPair<QString, QStringList>> tags;
 
-   for (auto commit : mReferences)
-      tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::Tag)));
+   if (!mCacheLocked)
+      for (auto commit : mReferences)
+         tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::Tag)));
 
    return tags;
 }
@@ -345,15 +367,18 @@ QString RevisionsCache::getCommitForBranch(const QString &branch, bool local) co
 {
    QString sha;
 
-   for (auto commit : mReferences)
+   if (!mCacheLocked)
    {
-      const auto branches
-          = commit->getReferences(local ? References::Type::LocalBranch : References::Type::RemoteBranches);
-
-      if (branches.contains(branch))
+      for (auto commit : mReferences)
       {
-         sha = commit->sha();
-         break;
+         const auto branches
+             = commit->getReferences(local ? References::Type::LocalBranch : References::Type::RemoteBranches);
+
+         if (branches.contains(branch))
+         {
+            sha = commit->sha();
+            break;
+         }
       }
    }
 
