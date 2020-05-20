@@ -37,6 +37,8 @@ bool GitRepoLoader::loadRepository()
 
          if (configureRepoDirectory())
          {
+            mGitBase->updateCurrentBranch();
+
             requestRevisions();
 
             QLog_Info("Git", "... Git init finished");
