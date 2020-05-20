@@ -164,7 +164,7 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 
    if (!mDiffButtons.contains(id))
    {
-      const auto fullDiffWidget = new FullDiffWidget(mGit);
+      const auto fullDiffWidget = new FullDiffWidget(mGit, mCache);
       fullDiffWidget->loadDiff(sha, parentSha);
 
       const auto diffButton = new DiffButton(id, ":/icons/commit-list");
@@ -173,9 +173,9 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       for (const auto &buttons : qAsConst(mDiffButtons))
          buttons.second->setUnselected();
 
-      connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton]() {
+      connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton, sha, parentSha]() {
          centerStackedWidget->setCurrentWidget(fullDiffWidget);
-         mCommitDiffWidget->configure(fullDiffWidget->getCurrentSha(), fullDiffWidget->getPreviousSha());
+         mCommitDiffWidget->configure(sha, parentSha);
 
          for (const auto &buttons : qAsConst(mDiffButtons))
             if (buttons.second != diffButton)

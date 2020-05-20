@@ -3,6 +3,7 @@ INCLUDEPATH += $$PWD
 HEADERS += \
     $$PWD/CommitDiffWidget.h \
     $$PWD/DiffButton.h \
+    $$PWD/DiffInfoPanel.h \
     $$PWD/FileBlameWidget.h \
     $$PWD/FileDiffHighlighter.h \
     $$PWD/FileDiffView.h \
@@ -12,6 +13,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/CommitDiffWidget.cpp \
     $$PWD/DiffButton.cpp \
+    $$PWD/DiffInfoPanel.cpp \
     $$PWD/FileBlameWidget.cpp \
     $$PWD/FileDiffHighlighter.cpp \
     $$PWD/FileDiffView.cpp \

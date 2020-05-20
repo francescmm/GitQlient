@@ -2,11 +2,14 @@
 
 #include <CommitInfo.h>
 #include <GitHistory.h>
+#include <DiffInfoPanel.h>
+#include <RevisionsCache.h>
 #include <GitQlientStyles.h>
 
 #include <QScrollBar>
 #include <QTextCharFormat>
 #include <QTextCodec>
+#include <QVBoxLayout>
 
 FullDiffWidget::DiffHighlighter::DiffHighlighter(QTextEdit *p)
    : QSyntaxHighlighter(p)
@@ -57,9 +60,13 @@ void FullDiffWidget::DiffHighlighter::highlightBlock(const QString &text)
       setFormat(0, text.length(), myFormat);
 }
 
-FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
+FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+                               QWidget *parent)
    : QTextEdit(parent)
    , mGit(git)
+   , mCache(cache)
+   , mDiffInfoPanel(new DiffInfoPanel(cache))
+   , mDiffWidget(new QTextEdit())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -67,12 +74,18 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *pare
 
    QFont font;
    font.setFamily(QString::fromUtf8("Ubuntu Mono"));
-   setFont(font);
-   setObjectName("textEditDiff");
-   setUndoRedoEnabled(false);
-   setLineWrapMode(QTextEdit::NoWrap);
-   setReadOnly(true);
-   setTextInteractionFlags(Qt::TextSelectableByMouse);
+   mDiffWidget->setFont(font);
+   mDiffWidget->setObjectName("textEditDiff");
+   mDiffWidget->setUndoRedoEnabled(false);
+   mDiffWidget->setLineWrapMode(QTextEdit::NoWrap);
+   mDiffWidget->setReadOnly(true);
+   mDiffWidget->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
+   const auto layout = new QVBoxLayout(this);
+   layout->setContentsMargins(QMargins());
+   layout->setSpacing(10);
+   layout->addWidget(mDiffInfoPanel);
+   layout->addWidget(mDiffWidget);
 }
 
 void FullDiffWidget::reload()
@@ -87,18 +100,14 @@ void FullDiffWidget::processData(const QString &fileChunk)
    {
       mPreviousDiffText = fileChunk;
 
-      const auto pos = verticalScrollBar()->value();
+      const auto pos = mDiffWidget->verticalScrollBar()->value();
 
-      setUpdatesEnabled(false);
-
-      clear();
-
-      setPlainText(fileChunk);
-      moveCursor(QTextCursor::Start);
-
-      verticalScrollBar()->setValue(pos);
-
-      setUpdatesEnabled(true);
+      mDiffWidget->setUpdatesEnabled(false);
+      mDiffWidget->clear();
+      mDiffWidget->setPlainText(fileChunk);
+      mDiffWidget->moveCursor(QTextCursor::Start);
+      mDiffWidget->verticalScrollBar()->setValue(pos);
+      mDiffWidget->setUpdatesEnabled(true);
    }
 }
 
@@ -106,6 +115,8 @@ void FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
 {
    mCurrentSha = sha;
    mPreviousSha = diffToSha;
+
+   mDiffInfoPanel->configure(mCurrentSha, mPreviousSha);
 
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
    const auto ret = git->getCommitDiff(mCurrentSha, mPreviousSha);

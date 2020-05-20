@@ -29,7 +29,7 @@ class FileDiffHighlighter;
 class FileDiffView;
 class QPushButton;
 class GitBase;
-class QLabel;
+class DiffInfoPanel;
 class RevisionsCache;
 
 /*!
@@ -94,16 +94,7 @@ private:
    FileDiffView *mDiffView = nullptr;
    QPushButton *mGoPrevious = nullptr;
    QPushButton *mGoNext = nullptr;
-   QLabel *mLabelCurrentSha = nullptr;
-   QLabel *mLabelCurrentTitle = nullptr;
-   QLabel *mLabelCurrentAuthor = nullptr;
-   QLabel *mLabelCurrentDateTime = nullptr;
-   QLabel *mLabelCurrentEmail = nullptr;
-   QLabel *mLabelPreviousSha = nullptr;
-   QLabel *mLabelPreviousTitle = nullptr;
-   QLabel *mLabelPreviousAuthor = nullptr;
-   QLabel *mLabelPreviousDateTime = nullptr;
-   QLabel *mLabelPreviousEmail = nullptr;
+   DiffInfoPanel *mDiffInfoPanel = nullptr;
    QVector<int> mModifications;
    int mRowIndex = 0;
    int mDestRow = 0;

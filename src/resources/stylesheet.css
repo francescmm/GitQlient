@@ -151,7 +151,12 @@ QMenu::separator
 
 /**  END  RepositoryContextMenu **/
 
-FullDiffWidget, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget
+{
+    border: none;
+}
+
+FullDiffWidget > QTextEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-width: 1px;
     border-style: solid;
