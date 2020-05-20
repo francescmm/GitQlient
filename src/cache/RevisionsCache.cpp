@@ -85,11 +85,6 @@ RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString
    return mRevisionFilesMap.value(qMakePair(sha1, sha2));
 }
 
-References RevisionsCache::getReference(const QString &sha) const
-{
-   return mCommitsMap.contains(sha) ? mCommitsMap[sha]->getReferences() : References();
-}
-
 void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 {
    if (mCacheLocked)
@@ -112,7 +107,9 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
       {
          QLog_Trace("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
 
-         delete mCommits[orderIdx];
+         if (mCommits[orderIdx])
+            delete mCommits[orderIdx];
+
          mCommits[orderIdx] = commit;
       }
 
@@ -139,11 +136,11 @@ bool RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2
    return false;
 }
 
-void RevisionsCache::insertReference(const QString &sha, References ref)
+void RevisionsCache::insertReference(const QString &sha, const QString &reference)
 {
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-   mCommitsMap[sha]->addReferences(std::move(ref));
+   mCommitsMap[sha]->addReference(reference);
 
    if (!mReferences.contains(mCommitsMap[sha]))
       mReferences.append(mCommitsMap[sha]);
@@ -178,7 +175,9 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
       const auto sha = c.sha();
       const auto commit = new CommitInfo(std::move(c));
 
-      delete mCommits[0];
+      if (mCommits[0])
+         delete mCommits[0];
+
       mCommits[0] = commit;
 
       mCommitsMap.insert(sha, commit);
@@ -207,8 +206,6 @@ QVector<Lane> RevisionsCache::calculateLanes(const CommitInfo &c)
 
    if (isDiscontinuity)
       mLanes.changeActiveLane(sha); // uses previous isBoundary state
-
-   mLanes.setBoundary(c.isBoundary()); // update must be here
 
    if (isFork)
       mLanes.setFork(sha);
@@ -343,7 +340,7 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const
    QVector<QPair<QString, QStringList>> tags;
 
    for (auto commit : mReferences)
-      tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences().tags));
+      tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::Tag)));
 
    return tags;
 }
@@ -354,7 +351,8 @@ QString RevisionsCache::getCommitForBranch(const QString &branch, bool local) co
 
    for (auto commit : mReferences)
    {
-      const auto branches = local ? commit->getReferences().branches : commit->getReferences().remoteBranches;
+      const auto branches
+          = commit->getReferences(local ? References::Type::LocalBranch : References::Type::RemoteBranches);
 
       if (branches.contains(branch))
       {

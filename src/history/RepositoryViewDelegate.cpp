@@ -1,6 +1,7 @@
 ﻿#include "RepositoryViewDelegate.h"
 
 #include <GitQlientStyles.h>
+#include <GitLocal.h>
 #include <Lane.h>
 #include <LaneType.h>
 #include <CommitInfo.h>
@@ -202,17 +203,14 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool 
       case LaneType::TAIL:
       case LaneType::CROSS:
       case LaneType::CROSS_EMPTY:
-      case LaneType::BOUNDARY_C:
          p->drawLine(x1 + (isCommit ? 10 : 0), h, x2, h);
          break;
       case LaneType::MERGE_FORK_R:
-      case LaneType::BOUNDARY_R:
          p->drawLine(x1 + (isCommit ? 0 : 10), h, m - (isCommit ? 6 : 0), h);
          break;
       case LaneType::MERGE_FORK_L:
       case LaneType::HEAD_L:
       case LaneType::TAIL_L:
-      case LaneType::BOUNDARY_L:
          p->drawLine(m + (isCommit ? 6 : 0), h, x2, h);
          break;
       default:
@@ -323,7 +321,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto offset = 0;
 
-   if ((commit.getReferences().type & ANY_REF) > 0 && !mView->hasActiveFilter())
+   if (commit.hasReferences() && !mView->hasActiveFilter())
    {
       offset = 5;
       paintTagBranch(p, opt, offset, sha);
@@ -346,31 +344,28 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
    QMap<QString, QColor> markValues;
    const auto currentBranch = mGit->getCurrentBranch();
    const auto commit = mCache->getCommitInfo(sha);
-   auto ref_types = commit.getReferences().type;
 
-   if (ref_types != 0)
+   if ((currentBranch.isEmpty() || currentBranch == "HEAD"))
    {
-      const auto references = commit.getReferences();
-      if (ref_types & CUR_BRANCH && (currentBranch.isEmpty() || currentBranch == "HEAD"))
+      if (const auto ret = mGit->getLastCommit(); ret.success && commit.sha() == ret.output.toString().trimmed())
          markValues.insert("detached", GitQlientStyles::getDetachedColor());
+   }
 
-      const auto localBranches = references.branches;
+   if (commit.hasReferences())
+   {
+      const auto localBranches = commit.getReferences(References::Type::LocalBranch);
       for (const auto &branch : localBranches)
          markValues.insert(branch,
                            branch == currentBranch ? GitQlientStyles::getCurrentBranchColor()
                                                    : GitQlientStyles::getLocalBranchColor());
 
-      const auto remoteBranches = references.remoteBranches;
+      const auto remoteBranches = commit.getReferences(References::Type::RemoteBranches);
       for (const auto &branch : remoteBranches)
          markValues.insert(branch, QColor("#011f4b"));
 
-      const auto tags = references.tags;
+      const auto tags = commit.getReferences(References::Type::Tag);
       for (const auto &tag : tags)
          markValues.insert(tag, GitQlientStyles::getTagColor());
-
-      const auto refs = references.refs;
-      for (const auto &ref : refs)
-         markValues.insert(ref, GitQlientStyles::getRefsColor());
    }
 
    const auto showMinimal = o.rect.width() <= MIN_VIEW_WIDTH_PX;

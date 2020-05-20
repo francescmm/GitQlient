@@ -74,8 +74,10 @@ public:
    int getLanesCount() const { return mLanes.count(); }
    int getActiveLane() const;
 
+   void addReference(const QString &reference);
    void addReferences(const References &refs) { mReferences = refs; }
-   References getReferences() const { return mReferences; }
+   QStringList getReferences(References::Type type) const { return mReferences.getReferences(type); }
+   bool hasReferences() const { return !mReferences.isEmpty(); }
 
    static const QString ZERO_SHA;
 

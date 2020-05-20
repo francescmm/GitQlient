@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>WorkInProgressWidget</class>
- <widget class="QWidget" name="WorkInProgressWidget">
+ <class>CommitChangesWidget</class>
+ <widget class="QWidget" name="CommitChangesWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -151,7 +151,7 @@
     </widget>
    </item>
    <item row="1" column="1" colspan="2">
-    <widget class="QListWidget" name="untrackedFilesList">
+    <widget class="UntrackedFilesList" name="untrackedFilesList">
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>
      </property>
@@ -184,7 +184,7 @@
     </widget>
    </item>
    <item row="7" column="1" colspan="2">
-    <widget class="QListWidget" name="stagedFilesList">
+    <widget class="StagedFilesList" name="stagedFilesList">
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>
      </property>
@@ -478,7 +478,7 @@
         <string>Commit selected files</string>
        </property>
        <property name="text">
-        <string>&amp;Commit</string>
+        <string>&amp;Amend</string>
        </property>
        <property name="shortcut">
         <string>Alt+C</string>
@@ -490,6 +490,18 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>UntrackedFilesList</class>
+   <extends>QListWidget</extends>
+   <header>UntrackedFilesList.h</header>
+  </customwidget>
+  <customwidget>
+   <class>StagedFilesList</class>
+   <extends>QListWidget</extends>
+   <header>StagedFilesList.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>leCommitTitle</tabstop>
   <tabstop>teDescription</tabstop>

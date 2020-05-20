@@ -52,6 +52,8 @@ public:
 
    QString getCurrentBranch();
 
+   GitExecResult getLastCommit() const;
+
 protected:
    QString mWorkingDirectory;
    QString mCurrentBranch;

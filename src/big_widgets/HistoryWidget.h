@@ -32,7 +32,8 @@ class CommitHistoryView;
 class QLineEdit;
 class BranchesWidget;
 class QStackedWidget;
-class WorkInProgressWidget;
+class WipWidget;
+class AmendWidget;
 class CommitInfoWidget;
 class QCheckBox;
 class RepositoryViewDelegate;
@@ -168,11 +169,6 @@ public:
 
    */
    void resetWip();
-   /*!
-    \brief Reloads the information for the current subwidgets.
-
-   */
-   void reload();
 
    /**
     * @brief loadBranches Loads the information on the branches widget: branches, tags, stashes and submodules.
@@ -198,7 +194,7 @@ public:
    */
    void onCommitSelected(const QString &goToSha);
    /*!
-    \brief Opens the WorkInProgressWidget in amend mode.
+    \brief Opens the AmendWidget.
 
     \param sha The commit SHA to amend.
    */
@@ -224,8 +220,9 @@ private:
    BranchesWidget *mBranchesWidget = nullptr;
    QLineEdit *mSearchInput = nullptr;
    QStackedWidget *mCommitStackedWidget = nullptr;
-   WorkInProgressWidget *mCommitWidget = nullptr;
-   CommitInfoWidget *mRevisionWidget = nullptr;
+   WipWidget *mWipWidget = nullptr;
+   AmendWidget *mAmendWidget = nullptr;
+   CommitInfoWidget *mCommitInfoWidget = nullptr;
    QCheckBox *mChShowAllBranches = nullptr;
    RepositoryViewDelegate *mItemDelegate = nullptr;
 

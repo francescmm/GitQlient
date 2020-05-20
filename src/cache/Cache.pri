@@ -4,7 +4,6 @@ HEADERS += \
     $$PWD/CommitInfo.h \
     $$PWD/Lane.h \
     $$PWD/LaneType.h \
-    $$PWD/ReferenceType.h \
     $$PWD/References.h \
     $$PWD/RevisionFiles.h \
     $$PWD/RevisionsCache.h \

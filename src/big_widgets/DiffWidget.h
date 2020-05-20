@@ -109,6 +109,7 @@ public:
 
 private:
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<RevisionsCache> mCache;
    QStackedWidget *centerStackedWidget = nullptr;
    QMap<QString, QPair<QFrame *, DiffButton *>> mDiffButtons;
    QVBoxLayout *mDiffButtonsContainer = nullptr;

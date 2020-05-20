@@ -23,43 +23,29 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <GitExecResult.h>
+#include <CommitChangesWidget.h>
 
-#include <QSharedPointer>
+namespace Ui
+{
+class CommitChangesWidget;
+}
 
-class GitBase;
-class RevisionFiles;
-
-class GitLocal : public QObject
+class AmendWidget : public CommitChangesWidget
 {
    Q_OBJECT
 
-signals:
-   void signalWipUpdated() const;
-
 public:
-   enum class CommitResetType
-   {
-      SOFT,
-      MIXED,
-      HARD
-   };
+   explicit AmendWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                        QWidget *parent = nullptr);
 
-   explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
-   GitExecResult cherryPickCommit(const QString &sha) const;
-   GitExecResult cherryPickAbort() const;
-   GitExecResult cherryPickContinue() const;
-   GitExecResult checkoutCommit(const QString &sha) const;
-   GitExecResult markFileAsResolved(const QString &fileName) const;
-   bool checkoutFile(const QString &fileName) const;
-   GitExecResult resetFile(const QString &fileName) const;
-   bool resetCommit(const QString &sha, CommitResetType type) const;
-   GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg) const;
-   GitExecResult ammendCommit(const QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
-                              const QString &author = QString()) const;
+   ~AmendWidget() = default;
+
+   void configure(const QString &sha) override;
 
 private:
-   QSharedPointer<GitBase> mGitBase;
+   bool commitChanges() override;
+   void showUnstagedMenu(const QPoint &pos) override;
 
-   GitExecResult updateIndex(const RevisionFiles &files, const QStringList &selFiles) const;
+   static QString lastMsgBeforeError;
+   static const int kMaxTitleChars;
 };

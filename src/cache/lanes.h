@@ -10,9 +10,8 @@
 #include <QString>
 #include <QVector>
 
+#include <LaneType.h>
 #include <Lane.h>
-
-enum class LaneType;
 
 //
 //  At any given time, the Lanes class represents a single revision (row) of the history graph.
@@ -33,7 +32,6 @@ public:
    void init(const QString &expectedSha);
    void clear();
    bool isFork(const QString &sha, bool &isDiscontinuity);
-   void setBoundary(bool isBoundary);
    void setFork(const QString &sha);
    void setMerge(const QStringList &parents);
    void setInitial();
@@ -55,8 +53,9 @@ private:
    int activeLane;
    QVector<Lane> typeVec; // Describes which glyphs should be drawn.
    QVector<QString> nextShaVec; // The sha1 hashes of the next commit to appear in each lane (column).
-   bool boundary;
-   LaneType NODE, NODE_L, NODE_R;
+   LaneType NODE = LaneType::MERGE_FORK;
+   LaneType NODE_R = LaneType::MERGE_FORK_R;
+   LaneType NODE_L = LaneType::MERGE_FORK_L;
 };
 
 #endif

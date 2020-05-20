@@ -113,13 +113,6 @@ GitExecResult GitBranches::removeRemoteBranch(const QString &branchName)
    return mGitBase->run(QString("git push --delete origin %1").arg(branchName));
 }
 
-GitExecResult GitBranches::getBranchesOfCommit(const QString &sha)
-{
-   QLog_Debug("Git", QString("Executing removeBranchesOfCommit: {%1}").arg(sha));
-
-   return mGitBase->run(QString("git branch --contains %1 --all").arg(sha));
-}
-
 GitExecResult GitBranches::getLastCommitOfBranch(const QString &branch)
 {
    QLog_Debug("Git", QString("Executing getLastCommitOfBranch: {%1}").arg(branch));

@@ -74,3 +74,8 @@ QString GitBase::getCurrentBranch()
 
    return mCurrentBranch;
 }
+
+GitExecResult GitBase::getLastCommit() const
+{
+   return run("git rev-parse HEAD");
+}

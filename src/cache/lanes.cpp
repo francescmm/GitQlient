@@ -7,7 +7,6 @@
 
 */
 #include "lanes.h"
-#include <LaneType.h>
 
 #include <QStringList>
 
@@ -15,7 +14,6 @@ void Lanes::init(const QString &expectedSha)
 {
    clear();
    activeLane = 0;
-   setBoundary(false);
    add(LaneType::BRANCH, expectedSha, activeLane);
 }
 
@@ -23,17 +21,6 @@ void Lanes::clear()
 {
    typeVec.clear();
    nextShaVec.clear();
-}
-
-void Lanes::setBoundary(bool b)
-{
-   NODE = b ? LaneType::BOUNDARY_C : LaneType::MERGE_FORK;
-   NODE_R = b ? LaneType::BOUNDARY_R : LaneType::MERGE_FORK_R;
-   NODE_L = b ? LaneType::BOUNDARY_L : LaneType::MERGE_FORK_L;
-   boundary = b;
-
-   if (boundary)
-      typeVec[activeLane].setBoundary();
 }
 
 bool Lanes::isFork(const QString &sha, bool &isDiscontinuity)
@@ -92,9 +79,6 @@ void Lanes::setFork(const QString &sha)
 
 void Lanes::setMerge(const QStringList &parents)
 {
-   if (boundary)
-      return; // handle as a simple active line
-
    auto &t = typeVec[activeLane];
    auto wasFork = t.equals(NODE);
    auto wasFork_L = t.equals(NODE_L);
@@ -171,14 +155,14 @@ void Lanes::setInitial()
    auto &t = typeVec[activeLane];
 
    if (!isNode(t))
-      t.setType(boundary ? LaneType::BOUNDARY : LaneType::INITIAL);
+      t.setType(LaneType::INITIAL);
 }
 
 void Lanes::changeActiveLane(const QString &sha)
 {
    auto &t = typeVec[activeLane];
 
-   if (t.equals(LaneType::INITIAL) || t.isBoundary())
+   if (t.equals(LaneType::INITIAL))
       t.setType(LaneType::EMPTY);
    else
       t.setType(LaneType::NOT_ACTIVE);
@@ -194,9 +178,6 @@ void Lanes::changeActiveLane(const QString &sha)
 
 void Lanes::afterMerge()
 {
-   if (boundary)
-      return; // will be reset by changeActiveLane()
-
    for (int i = 0; i < typeVec.count(); i++)
    {
       auto &t = typeVec[i];
@@ -221,7 +202,7 @@ void Lanes::afterFork()
       else if (t.isTail() || t.equals(LaneType::CROSS_EMPTY))
          t.setType(LaneType::EMPTY);
 
-      if (!boundary && isNode(t))
+      if (isNode(t))
          t.setType(LaneType::ACTIVE); // boundary will be reset by changeActiveLane()
    }
 
@@ -244,7 +225,7 @@ void Lanes::afterBranch()
 
 void Lanes::nextParent(const QString &sha)
 {
-   nextShaVec[activeLane] = boundary ? QString() : sha;
+   nextShaVec[activeLane] = sha;
 }
 
 int Lanes::findNextSha(const QString &next, int pos)

@@ -47,7 +47,6 @@ public:
    GitExecResult renameBranch(const QString &oldName, const QString &newName);
    GitExecResult removeLocalBranch(const QString &branchName);
    GitExecResult removeRemoteBranch(const QString &branchName);
-   GitExecResult getBranchesOfCommit(const QString &sha);
    GitExecResult getLastCommitOfBranch(const QString &branch);
    GitExecResult prune();
    QString getCurrentBranch() const;

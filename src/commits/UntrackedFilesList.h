@@ -23,43 +23,27 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <GitExecResult.h>
+#include <QListWidget>
 
-#include <QSharedPointer>
-
-class GitBase;
-class RevisionFiles;
-
-class GitLocal : public QObject
+class UntrackedFilesList : public QListWidget
 {
    Q_OBJECT
 
 signals:
-   void signalWipUpdated() const;
+   void signalStageFile(QListWidgetItem *item);
+   void signalCheckoutPerformed();
+   void signalShowDiff(const QString &fileName);
 
 public:
-   enum class CommitResetType
-   {
-      SOFT,
-      MIXED,
-      HARD
-   };
-
-   explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
-   GitExecResult cherryPickCommit(const QString &sha) const;
-   GitExecResult cherryPickAbort() const;
-   GitExecResult cherryPickContinue() const;
-   GitExecResult checkoutCommit(const QString &sha) const;
-   GitExecResult markFileAsResolved(const QString &fileName) const;
-   bool checkoutFile(const QString &fileName) const;
-   GitExecResult resetFile(const QString &fileName) const;
-   bool resetCommit(const QString &sha, CommitResetType type) const;
-   GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg) const;
-   GitExecResult ammendCommit(const QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
-                              const QString &author = QString()) const;
+   explicit UntrackedFilesList(QWidget *parent = nullptr);
+   void setWorkingDirectory(const QString &workingDir) { mWorkingDir = workingDir; }
 
 private:
-   QSharedPointer<GitBase> mGitBase;
+   QString mWorkingDir;
+   QListWidgetItem *mSelectedItem = nullptr;
 
-   GitExecResult updateIndex(const RevisionFiles &files, const QStringList &selFiles) const;
+   void onContextMenu(const QPoint &pos);
+   void onStageFile();
+   void onDeleteFile();
+   void onDoubleClick(QListWidgetItem *item);
 };

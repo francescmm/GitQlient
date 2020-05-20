@@ -52,12 +52,12 @@ QLabel
     color: black;
 }
 
-CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoWidget > #labelDescription
+#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
 {
     background-color: #606162;
 }
 
-CommitInfoWidget #labelSha
+#labelSha
 {
     color: #D89000;
     background-color: #202122;
@@ -96,7 +96,7 @@ QListWidget::item:disabled
     color: #A6A6A7;
 }
 
-CommitHistoryView, FullDiffWidget, WorkInProgressWidget > QListWidget, FileListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget > QTextEdit, WorkInProgressWidget > QListWidget, FileListWidget, QTreeWidget
 {
     background-color: white;
     border: 1px solid #202122;
@@ -107,7 +107,7 @@ WorkInProgressWidget > QListWidget
     border-top: 0;
 }
 
-CommitHistoryView, FullDiffWidget, WorkInProgressWidget > QListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget > QTextEdit, WorkInProgressWidget > QListWidget, QTreeWidget
 {
     color: black;
 }
@@ -145,7 +145,7 @@ QMenu::separator
    background: black;
 }
 
-FullDiffWidget, WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription
+FullDiffWidget > QTextEdit, WorkInProgressWidget > QLineEdit, WorkInProgressWidget > #teDescription
 {
     border-color: #202122
 }

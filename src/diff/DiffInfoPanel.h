@@ -23,43 +23,28 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <GitExecResult.h>
+#include <QFrame>
 
-#include <QSharedPointer>
+class QLabel;
+class RevisionsCache;
 
-class GitBase;
-class RevisionFiles;
-
-class GitLocal : public QObject
+class DiffInfoPanel : public QFrame
 {
-   Q_OBJECT
-
-signals:
-   void signalWipUpdated() const;
-
 public:
-   enum class CommitResetType
-   {
-      SOFT,
-      MIXED,
-      HARD
-   };
+   explicit DiffInfoPanel(QSharedPointer<RevisionsCache> cache, QWidget *parent = nullptr);
 
-   explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
-   GitExecResult cherryPickCommit(const QString &sha) const;
-   GitExecResult cherryPickAbort() const;
-   GitExecResult cherryPickContinue() const;
-   GitExecResult checkoutCommit(const QString &sha) const;
-   GitExecResult markFileAsResolved(const QString &fileName) const;
-   bool checkoutFile(const QString &fileName) const;
-   GitExecResult resetFile(const QString &fileName) const;
-   bool resetCommit(const QString &sha, CommitResetType type) const;
-   GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg) const;
-   GitExecResult ammendCommit(const QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
-                              const QString &author = QString()) const;
+   void configure(const QString &currentSha, const QString &previousSha);
 
 private:
-   QSharedPointer<GitBase> mGitBase;
-
-   GitExecResult updateIndex(const RevisionFiles &files, const QStringList &selFiles) const;
+   QSharedPointer<RevisionsCache> mCache;
+   QLabel *mLabelCurrentSha = nullptr;
+   QLabel *mLabelCurrentTitle = nullptr;
+   QLabel *mLabelCurrentAuthor = nullptr;
+   QLabel *mLabelCurrentDateTime = nullptr;
+   QLabel *mLabelCurrentEmail = nullptr;
+   QLabel *mLabelPreviousSha = nullptr;
+   QLabel *mLabelPreviousTitle = nullptr;
+   QLabel *mLabelPreviousAuthor = nullptr;
+   QLabel *mLabelPreviousDateTime = nullptr;
+   QLabel *mLabelPreviousEmail = nullptr;
 };

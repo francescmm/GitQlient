@@ -4,17 +4,24 @@
 #include <FileDiffView.h>
 #include <FileDiffHighlighter.h>
 #include <CommitInfo.h>
+#include <RevisionsCache.h>
+#include <DiffInfoPanel.h>
 
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QLabel>
 #include <QScrollBar>
+#include <QDateTime>
 
-FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
+FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+                               QWidget *parent)
    : QFrame(parent)
    , mGit(git)
+   , mCache(cache)
    , mDiffView(new FileDiffView())
    , mGoPrevious(new QPushButton())
    , mGoNext(new QPushButton())
+   , mDiffInfoPanel(new DiffInfoPanel(cache))
 
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -24,9 +31,10 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QWidget *pare
    mGoPrevious->setIcon(QIcon(":/icons/go_up"));
    mGoNext->setIcon(QIcon(":/icons/go_down"));
 
-   const auto vLayout = new QHBoxLayout(this);
+   const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
-   vLayout->setSpacing(0);
+   vLayout->setSpacing(10);
+   vLayout->addWidget(mDiffInfoPanel);
    vLayout->addWidget(mDiffView);
 }
 
@@ -48,6 +56,8 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    mCurrentFile = file;
    mCurrentSha = currentSha;
    mPreviousSha = previousSha;
+
+   mDiffInfoPanel->configure(currentSha, previousSha);
 
    auto destFile = file;
 

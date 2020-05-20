@@ -23,43 +23,24 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <GitExecResult.h>
+#include <QListWidget>
 
-#include <QSharedPointer>
-
-class GitBase;
-class RevisionFiles;
-
-class GitLocal : public QObject
+class StagedFilesList : public QListWidget
 {
    Q_OBJECT
 
 signals:
-   void signalWipUpdated() const;
+   void signalResetFile(QListWidgetItem *item);
+   void signalShowDiff(const QString &fileName);
 
 public:
-   enum class CommitResetType
-   {
-      SOFT,
-      MIXED,
-      HARD
-   };
-
-   explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
-   GitExecResult cherryPickCommit(const QString &sha) const;
-   GitExecResult cherryPickAbort() const;
-   GitExecResult cherryPickContinue() const;
-   GitExecResult checkoutCommit(const QString &sha) const;
-   GitExecResult markFileAsResolved(const QString &fileName) const;
-   bool checkoutFile(const QString &fileName) const;
-   GitExecResult resetFile(const QString &fileName) const;
-   bool resetCommit(const QString &sha, CommitResetType type) const;
-   GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg) const;
-   GitExecResult ammendCommit(const QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
-                              const QString &author = QString()) const;
+   explicit StagedFilesList(QWidget *parent);
 
 private:
-   QSharedPointer<GitBase> mGitBase;
+   QListWidgetItem *mSelectedItem = nullptr;
 
-   GitExecResult updateIndex(const RevisionFiles &files, const QStringList &selFiles) const;
+   void onContextMenu(const QPoint &pos);
+   void onResetFile();
+   void onShowDiff();
+   void onDoubleClick(QListWidgetItem *item);
 };

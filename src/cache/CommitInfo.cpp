@@ -96,3 +96,13 @@ int CommitInfo::getActiveLane() const
 
    return -1;
 }
+
+void CommitInfo::addReference(const QString &reference)
+{
+   if (reference.startsWith("refs/tags/"))
+      mReferences.addReference(References::Type::Tag, reference.mid(10, reference.length() - 13));
+   else if (reference.startsWith("refs/heads/"))
+      mReferences.addReference(References::Type::LocalBranch, reference.mid(11));
+   else if (reference.startsWith("refs/remotes/") && !reference.endsWith("HEAD"))
+      mReferences.addReference(References::Type::RemoteBranches, reference.mid(13));
+}

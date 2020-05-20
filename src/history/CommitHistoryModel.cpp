@@ -45,12 +45,11 @@ void CommitHistoryModel::clear()
 
 void CommitHistoryModel::onNewRevisions(int totalCommits)
 {
-   const auto revisionsCount = totalCommits;
-
    beginResetModel();
-   beginInsertRows(QModelIndex(), 0, revisionsCount - 1);
-   endInsertRows();
    endResetModel();
+
+   beginInsertRows(QModelIndex(), 0, totalCommits - 2);
+   endInsertRows();
 }
 
 QVariant CommitHistoryModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -76,20 +75,20 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    QString auxMessage;
    const auto sha = r.sha();
 
-   if ((r.getReferences().type & ANY_REF & CUR_BRANCH) && mGit->getCurrentBranch().isEmpty())
+   if (mGit->getCurrentBranch().isEmpty())
       auxMessage.append("<p>Status: <b>detached</b></p>");
 
-   const auto localBranches = r.getReferences().branches;
+   const auto localBranches = r.getReferences(References::Type::LocalBranch);
 
    if (!localBranches.isEmpty())
       auxMessage.append(QString("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
 
-   const auto remoteBranches = r.getReferences().remoteBranches;
+   const auto remoteBranches = r.getReferences(References::Type::RemoteBranches);
 
    if (!remoteBranches.isEmpty())
       auxMessage.append(QString("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
 
-   const auto tags = r.getReferences().tags;
+   const auto tags = r.getReferences(References::Type::Tag);
 
    if (!tags.isEmpty())
       auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));

@@ -17,8 +17,9 @@ using namespace QLogger;
 DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
+   , mCache(cache)
    , centerStackedWidget(new QStackedWidget())
-   , mCommitDiffWidget(new CommitDiffWidget(mGit, std::move(cache)))
+   , mCommitDiffWidget(new CommitDiffWidget(mGit, mCache))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -91,7 +92,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
           "UI",
           QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
 
-      const auto fileDiffWidget = new FileDiffWidget(mGit);
+      const auto fileDiffWidget = new FileDiffWidget(mGit, mCache);
       const auto fileWithModifications = fileDiffWidget->configure(currentSha, previousSha, file);
 
       if (fileWithModifications)
@@ -163,7 +164,7 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 
    if (!mDiffButtons.contains(id))
    {
-      const auto fullDiffWidget = new FullDiffWidget(mGit);
+      const auto fullDiffWidget = new FullDiffWidget(mGit, mCache);
       fullDiffWidget->loadDiff(sha, parentSha);
 
       const auto diffButton = new DiffButton(id, ":/icons/commit-list");
@@ -172,9 +173,9 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       for (const auto &buttons : qAsConst(mDiffButtons))
          buttons.second->setUnselected();
 
-      connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton]() {
+      connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton, sha, parentSha]() {
          centerStackedWidget->setCurrentWidget(fullDiffWidget);
-         mCommitDiffWidget->configure(fullDiffWidget->getCurrentSha(), fullDiffWidget->getPreviousSha());
+         mCommitDiffWidget->configure(sha, parentSha);
 
          for (const auto &buttons : qAsConst(mDiffButtons))
             if (buttons.second != diffButton)
