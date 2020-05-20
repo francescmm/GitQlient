@@ -46,9 +46,10 @@ void CommitHistoryModel::clear()
 void CommitHistoryModel::onNewRevisions(int totalCommits)
 {
    beginResetModel();
+   endResetModel();
+
    beginInsertRows(QModelIndex(), 0, totalCommits - 2);
    endInsertRows();
-   endResetModel();
 }
 
 QVariant CommitHistoryModel::headerData(int section, Qt::Orientation orientation, int role) const
