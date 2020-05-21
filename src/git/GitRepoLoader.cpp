@@ -127,7 +127,7 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    mRevCache->configure(totalCommits);
 
-   emit signalLoadingStarted();
+   emit signalLoadingStarted(totalCommits);
 
    QLog_Debug("Git", QString("Adding the WIP commit."));
 
@@ -138,9 +138,11 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
       CommitInfo revision(commitInfo);
 
       if (revision.isValid())
-         mRevCache->insertCommitInfo(std::move(revision), count++);
+         mRevCache->insertCommitInfo(std::move(revision), count);
       else
          break;
+
+      emit signalLoadingStep(count++);
    }
 
    mLocked = false;

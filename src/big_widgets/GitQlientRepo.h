@@ -191,11 +191,18 @@ private:
     \param fileName The path to the file.
    */
    void showFileHistory(const QString &fileName);
+
    /*!
     \brief Updates the progess dialog when loading a really huge repository.
-
+    \param total Total number of steps
    */
-   void updateProgressDialog();
+   void createProgressDialog(int total);
+
+   /*!
+    \brief Updates the progess dialog when loading a really huge repository.
+    \param step Number of step
+   */
+   void updateProgressDialog(int step);
    /*!
     \brief When the loading finishes this method closes and destroyes the dialog.
 

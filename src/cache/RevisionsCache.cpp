@@ -140,10 +140,15 @@ void RevisionsCache::insertReference(const QString &sha, const QString &referenc
 {
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-   mCommitsMap[sha]->addReference(reference);
+   auto commit = mCommitsMap[sha];
 
-   if (!mReferences.contains(mCommitsMap[sha]))
-      mReferences.append(mCommitsMap[sha]);
+   if (commit)
+   {
+      commit->addReference(reference);
+
+      if (!mReferences.contains(mCommitsMap[sha]))
+         mReferences.append(mCommitsMap[sha]);
+   }
 }
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)

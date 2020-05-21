@@ -35,7 +35,8 @@ class GitRepoLoader : public QObject
    Q_OBJECT
 
 signals:
-   void signalLoadingStarted();
+   void signalLoadingStarted(int total);
+   void signalLoadingStep(int value);
    void signalLoadingFinished();
    void cancelAllProcesses(QPrivateSignal);
 
