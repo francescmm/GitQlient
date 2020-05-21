@@ -442,3 +442,8 @@ void GitQlientRepo::closeEvent(QCloseEvent *ce)
 
    QWidget::closeEvent(ce);
 }
+
+void GitRepoLoader::cancelAll()
+{
+   emit cancelAllProcesses(QPrivateSignal());
+}

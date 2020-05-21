@@ -31,15 +31,10 @@ class GitBase;
 
 class GitBranches : public QObject
 {
-   Q_OBJECT
-
-signals:
-   void signalDistanceBetweenBranches(GitExecResult result);
-
 public:
    GitBranches(const QSharedPointer<GitBase> &gitBase);
    GitExecResult getBranches();
-   bool getDistanceBetweenBranchesAsync(bool toMaster, const QString &right);
+   GitExecResult getDistanceBetweenBranches(bool toMaster, const QString &right);
    GitExecResult createBranchFromAnotherBranch(const QString &oldName, const QString &newName);
    GitExecResult createBranchAtCommit(const QString &commitSha, const QString &branchName);
    GitExecResult checkoutRemoteBranch(const QString &branchName);

@@ -1,7 +1,6 @@
 #include "BranchesWidget.h"
 
 #include <BranchTreeWidget.h>
-#include <GitBranches.h>
 #include <GitTags.h>
 #include <GitSubmodules.h>
 #include <GitStashes.h>
@@ -218,44 +217,39 @@ void BranchesWidget::showBranches()
    clear();
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<GitBranches> git(new GitBranches(mGit));
-   auto ret = git->getBranches();
 
-   if (ret.success)
+   const auto branches = mCache->getBranches();
+
+   if (!branches.empty())
    {
-      auto output = ret.output.toString();
-      if (!output.startsWith("fatal"))
+      QLog_Info("UI", QString("Fetched {%1} branches").arg(branches.count()));
+      QLog_Info("UI", QString("Processing branches..."));
+
+      mRemoteBranchesTree->addTopLevelItem(new QTreeWidgetItem({ "origin" }));
+
+      for (const auto &pair : branches)
       {
-         output.replace(' ', "");
-         const auto branches = output.split('\n');
+         const auto sha = pair.first;
 
-         QLog_Info("UI", QString("Fetched {%1} branches").arg(branches.count()));
-         QLog_Info("UI", QString("Processing branches..."));
-
-         mRemoteBranchesTree->addTopLevelItem(new QTreeWidgetItem({ "origin" }));
-
-         for (const auto &branch : branches)
+         for (const auto &branch : pair.second)
          {
-            if (!branch.isEmpty())
-            {
-               if (branch.startsWith("remotes/") && !branch.contains("HEAD->"))
-                  processRemoteBranch(branch);
-               else if (!branch.contains("HEAD->"))
-                  processLocalBranch(branch);
-            }
+            if (branch.startsWith("remotes/") && !branch.contains("HEAD->"))
+               processRemoteBranch(sha, branch);
+            else if (!branch.contains("HEAD->"))
+               processLocalBranch(sha, branch);
          }
-
-         QLog_Info("UI", QString("... branches processed"));
       }
 
-      processTags();
-      processStashes();
-      processSubmodules();
-
-      QApplication::restoreOverrideCursor();
-
-      adjustBranchesTree(mLocalBranchesTree);
+      QLog_Info("UI", QString("... branches processed"));
    }
+
+   processTags();
+   processStashes();
+   processSubmodules();
+
+   QApplication::restoreOverrideCursor();
+
+   adjustBranchesTree(mLocalBranchesTree);
 }
 
 void BranchesWidget::clear()
@@ -269,7 +263,7 @@ void BranchesWidget::clear()
    blockSignals(false);
 }
 
-void BranchesWidget::processLocalBranch(QString branch)
+void BranchesWidget::processLocalBranch(const QString &sha, QString branch)
 {
    QLog_Debug("UI", QString("Adding local branch {%1}").arg(branch));
 
@@ -281,19 +275,7 @@ void BranchesWidget::processLocalBranch(QString branch)
       isCurrentBranch = true;
    }
 
-   QString sha;
-   auto fullBranchName = branch;
-
-   if (fullBranchName.startsWith("(HEADdetachedat"))
-   {
-      auto shortSha = fullBranchName.remove("(HEADdetachedat");
-      sha = shortSha.remove(")");
-
-      fullBranchName = "detached";
-      branch = "detached";
-   }
-   else
-      sha = mCache->getCommitForBranch(fullBranchName, true);
+   const auto fullBranchName = branch;
 
    QVector<QTreeWidgetItem *> parents;
    QTreeWidgetItem *parent = nullptr;
@@ -365,16 +347,10 @@ void BranchesWidget::processLocalBranch(QString branch)
 
    if (fullBranchName != "detached")
    {
-      const auto git = new GitBranches(mGit);
-      connect(git, &GitBranches::signalDistanceBetweenBranches, item, &GitQlientTreeWidgetItem::distancesToMaster);
-      connect(git, &GitBranches::signalDistanceBetweenBranches, git, &GitBranches::deleteLater);
+      const auto distances = mCache->getLocalBranchDistances(fullBranchName);
 
-      git->getDistanceBetweenBranchesAsync(true, fullBranchName);
-
-      const auto git2 = new GitBranches(mGit);
-      connect(git2, &GitBranches::signalDistanceBetweenBranches, item, &GitQlientTreeWidgetItem::distancesToOrigin);
-      connect(git2, &GitBranches::signalDistanceBetweenBranches, git2, &GitBranches::deleteLater);
-      git2->getDistanceBetweenBranchesAsync(false, fullBranchName);
+      item->setText(1, QString("%1 \u2193 - %2 \u2191").arg(distances.behindMaster).arg(distances.aheadMaster));
+      item->setText(2, QString("%1 \u2193 - %2 \u2191").arg(distances.behindOrigin).arg(distances.aheadOrigin));
    }
 
    mLocalBranchesTree->addTopLevelItem(item);
@@ -382,7 +358,7 @@ void BranchesWidget::processLocalBranch(QString branch)
    QLog_Debug("UI", QString("Finish gathering local branch information"));
 }
 
-void BranchesWidget::processRemoteBranch(QString branch)
+void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
 {
    branch.replace("remotes/", "");
 
@@ -419,8 +395,6 @@ void BranchesWidget::processRemoteBranch(QString branch)
       }
    }
 
-   const auto sha = mCache->getCommitForBranch(fullBranchName, false);
-
    QLog_Debug("UI", QString("Adding remote branch {%1}").arg(branch));
 
    const auto item = new QTreeWidgetItem(parent);
@@ -434,8 +408,6 @@ void BranchesWidget::processRemoteBranch(QString branch)
 
 void BranchesWidget::processTags()
 {
-   QScopedPointer<GitTags> git(new GitTags(mGit));
-   // const auto localTags = git->getLocalTags();
    QVector<QString> localTags;
    const auto tags = mCache->getTags();
 

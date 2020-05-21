@@ -136,7 +136,7 @@ bool RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2
    return false;
 }
 
-void RevisionsCache::insertReference(const QString &sha, const QString &reference)
+void RevisionsCache::insertReference(const QString &sha, References::Type type, const QString &reference)
 {
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
@@ -144,11 +144,16 @@ void RevisionsCache::insertReference(const QString &sha, const QString &referenc
 
    if (commit)
    {
-      commit->addReference(reference);
+      commit->addReference(type, reference);
 
       if (!mReferences.contains(mCommitsMap[sha]))
          mReferences.append(mCommitsMap[sha]);
    }
+}
+
+void RevisionsCache::insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances)
+{
+   mLocalBranchDistances[name] = distances;
 }
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
@@ -338,6 +343,20 @@ bool RevisionsCache::pendingLocalChanges() const
    }
 
    return localChanges;
+}
+
+QVector<QPair<QString, QStringList>> RevisionsCache::getBranches() const
+{
+   QVector<QPair<QString, QStringList>> branches;
+
+   for (auto commit : mReferences)
+   {
+      branches.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::LocalBranch)));
+      branches.append(
+          QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::RemoteBranches)));
+   }
+
+   return branches;
 }
 
 QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const

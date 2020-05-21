@@ -120,14 +120,14 @@ private:
 
     \param branch The branch to be added in the tree widget.
    */
-   void processLocalBranch(QString branch);
+   void processLocalBranch(const QString &sha, QString branch);
    /*!
     \brief Method that for a given \p branch process al the information and creates the item that will be sotred in the
     remote branches BranchTreeWidget.
 
     \param branch The remote branch to be added in the tree widget.
    */
-   void processRemoteBranch(QString branch);
+   void processRemoteBranch(const QString &sha, QString branch);
    /*!
     \brief Process all the tags and adds them into the QListWidget.
 
