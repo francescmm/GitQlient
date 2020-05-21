@@ -1,5 +1,7 @@
 #include "FileListDelegate.h"
 
+#include <GitQlientStyles.h>
+
 #include <QPainter>
 
 const int FileListDelegate::OFFSET = 5;
@@ -13,17 +15,9 @@ void FileListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 {
    painter->save();
    if (option.state & QStyle::State_Selected)
-   {
-      QColor c("#404142");
-      c.setAlphaF(0.75);
-      painter->fillRect(option.rect, c);
-   }
+      painter->fillRect(option.rect, GitQlientStyles::getGraphSelectionColor());
    else if (option.state & QStyle::State_MouseOver)
-   {
-      QColor c("#404142");
-      c.setAlphaF(0.4);
-      painter->fillRect(option.rect, c);
-   }
+      painter->fillRect(option.rect, GitQlientStyles::getGraphHoverColor());
 
    painter->setPen(qvariant_cast<QColor>(index.data(Qt::ForegroundRole)));
 

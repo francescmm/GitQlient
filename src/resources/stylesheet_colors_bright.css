@@ -126,8 +126,8 @@ QMenu
 
 QMenu::item
 {
-    background-color: #2E2F30;
-    color: #ffffff;
+    background-color: white;
+    color: black;
 }
 
 QMenu::item:selected
@@ -429,7 +429,7 @@ FileBlameWidget
 
 BlameWidget > QTabWidget, QTabWidget#HistoryTab:pane
 {
-    background-color: #2E2F30;
+    background-color: #C6C6C7;
     border: 0;
 }
 
