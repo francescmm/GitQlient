@@ -57,6 +57,25 @@ public:
     \return QColor Current text color.
    */
    static QColor getTextColor();
+
+   /**
+    * @brief Gets the row selection color
+    * @return QColor Current row selection color
+    */
+   static QColor getGraphSelectionColor();
+
+   /**
+    * @brief Gets the row hover color
+    * @return QColor Current row hover color
+    */
+   static QColor getGraphHoverColor();
+
+   /**
+    * @brief Gets the background color
+    * @return QColor Current background color
+    */
+   static QColor getBackgroundColor();
+
    /*!
     \brief Gets the GitQlient blue color.
 

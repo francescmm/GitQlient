@@ -32,17 +32,9 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
    newOpt.font.setPointSize(9);
 
    if (newOpt.state & QStyle::State_Selected)
-   {
-      QColor c("#404142");
-      c.setAlphaF(0.75);
-      p->fillRect(newOpt.rect, c);
-   }
+      p->fillRect(newOpt.rect, GitQlientStyles::getGraphSelectionColor());
    else if (newOpt.state & QStyle::State_MouseOver)
-   {
-      QColor c("#404142");
-      c.setAlphaF(0.4);
-      p->fillRect(newOpt.rect, c);
-   }
+      p->fillRect(newOpt.rect, GitQlientStyles::getGraphHoverColor());
 
    const auto row = mView->hasActiveFilter()
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
@@ -183,7 +175,7 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool 
       case LaneType::ACTIVE: {
          isCommit = true;
          p->setPen(QPen(col, 2));
-         p->setBrush(QColor(isWip ? col : "#2E2F30"));
+         p->setBrush(QColor(isWip ? col : GitQlientStyles::getBackgroundColor()));
          p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
       }
       break;

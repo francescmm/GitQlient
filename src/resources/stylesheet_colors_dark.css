@@ -164,9 +164,10 @@ QLabel#lCounter
 CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles
 {
     background: #202122;
+    border: none;
 }
 
-#outputTerminal, FileDiffView
+FileDiffView
 {
     background-color: #2E2F30;
     color: white;
@@ -285,11 +286,6 @@ QFrame#separator, QFrame#separator2px
 QFrame#orangeSeparator
 {
    background-color: #D89000;
-}
-
-QWidget#testWidget
-{
-    background-color: #606162;
 }
 
 QPushButton#bigButton
@@ -452,13 +448,6 @@ QTabWidget#HistoryTab > QTabBar::tab:!selected
 QTabWidget#HistoryTab > QTabBar::tab:!selected:hover
 {
     background-color: #202122;
-}
-
-
-#ShaLabel
-{
-    background-color: #2E2F30;
-    color: white;
 }
 
 DiffButton
