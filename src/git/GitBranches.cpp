@@ -58,7 +58,7 @@ GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
 {
    QLog_Debug("Git", QString("Executing checkoutRemoteBranch: {%1}").arg(branchName));
 
-   const auto ret = mGitBase->run(QString("git checkout %1").arg(branchName));
+   const auto ret = mGitBase->run(QString("git checkout --track %1").arg(branchName));
 
    if (ret.success)
       mGitBase->updateCurrentBranch();
