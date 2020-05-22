@@ -339,7 +339,7 @@ GeneralConfigPage > QLineEdit, QDialog > QLineEdit
 
 QMessageBox
 {
-    background-color: #C6C6C7;
+    background-color: white;
     color: black;
 }
 
