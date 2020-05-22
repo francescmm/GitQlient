@@ -360,26 +360,26 @@ QScrollBar::add-line:vertical, QScrollBar::add-line:horizontal,
 QScrollBar::sub-line:vertical, QScrollBar::sub-line:horizontal
 {
     border-color: #202122;
-    background-color: #A6A6A7;
+    background-color: #2E2F30;
 }
 
 QScrollBar::add-line:vertical:hover, QScrollBar::sub-line:vertical:hover,
 QScrollBar::handle:vertical:hover, QScrollBar::add-line:horizontal:hover,
 QScrollBar::sub-line:horizontal:hover, QScrollBar::handle:horizontal:hover
 {
-    background-color: #C6C6C7;
+    background-color: #404142;
 }
 
 QScrollBar::add-line:vertical:pressed, QScrollBar::sub-line:vertical:pressed,
 QScrollBar::handle:vertical:pressed, QScrollBar::add-line:horizontal:pressed,
 QScrollBar::sub-line:horizontal:pressed, QScrollBar::handle:horizontal:pressed
 {
-    background-color: #B6B6B7;
+    background-color: #303132;
 }
 
 QScrollBar::add-page, QScrollBar::sub-page
 {
-    background-color: #EFEFEF;
+    background-color: #C6C6C7
 }
 
 #AnnotationFrame
