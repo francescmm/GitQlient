@@ -1,6 +1,7 @@
 #include "BranchesWidget.h"
 
 #include <BranchTreeWidget.h>
+#include <GitBase.h>
 #include <GitTags.h>
 #include <GitSubmodules.h>
 #include <GitStashes.h>
@@ -9,7 +10,7 @@
 #include <AddSubmoduleDlg.h>
 #include <StashesContextMenu.h>
 #include <RevisionsCache.h>
-#include <GitQlientTreeWidgetItem.h>
+#include <GitQlientBranchItemRole.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -22,6 +23,7 @@
 #include <QLogger.h>
 
 using namespace QLogger;
+using namespace GitQlient;
 
 namespace
 {
@@ -278,11 +280,8 @@ void BranchesWidget::processLocalBranch(const QString &sha, QString branch)
 
    auto isCurrentBranch = false;
 
-   if (branch.startsWith('*'))
-   {
-      branch.replace('*', "");
+   if (branch == mGit->getCurrentBranch())
       isCurrentBranch = true;
-   }
 
    const auto fullBranchName = branch;
 
@@ -330,14 +329,15 @@ void BranchesWidget::processLocalBranch(const QString &sha, QString branch)
       }
    }
 
-   auto item = new GitQlientTreeWidgetItem(parent);
+   auto item = new QTreeWidgetItem(parent);
    item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
    item->setText(0, branch);
-   item->setData(0, Qt::UserRole, isCurrentBranch);
-   item->setData(0, Qt::UserRole + 1, fullBranchName);
-   item->setData(0, Qt::UserRole + 2, true);
-   item->setData(0, Qt::UserRole + 3, sha);
+   item->setData(0, GitQlient::IsCurrentBranchRole, isCurrentBranch);
+   item->setData(0, GitQlient::FullNameRole, fullBranchName);
+   item->setData(0, GitQlient::LocalBranchRole, true);
+   item->setData(0, GitQlient::ShaRole, sha);
    item->setData(0, Qt::ToolTipRole, fullBranchName);
+   item->setData(0, GitQlient::IsLeaf, true);
 
    if (isCurrentBranch)
    {
@@ -409,10 +409,11 @@ void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
    const auto item = new QTreeWidgetItem(parent);
    item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
    item->setText(0, branch);
-   item->setData(0, Qt::UserRole + 1, fullBranchName);
-   item->setData(0, Qt::UserRole + 2, true);
-   item->setData(0, Qt::UserRole + 3, sha);
+   item->setData(0, GitQlient::FullNameRole, fullBranchName);
+   item->setData(0, GitQlient::LocalBranchRole, false);
+   item->setData(0, GitQlient::ShaRole, sha);
    item->setData(0, Qt::ToolTipRole, fullBranchName);
+   item->setData(0, GitQlient::IsLeaf, true);
 }
 
 void BranchesWidget::processTags()

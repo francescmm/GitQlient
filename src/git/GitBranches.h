@@ -37,6 +37,7 @@ public:
    GitExecResult getDistanceBetweenBranches(bool toMaster, const QString &right);
    GitExecResult createBranchFromAnotherBranch(const QString &oldName, const QString &newName);
    GitExecResult createBranchAtCommit(const QString &commitSha, const QString &branchName);
+   GitExecResult checkoutLocalBranch(const QString &branchName);
    GitExecResult checkoutRemoteBranch(const QString &branchName);
    GitExecResult checkoutNewLocalBranch(const QString &branchName);
    GitExecResult renameBranch(const QString &oldName, const QString &newName);

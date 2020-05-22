@@ -1,8 +1,11 @@
 #include "BranchesViewDelegate.h"
 
 #include <GitQlientStyles.h>
+#include <GitQlientBranchItemRole.h>
 
 #include <QPainter>
+
+using namespace GitQlient;
 
 BranchesViewDelegate::BranchesViewDelegate(QObject *parent)
    : QStyledItemDelegate(parent)
@@ -40,7 +43,7 @@ void BranchesViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &o, con
 
    if (i.column() == 0)
    {
-      if (i.data(Qt::UserRole + 2).toBool())
+      if (i.data(IsLeaf).toBool())
       {
          const auto width = newOpt.rect.x();
          QRect rectIcon(width - 20, newOpt.rect.y(), 20, newOpt.rect.height());

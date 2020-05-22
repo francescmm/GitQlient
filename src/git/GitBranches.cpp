@@ -54,14 +54,43 @@ GitExecResult GitBranches::createBranchAtCommit(const QString &commitSha, const 
    return mGitBase->run(QString("git branch %1 %2").arg(branchName, commitSha));
 }
 
+GitExecResult GitBranches::checkoutLocalBranch(const QString &branchName)
+{
+   QLog_Debug("Git", QString("Executing checkoutRemoteBranch: {%1}").arg(branchName));
+
+   const auto ret = mGitBase->run(QString("git checkout %1").arg(branchName));
+
+   if (ret.success)
+      mGitBase->updateCurrentBranch();
+
+   return ret;
+}
+
 GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
 {
    QLog_Debug("Git", QString("Executing checkoutRemoteBranch: {%1}").arg(branchName));
 
-   const auto ret = mGitBase->run(QString("git checkout --track %1").arg(branchName));
+   auto localBranch = branchName;
+   if (localBranch.startsWith("origin/"))
+      localBranch.remove("origin/");
 
-   if (ret.success)
+   auto ret = mGitBase->run(QString("git checkout -b %1 %2").arg(localBranch).arg(branchName));
+   const auto output = ret.output.toString();
+
+   if (ret.success && !output.contains("fatal:"))
       mGitBase->updateCurrentBranch();
+   else if (output.contains("already exists"))
+   {
+      QRegExp rx("\'\\w+\'");
+      rx.indexIn(ret.output.toString());
+      auto value = rx.capturedTexts().constFirst();
+      value.remove("'");
+
+      if (!value.isEmpty())
+         ret = checkoutLocalBranch(value);
+      else
+         ret.success = false;
+   }
 
    return ret;
 }
