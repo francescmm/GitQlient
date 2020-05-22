@@ -102,7 +102,8 @@ void GitRepoLoader::loadReferences()
             if (refName.startsWith("refs/tags/"))
             {
                type = References::Type::Tag;
-               name = refName.mid(10, reference.length() - 13);
+               name = refName.mid(10, reference.length());
+               name.remove("^{}");
             }
             else if (refName.startsWith("refs/heads/"))
             {
