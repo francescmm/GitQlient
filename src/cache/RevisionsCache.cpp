@@ -345,16 +345,12 @@ bool RevisionsCache::pendingLocalChanges() const
    return localChanges;
 }
 
-QVector<QPair<QString, QStringList>> RevisionsCache::getBranches() const
+QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Type type) const
 {
    QVector<QPair<QString, QStringList>> branches;
 
    for (auto commit : mReferences)
-   {
-      branches.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::LocalBranch)));
-      branches.append(
-          QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::RemoteBranches)));
-   }
+      branches.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(type)));
 
    return branches;
 }

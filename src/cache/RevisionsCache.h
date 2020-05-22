@@ -79,7 +79,7 @@ public:
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
    bool pendingLocalChanges() const;
 
-   QVector<QPair<QString, QStringList>> getBranches() const;
+   QVector<QPair<QString, QStringList>> getBranches(References::Type type) const;
    QVector<QPair<QString, QStringList>> getTags() const;
 
    QString getCommitForBranch(const QString &branch, bool local = true) const;

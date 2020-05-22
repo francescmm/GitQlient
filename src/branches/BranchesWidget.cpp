@@ -218,29 +218,38 @@ void BranchesWidget::showBranches()
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-   const auto branches = mCache->getBranches();
+   auto branches = mCache->getBranches(References::Type::LocalBranch);
 
    if (!branches.empty())
    {
-      QLog_Info("UI", QString("Fetched {%1} branches").arg(branches.count()));
-      QLog_Info("UI", QString("Processing branches..."));
-
-      mRemoteBranchesTree->addTopLevelItem(new QTreeWidgetItem({ "origin" }));
+      QLog_Info("UI", QString("Fetched {%1} local branches").arg(branches.count()));
+      QLog_Info("UI", QString("Processing local branches..."));
 
       for (const auto &pair : branches)
       {
-         const auto sha = pair.first;
-
          for (const auto &branch : pair.second)
-         {
-            if (branch.startsWith("remotes/") && !branch.contains("HEAD->"))
-               processRemoteBranch(sha, branch);
-            else if (!branch.contains("HEAD->"))
-               processLocalBranch(sha, branch);
-         }
+            if (!branch.contains("HEAD->"))
+               processLocalBranch(pair.first, branch);
       }
 
-      QLog_Info("UI", QString("... branches processed"));
+      QLog_Info("UI", QString("... local branches processed"));
+   }
+
+   branches = mCache->getBranches(References::Type::RemoteBranches);
+
+   if (!branches.empty())
+   {
+      QLog_Info("UI", QString("Fetched {%1} remote branches").arg(branches.count()));
+      QLog_Info("UI", QString("Processing remote branches..."));
+
+      for (const auto &pair : branches)
+      {
+         for (const auto &branch : pair.second)
+            if (!branch.contains("HEAD->"))
+               processRemoteBranch(pair.first, branch);
+      }
+
+      QLog_Info("UI", QString("... rmote branches processed"));
    }
 
    processTags();
@@ -360,39 +369,39 @@ void BranchesWidget::processLocalBranch(const QString &sha, QString branch)
 
 void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
 {
-   branch.replace("remotes/", "");
-
    const auto fullBranchName = branch;
-
-   branch.replace("origin/", "");
-
-   auto parent = mRemoteBranchesTree->topLevelItem(0);
    auto folders = branch.split("/");
    branch = folders.takeLast();
 
-   auto found = false;
+   QTreeWidgetItem *parent = nullptr;
 
-   for (const auto &folder : folders)
+   for (const auto &folder : qAsConst(folders))
    {
-      const auto children = parent->childCount();
-      if (children != 0)
+      QTreeWidgetItem *child = nullptr;
+
+      if (parent)
+         child = getChild(parent, folder);
+      else
       {
-         for (auto i = 0; i < children; ++i)
+         for (auto i = 0; i < mRemoteBranchesTree->topLevelItemCount(); ++i)
          {
-            if (parent->child(i)->data(0, Qt::DisplayRole) == folder)
-            {
-               parent = parent->child(i);
-               found = true;
-               break;
-            }
+            if (mRemoteBranchesTree->topLevelItem(i)->text(0) == folder)
+               child = mRemoteBranchesTree->topLevelItem(i);
          }
       }
-      if (!found)
+
+      if (!child)
       {
-         auto item = new QTreeWidgetItem(parent);
+         const auto item = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem();
          item->setText(0, folder);
+
+         if (!parent)
+            mRemoteBranchesTree->addTopLevelItem(item);
+
          parent = item;
       }
+      else
+         parent = child;
    }
 
    QLog_Debug("UI", QString("Adding remote branch {%1}").arg(branch));

@@ -379,7 +379,7 @@ QScrollBar::sub-line:horizontal:pressed, QScrollBar::handle:horizontal:pressed
 
 QScrollBar::add-page, QScrollBar::sub-page
 {
-    background-color: #C6C6C7
+    background-color: #C6C6C7;
 }
 
 #AnnotationFrame
