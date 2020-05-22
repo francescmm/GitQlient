@@ -137,14 +137,14 @@ QMenu::item
 
 QMenu::item:selected
 {
-   background-color: #404142;
+   background-color: #C6C6C7;
    color: #d89000;
 }
 
 QMenu::item:disabled
 {
-   background-color: #242425;
-   color: #656668;
+   background-color: #EFEFEF;
+   color: #C6C6C7;
 }
 
 QMenu::separator
