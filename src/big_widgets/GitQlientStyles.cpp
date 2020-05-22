@@ -64,7 +64,7 @@ QColor GitQlientStyles::getGraphSelectionColor()
       c.setAlphaF(0.75);
    }
    else
-      c.setNamedColor("#EFEFEF");
+      c.setNamedColor("#C6C6C7");
 
    return c;
 }
@@ -82,7 +82,7 @@ QColor GitQlientStyles::getGraphHoverColor()
       c.setAlphaF(0.4);
    }
    else
-      c.setNamedColor("#C6C6C7");
+      c.setNamedColor("#EFEFEF");
 
    return c;
 }
@@ -94,6 +94,17 @@ QColor GitQlientStyles::getBackgroundColor()
 
    QColor c;
    c.setNamedColor(colorSchema == "dark" ? "#2E2F30" : "white");
+
+   return c;
+}
+
+QColor GitQlientStyles::getTabColor()
+{
+   GitQlientSettings settings;
+   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+
+   QColor c;
+   c.setNamedColor(colorSchema == "dark" ? "#404142" : "white");
 
    return c;
 }

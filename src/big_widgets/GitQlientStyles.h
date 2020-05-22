@@ -76,6 +76,12 @@ public:
     */
    static QColor getBackgroundColor();
 
+   /**
+    * @brief Gets the tabs color
+    * @return QColor Current tab color
+    */
+   static QColor getTabColor();
+
    /*!
     \brief Gets the GitQlient blue color.
 

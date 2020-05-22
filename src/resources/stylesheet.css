@@ -260,11 +260,6 @@ QTabBar::tab
    min-height: 25px;
 }
 
-QTabBar::tab:selected
-{
-   background-color: #404142;
-}
-
 QTabBar::tab:!selected
 {
     border-right-width: 1px;

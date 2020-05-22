@@ -251,6 +251,11 @@ QTabBar::tab
    color: white;
 }
 
+QTabBar::tab:selected
+{
+   background-color: #404142;
+}
+
 QTabBar::tab:!selected
 {
     border-right-color: #2E2F30;
