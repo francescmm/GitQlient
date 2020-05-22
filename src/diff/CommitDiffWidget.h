@@ -26,7 +26,6 @@
 #include <QFrame>
 
 class GitBase;
-class QLabel;
 class FileListWidget;
 class RevisionsCache;
 
@@ -92,8 +91,6 @@ public:
 private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<RevisionsCache> mCache;
-   QLabel *mFirstSha = nullptr;
-   QLabel *mSecondSha = nullptr;
    FileListWidget *fileListWidget = nullptr;
    QString mFirstShaStr;
    QString mSecondShaStr;
