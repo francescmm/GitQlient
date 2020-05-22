@@ -81,13 +81,24 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    const auto title = new QLabel(tr("Welcome to GitQlient"));
    title->setObjectName("title");
 
+   const auto gitqlientIcon = new QLabel();
+   QIcon stagedIcon(":/icons/GitQlientLogoSVG");
+   gitqlientIcon->setPixmap(stagedIcon.pixmap(96, 96));
+
+   const auto titleLayout = new QHBoxLayout();
+   titleLayout->setContentsMargins(QMargins());
+   titleLayout->setSpacing(10);
+   titleLayout->addWidget(gitqlientIcon);
+   titleLayout->addWidget(title);
+   titleLayout->addStretch();
+
    const auto lineTitle = new QFrame();
    lineTitle->setObjectName("separator");
 
    const auto centerLayout = new QVBoxLayout();
    centerLayout->setSpacing(20);
    centerLayout->setContentsMargins(QMargins());
-   centerLayout->addWidget(title);
+   centerLayout->addLayout(titleLayout);
    centerLayout->addWidget(lineTitle);
    centerLayout->addLayout(widgetsLayout);
    centerLayout->addStretch();
