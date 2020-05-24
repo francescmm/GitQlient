@@ -47,6 +47,7 @@ public:
    GitExecResult prune();
    QString getCurrentBranch() const;
    GitExecResult pushUpstream(const QString &branchName);
+   QMap<QString, QStringList> getTrackingBranches() const;
 
 private:
    QSharedPointer<GitBase> mGitBase;

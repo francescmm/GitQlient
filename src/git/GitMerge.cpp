@@ -21,7 +21,7 @@ GitExecResult GitMerge::merge(const QString &into, QStringList sources)
    if (!retCheckout.success)
       return retCheckout;
 
-   const auto retMerge = mGitBase->run(QString("git merge -q ") + sources.join(" "));
+   const auto retMerge = mGitBase->run(QString("git merge ") + sources.join(" "));
 
    if (retMerge.success)
    {

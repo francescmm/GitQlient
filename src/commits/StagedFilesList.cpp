@@ -8,7 +8,7 @@ StagedFilesList::StagedFilesList(QWidget *parent)
    : QListWidget(parent)
 {
    connect(this, &QListWidget::customContextMenuRequested, this, &StagedFilesList::onContextMenu);
-   connect(this, &QListWidget::itemDoubleClicked, this, &StagedFilesList::onShowDiff);
+   connect(this, &QListWidget::itemDoubleClicked, this, &StagedFilesList::onDoubleClick);
 }
 
 void StagedFilesList::onContextMenu(const QPoint &pos)

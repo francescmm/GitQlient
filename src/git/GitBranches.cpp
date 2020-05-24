@@ -151,3 +151,31 @@ GitExecResult GitBranches::pushUpstream(const QString &branchName)
 
    return mGitBase->run(QString("git push --set-upstream origin %1").arg(branchName));
 }
+
+QMap<QString, QStringList> GitBranches::getTrackingBranches() const
+{
+   QLog_Debug("Git", QString("Executing getTrackingBranches"));
+
+   const auto ret = mGitBase->run(QString("git branch -vv"));
+   QMap<QString, QStringList> trackings;
+
+   if (ret.success)
+   {
+      const auto output = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+      for (auto line : output)
+      {
+         if (line.startsWith("*"))
+            line.remove("*");
+
+         if (line.contains("["))
+         {
+            const auto fields = line.split(' ', Qt::SkipEmptyParts);
+            auto remote = fields.at(2);
+            remote.remove('[').remove(']');
+            trackings[remote].append(fields.at(0));
+         }
+      }
+   }
+
+   return trackings;
+}
