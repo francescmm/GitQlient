@@ -124,7 +124,7 @@ RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString
       return RevisionFiles();
    }
 
-   return mCacheLocked ? mRevisionFilesMap.value(qMakePair(sha1, sha2)) : RevisionFiles();
+   return mRevisionFilesMap.value(qMakePair(sha1, sha2));
 }
 
 void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
