@@ -58,13 +58,15 @@ CommitInfo RevisionsCache::getCommitInfoByRow(int row) const
    return commit ? *commit : CommitInfo();
 }
 
-int RevisionsCache::getCommitPos(const QString &sha) const
+int RevisionsCache::getCommitPos(const QString &sha)
 {
    if (mCacheLocked)
    {
       QLog_Info("Git", QString("The cache is updating!"));
       return -1;
    }
+
+   QMutexLocker locker(&mMutex);
 
    const auto commit = mCommitsMap.value(sha, nullptr);
    return mCommits.indexOf(commit);
@@ -86,13 +88,15 @@ CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const Q
    return commitIter != mCommits.constEnd() ? **commitIter : CommitInfo();
 }
 
-CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
+CommitInfo RevisionsCache::getCommitInfo(const QString &sha)
 {
    if (mCacheLocked)
    {
       QLog_Info("Git", QString("The cache is updating!"));
       return CommitInfo();
    }
+
+   QMutexLocker locker(&mMutex);
 
    if (!sha.isEmpty())
    {
@@ -271,6 +275,8 @@ void RevisionsCache::removeReference(const QString &sha)
       return;
    }
 
+   QMutexLocker locker(&mMutex);
+
    mCommitsMap[sha]->addReferences(References());
 }
 
@@ -412,15 +418,21 @@ void RevisionsCache::flushFileNames(FileNamesLoader &fl)
    fl.rf = nullptr;
 }
 
-bool RevisionsCache::pendingLocalChanges() const
+bool RevisionsCache::pendingLocalChanges()
 {
    auto localChanges = false;
 
    if (!mCacheLocked)
    {
+      QMutexLocker locker(&mMutex);
+
       const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA);
-      const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
-      localChanges = rf.count() == mUntrackedfiles.count();
+
+      if (commit)
+      {
+         const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
+         localChanges = rf.count() == mUntrackedfiles.count();
+      }
    }
    else
       QLog_Info("Git", QString("The cache is updating!"));
@@ -428,12 +440,14 @@ bool RevisionsCache::pendingLocalChanges() const
    return localChanges;
 }
 
-QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Type type) const
+QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Type type)
 {
    QVector<QPair<QString, QStringList>> branches;
 
    if (!mCacheLocked)
    {
+      QMutexLocker locker(&mMutex);
+
       for (auto commit : mReferences)
          branches.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(type)));
    }
@@ -443,12 +457,14 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Typ
    return branches;
 }
 
-QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const
+QVector<QPair<QString, QStringList>> RevisionsCache::getTags()
 {
    QVector<QPair<QString, QStringList>> tags;
 
    if (!mCacheLocked)
    {
+      QMutexLocker locker(&mMutex);
+
       for (auto commit : mReferences)
          tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::Tag)));
    }
@@ -458,12 +474,14 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const
    return tags;
 }
 
-QString RevisionsCache::getCommitForBranch(const QString &branch, bool local) const
+QString RevisionsCache::getCommitForBranch(const QString &branch, bool local)
 {
    QString sha;
 
    if (!mCacheLocked)
    {
+      QMutexLocker locker(&mMutex);
+
       for (auto commit : mReferences)
       {
          const auto branches

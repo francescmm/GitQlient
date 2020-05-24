@@ -58,9 +58,9 @@ public:
 
    int count() const;
 
-   CommitInfo getCommitInfo(const QString &sha) const;
+   CommitInfo getCommitInfo(const QString &sha);
    CommitInfo getCommitInfoByRow(int row) const;
-   int getCommitPos(const QString &sha) const;
+   int getCommitPos(const QString &sha);
    CommitInfo getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint = 0);
    RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
 
@@ -79,12 +79,12 @@ public:
    RevisionFiles parseDiff(const QString &logDiff);
 
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
-   bool pendingLocalChanges() const;
+   bool pendingLocalChanges();
 
-   QVector<QPair<QString, QStringList>> getBranches(References::Type type) const;
-   QVector<QPair<QString, QStringList>> getTags() const;
+   QVector<QPair<QString, QStringList>> getBranches(References::Type type);
+   QVector<QPair<QString, QStringList>> getTags();
 
-   QString getCommitForBranch(const QString &branch, bool local = true) const;
+   QString getCommitForBranch(const QString &branch, bool local = true);
 
 private:
    QMutex mMutex;
