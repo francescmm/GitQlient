@@ -27,7 +27,7 @@
 class Lanes
 {
 public:
-   Lanes() { } // init() will setup us later, when data is available
+   Lanes() {} // init() will setup us later, when data is available
    bool isEmpty() { return typeVec.empty(); }
    void init(const QString &expectedSha);
    void clear();
@@ -50,7 +50,7 @@ private:
    int add(LaneType type, const QString &next, int pos);
    bool isNode(Lane lane) const;
 
-   int activeLane;
+   int activeLane = 0;
    QVector<Lane> typeVec; // Describes which glyphs should be drawn.
    QVector<QString> nextShaVec; // The sha1 hashes of the next commit to appear in each lane (column).
    LaneType NODE = LaneType::MERGE_FORK;

@@ -294,8 +294,9 @@ void GitQlientRepo::updateProgressDialog(int step)
    if (mProgressDlg)
    {
       mProgressDlg->setValue(step);
+      mProgressDlg->update();
 
-      QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+      // QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
    }
 }
 

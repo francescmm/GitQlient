@@ -182,7 +182,7 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    QLog_Debug("Git", QString("There are {%1} commits to process.").arg(totalCommits));
 
-   mRevCache->configure(totalCommits);
+   mRevCache->beginCacheConfig(totalCommits);
 
    emit signalLoadingStarted(totalCommits);
 
@@ -202,9 +202,11 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
       emit signalLoadingStep(count++);
    }
 
-   mLocked = false;
-
    loadReferences();
+
+   mRevCache->endCacheConfig();
+
+   mLocked = false;
 
    emit signalLoadingFinished();
 }

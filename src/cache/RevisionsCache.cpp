@@ -19,22 +19,40 @@ RevisionsCache::~RevisionsCache()
    mReferences.clear();
 }
 
-void RevisionsCache::configure(int numElementsToStore)
+void RevisionsCache::beginCacheConfig(int numElementsToStore)
 {
+   QMutexLocker locker(&mMutex);
+
    QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(numElementsToStore));
 
-   if (mCommits.isEmpty())
+   if (!mCacheLocked)
    {
-      // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
-      mCommits.resize(numElementsToStore + 1);
-      mCommitsMap.reserve(numElementsToStore + 1);
+      if (mCommits.isEmpty())
+      {
+         // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
+         mCommits.resize(numElementsToStore + 1);
+         mCommitsMap.reserve(numElementsToStore + 1);
+      }
+
+      mCacheLocked = true;
    }
+}
+
+void RevisionsCache::endCacheConfig()
+{
+   QMutexLocker locker(&mMutex);
 
    mCacheLocked = false;
 }
 
 CommitInfo RevisionsCache::getCommitInfoByRow(int row) const
 {
+   if (mCacheLocked)
+   {
+      QLog_Info("Git", QString("The cache is updating!"));
+      return CommitInfo();
+   }
+
    const auto commit = row >= 0 && row < mCommits.count() ? mCommits.at(row) : nullptr;
 
    return commit ? *commit : CommitInfo();
@@ -42,12 +60,24 @@ CommitInfo RevisionsCache::getCommitInfoByRow(int row) const
 
 int RevisionsCache::getCommitPos(const QString &sha) const
 {
+   if (mCacheLocked)
+   {
+      QLog_Info("Git", QString("The cache is updating!"));
+      return -1;
+   }
+
    const auto commit = mCommitsMap.value(sha, nullptr);
    return mCommits.indexOf(commit);
 }
 
 CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint)
 {
+   if (mCacheLocked)
+   {
+      QLog_Info("Git", QString("The cache is updating!"));
+      return CommitInfo();
+   }
+
    auto commitIter = searchCommit(field, text, startingPoint);
 
    if (commitIter == mCommits.constEnd() && startingPoint > 0)
@@ -58,6 +88,12 @@ CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const Q
 
 CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 {
+   if (mCacheLocked)
+   {
+      QLog_Info("Git", QString("The cache is updating!"));
+      return CommitInfo();
+   }
+
    if (!sha.isEmpty())
    {
       const auto c = mCommitsMap.value(sha, nullptr);
@@ -82,46 +118,64 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
 
 RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString &sha2) const
 {
-   return mRevisionFilesMap.value(qMakePair(sha1, sha2));
+   if (mCacheLocked)
+   {
+      QLog_Info("Git", QString("The cache is updating!"));
+      return RevisionFiles();
+   }
+
+   return mCacheLocked ? mRevisionFilesMap.value(qMakePair(sha1, sha2)) : RevisionFiles();
 }
 
 void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 {
    if (mCacheLocked)
-      QLog_Warning("Git", QString("The cache is currently locked."));
-   else if (mCommitsMap.contains(rev.sha()))
-      QLog_Info("Git", QString("The commit with SHA {%1} is already in the cache.").arg(rev.sha()));
-   else
    {
-      rev.setLanes(calculateLanes(rev));
-
-      const auto commit = new CommitInfo(rev);
-
-      if (orderIdx >= mCommits.count())
+      if (mCommitsMap.contains(rev.sha()))
+         QLog_Info("Git", QString("The commit with SHA {%1} is already in the cache.").arg(rev.sha()));
+      else
       {
-         QLog_Debug("Git", QString("Adding commit with sha {%1}.").arg(commit->sha()));
+         if (mLanes.isEmpty())
+            mLanes.init(rev.sha());
 
-         mCommits.append(commit);
+         const auto commit = new CommitInfo(rev);
+
+         rev.setLanes(calculateLanes(rev));
+
+         if (orderIdx >= mCommits.count())
+         {
+            QLog_Debug("Git", QString("Adding commit with sha {%1}.").arg(commit->sha()));
+
+            mCommits.append(commit);
+         }
+         else if (!(mCommits[orderIdx] && *mCommits[orderIdx] == *commit))
+         {
+            QLog_Trace("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
+
+            if (mCommits[orderIdx])
+               delete mCommits[orderIdx];
+
+            mCommits[orderIdx] = commit;
+         }
+
+         mCommitsMap.insert(rev.sha(), commit);
+
+         if (mCommitsMap.contains(rev.parent(0)))
+            mCommitsMap.remove(rev.parent(0));
       }
-      else if (!(mCommits[orderIdx] && *mCommits[orderIdx] == *commit))
-      {
-         QLog_Trace("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
-
-         if (mCommits[orderIdx])
-            delete mCommits[orderIdx];
-
-         mCommits[orderIdx] = commit;
-      }
-
-      mCommitsMap.insert(rev.sha(), commit);
-
-      if (mCommitsMap.contains(rev.parent(0)))
-         mCommitsMap.remove(rev.parent(0));
    }
+   else
+      QLog_Info("Git", QString("The cache is updating!"));
 }
 
 bool RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)
 {
+   if (mCacheLocked)
+   {
+      QLog_Info("Git", QString("The cache is updating!"));
+      return false;
+   }
+
    const auto key = qMakePair(sha1, sha2);
 
    if (!sha1.isEmpty() && !sha2.isEmpty() && mRevisionFilesMap.value(key) != file)
@@ -138,69 +192,107 @@ bool RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2
 
 void RevisionsCache::insertReference(const QString &sha, References::Type type, const QString &reference)
 {
-   QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
-
-   auto commit = mCommitsMap[sha];
-
-   if (commit)
+   if (mCacheLocked)
    {
-      commit->addReference(type, reference);
+      QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-      if (!mReferences.contains(mCommitsMap[sha]))
-         mReferences.append(mCommitsMap[sha]);
+      auto commit = mCommitsMap[sha];
+
+      if (commit)
+      {
+         commit->addReference(type, reference);
+
+         if (!mReferences.contains(mCommitsMap[sha]))
+            mReferences.append(mCommitsMap[sha]);
+      }
    }
+   else
+      QLog_Info("Git", QString("The cache is updating!"));
 }
 
 void RevisionsCache::insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances)
 {
-   mLocalBranchDistances[name] = distances;
+   if (mCacheLocked)
+      mLocalBranchDistances[name] = distances;
+   else
+      QLog_Info("Git", QString("The cache is updating!"));
+}
+
+RevisionsCache::LocalBranchDistances RevisionsCache::getLocalBranchDistances(const QString &name)
+{
+   if (mCacheLocked)
+   {
+      QLog_Info("Git", QString("The cache is updating!"));
+      return LocalBranchDistances();
+   }
+
+   return mLocalBranchDistances.value(name);
 }
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
 {
-   QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
+   QMutexLocker locker(&mMutex);
 
-   const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
-   const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
-
-   insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
-
-   if (!mCacheLocked)
+   if (mCacheLocked)
    {
-      const QString longLog;
-      const auto author = QString("-");
-      const auto log
-          = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
-      CommitInfo c(CommitInfo::ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log,
-                   longLog);
+      QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
 
-      if (mLanes.isEmpty())
-         mLanes.init(c.sha());
+      const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
+      const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
 
-      c.setLanes(calculateLanes(c));
+      insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
 
-      if (mCommits[0])
-         c.setLanes(mCommits[0]->getLanes());
+      if (!mCacheLocked)
+      {
+         const QString longLog;
+         const auto author = QString("-");
+         const auto log
+             = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
+         CommitInfo c(CommitInfo::ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log,
+                      longLog);
 
-      const auto sha = c.sha();
-      const auto commit = new CommitInfo(std::move(c));
+         if (mLanes.isEmpty())
+            mLanes.init(c.sha());
 
-      if (mCommits[0])
-         delete mCommits[0];
+         c.setLanes(calculateLanes(c));
 
-      mCommits[0] = commit;
+         if (mCommits[0])
+            c.setLanes(mCommits[0]->getLanes());
 
-      mCommitsMap.insert(sha, commit);
+         const auto sha = c.sha();
+         const auto commit = new CommitInfo(std::move(c));
+
+         if (mCommits[0])
+            delete mCommits[0];
+
+         mCommits[0] = commit;
+
+         mCommitsMap.insert(sha, commit);
+      }
    }
+   else
+      QLog_Info("Git", QString("The cache is updating!"));
 }
 
 void RevisionsCache::removeReference(const QString &sha)
 {
+   if (mCacheLocked)
+   {
+      QLog_Info("Git", QString("The cache is updating!"));
+      return;
+   }
+
    mCommitsMap[sha]->addReferences(References());
 }
 
 bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
 {
+   if (mCacheLocked)
+   {
+      QLog_Info("Git", QString("The cache is updating!"));
+      return false;
+   }
+
    return mRevisionFilesMap.contains(qMakePair(sha1, sha2));
 }
 
@@ -341,6 +433,8 @@ bool RevisionsCache::pendingLocalChanges() const
       const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
       localChanges = rf.count() == mUntrackedfiles.count();
    }
+   else
+      QLog_Info("Git", QString("The cache is updating!"));
 
    return localChanges;
 }
@@ -349,8 +443,13 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Typ
 {
    QVector<QPair<QString, QStringList>> branches;
 
-   for (auto commit : mReferences)
-      branches.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(type)));
+   if (!mCacheLocked)
+   {
+      for (auto commit : mReferences)
+         branches.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(type)));
+   }
+   else
+      QLog_Info("Git", QString("The cache is updating!"));
 
    return branches;
 }
@@ -359,8 +458,13 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const
 {
    QVector<QPair<QString, QStringList>> tags;
 
-   for (auto commit : mReferences)
-      tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::Tag)));
+   if (!mCacheLocked)
+   {
+      for (auto commit : mReferences)
+         tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::Tag)));
+   }
+   else
+      QLog_Info("Git", QString("The cache is updating!"));
 
    return tags;
 }
@@ -369,17 +473,22 @@ QString RevisionsCache::getCommitForBranch(const QString &branch, bool local) co
 {
    QString sha;
 
-   for (auto commit : mReferences)
+   if (!mCacheLocked)
    {
-      const auto branches
-          = commit->getReferences(local ? References::Type::LocalBranch : References::Type::RemoteBranches);
-
-      if (branches.contains(branch))
+      for (auto commit : mReferences)
       {
-         sha = commit->sha();
-         break;
+         const auto branches
+             = commit->getReferences(local ? References::Type::LocalBranch : References::Type::RemoteBranches);
+
+         if (branches.contains(branch))
+         {
+            sha = commit->sha();
+            break;
+         }
       }
    }
+   else
+      QLog_Info("Git", QString("The cache is updating!"));
 
    return sha;
 }
@@ -456,7 +565,8 @@ void RevisionsCache::resetLanes(const CommitInfo &c, bool isFork)
 
 void RevisionsCache::clear()
 {
-   mCacheLocked = true;
+   QMutexLocker locker(&mMutex);
+
    mDirNames.clear();
    mFileNames.clear();
    mRevisionFilesMap.clear();

@@ -29,6 +29,7 @@
 
 #include <QObject>
 #include <QHash>
+#include <QMutex>
 
 struct WorkingDirInfo;
 
@@ -51,7 +52,8 @@ public:
    explicit RevisionsCache(QObject *parent = nullptr);
    ~RevisionsCache();
 
-   void configure(int numElementsToStore);
+   void beginCacheConfig(int numElementsToStore);
+   void endCacheConfig();
    void clear();
 
    int count() const;
@@ -63,12 +65,12 @@ public:
    RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
 
    void insertCommitInfo(CommitInfo rev, int orderIdx);
-
-   bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    void insertReference(const QString &sha, References::Type type, const QString &reference);
    void insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances);
-   LocalBranchDistances getLocalBranchDistances(const QString &name) { return mLocalBranchDistances.value(name); }
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
+
+   bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
+   LocalBranchDistances getLocalBranchDistances(const QString &name);
 
    void removeReference(const QString &sha);
 
@@ -85,7 +87,8 @@ public:
    QString getCommitForBranch(const QString &branch, bool local = true) const;
 
 private:
-   bool mCacheLocked = true;
+   QMutex mMutex;
+   bool mCacheLocked = false;
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo *> mCommitsMap;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
