@@ -135,12 +135,9 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
          QLog_Info("Git", QString("The commit with SHA {%1} is already in the cache.").arg(rev.sha()));
       else
       {
-         if (mLanes.isEmpty())
-            mLanes.init(rev.sha());
+         rev.setLanes(calculateLanes(rev));
 
          const auto commit = new CommitInfo(rev);
-
-         rev.setLanes(calculateLanes(rev));
 
          if (orderIdx >= mCommits.count())
          {
@@ -233,45 +230,37 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 {
    QMutexLocker locker(&mMutex);
 
-   if (mCacheLocked)
-   {
-      QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
+   QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
 
-      const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
-      const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
+   const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
+   const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
 
-      insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
+   insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
 
-      if (!mCacheLocked)
-      {
-         const QString longLog;
-         const auto author = QString("-");
-         const auto log
-             = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
-         CommitInfo c(CommitInfo::ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log,
-                      longLog);
+   const QString longLog;
+   const auto author = QString("-");
+   const auto log
+       = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
+   CommitInfo c(CommitInfo::ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log,
+                longLog);
 
-         if (mLanes.isEmpty())
-            mLanes.init(c.sha());
+   if (mLanes.isEmpty())
+      mLanes.init(c.sha());
 
-         c.setLanes(calculateLanes(c));
+   c.setLanes(calculateLanes(c));
 
-         if (mCommits[0])
-            c.setLanes(mCommits[0]->getLanes());
+   if (mCommits[0])
+      c.setLanes(mCommits[0]->getLanes());
 
-         const auto sha = c.sha();
-         const auto commit = new CommitInfo(std::move(c));
+   const auto sha = c.sha();
+   const auto commit = new CommitInfo(std::move(c));
 
-         if (mCommits[0])
-            delete mCommits[0];
+   if (mCommits[0])
+      delete mCommits[0];
 
-         mCommits[0] = commit;
+   mCommits[0] = commit;
 
-         mCommitsMap.insert(sha, commit);
-      }
-   }
-   else
-      QLog_Info("Git", QString("The cache is updating!"));
+   mCommitsMap.insert(sha, commit);
 }
 
 void RevisionsCache::removeReference(const QString &sha)
