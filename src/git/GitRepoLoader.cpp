@@ -3,6 +3,7 @@
 #include <GitBase.h>
 #include <RevisionsCache.h>
 #include <GitRequestorProcess.h>
+#include <GitBranches.h>
 
 #include <QLogger.h>
 
@@ -93,7 +94,63 @@ void GitRepoLoader::loadReferences()
          const auto refName = reference.mid(41);
 
          if (!refName.startsWith("refs/tags/") || (refName.startsWith("refs/tags/") && refName.endsWith("^{}")))
-            mRevCache->insertReference(revSha, refName);
+         {
+            auto localBranches = false;
+            References::Type type;
+            QString name;
+
+            if (refName.startsWith("refs/tags/"))
+            {
+               type = References::Type::Tag;
+               name = refName.mid(10, reference.length());
+               name.remove("^{}");
+            }
+            else if (refName.startsWith("refs/heads/"))
+            {
+               type = References::Type::LocalBranch;
+               name = refName.mid(11);
+               localBranches = true;
+            }
+            else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
+            {
+               type = References::Type::RemoteBranches;
+               name = refName.mid(13);
+            }
+            else
+               continue;
+
+            mRevCache->insertReference(revSha, type, name);
+
+            if (localBranches)
+            {
+               const auto git = new GitBranches(mGitBase);
+               RevisionsCache::LocalBranchDistances distances;
+
+               const auto distToMaster = git->getDistanceBetweenBranches(true, name);
+               auto toMaster = distToMaster.output.toString();
+
+               if (!toMaster.contains("fatal"))
+               {
+                  toMaster.replace('\n', "");
+                  const auto values = toMaster.split('\t');
+                  distances.behindMaster = values.first().toUInt();
+                  distances.aheadMaster = values.last().toUInt();
+               }
+
+               const auto distToOrigin = git->getDistanceBetweenBranches(false, name);
+               auto toOrigin = distToOrigin.output.toString();
+
+               if (!toOrigin.contains("fatal"))
+               {
+                  toOrigin.replace('\n', "");
+                  const auto values = toOrigin.split('\t');
+                  distances.behindOrigin = values.first().toUInt();
+                  distances.aheadOrigin = values.last().toUInt();
+               }
+
+               mRevCache->insertLocalBranchDistances(name, distances);
+            }
+         }
 
          prevRefSha = revSha;
       }
@@ -127,7 +184,7 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    mRevCache->configure(totalCommits);
 
-   emit signalLoadingStarted();
+   emit signalLoadingStarted(totalCommits);
 
    QLog_Debug("Git", QString("Adding the WIP commit."));
 
@@ -138,9 +195,11 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
       CommitInfo revision(commitInfo);
 
       if (revision.isValid())
-         mRevCache->insertCommitInfo(std::move(revision), count++);
+         mRevCache->insertCommitInfo(std::move(revision), count);
       else
          break;
+
+      emit signalLoadingStep(count++);
    }
 
    mLocked = false;
@@ -186,9 +245,4 @@ QVector<QString> GitRepoLoader::getUntrackedFiles() const
    runCmd.append(QString(" --exclude-per-directory=$%1$").arg(".gitignore"));
 
    return mGitBase->run(runCmd).output.toString().split('\n', QString::SkipEmptyParts).toVector();
-}
-
-void GitRepoLoader::cancelAll()
-{
-   emit cancelAllProcesses(QPrivateSignal());
 }

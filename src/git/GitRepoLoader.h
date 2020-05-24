@@ -23,6 +23,8 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <GitExecResult.h>
+
 #include <QObject>
 #include <QSharedPointer>
 #include <QVector>
@@ -35,7 +37,8 @@ class GitRepoLoader : public QObject
    Q_OBJECT
 
 signals:
-   void signalLoadingStarted();
+   void signalLoadingStarted(int total);
+   void signalLoadingStep(int value);
    void signalLoadingFinished();
    void cancelAllProcesses(QPrivateSignal);
 

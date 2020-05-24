@@ -260,11 +260,6 @@ QTabBar::tab
    min-height: 25px;
 }
 
-QTabBar::tab:selected
-{
-   background-color: #404142;
-}
-
 QTabBar::tab:!selected
 {
     border-right-width: 1px;
@@ -553,5 +548,10 @@ PullDlg
    min-height: 150px;
    max-width: 500px;
    min-width: 500px;
+}
+
+GeneralConfigPage > QLabel#configLabel
+{
+    qproperty-alignment: AlignCenter;
 }
 

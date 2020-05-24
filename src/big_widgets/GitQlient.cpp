@@ -96,7 +96,7 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
 {
    auto logLevel = LogLevel::Info;
 #ifdef DEBUG
-   logLevel = LogLevel::Debug;
+   logLevel = LogLevel::Trace;
 #endif
 
    const auto manager = QLoggerManager::getInstance();

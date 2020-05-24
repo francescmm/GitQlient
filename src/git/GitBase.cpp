@@ -62,7 +62,7 @@ void GitBase::updateCurrentBranch()
 
    const auto ret = run("git rev-parse --abbrev-ref HEAD");
 
-   mCurrentBranch = ret.success ? ret.output.toString().trimmed() : QString();
+   mCurrentBranch = ret.success ? ret.output.toString().trimmed().remove("heads/") : QString();
 }
 
 QString GitBase::getCurrentBranch()

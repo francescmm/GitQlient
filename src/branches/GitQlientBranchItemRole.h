@@ -23,31 +23,16 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QTreeWidgetItem>
-#include <GitExecResult.h>
+#include <qnamespace.h>
 
-/**
- * @brief The GitQlientTreeWidgetItem class is a custom QTreeWidgetItem class that implements two methods that will
- * receive signals from GitBranches. In order to be able to process the data from git, we need to know that the item is
- * still alive. The normal behaviour of QTreeWidgetItem is to not inherit from QObject, so that needs to be done by
- * creating a derived class from that one and adding an additional inheritance from QObject.
- */
-class GitQlientTreeWidgetItem : public QObject, public QTreeWidgetItem
+namespace GitQlient
 {
-public:
-   /**
-    * @brief GitQlientTreeWidgetItem Default constructor
-    * @param parent The parent item.
-    */
-   GitQlientTreeWidgetItem(QTreeWidgetItem *parent);
-   /**
-    * @brief distancesToMaster Writes the distance to master.
-    * @param result The result of the \ref getDistanceBetweenBranchesAsync method in \ref GitBranches.
-    */
-   void distancesToMaster(GitExecResult result);
-   /**
-    * @brief distancesToOrigin Writes the distance to origin.
-    * @param result The result of the \ref getDistanceBetweenBranchesAsync method in \ref GitBranches.
-    */
-   void distancesToOrigin(GitExecResult result);
+enum GitQlientBranchItemRole
+{
+   IsCurrentBranchRole = Qt::UserRole,
+   FullNameRole,
+   LocalBranchRole,
+   ShaRole,
+   IsLeaf
 };
+}

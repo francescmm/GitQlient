@@ -61,6 +61,7 @@ private:
    QCheckBox *mAutoFormat = nullptr;
    QLabel *mStatusLabel = nullptr;
    QLineEdit *mExternalEditor = nullptr;
+   QComboBox *mStylesSchema = nullptr;
    QPushButton *mReset = nullptr;
    QPushButton *mApply = nullptr;
 

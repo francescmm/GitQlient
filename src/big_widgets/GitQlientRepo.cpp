@@ -112,7 +112,9 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, mControls, &Controls::disableMergeWarning);
    connect(mMergeWidget, &MergeWidget::signalEditFile, this, &GitQlientRepo::signalEditFile);
 
-   connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::updateProgressDialog,
+   connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::createProgressDialog,
+           Qt::DirectConnection);
+   connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStep, this, &GitQlientRepo::updateProgressDialog,
            Qt::DirectConnection);
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished,
            Qt::DirectConnection);
@@ -274,14 +276,26 @@ void GitQlientRepo::showFileHistory(const QString &fileName)
    showBlameView();
 }
 
-void GitQlientRepo::updateProgressDialog()
+void GitQlientRepo::createProgressDialog(int total)
 {
    if (!mProgressDlg)
    {
-      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, 0, false, true);
+      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, total, false, true);
       connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
 
       mProgressDlg->show();
+
+      QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
+   }
+}
+
+void GitQlientRepo::updateProgressDialog(int step)
+{
+   if (mProgressDlg)
+   {
+      mProgressDlg->setValue(step);
+
+      QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
    }
 }
 
@@ -427,4 +441,9 @@ void GitQlientRepo::closeEvent(QCloseEvent *ce)
    mGitLoader->cancelAll();
 
    QWidget::closeEvent(ce);
+}
+
+void GitRepoLoader::cancelAll()
+{
+   emit cancelAllProcesses(QPrivateSignal());
 }

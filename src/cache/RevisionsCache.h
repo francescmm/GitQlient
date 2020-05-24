@@ -40,6 +40,14 @@ signals:
    void signalCacheUpdated();
 
 public:
+   struct LocalBranchDistances
+   {
+      int aheadMaster = 0;
+      int behindMaster = 0;
+      int aheadOrigin = 0;
+      int behindOrigin = 0;
+   };
+
    explicit RevisionsCache(QObject *parent = nullptr);
    ~RevisionsCache();
 
@@ -57,7 +65,9 @@ public:
    void insertCommitInfo(CommitInfo rev, int orderIdx);
 
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
-   void insertReference(const QString &sha, const QString &reference);
+   void insertReference(const QString &sha, References::Type type, const QString &reference);
+   void insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances);
+   LocalBranchDistances getLocalBranchDistances(const QString &name) { return mLocalBranchDistances.value(name); }
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 
    void removeReference(const QString &sha);
@@ -69,6 +79,7 @@ public:
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
    bool pendingLocalChanges() const;
 
+   QVector<QPair<QString, QStringList>> getBranches(References::Type type) const;
    QVector<QPair<QString, QStringList>> getTags() const;
 
    QString getCommitForBranch(const QString &branch, bool local = true) const;
@@ -79,6 +90,7 @@ private:
    QHash<QString, CommitInfo *> mCommitsMap;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
    QVector<CommitInfo *> mReferences;
+   QMap<QString, LocalBranchDistances> mLocalBranchDistances;
    Lanes mLanes;
    QVector<QString> mDirNames;
    QVector<QString> mFileNames;

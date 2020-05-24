@@ -18,7 +18,7 @@ GitExecResult GitBranches::getBranches()
    return mGitBase->run(QString("git branch -a"));
 }
 
-bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &right)
+GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QString &right)
 {
    QLog_Debug("Git",
               QString("Executing getDistanceBetweenBranches: {origin/%1} and {%2}")
@@ -29,23 +29,14 @@ bool GitBranches::getDistanceBetweenBranchesAsync(bool toMaster, const QString &
    const auto ret = gitConfig->getRemoteForBranch(toMaster ? QString("master") : right);
 
    if (!toMaster && right == "master")
-   {
-      emit signalDistanceBetweenBranches({ false, "Same branch" });
-
-      return true;
-   }
+      return { false, "Same branch" };
    else
    {
       const auto gitBase = new GitBase(mGitBase->getWorkingDir());
-      connect(gitBase, &GitBase::signalResultReady, this, [this, gitBase](GitExecResult result) {
-         emit signalDistanceBetweenBranches(result);
-         gitBase->deleteLater();
-      });
+      const auto gitCmd = QString("git rev-list --left-right --count %1/%2...%3")
+                              .arg(ret.output.toString(), toMaster ? QString("master") : right, right);
 
-      const auto gitCmd = QString("git rev-list %1 --count %2/%3...%4")
-                              .arg("--left-right", ret.output.toString(), toMaster ? QString("master") : right, right);
-
-      return gitBase->runAsync(gitCmd);
+      return gitBase->run(gitCmd);
    }
 }
 
@@ -63,7 +54,7 @@ GitExecResult GitBranches::createBranchAtCommit(const QString &commitSha, const 
    return mGitBase->run(QString("git branch %1 %2").arg(branchName, commitSha));
 }
 
-GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
+GitExecResult GitBranches::checkoutLocalBranch(const QString &branchName)
 {
    QLog_Debug("Git", QString("Executing checkoutRemoteBranch: {%1}").arg(branchName));
 
@@ -71,6 +62,35 @@ GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
 
    if (ret.success)
       mGitBase->updateCurrentBranch();
+
+   return ret;
+}
+
+GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
+{
+   QLog_Debug("Git", QString("Executing checkoutRemoteBranch: {%1}").arg(branchName));
+
+   auto localBranch = branchName;
+   if (localBranch.startsWith("origin/"))
+      localBranch.remove("origin/");
+
+   auto ret = mGitBase->run(QString("git checkout -b %1 %2").arg(localBranch).arg(branchName));
+   const auto output = ret.output.toString();
+
+   if (ret.success && !output.contains("fatal:"))
+      mGitBase->updateCurrentBranch();
+   else if (output.contains("already exists"))
+   {
+      QRegExp rx("\'\\w+\'");
+      rx.indexIn(ret.output.toString());
+      auto value = rx.capturedTexts().constFirst();
+      value.remove("'");
+
+      if (!value.isEmpty())
+         ret = checkoutLocalBranch(value);
+      else
+         ret.success = false;
+   }
 
    return ret;
 }
@@ -130,4 +150,32 @@ GitExecResult GitBranches::pushUpstream(const QString &branchName)
    QLog_Debug("Git", QString("Executing pushUpstream: {%1}").arg(branchName));
 
    return mGitBase->run(QString("git push --set-upstream origin %1").arg(branchName));
+}
+
+QMap<QString, QStringList> GitBranches::getTrackingBranches() const
+{
+   QLog_Debug("Git", QString("Executing getTrackingBranches"));
+
+   const auto ret = mGitBase->run(QString("git branch -vv"));
+   QMap<QString, QStringList> trackings;
+
+   if (ret.success)
+   {
+      const auto output = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+      for (auto line : output)
+      {
+         if (line.startsWith("*"))
+            line.remove("*");
+
+         if (line.contains("["))
+         {
+            const auto fields = line.split(' ', Qt::SkipEmptyParts);
+            auto remote = fields.at(2);
+            remote.remove('[').remove(']');
+            trackings[remote].append(fields.at(0));
+         }
+      }
+   }
+
+   return trackings;
 }
