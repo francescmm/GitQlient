@@ -70,7 +70,7 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
-   diffHighlighter = new DiffHighlighter(this);
+   diffHighlighter = new DiffHighlighter(mDiffWidget);
 
    QFont font;
    font.setFamily(QString::fromUtf8("Ubuntu Mono"));
