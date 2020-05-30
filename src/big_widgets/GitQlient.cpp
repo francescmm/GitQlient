@@ -98,7 +98,7 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
    LogLevel logLevel;
    GitQlientSettings settings;
 
-#ifndef DEBUG
+#ifdef DEBUG
    logLevel = LogLevel::Trace;
 #else
    logLevel = static_cast<LogLevel>(settings.value("logsLevel", static_cast<int>(LogLevel::Info)).toInt());
