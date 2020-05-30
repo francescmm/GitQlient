@@ -22,7 +22,7 @@ GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QStri
 {
    QLog_Debug("Git",
               QString("Executing getDistanceBetweenBranches: {origin/%1} and {%2}")
-                  .arg(toMaster ? QString("master") : QString("%1"), right));
+                  .arg(toMaster ? QString("master") : right, right));
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
 
@@ -32,9 +32,10 @@ GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QStri
       return { false, "Same branch" };
    else
    {
+      const auto remote = ret.success ? ret.output.toString() + "/" : "";
       const auto gitBase = new GitBase(mGitBase->getWorkingDir());
-      const auto gitCmd = QString("git rev-list --left-right --count %1/%2...%3")
-                              .arg(ret.output.toString(), toMaster ? QString("master") : right, right);
+      const auto gitCmd = QString("git rev-list --left-right --count %1%2...%3")
+                              .arg(remote, toMaster ? QString("master") : right, right);
 
       return gitBase->run(gitCmd);
    }
