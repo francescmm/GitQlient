@@ -65,7 +65,10 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    mainLayout->addWidget(mControls);
    mainLayout->addLayout(mStackedLayout);
 
-   mAutoFetch->setInterval(mConfig.mAutoFetchSecs * 1000);
+   GitQlientSettings settings;
+   const auto fetchInterval = settings.value("autoFetch", mConfig.mAutoFetchSecs).toInt();
+
+   mAutoFetch->setInterval(fetchInterval * 1000);
    mAutoFilesUpdate->setInterval(mConfig.mAutoFileUpdateSecs * 1000);
 
    connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
@@ -119,7 +122,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished,
            Qt::DirectConnection);
 
-   GitQlientSettings settings;
    mGitLoader->setShowAll(settings.value("ShowAllBranches", true).toBool());
 
    setRepository(repoPath);
