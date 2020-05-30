@@ -2,6 +2,7 @@
 
 #include <ConfigWidget.h>
 #include <GitQlientStyles.h>
+#include <GitQlientSettings.h>
 
 #include <QProcess>
 #include <QTabWidget>
@@ -94,15 +95,16 @@ void GitQlient::setArgumentsPostInit(const QStringList &arguments)
 
 QStringList GitQlient::parseArguments(const QStringList &arguments)
 {
-   auto logLevel = LogLevel::Info;
-#ifdef DEBUG
+   LogLevel logLevel;
+   GitQlientSettings settings;
+
+#ifndef DEBUG
    logLevel = LogLevel::Trace;
+#else
+   logLevel = static_cast<LogLevel>(settings.value("logsLevel", static_cast<int>(LogLevel::Info)).toInt());
 #endif
 
-   const auto manager = QLoggerManager::getInstance();
-   manager->addDestination("GitQlient.log", { "UI", "Git" }, logLevel);
-
-   if (arguments.contains("-noLog"))
+   if (arguments.contains("-noLog") || settings.value("logsDisabled", false).toBool())
       QLoggerManager::getInstance()->pause();
 
    QLog_Info("UI", QString("Getting arguments {%1}").arg(arguments.join(", ")));
@@ -121,19 +123,23 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
       {
          if (arguments.at(i) == "-logLevel")
          {
-            const auto logLevel = arguments.at(++i).toInt();
+            logLevel = static_cast<LogLevel>(arguments.at(++i).toInt());
 
-            if (logLevel >= static_cast<int>(QLogger::LogLevel::Trace)
-                && logLevel <= static_cast<int>(QLogger::LogLevel::Fatal))
+            if (logLevel >= QLogger::LogLevel::Trace && logLevel <= QLogger::LogLevel::Fatal)
             {
                const auto logger = QLoggerManager::getInstance();
-               logger->overwriteLogLevel(static_cast<LogLevel>(logLevel));
+               logger->overwriteLogLevel(logLevel);
+
+               settings.setValue("logsLevel", static_cast<int>(logLevel));
             }
          }
 
          ++i;
       }
    }
+
+   const auto manager = QLoggerManager::getInstance();
+   manager->addDestination("GitQlient.log", { "UI", "Git" }, logLevel);
 
    return repos;
 }
