@@ -162,7 +162,7 @@ QMap<QString, QStringList> GitBranches::getTrackingBranches() const
 
    if (ret.success)
    {
-      const auto output = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+      const auto output = ret.output.toString().split("\n", QString::SkipEmptyParts);
       for (auto line : output)
       {
          if (line.startsWith("*"))
@@ -170,7 +170,7 @@ QMap<QString, QStringList> GitBranches::getTrackingBranches() const
 
          if (line.contains("["))
          {
-            const auto fields = line.split(' ', Qt::SkipEmptyParts);
+            const auto fields = line.split(' ', QString::SkipEmptyParts);
             auto remote = fields.at(2);
             remote.remove('[').remove(']');
             trackings[remote].append(fields.at(0));
