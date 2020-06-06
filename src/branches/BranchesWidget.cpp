@@ -419,28 +419,28 @@ void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
 void BranchesWidget::processTags()
 {
    QVector<QString> localTags;
-   const auto tags = mCache->getTags();
+   auto tags = mCache->getTags();
 
    QLog_Info("UI", QString("Fetching {%1} tags").arg(tags.count()));
 
-   for (const auto &tag : tags)
+   // std::sort(tags.begin(), tags.end());
+
+   for (const auto &tag : tags.toStdMap())
    {
-      for (auto tagName : tag.second)
+      auto tagName = tag.first;
+      const auto item = new QListWidgetItem();
+      item->setData(Qt::UserRole, tagName);
+      item->setData(Qt::UserRole + 1, true);
+      item->setData(Qt::UserRole + 2, tag.second);
+
+      if (localTags.contains(tagName))
       {
-         const auto item = new QListWidgetItem();
-         item->setData(Qt::UserRole, tagName);
-         item->setData(Qt::UserRole + 1, true);
-         item->setData(Qt::UserRole + 2, tag.first);
-
-         if (localTags.contains(tagName))
-         {
-            tagName += " (local)";
-            item->setData(Qt::UserRole + 1, false);
-         }
-
-         item->setText(tagName);
-         mTagsList->addItem(item);
+         tagName += " (local)";
+         item->setData(Qt::UserRole + 1, false);
       }
+
+      item->setText(tagName);
+      mTagsList->addItem(item);
    }
 
    mTagsCount->setText(QString("(%1)").arg(tags.count()));
@@ -474,8 +474,8 @@ void BranchesWidget::processSubmodules()
 
    for (const auto &submodule : submodules)
    {
-       mSubmodulesList->addItem(submodule);
-       mSubmodulesCount->setText('(' + QString::number(submodules.count()) + ')');
+      mSubmodulesList->addItem(submodule);
+      mSubmodulesCount->setText('(' + QString::number(submodules.count()) + ')');
    }
 }
 
