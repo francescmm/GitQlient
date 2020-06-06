@@ -43,8 +43,7 @@ public:
     * @param autoReset Tells the progress dialog if it should automatically reset.
     * @param autoClose Tells the progress dialog if it should automatically close.
     */
-   explicit ProgressDlg(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum,
-                        bool autoReset, bool autoClose);
+   explicit ProgressDlg(const QString &labelText, const QString &cancelButtonText, int maximum, bool autoClose);
 
    /**
     * @brief Detects the press event to avoid closing the dialog when the Esc key is pressed.

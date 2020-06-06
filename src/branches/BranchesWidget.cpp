@@ -423,8 +423,6 @@ void BranchesWidget::processTags()
 
    QLog_Info("UI", QString("Fetching {%1} tags").arg(tags.count()));
 
-   // std::sort(tags.begin(), tags.end());
-
    for (const auto &tag : tags.toStdMap())
    {
       auto tagName = tag.first;

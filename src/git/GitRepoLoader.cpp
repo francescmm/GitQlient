@@ -199,7 +199,7 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
       else
          break;
 
-      emit signalLoadingStep(count++);
+      ++count;
    }
 
    mLocked = false;

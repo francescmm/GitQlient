@@ -115,12 +115,13 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, mControls, &Controls::disableMergeWarning);
    connect(mMergeWidget, &MergeWidget::signalEditFile, this, &GitQlientRepo::signalEditFile);
 
-   connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::createProgressDialog,
-           Qt::DirectConnection);
-   connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStep, this, &GitQlientRepo::updateProgressDialog,
-           Qt::DirectConnection);
-   connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished,
-           Qt::DirectConnection);
+   connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::createProgressDialog);
+   connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished);
+
+   m_loaderThread = new QThread();
+   mGitLoader->moveToThread(m_loaderThread);
+   connect(this, &GitQlientRepo::signalLoadRepo, mGitLoader.get(), &GitRepoLoader::loadRepository);
+   m_loaderThread->start();
 
    mGitLoader->setShowAll(settings.value("ShowAllBranches", true).toBool());
 
@@ -132,6 +133,9 @@ GitQlientRepo::~GitQlientRepo()
    delete mAutoFetch;
    delete mAutoFilesUpdate;
    delete mGitWatcher;
+
+   m_loaderThread->exit();
+   m_loaderThread->deleteLater();
 }
 
 void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
@@ -155,7 +159,7 @@ void GitQlientRepo::updateCache()
    {
       QLog_Debug("UI", QString("Updating the GitQlient UI"));
 
-      mGitLoader->loadRepository();
+      emit signalLoadRepo();
 
       mDiffWidget->reload();
    }
@@ -180,47 +184,11 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
       mGitLoader->cancelAll();
 
-      const auto ok = mGitLoader->loadRepository();
+      emit signalLoadRepo();
 
-      if (ok)
-      {
-         GitQlientSettings settings;
-         settings.setProjectOpened(newDir);
-
-         mCurrentDir = mGitBase->getWorkingDir();
-         setWidgetsEnabled(true);
-
-         setWatcher();
-
-         mBlameWidget->init(newDir);
-
-         mControls->enableButtons(true);
-
-         mAutoFilesUpdate->start();
-
-         QScopedPointer<GitConfig> git(new GitConfig(mGitBase));
-
-         if (!git->getGlobalUserInfo().isValid() && !git->getLocalUserInfo().isValid())
-         {
-            QLog_Info("UI", QString("Configuring Git..."));
-
-            GitConfigDlg configDlg(mGitBase);
-
-            configDlg.exec();
-
-            QLog_Info("UI", QString("... Git configured!"));
-         }
-
-         QLog_Info("UI", "... repository loaded successfully");
-      }
-      else
-      {
-         QLog_Error("Git", QString("There was an error during the repository load!"));
-
-         mCurrentDir = "";
-         clearWindow();
-         setWidgetsEnabled(false);
-      }
+      mCurrentDir = newDir;
+      clearWindow();
+      setWidgetsEnabled(false);
    }
    else
    {
@@ -278,24 +246,12 @@ void GitQlientRepo::showFileHistory(const QString &fileName)
    showBlameView();
 }
 
-void GitQlientRepo::createProgressDialog(int total)
+void GitQlientRepo::createProgressDialog()
 {
    if (!mProgressDlg)
    {
-      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, total, false, true);
-      connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
-
-      mProgressDlg->show();
-
-      QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
-   }
-}
-
-void GitQlientRepo::updateProgressDialog(int step)
-{
-   if (mProgressDlg)
-   {
-      mProgressDlg->setValue(step);
+      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, true);
+      mProgressDlg->exec();
 
       QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
    }
@@ -303,7 +259,43 @@ void GitQlientRepo::updateProgressDialog(int step)
 
 void GitQlientRepo::onRepoLoadFinished()
 {
-   mProgressDlg->close();
+   if (mProgressDlg)
+      mProgressDlg->close();
+
+   if (!mIsInit)
+   {
+      mIsInit = true;
+
+      mCurrentDir = mGitBase->getWorkingDir();
+
+      GitQlientSettings settings;
+      settings.setProjectOpened(mCurrentDir);
+
+      setWidgetsEnabled(true);
+
+      setWatcher();
+
+      mBlameWidget->init(mCurrentDir);
+
+      mControls->enableButtons(true);
+
+      mAutoFilesUpdate->start();
+
+      QScopedPointer<GitConfig> git(new GitConfig(mGitBase));
+
+      if (!git->getGlobalUserInfo().isValid() && !git->getLocalUserInfo().isValid())
+      {
+         QLog_Info("UI", QString("Configuring Git..."));
+
+         GitConfigDlg configDlg(mGitBase);
+
+         configDlg.exec();
+
+         QLog_Info("UI", QString("... Git configured!"));
+      }
+
+      QLog_Info("UI", "... repository loaded successfully");
+   }
 
    const auto totalCommits = mGitQlientCache->count();
 

@@ -4,12 +4,11 @@
 
 #include <QKeyEvent>
 
-ProgressDlg::ProgressDlg(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum,
-                         bool autoReset, bool autoClose)
-   : QProgressDialog(labelText, cancelButtonText, minimum, maximum)
+ProgressDlg::ProgressDlg(const QString &labelText, const QString &cancelButtonText, int maximum, bool autoClose)
+   : QProgressDialog(labelText, cancelButtonText, 0, maximum)
 {
    setAutoClose(autoClose);
-   setAutoReset(autoReset);
+   setAutoReset(false);
    setAttribute(Qt::WA_DeleteOnClose);
    setWindowModality(Qt::ApplicationModal);
    setWindowFlags(Qt::FramelessWindowHint);

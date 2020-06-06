@@ -338,8 +338,12 @@ bool RevisionsCache::pendingLocalChanges() const
    if (!mCacheLocked)
    {
       const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA);
-      const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
-      localChanges = rf.count() == mUntrackedfiles.count();
+
+      if (commit)
+      {
+         const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
+         localChanges = rf.count() == mUntrackedfiles.count();
+      }
    }
 
    return localChanges;
