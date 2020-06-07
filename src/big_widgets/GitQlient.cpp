@@ -14,8 +14,10 @@
 #include <QFileDialog>
 
 #include <QLogger.h>
+#include <QBenchmark.h>
 
 using namespace QLogger;
+using namespace QBenchmark;
 
 GitQlient::GitQlient(QWidget *parent)
    : GitQlient(QStringList(), parent)
@@ -27,6 +29,8 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    , mRepos(new QTabWidget())
    , mConfigWidget(new ConfigWidget())
 {
+   QBenchmarkStart();
+
    const auto repos = parseArguments(arguments);
 
    QLog_Info("UI", "*******************************************");
@@ -58,6 +62,8 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    connect(mConfigWidget, &ConfigWidget::signalOpenRepo, this, &GitQlient::addRepoTab);
 
    setRepositories(repos);
+
+   QBenchmarkEnd();
 }
 
 GitQlient::~GitQlient()
@@ -67,6 +73,8 @@ GitQlient::~GitQlient()
 
 void GitQlient::openRepo()
 {
+   QBenchmarkStart();
+
    const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
 
    if (!dirName.isEmpty())
@@ -74,27 +82,38 @@ void GitQlient::openRepo()
       QDir d(dirName);
       addRepoTab(d.absolutePath());
    }
+   QBenchmarkEnd();
 }
 
 void GitQlient::setRepositories(const QStringList &repositories)
 {
    QLog_Info("UI", QString("Adding {%1} repositories").arg(repositories.count()));
 
+   QBenchmarkStart();
+
    for (const auto &repo : repositories)
       addRepoTab(repo);
+
+   QBenchmarkEnd();
 }
 
 void GitQlient::setArgumentsPostInit(const QStringList &arguments)
 {
    QLog_Info("UI", QString("External call with the params {%1}").arg(arguments.join(",")));
 
+   QBenchmarkStart();
+
    const auto repos = parseArguments(arguments);
 
    setRepositories(repos);
+
+   QBenchmarkEnd();
 }
 
 QStringList GitQlient::parseArguments(const QStringList &arguments)
 {
+   QBenchmarkStart();
+
    LogLevel logLevel;
    GitQlientSettings settings;
 
@@ -141,11 +160,15 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
    const auto manager = QLoggerManager::getInstance();
    manager->addDestination("GitQlient.log", { "UI", "Git" }, logLevel);
 
+   QBenchmarkEnd();
+
    return repos;
 }
 
 void GitQlient::addRepoTab(const QString &repoPath)
 {
+   QBenchmarkStartMsg(repoPath.toStdString());
+
    if (!mCurrentRepos.contains(repoPath))
    {
       const auto newRepo = new GitQlientRepo(repoPath);
@@ -198,10 +221,14 @@ void GitQlient::addRepoTab(const QString &repoPath)
    }
    else
       QLog_Warning("UI", QString("Repository at {%1} already opened. Skip adding it again.").arg(repoPath));
+
+   QBenchmarkEnd();
 }
 
 void GitQlient::closeTab(int tabIndex)
 {
+   QBenchmarkStart();
+
    auto repoToRemove = dynamic_cast<GitQlientRepo *>(mRepos->widget(tabIndex));
 
    QLog_Info("UI", QString("Removing repository {%1}").arg(repoToRemove->currentDir()));
@@ -209,4 +236,6 @@ void GitQlient::closeTab(int tabIndex)
    mCurrentRepos.remove(repoToRemove->currentDir());
    mRepos->removeTab(tabIndex);
    repoToRemove->close();
+
+   QBenchmarkEnd();
 }

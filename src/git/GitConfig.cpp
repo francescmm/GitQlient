@@ -2,9 +2,12 @@
 
 #include <GitBase.h>
 #include <GitCloneProcess.h>
+
 #include <QLogger.h>
+#include <QBenchmark.h>
 
 using namespace QLogger;
+using namespace QBenchmark;
 
 bool GitUserInfo::isValid() const
 {
@@ -19,6 +22,8 @@ GitConfig::GitConfig(QSharedPointer<GitBase> gitBase, QObject *parent)
 
 GitUserInfo GitConfig::getGlobalUserInfo() const
 {
+   QBenchmarkStart();
+
    GitUserInfo userInfo;
 
    QLog_Debug("Git", QString("Getting global user info"));
@@ -33,26 +38,40 @@ GitUserInfo GitConfig::getGlobalUserInfo() const
    if (emailRequest.success)
       userInfo.mUserEmail = emailRequest.output.toString().trimmed();
 
+   QBenchmarkEnd();
+
    return userInfo;
 }
 
 void GitConfig::setGlobalUserInfo(const GitUserInfo &info)
 {
+   QBenchmarkStart();
+
    QLog_Debug("Git", QString("Setting global user info"));
 
    mGitBase->run(QString("git config --global user.name \"%1\"").arg(info.mUserName));
    mGitBase->run(QString("git config --global user.email %1").arg(info.mUserEmail));
+
+   QBenchmarkEnd();
 }
 
 GitExecResult GitConfig::setGlobalData(const QString &key, const QString &value)
 {
+   QBenchmarkStart();
+
    QLog_Debug("Git", QString("Configuring global key {%1} with value {%2}").arg(key, value));
 
-   return mGitBase->run(QString("git config --global %1 \"%2\"").arg(key, value));
+   const auto ret = mGitBase->run(QString("git config --global %1 \"%2\"").arg(key, value));
+
+   QBenchmarkEnd();
+
+   return ret;
 }
 
 GitUserInfo GitConfig::getLocalUserInfo() const
 {
+   QBenchmarkStart();
+
    QLog_Debug("Git", QString("Getting local user info"));
 
    GitUserInfo userInfo;
@@ -67,23 +86,34 @@ GitUserInfo GitConfig::getLocalUserInfo() const
    if (emailRequest.success)
       userInfo.mUserEmail = emailRequest.output.toString().trimmed();
 
+   QBenchmarkEnd();
+
    return userInfo;
 }
 
 void GitConfig::setLocalUserInfo(const GitUserInfo &info)
 {
+   QBenchmarkStart();
+
    QLog_Debug("Git", QString("Setting local user info"));
 
    mGitBase->run(QString("git config --local user.name \"%1\"").arg(info.mUserName));
    mGitBase->run(QString("git config --local user.email %1").arg(info.mUserEmail));
+
+   QBenchmarkEnd();
 }
 
 GitExecResult GitConfig::setLocalData(const QString &key, const QString &value)
 {
+   QBenchmarkStart();
 
    QLog_Debug("Git", QString("Configuring local key {%1} with value {%2}").arg(key, value));
 
-   return mGitBase->run(QString("git config --local %1 \"%2\"").arg(key, value));
+   const auto ret = mGitBase->run(QString("git config --local %1 \"%2\"").arg(key, value));
+
+   QBenchmarkEnd();
+
+   return ret;
 }
 
 GitExecResult GitConfig::clone(const QString &url, const QString &fullPath)
@@ -100,6 +130,8 @@ GitExecResult GitConfig::clone(const QString &url, const QString &fullPath)
 
 GitExecResult GitConfig::initRepo(const QString &fullPath)
 {
+   QBenchmarkStart();
+
    QLog_Debug("Git", QString("Initializing a new repository at {%1}").arg(fullPath));
 
    const auto ret = mGitBase->run(QString("git init %1").arg(fullPath));
@@ -107,25 +139,41 @@ GitExecResult GitConfig::initRepo(const QString &fullPath)
    if (ret.success)
       mGitBase->setWorkingDir(fullPath);
 
+   QBenchmarkEnd();
+
    return ret;
 }
 
 GitExecResult GitConfig::getLocalConfig() const
 {
+   QBenchmarkStart();
+
    QLog_Debug("Git", QString("Getting local config"));
 
-   return mGitBase->run("git config --local --list");
+   const auto ret = mGitBase->run("git config --local --list");
+
+   QBenchmarkEnd();
+
+   return ret;
 }
 
 GitExecResult GitConfig::getGlobalConfig() const
 {
+   QBenchmarkStart();
+
    QLog_Debug("Git", QString("Getting global config"));
 
-   return mGitBase->run("git config --global --list");
+   const auto ret = mGitBase->run("git config --global --list");
+
+   QBenchmarkEnd();
+
+   return ret;
 }
 
 GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
 {
+   QBenchmarkStart();
+
    QLog_Debug("Git", QString("Getting remote for branch {%1}.").arg(branch));
 
    const auto config = getLocalConfig();
@@ -146,8 +194,12 @@ GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
       }
 
       if (!configValue.isEmpty())
+      {
+         QBenchmarkEnd();
          return { true, configValue };
+      }
    }
 
+   QBenchmarkEnd();
    return GitExecResult();
 }
