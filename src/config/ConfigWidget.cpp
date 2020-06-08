@@ -142,7 +142,7 @@ void ConfigWidget::cloneRepo()
 
    if (cloneDlg.exec() == QDialog::Accepted)
    {
-      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, 100, false, false);
+      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 100, false);
       connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
       mProgressDlg->show();
    }

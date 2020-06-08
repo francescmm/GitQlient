@@ -338,8 +338,12 @@ bool RevisionsCache::pendingLocalChanges() const
    if (!mCacheLocked)
    {
       const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA);
-      const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
-      localChanges = rf.count() == mUntrackedfiles.count();
+
+      if (commit)
+      {
+         const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
+         localChanges = rf.count() == mUntrackedfiles.count();
+      }
    }
 
    return localChanges;
@@ -355,12 +359,18 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Typ
    return branches;
 }
 
-QVector<QPair<QString, QStringList>> RevisionsCache::getTags() const
+QMap<QString, QString> RevisionsCache::getTags() const
 {
-   QVector<QPair<QString, QStringList>> tags;
+   QMap<QString, QString> tags;
 
    for (auto commit : mReferences)
-      tags.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(References::Type::Tag)));
+   {
+      const auto sha = commit->sha();
+      const auto tagNames = commit->getReferences(References::Type::Tag);
+
+      for (const auto &tag : tagNames)
+         tags[tag] = sha;
+   }
 
    return tags;
 }

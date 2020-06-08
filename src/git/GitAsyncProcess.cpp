@@ -1,6 +1,9 @@
 #include "GitAsyncProcess.h"
 
-#include <QTemporaryFile>
+#include <QBenchmark.h>
+
+using namespace QBenchmark;
+
 GitAsyncProcess::GitAsyncProcess(const QString &workingDir)
    : AGitProcess(workingDir)
 {
@@ -8,15 +11,25 @@ GitAsyncProcess::GitAsyncProcess(const QString &workingDir)
 
 GitExecResult GitAsyncProcess::run(const QString &command)
 {
-   return { execute(command), "" };
+   QBenchmarkStart();
+
+   const auto ret = execute(command);
+
+   QBenchmarkEnd();
+
+   return { ret, "" };
 }
 
 void GitAsyncProcess::onFinished(int code, QProcess::ExitStatus exitStatus)
 {
+   QBenchmarkStart();
+
    AGitProcess::onFinished(code, exitStatus);
 
    if (!mCanceling)
       emit signalDataReady({ mRealError, mRunOutput });
 
    deleteLater();
+
+   QBenchmarkEnd();
 }
