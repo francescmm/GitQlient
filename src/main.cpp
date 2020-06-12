@@ -6,10 +6,10 @@
 #include <GitQlientSettings.h>
 
 #include <QLogger.h>
-#include <QBenchmark.h>
+#include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace QBenchmark;
+using namespace GitQlientTools;
 
 int main(int argc, char *argv[])
 {
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
    QApplication app(argc, argv);
    QStringList arguments;
 
-   QBenchmarkRegisterer::getInstance();
+   BenchmarkTool::getInstance();
 
    auto argNum = argc;
 
