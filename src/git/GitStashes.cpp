@@ -3,10 +3,10 @@
 #include <GitBase.h>
 
 #include <QLogger.h>
-#include <QBenchmark.h>
+#include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace QBenchmark;
+using namespace GitQlientTools;
 
 GitStashes::GitStashes(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
@@ -15,7 +15,7 @@ GitStashes::GitStashes(const QSharedPointer<GitBase> &gitBase)
 
 QVector<QString> GitStashes::getStashes()
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing getStashes"));
 
@@ -32,72 +32,72 @@ QVector<QString> GitStashes::getStashes()
             stashes.append(tag);
    }
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return stashes;
 }
 
 GitExecResult GitStashes::pop() const
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing pop"));
 
    const auto ret = mGitBase->run("git stash pop");
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitStashes::stash()
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing stash"));
 
    const auto ret = mGitBase->run("git stash");
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitStashes::stashBranch(const QString &stashId, const QString &branchName)
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing stashBranch: {%1} in branch {%2}").arg(stashId, branchName));
 
    const auto ret = mGitBase->run(QString("git stash branch %1 %2").arg(branchName, stashId));
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitStashes::stashDrop(const QString &stashId)
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing stashDrop: {%1}").arg(stashId));
 
    const auto ret = mGitBase->run(QString("git stash drop -q %1").arg(stashId));
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitStashes::stashClear()
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing stashClear"));
 
    const auto ret = mGitBase->run("git stash clear");
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret;
 }

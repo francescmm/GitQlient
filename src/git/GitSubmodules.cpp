@@ -3,10 +3,10 @@
 #include <GitBase.h>
 
 #include <QLogger.h>
-#include <QBenchmark.h>
+#include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace QBenchmark;
+using namespace GitQlientTools;
 
 GitSubmodules::GitSubmodules(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
@@ -15,7 +15,7 @@ GitSubmodules::GitSubmodules(const QSharedPointer<GitBase> &gitBase)
 
 QVector<QString> GitSubmodules::getSubmodules()
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing getSubmodules"));
 
@@ -29,33 +29,33 @@ QVector<QString> GitSubmodules::getSubmodules()
             submodulesList.append(submodule.split('.').at(1));
    }
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return submodulesList;
 }
 
 bool GitSubmodules::submoduleAdd(const QString &url, const QString &name)
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing submoduleAdd: {%1} {%2}").arg(url, name));
 
    const auto ret = mGitBase->run(QString("git submodule add %1 %2").arg(url, name)).success;
 
-   QBenchmarkStart();
+   BenchmarkStart();
 
    return ret;
 }
 
 bool GitSubmodules::submoduleUpdate(const QString &)
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing submoduleUpdate"));
 
    const auto ret = mGitBase->run("git submodule update --init --recursive").success;
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret;
 }

@@ -3,10 +3,10 @@
 #include <GitBase.h>
 
 #include <QLogger.h>
-#include <QBenchmark.h>
+#include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace QBenchmark;
+using namespace GitQlientTools;
 
 GitTags::GitTags(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
@@ -15,7 +15,7 @@ GitTags::GitTags(const QSharedPointer<GitBase> &gitBase)
 
 QVector<QString> GitTags::getTags() const
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing getTags"));
 
@@ -32,14 +32,14 @@ QVector<QString> GitTags::getTags() const
             tags.append(tag);
    }
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return tags;
 }
 
 QVector<QString> GitTags::getLocalTags() const
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing getLocalTags"));
 
@@ -56,27 +56,27 @@ QVector<QString> GitTags::getLocalTags() const
             tags.append(tag.split(" -> ").last());
    }
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return tags;
 }
 
 GitExecResult GitTags::addTag(const QString &tagName, const QString &tagMessage, const QString &sha)
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing addTag: {%1}").arg(tagName));
 
    const auto ret = mGitBase->run(QString("git tag -a %1 %2 -m \"%3\"").arg(tagName, sha, tagMessage));
 
-   QBenchmarkStart();
+   BenchmarkStart();
 
    return ret;
 }
 
 GitExecResult GitTags::removeTag(const QString &tagName, bool remote)
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing removeTag: {%1}").arg(tagName));
 
@@ -88,34 +88,34 @@ GitExecResult GitTags::removeTag(const QString &tagName, bool remote)
    if (!remote || (remote && ret.success))
       ret = mGitBase->run(QString("git tag -d %1").arg(tagName));
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitTags::pushTag(const QString &tagName)
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing pushTag: {%1}").arg(tagName));
 
    const auto ret = mGitBase->run(QString("git push origin %1").arg(tagName));
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitTags::getTagCommit(const QString &tagName)
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing getTagCommit: {%1}").arg(tagName));
 
    const auto ret = mGitBase->run(QString("git rev-list -n 1 %1").arg(tagName));
    const auto output = ret.output.toString().trimmed();
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return qMakePair(ret.success, output);
 }

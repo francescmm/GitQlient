@@ -4,10 +4,10 @@
 #include <GitAsyncProcess.h>
 
 #include <QLogger.h>
-#include <QBenchmark.h>
+#include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace QBenchmark;
+using namespace GitQlientTools;
 
 #include <QDir>
 
@@ -29,7 +29,7 @@ void GitBase::setWorkingDir(const QString &workingDir)
 
 GitExecResult GitBase::run(const QString &cmd) const
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    GitSyncProcess p(mWorkingDirectory);
    connect(this, &GitBase::cancelAllProcesses, &p, &AGitProcess::onCancel);
@@ -48,14 +48,14 @@ GitExecResult GitBase::run(const QString &cmd) const
    else
       QLog_Warning("Git", QString("Git command {%1} has errors:\n%2").arg(cmd, runOutput));
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret;
 }
 
 bool GitBase::runAsync(const QString &cmd) const
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    const auto p = new GitAsyncProcess(mWorkingDirectory);
    connect(this, &GitBase::cancelAllProcesses, p, &AGitProcess::onCancel);
@@ -63,14 +63,14 @@ bool GitBase::runAsync(const QString &cmd) const
 
    const auto ret = p->run(cmd);
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret.success;
 }
 
 void GitBase::updateCurrentBranch()
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Trace("Git", "Updating the current branch");
 
@@ -78,30 +78,30 @@ void GitBase::updateCurrentBranch()
 
    mCurrentBranch = ret.success ? ret.output.toString().trimmed().remove("heads/") : QString();
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 }
 
 QString GitBase::getCurrentBranch()
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    QLog_Trace("Git", "Executing getCurrentBranch");
 
    if (mCurrentBranch.isEmpty())
       updateCurrentBranch();
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return mCurrentBranch;
 }
 
 GitExecResult GitBase::getLastCommit() const
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    const auto ret = run("git rev-parse HEAD");
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 
    return ret;
 }

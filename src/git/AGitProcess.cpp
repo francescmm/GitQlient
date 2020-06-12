@@ -4,10 +4,10 @@
 #include <QTextStream>
 
 #include <QLogger.h>
-#include <QBenchmark.h>
+#include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace QBenchmark;
+using namespace GitQlientTools;
 
 namespace
 {
@@ -106,13 +106,13 @@ AGitProcess::AGitProcess(const QString &workingDir)
 
 void AGitProcess::onCancel()
 {
-   QBenchmarkStart();
+   BenchmarkStart();
 
    mCanceling = true;
 
    waitForFinished();
 
-   QBenchmarkEnd();
+   BenchmarkEnd();
 }
 
 void AGitProcess::onReadyStandardOutput()
