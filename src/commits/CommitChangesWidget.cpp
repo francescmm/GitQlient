@@ -53,6 +53,7 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<RevisionsCache> &c
    ui->lCounter->setText(QString::number(kMaxTitleChars));
    ui->leCommitTitle->setMaxLength(kMaxTitleChars);
    ui->teDescription->setMaximumHeight(125);
+   ui->untrackedFilesList->setWorkingDirectory(mGit->getWorkingDir());
 
    QIcon stagedIcon(":/icons/staged");
    ui->stagedFilesIcon->setPixmap(stagedIcon.pixmap(15, 15));

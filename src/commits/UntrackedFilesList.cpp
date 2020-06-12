@@ -3,6 +3,10 @@
 #include <QMenu>
 #include <QProcess>
 
+#include <QLogger.h>
+
+using namespace QLogger;
+
 UntrackedFilesList::UntrackedFilesList(QWidget *parent)
    : QListWidget(parent)
 {
@@ -29,9 +33,13 @@ void UntrackedFilesList::onStageFile()
 
 void UntrackedFilesList::onDeleteFile()
 {
+   const auto path = QString("rm -rf %1").arg(mSelectedItem->toolTip());
+
+   QLog_Info("UI", "Removing paht: " + path);
+
    QProcess p;
    p.setWorkingDirectory(mWorkingDir);
-   p.start(QString("rm -rf %1").arg(mSelectedItem->toolTip()));
+   p.start(path);
 
    if (p.waitForFinished())
       emit signalCheckoutPerformed();
