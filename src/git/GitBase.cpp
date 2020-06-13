@@ -83,14 +83,10 @@ void GitBase::updateCurrentBranch()
 
 QString GitBase::getCurrentBranch()
 {
-   BenchmarkStart();
-
    QLog_Trace("Git", "Executing getCurrentBranch");
 
    if (mCurrentBranch.isEmpty())
       updateCurrentBranch();
-
-   BenchmarkEnd();
 
    return mCurrentBranch;
 }
@@ -98,6 +94,8 @@ QString GitBase::getCurrentBranch()
 GitExecResult GitBase::getLastCommit() const
 {
    BenchmarkStart();
+
+   QLog_Trace("Git", "Executing getLastCommit");
 
    const auto ret = run("git rev-parse HEAD");
 
