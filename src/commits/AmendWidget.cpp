@@ -83,7 +83,6 @@ void AmendWidget::configure(const QString &sha)
       ui->leCommitTitle->setText(commit.shortLog());
    }
 
-   ui->teDescription->moveCursor(QTextCursor::Start);
    ui->pbCommit->setEnabled(ui->stagedFilesList->count());
 }
 
