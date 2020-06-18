@@ -471,10 +471,9 @@ void BranchesWidget::processSubmodules()
    QLog_Info("UI", QString("Fetching {%1} submodules").arg(submodules.count()));
 
    for (const auto &submodule : submodules)
-   {
       mSubmodulesList->addItem(submodule);
-      mSubmodulesCount->setText('(' + QString::number(submodules.count()) + ')');
-   }
+
+   mSubmodulesCount->setText('(' + QString::number(submodules.count()) + ')');
 }
 
 void BranchesWidget::adjustBranchesTree(BranchTreeWidget *treeWidget)
