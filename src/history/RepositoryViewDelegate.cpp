@@ -213,8 +213,8 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool 
 QColor RepositoryViewDelegate::getMergeColor(const Lane &currentLane, const CommitInfo &commit, int currentLaneIndex,
                                              const QColor &defaultColor, bool &isSet) const
 {
-   auto mergeColor
-       = GitQlientStyles::getBranchColorAt((commit.getLanesCount() - 1) % GitQlientStyles::getTotalBranchColors());
+   auto mergeColor = defaultColor;
+       //= GitQlientStyles::getBranchColorAt((commit.getLanesCount() - 1) % GitQlientStyles::getTotalBranchColors());
 
    switch (currentLane.getType())
    {
