@@ -97,11 +97,25 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 
       const auto commit = new CommitInfo(rev);
 
+      if (orderIdx == 1)
+          commit->addChildReference(mCommits.first());
+
       if (orderIdx >= mCommits.count())
       {
          QLog_Debug("Git", QString("Adding commit with sha {%1}.").arg(commit->sha()));
 
          mCommits.append(commit);
+
+         if (mTmpChildsStorage.contains(commit->sha()))
+         {
+             for (auto child : mTmpChildsStorage.values(commit->sha()))
+                 commit->addChildReference(child);
+
+             mTmpChildsStorage.remove(commit->sha());
+         }
+
+         for (const auto& parent : commit->parents())
+            mTmpChildsStorage.insert(parent, commit);
       }
       else if (!(mCommits[orderIdx] && *mCommits[orderIdx] == *commit))
       {
@@ -111,6 +125,17 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
             delete mCommits[orderIdx];
 
          mCommits[orderIdx] = commit;
+
+         if (mTmpChildsStorage.contains(commit->sha()))
+         {
+             for (auto child : mTmpChildsStorage.values(commit->sha()))
+                 commit->addChildReference(child);
+
+             mTmpChildsStorage.remove(commit->sha());
+         }
+
+         for (const auto& parent : commit->parents())
+            mTmpChildsStorage.insert(parent, commit);
       }
 
       mCommitsMap.insert(rev.sha(), commit);

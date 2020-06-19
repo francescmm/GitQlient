@@ -88,6 +88,7 @@ private:
    bool mCacheLocked = true;
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo *> mCommitsMap;
+   QMultiMap<QString, CommitInfo*> mTmpChildsStorage;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
    QVector<CommitInfo *> mReferences;
    QMap<QString, LocalBranchDistances> mLocalBranchDistances;

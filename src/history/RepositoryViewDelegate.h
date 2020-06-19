@@ -107,7 +107,7 @@ private:
     * @param isWip Tells the method if it's the WIP commit so it's painted differently.
     */
    void paintGraphLane(QPainter *p, const Lane &type, bool laneHeadPresent, int x1, int x2, const QColor &col,
-                       const QColor &activeCol, const QColor &mergeColor, bool isWip = false) const;
+                       const QColor &activeCol, const QColor &mergeColor, bool isWip = false, bool hasChilds = true) const;
 
    /**
     * @brief Specialized method that paints a tag in the commit message column.

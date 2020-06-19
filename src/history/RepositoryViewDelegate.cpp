@@ -77,7 +77,7 @@ QSize RepositoryViewDelegate::sizeHint(const QStyleOptionViewItem &, const QMode
 
 void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool laneHeadPresent, int x1, int x2,
                                             const QColor &col, const QColor &activeCol, const QColor &mergeColor,
-                                            bool isWip) const
+                                            bool isWip, bool hasChilds) const
 {
    const auto padding = 2;
    x1 += padding;
@@ -127,29 +127,40 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool 
    }
 
    // vertical line
-   switch (lane.getType())
+   if (!isWip && !hasChilds && (lane.getType() == LaneType::HEAD
+                      || lane.getType() == LaneType::INITIAL
+                      || lane.getType() == LaneType::BRANCH
+                      || lane.getType() == LaneType::MERGE_FORK
+                      || lane.getType() == LaneType::MERGE_FORK_R
+                      || lane.getType() == LaneType::MERGE_FORK_L
+                      || lane.getType() == LaneType::ACTIVE))
+       p->drawLine(m, h, m, 2 * h);
+   else
    {
-      case LaneType::ACTIVE:
-      case LaneType::NOT_ACTIVE:
-      case LaneType::MERGE_FORK:
-      case LaneType::MERGE_FORK_R:
-      case LaneType::MERGE_FORK_L:
-      case LaneType::JOIN:
-      case LaneType::JOIN_R:
-      case LaneType::JOIN_L:
-      case LaneType::CROSS:
-         p->drawLine(m, 0, m, 2 * h);
-         break;
-      case LaneType::HEAD_L:
-      case LaneType::BRANCH:
-         p->drawLine(m, h, m, 2 * h);
-         break;
-      case LaneType::TAIL_L:
-      case LaneType::INITIAL:
-         p->drawLine(m, 0, m, h);
-         break;
-      default:
-         break;
+       switch (lane.getType())
+       {
+          case LaneType::ACTIVE:
+          case LaneType::NOT_ACTIVE:
+          case LaneType::MERGE_FORK:
+          case LaneType::MERGE_FORK_R:
+          case LaneType::MERGE_FORK_L:
+          case LaneType::JOIN:
+          case LaneType::JOIN_R:
+          case LaneType::JOIN_L:
+          case LaneType::CROSS:
+             p->drawLine(m, 0, m, 2 * h);
+             break;
+          case LaneType::HEAD_L:
+          case LaneType::BRANCH:
+             p->drawLine(m, h, m, 2 * h);
+             break;
+          case LaneType::TAIL_L:
+          case LaneType::INITIAL:
+             p->drawLine(m, 0, m, h);
+             break;
+          default:
+             break;
+       }
    }
 
    // center symbol, e.g. rect or ellipse
@@ -255,7 +266,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    if (mView->hasActiveFilter())
    {
       const auto activeColor = GitQlientStyles::getBranchColorAt(0);
-      paintGraphLane(p, LaneType::ACTIVE, false, 0, LANE_WIDTH, activeColor, activeColor, activeColor, false);
+      paintGraphLane(p, LaneType::ACTIVE, false, 0, LANE_WIDTH, activeColor, activeColor, activeColor, false, commit.hasChilds());
    }
    else
    {
@@ -293,7 +304,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
             if (!isSet)
                mergeColor = getMergeColor(currentLane, commit, i, color, isSet);
 
-            paintGraphLane(p, currentLane, laneHeadPresent, x1, x2, color, activeColor, mergeColor, isWip);
+            paintGraphLane(p, currentLane, laneHeadPresent, x1, x2, color, activeColor, mergeColor, isWip, commit.hasChilds());
 
             if (mView->hasActiveFilter())
                break;
