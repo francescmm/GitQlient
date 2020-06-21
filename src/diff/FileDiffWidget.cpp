@@ -95,8 +95,8 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
 
    if (!text.isEmpty())
    {
-      QPair<QString, QVector<DiffInfo::ChunkInfo>> oldData;
-      QPair<QString, QVector<DiffInfo::ChunkInfo>> newData;
+      QPair<QStringList, QVector<DiffInfo::ChunkInfo>> oldData;
+      QPair<QStringList, QVector<DiffInfo::ChunkInfo>> newData;
 
       QVector<DiffInfo::ChunkInfo> newFileDiffs;
       QVector<DiffInfo::ChunkInfo> oldFileDiffs;
@@ -104,11 +104,11 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
       processDiff(text, newData, oldData);
 
       mOldFile->blockSignals(true);
-      mOldFile->loadDiff(oldData.first, oldData.second);
+      mOldFile->loadDiff(oldData.first.join('\n'), oldData.second);
       mOldFile->blockSignals(false);
 
       mNewFile->blockSignals(true);
-      mNewFile->loadDiff(newData.first, newData.second);
+      mNewFile->loadDiff(newData.first.join('\n'), newData.second);
       mNewFile->blockSignals(false);
 
       return true;
@@ -126,8 +126,8 @@ void FileDiffWidget::setFileVsFileEnable(bool enable)
    configure(mCurrentSha, mPreviousSha, mCurrentFile);
 }
 
-void FileDiffWidget::processDiff(const QString &text, QPair<QString, QVector<DiffInfo::ChunkInfo>> &newFileData,
-                                 QPair<QString, QVector<DiffInfo::ChunkInfo>> &oldFileData)
+void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
+                                 QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData)
 {
    auto row = 1;
    DiffInfo diff;
@@ -143,7 +143,7 @@ void FileDiffWidget::processDiff(const QString &text, QPair<QString, QVector<Dif
             if (diff.oldFile.startLine == -1)
                diff.oldFile.startLine = row;
 
-            oldFileData.first.append(line).append('\n');
+            oldFileData.first.append(line);
 
             --row;
          }
@@ -157,7 +157,7 @@ void FileDiffWidget::processDiff(const QString &text, QPair<QString, QVector<Dif
                diff.newFile.addition = true;
             }
 
-            newFileData.first.append(line).append('\n');
+            newFileData.first.append(line);
          }
          else
          {
@@ -178,12 +178,18 @@ void FileDiffWidget::processDiff(const QString &text, QPair<QString, QVector<Dif
                   oldFileData.second.append(diff.oldFile);
             }
 
+            oldFileData.first.append(line);
+            newFileData.first.append(line);
+
             diff = DiffInfo();
          }
 
          ++row;
       }
-      oldFileData.first.append(line).append('\n');
-      newFileData.first.append(line).append('\n');
+      else
+      {
+         oldFileData.first.append(line);
+         newFileData.first.append(line);
+      }
    }
 }

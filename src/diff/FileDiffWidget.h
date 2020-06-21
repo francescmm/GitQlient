@@ -105,6 +105,6 @@ private:
    QCheckBox *mFileVsFileCheck = nullptr;
    bool mFileVsFile = false;
 
-   void processDiff(const QString &text, QPair<QString, QVector<DiffInfo::ChunkInfo>> &newFileData,
-                    QPair<QString, QVector<DiffInfo::ChunkInfo>> &oldFileData);
+   void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
+                    QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);
 };
