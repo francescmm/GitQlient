@@ -5,6 +5,7 @@ HEADERS += \
     $$PWD/DiffButton.h \
     $$PWD/DiffInfoPanel.h \
     $$PWD/FileBlameWidget.h \
+    $$PWD/FileDiffEditor.h \
     $$PWD/FileDiffHighlighter.h \
     $$PWD/FileDiffView.h \
     $$PWD/FileDiffWidget.h \
@@ -15,6 +16,7 @@ SOURCES += \
     $$PWD/DiffButton.cpp \
     $$PWD/DiffInfoPanel.cpp \
     $$PWD/FileBlameWidget.cpp \
+    $$PWD/FileDiffEditor.cpp \
     $$PWD/FileDiffHighlighter.cpp \
     $$PWD/FileDiffView.cpp \
     $$PWD/FileDiffWidget.cpp \
