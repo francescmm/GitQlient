@@ -5,6 +5,7 @@
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
 #include <DiffInfoPanel.h>
+#include <GitQlientSettings.h>
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -26,6 +27,10 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mFileVsFileCheck(new QCheckBox(tr("Show file vs file")))
 
 {
+   GitQlientSettings settings;
+   mFileVsFile = settings.value("FileVsFile", false).toBool();
+   mFileVsFileCheck->setChecked(mFileVsFile);
+
    mNewFile->setObjectName("newFile");
    mOldFile->setObjectName("oldFile");
 
@@ -122,6 +127,9 @@ void FileDiffWidget::setFileVsFileEnable(bool enable)
    mFileVsFile = enable;
 
    mOldFile->setVisible(mFileVsFile);
+
+   GitQlientSettings settings;
+   settings.setValue("FileVsFile", mFileVsFile);
 
    configure(mCurrentSha, mPreviousSha, mCurrentFile);
 }
