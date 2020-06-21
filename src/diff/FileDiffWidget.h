@@ -31,7 +31,7 @@ class QPushButton;
 class GitBase;
 class DiffInfoPanel;
 class RevisionsCache;
-
+class QCheckBox;
 /*!
  \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
  specific file.
@@ -84,6 +84,12 @@ public:
    */
    QString getPreviousSha() const { return mPreviousSha; }
 
+   /**
+    * @brief setFileVsFileEnable Enables the widget to show file vs file view.
+    * @param enable If true, enables the file vs file view.
+    */
+   void setFileVsFileEnable(bool enable);
+
 private:
    QString mCurrentFile;
    QString mCurrentSha;
@@ -96,6 +102,9 @@ private:
    QPushButton *mGoNext = nullptr;
    DiffInfoPanel *mDiffInfoPanel = nullptr;
    QVector<int> mModifications;
+   QCheckBox *mFileVsFileCheck = nullptr;
+   bool mFileVsFile = false;
 
-   QVector<DiffInfo> fileDiffs;
+   void processDiff(const QString &text, QPair<QString, QVector<DiffInfo::ChunkInfo>> &newFileData,
+                    QPair<QString, QVector<DiffInfo::ChunkInfo>> &oldFileData);
 };

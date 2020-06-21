@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QScrollBar>
 #include <QDateTime>
+#include <QCheckBox>
 
 FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
                                QWidget *parent)
@@ -22,6 +23,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mGoPrevious(new QPushButton())
    , mGoNext(new QPushButton())
    , mDiffInfoPanel(new DiffInfoPanel(cache))
+   , mFileVsFileCheck(new QCheckBox(tr("Show file vs file")))
 
 {
    mNewFile->setObjectName("newFile");
@@ -32,7 +34,13 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mGoPrevious->setIcon(QIcon(":/icons/go_up"));
    mGoNext->setIcon(QIcon(":/icons/go_down"));
 
+   const auto optionsLayout = new QHBoxLayout();
+   optionsLayout->setContentsMargins(QMargins());
+   optionsLayout->setSpacing(10);
+   optionsLayout->addWidget(mFileVsFileCheck);
+
    const auto diffLayout = new QHBoxLayout();
+   diffLayout->setContentsMargins(QMargins());
    diffLayout->addWidget(mNewFile);
    diffLayout->addWidget(mOldFile);
 
@@ -40,10 +48,14 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    vLayout->setContentsMargins(QMargins());
    vLayout->setSpacing(10);
    vLayout->addWidget(mDiffInfoPanel);
+   vLayout->addLayout(optionsLayout);
    vLayout->addLayout(diffLayout);
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
+   connect(mFileVsFileCheck, &QCheckBox::toggled, this, &FileDiffWidget::setFileVsFileEnable);
+
+   mOldFile->setVisible(mFileVsFile);
 }
 
 void FileDiffWidget::clear()
@@ -83,17 +95,46 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
 
    if (!text.isEmpty())
    {
-      QString oldText;
-      QString newText;
-      auto row = 1;
+      QPair<QString, QVector<DiffInfo::ChunkInfo>> oldData;
+      QPair<QString, QVector<DiffInfo::ChunkInfo>> newData;
 
-      fileDiffs.clear();
-
-      DiffInfo diff;
       QVector<DiffInfo::ChunkInfo> newFileDiffs;
       QVector<DiffInfo::ChunkInfo> oldFileDiffs;
 
-      for (auto line : text.split("\n"))
+      processDiff(text, newData, oldData);
+
+      mOldFile->blockSignals(true);
+      mOldFile->loadDiff(oldData.first, oldData.second);
+      mOldFile->blockSignals(false);
+
+      mNewFile->blockSignals(true);
+      mNewFile->loadDiff(newData.first, newData.second);
+      mNewFile->blockSignals(false);
+
+      return true;
+   }
+
+   return false;
+}
+
+void FileDiffWidget::setFileVsFileEnable(bool enable)
+{
+   mFileVsFile = enable;
+
+   mOldFile->setVisible(mFileVsFile);
+
+   configure(mCurrentSha, mPreviousSha, mCurrentFile);
+}
+
+void FileDiffWidget::processDiff(const QString &text, QPair<QString, QVector<DiffInfo::ChunkInfo>> &newFileData,
+                                 QPair<QString, QVector<DiffInfo::ChunkInfo>> &oldFileData)
+{
+   auto row = 1;
+   DiffInfo diff;
+
+   for (auto line : text.split("\n"))
+   {
+      if (mFileVsFile)
       {
          if (line.startsWith('-'))
          {
@@ -102,7 +143,7 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
             if (diff.oldFile.startLine == -1)
                diff.oldFile.startLine = row;
 
-            oldText.append(line).append('\n');
+            oldFileData.first.append(line).append('\n');
 
             --row;
          }
@@ -116,7 +157,7 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
                diff.newFile.addition = true;
             }
 
-            newText.append(line).append('\n');
+            newFileData.first.append(line).append('\n');
          }
          else
          {
@@ -130,34 +171,19 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
 
             if (diff.isValid())
             {
-               fileDiffs.append(diff);
-
                if (diff.newFile.isValid())
-                  newFileDiffs.append(diff.newFile);
+                  newFileData.second.append(diff.newFile);
 
                if (diff.oldFile.isValid())
-                  oldFileDiffs.append(diff.oldFile);
+                  oldFileData.second.append(diff.oldFile);
             }
 
             diff = DiffInfo();
-
-            oldText.append(line).append('\n');
-            newText.append(line).append('\n');
          }
 
          ++row;
       }
-
-      mOldFile->blockSignals(true);
-      mOldFile->loadDiff(oldText, oldFileDiffs);
-      mOldFile->blockSignals(false);
-
-      mNewFile->blockSignals(true);
-      mNewFile->loadDiff(newText, newFileDiffs);
-      mNewFile->blockSignals(false);
-
-      return true;
+      oldFileData.first.append(line).append('\n');
+      newFileData.first.append(line).append('\n');
    }
-
-   return false;
 }
