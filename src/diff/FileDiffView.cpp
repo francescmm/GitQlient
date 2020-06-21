@@ -79,11 +79,13 @@ FileDiffView::~FileDiffView()
    delete mDiffHighlighter;
 }
 
-void FileDiffView::loadDiff(QString text)
+void FileDiffView::loadDiff(QString text, const QVector<DiffInfo::ChunkInfo> &fileDiffInfo)
 {
    QLog_Trace("UI",
               QString("FileDiffView::loadDiff - {%1} move scroll to pos {%2}")
                   .arg(objectName(), QString::number(verticalScrollBar()->value())));
+
+   mDiffHighlighter->setDiffInfo(fileDiffInfo);
 
    const auto pos = verticalScrollBar()->value();
    auto cursor = textCursor();

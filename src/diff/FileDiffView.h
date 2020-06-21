@@ -51,6 +51,7 @@
 ****************************************************************************/
 
 #include <QPlainTextEdit>
+#include <DiffInfo.h>
 
 class FileDiffHighlighter;
 
@@ -88,7 +89,7 @@ public:
     * @param text The text representing a diff
     * @return True if correctly loaded, otherwise false.
     */
-   void loadDiff(QString text);
+   void loadDiff(QString text, const QVector<DiffInfo::ChunkInfo> &fileDiffInfo);
 
    /**
     * @brief moveScrollBarToPos Moves the vertical scroll bar to the value defined in @p value.

@@ -90,11 +90,15 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
       fileDiffs.clear();
 
       DiffInfo diff;
+      QVector<DiffInfo::ChunkInfo> newFileDiffs;
+      QVector<DiffInfo::ChunkInfo> oldFileDiffs;
 
       for (auto line : text.split("\n"))
       {
          if (line.startsWith('-'))
          {
+            line.remove(0, 1);
+
             if (diff.oldFile.startLine == -1)
                diff.oldFile.startLine = row;
 
@@ -104,20 +108,36 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
          }
          else if (line.startsWith('+'))
          {
+            line.remove(0, 1);
+
             if (diff.newFile.startLine == -1)
+            {
                diff.newFile.startLine = row;
+               diff.newFile.addition = true;
+            }
 
             newText.append(line).append('\n');
          }
          else
          {
+            line.remove(0, 1);
+
             if (diff.oldFile.startLine != -1)
                diff.oldFile.endLine = row - 1;
+
             if (diff.newFile.startLine != -1)
                diff.newFile.endLine = row - 1;
 
             if (diff.isValid())
+            {
                fileDiffs.append(diff);
+
+               if (diff.newFile.isValid())
+                  newFileDiffs.append(diff.newFile);
+
+               if (diff.oldFile.isValid())
+                  oldFileDiffs.append(diff.oldFile);
+            }
 
             diff = DiffInfo();
 
@@ -129,11 +149,11 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
       }
 
       mOldFile->blockSignals(true);
-      mOldFile->loadDiff(oldText);
+      mOldFile->loadDiff(oldText, oldFileDiffs);
       mOldFile->blockSignals(false);
 
       mNewFile->blockSignals(true);
-      mNewFile->loadDiff(newText);
+      mNewFile->loadDiff(newText, newFileDiffs);
       mNewFile->blockSignals(false);
 
       return true;
