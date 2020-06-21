@@ -24,6 +24,9 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mDiffInfoPanel(new DiffInfoPanel(cache))
 
 {
+   mNewFile->setObjectName("newFile");
+   mOldFile->setObjectName("oldFile");
+
    setAttribute(Qt::WA_DeleteOnClose);
 
    mGoPrevious->setIcon(QIcon(":/icons/go_up"));
@@ -72,5 +75,69 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
    auto text = git->getFileDiff(currentSha == CommitInfo::ZERO_SHA ? QString() : currentSha, previousSha, destFile);
 
-   return mNewFile->loadDiff(text) && mOldFile->loadDiff(text);
+   auto pos = 0;
+   for (auto i = 0; i < 5; ++i)
+      pos = text.indexOf("\n", pos + 1);
+
+   text = text.mid(pos + 1);
+
+   if (!text.isEmpty())
+   {
+      QString oldText;
+      QString newText;
+      auto row = 1;
+
+      fileDiffs.clear();
+
+      DiffInfo diff;
+
+      for (auto line : text.split("\n"))
+      {
+         if (line.startsWith('-'))
+         {
+            if (diff.oldFile.startLine == -1)
+               diff.oldFile.startLine = row;
+
+            oldText.append(line).append('\n');
+
+            --row;
+         }
+         else if (line.startsWith('+'))
+         {
+            if (diff.newFile.startLine == -1)
+               diff.newFile.startLine = row;
+
+            newText.append(line).append('\n');
+         }
+         else
+         {
+            if (diff.oldFile.startLine != -1)
+               diff.oldFile.endLine = row - 1;
+            if (diff.newFile.startLine != -1)
+               diff.newFile.endLine = row - 1;
+
+            if (diff.isValid())
+               fileDiffs.append(diff);
+
+            diff = DiffInfo();
+
+            oldText.append(line).append('\n');
+            newText.append(line).append('\n');
+         }
+
+         ++row;
+      }
+
+      mOldFile->blockSignals(true);
+      mOldFile->loadDiff(oldText);
+      mOldFile->blockSignals(false);
+
+      mNewFile->blockSignals(true);
+      mNewFile->loadDiff(newText);
+      mNewFile->blockSignals(false);
+
+      return true;
+   }
+
+   return false;
 }

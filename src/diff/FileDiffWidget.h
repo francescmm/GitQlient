@@ -95,4 +95,22 @@ private:
    QPushButton *mGoNext = nullptr;
    DiffInfoPanel *mDiffInfoPanel = nullptr;
    QVector<int> mModifications;
+
+   struct DiffInfo
+   {
+      struct FileInfo
+      {
+         int startLine = -1;
+         int endLine = -1;
+
+         bool isValid() const { return startLine != -1 && endLine != -1; }
+      };
+
+      bool isValid() const { return newFile.isValid() || oldFile.isValid(); }
+
+      FileInfo newFile;
+      FileInfo oldFile;
+   };
+
+   QVector<DiffInfo> fileDiffs;
 };

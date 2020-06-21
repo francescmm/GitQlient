@@ -57,18 +57,21 @@
 #include <QTextBlock>
 #include <QScrollBar>
 
+#include <QLogger.h>
+
+using namespace QLogger;
+
 FileDiffView::FileDiffView(QWidget *parent)
    : QPlainTextEdit(parent)
    , mLineNumberArea(new LineNumberArea(this))
    , mDiffHighlighter(new FileDiffHighlighter(document()))
 {
    setAttribute(Qt::WA_DeleteOnClose);
+   setReadOnly(true);
 
    connect(this, &FileDiffView::blockCountChanged, this, &FileDiffView::updateLineNumberAreaWidth);
    connect(this, &FileDiffView::updateRequest, this, &FileDiffView::updateLineNumberArea);
    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &FileDiffView::signalScrollChanged);
-
-   updateLineNumberAreaWidth(0);
 }
 
 FileDiffView::~FileDiffView()
@@ -76,30 +79,28 @@ FileDiffView::~FileDiffView()
    delete mDiffHighlighter;
 }
 
-bool FileDiffView::loadDiff(QString text)
+void FileDiffView::loadDiff(QString text)
 {
-   auto pos = 0;
-   for (auto i = 0; i < 5; ++i)
-      pos = text.indexOf("\n", pos + 1);
+   QLog_Trace("UI",
+              QString("FileDiffView::loadDiff - {%1} move scroll to pos {%2}")
+                  .arg(objectName(), QString::number(verticalScrollBar()->value())));
 
-   text = text.mid(pos + 1);
+   const auto pos = verticalScrollBar()->value();
+   auto cursor = textCursor();
+   const auto tmpCursor = textCursor().position();
+   setPlainText(text);
 
-   if (!text.isEmpty())
-   {
-      const auto pos = verticalScrollBar()->value();
-      auto cursor = textCursor();
-      const auto tmpCursor = textCursor().position();
-      setPlainText(text);
+   cursor.setPosition(tmpCursor);
+   setTextCursor(cursor);
 
-      cursor.setPosition(tmpCursor);
-      setTextCursor(cursor);
+   blockSignals(true);
+   verticalScrollBar()->setValue(pos);
+   blockSignals(false);
 
-      verticalScrollBar()->setValue(pos);
+   emit updateRequest(viewport()->rect(), 0);
 
-      return true;
-   }
-
-   return false;
+   QLog_Trace("UI",
+              QString("FileDiffView::loadDiff - {%1} move scroll to pos {%2}").arg(objectName(), QString::number(pos)));
 }
 
 void FileDiffView::moveScrollBarToPos(int value)
@@ -107,6 +108,12 @@ void FileDiffView::moveScrollBarToPos(int value)
    blockSignals(true);
    verticalScrollBar()->setValue(value);
    blockSignals(false);
+
+   emit updateRequest(viewport()->rect(), 0);
+
+   QLog_Trace("UI",
+              QString("FileDiffView::moveScrollBarToPos - {%1} move scroll to pos {%2}")
+                  .arg(objectName(), QString::number(value)));
 }
 
 int FileDiffView::lineNumberAreaWidth()

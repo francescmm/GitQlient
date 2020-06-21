@@ -88,8 +88,12 @@ public:
     * @param text The text representing a diff
     * @return True if correctly loaded, otherwise false.
     */
-   bool loadDiff(QString text);
+   void loadDiff(QString text);
 
+   /**
+    * @brief moveScrollBarToPos Moves the vertical scroll bar to the value defined in @p value.
+    * @param value The new scroll bar value.
+    */
    void moveScrollBarToPos(int value);
 
 protected:
