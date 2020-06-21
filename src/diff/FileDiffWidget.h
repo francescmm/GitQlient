@@ -109,7 +109,14 @@ private:
    QPushButton *mGoDown = nullptr;
    QPushButton *mGoBottom = nullptr;
    QFrame *mNavFrame = nullptr;
+   QVector<DiffInfo::ChunkInfo> mChunks;
+   int mCurrentChunkLine = 0;
 
    void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
                     QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);
+
+   void moveTopChunk();
+   void moveChunkUp();
+   void moveChunkDown();
+   void moveBottomChunk();
 };

@@ -50,9 +50,16 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    optionsLayout->addWidget(mFileVsFileCheck);
 
    mGoTop->setIcon(QIcon(":/icons/arrow_up_full"));
+   connect(mGoTop, &QPushButton::clicked, this, &FileDiffWidget::moveTopChunk);
+
    mGoUp->setIcon(QIcon(":/icons/arrow_up"));
+   connect(mGoUp, &QPushButton::clicked, this, &FileDiffWidget::moveChunkUp);
+
    mGoDown->setIcon(QIcon(":/icons/arrow_down"));
+   connect(mGoDown, &QPushButton::clicked, this, &FileDiffWidget::moveChunkDown);
+
    mGoBottom->setIcon(QIcon(":/icons/arrow_down_full"));
+   connect(mGoBottom, &QPushButton::clicked, this, &FileDiffWidget::moveBottomChunk);
 
    const auto navLayout = new QVBoxLayout(mNavFrame);
    navLayout->setContentsMargins(QMargins());
@@ -124,9 +131,6 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    {
       QPair<QStringList, QVector<DiffInfo::ChunkInfo>> oldData;
       QPair<QStringList, QVector<DiffInfo::ChunkInfo>> newData;
-
-      QVector<DiffInfo::ChunkInfo> newFileDiffs;
-      QVector<DiffInfo::ChunkInfo> oldFileDiffs;
 
       processDiff(text, newData, oldData);
 
@@ -203,10 +207,16 @@ void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector
             if (diff.isValid())
             {
                if (diff.newFile.isValid())
+               {
                   newFileData.second.append(diff.newFile);
+                  mChunks.append(diff.newFile);
+               }
 
                if (diff.oldFile.isValid())
+               {
                   oldFileData.second.append(diff.oldFile);
+                  mChunks.append(diff.oldFile);
+               }
             }
 
             oldFileData.first.append(line);
@@ -223,4 +233,50 @@ void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector
          newFileData.first.append(line);
       }
    }
+}
+
+void FileDiffWidget::moveTopChunk()
+{
+   mCurrentChunkLine = mChunks.constFirst().startLine;
+
+   mNewFile->moveScrollBarToPos(mCurrentChunkLine);
+   mOldFile->moveScrollBarToPos(mCurrentChunkLine);
+}
+
+void FileDiffWidget::moveChunkUp()
+{
+   const auto endIter = mChunks.end();
+   auto iter = mChunks.cbegin();
+
+   for (; iter != endIter; ++iter)
+      if (iter->startLine == mCurrentChunkLine)
+         break;
+
+   mCurrentChunkLine = (iter - 1)->startLine;
+
+   mNewFile->moveScrollBarToPos(mCurrentChunkLine - 1);
+   mOldFile->moveScrollBarToPos(mCurrentChunkLine - 1);
+}
+
+void FileDiffWidget::moveChunkDown()
+{
+   const auto endIter = mChunks.end();
+   auto iter = mChunks.cbegin();
+
+   for (; iter != endIter; ++iter)
+      if (iter->startLine > mCurrentChunkLine)
+         break;
+
+   mCurrentChunkLine = iter->startLine;
+
+   mNewFile->moveScrollBarToPos(mCurrentChunkLine - 1);
+   mOldFile->moveScrollBarToPos(mCurrentChunkLine - 1);
+}
+
+void FileDiffWidget::moveBottomChunk()
+{
+   mCurrentChunkLine = mChunks.constLast().startLine;
+
+   mNewFile->moveScrollBarToPos(mCurrentChunkLine);
+   mOldFile->moveScrollBarToPos(mCurrentChunkLine);
 }
