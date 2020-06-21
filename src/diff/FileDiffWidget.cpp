@@ -29,6 +29,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mGoUp(new QPushButton())
    , mGoDown(new QPushButton())
    , mGoBottom(new QPushButton())
+   , mNavFrame(new QFrame())
 
 {
    GitQlientSettings settings;
@@ -53,7 +54,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mGoDown->setIcon(QIcon(":/icons/arrow_down"));
    mGoBottom->setIcon(QIcon(":/icons/arrow_down_full"));
 
-   const auto navLayout = new QVBoxLayout();
+   const auto navLayout = new QVBoxLayout(mNavFrame);
    navLayout->setContentsMargins(QMargins());
    navLayout->setSpacing(10);
    navLayout->addWidget(mGoTop);
@@ -62,9 +63,11 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    navLayout->addWidget(mGoDown);
    navLayout->addWidget(mGoBottom);
 
+   mNavFrame->setVisible(mFileVsFile);
+
    const auto diffLayout = new QHBoxLayout();
    diffLayout->setContentsMargins(QMargins());
-   diffLayout->addLayout(navLayout);
+   diffLayout->addWidget(mNavFrame);
    diffLayout->addWidget(mNewFile);
    diffLayout->addWidget(mOldFile);
 
@@ -146,6 +149,7 @@ void FileDiffWidget::setFileVsFileEnable(bool enable)
    mFileVsFile = enable;
 
    mOldFile->setVisible(mFileVsFile);
+   mNavFrame->setVisible(mFileVsFile);
 
    GitQlientSettings settings;
    settings.setValue("FileVsFile", mFileVsFile);
@@ -191,7 +195,7 @@ void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector
             line.remove(0, 1);
 
             if (diff.oldFile.startLine != -1)
-               diff.oldFile.endLine = row - 1;
+               diff.oldFile.endLine = row;
 
             if (diff.newFile.startLine != -1)
                diff.newFile.endLine = row - 1;

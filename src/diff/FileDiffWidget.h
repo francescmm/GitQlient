@@ -108,6 +108,7 @@ private:
    QPushButton *mGoUp = nullptr;
    QPushButton *mGoDown = nullptr;
    QPushButton *mGoBottom = nullptr;
+   QFrame *mNavFrame = nullptr;
 
    void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
                     QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);
