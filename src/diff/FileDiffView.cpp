@@ -51,6 +51,7 @@
 #include "FileDiffView.h"
 
 #include <GitQlientStyles.h>
+#include <FileDiffHighlighter.h>
 
 #include <QPainter>
 #include <QTextBlock>
@@ -59,13 +60,53 @@
 FileDiffView::FileDiffView(QWidget *parent)
    : QPlainTextEdit(parent)
    , mLineNumberArea(new LineNumberArea(this))
+   , mDiffHighlighter(new FileDiffHighlighter(document()))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
    connect(this, &FileDiffView::blockCountChanged, this, &FileDiffView::updateLineNumberAreaWidth);
    connect(this, &FileDiffView::updateRequest, this, &FileDiffView::updateLineNumberArea);
+   connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &FileDiffView::signalScrollChanged);
 
    updateLineNumberAreaWidth(0);
+}
+
+FileDiffView::~FileDiffView()
+{
+   delete mDiffHighlighter;
+}
+
+bool FileDiffView::loadDiff(QString text)
+{
+   auto pos = 0;
+   for (auto i = 0; i < 5; ++i)
+      pos = text.indexOf("\n", pos + 1);
+
+   text = text.mid(pos + 1);
+
+   if (!text.isEmpty())
+   {
+      const auto pos = verticalScrollBar()->value();
+      auto cursor = textCursor();
+      const auto tmpCursor = textCursor().position();
+      setPlainText(text);
+
+      cursor.setPosition(tmpCursor);
+      setTextCursor(cursor);
+
+      verticalScrollBar()->setValue(pos);
+
+      return true;
+   }
+
+   return false;
+}
+
+void FileDiffView::moveScrollBarToPos(int value)
+{
+   blockSignals(true);
+   verticalScrollBar()->setValue(value);
+   blockSignals(false);
 }
 
 int FileDiffView::lineNumberAreaWidth()

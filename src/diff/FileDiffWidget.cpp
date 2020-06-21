@@ -2,7 +2,6 @@
 
 #include <GitHistory.h>
 #include <FileDiffView.h>
-#include <FileDiffHighlighter.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
 #include <DiffInfoPanel.h>
@@ -18,7 +17,8 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)
-   , mDiffView(new FileDiffView())
+   , mNewFile(new FileDiffView())
+   , mOldFile(new FileDiffView())
    , mGoPrevious(new QPushButton())
    , mGoNext(new QPushButton())
    , mDiffInfoPanel(new DiffInfoPanel(cache))
@@ -26,21 +26,26 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
-   mDiffHighlighter = new FileDiffHighlighter(mDiffView->document());
-
    mGoPrevious->setIcon(QIcon(":/icons/go_up"));
    mGoNext->setIcon(QIcon(":/icons/go_down"));
+
+   const auto diffLayout = new QHBoxLayout();
+   diffLayout->addWidget(mNewFile);
+   diffLayout->addWidget(mOldFile);
 
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
    vLayout->setSpacing(10);
    vLayout->addWidget(mDiffInfoPanel);
-   vLayout->addWidget(mDiffView);
+   vLayout->addLayout(diffLayout);
+
+   connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
+   connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
 }
 
 void FileDiffWidget::clear()
 {
-   mDiffView->clear();
+   mNewFile->clear();
 }
 
 bool FileDiffWidget::reload()
@@ -67,28 +72,5 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
    auto text = git->getFileDiff(currentSha == CommitInfo::ZERO_SHA ? QString() : currentSha, previousSha, destFile);
 
-   auto pos = 0;
-   for (auto i = 0; i < 5; ++i)
-      pos = text.indexOf("\n", pos + 1);
-
-   text = text.mid(pos + 1);
-
-   if (!text.isEmpty())
-   {
-      const auto pos = mDiffView->verticalScrollBar()->value();
-      auto cursor = mDiffView->textCursor();
-      const auto tmpCursor = mDiffView->textCursor().position();
-      mDiffView->setPlainText(text);
-
-      mRowIndex = 0;
-
-      cursor.setPosition(tmpCursor);
-      mDiffView->setTextCursor(cursor);
-
-      mDiffView->verticalScrollBar()->setValue(pos);
-
-      return true;
-   }
-
-   return false;
+   return mNewFile->loadDiff(text) && mOldFile->loadDiff(text);
 }

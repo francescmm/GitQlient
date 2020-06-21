@@ -52,6 +52,8 @@
 
 #include <QPlainTextEdit>
 
+class FileDiffHighlighter;
+
 /*!
  \brief The FileDiffView is an overload QPlainTextEdit class used to show the contents of a file diff between two
  commits.
@@ -61,6 +63,13 @@ class FileDiffView : public QPlainTextEdit
 {
    Q_OBJECT
 
+signals:
+   /**
+    * @brief signalScrollChanged Signal emited when the scrollbar changes its position.
+    * @param value The new scrollbar position.
+    */
+   void signalScrollChanged(int value);
+
 public:
    /*!
     \brief Default constructor.
@@ -68,6 +77,20 @@ public:
     \param parent The parent widget if needed.
    */
    explicit FileDiffView(QWidget *parent = nullptr);
+
+   /**
+    * @brief Default constructor
+    */
+   ~FileDiffView();
+
+   /**
+    * @brief loadDiff Loads the text edit based on a diff text.
+    * @param text The text representing a diff
+    * @return True if correctly loaded, otherwise false.
+    */
+   bool loadDiff(QString text);
+
+   void moveScrollBarToPos(int value);
 
 protected:
    /*!
@@ -120,5 +143,6 @@ private:
       FileDiffView *fileDiffWidget;
    };
 
-   LineNumberArea *mLineNumberArea;
+   LineNumberArea *mLineNumberArea = nullptr;
+   FileDiffHighlighter *mDiffHighlighter = nullptr;
 };

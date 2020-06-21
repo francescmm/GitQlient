@@ -25,7 +25,6 @@
 
 #include <QFrame>
 
-class FileDiffHighlighter;
 class FileDiffView;
 class QPushButton;
 class GitBase;
@@ -90,12 +89,10 @@ private:
    QString mPreviousSha;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<RevisionsCache> mCache;
-   FileDiffHighlighter *mDiffHighlighter = nullptr;
-   FileDiffView *mDiffView = nullptr;
+   FileDiffView *mNewFile = nullptr;
+   FileDiffView *mOldFile = nullptr;
    QPushButton *mGoPrevious = nullptr;
    QPushButton *mGoNext = nullptr;
    DiffInfoPanel *mDiffInfoPanel = nullptr;
    QVector<int> mModifications;
-   int mRowIndex = 0;
-   int mDestRow = 0;
 };
