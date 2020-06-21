@@ -66,21 +66,24 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
 
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
    auto text = git->getFileDiff(currentSha == CommitInfo::ZERO_SHA ? QString() : currentSha, previousSha, destFile);
-   auto lines = text.split("\n");
 
-   for (auto i = 0; !lines.isEmpty() && i < 5; ++i)
-      lines.takeFirst();
+   auto pos = 0;
+   for (auto i = 0; i < 5; ++i)
+      pos = text.indexOf("\n", pos + 1);
 
-   if (!lines.isEmpty())
+   text = text.mid(pos + 1);
+
+   if (!text.isEmpty())
    {
-      text = lines.join("\n");
-
       const auto pos = mDiffView->verticalScrollBar()->value();
+      auto cursor = mDiffView->textCursor();
+      const auto tmpCursor = mDiffView->textCursor().position();
       mDiffView->setPlainText(text);
 
       mRowIndex = 0;
 
-      mDiffView->moveCursor(QTextCursor::Start);
+      cursor.setPosition(tmpCursor);
+      mDiffView->setTextCursor(cursor);
 
       mDiffView->verticalScrollBar()->setValue(pos);
 

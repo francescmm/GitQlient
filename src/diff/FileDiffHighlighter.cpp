@@ -1,6 +1,7 @@
 #include "FileDiffHighlighter.h"
 
 #include <GitQlientStyles.h>
+#include <QTextDocument>
 
 FileDiffHighlighter::FileDiffHighlighter(QTextDocument *document)
    : QSyntaxHighlighter(document)
@@ -13,24 +14,19 @@ void FileDiffHighlighter::highlightBlock(const QString &text)
 
    if (!text.isEmpty())
    {
-      QBrush green = GitQlientStyles::getGreen();
-      QBrush magenta = GitQlientStyles::getRed();
-      QBrush orange = GitQlientStyles::getOrange();
-
       QTextCharFormat myFormat;
-      const char firstChar = text.at(0).toLatin1();
 
-      switch (firstChar)
+      switch (text.at(0).toLatin1())
       {
          case '@':
-            myFormat.setForeground(orange);
+            myFormat.setForeground(GitQlientStyles::getOrange());
             myFormat.setFontWeight(QFont::ExtraBold);
             break;
          case '+':
-            myFormat.setForeground(green);
+            myFormat.setForeground(GitQlientStyles::getGreen());
             break;
          case '-':
-            myFormat.setForeground(magenta);
+            myFormat.setForeground(GitQlientStyles::getRed());
             break;
          default:
             break;
