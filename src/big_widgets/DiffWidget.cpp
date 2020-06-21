@@ -51,6 +51,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
    layout->addLayout(diffsLayout);
+   layout->setSpacing(10);
    layout->addWidget(centerStackedWidget);
 
    setLayout(layout);

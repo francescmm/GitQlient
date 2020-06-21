@@ -104,6 +104,10 @@ private:
    QVector<int> mModifications;
    QCheckBox *mFileVsFileCheck = nullptr;
    bool mFileVsFile = false;
+   QPushButton *mGoTop = nullptr;
+   QPushButton *mGoUp = nullptr;
+   QPushButton *mGoDown = nullptr;
+   QPushButton *mGoBottom = nullptr;
 
    void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
                     QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);

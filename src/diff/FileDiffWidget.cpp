@@ -25,6 +25,10 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mGoNext(new QPushButton())
    , mDiffInfoPanel(new DiffInfoPanel(cache))
    , mFileVsFileCheck(new QCheckBox(tr("Show file vs file")))
+   , mGoTop(new QPushButton())
+   , mGoUp(new QPushButton())
+   , mGoDown(new QPushButton())
+   , mGoBottom(new QPushButton())
 
 {
    GitQlientSettings settings;
@@ -44,8 +48,23 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    optionsLayout->setSpacing(10);
    optionsLayout->addWidget(mFileVsFileCheck);
 
+   mGoTop->setIcon(QIcon(":/icons/arrow_up_full"));
+   mGoUp->setIcon(QIcon(":/icons/arrow_up"));
+   mGoDown->setIcon(QIcon(":/icons/arrow_down"));
+   mGoBottom->setIcon(QIcon(":/icons/arrow_down_full"));
+
+   const auto navLayout = new QVBoxLayout();
+   navLayout->setContentsMargins(QMargins());
+   navLayout->setSpacing(10);
+   navLayout->addWidget(mGoTop);
+   navLayout->addWidget(mGoUp);
+   navLayout->addStretch();
+   navLayout->addWidget(mGoDown);
+   navLayout->addWidget(mGoBottom);
+
    const auto diffLayout = new QHBoxLayout();
    diffLayout->setContentsMargins(QMargins());
+   diffLayout->addLayout(navLayout);
    diffLayout->addWidget(mNewFile);
    diffLayout->addWidget(mOldFile);
 
