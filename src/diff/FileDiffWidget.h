@@ -115,7 +115,7 @@ private:
    void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
                     QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);
 
-   void moveTopChunk();
+   void moveTop();
    void moveChunkUp();
    void moveChunkDown();
    void moveBottomChunk();
