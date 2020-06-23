@@ -90,6 +90,8 @@ public:
     */
    void setFileVsFileEnable(bool enable);
 
+   void editMode(const QString &fileName);
+
 private:
    QString mCurrentFile;
    QString mCurrentSha;

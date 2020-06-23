@@ -161,6 +161,11 @@ void FileDiffWidget::setFileVsFileEnable(bool enable)
    configure(mCurrentSha, mPreviousSha, mCurrentFile);
 }
 
+void FileDiffWidget::editMode(const QString &)
+{
+
+}
+
 void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
                                  QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData)
 {

@@ -20,16 +20,14 @@ FileContextMenu::FileContextMenu(const QString &file, QWidget *parent)
 
    addSeparator();
 
-   GitQlientSettings settings;
 
-   if (!settings.value("isGitQlient", false).toBool())
-      connect(addAction("Edit file"), &QAction::triggered, this, [this]() { emit signalEditFile(); });
+   connect(addAction("Edit file"), &QAction::triggered, this, &FileContextMenu::signalEditFile);
 
    addSeparator();
 
    const auto copyPathAction = addAction(tr("Copy path"));
    connect(copyPathAction, &QAction::triggered, this, [file]() {
-      QSettings settings;
+      GitQlientSettings settings;
       const auto fullPath = QString("%1/%2").arg(settings.value("WorkingDirectory").toString(), file);
       QApplication::clipboard()->setText(fullPath);
    });

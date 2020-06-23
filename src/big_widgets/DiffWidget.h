@@ -32,6 +32,7 @@ class DiffButton;
 class QVBoxLayout;
 class CommitDiffWidget;
 class RevisionsCache;
+class FileEditor;
 
 /*!
  \brief The DiffWidget class creates the layout to display the dif information for both files and commits.
@@ -114,6 +115,7 @@ private:
    QMap<QString, QPair<QFrame *, DiffButton *>> mDiffButtons;
    QVBoxLayout *mDiffButtonsContainer = nullptr;
    CommitDiffWidget *mCommitDiffWidget = nullptr;
+   FileEditor *mFileEditor = nullptr;
 
    /*!
     \brief When the user selectes a different diff from a different tab, it triggers an actionto change the current
@@ -122,4 +124,17 @@ private:
     \param index The new selected index.
    */
    void changeSelection(int index);
+
+   /**
+    * @brief startEditFile Shows the file edition windows with the content of @p fileName loaded on it.
+    * @param fileName The full path of the file that will be opened.
+    * @param line The line to put the cursor.
+    * @param column The column to put the cursor.
+    */
+   void startEditFile(const QString &fileName, int line, int column);
+
+   /**
+    * @brief endEditFile Closes the file editor.
+    */
+   void endEditFile();
 };

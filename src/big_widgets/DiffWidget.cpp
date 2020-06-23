@@ -4,6 +4,8 @@
 #include <FullDiffWidget.h>
 #include <DiffButton.h>
 #include <CommitDiffWidget.h>
+#include <GitQlientSettings.h>
+#include <FileEditor.h>
 
 #include <QLogger.h>
 
@@ -20,6 +22,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
    , mCache(cache)
    , centerStackedWidget(new QStackedWidget())
    , mCommitDiffWidget(new CommitDiffWidget(mGit, mCache))
+   , mFileEditor(new FileEditor())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -48,17 +51,27 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
    diffsLayout->addWidget(scrollArea);
    diffsLayout->addWidget(mCommitDiffWidget);
 
+   mFileEditor->setVisible(false);
+
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
    layout->addLayout(diffsLayout);
    layout->setSpacing(10);
    layout->addWidget(centerStackedWidget);
+   layout->addWidget(mFileEditor);
 
    setLayout(layout);
 
    connect(mCommitDiffWidget, &CommitDiffWidget::signalOpenFileCommit, this, &DiffWidget::loadFileDiff);
    connect(mCommitDiffWidget, &CommitDiffWidget::signalShowFileHistory, this, &DiffWidget::signalShowFileHistory);
-   connect(mCommitDiffWidget, &CommitDiffWidget::signalEditFile, this, &DiffWidget::signalEditFile);
+
+   if (GitQlientSettings settings; !settings.value("isGitQlient", false).toBool())
+      connect(mCommitDiffWidget, &CommitDiffWidget::signalEditFile, this, &DiffWidget::signalEditFile);
+   else
+   {
+      connect(mCommitDiffWidget, &CommitDiffWidget::signalEditFile, this, &DiffWidget::startEditFile);
+      connect(mFileEditor, &FileEditor::signalEditionClosed, this, &DiffWidget::endEditFile);
+   }
 }
 
 DiffWidget::~DiffWidget()
@@ -85,6 +98,8 @@ void DiffWidget::clear() const
 
 bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
+   mFileEditor->finishEdition();
+
    const auto id = QString("%1 (%2 \u2194 %3)").arg(file.split("/").last(), currentSha.left(6), previousSha.left(6));
 
    if (!mDiffButtons.contains(id))
@@ -226,4 +241,18 @@ void DiffWidget::changeSelection(int index)
       else
          buttons.second->setUnselected();
    }
+}
+
+void DiffWidget::startEditFile(const QString &fileName, int, int)
+{
+   centerStackedWidget->setVisible(false);
+
+   mFileEditor->editFile(fileName);
+   mFileEditor->setVisible(true);
+}
+
+void DiffWidget::endEditFile()
+{
+   centerStackedWidget->setVisible(true);
+   mFileEditor->setVisible(false);
 }

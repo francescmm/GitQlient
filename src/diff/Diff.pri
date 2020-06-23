@@ -10,6 +10,7 @@ HEADERS += \
     $$PWD/FileDiffHighlighter.h \
     $$PWD/FileDiffView.h \
     $$PWD/FileDiffWidget.h \
+    $$PWD/FileEditor.h \
     $$PWD/FullDiffWidget.h
 
 SOURCES += \
@@ -21,4 +22,5 @@ SOURCES += \
     $$PWD/FileDiffHighlighter.cpp \
     $$PWD/FileDiffView.cpp \
     $$PWD/FileDiffWidget.cpp \
+    $$PWD/FileEditor.cpp \
     $$PWD/FullDiffWidget.cpp
