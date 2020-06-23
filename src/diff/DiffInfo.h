@@ -23,40 +23,19 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QSyntaxHighlighter>
-#include <DiffInfo.h>
-
-/*!
- \brief Overloaded class that adds syntax highlight for the diff view. It shows the additions in green, removals in red
- and the files where that happened in blue.
-
- \class FileDiffHighlighter FileDiffHighlighter.h "FileDiffHighlighter.h"
-*/
-class FileDiffHighlighter : public QSyntaxHighlighter
+struct DiffInfo
 {
-   Q_OBJECT
+   struct ChunkInfo
+   {
+      int startLine = -1;
+      int endLine = -1;
+      bool addition = false;
 
-public:
-   /*!
-    \brief Default constructor.
+      bool isValid() const { return startLine != -1 && endLine != -1; }
+   };
 
-    \param document The document to parse.
-   */
-   explicit FileDiffHighlighter(QTextDocument *document);
+   bool isValid() const { return newFile.isValid() || oldFile.isValid(); }
 
-   /*!
-    \brief Analyses a block of text and applies the syntax highlighter.
-
-    \param text The block of text to analyse.
-   */
-   void highlightBlock(const QString &text) override;
-
-   /**
-    * @brief setDiffInfo Sets the file diff information that will be used to colour the foreground and background text.
-    * @param fileDiffInfo The file diff information.
-    */
-   void setDiffInfo(const QVector<DiffInfo::ChunkInfo> &fileDiffInfo) { mFileDiffInfo = fileDiffInfo; }
-
-private:
-   QVector<DiffInfo::ChunkInfo> mFileDiffInfo;
+   ChunkInfo newFile;
+   ChunkInfo oldFile;
 };

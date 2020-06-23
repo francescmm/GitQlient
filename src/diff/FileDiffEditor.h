@@ -23,40 +23,20 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QSyntaxHighlighter>
-#include <DiffInfo.h>
+#include <FileDiffView.h>
 
-/*!
- \brief Overloaded class that adds syntax highlight for the diff view. It shows the additions in green, removals in red
- and the files where that happened in blue.
-
- \class FileDiffHighlighter FileDiffHighlighter.h "FileDiffHighlighter.h"
-*/
-class FileDiffHighlighter : public QSyntaxHighlighter
+class FileDiffEditor : public FileDiffView
 {
-   Q_OBJECT
-
 public:
-   /*!
-    \brief Default constructor.
-
-    \param document The document to parse.
-   */
-   explicit FileDiffHighlighter(QTextDocument *document);
-
-   /*!
-    \brief Analyses a block of text and applies the syntax highlighter.
-
-    \param text The block of text to analyse.
-   */
-   void highlightBlock(const QString &text) override;
-
    /**
-    * @brief setDiffInfo Sets the file diff information that will be used to colour the foreground and background text.
-    * @param fileDiffInfo The file diff information.
+    * @brief FileDiffEditor Default constructor
+    * @param parent The parent widget
     */
-   void setDiffInfo(const QVector<DiffInfo::ChunkInfo> &fileDiffInfo) { mFileDiffInfo = fileDiffInfo; }
+   explicit FileDiffEditor(QWidget *parent = nullptr);
 
 private:
-   QVector<DiffInfo::ChunkInfo> mFileDiffInfo;
+   /**
+    * @brief highlightCurrentLine Highlights the current line where the cursor is placed.
+    */
+   void highlightCurrentLine();
 };

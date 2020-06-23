@@ -80,9 +80,11 @@ DiffInfoPanel::DiffInfoPanel(QSharedPointer<RevisionsCache> cache, QWidget *pare
    const auto infoLayout = new QHBoxLayout(this);
    infoLayout->setSpacing(0);
    infoLayout->setContentsMargins(QMargins());
+   infoLayout->addStretch(1);
    infoLayout->addLayout(verticalCurrentLayout);
-   infoLayout->addStretch();
+   infoLayout->addStretch(2);
    infoLayout->addLayout(verticalPreviousLayout);
+   infoLayout->addStretch(1);
 }
 
 void DiffInfoPanel::configure(const QString &currentSha, const QString &previousSha)
