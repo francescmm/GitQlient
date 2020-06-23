@@ -243,7 +243,7 @@ void DiffWidget::changeSelection(int index)
    }
 }
 
-void DiffWidget::startEditFile(const QString &fileName, int, int)
+void DiffWidget::startEditFile(const QString &fileName)
 {
    centerStackedWidget->setVisible(false);
 

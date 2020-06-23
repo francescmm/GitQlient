@@ -217,6 +217,7 @@ private:
     \param file The file to show the diff.
    */
    void loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
+
    /*!
     \brief Shows the history/repository view.
 

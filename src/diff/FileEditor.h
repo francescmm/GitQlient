@@ -30,6 +30,7 @@
 
 class FileDiffEditor;
 class QPushButton;
+class Highlighter;
 
 class FileEditor : public QFrame
 {
@@ -57,6 +58,7 @@ public:
 private:
    FileDiffEditor *mFileEditor = nullptr;
    QPushButton *mCloseBtn = nullptr;
+   Highlighter *mHighlighter = nullptr;
    QString mFileName;
    QString mLoadedContent;
 };

@@ -22,8 +22,7 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
 
    GitQlientSettings settings;
 
-   if (!settings.value("isGitQlient", false).toBool())
-      connect(addAction("Edit file"), &QAction::triggered, this, [this]() { emit signalEditFile(); });
+   connect(addAction("Edit file"), &QAction::triggered, this, [this]() { emit signalEditFile(); });
 
    addSeparator();
 

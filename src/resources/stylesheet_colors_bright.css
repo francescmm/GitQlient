@@ -228,14 +228,14 @@ BranchDlg
     color: black;
 }
 
-BranchDlg > QLineEdit, HistoryWidget > QLineEdit
+BranchDlg > QLineEdit
 {
     border-color: #202122;
     background-color: white;
     color: black;
 }
 
-HistoryWidget > QLineEdit
+HistoryWidget > QFrame > QLineEdit
 {
     border-color: #202122;
     background-color: white;

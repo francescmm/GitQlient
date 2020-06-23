@@ -2,6 +2,7 @@
 
 #include <FileDiffEditor.h>
 #include <GitQlientStyles.h>
+#include <Highlighter.h>
 
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -11,6 +12,7 @@ FileEditor::FileEditor(QWidget *parent)
    : QFrame(parent)
    , mFileEditor(new FileDiffEditor())
    , mCloseBtn(new QPushButton())
+   , mHighlighter(new Highlighter(mFileEditor->document()))
 {
    mCloseBtn->setIcon(QIcon(":/icons/close"));
    connect(mCloseBtn, &QPushButton::clicked, this, &FileEditor::finishEdition);

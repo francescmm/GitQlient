@@ -14,6 +14,8 @@
 #include <GitRepoLoader.h>
 #include <GitRemote.h>
 #include <GitMerge.h>
+#include <FileEditor.h>
+#include <GitQlientSettings.h>
 
 #include <QLogger.h>
 
@@ -40,6 +42,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    , mAmendWidget(new AmendWidget(mCache, git))
    , mCommitInfoWidget(new CommitInfoWidget(mCache, git))
    , mChShowAllBranches(new QCheckBox(tr("Show all branches")))
+   , mGraphFrame(new QFrame())
+   , mFileEditor(new FileEditor())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -49,7 +53,14 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    mCommitStackedWidget->addWidget(mAmendWidget);
    mCommitStackedWidget->setFixedWidth(310);
 
-   connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
+   if (GitQlientSettings settings; !settings.value("isGitQlient", false).toBool())
+      connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
+   else
+   {
+      connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::startEditFile);
+      connect(mFileEditor, &FileEditor::signalEditionClosed, this, &HistoryWidget::endEditFile);
+   }
+
    connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
    connect(mWipWidget, &WipWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
    connect(mWipWidget, &WipWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
@@ -67,7 +78,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
 
    connect(mCommitInfoWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalShowDiff);
    connect(mCommitInfoWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
-   connect(mCommitInfoWidget, &CommitInfoWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
 
    mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
@@ -112,17 +122,20 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    graphOptionsLayout->addWidget(mSearchInput);
    graphOptionsLayout->addWidget(mChShowAllBranches);
 
-   const auto viewLayout = new QVBoxLayout();
+   const auto viewLayout = new QVBoxLayout(mGraphFrame);
    viewLayout->setContentsMargins(QMargins());
    viewLayout->setSpacing(5);
    viewLayout->addLayout(graphOptionsLayout);
    viewLayout->addWidget(mRepositoryView);
 
+   mFileEditor->setVisible(false);
+
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
    layout->setSpacing(15);
    layout->addWidget(mCommitStackedWidget);
-   layout->addLayout(viewLayout);
+   layout->addWidget(mGraphFrame);
+   layout->addWidget(mFileEditor);
    layout->addWidget(mBranchesWidget);
 
    setLayout(layout);
@@ -307,4 +320,18 @@ void HistoryWidget::onAmendCommit(const QString &sha)
 {
    mCommitStackedWidget->setCurrentIndex(2);
    mAmendWidget->configure(sha);
+}
+
+void HistoryWidget::startEditFile(const QString &fileName)
+{
+   mGraphFrame->setVisible(false);
+
+   mFileEditor->editFile(fileName);
+   mFileEditor->setVisible(true);
+}
+
+void HistoryWidget::endEditFile()
+{
+   mGraphFrame->setVisible(true);
+   mFileEditor->setVisible(false);
 }

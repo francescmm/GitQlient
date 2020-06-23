@@ -20,7 +20,6 @@ FileContextMenu::FileContextMenu(const QString &file, QWidget *parent)
 
    addSeparator();
 
-
    connect(addAction("Edit file"), &QAction::triggered, this, &FileContextMenu::signalEditFile);
 
    addSeparator();

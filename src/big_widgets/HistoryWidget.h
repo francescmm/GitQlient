@@ -37,6 +37,7 @@ class AmendWidget;
 class CommitInfoWidget;
 class QCheckBox;
 class RepositoryViewDelegate;
+class FileEditor;
 
 /*!
  \brief The HistoryWidget is the responsible fro showing the history of the repository. It is the first widget shown
@@ -225,6 +226,8 @@ private:
    CommitInfoWidget *mCommitInfoWidget = nullptr;
    QCheckBox *mChShowAllBranches = nullptr;
    RepositoryViewDelegate *mItemDelegate = nullptr;
+   QFrame *mGraphFrame = nullptr;
+   FileEditor *mFileEditor = nullptr;
 
    /*!
     \brief Performs a search based on the input of the search QLineEdit with the users input.
@@ -270,4 +273,17 @@ private:
     \param branchToMerge The branch to merge from.
    */
    void mergeBranch(const QString &current, const QString &branchToMerge);
+
+   /**
+    * @brief startEditFile Shows the file edition windows with the content of @p fileName loaded on it.
+    * @param fileName The full path of the file that will be opened.
+    * @param line The line to put the cursor.
+    * @param column The column to put the cursor.
+    */
+   void startEditFile(const QString &fileName);
+
+   /**
+    * @brief endEditFile Closes the file editor.
+    */
+   void endEditFile();
 };
