@@ -36,7 +36,7 @@ class RevisionsCache;
  diff chuck starts.
 
 */
-class FullDiffWidget : public QTextEdit
+class FullDiffWidget : public QFrame
 {
    Q_OBJECT
 

@@ -62,7 +62,7 @@ void FullDiffWidget::DiffHighlighter::highlightBlock(const QString &text)
 
 FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
                                QWidget *parent)
-   : QTextEdit(parent)
+   : QFrame(parent)
    , mGit(git)
    , mCache(cache)
    , mDiffInfoPanel(new DiffInfoPanel(cache))
