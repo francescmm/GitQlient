@@ -29,6 +29,7 @@
 
 #include <QObject>
 #include <QHash>
+#include <QMutex>
 
 struct WorkingDirInfo;
 
@@ -52,17 +53,16 @@ public:
    ~RevisionsCache();
 
    void configure(int numElementsToStore);
+   void setup(const QList<QByteArray> &commits);
    void clear();
 
    int count() const;
 
-   CommitInfo getCommitInfo(const QString &sha) const;
-   CommitInfo getCommitInfoByRow(int row) const;
-   int getCommitPos(const QString &sha) const;
+   CommitInfo getCommitInfo(const QString &sha);
+   CommitInfo getCommitInfoByRow(int row);
+   int getCommitPos(const QString &sha);
    CommitInfo getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint = 0);
    RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
-
-   void insertCommitInfo(CommitInfo rev, int orderIdx);
 
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    void insertReference(const QString &sha, References::Type type, const QString &reference);
@@ -70,25 +70,22 @@ public:
    LocalBranchDistances getLocalBranchDistances(const QString &name) { return mLocalBranchDistances.value(name); }
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 
-   void removeReference(const QString &sha);
-
    bool containsRevisionFile(const QString &sha1, const QString &sha2) const;
 
    RevisionFiles parseDiff(const QString &logDiff);
 
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
-   bool pendingLocalChanges() const;
+   bool pendingLocalChanges();
 
-   QVector<QPair<QString, QStringList>> getBranches(References::Type type) const;
+   QVector<QPair<QString, QStringList>> getBranches(References::Type type);
    QMap<QString, QString> getTags() const;
 
-   QString getCommitForBranch(const QString &branch, bool local = true) const;
-
 private:
+   QMutex mMutex;
    bool mCacheLocked = true;
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo *> mCommitsMap;
-   QMultiMap<QString, CommitInfo*> mTmpChildsStorage;
+   QMultiMap<QString, CommitInfo *> mTmpChildsStorage;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
    QVector<CommitInfo *> mReferences;
    QMap<QString, LocalBranchDistances> mLocalBranchDistances;
@@ -110,6 +107,7 @@ private:
       QVector<QString> files;
    };
 
+   void insertCommitInfo(CommitInfo rev, int orderIdx);
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
    QVector<Lane> calculateLanes(const CommitInfo &c);
    RevisionFiles parseDiffFormat(const QString &buf, FileNamesLoader &fl);

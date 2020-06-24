@@ -6,6 +6,7 @@ using namespace QLogger;
 
 RevisionsCache::RevisionsCache(QObject *parent)
    : QObject(parent)
+   , mMutex(QMutex::Recursive)
 {
 }
 
@@ -22,6 +23,7 @@ RevisionsCache::~RevisionsCache()
 void RevisionsCache::configure(int numElementsToStore)
 {
    QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(numElementsToStore));
+   QMutexLocker lock(&mMutex);
 
    if (mCommits.isEmpty())
    {
@@ -33,21 +35,44 @@ void RevisionsCache::configure(int numElementsToStore)
    mCacheLocked = false;
 }
 
-CommitInfo RevisionsCache::getCommitInfoByRow(int row) const
+void RevisionsCache::setup(const QList<QByteArray> &commits)
 {
+   QMutexLocker lock(&mMutex);
+   auto count = 1;
+
+   for (const auto &commitInfo : commits)
+   {
+      CommitInfo revision(commitInfo);
+
+      if (revision.isValid())
+         insertCommitInfo(std::move(revision), count);
+      else
+         break;
+
+      ++count;
+   }
+}
+
+CommitInfo RevisionsCache::getCommitInfoByRow(int row)
+{
+   QMutexLocker lock(&mMutex);
+
    const auto commit = row >= 0 && row < mCommits.count() ? mCommits.at(row) : nullptr;
 
    return commit ? *commit : CommitInfo();
 }
 
-int RevisionsCache::getCommitPos(const QString &sha) const
+int RevisionsCache::getCommitPos(const QString &sha)
 {
+   QMutexLocker lock(&mMutex);
+
    const auto commit = mCommitsMap.value(sha, nullptr);
    return mCommits.indexOf(commit);
 }
 
 CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint)
 {
+   QMutexLocker lock(&mMutex);
    auto commitIter = searchCommit(field, text, startingPoint);
 
    if (commitIter == mCommits.constEnd() && startingPoint > 0)
@@ -56,8 +81,10 @@ CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const Q
    return commitIter != mCommits.constEnd() ? **commitIter : CommitInfo();
 }
 
-CommitInfo RevisionsCache::getCommitInfo(const QString &sha) const
+CommitInfo RevisionsCache::getCommitInfo(const QString &sha)
 {
+   QMutexLocker lock(&mMutex);
+
    if (!sha.isEmpty())
    {
       const auto c = mCommitsMap.value(sha, nullptr);
@@ -98,7 +125,7 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
       const auto commit = new CommitInfo(rev);
 
       if (orderIdx == 1)
-          commit->addChildReference(mCommits.first());
+         commit->addChildReference(mCommits.first());
 
       if (orderIdx >= mCommits.count())
       {
@@ -108,13 +135,13 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 
          if (mTmpChildsStorage.contains(commit->sha()))
          {
-             for (auto child : mTmpChildsStorage.values(commit->sha()))
-                 commit->addChildReference(child);
+            for (auto child : mTmpChildsStorage.values(commit->sha()))
+               commit->addChildReference(child);
 
-             mTmpChildsStorage.remove(commit->sha());
+            mTmpChildsStorage.remove(commit->sha());
          }
 
-         for (const auto& parent : commit->parents())
+         for (const auto &parent : commit->parents())
             mTmpChildsStorage.insert(parent, commit);
       }
       else if (!(mCommits[orderIdx] && *mCommits[orderIdx] == *commit))
@@ -128,13 +155,13 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 
          if (mTmpChildsStorage.contains(commit->sha()))
          {
-             for (auto child : mTmpChildsStorage.values(commit->sha()))
-                 commit->addChildReference(child);
+            for (auto child : mTmpChildsStorage.values(commit->sha()))
+               commit->addChildReference(child);
 
-             mTmpChildsStorage.remove(commit->sha());
+            mTmpChildsStorage.remove(commit->sha());
          }
 
-         for (const auto& parent : commit->parents())
+         for (const auto &parent : commit->parents())
             mTmpChildsStorage.insert(parent, commit);
       }
 
@@ -163,6 +190,7 @@ bool RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2
 
 void RevisionsCache::insertReference(const QString &sha, References::Type type, const QString &reference)
 {
+   QMutexLocker lock(&mMutex);
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
    auto commit = mCommitsMap[sha];
@@ -183,6 +211,7 @@ void RevisionsCache::insertLocalBranchDistances(const QString &name, const Local
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
 {
+   QMutexLocker lock(&mMutex);
    QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
 
    const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
@@ -217,11 +246,6 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 
       mCommitsMap.insert(sha, commit);
    }
-}
-
-void RevisionsCache::removeReference(const QString &sha)
-{
-   mCommitsMap[sha]->addReferences(References());
 }
 
 bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
@@ -356,8 +380,9 @@ void RevisionsCache::flushFileNames(FileNamesLoader &fl)
    fl.rf = nullptr;
 }
 
-bool RevisionsCache::pendingLocalChanges() const
+bool RevisionsCache::pendingLocalChanges()
 {
+   QMutexLocker lock(&mMutex);
    auto localChanges = false;
 
    if (!mCacheLocked)
@@ -374,8 +399,9 @@ bool RevisionsCache::pendingLocalChanges() const
    return localChanges;
 }
 
-QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Type type) const
+QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Type type)
 {
+   QMutexLocker lock(&mMutex);
    QVector<QPair<QString, QStringList>> branches;
 
    for (auto commit : mReferences)
@@ -398,25 +424,6 @@ QMap<QString, QString> RevisionsCache::getTags() const
    }
 
    return tags;
-}
-
-QString RevisionsCache::getCommitForBranch(const QString &branch, bool local) const
-{
-   QString sha;
-
-   for (auto commit : mReferences)
-   {
-      const auto branches
-          = commit->getReferences(local ? References::Type::LocalBranch : References::Type::RemoteBranches);
-
-      if (branches.contains(branch))
-      {
-         sha = commit->sha();
-         break;
-      }
-   }
-
-   return sha;
 }
 
 void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)

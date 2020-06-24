@@ -200,9 +200,8 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    QLog_Debug("Git", "Processing revisions...");
 
-   const auto commits = ba.split('\000');
+   const auto &commits = ba.split('\000');
    const auto totalCommits = commits.count();
-   auto count = 1;
 
    QLog_Debug("Git", QString("There are {%1} commits to process.").arg(totalCommits));
 
@@ -214,17 +213,7 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    updateWipRevision();
 
-   for (const auto &commitInfo : commits)
-   {
-      CommitInfo revision(commitInfo);
-
-      if (revision.isValid())
-         mRevCache->insertCommitInfo(std::move(revision), count);
-      else
-         break;
-
-      ++count;
-   }
+   mRevCache->setup(commits);
 
    mLocked = false;
 
