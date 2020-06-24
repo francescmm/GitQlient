@@ -31,6 +31,7 @@
 
 class GitBase;
 class RevisionsCache;
+struct WipRevisionInfo;
 
 class GitRepoLoader : public QObject
 {
@@ -48,7 +49,6 @@ public:
    void updateWipRevision();
    void cancelAll();
    void setShowAll(bool showAll = true) { mShowAll = showAll; }
-   bool showsAll() const { return mShowAll; }
 
 private:
    bool mShowAll = true;
@@ -60,5 +60,6 @@ private:
    void loadReferences();
    void requestRevisions();
    void processRevision(const QByteArray &ba);
+   WipRevisionInfo processWip();
    QVector<QString> getUntrackedFiles() const;
 };

@@ -33,6 +33,15 @@
 
 struct WorkingDirInfo;
 
+struct WipRevisionInfo
+{
+   QString parentSha;
+   QString diffIndex;
+   QString diffIndexCached;
+
+   bool isValid() const { return !parentSha.isEmpty() && !diffIndex.isEmpty() && !diffIndexCached.isEmpty(); }
+};
+
 class RevisionsCache : public QObject
 {
    Q_OBJECT
@@ -52,9 +61,7 @@ public:
    explicit RevisionsCache(QObject *parent = nullptr);
    ~RevisionsCache();
 
-   void configure(int numElementsToStore);
-   void setup(const QList<QByteArray> &commits);
-   void clear();
+   void setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits);
 
    int count() const;
 

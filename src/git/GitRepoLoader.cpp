@@ -36,17 +36,17 @@ bool GitRepoLoader::loadRepository()
       {
          QLog_Info("Git", "Initializing Git...");
 
-         mRevCache->clear();
-
          mLocked = true;
 
          if (configureRepoDirectory())
          {
             mGitBase->updateCurrentBranch();
 
-            requestRevisions();
+            QLog_Info("Git", "... Git initialization finished.");
 
-            QLog_Info("Git", "... Git init finished");
+            QLog_Info("Git", "Requesting revisions...");
+
+            requestRevisions();
 
             BenchmarkEnd();
 
@@ -198,37 +198,32 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 {
    BenchmarkStart();
 
+   QLog_Info("Git", "Revisions received!");
+
    QLog_Debug("Git", "Processing revisions...");
 
    const auto &commits = ba.split('\000');
-   const auto totalCommits = commits.count();
 
-   QLog_Debug("Git", QString("There are {%1} commits to process.").arg(totalCommits));
+   emit signalLoadingStarted(commits.count());
 
-   mRevCache->configure(totalCommits);
+   const auto wipInfo = processWip();
 
-   emit signalLoadingStarted(totalCommits);
-
-   QLog_Debug("Git", QString("Adding the WIP commit."));
-
-   updateWipRevision();
-
-   mRevCache->setup(commits);
-
-   mLocked = false;
+   mRevCache->setup(wipInfo, commits);
 
    loadReferences();
+
+   mLocked = false;
 
    BenchmarkEnd();
 
    emit signalLoadingFinished();
 }
 
-void GitRepoLoader::updateWipRevision()
+WipRevisionInfo GitRepoLoader::processWip()
 {
    BenchmarkStart();
 
-   QLog_Debug("Git", QString("Executing updateWipRevision."));
+   QLog_Debug("Git", QString("Executing processWip."));
 
    mRevCache->setUntrackedFilesList(getUntrackedFiles());
 
@@ -244,8 +239,20 @@ void GitRepoLoader::updateWipRevision()
       const auto ret4 = mGitBase->run(QString("git diff-index --cached %1").arg(parentSha));
       const auto diffIndexCached = ret4.success ? ret4.output.toString() : QString();
 
-      mRevCache->updateWipCommit(parentSha, diffIndex, diffIndexCached);
+      return { parentSha, diffIndex, diffIndexCached };
    }
+
+   BenchmarkEnd();
+
+   return {};
+}
+
+void GitRepoLoader::updateWipRevision()
+{
+   BenchmarkStart();
+
+   if (const auto wipInfo = processWip(); wipInfo.isValid())
+      mRevCache->updateWipCommit(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
 
    BenchmarkEnd();
 }

@@ -20,25 +20,35 @@ RevisionsCache::~RevisionsCache()
    mReferences.clear();
 }
 
-void RevisionsCache::configure(int numElementsToStore)
+void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits)
 {
-   QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(numElementsToStore));
    QMutexLocker lock(&mMutex);
+
+   const auto totalCommits = commits.count();
+
+   QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
+
+   mDirNames.clear();
+   mFileNames.clear();
+   mRevisionFilesMap.clear();
+   mLanes.clear();
+   mCommitsMap.clear();
+   mReferences.clear();
 
    if (mCommits.isEmpty())
    {
       // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
-      mCommits.resize(numElementsToStore + 1);
-      mCommitsMap.reserve(numElementsToStore + 1);
+      mCommits.resize(totalCommits + 1);
+      mCommitsMap.reserve(totalCommits + 1);
    }
 
-   mConfigured = true;
-}
+   QLog_Debug("Git", QString("Adding WIP revision."));
 
-void RevisionsCache::setup(const QList<QByteArray> &commits)
-{
-   QMutexLocker lock(&mMutex);
+   updateWipCommit(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
+
    auto count = 1;
+
+   QLog_Debug("Git", QString("Adding commited revisions."));
 
    for (const auto &commitInfo : commits)
    {
@@ -491,17 +501,6 @@ void RevisionsCache::resetLanes(const CommitInfo &c, bool isFork)
       mLanes.afterFork();
    if (mLanes.isBranch())
       mLanes.afterBranch();
-}
-
-void RevisionsCache::clear()
-{
-   mConfigured = false;
-   mDirNames.clear();
-   mFileNames.clear();
-   mRevisionFilesMap.clear();
-   mLanes.clear();
-   mCommitsMap.clear();
-   mReferences.clear();
 }
 
 int RevisionsCache::count() const
