@@ -32,7 +32,10 @@ void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArra
    mFileNames.clear();
    mRevisionFilesMap.clear();
    mLanes.clear();
-   mCommitsMap.clear();
+
+   for (auto reference : mReferences)
+      reference->clearReferences();
+
    mReferences.clear();
 
    if (mCommits.isEmpty())
@@ -76,7 +79,10 @@ int RevisionsCache::getCommitPos(const QString &sha)
 {
    QMutexLocker lock(&mMutex);
 
-   const auto commit = mCommitsMap.value(sha, nullptr);
+   const auto iter = std::find_if(mCommitsMap.constBegin(), mCommitsMap.constEnd(),
+                                  [sha](const CommitInfo *commit) { return commit->sha().startsWith(sha); });
+
+   const auto commit = iter != mCommitsMap.constEnd() ? iter.value() : nullptr;
    return mCommits.indexOf(commit);
 }
 
@@ -137,24 +143,7 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
       if (orderIdx == 1)
          commit->addChildReference(mCommits.first());
 
-      if (orderIdx >= mCommits.count())
-      {
-         QLog_Debug("Git", QString("Adding commit with sha {%1}.").arg(commit->sha()));
-
-         mCommits.append(commit);
-
-         if (mTmpChildsStorage.contains(commit->sha()))
-         {
-            for (auto child : mTmpChildsStorage.values(commit->sha()))
-               commit->addChildReference(child);
-
-            mTmpChildsStorage.remove(commit->sha());
-         }
-
-         for (const auto &parent : commit->parents())
-            mTmpChildsStorage.insert(parent, commit);
-      }
-      else if (!(mCommits[orderIdx] && *mCommits[orderIdx] == *commit))
+      if (!mCommits.at(orderIdx) || *mCommits.at(orderIdx) != *commit)
       {
          QLog_Trace("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
 
@@ -173,12 +162,11 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 
          for (const auto &parent : commit->parents())
             mTmpChildsStorage.insert(parent, commit);
+
+         mCommitsMap.insert(rev.sha(), commit);
       }
-
-      mCommitsMap.insert(rev.sha(), commit);
-
-      if (mCommitsMap.contains(rev.parent(0)))
-         mCommitsMap.remove(rev.parent(0));
+      else
+         delete commit;
    }
 }
 
@@ -203,7 +191,7 @@ void RevisionsCache::insertReference(const QString &sha, References::Type type, 
    QMutexLocker lock(&mMutex);
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-   auto commit = mCommitsMap[sha];
+   auto commit = mCommitsMap.value(sha, nullptr);
 
    if (commit)
    {

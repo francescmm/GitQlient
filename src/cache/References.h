@@ -22,6 +22,8 @@ public:
 
    bool isEmpty() const { return mReferences.isEmpty(); }
 
+   void clear() { mReferences.clear(); }
+
 private:
    QMap<Type, QStringList> mReferences;
 };

@@ -79,9 +79,11 @@ public:
    QStringList getReferences(References::Type type) const { return mReferences.getReferences(type); }
    bool hasReferences() const { return !mReferences.isEmpty(); }
 
-   void addChildReference(CommitInfo* commit) { mChilds.insert(commit->sha(), commit); }
-   QList<CommitInfo*> getChilds() const { return mChilds.values(); }
+   void addChildReference(CommitInfo *commit) { mChilds.insert(commit->sha(), commit); }
+   QList<CommitInfo *> getChilds() const { return mChilds.values(); }
    bool hasChilds() const { return !mChilds.empty(); }
+
+   void clearReferences() { mReferences.clear(); }
 
    static const QString ZERO_SHA;
 
@@ -97,5 +99,5 @@ private:
    QString mDiff;
    QVector<Lane> mLanes;
    References mReferences;
-   QMap<QString, CommitInfo*> mChilds;
+   QMap<QString, CommitInfo *> mChilds;
 };
