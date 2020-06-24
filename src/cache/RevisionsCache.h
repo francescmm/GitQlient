@@ -82,7 +82,7 @@ public:
 
 private:
    QMutex mMutex;
-   bool mCacheLocked = true;
+   bool mConfigured = true;
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo *> mCommitsMap;
    QMultiMap<QString, CommitInfo *> mTmpChildsStorage;

@@ -32,7 +32,7 @@ void RevisionsCache::configure(int numElementsToStore)
       mCommitsMap.reserve(numElementsToStore + 1);
    }
 
-   mCacheLocked = false;
+   mConfigured = true;
 }
 
 void RevisionsCache::setup(const QList<QByteArray> &commits)
@@ -114,7 +114,7 @@ RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString
 
 void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 {
-   if (mCacheLocked)
+   if (!mConfigured)
       QLog_Warning("Git", QString("The cache is currently locked."));
    else if (mCommitsMap.contains(rev.sha()))
       QLog_Info("Git", QString("The commit with SHA {%1} is already in the cache.").arg(rev.sha()));
@@ -219,7 +219,7 @@ void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &di
 
    insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
 
-   if (!mCacheLocked)
+   if (mConfigured)
    {
       const QString longLog;
       const auto author = QString("-");
@@ -385,15 +385,12 @@ bool RevisionsCache::pendingLocalChanges()
    QMutexLocker lock(&mMutex);
    auto localChanges = false;
 
-   if (!mCacheLocked)
-   {
-      const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA);
+   const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA);
 
-      if (commit)
-      {
-         const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
-         localChanges = rf.count() == mUntrackedfiles.count();
-      }
+   if (commit)
+   {
+      const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
+      localChanges = rf.count() == mUntrackedfiles.count();
    }
 
    return localChanges;
@@ -498,7 +495,7 @@ void RevisionsCache::resetLanes(const CommitInfo &c, bool isFork)
 
 void RevisionsCache::clear()
 {
-   mCacheLocked = true;
+   mConfigured = false;
    mDirNames.clear();
    mFileNames.clear();
    mRevisionFilesMap.clear();
