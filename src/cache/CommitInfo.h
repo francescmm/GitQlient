@@ -46,7 +46,7 @@ public:
 
    CommitInfo() = default;
    explicit CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
-                       const QString &log, const QString &longLog);
+                       const QString &log, const QString &longLog = QString());
    explicit CommitInfo(const QByteArray &b);
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;

@@ -88,10 +88,12 @@ public:
    QMap<QString, QString> getTags() const;
 
 private:
+   friend class GitRepoLoader;
+
    QMutex mMutex;
    bool mConfigured = true;
    QVector<CommitInfo *> mCommits;
-   QHash<QString, CommitInfo *> mCommitsMap;
+   QHash<QString, CommitInfo> mCommitsMap;
    QMultiMap<QString, CommitInfo *> mTmpChildsStorage;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
    QVector<CommitInfo *> mReferences;
@@ -114,7 +116,9 @@ private:
       QVector<QString> files;
    };
 
+   void setConfigurationDone() { mConfigured = true; }
    void insertCommitInfo(CommitInfo rev, int orderIdx);
+   void insertWipRevision(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
    QVector<Lane> calculateLanes(const CommitInfo &c);
    RevisionFiles parseDiffFormat(const QString &buf, FileNamesLoader &fl);

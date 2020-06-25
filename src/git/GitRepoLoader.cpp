@@ -212,6 +212,8 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    loadReferences();
 
+   mRevCache->setConfigurationDone();
+
    mLocked = false;
 
    BenchmarkEnd();

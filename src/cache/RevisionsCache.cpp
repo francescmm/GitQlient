@@ -12,9 +12,6 @@ RevisionsCache::RevisionsCache(QObject *parent)
 
 RevisionsCache::~RevisionsCache()
 {
-   for (auto commit : mCommits)
-      delete commit;
-
    mCommits.clear();
    mCommitsMap.clear();
    mReferences.clear();
@@ -28,6 +25,8 @@ void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArra
 
    QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
 
+   mConfigured = false;
+
    mDirNames.clear();
    mFileNames.clear();
    mRevisionFilesMap.clear();
@@ -38,16 +37,15 @@ void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArra
 
    mReferences.clear();
 
-   if (mCommits.isEmpty())
-   {
-      // We reserve 1 extra slots for the ZERO_SHA (aka WIP commit)
-      mCommits.resize(totalCommits + 1);
+   if (mCommitsMap.isEmpty())
       mCommitsMap.reserve(totalCommits + 1);
-   }
+
+   if (mCommits.isEmpty())
+      mCommits.resize(totalCommits + 1);
 
    QLog_Debug("Git", QString("Adding WIP revision."));
 
-   updateWipCommit(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
+   insertWipRevision(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
 
    auto count = 1;
 
@@ -79,11 +77,13 @@ int RevisionsCache::getCommitPos(const QString &sha)
 {
    QMutexLocker lock(&mMutex);
 
-   const auto iter = std::find_if(mCommitsMap.constBegin(), mCommitsMap.constEnd(),
-                                  [sha](const CommitInfo *commit) { return commit->sha().startsWith(sha); });
+   const auto iter = std::find_if(mCommitsMap.begin(), mCommitsMap.end(),
+                                  [sha](const CommitInfo &commit) { return commit.sha().startsWith(sha); });
 
-   const auto commit = iter != mCommitsMap.constEnd() ? iter.value() : nullptr;
-   return mCommits.indexOf(commit);
+   if (iter != mCommitsMap.constEnd())
+      return mCommits.indexOf(&iter.value());
+
+   return -1;
 }
 
 CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint)
@@ -103,21 +103,21 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha)
 
    if (!sha.isEmpty())
    {
-      const auto c = mCommitsMap.value(sha, nullptr);
+      const auto c = mCommitsMap.value(sha, CommitInfo());
 
-      if (c == nullptr)
+      if (!c.isValid())
       {
          const auto shas = mCommitsMap.keys();
          const auto it = std::find_if(shas.cbegin(), shas.cend(),
                                       [sha](const QString &shaToCompare) { return shaToCompare.startsWith(sha); });
 
          if (it != shas.cend())
-            return *mCommitsMap.value(*it);
+            return mCommitsMap.value(*it);
 
          return CommitInfo();
       }
 
-      return *c;
+      return c;
    }
 
    return CommitInfo();
@@ -131,43 +131,59 @@ RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString
 void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 {
    if (!mConfigured)
-      QLog_Warning("Git", QString("The cache is currently locked."));
-   else if (mCommitsMap.contains(rev.sha()))
-      QLog_Info("Git", QString("The commit with SHA {%1} is already in the cache.").arg(rev.sha()));
-   else
    {
       rev.setLanes(calculateLanes(rev));
 
-      const auto commit = new CommitInfo(rev);
+      const auto sha = rev.sha();
 
-      if (orderIdx == 1)
-         commit->addChildReference(mCommits.first());
+      if (sha == mCommitsMap.value(CommitInfo::ZERO_SHA).parent(0))
+         rev.addChildReference(&mCommitsMap[CommitInfo::ZERO_SHA]);
 
-      if (!mCommits.at(orderIdx) || *mCommits.at(orderIdx) != *commit)
+      mCommitsMap[sha] = rev;
+
+      mCommits.insert(orderIdx, &mCommitsMap[sha]);
+
+      if (mTmpChildsStorage.contains(sha))
       {
-         QLog_Trace("Git", QString("Overwriting commit with sha {%1}.").arg(commit->sha()));
+         for (auto child : mTmpChildsStorage.values(sha))
+            mCommitsMap[sha].addChildReference(child);
 
-         if (mCommits[orderIdx])
-            delete mCommits[orderIdx];
-
-         mCommits[orderIdx] = commit;
-
-         if (mTmpChildsStorage.contains(commit->sha()))
-         {
-            for (auto child : mTmpChildsStorage.values(commit->sha()))
-               commit->addChildReference(child);
-
-            mTmpChildsStorage.remove(commit->sha());
-         }
-
-         for (const auto &parent : commit->parents())
-            mTmpChildsStorage.insert(parent, commit);
-
-         mCommitsMap.insert(rev.sha(), commit);
+         mTmpChildsStorage.remove(sha);
       }
-      else
-         delete commit;
+
+      for (const auto &parent : mCommitsMap.value(sha).parents())
+         mTmpChildsStorage.insert(parent, &mCommitsMap[sha]);
    }
+}
+
+void RevisionsCache::insertWipRevision(const QString &parentSha, const QString &diffIndex,
+                                       const QString &diffIndexCache)
+{
+   QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
+
+   const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
+   const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
+
+   insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
+
+   const auto log
+       = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
+
+   CommitInfo c(CommitInfo::ZERO_SHA, { parentSha }, QString("-"), QDateTime::currentDateTime().toSecsSinceEpoch(),
+                log);
+
+   if (mLanes.isEmpty())
+      mLanes.init(c.sha());
+
+   c.setLanes(calculateLanes(c));
+
+   if (mCommits[0])
+      c.setLanes(mCommits[0]->getLanes());
+
+   const auto sha = c.sha();
+
+   mCommitsMap.insert(sha, std::move(c));
+   mCommits[0] = &mCommitsMap[sha];
 }
 
 bool RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)
@@ -191,14 +207,14 @@ void RevisionsCache::insertReference(const QString &sha, References::Type type, 
    QMutexLocker lock(&mMutex);
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-   auto commit = mCommitsMap.value(sha, nullptr);
-
-   if (commit)
+   if (mCommitsMap.contains(sha))
    {
-      commit->addReference(type, reference);
+      auto &commit = mCommitsMap[sha];
 
-      if (!mReferences.contains(mCommitsMap[sha]))
-         mReferences.append(mCommitsMap[sha]);
+      commit.addReference(type, reference);
+
+      if (!mReferences.contains(&mCommitsMap[sha]))
+         mReferences.append(&mCommitsMap[sha]);
    }
 }
 
@@ -209,41 +225,8 @@ void RevisionsCache::insertLocalBranchDistances(const QString &name, const Local
 
 void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
 {
-   QMutexLocker lock(&mMutex);
-   QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
-
-   const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
-   const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
-
-   insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
-
    if (mConfigured)
-   {
-      const QString longLog;
-      const auto author = QString("-");
-      const auto log
-          = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
-      CommitInfo c(CommitInfo::ZERO_SHA, { parentSha }, author, QDateTime::currentDateTime().toSecsSinceEpoch(), log,
-                   longLog);
-
-      if (mLanes.isEmpty())
-         mLanes.init(c.sha());
-
-      c.setLanes(calculateLanes(c));
-
-      if (mCommits[0])
-         c.setLanes(mCommits[0]->getLanes());
-
-      const auto sha = c.sha();
-      const auto commit = new CommitInfo(std::move(c));
-
-      if (mCommits[0])
-         delete mCommits[0];
-
-      mCommits[0] = commit;
-
-      mCommitsMap.insert(sha, commit);
-   }
+      insertWipRevision(parentSha, diffIndex, diffIndexCache);
 }
 
 bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
@@ -383,11 +366,11 @@ bool RevisionsCache::pendingLocalChanges()
    QMutexLocker lock(&mMutex);
    auto localChanges = false;
 
-   const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA);
+   const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA, CommitInfo());
 
-   if (commit)
+   if (commit.isValid())
    {
-      const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit->parent(0));
+      const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
       localChanges = rf.count() == mUntrackedfiles.count();
    }
 
