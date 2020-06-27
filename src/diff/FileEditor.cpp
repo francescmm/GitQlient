@@ -44,33 +44,40 @@ void FileEditor::editFile(const QString &fileName)
    }
 
    mFileEditor->loadDiff(mLoadedContent, {});
+
+   isEditing = true;
 }
 
 void FileEditor::finishEdition()
 {
-   const auto currentContent = mFileEditor->toPlainText();
-
-   if (currentContent != mLoadedContent)
+   if (isEditing)
    {
-      const auto alert = new QMessageBox(QMessageBox::Warning, tr("Unsaved changes"),
-                                         tr("The current text was modified. Do you want to save the changes?"));
-      alert->setStyleSheet(GitQlientStyles::getInstance()->getStyles());
-      alert->addButton("Discard", QMessageBox::ButtonRole::RejectRole);
-      alert->addButton("Save", QMessageBox::ButtonRole::AcceptRole);
+      const auto currentContent = mFileEditor->toPlainText();
 
-      const auto ret = alert->exec();
-
-      if (ret == QMessageBox::Accepted)
+      if (currentContent != mLoadedContent)
       {
-         QFile f(mFileName);
+         const auto alert = new QMessageBox(QMessageBox::Warning, tr("Unsaved changes"),
+                                            tr("The current text was modified. Do you want to save the changes?"));
+         alert->setStyleSheet(GitQlientStyles::getInstance()->getStyles());
+         alert->addButton("Discard", QMessageBox::ButtonRole::RejectRole);
+         alert->addButton("Save", QMessageBox::ButtonRole::AcceptRole);
 
-         if (f.open(QIODevice::WriteOnly))
+         const auto ret = alert->exec();
+
+         if (ret == QMessageBox::Accepted)
          {
-            f.write(currentContent.toUtf8());
-            f.close();
+            QFile f(mFileName);
+
+            if (f.open(QIODevice::WriteOnly))
+            {
+               f.write(currentContent.toUtf8());
+               f.close();
+            }
          }
       }
-   }
 
-   emit signalEditionClosed();
+      isEditing = false;
+
+      emit signalEditionClosed();
+   }
 }

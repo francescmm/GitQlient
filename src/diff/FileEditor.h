@@ -61,4 +61,5 @@ private:
    Highlighter *mHighlighter = nullptr;
    QString mFileName;
    QString mLoadedContent;
+   bool isEditing = false;
 };
