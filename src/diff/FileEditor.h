@@ -30,6 +30,7 @@
 
 class FileDiffEditor;
 class QPushButton;
+class QLabel;
 class Highlighter;
 
 class FileEditor : public QFrame
@@ -57,9 +58,14 @@ public:
 
 private:
    FileDiffEditor *mFileEditor = nullptr;
+   QPushButton *mSaveBtn = nullptr;
    QPushButton *mCloseBtn = nullptr;
+   QLabel *mFilePathLabel = nullptr;
    Highlighter *mHighlighter = nullptr;
    QString mFileName;
    QString mLoadedContent;
    bool isEditing = false;
+
+   void saveFile() const;
+   void saveTextInFile(const QString &content) const;
 };

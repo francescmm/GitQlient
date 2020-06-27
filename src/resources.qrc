@@ -58,6 +58,7 @@
         <file alias="text-file">resources/icons/text-file.svg</file>
         <file alias="arrow_down_full">resources/icons/arrow_down_full.svg</file>
         <file alias="arrow_up_full">resources/icons/arrow_up_full.svg</file>
+        <file alias="save">resources/icons/save.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

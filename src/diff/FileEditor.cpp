@@ -7,20 +7,29 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QLabel>
 
 FileEditor::FileEditor(QWidget *parent)
    : QFrame(parent)
    , mFileEditor(new FileDiffEditor())
+   , mSaveBtn(new QPushButton())
    , mCloseBtn(new QPushButton())
+   , mFilePathLabel(new QLabel())
    , mHighlighter(new Highlighter(mFileEditor->document()))
 {
+   mSaveBtn->setIcon(QIcon(":/icons/save"));
+   connect(mSaveBtn, &QPushButton::clicked, this, &FileEditor::saveFile);
+
    mCloseBtn->setIcon(QIcon(":/icons/close"));
    connect(mCloseBtn, &QPushButton::clicked, this, &FileEditor::finishEdition);
 
    const auto optionsLayout = new QHBoxLayout();
    optionsLayout->setContentsMargins(QMargins());
-   optionsLayout->addStretch();
    optionsLayout->setSpacing(10);
+   optionsLayout->addWidget(mSaveBtn);
+   optionsLayout->addStretch();
+   optionsLayout->addWidget(mFilePathLabel);
+   optionsLayout->addStretch();
    optionsLayout->addWidget(mCloseBtn);
 
    const auto layout = new QVBoxLayout(this);
@@ -33,6 +42,8 @@ FileEditor::FileEditor(QWidget *parent)
 void FileEditor::editFile(const QString &fileName)
 {
    mFileName = fileName;
+
+   mFilePathLabel->setText(mFileName);
 
    QFile f(mFileName);
    QString fileContent;
@@ -62,22 +73,31 @@ void FileEditor::finishEdition()
          alert->addButton("Discard", QMessageBox::ButtonRole::RejectRole);
          alert->addButton("Save", QMessageBox::ButtonRole::AcceptRole);
 
-         const auto ret = alert->exec();
-
-         if (ret == QMessageBox::Accepted)
-         {
-            QFile f(mFileName);
-
-            if (f.open(QIODevice::WriteOnly))
-            {
-               f.write(currentContent.toUtf8());
-               f.close();
-            }
-         }
+         if (alert->exec() == QMessageBox::Accepted)
+            saveTextInFile(currentContent);
       }
 
       isEditing = false;
 
       emit signalEditionClosed();
+   }
+}
+
+void FileEditor::saveFile() const
+{
+   const auto currentContent = mFileEditor->toPlainText();
+
+   if (currentContent != mLoadedContent)
+      saveTextInFile(currentContent);
+}
+
+void FileEditor::saveTextInFile(const QString &content) const
+{
+   QFile f(mFileName);
+
+   if (f.open(QIODevice::WriteOnly))
+   {
+      f.write(content.toUtf8());
+      f.close();
    }
 }
