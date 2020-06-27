@@ -161,16 +161,15 @@ void FileDiffWidget::setFileVsFileEnable(bool enable)
    configure(mCurrentSha, mPreviousSha, mCurrentFile);
 }
 
-void FileDiffWidget::editMode(const QString &)
-{
-
-}
+void FileDiffWidget::editMode(const QString &) { }
 
 void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
                                  QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData)
 {
-   auto row = 1;
    DiffInfo diff;
+   // int newFileVariation = 0;
+   int oldFileRow = 1;
+   int newFileRow = 1;
    mChunks.clear();
 
    for (auto line : text.split("\n"))
@@ -182,11 +181,11 @@ void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector
             line.remove(0, 1);
 
             if (diff.oldFile.startLine == -1)
-               diff.oldFile.startLine = row;
+               diff.oldFile.startLine = oldFileRow;
 
             oldFileData.first.append(line);
 
-            --row;
+            ++oldFileRow;
          }
          else if (line.startsWith('+'))
          {
@@ -194,21 +193,23 @@ void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector
 
             if (diff.newFile.startLine == -1)
             {
-               diff.newFile.startLine = row;
+               diff.newFile.startLine = newFileRow;
                diff.newFile.addition = true;
             }
 
             newFileData.first.append(line);
+
+            ++newFileRow;
          }
          else
          {
             line.remove(0, 1);
 
             if (diff.oldFile.startLine != -1)
-               diff.oldFile.endLine = row;
+               diff.oldFile.endLine = oldFileRow - 1;
 
             if (diff.newFile.startLine != -1)
-               diff.newFile.endLine = row - 1;
+               diff.newFile.endLine = newFileRow - 1;
 
             if (diff.isValid())
             {
@@ -229,9 +230,10 @@ void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector
             newFileData.first.append(line);
 
             diff = DiffInfo();
-         }
 
-         ++row;
+            ++oldFileRow;
+            ++newFileRow;
+         }
       }
       else
       {
