@@ -212,7 +212,8 @@ GitExecResult GitLocal::ammendCommit(const QStringList &selFiles, const Revision
    for (auto i = 0; i < allCommitFiles.count(); ++i)
    {
       const QString &fp = allCommitFiles.getFile(i);
-      if (selFiles.indexOf(fp) == -1 && allCommitFiles.statusCmp(i, RevisionFiles::IN_INDEX))
+      if (selFiles.indexOf(fp) == -1 && allCommitFiles.statusCmp(i, RevisionFiles::IN_INDEX)
+          && !allCommitFiles.statusCmp(i, RevisionFiles::DELETED))
          notSel.append(fp);
    }
 

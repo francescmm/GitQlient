@@ -109,7 +109,7 @@ bool AmendWidget::commitChanges()
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          QScopedPointer<GitLocal> git(new GitLocal(mGit));
-         const auto ret = git->ammendCommit(files.getFiles(), files, msg, author);
+         const auto ret = git->ammendCommit(selFiles, files, msg, author);
          QApplication::restoreOverrideCursor();
 
          emit signalChangesCommitted(ret.success);
