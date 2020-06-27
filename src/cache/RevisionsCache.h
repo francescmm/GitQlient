@@ -39,7 +39,7 @@ struct WipRevisionInfo
    QString diffIndex;
    QString diffIndexCached;
 
-   bool isValid() const { return !parentSha.isEmpty() && !diffIndex.isEmpty() && !diffIndexCached.isEmpty(); }
+   bool isValid() const { return !parentSha.isEmpty() || !diffIndex.isEmpty() || !diffIndexCached.isEmpty(); }
 };
 
 class RevisionsCache : public QObject
