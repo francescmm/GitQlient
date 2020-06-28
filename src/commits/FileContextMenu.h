@@ -39,5 +39,5 @@ signals:
    void signalEditFile();
 
 public:
-   explicit FileContextMenu(const QString &file, QWidget *parent = nullptr);
+   explicit FileContextMenu(const QString &file, bool editionAllowed = false, QWidget *parent = nullptr);
 };
