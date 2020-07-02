@@ -23,7 +23,7 @@ void RevisionsCache::setup(
 {
     QMutexLocker lock(&mMutex);
 
-    const auto totalCommits = commits.count();
+    const auto totalCommits = commits.count() + 1;
 
     QLog_Debug(
         "Git",
@@ -42,10 +42,16 @@ void RevisionsCache::setup(
     mReferences.clear();
 
     if (mCommitsMap.isEmpty())
-        mCommitsMap.reserve(totalCommits + 1);
+        mCommitsMap.reserve(totalCommits);
 
-    if (mCommits.isEmpty())
-        mCommits.resize(totalCommits + 1);
+    if (mCommits.isEmpty() || totalCommits > mCommits.count())
+        mCommits.resize(totalCommits);
+    else if (totalCommits < mCommits.count()) {
+        const auto commitsToRemove = std::abs(totalCommits - mCommits.count());
+        for (auto i = 0, pos = 1; i < commitsToRemove; ++i, ++pos) {
+            mCommits.remove(pos);
+        }
+    }
 
     QLog_Debug("Git", QString("Adding WIP revision."));
 
