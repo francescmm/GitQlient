@@ -555,3 +555,10 @@ GeneralConfigPage > QLabel#configLabel
     qproperty-alignment: AlignCenter;
 }
 
+#pbCherryPick
+{
+   max-height: 20px;
+   min-height: 20px;
+   padding: 2px 5px;
+}
+

@@ -14,11 +14,13 @@
 #include <GitRepoLoader.h>
 #include <GitRemote.h>
 #include <GitMerge.h>
+#include <GitLocal.h>
 #include <FileEditor.h>
 #include <GitQlientSettings.h>
 
 #include <QLogger.h>
 
+#include <QPushButton>
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QStackedWidget>
@@ -113,6 +115,13 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
 
    GitQlientSettings settings;
 
+   const auto cherryPickBtn = new QPushButton(tr("Cherry-pick"));
+   cherryPickBtn->setEnabled(false);
+   cherryPickBtn->setObjectName("pbCherryPick");
+   connect(cherryPickBtn, &QPushButton::clicked, this, &HistoryWidget::cherryPickCommit);
+   connect(mSearchInput, &QLineEdit::textChanged, this,
+           [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });
+
    mChShowAllBranches->setChecked(settings.value("ShowAllBranches", true).toBool());
    connect(mChShowAllBranches, &QCheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
 
@@ -120,6 +129,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    graphOptionsLayout->setContentsMargins(QMargins());
    graphOptionsLayout->setSpacing(10);
    graphOptionsLayout->addWidget(mSearchInput);
+   graphOptionsLayout->addWidget(cherryPickBtn);
    graphOptionsLayout->addWidget(mChShowAllBranches);
 
    const auto viewLayout = new QVBoxLayout(mGraphFrame);
@@ -334,4 +344,29 @@ void HistoryWidget::endEditFile()
 {
    mGraphFrame->setVisible(true);
    mFileEditor->setVisible(false);
+}
+
+void HistoryWidget::cherryPickCommit()
+{
+   if (const auto commit = mCache->getCommitInfo(mSearchInput->text()); commit.isValid())
+   {
+      const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
+
+      const auto ret = git->cherryPickCommit(commit.sha());
+
+      if (ret.success)
+         emit signalViewUpdated();
+      else
+      {
+         const auto errorMsg = ret.output.toString();
+
+         if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
+             && errorMsg.contains("causing a conflict", Qt::CaseInsensitive))
+         {
+            emit signalCherryPickConflict();
+         }
+         else
+            QMessageBox::critical(this, tr("Error while cherry-pick"), errorMsg);
+      }
+   }
 }

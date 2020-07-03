@@ -286,4 +286,9 @@ private:
     * @brief endEditFile Closes the file editor.
     */
    void endEditFile();
+
+   /**
+    * @brief cherryPickCommit Cherry-picks the commit defined by the SHA in the QLineEdit of the filter.
+    */
+   void cherryPickCommit();
 };
