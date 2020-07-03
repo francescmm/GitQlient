@@ -562,3 +562,11 @@ GeneralConfigPage > QLabel#configLabel
    padding: 2px 5px;
 }
 
+QMessageBox
+{
+   max-width: 400px;
+   min-width: 400px;
+   max-height: 300px;
+   min-height: 300px;
+}
+

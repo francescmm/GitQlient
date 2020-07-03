@@ -1,5 +1,6 @@
 #include "BranchContextMenu.h"
 
+#include <GitQlientStyles.h>
 #include <BranchDlg.h>
 #include <GitBranches.h>
 #include <GitBase.h>
@@ -65,7 +66,15 @@ void BranchContextMenu::pull()
          emit signalPullConflict();
       }
       else
-         QMessageBox::critical(this, tr("Error while pulling"), errorMsg);
+      {
+         QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
+                            QString("There were problems during the pull operation. Please, see the detailed "
+                                    "description for more information."),
+                            QMessageBox::Ok, this);
+         msgBox.setDetailedText(errorMsg);
+         msgBox.setStyleSheet(GitQlientStyles::getStyles());
+         msgBox.exec();
+      }
    }
 }
 
@@ -100,7 +109,15 @@ void BranchContextMenu::push()
    else if (ret.success)
       emit signalBranchesUpdated();
    else
-      QMessageBox::critical(this, tr("Push failed"), ret.output.toString());
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
+                         QString("There were problems during the push operation. Please, see the detailed description "
+                                 "for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }
 
 void BranchContextMenu::pushForce()
@@ -113,7 +130,15 @@ void BranchContextMenu::pushForce()
    if (ret.success)
       emit signalBranchesUpdated();
    else
-      QMessageBox::critical(this, tr("Push force failed"), ret.output.toString());
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
+                         QString("There were problems during the pull operation. Please, see the detailed description "
+                                 "for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }
 
 void BranchContextMenu::createBranch()

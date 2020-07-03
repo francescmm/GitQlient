@@ -67,7 +67,7 @@ void FileEditor::finishEdition()
 
       if (currentContent != mLoadedContent)
       {
-         const auto alert = new QMessageBox(QMessageBox::Warning, tr("Unsaved changes"),
+         const auto alert = new QMessageBox(QMessageBox::Question, tr("Unsaved changes"),
                                             tr("The current text was modified. Do you want to save the changes?"));
          alert->setStyleSheet(GitQlientStyles::getInstance()->getStyles());
          alert->addButton("Discard", QMessageBox::ButtonRole::RejectRole);

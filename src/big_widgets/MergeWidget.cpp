@@ -1,5 +1,6 @@
 #include "MergeWidget.h"
 
+#include <GitQlientStyles.h>
 #include <GitBase.h>
 #include <GitMerge.h>
 #include <GitRemote.h>
@@ -208,8 +209,15 @@ void MergeWidget::abort()
    }
 
    if (!ret.success)
-      QMessageBox::warning(this, tr("Error aborting!"),
-                           tr("The git command thrown an error: %1").arg(ret.output.toString()));
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error aborting"),
+                         QString("There were problems during the aborting the merge. Please, see the detailed "
+                                 "description for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
    else
    {
       removeMergeComponents();
@@ -240,8 +248,15 @@ void MergeWidget::commit()
    }
 
    if (!ret.success)
-      QMessageBox::warning(this, tr("Error merging!"),
-                           tr("The git command throuwn an error: %1").arg(ret.output.toString()));
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while merging"),
+                         QString("There were problems during the merge operation. Please, see the detailed description "
+                                 "for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
    else
    {
       removeMergeComponents();

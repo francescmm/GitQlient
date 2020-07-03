@@ -14,10 +14,6 @@
 
 using namespace QLogger;
 
-const int AmendWidget::kMaxTitleChars = 50;
-
-QString AmendWidget::lastMsgBeforeError;
-
 AmendWidget::AmendWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                          QWidget *parent)
    : CommitChangesWidget(cache, git, parent)
@@ -50,6 +46,8 @@ void AmendWidget::configure(const QString &sha)
       const auto author = commit.author().split("<");
       ui->leAuthorName->setText(author.first());
       ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
+      ui->teDescription->setPlainText(commit.longLog().trimmed());
+      ui->leCommitTitle->setText(commit.shortLog());
 
       blockSignals(true);
       mCurrentFilesCache.clear();
@@ -77,12 +75,6 @@ void AmendWidget::configure(const QString &sha)
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
 
-   if (lastMsgBeforeError.isEmpty())
-   {
-      ui->teDescription->setPlainText(commit.longLog().trimmed());
-      ui->leCommitTitle->setText(commit.shortLog());
-   }
-
    ui->pbCommit->setEnabled(ui->stagedFilesList->count());
 }
 
@@ -97,8 +89,8 @@ bool AmendWidget::commitChanges()
 
       if (hasConflicts())
       {
-         QMessageBox::warning(this, tr("Impossible to commit"),
-                              tr("There are files with conflicts. Please, resolve the conflicts first."));
+         QMessageBox::critical(this, tr("Impossible to commit"),
+                               tr("There are files with conflicts. Please, resolve the conflicts first."));
       }
       else if (checkMsg(msg))
       {

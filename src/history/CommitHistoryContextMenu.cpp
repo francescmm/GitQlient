@@ -1,5 +1,6 @@
 #include "CommitHistoryContextMenu.h"
 
+#include <GitQlientStyles.h>
 #include <GitLocal.h>
 #include <GitPatches.h>
 #include <GitBase.h>
@@ -241,7 +242,15 @@ void CommitHistoryContextMenu::checkoutBranch()
       emit signalRepositoryUpdated();
    }
    else
-      QMessageBox::critical(this, tr("Checkout error"), ret.output.toString());
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
+                         QString("There were problems during the checkout operation. Please, see the detailed "
+                                 "description for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }
 
 void CommitHistoryContextMenu::checkoutCommit()
@@ -255,7 +264,15 @@ void CommitHistoryContextMenu::checkoutCommit()
    if (ret.success)
       emit signalRepositoryUpdated();
    else
-      QMessageBox::critical(this, tr("Checkout error"), ret.output.toString());
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
+                         QString("There were problems during the checkout operation. Please, see the detailed "
+                                 "description for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }
 
 void CommitHistoryContextMenu::cherryPickCommit()
@@ -275,7 +292,15 @@ void CommitHistoryContextMenu::cherryPickCommit()
          emit signalCherryPickConflict();
       }
       else
-         QMessageBox::critical(this, tr("Error while cherry-pick"), errorMsg);
+      {
+         QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
+                            QString("There were problems during the cherry-pich operation. Please, see the detailed "
+                                    "description for more information."),
+                            QMessageBox::Ok, this);
+         msgBox.setDetailedText(errorMsg);
+         msgBox.setStyleSheet(GitQlientStyles::getStyles());
+         msgBox.exec();
+      }
    }
 }
 
@@ -316,7 +341,15 @@ void CommitHistoryContextMenu::push()
    else if (ret.success)
       emit signalRepositoryUpdated();
    else
-      QMessageBox::critical(this, tr("Error while pushin"), ret.output.toString());
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
+                         QString("There were problems during the push operation. Please, see the detailed description "
+                                 "for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }
 
 void CommitHistoryContextMenu::pull()
@@ -338,7 +371,15 @@ void CommitHistoryContextMenu::pull()
          emit signalPullConflict();
       }
       else
-         QMessageBox::critical(this, tr("Error while pulling"), errorMsg);
+      {
+         QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
+                            QString("There were problems during the pull operation. Please, see the detailed "
+                                    "description for more information."),
+                            QMessageBox::Ok, this);
+         msgBox.setDetailedText(errorMsg);
+         msgBox.setStyleSheet(GitQlientStyles::getStyles());
+         msgBox.exec();
+      }
    }
 }
 

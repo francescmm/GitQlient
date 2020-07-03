@@ -2,6 +2,7 @@
 
 #include <BranchDlg.h>
 #include <GitStashes.h>
+#include <GitQlientStyles.h>
 
 #include <QMessageBox>
 
@@ -34,7 +35,15 @@ void StashesContextMenu::drop()
    if (ret.success)
       emit signalUpdateView();
    else
-      QMessageBox::warning(this, tr("Error on stash drop"), ret.output.toString());
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while droping stash"),
+                         QString("There were problems during the stash drop operation. Please, see the detailed "
+                                 "description for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }
 
 void StashesContextMenu::clear()
@@ -45,5 +54,13 @@ void StashesContextMenu::clear()
    if (ret.success)
       emit signalUpdateView();
    else
-      QMessageBox::warning(this, tr("Error on stash branch"), ret.output.toString());
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while branch stash"),
+                         QString("There were problems during the branch stash operation. Please, see the detailed "
+                                 "description for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }

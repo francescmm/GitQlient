@@ -1,5 +1,6 @@
 #include "BranchTreeWidget.h"
 
+#include <GitQlientStyles.h>
 #include <GitBranches.h>
 #include <GitBase.h>
 #include <BranchContextMenu.h>
@@ -83,7 +84,15 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
                emit signalBranchCheckedOut();
          }
          else
-            QMessageBox::critical(this, tr("Checkout branch error"), output);
+         {
+            QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
+                               QString("There were problems during the checkout operation. Please, see the detailed "
+                                       "description for more information."),
+                               QMessageBox::Ok, this);
+            msgBox.setDetailedText(output);
+            msgBox.setStyleSheet(GitQlientStyles::getStyles());
+            msgBox.exec();
+         }
       }
    }
 }

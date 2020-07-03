@@ -17,6 +17,7 @@
 #include <GitLocal.h>
 #include <FileEditor.h>
 #include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
 
 #include <QLogger.h>
 
@@ -292,7 +293,13 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
 
    if (ret.output.toString().contains("merge failed", Qt::CaseInsensitive))
    {
-      QMessageBox::critical(parentWidget(), tr("Merge failed"), ret.output.toString());
+      QMessageBox msgBox(
+          QMessageBox::Critical, tr("Merge failed"),
+          QString("There were problems during the merge. Please, see the detailed description for more information."),
+          QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
 
       emit signalMergeConflicts();
    }
@@ -305,10 +312,26 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
          if (ret.success)
          {
             emit signalUpdateCache();
-            QMessageBox::information(parentWidget(), tr("Merge status"), outputStr);
+
+            QMessageBox msgBox(
+                QMessageBox::Information, tr("Merge successful"),
+                QString("The merge was successfully done. See the detailed description for more information."),
+                QMessageBox::Ok, this);
+            msgBox.setDetailedText(ret.output.toString());
+            msgBox.setStyleSheet(GitQlientStyles::getStyles());
+            msgBox.exec();
          }
          else
-            QMessageBox::warning(parentWidget(), tr("Merge status"), outputStr);
+         {
+            QMessageBox msgBox(
+                QMessageBox::Warning, tr("Merge status"),
+                QString(
+                    "There were problems during the merge. Please, see the detailed description for more information."),
+                QMessageBox::Ok, this);
+            msgBox.setDetailedText(ret.output.toString());
+            msgBox.setStyleSheet(GitQlientStyles::getStyles());
+            msgBox.exec();
+         }
       }
    }
 }
@@ -366,7 +389,15 @@ void HistoryWidget::cherryPickCommit()
             emit signalCherryPickConflict();
          }
          else
-            QMessageBox::critical(this, tr("Error while cherry-pick"), errorMsg);
+         {
+            QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
+                               QString("There were problems during the cherry-pick operation. Please, see the detailed "
+                                       "description for more information."),
+                               QMessageBox::Ok, this);
+            msgBox.setDetailedText(errorMsg);
+            msgBox.setStyleSheet(GitQlientStyles::getStyles());
+            msgBox.exec();
+         }
       }
    }
 }
