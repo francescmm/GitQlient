@@ -105,12 +105,9 @@ void WipWidget::showUnstagedMenu(const QPoint &pos)
       connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &WipWidget::signalShowFileHistory);
       connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
       connect(contextMenu, &UnstagedMenu::signalConflictsResolved, this, [this, item] {
-         const auto fileWidget = qobject_cast<FileWidget *>(ui->unstagedFilesList->itemWidget(item));
-
          item->setData(GitQlientRole::U_IsConflict, false);
-         item->setText(fileWidget->text().remove("(conflicts)").trimmed());
          item->setForeground(GitQlientStyles::getGreen());
-         configure(mCurrentSha);
+         addFileToCommitList(item);
       });
 
       const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
