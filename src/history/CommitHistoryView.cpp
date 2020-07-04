@@ -4,7 +4,6 @@
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryContextMenu.h>
 #include <ShaFilterProxyModel.h>
-#include <GitBranches.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
 
@@ -45,7 +44,10 @@ void CommitHistoryView::setModel(QAbstractItemModel *model)
            [this](const QItemSelection &selected, const QItemSelection &) {
               const auto indexes = selected.indexes();
               if (!indexes.isEmpty())
+              {
                  scrollTo(indexes.first());
+                 emit clicked(indexes.first());
+              }
            });
 }
 
@@ -121,7 +123,7 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
 
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 
-   auto row = mCache->getCommitInfo(mCurrentSha).orderIdx;
+   auto row = mCache->getCommitPos(mCurrentSha);
 
    if (mIsFiltering)
    {
@@ -187,10 +189,11 @@ QList<QString> CommitHistoryView::getSelectedShaList() const
       const auto dt = QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm");
 
       shas.insert(dt, sha);
-      QScopedPointer<GitBranches> git(new GitBranches(mGit));
-      const auto ret = git->getBranchesOfCommit(sha);
 
-      auto branches = ret.output.toString().trimmed().split("\n ");
+      const auto commit = mCache->getCommitInfo(sha);
+      auto branches = commit.getReferences(References::Type::LocalBranch)
+          + commit.getReferences(References::Type::RemoteBranches);
+
       std::sort(branches.begin(), branches.end());
       godVector.append(branches.toVector());
    }

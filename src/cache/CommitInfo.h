@@ -27,7 +27,8 @@
 #include <QStringList>
 #include <QDateTime>
 
-enum class LaneType;
+#include <Lane.h>
+#include <References.h>
 
 class CommitInfo
 {
@@ -44,16 +45,18 @@ public:
    };
 
    CommitInfo() = default;
-   CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
-              const QString &log, const QString &longLog, int idx);
-   CommitInfo(const QByteArray &b, int idx);
+   explicit CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
+                       const QString &log, const QString &longLog = QString());
+   explicit CommitInfo(const QByteArray &b);
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;
+
    QString getFieldStr(CommitInfo::Field field) const;
    bool isBoundary() const { return mBoundaryInfo == '-'; }
    int parentsCount() const { return mParentsSha.count(); }
    QString parent(int idx) const { return mParentsSha.count() > idx ? mParentsSha.at(idx) : QString(); }
    QStringList parents() const { return mParentsSha; }
+
    QString sha() const { return mSha; }
    QString committer() const { return mCommitter; }
    QString author() const { return mAuthor; }
@@ -61,11 +64,26 @@ public:
    QString shortLog() const { return mShortLog; }
    QString longLog() const { return mLongLog; }
    QString fullLog() const { return QString("%1\n\n%2").arg(mShortLog, mLongLog.trimmed()); }
-   bool isValid() const;
 
-   QVector<LaneType> lanes;
-   int orderIdx = -1;
-   bool isDiffCache = false;
+   bool isValid() const;
+   bool isWip() const { return mSha == ZERO_SHA; }
+
+   void setLanes(const QVector<Lane> &lanes) { mLanes = lanes; }
+   QVector<Lane> getLanes() const { return mLanes; }
+   Lane getLane(int i) const { return mLanes.at(i); }
+   int getLanesCount() const { return mLanes.count(); }
+   int getActiveLane() const;
+
+   void addReference(References::Type type, const QString &reference);
+   void addReferences(const References &refs) { mReferences = refs; }
+   QStringList getReferences(References::Type type) const { return mReferences.getReferences(type); }
+   bool hasReferences() const { return !mReferences.isEmpty(); }
+
+   void addChildReference(CommitInfo *commit) { mChilds.insert(commit->sha(), commit); }
+   QList<CommitInfo *> getChilds() const { return mChilds.values(); }
+   bool hasChilds() const { return !mChilds.empty(); }
+
+   void clearReferences() { mReferences.clear(); }
 
    static const QString ZERO_SHA;
 
@@ -79,4 +97,7 @@ private:
    QString mShortLog;
    QString mLongLog;
    QString mDiff;
+   QVector<Lane> mLanes;
+   References mReferences;
+   QMap<QString, CommitInfo *> mChilds;
 };

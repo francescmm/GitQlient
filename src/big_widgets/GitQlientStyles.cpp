@@ -51,6 +51,64 @@ QColor GitQlientStyles::getTextColor()
    return textColor;
 }
 
+QColor GitQlientStyles::getGraphSelectionColor()
+{
+   GitQlientSettings settings;
+   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+
+   QColor c;
+
+   if (colorSchema == "dark")
+   {
+      c.setNamedColor("#404142");
+      c.setAlphaF(0.75);
+   }
+   else
+      c.setNamedColor("#C6C6C7");
+
+   return c;
+}
+
+QColor GitQlientStyles::getGraphHoverColor()
+{
+   GitQlientSettings settings;
+   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+
+   QColor c;
+
+   if (colorSchema == "dark")
+   {
+      c.setNamedColor("#404142");
+      c.setAlphaF(0.4);
+   }
+   else
+      c.setNamedColor("#EFEFEF");
+
+   return c;
+}
+
+QColor GitQlientStyles::getBackgroundColor()
+{
+   GitQlientSettings settings;
+   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+
+   QColor c;
+   c.setNamedColor(colorSchema == "dark" ? "#2E2F30" : "white");
+
+   return c;
+}
+
+QColor GitQlientStyles::getTabColor()
+{
+   GitQlientSettings settings;
+   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+
+   QColor c;
+   c.setNamedColor(colorSchema == "dark" ? "#404142" : "white");
+
+   return c;
+}
+
 QColor GitQlientStyles::getBlue()
 {
    static QColor blue("#579BD5");

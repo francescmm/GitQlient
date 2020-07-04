@@ -1,12 +1,16 @@
 #include "BranchTreeWidget.h"
 
+#include <GitQlientStyles.h>
 #include <GitBranches.h>
 #include <GitBase.h>
 #include <BranchContextMenu.h>
 #include <PullDlg.h>
+#include <GitQlientBranchItemRole.h>
 
 #include <QApplication>
 #include <QMessageBox>
+
+using namespace GitQlient;
 
 BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QTreeWidget(parent)
@@ -24,13 +28,10 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 {
    const auto item = itemAt(pos);
 
-   if (item && item->data(0, Qt::UserRole + 2).toBool())
+   if (item)
    {
       auto currentBranch = mGit->getCurrentBranch();
-      auto selectedBranch = item->data(0, Qt::UserRole + 1).toString();
-
-      if (mLocal)
-         selectedBranch = selectedBranch.remove("origin/");
+      auto selectedBranch = item->data(0, FullNameRole).toString();
 
       const auto menu = new BranchContextMenu({ currentBranch, selectedBranch, mLocal, mGit }, this);
       connect(menu, &BranchContextMenu::signalBranchesUpdated, this, &BranchTreeWidget::signalBranchesUpdated);
@@ -44,45 +45,60 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 
 void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 {
-   if (item->data(0, Qt::UserRole + 2).toBool())
+   if (item)
    {
-      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      QScopedPointer<GitBranches> git(new GitBranches(mGit));
-      const auto ret = git->checkoutRemoteBranch(item->data(0, Qt::UserRole + 1).toString().remove("origin/"));
-      QApplication::restoreOverrideCursor();
+      auto branchName = item->data(0, FullNameRole).toString();
 
-      const auto output = ret.output.toString();
-
-      if (ret.success)
+      if (!branchName.isEmpty())
       {
-         QRegExp rx("by \\d+ commits");
-         rx.indexIn(output);
-         auto value = rx.capturedTexts().constFirst().split(" ");
-         auto uiUpdateRequested = false;
+         const auto isLocal = item->data(0, LocalBranchRole).toBool();
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+         QScopedPointer<GitBranches> git(new GitBranches(mGit));
+         const auto ret
+             = isLocal ? git->checkoutLocalBranch(branchName.remove("origin/")) : git->checkoutRemoteBranch(branchName);
+         QApplication::restoreOverrideCursor();
 
-         if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
+         const auto output = ret.output.toString();
+
+         if (ret.success)
          {
-            const auto commits = value.at(1).toUInt();
-            (void)commits;
+            QRegExp rx("by \\d+ commits");
+            rx.indexIn(output);
+            auto value = rx.capturedTexts().constFirst().split(" ");
+            auto uiUpdateRequested = false;
 
-            PullDlg pull(mGit, output.split('\n').first());
-            connect(&pull, &PullDlg::signalRepositoryUpdated, this, &BranchTreeWidget::signalBranchCheckedOut);
-            connect(&pull, &PullDlg::signalPullConflict, this, &BranchTreeWidget::signalPullConflict);
+            if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
+            {
+               const auto commits = value.at(1).toUInt();
+               (void)commits;
 
-            if (pull.exec() == QDialog::Accepted)
-               uiUpdateRequested = true;
+               PullDlg pull(mGit, output.split('\n').first());
+               connect(&pull, &PullDlg::signalRepositoryUpdated, this, &BranchTreeWidget::signalBranchCheckedOut);
+               connect(&pull, &PullDlg::signalPullConflict, this, &BranchTreeWidget::signalPullConflict);
+
+               if (pull.exec() == QDialog::Accepted)
+                  uiUpdateRequested = true;
+            }
+
+            if (!uiUpdateRequested)
+               emit signalBranchCheckedOut();
          }
-
-         if (!uiUpdateRequested)
-            emit signalBranchCheckedOut();
+         else
+         {
+            QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
+                               QString("There were problems during the checkout operation. Please, see the detailed "
+                                       "description for more information."),
+                               QMessageBox::Ok, this);
+            msgBox.setDetailedText(output);
+            msgBox.setStyleSheet(GitQlientStyles::getStyles());
+            msgBox.exec();
+         }
       }
-      else
-         QMessageBox::critical(this, tr("Checkout branch error"), output);
    }
 }
 
 void BranchTreeWidget::selectCommit(QTreeWidgetItem *item)
 {
-   if (item->data(0, Qt::UserRole + 2).toBool())
+   if (item)
       emit signalSelectCommit(item->data(0, Qt::UserRole + 3).toString());
 }

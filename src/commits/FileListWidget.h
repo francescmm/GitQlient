@@ -55,6 +55,7 @@ private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<RevisionsCache> mCache;
    FileListDelegate *mFileDelegate = nullptr;
+   QString mCurrentSha;
 
    void showContextMenu(const QPoint &);
    void addItem(const QString &label, const QColor &clr);

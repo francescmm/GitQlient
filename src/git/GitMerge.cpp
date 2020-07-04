@@ -2,9 +2,12 @@
 
 #include <GitBase.h>
 #include <GitRepoLoader.h>
+
 #include <QLogger.h>
+#include <BenchmarkTool.h>
 
 using namespace QLogger;
+using namespace GitQlientTools;
 
 GitMerge::GitMerge(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> cache)
    : mGitBase(gitBase)
@@ -14,14 +17,19 @@ GitMerge::GitMerge(const QSharedPointer<GitBase> &gitBase, QSharedPointer<Revisi
 
 GitExecResult GitMerge::merge(const QString &into, QStringList sources)
 {
+   BenchmarkStart();
+
    QLog_Debug("Git", QString("Executing merge: {%1} into {%2}").arg(sources.join(","), into));
 
    const auto retCheckout = mGitBase->run(QString("git checkout -q %1").arg(into));
 
    if (!retCheckout.success)
+   {
+      BenchmarkEnd();
       return retCheckout;
+   }
 
-   const auto retMerge = mGitBase->run(QString("git merge -q ") + sources.join(" "));
+   const auto retMerge = mGitBase->run(QString("git merge -Xignore-all-space ") + sources.join(" "));
 
    if (retMerge.success)
    {
@@ -29,15 +37,33 @@ GitExecResult GitMerge::merge(const QString &into, QStringList sources)
       gitLoader->updateWipRevision();
    }
 
+   BenchmarkEnd();
+
    return retMerge;
 }
 
 GitExecResult GitMerge::abortMerge() const
 {
-   return mGitBase->run("git merge --abort");
+   BenchmarkStart();
+
+   QLog_Debug("Git", QString("Merge aborted"));
+
+   const auto ret = mGitBase->run("git merge --abort");
+
+   BenchmarkEnd();
+
+   return ret;
 }
 
 GitExecResult GitMerge::applyMerge() const
 {
-   return mGitBase->run("git commit --no-edit");
+   BenchmarkStart();
+
+   QLog_Debug("Git", QString("Merge commit"));
+
+   const auto ret = mGitBase->run("git commit --no-edit");
+
+   BenchmarkEnd();
+
+   return ret;
 }

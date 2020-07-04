@@ -26,12 +26,21 @@
 #include <RevisionFiles.h>
 #include <lanes.h>
 #include <CommitInfo.h>
-#include <Reference.h>
 
 #include <QObject>
 #include <QHash>
+#include <QMutex>
 
 struct WorkingDirInfo;
+
+struct WipRevisionInfo
+{
+   QString parentSha;
+   QString diffIndex;
+   QString diffIndexCached;
+
+   bool isValid() const { return !parentSha.isEmpty() || !diffIndex.isEmpty() || !diffIndexCached.isEmpty(); }
+};
 
 class RevisionsCache : public QObject
 {
@@ -41,45 +50,54 @@ signals:
    void signalCacheUpdated();
 
 public:
+   struct LocalBranchDistances
+   {
+      int aheadMaster = 0;
+      int behindMaster = 0;
+      int aheadOrigin = 0;
+      int behindOrigin = 0;
+   };
+
    explicit RevisionsCache(QObject *parent = nullptr);
    ~RevisionsCache();
 
-   void configure(int numElementsToStore);
-   void clear();
+   void setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits);
 
    int count() const;
-   int countReferences() const;
 
-   CommitInfo getCommitInfo(const QString &sha) const;
-   CommitInfo getCommitInfoByRow(int row) const;
+   CommitInfo getCommitInfo(const QString &sha);
+   CommitInfo getCommitInfoByRow(int row);
+   int getCommitPos(const QString &sha);
    CommitInfo getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint = 0);
    RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
-   Reference getReference(const QString &sha) const;
-
-   void insertCommitInfo(CommitInfo rev);
 
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
-   void insertReference(const QString &sha, Reference ref);
+   void insertReference(const QString &sha, References::Type type, const QString &reference);
+   void insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances);
+   LocalBranchDistances getLocalBranchDistances(const QString &name) { return mLocalBranchDistances.value(name); }
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
-
-   void removeReference(const QString &sha);
 
    bool containsRevisionFile(const QString &sha1, const QString &sha2) const;
 
    RevisionFiles parseDiff(const QString &logDiff);
 
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
-   bool pendingLocalChanges() const;
+   bool pendingLocalChanges();
 
-   uint checkRef(const QString &sha, uint mask = ANY_REF) const;
-   const QStringList getRefNames(const QString &sha, uint mask) const;
+   QVector<QPair<QString, QStringList>> getBranches(References::Type type);
+   QMap<QString, QString> getTags() const;
 
 private:
-   bool mCacheLocked = true;
+   friend class GitRepoLoader;
+
+   QMutex mMutex;
+   bool mConfigured = true;
    QVector<CommitInfo *> mCommits;
-   QHash<QString, CommitInfo *> mCommitsMap;
+   QHash<QString, CommitInfo> mCommitsMap;
+   QMultiMap<QString, CommitInfo *> mTmpChildsStorage;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
-   QHash<QString, Reference> mReferencesMap;
+   QVector<CommitInfo *> mReferences;
+   QMap<QString, LocalBranchDistances> mLocalBranchDistances;
    Lanes mLanes;
    QVector<QString> mDirNames;
    QVector<QString> mFileNames;
@@ -98,12 +116,16 @@ private:
       QVector<QString> files;
    };
 
+   void setConfigurationDone() { mConfigured = true; }
+   void insertCommitInfo(CommitInfo rev, int orderIdx);
+   void insertWipRevision(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
-   void updateLanes(CommitInfo &c);
+   QVector<Lane> calculateLanes(const CommitInfo &c);
    RevisionFiles parseDiffFormat(const QString &buf, FileNamesLoader &fl);
    void appendFileName(const QString &name, FileNamesLoader &fl);
    void flushFileNames(FileNamesLoader &fl);
    void setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
    QVector<CommitInfo *>::const_iterator searchCommit(CommitInfo::Field field, const QString &text,
                                                       int startingPoint = 0) const;
+   void resetLanes(const CommitInfo &c, bool isFork);
 };

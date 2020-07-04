@@ -10,6 +10,7 @@ HEADERS += \
     $$PWD/BranchTreeWidget.h \
     $$PWD/BranchesViewDelegate.h \
     $$PWD/BranchesWidget.h \
+    $$PWD/GitQlientBranchItemRole.h \
     $$PWD/StashesContextMenu.h \
     $$PWD/TagDlg.h
 

@@ -4,8 +4,10 @@
 #include <QTextStream>
 
 #include <QLogger.h>
+#include <BenchmarkTool.h>
 
 using namespace QLogger;
+using namespace GitQlientTools;
 
 namespace
 {
@@ -104,9 +106,13 @@ AGitProcess::AGitProcess(const QString &workingDir)
 
 void AGitProcess::onCancel()
 {
+   BenchmarkStart();
+
    mCanceling = true;
 
    waitForFinished();
+
+   BenchmarkEnd();
 }
 
 void AGitProcess::onReadyStandardOutput()
@@ -143,6 +149,8 @@ bool AGitProcess::execute(const QString &command)
 
       if (!processStarted)
          QLog_Warning("Git", QString("Unable to start the process:\n%1\nMore info:\n%2").arg(mCommand, errorString()));
+      else
+         QLog_Debug("Git", QString("Process started: %1").arg(mCommand));
    }
 
    return processStarted;
@@ -150,6 +158,8 @@ bool AGitProcess::execute(const QString &command)
 
 void AGitProcess::onFinished(int, QProcess::ExitStatus exitStatus)
 {
+   QLog_Debug("Git", QString("Process {%1} finished.").arg(mCommand));
+
    const auto errorOutput = readAllStandardError();
 
    mErrorOutput = QString::fromUtf8(errorOutput);

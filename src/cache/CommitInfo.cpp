@@ -5,7 +5,7 @@
 const QString CommitInfo::ZERO_SHA = QString("0000000000000000000000000000000000000000");
 
 CommitInfo::CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
-                       const QString &log, const QString &longLog, int idx)
+                       const QString &log, const QString &longLog)
 {
    mSha = sha;
    mParentsSha = parents;
@@ -14,11 +14,9 @@ CommitInfo::CommitInfo(const QString &sha, const QStringList &parents, const QSt
    mCommitDate = QDateTime::fromSecsSinceEpoch(secsSinceEpoch);
    mShortLog = log;
    mLongLog = longLog;
-   orderIdx = idx;
 }
 
-CommitInfo::CommitInfo(const QByteArray &b, int idx)
-   : orderIdx(idx)
+CommitInfo::CommitInfo(const QByteArray &b)
 {
    const auto fields = QString::fromUtf8(b).split('\n');
 
@@ -46,7 +44,7 @@ bool CommitInfo::operator==(const CommitInfo &commit) const
    return (mSha == commit.mSha || mSha.startsWith(commit.sha()) || commit.sha().startsWith(mSha))
        && mParentsSha == commit.mParentsSha && mCommitter == commit.mCommitter && mAuthor == commit.mAuthor
        && mCommitDate == commit.mCommitDate && mShortLog == commit.mShortLog && mLongLog == commit.mLongLog
-       && orderIdx == commit.orderIdx && lanes == commit.lanes;
+       && mLanes == commit.mLanes;
 }
 
 bool CommitInfo::operator!=(const CommitInfo &commit) const
@@ -82,4 +80,24 @@ bool CommitInfo::isValid() const
    QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
 
    return !mSha.isEmpty() && hexMatcher.exactMatch(mSha);
+}
+
+int CommitInfo::getActiveLane() const
+{
+   auto i = 0;
+
+   for (auto lane : mLanes)
+   {
+      if (lane.isActive())
+         return i;
+      else
+         ++i;
+   }
+
+   return -1;
+}
+
+void CommitInfo::addReference(References::Type type, const QString &reference)
+{
+   mReferences.addReference(type, reference);
 }

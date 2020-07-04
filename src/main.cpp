@@ -3,10 +3,13 @@
 #include <QIcon>
 
 #include <GitQlient.h>
-#include <QLogger.h>
 #include <GitQlientSettings.h>
 
+#include <QLogger.h>
+#include <BenchmarkTool.h>
+
 using namespace QLogger;
+using namespace GitQlientTools;
 
 int main(int argc, char *argv[])
 {
@@ -14,6 +17,8 @@ int main(int argc, char *argv[])
 
    QApplication app(argc, argv);
    QStringList arguments;
+
+   BenchmarkTool::getInstance();
 
    auto argNum = argc;
 

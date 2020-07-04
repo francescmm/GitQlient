@@ -4,8 +4,10 @@
 #include <GitAsyncProcess.h>
 
 #include <QLogger.h>
+#include <BenchmarkTool.h>
 
 using namespace QLogger;
+using namespace GitQlientTools;
 
 #include <QDir>
 
@@ -27,6 +29,8 @@ void GitBase::setWorkingDir(const QString &workingDir)
 
 GitExecResult GitBase::run(const QString &cmd) const
 {
+   BenchmarkStart();
+
    GitSyncProcess p(mWorkingDirectory);
    connect(this, &GitBase::cancelAllProcesses, &p, &AGitProcess::onCancel);
 
@@ -44,25 +48,37 @@ GitExecResult GitBase::run(const QString &cmd) const
    else
       QLog_Warning("Git", QString("Git command {%1} has errors:\n%2").arg(cmd, runOutput));
 
+   BenchmarkEnd();
+
    return ret;
 }
 
 bool GitBase::runAsync(const QString &cmd) const
 {
+   BenchmarkStart();
+
    const auto p = new GitAsyncProcess(mWorkingDirectory);
    connect(this, &GitBase::cancelAllProcesses, p, &AGitProcess::onCancel);
    connect(p, &GitAsyncProcess::signalDataReady, this, &GitBase::signalResultReady);
 
-   return p->run(cmd).success;
+   const auto ret = p->run(cmd);
+
+   BenchmarkEnd();
+
+   return ret.success;
 }
 
 void GitBase::updateCurrentBranch()
 {
+   BenchmarkStart();
+
    QLog_Trace("Git", "Updating the current branch");
 
    const auto ret = run("git rev-parse --abbrev-ref HEAD");
 
-   mCurrentBranch = ret.success ? ret.output.toString().trimmed() : QString();
+   mCurrentBranch = ret.success ? ret.output.toString().trimmed().remove("heads/") : QString();
+
+   BenchmarkEnd();
 }
 
 QString GitBase::getCurrentBranch()
@@ -73,4 +89,17 @@ QString GitBase::getCurrentBranch()
       updateCurrentBranch();
 
    return mCurrentBranch;
+}
+
+GitExecResult GitBase::getLastCommit() const
+{
+   BenchmarkStart();
+
+   QLog_Trace("Git", "Executing getLastCommit");
+
+   const auto ret = run("git rev-parse HEAD");
+
+   BenchmarkEnd();
+
+   return ret;
 }

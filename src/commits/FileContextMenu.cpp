@@ -5,7 +5,7 @@
 #include <QApplication>
 #include <QClipboard>
 
-FileContextMenu::FileContextMenu(const QString &file, QWidget *parent)
+FileContextMenu::FileContextMenu(const QString &file, bool editionAllowed, QWidget *parent)
    : QMenu(parent)
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -20,16 +20,16 @@ FileContextMenu::FileContextMenu(const QString &file, QWidget *parent)
 
    addSeparator();
 
-   GitQlientSettings settings;
+   if (editionAllowed)
+   {
+      connect(addAction("Edit file"), &QAction::triggered, this, &FileContextMenu::signalEditFile);
 
-   if (!settings.value("isGitQlient", false).toBool())
-      connect(addAction("Edit file"), &QAction::triggered, this, [this]() { emit signalEditFile(); });
-
-   addSeparator();
+      addSeparator();
+   }
 
    const auto copyPathAction = addAction(tr("Copy path"));
    connect(copyPathAction, &QAction::triggered, this, [file]() {
-      QSettings settings;
+      GitQlientSettings settings;
       const auto fullPath = QString("%1/%2").arg(settings.value("WorkingDirectory").toString(), file);
       QApplication::clipboard()->setText(fullPath);
    });

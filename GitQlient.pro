@@ -20,8 +20,10 @@ SOURCES += src/main.cpp
 
 include(src/App.pri)
 include(QLogger/QLogger.pri)
+include(BenchmarkTool/BenchmarkLib/BenchmarkTool.pri)
 
-INCLUDEPATH += QLogger
+INCLUDEPATH += QLogger \
+    BenchmarkTool/BenchmarkLib
 
 OTHER_FILES += \
     $$PWD/LICENSE \

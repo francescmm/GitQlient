@@ -28,11 +28,11 @@
 class CommitHistoryView;
 class RevisionsCache;
 class GitBase;
+class Lane;
+class CommitInfo;
 
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
-
-enum class LaneType;
 
 /**
  * @brief The RepositoryViewDelegate class is the delegate overloads the paint functionality in the RepositoryView. This
@@ -83,7 +83,7 @@ private:
     * @param o The style options of the item.
     * @param i The index with the item data.
     */
-   void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const;
+   void paintLog(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit, const QString &text) const;
    /**
     * @brief Method that sets up the configuration to paint the lane for the commit graph representation.
     *
@@ -91,7 +91,7 @@ private:
     * @param o The style options of the item.
     * @param index The index with the item data.
     */
-   void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &index) const;
+   void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit) const;
 
    /**
     * @brief Specialization method called by @ref paintGrapth that does the actual lane painting.
@@ -106,8 +106,8 @@ private:
     * @param mergeColor Color of the lane where the merge comes from in case the commit is a end-merge point.
     * @param isWip Tells the method if it's the WIP commit so it's painted differently.
     */
-   void paintGraphLane(QPainter *p, const LaneType type, bool laneHeadPresent, int x1, int x2, const QColor &col,
-                       const QColor &activeCol, const QColor &mergeColor, bool isWip = false) const;
+   void paintGraphLane(QPainter *p, const Lane &type, bool laneHeadPresent, int x1, int x2, const QColor &col,
+                       const QColor &activeCol, const QColor &mergeColor, bool isWip = false, bool hasChilds = true) const;
 
    /**
     * @brief Specialized method that paints a tag in the commit message column.
@@ -119,6 +119,6 @@ private:
     */
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
 
-   QColor getMergeColor(const LaneType currentLane, const QVector<LaneType> &lanes, int currentLaneIndex,
+   QColor getMergeColor(const Lane &currentLane, const CommitInfo &commit, int currentLaneIndex,
                         const QColor &defaultColor, bool &isSet) const;
 };

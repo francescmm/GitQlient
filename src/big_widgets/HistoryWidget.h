@@ -32,10 +32,12 @@ class CommitHistoryView;
 class QLineEdit;
 class BranchesWidget;
 class QStackedWidget;
-class WorkInProgressWidget;
+class WipWidget;
+class AmendWidget;
 class CommitInfoWidget;
 class QCheckBox;
 class RepositoryViewDelegate;
+class FileEditor;
 
 /*!
  \brief The HistoryWidget is the responsible fro showing the history of the repository. It is the first widget shown
@@ -168,11 +170,12 @@ public:
 
    */
    void resetWip();
-   /*!
-    \brief Reloads the information for the current subwidgets.
 
-   */
-   void reload();
+   /**
+    * @brief loadBranches Loads the information on the branches widget: branches, tags, stashes and submodules.
+    */
+   void loadBranches();
+
    /*!
     \brief If the current view is the WIP widget, updates it.
 
@@ -192,7 +195,7 @@ public:
    */
    void onCommitSelected(const QString &goToSha);
    /*!
-    \brief Opens the WorkInProgressWidget in amend mode.
+    \brief Opens the AmendWidget.
 
     \param sha The commit SHA to amend.
    */
@@ -218,10 +221,13 @@ private:
    BranchesWidget *mBranchesWidget = nullptr;
    QLineEdit *mSearchInput = nullptr;
    QStackedWidget *mCommitStackedWidget = nullptr;
-   WorkInProgressWidget *mCommitWidget = nullptr;
-   CommitInfoWidget *mRevisionWidget = nullptr;
+   WipWidget *mWipWidget = nullptr;
+   AmendWidget *mAmendWidget = nullptr;
+   CommitInfoWidget *mCommitInfoWidget = nullptr;
    QCheckBox *mChShowAllBranches = nullptr;
    RepositoryViewDelegate *mItemDelegate = nullptr;
+   QFrame *mGraphFrame = nullptr;
+   FileEditor *mFileEditor = nullptr;
 
    /*!
     \brief Performs a search based on the input of the search QLineEdit with the users input.
@@ -267,4 +273,22 @@ private:
     \param branchToMerge The branch to merge from.
    */
    void mergeBranch(const QString &current, const QString &branchToMerge);
+
+   /**
+    * @brief startEditFile Shows the file edition windows with the content of @p fileName loaded on it.
+    * @param fileName The full path of the file that will be opened.
+    * @param line The line to put the cursor.
+    * @param column The column to put the cursor.
+    */
+   void startEditFile(const QString &fileName);
+
+   /**
+    * @brief endEditFile Closes the file editor.
+    */
+   void endEditFile();
+
+   /**
+    * @brief cherryPickCommit Cherry-picks the commit defined by the SHA in the QLineEdit of the filter.
+    */
+   void cherryPickCommit();
 };

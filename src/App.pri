@@ -5,6 +5,7 @@ include($$PWD/commits/Commits.pri)
 include($$PWD/config/Config.pri)
 include($$PWD/diff/Diff.pri)
 include($$PWD/git/Git.pri)
+include($$PWD/cache/Cache.pri)
 include($$PWD/history/History.pri)
 
 RESOURCES += \

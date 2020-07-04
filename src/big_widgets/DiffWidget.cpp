@@ -4,6 +4,8 @@
 #include <FullDiffWidget.h>
 #include <DiffButton.h>
 #include <CommitDiffWidget.h>
+#include <GitQlientSettings.h>
+#include <FileEditor.h>
 
 #include <QLogger.h>
 
@@ -17,8 +19,10 @@ using namespace QLogger;
 DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
+   , mCache(cache)
    , centerStackedWidget(new QStackedWidget())
-   , mCommitDiffWidget(new CommitDiffWidget(mGit, std::move(cache)))
+   , mCommitDiffWidget(new CommitDiffWidget(mGit, mCache))
+   , mFileEditor(new FileEditor())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -47,16 +51,27 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
    diffsLayout->addWidget(scrollArea);
    diffsLayout->addWidget(mCommitDiffWidget);
 
+   mFileEditor->setVisible(false);
+
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
    layout->addLayout(diffsLayout);
+   layout->setSpacing(10);
    layout->addWidget(centerStackedWidget);
+   layout->addWidget(mFileEditor);
 
    setLayout(layout);
 
    connect(mCommitDiffWidget, &CommitDiffWidget::signalOpenFileCommit, this, &DiffWidget::loadFileDiff);
    connect(mCommitDiffWidget, &CommitDiffWidget::signalShowFileHistory, this, &DiffWidget::signalShowFileHistory);
-   connect(mCommitDiffWidget, &CommitDiffWidget::signalEditFile, this, &DiffWidget::signalEditFile);
+
+   if (GitQlientSettings settings; !settings.value("isGitQlient", false).toBool())
+      connect(mCommitDiffWidget, &CommitDiffWidget::signalEditFile, this, &DiffWidget::signalEditFile);
+   else
+   {
+      connect(mCommitDiffWidget, &CommitDiffWidget::signalEditFile, this, &DiffWidget::startEditFile);
+      connect(mFileEditor, &FileEditor::signalEditionClosed, this, &DiffWidget::endEditFile);
+   }
 }
 
 DiffWidget::~DiffWidget()
@@ -83,6 +98,8 @@ void DiffWidget::clear() const
 
 bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
+   mFileEditor->finishEdition();
+
    const auto id = QString("%1 (%2 \u2194 %3)").arg(file.split("/").last(), currentSha.left(6), previousSha.left(6));
 
    if (!mDiffButtons.contains(id))
@@ -91,7 +108,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
           "UI",
           QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
 
-      const auto fileDiffWidget = new FileDiffWidget(mGit);
+      const auto fileDiffWidget = new FileDiffWidget(mGit, mCache);
       const auto fileWithModifications = fileDiffWidget->configure(currentSha, previousSha, file);
 
       if (fileWithModifications)
@@ -163,7 +180,7 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 
    if (!mDiffButtons.contains(id))
    {
-      const auto fullDiffWidget = new FullDiffWidget(mGit);
+      const auto fullDiffWidget = new FullDiffWidget(mGit, mCache);
       fullDiffWidget->loadDiff(sha, parentSha);
 
       const auto diffButton = new DiffButton(id, ":/icons/commit-list");
@@ -172,9 +189,9 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       for (const auto &buttons : qAsConst(mDiffButtons))
          buttons.second->setUnselected();
 
-      connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton]() {
+      connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton, sha, parentSha]() {
          centerStackedWidget->setCurrentWidget(fullDiffWidget);
-         mCommitDiffWidget->configure(fullDiffWidget->getCurrentSha(), fullDiffWidget->getPreviousSha());
+         mCommitDiffWidget->configure(sha, parentSha);
 
          for (const auto &buttons : qAsConst(mDiffButtons))
             if (buttons.second != diffButton)
@@ -224,4 +241,18 @@ void DiffWidget::changeSelection(int index)
       else
          buttons.second->setUnselected();
    }
+}
+
+void DiffWidget::startEditFile(const QString &fileName)
+{
+   centerStackedWidget->setVisible(false);
+
+   mFileEditor->editFile(fileName);
+   mFileEditor->setVisible(true);
+}
+
+void DiffWidget::endEditFile()
+{
+   centerStackedWidget->setVisible(true);
+   mFileEditor->setVisible(false);
 }

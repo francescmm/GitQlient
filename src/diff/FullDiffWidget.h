@@ -27,6 +27,8 @@
 #include <QTextEdit>
 
 class GitBase;
+class DiffInfoPanel;
+class RevisionsCache;
 
 /*!
  \brief The FullDiffWidget class is an overload class inherited from QTextEdit that process the output from a diff for a
@@ -34,7 +36,7 @@ class GitBase;
  diff chuck starts.
 
 */
-class FullDiffWidget : public QTextEdit
+class FullDiffWidget : public QFrame
 {
    Q_OBJECT
 
@@ -45,7 +47,8 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit FullDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+                           QWidget *parent = nullptr);
 
    /*!
     \brief Reloads the current diff in case the user loaded the work in progress as base commit.
@@ -59,24 +62,15 @@ public:
     \param diffToSha The commit SHA to comapre to.
    */
    void loadDiff(const QString &sha, const QString &diffToSha);
-   /*!
-    \brief Gets the base commit SHA.
-
-    \return QString The base commit SHA.
-   */
-   QString getCurrentSha() const { return mCurrentSha; }
-   /*!
-    \brief Gets the commit SHA that is used to compare agains the base.
-
-    \return QString The commit SHA that is used to compare to the base SHA.
-   */
-   QString getPreviousSha() const { return mPreviousSha; }
 
 private:
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<RevisionsCache> mCache;
    QString mCurrentSha;
    QString mPreviousSha;
    QString mPreviousDiffText;
+   DiffInfoPanel *mDiffInfoPanel = nullptr;
+   QTextEdit *mDiffWidget = nullptr;
 
    class DiffHighlighter : public QSyntaxHighlighter
    {

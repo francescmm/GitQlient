@@ -24,12 +24,14 @@
  ***************************************************************************************/
 
 #include <QFrame>
+#include <DiffInfo.h>
 
-class FileDiffHighlighter;
 class FileDiffView;
 class QPushButton;
 class GitBase;
-
+class DiffInfoPanel;
+class RevisionsCache;
+class QCheckBox;
 /*!
  \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
  specific file.
@@ -47,7 +49,8 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit FileDiffWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+                           QWidget *parent = nullptr);
 
    /*!
     \brief Clears the current information on the diff view.
@@ -81,16 +84,41 @@ public:
    */
    QString getPreviousSha() const { return mPreviousSha; }
 
+   /**
+    * @brief setFileVsFileEnable Enables the widget to show file vs file view.
+    * @param enable If true, enables the file vs file view.
+    */
+   void setFileVsFileEnable(bool enable);
+
+   void editMode(const QString &fileName);
+
 private:
    QString mCurrentFile;
    QString mCurrentSha;
    QString mPreviousSha;
    QSharedPointer<GitBase> mGit;
-   FileDiffHighlighter *mDiffHighlighter = nullptr;
-   FileDiffView *mDiffView = nullptr;
+   QSharedPointer<RevisionsCache> mCache;
+   FileDiffView *mNewFile = nullptr;
+   FileDiffView *mOldFile = nullptr;
    QPushButton *mGoPrevious = nullptr;
    QPushButton *mGoNext = nullptr;
+   DiffInfoPanel *mDiffInfoPanel = nullptr;
    QVector<int> mModifications;
-   int mRowIndex = 0;
-   int mDestRow = 0;
+   QCheckBox *mFileVsFileCheck = nullptr;
+   bool mFileVsFile = false;
+   QPushButton *mGoTop = nullptr;
+   QPushButton *mGoUp = nullptr;
+   QPushButton *mGoDown = nullptr;
+   QPushButton *mGoBottom = nullptr;
+   QFrame *mNavFrame = nullptr;
+   QVector<DiffInfo::ChunkInfo> mChunks;
+   int mCurrentChunkLine = 0;
+
+   void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
+                    QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);
+
+   void moveTop();
+   void moveChunkUp();
+   void moveChunkDown();
+   void moveBottomChunk();
 };

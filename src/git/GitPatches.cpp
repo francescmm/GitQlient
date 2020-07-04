@@ -1,11 +1,13 @@
 #include "GitPatches.h"
 
-#include <QLogger.h>
 #include <GitBase.h>
-
-#include <QFile>
+#include <QLogger.h>
+#include <BenchmarkTool.h>
 
 using namespace QLogger;
+using namespace GitQlientTools;
+
+#include <QFile>
 
 GitPatches::GitPatches(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
@@ -14,6 +16,8 @@ GitPatches::GitPatches(const QSharedPointer<GitBase> &gitBase)
 
 GitExecResult GitPatches::exportPatch(const QStringList &shaList)
 {
+   BenchmarkStart();
+
    QLog_Debug("Git", QString("Executing exportPatch: {%1}").arg(shaList.join(",")));
 
    auto val = 1;
@@ -43,16 +47,22 @@ GitExecResult GitPatches::exportPatch(const QStringList &shaList)
    if (val != shaList.count())
       QLog_Error("Git", QString("Problem generating patches. Stop after {%1} iterations").arg(val));
 
+   BenchmarkEnd();
+
    return qMakePair(true, QVariant(files));
 }
 
 bool GitPatches::applyPatch(const QString &fileName, bool asCommit)
 {
+   BenchmarkStart();
+
    QLog_Debug("Git",
               QString("Executing applyPatch: {%1} %2").arg(fileName, asCommit ? QString("as commit.") : QString()));
 
    const auto cmd = asCommit ? QString("git am --signof") : QString("git apply");
    const auto ret = mGitBase->run(QString("%1 %2").arg(cmd, fileName));
+
+   BenchmarkEnd();
 
    return ret.success;
 }

@@ -22,8 +22,7 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
 
    GitQlientSettings settings;
 
-   if (!settings.value("isGitQlient", false).toBool())
-      connect(addAction("Edit file"), &QAction::triggered, this, [this]() { emit signalEditFile(); });
+   connect(addAction("Edit file"), &QAction::triggered, this, [this]() { emit signalEditFile(); });
 
    addSeparator();
 
@@ -125,8 +124,8 @@ bool UnstagedMenu::addEntryToGitIgnore(const QString &entry)
          entryAdded = true;
       }
       else
-         QMessageBox::warning(this, tr("Unable to add the entry"),
-                              tr("It was impossible to add the entry in the .gitignore file."));
+         QMessageBox::critical(this, tr("Unable to add the entry"),
+                               tr("It was impossible to add the entry in the .gitignore file."));
 
       f.close();
    }

@@ -23,19 +23,22 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <GitExecResult.h>
+
 #include <QObject>
 #include <QSharedPointer>
 #include <QVector>
 
 class GitBase;
 class RevisionsCache;
+struct WipRevisionInfo;
 
 class GitRepoLoader : public QObject
 {
    Q_OBJECT
 
 signals:
-   void signalLoadingStarted();
+   void signalLoadingStarted(int total);
    void signalLoadingFinished();
    void cancelAllProcesses(QPrivateSignal);
 
@@ -46,7 +49,6 @@ public:
    void updateWipRevision();
    void cancelAll();
    void setShowAll(bool showAll = true) { mShowAll = showAll; }
-   bool showsAll() const { return mShowAll; }
 
 private:
    bool mShowAll = true;
@@ -58,5 +60,6 @@ private:
    void loadReferences();
    void requestRevisions();
    void processRevision(const QByteArray &ba);
+   WipRevisionInfo processWip();
    QVector<QString> getUntrackedFiles() const;
 };

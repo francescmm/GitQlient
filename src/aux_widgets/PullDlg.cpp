@@ -49,6 +49,14 @@ void PullDlg::accept()
          emit signalPullConflict();
       }
       else
-         QMessageBox::critical(this, tr("Error while pulling"), errorMsg);
+      {
+         QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
+                            QString("There were problems during the pull operation. Please, see the detailed "
+                                    "description for more information."),
+                            QMessageBox::Ok, this);
+         msgBox.setDetailedText(errorMsg);
+         msgBox.setStyleSheet(GitQlientStyles::getStyles());
+         msgBox.exec();
+      }
    }
 }

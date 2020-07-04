@@ -35,7 +35,7 @@ QPushButton:hover
     font-size: 10pt;
 }
 
-CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoWidget > #labelDescription
+#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
 {
     padding: 10px;
 }
@@ -53,7 +53,7 @@ CommitDiffWidget
    min-height: 350px;
 }
 
-WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
+CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
 {
    border: 0;
    outline: 0;
@@ -70,7 +70,7 @@ QListWidget::item, BlameWidget > QTreeView::item
    max-height: 25px;
 }
 
-WorkInProgressWidget > QListWidget::item
+CommitChangesWidget > QListWidget::item
 {
    padding: 0;
 }
@@ -97,25 +97,25 @@ QListWidget::item:focus, BlameWidget > QTreeView::item:focus
    border: 0;
 }
 
-WorkInProgressWidget > #pbCommit, WorkInProgressWidget > #pbCancelAmend
+CommitChangesWidget > #pbCommit, CommitChangesWidget > #pbCancelAmend
 {
     max-height: 30px;
     min-height: 30px;
 }
 
-WorkInProgressWidget > #pbCancelAmend
+CommitChangesWidget > #pbCancelAmend
 {
     padding-left: 10px;
     padding-right: 10px;
 }
 
-CommitInfoWidget, WorkInProgressWidget
+CommitInfoWidget, CommitChangesWidget
 {
     max-width: 300px;
     min-width: 300px;
 }
 
-WorkInProgressWidget > QListWidget
+CommitChangesWidget > QListWidget
 {
     border-width: 1px;
     border-style: solid;
@@ -151,20 +151,25 @@ QMenu::separator
 
 /**  END  RepositoryContextMenu **/
 
-FullDiffWidget, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget
+{
+    border: none;
+}
+
+FullDiffWidget > QTextEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-width: 1px;
     border-style: solid;
 }
 
-WorkInProgressWidget > #leAuthorName
+CommitChangesWidget > #leAuthorName
 {
     max-height: 30px;
     min-height: 30px;
     padding-left: 10px;
 }
 
-WorkInProgressWidget > #leAuthorEmail
+CommitChangesWidget > #leAuthorEmail
 {
     border-top-width: none;
     border-top-style: none;
@@ -185,7 +190,7 @@ QLabel#lCounter
     qproperty-alignment: AlignCenter;
 }
 
-WorkInProgressWidget > QFrame#stagedFiles, WorkInProgressWidget > QFrame#unstagedFiles, WorkInProgressWidget > QFrame#untrackedFiles
+CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles
 {
     max-height: 30px;
     min-height: 30px;
@@ -253,11 +258,6 @@ QTabBar::tab
    padding-left: 15px;
    max-height: 25px;
    min-height: 25px;
-}
-
-QTabBar::tab:selected
-{
-   background-color: #404142;
 }
 
 QTabBar::tab:!selected
@@ -548,5 +548,25 @@ PullDlg
    min-height: 150px;
    max-width: 500px;
    min-width: 500px;
+}
+
+GeneralConfigPage > QLabel#configLabel
+{
+    qproperty-alignment: AlignCenter;
+}
+
+#pbCherryPick
+{
+   max-height: 20px;
+   min-height: 20px;
+   padding: 2px 5px;
+}
+
+QMessageBox
+{
+   max-width: 400px;
+   min-width: 400px;
+   max-height: 300px;
+   min-height: 300px;
 }
 

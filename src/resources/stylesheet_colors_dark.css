@@ -50,7 +50,7 @@ QLabel
     color: white;
 }
 
-CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoWidget > #labelDescription
+#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
 {
     background-color: #606162;
 }
@@ -61,7 +61,7 @@ CommitInfoWidget > #labelTitle, CommitInfoWidget > #commitInfoFrame, CommitInfoW
     background-color: #202122;
 }
 
-WorkInProgressWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
+CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
 {
    color: white;
    background-color: #2E2F30;
@@ -92,17 +92,17 @@ QListWidget::item:disabled
     color: #606162;
 }
 
-CommitHistoryView, FullDiffWidget, WorkInProgressWidget > QListWidget, FileListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget > QTextEdit, CommitChangesWidget > QListWidget, FileListWidget, QTreeWidget
 {
     background-color: #2E2F30;
 }
 
-CommitHistoryView, FullDiffWidget, WorkInProgressWidget > QListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget > QTextEdit, CommitChangesWidget > QListWidget, QTreeWidget
 {
     color: white;
 }
 
-WorkInProgressWidget > QListWidget
+CommitChangesWidget > QListWidget
 {
     border-color: #202122;
 }
@@ -137,18 +137,18 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget, WorkInProgressWidget > QLineEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget > QTextEdit, CommitChangesWidget > QLineEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-color: #202122
 }
 
-WorkInProgressWidget > QLineEdit, #leCommitTitle, #teDescription
+CommitChangesWidget > QLineEdit, #leCommitTitle, #teDescription
 {
     background-color: #606162;
     color: white;
 }
 
-WorkInProgressWidget > #leAuthorName
+CommitChangesWidget > #leAuthorName
 {
     border-bottom-color: #404142;
 }
@@ -161,18 +161,24 @@ QLabel#lCounter
     color: #A3A3A4;
 }
 
-WorkInProgressWidget > QFrame#stagedFiles, WorkInProgressWidget > QFrame#unstagedFiles, WorkInProgressWidget > QFrame#untrackedFiles
+CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles
 {
     background: #202122;
+    border: none;
 }
 
-#outputTerminal, FileDiffView
+FileDiffView
 {
     background-color: #2E2F30;
     color: white;
 }
 
-FileDiffWidget, FileDiffWidget > QPushButton
+FileDiffWidget, FullDiffWidget
+{
+    background-color: #404142;
+}
+
+FileDiffWidget > QPushButton
 {
     background-color: #202122;
 }
@@ -205,14 +211,14 @@ BranchDlg
     color: white;
 }
 
-BranchDlg > QLineEdit, HistoryWidget > QLineEdit
+BranchDlg > QLineEdit
 {
     border-color: #202122;
     background-color: #606162;
     color: white;
 }
 
-HistoryWidget > QLineEdit
+HistoryWidget > QFrame > QLineEdit
 {
     border-color: #202122;
     background-color: #2E2F30;
@@ -243,6 +249,11 @@ QTabBar::tab
 {
    background-color: #202122;
    color: white;
+}
+
+QTabBar::tab:selected
+{
+   background-color: #404142;
 }
 
 QTabBar::tab:!selected
@@ -280,11 +291,6 @@ QFrame#separator, QFrame#separator2px
 QFrame#orangeSeparator
 {
    background-color: #D89000;
-}
-
-QWidget#testWidget
-{
-    background-color: #606162;
 }
 
 QPushButton#bigButton
@@ -449,13 +455,6 @@ QTabWidget#HistoryTab > QTabBar::tab:!selected:hover
     background-color: #202122;
 }
 
-
-#ShaLabel
-{
-    background-color: #2E2F30;
-    color: white;
-}
-
 DiffButton
 {
    background-color: #2F2E30;
@@ -508,19 +507,19 @@ DiffButton[pressed="true"]
    background-color: rgba(255, 85, 85, 0.55);
 }
 
-QPushButton#Merge, QPushButton#pbCommit
+QPushButton#Merge, QPushButton#pbCommit, QPushButton#pbCherryPick
 {
    border-style: solid;
    border-color: #8DC944;
    background-color: rgba(141, 201, 68, 0.45);
 }
 
-QPushButton#Merge:hover, QPushButton#pbCommit:hover
+QPushButton#Merge:hover, QPushButton#pbCommit:hover, QPushButton#pbCherryPick:hover
 {
    background-color: rgba(141, 201, 68, 0.65);
 }
 
-QPushButton#Merge:pressed, QPushButton#pbCommit:pressed
+QPushButton#Merge:pressed, QPushButton#pbCommit:pressed, QPushButton#pbCherryPick:pressed
 {
    background-color: rgba(141, 201, 68, 0.55);
 }

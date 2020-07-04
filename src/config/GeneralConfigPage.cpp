@@ -22,6 +22,8 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    , mLevelCombo(new QComboBox())
    , mAutoFormat(new QCheckBox(tr(" (needs clang-format)")))
    , mStatusLabel(new QLabel())
+   , mExternalEditor(new QLineEdit())
+   , mStylesSchema(new QComboBox())
    , mReset(new QPushButton(tr("Reset")))
    , mApply(new QPushButton(tr("Apply")))
 
@@ -60,11 +62,15 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
 
    mAutoFormat->setChecked(settings.value("autoFormat", true).toBool());
 
-   mExternalEditor = new QLineEdit(
+   mExternalEditor->setText(
        settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString());
 
-   connect(mReset, &QPushButton::clicked, this, &GeneralConfigPage::resetChanges);
+   mStylesSchema->addItems({ "dark", "bright" });
+   mStylesSchema->setCurrentText(settings.value("colorSchema", "bright").toString());
 
+   mStatusLabel->setObjectName("configLabel");
+
+   connect(mReset, &QPushButton::clicked, this, &GeneralConfigPage::resetChanges);
    connect(mApply, &QPushButton::clicked, this, &GeneralConfigPage::applyChanges);
 
    const auto buttonsLayout = new QHBoxLayout();
@@ -93,6 +99,8 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    layout->addWidget(mAutoFormat, row, 1);
    layout->addWidget(new QLabel(tr("External editor")), ++row, 0);
    layout->addWidget(mExternalEditor, row, 1);
+   layout->addWidget(new QLabel(tr("Styles schema")), ++row, 0);
+   layout->addWidget(mStylesSchema, row, 1);
    layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), ++row, 0, 1, 2);
    layout->addLayout(buttonsLayout, ++row, 0, 1, 2);
 }
@@ -107,10 +115,11 @@ void GeneralConfigPage::resetChanges()
    mAutoFormat->setChecked(settings.value("autoFormat", true).toBool());
    mExternalEditor->setText(
        settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString());
+   mStylesSchema->setCurrentText(settings.value("colorSchema", "bright").toString());
 
    QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
 
-   mStatusLabel->setText(tr("Changes reseted"));
+   mStatusLabel->setText(tr("Changes reseted."));
 }
 
 void GeneralConfigPage::applyChanges()
@@ -122,9 +131,10 @@ void GeneralConfigPage::applyChanges()
    settings.setValue("logsLevel", mLevelCombo->currentIndex());
    settings.setValue("autoFormat", mAutoFormat->isChecked());
    settings.setValue(GitQlientSettings::ExternalEditorKey, mExternalEditor->text());
+   settings.setValue("colorSchema", mStylesSchema->currentText());
 
    QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
-   mStatusLabel->setText(tr("Changes applied"));
+   mStatusLabel->setText(tr("Changes applied! \n Reset is needed if the color schema changed."));
 
    const auto logger = QLoggerManager::getInstance();
    logger->overwriteLogLevel(static_cast<LogLevel>(mLevelCombo->currentIndex()));

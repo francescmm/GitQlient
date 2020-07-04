@@ -1,12 +1,12 @@
 #include "CommitHistoryContextMenu.h"
 
+#include <GitQlientStyles.h>
 #include <GitLocal.h>
 #include <GitPatches.h>
 #include <GitBase.h>
 #include <GitStashes.h>
 #include <GitBranches.h>
 #include <GitRemote.h>
-#include <WorkInProgressWidget.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
 #include <CommitInfo.h>
@@ -213,11 +213,13 @@ void CommitHistoryContextMenu::exportAsPatch()
 
 void CommitHistoryContextMenu::checkoutBranch()
 {
-   auto branchName = qobject_cast<QAction *>(sender())->text();
+   const auto action = qobject_cast<QAction *>(sender());
+   auto isLocal = action->data().toBool();
+   auto branchName = action->text();
    branchName.remove("origin/");
 
    QScopedPointer<GitBranches> git(new GitBranches(mGit));
-   const auto ret = git->checkoutRemoteBranch(branchName);
+   const auto ret = isLocal ? git->checkoutLocalBranch(branchName) : git->checkoutRemoteBranch(branchName);
    const auto output = ret.output.toString();
 
    if (ret.success)
@@ -225,7 +227,6 @@ void CommitHistoryContextMenu::checkoutBranch()
       QRegExp rx("by \\d+ commits");
       rx.indexIn(ret.output.toString());
       auto value = rx.capturedTexts().constFirst().split(" ");
-      auto uiUpdateRequested = true;
 
       if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
       {
@@ -236,16 +237,20 @@ void CommitHistoryContextMenu::checkoutBranch()
 
          connect(&pull, &PullDlg::signalRepositoryUpdated, this, &CommitHistoryContextMenu::signalRepositoryUpdated);
          connect(&pull, &PullDlg::signalPullConflict, this, &CommitHistoryContextMenu::signalPullConflict);
-
-         if (pull.exec() == QDialog::Accepted)
-            uiUpdateRequested = true;
       }
 
-      if (!uiUpdateRequested)
-         emit signalRepositoryUpdated();
+      emit signalRepositoryUpdated();
    }
    else
-      QMessageBox::critical(this, tr("Checkout error"), ret.output.toString());
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
+                         QString("There were problems during the checkout operation. Please, see the detailed "
+                                 "description for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }
 
 void CommitHistoryContextMenu::checkoutCommit()
@@ -259,7 +264,15 @@ void CommitHistoryContextMenu::checkoutCommit()
    if (ret.success)
       emit signalRepositoryUpdated();
    else
-      QMessageBox::critical(this, tr("Checkout error"), ret.output.toString());
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
+                         QString("There were problems during the checkout operation. Please, see the detailed "
+                                 "description for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }
 
 void CommitHistoryContextMenu::cherryPickCommit()
@@ -279,7 +292,15 @@ void CommitHistoryContextMenu::cherryPickCommit()
          emit signalCherryPickConflict();
       }
       else
-         QMessageBox::critical(this, tr("Error while cherry-pick"), errorMsg);
+      {
+         QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
+                            QString("There were problems during the cherry-pich operation. Please, see the detailed "
+                                    "description for more information."),
+                            QMessageBox::Ok, this);
+         msgBox.setDetailedText(errorMsg);
+         msgBox.setStyleSheet(GitQlientStyles::getStyles());
+         msgBox.exec();
+      }
    }
 }
 
@@ -320,7 +341,15 @@ void CommitHistoryContextMenu::push()
    else if (ret.success)
       emit signalRepositoryUpdated();
    else
-      QMessageBox::critical(this, tr("Error while pushin"), ret.output.toString());
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
+                         QString("There were problems during the push operation. Please, see the detailed description "
+                                 "for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }
 
 void CommitHistoryContextMenu::pull()
@@ -342,7 +371,15 @@ void CommitHistoryContextMenu::pull()
          emit signalPullConflict();
       }
       else
-         QMessageBox::critical(this, tr("Error while pulling"), errorMsg);
+      {
+         QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
+                            QString("There were problems during the pull operation. Please, see the detailed "
+                                    "description for more information."),
+                            QMessageBox::Ok, this);
+         msgBox.setDetailedText(errorMsg);
+         msgBox.setStyleSheet(GitQlientStyles::getStyles());
+         msgBox.exec();
+      }
    }
 }
 
@@ -397,26 +434,47 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 {
    auto isCommitInCurrentBranch = false;
    const auto currentBranch = mGit->getCurrentBranch();
-   const auto remoteBranches = mCache->getRefNames(sha, RMT_BRANCH);
-   const auto localBranches = mCache->getRefNames(sha, BRANCH);
-   auto branches = localBranches;
+   const auto commitInfo = mCache->getCommitInfo(sha);
+   const auto remoteBranches = commitInfo.getReferences(References::Type::RemoteBranches);
+   const auto localBranches = commitInfo.getReferences(References::Type::LocalBranch);
 
-   for (const auto &branch : remoteBranches)
+   QScopedPointer<GitBranches> git(new GitBranches(mGit));
+   const auto tracking = git->getTrackingBranches();
+   QMap<QString, bool> branchTracking;
+
+   if (remoteBranches.isEmpty())
    {
-      auto localBranchEquivalent = branch;
-      if (!localBranches.contains(localBranchEquivalent.remove("origin/")))
-         branches.append(branch);
+      for (const auto &branch : localBranches)
+         branchTracking.insert(branch, true);
+   }
+   else
+   {
+      for (const auto &remote : remoteBranches)
+      {
+         if (tracking.contains(remote))
+         {
+            for (const auto &local : tracking[remote])
+            {
+               if (!branchTracking.contains(local))
+                  branchTracking.insert(local, true);
+            }
+         }
+         else
+            branchTracking.insert(remote, false);
+      }
    }
 
    QList<QAction *> branchesToCheckout;
 
-   for (const auto &branch : qAsConst(branches))
+   for (const auto &pair : branchTracking.toStdMap())
    {
-      isCommitInCurrentBranch |= branch == currentBranch;
+      isCommitInCurrentBranch |= pair.first == currentBranch;
 
-      if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
+      if (!branchTracking.isEmpty() && pair.first != currentBranch
+          && pair.first != QString("origin/%1").arg(currentBranch))
       {
-         const auto checkoutCommitAction = new QAction(QString(tr("%1")).arg(branch));
+         const auto checkoutCommitAction = new QAction(QString(tr("%1")).arg(pair.first));
+         checkoutCommitAction->setData(pair.second);
          connect(checkoutCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::checkoutBranch);
          branchesToCheckout.append(checkoutCommitAction);
       }
@@ -430,13 +488,14 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 
    if (!isCommitInCurrentBranch)
    {
-      for (const auto &branch : qAsConst(branches))
+      for (const auto &pair : branchTracking.toStdMap())
       {
-         if (!branch.isEmpty() && branch != currentBranch && branch != QString("origin/%1").arg(currentBranch))
+         if (!pair.first.isEmpty() && pair.first != currentBranch
+             && pair.first != QString("origin/%1").arg(currentBranch))
          {
             // If is the last commit of a branch
-            const auto mergeBranchAction = addAction(QString(tr("Merge %1")).arg(branch));
-            connect(mergeBranchAction, &QAction::triggered, this, [this, branch]() { merge(branch); });
+            const auto mergeBranchAction = addAction(QString(tr("Merge %1")).arg(pair.first));
+            connect(mergeBranchAction, &QAction::triggered, this, [this, pair]() { merge(pair.first); });
          }
       }
    }

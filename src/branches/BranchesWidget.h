@@ -30,6 +30,7 @@ class QListWidget;
 class QListWidgetItem;
 class QLabel;
 class GitBase;
+class RevisionsCache;
 
 /*!
  \brief BranchesWidget is the widget that creates the layout that contains all the widgets related with the display of
@@ -84,7 +85,8 @@ public:
     \param git The git object to perform Git commands.
     \param parent The parent widget if needed.
    */
-   explicit BranchesWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit BranchesWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                           QWidget *parent = nullptr);
    /*!
     \brief This method configures the widget gathering all the information regarding branches, tags, stashes and
     submodules.
@@ -98,6 +100,7 @@ public:
    void clear();
 
 private:
+   QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
    BranchTreeWidget *mLocalBranchesTree = nullptr;
    BranchTreeWidget *mRemoteBranchesTree = nullptr;
@@ -117,14 +120,14 @@ private:
 
     \param branch The branch to be added in the tree widget.
    */
-   void processLocalBranch(QString branch);
+   void processLocalBranch(const QString &sha, QString branch);
    /*!
     \brief Method that for a given \p branch process al the information and creates the item that will be sotred in the
     remote branches BranchTreeWidget.
 
     \param branch The remote branch to be added in the tree widget.
    */
-   void processRemoteBranch(QString branch);
+   void processRemoteBranch(const QString &sha, QString branch);
    /*!
     \brief Process all the tags and adds them into the QListWidget.
 

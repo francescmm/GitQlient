@@ -1,8 +1,11 @@
 #include "BranchesViewDelegate.h"
 
 #include <GitQlientStyles.h>
+#include <GitQlientBranchItemRole.h>
 
 #include <QPainter>
+
+using namespace GitQlient;
 
 BranchesViewDelegate::BranchesViewDelegate(QObject *parent)
    : QStyledItemDelegate(parent)
@@ -17,34 +20,30 @@ void BranchesViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &o, con
 
    if (newOpt.state & QStyle::State_Selected)
    {
-      QColor c("#404142");
-      c.setAlphaF(0.75);
-      p->fillRect(newOpt.rect, c);
+      p->fillRect(newOpt.rect, GitQlientStyles::getGraphSelectionColor());
 
       if (i.column() == 0)
       {
          QRect rect(0, newOpt.rect.y(), newOpt.rect.x(), newOpt.rect.height());
-         p->fillRect(rect, c);
+         p->fillRect(rect, GitQlientStyles::getGraphSelectionColor());
       }
    }
    else if (newOpt.state & QStyle::State_MouseOver)
    {
-      QColor c("#404142");
-      c.setAlphaF(0.4);
-      p->fillRect(newOpt.rect, c);
+      p->fillRect(newOpt.rect, GitQlientStyles::getGraphHoverColor());
 
       if (i.column() == 0)
       {
          QRect rect(0, newOpt.rect.y(), newOpt.rect.x(), newOpt.rect.height());
-         p->fillRect(rect, c);
+         p->fillRect(rect, GitQlientStyles::getGraphHoverColor());
       }
    }
    else
-      p->fillRect(newOpt.rect, QColor("#2E2F30"));
+      p->fillRect(newOpt.rect, GitQlientStyles::getBackgroundColor());
 
    if (i.column() == 0)
    {
-      if (i.data(Qt::UserRole + 2).toBool())
+      if (i.data(IsLeaf).toBool())
       {
          const auto width = newOpt.rect.x();
          QRect rectIcon(width - 20, newOpt.rect.y(), 20, newOpt.rect.height());

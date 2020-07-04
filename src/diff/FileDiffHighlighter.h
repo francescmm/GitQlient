@@ -22,7 +22,9 @@
  ** License along with this library; if not, write to the Free Software
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
+
 #include <QSyntaxHighlighter>
+#include <DiffInfo.h>
 
 /*!
  \brief Overloaded class that adds syntax highlight for the diff view. It shows the additions in green, removals in red
@@ -48,4 +50,13 @@ public:
     \param text The block of text to analyse.
    */
    void highlightBlock(const QString &text) override;
+
+   /**
+    * @brief setDiffInfo Sets the file diff information that will be used to colour the foreground and background text.
+    * @param fileDiffInfo The file diff information.
+    */
+   void setDiffInfo(const QVector<DiffInfo::ChunkInfo> &fileDiffInfo) { mFileDiffInfo = fileDiffInfo; }
+
+private:
+   QVector<DiffInfo::ChunkInfo> mFileDiffInfo;
 };

@@ -24,6 +24,8 @@
  ***************************************************************************************/
 
 #include <QFrame>
+#include <QThread>
+#include <QPointer>
 
 class GitBase;
 class RevisionsCache;
@@ -54,7 +56,7 @@ struct GitQlientRepoConfig
 {
    int mAutoFetchSecs = 300; /*!< The auto-fetch interval in seconds. Default value: 300. */
    int mAutoFileUpdateSecs
-       = 10; /*!< The interval where GitQlient retrieves information from disk for the current WIP. Default: 10 secs.*/
+       = 5; /*!< The interval where GitQlient retrieves information from disk for the current WIP. Default: 10 secs.*/
 };
 
 /*!
@@ -81,6 +83,8 @@ signals:
     * @param column The column
     */
    void signalEditFile(const QString &fileName, int line, int column);
+
+   void signalLoadRepo();
 
 public:
    /*!
@@ -138,9 +142,12 @@ private:
    MergeWidget *mMergeWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
-   ProgressDlg *mProgressDlg = nullptr;
+   QPointer<ProgressDlg> mProgressDlg;
    QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
+
+   bool mIsInit = false;
+   QThread *m_loaderThread;
 
    /*!
     \brief Updates the UI cache and refreshes the subwidgets.
@@ -191,11 +198,12 @@ private:
     \param fileName The path to the file.
    */
    void showFileHistory(const QString &fileName);
+
    /*!
     \brief Updates the progess dialog when loading a really huge repository.
-
    */
-   void updateProgressDialog();
+   void createProgressDialog();
+
    /*!
     \brief When the loading finishes this method closes and destroyes the dialog.
 
@@ -209,6 +217,7 @@ private:
     \param file The file to show the diff.
    */
    void loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
+
    /*!
     \brief Shows the history/repository view.
 
