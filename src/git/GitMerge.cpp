@@ -29,7 +29,7 @@ GitExecResult GitMerge::merge(const QString &into, QStringList sources)
       return retCheckout;
    }
 
-   const auto retMerge = mGitBase->run(QString("git merge ") + sources.join(" "));
+   const auto retMerge = mGitBase->run(QString("git merge -Xignore-all-space ") + sources.join(" "));
 
    if (retMerge.success)
    {
