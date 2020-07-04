@@ -52,12 +52,11 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    repoOptionsLayout->addWidget(mInitRepo);
    repoOptionsLayout->addWidget(line);
 
-   const auto sha = QString("%1").arg(SHA_VER);
    const auto version
        = new ClickableFrame(QString("About GitQlient v%1 ...").arg(VER), Qt::AlignLeft | Qt::AlignVCenter);
    version->setLinkStyle();
    connect(version, &ClickableFrame::clicked, this, &ConfigWidget::showAbout);
-   version->setToolTip(sha);
+   version->setToolTip(QString("%1").arg(SHA_VER));
    repoOptionsLayout->addWidget(version);
    repoOptionsLayout->addStretch();
 
