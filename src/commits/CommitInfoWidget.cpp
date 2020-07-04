@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDateTime>
+#include <QScrollArea>
 
 #include <QLogger.h>
 
@@ -58,11 +59,6 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    labelIcon->setPixmap(QIcon(":/icons/file").pixmap(15, 15));
 
    fileListWidget->setObjectName("fileListWidget");
-   QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-   sizePolicy.setHorizontalStretch(0);
-   sizePolicy.setVerticalStretch(0);
-   sizePolicy.setHeightForWidth(fileListWidget->sizePolicy().hasHeightForWidth());
-   fileListWidget->setSizePolicy(sizePolicy);
 
    const auto headerLayout = new QHBoxLayout();
    headerLayout->setContentsMargins(5, 0, 0, 0);

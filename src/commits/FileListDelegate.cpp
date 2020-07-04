@@ -4,7 +4,9 @@
 
 #include <QPainter>
 
-const int FileListDelegate::OFFSET = 5;
+constexpr int Offset = 5;
+constexpr int DefaultHeight = 25;
+constexpr int HeightIncrement = 15;
 
 FileListDelegate::FileListDelegate(QObject *parent)
    : QItemDelegate(parent)
@@ -14,6 +16,7 @@ FileListDelegate::FileListDelegate(QObject *parent)
 void FileListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
    painter->save();
+
    if (option.state & QStyle::State_Selected)
       painter->fillRect(option.rect, GitQlientStyles::getGraphSelectionColor());
    else if (option.state & QStyle::State_MouseOver)
@@ -22,16 +25,24 @@ void FileListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
    painter->setPen(qvariant_cast<QColor>(index.data(Qt::ForegroundRole)));
 
    auto newOpt = option;
-   newOpt.rect.setX(newOpt.rect.x() + OFFSET);
+   newOpt.rect.setX(newOpt.rect.x() + Offset);
 
-   QFontMetrics fm(newOpt.font);
-   painter->drawText(newOpt.rect, fm.elidedText(index.data().toString(), Qt::ElideRight, newOpt.rect.width() - OFFSET),
-                     QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
+   painter->drawText(newOpt.rect, index.data().toString(), QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
 
    painter->restore();
 }
 
-QSize FileListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &) const
+QSize FileListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-   return QSize(option.rect.width(), 25);
+   QFontMetrics fm(option.font);
+   const QAbstractItemModel *model = index.model();
+   QString Text = model->data(index, Qt::DisplayRole).toString();
+   QRect neededsize = fm.boundingRect(option.rect, Qt::TextWordWrap, Text);
+
+   if (neededsize.height() < DefaultHeight)
+      neededsize.setHeight(DefaultHeight);
+   else
+      neededsize.setHeight((neededsize.height() / DefaultHeight) * HeightIncrement + DefaultHeight);
+
+   return QSize(option.rect.width(), neededsize.height());
 }
