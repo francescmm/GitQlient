@@ -169,20 +169,32 @@ GitExecResult GitBranches::removeLocalBranch(const QString &branchName)
 
    QLog_Debug("Git", QString("Executing removeLocalBranch: {%1}").arg(branchName));
 
+   const auto ret = mGitBase->run(QString("git branch -D %1").arg(branchName));
+
    BenchmarkEnd();
 
-   return mGitBase->run(QString("git branch -D %1").arg(branchName));
+   return ret;
 }
 
 GitExecResult GitBranches::removeRemoteBranch(const QString &branchName)
 {
    BenchmarkStart();
 
-   QLog_Debug("Git", QString("Executing removeRemoteBranch: {%1}").arg(branchName));
+   auto branch = branchName;
+   branch = branch.mid(branch.indexOf('/') + 1);
+
+   QLog_Debug("Git", QString("Executing removeRemoteBranch: {%1}").arg(branch));
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+
+   auto ret = gitConfig->getRemoteForBranch(branch);
+
+   ret = mGitBase->run(
+       QString("git push --delete %2 %1").arg(branch, ret.success ? ret.output.toString() : QString("origin")));
 
    BenchmarkEnd();
 
-   return mGitBase->run(QString("git push --delete origin %1").arg(branchName));
+   return ret;
 }
 
 GitExecResult GitBranches::getLastCommitOfBranch(const QString &branch)
