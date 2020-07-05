@@ -293,10 +293,10 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
 
    if (ret.output.toString().contains("merge failed", Qt::CaseInsensitive))
    {
-      QMessageBox msgBox(
-          QMessageBox::Critical, tr("Merge failed"),
-          QString("There were problems during the merge. Please, see the detailed description for more information."),
-          QMessageBox::Ok, this);
+      QMessageBox msgBox(QMessageBox::Critical, tr("Merge failed"),
+                         QString("There were problems during the merge. Please, see the detailed description for more "
+                                 "information.<br><br>GitQlient will show the merge helper tool."),
+                         QMessageBox::Ok, this);
       msgBox.setDetailedText(ret.output.toString());
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
