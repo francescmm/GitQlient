@@ -13,8 +13,6 @@ jobs:
   include:
   - os: osx
     osx_image: xcode10.1
-  - os: osx
-    osx_image: xcode11.4
   - os: linux
     compiler: gcc
 before_deploy:
