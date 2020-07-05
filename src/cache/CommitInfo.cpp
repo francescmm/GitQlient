@@ -28,7 +28,11 @@ CommitInfo::CommitInfo(const QByteArray &b)
       sha.remove(0, 1);
       mSha = sha;
       combinedShas = combinedShas.remove(0, mSha.size() + 1 + 1);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+      mParentsSha = combinedShas.trimmed().split(' ', Qt::SkipEmptyParts);
+#else
       mParentsSha = combinedShas.trimmed().split(' ', QString::SkipEmptyParts);
+#endif
       mCommitter = fields.at(2);
       mAuthor = fields.at(3);
       mCommitDate = QDateTime::fromSecsSinceEpoch(fields.at(4).toInt());

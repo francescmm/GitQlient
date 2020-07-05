@@ -6,6 +6,7 @@
 #include <GitBase.h>
 
 #include <QDateTime>
+#include <QLocale>
 
 CommitHistoryModel::CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                        QObject *p)
@@ -96,10 +97,12 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    QDateTime d;
    d.setSecsSinceEpoch(r.authorDate().toUInt());
 
+   QLocale locale;
+
    return sha == CommitInfo::ZERO_SHA
        ? QString()
        : QString("<p>%1 - %2<p></p>%3</p>%4")
-             .arg(r.author().split("<").first(), d.toString(Qt::SystemLocaleShortDate), sha, auxMessage);
+             .arg(r.author().split("<").first(), d.toString(locale.dateFormat(QLocale::ShortFormat)), sha, auxMessage);
 }
 
 QVariant CommitHistoryModel::getDisplayData(const CommitInfo &rev, int column) const

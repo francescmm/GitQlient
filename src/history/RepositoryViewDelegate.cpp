@@ -13,6 +13,7 @@
 
 #include <QSortFilterProxyModel>
 #include <QPainter>
+#include <QPainterPath>
 
 static const int MIN_VIEW_WIDTH_PX = 480;
 
@@ -127,40 +128,37 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool 
    }
 
    // vertical line
-   if (!isWip && !hasChilds && (lane.getType() == LaneType::HEAD
-                      || lane.getType() == LaneType::INITIAL
-                      || lane.getType() == LaneType::BRANCH
-                      || lane.getType() == LaneType::MERGE_FORK
-                      || lane.getType() == LaneType::MERGE_FORK_R
-                      || lane.getType() == LaneType::MERGE_FORK_L
-                      || lane.getType() == LaneType::ACTIVE))
-       p->drawLine(m, h, m, 2 * h);
+   if (!isWip && !hasChilds
+       && (lane.getType() == LaneType::HEAD || lane.getType() == LaneType::INITIAL || lane.getType() == LaneType::BRANCH
+           || lane.getType() == LaneType::MERGE_FORK || lane.getType() == LaneType::MERGE_FORK_R
+           || lane.getType() == LaneType::MERGE_FORK_L || lane.getType() == LaneType::ACTIVE))
+      p->drawLine(m, h, m, 2 * h);
    else
    {
-       switch (lane.getType())
-       {
-          case LaneType::ACTIVE:
-          case LaneType::NOT_ACTIVE:
-          case LaneType::MERGE_FORK:
-          case LaneType::MERGE_FORK_R:
-          case LaneType::MERGE_FORK_L:
-          case LaneType::JOIN:
-          case LaneType::JOIN_R:
-          case LaneType::JOIN_L:
-          case LaneType::CROSS:
-             p->drawLine(m, 0, m, 2 * h);
-             break;
-          case LaneType::HEAD_L:
-          case LaneType::BRANCH:
-             p->drawLine(m, h, m, 2 * h);
-             break;
-          case LaneType::TAIL_L:
-          case LaneType::INITIAL:
-             p->drawLine(m, 0, m, h);
-             break;
-          default:
-             break;
-       }
+      switch (lane.getType())
+      {
+         case LaneType::ACTIVE:
+         case LaneType::NOT_ACTIVE:
+         case LaneType::MERGE_FORK:
+         case LaneType::MERGE_FORK_R:
+         case LaneType::MERGE_FORK_L:
+         case LaneType::JOIN:
+         case LaneType::JOIN_R:
+         case LaneType::JOIN_L:
+         case LaneType::CROSS:
+            p->drawLine(m, 0, m, 2 * h);
+            break;
+         case LaneType::HEAD_L:
+         case LaneType::BRANCH:
+            p->drawLine(m, h, m, 2 * h);
+            break;
+         case LaneType::TAIL_L:
+         case LaneType::INITIAL:
+            p->drawLine(m, 0, m, h);
+            break;
+         default:
+            break;
+      }
    }
 
    // center symbol, e.g. rect or ellipse
@@ -225,7 +223,7 @@ QColor RepositoryViewDelegate::getMergeColor(const Lane &currentLane, const Comm
                                              const QColor &defaultColor, bool &isSet) const
 {
    auto mergeColor = defaultColor;
-       //= GitQlientStyles::getBranchColorAt((commit.getLanesCount() - 1) % GitQlientStyles::getTotalBranchColors());
+   //= GitQlientStyles::getBranchColorAt((commit.getLanesCount() - 1) % GitQlientStyles::getTotalBranchColors());
 
    switch (currentLane.getType())
    {
@@ -266,7 +264,8 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    if (mView->hasActiveFilter())
    {
       const auto activeColor = GitQlientStyles::getBranchColorAt(0);
-      paintGraphLane(p, LaneType::ACTIVE, false, 0, LANE_WIDTH, activeColor, activeColor, activeColor, false, commit.hasChilds());
+      paintGraphLane(p, LaneType::ACTIVE, false, 0, LANE_WIDTH, activeColor, activeColor, activeColor, false,
+                     commit.hasChilds());
    }
    else
    {
@@ -304,7 +303,8 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
             if (!isSet)
                mergeColor = getMergeColor(currentLane, commit, i, color, isSet);
 
-            paintGraphLane(p, currentLane, laneHeadPresent, x1, x2, color, activeColor, mergeColor, isWip, commit.hasChilds());
+            paintGraphLane(p, currentLane, laneHeadPresent, x1, x2, color, activeColor, mergeColor, isWip,
+                           commit.hasChilds());
 
             if (mView->hasActiveFilter())
                break;

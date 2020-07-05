@@ -206,7 +206,7 @@ void CommitHistoryContextMenu::exportAsPatch()
          fileBrowser.append("explorer.exe");
 #endif
 
-         QProcess::startDetached(QString("%1 %2").arg(fileBrowser, mGit->getWorkingDir()));
+         QProcess::startDetached(fileBrowser, { mGit->getWorkingDir() });
       }
    }
 }

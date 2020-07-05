@@ -180,7 +180,11 @@ GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
 
    if (config.success)
    {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+      const auto values = config.output.toString().split('\n', Qt::SkipEmptyParts);
+#else
       const auto values = config.output.toString().split('\n', QString::SkipEmptyParts);
+#endif
       const auto configKey = QString("branch.%1.remote=").arg(branch);
       QString configValue;
 

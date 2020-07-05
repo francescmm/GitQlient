@@ -5,6 +5,7 @@ enum class LaneType;
 class Lane
 {
 public:
+   Lane() = default;
    Lane(LaneType type);
 
    bool operator==(const Lane &lane) const { return mType == lane.mType; }

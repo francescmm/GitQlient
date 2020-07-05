@@ -33,13 +33,13 @@ void UntrackedFilesList::onStageFile()
 
 void UntrackedFilesList::onDeleteFile()
 {
-   const auto path = QString("rm -rf %1").arg(mSelectedItem->toolTip());
+   const auto path = QString("%1").arg(mSelectedItem->toolTip());
 
    QLog_Info("UI", "Removing paht: " + path);
 
    QProcess p;
    p.setWorkingDirectory(mWorkingDir);
-   p.start(path);
+   p.start("rm -rf", { path });
 
    if (p.waitForFinished())
       emit signalCheckoutPerformed();

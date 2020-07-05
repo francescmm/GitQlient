@@ -102,7 +102,12 @@ void GitRepoLoader::loadReferences()
 
       QString prevRefSha;
       const auto curBranchSHA = ret.output.toString();
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+      const auto referencesList = ret3.output.toString().split('\n', Qt::SkipEmptyParts);
+#else
       const auto referencesList = ret3.output.toString().split('\n', QString::SkipEmptyParts);
+#endif
 
       for (const auto &reference : referencesList)
       {
@@ -274,7 +279,11 @@ QVector<QString> GitRepoLoader::getUntrackedFiles() const
 
    runCmd.append(QString(" --exclude-per-directory=$%1$").arg(".gitignore"));
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+   const auto ret = mGitBase->run(runCmd).output.toString().split('\n', Qt::SkipEmptyParts).toVector();
+#else
    const auto ret = mGitBase->run(runCmd).output.toString().split('\n', QString::SkipEmptyParts).toVector();
+#endif
 
    BenchmarkEnd();
 

@@ -192,7 +192,7 @@ void GitQlient::addRepoTab(const QString &repoPath)
       {
          QProcess p;
          p.setWorkingDirectory(repoPath);
-         p.start("git rev-parse --show-superproject-working-tree");
+         p.start("git rev-parse", { "--show-superproject-working-tree" });
          p.waitForFinished(5000);
 
          const auto output = p.readAll().trimmed();

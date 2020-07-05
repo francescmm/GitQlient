@@ -17,6 +17,7 @@
 #include <QLabel>
 #include <QApplication>
 #include <QMessageBox>
+#include <QtGlobal>
 
 #include <QLogger.h>
 
@@ -203,20 +204,23 @@ QWidget *ConfigWidget::createConfigWidget()
    stackedWidget->addWidget(projectsFrame);
    stackedWidget->setCurrentIndex(2);
 
-   connect(mBtnGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this,
-           [this, stackedWidget](int index) {
-              const auto selectedBtn = mBtnGroup->button(index);
-              const auto buttons = mBtnGroup->buttons();
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+   connect(mBtnGroup, &QButtonGroup::idClicked, this, [this, stackedWidget](int index) {
+#else
+   connect(mBtnGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, [this, stackedWidget](int index) {
+#endif
+      const auto selectedBtn = mBtnGroup->button(index);
+      const auto buttons = mBtnGroup->buttons();
 
-              for (auto btn : buttons)
-              {
-                 btn->setProperty("selected", selectedBtn == btn);
-                 btn->style()->unpolish(btn);
-                 btn->style()->polish(btn);
-              }
+      for (auto btn : buttons)
+      {
+         btn->setProperty("selected", selectedBtn == btn);
+         btn->style()->unpolish(btn);
+         btn->style()->polish(btn);
+      }
 
-              stackedWidget->setCurrentIndex(index);
-           });
+      stackedWidget->setCurrentIndex(index);
+   });
 
    const auto tabWidget = new QFrame();
    tabWidget->setObjectName("tabWidget");

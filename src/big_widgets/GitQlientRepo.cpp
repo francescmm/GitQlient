@@ -120,7 +120,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    m_loaderThread = new QThread();
    mGitLoader->moveToThread(m_loaderThread);
-   connect(this, &GitQlientRepo::signalLoadRepo, mGitLoader.get(), &GitRepoLoader::loadRepository);
+   connect(this, &GitQlientRepo::signalLoadRepo, mGitLoader.data(), &GitRepoLoader::loadRepository);
    m_loaderThread->start();
 
    mGitLoader->setShowAll(settings.value("ShowAllBranches", true).toBool());

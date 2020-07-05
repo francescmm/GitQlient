@@ -49,7 +49,11 @@ QStringList splitArgList(const QString &cmd)
 
    // early exit the common case
    if (!(cmd.contains("$") || cmd.contains("\"") || cmd.contains("\'")))
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+      return cmd.split(' ', Qt::SkipEmptyParts);
+#else
       return cmd.split(' ', QString::SkipEmptyParts);
+#endif
 
    // we have some work to do...
    // first find a possible separator
@@ -78,7 +82,12 @@ QStringList splitArgList(const QString &cmd)
 
    // QProcess::setArguments doesn't want quote
    // delimited arguments, so remove trailing quotes
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+   auto sl = QStringList(newCmd.split(sepChar, Qt::SkipEmptyParts));
+#else
    auto sl = QStringList(newCmd.split(sepChar, QString::SkipEmptyParts));
+#endif
    QStringList::iterator it(sl.begin());
 
    for (; it != sl.end(); ++it)

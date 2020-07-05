@@ -28,7 +28,11 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
       layout->addWidget(new QLabel("KEY"), 0, 0);
       layout->addWidget(new QLabel("VALUE"), 0, 1);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+      const auto elements = localConfig.output.toString().split('\n', Qt::SkipEmptyParts);
+#else
       const auto elements = localConfig.output.toString().split('\n', QString::SkipEmptyParts);
+#endif
       addUserConfig(elements, layout);
    }
 
@@ -42,7 +46,11 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
       layout->addWidget(new QLabel("KEY"), 0, 0);
       layout->addWidget(new QLabel("VALUE"), 0, 1);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+      const auto elements = globalConfig.output.toString().split('\n', Qt::SkipEmptyParts);
+#else
       const auto elements = globalConfig.output.toString().split('\n', QString::SkipEmptyParts);
+#endif
       addUserConfig(elements, layout);
    }
 

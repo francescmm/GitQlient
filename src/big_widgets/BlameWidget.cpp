@@ -109,7 +109,11 @@ void BlameWidget::showFileHistory(const QString &filePath)
 
       if (ret.success)
       {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+         const auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+#else
          const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+#endif
          mRepoView->blockSignals(true);
          mRepoView->filterBySha(shaHistory);
          mRepoView->blockSignals(false);
@@ -169,7 +173,11 @@ void BlameWidget::reloadHistory(int tabIndex)
 
       if (ret.success)
       {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+         const auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+#else
          const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+#endif
          mRepoView->blockSignals(true);
          mRepoView->filterBySha(shaHistory);
 
