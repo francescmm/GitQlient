@@ -37,6 +37,7 @@ class FileDiffWidget;
 class RevisionFiles;
 class RevisionsCache;
 class ConflictButton;
+class FileEditor;
 
 /**
  * @brief The MergeWidget class creates the layout for when a merge happens. The layout is composed by two lists of
@@ -103,6 +104,7 @@ private:
    QPushButton *mAbortBtn = nullptr;
    QMap<ConflictButton *, FileDiffWidget *> mConflictButtons;
    ConflictReason mReason = ConflictReason::Merge;
+   FileEditor *mFileEditor = nullptr;
 
    /**
     * @brief Fills both lists of ConflictButton.
@@ -142,4 +144,16 @@ private:
     *
     */
    void onUpdateRequested();
+   /**
+    * @brief startEditFile Shows the file edition windows with the content of @p fileName loaded on it.
+    * @param fileName The full path of the file that will be opened.
+    * @param line The line to put the cursor.
+    * @param column The column to put the cursor.
+    */
+   void startEditFile(const QString &fileName);
+
+   /**
+    * @brief endEditFile Closes the file editor.
+    */
+   void endEditFile();
 };

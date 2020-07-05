@@ -9,6 +9,7 @@
 #include <CommitInfo.h>
 #include <RevisionFiles.h>
 #include <ConflictButton.h>
+#include <FileEditor.h>
 
 #include <QPushButton>
 #include <QLineEdit>
@@ -30,6 +31,7 @@ MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, c
    , mDescription(new QTextEdit())
    , mMergeBtn(new QPushButton(tr("Merge && Commit")))
    , mAbortBtn(new QPushButton(tr("Abort merge")))
+   , mFileEditor(new FileEditor())
 {
    mCenterStackedWidget->setCurrentIndex(0);
    mCenterStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -106,10 +108,13 @@ MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, c
    mergeLayout->addSpacerItem(new QSpacerItem(1, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
    mergeLayout->addLayout(mergeInfoLayout);
 
+   mFileEditor->setVisible(false);
+
    const auto layout = new QHBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->addWidget(mergeFrame);
    layout->addWidget(mCenterStackedWidget);
+   layout->addWidget(mFileEditor);
 
    connect(mAbortBtn, &QPushButton::clicked, this, &MergeWidget::abort);
    connect(mMergeBtn, &QPushButton::clicked, this, &MergeWidget::commit);
@@ -118,6 +123,8 @@ MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, c
 void MergeWidget::configure(const RevisionFiles &files, ConflictReason reason)
 {
    mReason = reason;
+
+   mFileEditor->finishEdition();
 
    QFile mergeMsg(mGit->getWorkingDir() + "/.git/MERGE_MSG");
 
@@ -145,7 +152,7 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
       connect(fileBtn, &ConflictButton::toggled, this, &MergeWidget::changeDiffView);
       connect(fileBtn, &ConflictButton::updateRequested, this, &MergeWidget::onUpdateRequested);
       connect(fileBtn, &ConflictButton::resolved, this, &MergeWidget::onConflictResolved);
-      connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::signalEditFile);
+      connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::startEditFile);
 
       const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
       const auto fileDiffWidget = new FileDiffWidget(mGit, mGitQlientCache);
@@ -296,4 +303,18 @@ void MergeWidget::onUpdateRequested()
 {
    const auto conflictButton = qobject_cast<ConflictButton *>(sender());
    mConflictButtons.value(conflictButton)->reload();
+}
+
+void MergeWidget::startEditFile(const QString &fileName)
+{
+   mCenterStackedWidget->setVisible(false);
+
+   mFileEditor->editFile(fileName);
+   mFileEditor->setVisible(true);
+}
+
+void MergeWidget::endEditFile()
+{
+   mCenterStackedWidget->setVisible(true);
+   mFileEditor->setVisible(false);
 }
