@@ -85,6 +85,12 @@ public:
     */
    void setChecked(bool checked);
 
+   /**
+    * @brief getFileName
+    * @return
+    */
+   QString getFileName() const;
+
 private:
    QSharedPointer<GitBase> mGit;
    QString mFileName;
@@ -104,9 +110,4 @@ private:
     *
     */
    void resolveConflict();
-
-   /**
-    * @brief openFileEditor Opens the external file editor.
-    */
-   void openFileEditor();
 };

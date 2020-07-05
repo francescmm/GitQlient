@@ -10,6 +10,7 @@
 #include <RevisionFiles.h>
 #include <ConflictButton.h>
 #include <FileEditor.h>
+#include <GitQlientSettings.h>
 
 #include <QPushButton>
 #include <QLineEdit>
@@ -152,7 +153,12 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
       connect(fileBtn, &ConflictButton::toggled, this, &MergeWidget::changeDiffView);
       connect(fileBtn, &ConflictButton::updateRequested, this, &MergeWidget::onUpdateRequested);
       connect(fileBtn, &ConflictButton::resolved, this, &MergeWidget::onConflictResolved);
-      connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::startEditFile);
+
+      GitQlientSettings settings;
+      if (!settings.value("isGitQlient", false).toBool())
+         connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::signalEditFile);
+      else
+         connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::startEditFile);
 
       const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
       const auto fileDiffWidget = new FileDiffWidget(mGit, mGitQlientCache);
@@ -305,9 +311,11 @@ void MergeWidget::onUpdateRequested()
    mConflictButtons.value(conflictButton)->reload();
 }
 
-void MergeWidget::startEditFile(const QString &fileName)
+void MergeWidget::startEditFile()
 {
    mCenterStackedWidget->setVisible(false);
+
+   const auto fileName = qobject_cast<ConflictButton *>(sender())->getFileName();
 
    mFileEditor->editFile(fileName);
    mFileEditor->setVisible(true);

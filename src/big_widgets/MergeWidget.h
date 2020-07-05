@@ -150,7 +150,7 @@ private:
     * @param line The line to put the cursor.
     * @param column The column to put the cursor.
     */
-   void startEditFile(const QString &fileName);
+   void startEditFile();
 
    /**
     * @brief endEditFile Closes the file editor.
