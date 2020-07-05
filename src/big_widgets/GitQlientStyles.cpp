@@ -135,14 +135,9 @@ QColor GitQlientStyles::getOrange()
 
 std::array<QColor, GitQlientStyles::kBranchColors> GitQlientStyles::getBranchColors()
 {
-   static std::array<QColor, kBranchColors> colors { getTextColor(),
-                                                     getRed(),
-                                                     getBlue(),
-                                                     getGreen(),
-                                                     getOrange(),
-                                                     QColor("#848484") /* grey */,
-                                                     QColor("#FF79C6") /* pink */,
-                                                     QColor("#CD9077") /* pastel */ };
+   static std::array<QColor, kBranchColors> colors { { getTextColor(), getRed(), getBlue(), getGreen(), getOrange(),
+                                                       QColor("#848484") /* grey */, QColor("#FF79C6") /* pink */,
+                                                       QColor("#CD9077") /* pastel */ } };
 
    return colors;
 }
