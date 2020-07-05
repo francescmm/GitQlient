@@ -195,7 +195,9 @@ QList<QString> CommitHistoryView::getSelectedShaList() const
           + commit.getReferences(References::Type::RemoteBranches);
 
       std::sort(branches.begin(), branches.end());
-      godVector.append(branches.toVector());
+
+      if (!branches.isEmpty())
+         godVector.append(branches.toVector());
    }
 
    auto commitsInSameBranch = false;
