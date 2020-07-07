@@ -378,7 +378,10 @@ void HistoryWidget::cherryPickCommit()
       const auto ret = git->cherryPickCommit(commit.sha());
 
       if (ret.success)
+      {
+         mSearchInput->clear();
          emit signalViewUpdated();
+      }
       else
       {
          const auto errorMsg = ret.output.toString();
