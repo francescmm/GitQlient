@@ -4,7 +4,7 @@ git:
 sudo: required
 dist: xenial
 env:
-  - VERSION="1.1.0"
+  - VERSION="1.1.1"
 install:
 - bash ci-scripts/$TRAVIS_OS_NAME/install.sh
 script:
@@ -12,7 +12,7 @@ script:
 matrix:
   include:
   - os: osx
-    osx_image: xcode11.2
+    osx_image: xcode10.1
   - os: linux
     compiler: gcc
 before_deploy:
