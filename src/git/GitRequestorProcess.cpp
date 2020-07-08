@@ -28,13 +28,8 @@ void GitRequestorProcess::onFinished(int, QProcess::ExitStatus)
 {
    bool ok = mTempFile && (mTempFile->isOpen() || (mTempFile->exists() && mTempFile->open()));
 
-   if (ok)
-   {
-      const auto ba = mTempFile->readAll();
-
-      if (ba.size() != 0 && !mCanceling)
-         emit procDataReady(ba);
-   }
+   if (ok && !mCanceling)
+      emit procDataReady(mTempFile->readAll());
 
    deleteLater();
 }
