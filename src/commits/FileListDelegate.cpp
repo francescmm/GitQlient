@@ -4,9 +4,9 @@
 
 #include <QPainter>
 
-constexpr int Offset = 5;
-constexpr int DefaultHeight = 25;
-constexpr int HeightIncrement = 15;
+constexpr auto Offset = 5;
+constexpr auto DefaultHeight = 25.0;
+constexpr auto HeightIncrement = 15.0;
 
 FileListDelegate::FileListDelegate(QObject *parent)
    : QItemDelegate(parent)
