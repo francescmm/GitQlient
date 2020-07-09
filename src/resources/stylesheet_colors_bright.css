@@ -524,19 +524,19 @@ DiffButton[pressed="true"]
    background-color: rgba(255, 85, 85, 0.80);
 }
 
-QPushButton#Merge, QPushButton#pbCommit
+QPushButton#Merge, QPushButton#pbCommit, QPushButton#pbCherryPick
 {
    border-style: solid;
    border-color: #8DC944;
    background-color: rgba(141, 201, 68, 0.65);
 }
 
-QPushButton#Merge:hover, QPushButton#pbCommit:hover
+QPushButton#Merge:hover, QPushButton#pbCommit:hover, QPushButton#pbCherryPick:hover
 {
    background-color: rgba(141, 201, 68, 0.95);
 }
 
-QPushButton#Merge:pressed, QPushButton#pbCommit:pressed
+QPushButton#Merge:pressed, QPushButton#pbCommit:pressed, QPushButton#pbCherryPick:pressed
 {
    background-color: rgba(141, 201, 68, 0.80);
 }
