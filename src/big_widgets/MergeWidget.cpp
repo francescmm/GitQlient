@@ -117,6 +117,7 @@ MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, c
    layout->addWidget(mCenterStackedWidget);
    layout->addWidget(mFileEditor);
 
+   connect(mFileEditor, &FileEditor::signalEditionClosed, this, &MergeWidget::endEditFile);
    connect(mAbortBtn, &QPushButton::clicked, this, &MergeWidget::abort);
    connect(mMergeBtn, &QPushButton::clicked, this, &MergeWidget::commit);
 }
