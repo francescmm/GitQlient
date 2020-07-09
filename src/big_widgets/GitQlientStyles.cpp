@@ -111,26 +111,46 @@ QColor GitQlientStyles::getTabColor()
 
 QColor GitQlientStyles::getBlue()
 {
-   static QColor blue("#579BD5");
-   return blue;
+   GitQlientSettings settings;
+   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+
+   QColor c;
+   c.setNamedColor(colorSchema == "dark" ? "#579BD5" : "#325CC7");
+
+   return c;
 }
 
 QColor GitQlientStyles::getRed()
 {
-   static QColor red("#FF5555");
-   return red;
+   GitQlientSettings settings;
+   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+
+   QColor c;
+   c.setNamedColor(colorSchema == "dark" ? "#FF5555" : "#FF2222");
+
+   return c;
 }
 
 QColor GitQlientStyles::getGreen()
 {
-   static QColor green("#8DC944");
-   return green;
+   GitQlientSettings settings;
+   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+
+   QColor c;
+   c.setNamedColor(colorSchema == "dark" ? "#8DC944" : "#65952B");
+
+   return c;
 }
 
 QColor GitQlientStyles::getOrange()
 {
-   static QColor orange("#FFB86C");
-   return orange;
+   GitQlientSettings settings;
+   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+
+   QColor c;
+   c.setNamedColor(colorSchema == "dark" ? "#FFB86C" : "#FF9320");
+
+   return c;
 }
 
 std::array<QColor, GitQlientStyles::kBranchColors> GitQlientStyles::getBranchColors()
