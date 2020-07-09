@@ -418,6 +418,9 @@ void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
 
 void BranchesWidget::processTags()
 {
+   QScopedPointer<GitTags> git(new GitTags(mGit));
+
+   const auto remoteTags = git->getRemoteTags();
    QVector<QString> localTags;
    auto tags = mCache->getTags();
 
@@ -431,7 +434,7 @@ void BranchesWidget::processTags()
       item->setData(Qt::UserRole + 1, true);
       item->setData(Qt::UserRole + 2, tag.second);
 
-      if (localTags.contains(tagName))
+      if (!remoteTags.contains(tagName))
       {
          tagName += " (local)";
          item->setData(Qt::UserRole + 1, false);

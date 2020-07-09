@@ -13,13 +13,13 @@ GitTags::GitTags(const QSharedPointer<GitBase> &gitBase)
 {
 }
 
-QVector<QString> GitTags::getTags() const
+QVector<QString> GitTags::getRemoteTags() const
 {
    BenchmarkStart();
 
-   QLog_Debug("Git", QString("Executing getTags"));
+   QLog_Debug("Git", QString("Executing getRemoteTags"));
 
-   const auto ret = mGitBase->run("git tag");
+   const auto ret = mGitBase->run("git ls-remote --tags");
 
    QVector<QString> tags;
 
@@ -28,8 +28,14 @@ QVector<QString> GitTags::getTags() const
       const auto tagsTmp = ret.output.toString().split("\n");
 
       for (const auto &tag : tagsTmp)
-         if (tag != "\n" && !tag.isEmpty())
-            tags.append(tag);
+      {
+         if (tag != "\n" && !tag.isEmpty() && !tag.contains("^{}"))
+         {
+            const auto tagName = tag.split('\t').last().remove("refs/tags/");
+
+            tags.append(tagName);
+         }
+      }
    }
 
    BenchmarkEnd();
