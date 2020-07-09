@@ -18,11 +18,13 @@ jobs:
 before_deploy:
   - git config --local user.name "Francesc Martinez"
   - git config --local user.email "francescmm@gmail.com"
+  - export FILE=$(ls GitQlient-*)
 deploy:
   provider: releases
   token:
     secure: qv/f6FbrT5z65nla2V41tmgqBF4+xK+6YSZoku9DSMducdTY69YgwSFcDZtmC2yABKoiykCIpaiSjKY06KUpmF12ydTfnDjT9FYyGiFnyj5VLhWbT4O3u9HiY7rjknYvcbOBVZcGyA/6vRLvCUIA1cpdIyO3VRuJTEYseaTQNkLTgGf+I5Hk+gxHqGM7yXiLOxzbbwqITkT2B9tRSnqFR3HSSHe2p8MQD0Sy01kIsPdi1AwPmllCKaaws+62C21UhUX4ms4utanZYMq2DaXKMDJzpWDlN3kgQFrrpLZe5IJtebkEdOoO1tvuNRl8m7QqBzS+2Bd9P7drXkElz/nYMuz3rdZwKDcUqcjyLfxKayl33Y6S6/nXRsfi0y59tIIWOvPtcH25LZL9mTcovvWFvVS6f6eCfohAxvON1JwSXqjPfk55A9p85QbM4uYgHZQ3Z1drRs4P6i5Vd+qHYK5KwJ8XvFuXeF6NlfVUpuC7zz3VIm0MVmeA7JYZJIhQx8FeVegXJN9czy+bcLKtFht9Neogm/2oVWAuURknKUKmR6x7k1QRXEGmRMdNzgi2hJPGxpzyczhn4bS047niSVS01NQ9kamBBcNhZE7vevth6z6vxSAG7SHxFApMhzp3zVovLISJfz2+nryMzDJmv8xqDJrnpjIGsJeR+SRptWCa0NE=
-  file: "GitQlient-${VERSION}*.*"
+  file: "${FILE}"
+  skip_cleanup: true
   prerelease: true
   draft: true
   on:

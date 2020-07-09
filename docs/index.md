@@ -409,7 +409,7 @@ The merge manager is divided in three sub-sections. In the top left you can see 
 
 To show a file, you need to click over the file name (red ellipse). Once clicked, the diff view will change to show that file.
 
-**Important note:** GitQlient in the current version (1.1.0) doens't allow to edit the files inside. To fix a file you need to edit it in a separated editor. To do that, press the file icon (orange ellipse).
+**Important note:** GitQlient in the current version (1.1.1) doens't allow to edit the files inside. To fix a file you need to edit it in a separated editor. To do that, press the file icon (orange ellipse).
 
 Once you fix all the conflicts in the file, you can mark it as solved by clicking the check button (green ellipse). That will add the file to the list below (Merged files).
 

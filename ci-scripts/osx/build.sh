@@ -5,3 +5,4 @@ export CPPFLAGS="-I/usr/local/opt/qt/include"
 qmake GitQlient.pro
 make
 make dmg
+cp GitQlient-* ../
