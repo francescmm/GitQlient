@@ -177,8 +177,12 @@ void RevisionsCache::insertWipRevision(const QString &parentSha, const QString &
    const auto log
        = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
 
-   CommitInfo c(CommitInfo::ZERO_SHA, { parentSha }, QString("-"), QDateTime::currentDateTime().toSecsSinceEpoch(),
-                log);
+   QStringList parents;
+
+   if (!parentSha.isEmpty())
+      parents.append(parentSha);
+
+   CommitInfo c(CommitInfo::ZERO_SHA, parents, QString("-"), QDateTime::currentDateTime().toSecsSinceEpoch(), log);
 
    if (mLanes.isEmpty())
       mLanes.init(c.sha());
@@ -384,7 +388,7 @@ bool RevisionsCache::pendingLocalChanges()
    if (commit.isValid())
    {
       const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
-      localChanges = rf.count() == mUntrackedfiles.count();
+      localChanges = rf.count() - mUntrackedfiles.count() > 0;
    }
 
    return localChanges;

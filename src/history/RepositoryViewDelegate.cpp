@@ -128,36 +128,40 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool 
    }
 
    // vertical line
-   if (!isWip && !hasChilds
-       && (lane.getType() == LaneType::HEAD || lane.getType() == LaneType::INITIAL || lane.getType() == LaneType::BRANCH
-           || lane.getType() == LaneType::MERGE_FORK || lane.getType() == LaneType::MERGE_FORK_R
-           || lane.getType() == LaneType::MERGE_FORK_L || lane.getType() == LaneType::ACTIVE))
-      p->drawLine(m, h, m, 2 * h);
-   else
+   if (!(isWip && !hasChilds))
    {
-      switch (lane.getType())
+      if (!isWip && !hasChilds
+          && (lane.getType() == LaneType::HEAD || lane.getType() == LaneType::INITIAL
+              || lane.getType() == LaneType::BRANCH || lane.getType() == LaneType::MERGE_FORK
+              || lane.getType() == LaneType::MERGE_FORK_R || lane.getType() == LaneType::MERGE_FORK_L
+              || lane.getType() == LaneType::ACTIVE))
+         p->drawLine(m, h, m, 2 * h);
+      else
       {
-         case LaneType::ACTIVE:
-         case LaneType::NOT_ACTIVE:
-         case LaneType::MERGE_FORK:
-         case LaneType::MERGE_FORK_R:
-         case LaneType::MERGE_FORK_L:
-         case LaneType::JOIN:
-         case LaneType::JOIN_R:
-         case LaneType::JOIN_L:
-         case LaneType::CROSS:
-            p->drawLine(m, 0, m, 2 * h);
-            break;
-         case LaneType::HEAD_L:
-         case LaneType::BRANCH:
-            p->drawLine(m, h, m, 2 * h);
-            break;
-         case LaneType::TAIL_L:
-         case LaneType::INITIAL:
-            p->drawLine(m, 0, m, h);
-            break;
-         default:
-            break;
+         switch (lane.getType())
+         {
+            case LaneType::ACTIVE:
+            case LaneType::NOT_ACTIVE:
+            case LaneType::MERGE_FORK:
+            case LaneType::MERGE_FORK_R:
+            case LaneType::MERGE_FORK_L:
+            case LaneType::JOIN:
+            case LaneType::JOIN_R:
+            case LaneType::JOIN_L:
+            case LaneType::CROSS:
+               p->drawLine(m, 0, m, 2 * h);
+               break;
+            case LaneType::HEAD_L:
+            case LaneType::BRANCH:
+               p->drawLine(m, h, m, 2 * h);
+               break;
+            case LaneType::TAIL_L:
+            case LaneType::INITIAL:
+               p->drawLine(m, 0, m, h);
+               break;
+            default:
+               break;
+         }
       }
    }
 
@@ -269,45 +273,57 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    }
    else
    {
-      const auto laneNum = commit.getLanesCount();
-      const auto activeLane = commit.getActiveLane();
-      const auto activeColor = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
-      const auto isWip = commit.sha() == CommitInfo::ZERO_SHA;
-      auto x1 = 0;
-      auto isSet = false;
-      auto laneHeadPresent = false;
-      auto mergeColor = GitQlientStyles::getBranchColorAt((laneNum - 1) % GitQlientStyles::getTotalBranchColors());
-
-      for (auto i = laneNum - 1, x2 = LANE_WIDTH * laneNum; i >= 0; --i, x2 -= LANE_WIDTH)
+      if (commit.sha() == CommitInfo::ZERO_SHA)
       {
-         x1 = x2 - LANE_WIDTH;
+         const auto activeColor = GitQlientStyles::getBranchColorAt(0);
+         QColor color = activeColor;
 
-         auto currentLane = commit.getLane(i);
+         if (mCache->pendingLocalChanges())
+            color = QColor("#D89000");
 
-         if (!laneHeadPresent && i < laneNum - 1)
+         paintGraphLane(p, LaneType::BRANCH, false, 0, LANE_WIDTH, color, activeColor, activeColor, true,
+                        commit.parentsCount() != 0);
+      }
+      else
+      {
+         const auto laneNum = commit.getLanesCount();
+         const auto activeLane = commit.getActiveLane();
+         const auto activeColor
+             = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
+         auto x1 = 0;
+         auto isSet = false;
+         auto laneHeadPresent = false;
+         auto mergeColor = GitQlientStyles::getBranchColorAt((laneNum - 1) % GitQlientStyles::getTotalBranchColors());
+
+         for (auto i = laneNum - 1, x2 = LANE_WIDTH * laneNum; i >= 0; --i, x2 -= LANE_WIDTH)
          {
-            auto prevLane = commit.getLane(i + 1);
-            laneHeadPresent
-                = prevLane.isHead() || prevLane.equals(LaneType::JOIN_R) || prevLane.equals(LaneType::JOIN_L);
-         }
+            x1 = x2 - LANE_WIDTH;
 
-         if (!currentLane.equals(LaneType::EMPTY))
-         {
-            auto color = activeColor;
+            auto currentLane = commit.getLane(i);
 
-            if (i != activeLane)
-               color = GitQlientStyles::getBranchColorAt(i % GitQlientStyles::getTotalBranchColors());
-            else if (isWip && !mCache->pendingLocalChanges())
-               color = QColor("#D89000");
+            if (!laneHeadPresent && i < laneNum - 1)
+            {
+               auto prevLane = commit.getLane(i + 1);
+               laneHeadPresent
+                   = prevLane.isHead() || prevLane.equals(LaneType::JOIN_R) || prevLane.equals(LaneType::JOIN_L);
+            }
 
-            if (!isSet)
-               mergeColor = getMergeColor(currentLane, commit, i, color, isSet);
+            if (!currentLane.equals(LaneType::EMPTY))
+            {
+               auto color = activeColor;
 
-            paintGraphLane(p, currentLane, laneHeadPresent, x1, x2, color, activeColor, mergeColor, isWip,
-                           commit.hasChilds());
+               if (i != activeLane)
+                  color = GitQlientStyles::getBranchColorAt(i % GitQlientStyles::getTotalBranchColors());
 
-            if (mView->hasActiveFilter())
-               break;
+               if (!isSet)
+                  mergeColor = getMergeColor(currentLane, commit, i, color, isSet);
+
+               paintGraphLane(p, currentLane, laneHeadPresent, x1, x2, color, activeColor, mergeColor, false,
+                              commit.hasChilds());
+
+               if (mView->hasActiveFilter())
+                  break;
+            }
          }
       }
    }
