@@ -46,7 +46,6 @@ void FileEditor::editFile(const QString &fileName)
    mFilePathLabel->setText(mFileName);
 
    QFile f(mFileName);
-   QString fileContent;
 
    if (f.open(QIODevice::ReadOnly))
    {
@@ -64,8 +63,16 @@ void FileEditor::finishEdition()
    if (isEditing)
    {
       const auto currentContent = mFileEditor->toPlainText();
+      QFile f(mFileName);
+      QString fileContent;
 
-      if (currentContent != mLoadedContent)
+      if (f.open(QIODevice::ReadOnly))
+      {
+         fileContent = f.readAll();
+         f.close();
+      }
+
+      if (currentContent != fileContent)
       {
          const auto alert = new QMessageBox(QMessageBox::Question, tr("Unsaved changes"),
                                             tr("The current text was modified. Do you want to save the changes?"));
