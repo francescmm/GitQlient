@@ -9,7 +9,7 @@
 #include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 int main(int argc, char *argv[])
 {

@@ -7,7 +7,7 @@
 #include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 GitBranches::GitBranches(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)

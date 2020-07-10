@@ -17,7 +17,7 @@
 #include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 GitQlient::GitQlient(QWidget *parent)
    : GitQlient(QStringList(), parent)

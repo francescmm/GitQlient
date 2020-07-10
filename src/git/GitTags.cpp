@@ -6,7 +6,7 @@
 #include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 GitTags::GitTags(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
