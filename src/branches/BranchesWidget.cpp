@@ -246,7 +246,7 @@ void BranchesWidget::showBranches()
       QLog_Info("UI", QString("Fetched {%1} remote branches").arg(branches.count()));
       QLog_Info("UI", QString("Processing remote branches..."));
 
-      for (const auto &pair : branches)
+      for (const auto &pair : qAsConst(branches))
       {
          for (const auto &branch : pair.second)
             if (!branch.contains("HEAD->"))

@@ -79,7 +79,7 @@ GitExecResult GitLocal::checkoutCommit(const QString &sha) const
    return ret;
 }
 
-GitExecResult GitLocal::markFileAsResolved(const QString &fileName) const
+GitExecResult GitLocal::markFileAsResolved(const QString &fileName)
 {
    BenchmarkStart();
 
@@ -128,7 +128,7 @@ GitExecResult GitLocal::resetFile(const QString &fileName) const
    return ret;
 }
 
-bool GitLocal::resetCommit(const QString &sha, CommitResetType type) const
+bool GitLocal::resetCommit(const QString &sha, CommitResetType type)
 {
    BenchmarkStart();
 

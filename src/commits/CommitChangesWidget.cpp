@@ -394,7 +394,7 @@ void CommitChangesWidget::updateCounter(const QString &text)
 
 bool CommitChangesWidget::hasConflicts()
 {
-   for (const auto &pair : mCurrentFilesCache.values())
+   for (const auto &pair : qAsConst(mCurrentFilesCache))
       if (pair.second->data(GitQlientRole::U_IsConflict).toBool())
          return true;
 

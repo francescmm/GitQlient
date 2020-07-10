@@ -19,7 +19,7 @@ void FileDiffHighlighter::highlightBlock(const QString &text)
 
       if (!mFileDiffInfo.isEmpty())
       {
-         for (const auto &diff : mFileDiffInfo)
+         for (const auto &diff : qAsConst(mFileDiffInfo))
          {
             if (diff.startLine <= currentLine && currentLine <= diff.endLine)
             {

@@ -101,7 +101,6 @@ void GitRepoLoader::loadReferences()
          ret.output = ret.output.toString().trimmed();
 
       QString prevRefSha;
-      const auto curBranchSHA = ret.output.toString();
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
       const auto referencesList = ret3.output.toString().split('\n', Qt::SkipEmptyParts);

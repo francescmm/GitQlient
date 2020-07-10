@@ -34,20 +34,7 @@ CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, QSharedPointer<R
 void CommitDiffWidget::configure(const QString &firstSha, const QString &secondSha)
 {
    mFirstShaStr = firstSha;
-
-   if (mFirstShaStr != CommitInfo::ZERO_SHA)
-   {
-      const auto c = mCache->getCommitInfo(mFirstShaStr);
-      const auto dateStr = QDateTime::fromSecsSinceEpoch(c.authorDate().toUInt()).toString("dd MMM yyyy hh:mm");
-   }
-
    mSecondShaStr = secondSha;
-
-   if (mFirstShaStr != CommitInfo::ZERO_SHA)
-   {
-      const auto c = mCache->getCommitInfo(mSecondShaStr);
-      const auto dateStr = QDateTime::fromSecsSinceEpoch(c.authorDate().toUInt()).toString("dd MMM yyyy hh:mm");
-   }
 
    fileListWidget->insertFiles(mFirstShaStr, mSecondShaStr);
 }
