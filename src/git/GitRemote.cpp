@@ -1,6 +1,7 @@
 #include "GitRemote.h"
 
 #include <GitBase.h>
+#include <GitConfig.h>
 
 #include <QLogger.h>
 #include <BenchmarkTool.h>
@@ -19,8 +20,14 @@ GitExecResult GitRemote::pushBranch(const QString &branchName, bool force)
 
    QLog_Debug("Git", QString("Executing push"));
 
-   const auto ret
-       = mGitBase->run(QString("git push origin %1 %2").arg(branchName, force ? QString("--force") : QString()));
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+   auto ret = gitConfig->getRemoteForBranch(branchName);
+
+   if (ret.success)
+   {
+      const auto remote = ret.output.toString().isEmpty() ? QString("origin") : ret.output.toString();
+      ret = mGitBase->run(QString("git push %1 %2 %3").arg(remote, branchName, force ? QString("--force") : QString()));
+   }
 
    BenchmarkEnd();
 
