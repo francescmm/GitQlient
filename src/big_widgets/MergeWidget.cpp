@@ -92,10 +92,10 @@ MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, c
    const auto mergeFrame = new QFrame();
    mergeFrame->setObjectName("mergeFrame");
 
-   const auto conflictsLabel = new QLabel(tr("Files with conflicts"));
+   const auto conflictsLabel = new QLabel(tr("Conflicts"));
    conflictsLabel->setObjectName("FilesListTitle");
 
-   const auto automergeLabel = new QLabel(tr("Merged files"));
+   const auto automergeLabel = new QLabel(tr("Other files"));
    automergeLabel->setObjectName("FilesListTitle");
 
    const auto mergeLayout = new QVBoxLayout(mergeFrame);
