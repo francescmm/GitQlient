@@ -23,7 +23,7 @@ ConflictButton::ConflictButton(const QString &filename, bool inConflict, const Q
    mFile->setCheckable(true);
    mFile->setChecked(inConflict);
 
-   mEdit->setIcon(QIcon(":/icons/text-file"));
+   mEdit->setIcon(QIcon(":/icons/edit"));
    mEdit->setFixedSize(30, 30);
    mResolve->setIcon(QIcon(":/icons/check"));
    mResolve->setFixedSize(30, 30);
