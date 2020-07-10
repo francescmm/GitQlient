@@ -11,6 +11,7 @@
 #include <StashesContextMenu.h>
 #include <RevisionsCache.h>
 #include <GitQlientBranchItemRole.h>
+#include <GitQlientSettings.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -89,6 +90,13 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    tagsHeaderLayout->setContentsMargins(20, 9, 10, 9);
    tagsHeaderLayout->setSpacing(10);
 
+   GitQlientSettings settings;
+   if (const auto visible = settings.value("TagsHeader", true).toBool(); !visible)
+   {
+      mTagsList->setVisible(!visible);
+      onTagsHeaderClicked();
+   }
+
    const auto tagsIcon = new QLabel();
    tagsIcon->setPixmap(QIcon(":/icons/tags").pixmap(QSize(15, 15)));
 
@@ -115,6 +123,12 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
 
    const auto stashFrame = new ClickableFrame();
    stashFrame->setObjectName("tagsFrame");
+
+   if (const auto visible = settings.value("StashesHeader", true).toBool(); !visible)
+   {
+      mStashesList->setVisible(!visible);
+      onStashesHeaderClicked();
+   }
 
    const auto stashHeaderLayout = new QHBoxLayout(stashFrame);
    stashHeaderLayout->setContentsMargins(20, 9, 10, 9);
@@ -144,6 +158,12 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
 
    const auto submoduleFrame = new ClickableFrame();
    submoduleFrame->setObjectName("tagsFrame");
+
+   if (const auto visible = settings.value("SubmodulesHeader", true).toBool(); !visible)
+   {
+      mSubmodulesList->setVisible(!visible);
+      onSubmodulesHeaderClicked();
+   }
 
    const auto submoduleHeaderLayout = new QHBoxLayout(submoduleFrame);
    submoduleHeaderLayout->setContentsMargins(20, 9, 10, 9);
@@ -593,6 +613,9 @@ void BranchesWidget::onTagsHeaderClicked()
    const auto icon = QIcon(tagsAreVisible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
    mTagArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mTagsList->setVisible(!tagsAreVisible);
+
+   GitQlientSettings settings;
+   settings.setValue("TagsHeader", !tagsAreVisible);
 }
 
 void BranchesWidget::onStashesHeaderClicked()
@@ -601,6 +624,9 @@ void BranchesWidget::onStashesHeaderClicked()
    const auto icon = QIcon(stashesAreVisible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
    mStashesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mStashesList->setVisible(!stashesAreVisible);
+
+   GitQlientSettings settings;
+   settings.setValue("StashesHeader", !stashesAreVisible);
 }
 
 void BranchesWidget::onSubmodulesHeaderClicked()
@@ -609,6 +635,9 @@ void BranchesWidget::onSubmodulesHeaderClicked()
    const auto icon = QIcon(submodulesAreVisible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
    mSubmodulesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mSubmodulesList->setVisible(!submodulesAreVisible);
+
+   GitQlientSettings settings;
+   settings.setValue("SubmodulesHeader", !submodulesAreVisible);
 }
 
 void BranchesWidget::onTagClicked(QListWidgetItem *item)
