@@ -3,9 +3,9 @@
 #include <ConfigWidget.h>
 #include <GitQlientStyles.h>
 #include <GitQlientSettings.h>
+#include <QPinableTabWidget.h>
 
 #include <QProcess>
-#include <QTabWidget>
 #include <QTabBar>
 #include <GitQlientRepo.h>
 #include <QVBoxLayout>
@@ -26,12 +26,12 @@ GitQlient::GitQlient(QWidget *parent)
 
 GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    : QWidget(parent)
-   , mRepos(new QTabWidget())
+   , mRepos(new QPinableTabWidget())
    , mConfigWidget(new ConfigWidget())
 {
    BenchmarkStart();
 
-   const auto repos = parseArguments(arguments);
+   auto repos = parseArguments(arguments);
 
    QLog_Info("UI", "*******************************************");
    QLog_Info("UI", "*          GitQlient has started          *");
@@ -48,19 +48,18 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    addTab->setToolTip(tr("Open new repository"));
    connect(addTab, &QPushButton::clicked, this, &GitQlient::openRepo);
 
+   mRepos->setStyleSheet(GitQlientStyles::getStyles());
    mRepos->setCornerWidget(addTab, Qt::TopRightCorner);
-   mRepos->setTabsClosable(true);
    connect(mRepos, &QTabWidget::tabCloseRequested, this, &GitQlient::closeTab);
 
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
    vLayout->addWidget(mRepos);
-
-   auto configIndex = mRepos->addTab(mConfigWidget, QIcon(":/icons/config"), QString());
-   mRepos->tabBar()->setTabButton(configIndex, QTabBar::RightSide, nullptr);
+   mRepos->addPinnedTab(mConfigWidget, QIcon(":/icons/config"), QString());
 
    connect(mConfigWidget, &ConfigWidget::signalOpenRepo, this, &GitQlient::addRepoTab);
 
+   restorePinnedRepos();
    setRepositories(repos);
 
    BenchmarkEnd();
@@ -68,6 +67,21 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
 GitQlient::~GitQlient()
 {
+   GitQlientSettings settings;
+   QStringList pinnedRepos;
+   const auto totalTabs = mRepos->count();
+
+   for (auto i = 1; i < totalTabs; ++i)
+   {
+      if (mRepos->isPinned(i))
+      {
+         auto repoToRemove = dynamic_cast<GitQlientRepo *>(mRepos->widget(i));
+         pinnedRepos.append(repoToRemove->currentDir());
+      }
+   }
+
+   settings.setValue("PinnedRepos", pinnedRepos);
+
    QLog_Info("UI", "*            Closing GitQlient            *\n\n");
 }
 
@@ -167,6 +181,11 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
 
 void GitQlient::addRepoTab(const QString &repoPath)
 {
+   addNewRepoTab(repoPath, false);
+}
+
+void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
+{
    BenchmarkStartMsg(repoPath.toStdString());
 
    if (!mCurrentRepos.contains(repoPath))
@@ -186,7 +205,7 @@ void GitQlient::addRepoTab(const QString &repoPath)
       mConfigWidget->onRepoOpened();
 
       const auto repoName = newRepo->currentDir().contains("/") ? newRepo->currentDir().split("/").last() : "No repo";
-      const auto index = mRepos->addTab(newRepo, repoName);
+      const auto index = pinned ? mRepos->addPinnedTab(newRepo, repoName) : mRepos->addTab(newRepo, repoName);
 
       if (!repoPath.isEmpty())
       {
@@ -238,4 +257,13 @@ void GitQlient::closeTab(int tabIndex)
    repoToRemove->close();
 
    BenchmarkEnd();
+}
+
+void GitQlient::restorePinnedRepos()
+{
+   GitQlientSettings settings;
+   const auto pinnedRepos = settings.value("PinnedRepos", QStringList()).toStringList();
+
+   for (auto &repo : pinnedRepos)
+      addNewRepoTab(repo, true);
 }
