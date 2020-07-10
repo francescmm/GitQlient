@@ -46,7 +46,7 @@ signals:
     *
     * @param checked True if the button is selected, otherwise false.
     */
-   void toggled(bool checked);
+   void clicked();
    /**
     * @brief Signal triggered when the user solves the merge conflict.
     *

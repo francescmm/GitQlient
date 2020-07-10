@@ -117,7 +117,7 @@ private:
     *
     * @param fileBtnChecked True if the ConflictButton is selected.
     */
-   void changeDiffView(bool fileBtnChecked);
+   void changeDiffView();
    /**
     * @brief Aborts the current merge.
     *

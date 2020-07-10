@@ -151,7 +151,7 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
       const auto fileBtn = new ConflictButton(fileName, fileInConflict, mGit);
       fileBtn->setObjectName("FileBtn");
 
-      connect(fileBtn, &ConflictButton::toggled, this, &MergeWidget::changeDiffView);
+      connect(fileBtn, &ConflictButton::clicked, this, &MergeWidget::changeDiffView);
       connect(fileBtn, &ConflictButton::updateRequested, this, &MergeWidget::onUpdateRequested);
       connect(fileBtn, &ConflictButton::resolved, this, &MergeWidget::onConflictResolved);
 
@@ -181,9 +181,9 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
    }
 }
 
-void MergeWidget::changeDiffView(bool fileBtnChecked)
+void MergeWidget::changeDiffView()
 {
-   if (fileBtnChecked)
+   if (!mFileEditor->isVisible())
    {
       const auto end = mConflictButtons.constEnd();
 

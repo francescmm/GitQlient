@@ -41,7 +41,7 @@ ConflictButton::ConflictButton(const QString &filename, bool inConflict, const Q
    mUpdate->setVisible(inConflict);
    mResolve->setVisible(inConflict);
 
-   connect(mFile, &QPushButton::toggled, this, &ConflictButton::toggled);
+   connect(mFile, &QPushButton::clicked, this, &ConflictButton::clicked);
    connect(mEdit, &QPushButton::clicked, this, [this] { emit signalEditFile(getFileName(), 0, 0); });
    connect(mResolve, &QPushButton::clicked, this, &ConflictButton::resolveConflict);
    connect(mUpdate, &QPushButton::clicked, this, [this]() { emit updateRequested(); });
