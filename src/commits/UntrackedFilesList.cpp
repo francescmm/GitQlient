@@ -39,7 +39,7 @@ void UntrackedFilesList::onDeleteFile()
 
    QProcess p;
    p.setWorkingDirectory(mWorkingDir);
-   p.start("rm -rf", { path });
+   p.start("rm", { "-rf", path });
 
    if (p.waitForFinished())
       emit signalCheckoutPerformed();
