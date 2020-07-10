@@ -117,7 +117,7 @@ void CommitInfoWidget::configure(const QString &sha)
          labelAuthor->setText(authorName);
          labelDateTime->setText(commitDate.toString("dd/MM/yyyy hh:mm"));
 
-         const auto description = currentRev.longLog().trimmed();
+         const auto description = currentRev.longLog();
          labelDescription->setText(description.isEmpty() ? "No description provided." : description);
 
          auto f = labelDescription->font();

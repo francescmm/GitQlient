@@ -39,7 +39,9 @@ CommitInfo::CommitInfo(const QByteArray &b)
       mShortLog = fields.at(5);
 
       for (auto i = 6; i < fields.count(); ++i)
-         mLongLog += fields.at(i);
+         mLongLog += fields.at(i) + '\n';
+
+      mLongLog = mLongLog.trimmed();
    }
 }
 
