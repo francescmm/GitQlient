@@ -2,9 +2,9 @@
 
 #include <BranchTreeWidget.h>
 #include <GitBase.h>
-#include <GitTags.h>
 #include <GitSubmodules.h>
 #include <GitStashes.h>
+#include <GitTags.h>
 #include <BranchesViewDelegate.h>
 #include <ClickableFrame.h>
 #include <AddSubmoduleDlg.h>
@@ -189,6 +189,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, mRemoteBranchesTree,
            &BranchTreeWidget::clearSelection);
+   connect(mLocalBranchesTree, &BranchTreeWidget::signalFetchPerformed, this, &BranchesWidget::onFetchPerformed);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalBranchesUpdated, this, &BranchesWidget::signalBranchesUpdated);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalBranchCheckedOut, this,
            &BranchesWidget::signalBranchCheckedOut);
@@ -197,6 +198,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, mLocalBranchesTree,
            &BranchTreeWidget::clearSelection);
+   connect(mRemoteBranchesTree, &BranchTreeWidget::signalFetchPerformed, this, &BranchesWidget::onFetchPerformed);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalBranchesUpdated, this, &BranchesWidget::signalBranchesUpdated);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalBranchCheckedOut, this,
            &BranchesWidget::signalBranchCheckedOut);
@@ -418,15 +420,12 @@ void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
 
 void BranchesWidget::processTags()
 {
-   QScopedPointer<GitTags> git(new GitTags(mGit));
+   const auto localTags = mCache->getTags(References::Type::LocalTag);
+   const auto remoteTags = mCache->getTags(References::Type::RemoteTag);
 
-   const auto remoteTags = git->getRemoteTags();
-   QVector<QString> localTags;
-   auto tags = mCache->getTags();
+   QLog_Info("UI", QString("Fetching {%1} tags").arg(localTags.count()));
 
-   QLog_Info("UI", QString("Fetching {%1} tags").arg(tags.count()));
-
-   for (const auto &tag : tags.toStdMap())
+   for (const auto &tag : localTags.toStdMap())
    {
       auto tagName = tag.first;
       const auto item = new QListWidgetItem();
@@ -444,7 +443,7 @@ void BranchesWidget::processTags()
       mTagsList->addItem(item);
    }
 
-   mTagsCount->setText(QString("(%1)").arg(tags.count()));
+   mTagsCount->setText(QString("(%1)").arg(localTags.count()));
 }
 
 void BranchesWidget::processStashes()
@@ -623,4 +622,12 @@ void BranchesWidget::onStashClicked(QListWidgetItem *item)
    const auto sha = git->getTagCommit(item->data(Qt::UserRole).toString()).output.toString();
 
    emit signalSelectCommit(sha);
+}
+
+void BranchesWidget::onFetchPerformed()
+{
+   QScopedPointer<GitTags> gitTags(new GitTags(mGit));
+   const auto remoteTags = gitTags->getRemoteTags();
+
+   mCache->updateTags(remoteTags);
 }

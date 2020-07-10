@@ -85,7 +85,9 @@ public:
    bool pendingLocalChanges();
 
    QVector<QPair<QString, QStringList>> getBranches(References::Type type);
-   QMap<QString, QString> getTags() const;
+   QMap<QString, QString> getTags(References::Type tagType) const;
+
+   void updateTags(const QMap<QString, QString> &remoteTags);
 
 private:
    friend class GitRepoLoader;

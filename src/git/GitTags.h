@@ -36,7 +36,7 @@ class GitTags
 public:
    explicit GitTags(const QSharedPointer<GitBase> &gitBase);
 
-   QVector<QString> getRemoteTags() const;
+   QMap<QString, QString> getRemoteTags() const;
    QVector<QString> getLocalTags() const;
    GitExecResult addTag(const QString &tagName, const QString &tagMessage, const QString &sha);
    GitExecResult removeTag(const QString &tagName, bool remote);

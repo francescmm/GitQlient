@@ -382,7 +382,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
       for (const auto &branch : remoteBranches)
          markValues.insert(branch, QColor("#011f4b"));
 
-      const auto tags = commit.getReferences(References::Type::Tag);
+      const auto tags = commit.getReferences(References::Type::LocalTag);
       for (const auto &tag : tags)
          markValues.insert(tag, GitQlientStyles::getTagColor());
    }

@@ -65,6 +65,11 @@ signals:
     */
    void signalPullConflict();
 
+   /**
+    * @brief signalFetchPerformed Signal triggered when a deep fetch is performed.
+    */
+   void signalFetchPerformed();
+
 public:
    /*!
     \brief Default constructor.

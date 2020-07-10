@@ -195,4 +195,9 @@ private:
     \param item The stash item from the stashes list.
    */
    void onStashClicked(QListWidgetItem *item);
+
+   /**
+    * @brief onFetchPerformed Updates the remote tags in the cache.
+    */
+   void onFetchPerformed();
 };

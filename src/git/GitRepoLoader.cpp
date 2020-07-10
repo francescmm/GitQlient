@@ -122,7 +122,7 @@ void GitRepoLoader::loadReferences()
 
             if (refName.startsWith("refs/tags/"))
             {
-               type = References::Type::Tag;
+               type = References::Type::LocalTag;
                name = refName.mid(10, reference.length());
                name.remove("^{}");
             }

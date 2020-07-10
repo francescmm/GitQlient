@@ -235,7 +235,10 @@ void Controls::fetchAll()
    QApplication::restoreOverrideCursor();
 
    if (ret)
+   {
+      emit signalFetchPerformed();
       emit signalRepositoryUpdated();
+   }
 }
 
 void Controls::activateMergeWarning()

@@ -264,4 +264,9 @@ private:
 
    */
    void updateWip();
+
+   /**
+    * @brief updateTagsOnCache Updates the remote tags in the cache.
+    */
+   void updateTagsOnCache();
 };

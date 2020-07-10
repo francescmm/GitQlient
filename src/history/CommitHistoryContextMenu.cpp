@@ -2,6 +2,7 @@
 
 #include <GitQlientStyles.h>
 #include <GitLocal.h>
+#include <GitTags.h>
 #include <GitPatches.h>
 #include <GitBase.h>
 #include <GitStashes.h>
@@ -388,7 +389,13 @@ void CommitHistoryContextMenu::fetch()
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
 
    if (git->fetch())
+   {
+      QScopedPointer<GitTags> gitTags(new GitTags(mGit));
+      const auto remoteTags = gitTags->getRemoteTags();
+
+      mCache->updateTags(remoteTags);
       emit signalRepositoryUpdated();
+   }
 }
 
 void CommitHistoryContextMenu::resetSoft()

@@ -89,7 +89,7 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    if (!remoteBranches.isEmpty())
       auxMessage.append(QString("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
 
-   const auto tags = r.getReferences(References::Type::Tag);
+   const auto tags = r.getReferences(References::Type::LocalTag);
 
    if (!tags.isEmpty())
       auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));

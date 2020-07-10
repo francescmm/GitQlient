@@ -405,20 +405,28 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Typ
    return branches;
 }
 
-QMap<QString, QString> RevisionsCache::getTags() const
+QMap<QString, QString> RevisionsCache::getTags(References::Type tagType) const
 {
    QMap<QString, QString> tags;
 
    for (auto commit : mReferences)
    {
       const auto sha = commit->sha();
-      const auto tagNames = commit->getReferences(References::Type::Tag);
+      const auto tagNames = commit->getReferences(tagType);
 
       for (const auto &tag : tagNames)
          tags[tag] = sha;
    }
 
    return tags;
+}
+
+void RevisionsCache::updateTags(const QMap<QString, QString> &remoteTags)
+{
+   const auto end = remoteTags.constEnd();
+
+   for (auto iter = remoteTags.constBegin(); iter != end; ++iter)
+      insertReference(iter.key(), References::Type::RemoteTag, iter.value());
 }
 
 void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)

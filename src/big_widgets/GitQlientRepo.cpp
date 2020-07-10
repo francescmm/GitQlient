@@ -1,6 +1,7 @@
 #include "GitQlientRepo.h"
 
 #include <GitQlientSettings.h>
+#include <GitTags.h>
 #include <Controls.h>
 #include <BranchesWidget.h>
 #include <CommitHistoryColumns.h>
@@ -74,6 +75,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
    connect(mAutoFilesUpdate, &QTimer::timeout, this, &GitQlientRepo::updateUiFromWatcher);
 
+   connect(mControls, &Controls::signalFetchPerformed, this, &GitQlientRepo::updateTagsOnCache);
    connect(mControls, &Controls::signalGoRepo, this, &GitQlientRepo::showHistoryView);
    connect(mControls, &Controls::signalGoBlame, this, &GitQlientRepo::showBlameView);
    connect(mControls, &Controls::signalGoDiff, this, &GitQlientRepo::showDiffView);
@@ -264,6 +266,8 @@ void GitQlientRepo::onRepoLoadFinished()
 
    if (!mIsInit)
    {
+      updateTagsOnCache();
+
       mIsInit = true;
 
       mCurrentDir = mGitBase->getWorkingDir();
@@ -398,6 +402,14 @@ void GitQlientRepo::updateWip()
    mHistoryWidget->resetWip();
    mGitLoader.data()->updateWipRevision();
    mHistoryWidget->updateUiFromWatcher();
+}
+
+void GitQlientRepo::updateTagsOnCache()
+{
+   QScopedPointer<GitTags> gitTags(new GitTags(mGitBase));
+   const auto remoteTags = gitTags->getRemoteTags();
+
+   mGitQlientCache->updateTags(remoteTags);
 }
 
 void GitQlientRepo::openCommitDiff(const QString currentSha)

@@ -86,7 +86,10 @@ void BranchContextMenu::fetch()
    QApplication::restoreOverrideCursor();
 
    if (ret)
+   {
+      emit signalFetchPerformed();
       emit signalBranchesUpdated();
+   }
    else
       QMessageBox::critical(this, tr("Fetch failed"), tr("There were some problems while fetching. Please try again."));
 }

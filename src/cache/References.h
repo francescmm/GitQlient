@@ -8,7 +8,8 @@ class References
 public:
    enum class Type
    {
-      Tag,
+      LocalTag,
+      RemoteTag,
       LocalBranch,
       RemoteBranches,
       Applied,
