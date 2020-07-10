@@ -21,13 +21,11 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
    {
       connect(addAction("Pull"), &QAction::triggered, this, &BranchContextMenu::pull);
       connect(addAction("Fetch"), &QAction::triggered, this, &BranchContextMenu::fetch);
+      connect(addAction("Push"), &QAction::triggered, this, &BranchContextMenu::push);
    }
 
    if (mConfig.currentBranch == mConfig.branchSelected)
-   {
-      connect(addAction("Push"), &QAction::triggered, this, &BranchContextMenu::push);
       connect(addAction("Push force"), &QAction::triggered, this, &BranchContextMenu::pushForce);
-   }
 
    addSeparator();
 
@@ -98,7 +96,8 @@ void BranchContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
-   const auto ret = git->push();
+   const auto ret
+       = mConfig.currentBranch == mConfig.branchSelected ? git->push() : git->pushBranch(mConfig.branchSelected);
    QApplication::restoreOverrideCursor();
 
    if (ret.output.toString().contains("has no upstream branch"))

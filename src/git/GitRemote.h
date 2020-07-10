@@ -34,6 +34,7 @@ class GitRemote
 public:
    explicit GitRemote(const QSharedPointer<GitBase> &gitBase);
 
+   GitExecResult pushBranch(const QString &branchName, bool force = false);
    GitExecResult push(bool force = false);
    GitExecResult pull();
    bool fetch();

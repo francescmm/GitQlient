@@ -13,6 +13,20 @@ GitRemote::GitRemote(const QSharedPointer<GitBase> &gitBase)
 {
 }
 
+GitExecResult GitRemote::pushBranch(const QString &branchName, bool force)
+{
+   BenchmarkStart();
+
+   QLog_Debug("Git", QString("Executing push"));
+
+   const auto ret
+       = mGitBase->run(QString("git push origin %1 %2").arg(branchName, force ? QString("--force") : QString()));
+
+   BenchmarkEnd();
+
+   return ret;
+}
+
 GitExecResult GitRemote::push(bool force)
 {
    BenchmarkStart();
