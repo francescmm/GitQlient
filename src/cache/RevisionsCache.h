@@ -104,6 +104,7 @@ private:
    QVector<QString> mDirNames;
    QVector<QString> mFileNames;
    QVector<QString> mUntrackedfiles;
+   QMap<QString, QString> mRemoteTags;
 
    struct FileNamesLoader
    {

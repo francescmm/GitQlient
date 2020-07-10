@@ -34,7 +34,7 @@ QMap<QString, QString> GitTags::getRemoteTags() const
             const auto sha = tag.split('\t').constFirst();
             const auto tagName = tag.split('\t').last().remove("refs/tags/").remove("^{}");
 
-            tags.insert(sha, tagName);
+            tags.insert(tagName, sha);
          }
       }
    }

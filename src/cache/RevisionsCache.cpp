@@ -409,24 +409,26 @@ QMap<QString, QString> RevisionsCache::getTags(References::Type tagType) const
 {
    QMap<QString, QString> tags;
 
-   for (auto commit : mReferences)
+   if (tagType == References::Type::LocalTag)
    {
-      const auto sha = commit->sha();
-      const auto tagNames = commit->getReferences(tagType);
+      for (auto commit : mReferences)
+      {
+         const auto sha = commit->sha();
+         const auto tagNames = commit->getReferences(tagType);
 
-      for (const auto &tag : tagNames)
-         tags[tag] = sha;
+         for (const auto &tag : tagNames)
+            tags[tag] = sha;
+      }
    }
+   else
+      tags = mRemoteTags;
 
    return tags;
 }
 
 void RevisionsCache::updateTags(const QMap<QString, QString> &remoteTags)
 {
-   const auto end = remoteTags.constEnd();
-
-   for (auto iter = remoteTags.constBegin(); iter != end; ++iter)
-      insertReference(iter.key(), References::Type::RemoteTag, iter.value());
+   mRemoteTags = remoteTags;
 }
 
 void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
