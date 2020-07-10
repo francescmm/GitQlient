@@ -83,7 +83,7 @@ QString CommitInfo::getFieldStr(CommitInfo::Field field) const
 
 bool CommitInfo::isValid() const
 {
-   QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
+   static QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
 
    return !mSha.isEmpty() && hexMatcher.exactMatch(mSha);
 }
