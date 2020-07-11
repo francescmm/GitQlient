@@ -13,7 +13,7 @@ using namespace QLogger;
 
 GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString repoName, const ServerAuthentication &auth,
                              QObject *parent)
-   : ServerRestApi(parent)
+   : QObject(parent)
 {
    mManager = new QNetworkAccessManager();
    mServerUrl = "https://api.github.com/repos/";
@@ -63,6 +63,18 @@ void GitHubRestApi::requestLabels()
 }
 
 void GitHubRestApi::getMilestones() { }
+
+QUrl GitHubRestApi::formatUrl(const QString endPoint) const
+{
+   auto tmpUrl = mServerUrl + mRepoOwner + mRepoName + endPoint;
+   if (tmpUrl.endsWith("/"))
+      tmpUrl = tmpUrl.left(tmpUrl.size() - 1);
+
+   QUrl url(tmpUrl);
+   url.setUserName(mAuth.userName);
+   url.setPassword(mAuth.userPass);
+   return url;
+}
 
 void GitHubRestApi::onLabelsReceived(QNetworkReply *reply)
 {

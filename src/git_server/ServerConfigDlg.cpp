@@ -9,6 +9,7 @@
 
 #include <QLogger.h>
 
+#include <QTimer>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -35,6 +36,7 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *pa
    connect(ui->leUserToken, &QLineEdit::returnPressed, this, &ServerConfigDlg::accept);
    connect(ui->pbAccept, &QPushButton::clicked, this, &ServerConfigDlg::accept);
    connect(ui->pbCancel, &QPushButton::clicked, this, &ServerConfigDlg::reject);
+   connect(ui->pbTest, &QPushButton::clicked, this, &ServerConfigDlg::testToken);
 }
 
 ServerConfigDlg::~ServerConfigDlg()
@@ -51,24 +53,32 @@ void ServerConfigDlg::checkToken()
 
 void ServerConfigDlg::accept()
 {
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto serverUrl = gitConfig->getServerUrl();
+
+   GitQlientSettings settings;
+   settings.setValue(QString("%1/user").arg(serverUrl), ui->leUserName->text());
+   settings.setValue(QString("%1/token").arg(serverUrl), ui->leUserToken->text());
+
+   QDialog::accept();
+}
+
+void ServerConfigDlg::testToken()
+{
    if (ui->leUserToken->text().isEmpty())
       ui->leUserName->setStyleSheet("border: 1px solid red;");
    else
    {
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-      const auto serverUrl = gitConfig->getServerUrl();
       const auto parts = gitConfig->getCurrentRepoAndOwner();
       const auto api
           = new GitHubRestApi(parts.first, parts.second, { ui->leUserName->text(), ui->leUserToken->text() });
 
       api->testConnection();
 
-      connect(api, &GitHubRestApi::signalConnectionSuccessful, this, [this, serverUrl]() {
-         GitQlientSettings settings;
-         settings.setValue(QString("%1/user").arg(serverUrl), ui->leUserName->text());
-         settings.setValue(QString("%1/token").arg(serverUrl), ui->leUserToken->text());
-
-         QDialog::accept();
+      connect(api, &GitHubRestApi::signalConnectionSuccessful, this, [this]() {
+         ui->lTestResult->setText("Token confirmed!");
+         QTimer::singleShot(3000, ui->lTestResult, &QLabel::clear);
       });
    }
 }

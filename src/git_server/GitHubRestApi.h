@@ -2,7 +2,6 @@
 
 #include <QObject>
 #include <QUrl>
-#include <GitQlientSettings.h>
 
 struct ServerIssue
 {
@@ -46,48 +45,17 @@ struct ServerMilestone
    bool isOpen;
 };
 
-class QNetworkAccessManager;
-class QNetworkReply;
-
 struct ServerAuthentication
 {
    QString userName;
    QString userPass;
 };
 
-class ServerRestApi : public QObject
-{
-   Q_OBJECT
-
-public:
-   explicit ServerRestApi(QObject *parent = nullptr)
-      : QObject(parent)
-   {
-   }
-
-protected:
-   QString mServerUrl;
-   QString mRepoName;
-   QString mRepoOwner;
-   ServerAuthentication mAuth;
-   QNetworkAccessManager *mManager;
-
-   virtual QUrl formatUrl(const QString endPoint) const final
-   {
-      auto tmpUrl = mServerUrl + mRepoOwner + mRepoName + endPoint;
-      if (tmpUrl.endsWith("/"))
-         tmpUrl = tmpUrl.left(tmpUrl.size() - 1);
-
-      QUrl url(tmpUrl);
-      url.setUserName(mAuth.userName);
-      url.setPassword(mAuth.userPass);
-      return url;
-   }
-};
-
 class QJsonDocument;
+class QNetworkAccessManager;
+class QNetworkReply;
 
-class GitHubRestApi : public ServerRestApi
+class GitHubRestApi : public QObject
 {
    Q_OBJECT
 
@@ -111,7 +79,14 @@ public:
    void getMilestones();
 
 private:
-   void onLabelsReceived(QNetworkReply *reply);
+   QString mServerUrl;
+   QString mRepoName;
+   QString mRepoOwner;
+   ServerAuthentication mAuth;
+   QNetworkAccessManager *mManager;
+
+   QUrl formatUrl(const QString endPoint) const;
 
    std::optional<QJsonDocument> validateData(QNetworkReply *reply);
+   void onLabelsReceived(QNetworkReply *reply);
 };

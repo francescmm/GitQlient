@@ -72,4 +72,5 @@ private:
     * @brief Executes the Git actions based on the configuration once the validation as taken place.
     */
    void accept() override;
+   void testToken();
 };
