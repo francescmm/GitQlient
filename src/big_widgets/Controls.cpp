@@ -148,10 +148,14 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
          const auto gitMenu = new QMenu(mStashBtn);
 
          action = gitMenu->addAction(tr("New Issue"));
-         connect(action, &QAction::triggered, this, &Controls::stashCurrentWork);
+         connect(action, &QAction::triggered, this, &Controls::createNewIssue);
 
          action = gitMenu->addAction(tr("New %1").arg(prName));
-         connect(action, &QAction::triggered, this, &Controls::popStashedWork);
+         connect(action, &QAction::triggered, this, &Controls::createNewPullRequest);
+
+         gitMenu->addSeparator();
+         action = gitMenu->addAction(tr("Config server"));
+         connect(action, &QAction::triggered, this, &Controls::configServer);
 
          mGitPlatform->setMenu(gitMenu);
          mGitPlatform->setIcon(gitPlatformIcon);
@@ -422,3 +426,9 @@ void Controls::showConfigDlg()
    const auto configDlg = new RepoConfigDlg(mGit, this);
    configDlg->exec();
 }
+
+void Controls::createNewIssue() { }
+
+void Controls::createNewPullRequest() { }
+
+void Controls::configServer() { }

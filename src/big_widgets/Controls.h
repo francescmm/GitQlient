@@ -194,4 +194,19 @@ private:
     * \brief Shows the config dialog for both Local and Global user data.
     */
    void showConfigDlg();
+
+   /**
+    * @brief createNewIssue Shows the dialog to create a new issue on the server.
+    */
+   void createNewIssue();
+
+   /**
+    * @brief createNewPullRequest Shows the dialog to create a new pull request on the server.
+    */
+   void createNewPullRequest();
+
+   /**
+    * @brief configServer Shows the dialog to configure this repository's server.
+    */
+   void configServer();
 };
