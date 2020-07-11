@@ -7,6 +7,7 @@
 #include <GitConfig.h>
 #include <BranchDlg.h>
 #include <RepoConfigDlg.h>
+#include <ServerConfigDlg.h>
 
 #include <QApplication>
 #include <QToolButton>
@@ -431,4 +432,8 @@ void Controls::createNewIssue() { }
 
 void Controls::createNewPullRequest() { }
 
-void Controls::configServer() { }
+void Controls::configServer()
+{
+   const auto configDlg = new ServerConfigDlg(mGit, this);
+   configDlg->exec();
+}
