@@ -62,7 +62,14 @@ void GitHubRestApi::requestLabels()
    connect(reply, &QNetworkReply::readyRead, this, [this, reply]() { onLabelsReceived(reply); });
 }
 
-void GitHubRestApi::getMilestones() { }
+void GitHubRestApi::getMilestones()
+{
+   QNetworkRequest request;
+   request.setUrl(formatUrl("milestones"));
+
+   const auto reply = mManager->get(request);
+   connect(reply, &QNetworkReply::readyRead, this, [this, reply]() { onLabelsReceived(reply); });
+}
 
 QUrl GitHubRestApi::formatUrl(const QString endPoint) const
 {
@@ -98,6 +105,30 @@ void GitHubRestApi::onLabelsReceived(QNetworkReply *reply)
       }
 
       emit signalLabelsReceived(labels);
+   }
+}
+
+void GitHubRestApi::onMilestonesReceived(QNetworkReply *reply)
+{
+   if (const auto jsonDoc = validateData(reply); jsonDoc.has_value())
+   {
+      QVector<ServerMilestone> milestones;
+      const auto labelsArray = jsonDoc.value().array();
+
+      for (auto label : labelsArray)
+      {
+         const auto jobObject = label.toObject();
+         ServerMilestone sMilestone { jobObject[QStringLiteral("id")].toInt(),
+                                      jobObject[QStringLiteral("number")].toInt(),
+                                      jobObject[QStringLiteral("node_id")].toString(),
+                                      jobObject[QStringLiteral("title")].toString(),
+                                      jobObject[QStringLiteral("description")].toString(),
+                                      jobObject[QStringLiteral("state")].toString() == "open" };
+
+         milestones.append(std::move(sMilestone));
+      }
+
+      emit signalMilestonesReceived(milestones);
    }
 }
 

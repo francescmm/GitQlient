@@ -89,4 +89,5 @@ private:
 
    std::optional<QJsonDocument> validateData(QNetworkReply *reply);
    void onLabelsReceived(QNetworkReply *reply);
+   void onMilestonesReceived(QNetworkReply *reply);
 };
