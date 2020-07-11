@@ -4,6 +4,7 @@
 #include <GitStashes.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
+#include <GitConfig.h>
 #include <BranchDlg.h>
 #include <RepoConfigDlg.h>
 
@@ -25,6 +26,7 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    , mStashBtn(new QToolButton())
    , mRefreshBtn(new QToolButton())
    , mConfigBtn(new QToolButton())
+   , mGitPlatform(new QToolButton())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -115,6 +117,44 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    hLayout->addWidget(mPullBtn);
    hLayout->addWidget(mPushBtn);
    hLayout->addWidget(mStashBtn);
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto remoteUrl = gitConfig->getGitValue("remote.origin.url");
+   if (remoteUrl.success)
+   {
+      const auto platform = remoteUrl.output.toString();
+      QIcon gitPlatformIcon;
+      QString name;
+
+      if (platform.contains("github", Qt::CaseInsensitive))
+      {
+         gitPlatformIcon = QIcon(":/icons/github");
+         name = "GitHub";
+      }
+      else if (platform.contains("gitlab", Qt::CaseInsensitive))
+      {
+         gitPlatformIcon = QIcon(":/icons/gitlab");
+         name = "GitLab";
+      }
+      else if (platform.contains("bitbucket", Qt::CaseInsensitive))
+      {
+         gitPlatformIcon = QIcon(":/icons/bitbucket");
+         name = "Bitbucket";
+      }
+
+      mGitPlatform->setIcon(gitPlatformIcon);
+      mGitPlatform->setIconSize(QSize(22, 22));
+      mGitPlatform->setText(name);
+      mGitPlatform->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+      const auto verticalFrame3 = new QFrame();
+      verticalFrame3->setObjectName("orangeSeparator");
+      hLayout->addWidget(verticalFrame3);
+      hLayout->addWidget(mGitPlatform);
+   }
+   else
+      mGitPlatform->setVisible(false);
+
    hLayout->addWidget(verticalFrame2);
    hLayout->addWidget(mRefreshBtn);
    hLayout->addStretch();

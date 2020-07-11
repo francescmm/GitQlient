@@ -155,6 +155,7 @@ private:
    QToolButton *mStashBtn = nullptr;
    QToolButton *mRefreshBtn = nullptr;
    QToolButton *mConfigBtn = nullptr;
+   QToolButton *mGitPlatform = nullptr;
    QPushButton *mMergeWarning = nullptr;
 
    /*!

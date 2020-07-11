@@ -60,6 +60,9 @@
         <file alias="arrow_up_full">resources/icons/arrow_up_full.svg</file>
         <file alias="save">resources/icons/save.svg</file>
         <file alias="edit">resources/icons/edit.svg</file>
+        <file alias="bitbucket">resources/icons/bitbucket-brands.svg</file>
+        <file alias="github">resources/icons/github-brands.svg</file>
+        <file alias="gitlab">resources/icons/gitlab-brands.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

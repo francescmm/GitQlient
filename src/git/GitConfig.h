@@ -60,6 +60,7 @@ public:
    GitExecResult getLocalConfig() const;
    GitExecResult getGlobalConfig() const;
    GitExecResult getRemoteForBranch(const QString &branch);
+   GitExecResult getGitValue(const QString &key);
 
 private:
    QSharedPointer<GitBase> mGitBase;

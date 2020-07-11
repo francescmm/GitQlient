@@ -207,3 +207,16 @@ GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
    BenchmarkEnd();
    return GitExecResult();
 }
+
+GitExecResult GitConfig::getGitValue(const QString &key)
+{
+   BenchmarkStart();
+
+   QLog_Debug("Git", QString("Getting value for config key {%1}").arg(key));
+
+   const auto ret = mGitBase->run(QString("git config --get %1").arg(key));
+
+   BenchmarkEnd();
+
+   return ret;
+}
