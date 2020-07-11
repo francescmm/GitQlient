@@ -55,16 +55,22 @@ void ServerConfigDlg::accept()
    else
    {
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-      auto repoUrl = gitConfig->getGitValue("remote.origin.url").output.toString().trimmed();
-      QString repo = repoUrl;
+      auto serverUrl = gitConfig->getGitValue("remote.origin.url").output.toString().trimmed();
+      QString repo;
 
-      if (repo.startsWith("git@"))
-         repo = repo.mid(repo.lastIndexOf(":") + 1);
-      else if (repo.startsWith("https"))
+      if (serverUrl.startsWith("git@"))
       {
-         repo = repo.remove("https://");
-         repo = repo.mid(repo.indexOf("/") + 1);
+         serverUrl.remove("git@");
+         repo = serverUrl.mid(serverUrl.lastIndexOf(":") + 1);
+         serverUrl.replace(":", "/");
       }
+      else if (serverUrl.startsWith("https://"))
+      {
+         serverUrl.remove("https://");
+         repo = serverUrl.mid(serverUrl.indexOf("/") + 1);
+      }
+
+      serverUrl = serverUrl.mid(0, repo.indexOf("/"));
       repo.remove(".git");
 
       QUrl url(QString("https://api.github.com/repos/%1").arg(repo));
@@ -77,19 +83,9 @@ void ServerConfigDlg::accept()
       const auto reply = mManager->get(request);
       connect(reply, &QNetworkReply::readyRead, this, [reply, this]() { onUserTokenCheck(reply); });
 
-      if (repoUrl.startsWith("git@"))
-      {
-         repoUrl.remove("git@");
-         repoUrl.replace(":", "/");
-      }
-      else if (repoUrl.startsWith("https://"))
-         repoUrl.remove("https://");
-
-      repoUrl = repoUrl.mid(0, repo.indexOf("/"));
-
       GitQlientSettings settings;
-      settings.setValue(QString("%1/user").arg(repoUrl), ui->leUserName->text());
-      settings.setValue(QString("%1/token").arg(repoUrl), ui->leUserToken->text());
+      settings.setValue(QString("%1/user").arg(serverUrl), ui->leUserName->text());
+      settings.setValue(QString("%1/token").arg(serverUrl), ui->leUserToken->text());
    }
 }
 
