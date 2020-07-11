@@ -38,7 +38,8 @@ enum class ControlsMainViews
    HISTORY,
    DIFF,
    BLAME,
-   MERGE
+   MERGE,
+   SERVER
 };
 
 /*!
@@ -71,6 +72,12 @@ signals:
 
    */
    void signalGoMerge();
+
+   /**
+    * @brief signalGoManagement Signal triggered when the user selected the Git remote platform viewer.
+    */
+   void signalGoServer();
+
    /*!
     \brief Signal triggered when the user manually forces a refresh of the repository data.
 
