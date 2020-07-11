@@ -31,6 +31,8 @@ class ServerConfigDlg;
 }
 
 class GitBase;
+class QNetworkAccessManager;
+class QNetworkReply;
 
 /**
  * @brief The ServerConfigDlg class creates a small dialog where the user can add the user name and the user token of
@@ -60,6 +62,7 @@ public:
 private:
    Ui::ServerConfigDlg *ui = nullptr;
    QSharedPointer<GitBase> mGit;
+   QNetworkAccessManager *mManager;
 
    /**
     * @brief Validates the provided token by the user.
@@ -69,4 +72,10 @@ private:
     * @brief Executes the Git actions based on the configuration once the validation as taken place.
     */
    void accept() override;
+
+   /**
+    * @brief onUserTokenCheck Stores the data when the user name and token provided are checked agains the server.
+    * @param The reply data to process.
+    */
+   void onUserTokenCheck(QNetworkReply *reply);
 };
