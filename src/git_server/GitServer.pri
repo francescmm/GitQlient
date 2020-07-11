@@ -10,7 +10,8 @@ HEADERS += \
    $$PWD/ServerConfigDlg.h \
    $$PWD/ServerIssue.h \
    $$PWD/ServerLabel.h \
-   $$PWD/ServerMilestone.h
+   $$PWD/ServerMilestone.h \
+   $$PWD/ServerPullRequest.h
 
 SOURCES += \
    $$PWD/CreateIssueDlg.cpp \

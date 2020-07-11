@@ -29,17 +29,6 @@
 #include <QObject>
 #include <QUrl>
 
-struct ServerPullRequest
-{
-   QString title;
-   QString head;
-   QString base;
-   QString body;
-   bool isOpen;
-   bool maintainerCanModify;
-   bool draft;
-};
-
 struct ServerAuthentication
 {
    QString userName;
@@ -50,6 +39,7 @@ class QJsonDocument;
 class QNetworkAccessManager;
 class QNetworkReply;
 struct ServerIssue;
+struct ServerPullRequest;
 
 class GitHubRestApi : public QObject
 {

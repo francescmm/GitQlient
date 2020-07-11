@@ -1,5 +1,6 @@
 #include "GitHubRestApi.h"
 #include <ServerIssue.h>
+#include <ServerPullRequest.h>
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
