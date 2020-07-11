@@ -125,6 +125,7 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
       const auto platform = remoteUrl.output.toString();
       QIcon gitPlatformIcon;
       QString name;
+      auto add = true;
 
       if (platform.contains("github", Qt::CaseInsensitive))
       {
@@ -136,21 +137,23 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
          gitPlatformIcon = QIcon(":/icons/gitlab");
          name = "GitLab";
       }
-      else if (platform.contains("bitbucket", Qt::CaseInsensitive))
+      else
+         add = false;
+
+      if (add)
       {
-         gitPlatformIcon = QIcon(":/icons/bitbucket");
-         name = "Bitbucket";
+         mGitPlatform->setIcon(gitPlatformIcon);
+         mGitPlatform->setIconSize(QSize(22, 22));
+         mGitPlatform->setText(name);
+         mGitPlatform->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+
+         const auto verticalFrame3 = new QFrame();
+         verticalFrame3->setObjectName("orangeSeparator");
+         hLayout->addWidget(verticalFrame3);
+         hLayout->addWidget(mGitPlatform);
       }
-
-      mGitPlatform->setIcon(gitPlatformIcon);
-      mGitPlatform->setIconSize(QSize(22, 22));
-      mGitPlatform->setText(name);
-      mGitPlatform->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-
-      const auto verticalFrame3 = new QFrame();
-      verticalFrame3->setObjectName("orangeSeparator");
-      hLayout->addWidget(verticalFrame3);
-      hLayout->addWidget(mGitPlatform);
+      else
+         mGitPlatform->setVisible(false);
    }
    else
       mGitPlatform->setVisible(false);
