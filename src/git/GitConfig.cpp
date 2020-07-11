@@ -223,12 +223,26 @@ GitExecResult GitConfig::getGitValue(const QString &key) const
 
 QString GitConfig::getServerUrl() const
 {
-   return getGitValue("remote.origin.url").output.toString().trimmed();
+   auto serverUrl = getGitValue("remote.origin.url").output.toString().trimmed();
+
+   if (serverUrl.startsWith("git@"))
+   {
+      serverUrl.remove("git@");
+      serverUrl.replace(":", "/");
+   }
+   else if (serverUrl.startsWith("https://"))
+   {
+      serverUrl.remove("https://");
+   }
+
+   serverUrl = serverUrl.mid(0, serverUrl.indexOf("/"));
+
+   return serverUrl;
 }
 
 QPair<QString, QString> GitConfig::getCurrentRepoAndOwner() const
 {
-   auto serverUrl = getServerUrl();
+   auto serverUrl = getGitValue("remote.origin.url").output.toString().trimmed();
    QString repo;
 
    if (serverUrl.startsWith("git@"))
@@ -243,7 +257,7 @@ QPair<QString, QString> GitConfig::getCurrentRepoAndOwner() const
       repo = serverUrl.mid(serverUrl.indexOf("/") + 1);
    }
 
-   serverUrl = serverUrl.mid(0, repo.indexOf("/"));
+   serverUrl = serverUrl.mid(0, serverUrl.indexOf("/"));
    repo.remove(".git");
 
    const auto parts = repo.split("/");

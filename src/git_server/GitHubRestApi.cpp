@@ -1,4 +1,5 @@
 #include "GitHubRestApi.h"
+#include <ServerIssue.h>
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -11,7 +12,7 @@
 
 using namespace QLogger;
 
-GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString repoName, const ServerAuthentication &auth,
+GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
                              QObject *parent)
    : QObject(parent)
 {
@@ -40,16 +41,30 @@ void GitHubRestApi::testConnection()
    QNetworkRequest request;
    request.setUrl(url);
 
-   const auto reply = mManager->get(request);
-   connect(reply, &QNetworkReply::readyRead, this, [this, reply]() {
-      if (const auto jsonDoc = validateData(reply); jsonDoc.has_value())
-      {
-         emit signalConnectionSuccessful();
-      }
-   });
+   mManager->get(request);
+   connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
 }
 
-void GitHubRestApi::createIssue() { }
+void GitHubRestApi::createIssue(const ServerIssue &issue)
+{
+   QJsonDocument doc(issue.toJson());
+   const auto data = doc.toJson(QJsonDocument::Compact);
+
+   QNetworkRequest request;
+   request.setUrl(formatUrl("issues"));
+   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("Content-Type", "application/json");
+   request.setRawHeader("Content-Length", QByteArray::number(data.size()));
+   request.setRawHeader(
+       QByteArray("Authorization"),
+       QByteArray("Basic ")
+           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
+                 .toBase64());
+
+   mManager->post(request, data);
+   connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
+}
 
 void GitHubRestApi::createPullRequest() { }
 
@@ -58,8 +73,8 @@ void GitHubRestApi::requestLabels()
    QNetworkRequest request;
    request.setUrl(formatUrl("labels"));
 
-   const auto reply = mManager->get(request);
-   connect(reply, &QNetworkReply::readyRead, this, [this, reply]() { onLabelsReceived(reply); });
+   mManager->get(request);
+   connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
 }
 
 void GitHubRestApi::getMilestones()
@@ -67,8 +82,8 @@ void GitHubRestApi::getMilestones()
    QNetworkRequest request;
    request.setUrl(formatUrl("milestones"));
 
-   const auto reply = mManager->get(request);
-   connect(reply, &QNetworkReply::readyRead, this, [this, reply]() { onLabelsReceived(reply); });
+   mManager->get(request);
+   connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
 }
 
 QUrl GitHubRestApi::formatUrl(const QString endPoint) const
@@ -78,72 +93,75 @@ QUrl GitHubRestApi::formatUrl(const QString endPoint) const
       tmpUrl = tmpUrl.left(tmpUrl.size() - 1);
 
    QUrl url(tmpUrl);
-   url.setUserName(mAuth.userName);
-   url.setPassword(mAuth.userPass);
+   // url.setUserName(mAuth.userName);
+   // url.setPassword(mAuth.userPass);
    return url;
 }
 
-void GitHubRestApi::onLabelsReceived(QNetworkReply *reply)
+void GitHubRestApi::onLabelsReceived(const QJsonDocument &doc)
 {
-   if (const auto jsonDoc = validateData(reply); jsonDoc.has_value())
+   QVector<ServerLabel> labels;
+   const auto labelsArray = doc.array();
+
+   for (auto label : labelsArray)
    {
-      QVector<ServerLabel> labels;
-      const auto labelsArray = jsonDoc.value().array();
+      const auto jobObject = label.toObject();
+      ServerLabel sLabel { jobObject[QStringLiteral("id")].toInt(),
+                           jobObject[QStringLiteral("node_id")].toString(),
+                           jobObject[QStringLiteral("url")].toString(),
+                           jobObject[QStringLiteral("name")].toString(),
+                           jobObject[QStringLiteral("description")].toString(),
+                           jobObject[QStringLiteral("color")].toString(),
+                           jobObject[QStringLiteral("default")].toBool() };
 
-      for (auto label : labelsArray)
-      {
-         const auto jobObject = label.toObject();
-         ServerLabel sLabel { jobObject[QStringLiteral("id")].toInt(),
-                              jobObject[QStringLiteral("node_id")].toString(),
-                              jobObject[QStringLiteral("url")].toString(),
-                              jobObject[QStringLiteral("name")].toString(),
-                              jobObject[QStringLiteral("description")].toString(),
-                              jobObject[QStringLiteral("color")].toString(),
-                              jobObject[QStringLiteral("default")].toBool() };
-
-         labels.append(std::move(sLabel));
-      }
-
-      emit signalLabelsReceived(labels);
+      labels.append(std::move(sLabel));
    }
+
+   emit signalLabelsReceived(labels);
 }
 
-void GitHubRestApi::onMilestonesReceived(QNetworkReply *reply)
+void GitHubRestApi::onMilestonesReceived(const QJsonDocument &doc)
 {
-   if (const auto jsonDoc = validateData(reply); jsonDoc.has_value())
+   QVector<ServerMilestone> milestones;
+   const auto labelsArray = doc.array();
+
+   for (auto label : labelsArray)
    {
-      QVector<ServerMilestone> milestones;
-      const auto labelsArray = jsonDoc.value().array();
+      const auto jobObject = label.toObject();
+      ServerMilestone sMilestone { jobObject[QStringLiteral("id")].toInt(),
+                                   jobObject[QStringLiteral("number")].toInt(),
+                                   jobObject[QStringLiteral("node_id")].toString(),
+                                   jobObject[QStringLiteral("title")].toString(),
+                                   jobObject[QStringLiteral("description")].toString(),
+                                   jobObject[QStringLiteral("state")].toString() == "open" };
 
-      for (auto label : labelsArray)
-      {
-         const auto jobObject = label.toObject();
-         ServerMilestone sMilestone { jobObject[QStringLiteral("id")].toInt(),
-                                      jobObject[QStringLiteral("number")].toInt(),
-                                      jobObject[QStringLiteral("node_id")].toString(),
-                                      jobObject[QStringLiteral("title")].toString(),
-                                      jobObject[QStringLiteral("description")].toString(),
-                                      jobObject[QStringLiteral("state")].toString() == "open" };
-
-         milestones.append(std::move(sMilestone));
-      }
-
-      emit signalMilestonesReceived(milestones);
+      milestones.append(std::move(sMilestone));
    }
+
+   emit signalMilestonesReceived(milestones);
 }
 
-std::optional<QJsonDocument> GitHubRestApi::validateData(QNetworkReply *reply)
+void GitHubRestApi::onIssueCreated(const QJsonDocument &doc)
+{
+   const auto issue = doc.object();
+   const auto url = issue[QStringLiteral("url")].toString();
+
+   emit signalIssueCreated(url);
+}
+
+void GitHubRestApi::validateData(QNetworkReply *reply)
 {
    if (reply == nullptr)
-      return std::nullopt;
+      return;
 
    const auto data = reply->readAll();
    const auto jsonDoc = QJsonDocument::fromJson(data);
+   const auto url = reply->url().path();
 
    if (jsonDoc.isNull())
    {
       QLog_Error("Ui", QString("Error when parsing Json. Current data:\n%1").arg(QString::fromUtf8(data)));
-      return std::nullopt;
+      return;
    }
 
    const auto jsonObject = jsonDoc.object();
@@ -154,8 +172,15 @@ std::optional<QJsonDocument> GitHubRestApi::validateData(QNetworkReply *reply)
       if (message.contains("Not found", Qt::CaseInsensitive))
          QLog_Error("Ui", QString("Url not found or error when validating user and token."));
 
-      return std::nullopt;
+      return;
    }
 
-   return jsonDoc;
+   if (url.contains("labels"))
+      onLabelsReceived(jsonDoc);
+   else if (url.contains("milestones"))
+      onMilestonesReceived(jsonDoc);
+   else if (url.contains("issues"))
+      onIssueCreated(jsonDoc);
+   else
+      emit signalConnectionSuccessful();
 }
