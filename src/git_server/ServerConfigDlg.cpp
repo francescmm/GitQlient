@@ -5,6 +5,7 @@
 #include <GitConfig.h>
 #include <GitQlientStyles.h>
 #include <GitQlientSettings.h>
+#include <GitHubRestApi.h>
 
 #include <QLogger.h>
 
@@ -55,64 +56,19 @@ void ServerConfigDlg::accept()
    else
    {
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-      auto serverUrl = gitConfig->getGitValue("remote.origin.url").output.toString().trimmed();
-      QString repo;
+      const auto serverUrl = gitConfig->getServerUrl();
+      const auto parts = gitConfig->getCurrentRepoAndOwner();
+      const auto api
+          = new GitHubRestApi(parts.first, parts.second, { ui->leUserName->text(), ui->leUserToken->text() });
 
-      if (serverUrl.startsWith("git@"))
-      {
-         serverUrl.remove("git@");
-         repo = serverUrl.mid(serverUrl.lastIndexOf(":") + 1);
-         serverUrl.replace(":", "/");
-      }
-      else if (serverUrl.startsWith("https://"))
-      {
-         serverUrl.remove("https://");
-         repo = serverUrl.mid(serverUrl.indexOf("/") + 1);
-      }
+      api->testConnection();
 
-      serverUrl = serverUrl.mid(0, repo.indexOf("/"));
-      repo.remove(".git");
+      connect(api, &GitHubRestApi::signalConnectionSuccessful, this, [this, serverUrl]() {
+         GitQlientSettings settings;
+         settings.setValue(QString("%1/user").arg(serverUrl), ui->leUserName->text());
+         settings.setValue(QString("%1/token").arg(serverUrl), ui->leUserToken->text());
 
-      QUrl url(QString("https://api.github.com/repos/%1").arg(repo));
-      url.setUserName(ui->leUserName->text());
-      url.setPassword(ui->leUserToken->text());
-
-      QNetworkRequest request;
-      request.setUrl(url);
-
-      const auto reply = mManager->get(request);
-      connect(reply, &QNetworkReply::readyRead, this, [reply, this]() { onUserTokenCheck(reply); });
-
-      GitQlientSettings settings;
-      settings.setValue(QString("%1/user").arg(serverUrl), ui->leUserName->text());
-      settings.setValue(QString("%1/token").arg(serverUrl), ui->leUserToken->text());
+         QDialog::accept();
+      });
    }
-}
-
-void ServerConfigDlg::onUserTokenCheck(QNetworkReply *reply)
-{
-   if (reply == nullptr)
-      return;
-
-   const auto data = reply->readAll();
-   const auto jsonDoc = QJsonDocument::fromJson(data);
-
-   if (jsonDoc.isNull())
-   {
-      QLog_Error("Ui", QString("Error when parsing Json. Current data:\n%1").arg(QString::fromUtf8(data)));
-      return;
-   }
-
-   QJsonObject jsonObject = jsonDoc.object();
-   if (jsonObject.contains(QStringLiteral("message")))
-   {
-      const auto message = jsonObject[QStringLiteral("message")].toString();
-
-      if (message.contains("Not found", Qt::CaseInsensitive))
-         QLog_Error("Ui", QString("Error when validating user and token."));
-
-      return;
-   }
-
-   QDialog::accept();
 }

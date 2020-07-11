@@ -72,10 +72,4 @@ private:
     * @brief Executes the Git actions based on the configuration once the validation as taken place.
     */
    void accept() override;
-
-   /**
-    * @brief onUserTokenCheck Stores the data when the user name and token provided are checked agains the server.
-    * @param The reply data to process.
-    */
-   void onUserTokenCheck(QNetworkReply *reply);
 };

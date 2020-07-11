@@ -208,7 +208,7 @@ GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
    return GitExecResult();
 }
 
-GitExecResult GitConfig::getGitValue(const QString &key)
+GitExecResult GitConfig::getGitValue(const QString &key) const
 {
    BenchmarkStart();
 
@@ -219,4 +219,34 @@ GitExecResult GitConfig::getGitValue(const QString &key)
    BenchmarkEnd();
 
    return ret;
+}
+
+QString GitConfig::getServerUrl() const
+{
+   return getGitValue("remote.origin.url").output.toString().trimmed();
+}
+
+QPair<QString, QString> GitConfig::getCurrentRepoAndOwner() const
+{
+   auto serverUrl = getServerUrl();
+   QString repo;
+
+   if (serverUrl.startsWith("git@"))
+   {
+      serverUrl.remove("git@");
+      repo = serverUrl.mid(serverUrl.lastIndexOf(":") + 1);
+      serverUrl.replace(":", "/");
+   }
+   else if (serverUrl.startsWith("https://"))
+   {
+      serverUrl.remove("https://");
+      repo = serverUrl.mid(serverUrl.indexOf("/") + 1);
+   }
+
+   serverUrl = serverUrl.mid(0, repo.indexOf("/"));
+   repo.remove(".git");
+
+   const auto parts = repo.split("/");
+
+   return qMakePair(parts.constFirst(), parts.constLast());
 }
