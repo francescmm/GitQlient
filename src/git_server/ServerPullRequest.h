@@ -29,9 +29,9 @@
 struct ServerPullRequest
 {
    QString title;
+   QByteArray body;
    QString head;
    QString base;
-   QString body;
    bool isOpen;
    bool maintainerCanModify;
    bool draft;
@@ -43,7 +43,7 @@ struct ServerPullRequest
       object.insert("title", title);
       object.insert("head", head);
       object.insert("base", base);
-      object.insert("body", body);
+      object.insert("body", body.toStdString().c_str());
       object.insert("maintainer_can_modify", maintainerCanModify);
       object.insert("draft", draft);
 
