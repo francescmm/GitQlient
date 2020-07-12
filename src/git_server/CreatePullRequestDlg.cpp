@@ -19,6 +19,8 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
    , mCache(cache)
    , mGit(git)
 {
+   ui->setupUi(this);
+
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto gameServerUrl = gitConfig->getServerUrl();
 
@@ -38,8 +40,6 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
       mApi->getMilestones();
       mApi->requestLabels();
    }
-
-   ui->setupUi(this);
 
    const auto branches = mCache->getBranches(References::Type::RemoteBranches);
 
@@ -82,6 +82,8 @@ void CreatePullRequestDlg::accept()
 
 void CreatePullRequestDlg::onMilestones(const QVector<ServerMilestone> &milestones)
 {
+   ui->cbMilesone->addItem("Select milestone", -1);
+
    for (auto &milestone : milestones)
       ui->cbMilesone->addItem(milestone.title, milestone.number);
 }
@@ -119,7 +121,7 @@ void CreatePullRequestDlg::onPullRequestCreated(const QString &url)
       }
    }
 
-   mApi->updateIssue(mIssue, { "", "", milestone, labels, { mUserName } });
+   mApi->updateIssue(mIssue, { ui->leTitle->text(), "", milestone, labels, { mUserName } });
 }
 
 void CreatePullRequestDlg::onPullRequestUpdated()

@@ -14,6 +14,8 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *paren
    , ui(new Ui::CreateIssueDlg)
    , mGit(git)
 {
+   ui->setupUi(this);
+
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto gameServerUrl = gitConfig->getServerUrl();
 
@@ -32,8 +34,6 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *paren
       mApi->getMilestones();
       mApi->requestLabels();
    }
-
-   ui->setupUi(this);
 
    connect(ui->pbAccept, &QPushButton::clicked, this, &CreateIssueDlg::accept);
    connect(ui->pbClose, &QPushButton::clicked, this, &CreateIssueDlg::reject);
@@ -68,6 +68,8 @@ void CreateIssueDlg::accept()
 
 void CreateIssueDlg::onMilestones(const QVector<ServerMilestone> &milestones)
 {
+   ui->cbMilesone->addItem("Select milestone", -1);
+
    for (auto &milestone : milestones)
       ui->cbMilesone->addItem(milestone.title, milestone.number);
 }
