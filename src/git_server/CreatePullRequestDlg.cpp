@@ -44,7 +44,8 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
       ui->cbDestination->addItems(value.second);
    }
 
-   ui->cbOrigin->setCurrentText(mGit->getCurrentBranch());
+   const auto index = ui->cbOrigin->findText(mGit->getCurrentBranch(), Qt::MatchEndsWith);
+   ui->cbOrigin->setCurrentIndex(index);
 
    connect(ui->pbCreate, &QPushButton::clicked, this, &CreatePullRequestDlg::accept);
    connect(ui->pbClose, &QPushButton::clicked, this, &CreatePullRequestDlg::reject);
