@@ -32,8 +32,9 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
       mUserName = settings.value(QString("%1/user").arg(serverUrl)).toString();
       const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+      const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
 
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken }, serverUrl);
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken }, endpoint);
       connect(mApi, &GitHubRestApi::signalIssueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
       connect(mApi, &GitHubRestApi::signalPullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
       connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreatePullRequestDlg::onMilestones);
@@ -96,6 +97,8 @@ void CreatePullRequestDlg::onMilestones(const QVector<ServerMilestone> &mileston
 
    for (auto &milestone : milestones)
       ui->cbMilesone->addItem(milestone.title, milestone.number);
+
+   ui->cbMilesone->setCurrentIndex(0);
 }
 
 void CreatePullRequestDlg::onLabels(const QVector<ServerLabel> &labels)

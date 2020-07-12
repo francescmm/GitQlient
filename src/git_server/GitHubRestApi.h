@@ -55,7 +55,7 @@ signals:
 
 public:
    explicit GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
-                          const QString &serverUrl, QObject *parent = nullptr);
+                          const QString &endpointUrl, QObject *parent = nullptr);
 
    void testConnection();
 
@@ -67,13 +67,13 @@ public:
    void getMilestones();
 
 private:
-   QString mServerUrl;
+   QString mEndpointUrl;
    QString mRepoName;
    QString mRepoOwner;
    ServerAuthentication mAuth;
    QNetworkAccessManager *mManager;
 
-   QUrl formatUrl(const QString endPoint) const;
+   QUrl formatUrl(const QString page) const;
 
    void validateData(QNetworkReply *reply);
    void onLabelsReceived(const QJsonDocument &doc);

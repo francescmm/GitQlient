@@ -25,8 +25,9 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *paren
       mUserName = settings.value(QString("%1/user").arg(serverUrl)).toString();
       const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+      const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
 
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken }, serverUrl);
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken }, endpoint);
       connect(mApi, &GitHubRestApi::signalIssueCreated, this, &CreateIssueDlg::onIssueCreated);
       connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreateIssueDlg::onMilestones);
       connect(mApi, &GitHubRestApi::signalLabelsReceived, this, &CreateIssueDlg::onLabels);
@@ -72,6 +73,8 @@ void CreateIssueDlg::onMilestones(const QVector<ServerMilestone> &milestones)
 
    for (auto &milestone : milestones)
       ui->cbMilesone->addItem(milestone.title, milestone.number);
+
+   ui->cbMilesone->setCurrentIndex(0);
 }
 
 void CreateIssueDlg::onLabels(const QVector<ServerLabel> &labels)

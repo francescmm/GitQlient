@@ -14,15 +14,15 @@
 using namespace QLogger;
 
 GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
-                             const QString &serverUrl, QObject *parent)
+                             const QString &endpointUrl, QObject *parent)
    : QObject(parent)
-   , mServerUrl(serverUrl)
+   , mEndpointUrl(endpointUrl)
 {
    mManager = new QNetworkAccessManager();
    connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
 
-   if (!mServerUrl.endsWith("/"))
-      mServerUrl.append("/");
+   if (!mEndpointUrl.endsWith("/"))
+      mEndpointUrl.append("/");
 
    mRepoOwner = repoOwner;
 
@@ -39,9 +39,8 @@ GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, 
 
 void GitHubRestApi::testConnection()
 {
-   const auto url = formatUrl("");
    QNetworkRequest request;
-   request.setUrl(url);
+   request.setUrl(mEndpointUrl);
    request.setRawHeader("User-Agent", "GitQlient v1.2.0");
    request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
    request.setRawHeader(
@@ -117,6 +116,11 @@ void GitHubRestApi::requestLabels()
 {
    QNetworkRequest request;
    request.setUrl(formatUrl("labels"));
+   request.setRawHeader(
+       QByteArray("Authorization"),
+       QByteArray("Basic ")
+           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
+                 .toBase64());
 
    mManager->get(request);
 }
@@ -125,13 +129,18 @@ void GitHubRestApi::getMilestones()
 {
    QNetworkRequest request;
    request.setUrl(formatUrl("milestones"));
+   request.setRawHeader(
+       QByteArray("Authorization"),
+       QByteArray("Basic ")
+           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
+                 .toBase64());
 
    mManager->get(request);
 }
 
-QUrl GitHubRestApi::formatUrl(const QString endPoint) const
+QUrl GitHubRestApi::formatUrl(const QString page) const
 {
-   auto tmpUrl = mServerUrl + mRepoOwner + mRepoName + endPoint;
+   auto tmpUrl = mEndpointUrl + "repos/" + mRepoOwner + mRepoName + page;
    if (tmpUrl.endsWith("/"))
       tmpUrl = tmpUrl.left(tmpUrl.size() - 1);
 
