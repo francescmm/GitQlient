@@ -28,6 +28,7 @@
 
 #include <QObject>
 #include <QUrl>
+#include <QNetworkRequest>
 
 struct ServerAuthentication
 {
@@ -74,6 +75,7 @@ private:
    QNetworkAccessManager *mManager;
 
    QUrl formatUrl(const QString page) const;
+   QNetworkRequest createRequest(const QString &page) const;
 
    void validateData(QNetworkReply *reply);
    void onLabelsReceived(const QJsonDocument &doc);

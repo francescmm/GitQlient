@@ -38,7 +38,8 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *pa
    GitQlientSettings settings;
    ui->leUserName->setText(settings.value(QString("%1/user").arg(serverUrl)).toString());
    ui->leUserToken->setText(settings.value(QString("%1/token").arg(serverUrl)).toString());
-   ui->leEndPoint->setText(settings.value(QString("%1/endpoint").arg(serverUrl)).toString());
+   ui->leEndPoint->setText(
+       settings.value(QString("%1/endpoint").arg(serverUrl), QString("https://api.github.com/")).toString());
 
    connect(ui->leUserToken, &QLineEdit::editingFinished, this, &ServerConfigDlg::checkToken);
    connect(ui->leUserToken, &QLineEdit::returnPressed, this, &ServerConfigDlg::accept);
@@ -81,12 +82,8 @@ void ServerConfigDlg::testToken()
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
       const auto serverUrl = gitConfig->getServerUrl();
       const auto parts = gitConfig->getCurrentRepoAndOwner();
-
-      GitQlientSettings settings;
-      const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
-
-      const auto api
-          = new GitHubRestApi(parts.first, parts.second, { ui->leUserName->text(), ui->leUserToken->text() }, endpoint);
+      const auto api = new GitHubRestApi(parts.first, parts.second, { ui->leUserName->text(), ui->leUserToken->text() },
+                                         ui->leEndPoint->text());
 
       api->testConnection();
 

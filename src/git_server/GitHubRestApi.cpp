@@ -39,15 +39,8 @@ GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, 
 
 void GitHubRestApi::testConnection()
 {
-   QNetworkRequest request;
+   auto request = createRequest("");
    request.setUrl(mEndpointUrl);
-   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
-   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
-   request.setRawHeader(
-       QByteArray("Authorization"),
-       QByteArray("Basic ")
-           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
-                 .toBase64());
 
    mManager->get(request);
 }
@@ -57,18 +50,8 @@ void GitHubRestApi::createIssue(const ServerIssue &issue)
    QJsonDocument doc(issue.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
 
-   QNetworkRequest request;
-   request.setUrl(formatUrl("issues"));
-   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
-   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
-   request.setRawHeader("Content-Type", "application/json");
+   auto request = createRequest("issues");
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
-   request.setRawHeader(
-       QByteArray("Authorization"),
-       QByteArray("Basic ")
-           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
-                 .toBase64());
-
    mManager->post(request, data);
 }
 
@@ -77,18 +60,8 @@ void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
    QJsonDocument doc(issue.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
 
-   QNetworkRequest request;
-   request.setUrl(formatUrl(QString("issues/%1").arg(issueNumber)));
-   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
-   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
-   request.setRawHeader("Content-Type", "application/json");
+   auto request = createRequest(QString("issues/%1").arg(issueNumber));
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
-   request.setRawHeader(
-       QByteArray("Authorization"),
-       QByteArray("Basic ")
-           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
-                 .toBase64());
-
    mManager->post(request, data);
 }
 
@@ -97,54 +70,47 @@ void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
    QJsonDocument doc(pullRequest.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
 
-   QNetworkRequest request;
-   request.setUrl(formatUrl("pulls"));
-   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
-   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
-   request.setRawHeader("Content-Type", "application/json");
+   auto request = createRequest("pulls");
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
-   request.setRawHeader(
-       QByteArray("Authorization"),
-       QByteArray("Basic ")
-           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
-                 .toBase64());
 
    mManager->post(request, data);
 }
 
 void GitHubRestApi::requestLabels()
 {
-   QNetworkRequest request;
-   request.setUrl(formatUrl("labels"));
-   request.setRawHeader(
-       QByteArray("Authorization"),
-       QByteArray("Basic ")
-           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
-                 .toBase64());
-
-   mManager->get(request);
+   mManager->get(createRequest("labels"));
 }
 
 void GitHubRestApi::getMilestones()
 {
-   QNetworkRequest request;
-   request.setUrl(formatUrl("milestones"));
-   request.setRawHeader(
-       QByteArray("Authorization"),
-       QByteArray("Basic ")
-           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
-                 .toBase64());
-
-   mManager->get(request);
+   mManager->get(createRequest("milestones"));
 }
 
 QUrl GitHubRestApi::formatUrl(const QString page) const
 {
    auto tmpUrl = mEndpointUrl + "repos/" + mRepoOwner + mRepoName + page;
+
    if (tmpUrl.endsWith("/"))
       tmpUrl = tmpUrl.left(tmpUrl.size() - 1);
 
    return QUrl(tmpUrl);
+}
+
+QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
+{
+   QNetworkRequest request;
+   request.setUrl(formatUrl(page));
+   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("Content-Type", "application/json");
+   request.setRawHeader("Accept", "application/vnd.github.v3+json");
+   request.setRawHeader(
+       QByteArray("Authorization"),
+       QByteArray("Basic ")
+           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
+                 .toBase64());
+
+   return request;
 }
 
 void GitHubRestApi::onLabelsReceived(const QJsonDocument &doc)
