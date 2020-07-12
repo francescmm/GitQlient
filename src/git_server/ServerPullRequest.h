@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <QString>
+#include <QJsonObject>
 
 struct ServerPullRequest
 {
@@ -34,4 +35,18 @@ struct ServerPullRequest
    bool isOpen;
    bool maintainerCanModify;
    bool draft;
+
+   QJsonObject toJson() const
+   {
+      QJsonObject object;
+
+      object.insert("title", title);
+      object.insert("head", head);
+      object.insert("base", base);
+      object.insert("body", body);
+      object.insert("maintainer_can_modify", maintainerCanModify);
+      object.insert("draft", draft);
+
+      return object;
+   }
 };
