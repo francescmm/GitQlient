@@ -210,9 +210,17 @@ void GitHubRestApi::validateData(QNetworkReply *reply)
    if (jsonObject.contains(QStringLiteral("message")))
    {
       const auto message = jsonObject[QStringLiteral("message")].toString();
+      QString details;
 
-      if (message.contains("Not found", Qt::CaseInsensitive))
-         QLog_Error("Ui", QString("Url not found or error when validating user and token."));
+      if (jsonObject.contains(QStringLiteral("errors")))
+      {
+         const auto errors = jsonObject[QStringLiteral("errors")].toArray();
+
+         for (auto error : errors)
+            details = error[QStringLiteral("message")].toString();
+      }
+
+      QLog_Error("Ui", message + ". " + details);
 
       return;
    }
