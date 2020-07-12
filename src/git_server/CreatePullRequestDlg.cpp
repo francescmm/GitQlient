@@ -8,9 +8,10 @@
 
 #include <QMessageBox>
 
-CreatePullRequestDlg::CreatePullRequestDlg(QWidget *parent)
+CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::CreatePullRequestDlg)
+   , mGit(git)
 {
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto gameServerUrl = gitConfig->getServerUrl();

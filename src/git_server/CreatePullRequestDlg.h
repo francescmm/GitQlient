@@ -38,7 +38,7 @@ class CreatePullRequestDlg : public QDialog
    Q_OBJECT
 
 public:
-   explicit CreatePullRequestDlg(QWidget *parent = nullptr);
+   explicit CreatePullRequestDlg(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    ~CreatePullRequestDlg();
 
 private:
