@@ -84,11 +84,17 @@ void CreatePullRequestDlg::accept()
    }
 
    mApi->createPullRequest(
-       { ui->leTitle->text(), ui->teDescription->toPlainText().toUtf8(),
-
+       { ui->leTitle->text(),
+         ui->teDescription->toPlainText().toUtf8(),
          mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1),
-         ui->cbDestination->currentText().remove(0, ui->cbDestination->currentText().indexOf("/") + 1), true,
-         ui->chModify->isChecked(), ui->chDraft->isChecked() });
+         ui->cbDestination->currentText().remove(0, ui->cbDestination->currentText().indexOf("/") + 1),
+         true,
+         ui->chModify->isChecked(),
+         ui->chDraft->isChecked(),
+         0,
+         "",
+         {},
+         {} });
 }
 
 void CreatePullRequestDlg::onMilestones(const QVector<ServerMilestone> &milestones)

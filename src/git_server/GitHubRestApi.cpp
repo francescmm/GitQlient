@@ -1,6 +1,5 @@
 #include "GitHubRestApi.h"
 #include <ServerIssue.h>
-#include <ServerPullRequest.h>
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -84,6 +83,11 @@ void GitHubRestApi::requestLabels()
 void GitHubRestApi::getMilestones()
 {
    mManager->get(createRequest("milestones"));
+}
+
+void GitHubRestApi::requestPullRequestsState()
+{
+   mManager->get(createRequest("pulls"));
 }
 
 QUrl GitHubRestApi::formatUrl(const QString page) const
@@ -172,6 +176,47 @@ void GitHubRestApi::onPullRequestCreated(const QJsonDocument &doc)
    emit signalPullRequestCreated(url);
 }
 
+void GitHubRestApi::processPullRequets(const QJsonDocument &doc)
+{
+   const auto prs = doc.array();
+
+   ServerPullRequest prInfo;
+
+   for (const auto &pr : prs)
+   {
+      prInfo.id = pr["id"].toInt();
+      prInfo.title = pr["title"].toString();
+      prInfo.body = pr["body"].toString().toUtf8();
+      prInfo.head = pr["head"].toObject()["ref"].toString();
+      prInfo.base = pr["base"].toObject()["ref"].toString();
+      prInfo.isOpen = pr["state"].toString() == "open";
+      prInfo.draft = pr["draft"].toBool();
+      // prInfo.details;
+      prInfo.url = pr["html_url"].toString();
+
+      const auto headObj = pr["head"].toObject();
+
+      prInfo.state.sha = headObj["sha"].toString();
+
+      mPulls.insert(prInfo.state.sha, prInfo);
+
+      auto request = createRequest(QString("commits/%1/status").arg(prInfo.state.sha));
+      mManager->get(request);
+   }
+}
+
+void GitHubRestApi::onPullRequestStatusReceived(const QString &sha, const QJsonDocument &doc)
+{
+   const auto obj = doc.object();
+
+   mPulls[sha].state.state = obj["state"].toString();
+
+   mPulls[sha].state.eState = mPulls[sha].state.state == "success"
+       ? ServerPullRequest::HeadState::State::Success
+       : mPulls[sha].state.state == "failure" ? ServerPullRequest::HeadState::State::Failure
+                                              : ServerPullRequest::HeadState::State::Pending;
+}
+
 void GitHubRestApi::validateData(QNetworkReply *reply)
 {
    if (reply == nullptr)
@@ -214,8 +259,19 @@ void GitHubRestApi::validateData(QNetworkReply *reply)
       emit signalIssueUpdated();
    else if (url.contains("issues"))
       onIssueCreated(jsonDoc);
+   else if (url.contains("commits"))
+   {
+      auto sha = url;
+      sha.remove("/status");
+      onPullRequestStatusReceived(sha.mid(sha.lastIndexOf("/") + 1), jsonDoc);
+   }
    else if (url.contains("pulls"))
-      onPullRequestCreated(jsonDoc);
+   {
+      if (reply->operation() == QNetworkAccessManager::PutOperation)
+         onPullRequestCreated(jsonDoc);
+      else if (reply->operation() == QNetworkAccessManager::GetOperation)
+         processPullRequets(jsonDoc);
+   }
    else
       emit signalConnectionSuccessful();
 }

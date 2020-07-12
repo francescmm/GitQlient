@@ -25,6 +25,7 @@
 
 #include <ServerMilestone.h>
 #include <ServerLabel.h>
+#include <ServerPullRequest.h>
 
 #include <QObject>
 #include <QUrl>
@@ -40,7 +41,6 @@ class QJsonDocument;
 class QNetworkAccessManager;
 class QNetworkReply;
 struct ServerIssue;
-struct ServerPullRequest;
 
 class GitHubRestApi : public QObject
 {
@@ -62,10 +62,14 @@ public:
 
    void createIssue(const ServerIssue &issue);
    void updateIssue(int issueNumber, const ServerIssue &issue);
+
    void createPullRequest(const ServerPullRequest &pullRequest);
 
    void requestLabels();
+
    void getMilestones();
+
+   void requestPullRequestsState();
 
 private:
    QString mEndpointUrl;
@@ -73,6 +77,7 @@ private:
    QString mRepoOwner;
    ServerAuthentication mAuth;
    QNetworkAccessManager *mManager;
+   QMap<QString, ServerPullRequest> mPulls;
 
    QUrl formatUrl(const QString page) const;
    QNetworkRequest createRequest(const QString &page) const;
@@ -82,4 +87,6 @@ private:
    void onMilestonesReceived(const QJsonDocument &doc);
    void onIssueCreated(const QJsonDocument &doc);
    void onPullRequestCreated(const QJsonDocument &doc);
+   void processPullRequets(const QJsonDocument &doc);
+   void onPullRequestStatusReceived(const QString &sha, const QJsonDocument &doc);
 };

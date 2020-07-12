@@ -28,6 +28,24 @@
 
 struct ServerPullRequest
 {
+   struct Details
+   {
+   };
+
+   struct HeadState
+   {
+      enum class State
+      {
+         Failure,
+         Success,
+         Pending
+      };
+
+      QString sha;
+      QString state;
+      State eState;
+   };
+
    QString title;
    QByteArray body;
    QString head;
@@ -35,6 +53,10 @@ struct ServerPullRequest
    bool isOpen;
    bool maintainerCanModify;
    bool draft;
+   int id;
+   QString url;
+   Details details;
+   HeadState state;
 
    QJsonObject toJson() const
    {
