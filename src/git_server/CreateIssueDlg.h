@@ -52,5 +52,5 @@ private:
    void accept() override;
    void onMilestones(const QVector<ServerMilestone> &milestones);
    void onLabels(const QVector<ServerLabel> &labels);
-   void onIssueCreated(const QString &url);
+   void onIssueCreated(QString url);
 };

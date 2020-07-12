@@ -38,8 +38,12 @@ struct ServerIssue
    QJsonObject toJson() const
    {
       QJsonObject object;
-      object.insert("title", title);
-      object.insert("body", body.toStdString().c_str());
+
+      if (!title.isEmpty())
+         object.insert("title", title);
+
+      if (!body.isEmpty())
+         object.insert("body", body.toStdString().c_str());
 
       if (milestone != -1)
          object.insert("milestone", milestone);

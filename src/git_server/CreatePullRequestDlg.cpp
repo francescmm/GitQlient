@@ -102,10 +102,9 @@ void CreatePullRequestDlg::onLabels(const QVector<ServerLabel> &labels)
    ui->labelsListView->setModel(model);
 }
 
-void CreatePullRequestDlg::onPullRequestCreated(const QString &url)
+void CreatePullRequestDlg::onPullRequestCreated(QString url)
 {
-   auto finalUrl = url;
-   mFinalUrl = finalUrl.remove("api.").remove("repos/");
+   mFinalUrl = url;
    mIssue = mFinalUrl.mid(mFinalUrl.lastIndexOf("/") + 1, mFinalUrl.count() - 1).toInt();
 
    const auto milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
@@ -123,12 +122,15 @@ void CreatePullRequestDlg::onPullRequestCreated(const QString &url)
 
    mApi->updateIssue(mIssue, { ui->leTitle->text(), "", milestone, labels, { mUserName } });
 }
+#include <QTimer>
 
 void CreatePullRequestDlg::onPullRequestUpdated()
 {
-   QMessageBox::information(
-       this, tr("Pull Request created"),
-       tr("The Pull Request has been created. You can <a href=\"%1\">find it here</a>.").arg(mFinalUrl));
+   QTimer::singleShot(200, [this]() {
+      QMessageBox::information(
+          this, tr("Pull Request created"),
+          tr("The Pull Request has been created. You can <a href=\"%1\">find it here</a>.").arg(mFinalUrl));
 
-   QDialog::accept();
+      QDialog::accept();
+   });
 }

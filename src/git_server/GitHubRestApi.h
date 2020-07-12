@@ -49,9 +49,9 @@ signals:
    void signalConnectionSuccessful();
    void signalLabelsReceived(const QVector<ServerLabel> &labels);
    void signalMilestonesReceived(const QVector<ServerMilestone> &milestones);
-   void signalIssueCreated(const QString &url);
+   void signalIssueCreated(QString url);
    void signalIssueUpdated();
-   void signalPullRequestCreated(const QString &url);
+   void signalPullRequestCreated(QString url);
 
 public:
    explicit GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,

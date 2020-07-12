@@ -88,13 +88,10 @@ void CreateIssueDlg::onLabels(const QVector<ServerLabel> &labels)
    ui->labelsListView->setModel(model);
 }
 
-void CreateIssueDlg::onIssueCreated(const QString &url)
+void CreateIssueDlg::onIssueCreated(QString url)
 {
-   auto finalUrl = url;
-   finalUrl = finalUrl.remove("api.").remove("repos/");
-
    QMessageBox::information(this, tr("Issue created"),
-                            tr("The issue has been created. You can <a href=\"%1\">find it here</a>.").arg(finalUrl));
+                            tr("The issue has been created. You can <a href=\"%1\">find it here</a>.").arg(url));
 
    QDialog::accept();
 }

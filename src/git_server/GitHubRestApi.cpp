@@ -178,7 +178,7 @@ void GitHubRestApi::onMilestonesReceived(const QJsonDocument &doc)
 void GitHubRestApi::onIssueCreated(const QJsonDocument &doc)
 {
    const auto issue = doc.object();
-   const auto url = issue[QStringLiteral("url")].toString();
+   const auto url = issue[QStringLiteral("html_url")].toString();
 
    emit signalIssueCreated(url);
 }
@@ -186,7 +186,7 @@ void GitHubRestApi::onIssueCreated(const QJsonDocument &doc)
 void GitHubRestApi::onPullRequestCreated(const QJsonDocument &doc)
 {
    const auto issue = doc.object();
-   const auto url = issue[QStringLiteral("url")].toString();
+   const auto url = issue[QStringLiteral("html_url")].toString();
 
    emit signalPullRequestCreated(url);
 }
