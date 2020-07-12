@@ -83,8 +83,8 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
 
    action = stashMenu->addAction(tr("Push"));
    connect(action, &QAction::triggered, this, &Controls::stashCurrentWork);
+   mStashBtn->setDefaultAction(action);
 
-   // mStashBtn->setDefaultAction(action);
    action = stashMenu->addAction(tr("Pop"));
    connect(action, &QAction::triggered, this, &Controls::popStashedWork);
 
@@ -158,6 +158,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
 
       gitMenu->addSeparator();
       action = gitMenu->addAction(tr("Config server"));
+      mGitPlatform->setDefaultAction(action);
       connect(action, &QAction::triggered, this, &Controls::configServer);
 
       mGitPlatform->setMenu(gitMenu);
