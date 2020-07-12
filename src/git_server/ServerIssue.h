@@ -57,7 +57,7 @@ struct ServerIssue
       QJsonArray labelsArray;
       count = 0;
       for (auto label : labels)
-         array.insert(count++, label);
+         labelsArray.insert(count++, label);
       object.insert("labels", labelsArray);
 
       return object;

@@ -11,6 +11,7 @@
 
 #include <QStandardItemModel>
 #include <QMessageBox>
+#include <QTimer>
 
 CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache,
                                            const QSharedPointer<GitBase> &git, QWidget *parent)
@@ -122,7 +123,6 @@ void CreatePullRequestDlg::onPullRequestCreated(QString url)
 
    mApi->updateIssue(mIssue, { ui->leTitle->text(), "", milestone, labels, { mUserName } });
 }
-#include <QTimer>
 
 void CreatePullRequestDlg::onPullRequestUpdated()
 {
