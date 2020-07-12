@@ -3,14 +3,18 @@
 
 #include <GitHubRestApi.h>
 #include <GitQlientSettings.h>
+#include <GitBase.h>
 #include <GitConfig.h>
 #include <ServerPullRequest.h>
+#include <RevisionsCache.h>
 
 #include <QMessageBox>
 
-CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitBase> &git, QWidget *parent)
+CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache,
+                                           const QSharedPointer<GitBase> &git, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::CreatePullRequestDlg)
+   , mCache(cache)
    , mGit(git)
 {
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
@@ -31,6 +35,16 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitBase> &git, Q
    }
 
    ui->setupUi(this);
+
+   const auto branches = mCache->getBranches(References::Type::RemoteBranches);
+
+   for (auto &value : branches)
+   {
+      ui->cbOrigin->addItems(value.second);
+      ui->cbDestination->addItems(value.second);
+   }
+
+   ui->cbOrigin->setCurrentText(mGit->getCurrentBranch());
 
    connect(ui->pbCreate, &QPushButton::clicked, this, &CreatePullRequestDlg::accept);
    connect(ui->pbClose, &QPushButton::clicked, this, &CreatePullRequestDlg::reject);

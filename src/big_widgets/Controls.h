@@ -28,6 +28,7 @@
 class QToolButton;
 class QPushButton;
 class GitBase;
+class RevisionsCache;
 
 /*!
  \brief Enum used to configure the different views handled by the Controls widget.
@@ -100,7 +101,8 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit Controls(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                     QWidget *parent = nullptr);
    /*!
     \brief Process the toggled button and triggers its corresponding action.
 
@@ -153,6 +155,7 @@ public:
 
 private:
    QString mCurrentSha;
+   QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
    QToolButton *mHistory = nullptr;
    QToolButton *mDiff = nullptr;

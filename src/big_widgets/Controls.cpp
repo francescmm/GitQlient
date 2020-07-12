@@ -18,8 +18,9 @@
 #include <QMessageBox>
 #include <QPushButton>
 
-Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
+Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
+   , mCache(cache)
    , mGit(git)
    , mHistory(new QToolButton())
    , mDiff(new QToolButton())
@@ -438,7 +439,7 @@ void Controls::createNewIssue()
 
 void Controls::createNewPullRequest()
 {
-   const auto prDlg = new CreatePullRequestDlg(mGit, this);
+   const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
    prDlg->exec();
 }
 

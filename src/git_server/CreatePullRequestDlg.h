@@ -32,17 +32,20 @@ class CreatePullRequestDlg;
 
 class GitBase;
 class GitHubRestApi;
+class RevisionsCache;
 
 class CreatePullRequestDlg : public QDialog
 {
    Q_OBJECT
 
 public:
-   explicit CreatePullRequestDlg(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                                 QWidget *parent = nullptr);
    ~CreatePullRequestDlg();
 
 private:
    Ui::CreatePullRequestDlg *ui;
+   QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
    GitHubRestApi *mApi;
    QString mUserName;
