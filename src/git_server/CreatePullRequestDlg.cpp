@@ -28,10 +28,7 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
       mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken });
-      connect(mApi, &GitHubRestApi::signalIssueCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
-
-      mApi->getMilestones();
-      mApi->requestLabels();
+      connect(mApi, &GitHubRestApi::signalPullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
    }
 
    ui->setupUi(this);
@@ -67,9 +64,12 @@ void CreatePullRequestDlg::accept()
           tr("The base branch and the branch to merge from cannot be the same. Please, select different branches."));
    }
 
-   mApi->createPullRequest({ ui->leTitle->text(), ui->teDescription->toPlainText().toUtf8(),
-                             ui->cbDestination->currentText(), ui->cbOrigin->currentText(), true,
-                             ui->chModify->isChecked(), ui->chDraft->isChecked() });
+   mApi->createPullRequest(
+       { ui->leTitle->text(), ui->teDescription->toPlainText().toUtf8(),
+
+         mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1),
+         ui->cbDestination->currentText().remove(0, ui->cbDestination->currentText().indexOf("/") + 1), true,
+         ui->chModify->isChecked(), ui->chDraft->isChecked() });
 }
 
 void CreatePullRequestDlg::onPullRequestCreated(const QString &url)

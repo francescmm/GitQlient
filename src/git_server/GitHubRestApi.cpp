@@ -73,7 +73,7 @@ void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
    const auto data = doc.toJson(QJsonDocument::Compact);
 
    QNetworkRequest request;
-   request.setUrl(formatUrl("issues"));
+   request.setUrl(formatUrl("pulls"));
    request.setRawHeader("User-Agent", "GitQlient v1.2.0");
    request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
    request.setRawHeader("Content-Type", "application/json");
@@ -168,7 +168,7 @@ void GitHubRestApi::onPullRequestCreated(const QJsonDocument &doc)
    const auto issue = doc.object();
    const auto url = issue[QStringLiteral("url")].toString();
 
-   emit signalIssueCreated(url);
+   emit signalPullRequestCreated(url);
 }
 
 void GitHubRestApi::validateData(QNetworkReply *reply)
