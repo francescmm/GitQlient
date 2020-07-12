@@ -4,3 +4,6 @@
 [submodule "BenchmarkTool"]
 	path = BenchmarkTool
 	url = https://github.com/francescmm/BenchmarkTool.git
+[submodule "QPinnableTabWidget"]
+	path = QPinnableTabWidget
+	url = https://github.com/francescmm/QPinnableTabWidget.git
