@@ -9,6 +9,7 @@
 #include <RepoConfigDlg.h>
 #include <ServerConfigDlg.h>
 #include <CreateIssueDlg.h>
+#include <CreatePullRequestDlg.h>
 
 #include <QApplication>
 #include <QToolButton>
@@ -435,7 +436,11 @@ void Controls::createNewIssue()
    createIssue->exec();
 }
 
-void Controls::createNewPullRequest() { }
+void Controls::createNewPullRequest()
+{
+   const auto prDlg = new CreatePullRequestDlg(mGit, this);
+   prDlg->exec();
+}
 
 void Controls::configServer()
 {
