@@ -7,7 +7,9 @@
 #include <GitConfig.h>
 #include <ServerPullRequest.h>
 #include <RevisionsCache.h>
+#include <ServerIssue.h>
 
+#include <QStandardItemModel>
 #include <QMessageBox>
 
 CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache,
@@ -28,7 +30,13 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
       mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken });
+      connect(mApi, &GitHubRestApi::signalIssueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
       connect(mApi, &GitHubRestApi::signalPullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
+      connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreatePullRequestDlg::onMilestones);
+      connect(mApi, &GitHubRestApi::signalLabelsReceived, this, &CreatePullRequestDlg::onLabels);
+
+      mApi->getMilestones();
+      mApi->requestLabels();
    }
 
    ui->setupUi(this);
@@ -72,14 +80,53 @@ void CreatePullRequestDlg::accept()
          ui->chModify->isChecked(), ui->chDraft->isChecked() });
 }
 
+void CreatePullRequestDlg::onMilestones(const QVector<ServerMilestone> &milestones)
+{
+   for (auto &milestone : milestones)
+      ui->cbMilesone->addItem(milestone.title, milestone.number);
+}
+
+void CreatePullRequestDlg::onLabels(const QVector<ServerLabel> &labels)
+{
+   const auto model = new QStandardItemModel(labels.count(), 0, this);
+   auto count = 0;
+   for (auto label : labels)
+   {
+      const auto item = new QStandardItem(label.name);
+      item->setCheckable(true);
+      item->setCheckState(Qt::Unchecked);
+      model->setItem(count++, item);
+   }
+   ui->labelsListView->setModel(model);
+}
+
 void CreatePullRequestDlg::onPullRequestCreated(const QString &url)
 {
    auto finalUrl = url;
-   finalUrl = finalUrl.remove("api.").remove("repos/");
+   mFinalUrl = finalUrl.remove("api.").remove("repos/");
+   mIssue = mFinalUrl.mid(mFinalUrl.lastIndexOf("/") + 1, mFinalUrl.count() - 1).toInt();
 
+   const auto milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
+
+   QStringList labels;
+
+   if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
+   {
+      for (auto i = 0; i < cbModel->rowCount(); ++i)
+      {
+         if (cbModel->item(i)->checkState() == Qt::Checked)
+            labels.append(cbModel->item(i)->text());
+      }
+   }
+
+   mApi->updateIssue(mIssue, { "", "", milestone, labels, { mUserName } });
+}
+
+void CreatePullRequestDlg::onPullRequestUpdated()
+{
    QMessageBox::information(
        this, tr("Pull Request created"),
-       tr("The Pull Request has been created. You can <a href=\"%1\">find it here</a>.").arg(finalUrl));
+       tr("The Pull Request has been created. You can <a href=\"%1\">find it here</a>.").arg(mFinalUrl));
 
    QDialog::accept();
 }

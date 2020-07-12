@@ -24,6 +24,8 @@
  ***************************************************************************************/
 
 #include <QDialog>
+#include <ServerMilestone.h>
+#include <ServerLabel.h>
 
 namespace Ui
 {
@@ -49,7 +51,12 @@ private:
    QSharedPointer<GitBase> mGit;
    GitHubRestApi *mApi;
    QString mUserName;
+   int mIssue;
+   QString mFinalUrl;
 
    void accept() override;
+   void onMilestones(const QVector<ServerMilestone> &milestones);
+   void onLabels(const QVector<ServerLabel> &labels);
    void onPullRequestCreated(const QString &url);
+   void onPullRequestUpdated();
 };

@@ -50,14 +50,14 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="6" column="1">
       <widget class="QCheckBox" name="chDraft">
        <property name="text">
         <string>Mark as draft</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="7" column="1">
       <widget class="QCheckBox" name="chModify">
        <property name="text">
         <string>Allow maintainers to modify the Pull Request</string>
@@ -69,6 +69,33 @@
      </item>
      <item row="3" column="1">
       <widget class="QComboBox" name="cbOrigin"/>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="cbMilesone"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Milestone:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Labels:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QListView" name="labelsListView">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>100</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -109,8 +136,10 @@
   <tabstop>leTitle</tabstop>
   <tabstop>teDescription</tabstop>
   <tabstop>cbDestination</tabstop>
-  <tabstop>chDraft</tabstop>
   <tabstop>cbOrigin</tabstop>
+  <tabstop>cbMilesone</tabstop>
+  <tabstop>labelsListView</tabstop>
+  <tabstop>chDraft</tabstop>
   <tabstop>chModify</tabstop>
   <tabstop>pbCreate</tabstop>
   <tabstop>pbClose</tabstop>

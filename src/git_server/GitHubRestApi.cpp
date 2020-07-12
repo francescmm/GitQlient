@@ -67,6 +67,26 @@ void GitHubRestApi::createIssue(const ServerIssue &issue)
    mManager->post(request, data);
 }
 
+void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
+{
+   QJsonDocument doc(issue.toJson());
+   const auto data = doc.toJson(QJsonDocument::Compact);
+
+   QNetworkRequest request;
+   request.setUrl(formatUrl(QString("issues/%1").arg(issueNumber)));
+   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("Content-Type", "application/json");
+   request.setRawHeader("Content-Length", QByteArray::number(data.size()));
+   request.setRawHeader(
+       QByteArray("Authorization"),
+       QByteArray("Basic ")
+           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
+                 .toBase64());
+
+   mManager->post(request, data);
+}
+
 void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
 {
    QJsonDocument doc(pullRequest.toJson());
@@ -201,6 +221,8 @@ void GitHubRestApi::validateData(QNetworkReply *reply)
       onLabelsReceived(jsonDoc);
    else if (url.contains("milestones"))
       onMilestonesReceived(jsonDoc);
+   else if (url.contains("issues/"))
+      emit signalIssueUpdated();
    else if (url.contains("issues"))
       onIssueCreated(jsonDoc);
    else if (url.contains("pulls"))

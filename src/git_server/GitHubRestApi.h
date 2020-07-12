@@ -50,6 +50,7 @@ signals:
    void signalLabelsReceived(const QVector<ServerLabel> &labels);
    void signalMilestonesReceived(const QVector<ServerMilestone> &milestones);
    void signalIssueCreated(const QString &url);
+   void signalIssueUpdated();
    void signalPullRequestCreated(const QString &url);
 
 public:
@@ -59,6 +60,7 @@ public:
    void testConnection();
 
    void createIssue(const ServerIssue &issue);
+   void updateIssue(int issueNumber, const ServerIssue &issue);
    void createPullRequest(const ServerPullRequest &pullRequest);
 
    void requestLabels();
