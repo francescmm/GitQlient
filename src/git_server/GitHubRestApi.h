@@ -55,7 +55,7 @@ signals:
 
 public:
    explicit GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
-                          const QString &gameServerUrl, QObject *parent = nullptr);
+                          const QString &serverUrl, QObject *parent = nullptr);
 
    void testConnection();
 

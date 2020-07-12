@@ -24,16 +24,16 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
    ui->setupUi(this);
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto gameServerUrl = gitConfig->getServerUrl();
+   const auto serverUrl = gitConfig->getServerUrl();
 
-   if (gameServerUrl.contains("github"))
+   if (serverUrl.contains("github"))
    {
       GitQlientSettings settings;
-      mUserName = settings.value(QString("%1/user").arg(gameServerUrl)).toString();
-      const auto userToken = settings.value(QString("%1/token").arg(gameServerUrl)).toString();
+      mUserName = settings.value(QString("%1/user").arg(serverUrl)).toString();
+      const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken }, gameServerUrl);
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken }, serverUrl);
       connect(mApi, &GitHubRestApi::signalIssueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
       connect(mApi, &GitHubRestApi::signalPullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
       connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreatePullRequestDlg::onMilestones);

@@ -32,6 +32,13 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *pa
 
    ui->setupUi(this);
 
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto serverUrl = gitConfig->getServerUrl();
+
+   GitQlientSettings settings;
+   ui->leUserName->setText(settings.value(QString("%1/user").arg(serverUrl)).toString());
+   ui->leUserToken->setText(settings.value(QString("%1/token").arg(serverUrl)).toString());
+
    connect(ui->leUserToken, &QLineEdit::editingFinished, this, &ServerConfigDlg::checkToken);
    connect(ui->leUserToken, &QLineEdit::returnPressed, this, &ServerConfigDlg::accept);
    connect(ui->pbAccept, &QPushButton::clicked, this, &ServerConfigDlg::accept);
@@ -70,10 +77,10 @@ void ServerConfigDlg::testToken()
    else
    {
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-      const auto gameServerUrl = gitConfig->getServerUrl();
+      const auto serverUrl = gitConfig->getServerUrl();
       const auto parts = gitConfig->getCurrentRepoAndOwner();
       const auto api = new GitHubRestApi(parts.first, parts.second, { ui->leUserName->text(), ui->leUserToken->text() },
-                                         gameServerUrl);
+                                         serverUrl);
 
       api->testConnection();
 
