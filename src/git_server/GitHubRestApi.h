@@ -50,7 +50,7 @@ signals:
    void signalLabelsReceived(const QVector<ServerLabel> &labels);
    void signalMilestonesReceived(const QVector<ServerMilestone> &milestones);
    void signalIssueCreated(const QString &url);
-   void signalPullRequestCreated();
+   void signalPullRequestCreated(const QString &url);
 
 public:
    explicit GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
@@ -59,7 +59,7 @@ public:
    void testConnection();
 
    void createIssue(const ServerIssue &issue);
-   void createPullRequest();
+   void createPullRequest(const ServerPullRequest &pullRequest);
 
    void requestLabels();
    void getMilestones();
@@ -77,4 +77,5 @@ private:
    void onLabelsReceived(const QJsonDocument &doc);
    void onMilestonesReceived(const QJsonDocument &doc);
    void onIssueCreated(const QJsonDocument &doc);
+   void onPullRequestCreated(const QJsonDocument &doc);
 };

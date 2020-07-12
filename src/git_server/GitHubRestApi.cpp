@@ -18,6 +18,8 @@ GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, 
    : QObject(parent)
 {
    mManager = new QNetworkAccessManager();
+   connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
+
    mServerUrl = "https://api.github.com/repos/";
 
    if (!mServerUrl.endsWith("/"))
@@ -43,7 +45,6 @@ void GitHubRestApi::testConnection()
    request.setUrl(url);
 
    mManager->get(request);
-   connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
 }
 
 void GitHubRestApi::createIssue(const ServerIssue &issue)
@@ -64,10 +65,27 @@ void GitHubRestApi::createIssue(const ServerIssue &issue)
                  .toBase64());
 
    mManager->post(request, data);
-   connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
 }
 
-void GitHubRestApi::createPullRequest() { }
+void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
+{
+   QJsonDocument doc(pullRequest.toJson());
+   const auto data = doc.toJson(QJsonDocument::Compact);
+
+   QNetworkRequest request;
+   request.setUrl(formatUrl("issues"));
+   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("Content-Type", "application/json");
+   request.setRawHeader("Content-Length", QByteArray::number(data.size()));
+   request.setRawHeader(
+       QByteArray("Authorization"),
+       QByteArray("Basic ")
+           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
+                 .toBase64());
+
+   mManager->post(request, data);
+}
 
 void GitHubRestApi::requestLabels()
 {
@@ -75,7 +93,6 @@ void GitHubRestApi::requestLabels()
    request.setUrl(formatUrl("labels"));
 
    mManager->get(request);
-   connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
 }
 
 void GitHubRestApi::getMilestones()
@@ -84,7 +101,6 @@ void GitHubRestApi::getMilestones()
    request.setUrl(formatUrl("milestones"));
 
    mManager->get(request);
-   connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
 }
 
 QUrl GitHubRestApi::formatUrl(const QString endPoint) const
@@ -93,10 +109,7 @@ QUrl GitHubRestApi::formatUrl(const QString endPoint) const
    if (tmpUrl.endsWith("/"))
       tmpUrl = tmpUrl.left(tmpUrl.size() - 1);
 
-   QUrl url(tmpUrl);
-   // url.setUserName(mAuth.userName);
-   // url.setPassword(mAuth.userPass);
-   return url;
+   return QUrl(tmpUrl);
 }
 
 void GitHubRestApi::onLabelsReceived(const QJsonDocument &doc)
@@ -150,6 +163,14 @@ void GitHubRestApi::onIssueCreated(const QJsonDocument &doc)
    emit signalIssueCreated(url);
 }
 
+void GitHubRestApi::onPullRequestCreated(const QJsonDocument &doc)
+{
+   const auto issue = doc.object();
+   const auto url = issue[QStringLiteral("url")].toString();
+
+   emit signalIssueCreated(url);
+}
+
 void GitHubRestApi::validateData(QNetworkReply *reply)
 {
    if (reply == nullptr)
@@ -182,6 +203,8 @@ void GitHubRestApi::validateData(QNetworkReply *reply)
       onMilestonesReceived(jsonDoc);
    else if (url.contains("issues"))
       onIssueCreated(jsonDoc);
+   else if (url.contains("pulls"))
+      onPullRequestCreated(jsonDoc);
    else
       emit signalConnectionSuccessful();
 }
