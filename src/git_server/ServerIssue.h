@@ -54,11 +54,11 @@ struct ServerIssue
          array.insert(count++, assignee);
       object.insert("assignees", array);
 
-      QJsonArray labels;
+      QJsonArray labelsArray;
       count = 0;
       for (auto label : labels)
          array.insert(count++, label);
-      object.insert("labels", labels);
+      object.insert("labels", labelsArray);
 
       return object;
    }
