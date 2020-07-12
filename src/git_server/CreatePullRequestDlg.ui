@@ -51,7 +51,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QCheckBox" name="cbDraft">
+      <widget class="QCheckBox" name="chDraft">
        <property name="text">
         <string>Mark as draft</string>
        </property>
@@ -105,6 +105,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>leTitle</tabstop>
+  <tabstop>teDescription</tabstop>
+  <tabstop>cbDestination</tabstop>
+  <tabstop>chDraft</tabstop>
+  <tabstop>cbOrigin</tabstop>
+  <tabstop>chModify</tabstop>
+  <tabstop>pbCreate</tabstop>
+  <tabstop>pbClose</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
