@@ -123,71 +123,67 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    hLayout->addWidget(mStashBtn);
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto remoteUrl = gitConfig->getGitValue("remote.origin.url");
-   if (remoteUrl.success)
+   const auto remoteUrl = gitConfig->getServerUrl();
+   QIcon gitPlatformIcon;
+   QString name;
+   QString prName;
+   auto add = true;
+
+   if (remoteUrl.contains("github", Qt::CaseInsensitive))
    {
-      const auto platform = remoteUrl.output.toString();
-      QIcon gitPlatformIcon;
-      QString name;
-      QString prName;
-      auto add = true;
+      gitPlatformIcon = QIcon(":/icons/github");
+      name = "GitHub";
+      prName = tr("Pull Request");
+   }
+   /*
+   else if (remoteUrl.contains("gitlab", Qt::CaseInsensitive))
+   {
+      gitPlatformIcon = QIcon(":/icons/gitlab");
+      name = "GitLab";
+      prName = tr("Merge Request");
+   }
+*/
+   else
+      add = false;
 
-      if (platform.contains("github", Qt::CaseInsensitive))
-      {
-         gitPlatformIcon = QIcon(":/icons/github");
-         name = "GitHub";
-         prName = tr("Pull Request");
-      }
-      else if (platform.contains("gitlab", Qt::CaseInsensitive))
-      {
-         gitPlatformIcon = QIcon(":/icons/gitlab");
-         name = "GitLab";
-         prName = tr("Merge Request");
-      }
-      else
-         add = false;
+   if (add)
+   {
+      const auto gitMenu = new QMenu(mStashBtn);
 
-      if (add)
-      {
-         const auto gitMenu = new QMenu(mStashBtn);
+      action = gitMenu->addAction(tr("New Issue"));
+      connect(action, &QAction::triggered, this, &Controls::createNewIssue);
 
-         action = gitMenu->addAction(tr("New Issue"));
-         connect(action, &QAction::triggered, this, &Controls::createNewIssue);
+      action = gitMenu->addAction(tr("New %1").arg(prName));
+      connect(action, &QAction::triggered, this, &Controls::createNewPullRequest);
 
-         action = gitMenu->addAction(tr("New %1").arg(prName));
-         connect(action, &QAction::triggered, this, &Controls::createNewPullRequest);
+      gitMenu->addSeparator();
+      action = gitMenu->addAction(tr("Config server"));
+      connect(action, &QAction::triggered, this, &Controls::configServer);
 
-         gitMenu->addSeparator();
-         action = gitMenu->addAction(tr("Config server"));
-         connect(action, &QAction::triggered, this, &Controls::configServer);
+      mGitPlatform->setMenu(gitMenu);
+      mGitPlatform->setIcon(gitPlatformIcon);
+      mGitPlatform->setIconSize(QSize(22, 22));
+      mGitPlatform->setText(name);
+      mGitPlatform->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+      mGitPlatform->setPopupMode(QToolButton::MenuButtonPopup);
 
-         mGitPlatform->setMenu(gitMenu);
-         mGitPlatform->setIcon(gitPlatformIcon);
-         mGitPlatform->setIconSize(QSize(22, 22));
-         mGitPlatform->setText(name);
-         mGitPlatform->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-         mGitPlatform->setPopupMode(QToolButton::MenuButtonPopup);
+      const auto verticalFrame3 = new QFrame();
+      verticalFrame3->setObjectName("orangeSeparator");
+      hLayout->addWidget(verticalFrame3);
+      hLayout->addWidget(mGitPlatform);
 
-         const auto verticalFrame3 = new QFrame();
-         verticalFrame3->setObjectName("orangeSeparator");
-         hLayout->addWidget(verticalFrame3);
-         hLayout->addWidget(mGitPlatform);
-
-         connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
-         connect(mGitPlatform, &QToolButton::toggled, this, [this](bool checked) {
-            mDiff->blockSignals(true);
-            mDiff->setChecked(!checked);
-            mDiff->blockSignals(false);
-            mBlame->blockSignals(true);
-            mBlame->setChecked(!checked);
-            mBlame->blockSignals(false);
-            mHistory->blockSignals(true);
-            mHistory->setChecked(!checked);
-            mHistory->blockSignals(false);
-         });
-      }
-      else
-         mGitPlatform->setVisible(false);
+      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
+      connect(mGitPlatform, &QToolButton::toggled, this, [this](bool checked) {
+         mDiff->blockSignals(true);
+         mDiff->setChecked(!checked);
+         mDiff->blockSignals(false);
+         mBlame->blockSignals(true);
+         mBlame->setChecked(!checked);
+         mBlame->blockSignals(false);
+         mHistory->blockSignals(true);
+         mHistory->setChecked(!checked);
+         mHistory->blockSignals(false);
+      });
    }
    else
       mGitPlatform->setVisible(false);
