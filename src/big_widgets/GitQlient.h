@@ -26,7 +26,7 @@
 #include <QWidget>
 #include <QSet>
 
-class QPinableTabWidget;
+class QPinnableTabWidget;
 class ConfigWidget;
 
 /*!
@@ -75,7 +75,7 @@ public:
    void setArgumentsPostInit(const QStringList &arguments);
 
 private:
-   QPinableTabWidget *mRepos = nullptr;
+   QPinnableTabWidget *mRepos = nullptr;
    ConfigWidget *mConfigWidget = nullptr;
    QSet<QString> mCurrentRepos;
 

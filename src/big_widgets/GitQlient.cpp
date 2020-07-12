@@ -3,7 +3,7 @@
 #include <ConfigWidget.h>
 #include <GitQlientStyles.h>
 #include <GitQlientSettings.h>
-#include <QPinableTabWidget.h>
+#include <QPinnableTabWidget.h>
 
 #include <QProcess>
 #include <QTabBar>
@@ -26,7 +26,7 @@ GitQlient::GitQlient(QWidget *parent)
 
 GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    : QWidget(parent)
-   , mRepos(new QPinableTabWidget())
+   , mRepos(new QPinnableTabWidget())
    , mConfigWidget(new ConfigWidget())
 {
    BenchmarkStart();

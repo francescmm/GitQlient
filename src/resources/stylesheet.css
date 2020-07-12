@@ -243,21 +243,21 @@ BranchDlg > QLineEdit, HistoryWidget > QLineEdit
     padding-left: 10px;
 }
 
-/** QPinableTabWidget **/
+/** QPinnableTabWidget **/
 #openNewRepo
 {
-   max-height: 25px; /** 25px for the button + 1px to compensate the border of the tabs in the QPinableTabWidget **/
+   max-height: 25px; /** 25px for the button + 1px to compensate the border of the tabs in the QPinnableTabWidget **/
    min-height: 25px;
    max-width: 31px;
    min-width: 31px;
    padding-left: 10px;
 }
 
-QPinableTabWidget::pane
+QPinnableTabWidget::pane
 {
 }
 
-QPinableTabWidget > QTabBar::tab
+QPinnableTabWidget > QTabBar::tab
 {
    padding: 5px;
    padding-left: 15px;
@@ -265,23 +265,23 @@ QPinableTabWidget > QTabBar::tab
    min-height: 25px;
 }
 
-QPinableTabWidget > QTabBar::tab:!selected
+QPinnableTabWidget > QTabBar::tab:!selected
 {
     border-right-width: 1px;
     border-right-style: solid;
 }
 
-QPinableTabWidget > QTabBar::close-button
+QPinnableTabWidget > QTabBar::close-button
 {
     image: url(:/icons/close);
 }
 
-QPinableTabWidget > QTabBar::close-button:hover
+QPinnableTabWidget > QTabBar::close-button:hover
 {
     image: url(:/icons/close_hover);
 }
 
-QPinableTabWidget > QTabBar::close-button:pressed
+QPinnableTabWidget > QTabBar::close-button:pressed
 {
   image: url(":/icons/close_press");
 }
