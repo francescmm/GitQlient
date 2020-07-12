@@ -8,11 +8,14 @@
 #include <GitStashes.h>
 #include <GitBranches.h>
 #include <GitRemote.h>
+#include <GitConfig.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
 #include <PullDlg.h>
+#include <CreateIssueDlg.h>
+#include <CreatePullRequestDlg.h>
 
 #include <QMessageBox>
 #include <QApplication>
@@ -121,6 +124,26 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          const auto resetHardAction = addAction("Reset - Hard");
          connect(resetHardAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetHard);
       }
+   }
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto remoteUrl = gitConfig->getServerUrl();
+
+   if (remoteUrl.contains("github", Qt::CaseInsensitive))
+   {
+      addSeparator();
+
+      const auto gitHubMenu = new QMenu("GitHub", this);
+      addMenu(gitHubMenu);
+
+      connect(gitHubMenu->addAction("New Issue"), &QAction::triggered, this, [this]() {
+         const auto createIssue = new CreateIssueDlg(mGit, this);
+         createIssue->exec();
+      });
+      connect(gitHubMenu->addAction("New Pull Request"), &QAction::triggered, this, [this]() {
+         const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
+         prDlg->exec();
+      });
    }
 }
 
