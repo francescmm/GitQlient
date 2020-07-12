@@ -2,10 +2,12 @@ INCLUDEPATH += $$PWD
 
 FORMS += \
    $$PWD/CreateIssueDlg.ui \
+   $$PWD/CreatePullRequestDlg.ui \
    $$PWD/ServerConfigDlg.ui
 
 HEADERS += \
    $$PWD/CreateIssueDlg.h \
+   $$PWD/CreatePullRequestDlg.h \
    $$PWD/GitHubRestApi.h \
    $$PWD/ServerConfigDlg.h \
    $$PWD/ServerIssue.h \
@@ -15,5 +17,6 @@ HEADERS += \
 
 SOURCES += \
    $$PWD/CreateIssueDlg.cpp \
+   $$PWD/CreatePullRequestDlg.cpp \
    $$PWD/GitHubRestApi.cpp \
    $$PWD/ServerConfigDlg.cpp
