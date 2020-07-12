@@ -98,6 +98,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>leTitle</tabstop>
+  <tabstop>teDescription</tabstop>
+  <tabstop>cbMilesone</tabstop>
+  <tabstop>labelsListView</tabstop>
+  <tabstop>pbAccept</tabstop>
+  <tabstop>pbClose</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
