@@ -12,6 +12,7 @@
 #include <QStandardItemModel>
 #include <QMessageBox>
 #include <QTimer>
+#include <QFile>
 
 CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache,
                                            const QSharedPointer<GitBase> &git, QWidget *parent)
@@ -32,7 +33,7 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
       const auto userToken = settings.value(QString("%1/token").arg(gameServerUrl)).toString();
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken });
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken }, gameServerUrl);
       connect(mApi, &GitHubRestApi::signalIssueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
       connect(mApi, &GitHubRestApi::signalPullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
       connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreatePullRequestDlg::onMilestones);
@@ -55,6 +56,14 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
 
    connect(ui->pbCreate, &QPushButton::clicked, this, &CreatePullRequestDlg::accept);
    connect(ui->pbClose, &QPushButton::clicked, this, &CreatePullRequestDlg::reject);
+
+   QFile f(mGit->getWorkingDir() + "/.github/PULL_REQUEST_TEMPLATE.md");
+
+   if (f.open(QIODevice::ReadOnly))
+   {
+      ui->teDescription->setText(f.readAll());
+      f.close();
+   }
 }
 
 CreatePullRequestDlg::~CreatePullRequestDlg()

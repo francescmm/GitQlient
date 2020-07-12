@@ -26,7 +26,7 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *paren
       const auto userToken = settings.value(QString("%1/token").arg(gameServerUrl)).toString();
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken });
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken }, gameServerUrl);
       connect(mApi, &GitHubRestApi::signalIssueCreated, this, &CreateIssueDlg::onIssueCreated);
       connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreateIssueDlg::onMilestones);
       connect(mApi, &GitHubRestApi::signalLabelsReceived, this, &CreateIssueDlg::onLabels);

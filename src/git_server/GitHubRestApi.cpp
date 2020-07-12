@@ -14,13 +14,12 @@
 using namespace QLogger;
 
 GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
-                             QObject *parent)
+                             const QString &gameServerUrl, QObject *parent)
    : QObject(parent)
+   , mServerUrl(gameServerUrl)
 {
    mManager = new QNetworkAccessManager();
    connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
-
-   mServerUrl = "https://api.github.com/repos/";
 
    if (!mServerUrl.endsWith("/"))
       mServerUrl.append("/");
@@ -43,6 +42,13 @@ void GitHubRestApi::testConnection()
    const auto url = formatUrl("");
    QNetworkRequest request;
    request.setUrl(url);
+   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader(
+       QByteArray("Authorization"),
+       QByteArray("Basic ")
+           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
+                 .toBase64());
 
    mManager->get(request);
 }

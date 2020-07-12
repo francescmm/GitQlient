@@ -70,9 +70,10 @@ void ServerConfigDlg::testToken()
    else
    {
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+      const auto gameServerUrl = gitConfig->getServerUrl();
       const auto parts = gitConfig->getCurrentRepoAndOwner();
-      const auto api
-          = new GitHubRestApi(parts.first, parts.second, { ui->leUserName->text(), ui->leUserToken->text() });
+      const auto api = new GitHubRestApi(parts.first, parts.second, { ui->leUserName->text(), ui->leUserToken->text() },
+                                         gameServerUrl);
 
       api->testConnection();
 
