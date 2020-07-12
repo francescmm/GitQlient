@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>474</width>
-    <height>528</height>
+    <width>700</width>
+    <height>550</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>700</width>
+    <height>550</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>700</width>
+    <height>550</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Create Pull Request</string>
@@ -95,7 +107,7 @@
        <property name="maximumSize">
         <size>
          <width>16777215</width>
-         <height>100</height>
+         <height>75</height>
         </size>
        </property>
       </widget>
