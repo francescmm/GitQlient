@@ -75,7 +75,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
       const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
       const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
 
-      mApi.reset(new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint }, this));
+      mApi.reset(new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint }));
       mGitQlientCache->setupGitPlatform(mApi);
    }
 
