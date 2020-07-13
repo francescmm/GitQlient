@@ -122,35 +122,17 @@ QColor GitQlientStyles::getBlue()
 
 QColor GitQlientStyles::getRed()
 {
-   GitQlientSettings settings;
-   const auto colorSchema = settings.value("colorSchema", "dark").toString();
-
-   QColor c;
-   c.setNamedColor(colorSchema == "dark" ? "#FF5555" : "#FF2222");
-
-   return c;
+   return QColor("#FF2222");
 }
 
 QColor GitQlientStyles::getGreen()
 {
-   GitQlientSettings settings;
-   const auto colorSchema = settings.value("colorSchema", "dark").toString();
-
-   QColor c;
-   c.setNamedColor(colorSchema == "dark" ? "#8DC944" : "#65952B");
-
-   return c;
+   return QColor("#65952B");
 }
 
 QColor GitQlientStyles::getOrange()
 {
-   GitQlientSettings settings;
-   const auto colorSchema = settings.value("colorSchema", "dark").toString();
-
-   QColor c;
-   c.setNamedColor(colorSchema == "dark" ? "#FFB86C" : "#FF9320");
-
-   return c;
+   return QColor("#FF9320");
 }
 
 std::array<QColor, GitQlientStyles::kBranchColors> GitQlientStyles::getBranchColors()
