@@ -22,6 +22,7 @@
 #include <QClipboard>
 #include <QFileDialog>
 #include <QProcess>
+#include <QDesktopServices>
 
 #include <QLogger.h>
 
@@ -135,6 +136,15 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
       const auto gitHubMenu = new QMenu("GitHub", this);
       addMenu(gitHubMenu);
+
+      if (mShas.count() == 1 && mCache->getPullRequestStatus(mShas.first()).isValid())
+      {
+         const auto link = mCache->getPullRequestStatus(mShas.first()).url;
+         connect(gitHubMenu->addAction("Open PR on browser"), &QAction::triggered, this,
+                 [link]() { QDesktopServices::openUrl(link); });
+
+         gitHubMenu->addSeparator();
+      }
 
       connect(gitHubMenu->addAction("New Issue"), &QAction::triggered, this, [this]() {
          const auto createIssue = new CreateIssueDlg(mGit, this);
