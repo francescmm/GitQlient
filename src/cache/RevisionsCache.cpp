@@ -74,6 +74,16 @@ void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArra
    }
 }
 
+void RevisionsCache::setupGitPlatform(const QSharedPointer<GitHubRestApi> &api)
+{
+   if (mApi)
+      disconnect(mApi.get(), &GitHubRestApi::signalPullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
+
+   mApi = api;
+
+   connect(mApi.get(), &GitHubRestApi::signalPullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
+}
+
 CommitInfo RevisionsCache::getCommitInfoByRow(int row)
 {
    QMutexLocker lock(&mMutex);
@@ -445,17 +455,8 @@ ServerPullRequest RevisionsCache::getPullRequestStatus(const QString &sha)
    return mPullRequestsStatus.value(sha);
 }
 
-void RevisionsCache::refreshPRsCache(const QString repoName, const QString &repoOwner, const QString &serverUrl)
+void RevisionsCache::refreshPRsCache()
 {
-   GitQlientSettings settings;
-   const auto userName = settings.value(QString("%1/user").arg(serverUrl)).toString();
-   const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
-   const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
-
-   mApi = new GitHubRestApi(repoName, repoOwner, { userName, userToken, endpoint }, this);
-   connect(mApi, &GitHubRestApi::signalPullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
-   connect(mApi, &GitHubRestApi::signalPullRequestsReceived, mApi, &GitHubRestApi::deleteLater);
-
    mApi->requestPullRequestsState();
 }
 

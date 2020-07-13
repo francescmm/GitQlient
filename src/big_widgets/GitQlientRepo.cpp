@@ -63,8 +63,20 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
       mAutoPrUpdater = new QTimer();
       mAutoPrUpdater->start(300 * 1000);
 
-      connect(mAutoPrUpdater, &QTimer::timeout, this, &GitQlientRepo::refreshPRsCache);
-      connect(mControls, &Controls::signalRefreshPRsCache, this, &GitQlientRepo::refreshPRsCache);
+      connect(mAutoPrUpdater, &QTimer::timeout, mGitQlientCache.get(), &RevisionsCache::refreshPRsCache);
+      connect(mControls, &Controls::signalRefreshPRsCache, mGitQlientCache.get(), &RevisionsCache::refreshPRsCache);
+
+      QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+      const auto serverUrl = gitConfig->getServerUrl();
+
+      GitQlientSettings settings;
+      const auto userName = settings.value(QString("%1/user").arg(serverUrl)).toString();
+      const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
+      const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
+
+      mApi.reset(new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint }, this));
+      mGitQlientCache->setupGitPlatform(mApi);
    }
 
    mStackedLayout->addWidget(mHistoryWidget);
@@ -423,14 +435,6 @@ void GitQlientRepo::updateTagsOnCache()
    const auto remoteTags = gitTags->getRemoteTags();
 
    mGitQlientCache->updateTags(remoteTags);
-}
-
-void GitQlientRepo::refreshPRsCache()
-{
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
-   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-   const auto serverUrl = gitConfig->getServerUrl();
-   mGitQlientCache->refreshPRsCache(repoInfo.first, repoInfo.second, serverUrl);
 }
 
 void GitQlientRepo::openCommitDiff(const QString currentSha)

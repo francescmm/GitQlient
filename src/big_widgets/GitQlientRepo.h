@@ -147,6 +147,7 @@ private:
    QPointer<ProgressDlg> mProgressDlg;
    QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
+   QSharedPointer<GitHubRestApi> mApi;
 
    bool mIsInit = false;
    QThread *m_loaderThread;
@@ -271,9 +272,4 @@ private:
     * @brief updateTagsOnCache Updates the remote tags in the cache.
     */
    void updateTagsOnCache();
-
-   /**
-    * @brief refreshPRsCache Orders the cache to refresh the info of the PRs.
-    */
-   void refreshPRsCache();
 };

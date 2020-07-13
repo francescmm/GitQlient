@@ -26,9 +26,9 @@
 #include <RevisionFiles.h>
 #include <lanes.h>
 #include <CommitInfo.h>
-
 #include <ServerPullRequest.h>
 
+#include <QSharedPointer>
 #include <QObject>
 #include <QHash>
 #include <QMutex>
@@ -64,6 +64,7 @@ public:
    ~RevisionsCache();
 
    void setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits);
+   void setupGitPlatform(const QSharedPointer<GitHubRestApi> &api);
 
    int count() const;
 
@@ -92,7 +93,7 @@ public:
    void updateTags(const QMap<QString, QString> &remoteTags);
 
    ServerPullRequest getPullRequestStatus(const QString &sha);
-   void refreshPRsCache(const QString repoName, const QString &repoOwner, const QString &serverUrl);
+   void refreshPRsCache();
 
 private:
    friend class GitRepoLoader;
@@ -111,7 +112,7 @@ private:
    QVector<QString> mUntrackedfiles;
    QMap<QString, QString> mRemoteTags;
    QMap<QString, ServerPullRequest> mPullRequestsStatus;
-   GitHubRestApi *mApi = nullptr;
+   QSharedPointer<GitHubRestApi> mApi;
 
    struct FileNamesLoader
    {

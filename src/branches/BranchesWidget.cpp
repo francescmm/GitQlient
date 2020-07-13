@@ -207,12 +207,8 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
 
    setLayout(vLayout);
 
-   connect(mLocalBranchesTree, &BranchTreeWidget::signalRefreshPRsCache, this, [this]() {
-      QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-      const auto serverUrl = gitConfig->getServerUrl();
-      mCache->refreshPRsCache(repoInfo.first, repoInfo.second, serverUrl);
-   });
+   connect(mLocalBranchesTree, &BranchTreeWidget::signalRefreshPRsCache, mCache.get(),
+           &RevisionsCache::refreshPRsCache);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, mRemoteBranchesTree,
            &BranchTreeWidget::clearSelection);
