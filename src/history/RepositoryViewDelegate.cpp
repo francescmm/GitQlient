@@ -10,6 +10,7 @@
 #include <CommitHistoryModel.h>
 #include <RevisionsCache.h>
 #include <GitBase.h>
+#include <ServerPullRequest.h>
 
 #include <QSortFilterProxyModel>
 #include <QPainter>
@@ -340,9 +341,17 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto offset = 0;
 
-   if (commit.hasReferences() && !mView->hasActiveFilter())
+   if (const auto pr = mCache->getPullRequestStatus(commit.sha()); pr.isValid())
    {
       offset = 5;
+      paintPrStatus(p, opt, offset, pr);
+   }
+
+   if (commit.hasReferences() && !mView->hasActiveFilter())
+   {
+      if (offset == 0)
+         offset = 5;
+
       paintTagBranch(p, opt, offset, sha);
    }
 
@@ -421,4 +430,33 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
       startPoint += rectWidth + mark_spacing;
    }
+}
+
+void RepositoryViewDelegate::paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
+                                           const ServerPullRequest &pr) const
+{
+   QColor c;
+
+   switch (pr.state.eState)
+   {
+      case ServerPullRequest::HeadState::State::Failure:
+         c = GitQlientStyles::getRed();
+         break;
+      case ServerPullRequest::HeadState::State::Success:
+         c = GitQlientStyles::getGreen();
+         break;
+      default:
+      case ServerPullRequest::HeadState::State::Pending:
+         c = GitQlientStyles::getOrange();
+         break;
+   }
+
+   painter->save();
+   painter->setRenderHint(QPainter::Antialiasing);
+   painter->setPen(c);
+   painter->setBrush(c);
+   painter->drawEllipse(opt.rect.x() + startPoint, opt.rect.y() + (opt.rect.height() / 2) - 5, 10, 10);
+   painter->restore();
+
+   startPoint += 10 + 5;
 }

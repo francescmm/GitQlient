@@ -431,6 +431,16 @@ void RevisionsCache::updateTags(const QMap<QString, QString> &remoteTags)
    mRemoteTags = remoteTags;
 }
 
+void RevisionsCache::setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus)
+{
+   mPullRequestsStatus = std::move(prStatus);
+}
+
+ServerPullRequest RevisionsCache::getPullRequestStatus(const QString &sha)
+{
+   return mPullRequestsStatus.value(sha);
+}
+
 void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)

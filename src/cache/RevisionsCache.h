@@ -27,11 +27,13 @@
 #include <lanes.h>
 #include <CommitInfo.h>
 
+#include <ServerPullRequest.h>
+
 #include <QObject>
 #include <QHash>
 #include <QMutex>
 
-struct WorkingDirInfo;
+class GitHubRestApi;
 
 struct WipRevisionInfo
 {
@@ -89,6 +91,9 @@ public:
 
    void updateTags(const QMap<QString, QString> &remoteTags);
 
+   void setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus);
+   ServerPullRequest getPullRequestStatus(const QString &sha);
+
 private:
    friend class GitRepoLoader;
 
@@ -105,6 +110,7 @@ private:
    QVector<QString> mFileNames;
    QVector<QString> mUntrackedfiles;
    QMap<QString, QString> mRemoteTags;
+   QMap<QString, ServerPullRequest> mPullRequestsStatus;
 
    struct FileNamesLoader
    {

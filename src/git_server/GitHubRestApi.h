@@ -54,6 +54,7 @@ signals:
    void signalIssueCreated(QString url);
    void signalIssueUpdated();
    void signalPullRequestCreated(QString url);
+   void signalPullRequestsReceived(QMap<QString, ServerPullRequest> prs);
 
 public:
    explicit GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
@@ -79,6 +80,7 @@ private:
    ServerAuthentication mAuth;
    QNetworkAccessManager *mManager;
    QMap<QString, ServerPullRequest> mPulls;
+   int mPrRequested = 0;
 
    QUrl formatUrl(const QString page) const;
    QNetworkRequest createRequest(const QString &page) const;

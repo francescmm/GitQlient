@@ -71,4 +71,6 @@ struct ServerPullRequest
 
       return object;
    }
+
+   bool isValid() const { return !title.isEmpty(); }
 };

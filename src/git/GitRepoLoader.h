@@ -32,6 +32,7 @@
 class GitBase;
 class RevisionsCache;
 struct WipRevisionInfo;
+class GitHubRestApi;
 
 class GitRepoLoader : public QObject
 {
@@ -55,6 +56,7 @@ private:
    bool mLocked = false;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<RevisionsCache> mRevCache;
+   GitHubRestApi *mApi = nullptr;
 
    bool configureRepoDirectory();
    void loadReferences();

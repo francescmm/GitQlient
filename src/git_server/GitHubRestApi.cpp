@@ -202,6 +202,8 @@ void GitHubRestApi::processPullRequets(const QJsonDocument &doc)
 
       auto request = createRequest(QString("commits/%1/status").arg(prInfo.state.sha));
       mManager->get(request);
+
+      ++mPrRequested;
    }
 }
 
@@ -215,6 +217,11 @@ void GitHubRestApi::onPullRequestStatusReceived(const QString &sha, const QJsonD
        ? ServerPullRequest::HeadState::State::Success
        : mPulls[sha].state.state == "failure" ? ServerPullRequest::HeadState::State::Failure
                                               : ServerPullRequest::HeadState::State::Pending;
+
+   --mPrRequested;
+
+   if (mPrRequested == 0)
+      emit signalPullRequestsReceived(mPulls);
 }
 
 void GitHubRestApi::validateData(QNetworkReply *reply)

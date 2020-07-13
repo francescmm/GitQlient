@@ -1,9 +1,12 @@
 #include "GitRepoLoader.h"
 
 #include <GitBase.h>
+#include <GitConfig.h>
 #include <RevisionsCache.h>
 #include <GitRequestorProcess.h>
 #include <GitBranches.h>
+#include <GitQlientSettings.h>
+#include <GitHubRestApi.h>
 
 #include <QLogger.h>
 #include <BenchmarkTool.h>
@@ -203,6 +206,29 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
    BenchmarkStart();
 
    QLog_Info("Git", "Revisions received!");
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+   const auto serverUrl = gitConfig->getServerUrl();
+
+   if (serverUrl.contains("github"))
+   {
+      QLog_Info("Git", "Requesting PR status!");
+
+      GitQlientSettings settings;
+      const auto userName = settings.value(QString("%1/user").arg(serverUrl)).toString();
+      const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
+      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+      const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
+
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint }, this);
+      connect(mApi, &GitHubRestApi::signalPullRequestsReceived, this,
+              [this](QMap<QString, ServerPullRequest> prStatus) {
+                 QLog_Info("Git", "Storing PR status!");
+                 mRevCache->setPullRequestStatus(std::move(prStatus));
+              });
+
+      mApi->requestPullRequestsState();
+   }
 
    QLog_Debug("Git", "Processing revisions...");
 
