@@ -14,14 +14,9 @@ using namespace QLogger;
 
 GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
                              QObject *parent)
-   : QObject(parent)
-   , mEndpointUrl(auth.endpointUrl)
+   : IRestApi(auth, parent)
 {
-   mManager = new QNetworkAccessManager();
    connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
-
-   if (!mEndpointUrl.endsWith("/"))
-      mEndpointUrl.append("/");
 
    mRepoOwner = repoOwner;
 
@@ -39,7 +34,7 @@ GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, 
 void GitHubRestApi::testConnection()
 {
    auto request = createRequest("");
-   request.setUrl(mEndpointUrl);
+   request.setUrl(mAuth.endpointUrl);
 
    mManager->get(request);
 }
@@ -92,7 +87,7 @@ void GitHubRestApi::requestPullRequestsState()
 
 QUrl GitHubRestApi::formatUrl(const QString page) const
 {
-   auto tmpUrl = mEndpointUrl + "repos/" + mRepoOwner + mRepoName + page;
+   auto tmpUrl = mAuth.endpointUrl + "repos/" + mRepoOwner + mRepoName + page;
 
    if (tmpUrl.endsWith("/"))
       tmpUrl = tmpUrl.left(tmpUrl.size() - 1);

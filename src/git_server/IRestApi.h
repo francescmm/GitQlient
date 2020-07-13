@@ -23,51 +23,42 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <IRestApi.h>
+#include <ServerMilestone.h>
+#include <ServerLabel.h>
+#include <ServerPullRequest.h>
 
-#include <QUrl>
-#include <QNetworkRequest>
+#include <QObject>
+#include <QMap>
 
-class QJsonDocument;
-class QNetworkReply;
-struct ServerIssue;
+class QNetworkAccessManager;
 
-class GitHubRestApi final : public IRestApi
+struct ServerAuthentication
+{
+   QString userName;
+   QString userPass;
+   QString endpointUrl;
+};
+
+class IRestApi : public QObject
 {
    Q_OBJECT
 
+signals:
+   void signalConnectionSuccessful();
+   void signalLabelsReceived(const QVector<ServerLabel> &labels);
+   void signalMilestonesReceived(const QVector<ServerMilestone> &milestones);
+   void signalIssueCreated(QString url);
+   void signalIssueUpdated();
+   void signalPullRequestCreated(QString url);
+   void signalPullRequestsReceived(QMap<QString, ServerPullRequest> prs);
+
 public:
-   explicit GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
-                          QObject *parent = nullptr);
+   explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
+   virtual ~IRestApi() = default;
 
-   void testConnection() override;
+   virtual void testConnection() = 0;
 
-   void createIssue(const ServerIssue &issue);
-   void updateIssue(int issueNumber, const ServerIssue &issue);
-
-   void createPullRequest(const ServerPullRequest &pullRequest);
-
-   void requestLabels();
-
-   void getMilestones();
-
-   void requestPullRequestsState();
-
-private:
-   QString mRepoName;
-   QString mRepoOwner;
-
-   QMap<QString, ServerPullRequest> mPulls;
-   int mPrRequested = 0;
-
-   QUrl formatUrl(const QString page) const;
-   QNetworkRequest createRequest(const QString &page) const;
-
-   void validateData(QNetworkReply *reply);
-   void onLabelsReceived(const QJsonDocument &doc);
-   void onMilestonesReceived(const QJsonDocument &doc);
-   void onIssueCreated(const QJsonDocument &doc);
-   void onPullRequestCreated(const QJsonDocument &doc);
-   void processPullRequets(const QJsonDocument &doc);
-   void onPullRequestStatusReceived(const QString &sha, const QJsonDocument &doc);
+protected:
+   QNetworkAccessManager *mManager = nullptr;
+   ServerAuthentication mAuth;
 };

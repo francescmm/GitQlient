@@ -9,6 +9,7 @@ HEADERS += \
    $$PWD/CreateIssueDlg.h \
    $$PWD/CreatePullRequestDlg.h \
    $$PWD/GitHubRestApi.h \
+   $$PWD/IRestApi.h \
    $$PWD/ServerConfigDlg.h \
    $$PWD/ServerIssue.h \
    $$PWD/ServerLabel.h \
@@ -19,4 +20,5 @@ SOURCES += \
    $$PWD/CreateIssueDlg.cpp \
    $$PWD/CreatePullRequestDlg.cpp \
    $$PWD/GitHubRestApi.cpp \
+   $$PWD/IRestApi.cpp \
    $$PWD/ServerConfigDlg.cpp
