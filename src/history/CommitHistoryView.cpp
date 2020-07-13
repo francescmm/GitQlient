@@ -32,13 +32,27 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache
 
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
    connect(mCache.get(), &RevisionsCache::signalCacheUpdated, this, [this]() {
+      QModelIndex topLeft;
+      QModelIndex bottomRight;
+
       if (mProxyModel)
       {
+         topLeft = mProxyModel->index(0, 0);
+         bottomRight = mProxyModel->index(mProxyModel->rowCount() - 1, mProxyModel->columnCount() - 1);
          mProxyModel->beginResetModel();
          mProxyModel->endResetModel();
       }
       else
+      {
+         topLeft = mCommitHistoryModel->index(0, 0);
+         bottomRight
+             = mCommitHistoryModel->index(mCommitHistoryModel->rowCount() - 1, mCommitHistoryModel->columnCount() - 1);
          mCommitHistoryModel->onNewRevisions(mCache->count());
+      }
+
+      const auto auxTL = visualRect(topLeft);
+      const auto auxBR = visualRect(bottomRight);
+      viewport()->update(auxTL.x(), auxTL.y(), auxBR.x() + auxBR.width(), auxBR.y() + auxBR.height());
    });
 }
 
