@@ -31,6 +31,15 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache
    header()->setSortIndicatorShown(false);
 
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
+   connect(mCache.get(), &RevisionsCache::signalCacheUpdated, this, [this]() {
+      if (mProxyModel)
+      {
+         mProxyModel->beginResetModel();
+         mProxyModel->endResetModel();
+      }
+      else
+         mCommitHistoryModel->onNewRevisions(mCache->count());
+   });
 }
 
 void CommitHistoryView::setModel(QAbstractItemModel *model)

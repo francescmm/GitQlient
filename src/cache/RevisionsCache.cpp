@@ -436,6 +436,8 @@ void RevisionsCache::updateTags(const QMap<QString, QString> &remoteTags)
 void RevisionsCache::setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus)
 {
    mPullRequestsStatus = std::move(prStatus);
+
+   emit signalCacheUpdated();
 }
 
 ServerPullRequest RevisionsCache::getPullRequestStatus(const QString &sha)

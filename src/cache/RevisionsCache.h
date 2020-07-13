@@ -91,7 +91,6 @@ public:
 
    void updateTags(const QMap<QString, QString> &remoteTags);
 
-   void setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus);
    ServerPullRequest getPullRequestStatus(const QString &sha);
    void refreshPRsCache(const QString repoName, const QString &repoOwner, const QString &serverUrl);
 
@@ -139,4 +138,5 @@ private:
    QVector<CommitInfo *>::const_iterator searchCommit(CommitInfo::Field field, const QString &text,
                                                       int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);
+   void setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus);
 };
