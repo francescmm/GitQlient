@@ -49,7 +49,7 @@ public:
 
    void requestLabels();
 
-   void getMilestones();
+   void requestMilestones();
 
    void requestPullRequestsState();
 

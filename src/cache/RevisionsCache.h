@@ -33,7 +33,7 @@
 #include <QHash>
 #include <QMutex>
 
-class GitHubRestApi;
+class IRestApi;
 
 struct WipRevisionInfo
 {
@@ -64,7 +64,7 @@ public:
    ~RevisionsCache();
 
    void setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits);
-   void setupGitPlatform(const QSharedPointer<GitHubRestApi> &api);
+   void setupGitPlatform(const QSharedPointer<IRestApi> &api);
 
    int count() const;
 
@@ -112,7 +112,7 @@ private:
    QVector<QString> mUntrackedfiles;
    QMap<QString, QString> mRemoteTags;
    QMap<QString, ServerPullRequest> mPullRequestsStatus;
-   QSharedPointer<GitHubRestApi> mApi;
+   QSharedPointer<IRestApi> mApi;
 
    struct FileNamesLoader
    {

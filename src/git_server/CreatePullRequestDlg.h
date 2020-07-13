@@ -33,7 +33,7 @@ class CreatePullRequestDlg;
 }
 
 class GitBase;
-class GitHubRestApi;
+class IRestApi;
 class RevisionsCache;
 
 class CreatePullRequestDlg : public QDialog
@@ -49,7 +49,7 @@ private:
    Ui::CreatePullRequestDlg *ui;
    QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
-   GitHubRestApi *mApi;
+   IRestApi *mApi;
    QString mUserName;
    int mIssue;
    QString mFinalUrl;

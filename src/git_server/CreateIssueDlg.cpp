@@ -32,7 +32,7 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *paren
       connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreateIssueDlg::onMilestones);
       connect(mApi, &GitHubRestApi::signalLabelsReceived, this, &CreateIssueDlg::onLabels);
 
-      mApi->getMilestones();
+      mApi->requestMilestones();
       mApi->requestLabels();
    }
 

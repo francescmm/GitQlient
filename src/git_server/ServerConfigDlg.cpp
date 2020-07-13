@@ -87,7 +87,7 @@ void ServerConfigDlg::testToken()
 
       api->testConnection();
 
-      connect(api, &GitHubRestApi::signalConnectionSuccessful, this, [this]() {
+      connect(api, &IRestApi::signalConnectionSuccessful, this, [this]() {
          ui->lTestResult->setText("Token confirmed!");
          QTimer::singleShot(3000, ui->lTestResult, &QLabel::clear);
       });

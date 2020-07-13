@@ -33,7 +33,7 @@ class CreateIssueDlg;
 }
 
 class GitBase;
-class GitHubRestApi;
+class IRestApi;
 
 class CreateIssueDlg : public QDialog
 {
@@ -46,7 +46,7 @@ public:
 private:
    Ui::CreateIssueDlg *ui;
    QSharedPointer<GitBase> mGit;
-   GitHubRestApi *mApi;
+   IRestApi *mApi;
    QString mUserName;
 
    void accept() override;

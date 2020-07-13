@@ -31,6 +31,7 @@
 #include <QMap>
 
 class QNetworkAccessManager;
+struct ServerIssue;
 
 struct ServerAuthentication
 {
@@ -57,6 +58,12 @@ public:
    virtual ~IRestApi() = default;
 
    virtual void testConnection() = 0;
+   virtual void createIssue(const ServerIssue &issue) = 0;
+   virtual void updateIssue(int issueNumber, const ServerIssue &issue) = 0;
+   virtual void createPullRequest(const ServerPullRequest &pullRequest) = 0;
+   virtual void requestLabels() = 0;
+   virtual void requestMilestones() = 0;
+   virtual void requestPullRequestsState() = 0;
 
 protected:
    QNetworkAccessManager *mManager = nullptr;

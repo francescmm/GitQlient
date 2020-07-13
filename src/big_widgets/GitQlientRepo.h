@@ -40,7 +40,7 @@ class BlameWidget;
 class MergeWidget;
 class QTimer;
 class ProgressDlg;
-class GitHubRestApi;
+class IRestApi;
 
 enum class ControlsMainViews;
 
@@ -147,7 +147,7 @@ private:
    QPointer<ProgressDlg> mProgressDlg;
    QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
-   QSharedPointer<GitHubRestApi> mApi;
+   QSharedPointer<IRestApi> mApi;
 
    bool mIsInit = false;
    QThread *m_loaderThread;

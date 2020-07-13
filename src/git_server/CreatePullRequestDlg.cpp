@@ -40,7 +40,7 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
       connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreatePullRequestDlg::onMilestones);
       connect(mApi, &GitHubRestApi::signalLabelsReceived, this, &CreatePullRequestDlg::onLabels);
 
-      mApi->getMilestones();
+      mApi->requestMilestones();
       mApi->requestLabels();
    }
 

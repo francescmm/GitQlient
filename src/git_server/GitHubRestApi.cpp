@@ -75,7 +75,7 @@ void GitHubRestApi::requestLabels()
    mManager->get(createRequest("labels"));
 }
 
-void GitHubRestApi::getMilestones()
+void GitHubRestApi::requestMilestones()
 {
    mManager->get(createRequest("milestones"));
 }
