@@ -79,6 +79,7 @@ void ServerConfigDlg::testToken()
       ui->leUserName->setStyleSheet("border: 1px solid red;");
    else
    {
+      // TODO: Initialize depending on the server
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
       const auto serverUrl = gitConfig->getServerUrl();
       const auto parts = gitConfig->getCurrentRepoAndOwner();
