@@ -13,9 +13,9 @@
 using namespace QLogger;
 
 GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
-                             const QString &endpointUrl, QObject *parent)
+                             QObject *parent)
    : QObject(parent)
-   , mEndpointUrl(endpointUrl)
+   , mEndpointUrl(auth.endpointUrl)
 {
    mManager = new QNetworkAccessManager();
    connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);

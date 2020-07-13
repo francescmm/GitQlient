@@ -35,6 +35,7 @@ struct ServerAuthentication
 {
    QString userName;
    QString userPass;
+   QString endpointUrl;
 };
 
 class QJsonDocument;
@@ -56,7 +57,7 @@ signals:
 
 public:
    explicit GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
-                          const QString &endpointUrl, QObject *parent = nullptr);
+                          QObject *parent = nullptr);
 
    void testConnection();
 

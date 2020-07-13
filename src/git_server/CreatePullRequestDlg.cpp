@@ -34,7 +34,7 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
       const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
 
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken }, endpoint);
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken, endpoint });
       connect(mApi, &GitHubRestApi::signalIssueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
       connect(mApi, &GitHubRestApi::signalPullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
       connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreatePullRequestDlg::onMilestones);

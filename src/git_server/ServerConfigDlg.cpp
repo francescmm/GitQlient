@@ -82,8 +82,8 @@ void ServerConfigDlg::testToken()
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
       const auto serverUrl = gitConfig->getServerUrl();
       const auto parts = gitConfig->getCurrentRepoAndOwner();
-      const auto api = new GitHubRestApi(parts.first, parts.second, { ui->leUserName->text(), ui->leUserToken->text() },
-                                         ui->leEndPoint->text());
+      const auto api = new GitHubRestApi(parts.first, parts.second,
+                                         { ui->leUserName->text(), ui->leUserToken->text(), ui->leEndPoint->text() });
 
       api->testConnection();
 

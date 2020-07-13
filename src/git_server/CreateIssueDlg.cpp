@@ -27,7 +27,7 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *paren
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
       const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
 
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken }, endpoint);
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken, endpoint });
       connect(mApi, &GitHubRestApi::signalIssueCreated, this, &CreateIssueDlg::onIssueCreated);
       connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreateIssueDlg::onMilestones);
       connect(mApi, &GitHubRestApi::signalLabelsReceived, this, &CreateIssueDlg::onLabels);
