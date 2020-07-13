@@ -41,17 +41,12 @@ public:
                           QObject *parent = nullptr);
 
    void testConnection() override;
-
-   void createIssue(const ServerIssue &issue);
-   void updateIssue(int issueNumber, const ServerIssue &issue);
-
-   void createPullRequest(const ServerPullRequest &pullRequest);
-
-   void requestLabels();
-
-   void requestMilestones();
-
-   void requestPullRequestsState();
+   void createIssue(const ServerIssue &issue) override;
+   void updateIssue(int issueNumber, const ServerIssue &issue) override;
+   void createPullRequest(const ServerPullRequest &pullRequest) override;
+   void requestLabels() override;
+   void requestMilestones() override;
+   void requestPullRequestsState() override;
 
 private:
    QString mRepoName;
