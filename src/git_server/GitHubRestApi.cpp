@@ -7,6 +7,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTimer>
 
 #include <QLogger.h>
 
@@ -82,7 +83,7 @@ void GitHubRestApi::requestMilestones()
 
 void GitHubRestApi::requestPullRequestsState()
 {
-   mManager->get(createRequest("pulls"));
+   QTimer::singleShot(1500, this, [this]() { mManager->get(createRequest("pulls")); });
 }
 
 QUrl GitHubRestApi::formatUrl(const QString page) const
