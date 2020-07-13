@@ -28,8 +28,6 @@ GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, 
 
    if (!mRepoName.endsWith("/"))
       mRepoName.append("/");
-
-   mAuth = auth;
 }
 
 void GitHubRestApi::testConnection()
@@ -220,7 +218,14 @@ void GitHubRestApi::onPullRequestStatusReceived(const QString &sha, const QJsonD
 
    for (auto status : statuses)
    {
-      ServerPullRequest::HeadState::Check check { status["description"].toString(), status["state"].toString(),
+      auto statusStr = status["state"].toString();
+
+      if (statusStr == "ok")
+         statusStr = "success";
+      else if (statusStr == "error")
+         statusStr = "failure";
+
+      ServerPullRequest::HeadState::Check check { status["description"].toString(), statusStr,
                                                   status["target_url"].toString(), status["context"].toString() };
 
       mPulls[sha].state.checks.append(check);
