@@ -139,6 +139,18 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
       if (mShas.count() == 1 && mCache->getPullRequestStatus(mShas.first()).isValid())
       {
+         const auto prInfo = mCache->getPullRequestStatus(mShas.first());
+
+         const auto checksMenu = new QMenu("Checks", gitHubMenu);
+         gitHubMenu->addMenu(checksMenu);
+
+         for (const auto &check : prInfo.state.checks)
+         {
+            const auto link = check.url;
+            checksMenu->addAction(QIcon(QString(":/icons/%1").arg(check.state)), check.name, this,
+                                  [link]() { QDesktopServices::openUrl(link); });
+         }
+
          const auto link = mCache->getPullRequestStatus(mShas.first()).url;
          connect(gitHubMenu->addAction("Open PR on browser"), &QAction::triggered, this,
                  [link]() { QDesktopServices::openUrl(link); });

@@ -25,6 +25,7 @@
 
 #include <QString>
 #include <QJsonObject>
+#include <QVector>
 
 struct ServerPullRequest
 {
@@ -41,9 +42,18 @@ struct ServerPullRequest
          Pending
       };
 
+      struct Check
+      {
+         QString description;
+         QString state;
+         QString url;
+         QString name;
+      };
+
       QString sha;
       QString state;
       State eState;
+      QVector<Check> checks;
    };
 
    QString title;

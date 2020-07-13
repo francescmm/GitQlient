@@ -216,6 +216,16 @@ void GitHubRestApi::onPullRequestStatusReceived(const QString &sha, const QJsonD
        : mPulls[sha].state.state == "failure" ? ServerPullRequest::HeadState::State::Failure
                                               : ServerPullRequest::HeadState::State::Pending;
 
+   const auto statuses = obj["statuses"].toArray();
+
+   for (auto status : statuses)
+   {
+      ServerPullRequest::HeadState::Check check { status["description"].toString(), status["state"].toString(),
+                                                  status["target_url"].toString(), status["context"].toString() };
+
+      mPulls[sha].state.checks.append(check);
+   }
+
    --mPrRequested;
 
    if (mPrRequested == 0)
