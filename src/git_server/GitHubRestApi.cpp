@@ -175,6 +175,8 @@ void GitHubRestApi::processPullRequets(const QJsonDocument &doc)
 {
    const auto prs = doc.array();
 
+   mPulls.clear();
+
    ServerPullRequest prInfo;
 
    for (const auto &pr : prs)
