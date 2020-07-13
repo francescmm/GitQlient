@@ -93,6 +93,7 @@ public:
 
    void setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus);
    ServerPullRequest getPullRequestStatus(const QString &sha);
+   void refreshPRsCache(const QString repoName, const QString &repoOwner, const QString &serverUrl);
 
 private:
    friend class GitRepoLoader;
@@ -111,6 +112,7 @@ private:
    QVector<QString> mUntrackedfiles;
    QMap<QString, QString> mRemoteTags;
    QMap<QString, ServerPullRequest> mPullRequestsStatus;
+   GitHubRestApi *mApi = nullptr;
 
    struct FileNamesLoader
    {

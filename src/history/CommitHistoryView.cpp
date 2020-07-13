@@ -6,6 +6,7 @@
 #include <ShaFilterProxyModel.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
+#include <GitConfig.h>
 
 #include <QHeaderView>
 #include <QSettings>
@@ -153,6 +154,13 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
       if (!shas.isEmpty())
       {
          const auto menu = new CommitHistoryContextMenu(mCache, mGit, shas, this);
+         connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, this, [this]() {
+            QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+            const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+            const auto serverUrl = gitConfig->getServerUrl();
+            mCache->refreshPRsCache(repoInfo.first, repoInfo.second, serverUrl);
+         });
+
          connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,

@@ -20,6 +20,7 @@
 #include <GitConfig.h>
 #include <GitBase.h>
 #include <GitHistory.h>
+#include <GitHubRestApi.h>
 
 #include <QTimer>
 #include <QDirIterator>
@@ -53,6 +54,18 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+   const auto serverUrl = gitConfig->getServerUrl();
+
+   if (serverUrl.contains("github"))
+   {
+      mAutoPrUpdater = new QTimer();
+      mAutoPrUpdater->start(300 * 1000);
+
+      connect(mAutoPrUpdater, &QTimer::timeout, this, &GitQlientRepo::refreshPRsCache);
+      connect(mControls, &Controls::signalRefreshPRsCache, this, &GitQlientRepo::refreshPRsCache);
+   }
 
    mStackedLayout->addWidget(mHistoryWidget);
    mStackedLayout->addWidget(mDiffWidget);
@@ -410,6 +423,14 @@ void GitQlientRepo::updateTagsOnCache()
    const auto remoteTags = gitTags->getRemoteTags();
 
    mGitQlientCache->updateTags(remoteTags);
+}
+
+void GitQlientRepo::refreshPRsCache()
+{
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+   const auto serverUrl = gitConfig->getServerUrl();
+   mGitQlientCache->refreshPRsCache(repoInfo.first, repoInfo.second, serverUrl);
 }
 
 void GitQlientRepo::openCommitDiff(const QString currentSha)

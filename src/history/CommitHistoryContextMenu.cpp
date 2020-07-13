@@ -360,10 +360,16 @@ void CommitHistoryContextMenu::push()
       const auto ret = dlg.exec();
 
       if (ret == QDialog::Accepted)
+      {
+         emit signalRefreshPRsCache();
          emit signalRepositoryUpdated();
+      }
    }
    else if (ret.success)
+   {
+      emit signalRefreshPRsCache();
       emit signalRepositoryUpdated();
+   }
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),

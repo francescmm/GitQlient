@@ -78,6 +78,10 @@ signals:
     * \brief signalPullConflict Signal triggered when trying to pull and a conflict happens.
     */
    void signalPullConflict();
+   /**
+    * @brief signalRefreshPRsCache Signal that refreshes PRs cache.
+    */
+   void signalRefreshPRsCache();
 
 public:
    /*!

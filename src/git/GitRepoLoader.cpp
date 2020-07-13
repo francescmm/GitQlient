@@ -23,6 +23,7 @@ GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<Rev
    , mGitBase(gitBase)
    , mRevCache(std::move(cache))
 {
+   connect(this, &GitRepoLoader::signalRefreshPRsCache, mRevCache.get(), &RevisionsCache::refreshPRsCache);
 }
 
 bool GitRepoLoader::loadRepository()
@@ -213,21 +214,9 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
    if (serverUrl.contains("github"))
    {
       QLog_Info("Git", "Requesting PR status!");
-
-      GitQlientSettings settings;
-      const auto userName = settings.value(QString("%1/user").arg(serverUrl)).toString();
-      const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-      const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
 
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint }, this);
-      connect(mApi, &GitHubRestApi::signalPullRequestsReceived, this,
-              [this](QMap<QString, ServerPullRequest> prStatus) {
-                 QLog_Info("Git", "Storing PR status!");
-                 mRevCache->setPullRequestStatus(std::move(prStatus));
-              });
-
-      mApi->requestPullRequestsState();
+      emit signalRefreshPRsCache(repoInfo.first, repoInfo.second, serverUrl);
    }
 
    QLog_Debug("Git", "Processing revisions...");

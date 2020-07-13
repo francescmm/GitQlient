@@ -130,7 +130,10 @@ void BranchContextMenu::pushForce()
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
+   {
+      emit signalRefreshPRsCache();
       emit signalBranchesUpdated();
+   }
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),

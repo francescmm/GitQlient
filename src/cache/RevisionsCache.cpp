@@ -1,4 +1,6 @@
 #include "RevisionsCache.h"
+#include <GitQlientSettings.h>
+#include <GitHubRestApi.h>
 
 #include <QLogger.h>
 
@@ -439,6 +441,20 @@ void RevisionsCache::setPullRequestStatus(QMap<QString, ServerPullRequest> prSta
 ServerPullRequest RevisionsCache::getPullRequestStatus(const QString &sha)
 {
    return mPullRequestsStatus.value(sha);
+}
+
+void RevisionsCache::refreshPRsCache(const QString repoName, const QString &repoOwner, const QString &serverUrl)
+{
+   GitQlientSettings settings;
+   const auto userName = settings.value(QString("%1/user").arg(serverUrl)).toString();
+   const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
+   const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
+
+   mApi = new GitHubRestApi(repoName, repoOwner, { userName, userToken, endpoint }, this);
+   connect(mApi, &GitHubRestApi::signalPullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
+   connect(mApi, &GitHubRestApi::signalPullRequestsReceived, mApi, &GitHubRestApi::deleteLater);
+
+   mApi->requestPullRequestsState();
 }
 
 void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)

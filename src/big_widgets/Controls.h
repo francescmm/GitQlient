@@ -94,6 +94,11 @@ signals:
     */
    void signalFetchPerformed();
 
+   /**
+    * @brief signalRefreshPRsCache Signal that refreshes PRs cache.
+    */
+   void signalRefreshPRsCache();
+
 public:
    /*!
     \brief Default constructor.

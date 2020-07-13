@@ -40,6 +40,7 @@ class BlameWidget;
 class MergeWidget;
 class QTimer;
 class ProgressDlg;
+class GitHubRestApi;
 
 enum class ControlsMainViews;
 
@@ -142,6 +143,7 @@ private:
    MergeWidget *mMergeWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
+   QTimer *mAutoPrUpdater = nullptr;
    QPointer<ProgressDlg> mProgressDlg;
    QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
@@ -269,4 +271,9 @@ private:
     * @brief updateTagsOnCache Updates the remote tags in the cache.
     */
    void updateTagsOnCache();
+
+   /**
+    * @brief refreshPRsCache Orders the cache to refresh the info of the PRs.
+    */
+   void refreshPRsCache();
 };
