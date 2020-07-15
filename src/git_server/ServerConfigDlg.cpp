@@ -98,6 +98,14 @@ void ServerConfigDlg::accept()
    settings.setValue(QString("%1/token").arg(serverUrl), ui->leUserToken->text());
    settings.setValue(QString("%1/endpoint").arg(serverUrl), endpoint);
 
+   if (ui->cbServer->currentIndex() == GitLab)
+   {
+      auto api
+          = new GitLabRestApi(ui->leUserName->text(), { ui->leUserName->text(), ui->leUserToken->text(), endpoint });
+
+      api->configureData(serverUrl);
+   }
+
    QDialog::accept();
 }
 

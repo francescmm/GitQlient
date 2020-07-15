@@ -1,4 +1,5 @@
 #include "GitLabRestApi.h"
+#include <GitQlientSettings.h>
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -11,6 +12,34 @@ GitLabRestApi::GitLabRestApi(const QString &userName, const ServerAuthentication
    : IRestApi(auth, parent)
    , mUserName(userName)
 {
+}
+
+void GitLabRestApi::configureData(const QString &serverUrl) const
+{
+   auto request = createRequest("/users?username=%1");
+   auto url = request.url();
+
+   QUrlQuery query;
+   query.addQueryItem("username", mUserName);
+   url.setQuery(query);
+   request.setUrl(url);
+
+   const auto reply = mManager->get(request);
+
+   connect(reply, &QNetworkReply::finished, this, [this, serverUrl]() {
+      const auto reply = qobject_cast<QNetworkReply *>(sender());
+      const auto tmpDoc = validateData(reply);
+
+      if (tmpDoc.has_value())
+      {
+         const auto doc = tmpDoc.value();
+         const auto user = doc.object();
+         const auto list = tmpDoc->toVariant().toList().first().toMap();
+
+         GitQlientSettings settings;
+         settings.setValue(QString("%1/userId").arg(serverUrl), list.value("id").toInt());
+      }
+   });
 }
 
 void GitLabRestApi::testConnection()

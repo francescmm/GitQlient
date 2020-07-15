@@ -32,6 +32,7 @@ class GitLabRestApi final : public IRestApi
 public:
    explicit GitLabRestApi(const QString &userName, const ServerAuthentication &auth, QObject *parent = nullptr);
 
+   void configureData(const QString &serverUrl) const;
    void testConnection() override;
    void createIssue(const ServerIssue &issue) override;
    void updateIssue(int issueNumber, const ServerIssue &issue) override;
