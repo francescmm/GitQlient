@@ -6,6 +6,7 @@
 #include <GitQlientStyles.h>
 #include <GitQlientSettings.h>
 #include <GitHubRestApi.h>
+#include <GitLabRestApi.h>
 
 #include <QLogger.h>
 
@@ -32,9 +33,9 @@ enum GitServerPlatform
    Bitbucket
 };
 
-static const QMap<GitServerPlatform, QString> repoUrls { { GitHub, "https://api.github.com/" },
+static const QMap<GitServerPlatform, QString> repoUrls { { GitHub, "https://api.github.com/repos" },
                                                          { GitHubEnterprise, "" },
-                                                         { GitLab, "https://gitlab.com/api/v4/" } };
+                                                         { GitLab, "https://gitlab.com/api/v4" } };
 }
 
 ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent)
@@ -49,7 +50,6 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *pa
 
    ui->leEndPoint->setHidden(true);
 
-   ui->cbServer->addItem(tr("Select server endpoint"));
    ui->cbServer->insertItem(GitHub, "GitHub", repoUrls.value(GitHub));
    ui->cbServer->insertItem(GitHubEnterprise, "GitHub Enterprise", repoUrls.value(GitHubEnterprise));
    ui->cbServer->insertItem(GitLab, "GitLab", repoUrls.value(GitLab));
@@ -60,11 +60,10 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *pa
    GitQlientSettings settings;
    ui->leUserName->setText(settings.value(QString("%1/user").arg(serverUrl)).toString());
    ui->leUserToken->setText(settings.value(QString("%1/token").arg(serverUrl)).toString());
-   ui->leEndPoint->setText(
-       settings.value(QString("%1/endpoint").arg(serverUrl), QString("https://api.github.com/")).toString());
+   ui->leEndPoint->setText(settings.value(QString("%1/endpoint").arg(serverUrl), repoUrls.value(GitHub)).toString());
 
-   if (const auto index = repoUrls.key(ui->leEndPoint->text(), GitHubEnterprise))
-      ui->cbServer->setCurrentIndex(index);
+   const auto index = repoUrls.key(ui->leEndPoint->text(), GitHubEnterprise);
+   ui->cbServer->setCurrentIndex(index);
 
    connect(ui->leUserToken, &QLineEdit::editingFinished, this, &ServerConfigDlg::checkToken);
    connect(ui->leUserToken, &QLineEdit::returnPressed, this, &ServerConfigDlg::accept);
@@ -110,12 +109,17 @@ void ServerConfigDlg::testToken()
    {
       const auto endpoint = ui->cbServer->currentIndex() == GitHubEnterprise ? ui->leEndPoint->text()
                                                                              : ui->cbServer->currentData().toString();
-      // TODO: Initialize depending on the server
-      QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-      const auto serverUrl = gitConfig->getServerUrl();
-      const auto parts = gitConfig->getCurrentRepoAndOwner();
-      const auto api
-          = new GitHubRestApi(parts.first, parts.second, { ui->leUserName->text(), ui->leUserToken->text(), endpoint });
+      IRestApi *api = nullptr;
+
+      if (ui->cbServer->currentIndex() == GitLab)
+         api = new GitLabRestApi(ui->leUserName->text(), { ui->leUserName->text(), ui->leUserToken->text(), endpoint });
+      else
+      {
+         QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+         const auto parts = gitConfig->getCurrentRepoAndOwner();
+         api = new GitHubRestApi(parts.first, parts.second,
+                                 { ui->leUserName->text(), ui->leUserToken->text(), endpoint });
+      }
 
       api->testConnection();
 

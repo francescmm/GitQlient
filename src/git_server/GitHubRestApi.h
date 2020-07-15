@@ -37,7 +37,7 @@ class GitHubRestApi final : public IRestApi
    Q_OBJECT
 
 public:
-   explicit GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
+   explicit GitHubRestApi(QString repoOwner, QString repoName, const ServerAuthentication &auth,
                           QObject *parent = nullptr);
 
    void testConnection() override;
@@ -49,15 +49,10 @@ public:
    void requestPullRequestsState() override;
 
 private:
-   QString mRepoName;
-   QString mRepoOwner;
-
    QMap<QString, ServerPullRequest> mPulls;
    int mPrRequested = 0;
 
-   QUrl formatUrl(const QString page) const;
-   QNetworkRequest createRequest(const QString &page) const;
-
+   QNetworkRequest createRequest(const QString &page) const override;
    void onLabelsReceived();
    void onMilestonesReceived();
    void onIssueCreated();

@@ -29,6 +29,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QNetworkRequest>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -58,6 +59,8 @@ public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
    virtual ~IRestApi() = default;
 
+   static std::optional<QJsonDocument> validateData(QNetworkReply *reply);
+
    virtual void testConnection() = 0;
    virtual void createIssue(const ServerIssue &issue) = 0;
    virtual void updateIssue(int issueNumber, const ServerIssue &issue) = 0;
@@ -70,5 +73,6 @@ protected:
    QNetworkAccessManager *mManager = nullptr;
    ServerAuthentication mAuth;
 
-   virtual std::optional<QJsonDocument> validateData(QNetworkReply *reply) final;
+   virtual QUrl formatUrl(const QString page) const final;
+   virtual QNetworkRequest createRequest(const QString &page) const = 0;
 };

@@ -13,25 +13,24 @@
 
 using namespace QLogger;
 
-GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, const ServerAuthentication &auth,
-                             QObject *parent)
+GitHubRestApi::GitHubRestApi(QString repoOwner, QString repoName, const ServerAuthentication &auth, QObject *parent)
    : IRestApi(auth, parent)
 {
-   mRepoOwner = repoOwner;
+   if (!repoOwner.endsWith("/"))
+      repoOwner.append("/");
 
-   if (!mRepoOwner.endsWith("/"))
-      mRepoOwner.append("/");
+   if (!repoOwner.startsWith("/"))
+      repoOwner.prepend("/");
 
-   mRepoName = repoName;
+   if (repoName.endsWith("/"))
+      repoName = repoName.left(repoName.size() - 1);
 
-   if (!mRepoName.endsWith("/"))
-      mRepoName.append("/");
+   mAuth.endpointUrl = mAuth.endpointUrl + repoOwner + repoName;
 }
 
 void GitHubRestApi::testConnection()
 {
    auto request = createRequest("");
-   request.setUrl(mAuth.endpointUrl);
 
    const auto reply = mManager->get(request);
 
@@ -51,7 +50,7 @@ void GitHubRestApi::createIssue(const ServerIssue &issue)
    QJsonDocument doc(issue.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
 
-   auto request = createRequest("issues");
+   auto request = createRequest("/issues");
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
    const auto reply = mManager->post(request, data);
 
@@ -63,7 +62,7 @@ void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
    QJsonDocument doc(issue.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
 
-   auto request = createRequest(QString("issues/%1").arg(issueNumber));
+   auto request = createRequest(QString("/issues/%1").arg(issueNumber));
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
    const auto reply = mManager->post(request, data);
 
@@ -83,7 +82,7 @@ void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
    QJsonDocument doc(pullRequest.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
 
-   auto request = createRequest("pulls");
+   auto request = createRequest("/pulls");
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
 
    const auto reply = mManager->post(request, data);
@@ -92,14 +91,14 @@ void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
 
 void GitHubRestApi::requestLabels()
 {
-   const auto reply = mManager->get(createRequest("labels"));
+   const auto reply = mManager->get(createRequest("/labels"));
 
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onLabelsReceived);
 }
 
 void GitHubRestApi::requestMilestones()
 {
-   const auto reply = mManager->get(createRequest("milestones"));
+   const auto reply = mManager->get(createRequest("/milestones"));
 
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onMilestonesReceived);
 }
@@ -107,19 +106,9 @@ void GitHubRestApi::requestMilestones()
 void GitHubRestApi::requestPullRequestsState()
 {
    QTimer::singleShot(1500, this, [this]() {
-      const auto reply = mManager->get(createRequest("pulls"));
+      const auto reply = mManager->get(createRequest("/pulls"));
       connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::processPullRequets);
    });
-}
-
-QUrl GitHubRestApi::formatUrl(const QString page) const
-{
-   auto tmpUrl = mAuth.endpointUrl + "repos/" + mRepoOwner + mRepoName + page;
-
-   if (tmpUrl.endsWith("/"))
-      tmpUrl = tmpUrl.left(tmpUrl.size() - 1);
-
-   return QUrl(tmpUrl);
 }
 
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
@@ -259,7 +248,7 @@ void GitHubRestApi::processPullRequets()
 
          mPulls.insert(prInfo.state.sha, prInfo);
 
-         auto request = createRequest(QString("commits/%1/status").arg(prInfo.state.sha));
+         auto request = createRequest(QString("/commits/%1/status").arg(prInfo.state.sha));
          const auto reply = mManager->get(request);
          connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestStatusReceived);
 

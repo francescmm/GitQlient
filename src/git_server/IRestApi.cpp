@@ -15,15 +15,10 @@ IRestApi::IRestApi(const ServerAuthentication &auth, QObject *parent)
    , mManager(new QNetworkAccessManager())
    , mAuth(auth)
 {
-   if (!mAuth.endpointUrl.endsWith("/"))
-      mAuth.endpointUrl.append("/");
 }
 
 std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply)
 {
-   if (reply == nullptr)
-      return std::nullopt;
-
    const auto data = reply->readAll();
    const auto jsonDoc = QJsonDocument::fromJson(data);
    const auto url = reply->url().path();
@@ -52,6 +47,22 @@ std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply)
 
       return std::nullopt;
    }
+   else if (jsonObject.contains(QStringLiteral("error")))
+   {
+      QLog_Error("Ui", jsonObject[QStringLiteral("error")].toString());
+
+      return std::nullopt;
+   }
 
    return jsonDoc;
+}
+
+QUrl IRestApi::formatUrl(const QString page) const
+{
+   auto tmpUrl = mAuth.endpointUrl + page;
+
+   if (tmpUrl.endsWith("/"))
+      tmpUrl = tmpUrl.left(tmpUrl.size() - 1);
+
+   return QUrl(tmpUrl);
 }
