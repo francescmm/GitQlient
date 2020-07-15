@@ -135,14 +135,12 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       name = "GitHub";
       prName = tr("Pull Request");
    }
-   /*
    else if (remoteUrl.contains("gitlab", Qt::CaseInsensitive))
    {
       gitPlatformIcon = QIcon(":/icons/gitlab");
       name = "GitLab";
       prName = tr("Merge Request");
    }
-*/
    else
       add = false;
 

@@ -72,5 +72,14 @@ private:
     * @brief Executes the Git actions based on the configuration once the validation as taken place.
     */
    void accept() override;
+   /**
+    * @brief testToken Method that does a light test connection to the selected server.
+    */
    void testToken();
+
+   /**
+    * @brief onServerChanged Shows the line edit to add the GitHub Enterprise URL.
+    * @param The new shown text.
+    */
+   void onServerChanged();
 };
