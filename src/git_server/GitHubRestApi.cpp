@@ -17,8 +17,6 @@ GitHubRestApi::GitHubRestApi(const QString &repoOwner, const QString &repoName, 
                              QObject *parent)
    : IRestApi(auth, parent)
 {
-   connect(mManager, &QNetworkAccessManager::finished, this, &GitHubRestApi::validateData);
-
    mRepoOwner = repoOwner;
 
    if (!mRepoOwner.endsWith("/"))
@@ -35,7 +33,17 @@ void GitHubRestApi::testConnection()
    auto request = createRequest("");
    request.setUrl(mAuth.endpointUrl);
 
-   mManager->get(request);
+   const auto reply = mManager->get(request);
+
+   connect(reply, &QNetworkReply::finished, this, [this]() {
+      const auto reply = qobject_cast<QNetworkReply *>(sender());
+      const auto tmpDoc = validateData(reply);
+
+      if (tmpDoc.has_value())
+      {
+         emit signalConnectionSuccessful();
+      }
+   });
 }
 
 void GitHubRestApi::createIssue(const ServerIssue &issue)
@@ -45,7 +53,9 @@ void GitHubRestApi::createIssue(const ServerIssue &issue)
 
    auto request = createRequest("issues");
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
-   mManager->post(request, data);
+   const auto reply = mManager->post(request, data);
+
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onIssueCreated);
 }
 
 void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
@@ -55,7 +65,17 @@ void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
 
    auto request = createRequest(QString("issues/%1").arg(issueNumber));
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
-   mManager->post(request, data);
+   const auto reply = mManager->post(request, data);
+
+   connect(reply, &QNetworkReply::finished, this, [this]() {
+      const auto reply = qobject_cast<QNetworkReply *>(sender());
+      const auto tmpDoc = validateData(reply);
+
+      if (tmpDoc.has_value())
+      {
+         emit signalIssueUpdated();
+      }
+   });
 }
 
 void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
@@ -66,22 +86,30 @@ void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
    auto request = createRequest("pulls");
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
 
-   mManager->post(request, data);
+   const auto reply = mManager->post(request, data);
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestCreated);
 }
 
 void GitHubRestApi::requestLabels()
 {
-   mManager->get(createRequest("labels"));
+   const auto reply = mManager->get(createRequest("labels"));
+
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onLabelsReceived);
 }
 
 void GitHubRestApi::requestMilestones()
 {
-   mManager->get(createRequest("milestones"));
+   const auto reply = mManager->get(createRequest("milestones"));
+
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onMilestonesReceived);
 }
 
 void GitHubRestApi::requestPullRequestsState()
 {
-   QTimer::singleShot(1500, this, [this]() { mManager->get(createRequest("pulls")); });
+   QTimer::singleShot(1500, this, [this]() {
+      const auto reply = mManager->get(createRequest("pulls"));
+      connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::processPullRequets);
+   });
 }
 
 QUrl GitHubRestApi::formatUrl(const QString page) const
@@ -111,187 +139,175 @@ QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
    return request;
 }
 
-void GitHubRestApi::onLabelsReceived(const QJsonDocument &doc)
+void GitHubRestApi::onLabelsReceived()
 {
-   QVector<ServerLabel> labels;
-   const auto labelsArray = doc.array();
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto tmpDoc = validateData(reply);
 
-   for (auto label : labelsArray)
+   if (tmpDoc.has_value())
    {
-      const auto jobObject = label.toObject();
-      ServerLabel sLabel { jobObject[QStringLiteral("id")].toInt(),
-                           jobObject[QStringLiteral("node_id")].toString(),
-                           jobObject[QStringLiteral("url")].toString(),
-                           jobObject[QStringLiteral("name")].toString(),
-                           jobObject[QStringLiteral("description")].toString(),
-                           jobObject[QStringLiteral("color")].toString(),
-                           jobObject[QStringLiteral("default")].toBool() };
+      const auto doc = tmpDoc.value();
 
-      labels.append(std::move(sLabel));
-   }
+      QVector<ServerLabel> labels;
+      const auto labelsArray = doc.array();
 
-   emit signalLabelsReceived(labels);
-}
-
-void GitHubRestApi::onMilestonesReceived(const QJsonDocument &doc)
-{
-   QVector<ServerMilestone> milestones;
-   const auto labelsArray = doc.array();
-
-   for (auto label : labelsArray)
-   {
-      const auto jobObject = label.toObject();
-      ServerMilestone sMilestone { jobObject[QStringLiteral("id")].toInt(),
-                                   jobObject[QStringLiteral("number")].toInt(),
-                                   jobObject[QStringLiteral("node_id")].toString(),
-                                   jobObject[QStringLiteral("title")].toString(),
-                                   jobObject[QStringLiteral("description")].toString(),
-                                   jobObject[QStringLiteral("state")].toString() == "open" };
-
-      milestones.append(std::move(sMilestone));
-   }
-
-   emit signalMilestonesReceived(milestones);
-}
-
-void GitHubRestApi::onIssueCreated(const QJsonDocument &doc)
-{
-   const auto issue = doc.object();
-   const auto url = issue[QStringLiteral("html_url")].toString();
-
-   emit signalIssueCreated(url);
-}
-
-void GitHubRestApi::onPullRequestCreated(const QJsonDocument &doc)
-{
-   const auto issue = doc.object();
-   const auto url = issue[QStringLiteral("html_url")].toString();
-
-   emit signalPullRequestCreated(url);
-}
-
-void GitHubRestApi::processPullRequets(const QJsonDocument &doc)
-{
-   const auto prs = doc.array();
-
-   mPulls.clear();
-
-   ServerPullRequest prInfo;
-
-   for (const auto &pr : prs)
-   {
-      prInfo.id = pr["id"].toInt();
-      prInfo.title = pr["title"].toString();
-      prInfo.body = pr["body"].toString().toUtf8();
-      prInfo.head = pr["head"].toObject()["ref"].toString();
-      prInfo.base = pr["base"].toObject()["ref"].toString();
-      prInfo.isOpen = pr["state"].toString() == "open";
-      prInfo.draft = pr["draft"].toBool();
-      // prInfo.details;
-      prInfo.url = pr["html_url"].toString();
-
-      const auto headObj = pr["head"].toObject();
-
-      prInfo.state.sha = headObj["sha"].toString();
-
-      mPulls.insert(prInfo.state.sha, prInfo);
-
-      auto request = createRequest(QString("commits/%1/status").arg(prInfo.state.sha));
-      mManager->get(request);
-
-      ++mPrRequested;
-   }
-}
-
-void GitHubRestApi::onPullRequestStatusReceived(const QString &sha, const QJsonDocument &doc)
-{
-   const auto obj = doc.object();
-
-   mPulls[sha].state.state = obj["state"].toString();
-
-   mPulls[sha].state.eState = mPulls[sha].state.state == "success"
-       ? ServerPullRequest::HeadState::State::Success
-       : mPulls[sha].state.state == "failure" ? ServerPullRequest::HeadState::State::Failure
-                                              : ServerPullRequest::HeadState::State::Pending;
-
-   const auto statuses = obj["statuses"].toArray();
-
-   for (auto status : statuses)
-   {
-      auto statusStr = status["state"].toString();
-
-      if (statusStr == "ok")
-         statusStr = "success";
-      else if (statusStr == "error")
-         statusStr = "failure";
-
-      ServerPullRequest::HeadState::Check check { status["description"].toString(), statusStr,
-                                                  status["target_url"].toString(), status["context"].toString() };
-
-      mPulls[sha].state.checks.append(check);
-   }
-
-   --mPrRequested;
-
-   if (mPrRequested == 0)
-      emit signalPullRequestsReceived(mPulls);
-}
-
-void GitHubRestApi::validateData(QNetworkReply *reply)
-{
-   if (reply == nullptr)
-      return;
-
-   const auto data = reply->readAll();
-   const auto jsonDoc = QJsonDocument::fromJson(data);
-   const auto url = reply->url().path();
-
-   if (jsonDoc.isNull())
-   {
-      QLog_Error("Ui", QString("Error when parsing Json. Current data:\n%1").arg(QString::fromUtf8(data)));
-      return;
-   }
-
-   const auto jsonObject = jsonDoc.object();
-   if (jsonObject.contains(QStringLiteral("message")))
-   {
-      const auto message = jsonObject[QStringLiteral("message")].toString();
-      QString details;
-
-      if (jsonObject.contains(QStringLiteral("errors")))
+      for (auto label : labelsArray)
       {
-         const auto errors = jsonObject[QStringLiteral("errors")].toArray();
+         const auto jobObject = label.toObject();
+         ServerLabel sLabel { jobObject[QStringLiteral("id")].toInt(),
+                              jobObject[QStringLiteral("node_id")].toString(),
+                              jobObject[QStringLiteral("url")].toString(),
+                              jobObject[QStringLiteral("name")].toString(),
+                              jobObject[QStringLiteral("description")].toString(),
+                              jobObject[QStringLiteral("color")].toString(),
+                              jobObject[QStringLiteral("default")].toBool() };
 
-         for (auto error : errors)
-            details = error[QStringLiteral("message")].toString();
+         labels.append(std::move(sLabel));
       }
 
-      QLog_Error("Ui", message + ". " + details);
-
-      return;
+      emit signalLabelsReceived(labels);
    }
+}
 
-   if (url.contains("labels"))
-      onLabelsReceived(jsonDoc);
-   else if (url.contains("milestones"))
-      onMilestonesReceived(jsonDoc);
-   else if (url.contains("issues/"))
-      emit signalIssueUpdated();
-   else if (url.contains("issues"))
-      onIssueCreated(jsonDoc);
-   else if (url.contains("commits"))
+void GitHubRestApi::onMilestonesReceived()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto tmpDoc = validateData(reply);
+
+   if (tmpDoc.has_value())
    {
-      auto sha = url;
+      const auto doc = tmpDoc.value();
+      QVector<ServerMilestone> milestones;
+      const auto labelsArray = doc.array();
+
+      for (auto label : labelsArray)
+      {
+         const auto jobObject = label.toObject();
+         ServerMilestone sMilestone { jobObject[QStringLiteral("id")].toInt(),
+                                      jobObject[QStringLiteral("number")].toInt(),
+                                      jobObject[QStringLiteral("node_id")].toString(),
+                                      jobObject[QStringLiteral("title")].toString(),
+                                      jobObject[QStringLiteral("description")].toString(),
+                                      jobObject[QStringLiteral("state")].toString() == "open" };
+
+         milestones.append(std::move(sMilestone));
+      }
+
+      emit signalMilestonesReceived(milestones);
+   }
+}
+
+void GitHubRestApi::onIssueCreated()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto tmpDoc = validateData(reply);
+
+   if (tmpDoc.has_value())
+   {
+      const auto doc = tmpDoc.value();
+      const auto issue = doc.object();
+      const auto url = issue[QStringLiteral("html_url")].toString();
+
+      emit signalIssueCreated(url);
+   }
+}
+
+void GitHubRestApi::onPullRequestCreated()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto tmpDoc = validateData(reply);
+
+   if (tmpDoc.has_value())
+   {
+      const auto doc = tmpDoc.value();
+      const auto issue = doc.object();
+      const auto url = issue[QStringLiteral("html_url")].toString();
+
+      emit signalPullRequestCreated(url);
+   }
+}
+
+void GitHubRestApi::processPullRequets()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto tmpDoc = validateData(reply);
+
+   if (tmpDoc.has_value())
+   {
+      const auto doc = tmpDoc.value();
+      const auto prs = doc.array();
+
+      mPulls.clear();
+
+      ServerPullRequest prInfo;
+
+      for (const auto &pr : prs)
+      {
+         prInfo.id = pr["id"].toInt();
+         prInfo.title = pr["title"].toString();
+         prInfo.body = pr["body"].toString().toUtf8();
+         prInfo.head = pr["head"].toObject()["ref"].toString();
+         prInfo.base = pr["base"].toObject()["ref"].toString();
+         prInfo.isOpen = pr["state"].toString() == "open";
+         prInfo.draft = pr["draft"].toBool();
+         // prInfo.details;
+         prInfo.url = pr["html_url"].toString();
+
+         const auto headObj = pr["head"].toObject();
+
+         prInfo.state.sha = headObj["sha"].toString();
+
+         mPulls.insert(prInfo.state.sha, prInfo);
+
+         auto request = createRequest(QString("commits/%1/status").arg(prInfo.state.sha));
+         const auto reply = mManager->get(request);
+         connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestStatusReceived);
+
+         ++mPrRequested;
+      }
+   }
+}
+
+void GitHubRestApi::onPullRequestStatusReceived()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto tmpDoc = validateData(reply);
+
+   if (tmpDoc.has_value())
+   {
+      auto sha = reply->url().toString();
       sha.remove("/status");
-      onPullRequestStatusReceived(sha.mid(sha.lastIndexOf("/") + 1), jsonDoc);
+      sha = sha.mid(sha.lastIndexOf("/") + 1);
+
+      const auto obj = tmpDoc.value().object();
+
+      mPulls[sha].state.state = obj["state"].toString();
+
+      mPulls[sha].state.eState = mPulls[sha].state.state == "success"
+          ? ServerPullRequest::HeadState::State::Success
+          : mPulls[sha].state.state == "failure" ? ServerPullRequest::HeadState::State::Failure
+                                                 : ServerPullRequest::HeadState::State::Pending;
+
+      const auto statuses = obj["statuses"].toArray();
+
+      for (auto status : statuses)
+      {
+         auto statusStr = status["state"].toString();
+
+         if (statusStr == "ok")
+            statusStr = "success";
+         else if (statusStr == "error")
+            statusStr = "failure";
+
+         ServerPullRequest::HeadState::Check check { status["description"].toString(), statusStr,
+                                                     status["target_url"].toString(), status["context"].toString() };
+
+         mPulls[sha].state.checks.append(check);
+      }
+
+      --mPrRequested;
+
+      if (mPrRequested == 0)
+         emit signalPullRequestsReceived(mPulls);
    }
-   else if (url.contains("pulls"))
-   {
-      if (reply->operation() == QNetworkAccessManager::PutOperation)
-         onPullRequestCreated(jsonDoc);
-      else if (reply->operation() == QNetworkAccessManager::GetOperation)
-         processPullRequets(jsonDoc);
-   }
-   else
-      emit signalConnectionSuccessful();
 }

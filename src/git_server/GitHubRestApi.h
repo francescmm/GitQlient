@@ -58,11 +58,10 @@ private:
    QUrl formatUrl(const QString page) const;
    QNetworkRequest createRequest(const QString &page) const;
 
-   void validateData(QNetworkReply *reply);
-   void onLabelsReceived(const QJsonDocument &doc);
-   void onMilestonesReceived(const QJsonDocument &doc);
-   void onIssueCreated(const QJsonDocument &doc);
-   void onPullRequestCreated(const QJsonDocument &doc);
-   void processPullRequets(const QJsonDocument &doc);
-   void onPullRequestStatusReceived(const QString &sha, const QJsonDocument &doc);
+   void onLabelsReceived();
+   void onMilestonesReceived();
+   void onIssueCreated();
+   void onPullRequestCreated();
+   void processPullRequets();
+   void onPullRequestStatusReceived();
 };

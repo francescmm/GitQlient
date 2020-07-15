@@ -31,6 +31,7 @@
 #include <QMap>
 
 class QNetworkAccessManager;
+class QNetworkReply;
 struct ServerIssue;
 
 struct ServerAuthentication
@@ -68,4 +69,6 @@ public:
 protected:
    QNetworkAccessManager *mManager = nullptr;
    ServerAuthentication mAuth;
+
+   virtual std::optional<QJsonDocument> validateData(QNetworkReply *reply) final;
 };
