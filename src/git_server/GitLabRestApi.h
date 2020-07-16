@@ -36,7 +36,7 @@ public:
    void testConnection() override;
    void createIssue(const ServerIssue &issue) override;
    void updateIssue(int issueNumber, const ServerIssue &issue) override;
-   void createPullRequest(const ServerPullRequest &pullRequest) override;
+   void createPullRequest(const ServerPullRequest &pr) override;
    void requestLabels() override;
    void requestMilestones() override;
    void requestPullRequestsState() override;
@@ -59,4 +59,5 @@ private:
    void onLabelsReceived();
    void onMilestonesReceived();
    void onIssueCreated();
+   void onMergeRequestCreated();
 };

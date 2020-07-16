@@ -79,7 +79,32 @@ void GitLabRestApi::createIssue(const ServerIssue &issue)
 
 void GitLabRestApi::updateIssue(int, const ServerIssue &) { }
 
-void GitLabRestApi::createPullRequest(const ServerPullRequest &) { }
+void GitLabRestApi::createPullRequest(const ServerPullRequest &pr)
+{
+   auto request = createRequest(QString("/projects/%1/merge_requests").arg(mRepoId));
+   auto url = request.url();
+
+   QUrlQuery query;
+   query.addQueryItem("title", pr.title);
+   query.addQueryItem("description", pr.body);
+   query.addQueryItem("assignee_ids", mUserId);
+   query.addQueryItem("target_branch", pr.base);
+   query.addQueryItem("source_branch", pr.head);
+   query.addQueryItem("allow_collaboration", QVariant(pr.maintainerCanModify).toString());
+
+   if (pr.milestone != -1)
+      query.addQueryItem("milestone_id", QString::number(pr.milestone));
+
+   if (!pr.labels.isEmpty())
+      query.addQueryItem("labels", pr.labels.join(","));
+
+   url.setQuery(query);
+   request.setUrl(url);
+
+   const auto reply = mManager->post(request, "");
+
+   connect(reply, &QNetworkReply::finished, this, &GitLabRestApi::onMergeRequestCreated);
+}
 
 void GitLabRestApi::requestLabels()
 {
@@ -249,5 +274,21 @@ void GitLabRestApi::onIssueCreated()
       const auto url = issue[QStringLiteral("web_url")].toString();
 
       emit signalIssueCreated(url);
+   }
+}
+
+void GitLabRestApi::onMergeRequestCreated()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto tmpDoc = validateData(reply);
+
+   if (tmpDoc.has_value())
+   {
+      const auto doc = tmpDoc.value();
+      const auto issue = doc.object();
+      const auto list = tmpDoc->toVariant().toList();
+      const auto url = issue[QStringLiteral("web_url")].toString();
+
+      emit signalPullRequestCreated(url);
    }
 }

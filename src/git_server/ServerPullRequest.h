@@ -26,8 +26,9 @@
 #include <QString>
 #include <QJsonObject>
 #include <QVector>
+#include <ServerIssue.h>
 
-struct ServerPullRequest
+struct ServerPullRequest : public ServerIssue
 {
    struct Details
    {
@@ -56,14 +57,12 @@ struct ServerPullRequest
       QVector<Check> checks;
    };
 
-   QString title;
-   QByteArray body;
    QString head;
    QString base;
-   bool isOpen;
-   bool maintainerCanModify;
-   bool draft;
-   int id;
+   bool isOpen = true;
+   bool maintainerCanModify = true;
+   bool draft = false;
+   int id = 0;
    QString url;
    Details details;
    HeadState state;

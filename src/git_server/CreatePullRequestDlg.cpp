@@ -85,18 +85,35 @@ void CreatePullRequestDlg::accept()
           tr("The base branch and the branch to merge from cannot be the same. Please, select different branches."));
    }
 
-   mApi->createPullRequest(
-       { ui->leTitle->text(),
-         ui->teDescription->toPlainText().toUtf8(),
-         mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1),
-         ui->cbDestination->currentText().remove(0, ui->cbDestination->currentText().indexOf("/") + 1),
-         true,
-         ui->chModify->isChecked(),
-         ui->chDraft->isChecked(),
-         0,
-         "",
-         {},
-         {} });
+   ServerPullRequest pr;
+   pr.title = ui->leTitle->text(), pr.body = ui->teDescription->toPlainText().toUtf8();
+   pr.head = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
+   pr.base = ui->cbDestination->currentText().remove(0, ui->cbDestination->currentText().indexOf("/") + 1);
+   pr.maintainerCanModify = ui->chModify->isChecked();
+   pr.draft = ui->chDraft->isChecked();
+
+   if (dynamic_cast<GitLabRestApi *>(mApi))
+   {
+      pr.head = ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
+
+      QStringList labels;
+
+      if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
+      {
+         for (auto i = 0; i < cbModel->rowCount(); ++i)
+         {
+            if (cbModel->item(i)->checkState() == Qt::Checked)
+               labels.append(cbModel->item(i)->text());
+         }
+      }
+
+      pr.labels = labels;
+      pr.milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
+   }
+   else
+      pr.head = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
+
+   mApi->createPullRequest(pr);
 }
 
 void CreatePullRequestDlg::onMilestones(const QVector<ServerMilestone> &milestones)
@@ -126,22 +143,28 @@ void CreatePullRequestDlg::onLabels(const QVector<ServerLabel> &labels)
 void CreatePullRequestDlg::onPullRequestCreated(QString url)
 {
    mFinalUrl = url;
-   mIssue = mFinalUrl.mid(mFinalUrl.lastIndexOf("/") + 1, mFinalUrl.count() - 1).toInt();
 
-   const auto milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
-
-   QStringList labels;
-
-   if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
+   if (dynamic_cast<GitHubRestApi *>(mApi))
    {
-      for (auto i = 0; i < cbModel->rowCount(); ++i)
-      {
-         if (cbModel->item(i)->checkState() == Qt::Checked)
-            labels.append(cbModel->item(i)->text());
-      }
-   }
+      mIssue = mFinalUrl.mid(mFinalUrl.lastIndexOf("/") + 1, mFinalUrl.count() - 1).toInt();
 
-   mApi->updateIssue(mIssue, { ui->leTitle->text(), "", milestone, labels, { mUserName } });
+      const auto milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
+
+      QStringList labels;
+
+      if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
+      {
+         for (auto i = 0; i < cbModel->rowCount(); ++i)
+         {
+            if (cbModel->item(i)->checkState() == Qt::Checked)
+               labels.append(cbModel->item(i)->text());
+         }
+      }
+
+      mApi->updateIssue(mIssue, { ui->leTitle->text(), "", milestone, labels, { mUserName } });
+   }
+   else
+      onPullRequestUpdated();
 }
 
 void CreatePullRequestDlg::onPullRequestUpdated()
