@@ -30,9 +30,9 @@ class GitLabRestApi final : public IRestApi
    Q_OBJECT
 
 public:
-   explicit GitLabRestApi(const QString &userName, const ServerAuthentication &auth, QObject *parent = nullptr);
+   explicit GitLabRestApi(const QString &userName, const QString &repoName, const QString &settingsKey,
+                          const ServerAuthentication &auth, QObject *parent = nullptr);
 
-   void configureData(const QString &serverUrl) const;
    void testConnection() override;
    void createIssue(const ServerIssue &issue) override;
    void updateIssue(int issueNumber, const ServerIssue &issue) override;
@@ -41,8 +41,21 @@ public:
    void requestMilestones() override;
    void requestPullRequestsState() override;
 
+   QString getUserId() const { return mUserId; }
+
 private:
    QString mUserName;
+   QString mRepoName;
+   QString mSettingsKey;
+   QString mUserId;
+   QString mRepoId;
 
    QNetworkRequest createRequest(const QString &page) const override;
+
+   void getUserInfo() const;
+   void onUserInfoReceived();
+   void getProjects();
+   void onProjectsReceived();
+   void onLabelsReceived();
+   void onMilestonesReceived();
 };
