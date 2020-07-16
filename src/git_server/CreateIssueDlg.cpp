@@ -1,6 +1,7 @@
 #include "CreateIssueDlg.h"
 #include "ui_CreateIssueDlg.h"
 #include <GitHubRestApi.h>
+#include <GitLabRestApi.h>
 #include <GitQlientSettings.h>
 #include <GitConfig.h>
 #include <ServerIssue.h>
@@ -19,22 +20,26 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *paren
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto serverUrl = gitConfig->getServerUrl();
 
+   GitQlientSettings settings;
+   mUserName = settings.value(QString("%1/user").arg(serverUrl)).toString();
+   const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
+   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+   const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
+
    if (serverUrl.contains("github"))
-   {
-      GitQlientSettings settings;
-      mUserName = settings.value(QString("%1/user").arg(serverUrl)).toString();
-      const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
-      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-      const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
-
       mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken, endpoint });
-      connect(mApi, &GitHubRestApi::signalIssueCreated, this, &CreateIssueDlg::onIssueCreated);
-      connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreateIssueDlg::onMilestones);
-      connect(mApi, &GitHubRestApi::signalLabelsReceived, this, &CreateIssueDlg::onLabels);
-
-      mApi->requestMilestones();
-      mApi->requestLabels();
+   else
+   {
+      mApi = new GitLabRestApi(mUserName, repoInfo.second, serverUrl, { mUserName, userToken, endpoint });
+      mUserName = dynamic_cast<GitLabRestApi *>(mApi)->getUserId();
    }
+
+   connect(mApi, &GitHubRestApi::signalIssueCreated, this, &CreateIssueDlg::onIssueCreated);
+   connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreateIssueDlg::onMilestones);
+   connect(mApi, &GitHubRestApi::signalLabelsReceived, this, &CreateIssueDlg::onLabels);
+
+   mApi->requestMilestones();
+   mApi->requestLabels();
 
    connect(ui->pbAccept, &QPushButton::clicked, this, &CreateIssueDlg::accept);
    connect(ui->pbClose, &QPushButton::clicked, this, &CreateIssueDlg::reject);
@@ -49,22 +54,24 @@ void CreateIssueDlg::accept()
 {
    if (ui->leTitle->text().isEmpty() || ui->teDescription->toPlainText().isEmpty())
       QMessageBox::warning(this, tr("Empty fields"), tr("Please, complete all fields with valid data."));
-
-   QStringList labels;
-
-   if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
+   else
    {
-      for (auto i = 0; i < cbModel->rowCount(); ++i)
+      QStringList labels;
+
+      if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
       {
-         if (cbModel->item(i)->checkState() == Qt::Checked)
-            labels.append(cbModel->item(i)->text());
+         for (auto i = 0; i < cbModel->rowCount(); ++i)
+         {
+            if (cbModel->item(i)->checkState() == Qt::Checked)
+               labels.append(cbModel->item(i)->text());
+         }
       }
+
+      const auto milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
+
+      mApi->createIssue(
+          { ui->leTitle->text(), ui->teDescription->toPlainText().toUtf8(), milestone, labels, { mUserName } });
    }
-
-   const auto milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
-
-   mApi->createIssue(
-       { ui->leTitle->text(), ui->teDescription->toPlainText().toUtf8(), milestone, labels, { mUserName } });
 }
 
 void CreateIssueDlg::onMilestones(const QVector<ServerMilestone> &milestones)

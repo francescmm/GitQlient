@@ -58,4 +58,5 @@ private:
    void onProjectsReceived();
    void onLabelsReceived();
    void onMilestonesReceived();
+   void onIssueCreated();
 };

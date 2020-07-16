@@ -1,5 +1,6 @@
 #include "GitLabRestApi.h"
 #include <GitQlientSettings.h>
+#include <ServerIssue.h>
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -50,7 +51,31 @@ void GitLabRestApi::testConnection()
    });
 }
 
-void GitLabRestApi::createIssue(const ServerIssue &) { }
+void GitLabRestApi::createIssue(const ServerIssue &issue)
+{
+   auto request = createRequest(QString("/projects/%1/issues").arg(mRepoId));
+   auto url = request.url();
+
+   QUrlQuery query;
+   query.addQueryItem("title", issue.title);
+   query.addQueryItem("description", issue.body);
+
+   if (!issue.assignees.isEmpty())
+      query.addQueryItem("assignee_ids", mUserId);
+
+   if (issue.milestone != -1)
+      query.addQueryItem("milestone_id", QString::number(issue.milestone));
+
+   if (!issue.labels.isEmpty())
+      query.addQueryItem("labels", issue.labels.join(","));
+
+   url.setQuery(query);
+   request.setUrl(url);
+
+   const auto reply = mManager->post(request, "");
+
+   connect(reply, &QNetworkReply::finished, this, &GitLabRestApi::onIssueCreated);
+}
 
 void GitLabRestApi::updateIssue(int, const ServerIssue &) { }
 
@@ -169,7 +194,7 @@ void GitLabRestApi::onLabelsReceived()
       for (const auto labelObj : labelsObj)
       {
          const auto labelMap = labelObj.toMap();
-         ServerLabel sLabel { labelMap.value("id").toInt(),
+         ServerLabel sLabel { labelMap.value("id").toString().toInt(),
                               "",
                               "",
                               labelMap.value("name").toString(),
@@ -198,16 +223,31 @@ void GitLabRestApi::onMilestonesReceived()
       for (const auto milestoneObj : milestonesObj)
       {
          const auto labelMap = milestoneObj.toMap();
-         ServerMilestone sMilestone { labelMap.value("id").toInt(),
-                                      0,
-                                      labelMap.value("iid").toString(),
-                                      labelMap.value("title").toString(),
-                                      labelMap.value("description").toString(),
-                                      labelMap.value("state").toString() == "active" };
+         ServerMilestone sMilestone {
+            labelMap.value("id").toString().toInt(),  labelMap.value("id").toString().toInt(),
+            labelMap.value("iid").toString(),         labelMap.value("title").toString(),
+            labelMap.value("description").toString(), labelMap.value("state").toString() == "active"
+         };
 
          milestones.append(std::move(sMilestone));
       }
 
       emit signalMilestonesReceived(milestones);
+   }
+}
+
+void GitLabRestApi::onIssueCreated()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto tmpDoc = validateData(reply);
+
+   if (tmpDoc.has_value())
+   {
+      const auto doc = tmpDoc.value();
+      const auto issue = doc.object();
+      const auto list = tmpDoc->toVariant().toList();
+      const auto url = issue[QStringLiteral("web_url")].toString();
+
+      emit signalIssueCreated(url);
    }
 }
