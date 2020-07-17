@@ -113,6 +113,8 @@ void CreatePullRequestDlg::accept()
    else
       pr.head = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
 
+   ui->pbCreate->setEnabled(false);
+
    mApi->createPullRequest(pr);
 }
 

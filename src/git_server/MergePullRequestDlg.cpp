@@ -52,6 +52,8 @@ void MergePullRequestDlg::accept()
       QMessageBox::warning(this, tr("Empty fields"), tr("Please, complete all fields with valid data."));
    else
    {
+      ui->pbMerge->setEnabled(false);
+
       QJsonObject object;
       object.insert("commit_title", ui->leTitle->text());
       object.insert("commit_message", ui->leMessage->text());
@@ -59,6 +61,7 @@ void MergePullRequestDlg::accept()
       object.insert("merge_method", "merge");
       QJsonDocument doc(object);
       const auto data = doc.toJson(QJsonDocument::Compact);
+
       mApi->mergePullRequest(mPr.id, data);
    }
 }

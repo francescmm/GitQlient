@@ -69,6 +69,8 @@ void CreateIssueDlg::accept()
 
       const auto milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
 
+      ui->pbAccept->setEnabled(false);
+
       mApi->createIssue(
           { ui->leTitle->text(), ui->teDescription->toPlainText().toUtf8(), milestone, labels, { mUserName } });
    }
