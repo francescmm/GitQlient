@@ -41,11 +41,11 @@ std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply)
 
          for (auto error : errors)
             details = error[QStringLiteral("message")].toString();
+
+         QLog_Error("Ui", message + ". " + details);
+
+         return std::nullopt;
       }
-
-      QLog_Error("Ui", message + ". " + details);
-
-      return std::nullopt;
    }
    else if (jsonObject.contains(QStringLiteral("error")))
    {
