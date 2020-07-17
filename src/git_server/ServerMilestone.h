@@ -23,47 +23,14 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QSharedPointer>
 #include <QString>
-#include <QObject>
 
-#include <GitExecResult.h>
-
-class GitBase;
-
-struct GitUserInfo
+struct ServerMilestone
 {
-   QString mUserName;
-   QString mUserEmail;
-
-   bool isValid() const;
-};
-
-class GitConfig : public QObject
-{
-   Q_OBJECT
-
-signals:
-   void signalCloningProgress(QString stepDescription, int value);
-
-public:
-   explicit GitConfig(QSharedPointer<GitBase> gitBase, QObject *parent = nullptr);
-
-   GitUserInfo getGlobalUserInfo() const;
-   void setGlobalUserInfo(const GitUserInfo &info);
-   GitExecResult setGlobalData(const QString &key, const QString &value);
-   GitUserInfo getLocalUserInfo() const;
-   void setLocalUserInfo(const GitUserInfo &info);
-   GitExecResult setLocalData(const QString &key, const QString &value);
-   GitExecResult clone(const QString &url, const QString &fullPath);
-   GitExecResult initRepo(const QString &fullPath);
-   GitExecResult getLocalConfig() const;
-   GitExecResult getGlobalConfig() const;
-   GitExecResult getRemoteForBranch(const QString &branch);
-   GitExecResult getGitValue(const QString &key) const;
-   QString getServerUrl() const;
-   QPair<QString, QString> getCurrentRepoAndOwner() const;
-
-private:
-   QSharedPointer<GitBase> mGitBase;
+   int id;
+   int number;
+   QString nodeId;
+   QString title;
+   QString description;
+   bool isOpen;
 };

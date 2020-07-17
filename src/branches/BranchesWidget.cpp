@@ -5,6 +5,7 @@
 #include <GitSubmodules.h>
 #include <GitStashes.h>
 #include <GitTags.h>
+#include <GitConfig.h>
 #include <BranchesViewDelegate.h>
 #include <ClickableFrame.h>
 #include <AddSubmoduleDlg.h>
@@ -206,6 +207,8 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
 
    setLayout(vLayout);
 
+   connect(mLocalBranchesTree, &BranchTreeWidget::signalRefreshPRsCache, mCache.get(),
+           &RevisionsCache::refreshPRsCache);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, mRemoteBranchesTree,
            &BranchTreeWidget::clearSelection);

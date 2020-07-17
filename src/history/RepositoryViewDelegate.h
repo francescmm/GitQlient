@@ -30,6 +30,7 @@ class RevisionsCache;
 class GitBase;
 class Lane;
 class CommitInfo;
+class ServerPullRequest;
 
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
@@ -107,7 +108,8 @@ private:
     * @param isWip Tells the method if it's the WIP commit so it's painted differently.
     */
    void paintGraphLane(QPainter *p, const Lane &type, bool laneHeadPresent, int x1, int x2, const QColor &col,
-                       const QColor &activeCol, const QColor &mergeColor, bool isWip = false, bool hasChilds = true) const;
+                       const QColor &activeCol, const QColor &mergeColor, bool isWip = false,
+                       bool hasChilds = true) const;
 
    /**
     * @brief Specialized method that paints a tag in the commit message column.
@@ -118,6 +120,16 @@ private:
     * @param sha The SHA reference to paint. It can be local branch, remote branch, tag or it could be detached.
     */
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
+
+   /**
+    * @brief Specialized method that paints a tag in the commit message column.
+    *
+    * @param painter The painter device.
+    * @param opt The style options of the item.
+    * @param startPoint The starting X coordinate for the tag.
+    * @param pr The PullRequest status.
+    */
+   void paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const ServerPullRequest &pr) const;
 
    QColor getMergeColor(const Lane &currentLane, const CommitInfo &commit, int currentLaneIndex,
                         const QColor &defaultColor, bool &isSet) const;

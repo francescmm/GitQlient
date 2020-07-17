@@ -23,47 +23,41 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QSharedPointer>
-#include <QString>
-#include <QObject>
+#include <IRestApi.h>
 
-#include <GitExecResult.h>
-
-class GitBase;
-
-struct GitUserInfo
-{
-   QString mUserName;
-   QString mUserEmail;
-
-   bool isValid() const;
-};
-
-class GitConfig : public QObject
+class GitLabRestApi final : public IRestApi
 {
    Q_OBJECT
 
-signals:
-   void signalCloningProgress(QString stepDescription, int value);
-
 public:
-   explicit GitConfig(QSharedPointer<GitBase> gitBase, QObject *parent = nullptr);
+   explicit GitLabRestApi(const QString &userName, const QString &repoName, const QString &settingsKey,
+                          const ServerAuthentication &auth, QObject *parent = nullptr);
 
-   GitUserInfo getGlobalUserInfo() const;
-   void setGlobalUserInfo(const GitUserInfo &info);
-   GitExecResult setGlobalData(const QString &key, const QString &value);
-   GitUserInfo getLocalUserInfo() const;
-   void setLocalUserInfo(const GitUserInfo &info);
-   GitExecResult setLocalData(const QString &key, const QString &value);
-   GitExecResult clone(const QString &url, const QString &fullPath);
-   GitExecResult initRepo(const QString &fullPath);
-   GitExecResult getLocalConfig() const;
-   GitExecResult getGlobalConfig() const;
-   GitExecResult getRemoteForBranch(const QString &branch);
-   GitExecResult getGitValue(const QString &key) const;
-   QString getServerUrl() const;
-   QPair<QString, QString> getCurrentRepoAndOwner() const;
+   void testConnection() override;
+   void createIssue(const ServerIssue &issue) override;
+   void updateIssue(int issueNumber, const ServerIssue &issue) override;
+   void createPullRequest(const ServerPullRequest &pr) override;
+   void requestLabels() override;
+   void requestMilestones() override;
+   void requestPullRequestsState() override;
+
+   QString getUserId() const { return mUserId; }
 
 private:
-   QSharedPointer<GitBase> mGitBase;
+   QString mUserName;
+   QString mRepoName;
+   QString mSettingsKey;
+   QString mUserId;
+   QString mRepoId;
+
+   QNetworkRequest createRequest(const QString &page) const override;
+
+   void getUserInfo() const;
+   void onUserInfoReceived();
+   void getProjects();
+   void onProjectsReceived();
+   void onLabelsReceived();
+   void onMilestonesReceived();
+   void onIssueCreated();
+   void onMergeRequestCreated();
 };

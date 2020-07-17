@@ -20,6 +20,7 @@
 #include <GitConfig.h>
 #include <GitBase.h>
 #include <GitHistory.h>
+#include <GitHubRestApi.h>
 
 #include <QTimer>
 #include <QDirIterator>
@@ -40,7 +41,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache))
    , mHistoryWidget(new HistoryWidget(mGitQlientCache, mGitBase))
    , mStackedLayout(new QStackedLayout())
-   , mControls(new Controls(mGitBase))
+   , mControls(new Controls(mGitQlientCache, mGitBase))
    , mDiffWidget(new DiffWidget(mGitBase, mGitQlientCache))
    , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
@@ -53,6 +54,30 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+   const auto serverUrl = gitConfig->getServerUrl();
+
+   if (serverUrl.contains("github"))
+   {
+      mAutoPrUpdater = new QTimer();
+      mAutoPrUpdater->start(300 * 1000);
+
+      connect(mAutoPrUpdater, &QTimer::timeout, mGitQlientCache.get(), &RevisionsCache::refreshPRsCache);
+      connect(mControls, &Controls::signalRefreshPRsCache, mGitQlientCache.get(), &RevisionsCache::refreshPRsCache);
+
+      QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+      const auto serverUrl = gitConfig->getServerUrl();
+
+      GitQlientSettings settings;
+      const auto userName = settings.value(QString("%1/user").arg(serverUrl)).toString();
+      const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
+      const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
+
+      mApi.reset(new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint }));
+      mGitQlientCache->setupGitPlatform(mApi);
+   }
 
    mStackedLayout->addWidget(mHistoryWidget);
    mStackedLayout->addWidget(mDiffWidget);

@@ -7,6 +7,7 @@ include($$PWD/diff/Diff.pri)
 include($$PWD/git/Git.pri)
 include($$PWD/cache/Cache.pri)
 include($$PWD/history/History.pri)
+include($$PWD/git_server/GitServer.pri)
 
 RESOURCES += \
     $$PWD/resources.qrc

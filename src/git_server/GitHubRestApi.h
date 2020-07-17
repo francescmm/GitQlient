@@ -23,47 +23,40 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QSharedPointer>
-#include <QString>
-#include <QObject>
+#include <IRestApi.h>
 
-#include <GitExecResult.h>
+#include <QUrl>
+#include <QNetworkRequest>
 
-class GitBase;
+class QJsonDocument;
+class QNetworkReply;
+struct ServerIssue;
 
-struct GitUserInfo
-{
-   QString mUserName;
-   QString mUserEmail;
-
-   bool isValid() const;
-};
-
-class GitConfig : public QObject
+class GitHubRestApi final : public IRestApi
 {
    Q_OBJECT
 
-signals:
-   void signalCloningProgress(QString stepDescription, int value);
-
 public:
-   explicit GitConfig(QSharedPointer<GitBase> gitBase, QObject *parent = nullptr);
+   explicit GitHubRestApi(QString repoOwner, QString repoName, const ServerAuthentication &auth,
+                          QObject *parent = nullptr);
 
-   GitUserInfo getGlobalUserInfo() const;
-   void setGlobalUserInfo(const GitUserInfo &info);
-   GitExecResult setGlobalData(const QString &key, const QString &value);
-   GitUserInfo getLocalUserInfo() const;
-   void setLocalUserInfo(const GitUserInfo &info);
-   GitExecResult setLocalData(const QString &key, const QString &value);
-   GitExecResult clone(const QString &url, const QString &fullPath);
-   GitExecResult initRepo(const QString &fullPath);
-   GitExecResult getLocalConfig() const;
-   GitExecResult getGlobalConfig() const;
-   GitExecResult getRemoteForBranch(const QString &branch);
-   GitExecResult getGitValue(const QString &key) const;
-   QString getServerUrl() const;
-   QPair<QString, QString> getCurrentRepoAndOwner() const;
+   void testConnection() override;
+   void createIssue(const ServerIssue &issue) override;
+   void updateIssue(int issueNumber, const ServerIssue &issue) override;
+   void createPullRequest(const ServerPullRequest &pullRequest) override;
+   void requestLabels() override;
+   void requestMilestones() override;
+   void requestPullRequestsState() override;
 
 private:
-   QSharedPointer<GitBase> mGitBase;
+   QMap<QString, ServerPullRequest> mPulls;
+   int mPrRequested = 0;
+
+   QNetworkRequest createRequest(const QString &page) const override;
+   void onLabelsReceived();
+   void onMilestonesReceived();
+   void onIssueCreated();
+   void onPullRequestCreated();
+   void processPullRequets();
+   void onPullRequestStatusReceived();
 };

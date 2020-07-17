@@ -23,47 +23,40 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QSharedPointer>
-#include <QString>
-#include <QObject>
+#include <QDialog>
+#include <ServerMilestone.h>
+#include <ServerLabel.h>
 
-#include <GitExecResult.h>
+namespace Ui
+{
+class CreatePullRequestDlg;
+}
 
 class GitBase;
+class IRestApi;
+class RevisionsCache;
 
-struct GitUserInfo
-{
-   QString mUserName;
-   QString mUserEmail;
-
-   bool isValid() const;
-};
-
-class GitConfig : public QObject
+class CreatePullRequestDlg : public QDialog
 {
    Q_OBJECT
 
-signals:
-   void signalCloningProgress(QString stepDescription, int value);
-
 public:
-   explicit GitConfig(QSharedPointer<GitBase> gitBase, QObject *parent = nullptr);
-
-   GitUserInfo getGlobalUserInfo() const;
-   void setGlobalUserInfo(const GitUserInfo &info);
-   GitExecResult setGlobalData(const QString &key, const QString &value);
-   GitUserInfo getLocalUserInfo() const;
-   void setLocalUserInfo(const GitUserInfo &info);
-   GitExecResult setLocalData(const QString &key, const QString &value);
-   GitExecResult clone(const QString &url, const QString &fullPath);
-   GitExecResult initRepo(const QString &fullPath);
-   GitExecResult getLocalConfig() const;
-   GitExecResult getGlobalConfig() const;
-   GitExecResult getRemoteForBranch(const QString &branch);
-   GitExecResult getGitValue(const QString &key) const;
-   QString getServerUrl() const;
-   QPair<QString, QString> getCurrentRepoAndOwner() const;
+   explicit CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                                 QWidget *parent = nullptr);
+   ~CreatePullRequestDlg();
 
 private:
-   QSharedPointer<GitBase> mGitBase;
+   Ui::CreatePullRequestDlg *ui;
+   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitBase> mGit;
+   IRestApi *mApi;
+   QString mUserName;
+   int mIssue;
+   QString mFinalUrl;
+
+   void accept() override;
+   void onMilestones(const QVector<ServerMilestone> &milestones);
+   void onLabels(const QVector<ServerLabel> &labels);
+   void onPullRequestCreated(QString url);
+   void onPullRequestUpdated();
 };

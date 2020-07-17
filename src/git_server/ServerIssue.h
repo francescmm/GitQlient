@@ -23,47 +23,43 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QSharedPointer>
-#include <QString>
-#include <QObject>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QStringList>
 
-#include <GitExecResult.h>
-
-class GitBase;
-
-struct GitUserInfo
+struct ServerIssue
 {
-   QString mUserName;
-   QString mUserEmail;
+   QString title;
+   QByteArray body;
+   int milestone;
+   QStringList labels;
+   QStringList assignees;
 
-   bool isValid() const;
-};
+   QJsonObject toJson() const
+   {
+      QJsonObject object;
 
-class GitConfig : public QObject
-{
-   Q_OBJECT
+      if (!title.isEmpty())
+         object.insert("title", title);
 
-signals:
-   void signalCloningProgress(QString stepDescription, int value);
+      if (!body.isEmpty())
+         object.insert("body", body.toStdString().c_str());
 
-public:
-   explicit GitConfig(QSharedPointer<GitBase> gitBase, QObject *parent = nullptr);
+      if (milestone != -1)
+         object.insert("milestone", milestone);
 
-   GitUserInfo getGlobalUserInfo() const;
-   void setGlobalUserInfo(const GitUserInfo &info);
-   GitExecResult setGlobalData(const QString &key, const QString &value);
-   GitUserInfo getLocalUserInfo() const;
-   void setLocalUserInfo(const GitUserInfo &info);
-   GitExecResult setLocalData(const QString &key, const QString &value);
-   GitExecResult clone(const QString &url, const QString &fullPath);
-   GitExecResult initRepo(const QString &fullPath);
-   GitExecResult getLocalConfig() const;
-   GitExecResult getGlobalConfig() const;
-   GitExecResult getRemoteForBranch(const QString &branch);
-   GitExecResult getGitValue(const QString &key) const;
-   QString getServerUrl() const;
-   QPair<QString, QString> getCurrentRepoAndOwner() const;
+      QJsonArray array;
+      auto count = 0;
+      for (auto assignee : assignees)
+         array.insert(count++, assignee);
+      object.insert("assignees", array);
 
-private:
-   QSharedPointer<GitBase> mGitBase;
+      QJsonArray labelsArray;
+      count = 0;
+      for (auto label : labels)
+         labelsArray.insert(count++, label);
+      object.insert("labels", labelsArray);
+
+      return object;
+   }
 };

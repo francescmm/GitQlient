@@ -40,6 +40,7 @@ class BlameWidget;
 class MergeWidget;
 class QTimer;
 class ProgressDlg;
+class IRestApi;
 
 enum class ControlsMainViews;
 
@@ -142,9 +143,11 @@ private:
    MergeWidget *mMergeWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
+   QTimer *mAutoPrUpdater = nullptr;
    QPointer<ProgressDlg> mProgressDlg;
    QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
+   QSharedPointer<IRestApi> mApi;
 
    bool mIsInit = false;
    QThread *m_loaderThread;

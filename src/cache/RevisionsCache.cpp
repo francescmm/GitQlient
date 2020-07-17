@@ -1,4 +1,6 @@
 #include "RevisionsCache.h"
+#include <GitQlientSettings.h>
+#include <GitHubRestApi.h>
 
 #include <QLogger.h>
 
@@ -70,6 +72,16 @@ void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArra
 
       ++count;
    }
+}
+
+void RevisionsCache::setupGitPlatform(const QSharedPointer<IRestApi> &api)
+{
+   if (mApi)
+      disconnect(mApi.get(), &IRestApi::signalPullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
+
+   mApi = api;
+
+   connect(mApi.get(), &IRestApi::signalPullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
 }
 
 CommitInfo RevisionsCache::getCommitInfoByRow(int row)
@@ -429,6 +441,23 @@ QMap<QString, QString> RevisionsCache::getTags(References::Type tagType) const
 void RevisionsCache::updateTags(const QMap<QString, QString> &remoteTags)
 {
    mRemoteTags = remoteTags;
+}
+
+void RevisionsCache::setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus)
+{
+   mPullRequestsStatus = std::move(prStatus);
+
+   emit signalCacheUpdated();
+}
+
+ServerPullRequest RevisionsCache::getPullRequestStatus(const QString &sha)
+{
+   return mPullRequestsStatus.value(sha);
+}
+
+void RevisionsCache::refreshPRsCache()
+{
+   mApi->requestPullRequestsState();
 }
 
 void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)

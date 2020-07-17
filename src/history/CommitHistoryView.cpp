@@ -6,6 +6,7 @@
 #include <ShaFilterProxyModel.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
+#include <GitConfig.h>
 
 #include <QHeaderView>
 #include <QSettings>
@@ -30,6 +31,29 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache
    header()->setSortIndicatorShown(false);
 
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
+   connect(mCache.get(), &RevisionsCache::signalCacheUpdated, this, [this]() {
+      QModelIndex topLeft;
+      QModelIndex bottomRight;
+
+      if (mProxyModel)
+      {
+         topLeft = mProxyModel->index(0, 0);
+         bottomRight = mProxyModel->index(mProxyModel->rowCount() - 1, mProxyModel->columnCount() - 1);
+         mProxyModel->beginResetModel();
+         mProxyModel->endResetModel();
+      }
+      else
+      {
+         topLeft = mCommitHistoryModel->index(0, 0);
+         bottomRight
+             = mCommitHistoryModel->index(mCommitHistoryModel->rowCount() - 1, mCommitHistoryModel->columnCount() - 1);
+         mCommitHistoryModel->onNewRevisions(mCache->count());
+      }
+
+      const auto auxTL = visualRect(topLeft);
+      const auto auxBR = visualRect(bottomRight);
+      viewport()->update(auxTL.x(), auxTL.y(), auxBR.x() + auxBR.width(), auxBR.y() + auxBR.height());
+   });
 }
 
 void CommitHistoryView::setModel(QAbstractItemModel *model)
@@ -153,6 +177,8 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
       if (!shas.isEmpty())
       {
          const auto menu = new CommitHistoryContextMenu(mCache, mGit, shas, this);
+         connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, mCache.get(),
+                 &RevisionsCache::refreshPRsCache);
          connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,

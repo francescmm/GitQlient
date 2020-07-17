@@ -23,47 +23,63 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QSharedPointer>
 #include <QString>
-#include <QObject>
+#include <QJsonObject>
+#include <QVector>
+#include <ServerIssue.h>
 
-#include <GitExecResult.h>
-
-class GitBase;
-
-struct GitUserInfo
+struct ServerPullRequest : public ServerIssue
 {
-   QString mUserName;
-   QString mUserEmail;
+   struct Details
+   {
+   };
 
-   bool isValid() const;
-};
+   struct HeadState
+   {
+      enum class State
+      {
+         Failure,
+         Success,
+         Pending
+      };
 
-class GitConfig : public QObject
-{
-   Q_OBJECT
+      struct Check
+      {
+         QString description;
+         QString state;
+         QString url;
+         QString name;
+      };
 
-signals:
-   void signalCloningProgress(QString stepDescription, int value);
+      QString sha;
+      QString state;
+      State eState;
+      QVector<Check> checks;
+   };
 
-public:
-   explicit GitConfig(QSharedPointer<GitBase> gitBase, QObject *parent = nullptr);
+   QString head;
+   QString base;
+   bool isOpen = true;
+   bool maintainerCanModify = true;
+   bool draft = false;
+   int id = 0;
+   QString url;
+   Details details;
+   HeadState state;
 
-   GitUserInfo getGlobalUserInfo() const;
-   void setGlobalUserInfo(const GitUserInfo &info);
-   GitExecResult setGlobalData(const QString &key, const QString &value);
-   GitUserInfo getLocalUserInfo() const;
-   void setLocalUserInfo(const GitUserInfo &info);
-   GitExecResult setLocalData(const QString &key, const QString &value);
-   GitExecResult clone(const QString &url, const QString &fullPath);
-   GitExecResult initRepo(const QString &fullPath);
-   GitExecResult getLocalConfig() const;
-   GitExecResult getGlobalConfig() const;
-   GitExecResult getRemoteForBranch(const QString &branch);
-   GitExecResult getGitValue(const QString &key) const;
-   QString getServerUrl() const;
-   QPair<QString, QString> getCurrentRepoAndOwner() const;
+   QJsonObject toJson() const
+   {
+      QJsonObject object;
 
-private:
-   QSharedPointer<GitBase> mGitBase;
+      object.insert("title", title);
+      object.insert("head", head);
+      object.insert("base", base);
+      object.insert("body", body.toStdString().c_str());
+      object.insert("maintainer_can_modify", maintainerCanModify);
+      object.insert("draft", draft);
+
+      return object;
+   }
+
+   bool isValid() const { return !title.isEmpty(); }
 };

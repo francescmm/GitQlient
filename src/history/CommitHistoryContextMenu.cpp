@@ -8,17 +8,21 @@
 #include <GitStashes.h>
 #include <GitBranches.h>
 #include <GitRemote.h>
+#include <GitConfig.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
 #include <PullDlg.h>
+#include <CreateIssueDlg.h>
+#include <CreatePullRequestDlg.h>
 
 #include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
 #include <QFileDialog>
 #include <QProcess>
+#include <QDesktopServices>
 
 #include <QLogger.h>
 
@@ -121,6 +125,47 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          const auto resetHardAction = addAction("Reset - Hard");
          connect(resetHardAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetHard);
       }
+   }
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto remoteUrl = gitConfig->getServerUrl();
+
+   if (remoteUrl.contains("github", Qt::CaseInsensitive))
+   {
+      addSeparator();
+
+      const auto gitHubMenu = new QMenu("GitHub", this);
+      addMenu(gitHubMenu);
+
+      if (mShas.count() == 1 && mCache->getPullRequestStatus(mShas.first()).isValid())
+      {
+         const auto prInfo = mCache->getPullRequestStatus(mShas.first());
+
+         const auto checksMenu = new QMenu("Checks", gitHubMenu);
+         gitHubMenu->addMenu(checksMenu);
+
+         for (const auto &check : prInfo.state.checks)
+         {
+            const auto link = check.url;
+            checksMenu->addAction(QIcon(QString(":/icons/%1").arg(check.state)), check.name, this,
+                                  [link]() { QDesktopServices::openUrl(link); });
+         }
+
+         const auto link = mCache->getPullRequestStatus(mShas.first()).url;
+         connect(gitHubMenu->addAction("Open PR on browser"), &QAction::triggered, this,
+                 [link]() { QDesktopServices::openUrl(link); });
+
+         gitHubMenu->addSeparator();
+      }
+
+      connect(gitHubMenu->addAction("New Issue"), &QAction::triggered, this, [this]() {
+         const auto createIssue = new CreateIssueDlg(mGit, this);
+         createIssue->exec();
+      });
+      connect(gitHubMenu->addAction("New Pull Request"), &QAction::triggered, this, [this]() {
+         const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
+         prDlg->exec();
+      });
    }
 }
 
@@ -337,10 +382,16 @@ void CommitHistoryContextMenu::push()
       const auto ret = dlg.exec();
 
       if (ret == QDialog::Accepted)
+      {
+         emit signalRefreshPRsCache();
          emit signalRepositoryUpdated();
+      }
    }
    else if (ret.success)
+   {
+      emit signalRefreshPRsCache();
       emit signalRepositoryUpdated();
+   }
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
