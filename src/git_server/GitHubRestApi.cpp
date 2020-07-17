@@ -111,6 +111,13 @@ void GitHubRestApi::requestPullRequestsState()
    });
 }
 
+void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
+{
+   const auto reply = mManager->put(createRequest(QString("/pulls/%1/merge").arg(number)), data);
+
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestMerged);
+}
+
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
@@ -232,10 +239,10 @@ void GitHubRestApi::processPullRequets()
 
       for (const auto &pr : prs)
       {
-         prInfo.id = pr["id"].toInt();
+         prInfo.id = pr["number"].toInt();
          prInfo.title = pr["title"].toString();
          prInfo.body = pr["body"].toString().toUtf8();
-         prInfo.head = pr["head"].toObject()["ref"].toString();
+         prInfo.head = qMakePair(pr["head"].toObject()["ref"].toString(), pr["head"].toObject()["sha"].toString());
          prInfo.base = pr["base"].toObject()["ref"].toString();
          prInfo.isOpen = pr["state"].toString() == "open";
          prInfo.draft = pr["draft"].toBool();
@@ -299,4 +306,13 @@ void GitHubRestApi::onPullRequestStatusReceived()
       if (mPrRequested == 0)
          emit signalPullRequestsReceived(mPulls);
    }
+}
+
+void GitHubRestApi::onPullRequestMerged()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto tmpDoc = validateData(reply);
+
+   if (tmpDoc.has_value())
+      emit signalPullRequestMerged();
 }

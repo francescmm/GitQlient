@@ -23,42 +23,35 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <IRestApi.h>
+#include <ServerPullRequest.h>
 
-class GitLabRestApi final : public IRestApi
+#include <QDialog>
+
+namespace Ui
+{
+class MergePullRequestDlg;
+}
+
+class GitBase;
+class IRestApi;
+
+class MergePullRequestDlg : public QDialog
 {
    Q_OBJECT
 
 public:
-   explicit GitLabRestApi(const QString &userName, const QString &repoName, const QString &settingsKey,
-                          const ServerAuthentication &auth, QObject *parent = nullptr);
-
-   void testConnection() override;
-   void createIssue(const ServerIssue &issue) override;
-   void updateIssue(int issueNumber, const ServerIssue &issue) override;
-   void createPullRequest(const ServerPullRequest &pr) override;
-   void requestLabels() override;
-   void requestMilestones() override;
-   void requestPullRequestsState() override;
-   void mergePullRequest(int, const QByteArray &) override { }
-
-   QString getUserId() const { return mUserId; }
+   explicit MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr, const QString &sha,
+                                QWidget *parent = nullptr);
+   ~MergePullRequestDlg();
 
 private:
+   Ui::MergePullRequestDlg *ui;
+   QSharedPointer<GitBase> mGit;
+   ServerPullRequest mPr;
+   QString mSha;
+   IRestApi *mApi;
    QString mUserName;
-   QString mRepoName;
-   QString mSettingsKey;
-   QString mUserId;
-   QString mRepoId;
 
-   QNetworkRequest createRequest(const QString &page) const override;
-
-   void getUserInfo() const;
-   void onUserInfoReceived();
-   void getProjects();
-   void onProjectsReceived();
-   void onLabelsReceived();
-   void onMilestonesReceived();
-   void onIssueCreated();
-   void onMergeRequestCreated();
+   void accept() override;
+   void onPRMerged();
 };

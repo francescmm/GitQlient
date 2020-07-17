@@ -47,6 +47,7 @@ public:
    void requestLabels() override;
    void requestMilestones() override;
    void requestPullRequestsState() override;
+   void mergePullRequest(int number, const QByteArray &data) override;
 
 private:
    QMap<QString, ServerPullRequest> mPulls;
@@ -59,4 +60,5 @@ private:
    void onPullRequestCreated();
    void processPullRequets();
    void onPullRequestStatusReceived();
+   void onPullRequestMerged();
 };

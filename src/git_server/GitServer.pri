@@ -3,6 +3,7 @@ INCLUDEPATH += $$PWD
 FORMS += \
    $$PWD/CreateIssueDlg.ui \
    $$PWD/CreatePullRequestDlg.ui \
+   $$PWD/MergePullRequestDlg.ui \
    $$PWD/ServerConfigDlg.ui
 
 HEADERS += \
@@ -11,6 +12,7 @@ HEADERS += \
    $$PWD/GitHubRestApi.h \
    $$PWD/GitLabRestApi.h \
    $$PWD/IRestApi.h \
+   $$PWD/MergePullRequestDlg.h \
    $$PWD/ServerConfigDlg.h \
    $$PWD/ServerIssue.h \
    $$PWD/ServerLabel.h \
@@ -23,4 +25,5 @@ SOURCES += \
    $$PWD/GitHubRestApi.cpp \
    $$PWD/GitLabRestApi.cpp \
    $$PWD/IRestApi.cpp \
+   $$PWD/MergePullRequestDlg.cpp \
    $$PWD/ServerConfigDlg.cpp
