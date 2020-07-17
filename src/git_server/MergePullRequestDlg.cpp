@@ -66,4 +66,6 @@ void MergePullRequestDlg::accept()
 void MergePullRequestDlg::onPRMerged()
 {
    QMessageBox::information(this, tr("PR merged!"), tr("The pull request has been merged."));
+
+   QDialog::accept();
 }
