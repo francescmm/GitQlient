@@ -55,7 +55,7 @@ void MergePullRequestDlg::accept()
       QJsonObject object;
       object.insert("commit_title", ui->leTitle->text());
       object.insert("commit_message", ui->leMessage->text());
-      object.insert("sha", mPr.head.second);
+      object.insert("sha", mSha);
       object.insert("merge_method", "merge");
       QJsonDocument doc(object);
       const auto data = doc.toJson(QJsonDocument::Compact);

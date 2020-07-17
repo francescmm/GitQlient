@@ -89,7 +89,7 @@ void GitLabRestApi::createPullRequest(const ServerPullRequest &pr)
    query.addQueryItem("description", pr.body);
    query.addQueryItem("assignee_ids", mUserId);
    query.addQueryItem("target_branch", pr.base);
-   query.addQueryItem("source_branch", pr.head.first);
+   query.addQueryItem("source_branch", pr.head);
    query.addQueryItem("allow_collaboration", QVariant(pr.maintainerCanModify).toString());
 
    if (pr.milestone != -1)
