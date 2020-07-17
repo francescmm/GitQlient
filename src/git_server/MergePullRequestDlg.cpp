@@ -1,0 +1,60 @@
+#include "MergePullRequestDlg.h"
+#include "ui_MergePullRequestDlg.h"
+#include <GitConfig.h>
+#include <GitQlientSettings.h>
+#include <GitHubRestApi.h>
+#include <GitLabRestApi.h>
+
+#include <QMessageBox>
+
+MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr,
+                                         QWidget *parent)
+   : QDialog(parent)
+   , ui(new Ui::MergePullRequestDlg)
+   , mGit(git)
+   , mPr(pr)
+{
+   ui->setupUi(this);
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto serverUrl = gitConfig->getServerUrl();
+
+   GitQlientSettings settings;
+   mUserName = settings.value(QString("%1/user").arg(serverUrl)).toString();
+   const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
+   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+   const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
+
+   if (serverUrl.contains("github"))
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken, endpoint });
+   else
+   {
+      mApi = new GitLabRestApi(mUserName, repoInfo.second, serverUrl, { mUserName, userToken, endpoint });
+      mUserName = dynamic_cast<GitLabRestApi *>(mApi)->getUserId();
+   }
+
+   connect(mApi, &GitHubRestApi::signalPullRequestMerged, this, &MergePullRequestDlg::onPRMerged);
+
+   connect(ui->pbMerge, &QPushButton::clicked, this, &MergePullRequestDlg::accept);
+   connect(ui->pbCancel, &QPushButton::clicked, this, &MergePullRequestDlg::reject);
+}
+
+MergePullRequestDlg::~MergePullRequestDlg()
+{
+   delete ui;
+}
+
+void MergePullRequestDlg::accept()
+{
+   if (ui->leTitle->text().isEmpty() || ui->leMessage->text().isEmpty())
+      QMessageBox::warning(this, tr("Empty fields"), tr("Please, complete all fields with valid data."));
+   else
+   {
+      mApi->mergePullRequest(mPr);
+   }
+}
+
+void MergePullRequestDlg::onPRMerged()
+{
+   QMessageBox::information(this, tr("PR merged!"), tr("The pull request has been merged."));
+}

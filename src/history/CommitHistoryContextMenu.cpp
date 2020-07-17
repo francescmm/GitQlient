@@ -16,6 +16,9 @@
 #include <PullDlg.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
+#include <GitHubRestApi.h>
+#include <GitQlientSettings.h>
+#include <MergePullRequestDlg.h>
 
 #include <QMessageBox>
 #include <QApplication>
@@ -139,7 +142,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
       const auto gitServerMenu = new QMenu(isGitHub ? "GitHub" : "GitLab", this);
       addMenu(gitServerMenu);
 
-      if (mShas.count() == 1 && mCache->getPullRequestStatus(mShas.first()).isValid())
+      if (const auto pr = mCache->getPullRequestStatus(mShas.first()); mShas.count() == 1 && pr.isValid())
       {
          const auto prInfo = mCache->getPullRequestStatus(mShas.first());
 
@@ -151,6 +154,15 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
             const auto link = check.url;
             checksMenu->addAction(QIcon(QString(":/icons/%1").arg(check.state)), check.name, this,
                                   [link]() { QDesktopServices::openUrl(link); });
+         }
+
+         if (isGitHub)
+         {
+            const auto link = mCache->getPullRequestStatus(mShas.first()).url;
+            connect(gitServerMenu->addAction("Merge PR"), &QAction::triggered, this, [this, pr]() {
+               MergePullRequestDlg *mergeDlg = new MergePullRequestDlg(mGit, pr, this);
+               mergeDlg->exec();
+            });
          }
 
          const auto link = mCache->getPullRequestStatus(mShas.first()).url;

@@ -111,6 +111,13 @@ void GitHubRestApi::requestPullRequestsState()
    });
 }
 
+void GitHubRestApi::mergePullRequest(const ServerPullRequest &pr)
+{
+   const auto reply = mManager->get(createRequest(QString("/pulls/%1/merge").arg(pr.id)));
+
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestMerged);
+}
+
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
@@ -299,4 +306,13 @@ void GitHubRestApi::onPullRequestStatusReceived()
       if (mPrRequested == 0)
          emit signalPullRequestsReceived(mPulls);
    }
+}
+
+void GitHubRestApi::onPullRequestMerged()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto tmpDoc = validateData(reply);
+
+   if (tmpDoc.has_value())
+      emit signalPullRequestMerged();
 }

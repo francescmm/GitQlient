@@ -23,42 +23,34 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <IRestApi.h>
+#include <ServerPullRequest.h>
 
-#include <QUrl>
-#include <QNetworkRequest>
+#include <QDialog>
 
-class QJsonDocument;
-class QNetworkReply;
-struct ServerIssue;
+namespace Ui
+{
+class MergePullRequestDlg;
+}
 
-class GitHubRestApi final : public IRestApi
+class GitBase;
+class IRestApi;
+
+class MergePullRequestDlg : public QDialog
 {
    Q_OBJECT
 
 public:
-   explicit GitHubRestApi(QString repoOwner, QString repoName, const ServerAuthentication &auth,
-                          QObject *parent = nullptr);
-
-   void testConnection() override;
-   void createIssue(const ServerIssue &issue) override;
-   void updateIssue(int issueNumber, const ServerIssue &issue) override;
-   void createPullRequest(const ServerPullRequest &pullRequest) override;
-   void requestLabels() override;
-   void requestMilestones() override;
-   void requestPullRequestsState() override;
-   void mergePullRequest(const ServerPullRequest &pr) override;
+   explicit MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr,
+                                QWidget *parent = nullptr);
+   ~MergePullRequestDlg();
 
 private:
-   QMap<QString, ServerPullRequest> mPulls;
-   int mPrRequested = 0;
+   Ui::MergePullRequestDlg *ui;
+   QSharedPointer<GitBase> mGit;
+   ServerPullRequest mPr;
+   IRestApi *mApi;
+   QString mUserName;
 
-   QNetworkRequest createRequest(const QString &page) const override;
-   void onLabelsReceived();
-   void onMilestonesReceived();
-   void onIssueCreated();
-   void onPullRequestCreated();
-   void processPullRequets();
-   void onPullRequestStatusReceived();
-   void onPullRequestMerged();
+   void accept() override;
+   void onPRMerged();
 };

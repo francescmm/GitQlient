@@ -54,6 +54,7 @@ signals:
    void signalIssueUpdated();
    void signalPullRequestCreated(QString url);
    void signalPullRequestsReceived(QMap<QString, ServerPullRequest> prs);
+   void signalPullRequestMerged();
 
 public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
@@ -68,6 +69,7 @@ public:
    virtual void requestLabels() = 0;
    virtual void requestMilestones() = 0;
    virtual void requestPullRequestsState() = 0;
+   virtual void mergePullRequest(const ServerPullRequest &pr) = 0;
 
 protected:
    QNetworkAccessManager *mManager = nullptr;
