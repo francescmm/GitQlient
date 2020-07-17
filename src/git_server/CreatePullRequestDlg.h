@@ -40,6 +40,12 @@ class CreatePullRequestDlg : public QDialog
 {
    Q_OBJECT
 
+signals:
+   /**
+    * @brief signalRefreshPRsCache Signal that refreshes PRs cache.
+    */
+   void signalRefreshPRsCache();
+
 public:
    explicit CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent = nullptr);

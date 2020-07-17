@@ -174,6 +174,8 @@ void CreatePullRequestDlg::onPullRequestUpdated()
           this, tr("Pull Request created"),
           tr("The Pull Request has been created. You can <a href=\"%1\">find it here</a>.").arg(mFinalUrl));
 
+      emit signalRefreshPRsCache();
+
       QDialog::accept();
    });
 }

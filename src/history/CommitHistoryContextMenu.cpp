@@ -178,6 +178,9 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
       });
       connect(gitServerMenu->addAction("New Pull Request"), &QAction::triggered, this, [this]() {
          const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
+         connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, this,
+                 &CommitHistoryContextMenu::signalRefreshPRsCache);
+
          prDlg->exec();
       });
    }
