@@ -39,6 +39,12 @@ class MergePullRequestDlg : public QDialog
 {
    Q_OBJECT
 
+signals:
+   /*!
+    \brief Signal triggered when some action in the context menu things the main UI needs an update.
+   */
+   void signalRepositoryUpdated();
+
 public:
    explicit MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr, const QString &sha,
                                 QWidget *parent = nullptr);
