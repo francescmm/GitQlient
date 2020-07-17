@@ -87,14 +87,15 @@ void CreatePullRequestDlg::accept()
 
    ServerPullRequest pr;
    pr.title = ui->leTitle->text(), pr.body = ui->teDescription->toPlainText().toUtf8();
-   pr.head = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
+   pr.head.first
+       = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
    pr.base = ui->cbDestination->currentText().remove(0, ui->cbDestination->currentText().indexOf("/") + 1);
    pr.maintainerCanModify = ui->chModify->isChecked();
    pr.draft = ui->chDraft->isChecked();
 
    if (dynamic_cast<GitLabRestApi *>(mApi))
    {
-      pr.head = ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
+      pr.head.first = ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
 
       QStringList labels;
 
@@ -111,7 +112,8 @@ void CreatePullRequestDlg::accept()
       pr.milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
    }
    else
-      pr.head = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
+      pr.head.first
+          = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
 
    mApi->createPullRequest(pr);
 }

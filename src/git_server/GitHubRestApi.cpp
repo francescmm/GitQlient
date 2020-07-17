@@ -242,7 +242,7 @@ void GitHubRestApi::processPullRequets()
          prInfo.id = pr["number"].toInt();
          prInfo.title = pr["title"].toString();
          prInfo.body = pr["body"].toString().toUtf8();
-         prInfo.head = pr["head"].toObject()["ref"].toString();
+         prInfo.head = qMakePair(pr["head"].toObject()["ref"].toString(), pr["head"].toObject()["sha"].toString());
          prInfo.base = pr["base"].toObject()["ref"].toString();
          prInfo.isOpen = pr["state"].toString() == "open";
          prInfo.draft = pr["draft"].toBool();

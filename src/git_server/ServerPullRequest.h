@@ -57,7 +57,7 @@ struct ServerPullRequest : public ServerIssue
       QVector<Check> checks;
    };
 
-   QString head;
+   QPair<QString, QString> head;
    QString base;
    bool isOpen = true;
    bool maintainerCanModify = true;
@@ -72,7 +72,7 @@ struct ServerPullRequest : public ServerIssue
       QJsonObject object;
 
       object.insert("title", title);
-      object.insert("head", head);
+      object.insert("head", head.second);
       object.insert("base", base);
       object.insert("body", body.toStdString().c_str());
       object.insert("maintainer_can_modify", maintainerCanModify);
