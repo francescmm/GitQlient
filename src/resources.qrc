@@ -66,6 +66,7 @@
         <file alias="failure">resources/icons/failure.svg</file>
         <file alias="pending">resources/icons/pending.svg</file>
         <file alias="success">resources/icons/success.svg</file>
+        <file alias="get_gitqlient">resources/icons/file-download-solid.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

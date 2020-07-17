@@ -16,6 +16,12 @@ Controls > QToolButton
     min-height: 50px;
 }
 
+QToolButton#longToolButton
+{
+    max-width: 75px;
+    min-width: 75px;
+}
+
 QPushButton, QToolButton
 {
     border: 0;

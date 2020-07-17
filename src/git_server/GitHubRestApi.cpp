@@ -115,8 +115,8 @@ QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
    request.setUrl(formatUrl(page));
-   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
-   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("User-Agent", "GitQlient");
+   request.setRawHeader("X-Custom-User-Agent", "GitQlient");
    request.setRawHeader("Content-Type", "application/json");
    request.setRawHeader("Accept", "application/vnd.github.v3+json");
    request.setRawHeader(

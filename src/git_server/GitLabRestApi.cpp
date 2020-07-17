@@ -126,8 +126,8 @@ QNetworkRequest GitLabRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
    request.setUrl(formatUrl(page));
-   request.setRawHeader("User-Agent", "GitQlient v1.2.0");
-   request.setRawHeader("X-Custom-User-Agent", "GitQlient v1.2.0");
+   request.setRawHeader("User-Agent", "GitQlient");
+   request.setRawHeader("X-Custom-User-Agent", "GitQlient");
    request.setRawHeader("Content-Type", "application/json");
    request.setRawHeader(QByteArray("PRIVATE-TOKEN"),
                         QByteArray(QString(QStringLiteral("%1")).arg(mAuth.userPass).toLocal8Bit()));

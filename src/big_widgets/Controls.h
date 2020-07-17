@@ -29,6 +29,8 @@ class QToolButton;
 class QPushButton;
 class GitBase;
 class RevisionsCache;
+class QNetworkAccessManager;
+class QProgressBar;
 
 /*!
  \brief Enum used to configure the different views handled by the Controls widget.
@@ -171,7 +173,13 @@ private:
    QToolButton *mRefreshBtn = nullptr;
    QToolButton *mConfigBtn = nullptr;
    QToolButton *mGitPlatform = nullptr;
+   QToolButton *mVersionCheck = nullptr;
+   QProgressBar *mDownloadLog = nullptr;
    QPushButton *mMergeWarning = nullptr;
+   QNetworkAccessManager *mManager = nullptr;
+   QString mLatestGitQlient;
+   QString mChangeLog;
+   QString mGitQlientDownloadUrl;
 
    /*!
     \brief Pulls the current branch.
@@ -217,4 +225,29 @@ private:
     * @brief configServer Shows the dialog to configure this repository's server.
     */
    void configServer();
+
+   /**
+    * @brief checkNewGitQlientVersion Checks if there is a new version of GitQlient released.
+    */
+   void checkNewGitQlientVersion();
+
+   /**
+    * @brief processUpdateFile Processes the update file to check the updates.
+    */
+   void processUpdateFile();
+
+   /**
+    * @brief processChangeLog Downloads the latest changes log file.
+    */
+   void processChangeLog();
+
+   /**
+    * @brief showInfoMessage Shows the info message to download the new version.
+    */
+   void showInfoMessage();
+
+   /**
+    * @brief downloadFile Downloads the latest release of GitQlient.
+    */
+   void downloadFile();
 };
