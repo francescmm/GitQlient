@@ -1,6 +1,6 @@
-Please, before creating the Pull Request ensure that your code is formatted following the clang-format file in the repo. Make sure that the code compiles and you've tested in any way.
+<!-- Please, before creating the Pull Request ensure that your code is formatted following the clang-format file in the repo. Make sure that the code compiles and you've tested in any way. -->
 
-Once the Pull Request is open, please mark the checkbox regarding the change type you are submitting.
+<!-- Once the Pull Request is open, please mark the checkbox regarding the change type you are submitting. -->
 
 ## Description
 <!--- Provide a short description of what has been changed and which area does it affect --->
