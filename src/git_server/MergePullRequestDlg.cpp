@@ -6,13 +6,15 @@
 #include <GitLabRestApi.h>
 
 #include <QMessageBox>
+#include <QJsonDocument>
 
 MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr,
-                                         QWidget *parent)
+                                         const QString &sha, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::MergePullRequestDlg)
    , mGit(git)
    , mPr(pr)
+   , mSha(sha)
 {
    ui->setupUi(this);
 
@@ -50,7 +52,14 @@ void MergePullRequestDlg::accept()
       QMessageBox::warning(this, tr("Empty fields"), tr("Please, complete all fields with valid data."));
    else
    {
-      mApi->mergePullRequest(mPr);
+      QJsonObject object;
+      object.insert("commit_title", ui->leTitle->text());
+      object.insert("commit_message", ui->leMessage->text());
+      object.insert("sha", mSha);
+      object.insert("merge_method", "merge");
+      QJsonDocument doc(object);
+      const auto data = doc.toJson(QJsonDocument::Compact);
+      mApi->mergePullRequest(mPr.id, data);
    }
 }
 

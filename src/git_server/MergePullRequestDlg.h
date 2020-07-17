@@ -40,7 +40,7 @@ class MergePullRequestDlg : public QDialog
    Q_OBJECT
 
 public:
-   explicit MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr,
+   explicit MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr, const QString &sha,
                                 QWidget *parent = nullptr);
    ~MergePullRequestDlg();
 
@@ -48,6 +48,7 @@ private:
    Ui::MergePullRequestDlg *ui;
    QSharedPointer<GitBase> mGit;
    ServerPullRequest mPr;
+   QString mSha;
    IRestApi *mApi;
    QString mUserName;
 

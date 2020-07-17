@@ -40,7 +40,7 @@ public:
    void requestLabels() override;
    void requestMilestones() override;
    void requestPullRequestsState() override;
-   void mergePullRequest(const ServerPullRequest &) override { }
+   void mergePullRequest(int, const QByteArray &) override { }
 
    QString getUserId() const { return mUserId; }
 

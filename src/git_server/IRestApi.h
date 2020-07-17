@@ -69,7 +69,7 @@ public:
    virtual void requestLabels() = 0;
    virtual void requestMilestones() = 0;
    virtual void requestPullRequestsState() = 0;
-   virtual void mergePullRequest(const ServerPullRequest &pr) = 0;
+   virtual void mergePullRequest(int number, const QByteArray &data) = 0;
 
 protected:
    QNetworkAccessManager *mManager = nullptr;

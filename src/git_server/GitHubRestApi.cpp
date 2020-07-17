@@ -111,9 +111,9 @@ void GitHubRestApi::requestPullRequestsState()
    });
 }
 
-void GitHubRestApi::mergePullRequest(const ServerPullRequest &pr)
+void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
 {
-   const auto reply = mManager->get(createRequest(QString("/pulls/%1/merge").arg(pr.id)));
+   const auto reply = mManager->post(createRequest(QString("/pulls/%1/merge").arg(number)), data);
 
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestMerged);
 }
