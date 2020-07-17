@@ -239,7 +239,7 @@ void GitHubRestApi::processPullRequets()
 
       for (const auto &pr : prs)
       {
-         prInfo.id = pr["id"].toInt();
+         prInfo.id = pr["number"].toInt();
          prInfo.title = pr["title"].toString();
          prInfo.body = pr["body"].toString().toUtf8();
          prInfo.head = pr["head"].toObject()["ref"].toString();
