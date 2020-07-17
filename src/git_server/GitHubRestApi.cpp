@@ -113,7 +113,7 @@ void GitHubRestApi::requestPullRequestsState()
 
 void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
 {
-   const auto reply = mManager->post(createRequest(QString("/pulls/%1/merge").arg(number)), data);
+   const auto reply = mManager->put(createRequest(QString("/pulls/%1/merge").arg(number)), data);
 
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestMerged);
 }
