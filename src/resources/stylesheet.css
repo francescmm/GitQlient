@@ -1,6 +1,7 @@
 *
 {
    outline: none;
+   font-size: 10pt;
 }
 
 ClickableFrame
@@ -39,11 +40,6 @@ QPushButton
 QPushButton:hover
 {
     border: 0;
-}
-
-*
-{
-    font-size: 10pt;
 }
 
 #labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
