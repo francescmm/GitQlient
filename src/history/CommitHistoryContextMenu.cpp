@@ -262,7 +262,9 @@ void CommitHistoryContextMenu::checkoutBranch()
    const auto action = qobject_cast<QAction *>(sender());
    auto isLocal = action->data().toBool();
    auto branchName = action->text();
-   branchName.remove("origin/");
+
+   if (isLocal)
+      branchName.remove("origin/");
 
    QScopedPointer<GitBranches> git(new GitBranches(mGit));
    const auto ret = isLocal ? git->checkoutLocalBranch(branchName) : git->checkoutRemoteBranch(branchName);
