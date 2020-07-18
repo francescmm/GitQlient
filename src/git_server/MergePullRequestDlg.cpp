@@ -75,7 +75,10 @@ void MergePullRequestDlg::onPRMerged()
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
 
    if (auto ret = git->pull(); ret.success)
+   {
+      git->prune();
       emit signalRepositoryUpdated();
+   }
 
    QDialog::accept();
 }
