@@ -51,14 +51,14 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Base branch:</string>
+        <string>Origin branch (HEAD):</string>
        </property>
       </widget>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Branch to merge:</string>
+        <string>Destination branch (base):</string>
        </property>
       </widget>
      </item>
