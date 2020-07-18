@@ -35,7 +35,8 @@ MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, cons
       mUserName = dynamic_cast<GitLabRestApi *>(mApi)->getUserId();
    }
 
-   connect(mApi, &GitHubRestApi::signalPullRequestMerged, this, &MergePullRequestDlg::onPRMerged);
+   connect(mApi, &GitHubRestApi::pullRequestMerged, this, &MergePullRequestDlg::onPRMerged);
+   connect(mApi, &IRestApi::errorOccurred, this, &MergePullRequestDlg::onGitServerError);
 
    connect(ui->pbMerge, &QPushButton::clicked, this, &MergePullRequestDlg::accept);
    connect(ui->pbCancel, &QPushButton::clicked, this, &MergePullRequestDlg::reject);
@@ -52,6 +53,8 @@ void MergePullRequestDlg::accept()
       QMessageBox::warning(this, tr("Empty fields"), tr("Please, complete all fields with valid data."));
    else
    {
+      ui->pbMerge->setEnabled(false);
+
       QJsonObject object;
       object.insert("commit_title", ui->leTitle->text());
       object.insert("commit_message", ui->leMessage->text());
@@ -59,6 +62,7 @@ void MergePullRequestDlg::accept()
       object.insert("merge_method", "merge");
       QJsonDocument doc(object);
       const auto data = doc.toJson(QJsonDocument::Compact);
+
       mApi->mergePullRequest(mPr.id, data);
    }
 }
@@ -68,4 +72,11 @@ void MergePullRequestDlg::onPRMerged()
    QMessageBox::information(this, tr("PR merged!"), tr("The pull request has been merged."));
 
    QDialog::accept();
+}
+
+void MergePullRequestDlg::onGitServerError(const QString &error)
+{
+   ui->pbMerge->setEnabled(true);
+
+   QMessageBox::warning(this, tr("API access error!"), error);
 }

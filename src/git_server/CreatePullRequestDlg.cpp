@@ -38,10 +38,11 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
    else if (serverUrl.contains("gitlab"))
       mApi = new GitLabRestApi(mUserName, repoInfo.second, serverUrl, { mUserName, userToken, endpoint });
 
-   connect(mApi, &GitHubRestApi::signalIssueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
-   connect(mApi, &GitHubRestApi::signalPullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
-   connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreatePullRequestDlg::onMilestones);
-   connect(mApi, &GitHubRestApi::signalLabelsReceived, this, &CreatePullRequestDlg::onLabels);
+   connect(mApi, &IRestApi::issueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
+   connect(mApi, &IRestApi::pullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
+   connect(mApi, &IRestApi::milestonesReceived, this, &CreatePullRequestDlg::onMilestones);
+   connect(mApi, &IRestApi::labelsReceived, this, &CreatePullRequestDlg::onLabels);
+   connect(mApi, &IRestApi::errorOccurred, this, &CreatePullRequestDlg::onGitServerError);
 
    mApi->requestMilestones();
    mApi->requestLabels();
@@ -113,6 +114,8 @@ void CreatePullRequestDlg::accept()
    else
       pr.head = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
 
+   ui->pbCreate->setEnabled(false);
+
    mApi->createPullRequest(pr);
 }
 
@@ -174,6 +177,15 @@ void CreatePullRequestDlg::onPullRequestUpdated()
           this, tr("Pull Request created"),
           tr("The Pull Request has been created. You can <a href=\"%1\">find it here</a>.").arg(mFinalUrl));
 
+      emit signalRefreshPRsCache();
+
       QDialog::accept();
    });
+}
+
+void CreatePullRequestDlg::onGitServerError(const QString &error)
+{
+   ui->pbCreate->setEnabled(true);
+
+   QMessageBox::warning(this, tr("API access error!"), error);
 }

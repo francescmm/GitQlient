@@ -40,6 +40,12 @@ class CreatePullRequestDlg : public QDialog
 {
    Q_OBJECT
 
+signals:
+   /**
+    * @brief signalRefreshPRsCache Signal that refreshes PRs cache.
+    */
+   void signalRefreshPRsCache();
+
 public:
    explicit CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent = nullptr);
@@ -59,4 +65,9 @@ private:
    void onLabels(const QVector<ServerLabel> &labels);
    void onPullRequestCreated(QString url);
    void onPullRequestUpdated();
+
+   /**
+    * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
+    */
+   void onGitServerError(const QString &error);
 };

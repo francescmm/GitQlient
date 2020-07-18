@@ -47,20 +47,21 @@ class IRestApi : public QObject
    Q_OBJECT
 
 signals:
-   void signalConnectionSuccessful();
-   void signalLabelsReceived(const QVector<ServerLabel> &labels);
-   void signalMilestonesReceived(const QVector<ServerMilestone> &milestones);
-   void signalIssueCreated(QString url);
-   void signalIssueUpdated();
-   void signalPullRequestCreated(QString url);
-   void signalPullRequestsReceived(QMap<QString, ServerPullRequest> prs);
-   void signalPullRequestMerged();
+   void connectionTested();
+   void labelsReceived(const QVector<ServerLabel> &labels);
+   void milestonesReceived(const QVector<ServerMilestone> &milestones);
+   void issueCreated(QString url);
+   void issueUpdated();
+   void pullRequestCreated(QString url);
+   void pullRequestsReceived(QMap<QString, ServerPullRequest> prs);
+   void pullRequestMerged();
+   void errorOccurred(const QString &errorStr);
 
 public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
    virtual ~IRestApi() = default;
 
-   static std::optional<QJsonDocument> validateData(QNetworkReply *reply);
+   static std::optional<QJsonDocument> validateData(QNetworkReply *reply, QString &errorString);
 
    virtual void testConnection() = 0;
    virtual void createIssue(const ServerIssue &issue) = 0;

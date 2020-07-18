@@ -17,7 +17,7 @@ IRestApi::IRestApi(const ServerAuthentication &auth, QObject *parent)
 {
 }
 
-std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply)
+std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply, QString &errorString)
 {
    const auto data = reply->readAll();
    const auto jsonDoc = QJsonDocument::fromJson(data);
@@ -42,17 +42,23 @@ std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply)
          for (auto error : errors)
             details = error[QStringLiteral("message")].toString();
 
-         QLog_Error("Ui", message + ". " + details);
+         errorString = message + ". " + details;
+
+         QLog_Error("Ui", errorString);
 
          return std::nullopt;
       }
    }
    else if (jsonObject.contains(QStringLiteral("error")))
    {
-      QLog_Error("Ui", jsonObject[QStringLiteral("error")].toString());
+      errorString = jsonObject[QStringLiteral("error")].toString();
+
+      QLog_Error("Ui", errorString);
 
       return std::nullopt;
    }
+
+   reply->deleteLater();
 
    return jsonDoc;
 }

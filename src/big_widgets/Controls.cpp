@@ -470,6 +470,8 @@ void Controls::createNewIssue()
 void Controls::createNewPullRequest()
 {
    const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
+   connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, this, &Controls::signalRefreshPRsCache);
+
    prDlg->exec();
 }
 

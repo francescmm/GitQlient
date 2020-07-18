@@ -34,9 +34,10 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *paren
       mUserName = dynamic_cast<GitLabRestApi *>(mApi)->getUserId();
    }
 
-   connect(mApi, &GitHubRestApi::signalIssueCreated, this, &CreateIssueDlg::onIssueCreated);
-   connect(mApi, &GitHubRestApi::signalMilestonesReceived, this, &CreateIssueDlg::onMilestones);
-   connect(mApi, &GitHubRestApi::signalLabelsReceived, this, &CreateIssueDlg::onLabels);
+   connect(mApi, &IRestApi::issueCreated, this, &CreateIssueDlg::onIssueCreated);
+   connect(mApi, &IRestApi::milestonesReceived, this, &CreateIssueDlg::onMilestones);
+   connect(mApi, &IRestApi::labelsReceived, this, &CreateIssueDlg::onLabels);
+   connect(mApi, &IRestApi::errorOccurred, this, &CreateIssueDlg::onGitServerError);
 
    mApi->requestMilestones();
    mApi->requestLabels();
@@ -68,6 +69,8 @@ void CreateIssueDlg::accept()
       }
 
       const auto milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
+
+      ui->pbAccept->setEnabled(false);
 
       mApi->createIssue(
           { ui->leTitle->text(), ui->teDescription->toPlainText().toUtf8(), milestone, labels, { mUserName } });
@@ -104,4 +107,11 @@ void CreateIssueDlg::onIssueCreated(QString url)
                             tr("The issue has been created. You can <a href=\"%1\">find it here</a>.").arg(url));
 
    QDialog::accept();
+}
+
+void CreateIssueDlg::onGitServerError(const QString &error)
+{
+   ui->pbAccept->setEnabled(true);
+
+   QMessageBox::warning(this, tr("API access error!"), error);
 }

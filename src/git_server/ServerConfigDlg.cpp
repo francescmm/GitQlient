@@ -18,6 +18,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QFile>
+#include <QMessageBox>
 
 #include <utility>
 
@@ -138,10 +139,8 @@ void ServerConfigDlg::testToken()
 
       api->testConnection();
 
-      connect(api, &IRestApi::signalConnectionSuccessful, this, [this]() {
-         ui->lTestResult->setText("Token confirmed!");
-         QTimer::singleShot(3000, ui->lTestResult, &QLabel::clear);
-      });
+      connect(api, &IRestApi::connectionTested, this, &ServerConfigDlg::onTestSucceeded);
+      connect(api, &IRestApi::errorOccurred, this, &ServerConfigDlg::onGitServerError);
    }
 }
 
@@ -149,4 +148,15 @@ void ServerConfigDlg::onServerChanged()
 {
    if (ui->cbServer->currentIndex() == GitHubEnterprise)
       ui->leEndPoint->setVisible(true);
+}
+
+void ServerConfigDlg::onTestSucceeded()
+{
+   ui->lTestResult->setText("Token confirmed!");
+   QTimer::singleShot(3000, ui->lTestResult, &QLabel::clear);
+}
+
+void ServerConfigDlg::onGitServerError(const QString &error)
+{
+   QMessageBox::warning(this, tr("API access error!"), error);
 }

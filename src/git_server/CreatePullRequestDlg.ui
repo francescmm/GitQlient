@@ -51,14 +51,47 @@
      <item row="2" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Base branch:</string>
+        <string>Origin branch (HEAD):</string>
        </property>
       </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="cbOrigin"/>
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Branch to merge:</string>
+        <string>Destination branch (base):</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="cbDestination"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Milestone:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="cbMilesone"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Labels:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QListView" name="labelsListView">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>75</height>
+        </size>
        </property>
       </widget>
      </item>
@@ -76,39 +109,6 @@
        </property>
        <property name="checked">
         <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QComboBox" name="cbDestination"/>
-     </item>
-     <item row="3" column="1">
-      <widget class="QComboBox" name="cbOrigin"/>
-     </item>
-     <item row="4" column="1">
-      <widget class="QComboBox" name="cbMilesone"/>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>Milestone:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>Labels:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QListView" name="labelsListView">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>75</height>
-        </size>
        </property>
       </widget>
      </item>
@@ -150,8 +150,6 @@
  <tabstops>
   <tabstop>leTitle</tabstop>
   <tabstop>teDescription</tabstop>
-  <tabstop>cbDestination</tabstop>
-  <tabstop>cbOrigin</tabstop>
   <tabstop>cbMilesone</tabstop>
   <tabstop>labelsListView</tabstop>
   <tabstop>chDraft</tabstop>

@@ -160,7 +160,10 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          {
             const auto link = mCache->getPullRequestStatus(mShas.first()).url;
             connect(gitServerMenu->addAction("Merge PR"), &QAction::triggered, this, [this, pr]() {
-               MergePullRequestDlg *mergeDlg = new MergePullRequestDlg(mGit, pr, mShas.first(), this);
+               const auto mergeDlg = new MergePullRequestDlg(mGit, pr, mShas.first(), this);
+               connect(mergeDlg, &MergePullRequestDlg::signalRepositoryUpdated, this,
+                       &CommitHistoryContextMenu::signalRepositoryUpdated);
+
                mergeDlg->exec();
             });
          }
@@ -178,6 +181,9 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
       });
       connect(gitServerMenu->addAction("New Pull Request"), &QAction::triggered, this, [this]() {
          const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
+         connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, this,
+                 &CommitHistoryContextMenu::signalRefreshPRsCache);
+
          prDlg->exec();
       });
    }

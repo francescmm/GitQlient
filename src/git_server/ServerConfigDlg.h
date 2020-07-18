@@ -82,4 +82,14 @@ private:
     * @param The new shown text.
     */
    void onServerChanged();
+
+   /**
+    * @brief onTestSucceeded Notifies the user through the UI that the connection test succceeded.
+    */
+   void onTestSucceeded();
+
+   /**
+    * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
+    */
+   void onGitServerError(const QString &error);
 };

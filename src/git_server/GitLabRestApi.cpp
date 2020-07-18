@@ -42,12 +42,13 @@ void GitLabRestApi::testConnection()
 
    connect(reply, &QNetworkReply::finished, this, [this]() {
       const auto reply = qobject_cast<QNetworkReply *>(sender());
-      const auto tmpDoc = validateData(reply);
+      QString errorStr;
+      const auto tmpDoc = validateData(reply, errorStr);
 
       if (tmpDoc.has_value())
-      {
-         emit signalConnectionSuccessful();
-      }
+         emit connectionTested();
+      else
+         emit errorOccurred(errorStr);
    });
 }
 
@@ -153,7 +154,8 @@ void GitLabRestApi::getUserInfo() const
 void GitLabRestApi::onUserInfoReceived()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -170,6 +172,8 @@ void GitLabRestApi::onUserInfoReceived()
          settings.setValue(QString("%1/%2-userId").arg(mSettingsKey, mRepoName), mUserId);
       }
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitLabRestApi::getProjects()
@@ -183,7 +187,8 @@ void GitLabRestApi::getProjects()
 void GitLabRestApi::onProjectsReceived()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -203,12 +208,15 @@ void GitLabRestApi::onProjectsReceived()
          }
       }
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitLabRestApi::onLabelsReceived()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -230,14 +238,17 @@ void GitLabRestApi::onLabelsReceived()
          labels.append(std::move(sLabel));
       }
 
-      emit signalLabelsReceived(labels);
+      emit labelsReceived(labels);
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitLabRestApi::onMilestonesReceived()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -257,14 +268,17 @@ void GitLabRestApi::onMilestonesReceived()
          milestones.append(std::move(sMilestone));
       }
 
-      emit signalMilestonesReceived(milestones);
+      emit milestonesReceived(milestones);
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitLabRestApi::onIssueCreated()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -273,14 +287,17 @@ void GitLabRestApi::onIssueCreated()
       const auto list = tmpDoc->toVariant().toList();
       const auto url = issue[QStringLiteral("web_url")].toString();
 
-      emit signalIssueCreated(url);
+      emit issueCreated(url);
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitLabRestApi::onMergeRequestCreated()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -289,6 +306,8 @@ void GitLabRestApi::onMergeRequestCreated()
       const auto list = tmpDoc->toVariant().toList();
       const auto url = issue[QStringLiteral("web_url")].toString();
 
-      emit signalPullRequestCreated(url);
+      emit pullRequestCreated(url);
    }
+   else
+      emit errorOccurred(errorStr);
 }
