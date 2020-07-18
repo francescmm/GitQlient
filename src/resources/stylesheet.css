@@ -4,6 +4,22 @@
    font-size: 10pt;
 }
 
+QComboBox, QLineEdit
+{
+    border-width: 1px;
+    border-style: solid;
+    max-height: 25px;
+    min-height: 25px;
+    padding-left: 10px;
+    outline: none;
+}
+
+QComboBox::drop-down
+{
+     min-width: 20px;
+     max-width: 20px;
+}
+
 ClickableFrame
 {
     padding: 5px;
@@ -575,22 +591,6 @@ QMessageBox
    min-width: 400px;
    max-height: 300px;
    min-height: 300px;
-}
-
-QComboBox
-{
-    border-width: 1px;
-    border-style: solid;
-    max-height: 25px;
-    min-height: 25px;
-    padding-left: 10px;
-    outline: none;
-}
-
-QComboBox::drop-down
-{
-     min-width: 20px;
-     max-width: 20px;
 }
 
 

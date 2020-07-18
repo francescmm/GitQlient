@@ -556,11 +556,11 @@ QComboBox
    outline: none;
    color: white;
    border-color: #202122;
-   background-color: #606162;
+   background-color: #2E2F30;
 }
 
 QComboBox:disabled {
-   color: #e0e0e1;
+   color: #E0E0E1;
 }
 
 QComboBox:editable {
@@ -568,7 +568,7 @@ QComboBox:editable {
 }
 
 QComboBox:on {
-   background-color: #606162;
+   background-color: #2E2F30;
 }
 
 QComboBox QAbstractItemView
