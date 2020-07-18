@@ -568,6 +568,31 @@ QPushButton#Merge:pressed, QPushButton#pbCommit:pressed, QPushButton#pbCherryPic
    background-color: #404142;
 }
 
+QComboBox
+{
+   color: white;
+   border-color: #202122;
+   background-color: #606162;
+}
+
+QComboBox:disabled {
+   color: #e0e0e1;
+}
+
+QComboBox:editable {
+   background: #ffffff;
+}
+
+QComboBox:on {
+   background-color: #606162;
+}
+
+QComboBox QAbstractItemView
+{
+   outline: none;
+   background-color: #404142;
+}
+
 QCheckBox
 {
    color: black;
