@@ -53,4 +53,9 @@ private:
    void onMilestones(const QVector<ServerMilestone> &milestones);
    void onLabels(const QVector<ServerLabel> &labels);
    void onIssueCreated(QString url);
+
+   /**
+    * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
+    */
+   void onGitServerError(const QString &error);
 };

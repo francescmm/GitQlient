@@ -65,4 +65,9 @@ private:
    void onLabels(const QVector<ServerLabel> &labels);
    void onPullRequestCreated(QString url);
    void onPullRequestUpdated();
+
+   /**
+    * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
+    */
+   void onGitServerError(const QString &error);
 };

@@ -36,6 +36,7 @@ MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, cons
    }
 
    connect(mApi, &GitHubRestApi::signalPullRequestMerged, this, &MergePullRequestDlg::onPRMerged);
+   connect(mApi, &IRestApi::errorOccurred, this, &MergePullRequestDlg::onGitServerError);
 
    connect(ui->pbMerge, &QPushButton::clicked, this, &MergePullRequestDlg::accept);
    connect(ui->pbCancel, &QPushButton::clicked, this, &MergePullRequestDlg::reject);
@@ -71,4 +72,11 @@ void MergePullRequestDlg::onPRMerged()
    QMessageBox::information(this, tr("PR merged!"), tr("The pull request has been merged."));
 
    QDialog::accept();
+}
+
+void MergePullRequestDlg::onGitServerError(const QString &error)
+{
+   ui->pbMerge->setEnabled(true);
+
+   QMessageBox::warning(this, tr("API access error!"), error);
 }

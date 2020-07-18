@@ -36,12 +36,13 @@ void GitHubRestApi::testConnection()
 
    connect(reply, &QNetworkReply::finished, this, [this]() {
       const auto reply = qobject_cast<QNetworkReply *>(sender());
-      const auto tmpDoc = validateData(reply);
+      QString errorStr;
+      const auto tmpDoc = validateData(reply, errorStr);
 
       if (tmpDoc.has_value())
-      {
          emit signalConnectionSuccessful();
-      }
+      else
+         emit errorOccurred(errorStr);
    });
 }
 
@@ -68,12 +69,13 @@ void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
 
    connect(reply, &QNetworkReply::finished, this, [this]() {
       const auto reply = qobject_cast<QNetworkReply *>(sender());
-      const auto tmpDoc = validateData(reply);
+      QString errorStr;
+      const auto tmpDoc = validateData(reply, errorStr);
 
       if (tmpDoc.has_value())
-      {
          emit signalIssueUpdated();
-      }
+      else
+         emit errorOccurred(errorStr);
    });
 }
 
@@ -138,7 +140,8 @@ QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 void GitHubRestApi::onLabelsReceived()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -163,12 +166,15 @@ void GitHubRestApi::onLabelsReceived()
 
       emit signalLabelsReceived(labels);
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitHubRestApi::onMilestonesReceived()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -191,12 +197,15 @@ void GitHubRestApi::onMilestonesReceived()
 
       emit signalMilestonesReceived(milestones);
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitHubRestApi::onIssueCreated()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -206,12 +215,15 @@ void GitHubRestApi::onIssueCreated()
 
       emit signalIssueCreated(url);
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitHubRestApi::onPullRequestCreated()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -221,12 +233,15 @@ void GitHubRestApi::onPullRequestCreated()
 
       emit signalPullRequestCreated(url);
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitHubRestApi::processPullRequets()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -262,12 +277,15 @@ void GitHubRestApi::processPullRequets()
          ++mPrRequested;
       }
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitHubRestApi::onPullRequestStatusReceived()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
    {
@@ -306,13 +324,18 @@ void GitHubRestApi::onPullRequestStatusReceived()
       if (mPrRequested == 0)
          emit signalPullRequestsReceived(mPulls);
    }
+   else
+      emit errorOccurred(errorStr);
 }
 
 void GitHubRestApi::onPullRequestMerged()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto tmpDoc = validateData(reply);
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
       emit signalPullRequestMerged();
+   else
+      emit errorOccurred(errorStr);
 }

@@ -60,4 +60,9 @@ private:
 
    void accept() override;
    void onPRMerged();
+
+   /**
+    * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
+    */
+   void onGitServerError(const QString &error);
 };
