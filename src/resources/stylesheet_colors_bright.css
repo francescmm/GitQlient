@@ -71,7 +71,7 @@ QLabel
     background-color: #C6C6C7;
 }
 
-CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
+CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView, QListView
 {
    color: black;
    background-color: white;
@@ -80,6 +80,17 @@ CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > Q
 BranchesWidget > QListWidget, BlameWidget > QTreeView, QTreeView, QTreeWidget
 {
     border: 1px solid #202122;
+}
+
+QListView
+{
+   background-color: white;
+   color: black;
+}
+
+QListView::item
+{
+   background-color: white;
 }
 
 QListWidget::item, BlameWidget > QTreeView::item

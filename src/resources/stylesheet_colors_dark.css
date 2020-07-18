@@ -67,6 +67,17 @@ CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > Q
    background-color: #2E2F30;
 }
 
+QListView
+{
+   background-color: #606162;
+   color: white;
+}
+
+QListView::item
+{
+   background-color: #606162;
+}
+
 QListWidget::item, BlameWidget > QTreeView::item
 {
     background-color: #2E2F30;
@@ -77,17 +88,17 @@ QTreeView::branch
     background-color: #2E2F30;
 }
 
-QListWidget::item:hover, BlameWidget > QTreeView::item:hover
+QListWidget::item:hover, BlameWidget > QTreeView::item:hover, QListView::item:hover
 {
    background:#363637;
 }
 
-QListWidget::item:focus, BlameWidget > QTreeView::item:focus
+QListWidget::item:focus, BlameWidget > QTreeView::item:focus, QListView::item:focus
 {
    background-color: #3C3D3D;
 }
 
-QListWidget::item:disabled
+QListWidget::item:disabled, QListView::item:disabled
 {
     color: #606162;
 }
