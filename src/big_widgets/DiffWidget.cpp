@@ -181,41 +181,52 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
    if (!mDiffButtons.contains(id))
    {
       const auto fullDiffWidget = new FullDiffWidget(mGit, mCache);
-      fullDiffWidget->loadDiff(sha, parentSha);
 
-      const auto diffButton = new DiffButton(id, ":/icons/commit-list");
-      diffButton->setSelected();
-
-      for (const auto &buttons : qAsConst(mDiffButtons))
-         buttons.second->setUnselected();
-
-      connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton, sha, parentSha]() {
-         centerStackedWidget->setCurrentWidget(fullDiffWidget);
-         mCommitDiffWidget->configure(sha, parentSha);
+      if (fullDiffWidget->loadDiff(sha, parentSha))
+      {
+         const auto diffButton = new DiffButton(id, ":/icons/commit-list");
+         diffButton->setSelected();
 
          for (const auto &buttons : qAsConst(mDiffButtons))
-            if (buttons.second != diffButton)
-               buttons.second->setUnselected();
-      });
-      connect(diffButton, &DiffButton::destroyed, this, [this, id, fullDiffWidget]() {
-         centerStackedWidget->removeWidget(fullDiffWidget);
+            buttons.second->setUnselected();
+
+         connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton, sha, parentSha]() {
+            centerStackedWidget->setCurrentWidget(fullDiffWidget);
+            mCommitDiffWidget->configure(sha, parentSha);
+
+            for (const auto &buttons : qAsConst(mDiffButtons))
+               if (buttons.second != diffButton)
+                  buttons.second->setUnselected();
+         });
+         connect(diffButton, &DiffButton::destroyed, this, [this, id, fullDiffWidget]() {
+            centerStackedWidget->removeWidget(fullDiffWidget);
+            delete fullDiffWidget;
+            mDiffButtons.remove(id);
+
+            if (mDiffButtons.count() == 0)
+            {
+               mCommitDiffWidget->setVisible(false);
+               emit signalDiffEmpty();
+            }
+         });
+         mDiffButtonsContainer->addWidget(diffButton);
+         mDiffButtons.insert(id, { fullDiffWidget, diffButton });
+
+         const auto index = centerStackedWidget->addWidget(fullDiffWidget);
+         centerStackedWidget->setCurrentIndex(index);
+
+         mCommitDiffWidget->configure(sha, parentSha);
+         mCommitDiffWidget->setVisible(true);
+      }
+      else
+      {
          delete fullDiffWidget;
-         mDiffButtons.remove(id);
 
-         if (mDiffButtons.count() == 0)
-         {
-            mCommitDiffWidget->setVisible(false);
-            emit signalDiffEmpty();
-         }
-      });
-      mDiffButtonsContainer->addWidget(diffButton);
-      mDiffButtons.insert(id, { fullDiffWidget, diffButton });
+         QMessageBox::information(this, tr("No diff to show!"),
+                                  tr("There is no diff to show between commit SHAs {%1} and {%2}").arg(sha, parentSha));
 
-      const auto index = centerStackedWidget->addWidget(fullDiffWidget);
-      centerStackedWidget->setCurrentIndex(index);
-
-      mCommitDiffWidget->configure(sha, parentSha);
-      mCommitDiffWidget->setVisible(true);
+         emit signalDiffEmpty();
+      }
    }
    else
    {

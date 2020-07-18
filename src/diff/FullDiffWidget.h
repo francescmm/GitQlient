@@ -60,8 +60,9 @@ public:
 
     \param sha The base commit SHA.
     \param diffToSha The commit SHA to comapre to.
+    \return True if there is a diff to load, otherwise false.
    */
-   void loadDiff(const QString &sha, const QString &diffToSha);
+   bool loadDiff(const QString &sha, const QString &diffToSha);
 
 private:
    QSharedPointer<GitBase> mGit;

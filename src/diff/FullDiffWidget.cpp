@@ -111,7 +111,7 @@ void FullDiffWidget::processData(const QString &fileChunk)
    }
 }
 
-void FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
+bool FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
 {
    mCurrentSha = sha;
    mPreviousSha = diffToSha;
@@ -121,6 +121,11 @@ void FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
    const auto ret = git->getCommitDiff(mCurrentSha, mPreviousSha);
 
-   if (ret.success)
+   if (ret.success && !ret.output.toString().isEmpty())
+   {
       processData(ret.output.toString());
+      return true;
+   }
+
+   return false;
 }
