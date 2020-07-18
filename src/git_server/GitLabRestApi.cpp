@@ -46,7 +46,7 @@ void GitLabRestApi::testConnection()
       const auto tmpDoc = validateData(reply, errorStr);
 
       if (tmpDoc.has_value())
-         emit signalConnectionSuccessful();
+         emit connectionTested();
       else
          emit errorOccurred(errorStr);
    });
@@ -238,7 +238,7 @@ void GitLabRestApi::onLabelsReceived()
          labels.append(std::move(sLabel));
       }
 
-      emit signalLabelsReceived(labels);
+      emit labelsReceived(labels);
    }
    else
       emit errorOccurred(errorStr);
@@ -268,7 +268,7 @@ void GitLabRestApi::onMilestonesReceived()
          milestones.append(std::move(sMilestone));
       }
 
-      emit signalMilestonesReceived(milestones);
+      emit milestonesReceived(milestones);
    }
    else
       emit errorOccurred(errorStr);
@@ -287,7 +287,7 @@ void GitLabRestApi::onIssueCreated()
       const auto list = tmpDoc->toVariant().toList();
       const auto url = issue[QStringLiteral("web_url")].toString();
 
-      emit signalIssueCreated(url);
+      emit issueCreated(url);
    }
    else
       emit errorOccurred(errorStr);
@@ -306,7 +306,7 @@ void GitLabRestApi::onMergeRequestCreated()
       const auto list = tmpDoc->toVariant().toList();
       const auto url = issue[QStringLiteral("web_url")].toString();
 
-      emit signalPullRequestCreated(url);
+      emit pullRequestCreated(url);
    }
    else
       emit errorOccurred(errorStr);

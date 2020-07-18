@@ -139,7 +139,7 @@ void ServerConfigDlg::testToken()
 
       api->testConnection();
 
-      connect(api, &IRestApi::signalConnectionSuccessful, this, &ServerConfigDlg::onTestSucceeded);
+      connect(api, &IRestApi::connectionTested, this, &ServerConfigDlg::onTestSucceeded);
       connect(api, &IRestApi::errorOccurred, this, &ServerConfigDlg::onGitServerError);
    }
 }

@@ -35,7 +35,7 @@ MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, cons
       mUserName = dynamic_cast<GitLabRestApi *>(mApi)->getUserId();
    }
 
-   connect(mApi, &GitHubRestApi::signalPullRequestMerged, this, &MergePullRequestDlg::onPRMerged);
+   connect(mApi, &GitHubRestApi::pullRequestMerged, this, &MergePullRequestDlg::onPRMerged);
    connect(mApi, &IRestApi::errorOccurred, this, &MergePullRequestDlg::onGitServerError);
 
    connect(ui->pbMerge, &QPushButton::clicked, this, &MergePullRequestDlg::accept);

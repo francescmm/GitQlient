@@ -47,14 +47,14 @@ class IRestApi : public QObject
    Q_OBJECT
 
 signals:
-   void signalConnectionSuccessful();
-   void signalLabelsReceived(const QVector<ServerLabel> &labels);
-   void signalMilestonesReceived(const QVector<ServerMilestone> &milestones);
-   void signalIssueCreated(QString url);
-   void signalIssueUpdated();
-   void signalPullRequestCreated(QString url);
-   void signalPullRequestsReceived(QMap<QString, ServerPullRequest> prs);
-   void signalPullRequestMerged();
+   void connectionTested();
+   void labelsReceived(const QVector<ServerLabel> &labels);
+   void milestonesReceived(const QVector<ServerMilestone> &milestones);
+   void issueCreated(QString url);
+   void issueUpdated();
+   void pullRequestCreated(QString url);
+   void pullRequestsReceived(QMap<QString, ServerPullRequest> prs);
+   void pullRequestMerged();
    void errorOccurred(const QString &errorStr);
 
 public:

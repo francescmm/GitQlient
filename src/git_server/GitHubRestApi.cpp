@@ -40,7 +40,7 @@ void GitHubRestApi::testConnection()
       const auto tmpDoc = validateData(reply, errorStr);
 
       if (tmpDoc.has_value())
-         emit signalConnectionSuccessful();
+         emit connectionTested();
       else
          emit errorOccurred(errorStr);
    });
@@ -73,7 +73,7 @@ void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
       const auto tmpDoc = validateData(reply, errorStr);
 
       if (tmpDoc.has_value())
-         emit signalIssueUpdated();
+         emit issueUpdated();
       else
          emit errorOccurred(errorStr);
    });
@@ -164,7 +164,7 @@ void GitHubRestApi::onLabelsReceived()
          labels.append(std::move(sLabel));
       }
 
-      emit signalLabelsReceived(labels);
+      emit labelsReceived(labels);
    }
    else
       emit errorOccurred(errorStr);
@@ -195,7 +195,7 @@ void GitHubRestApi::onMilestonesReceived()
          milestones.append(std::move(sMilestone));
       }
 
-      emit signalMilestonesReceived(milestones);
+      emit milestonesReceived(milestones);
    }
    else
       emit errorOccurred(errorStr);
@@ -213,7 +213,7 @@ void GitHubRestApi::onIssueCreated()
       const auto issue = doc.object();
       const auto url = issue[QStringLiteral("html_url")].toString();
 
-      emit signalIssueCreated(url);
+      emit issueCreated(url);
    }
    else
       emit errorOccurred(errorStr);
@@ -231,7 +231,7 @@ void GitHubRestApi::onPullRequestCreated()
       const auto issue = doc.object();
       const auto url = issue[QStringLiteral("html_url")].toString();
 
-      emit signalPullRequestCreated(url);
+      emit pullRequestCreated(url);
    }
    else
       emit errorOccurred(errorStr);
@@ -322,7 +322,7 @@ void GitHubRestApi::onPullRequestStatusReceived()
       --mPrRequested;
 
       if (mPrRequested == 0)
-         emit signalPullRequestsReceived(mPulls);
+         emit pullRequestsReceived(mPulls);
    }
    else
       emit errorOccurred(errorStr);
@@ -335,7 +335,7 @@ void GitHubRestApi::onPullRequestMerged()
    const auto tmpDoc = validateData(reply, errorStr);
 
    if (tmpDoc.has_value())
-      emit signalPullRequestMerged();
+      emit pullRequestMerged();
    else
       emit errorOccurred(errorStr);
 }

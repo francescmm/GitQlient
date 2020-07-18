@@ -38,10 +38,10 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
    else if (serverUrl.contains("gitlab"))
       mApi = new GitLabRestApi(mUserName, repoInfo.second, serverUrl, { mUserName, userToken, endpoint });
 
-   connect(mApi, &IRestApi::signalIssueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
-   connect(mApi, &IRestApi::signalPullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
-   connect(mApi, &IRestApi::signalMilestonesReceived, this, &CreatePullRequestDlg::onMilestones);
-   connect(mApi, &IRestApi::signalLabelsReceived, this, &CreatePullRequestDlg::onLabels);
+   connect(mApi, &IRestApi::issueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
+   connect(mApi, &IRestApi::pullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
+   connect(mApi, &IRestApi::milestonesReceived, this, &CreatePullRequestDlg::onMilestones);
+   connect(mApi, &IRestApi::labelsReceived, this, &CreatePullRequestDlg::onLabels);
    connect(mApi, &IRestApi::errorOccurred, this, &CreatePullRequestDlg::onGitServerError);
 
    mApi->requestMilestones();
