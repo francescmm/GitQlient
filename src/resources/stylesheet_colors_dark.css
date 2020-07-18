@@ -240,33 +240,33 @@ GitQlient
    background-color: #606162;
 }
 
-QPinnableTabWidget::tab-bar
+QTabWidget::tab-bar
 {
    background-color: #404142;
 }
 
-QPinnableTabWidget > QTabBar::tab
+QTabWidget > QTabBar::tab
 {
    background-color: #202122;
    color: white;
 }
 
-QPinnableTabWidget > QTabBar::tab:selected
+QTabWidget > QTabBar::tab:selected
 {
    background-color: #404142;
 }
 
-QPinnableTabWidget > QTabBar::tab:!selected
+QTabWidget > QTabBar::tab:!selected
 {
     border-right-color: #2E2F30;
 }
 
-QPinnableTabWidget > QTabBar::tab:!selected:hover
+QTabWidget > QTabBar::tab:!selected:hover
 {
     background-color: #606162;
 }
 
-QPinnableTabWidget > QTabBar::tab:disabled
+QTabWidget > QTabBar::tab:disabled
 {
     color: #606162;
 }
@@ -429,28 +429,28 @@ FileBlameWidget
     background-color: #2E2F30;
 }
 
-BlameWidget > QPinnableTabWidget, QPinnableTabWidget#HistoryTab:pane
+BlameWidget > QTabWidget, QTabWidget#HistoryTab:pane
 {
     background-color: #2E2F30;
     border: 0;
 }
 
-QPinnableTabWidget#HistoryTab > QTabBar::tab:selected
+QTabWidget#HistoryTab > QTabBar::tab:selected
 {
     background-color: #2E2F30;
 }
 
-QPinnableTabWidget#HistoryTab > QTabBar::tab:selected:hover
+QTabWidget#HistoryTab > QTabBar::tab:selected:hover
 {
     background-color: #2E2F30;
 }
 
-QPinnableTabWidget#HistoryTab > QTabBar::tab:!selected
+QTabWidget#HistoryTab > QTabBar::tab:!selected
 {
     background-color: #505152;
 }
 
-QPinnableTabWidget#HistoryTab > QTabBar::tab:!selected:hover
+QTabWidget#HistoryTab > QTabBar::tab:!selected:hover
 {
     background-color: #202122;
 }
