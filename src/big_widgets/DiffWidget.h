@@ -105,8 +105,9 @@ public:
 
     \param sha The base SHA.
     \param parentSha The SHA to compare to.
+    \return True if the load was successful, otherwise false.
    */
-   void loadCommitDiff(const QString &sha, const QString &parentSha);
+   bool loadCommitDiff(const QString &sha, const QString &parentSha);
 
 private:
    QSharedPointer<GitBase> mGit;

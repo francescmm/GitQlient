@@ -174,7 +174,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
    }
 }
 
-void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
+bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 {
    const auto id = QString("Commit diff (%1 \u2194 %2)").arg(sha.left(6), parentSha.left(6));
 
@@ -225,7 +225,7 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
          QMessageBox::information(this, tr("No diff to show!"),
                                   tr("There is no diff to show between commit SHAs {%1} and {%2}").arg(sha, parentSha));
 
-         emit signalDiffEmpty();
+         return false;
       }
    }
    else
@@ -239,6 +239,8 @@ void DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       pair.second->setSelected();
       centerStackedWidget->setCurrentWidget(diff);
    }
+
+   return true;
 }
 
 void DiffWidget::changeSelection(int index)

@@ -440,18 +440,26 @@ void GitQlientRepo::updateTagsOnCache()
 void GitQlientRepo::openCommitDiff(const QString currentSha)
 {
    const auto rev = mGitQlientCache->getCommitInfo(currentSha);
+   const auto loaded = mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
 
-   mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
-   mControls->enableDiff();
+   if (loaded)
+   {
+      mControls->enableDiff();
 
-   showDiffView();
+      showDiffView();
+   }
 }
 
 void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
 {
-   mDiffWidget->loadCommitDiff(shas.last(), shas.first());
-   mControls->enableDiff();
-   showDiffView();
+   const auto loaded = mDiffWidget->loadCommitDiff(shas.last(), shas.first());
+
+   if (loaded)
+   {
+      mControls->enableDiff();
+
+      showDiffView();
+   }
 }
 
 void GitQlientRepo::changesCommitted(bool ok)
