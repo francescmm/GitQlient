@@ -96,11 +96,11 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
 
    const auto stashMenu = new QMenu(mStashBtn);
 
-   action = stashMenu->addAction(tr("Push"));
+   action = stashMenu->addAction(tr("Stash push"));
    connect(action, &QAction::triggered, this, &Controls::stashCurrentWork);
    mStashBtn->setDefaultAction(action);
 
-   action = stashMenu->addAction(tr("Pop"));
+   action = stashMenu->addAction(tr("Stash pop"));
    connect(action, &QAction::triggered, this, &Controls::popStashedWork);
 
    mStashBtn->setMenu(stashMenu);
