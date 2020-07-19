@@ -67,6 +67,18 @@
         <file alias="pending">resources/icons/pending.svg</file>
         <file alias="success">resources/icons/success.svg</file>
         <file alias="get_gitqlient">resources/icons/file-download-solid.svg</file>
+        <file alias="qcb">resources/icons/qcheckbox.svg</file>
+        <file alias="qcb_c">resources/icons/qcheckbox_checked.svg</file>
+        <file alias="qcb_d">resources/icons/qcheckbox_disabled.svg</file>
+        <file alias="qcb_d_c">resources/icons/qcheckbox_disabled_checked.svg</file>
+        <file alias="qcb_d_i">resources/icons/qcheckbox_disabled_indeterminate.svg</file>
+        <file alias="qcb_i">resources/icons/qcheckbox_indet.svg</file>
+        <file alias="qcbb">resources/icons/qcheckbox_bright.svg</file>
+        <file alias="qcbb_c">resources/icons/qcheckbox_bright_checked.svg</file>
+        <file alias="qcbb_d">resources/icons/qcheckbox_bright_disabled.svg</file>
+        <file alias="qcbb_d_c">resources/icons/qcheckbox_bright_disabled_checked.svg</file>
+        <file alias="qcbb_d_i">resources/icons/qcheckbox_bright_disabled_indeterminate.svg</file>
+        <file alias="qcbb_i">resources/icons/qcheckbox_bright_indet.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

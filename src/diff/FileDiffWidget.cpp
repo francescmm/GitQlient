@@ -6,13 +6,13 @@
 #include <RevisionsCache.h>
 #include <DiffInfoPanel.h>
 #include <GitQlientSettings.h>
+#include <CheckBox.h>
 
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
 #include <QScrollBar>
 #include <QDateTime>
-#include <QCheckBox>
 
 FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
                                QWidget *parent)
@@ -24,7 +24,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mGoPrevious(new QPushButton())
    , mGoNext(new QPushButton())
    , mDiffInfoPanel(new DiffInfoPanel(cache))
-   , mFileVsFileCheck(new QCheckBox(tr("Show file vs file")))
+   , mFileVsFileCheck(new CheckBox(tr("Show file vs file")))
    , mGoTop(new QPushButton())
    , mGoUp(new QPushButton())
    , mGoDown(new QPushButton())
@@ -87,7 +87,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
-   connect(mFileVsFileCheck, &QCheckBox::toggled, this, &FileDiffWidget::setFileVsFileEnable);
+   connect(mFileVsFileCheck, &CheckBox::toggled, this, &FileDiffWidget::setFileVsFileEnable);
 
    mOldFile->setVisible(mFileVsFile);
 }

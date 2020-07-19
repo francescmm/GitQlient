@@ -31,7 +31,7 @@ class QPushButton;
 class GitBase;
 class DiffInfoPanel;
 class RevisionsCache;
-class QCheckBox;
+class CheckBox;
 /*!
  \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
  specific file.
@@ -104,7 +104,7 @@ private:
    QPushButton *mGoNext = nullptr;
    DiffInfoPanel *mDiffInfoPanel = nullptr;
    QVector<int> mModifications;
-   QCheckBox *mFileVsFileCheck = nullptr;
+   CheckBox *mFileVsFileCheck = nullptr;
    bool mFileVsFile = false;
    QPushButton *mGoTop = nullptr;
    QPushButton *mGoUp = nullptr;

@@ -35,7 +35,7 @@ class QStackedWidget;
 class WipWidget;
 class AmendWidget;
 class CommitInfoWidget;
-class QCheckBox;
+class CheckBox;
 class RepositoryViewDelegate;
 class FileEditor;
 
@@ -224,7 +224,7 @@ private:
    WipWidget *mWipWidget = nullptr;
    AmendWidget *mAmendWidget = nullptr;
    CommitInfoWidget *mCommitInfoWidget = nullptr;
-   QCheckBox *mChShowAllBranches = nullptr;
+   CheckBox *mChShowAllBranches = nullptr;
    RepositoryViewDelegate *mItemDelegate = nullptr;
    QFrame *mGraphFrame = nullptr;
    FileEditor *mFileEditor = nullptr;

@@ -42,7 +42,7 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
          break;
       case BranchDlgMode::PUSH_UPSTREAM:
          ui->chbCopyRemote->setVisible(true);
-         connect(ui->chbCopyRemote, &QCheckBox::clicked, this, &BranchDlg::copyBranchName);
+         connect(ui->chbCopyRemote, &CheckBox::clicked, this, &BranchDlg::copyBranchName);
          setWindowTitle("Push upstream branch");
          ui->pbAccept->setText(tr("Push"));
          break;

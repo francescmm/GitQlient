@@ -18,6 +18,7 @@
 #include <FileEditor.h>
 #include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
+#include <CheckBox.h>
 
 #include <QLogger.h>
 
@@ -25,7 +26,6 @@
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QStackedWidget>
-#include <QCheckBox>
 #include <QMessageBox>
 #include <QApplication>
 
@@ -44,7 +44,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    , mWipWidget(new WipWidget(mCache, git))
    , mAmendWidget(new AmendWidget(mCache, git))
    , mCommitInfoWidget(new CommitInfoWidget(mCache, git))
-   , mChShowAllBranches(new QCheckBox(tr("Show all branches")))
+   , mChShowAllBranches(new CheckBox(tr("Show all branches")))
    , mGraphFrame(new QFrame())
    , mFileEditor(new FileEditor())
 {
@@ -124,7 +124,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });
 
    mChShowAllBranches->setChecked(settings.value("ShowAllBranches", true).toBool());
-   connect(mChShowAllBranches, &QCheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
+   connect(mChShowAllBranches, &CheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
 
    const auto graphOptionsLayout = new QHBoxLayout();
    graphOptionsLayout->setContentsMargins(QMargins());

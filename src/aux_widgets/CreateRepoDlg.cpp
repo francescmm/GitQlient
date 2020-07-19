@@ -39,7 +39,7 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
    connect(ui->leRepoName, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
    connect(ui->pbAccept, &QPushButton::clicked, this, &CreateRepoDlg::accept);
    connect(ui->pbCancel, &QPushButton::clicked, this, &QDialog::reject);
-   connect(ui->cbGitUser, &QCheckBox::clicked, this, &CreateRepoDlg::showGitControls);
+   connect(ui->cbGitUser, &CheckBox::clicked, this, &CreateRepoDlg::showGitControls);
 
    GitQlientSettings settings;
    const auto configGitUser = settings.value("GitConfigRepo", true).toBool();

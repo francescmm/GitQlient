@@ -2,10 +2,10 @@
 
 #include <GitQlientSettings.h>
 #include <QLogger.h>
+#include <CheckBox.h>
 
 #include <QTimer>
 #include <QSpinBox>
-#include <QCheckBox>
 #include <QComboBox>
 #include <QLabel>
 #include <QVBoxLayout>
@@ -17,10 +17,10 @@ using namespace QLogger;
 GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    : QFrame(parent)
    , mAutoFetch(new QSpinBox())
-   , mAutoPrune(new QCheckBox())
-   , mDisableLogs(new QCheckBox())
+   , mAutoPrune(new CheckBox())
+   , mDisableLogs(new CheckBox())
    , mLevelCombo(new QComboBox())
-   , mAutoFormat(new QCheckBox(tr(" (needs clang-format)")))
+   , mAutoFormat(new CheckBox(tr(" (needs clang-format)")))
    , mStatusLabel(new QLabel())
    , mExternalEditor(new QLineEdit())
    , mStylesSchema(new QComboBox())

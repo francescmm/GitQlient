@@ -26,7 +26,7 @@
 #include <QFrame>
 
 class QSpinBox;
-class QCheckBox;
+class CheckBox;
 class QComboBox;
 class QLabel;
 class QPushButton;
@@ -55,10 +55,10 @@ public:
 
 private:
    QSpinBox *mAutoFetch = nullptr;
-   QCheckBox *mAutoPrune = nullptr;
-   QCheckBox *mDisableLogs = nullptr;
+   CheckBox *mAutoPrune = nullptr;
+   CheckBox *mDisableLogs = nullptr;
    QComboBox *mLevelCombo = nullptr;
-   QCheckBox *mAutoFormat = nullptr;
+   CheckBox *mAutoFormat = nullptr;
    QLabel *mStatusLabel = nullptr;
    QLineEdit *mExternalEditor = nullptr;
    QComboBox *mStylesSchema = nullptr;

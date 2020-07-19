@@ -8,6 +8,7 @@ FORMS += \
 
 HEADERS += \
     $$PWD/BranchDlg.h \
+    $$PWD/CheckBox.h \
     $$PWD/ClickableFrame.h \
     $$PWD/ConflictButton.h \
     $$PWD/CreateRepoDlg.h \
@@ -18,6 +19,7 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/BranchDlg.cpp \
+    $$PWD/CheckBox.cpp \
     $$PWD/ClickableFrame.cpp \
     $$PWD/ConflictButton.cpp \
     $$PWD/CreateRepoDlg.cpp \

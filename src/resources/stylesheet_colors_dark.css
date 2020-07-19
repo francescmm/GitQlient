@@ -577,9 +577,25 @@ QComboBox QAbstractItemView
    background-color: #404142;
 }
 
-QCheckBox
+CheckBox
 {
-    color: white;
+   color: white
+}
+
+CheckBox::indicator
+{
+    width: 13px;
+    height: 13px;
+}
+
+CheckBox::indicator:unchecked
+,CheckBox::indicator:unchecked:disabled
+,CheckBox::indicator:checked
+,CheckBox::indicator:checked:disabled
+,CheckBox::indicator:indeterminate
+,QCheckBox::indicator:indeterminate
+{
+   image: url();
 }
 
 RepoConfigDlg

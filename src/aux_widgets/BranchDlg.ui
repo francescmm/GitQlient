@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>102</height>
+    <height>130</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,7 +56,7 @@
     </widget>
    </item>
    <item row="1" column="0" colspan="3">
-    <widget class="QCheckBox" name="chbCopyRemote">
+    <widget class="CheckBox" name="chbCopyRemote">
      <property name="text">
       <string>Same as remote branch name</string>
      </property>
@@ -64,6 +64,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>CheckBox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>leOldName</tabstop>
   <tabstop>leNewName</tabstop>
