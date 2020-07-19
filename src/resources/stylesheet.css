@@ -194,8 +194,6 @@ CommitChangesWidget > #leAuthorName
 
 CommitChangesWidget > #leAuthorEmail
 {
-    border-top-width: none;
-    border-top-style: none;
     border-top: 0;
     max-height: 30px;
     min-height: 30px;

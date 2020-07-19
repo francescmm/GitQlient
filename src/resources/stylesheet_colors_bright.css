@@ -583,9 +583,6 @@ QComboBox:editable {
    background: #ffffff;
 }
 
-QComboBox:on {
-}
-
 QComboBox QAbstractItemView
 {
    border: none;
@@ -596,11 +593,6 @@ QComboBox QAbstractItemView
 QCheckBox
 {
    color: black;
-}
-
-RepoConfigDlg
-{
-   background-color: white;
 }
 
 PullDlg QLabel#lQuestion
