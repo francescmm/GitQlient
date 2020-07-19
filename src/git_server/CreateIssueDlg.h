@@ -35,12 +35,23 @@ class CreateIssueDlg;
 class GitBase;
 class IRestApi;
 
+/**
+ * @brief The CreateIssueDlg class presents the UI where the user can create issues in the remote Git server.
+ */
 class CreateIssueDlg : public QDialog
 {
    Q_OBJECT
 
 public:
+   /**
+    * @brief CreateIssueDlg Default constructor.
+    * @param git The git object to perform Git operations.
+    * @param parent The parent widget.
+    */
    explicit CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *parent = nullptr);
+   /**
+    * Destructor.
+    */
    ~CreateIssueDlg();
 
 private:
@@ -49,9 +60,25 @@ private:
    IRestApi *mApi;
    QString mUserName;
 
+   /**
+    * @brief accept Process the user input data and does a request to create an issue.
+    */
    void accept() override;
+   /**
+    * @brief onMilestones Process the reply from the server when the milestones request is done.
+    * @param milestones The list of milestones to process.
+    */
    void onMilestones(const QVector<ServerMilestone> &milestones);
+   /**
+    * @brief onLabels Process the reply from the server when the labels request is done.
+    * @param labels The list of labels to process.
+    */
    void onLabels(const QVector<ServerLabel> &labels);
+   /**
+    * @brief onIssueCreated Process the reply from the server if the issue was successfully created. It shows a message
+    * box with the url of the issue.
+    * @param url The url of the issue.
+    */
    void onIssueCreated(QString url);
 
    /**

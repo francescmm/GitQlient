@@ -131,6 +131,17 @@ private:
     */
    void paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const ServerPullRequest &pr) const;
 
+   /**
+    * @brief getMergeColor Returns the color to be used for painting the external circle of the node. This methods
+    * searches the origin of the merge and uses the same lane color.
+    * @param currentLane The current lane type.
+    * @param commit The current commit.
+    * @param currentLaneIndex The current index of the lane.
+    * @param defaultColor The default color in case it's not a merge.
+    * @param isSet Boolean used as a shortcut. If the current iteration is a merge it will change the value for the
+    * following lanes.
+    * @return Returns the color of the lane that merges into the current node, otherwise it returns @p defaultColor.
+    */
    QColor getMergeColor(const Lane &currentLane, const CommitInfo &commit, int currentLaneIndex,
                         const QColor &defaultColor, bool &isSet) const;
 };

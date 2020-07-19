@@ -35,6 +35,10 @@ class MergePullRequestDlg;
 class GitBase;
 class IRestApi;
 
+/**
+ * @brief The MergePullRequestDlg class creates the layout for the UI so the user can merge pull requests directly from
+ * GitQlient.
+ */
 class MergePullRequestDlg : public QDialog
 {
    Q_OBJECT
@@ -46,8 +50,18 @@ signals:
    void signalRepositoryUpdated();
 
 public:
+   /**
+    * @brief MergePullRequestDlg Defail constructor.
+    * @param git The git object to perform Git operations.
+    * @param pr The pull request to be merged.
+    * @param sha The sha of the current commit to check that is the current sha in the server.
+    * @param parent The parent widget.
+    */
    explicit MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr, const QString &sha,
                                 QWidget *parent = nullptr);
+   /**
+    * Destructor
+    */
    ~MergePullRequestDlg();
 
 private:
@@ -58,9 +72,15 @@ private:
    IRestApi *mApi;
    QString mUserName;
 
+   /**
+    * @brief accept Checks the data introduced by the user and triggers the connection agains the server.
+    */
    void accept() override;
+   /**
+    * @brief onPRMerged When the pull request has been merged, this method creates a message box that informs the user
+    * about it.
+    */
    void onPRMerged();
-
    /**
     * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
     */

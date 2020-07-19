@@ -90,6 +90,10 @@ public:
     */
    void setFileVsFileEnable(bool enable);
 
+   /**
+    * @brief editMode Enters in edit mode for the give file.
+    * @param fileName The full path of the file.
+    */
    void editMode(const QString &fileName);
 
 private:
@@ -114,6 +118,12 @@ private:
    QVector<DiffInfo::ChunkInfo> mChunks;
    int mCurrentChunkLine = 0;
 
+   /**
+    * @brief processDiff Process the diff to configure the navigation parameters.
+    * @param text
+    * @param newFileData
+    * @param oldFileData
+    */
    void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
                     QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);
 

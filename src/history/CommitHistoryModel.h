@@ -133,6 +133,7 @@ public:
 private:
    QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QMap<CommitHistoryColumns, QString> mColumns;
 
    /**
     * @brief Returns the tool tip data.
@@ -149,6 +150,4 @@ private:
     * @return QVariant The data to be shown.
     */
    QVariant getDisplayData(const CommitInfo &rev, int column) const;
-
-   QMap<CommitHistoryColumns, QString> mColumns;
 };
