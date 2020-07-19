@@ -63,6 +63,9 @@ private:
    QString mLoadedContent;
    bool isEditing = false;
 
-   void saveFile() const;
+   /**
+    * @brief saveTextInFile Saves the current file.
+    * @param content The content of the editor to be stored in the file.
+    */
    void saveTextInFile(const QString &content) const;
 };

@@ -126,9 +126,20 @@ private:
     */
    void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
                     QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);
-
+   /**
+    * @brief moveTop Moves to the first diff chunk.
+    */
    void moveTop();
+   /**
+    * @brief moveChunkUp Moves to the previous diff chunk.
+    */
    void moveChunkUp();
+   /**
+    * @brief moveChunkDown Moves to the following diff chunk.
+    */
    void moveChunkDown();
+   /**
+    * @brief moveBottomChunk Moves to the last diff chunk.
+    */
    void moveBottomChunk();
 };

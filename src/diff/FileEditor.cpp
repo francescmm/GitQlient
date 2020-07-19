@@ -18,7 +18,12 @@ FileEditor::FileEditor(QWidget *parent)
    , mHighlighter(new Highlighter(mFileEditor->document()))
 {
    mSaveBtn->setIcon(QIcon(":/icons/save"));
-   connect(mSaveBtn, &QPushButton::clicked, this, &FileEditor::saveFile);
+   connect(mSaveBtn, &QPushButton::clicked, this, [this]() {
+      const auto currentContent = mFileEditor->toPlainText();
+
+      if (currentContent != mLoadedContent)
+         saveTextInFile(currentContent);
+   });
 
    mCloseBtn->setIcon(QIcon(":/icons/close"));
    connect(mCloseBtn, &QPushButton::clicked, this, &FileEditor::finishEdition);
@@ -88,14 +93,6 @@ void FileEditor::finishEdition()
 
       emit signalEditionClosed();
    }
-}
-
-void FileEditor::saveFile() const
-{
-   const auto currentContent = mFileEditor->toPlainText();
-
-   if (currentContent != mLoadedContent)
-      saveTextInFile(currentContent);
 }
 
 void FileEditor::saveTextInFile(const QString &content) const

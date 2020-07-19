@@ -28,11 +28,24 @@
 class QLabel;
 class RevisionsCache;
 
+/**
+ * @brief The DiffInfoPanel class shows the information of the commits involved in a diff.
+ */
 class DiffInfoPanel : public QFrame
 {
 public:
+   /**
+    * @brief DiffInfoPanel Default constructor
+    * @param cache The GitQlient internal cache.
+    * @param parent The parent widget.
+    */
    explicit DiffInfoPanel(QSharedPointer<RevisionsCache> cache, QWidget *parent = nullptr);
 
+   /**
+    * @brief configure Configures the widget with the two SHAs that will be compared.
+    * @param currentSha The base commit SHA.
+    * @param previousSha The SHA to compare with.
+    */
    void configure(const QString &currentSha, const QString &previousSha);
 
 private:
