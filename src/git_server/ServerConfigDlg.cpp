@@ -146,8 +146,7 @@ void ServerConfigDlg::testToken()
 
 void ServerConfigDlg::onServerChanged()
 {
-   if (ui->cbServer->currentIndex() == GitHubEnterprise)
-      ui->leEndPoint->setVisible(true);
+   ui->leEndPoint->setVisible(ui->cbServer->currentIndex() == GitHubEnterprise);
 }
 
 void ServerConfigDlg::onTestSucceeded()
