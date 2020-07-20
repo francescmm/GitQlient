@@ -140,4 +140,10 @@ private:
     * @brief endEditFile Closes the file editor.
     */
    void endEditFile();
+
+   /**
+    * @brief onTabClosed Removes the IDiffWidget from the map.
+    * @param index The index to be closed.
+    */
+   void onTabClosed(int index);
 };

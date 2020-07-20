@@ -31,6 +31,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
    mCenterStackedWidget->setCurrentIndex(0);
    mCenterStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
    connect(mCenterStackedWidget, &QTabWidget::currentChanged, this, &DiffWidget::changeSelection);
+   connect(mCenterStackedWidget, &QTabWidget::tabCloseRequested, this, &DiffWidget::onTabClosed);
 
    mCommitDiffWidget->setVisible(false);
 
@@ -210,4 +211,15 @@ void DiffWidget::endEditFile()
 {
    mCenterStackedWidget->setVisible(true);
    mFileEditor->setVisible(false);
+}
+
+void DiffWidget::onTabClosed(int index)
+{
+   const auto widget = qobject_cast<IDiffWidget *>(mCenterStackedWidget->widget(index));
+
+   if (widget)
+   {
+      const auto key = mDiffWidgets.key(widget);
+      mDiffWidgets.remove(key);
+   }
 }
