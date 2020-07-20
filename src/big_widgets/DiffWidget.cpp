@@ -35,18 +35,13 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
 
    mCommitDiffWidget->setVisible(false);
 
-   const auto infoPanelsLayout = new QHBoxLayout();
-   infoPanelsLayout->setContentsMargins(QMargins());
-   infoPanelsLayout->setSpacing(10);
-   infoPanelsLayout->addWidget(mInfoPanelBase);
-   infoPanelsLayout->addWidget(mInfoPanelParent);
-
    const auto diffsLayout = new QVBoxLayout();
    diffsLayout->setContentsMargins(QMargins());
-   diffsLayout->setSpacing(10);
-   diffsLayout->addLayout(infoPanelsLayout);
-   diffsLayout->addStretch();
+   diffsLayout->setSpacing(0);
+   diffsLayout->addWidget(mInfoPanelBase);
    diffsLayout->addWidget(mCommitDiffWidget);
+   diffsLayout->addStretch();
+   diffsLayout->addWidget(mInfoPanelParent);
 
    mFileEditor->setVisible(false);
 
