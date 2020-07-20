@@ -91,29 +91,29 @@ void CommitHistoryView::setupGeometry()
    {
       const auto hv = header();
       hv->setMinimumSectionSize(75);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::SHA), 75);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::GRAPH), 120);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::AUTHOR), 160);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::DATE), 125);
-      hv->resizeSection(static_cast<int>(CommitHistoryColumns::SHA), 75);
-      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::AUTHOR), QHeaderView::Fixed);
-      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::DATE), QHeaderView::Fixed);
-      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::SHA), QHeaderView::Fixed);
-      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::LOG), QHeaderView::Stretch);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::Sha), 75);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::Graph), 120);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::Author), 160);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::Date), 125);
+      hv->resizeSection(static_cast<int>(CommitHistoryColumns::Sha), 75);
+      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::Author), QHeaderView::Fixed);
+      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::Date), QHeaderView::Fixed);
+      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::Sha), QHeaderView::Fixed);
+      hv->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::Log), QHeaderView::Stretch);
       hv->setStretchLastSection(false);
 
-      hideColumn(static_cast<int>(CommitHistoryColumns::ID));
+      hideColumn(static_cast<int>(CommitHistoryColumns::TreeViewIcon));
    }
    else
    {
       header()->restoreState(previousState);
-      header()->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::LOG), QHeaderView::Stretch);
+      header()->setSectionResizeMode(static_cast<int>(CommitHistoryColumns::Log), QHeaderView::Stretch);
    }
 }
 
 void CommitHistoryView::currentChanged(const QModelIndex &index, const QModelIndex &)
 {
-   mCurrentSha = model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+   mCurrentSha = model()->index(index.row(), static_cast<int>(CommitHistoryColumns::Sha)).data().toString();
 }
 
 void CommitHistoryView::refreshView()
@@ -237,7 +237,7 @@ QList<QString> CommitHistoryView::getSelectedShaList() const
    {
       const auto sha = mCommitHistoryModel->sha(index.row());
       const auto dtStr
-          = mCommitHistoryModel->index(index.row(), static_cast<int>(CommitHistoryColumns::DATE)).data().toString();
+          = mCommitHistoryModel->index(index.row(), static_cast<int>(CommitHistoryColumns::Date)).data().toString();
       const auto dt = QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm");
 
       shas.insert(dt, sha);

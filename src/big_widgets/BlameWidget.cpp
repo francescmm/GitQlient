@@ -32,9 +32,9 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    mTabWidget->setObjectName("HistoryTab");
    mRepoView->setObjectName("blameGraphView");
    mRepoView->setModel(mRepoModel);
-   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::GRAPH), true);
-   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::DATE), true);
-   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::AUTHOR), true);
+   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::Graph), true);
+   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::Date), true);
+   mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::Author), true);
    mRepoView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, mGit, mRepoView));
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(450);
@@ -151,9 +151,9 @@ void BlameWidget::reloadBlame(const QModelIndex &index)
    if (blameWidget)
    {
       const auto sha
-          = mRepoView->model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+          = mRepoView->model()->index(index.row(), static_cast<int>(CommitHistoryColumns::Sha)).data().toString();
       const auto previousSha
-          = mRepoView->model()->index(index.row() + 1, static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+          = mRepoView->model()->index(index.row() + 1, static_cast<int>(CommitHistoryColumns::Sha)).data().toString();
       blameWidget->reload(sha, previousSha);
    }
 }
@@ -185,7 +185,7 @@ void BlameWidget::reloadHistory(int tabIndex)
          const auto totalRows = repoModel->rowCount();
          for (auto i = 0; i < totalRows; ++i)
          {
-            const auto index = mRepoView->model()->index(i, static_cast<int>(CommitHistoryColumns::SHA));
+            const auto index = mRepoView->model()->index(i, static_cast<int>(CommitHistoryColumns::Sha));
 
             if (index.data().toString().startsWith(sha))
             {
@@ -210,7 +210,7 @@ void BlameWidget::showFileHistoryByIndex(const QModelIndex &index)
 
 void BlameWidget::showRepoViewMenu(const QPoint &pos)
 {
-   const auto shaColumnIndex = static_cast<int>(CommitHistoryColumns::SHA);
+   const auto shaColumnIndex = static_cast<int>(CommitHistoryColumns::Sha);
    const auto modelIndex = mRepoView->model()->index(mSelectedRow, shaColumnIndex);
 
    reloadBlame(modelIndex);
@@ -238,9 +238,9 @@ void BlameWidget::showRepoViewMenu(const QPoint &pos)
 void BlameWidget::openDiff(const QModelIndex &index)
 {
    const auto sha
-       = mRepoView->model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+       = mRepoView->model()->index(index.row(), static_cast<int>(CommitHistoryColumns::Sha)).data().toString();
    const auto previousSha
-       = mRepoView->model()->index(index.row() + 1, static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+       = mRepoView->model()->index(index.row() + 1, static_cast<int>(CommitHistoryColumns::Sha)).data().toString();
 
    emit signalOpenDiff({ previousSha, sha });
 }

@@ -53,9 +53,9 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
    if (commit.sha().isEmpty())
       return;
 
-   if (index.column() == static_cast<int>(CommitHistoryColumns::GRAPH))
+   if (index.column() == static_cast<int>(CommitHistoryColumns::Graph))
       paintGraph(p, newOpt, commit);
-   else if (index.column() == static_cast<int>(CommitHistoryColumns::LOG))
+   else if (index.column() == static_cast<int>(CommitHistoryColumns::Log))
       paintLog(p, newOpt, commit, index.data().toString());
    else
    {
@@ -64,7 +64,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
       auto text = index.data().toString();
 
-      if (index.column() == static_cast<int>(CommitHistoryColumns::SHA))
+      if (index.column() == static_cast<int>(CommitHistoryColumns::Sha))
       {
          newOpt.font.setPointSize(10);
          newOpt.font.setFamily("Ubuntu Mono");
@@ -76,7 +76,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
       if (const auto cursorColumn = mView->indexAt(mView->mapFromGlobal(QCursor::pos())).column();
           newOpt.state & QStyle::State_MouseOver && cursorColumn == index.column()
-          && cursorColumn == static_cast<int>(CommitHistoryColumns::SHA))
+          && cursorColumn == static_cast<int>(CommitHistoryColumns::Sha))
       {
          QFont font = newOpt.font;
          font.setUnderline(true);
@@ -99,14 +99,14 @@ bool RepositoryViewDelegate::editorEvent(QEvent *event, QAbstractItemModel *mode
    const auto cursorColumn = mView->indexAt(mView->mapFromGlobal(QCursor::pos())).column();
 
    if (event->type() == QEvent::MouseButtonPress && cursorColumn == index.column()
-       && cursorColumn == static_cast<int>(CommitHistoryColumns::SHA))
+       && cursorColumn == static_cast<int>(CommitHistoryColumns::Sha))
    {
       mColumnPressed = cursorColumn;
       return true;
    }
    else if (event->type() == QEvent::MouseButtonRelease && cursorColumn == index.column() && mColumnPressed != -1)
    {
-      if (cursorColumn == static_cast<int>(CommitHistoryColumns::SHA))
+      if (cursorColumn == static_cast<int>(CommitHistoryColumns::Sha))
       {
          QApplication::clipboard()->setText(index.data().toString());
          QToolTip::showText(QCursor::pos(), tr("Copied!"), mView);

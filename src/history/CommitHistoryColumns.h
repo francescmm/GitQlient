@@ -25,13 +25,18 @@
 
 /**
  * @brief The CommitHistoryColumns enum configures the columns and its order in the CommitHistoryView.
+ *
+ * It defines the first column as TreeViewIcon since this column is used in a QTreeView to show the tree indicator. It's
+ * not used by the CommitHistoryView since the graph is not shown as a tree.
+ *
+ * The main reson it's using a QTreeView is because the better custom styles management it does compared to QTableView.
  */
 enum class CommitHistoryColumns
 {
-   ID,
-   GRAPH,
-   LOG,
-   AUTHOR,
-   DATE,
-   SHA
+   TreeViewIcon,
+   Graph,
+   Log,
+   Author,
+   Date,
+   Sha
 };

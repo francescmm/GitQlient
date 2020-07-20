@@ -14,12 +14,12 @@ CommitHistoryModel::CommitHistoryModel(const QSharedPointer<RevisionsCache> &cac
    , mCache(cache)
    , mGit(git)
 {
-   mColumns.insert(CommitHistoryColumns::ID, "Id");
-   mColumns.insert(CommitHistoryColumns::GRAPH, "Graph");
-   mColumns.insert(CommitHistoryColumns::SHA, "Sha");
-   mColumns.insert(CommitHistoryColumns::LOG, "Log");
-   mColumns.insert(CommitHistoryColumns::AUTHOR, "Author");
-   mColumns.insert(CommitHistoryColumns::DATE, "Date");
+   mColumns.insert(CommitHistoryColumns::TreeViewIcon, "");
+   mColumns.insert(CommitHistoryColumns::Graph, "Graph");
+   mColumns.insert(CommitHistoryColumns::Sha, "Sha");
+   mColumns.insert(CommitHistoryColumns::Log, "Log");
+   mColumns.insert(CommitHistoryColumns::Author, "Author");
+   mColumns.insert(CommitHistoryColumns::Date, "Date");
 }
 
 int CommitHistoryModel::rowCount(const QModelIndex &parent) const
@@ -34,7 +34,7 @@ bool CommitHistoryModel::hasChildren(const QModelIndex &parent) const
 
 QString CommitHistoryModel::sha(int row) const
 {
-   return index(row, static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+   return index(row, static_cast<int>(CommitHistoryColumns::Sha)).data().toString();
 }
 
 void CommitHistoryModel::clear()
@@ -114,17 +114,17 @@ QVariant CommitHistoryModel::getDisplayData(const CommitInfo &rev, int column) c
 {
    switch (static_cast<CommitHistoryColumns>(column))
    {
-      case CommitHistoryColumns::SHA: {
+      case CommitHistoryColumns::Sha: {
          const auto sha = rev.sha();
          return sha;
       }
-      case CommitHistoryColumns::LOG:
+      case CommitHistoryColumns::Log:
          return rev.shortLog();
-      case CommitHistoryColumns::AUTHOR: {
+      case CommitHistoryColumns::Author: {
          const auto author = rev.author().split("<").first();
          return author;
       }
-      case CommitHistoryColumns::DATE: {
+      case CommitHistoryColumns::Date: {
          return QDateTime::fromSecsSinceEpoch(rev.authorDate().toUInt()).toString("dd MMM yyyy hh:mm");
       }
       default:
