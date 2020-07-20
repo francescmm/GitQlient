@@ -6,6 +6,8 @@
 #include <GitQlientStyles.h>
 
 #include <QFile>
+#include <QMessageBox>
+
 #include <utility>
 
 BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
@@ -76,26 +78,39 @@ void BranchDlg::accept()
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
       QScopedPointer<GitBranches> git(new GitBranches(mConfig.mGit));
+      GitExecResult ret;
 
       if (mConfig.mDialogMode == BranchDlgMode::CREATE)
-         git->createBranchFromAnotherBranch(ui->leOldName->text(), ui->leNewName->text());
+         ret = git->createBranchFromAnotherBranch(ui->leOldName->text(), ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::CREATE_CHECKOUT)
-         git->checkoutNewLocalBranch(ui->leNewName->text());
+         ret = git->checkoutNewLocalBranch(ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::RENAME)
-         git->renameBranch(ui->leOldName->text(), ui->leNewName->text());
+         ret = git->renameBranch(ui->leOldName->text(), ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::CREATE_FROM_COMMIT)
-         git->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text());
+         ret = git->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::STASH_BRANCH)
       {
          QScopedPointer<GitStashes> git(new GitStashes(mConfig.mGit));
-         git->stashBranch(ui->leOldName->text(), ui->leNewName->text());
+         ret = git->stashBranch(ui->leOldName->text(), ui->leNewName->text());
       }
       else if (mConfig.mDialogMode == BranchDlgMode::PUSH_UPSTREAM)
-         git->pushUpstream(ui->leNewName->text());
+         ret = git->pushUpstream(ui->leNewName->text());
 
       QApplication::restoreOverrideCursor();
 
       QDialog::accept();
+
+      if (!ret.success)
+      {
+         QMessageBox msgBox(
+             QMessageBox::Critical, tr("Error on branch action!"),
+             QString("There were problems during the branch operation. Please, see the detailed description "
+                     "for more information."),
+             QMessageBox::Ok, this);
+         msgBox.setDetailedText(ret.output.toString());
+         msgBox.setStyleSheet(GitQlientStyles::getStyles());
+         msgBox.exec();
+      }
    }
 }
 
