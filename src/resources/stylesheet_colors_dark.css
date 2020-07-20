@@ -50,9 +50,15 @@ QLabel
     color: white;
 }
 
-#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
+#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription,
+CommitInfoWidget > #labelAuthor, CommitInfoWidget > #labelDateTime
 {
     background-color: #606162;
+}
+
+CommitInfoWidget > #labelAuthor
+{
+   border-color: #404142;
 }
 
 #labelSha

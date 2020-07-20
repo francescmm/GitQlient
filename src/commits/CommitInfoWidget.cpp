@@ -23,7 +23,6 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    , labelDescription(new QLabel())
    , labelAuthor(new QLabel())
    , labelDateTime(new QLabel())
-   , labelEmail(new QLabel())
    , fileListWidget(new FileListWidget(mGit, mCache))
    , labelModCount(new QLabel())
 {
@@ -35,7 +34,7 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
 
    QFont font1;
    font1.setBold(true);
-   font1.setWeight(75);
+   font1.setWeight(QFont::Bold);
    labelTitle->setFont(font1);
    labelTitle->setAlignment(Qt::AlignCenter);
    labelTitle->setWordWrap(true);
@@ -44,15 +43,8 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    labelDescription->setWordWrap(true);
    labelDescription->setObjectName("labelDescription");
 
-   const auto commitInfoFrame = new QFrame();
-   commitInfoFrame->setObjectName("commitInfoFrame");
-
-   const auto verticalLayout_2 = new QVBoxLayout(commitInfoFrame);
-   verticalLayout_2->setSpacing(15);
-   verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-   verticalLayout_2->addWidget(labelAuthor);
-   verticalLayout_2->addWidget(labelDateTime);
-   verticalLayout_2->addWidget(labelEmail);
+   labelAuthor->setObjectName("labelAuthor");
+   labelDateTime->setObjectName("labelDateTime");
 
    const auto labelIcon = new QLabel();
    labelIcon->setScaledContents(false);
@@ -69,13 +61,19 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    headerLayout->addWidget(labelModCount);
    headerLayout->addStretch();
 
+   const auto descriptionLayout = new QVBoxLayout();
+   descriptionLayout->setContentsMargins(0, 0, 0, 0);
+   descriptionLayout->setSpacing(0);
+   descriptionLayout->addWidget(labelSha);
+   descriptionLayout->addWidget(labelTitle);
+   descriptionLayout->addWidget(labelDescription);
+   descriptionLayout->addWidget(labelAuthor);
+   descriptionLayout->addWidget(labelDateTime);
+
    const auto verticalLayout = new QVBoxLayout(this);
    verticalLayout->setSpacing(10);
    verticalLayout->setContentsMargins(0, 0, 0, 0);
-   verticalLayout->addWidget(labelSha);
-   verticalLayout->addWidget(labelTitle);
-   verticalLayout->addWidget(labelDescription);
-   verticalLayout->addWidget(commitInfoFrame);
+   verticalLayout->addLayout(descriptionLayout);
    verticalLayout->addLayout(headerLayout);
    verticalLayout->addWidget(fileListWidget);
 
@@ -112,13 +110,12 @@ void CommitInfoWidget::configure(const QString &sha)
          const auto authorName = author.split("<").first();
          const auto email = author.split("<").last().split(">").first();
 
-         labelEmail->setText(email);
          labelTitle->setText(currentRev.shortLog());
          labelAuthor->setText(authorName);
          labelDateTime->setText(commitDate.toString("dd/MM/yyyy hh:mm"));
 
          const auto description = currentRev.longLog();
-         labelDescription->setText(description.isEmpty() ? "No description provided." : description);
+         labelDescription->setText(description.isEmpty() ? "<No description provided>" : description);
 
          auto f = labelDescription->font();
          f.setItalic(description.isEmpty());
@@ -142,7 +139,6 @@ void CommitInfoWidget::clear()
 
    fileListWidget->clear();
    labelSha->clear();
-   labelEmail->clear();
    labelTitle->clear();
    labelAuthor->clear();
    labelDateTime->clear();

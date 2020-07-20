@@ -63,6 +63,23 @@ QPushButton:hover
     padding: 10px;
 }
 
+CommitInfoWidget > #labelAuthor
+{
+   font-size: 12pt;
+   padding: 10px;
+   padding-bottom: 1px;
+   border: none;
+   border-style: solid;
+   border-top-width: 1px;
+}
+
+CommitInfoWidget > #labelDateTime
+{
+   font-size: 9pt;
+   padding: 10px;
+   padding-top: 1px;
+}
+
 #labelSha
 {
     padding: 8px 10px;

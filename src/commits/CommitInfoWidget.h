@@ -65,7 +65,6 @@ private:
    QLabel *labelDescription = nullptr;
    QLabel *labelAuthor = nullptr;
    QLabel *labelDateTime = nullptr;
-   QLabel *labelEmail = nullptr;
    FileListWidget *fileListWidget = nullptr;
    QLabel *labelModCount = nullptr;
 };
