@@ -71,14 +71,20 @@ public:
     */
    QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override;
 
+protected:
+   bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+                    const QModelIndex &index) override;
+
 private:
    QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
    CommitHistoryView *mView = nullptr;
    int diffTargetRow = -1;
+   int mColumnPressed = -1;
 
    /**
-    * @brief Paints the log column. This method is in charge of painting the commit message as well as tags or branches.
+    * @brief Paints the log column. This method is in charge of painting the commit message as well as tags or
+    * branches.
     *
     * @param p The painter device.
     * @param o The style options of the item.

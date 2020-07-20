@@ -162,7 +162,7 @@ CommitChangesWidget > QListWidget
 }
 
 /** START RepositoryContextMenu **/
-QMenu
+QMenu, QToolTip
 {
     border-width: 1px;
     border-style: solid;

@@ -124,7 +124,7 @@ CommitChangesWidget > QListWidget
     border-color: #202122;
 }
 
-QMenu
+QMenu, QToolTip
 {
     border-color: #000000;
     background-color: #000000;

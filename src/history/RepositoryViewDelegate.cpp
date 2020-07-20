@@ -15,6 +15,12 @@
 #include <QSortFilterProxyModel>
 #include <QPainter>
 #include <QPainterPath>
+#include <QEvent>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QToolTip>
+#include <QApplication>
+#include <QClipboard>
 
 static const int MIN_VIEW_WIDTH_PX = 480;
 
@@ -67,6 +73,16 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
       QFontMetrics fm(newOpt.font);
       p->setFont(newOpt.font);
+
+      if (const auto cursorColumn = mView->indexAt(mView->mapFromGlobal(QCursor::pos())).column();
+          newOpt.state & QStyle::State_MouseOver && cursorColumn == index.column()
+          && cursorColumn == static_cast<int>(CommitHistoryColumns::SHA))
+      {
+         QFont font = newOpt.font;
+         font.setUnderline(true);
+         p->setFont(font);
+      }
+
       p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()),
                   QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
    }
@@ -75,6 +91,32 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 QSize RepositoryViewDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
 {
    return QSize(LANE_WIDTH, ROW_HEIGHT);
+}
+
+bool RepositoryViewDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+                                         const QModelIndex &index)
+{
+   const auto cursorColumn = mView->indexAt(mView->mapFromGlobal(QCursor::pos())).column();
+
+   if (event->type() == QEvent::MouseButtonPress && cursorColumn == index.column()
+       && cursorColumn == static_cast<int>(CommitHistoryColumns::SHA))
+   {
+      mColumnPressed = cursorColumn;
+      return true;
+   }
+   else if (event->type() == QEvent::MouseButtonRelease && cursorColumn == index.column() && mColumnPressed != -1)
+   {
+      if (cursorColumn == static_cast<int>(CommitHistoryColumns::SHA))
+      {
+         QApplication::clipboard()->setText(index.data().toString());
+         QToolTip::showText(QCursor::pos(), tr("Copied!"), mView);
+      }
+
+      mColumnPressed = -1;
+      return true;
+   }
+
+   return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
 void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool laneHeadPresent, int x1, int x2,
