@@ -594,16 +594,6 @@ CheckBox::indicator
     height: 13px;
 }
 
-CheckBox::indicator:unchecked
-,CheckBox::indicator:unchecked:disabled
-,CheckBox::indicator:checked
-,CheckBox::indicator:checked:disabled
-,CheckBox::indicator:indeterminate
-,QCheckBox::indicator:indeterminate
-{
-   image: url();
-}
-
 RepoConfigDlg
 {
    background-color: #2E2F30;

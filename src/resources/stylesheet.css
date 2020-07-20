@@ -4,6 +4,16 @@
    font-size: 10pt;
 }
 
+CheckBox::indicator:unchecked
+,CheckBox::indicator:unchecked:disabled
+,CheckBox::indicator:checked
+,CheckBox::indicator:checked:disabled
+,CheckBox::indicator:indeterminate
+,QCheckBox::indicator:indeterminate
+{
+   background: transparent;
+}
+
 QComboBox, QLineEdit
 {
     border-width: 1px;
