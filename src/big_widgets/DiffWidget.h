@@ -26,9 +26,11 @@
 #include <QFrame>
 #include <QMap>
 
+class CommitInfoPanel;
 class GitBase;
-class QStackedWidget;
+class QPinnableTabWidget;
 class DiffButton;
+class IDiffWidget;
 class QVBoxLayout;
 class CommitDiffWidget;
 class RevisionsCache;
@@ -112,8 +114,10 @@ public:
 private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<RevisionsCache> mCache;
-   QStackedWidget *centerStackedWidget = nullptr;
-   QMap<QString, QPair<QFrame *, DiffButton *>> mDiffButtons;
+   CommitInfoPanel *mInfoPanelBase = nullptr;
+   CommitInfoPanel *mInfoPanelParent = nullptr;
+   QPinnableTabWidget *mCenterStackedWidget = nullptr;
+   QMap<QString, QPair<IDiffWidget *, DiffButton *>> mDiffButtons;
    QVBoxLayout *mDiffButtonsContainer = nullptr;
    CommitDiffWidget *mCommitDiffWidget = nullptr;
    FileEditor *mFileEditor = nullptr;

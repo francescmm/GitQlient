@@ -25,39 +25,37 @@
 
 #include <QFrame>
 
+class CommitInfo;
 class QLabel;
-class RevisionsCache;
 
 /**
- * @brief The DiffInfoPanel class shows the information of the commits involved in a diff.
+ * @brief The CommitInfoPanel class represents the basic information of a commit. It's presented in the form of a simple
+ * UI frame with a heading on top that shows the commit SHA and followed by the commit title and description. Later on,
+ * the information about the commiteer is presented.
  */
-class DiffInfoPanel : public QFrame
+class CommitInfoPanel : public QFrame
 {
 public:
    /**
-    * @brief DiffInfoPanel Default constructor
-    * @param cache The GitQlient internal cache.
+    * @brief CommitInfoPanel Default constructor.
     * @param parent The parent widget.
     */
-   explicit DiffInfoPanel(QSharedPointer<RevisionsCache> cache, QWidget *parent = nullptr);
+   explicit CommitInfoPanel(QWidget *parent = nullptr);
 
    /**
-    * @brief configure Configures the widget with the two SHAs that will be compared.
-    * @param currentSha The base commit SHA.
-    * @param previousSha The SHA to compare with.
+    * @brief configure Configures the panel with the information of the given @p commit.
+    * @param commit The commit to get the data from.
     */
-   void configure(const QString &currentSha, const QString &previousSha);
+   void configure(const CommitInfo &commit);
+   /**
+    * @brief clear Clears all the widgets data.
+    */
+   void clear();
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
-   QLabel *mLabelCurrentSha = nullptr;
-   QLabel *mLabelCurrentTitle = nullptr;
-   QLabel *mLabelCurrentAuthor = nullptr;
-   QLabel *mLabelCurrentDateTime = nullptr;
-   QLabel *mLabelCurrentEmail = nullptr;
-   QLabel *mLabelPreviousSha = nullptr;
-   QLabel *mLabelPreviousTitle = nullptr;
-   QLabel *mLabelPreviousAuthor = nullptr;
-   QLabel *mLabelPreviousDateTime = nullptr;
-   QLabel *mLabelPreviousEmail = nullptr;
+   QLabel *mLabelSha = nullptr;
+   QLabel *mLabelTitle = nullptr;
+   QLabel *mLabelDescription = nullptr;
+   QLabel *mLabelAuthor = nullptr;
+   QLabel *mLabelDateTime = nullptr;
 };

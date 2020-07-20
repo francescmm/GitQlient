@@ -68,12 +68,12 @@ QPushButton:hover
     border: 0;
 }
 
-#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
+#labelTitle, #commitInfoFrame, #labelDescription
 {
     padding: 10px;
 }
 
-CommitInfoWidget > #labelAuthor
+#labelAuthor
 {
    font-size: 12pt;
    padding: 10px;
@@ -83,7 +83,7 @@ CommitInfoWidget > #labelAuthor
    border-top-width: 1px;
 }
 
-CommitInfoWidget > #labelDateTime
+#labelDateTime
 {
    font-size: 9pt;
    padding: 10px;

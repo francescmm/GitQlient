@@ -60,8 +60,8 @@ QLabel
     color: black;
 }
 
-#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription,
-CommitInfoWidget > #labelAuthor, CommitInfoWidget > #labelDateTime
+#labelTitle, #commitInfoFrame, #labelDescription,
+#labelAuthor, #labelDateTime
 {
     background-color: #C6C6C7;
 }

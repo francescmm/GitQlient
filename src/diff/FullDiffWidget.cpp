@@ -2,7 +2,6 @@
 
 #include <CommitInfo.h>
 #include <GitHistory.h>
-#include <DiffInfoPanel.h>
 #include <RevisionsCache.h>
 #include <GitQlientStyles.h>
 
@@ -62,10 +61,7 @@ void FullDiffWidget::DiffHighlighter::highlightBlock(const QString &text)
 
 FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
                                QWidget *parent)
-   : QFrame(parent)
-   , mGit(git)
-   , mCache(cache)
-   , mDiffInfoPanel(new DiffInfoPanel(cache))
+   : IDiffWidget(git, cache, parent)
    , mDiffWidget(new QTextEdit())
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -84,14 +80,18 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->setSpacing(10);
-   layout->addWidget(mDiffInfoPanel);
    layout->addWidget(mDiffWidget);
 }
 
-void FullDiffWidget::reload()
+bool FullDiffWidget::reload()
 {
    if (mCurrentSha != CommitInfo::ZERO_SHA)
+   {
       loadDiff(mCurrentSha, mPreviousSha);
+      return true;
+   }
+
+   return false;
 }
 
 void FullDiffWidget::processData(const QString &fileChunk)
@@ -115,8 +115,6 @@ bool FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha)
 {
    mCurrentSha = sha;
    mPreviousSha = diffToSha;
-
-   mDiffInfoPanel->configure(mCurrentSha, mPreviousSha);
 
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
    const auto ret = git->getCommitDiff(mCurrentSha, mPreviousSha);

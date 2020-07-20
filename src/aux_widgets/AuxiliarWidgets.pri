@@ -10,6 +10,7 @@ HEADERS += \
     $$PWD/BranchDlg.h \
     $$PWD/CheckBox.h \
     $$PWD/ClickableFrame.h \
+    $$PWD/CommitInfoPanel.h \
     $$PWD/ConflictButton.h \
     $$PWD/CreateRepoDlg.h \
     $$PWD/Highlighter.h \
@@ -21,6 +22,7 @@ SOURCES += \
     $$PWD/BranchDlg.cpp \
     $$PWD/CheckBox.cpp \
     $$PWD/ClickableFrame.cpp \
+    $$PWD/CommitInfoPanel.cpp \
     $$PWD/ConflictButton.cpp \
     $$PWD/CreateRepoDlg.cpp \
     $$PWD/Highlighter.cpp \

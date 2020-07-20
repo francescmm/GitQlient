@@ -23,14 +23,13 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <IDiffWidget.h>
+
 #include <QFrame>
 #include <DiffInfo.h>
 
 class FileDiffView;
 class QPushButton;
-class GitBase;
-class DiffInfoPanel;
-class RevisionsCache;
 class CheckBox;
 /*!
  \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
@@ -38,7 +37,7 @@ class CheckBox;
 
  \class FileDiffWidget FileDiffWidget.h "FileDiffWidget.h"
 */
-class FileDiffWidget : public QFrame
+class FileDiffWidget : public IDiffWidget
 {
    Q_OBJECT
 
@@ -61,7 +60,7 @@ public:
     could change, that is if the user is watching the work in progress state. \return bool Returns true if the reload
     was done, otherwise false.
    */
-   bool reload();
+   bool reload() override;
    /*!
     \brief Configures the diff view with the two commits that will be compared and the file that will be applied.
 
@@ -71,18 +70,6 @@ public:
     \return bool Returns true if the configuration was applied, otherwise false.
    */
    bool configure(const QString &currentSha, const QString &previousSha, const QString &file);
-   /*!
-    \brief Gets the current SHA.
-
-    \return QString The current SHA.
-   */
-   QString getCurrentSha() const { return mCurrentSha; }
-   /*!
-    \brief Gets the SHA agains the diff is comparing to.
-
-    \return QString The SHA that the diff is compared to.
-   */
-   QString getPreviousSha() const { return mPreviousSha; }
 
    /**
     * @brief setFileVsFileEnable Enables the widget to show file vs file view.
@@ -98,15 +85,10 @@ public:
 
 private:
    QString mCurrentFile;
-   QString mCurrentSha;
-   QString mPreviousSha;
-   QSharedPointer<GitBase> mGit;
-   QSharedPointer<RevisionsCache> mCache;
    FileDiffView *mNewFile = nullptr;
    FileDiffView *mOldFile = nullptr;
    QPushButton *mGoPrevious = nullptr;
    QPushButton *mGoNext = nullptr;
-   DiffInfoPanel *mDiffInfoPanel = nullptr;
    QVector<int> mModifications;
    CheckBox *mFileVsFileCheck = nullptr;
    bool mFileVsFile = false;

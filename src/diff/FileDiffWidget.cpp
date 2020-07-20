@@ -4,7 +4,6 @@
 #include <FileDiffView.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
-#include <DiffInfoPanel.h>
 #include <GitQlientSettings.h>
 #include <CheckBox.h>
 
@@ -16,14 +15,11 @@
 
 FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
                                QWidget *parent)
-   : QFrame(parent)
-   , mGit(git)
-   , mCache(cache)
+   : IDiffWidget(git, cache, parent)
    , mNewFile(new FileDiffView())
    , mOldFile(new FileDiffView())
    , mGoPrevious(new QPushButton())
    , mGoNext(new QPushButton())
-   , mDiffInfoPanel(new DiffInfoPanel(cache))
    , mFileVsFileCheck(new CheckBox(tr("Show file vs file")))
    , mGoTop(new QPushButton())
    , mGoUp(new QPushButton())
@@ -81,7 +77,6 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
    vLayout->setSpacing(10);
-   vLayout->addWidget(mDiffInfoPanel);
    vLayout->addLayout(optionsLayout);
    vLayout->addLayout(diffLayout);
 
@@ -110,8 +105,6 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    mCurrentFile = file;
    mCurrentSha = currentSha;
    mPreviousSha = previousSha;
-
-   mDiffInfoPanel->configure(currentSha, previousSha);
 
    auto destFile = file;
 
