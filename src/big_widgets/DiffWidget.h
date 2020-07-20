@@ -29,7 +29,6 @@
 class CommitInfoPanel;
 class GitBase;
 class QPinnableTabWidget;
-class DiffButton;
 class IDiffWidget;
 class QVBoxLayout;
 class CommitDiffWidget;
@@ -117,14 +116,13 @@ private:
    CommitInfoPanel *mInfoPanelBase = nullptr;
    CommitInfoPanel *mInfoPanelParent = nullptr;
    QPinnableTabWidget *mCenterStackedWidget = nullptr;
-   QMap<QString, QPair<IDiffWidget *, DiffButton *>> mDiffButtons;
-   QVBoxLayout *mDiffButtonsContainer = nullptr;
+   QMap<QString, IDiffWidget *> mDiffWidgets;
    CommitDiffWidget *mCommitDiffWidget = nullptr;
    FileEditor *mFileEditor = nullptr;
 
    /*!
-    \brief When the user selectes a different diff from a different tab, it triggers an actionto change the current
-    DiffButton selection.
+    \brief When the user selectes a different diff from a different tab, it changes the information in the commit info
+    panel.
 
     \param index The new selected index.
    */

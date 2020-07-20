@@ -4,7 +4,6 @@
 #include <CommitInfoPanel.h>
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
-#include <DiffButton.h>
 #include <CommitDiffWidget.h>
 #include <GitQlientSettings.h>
 #include <FileEditor.h>
@@ -14,7 +13,6 @@
 
 #include <QMessageBox>
 #include <QHBoxLayout>
-#include <QScrollArea>
 
 using namespace QLogger;
 
@@ -36,19 +34,6 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
 
    mCommitDiffWidget->setVisible(false);
 
-   const auto diffButtonsFrame = new QFrame();
-   diffButtonsFrame->setObjectName("DiffButtonsFrame");
-
-   mDiffButtonsContainer = new QVBoxLayout(diffButtonsFrame);
-   mDiffButtonsContainer->setContentsMargins(QMargins());
-   mDiffButtonsContainer->setSpacing(5);
-   mDiffButtonsContainer->setAlignment(Qt::AlignTop);
-
-   const auto scrollArea = new QScrollArea();
-   scrollArea->setWidget(diffButtonsFrame);
-   scrollArea->setWidgetResizable(true);
-   scrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-
    const auto infoPanelsLayout = new QHBoxLayout();
    infoPanelsLayout->setContentsMargins(QMargins());
    infoPanelsLayout->setSpacing(10);
@@ -59,7 +44,6 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
    diffsLayout->setContentsMargins(QMargins());
    diffsLayout->setSpacing(10);
    diffsLayout->addLayout(infoPanelsLayout);
-   diffsLayout->addWidget(scrollArea);
    diffsLayout->addWidget(mCommitDiffWidget);
 
    mFileEditor->setVisible(false);
@@ -87,7 +71,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
 
 DiffWidget::~DiffWidget()
 {
-   mDiffButtons.clear();
+   mDiffWidgets.clear();
    blockSignals(true);
 }
 
@@ -113,7 +97,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
 
    const auto id = QString("%1 (%2 \u2194 %3)").arg(file.split("/").last(), currentSha.left(6), previousSha.left(6));
 
-   if (!mDiffButtons.contains(id))
+   if (!mDiffWidgets.contains(id))
    {
       QLog_Info(
           "UI",
@@ -127,35 +111,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
          mInfoPanelBase->configure(mCache->getCommitInfo(currentSha));
          mInfoPanelParent->configure(mCache->getCommitInfo(previousSha));
 
-         const auto diffButton = new DiffButton(id, ":/icons/file");
-         diffButton->setSelected();
-
-         for (const auto &buttons : qAsConst(mDiffButtons))
-            buttons.second->setUnselected();
-
-         connect(diffButton, &DiffButton::clicked, this, [this, fileDiffWidget, diffButton]() {
-            mCenterStackedWidget->setCurrentWidget(fileDiffWidget);
-            mCommitDiffWidget->configure(fileDiffWidget->getCurrentSha(), fileDiffWidget->getPreviousSha());
-
-            for (const auto &buttons : qAsConst(mDiffButtons))
-               if (buttons.second != diffButton)
-                  buttons.second->setUnselected();
-         });
-         connect(diffButton, &DiffButton::destroyed, this, [this, id, fileDiffWidget]() {
-            const auto index = mCenterStackedWidget->indexOf(fileDiffWidget);
-            mCenterStackedWidget->removeTab(index);
-            delete fileDiffWidget;
-            mDiffButtons.remove(id);
-
-            if (mDiffButtons.count() == 0)
-            {
-               mCommitDiffWidget->setVisible(false);
-               emit signalDiffEmpty();
-            }
-         });
-
-         mDiffButtonsContainer->addWidget(diffButton);
-         mDiffButtons.insert(id, { fileDiffWidget, diffButton });
+         mDiffWidgets.insert(id, fileDiffWidget);
 
          const auto index = mCenterStackedWidget->addTab(fileDiffWidget, file.split("/").last());
          mCenterStackedWidget->setCurrentIndex(index);
@@ -175,14 +131,10 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
    }
    else
    {
-      for (const auto &buttons : qAsConst(mDiffButtons))
-         buttons.second->setUnselected();
-
-      const auto &pair = mDiffButtons.value(id);
-      const auto diff = dynamic_cast<FileDiffWidget *>(pair.first);
+      const auto diffWidget = mDiffWidgets.value(id);
+      const auto diff = dynamic_cast<FileDiffWidget *>(diffWidget);
       diff->reload();
 
-      pair.second->setSelected();
       mCenterStackedWidget->setCurrentWidget(diff);
 
       return true;
@@ -193,7 +145,7 @@ bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 {
    const auto id = QString("Commit diff (%1 \u2194 %2)").arg(sha.left(6), parentSha.left(6));
 
-   if (!mDiffButtons.contains(id))
+   if (!mDiffWidgets.contains(id))
    {
       const auto fullDiffWidget = new FullDiffWidget(mGit, mCache);
 
@@ -202,34 +154,7 @@ bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
          mInfoPanelBase->configure(mCache->getCommitInfo(sha));
          mInfoPanelParent->configure(mCache->getCommitInfo(parentSha));
 
-         const auto diffButton = new DiffButton(id, ":/icons/commit-list");
-         diffButton->setSelected();
-
-         for (const auto &buttons : qAsConst(mDiffButtons))
-            buttons.second->setUnselected();
-
-         connect(diffButton, &DiffButton::clicked, this, [this, fullDiffWidget, diffButton, sha, parentSha]() {
-            mCenterStackedWidget->setCurrentWidget(fullDiffWidget);
-            mCommitDiffWidget->configure(sha, parentSha);
-
-            for (const auto &buttons : qAsConst(mDiffButtons))
-               if (buttons.second != diffButton)
-                  buttons.second->setUnselected();
-         });
-         connect(diffButton, &DiffButton::destroyed, this, [this, id, fullDiffWidget]() {
-            const auto index = mCenterStackedWidget->indexOf(fullDiffWidget);
-            mCenterStackedWidget->removeTab(index);
-            delete fullDiffWidget;
-            mDiffButtons.remove(id);
-
-            if (mDiffButtons.count() == 0)
-            {
-               mCommitDiffWidget->setVisible(false);
-               emit signalDiffEmpty();
-            }
-         });
-         mDiffButtonsContainer->addWidget(diffButton);
-         mDiffButtons.insert(id, { fullDiffWidget, diffButton });
+         mDiffWidgets.insert(id, fullDiffWidget);
 
          const auto index = mCenterStackedWidget->addTab(fullDiffWidget,
                                                          QString("(%1 \u2194 %2)").arg(sha.left(6), parentSha.left(6)));
@@ -250,13 +175,9 @@ bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
    }
    else
    {
-      for (const auto &buttons : qAsConst(mDiffButtons))
-         buttons.second->setUnselected();
-
-      const auto &pair = mDiffButtons.value(id);
-      const auto diff = dynamic_cast<FullDiffWidget *>(pair.first);
+      const auto diffWidget = mDiffWidgets.value(id);
+      const auto diff = dynamic_cast<FullDiffWidget *>(diffWidget);
       diff->reload();
-      pair.second->setSelected();
       mCenterStackedWidget->setCurrentWidget(diff);
    }
 
@@ -267,16 +188,13 @@ void DiffWidget::changeSelection(int index)
 {
    const auto widget = qobject_cast<IDiffWidget *>(mCenterStackedWidget->widget(index));
 
-   for (const auto &buttons : qAsConst(mDiffButtons))
+   if (widget)
    {
-      if (buttons.first == widget)
-         buttons.second->setSelected();
-      else
-         buttons.second->setUnselected();
+      mInfoPanelBase->configure(mCache->getCommitInfo(widget->getCurrentSha()));
+      mInfoPanelParent->configure(mCache->getCommitInfo(widget->getPreviousSha()));
    }
-
-   mInfoPanelBase->configure(mCache->getCommitInfo(widget->getCurrentSha()));
-   mInfoPanelParent->configure(mCache->getCommitInfo(widget->getPreviousSha()));
+   else
+      emit signalDiffEmpty();
 }
 
 void DiffWidget::startEditFile(const QString &fileName)
