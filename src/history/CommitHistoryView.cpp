@@ -29,31 +29,11 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache
    setAttribute(Qt::WA_DeleteOnClose);
 
    header()->setSortIndicatorShown(false);
+   header()->setContextMenuPolicy(Qt::CustomContextMenu);
+   connect(header(), &QHeaderView::customContextMenuRequested, this, &CommitHistoryView::onHeaderContextMenu);
 
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
-   connect(mCache.get(), &RevisionsCache::signalCacheUpdated, this, [this]() {
-      QModelIndex topLeft;
-      QModelIndex bottomRight;
-
-      if (mProxyModel)
-      {
-         topLeft = mProxyModel->index(0, 0);
-         bottomRight = mProxyModel->index(mProxyModel->rowCount() - 1, mProxyModel->columnCount() - 1);
-         mProxyModel->beginResetModel();
-         mProxyModel->endResetModel();
-      }
-      else
-      {
-         topLeft = mCommitHistoryModel->index(0, 0);
-         bottomRight
-             = mCommitHistoryModel->index(mCommitHistoryModel->rowCount() - 1, mCommitHistoryModel->columnCount() - 1);
-         mCommitHistoryModel->onNewRevisions(mCache->count());
-      }
-
-      const auto auxTL = visualRect(topLeft);
-      const auto auxBR = visualRect(bottomRight);
-      viewport()->update(auxTL.x(), auxTL.y(), auxBR.x() + auxBR.width(), auxBR.y() + auxBR.height());
-   });
+   connect(mCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryView::refreshView);
 }
 
 void CommitHistoryView::setModel(QAbstractItemModel *model)
@@ -134,6 +114,52 @@ void CommitHistoryView::setupGeometry()
 void CommitHistoryView::currentChanged(const QModelIndex &index, const QModelIndex &)
 {
    mCurrentSha = model()->index(index.row(), static_cast<int>(CommitHistoryColumns::SHA)).data().toString();
+}
+
+void CommitHistoryView::refreshView()
+{
+   QModelIndex topLeft;
+   QModelIndex bottomRight;
+
+   if (mProxyModel)
+   {
+      topLeft = mProxyModel->index(0, 0);
+      bottomRight = mProxyModel->index(mProxyModel->rowCount() - 1, mProxyModel->columnCount() - 1);
+      mProxyModel->beginResetModel();
+      mProxyModel->endResetModel();
+   }
+   else
+   {
+      topLeft = mCommitHistoryModel->index(0, 0);
+      bottomRight
+          = mCommitHistoryModel->index(mCommitHistoryModel->rowCount() - 1, mCommitHistoryModel->columnCount() - 1);
+      mCommitHistoryModel->onNewRevisions(mCache->count());
+   }
+
+   const auto auxTL = visualRect(topLeft);
+   const auto auxBR = visualRect(bottomRight);
+   viewport()->update(auxTL.x(), auxTL.y(), auxBR.x() + auxBR.width(), auxBR.y() + auxBR.height());
+}
+
+void CommitHistoryView::onHeaderContextMenu(const QPoint &pos)
+{
+   const auto menu = new QMenu(this);
+   const auto total = header()->count();
+
+   for (auto column = 0; column < total; ++column)
+   {
+      const auto columnName = model()->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
+      const auto action = menu->addAction(columnName);
+      const auto isHidden = isColumnHidden(column);
+      action->setCheckable(true);
+      action->setChecked(!isHidden);
+      connect(action, &QAction::triggered, this, [column, this, action]() {
+         action->setChecked(!action->isChecked());
+         setColumnHidden(column, !isColumnHidden(column));
+      });
+   }
+
+   menu->exec(header()->mapToGlobal(pos));
 }
 
 void CommitHistoryView::clear()
