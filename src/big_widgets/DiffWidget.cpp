@@ -6,7 +6,6 @@
 #include <FullDiffWidget.h>
 #include <CommitDiffWidget.h>
 #include <GitQlientSettings.h>
-#include <FileEditor.h>
 
 #include <QPinnableTabWidget.h>
 #include <QLogger.h>
@@ -24,7 +23,6 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
    , mInfoPanelParent(new CommitInfoPanel())
    , mCenterStackedWidget(new QPinnableTabWidget())
    , mCommitDiffWidget(new CommitDiffWidget(mGit, mCache))
-   , mFileEditor(new FileEditor())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -43,27 +41,16 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
    diffsLayout->addStretch();
    diffsLayout->addWidget(mInfoPanelParent);
 
-   mFileEditor->setVisible(false);
-
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
    layout->addLayout(diffsLayout);
    layout->setSpacing(10);
    layout->addWidget(mCenterStackedWidget);
-   layout->addWidget(mFileEditor);
 
    setLayout(layout);
 
    connect(mCommitDiffWidget, &CommitDiffWidget::signalOpenFileCommit, this, &DiffWidget::loadFileDiff);
    connect(mCommitDiffWidget, &CommitDiffWidget::signalShowFileHistory, this, &DiffWidget::signalShowFileHistory);
-
-   if (GitQlientSettings settings; !settings.value("isGitQlient", false).toBool())
-      connect(mCommitDiffWidget, &CommitDiffWidget::signalEditFile, this, &DiffWidget::signalEditFile);
-   else
-   {
-      connect(mCommitDiffWidget, &CommitDiffWidget::signalEditFile, this, &DiffWidget::startEditFile);
-      connect(mFileEditor, &FileEditor::signalEditionClosed, this, &DiffWidget::endEditFile);
-   }
 }
 
 DiffWidget::~DiffWidget()
@@ -90,8 +77,6 @@ void DiffWidget::clear() const
 
 bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
-   mFileEditor->finishEdition();
-
    const auto id = QString("%1 (%2 \u2194 %3)").arg(file.split("/").last(), currentSha.left(6), previousSha.left(6));
 
    if (!mDiffWidgets.contains(id))
@@ -192,20 +177,6 @@ void DiffWidget::changeSelection(int index)
    }
    else
       emit signalDiffEmpty();
-}
-
-void DiffWidget::startEditFile(const QString &fileName)
-{
-   mCenterStackedWidget->setVisible(false);
-
-   mFileEditor->editFile(fileName);
-   mFileEditor->setVisible(true);
-}
-
-void DiffWidget::endEditFile()
-{
-   mCenterStackedWidget->setVisible(true);
-   mFileEditor->setVisible(false);
 }
 
 void DiffWidget::onTabClosed(int index)
