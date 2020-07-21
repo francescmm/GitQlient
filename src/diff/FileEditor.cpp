@@ -95,6 +95,13 @@ void FileEditor::finishEdition()
    }
 }
 
+void FileEditor::saveFile()
+{
+   const auto currentContent = mFileEditor->toPlainText();
+
+   saveTextInFile(currentContent);
+}
+
 void FileEditor::saveTextInFile(const QString &content) const
 {
    QFile f(mFileName);

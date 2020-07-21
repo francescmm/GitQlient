@@ -37,7 +37,6 @@ class AmendWidget;
 class CommitInfoWidget;
 class CheckBox;
 class RepositoryViewDelegate;
-class FileEditor;
 class FullDiffWidget;
 class FileDiffWidget;
 
@@ -219,7 +218,6 @@ private:
    enum class Pages
    {
       Graph,
-      FileEditor,
       FileDiff
    };
 
@@ -237,7 +235,6 @@ private:
    CheckBox *mChShowAllBranches = nullptr;
    RepositoryViewDelegate *mItemDelegate = nullptr;
    QFrame *mGraphFrame = nullptr;
-   FileEditor *mFileEditor = nullptr;
    FileDiffWidget *mFileDiff = nullptr;
 
    /*!
@@ -280,17 +277,9 @@ private:
    void mergeBranch(const QString &current, const QString &branchToMerge);
 
    /**
-    * @brief startEditFile Shows the file edition windows with the content of @p fileName loaded on it.
-    * @param fileName The full path of the file that will be opened.
-    * @param line The line to put the cursor.
-    * @param column The column to put the cursor.
+    * @brief endEditFile Closes the file diff view.
     */
-   void startEditFile(const QString &fileName);
-
-   /**
-    * @brief endEditFile Closes the file editor.
-    */
-   void endEditFile();
+   void returnToView();
 
    /**
     * @brief cherryPickCommit Cherry-picks the commit defined by the SHA in the QLineEdit of the filter.

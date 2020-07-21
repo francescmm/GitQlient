@@ -79,6 +79,7 @@
         <file alias="qcbb_d_c">resources/icons/qcheckbox_bright_disabled_checked.svg</file>
         <file alias="qcbb_d_i">resources/icons/qcheckbox_bright_disabled_indeterminate.svg</file>
         <file alias="qcbb_i">resources/icons/qcheckbox_bright_indet.svg</file>
+        <file alias="split_view">resources/icons/split_view.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

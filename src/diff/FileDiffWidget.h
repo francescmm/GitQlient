@@ -31,6 +31,9 @@
 class FileDiffView;
 class QPushButton;
 class CheckBox;
+class FileEditor;
+class QStackedWidget;
+
 /*!
  \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
  specific file.
@@ -40,6 +43,9 @@ class CheckBox;
 class FileDiffWidget : public IDiffWidget
 {
    Q_OBJECT
+
+signals:
+   void exitRequested();
 
 public:
    /*!
@@ -69,13 +75,19 @@ public:
     \param file The file that will show the diff.
     \return bool Returns true if the configuration was applied, otherwise false.
    */
-   bool configure(const QString &currentSha, const QString &previousSha, const QString &file);
+   bool configure(const QString &currentSha, const QString &previousSha, const QString &file, bool editMode = false);
 
    /**
     * @brief setFileVsFileEnable Enables the widget to show file vs file view.
     * @param enable If true, enables the file vs file view.
     */
-   void setFileVsFileEnable(bool enable);
+   void setSplitViewEnabled(bool enable);
+
+   /**
+    * @brief setFullViewEnabled Sets the full file view enabled.
+    * @param enable True to enable, otherwise false.
+    */
+   void setFullViewEnabled(bool enable);
 
    /**
     * @brief editMode Enters in edit mode for the give file.
@@ -85,20 +97,23 @@ public:
 
 private:
    QString mCurrentFile;
-   FileDiffView *mNewFile = nullptr;
-   FileDiffView *mOldFile = nullptr;
+   QPushButton *mBack = nullptr;
    QPushButton *mGoPrevious = nullptr;
    QPushButton *mGoNext = nullptr;
+   QPushButton *mEdition = nullptr;
+   QPushButton *mFullView = nullptr;
+   QPushButton *mSplitView = nullptr;
+   QPushButton *mSave = nullptr;
+   QPushButton *mStage = nullptr;
+   QPushButton *mRevert = nullptr;
+   FileDiffView *mNewFile = nullptr;
+   FileDiffView *mOldFile = nullptr;
    QVector<int> mModifications;
-   CheckBox *mFileVsFileCheck = nullptr;
    bool mFileVsFile = false;
-   QPushButton *mGoTop = nullptr;
-   QPushButton *mGoUp = nullptr;
-   QPushButton *mGoDown = nullptr;
-   QPushButton *mGoBottom = nullptr;
-   QFrame *mNavFrame = nullptr;
    QVector<DiffInfo::ChunkInfo> mChunks;
    int mCurrentChunkLine = 0;
+   FileEditor *mFileEditor = nullptr;
+   QStackedWidget *mViewStackedWidget = nullptr;
 
    /**
     * @brief processDiff Process the diff to configure the navigation parameters.
@@ -124,4 +139,15 @@ private:
     * @brief moveBottomChunk Moves to the last diff chunk.
     */
    void moveBottomChunk();
+
+   /**
+    * @brief enterEditionMode Enters edition mode
+    * @param enter
+    */
+   void enterEditionMode(bool enter);
+
+   /**
+    * @brief endEditFile Closes the file editor.
+    */
+   void endEditFile();
 };

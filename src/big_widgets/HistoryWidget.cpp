@@ -48,7 +48,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    , mCommitInfoWidget(new CommitInfoWidget(mCache, git))
    , mChShowAllBranches(new CheckBox(tr("Show all branches")))
    , mGraphFrame(new QFrame())
-   , mFileEditor(new FileEditor())
    , mFileDiff(new FileDiffWidget(mGit, mCache))
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -63,8 +62,9 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
       connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
    else
    {
-      connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::startEditFile);
-      connect(mFileEditor, &FileEditor::signalEditionClosed, this, &HistoryWidget::endEditFile);
+      connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName, int, int) {
+         mFileDiff->configure(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+      });
    }
 
    connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
@@ -142,10 +142,11 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    viewLayout->addLayout(graphOptionsLayout);
    viewLayout->addWidget(mRepositoryView);
 
+   connect(mFileDiff, &FileDiffWidget::exitRequested, this, &HistoryWidget::returnToView);
+
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
-   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileEditor), mFileEditor);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mFileDiff);
-   mCenterStackedWidget->setCurrentIndex(0);
+   mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
 
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
@@ -349,19 +350,13 @@ void HistoryWidget::onCommitSelected(const QString &goToSha)
 
 void HistoryWidget::onAmendCommit(const QString &sha)
 {
-   mCommitStackedWidget->setCurrentIndex(2);
+   mCommitStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
    mAmendWidget->configure(sha);
 }
 
-void HistoryWidget::startEditFile(const QString &fileName)
+void HistoryWidget::returnToView()
 {
-   mFileEditor->editFile(fileName);
-   mCenterStackedWidget->setCurrentIndex(1);
-}
-
-void HistoryWidget::endEditFile()
-{
-   mCenterStackedWidget->setCurrentIndex(0);
+   mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
 }
 
 void HistoryWidget::cherryPickCommit()
@@ -404,7 +399,7 @@ void HistoryWidget::showFileDiff(const QString &sha, const QString &parentSha, c
    if (sha == CommitInfo::ZERO_SHA)
    {
       mFileDiff->configure(sha, parentSha, fileName);
-      mCenterStackedWidget->setCurrentIndex(2);
+      mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
    }
    else
       emit signalShowDiff(sha, parentSha, fileName);

@@ -53,6 +53,11 @@ public:
     */
    void finishEdition();
 
+   /**
+    * @brief saveFile Saves the current state of the file.
+    */
+   void saveFile();
+
 private:
    FileDiffEditor *mFileEditor = nullptr;
    QPushButton *mSaveBtn = nullptr;

@@ -195,9 +195,14 @@ FileDiffWidget, FullDiffWidget
     background-color: #404142;
 }
 
-FileDiffWidget > QPushButton
+FileDiffWidget > QPushButton,FileDiffWidget > QToolButton
 {
-    background-color: #202122;
+    background-color: transparent;
+}
+
+FileDiffWidget > QPushButton:checked, FileDiffWidget > QToolButton:checked
+{
+   background-color: #202122;
 }
 
 #leCommitTitle

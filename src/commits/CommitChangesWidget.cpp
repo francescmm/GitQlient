@@ -77,7 +77,7 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<RevisionsCache> &c
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
            &CommitChangesWidget::showUnstagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
-           [this](QListWidgetItem *item) { requestDiff(item->toolTip()); });
+           [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
 
    ui->pbCancelAmend->setVisible(false);
    ui->leAuthorName->setVisible(false);

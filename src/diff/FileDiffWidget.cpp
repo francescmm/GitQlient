@@ -1,90 +1,120 @@
 #include "FileDiffWidget.h"
 
+#include <GitBase.h>
 #include <GitHistory.h>
 #include <FileDiffView.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
 #include <GitQlientSettings.h>
 #include <CheckBox.h>
+#include <FileEditor.h>
 
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
 #include <QScrollBar>
 #include <QDateTime>
+#include <QStackedWidget>
 
 FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
                                QWidget *parent)
    : IDiffWidget(git, cache, parent)
-   , mNewFile(new FileDiffView())
-   , mOldFile(new FileDiffView())
+   , mBack(new QPushButton())
    , mGoPrevious(new QPushButton())
    , mGoNext(new QPushButton())
-   , mFileVsFileCheck(new CheckBox(tr("Show file vs file")))
-   , mGoTop(new QPushButton())
-   , mGoUp(new QPushButton())
-   , mGoDown(new QPushButton())
-   , mGoBottom(new QPushButton())
-   , mNavFrame(new QFrame())
-
+   , mEdition(new QPushButton())
+   , mFullView(new QPushButton())
+   , mSplitView(new QPushButton())
+   , mSave(new QPushButton())
+   , mStage(new QPushButton())
+   , mRevert(new QPushButton())
+   , mNewFile(new FileDiffView())
+   , mOldFile(new FileDiffView())
+   , mFileEditor(new FileEditor())
+   , mViewStackedWidget(new QStackedWidget())
 {
    GitQlientSettings settings;
    mFileVsFile = settings.value("FileVsFile", false).toBool();
-   mFileVsFileCheck->setChecked(mFileVsFile);
 
-   mNewFile->setObjectName("newFile");
-   mOldFile->setObjectName("oldFile");
+   mBack->setIcon(QIcon(":/icons/back"));
+   mBack->setToolTip(tr("Return to the view"));
+   connect(mBack, &QPushButton::clicked, this, &FileDiffWidget::exitRequested);
 
-   setAttribute(Qt::WA_DeleteOnClose);
+   mGoPrevious->setIcon(QIcon(":/icons/arrow_up"));
+   mGoPrevious->setToolTip(tr("Previous change"));
+   connect(mGoPrevious, &QPushButton::clicked, this, &FileDiffWidget::moveChunkUp);
 
-   mGoPrevious->setIcon(QIcon(":/icons/go_up"));
-   mGoNext->setIcon(QIcon(":/icons/go_down"));
+   mGoNext->setToolTip(tr("Next change"));
+   mGoNext->setIcon(QIcon(":/icons/arrow_down"));
+   connect(mGoNext, &QPushButton::clicked, this, &FileDiffWidget::moveChunkDown);
+
+   mEdition->setIcon(QIcon(":/icons/edit"));
+   mEdition->setCheckable(true);
+   mEdition->setToolTip(tr("Edit file"));
+   connect(mEdition, &QPushButton::toggled, this, &FileDiffWidget::enterEditionMode);
+
+   mFullView->setIcon(QIcon(":/icons/text-file"));
+   mFullView->setCheckable(true);
+   mFullView->setToolTip(tr("Full file view"));
+   connect(mFullView, &QPushButton::toggled, this, &FileDiffWidget::setFullViewEnabled);
+
+   mSplitView->setIcon(QIcon(":/icons/split_view"));
+   mSplitView->setCheckable(true);
+   mSplitView->setToolTip(tr("Split file view"));
+   connect(mSplitView, &QPushButton::toggled, this, &FileDiffWidget::setSplitViewEnabled);
+
+   setSplitViewEnabled(mFileVsFile);
+
+   mSave->setIcon(QIcon(":/icons/save"));
+   mSave->setDisabled(true);
+   mSave->setToolTip(tr("Save"));
+   connect(mSave, &QPushButton::clicked, mFileEditor, &FileEditor::saveFile);
+
+   mStage->setIcon(QIcon(":/icons/staged"));
+   mStage->setToolTip(tr("Stage file"));
+
+   mRevert->setIcon(QIcon(":/icons/close"));
+   mRevert->setToolTip(tr("Revert changes"));
 
    const auto optionsLayout = new QHBoxLayout();
    optionsLayout->setContentsMargins(QMargins());
    optionsLayout->setSpacing(10);
-   optionsLayout->addWidget(mFileVsFileCheck);
+   optionsLayout->addWidget(mBack);
+   optionsLayout->addWidget(mGoPrevious);
+   optionsLayout->addWidget(mGoNext);
+   optionsLayout->addWidget(mFullView);
+   optionsLayout->addWidget(mSplitView);
+   optionsLayout->addWidget(mEdition);
+   optionsLayout->addWidget(mSave);
+   optionsLayout->addWidget(mStage);
+   optionsLayout->addWidget(mRevert);
+   optionsLayout->addStretch();
 
-   mGoTop->setIcon(QIcon(":/icons/arrow_up_full"));
-   connect(mGoTop, &QPushButton::clicked, this, &FileDiffWidget::moveTop);
+   mNewFile->setObjectName("newFile");
 
-   mGoUp->setIcon(QIcon(":/icons/arrow_up"));
-   connect(mGoUp, &QPushButton::clicked, this, &FileDiffWidget::moveChunkUp);
+   mOldFile->setObjectName("oldFile");
+   mOldFile->setVisible(mFileVsFile);
 
-   mGoDown->setIcon(QIcon(":/icons/arrow_down"));
-   connect(mGoDown, &QPushButton::clicked, this, &FileDiffWidget::moveChunkDown);
-
-   mGoBottom->setIcon(QIcon(":/icons/arrow_down_full"));
-   connect(mGoBottom, &QPushButton::clicked, this, &FileDiffWidget::moveBottomChunk);
-
-   const auto navLayout = new QVBoxLayout(mNavFrame);
-   navLayout->setContentsMargins(QMargins());
-   navLayout->setSpacing(10);
-   navLayout->addWidget(mGoTop);
-   navLayout->addWidget(mGoUp);
-   navLayout->addStretch();
-   navLayout->addWidget(mGoDown);
-   navLayout->addWidget(mGoBottom);
-
-   mNavFrame->setVisible(mFileVsFile);
-
-   const auto diffLayout = new QHBoxLayout();
+   const auto diffFrame = new QFrame();
+   const auto diffLayout = new QHBoxLayout(diffFrame);
    diffLayout->setContentsMargins(QMargins());
-   diffLayout->addWidget(mNavFrame);
    diffLayout->addWidget(mNewFile);
    diffLayout->addWidget(mOldFile);
+
+   mViewStackedWidget->addWidget(diffFrame);
+   mViewStackedWidget->addWidget(mFileEditor);
+   mViewStackedWidget->setCurrentIndex(0);
 
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
    vLayout->setSpacing(10);
    vLayout->addLayout(optionsLayout);
-   vLayout->addLayout(diffLayout);
+   vLayout->addWidget(mViewStackedWidget);
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
-   connect(mFileVsFileCheck, &CheckBox::toggled, this, &FileDiffWidget::setFileVsFileEnable);
 
-   mOldFile->setVisible(mFileVsFile);
+   setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void FileDiffWidget::clear()
@@ -100,7 +130,8 @@ bool FileDiffWidget::reload()
    return false;
 }
 
-bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file)
+bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file,
+                               bool editMode)
 {
    mCurrentFile = file;
    mCurrentSha = currentSha;
@@ -135,23 +166,76 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
       mNewFile->loadDiff(newData.first.join('\n'), newData.second);
       mNewFile->blockSignals(false);
 
+      GitQlientSettings settings;
+      mFileVsFile = settings.value("FileVsFile", false).toBool();
+
+      if (editMode)
+      {
+         mEdition->setChecked(true);
+         mSave->setEnabled(true);
+      }
+      else
+      {
+         mEdition->setChecked(false);
+         mSave->setDisabled(true);
+         mFullView->setChecked(!mFileVsFile);
+         mSplitView->setChecked(mFileVsFile);
+      }
+
       return true;
    }
 
    return false;
 }
 
-void FileDiffWidget::setFileVsFileEnable(bool enable)
+void FileDiffWidget::setSplitViewEnabled(bool enable)
 {
    mFileVsFile = enable;
 
    mOldFile->setVisible(mFileVsFile);
-   mNavFrame->setVisible(mFileVsFile);
 
    GitQlientSettings settings;
    settings.setValue("FileVsFile", mFileVsFile);
 
    configure(mCurrentSha, mPreviousSha, mCurrentFile);
+
+   mFullView->blockSignals(true);
+   mFullView->setChecked(!mFileVsFile);
+   mFullView->blockSignals(false);
+
+   if (enable)
+   {
+      mSave->setDisabled(true);
+      mEdition->blockSignals(true);
+      mEdition->setChecked(false);
+      mEdition->blockSignals(false);
+      endEditFile();
+   }
+}
+
+void FileDiffWidget::setFullViewEnabled(bool enable)
+{
+   mFileVsFile = !enable;
+
+   mOldFile->setVisible(mFileVsFile);
+
+   GitQlientSettings settings;
+   settings.setValue("FileVsFile", mFileVsFile);
+
+   configure(mCurrentSha, mPreviousSha, mCurrentFile);
+
+   mSplitView->blockSignals(true);
+   mSplitView->setChecked(mFileVsFile);
+   mSplitView->blockSignals(false);
+
+   if (enable)
+   {
+      mSave->setDisabled(true);
+      mEdition->blockSignals(true);
+      mEdition->setChecked(false);
+      mEdition->blockSignals(false);
+      endEditFile();
+   }
 }
 
 void FileDiffWidget::editMode(const QString &) { }
@@ -284,4 +368,27 @@ void FileDiffWidget::moveBottomChunk()
 
    mNewFile->moveScrollBarToPos(mNewFile->blockCount());
    mOldFile->moveScrollBarToPos(mOldFile->blockCount());
+}
+
+void FileDiffWidget::enterEditionMode(bool enter)
+{
+   if (enter)
+   {
+      mSave->setEnabled(true);
+      mSplitView->blockSignals(true);
+      mSplitView->setChecked(!enter);
+      mSplitView->blockSignals(false);
+
+      mFullView->blockSignals(true);
+      mFullView->setChecked(!enter);
+      mFullView->blockSignals(false);
+
+      mFileEditor->editFile(mCurrentFile);
+      mViewStackedWidget->setCurrentIndex(1);
+   }
+}
+
+void FileDiffWidget::endEditFile()
+{
+   mViewStackedWidget->setCurrentIndex(0);
 }
