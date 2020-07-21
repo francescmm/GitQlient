@@ -19,6 +19,7 @@
 #include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 #include <CheckBox.h>
+#include <FileDiffWidget.h>
 
 #include <QLogger.h>
 
@@ -41,12 +42,14 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    , mBranchesWidget(new BranchesWidget(mCache, git))
    , mSearchInput(new QLineEdit())
    , mCommitStackedWidget(new QStackedWidget())
+   , mCenterStackedWidget(new QStackedWidget())
    , mWipWidget(new WipWidget(mCache, git))
    , mAmendWidget(new AmendWidget(mCache, git))
    , mCommitInfoWidget(new CommitInfoWidget(mCache, git))
    , mChShowAllBranches(new CheckBox(tr("Show all branches")))
    , mGraphFrame(new QFrame())
    , mFileEditor(new FileEditor())
+   , mFileDiff(new FileDiffWidget(mGit, mCache))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -64,7 +67,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
       connect(mFileEditor, &FileEditor::signalEditionClosed, this, &HistoryWidget::endEditFile);
    }
 
-   connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
+   connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mWipWidget, &WipWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
    connect(mWipWidget, &WipWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
    connect(mWipWidget, &WipWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
@@ -72,16 +75,17 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mWipWidget, &WipWidget::signalCancelAmend, this, &HistoryWidget::onCommitSelected);
 
    connect(mAmendWidget, &AmendWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
-   connect(mAmendWidget, &AmendWidget::signalShowDiff, this, &HistoryWidget::signalShowDiff);
+   connect(mAmendWidget, &AmendWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mAmendWidget, &AmendWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
    connect(mAmendWidget, &AmendWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
    connect(mAmendWidget, &AmendWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
    connect(mAmendWidget, &AmendWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
    connect(mAmendWidget, &AmendWidget::signalCancelAmend, this, &HistoryWidget::onCommitSelected);
 
-   connect(mCommitInfoWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalShowDiff);
+   connect(mCommitInfoWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::showFileDiff);
    connect(mCommitInfoWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
 
+   mSearchInput->setObjectName("SearchInput");
    mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
@@ -93,7 +97,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
       const auto rowIndex = mRepositoryView->indexAt(pos);
       commitSelected(rowIndex);
    });
-   connect(mRepositoryView, &CommitHistoryView::doubleClicked, this, &HistoryWidget::openDiff);
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &HistoryWidget::onAmendCommit);
    connect(mRepositoryView, &CommitHistoryView::signalMergeRequired, this, &HistoryWidget::mergeBranch);
    connect(mRepositoryView, &CommitHistoryView::signalCherryPickConflict, this,
@@ -139,14 +142,16 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    viewLayout->addLayout(graphOptionsLayout);
    viewLayout->addWidget(mRepositoryView);
 
-   mFileEditor->setVisible(false);
+   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
+   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileEditor), mFileEditor);
+   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mFileDiff);
+   mCenterStackedWidget->setCurrentIndex(0);
 
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
    layout->setSpacing(15);
    layout->addWidget(mCommitStackedWidget);
-   layout->addWidget(mGraphFrame);
-   layout->addWidget(mFileEditor);
+   layout->addWidget(mCenterStackedWidget);
    layout->addWidget(mBranchesWidget);
 
    setLayout(layout);
@@ -254,13 +259,6 @@ void HistoryWidget::commitSelected(const QModelIndex &index)
    onCommitSelected(sha);
 }
 
-void HistoryWidget::openDiff(const QModelIndex &index)
-{
-   const auto sha = mRepositoryModel->sha(index.row());
-
-   emit signalOpenDiff(sha);
-}
-
 void HistoryWidget::onShowAllUpdated(bool showAll)
 {
    GitQlientSettings settings;
@@ -357,16 +355,13 @@ void HistoryWidget::onAmendCommit(const QString &sha)
 
 void HistoryWidget::startEditFile(const QString &fileName)
 {
-   mGraphFrame->setVisible(false);
-
    mFileEditor->editFile(fileName);
-   mFileEditor->setVisible(true);
+   mCenterStackedWidget->setCurrentIndex(1);
 }
 
 void HistoryWidget::endEditFile()
 {
-   mGraphFrame->setVisible(true);
-   mFileEditor->setVisible(false);
+   mCenterStackedWidget->setCurrentIndex(0);
 }
 
 void HistoryWidget::cherryPickCommit()
@@ -374,7 +369,6 @@ void HistoryWidget::cherryPickCommit()
    if (const auto commit = mCache->getCommitInfo(mSearchInput->text()); commit.isValid())
    {
       const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
-
       const auto ret = git->cherryPickCommit(commit.sha());
 
       if (ret.success)
@@ -403,4 +397,15 @@ void HistoryWidget::cherryPickCommit()
          }
       }
    }
+}
+
+void HistoryWidget::showFileDiff(const QString &sha, const QString &parentSha, const QString &fileName)
+{
+   if (sha == CommitInfo::ZERO_SHA)
+   {
+      mFileDiff->configure(sha, parentSha, fileName);
+      mCenterStackedWidget->setCurrentIndex(2);
+   }
+   else
+      emit signalShowDiff(sha, parentSha, fileName);
 }

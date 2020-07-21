@@ -31,9 +31,17 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache
    header()->setSortIndicatorShown(false);
    header()->setContextMenuPolicy(Qt::CustomContextMenu);
    connect(header(), &QHeaderView::customContextMenuRequested, this, &CommitHistoryView::onHeaderContextMenu);
-
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
+
    connect(mCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryView::refreshView);
+
+   connect(this, &CommitHistoryView::doubleClicked, this, [this](const QModelIndex &index) {
+      if (mCommitHistoryModel)
+      {
+         const auto sha = mCommitHistoryModel->sha(index.row());
+         emit signalOpenDiff(sha);
+      }
+   });
 }
 
 void CommitHistoryView::setModel(QAbstractItemModel *model)

@@ -247,7 +247,7 @@ BranchDlg > QLineEdit
     color: black;
 }
 
-HistoryWidget > QFrame > QLineEdit
+#SearchInput
 {
     border-color: #404142;
     background-color: white;
