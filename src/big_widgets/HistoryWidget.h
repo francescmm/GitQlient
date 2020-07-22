@@ -293,4 +293,12 @@ private:
     * @param fileName The file name to diff.
     */
    void showFileDiff(const QString &sha, const QString &parentSha, const QString &fileName);
+
+   /**
+    * @brief showFileDiff Shows the file diff.
+    * @param sha The base commit SHA.
+    * @param parentSha The commit SHA to compare with.
+    * @param fileName The file name to diff.
+    */
+   void showFileDiffEdition(const QString &sha, const QString &parentSha, const QString &fileName);
 };

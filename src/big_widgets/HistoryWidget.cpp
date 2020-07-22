@@ -63,7 +63,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    else
    {
       connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName, int, int) {
-         mFileDiff->configure(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+         showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
       });
    }
 
@@ -355,12 +355,14 @@ void HistoryWidget::onCommitSelected(const QString &goToSha)
 void HistoryWidget::onAmendCommit(const QString &sha)
 {
    mCommitStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
+   mBranchesWidget->setVisible(false);
    mAmendWidget->configure(sha);
 }
 
 void HistoryWidget::returnToView()
 {
    mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
+   mBranchesWidget->setVisible(true);
 }
 
 void HistoryWidget::cherryPickCommit()
@@ -404,6 +406,19 @@ void HistoryWidget::showFileDiff(const QString &sha, const QString &parentSha, c
    {
       mFileDiff->configure(sha, parentSha, fileName);
       mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
+      mBranchesWidget->setVisible(false);
+   }
+   else
+      emit signalShowDiff(sha, parentSha, fileName);
+}
+
+void HistoryWidget::showFileDiffEdition(const QString &sha, const QString &parentSha, const QString &fileName)
+{
+   if (sha == CommitInfo::ZERO_SHA)
+   {
+      mFileDiff->configure(sha, parentSha, fileName, true);
+      mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
+      mBranchesWidget->setVisible(false);
    }
    else
       emit signalShowDiff(sha, parentSha, fileName);
