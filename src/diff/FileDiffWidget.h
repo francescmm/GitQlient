@@ -45,7 +45,22 @@ class FileDiffWidget : public IDiffWidget
    Q_OBJECT
 
 signals:
+   /**
+    * @brief exitRequested Signal triggered when the user clicks the back button to return to the graph view.
+    */
    void exitRequested();
+
+   /**
+    * @brief fileStaged
+    * @param fileName
+    */
+   void fileStaged(const QString &fileName);
+
+   /**
+    * @brief fileReverted Signal triggered when the user reverts all the changes of the current file.
+    * @param fileName The filename
+    */
+   void fileReverted(const QString &fileName);
 
 public:
    /*!
@@ -150,4 +165,12 @@ private:
     * @brief endEditFile Closes the file editor.
     */
    void endEditFile();
+   /**
+    * @brief stageFile Stages the file.
+    */
+   void stageFile();
+   /**
+    * @brief revertFile Revert all the changes to the file.
+    */
+   void revertFile();
 };

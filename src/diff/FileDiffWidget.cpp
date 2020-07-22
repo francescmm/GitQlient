@@ -8,6 +8,7 @@
 #include <GitQlientSettings.h>
 #include <CheckBox.h>
 #include <FileEditor.h>
+#include <GitLocal.h>
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -15,6 +16,7 @@
 #include <QScrollBar>
 #include <QDateTime>
 #include <QStackedWidget>
+#include <QMessageBox>
 
 FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
                                QWidget *parent)
@@ -72,9 +74,11 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
 
    mStage->setIcon(QIcon(":/icons/staged"));
    mStage->setToolTip(tr("Stage file"));
+   connect(mStage, &QPushButton::clicked, this, &FileDiffWidget::stageFile);
 
    mRevert->setIcon(QIcon(":/icons/close"));
    mRevert->setToolTip(tr("Revert changes"));
+   connect(mRevert, &QPushButton::clicked, this, &FileDiffWidget::revertFile);
 
    const auto optionsLayout = new QHBoxLayout();
    optionsLayout->setContentsMargins(QMargins());
@@ -391,4 +395,33 @@ void FileDiffWidget::enterEditionMode(bool enter)
 void FileDiffWidget::endEditFile()
 {
    mViewStackedWidget->setCurrentIndex(0);
+}
+
+void FileDiffWidget::stageFile()
+{
+   QScopedPointer<GitLocal> git(new GitLocal(mGit));
+   const auto ret = git->markFileAsResolved(mCurrentFile);
+
+   if (ret.success)
+   {
+      emit fileStaged(mCurrentFile);
+      emit exitRequested();
+   }
+}
+
+void FileDiffWidget::revertFile()
+{
+   const auto ret = QMessageBox::warning(this, tr("Revert all changes"), tr("Please, take into account that this will revert all the changes you have performed so far."), QMessageBox::Ok, QMessageBox::Cancel);
+
+   if (ret == QMessageBox::Ok)
+   {
+      QScopedPointer<GitLocal> git(new GitLocal(mGit));
+      const auto ret = git->checkoutFile(mCurrentFile);
+
+      if (ret)
+      {
+         emit fileReverted(mCurrentFile);
+         emit exitRequested();
+      }
+   }
 }

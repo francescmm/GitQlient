@@ -145,6 +145,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    viewLayout->addWidget(mRepositoryView);
 
    connect(mFileDiff, &FileDiffWidget::exitRequested, this, &HistoryWidget::returnToView);
+   connect(mFileDiff, &FileDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
+   connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
 
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mFileDiff);
