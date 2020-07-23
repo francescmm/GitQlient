@@ -25,7 +25,7 @@ DiffButton::DiffButton(const QString &text, const QString &icon, bool selectable
 
    mLabel->setText(text);
    mLabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
-   const auto layout = new QHBoxLayout();
+   const auto layout = new QHBoxLayout(this);
    layout->setSpacing(10);
    layout->setContentsMargins(QMargins());
    layout->addSpacerItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -46,11 +46,10 @@ DiffButton::DiffButton(const QString &text, const QString &icon, bool selectable
       layout->addSpacerItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
 
    layout->addWidget(mCloseBtn);
+
    mCloseBtn->setVisible(closable);
 
    connect(mCloseBtn, &QPushButton::clicked, this, &DiffButton::close);
-
-   setLayout(layout);
 }
 
 void DiffButton::setText(const QString &text) const

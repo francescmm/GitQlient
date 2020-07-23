@@ -100,11 +100,6 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    diffLayout->addWidget(mNewFile);
    diffLayout->addWidget(mOldFile);
 
-   mNewFile->setObjectName("newFile");
-
-   mOldFile->setObjectName("oldFile");
-   mOldFile->setVisible(mFileVsFile);
-
    mViewStackedWidget->addWidget(diffFrame);
    mViewStackedWidget->addWidget(mFileEditor);
    mViewStackedWidget->setCurrentIndex(0);
@@ -114,6 +109,11 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    vLayout->setSpacing(10);
    vLayout->addLayout(optionsLayout);
    vLayout->addWidget(mViewStackedWidget);
+
+   mNewFile->setObjectName("newFile");
+
+   mOldFile->setObjectName("oldFile");
+   mOldFile->setVisible(mFileVsFile);
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
