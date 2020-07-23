@@ -360,8 +360,9 @@ void HistoryWidget::onCommitSelected(const QString &goToSha)
 
 void HistoryWidget::onAmendCommit(const QString &sha)
 {
-   mCommitStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
+   mCommitStackedWidget->setCurrentIndex(2);
    mAmendWidget->configure(sha);
+   mBranchesWidget->fullView();
 }
 
 void HistoryWidget::returnToView()
