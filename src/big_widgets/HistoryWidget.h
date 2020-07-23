@@ -237,7 +237,6 @@ private:
    RepositoryViewDelegate *mItemDelegate = nullptr;
    QFrame *mGraphFrame = nullptr;
    FileDiffWidget *mFileDiff = nullptr;
-   BranchesWidgetMinimal *mBranchesWidgetMinimal = nullptr;
 
    /*!
     \brief Performs a search based on the input of the search QLineEdit with the users input.

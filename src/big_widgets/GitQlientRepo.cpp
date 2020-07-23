@@ -151,8 +151,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    m_loaderThread->start();
 
    mGitLoader->setShowAll(settings.value("ShowAllBranches", true).toBool());
-
-   setRepository(repoPath);
 }
 
 GitQlientRepo::~GitQlientRepo()

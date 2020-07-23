@@ -57,6 +57,8 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    vLayout->addWidget(mRepos);
    mRepos->addPinnedTab(mConfigWidget, QIcon(":/icons/config"), QString());
 
+   mConfigWidget->onRepoOpened();
+
    connect(mConfigWidget, &ConfigWidget::signalOpenRepo, this, &GitQlient::addRepoTab);
 
    restorePinnedRepos();
@@ -190,9 +192,13 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
 
    if (!mCurrentRepos.contains(repoPath))
    {
-      const auto newRepo = new GitQlientRepo(repoPath);
-      connect(newRepo, &GitQlientRepo::signalEditFile, this, &GitQlient::signalEditDocument);
-      connect(newRepo, &GitQlientRepo::signalOpenSubmodule, this, [this](const QString &repoName) {
+      const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "No repo";
+      const auto repo = new GitQlientRepo(repoPath);
+
+      const auto index = pinned ? mRepos->addPinnedTab(repo, repoName) : mRepos->addTab(repo, repoName);
+
+      connect(repo, &GitQlientRepo::signalEditFile, this, &GitQlient::signalEditDocument);
+      connect(repo, &GitQlientRepo::signalOpenSubmodule, this, [this](const QString &repoName) {
          const auto currentDir = dynamic_cast<GitQlientRepo *>(sender())->currentDir();
 
          auto submoduleDir = QString("%1/%2").arg(currentDir, repoName);
@@ -202,10 +208,7 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
          addRepoTab(submoduleDir);
       });
 
-      mConfigWidget->onRepoOpened();
-
-      const auto repoName = newRepo->currentDir().contains("/") ? newRepo->currentDir().split("/").last() : "No repo";
-      const auto index = pinned ? mRepos->addPinnedTab(newRepo, repoName) : mRepos->addTab(newRepo, repoName);
+      repo->setRepository(repoName);
 
       if (!repoPath.isEmpty())
       {

@@ -13,6 +13,7 @@
 #include <RevisionsCache.h>
 #include <GitQlientBranchItemRole.h>
 #include <GitQlientSettings.h>
+#include <BranchesWidgetMinimal.h>
 
 #include <QApplication>
 #include <QVBoxLayout>
@@ -63,6 +64,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    , mSubmodulesCount(new QLabel("(0)"))
    , mSubmodulesArrow(new QLabel())
    , mMinimize(new QPushButton())
+   , mMinimal(new BranchesWidgetMinimal(mCache, mGit))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -210,16 +212,26 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
 
    mMinimize->setObjectName("MinimizeBtn");
    mMinimize->setIcon(QIcon(":/icons/arrow_right"));
-   connect(mMinimize, &QPushButton::clicked, this, [this]() {
-      setVisible(false);
-      emit minimized();
-   });
+   connect(mMinimize, &QPushButton::clicked, this, &BranchesWidget::minimalView);
 
-   const auto mainLayout = new QHBoxLayout(this);
-   mainLayout->setContentsMargins(0, 0, 10, 0);
-   mainLayout->setSpacing(0);
-   mainLayout->addWidget(mMinimize);
-   mainLayout->addLayout(vLayout);
+   mFullBranchFrame = new QFrame();
+   mFullBranchFrame->setObjectName("FullBranchesWidget");
+   const auto mainBranchLayout = new QHBoxLayout(mFullBranchFrame);
+   mainBranchLayout->setContentsMargins(QMargins());
+   mainBranchLayout->setSpacing(0);
+   mainBranchLayout->addWidget(mMinimize);
+   mainBranchLayout->addLayout(vLayout);
+
+   mMinimal->setVisible(false);
+   connect(mMinimal, &BranchesWidgetMinimal::showFullBranchesView, this, &BranchesWidget::fullView);
+
+   const auto mainLayout = new QGridLayout(this);
+   mainLayout->setContentsMargins(QMargins());
+   mainLayout->setSpacing(10);
+   mainLayout->addWidget(mFullBranchFrame, 0, 0, 3, 1);
+   mainLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding), 0, 1);
+   mainLayout->addWidget(mMinimal, 1, 1);
+   mainLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding), 2, 1);
 
    connect(mLocalBranchesTree, &BranchTreeWidget::signalRefreshPRsCache, mCache.get(),
            &RevisionsCache::refreshPRsCache);
@@ -300,6 +312,8 @@ void BranchesWidget::showBranches()
    QApplication::restoreOverrideCursor();
 
    adjustBranchesTree(mLocalBranchesTree);
+
+   mMinimal->configure();
 }
 
 void BranchesWidget::clear()
@@ -311,6 +325,18 @@ void BranchesWidget::clear()
    mStashesList->clear();
    mSubmodulesList->clear();
    blockSignals(false);
+}
+
+void BranchesWidget::fullView()
+{
+   mFullBranchFrame->setVisible(true);
+   mMinimal->setVisible(false);
+}
+
+void BranchesWidget::minimalView()
+{
+   mFullBranchFrame->setVisible(false);
+   mMinimal->setVisible(true);
 }
 
 void BranchesWidget::processLocalBranch(const QString &sha, QString branch)

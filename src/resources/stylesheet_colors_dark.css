@@ -635,3 +635,13 @@ BranchesWidgetMinimal > DiffButton
     background-color: #202122;
 }
 
+#MinimizeBtn
+{
+    background-color: #202122;
+}
+
+#MinimizeBtn:hover
+{
+    background-color: #606162;
+}
+

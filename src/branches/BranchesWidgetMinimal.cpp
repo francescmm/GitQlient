@@ -61,6 +61,7 @@ bool BranchesWidgetMinimal::eventFilter(QObject *obj, QEvent *event)
    return false;
 }
 
+#include <QStyle>
 void BranchesWidgetMinimal::configureLocalMenu()
 {
    auto branches = mCache->getBranches(References::Type::LocalBranch);

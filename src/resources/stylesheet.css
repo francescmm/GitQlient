@@ -131,7 +131,7 @@ QTreeWidget::item
     max-height: 25px;
 }
 
-BranchesWidget
+#FullBranchesWidget
 {
     min-width: 400px;
     max-width: 400px;
@@ -172,6 +172,11 @@ CommitChangesWidget > QListWidget
 }
 
 /** START RepositoryContextMenu **/
+QMenu
+{
+    menu-scrollable: 1;
+}
+
 QMenu, QToolTip
 {
     border-width: 1px;
@@ -620,7 +625,6 @@ QMessageBox
 
 #MinimizeBtn
 {
-    background-color: #202122;
     max-height: 30px;
     min-height: 30px;
     max-width: 20px;
@@ -630,12 +634,10 @@ QMessageBox
 
 #MinimizeBtn:hover
 {
-    background-color: #606162;
     max-height: 30px;
     min-height: 30px;
     max-width: 20px;
     min-width: 20px;
     padding: 0px;
 }
-
 
