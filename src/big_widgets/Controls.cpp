@@ -304,10 +304,12 @@ void Controls::toggleButton(ControlsMainViews view)
 void Controls::enableButtons(bool enabled)
 {
    mHistory->setEnabled(enabled);
+   mBlame->setEnabled(enabled);
    mPullBtn->setEnabled(enabled);
    mPushBtn->setEnabled(enabled);
    mStashBtn->setEnabled(enabled);
    mRefreshBtn->setEnabled(enabled);
+   mGitPlatform->setEnabled(enabled);
 }
 
 void Controls::pullCurrentBranch()
