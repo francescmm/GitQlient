@@ -5,50 +5,22 @@
 #include <Highlighter.h>
 
 #include <QVBoxLayout>
-#include <QPushButton>
 #include <QMessageBox>
-#include <QLabel>
 
 FileEditor::FileEditor(QWidget *parent)
    : QFrame(parent)
    , mFileEditor(new FileDiffEditor())
-   , mSaveBtn(new QPushButton())
-   , mCloseBtn(new QPushButton())
-   , mFilePathLabel(new QLabel())
    , mHighlighter(new Highlighter(mFileEditor->document()))
 {
-   mSaveBtn->setIcon(QIcon(":/icons/save"));
-   connect(mSaveBtn, &QPushButton::clicked, this, [this]() {
-      const auto currentContent = mFileEditor->toPlainText();
-
-      if (currentContent != mLoadedContent)
-         saveTextInFile(currentContent);
-   });
-
-   mCloseBtn->setIcon(QIcon(":/icons/close"));
-   connect(mCloseBtn, &QPushButton::clicked, this, &FileEditor::finishEdition);
-
-   const auto optionsLayout = new QHBoxLayout();
-   optionsLayout->setContentsMargins(QMargins());
-   optionsLayout->setSpacing(10);
-   optionsLayout->addWidget(mSaveBtn);
-   optionsLayout->addStretch();
-   optionsLayout->addWidget(mFilePathLabel);
-   optionsLayout->addStretch();
-   optionsLayout->addWidget(mCloseBtn);
-
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
-   layout->setSpacing(10);
-   layout->addLayout(optionsLayout);
+   layout->setSpacing(0);
    layout->addWidget(mFileEditor);
 }
 
 void FileEditor::editFile(const QString &fileName)
 {
    mFileName = fileName;
-
-   mFilePathLabel->setText(mFileName);
 
    QFile f(mFileName);
 
