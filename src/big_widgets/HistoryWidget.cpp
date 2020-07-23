@@ -160,6 +160,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
       mBranchesWidget->setVisible(true);
       mBranchesWidgetMinimal->setVisible(false);
    });
+   connect(mBranchesWidget, &BranchesWidget::minimized, this, [this]() { mBranchesWidgetMinimal->setVisible(true); });
 
    const auto minimalLayout = new QVBoxLayout();
    minimalLayout->setContentsMargins(QMargins());
@@ -168,15 +169,13 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    minimalLayout->addWidget(mBranchesWidgetMinimal);
    minimalLayout->addStretch();
 
-   const auto layout = new QHBoxLayout();
+   const auto layout = new QHBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->setSpacing(15);
    layout->addWidget(mCommitStackedWidget);
    layout->addWidget(mCenterStackedWidget);
    layout->addWidget(mBranchesWidget);
    layout->addLayout(minimalLayout);
-
-   setLayout(layout);
 }
 
 HistoryWidget::~HistoryWidget()

@@ -31,6 +31,7 @@ class QListWidgetItem;
 class QLabel;
 class GitBase;
 class RevisionsCache;
+class QPushButton;
 
 /*!
  \brief BranchesWidget is the widget that creates the layout that contains all the widgets related with the display of
@@ -78,6 +79,11 @@ signals:
     */
    void signalPullConflict();
 
+   /**
+    * @brief minimized Signal triggered when the widget is made not visible.
+    */
+   void minimized();
+
 public:
    /*!
     \brief Default constructor.
@@ -113,6 +119,7 @@ private:
    QLabel *mStashesArrow = nullptr;
    QLabel *mSubmodulesCount = nullptr;
    QLabel *mSubmodulesArrow = nullptr;
+   QPushButton *mMinimize = nullptr;
 
    /*!
     \brief Method that for a given \p branch process all the informatio and creates the item that will be stored in the

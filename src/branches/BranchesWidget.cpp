@@ -21,6 +21,7 @@
 #include <QLabel>
 #include <QMenu>
 #include <QHeaderView>
+#include <QPushButton>
 
 #include <QLogger.h>
 
@@ -61,6 +62,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    , mStashesArrow(new QLabel())
    , mSubmodulesCount(new QLabel("(0)"))
    , mSubmodulesArrow(new QLabel())
+   , mMinimize(new QPushButton())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -197,7 +199,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
 
    /* SUBMODULES END */
 
-   const auto vLayout = new QVBoxLayout(this);
+   const auto vLayout = new QVBoxLayout();
    vLayout->setContentsMargins(0, 0, 10, 0);
    vLayout->setSpacing(0);
    vLayout->addWidget(mLocalBranchesTree);
@@ -206,7 +208,18 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    vLayout->addLayout(stashLayout);
    vLayout->addLayout(submoduleLayout);
 
-   setLayout(vLayout);
+   mMinimize->setObjectName("MinimizeBtn");
+   mMinimize->setIcon(QIcon(":/icons/arrow_right"));
+   connect(mMinimize, &QPushButton::clicked, this, [this]() {
+      setVisible(false);
+      emit minimized();
+   });
+
+   const auto mainLayout = new QHBoxLayout(this);
+   mainLayout->setContentsMargins(0, 0, 10, 0);
+   mainLayout->setSpacing(0);
+   mainLayout->addWidget(mMinimize);
+   mainLayout->addLayout(vLayout);
 
    connect(mLocalBranchesTree, &BranchTreeWidget::signalRefreshPRsCache, mCache.get(),
            &RevisionsCache::refreshPRsCache);
