@@ -83,13 +83,14 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    mStackedLayout->addWidget(mDiffWidget);
    mStackedLayout->addWidget(mBlameWidget);
    mStackedLayout->addWidget(mMergeWidget);
-   showHistoryView();
 
    const auto mainLayout = new QVBoxLayout(this);
    mainLayout->setSpacing(0);
    mainLayout->setContentsMargins(10, 0, 0, 10);
    mainLayout->addWidget(mControls);
    mainLayout->addLayout(mStackedLayout);
+
+   showHistoryView();
 
    GitQlientSettings settings;
    const auto fetchInterval = settings.value("autoFetch", mConfig.mAutoFetchSecs).toInt();

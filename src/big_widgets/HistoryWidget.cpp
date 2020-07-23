@@ -38,35 +38,18 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)
-   , mRepositoryModel(new CommitHistoryModel(mCache, git))
-   , mRepositoryView(new CommitHistoryView(mCache, git))
-   , mBranchesWidget(new BranchesWidget(mCache, git))
-   , mSearchInput(new QLineEdit())
-   , mCommitStackedWidget(new QStackedWidget())
-   , mCenterStackedWidget(new QStackedWidget())
-   , mWipWidget(new WipWidget(mCache, git))
-   , mAmendWidget(new AmendWidget(mCache, git))
-   , mCommitInfoWidget(new CommitInfoWidget(mCache, git))
-   , mChShowAllBranches(new CheckBox(tr("Show all branches")))
-   , mGraphFrame(new QFrame())
-   , mFileDiff(new FileDiffWidget(mGit, mCache))
 {
+   mCommitInfoWidget = new CommitInfoWidget(mCache, git);
+   mWipWidget = new WipWidget(mCache, git);
+   mAmendWidget = new AmendWidget(mCache, git);
    setAttribute(Qt::WA_DeleteOnClose);
 
+   mCommitStackedWidget = new QStackedWidget();
    mCommitStackedWidget->setCurrentIndex(0);
    mCommitStackedWidget->addWidget(mCommitInfoWidget);
    mCommitStackedWidget->addWidget(mWipWidget);
    mCommitStackedWidget->addWidget(mAmendWidget);
    mCommitStackedWidget->setFixedWidth(310);
-
-   if (GitQlientSettings settings; !settings.value("isGitQlient", false).toBool())
-      connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
-   else
-   {
-      connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName, int, int) {
-         showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
-      });
-   }
 
    connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mWipWidget, &WipWidget::signalChangesCommitted, this, &HistoryWidget::returnToView);
@@ -88,9 +71,13 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mCommitInfoWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::showFileDiff);
    connect(mCommitInfoWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
 
+   mSearchInput = new QLineEdit();
    mSearchInput->setObjectName("SearchInput");
    mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
+
+   mRepositoryModel = new CommitHistoryModel(mCache, git);
+   mRepositoryView = new CommitHistoryView(mCache, git);
 
    connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &HistoryWidget::signalViewUpdated);
    connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, &HistoryWidget::signalOpenDiff);
@@ -111,6 +98,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    mRepositoryView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, git, mRepositoryView));
    mRepositoryView->setEnabled(true);
 
+   mBranchesWidget = new BranchesWidget(mCache, git);
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &HistoryWidget::signalUpdateCache);
    connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::onBranchCheckout);
 
@@ -129,6 +117,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mSearchInput, &QLineEdit::textChanged, this,
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });
 
+   mChShowAllBranches = new CheckBox(tr("Show all branches"));
    mChShowAllBranches->setChecked(settings.value("ShowAllBranches", true).toBool());
    connect(mChShowAllBranches, &CheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
 
@@ -139,22 +128,33 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    graphOptionsLayout->addWidget(cherryPickBtn);
    graphOptionsLayout->addWidget(mChShowAllBranches);
 
-   const auto viewLayout = new QVBoxLayout(mGraphFrame);
+   const auto viewLayout = new QVBoxLayout();
    viewLayout->setContentsMargins(QMargins());
    viewLayout->setSpacing(5);
    viewLayout->addLayout(graphOptionsLayout);
    viewLayout->addWidget(mRepositoryView);
 
+   mGraphFrame = new QFrame();
+   mGraphFrame->setLayout(viewLayout);
+
+   mFileDiff = new FileDiffWidget(mGit, mCache);
+
+   mCenterStackedWidget = new QStackedWidget();
+   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
+   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mFileDiff);
+
    connect(mFileDiff, &FileDiffWidget::exitRequested, this, &HistoryWidget::returnToView);
    connect(mFileDiff, &FileDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
    connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
 
-   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
-   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mFileDiff);
-   mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
-
-   mCenterStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-   mBranchesWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+   if (GitQlientSettings settings; !settings.value("isGitQlient", false).toBool())
+      connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
+   else
+   {
+      connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName, int, int) {
+         showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+      });
+   }
 
    const auto layout = new QHBoxLayout(this);
    layout->setContentsMargins(QMargins());
@@ -162,6 +162,10 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    layout->addWidget(mCommitStackedWidget);
    layout->addWidget(mCenterStackedWidget);
    layout->addWidget(mBranchesWidget);
+
+   mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
+   mCenterStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+   mBranchesWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 }
 
 HistoryWidget::~HistoryWidget()

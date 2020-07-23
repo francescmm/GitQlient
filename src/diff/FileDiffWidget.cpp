@@ -35,6 +35,40 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mFileEditor(new FileEditor())
    , mViewStackedWidget(new QStackedWidget())
 {
+   mNewFile->setObjectName("newFile");
+   mOldFile->setObjectName("oldFile");
+
+   const auto optionsLayout = new QHBoxLayout();
+   optionsLayout->setContentsMargins(QMargins());
+   optionsLayout->setSpacing(10);
+   optionsLayout->addWidget(mBack);
+   optionsLayout->addWidget(mGoPrevious);
+   optionsLayout->addWidget(mGoNext);
+   optionsLayout->addWidget(mFullView);
+   optionsLayout->addWidget(mSplitView);
+   optionsLayout->addWidget(mEdition);
+   optionsLayout->addWidget(mSave);
+   optionsLayout->addWidget(mStage);
+   optionsLayout->addWidget(mRevert);
+   optionsLayout->addStretch();
+
+   const auto diffLayout = new QHBoxLayout();
+   diffLayout->setContentsMargins(QMargins());
+   diffLayout->addWidget(mNewFile);
+   diffLayout->addWidget(mOldFile);
+
+   const auto diffFrame = new QFrame();
+   diffFrame->setLayout(diffLayout);
+
+   mViewStackedWidget->addWidget(diffFrame);
+   mViewStackedWidget->addWidget(mFileEditor);
+
+   const auto vLayout = new QVBoxLayout(this);
+   vLayout->setContentsMargins(QMargins());
+   vLayout->setSpacing(10);
+   vLayout->addLayout(optionsLayout);
+   vLayout->addWidget(mViewStackedWidget);
+
    GitQlientSettings settings;
    mFileVsFile = settings.value("FileVsFile", false).toBool();
 
@@ -80,40 +114,10 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mRevert->setToolTip(tr("Revert changes"));
    connect(mRevert, &QPushButton::clicked, this, &FileDiffWidget::revertFile);
 
-   const auto optionsLayout = new QHBoxLayout();
-   optionsLayout->setContentsMargins(QMargins());
-   optionsLayout->setSpacing(10);
-   optionsLayout->addWidget(mBack);
-   optionsLayout->addWidget(mGoPrevious);
-   optionsLayout->addWidget(mGoNext);
-   optionsLayout->addWidget(mFullView);
-   optionsLayout->addWidget(mSplitView);
-   optionsLayout->addWidget(mEdition);
-   optionsLayout->addWidget(mSave);
-   optionsLayout->addWidget(mStage);
-   optionsLayout->addWidget(mRevert);
-   optionsLayout->addStretch();
-
-   const auto diffFrame = new QFrame();
-   const auto diffLayout = new QHBoxLayout(diffFrame);
-   diffLayout->setContentsMargins(QMargins());
-   diffLayout->addWidget(mNewFile);
-   diffLayout->addWidget(mOldFile);
-
-   mViewStackedWidget->addWidget(diffFrame);
-   mViewStackedWidget->addWidget(mFileEditor);
    mViewStackedWidget->setCurrentIndex(0);
 
-   const auto vLayout = new QVBoxLayout(this);
-   vLayout->setContentsMargins(QMargins());
-   vLayout->setSpacing(10);
-   vLayout->addLayout(optionsLayout);
-   vLayout->addWidget(mViewStackedWidget);
-
-   mNewFile->setObjectName("newFile");
-
-   mOldFile->setObjectName("oldFile");
-   mOldFile->setVisible(mFileVsFile);
+   if (!mFileVsFile)
+      mOldFile->setHidden(true);
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
