@@ -50,6 +50,8 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<RevisionsCache> &c
    ui->setupUi(this);
    setAttribute(Qt::WA_DeleteOnClose);
 
+   ui->amendFrame->setVisible(false);
+
    ui->lCounter->setText(QString::number(kMaxTitleChars));
    ui->leCommitTitle->setMaxLength(kMaxTitleChars);
    ui->teDescription->setMaximumHeight(125);
@@ -80,8 +82,6 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<RevisionsCache> &c
            [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
 
    ui->pbCancelAmend->setVisible(false);
-   ui->leAuthorName->setVisible(false);
-   ui->leAuthorEmail->setVisible(false);
    ui->pbCommit->setText(tr("Commit"));
 }
 

@@ -159,13 +159,13 @@ FullDiffWidget > QTextEdit, CommitChangesWidget > QLineEdit,  #leCommitTitle, #t
     border-color: #202122
 }
 
-CommitChangesWidget > QLineEdit, #leCommitTitle, #teDescription
+CommitChangesWidget > QLineEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     background-color: #606162;
     color: white;
 }
 
-CommitChangesWidget > #leAuthorName
+#leAuthorName
 {
     border-bottom-color: #404142;
 }

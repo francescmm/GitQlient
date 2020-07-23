@@ -125,6 +125,11 @@ CommitChangesWidget > QListWidget::item
    padding: 0;
 }
 
+#amendFrame
+{
+    border: none;
+}
+
 QTreeWidget::item
 {
     min-height: 25px;
@@ -217,14 +222,14 @@ FullDiffWidget > QTextEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAu
     border-style: solid;
 }
 
-CommitChangesWidget > #leAuthorName
+#leAuthorName
 {
     max-height: 30px;
     min-height: 30px;
     padding-left: 10px;
 }
 
-CommitChangesWidget > #leAuthorEmail
+#leAuthorEmail
 {
     border-top: 0;
     max-height: 30px;

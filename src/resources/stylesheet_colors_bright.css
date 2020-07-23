@@ -175,7 +175,7 @@ CommitChangesWidget > QLineEdit, #leCommitTitle, #teDescription
     color: black;
 }
 
-CommitChangesWidget > #leAuthorName
+QLineEdit#leAuthorName
 {
     border-bottom-color: #404142;
 }
