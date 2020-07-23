@@ -20,9 +20,7 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    , mAutoPrune(new CheckBox())
    , mDisableLogs(new CheckBox())
    , mLevelCombo(new QComboBox())
-   , mAutoFormat(new CheckBox(tr(" (needs clang-format)")))
    , mStatusLabel(new QLabel())
-   , mExternalEditor(new QLineEdit())
    , mStylesSchema(new QComboBox())
    , mReset(new QPushButton(tr("Reset")))
    , mApply(new QPushButton(tr("Apply")))
@@ -60,11 +58,6 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    mLevelCombo->addItems({ "Trace", "Debug", "Info", "Warning", "Error", "Fatal" });
    mLevelCombo->setCurrentIndex(settings.value("logsLevel", 2).toInt());
 
-   mAutoFormat->setChecked(settings.value("autoFormat", true).toBool());
-
-   mExternalEditor->setText(
-       settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString());
-
    mStylesSchema->addItems({ "dark", "bright" });
    mStylesSchema->setCurrentText(settings.value("colorSchema", "bright").toString());
 
@@ -95,10 +88,6 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    layout->addWidget(mDisableLogs, row, 1);
    layout->addWidget(new QLabel(tr("Set log level")), ++row, 0);
    layout->addWidget(mLevelCombo, row, 1);
-   layout->addWidget(new QLabel(tr("Auto-Format files")), ++row, 0);
-   layout->addWidget(mAutoFormat, row, 1);
-   layout->addWidget(new QLabel(tr("External editor")), ++row, 0);
-   layout->addWidget(mExternalEditor, row, 1);
    layout->addWidget(new QLabel(tr("Styles schema")), ++row, 0);
    layout->addWidget(mStylesSchema, row, 1);
    layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), ++row, 0, 1, 2);
@@ -112,9 +101,6 @@ void GeneralConfigPage::resetChanges()
    mAutoPrune->setChecked(settings.value("autoPrune", true).toBool());
    mDisableLogs->setChecked(settings.value("logsDisabled", false).toBool());
    mLevelCombo->setCurrentIndex(settings.value("logsLevel", 2).toInt());
-   mAutoFormat->setChecked(settings.value("autoFormat", true).toBool());
-   mExternalEditor->setText(
-       settings.value(GitQlientSettings::ExternalEditorKey, GitQlientSettings::ExternalEditorValue).toString());
    mStylesSchema->setCurrentText(settings.value("colorSchema", "bright").toString());
 
    QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
@@ -129,8 +115,6 @@ void GeneralConfigPage::applyChanges()
    settings.setValue("autoPrune", mAutoPrune->isChecked());
    settings.setValue("logsDisabled", mDisableLogs->isChecked());
    settings.setValue("logsLevel", mLevelCombo->currentIndex());
-   settings.setValue("autoFormat", mAutoFormat->isChecked());
-   settings.setValue(GitQlientSettings::ExternalEditorKey, mExternalEditor->text());
    settings.setValue("colorSchema", mStylesSchema->currentText());
 
    QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);

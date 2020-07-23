@@ -76,6 +76,7 @@ public:
     * \param projectPath The project path to save.
     */
    void saveRecentProjects(const QString &projectPath);
+
    /**
     * @brief clearRecentProjects Clears the recent projects list.
     */
@@ -97,13 +98,4 @@ public:
     \return QStringList Projects list.
     */
    QStringList getMostUsedProjects() const;
-
-   /**
-    * @brief ExternalEditorKey The key for the external editor settings.
-    */
-   static const QString ExternalEditorKey;
-   /**
-    * @brief ExternalEditorValue The value for the external editor settings key.
-    */
-   static const QString ExternalEditorValue;
 };

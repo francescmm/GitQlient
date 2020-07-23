@@ -2,9 +2,6 @@
 
 #include <QVector>
 
-const QString GitQlientSettings::ExternalEditorKey = "externalEditor";
-const QString GitQlientSettings::ExternalEditorValue = "gedit";
-
 void GitQlientSettings::setValue(const QString &key, const QVariant &value)
 {
    QSettings::setValue(key, value);

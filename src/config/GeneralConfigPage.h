@@ -58,9 +58,7 @@ private:
    CheckBox *mAutoPrune = nullptr;
    CheckBox *mDisableLogs = nullptr;
    QComboBox *mLevelCombo = nullptr;
-   CheckBox *mAutoFormat = nullptr;
    QLabel *mStatusLabel = nullptr;
-   QLineEdit *mExternalEditor = nullptr;
    QComboBox *mStylesSchema = nullptr;
    QPushButton *mReset = nullptr;
    QPushButton *mApply = nullptr;
