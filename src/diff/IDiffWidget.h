@@ -25,13 +25,13 @@ public:
 
    \return QString The current SHA.
        */
-   virtual QString getCurrentSha() const final { return mCurrentSha; }
+   QString getCurrentSha() const { return mCurrentSha; }
    /*!
     \brief Gets the SHA agains the diff is comparing to.
 
    \return QString The SHA that the diff is compared to.
        */
-   virtual QString getPreviousSha() const final { return mPreviousSha; }
+   QString getPreviousSha() const { return mPreviousSha; }
 
 protected:
    QSharedPointer<GitBase> mGit;

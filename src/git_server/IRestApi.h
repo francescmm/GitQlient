@@ -144,7 +144,7 @@ protected:
     * @param page The page to attach to the server API URL.
     * @return Returns a url object with the final URL to be used.
     */
-   virtual QUrl formatUrl(const QString page) const final;
+   QUrl formatUrl(const QString page) const;
    /**
     * @brief createRequest Creates a request to be consumed by the Git remote server.
     * @param page The destination page of the request.
