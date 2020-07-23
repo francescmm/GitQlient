@@ -45,8 +45,8 @@ DiffButton::DiffButton(const QString &text, const QString &icon, bool selectable
    else
       layout->addSpacerItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
 
-   mCloseBtn->setVisible(closable);
    layout->addWidget(mCloseBtn);
+   mCloseBtn->setVisible(closable);
 
    connect(mCloseBtn, &QPushButton::clicked, this, &DiffButton::close);
 

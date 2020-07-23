@@ -95,6 +95,12 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    tagsHeaderLayout->setContentsMargins(20, 9, 10, 9);
    tagsHeaderLayout->setSpacing(10);
 
+   const auto tagLayout = new QVBoxLayout();
+   tagLayout->setContentsMargins(QMargins());
+   tagLayout->setSpacing(0);
+   tagLayout->addWidget(tagsFrame);
+   tagLayout->addWidget(mTagsList);
+
    GitQlientSettings settings;
    if (const auto visible = settings.value("TagsHeader", true).toBool(); !visible)
    {
@@ -116,18 +122,18 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    mTagsList->setMouseTracking(true);
    mTagsList->setContextMenuPolicy(Qt::CustomContextMenu);
 
-   const auto tagLayout = new QVBoxLayout();
-   tagLayout->setContentsMargins(QMargins());
-   tagLayout->setSpacing(0);
-   tagLayout->addWidget(tagsFrame);
-   tagLayout->addWidget(mTagsList);
-
    /* TAGS END */
 
    /* STASHES */
 
    const auto stashFrame = new ClickableFrame();
    stashFrame->setObjectName("tagsFrame");
+
+   const auto stashLayout = new QVBoxLayout();
+   stashLayout->setContentsMargins(QMargins());
+   stashLayout->setSpacing(0);
+   stashLayout->addWidget(stashFrame);
+   stashLayout->addWidget(mStashesList);
 
    if (const auto visible = settings.value("StashesHeader", true).toBool(); !visible)
    {
@@ -153,16 +159,16 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    mStashesList->setMouseTracking(true);
    mStashesList->setContextMenuPolicy(Qt::CustomContextMenu);
 
-   const auto stashLayout = new QVBoxLayout();
-   stashLayout->setContentsMargins(QMargins());
-   stashLayout->setSpacing(0);
-   stashLayout->addWidget(stashFrame);
-   stashLayout->addWidget(mStashesList);
-
    /* STASHES END */
 
    const auto submoduleFrame = new ClickableFrame();
    submoduleFrame->setObjectName("tagsFrame");
+
+   const auto submoduleLayout = new QVBoxLayout();
+   submoduleLayout->setContentsMargins(QMargins());
+   submoduleLayout->setSpacing(0);
+   submoduleLayout->addWidget(submoduleFrame);
+   submoduleLayout->addWidget(mSubmodulesList);
 
    if (const auto visible = settings.value("SubmodulesHeader", true).toBool(); !visible)
    {
@@ -191,12 +197,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    connect(mSubmodulesList, &QListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { emit signalOpenSubmodule(item->text()); });
 
-   const auto submoduleLayout = new QVBoxLayout();
-   submoduleLayout->setContentsMargins(QMargins());
-   submoduleLayout->setSpacing(0);
-   submoduleLayout->addWidget(submoduleFrame);
-   submoduleLayout->addWidget(mSubmodulesList);
-
    /* SUBMODULES START */
 
    /* SUBMODULES END */
@@ -222,9 +222,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    mainBranchLayout->addWidget(mMinimize);
    mainBranchLayout->addLayout(vLayout);
 
-   mMinimal->setVisible(false);
-   connect(mMinimal, &BranchesWidgetMinimal::showFullBranchesView, this, &BranchesWidget::fullView);
-
    const auto mainLayout = new QGridLayout(this);
    mainLayout->setContentsMargins(QMargins());
    mainLayout->setSpacing(10);
@@ -232,6 +229,9 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    mainLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding), 0, 1);
    mainLayout->addWidget(mMinimal, 1, 1);
    mainLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding), 2, 1);
+
+   mMinimal->setVisible(false);
+   connect(mMinimal, &BranchesWidgetMinimal::showFullBranchesView, this, &BranchesWidget::fullView);
 
    connect(mLocalBranchesTree, &BranchTreeWidget::signalRefreshPRsCache, mCache.get(),
            &RevisionsCache::refreshPRsCache);

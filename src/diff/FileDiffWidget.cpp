@@ -94,16 +94,16 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    optionsLayout->addWidget(mRevert);
    optionsLayout->addStretch();
 
-   mNewFile->setObjectName("newFile");
-
-   mOldFile->setObjectName("oldFile");
-   mOldFile->setVisible(mFileVsFile);
-
    const auto diffFrame = new QFrame();
    const auto diffLayout = new QHBoxLayout(diffFrame);
    diffLayout->setContentsMargins(QMargins());
    diffLayout->addWidget(mNewFile);
    diffLayout->addWidget(mOldFile);
+
+   mNewFile->setObjectName("newFile");
+
+   mOldFile->setObjectName("oldFile");
+   mOldFile->setVisible(mFileVsFile);
 
    mViewStackedWidget->addWidget(diffFrame);
    mViewStackedWidget->addWidget(mFileEditor);

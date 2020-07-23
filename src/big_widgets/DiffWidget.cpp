@@ -31,8 +31,6 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
    connect(mCenterStackedWidget, &QTabWidget::currentChanged, this, &DiffWidget::changeSelection);
    connect(mCenterStackedWidget, &QTabWidget::tabCloseRequested, this, &DiffWidget::onTabClosed);
 
-   mCommitDiffWidget->setVisible(false);
-
    const auto diffsLayout = new QVBoxLayout();
    diffsLayout->setContentsMargins(QMargins());
    diffsLayout->setSpacing(0);
@@ -51,6 +49,8 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
 
    connect(mCommitDiffWidget, &CommitDiffWidget::signalOpenFileCommit, this, &DiffWidget::loadFileDiff);
    connect(mCommitDiffWidget, &CommitDiffWidget::signalShowFileHistory, this, &DiffWidget::signalShowFileHistory);
+
+   mCommitDiffWidget->setVisible(false);
 }
 
 DiffWidget::~DiffWidget()
