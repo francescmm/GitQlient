@@ -67,7 +67,7 @@ QLabel
     background-color: #202122;
 }
 
-CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
+CommitChangesWidget > QListWidget, BranchesWidget > QFrame > QListWidget, BlameWidget > QTreeView
 {
    color: white;
    background-color: #2E2F30;
