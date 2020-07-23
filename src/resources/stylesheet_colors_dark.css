@@ -192,7 +192,7 @@ FileDiffView
 
 FileDiffWidget, FullDiffWidget
 {
-    background-color: #404142;
+    background-color: #2E2F30;
 }
 
 FileDiffWidget > QPushButton,FileDiffWidget > QToolButton
@@ -292,6 +292,38 @@ QTabWidget > QTabBar::tab:disabled
 {
     color: #606162;
 }
+
+DiffWidget > QPinnableTabWidget::tab-bar
+{
+   background-color: #404142;
+}
+
+DiffWidget > QPinnableTabWidget > QTabBar::tab
+{
+   background-color: #202122;
+   color: white;
+}
+
+DiffWidget > QPinnableTabWidget > QTabBar::tab:selected
+{
+   background-color: #2E2F30;
+}
+
+DiffWidget > QPinnableTabWidget > QTabBar::tab:!selected
+{
+    border-right-color: #404142;
+}
+
+DiffWidget > QPinnableTabWidget > QTabBar::tab:!selected:hover
+{
+    background-color: #606162;
+}
+
+DiffWidget > QPinnableTabWidget > QTabBar::tab:disabled
+{
+    color: #606162;
+}
+
 
 QToolTip
 {

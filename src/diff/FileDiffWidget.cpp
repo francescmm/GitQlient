@@ -39,7 +39,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mOldFile->setObjectName("oldFile");
 
    const auto optionsLayout = new QHBoxLayout();
-   optionsLayout->setContentsMargins(QMargins());
+   optionsLayout->setContentsMargins(10, 10, 0, 0);
    optionsLayout->setSpacing(10);
    optionsLayout->addWidget(mBack);
    optionsLayout->addWidget(mGoPrevious);
@@ -141,6 +141,13 @@ bool FileDiffWidget::reload()
 bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file,
                                bool editMode)
 {
+   const auto isWip = currentSha == CommitInfo::ZERO_SHA;
+   mBack->setVisible(isWip);
+   mEdition->setVisible(isWip);
+   mSave->setVisible(isWip);
+   mStage->setVisible(isWip);
+   mRevert->setVisible(isWip);
+
    mCurrentFile = file;
    mCurrentSha = currentSha;
    mPreviousSha = previousSha;
