@@ -615,3 +615,23 @@ PullDlg QLabel#lQuestion
    font-weight: bold;
 }
 
+BranchesWidgetMinimal
+{
+    background-color: #202122;
+}
+
+BranchesWidgetMinimal > QPushButton, BranchesWidgetMinimal > QToolButton
+{
+    background-color: #202122;
+}
+
+BranchesWidgetMinimal > QToolButton:menu-indicator
+{
+    image: none;
+}
+
+BranchesWidgetMinimal > DiffButton
+{
+    background-color: #202122;
+}
+

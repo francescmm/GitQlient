@@ -39,6 +39,7 @@ class CheckBox;
 class RepositoryViewDelegate;
 class FullDiffWidget;
 class FileDiffWidget;
+class BranchesWidgetMinimal;
 
 /*!
  \brief The HistoryWidget is the responsible fro showing the history of the repository. It is the first widget shown
@@ -236,6 +237,7 @@ private:
    RepositoryViewDelegate *mItemDelegate = nullptr;
    QFrame *mGraphFrame = nullptr;
    FileDiffWidget *mFileDiff = nullptr;
+   BranchesWidgetMinimal *mBranchesWidgetMinimal = nullptr;
 
    /*!
     \brief Performs a search based on the input of the search QLineEdit with the users input.

@@ -20,6 +20,7 @@
 #include <GitQlientStyles.h>
 #include <CheckBox.h>
 #include <FileDiffWidget.h>
+#include <BranchesWidgetMinimal.h>
 
 #include <QLogger.h>
 
@@ -29,6 +30,7 @@
 #include <QStackedWidget>
 #include <QMessageBox>
 #include <QApplication>
+#include <QMenu>
 
 using namespace QLogger;
 
@@ -49,6 +51,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    , mChShowAllBranches(new CheckBox(tr("Show all branches")))
    , mGraphFrame(new QFrame())
    , mFileDiff(new FileDiffWidget(mGit, mCache))
+   , mBranchesWidgetMinimal(new BranchesWidgetMinimal(mCache, mGit))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -152,12 +155,26 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mFileDiff);
    mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
 
+   mBranchesWidgetMinimal->setVisible(false);
+   connect(mBranchesWidgetMinimal, &BranchesWidgetMinimal::showFullBranchesView, this, [this] {
+      mBranchesWidget->setVisible(true);
+      mBranchesWidgetMinimal->setVisible(false);
+   });
+
+   const auto minimalLayout = new QVBoxLayout();
+   minimalLayout->setContentsMargins(QMargins());
+   minimalLayout->setSpacing(0);
+   minimalLayout->addStretch();
+   minimalLayout->addWidget(mBranchesWidgetMinimal);
+   minimalLayout->addStretch();
+
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
    layout->setSpacing(15);
    layout->addWidget(mCommitStackedWidget);
    layout->addWidget(mCenterStackedWidget);
    layout->addWidget(mBranchesWidget);
+   layout->addLayout(minimalLayout);
 
    setLayout(layout);
 }
@@ -187,6 +204,7 @@ void HistoryWidget::resetWip()
 void HistoryWidget::loadBranches()
 {
    mBranchesWidget->showBranches();
+   mBranchesWidgetMinimal->configure();
 }
 
 void HistoryWidget::updateUiFromWatcher()
@@ -356,6 +374,7 @@ void HistoryWidget::onAmendCommit(const QString &sha)
 {
    mCommitStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
    mBranchesWidget->setVisible(false);
+   mBranchesWidgetMinimal->setVisible(true);
    mAmendWidget->configure(sha);
 }
 
@@ -363,6 +382,7 @@ void HistoryWidget::returnToView()
 {
    mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
    mBranchesWidget->setVisible(true);
+   mBranchesWidgetMinimal->setVisible(false);
 }
 
 void HistoryWidget::cherryPickCommit()
@@ -407,6 +427,7 @@ void HistoryWidget::showFileDiff(const QString &sha, const QString &parentSha, c
       mFileDiff->configure(sha, parentSha, fileName);
       mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
       mBranchesWidget->setVisible(false);
+      mBranchesWidgetMinimal->setVisible(true);
    }
    else
       emit signalShowDiff(sha, parentSha, fileName);
@@ -419,6 +440,7 @@ void HistoryWidget::showFileDiffEdition(const QString &sha, const QString &paren
       mFileDiff->configure(sha, parentSha, fileName, true);
       mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
       mBranchesWidget->setVisible(false);
+      mBranchesWidgetMinimal->setVisible(true);
    }
    else
       emit signalShowDiff(sha, parentSha, fileName);

@@ -8,7 +8,14 @@
 #include <QStyle>
 
 DiffButton::DiffButton(const QString &text, const QString &icon, QWidget *parent)
+   : DiffButton(text, icon, true, true, parent)
+{
+}
+
+DiffButton::DiffButton(const QString &text, const QString &icon, bool selectable, bool closable, QWidget *parent)
    : QFrame(parent)
+   , mSelectable(selectable)
+   , mLabel(new QLabel())
    , mCloseBtn(new QPushButton())
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -16,8 +23,8 @@ DiffButton::DiffButton(const QString &text, const QString &icon, QWidget *parent
    mCloseBtn->setIcon(QIcon(":/icons/close"));
    mCloseBtn->setObjectName("DiffButtonClose");
 
-   const auto label = new QLabel(text);
-   label->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
+   mLabel->setText(text);
+   mLabel->setAlignment(Qt::AlignVCenter | Qt::AlignLeft);
    const auto layout = new QHBoxLayout();
    layout->setSpacing(10);
    layout->setContentsMargins(QMargins());
@@ -31,13 +38,24 @@ DiffButton::DiffButton(const QString &text, const QString &icon, QWidget *parent
       layout->addWidget(iconLabel);
    }
 
-   layout->addWidget(label);
-   layout->addStretch();
+   layout->addWidget(mLabel);
+
+   if (closable)
+      layout->addStretch();
+   else
+      layout->addSpacerItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+   mCloseBtn->setVisible(closable);
    layout->addWidget(mCloseBtn);
 
    connect(mCloseBtn, &QPushButton::clicked, this, &DiffButton::close);
 
    setLayout(layout);
+}
+
+void DiffButton::setText(const QString &text) const
+{
+   mLabel->setText(text);
 }
 
 void DiffButton::setSelected()
@@ -53,14 +71,30 @@ void DiffButton::mousePressEvent(QMouseEvent *e)
    if (mPressed)
       emit clicked();
 
-   setProperty("pressed", mPressed);
-   style()->polish(this);
+   if (mSelectable)
+   {
+      setProperty("pressed", mPressed);
+      style()->polish(this);
+   }
 }
 
 void DiffButton::setUnselected()
 {
    mPressed = false;
 
-   setProperty("pressed", false);
-   style()->polish(this);
+   if (mSelectable)
+   {
+      setProperty("pressed", false);
+      style()->polish(this);
+   }
+}
+
+void DiffButton::setSelectable(bool isSelectable)
+{
+   mSelectable = isSelectable;
+}
+
+void DiffButton::setClosable(bool closable) const
+{
+   mCloseBtn->setVisible(closable);
 }

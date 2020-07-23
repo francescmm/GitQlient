@@ -87,7 +87,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    const auto mainLayout = new QVBoxLayout(this);
    mainLayout->setSpacing(0);
-   mainLayout->setContentsMargins(10, 0, 10, 10);
+   mainLayout->setContentsMargins(10, 0, 0, 10);
    mainLayout->addWidget(mControls);
    mainLayout->addLayout(mStackedLayout);
 

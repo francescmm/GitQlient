@@ -198,7 +198,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    /* SUBMODULES END */
 
    const auto vLayout = new QVBoxLayout(this);
-   vLayout->setContentsMargins(QMargins());
+   vLayout->setContentsMargins(0, 0, 10, 0);
    vLayout->addWidget(mLocalBranchesTree);
    vLayout->addWidget(mRemoteBranchesTree);
    vLayout->addLayout(tagLayout);

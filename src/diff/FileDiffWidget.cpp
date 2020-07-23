@@ -411,7 +411,10 @@ void FileDiffWidget::stageFile()
 
 void FileDiffWidget::revertFile()
 {
-   const auto ret = QMessageBox::warning(this, tr("Revert all changes"), tr("Please, take into account that this will revert all the changes you have performed so far."), QMessageBox::Ok, QMessageBox::Cancel);
+   const auto ret = QMessageBox::warning(
+       this, tr("Revert all changes"),
+       tr("Please, take into account that this will revert all the changes you have performed so far."),
+       QMessageBox::Ok, QMessageBox::Cancel);
 
    if (ret == QMessageBox::Ok)
    {
