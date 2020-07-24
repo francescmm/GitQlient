@@ -44,7 +44,7 @@ GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QStri
       result = GitExecResult { false, "Same branch" };
    else
    {
-      const auto remote = ret.success ? ret.output.toString() + "/" : "";
+      const auto remote = ret.success ? ret.output.toString().append("/") : QString();
       const auto gitBase = new GitBase(mGitBase->getWorkingDir());
       const auto gitCmd = QString("git rev-list --left-right --count %1%2...%3")
                               .arg(remote, toMaster ? QString("master") : right, right);

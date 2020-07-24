@@ -26,7 +26,7 @@ void FileEditor::editFile(const QString &fileName)
 
    if (f.open(QIODevice::ReadOnly))
    {
-      mLoadedContent = f.readAll();
+      mLoadedContent = QString::fromUtf8(f.readAll());
       f.close();
    }
 
@@ -45,7 +45,7 @@ void FileEditor::finishEdition()
 
       if (f.open(QIODevice::ReadOnly))
       {
-         fileContent = f.readAll();
+         fileContent = QString::fromUtf8(f.readAll());
          f.close();
       }
 

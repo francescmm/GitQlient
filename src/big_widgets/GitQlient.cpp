@@ -136,7 +136,7 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
 #ifdef DEBUG
    logLevel = LogLevel::Trace;
 #else
-   logLevel = static_cast<LogLevel>(settings.value("logsLevel", static_cast<int>(LogLevel::Info)).toInt());
+   logLevel = static_cast<LogLevel>(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Info)).toInt());
 #endif
 
    if (arguments.contains("-noLog") || settings.globalValue("logsDisabled", false).toBool())
