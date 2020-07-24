@@ -20,30 +20,15 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, 
    , mGit(git)
    , mInfoPanel(new CommitInfoPanel())
    , fileListWidget(new FileListWidget(mGit, mCache))
-   , labelModCount(new QLabel())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
-   const auto labelIcon = new QLabel();
-   labelIcon->setScaledContents(false);
-   labelIcon->setPixmap(QIcon(":/icons/file").pixmap(15, 15));
-
    fileListWidget->setObjectName("fileListWidget");
 
-   const auto headerLayout = new QHBoxLayout();
-   headerLayout->setContentsMargins(5, 0, 0, 0);
-   headerLayout->setSpacing(0);
-   headerLayout->addWidget(labelIcon);
-   headerLayout->addSpacerItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
-   headerLayout->addWidget(new QLabel(tr("Files ")));
-   headerLayout->addWidget(labelModCount);
-   headerLayout->addStretch();
-
    const auto verticalLayout = new QVBoxLayout(this);
-   verticalLayout->setSpacing(10);
+   verticalLayout->setSpacing(0);
    verticalLayout->setContentsMargins(0, 0, 0, 0);
    verticalLayout->addWidget(mInfoPanel);
-   verticalLayout->addLayout(headerLayout);
    verticalLayout->addWidget(fileListWidget);
 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
@@ -75,7 +60,6 @@ void CommitInfoWidget::configure(const QString &sha)
          mInfoPanel->configure(commit);
 
          fileListWidget->insertFiles(mCurrentSha, mParentSha);
-         labelModCount->setText(QString("(%1)").arg(fileListWidget->count()));
       }
    }
 }

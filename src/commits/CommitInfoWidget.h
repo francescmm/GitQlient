@@ -63,5 +63,4 @@ private:
    QString mParentSha;
    CommitInfoPanel *mInfoPanel = nullptr;
    FileListWidget *fileListWidget = nullptr;
-   QLabel *labelModCount = nullptr;
 };
