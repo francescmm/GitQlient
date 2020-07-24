@@ -18,8 +18,8 @@ GitLabRestApi::GitLabRestApi(const QString &userName, const QString &repoName, c
    , mSettingsKey(settingsKey)
 {
    GitQlientSettings settings;
-   mUserId = settings.value(QString("%1/%2-userId").arg(mSettingsKey, mRepoName), "").toString();
-   mRepoId = settings.value(QString("%1/%2-repoId").arg(mSettingsKey, mRepoName), "").toString();
+   mUserId = settings.globalValue(QString("%1/%2-userId").arg(mSettingsKey, mRepoName), "").toString();
+   mRepoId = settings.globalValue(QString("%1/%2-repoId").arg(mSettingsKey, mRepoName), "").toString();
 
    if (mRepoId.isEmpty())
       getProjects();
@@ -169,7 +169,7 @@ void GitLabRestApi::onUserInfoReceived()
          mUserId = firstUser.value("id").toString();
 
          GitQlientSettings settings;
-         settings.setValue(QString("%1/%2-userId").arg(mSettingsKey, mRepoName), mUserId);
+         settings.setGlobalValue(QString("%1/%2-userId").arg(mSettingsKey, mRepoName), mUserId);
       }
    }
    else
@@ -203,7 +203,7 @@ void GitLabRestApi::onProjectsReceived()
             mRepoId = labelMap.value("id").toString();
 
             GitQlientSettings settings;
-            settings.setValue(QString("%1/%2-repoId").arg(mSettingsKey, mRepoName), mRepoId);
+            settings.setGlobalValue(QString("%1/%2-repoId").arg(mSettingsKey, mRepoName), mRepoId);
             break;
          }
       }

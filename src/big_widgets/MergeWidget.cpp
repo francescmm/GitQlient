@@ -156,7 +156,7 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
       connect(fileBtn, &ConflictButton::resolved, this, &MergeWidget::onConflictResolved);
 
       GitQlientSettings settings;
-      if (!settings.value("isGitQlient", false).toBool())
+      if (!settings.globalValue("isGitQlient", false).toBool())
          connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::signalEditFile);
       else
          connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::startEditFile);

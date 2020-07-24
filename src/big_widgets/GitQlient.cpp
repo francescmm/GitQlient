@@ -82,7 +82,7 @@ GitQlient::~GitQlient()
       }
    }
 
-   settings.setValue("PinnedRepos", pinnedRepos);
+   settings.setGlobalValue(GitQlientSettings::PinnedRepos, pinnedRepos);
 
    QLog_Info("UI", "*            Closing GitQlient            *\n\n");
 }
@@ -139,7 +139,7 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
    logLevel = static_cast<LogLevel>(settings.value("logsLevel", static_cast<int>(LogLevel::Info)).toInt());
 #endif
 
-   if (arguments.contains("-noLog") || settings.value("logsDisabled", false).toBool())
+   if (arguments.contains("-noLog") || settings.globalValue("logsDisabled", false).toBool())
       QLoggerManager::getInstance()->pause();
 
    QLog_Info("UI", QString("Getting arguments {%1}").arg(arguments.join(", ")));
@@ -165,7 +165,7 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
                const auto logger = QLoggerManager::getInstance();
                logger->overwriteLogLevel(logLevel);
 
-               settings.setValue("logsLevel", static_cast<int>(logLevel));
+               settings.setGlobalValue("logsLevel", static_cast<int>(logLevel));
             }
          }
 
@@ -265,7 +265,7 @@ void GitQlient::closeTab(int tabIndex)
 void GitQlient::restorePinnedRepos()
 {
    GitQlientSettings settings;
-   const auto pinnedRepos = settings.value("PinnedRepos", QStringList()).toStringList();
+   const auto pinnedRepos = settings.globalValue("PinnedRepos", QStringList()).toStringList();
 
    for (auto &repo : pinnedRepos)
       addNewRepoTab(repo, true);

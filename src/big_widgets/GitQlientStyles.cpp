@@ -21,7 +21,7 @@ QString GitQlientStyles::getStyles()
    if (stylesFile.open(QIODevice::ReadOnly))
    {
       GitQlientSettings settings;
-      const auto colorSchema = settings.value("colorSchema", "dark").toString();
+      const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
       QFile colorsFile(QString(":/colors_%1").arg(colorSchema));
       QString colorsCss;
 
@@ -43,7 +43,7 @@ QColor GitQlientStyles::getTextColor()
 {
    auto textColor = QColor("white");
    GitQlientSettings settings;
-   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
 
    if (colorSchema == "bright")
       textColor = "black";
@@ -54,7 +54,7 @@ QColor GitQlientStyles::getTextColor()
 QColor GitQlientStyles::getGraphSelectionColor()
 {
    GitQlientSettings settings;
-   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
 
    QColor c;
 
@@ -72,7 +72,7 @@ QColor GitQlientStyles::getGraphSelectionColor()
 QColor GitQlientStyles::getGraphHoverColor()
 {
    GitQlientSettings settings;
-   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
 
    QColor c;
 
@@ -90,7 +90,7 @@ QColor GitQlientStyles::getGraphHoverColor()
 QColor GitQlientStyles::getBackgroundColor()
 {
    GitQlientSettings settings;
-   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
 
    QColor c;
    c.setNamedColor(colorSchema == "dark" ? "#2E2F30" : "white");
@@ -101,7 +101,7 @@ QColor GitQlientStyles::getBackgroundColor()
 QColor GitQlientStyles::getTabColor()
 {
    GitQlientSettings settings;
-   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
 
    QColor c;
    c.setNamedColor(colorSchema == "dark" ? "#404142" : "white");
@@ -112,7 +112,7 @@ QColor GitQlientStyles::getTabColor()
 QColor GitQlientStyles::getBlue()
 {
    GitQlientSettings settings;
-   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
 
    QColor c;
    c.setNamedColor(colorSchema == "dark" ? "#579BD5" : "#325CC7");

@@ -118,7 +118,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });
 
    mChShowAllBranches = new CheckBox(tr("Show all branches"));
-   mChShowAllBranches->setChecked(settings.value("ShowAllBranches", true).toBool());
+   mChShowAllBranches->setChecked(settings.localValue(mGit->getGitDir(), "ShowAllBranches", true).toBool());
    connect(mChShowAllBranches, &CheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
 
    const auto graphOptionsLayout = new QHBoxLayout();
@@ -147,7 +147,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mFileDiff, &FileDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
    connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
 
-   if (GitQlientSettings settings; !settings.value("isGitQlient", false).toBool())
+   if (GitQlientSettings settings; !settings.globalValue("isGitQlient", false).toBool())
       connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
    else
    {
@@ -273,7 +273,7 @@ void HistoryWidget::commitSelected(const QModelIndex &index)
 void HistoryWidget::onShowAllUpdated(bool showAll)
 {
    GitQlientSettings settings;
-   settings.setValue("ShowAllBranches", showAll);
+   settings.setLocalValue(mGit->getGitDir(), "ShowAllBranches", showAll);
 
    emit signalAllBranchesActive(showAll);
 }

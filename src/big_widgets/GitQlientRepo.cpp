@@ -71,9 +71,9 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
       const auto serverUrl = gitConfig->getServerUrl();
 
       GitQlientSettings settings;
-      const auto userName = settings.value(QString("%1/user").arg(serverUrl)).toString();
-      const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
-      const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
+      const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
+      const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
+      const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
 
       mApi.reset(new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint }));
       mGitQlientCache->setupGitPlatform(mApi);
@@ -93,7 +93,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    showHistoryView();
 
    GitQlientSettings settings;
-   const auto fetchInterval = settings.value("autoFetch", mConfig.mAutoFetchSecs).toInt();
+   const auto fetchInterval
+       = settings.localValue(mGitBase->getGitDir(), "autoFetch", mConfig.mAutoFetchSecs).toInt();
 
    mAutoFetch->setInterval(fetchInterval * 1000);
    mAutoFilesUpdate->setInterval(mConfig.mAutoFileUpdateSecs * 1000);
@@ -151,7 +152,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(this, &GitQlientRepo::signalLoadRepo, mGitLoader.data(), &GitRepoLoader::loadRepository);
    m_loaderThread->start();
 
-   mGitLoader->setShowAll(settings.value("ShowAllBranches", true).toBool());
+   mGitLoader->setShowAll(settings.localValue(mGitBase->getGitDir(), "ShowAllBranches", true).toBool());
 }
 
 GitQlientRepo::~GitQlientRepo()

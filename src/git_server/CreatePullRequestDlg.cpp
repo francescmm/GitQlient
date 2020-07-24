@@ -28,10 +28,10 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
    const auto serverUrl = gitConfig->getServerUrl();
 
    GitQlientSettings settings;
-   mUserName = settings.value(QString("%1/user").arg(serverUrl)).toString();
-   const auto userToken = settings.value(QString("%1/token").arg(serverUrl)).toString();
+   mUserName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
+   const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
    const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-   const auto endpoint = settings.value(QString("%1/endpoint").arg(serverUrl)).toString();
+   const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
 
    if (serverUrl.contains("github"))
       mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken, endpoint });

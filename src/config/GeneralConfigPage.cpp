@@ -31,7 +31,7 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    GitQlientSettings settings;
 
    mAutoFetch->setRange(0, 60);
-   mAutoFetch->setValue(settings.value("autoFetch", 0).toInt());
+   // mAutoFetch->setValue(settings.localValue("autoFetch", 0).toInt());
 
    const auto labelAutoFetch = new QLabel(tr("The interval is expected to be in minutes. "
                                              "Choose a value between 0 (for disabled) and 60"));
@@ -51,15 +51,15 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    fetchLayoutLabel->addWidget(new QLabel(tr("Auto-Fetch interval")));
    fetchLayoutLabel->addStretch();
 
-   mAutoPrune->setChecked(settings.value("autoPrune", true).toBool());
+   // mAutoPrune->setChecked(settings.getLocalValue("autoPrune", true).toBool());
 
-   mDisableLogs->setChecked(settings.value("logsDisabled", false).toBool());
+   mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
 
    mLevelCombo->addItems({ "Trace", "Debug", "Info", "Warning", "Error", "Fatal" });
-   mLevelCombo->setCurrentIndex(settings.value("logsLevel", 2).toInt());
+   mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", 2).toInt());
 
    mStylesSchema->addItems({ "dark", "bright" });
-   mStylesSchema->setCurrentText(settings.value("colorSchema", "bright").toString());
+   mStylesSchema->setCurrentText(settings.globalValue("colorSchema", "bright").toString());
 
    mStatusLabel->setObjectName("configLabel");
 
@@ -97,11 +97,11 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
 void GeneralConfigPage::resetChanges()
 {
    GitQlientSettings settings;
-   mAutoFetch->setValue(settings.value("autoFetch", 0).toInt());
-   mAutoPrune->setChecked(settings.value("autoPrune", true).toBool());
-   mDisableLogs->setChecked(settings.value("logsDisabled", false).toBool());
-   mLevelCombo->setCurrentIndex(settings.value("logsLevel", 2).toInt());
-   mStylesSchema->setCurrentText(settings.value("colorSchema", "bright").toString());
+   mAutoFetch->setValue(settings.localValue("autoFetch", 0).toInt());
+   // mAutoPrune->setChecked(settings.getLocalValue("autoPrune", true).toBool());
+   mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
+   mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", 2).toInt());
+   mStylesSchema->setCurrentText(settings.globalValue("colorSchema", "bright").toString());
 
    QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
 
@@ -111,11 +111,11 @@ void GeneralConfigPage::resetChanges()
 void GeneralConfigPage::applyChanges()
 {
    GitQlientSettings settings;
-   settings.setValue("autoFetch", mAutoFetch->value());
-   settings.setValue("autoPrune", mAutoPrune->isChecked());
-   settings.setValue("logsDisabled", mDisableLogs->isChecked());
-   settings.setValue("logsLevel", mLevelCombo->currentIndex());
-   settings.setValue("colorSchema", mStylesSchema->currentText());
+   // settings.setLocalValue(mGit->getGitDir(), "autoFetch", mAutoFetch->value());
+   // settings.setLocalValue(mGit->getGitDir(),"autoPrune", mAutoPrune->isChecked());
+   settings.setGlobalValue("logsDisabled", mDisableLogs->isChecked());
+   settings.setGlobalValue("logsLevel", mLevelCombo->currentIndex());
+   settings.setGlobalValue("colorSchema", mStylesSchema->currentText());
 
    QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
    mStatusLabel->setText(tr("Changes applied! \n Reset is needed if the color schema changed."));

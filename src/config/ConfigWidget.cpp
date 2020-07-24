@@ -259,7 +259,6 @@ QWidget *ConfigWidget::createRecentProjectsPage()
    const auto clear = new QPushButton("Clear list");
    clear->setObjectName("warnButton");
    connect(clear, &QPushButton::clicked, this, [this]() {
-      mSettings->sync();
       mSettings->clearRecentProjects();
 
       mRecentProjectsLayout->addWidget(createRecentProjectsPage());
@@ -295,7 +294,6 @@ QWidget *ConfigWidget::createUsedProjectsPage()
    const auto clear = new QPushButton("Clear list");
    clear->setObjectName("warnButton");
    connect(clear, &QPushButton::clicked, this, [this]() {
-      mSettings->sync();
       mSettings->clearMostUsedProjects();
 
       mUsedProjectsLayout->addWidget(createUsedProjectsPage());
@@ -345,7 +343,6 @@ void ConfigWidget::showAbout()
 
 void ConfigWidget::onRepoOpened()
 {
-   mSettings->sync();
    mRecentProjectsLayout->addWidget(createRecentProjectsPage());
    mUsedProjectsLayout->addWidget(createUsedProjectsPage());
 }

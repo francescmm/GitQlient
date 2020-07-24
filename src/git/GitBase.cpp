@@ -27,6 +27,11 @@ void GitBase::setWorkingDir(const QString &workingDir)
    mWorkingDirectory = workingDir;
 }
 
+QString GitBase::getGitDir() const
+{
+   return mWorkingDirectory + "/.git";
+}
+
 GitExecResult GitBase::run(const QString &cmd) const
 {
    BenchmarkStart();

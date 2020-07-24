@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
    QFontDatabase::addApplicationFont(":/UbuntuMono");
 
    GitQlientSettings settings;
-   settings.setValue("isGitQlient", true);
+   settings.setGlobalValue("isGitQlient", true);
 
    GitQlient mainWin(arguments);
 

@@ -27,7 +27,7 @@ CheckBox::CheckBox(const QString &text, QWidget *parent)
 QString CheckBox::getIndicator(QStyle::State state) const
 {
    GitQlientSettings settings;
-   const auto colorSchema = settings.value("colorSchema", "dark").toString();
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
 
    auto &icons = colorSchema == "dark" ? indicators : indicators__bright;
 
