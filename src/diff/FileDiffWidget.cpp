@@ -235,7 +235,7 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
    mOldFile->setVisible(mFileVsFile);
 
    GitQlientSettings settings;
-   settings.setGlobalValue(GitQlientSettings::SplitFileDiffView, mFileVsFile);
+   settings.setLocalValue(mGit->getGitDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
 
    configure(mCurrentSha, mPreviousSha, mCurrentFile);
 
