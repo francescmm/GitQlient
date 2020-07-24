@@ -26,13 +26,13 @@
 #include <QFrame>
 #include <QMap>
 
+class CommitInfoPanel;
 class GitBase;
-class QStackedWidget;
-class DiffButton;
+class QPinnableTabWidget;
+class IDiffWidget;
 class QVBoxLayout;
 class CommitDiffWidget;
 class RevisionsCache;
-class FileEditor;
 
 /*!
  \brief The DiffWidget class creates the layout to display the dif information for both files and commits.
@@ -105,36 +105,30 @@ public:
 
     \param sha The base SHA.
     \param parentSha The SHA to compare to.
+    \return True if the load was successful, otherwise false.
    */
-   void loadCommitDiff(const QString &sha, const QString &parentSha);
+   bool loadCommitDiff(const QString &sha, const QString &parentSha);
 
 private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<RevisionsCache> mCache;
-   QStackedWidget *centerStackedWidget = nullptr;
-   QMap<QString, QPair<QFrame *, DiffButton *>> mDiffButtons;
-   QVBoxLayout *mDiffButtonsContainer = nullptr;
+   CommitInfoPanel *mInfoPanelBase = nullptr;
+   CommitInfoPanel *mInfoPanelParent = nullptr;
+   QPinnableTabWidget *mCenterStackedWidget = nullptr;
+   QMap<QString, IDiffWidget *> mDiffWidgets;
    CommitDiffWidget *mCommitDiffWidget = nullptr;
-   FileEditor *mFileEditor = nullptr;
 
    /*!
-    \brief When the user selectes a different diff from a different tab, it triggers an actionto change the current
-    DiffButton selection.
+    \brief When the user selectes a different diff from a different tab, it changes the information in the commit info
+    panel.
 
     \param index The new selected index.
    */
    void changeSelection(int index);
 
    /**
-    * @brief startEditFile Shows the file edition windows with the content of @p fileName loaded on it.
-    * @param fileName The full path of the file that will be opened.
-    * @param line The line to put the cursor.
-    * @param column The column to put the cursor.
+    * @brief onTabClosed Removes the IDiffWidget from the map.
+    * @param index The index to be closed.
     */
-   void startEditFile(const QString &fileName);
-
-   /**
-    * @brief endEditFile Closes the file editor.
-    */
-   void endEditFile();
+   void onTabClosed(int index);
 };

@@ -1,10 +1,8 @@
 #pragma once
 
 /****************************************************************************************
- ** GitQlient is an application to manage and operate one or several Git
- *repositories. With
- ** GitQlient you will be able to add commits, branches and manage all the
- *options Git provides.
+ ** GitQlient is an application to manage and operate one or several Git repositories. With
+ ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
  ** Copyright (C) 2020  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
@@ -22,15 +20,12 @@
  **
  ** You should have received a copy of the GNU Lesser General Public
  ** License along with this library; if not, write to the Free Software
- ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
- *USA
+ ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  ***************************************************************************************/
 
 #include <QFrame>
 
 class FileDiffEditor;
-class QPushButton;
-class QLabel;
 class Highlighter;
 
 class FileEditor : public QFrame
@@ -56,16 +51,21 @@ public:
     */
    void finishEdition();
 
+   /**
+    * @brief saveFile Saves the current state of the file.
+    */
+   void saveFile();
+
 private:
    FileDiffEditor *mFileEditor = nullptr;
-   QPushButton *mSaveBtn = nullptr;
-   QPushButton *mCloseBtn = nullptr;
-   QLabel *mFilePathLabel = nullptr;
    Highlighter *mHighlighter = nullptr;
    QString mFileName;
    QString mLoadedContent;
    bool isEditing = false;
 
-   void saveFile() const;
+   /**
+    * @brief saveTextInFile Saves the current file.
+    * @param content The content of the editor to be stored in the file.
+    */
    void saveTextInFile(const QString &content) const;
 };

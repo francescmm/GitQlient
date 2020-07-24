@@ -25,6 +25,9 @@ void AmendWidget::configure(const QString &sha)
 {
    const auto commit = mCache->getCommitInfo(sha);
 
+   ui->amendFrame->setVisible(true);
+   ui->pbCancelAmend->setVisible(true);
+
    if (commit.parentsCount() <= 0)
       return;
 

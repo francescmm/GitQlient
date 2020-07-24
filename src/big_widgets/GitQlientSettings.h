@@ -31,20 +31,8 @@
  parameter is modified by triggering a signal to notify the UI.
 
 */
-class GitQlientSettings : public QSettings
+class GitQlientSettings
 {
-   Q_OBJECT
-
-signals:
-   /*!
-    \brief Signal triggered when a value in the settings is changed. Only triggered if the value is changed using this
-    class.
-
-    \param key The key whose value changed.
-    \param value The new value for the key.
-   */
-   void valueChanged(const QString &key, const QVariant &value);
-
 public:
    /*!
     \brief Default constructor.
@@ -58,7 +46,31 @@ public:
     \param key The key.
     \param value The new value for the key.
    */
-   void setValue(const QString &key, const QVariant &value);
+   void setGlobalValue(const QString &key, const QVariant &value);
+
+   /**
+    * @brief getGlobalValue Returns the value for a given @p key.
+    * @param key The key.
+    * @param defaultValue (optional) A default value in case the key doesn't exist.
+    */
+   QVariant globalValue(const QString &key, const QVariant &defaultValue = QVariant());
+
+   /**
+    * @brief setLocalValue Sets a value for a given @p repo with a @p key and @p value.
+    * @param repo The local repo to store the config value.
+    * @param key The key.
+    * @param value The new value for the key.
+    */
+   void setLocalValue(const QString &repo, const QString &key, const QVariant &value);
+
+   /**
+    * @brief getLocalValue Returns the value for a given @p repo and a given @p key.
+    * @param repo The repo to retrieve where the key from.
+    * @param key The key
+    * @param defaultValue (optional) A default value in case the key doesn't exist.
+    */
+   QVariant localValue(const QString &repo, const QString &key, const QVariant &defaultValue = QVariant());
+
    /*!
     \brief Stores that a project is opened. This is used to recalculate which projects are the most used.
 
@@ -76,6 +88,7 @@ public:
     * \param projectPath The project path to save.
     */
    void saveRecentProjects(const QString &projectPath);
+
    /**
     * @brief clearRecentProjects Clears the recent projects list.
     */
@@ -98,12 +111,9 @@ public:
     */
    QStringList getMostUsedProjects() const;
 
-   /**
-    * @brief ExternalEditorKey The key for the external editor settings.
-    */
-   static const QString ExternalEditorKey;
-   /**
-    * @brief ExternalEditorValue The value for the external editor settings key.
-    */
-   static const QString ExternalEditorValue;
+   static QString PinnedRepos;
+   static QString SplitFileDiffView;
+
+private:
+   QSettings globalSettings;
 };

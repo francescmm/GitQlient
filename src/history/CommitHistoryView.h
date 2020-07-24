@@ -182,4 +182,13 @@ private:
     * @param parent The parent of the index. Not used.
     */
    void currentChanged(const QModelIndex &index, const QModelIndex &parent) override;
+   /**
+    * @brief refreshView Refreshes the view.
+    */
+   void refreshView();
+   /**
+    * @brief onHeaderContextMenu Shows the context menu for the header of the tree view.
+    * @param pos The position of the cursos that will be used to show the menu.
+    */
+   void onHeaderContextMenu(const QPoint &pos);
 };

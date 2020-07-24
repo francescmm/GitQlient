@@ -60,7 +60,8 @@ QLabel
     color: black;
 }
 
-#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
+#labelTitle, #commitInfoFrame, #labelDescription,
+#labelAuthor, #labelDateTime
 {
     background-color: #C6C6C7;
 }
@@ -71,7 +72,7 @@ QLabel
     background-color: #C6C6C7;
 }
 
-CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
+CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView, QListView
 {
    color: black;
    background-color: white;
@@ -80,6 +81,17 @@ CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > Q
 BranchesWidget > QListWidget, BlameWidget > QTreeView, QTreeView, QTreeWidget
 {
     border: 1px solid #202122;
+}
+
+QListView
+{
+   background-color: white;
+   color: black;
+}
+
+QListView::item
+{
+   background-color: white;
 }
 
 QListWidget::item, BlameWidget > QTreeView::item
@@ -107,13 +119,9 @@ QListWidget::item:disabled
     color: #606162;
 }
 
-CommitHistoryView, FullDiffWidget > QTextEdit, CommitChangesWidget > QListWidget, FileListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget > QTextEdit, CommitChangesWidget > QFrame > QListWidget, FileListWidget, QTreeWidget
 {
     background-color: white;
-}
-
-CommitHistoryView, FullDiffWidget > QTextEdit, CommitChangesWidget > QListWidget, QTreeWidget
-{
     color: black;
 }
 
@@ -163,7 +171,7 @@ CommitChangesWidget > QLineEdit, #leCommitTitle, #teDescription
     color: black;
 }
 
-CommitChangesWidget > #leAuthorName
+QLineEdit#leAuthorName
 {
     border-bottom-color: #404142;
 }
@@ -235,7 +243,7 @@ BranchDlg > QLineEdit
     color: black;
 }
 
-HistoryWidget > QFrame > QLineEdit
+#SearchInput
 {
     border-color: #404142;
     background-color: white;
@@ -262,28 +270,28 @@ QTabWidget::tab-bar
    background-color: #C6C6C7;
 }
 
-QTabBar::tab
+QTabWidget > QTabBar::tab
 {
    background-color: #C6C6C7;
    color: black;
 }
 
-QTabBar::tab:selected
+QTabWidget > QTabBar::tab:selected
 {
    background-color: white;
 }
 
-QTabBar::tab:!selected
+QTabWidget > QTabBar::tab:!selected
 {
     border-right-color: none;
 }
 
-QTabBar::tab:!selected:hover
+QTabWidget > QTabBar::tab:!selected:hover
 {
     background-color: #A6A6A7;
 }
 
-QTabBar::tab:disabled
+QTabWidget > QTabBar::tab:disabled
 {
     color: #606162;
 }
@@ -557,14 +565,31 @@ QPushButton#Merge:pressed, QPushButton#pbCommit:pressed, QPushButton#pbCherryPic
    background-color: #404142;
 }
 
+QComboBox
+{
+   color: black;
+   border-color: #202122;
+   background-color: white;
+}
+
+QComboBox:disabled {
+   color: #e0e0e1;
+}
+
+QComboBox:editable {
+   background: #ffffff;
+}
+
+QComboBox QAbstractItemView
+{
+   border: none;
+   outline: none;
+   background-color: white;
+}
+
 QCheckBox
 {
    color: black;
-}
-
-RepoConfigDlg
-{
-   background-color: white;
 }
 
 PullDlg QLabel#lQuestion
@@ -578,7 +603,7 @@ RepoConfigDlg
     background-color: #C6C6C7;
 }
 
-RepoConfigDlg > QTabWidget::tab-bar
+RepoConfigDlg > QPinnableTabWidget::tab-bar
 {
    background-color: white;
 }

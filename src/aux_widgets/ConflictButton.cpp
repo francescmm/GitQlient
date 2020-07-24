@@ -23,7 +23,7 @@ ConflictButton::ConflictButton(const QString &filename, bool inConflict, const Q
    mFile->setCheckable(true);
    mFile->setChecked(inConflict);
 
-   mEdit->setIcon(QIcon(":/icons/text-file"));
+   mEdit->setIcon(QIcon(":/icons/edit"));
    mEdit->setFixedSize(30, 30);
    mResolve->setIcon(QIcon(":/icons/check"));
    mResolve->setFixedSize(30, 30);
@@ -41,7 +41,7 @@ ConflictButton::ConflictButton(const QString &filename, bool inConflict, const Q
    mUpdate->setVisible(inConflict);
    mResolve->setVisible(inConflict);
 
-   connect(mFile, &QPushButton::toggled, this, &ConflictButton::toggled);
+   connect(mFile, &QPushButton::clicked, this, &ConflictButton::clicked);
    connect(mEdit, &QPushButton::clicked, this, [this] { emit signalEditFile(getFileName(), 0, 0); });
    connect(mResolve, &QPushButton::clicked, this, &ConflictButton::resolveConflict);
    connect(mUpdate, &QPushButton::clicked, this, [this]() { emit updateRequested(); });

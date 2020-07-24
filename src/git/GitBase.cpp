@@ -7,7 +7,7 @@
 #include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 #include <QDir>
 
@@ -25,6 +25,11 @@ QString GitBase::getWorkingDir() const
 void GitBase::setWorkingDir(const QString &workingDir)
 {
    mWorkingDirectory = workingDir;
+}
+
+QString GitBase::getGitDir() const
+{
+   return mWorkingDirectory + "/.git";
 }
 
 GitExecResult GitBase::run(const QString &cmd) const

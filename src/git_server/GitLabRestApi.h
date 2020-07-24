@@ -23,28 +23,42 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QFrame>
+#include <IRestApi.h>
 
-class QLabel;
-class RevisionsCache;
-
-class DiffInfoPanel : public QFrame
+class GitLabRestApi final : public IRestApi
 {
-public:
-   explicit DiffInfoPanel(QSharedPointer<RevisionsCache> cache, QWidget *parent = nullptr);
+   Q_OBJECT
 
-   void configure(const QString &currentSha, const QString &previousSha);
+public:
+   explicit GitLabRestApi(const QString &userName, const QString &repoName, const QString &settingsKey,
+                          const ServerAuthentication &auth, QObject *parent = nullptr);
+
+   void testConnection() override;
+   void createIssue(const ServerIssue &issue) override;
+   void updateIssue(int issueNumber, const ServerIssue &issue) override;
+   void createPullRequest(const ServerPullRequest &pr) override;
+   void requestLabels() override;
+   void requestMilestones() override;
+   void requestPullRequestsState() override;
+   void mergePullRequest(int, const QByteArray &) override { }
+
+   QString getUserId() const { return mUserId; }
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
-   QLabel *mLabelCurrentSha = nullptr;
-   QLabel *mLabelCurrentTitle = nullptr;
-   QLabel *mLabelCurrentAuthor = nullptr;
-   QLabel *mLabelCurrentDateTime = nullptr;
-   QLabel *mLabelCurrentEmail = nullptr;
-   QLabel *mLabelPreviousSha = nullptr;
-   QLabel *mLabelPreviousTitle = nullptr;
-   QLabel *mLabelPreviousAuthor = nullptr;
-   QLabel *mLabelPreviousDateTime = nullptr;
-   QLabel *mLabelPreviousEmail = nullptr;
+   QString mUserName;
+   QString mRepoName;
+   QString mSettingsKey;
+   QString mUserId;
+   QString mRepoId;
+
+   QNetworkRequest createRequest(const QString &page) const override;
+
+   void getUserInfo() const;
+   void onUserInfoReceived();
+   void getProjects();
+   void onProjectsReceived();
+   void onLabelsReceived();
+   void onMilestonesReceived();
+   void onIssueCreated();
+   void onMergeRequestCreated();
 };

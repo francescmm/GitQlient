@@ -10,10 +10,17 @@
 #include <CommitHistoryModel.h>
 #include <RevisionsCache.h>
 #include <GitBase.h>
+#include <ServerPullRequest.h>
 
 #include <QSortFilterProxyModel>
 #include <QPainter>
 #include <QPainterPath>
+#include <QEvent>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QToolTip>
+#include <QApplication>
+#include <QClipboard>
 
 static const int MIN_VIEW_WIDTH_PX = 480;
 
@@ -46,9 +53,9 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
    if (commit.sha().isEmpty())
       return;
 
-   if (index.column() == static_cast<int>(CommitHistoryColumns::GRAPH))
+   if (index.column() == static_cast<int>(CommitHistoryColumns::Graph))
       paintGraph(p, newOpt, commit);
-   else if (index.column() == static_cast<int>(CommitHistoryColumns::LOG))
+   else if (index.column() == static_cast<int>(CommitHistoryColumns::Log))
       paintLog(p, newOpt, commit, index.data().toString());
    else
    {
@@ -57,7 +64,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
       auto text = index.data().toString();
 
-      if (index.column() == static_cast<int>(CommitHistoryColumns::SHA))
+      if (index.column() == static_cast<int>(CommitHistoryColumns::Sha))
       {
          newOpt.font.setPointSize(10);
          newOpt.font.setFamily("Ubuntu Mono");
@@ -66,6 +73,16 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
       QFontMetrics fm(newOpt.font);
       p->setFont(newOpt.font);
+
+      if (const auto cursorColumn = mView->indexAt(mView->mapFromGlobal(QCursor::pos())).column();
+          newOpt.state & QStyle::State_MouseOver && cursorColumn == index.column()
+          && cursorColumn == static_cast<int>(CommitHistoryColumns::Sha))
+      {
+         QFont font = newOpt.font;
+         font.setUnderline(true);
+         p->setFont(font);
+      }
+
       p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()),
                   QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
    }
@@ -74,6 +91,32 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 QSize RepositoryViewDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
 {
    return QSize(LANE_WIDTH, ROW_HEIGHT);
+}
+
+bool RepositoryViewDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option,
+                                         const QModelIndex &index)
+{
+   const auto cursorColumn = mView->indexAt(mView->mapFromGlobal(QCursor::pos())).column();
+
+   if (event->type() == QEvent::MouseButtonPress && cursorColumn == index.column()
+       && cursorColumn == static_cast<int>(CommitHistoryColumns::Sha))
+   {
+      mColumnPressed = cursorColumn;
+      return true;
+   }
+   else if (event->type() == QEvent::MouseButtonRelease && cursorColumn == index.column() && mColumnPressed != -1)
+   {
+      if (cursorColumn == static_cast<int>(CommitHistoryColumns::Sha))
+      {
+         QApplication::clipboard()->setText(index.data().toString());
+         QToolTip::showText(QCursor::pos(), tr("Copied!"), mView);
+      }
+
+      mColumnPressed = -1;
+      return true;
+   }
+
+   return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
 void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool laneHeadPresent, int x1, int x2,
@@ -340,9 +383,17 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto offset = 0;
 
-   if (commit.hasReferences() && !mView->hasActiveFilter())
+   if (const auto pr = mCache->getPullRequestStatus(commit.sha()); pr.isValid())
    {
       offset = 5;
+      paintPrStatus(p, opt, offset, pr);
+   }
+
+   if (commit.hasReferences() && !mView->hasActiveFilter())
+   {
+      if (offset == 0)
+         offset = 5;
+
       paintTagBranch(p, opt, offset, sha);
    }
 
@@ -382,7 +433,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
       for (const auto &branch : remoteBranches)
          markValues.insert(branch, QColor("#011f4b"));
 
-      const auto tags = commit.getReferences(References::Type::Tag);
+      const auto tags = commit.getReferences(References::Type::LocalTag);
       for (const auto &tag : tags)
          markValues.insert(tag, GitQlientStyles::getTagColor());
    }
@@ -421,4 +472,33 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
       startPoint += rectWidth + mark_spacing;
    }
+}
+
+void RepositoryViewDelegate::paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
+                                           const ServerPullRequest &pr) const
+{
+   QColor c;
+
+   switch (pr.state.eState)
+   {
+      case ServerPullRequest::HeadState::State::Failure:
+         c = GitQlientStyles::getRed();
+         break;
+      case ServerPullRequest::HeadState::State::Success:
+         c = GitQlientStyles::getGreen();
+         break;
+      default:
+      case ServerPullRequest::HeadState::State::Pending:
+         c = GitQlientStyles::getOrange();
+         break;
+   }
+
+   painter->save();
+   painter->setRenderHint(QPainter::Antialiasing);
+   painter->setPen(c);
+   painter->setBrush(c);
+   painter->drawEllipse(opt.rect.x() + startPoint, opt.rect.y() + (opt.rect.height() / 2) - 5, 10, 10);
+   painter->restore();
+
+   startPoint += 10 + 5;
 }

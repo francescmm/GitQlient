@@ -29,6 +29,7 @@ class RevisionsCache;
 class GitBase;
 class QLabel;
 class FileListWidget;
+class CommitInfoPanel;
 
 class CommitInfoWidget : public QWidget
 {
@@ -60,12 +61,6 @@ private:
    QSharedPointer<GitBase> mGit;
    QString mCurrentSha;
    QString mParentSha;
-   QLabel *labelSha = nullptr;
-   QLabel *labelTitle = nullptr;
-   QLabel *labelDescription = nullptr;
-   QLabel *labelAuthor = nullptr;
-   QLabel *labelDateTime = nullptr;
-   QLabel *labelEmail = nullptr;
+   CommitInfoPanel *mInfoPanel = nullptr;
    FileListWidget *fileListWidget = nullptr;
-   QLabel *labelModCount = nullptr;
 };

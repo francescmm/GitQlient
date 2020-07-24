@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="3" column="0" colspan="3">
-    <widget class="QCheckBox" name="chbOpen">
+    <widget class="CheckBox" name="chbOpen">
      <property name="text">
       <string>Open repository after %1</string>
      </property>
@@ -32,9 +32,12 @@
     </widget>
    </item>
    <item row="4" column="0" colspan="3">
-    <widget class="QCheckBox" name="cbGitUser">
+    <widget class="CheckBox" name="cbGitUser">
      <property name="text">
       <string>Config Git user for this repo</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -102,6 +105,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>CheckBox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>lePath</tabstop>
   <tabstop>pbBrowse</tabstop>

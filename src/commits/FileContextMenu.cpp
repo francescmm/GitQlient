@@ -28,9 +28,5 @@ FileContextMenu::FileContextMenu(const QString &file, bool editionAllowed, QWidg
    }
 
    const auto copyPathAction = addAction(tr("Copy path"));
-   connect(copyPathAction, &QAction::triggered, this, [file]() {
-      GitQlientSettings settings;
-      const auto fullPath = QString("%1/%2").arg(settings.value("WorkingDirectory").toString(), file);
-      QApplication::clipboard()->setText(fullPath);
-   });
+   connect(copyPathAction, &QAction::triggered, this, [file]() { QApplication::clipboard()->setText(file); });
 }

@@ -92,10 +92,10 @@ MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, c
    const auto mergeFrame = new QFrame();
    mergeFrame->setObjectName("mergeFrame");
 
-   const auto conflictsLabel = new QLabel(tr("Files with conflicts"));
+   const auto conflictsLabel = new QLabel(tr("Conflicts"));
    conflictsLabel->setObjectName("FilesListTitle");
 
-   const auto automergeLabel = new QLabel(tr("Merged files"));
+   const auto automergeLabel = new QLabel(tr("Other files"));
    automergeLabel->setObjectName("FilesListTitle");
 
    const auto mergeLayout = new QVBoxLayout(mergeFrame);
@@ -151,12 +151,12 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
       const auto fileBtn = new ConflictButton(fileName, fileInConflict, mGit);
       fileBtn->setObjectName("FileBtn");
 
-      connect(fileBtn, &ConflictButton::toggled, this, &MergeWidget::changeDiffView);
+      connect(fileBtn, &ConflictButton::clicked, this, &MergeWidget::changeDiffView);
       connect(fileBtn, &ConflictButton::updateRequested, this, &MergeWidget::onUpdateRequested);
       connect(fileBtn, &ConflictButton::resolved, this, &MergeWidget::onConflictResolved);
 
       GitQlientSettings settings;
-      if (!settings.value("isGitQlient", false).toBool())
+      if (!settings.globalValue("isGitQlient", false).toBool())
          connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::signalEditFile);
       else
          connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::startEditFile);
@@ -181,9 +181,9 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
    }
 }
 
-void MergeWidget::changeDiffView(bool fileBtnChecked)
+void MergeWidget::changeDiffView()
 {
-   if (fileBtnChecked)
+   if (!mFileEditor->isVisible())
    {
       const auto end = mConflictButtons.constEnd();
 

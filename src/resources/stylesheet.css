@@ -1,3 +1,35 @@
+*
+{
+   outline: none;
+   font-size: 10pt;
+}
+
+CheckBox::indicator:unchecked
+,CheckBox::indicator:unchecked:disabled
+,CheckBox::indicator:checked
+,CheckBox::indicator:checked:disabled
+,CheckBox::indicator:indeterminate
+,QCheckBox::indicator:indeterminate
+{
+   background: transparent;
+}
+
+QComboBox, QLineEdit
+{
+    border-width: 1px;
+    border-style: solid;
+    max-height: 25px;
+    min-height: 25px;
+    padding-left: 10px;
+    outline: none;
+}
+
+QComboBox::drop-down
+{
+     min-width: 20px;
+     max-width: 20px;
+}
+
 ClickableFrame
 {
     padding: 5px;
@@ -9,6 +41,12 @@ Controls > QToolButton
     min-width: 65px;
     max-height: 50px;
     min-height: 50px;
+}
+
+QToolButton#longToolButton
+{
+    max-width: 75px;
+    min-width: 75px;
 }
 
 QPushButton, QToolButton
@@ -30,14 +68,26 @@ QPushButton:hover
     border: 0;
 }
 
-*
-{
-    font-size: 10pt;
-}
-
-#labelTitle, #commitInfoFrame, CommitInfoWidget > #labelDescription
+#labelTitle, #commitInfoFrame, #labelDescription
 {
     padding: 10px;
+}
+
+#labelAuthor
+{
+   font-size: 12pt;
+   padding: 10px;
+   padding-bottom: 1px;
+   border: none;
+   border-style: solid;
+   border-top-width: 1px;
+}
+
+#labelDateTime
+{
+   font-size: 9pt;
+   padding: 10px;
+   padding-top: 1px;
 }
 
 #labelSha
@@ -75,13 +125,18 @@ CommitChangesWidget > QListWidget::item
    padding: 0;
 }
 
+#amendFrame
+{
+    border: none;
+}
+
 QTreeWidget::item
 {
     min-height: 25px;
     max-height: 25px;
 }
 
-BranchesWidget
+#FullBranchesWidget
 {
     min-width: 400px;
     max-width: 400px;
@@ -124,6 +179,11 @@ CommitChangesWidget > QListWidget
 /** START RepositoryContextMenu **/
 QMenu
 {
+    menu-scrollable: 1;
+}
+
+QMenu, QToolTip
+{
     border-width: 1px;
     border-style: solid;
     margin: 0;
@@ -162,17 +222,15 @@ FullDiffWidget > QTextEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAu
     border-style: solid;
 }
 
-CommitChangesWidget > #leAuthorName
+#leAuthorName
 {
     max-height: 30px;
     min-height: 30px;
     padding-left: 10px;
 }
 
-CommitChangesWidget > #leAuthorEmail
+#leAuthorEmail
 {
-    border-top-width: none;
-    border-top-style: none;
     border-top: 0;
     max-height: 30px;
     min-height: 30px;
@@ -238,10 +296,10 @@ BranchDlg > QLineEdit, HistoryWidget > QLineEdit
     padding-left: 10px;
 }
 
-/** QTabWidget **/
+/** QPinnableTabWidget **/
 #openNewRepo
 {
-   max-height: 25px; /** 25px for the button + 1px to compensate the border of the tabs in the QTabWidget **/
+   max-height: 25px; /** 25px for the button + 1px to compensate the border of the tabs in the QPinnableTabWidget **/
    min-height: 25px;
    max-width: 31px;
    min-width: 31px;
@@ -252,7 +310,7 @@ QTabWidget::pane
 {
 }
 
-QTabBar::tab
+QTabWidget > QTabBar::tab
 {
    padding: 5px;
    padding-left: 15px;
@@ -260,23 +318,23 @@ QTabBar::tab
    min-height: 25px;
 }
 
-QTabBar::tab:!selected
+QTabWidget > QTabBar::tab:!selected
 {
     border-right-width: 1px;
     border-right-style: solid;
 }
 
-QTabBar::close-button
+QTabWidget > QTabBar::close-button
 {
     image: url(:/icons/close);
 }
 
-QTabBar::close-button:hover
+QTabWidget > QTabBar::close-button:hover
 {
     image: url(:/icons/close_hover);
 }
 
-QTabBar::close-button:pressed
+QTabWidget > QTabBar::close-button:pressed
 {
   image: url(":/icons/close_press");
 }
@@ -568,5 +626,23 @@ QMessageBox
    min-width: 400px;
    max-height: 300px;
    min-height: 300px;
+}
+
+#MinimizeBtn
+{
+    max-height: 30px;
+    min-height: 30px;
+    max-width: 20px;
+    min-width: 20px;
+    padding: 0;
+}
+
+#MinimizeBtn:hover
+{
+    max-height: 30px;
+    min-height: 30px;
+    max-width: 20px;
+    min-width: 20px;
+    padding: 0;
 }
 

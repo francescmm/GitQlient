@@ -4,8 +4,13 @@
 #include <GitStashes.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
+#include <GitConfig.h>
 #include <BranchDlg.h>
 #include <RepoConfigDlg.h>
+#include <ServerConfigDlg.h>
+#include <CreateIssueDlg.h>
+#include <CreatePullRequestDlg.h>
+#include <QLogger.h>
 
 #include <QApplication>
 #include <QToolButton>
@@ -13,9 +18,21 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QTimer>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QProgressBar>
+#include <QFile>
+#include <QStandardPaths>
 
-Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
+using namespace QLogger;
+
+Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
+   , mCache(cache)
    , mGit(git)
    , mHistory(new QToolButton())
    , mDiff(new QToolButton())
@@ -25,7 +42,11 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    , mStashBtn(new QToolButton())
    , mRefreshBtn(new QToolButton())
    , mConfigBtn(new QToolButton())
+   , mGitPlatform(new QToolButton())
+   , mVersionCheck(new QToolButton())
+   , mDownloadLog(new QProgressBar())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
+   , mManager(new QNetworkAccessManager())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -75,11 +96,11 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    const auto stashMenu = new QMenu(mStashBtn);
 
-   action = stashMenu->addAction(tr("Push"));
+   action = stashMenu->addAction(tr("Stash push"));
    connect(action, &QAction::triggered, this, &Controls::stashCurrentWork);
+   mStashBtn->setDefaultAction(action);
 
-   // mStashBtn->setDefaultAction(action);
-   action = stashMenu->addAction(tr("Pop"));
+   action = stashMenu->addAction(tr("Stash pop"));
    connect(action, &QAction::triggered, this, &Controls::popStashedWork);
 
    mStashBtn->setMenu(stashMenu);
@@ -115,8 +136,87 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
    hLayout->addWidget(mPullBtn);
    hLayout->addWidget(mPushBtn);
    hLayout->addWidget(mStashBtn);
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto remoteUrl = gitConfig->getServerUrl();
+   QIcon gitPlatformIcon;
+   QString name;
+   QString prName;
+   auto add = true;
+
+   if (remoteUrl.contains("github", Qt::CaseInsensitive))
+   {
+      gitPlatformIcon = QIcon(":/icons/github");
+      name = "GitHub";
+      prName = tr("Pull Request");
+   }
+   else if (remoteUrl.contains("gitlab", Qt::CaseInsensitive))
+   {
+      gitPlatformIcon = QIcon(":/icons/gitlab");
+      name = "GitLab";
+      prName = tr("Merge Request");
+   }
+   else
+      add = false;
+
+   if (add)
+   {
+      const auto gitMenu = new QMenu(mStashBtn);
+
+      action = gitMenu->addAction(tr("New Issue"));
+      connect(action, &QAction::triggered, this, &Controls::createNewIssue);
+
+      action = gitMenu->addAction(tr("New %1").arg(prName));
+      connect(action, &QAction::triggered, this, &Controls::createNewPullRequest);
+
+      gitMenu->addSeparator();
+      action = gitMenu->addAction(tr("Config server"));
+      mGitPlatform->setDefaultAction(action);
+      connect(action, &QAction::triggered, this, &Controls::configServer);
+
+      mGitPlatform->setMenu(gitMenu);
+      mGitPlatform->setIcon(gitPlatformIcon);
+      mGitPlatform->setIconSize(QSize(22, 22));
+      mGitPlatform->setText(name);
+      mGitPlatform->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+      mGitPlatform->setPopupMode(QToolButton::MenuButtonPopup);
+
+      const auto verticalFrame3 = new QFrame();
+      verticalFrame3->setObjectName("orangeSeparator");
+      hLayout->addWidget(verticalFrame3);
+      hLayout->addWidget(mGitPlatform);
+
+      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
+      connect(mGitPlatform, &QToolButton::toggled, this, [this](bool checked) {
+         mDiff->blockSignals(true);
+         mDiff->setChecked(!checked);
+         mDiff->blockSignals(false);
+         mBlame->blockSignals(true);
+         mBlame->setChecked(!checked);
+         mBlame->blockSignals(false);
+         mHistory->blockSignals(true);
+         mHistory->setChecked(!checked);
+         mHistory->blockSignals(false);
+      });
+   }
+   else
+      mGitPlatform->setVisible(false);
+
+   mVersionCheck->setIcon(QIcon(":/icons/get_gitqlient"));
+   mVersionCheck->setIconSize(QSize(22, 22));
+   mVersionCheck->setText(tr("New version"));
+   mVersionCheck->setObjectName("longToolButton");
+   mVersionCheck->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mVersionCheck->setVisible(false);
+
+   mDownloadLog->setVisible(false);
+
+   checkNewGitQlientVersion();
+
    hLayout->addWidget(verticalFrame2);
    hLayout->addWidget(mRefreshBtn);
+   hLayout->addWidget(mVersionCheck);
+   hLayout->addWidget(mDownloadLog);
    hLayout->addStretch();
    hLayout->addWidget(mConfigBtn);
 
@@ -137,6 +237,9 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
       mBlame->blockSignals(true);
       mBlame->setChecked(!checked);
       mBlame->blockSignals(false);
+      mGitPlatform->blockSignals(true);
+      mGitPlatform->setChecked(!checked);
+      mGitPlatform->blockSignals(false);
    });
    connect(mDiff, &QToolButton::clicked, this, &Controls::signalGoDiff);
    connect(mDiff, &QToolButton::toggled, this, [this](bool checked) {
@@ -146,6 +249,9 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
       mBlame->blockSignals(true);
       mBlame->setChecked(!checked);
       mBlame->blockSignals(false);
+      mGitPlatform->blockSignals(true);
+      mGitPlatform->setChecked(!checked);
+      mGitPlatform->blockSignals(false);
    });
    connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
    connect(mBlame, &QToolButton::toggled, this, [this](bool checked) {
@@ -155,11 +261,15 @@ Controls::Controls(const QSharedPointer<GitBase> &git, QWidget *parent)
       mDiff->blockSignals(true);
       mDiff->setChecked(!checked);
       mDiff->blockSignals(false);
+      mGitPlatform->blockSignals(true);
+      mGitPlatform->setChecked(!checked);
+      mGitPlatform->blockSignals(false);
    });
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
    connect(mConfigBtn, &QToolButton::clicked, this, &Controls::showConfigDlg);
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
+   connect(mVersionCheck, &QToolButton::clicked, this, &Controls::showInfoMessage);
 
    enableButtons(false);
 }
@@ -182,6 +292,10 @@ void Controls::toggleButton(ControlsMainViews view)
          mHistory->blockSignals(true);
          mHistory->setChecked(false);
          mHistory->blockSignals(false);
+         break;
+      case ControlsMainViews::SERVER:
+         mGitPlatform->setChecked(true);
+         break;
       default:
          break;
    }
@@ -190,10 +304,12 @@ void Controls::toggleButton(ControlsMainViews view)
 void Controls::enableButtons(bool enabled)
 {
    mHistory->setEnabled(enabled);
+   mBlame->setEnabled(enabled);
    mPullBtn->setEnabled(enabled);
    mPushBtn->setEnabled(enabled);
    mStashBtn->setEnabled(enabled);
    mRefreshBtn->setEnabled(enabled);
+   mGitPlatform->setEnabled(enabled);
 }
 
 void Controls::pullCurrentBranch()
@@ -235,7 +351,10 @@ void Controls::fetchAll()
    QApplication::restoreOverrideCursor();
 
    if (ret)
+   {
+      emit signalFetchPerformed();
       emit signalRepositoryUpdated();
+   }
 }
 
 void Controls::activateMergeWarning()
@@ -277,10 +396,16 @@ void Controls::pushCurrentBranch()
       const auto dlgRet = dlg.exec();
 
       if (dlgRet == QDialog::Accepted)
+      {
+         emit signalRefreshPRsCache();
          emit signalRepositoryUpdated();
+      }
    }
    else if (ret.success)
+   {
+      emit signalRefreshPRsCache();
       emit signalRepositoryUpdated();
+   }
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
@@ -336,4 +461,149 @@ void Controls::showConfigDlg()
 {
    const auto configDlg = new RepoConfigDlg(mGit, this);
    configDlg->exec();
+}
+
+void Controls::createNewIssue()
+{
+   const auto createIssue = new CreateIssueDlg(mGit, this);
+   createIssue->exec();
+}
+
+void Controls::createNewPullRequest()
+{
+   const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
+   connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, this, &Controls::signalRefreshPRsCache);
+
+   prDlg->exec();
+}
+
+void Controls::configServer()
+{
+   const auto configDlg = new ServerConfigDlg(mGit, this);
+   configDlg->exec();
+}
+
+void Controls::checkNewGitQlientVersion()
+{
+   QNetworkRequest request;
+   request.setRawHeader("User-Agent", "GitQlient");
+   request.setRawHeader("X-Custom-User-Agent", "GitQlient");
+   request.setRawHeader("Content-Type", "application/json");
+   request.setUrl(QUrl("https://github.com/francescmm/ci-utils/releases/download/gq_update/updates.json"));
+   request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+
+   const auto reply = mManager->get(request);
+   connect(reply, &QNetworkReply::finished, this, &Controls::processUpdateFile);
+}
+
+void Controls::processUpdateFile()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto data = reply->readAll();
+   const auto jsonDoc = QJsonDocument::fromJson(data);
+   const auto url = reply->url().path();
+
+   if (jsonDoc.isNull())
+   {
+      QLog_Error("Ui", QString("Error when parsing Json. Current data:\n%1").arg(QString::fromUtf8(data)));
+      return;
+   }
+
+   QVector<ServerLabel> labels;
+   const auto json = jsonDoc.object();
+
+   mLatestGitQlient = json["latest-version"].toString();
+   const auto changeLogUrl = json["changelog"].toString();
+
+#if defined(Q_OS_WIN)
+   const auto os = json["windows"].toObject();
+#elif defined(Q_OS_LINUX)
+   const auto os = json["linux"].toObject();
+#elif defined(Q_OS_OSX)
+   const auto os = json["osx"].toObject();
+#endif
+
+   mGitQlientDownloadUrl = os["download-url"].toString();
+
+   const auto newVersion = mLatestGitQlient.split(".");
+   const auto nv = newVersion.at(0).toInt() * 10000 + newVersion.at(1).toInt() * 100 + newVersion.at(2).toInt();
+   const auto curVersion = QString("%1").arg(VER).split(".");
+   const auto cv = curVersion.at(0).toInt() * 10000 + curVersion.at(1).toInt() * 100 + curVersion.at(2).toInt();
+
+   if (nv > cv)
+   {
+      mVersionCheck->setVisible(true);
+
+      QTimer::singleShot(200, this, [this, changeLogUrl] {
+         QNetworkRequest request;
+         request.setRawHeader("User-Agent", "GitQlient");
+         request.setRawHeader("X-Custom-User-Agent", "GitQlient");
+         request.setRawHeader("Content-Type", "application/json");
+         request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+         request.setUrl(QUrl(changeLogUrl));
+
+         const auto reply = mManager->get(request);
+
+         connect(reply, &QNetworkReply::finished, this, &Controls::processChangeLog);
+      });
+   }
+}
+
+void Controls::processChangeLog()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   mChangeLog = reply->readAll();
+}
+
+void Controls::showInfoMessage()
+{
+   QMessageBox msgBox(QMessageBox::Information, tr("New version of GitQlient!"),
+                      QString("There is a new version of GitQlient available. Your current vrsion is {%1} and the new "
+                              "one is {%2}. You can read more about the new changes in the detailed description.")
+                          .arg(VER, mLatestGitQlient),
+                      QMessageBox::Ok | QMessageBox::Close, this);
+   msgBox.setButtonText(QMessageBox::Ok, tr("Download"));
+   msgBox.setDetailedText(mChangeLog);
+   msgBox.setStyleSheet(GitQlientStyles::getStyles());
+
+   if (msgBox.exec() == QMessageBox::Ok)
+      downloadFile();
+}
+
+void Controls::downloadFile()
+{
+   QNetworkRequest request;
+   request.setRawHeader("User-Agent", "GitQlient");
+   request.setRawHeader("X-Custom-User-Agent", "GitQlient");
+   request.setRawHeader("Content-Type", "application/octet-stream");
+   request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+   request.setUrl(QUrl(mGitQlientDownloadUrl));
+
+   const auto fileName = mGitQlientDownloadUrl.split("/").last();
+
+   const auto reply = mManager->get(request);
+
+   connect(reply, &QNetworkReply::downloadProgress, this, [this](qint64 read, qint64 total) {
+      mDownloadLog->setVisible(true);
+      mDownloadLog->setMaximum(total);
+      mDownloadLog->setValue(read);
+   });
+
+   connect(reply, &QNetworkReply::finished, this, [this, reply, fileName]() {
+      mDownloadLog->setVisible(false);
+
+      const auto b = reply->readAll();
+      const auto destination
+          = QStandardPaths::standardLocations(QStandardPaths::DownloadLocation).first() + "/" + fileName;
+      QFile file(destination);
+      if (file.open(QIODevice::WriteOnly))
+      {
+         QDataStream out(&file);
+         out << b;
+
+         file.close();
+      }
+
+      reply->deleteLater();
+   });
 }

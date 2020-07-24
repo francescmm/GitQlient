@@ -28,6 +28,9 @@
 class QToolButton;
 class QPushButton;
 class GitBase;
+class RevisionsCache;
+class QNetworkAccessManager;
+class QProgressBar;
 
 /*!
  \brief Enum used to configure the different views handled by the Controls widget.
@@ -38,7 +41,8 @@ enum class ControlsMainViews
    HISTORY,
    DIFF,
    BLAME,
-   MERGE
+   MERGE,
+   SERVER
 };
 
 /*!
@@ -71,6 +75,12 @@ signals:
 
    */
    void signalGoMerge();
+
+   /**
+    * @brief signalGoManagement Signal triggered when the user selected the Git remote platform viewer.
+    */
+   void signalGoServer();
+
    /*!
     \brief Signal triggered when the user manually forces a refresh of the repository data.
 
@@ -81,6 +91,16 @@ signals:
     */
    void signalPullConflict();
 
+   /**
+    * @brief signalFetchPerformed Signal triggered when a deep fetch is performed.
+    */
+   void signalFetchPerformed();
+
+   /**
+    * @brief signalRefreshPRsCache Signal that refreshes PRs cache.
+    */
+   void signalRefreshPRsCache();
+
 public:
    /*!
     \brief Default constructor.
@@ -88,7 +108,8 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit Controls(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                     QWidget *parent = nullptr);
    /*!
     \brief Process the toggled button and triggers its corresponding action.
 
@@ -141,6 +162,7 @@ public:
 
 private:
    QString mCurrentSha;
+   QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
    QToolButton *mHistory = nullptr;
    QToolButton *mDiff = nullptr;
@@ -150,7 +172,14 @@ private:
    QToolButton *mStashBtn = nullptr;
    QToolButton *mRefreshBtn = nullptr;
    QToolButton *mConfigBtn = nullptr;
+   QToolButton *mGitPlatform = nullptr;
+   QToolButton *mVersionCheck = nullptr;
+   QProgressBar *mDownloadLog = nullptr;
    QPushButton *mMergeWarning = nullptr;
+   QNetworkAccessManager *mManager = nullptr;
+   QString mLatestGitQlient;
+   QString mChangeLog;
+   QString mGitQlientDownloadUrl;
 
    /*!
     \brief Pulls the current branch.
@@ -181,4 +210,44 @@ private:
     * \brief Shows the config dialog for both Local and Global user data.
     */
    void showConfigDlg();
+
+   /**
+    * @brief createNewIssue Shows the dialog to create a new issue on the server.
+    */
+   void createNewIssue();
+
+   /**
+    * @brief createNewPullRequest Shows the dialog to create a new pull request on the server.
+    */
+   void createNewPullRequest();
+
+   /**
+    * @brief configServer Shows the dialog to configure this repository's server.
+    */
+   void configServer();
+
+   /**
+    * @brief checkNewGitQlientVersion Checks if there is a new version of GitQlient released.
+    */
+   void checkNewGitQlientVersion();
+
+   /**
+    * @brief processUpdateFile Processes the update file to check the updates.
+    */
+   void processUpdateFile();
+
+   /**
+    * @brief processChangeLog Downloads the latest changes log file.
+    */
+   void processChangeLog();
+
+   /**
+    * @brief showInfoMessage Shows the info message to download the new version.
+    */
+   void showInfoMessage();
+
+   /**
+    * @brief downloadFile Downloads the latest release of GitQlient.
+    */
+   void downloadFile();
 };

@@ -23,12 +23,10 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <IDiffWidget.h>
+
 #include <QSyntaxHighlighter>
 #include <QTextEdit>
-
-class GitBase;
-class DiffInfoPanel;
-class RevisionsCache;
 
 /*!
  \brief The FullDiffWidget class is an overload class inherited from QTextEdit that process the output from a diff for a
@@ -36,7 +34,7 @@ class RevisionsCache;
  diff chuck starts.
 
 */
-class FullDiffWidget : public QFrame
+class FullDiffWidget : public IDiffWidget
 {
    Q_OBJECT
 
@@ -54,22 +52,18 @@ public:
     \brief Reloads the current diff in case the user loaded the work in progress as base commit.
 
    */
-   void reload();
+   bool reload() override;
    /*!
     \brief Loads a diff for a specific commit SHA respect another commit SHA.
 
     \param sha The base commit SHA.
     \param diffToSha The commit SHA to comapre to.
+    \return True if there is a diff to load, otherwise false.
    */
-   void loadDiff(const QString &sha, const QString &diffToSha);
+   bool loadDiff(const QString &sha, const QString &diffToSha);
 
 private:
-   QSharedPointer<GitBase> mGit;
-   QSharedPointer<RevisionsCache> mCache;
-   QString mCurrentSha;
-   QString mPreviousSha;
    QString mPreviousDiffText;
-   DiffInfoPanel *mDiffInfoPanel = nullptr;
    QTextEdit *mDiffWidget = nullptr;
 
    class DiffHighlighter : public QSyntaxHighlighter

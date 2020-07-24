@@ -121,7 +121,9 @@ In addition to this, you can select any of the projects listed in the *Most used
 
 Once you have selected and opened our repo, the new view shows in first place a series of controls to manage the most used actions done in Git. This controls are organized horizontally as sqaured buttons as the following image shows:
 
-![GitQlient - Quick access actions](/GitQlient/assets/2_quick_access_actions.png "GitQlient - Quick access actions")
+![GitQlient - Quick access actions (GitHub)](/GitQlient/assets/2_quick_access_actions.png "GitQlient - Quick access actions (GitHub)")
+
+![GitQlient - Quick access actions (GitLab)](/GitQlient/assets/2b_quick_access_actions.png "GitQlient - Quick access actions (GitLab)")
 
 The first three buttons reference the different views of GitQlient. They allow you to navigate GitQlient in a simple and easy way. The button changes its color when the view it refers is being dispayed:
 
@@ -135,17 +137,21 @@ After that, you can find three buttons that trigger three of the most used Git c
 
 ![GitQlient - Pull options](/GitQlient/assets/2_pull_options.png "GitQlient - Pull options")
 
-    - Fetch all: Fetches branches, commits and tags. If your current branch is behind the remote branch after fetching, GitQlient will ask if you want to pull the new changes.
-    - Pull: This is the default behaviour.
-    - Prune: Prunes all remote deleted tags and branches.
+    * Fetch all: Fetches branches, commits and tags. If your current branch is behind the remote branch after fetching, GitQlient will ask if you want to pull the new changes.
+    * Pull: This is the default behaviour.
+    * Prune: Prunes all remote deleted tags and branches.
 
 - Push: It performs the regular push (not *forced*) command.
 - Stash: It does not have a default command. Instead you have to press the dropdown menu to see the different options:
 
 ![GitQlient - Stash options](/GitQlient/assets/2_stash_options.png "GitQlient - Stash options")
 
-    - Stash push: Pushes the stash to your local repository.
-    - Stash pop: Pops the latest stash that you pushed.
+    * Stash push: Pushes the stash to your local repository.
+    * Stash pop: Pops the latest stash that you pushed.
+
+- GitHub/GitLab: This option displays a menu where you can configure your remote Git platform: GitHub or GitLab. In addition you can create Issues and Pull Requests from here.
+
+![GitQlient - Repository config](/GitQlient/assets/2_gitserver_options.png "GitQlient - Git platform options")
 
 - Refresh: This option performs a deep refresh of the repository cache. It reloads cache, views and branches information. This is costly so please take it into account when you trigger it. It's usually helpful to use if you have performed Git actions outside GitQlient and you want to sync.
 - Config: The last option opens the repository config dialog. For now, it shows the user data for the current repository:
@@ -227,6 +233,26 @@ Staged options:
 * Unstage file: Moves the file to its previous list. When amending it moves the file to the unstaged list.
 * See changes: Opens the diff view with the changes between the current work and the last commit.
 
+### <a name="wip-diff-view"></a>WIP diff view
+
+In the version 1.2.0 the Diff View for the WIP has been move to the main screen to facilitate the staging and to reduce UI interactions. In addition, the WIP diff view includes some extra options not present in the normal diff view:
+
+![GitQlient - Viewing a WIP](/GitQlient/assets/5_edit_view_options.png "GitQlient - Viewing a WIP")
+
+* Edition mode: Allows you to edit the WIP file.
+* Stage: Allows you to stage the current file.
+* Revert: Reverts all the changes made in the WIP.
+
+![GitQlient - Viewing a WIP](/GitQlient/assets/4_wip_diff_view.png "GitQlient - Viewing a WIP")
+
+When entering in this mode, the branches menu has changed as well: it shows a minimal view that can be expanded.
+
+### <a name="wip-edit-view"></a>WIP edit view
+
+To enter the edition mode you have to press the edit button (Pencil icon) and the file will be opened. For now, only C++ has syntax highlight and it cannot be edited. However it will change in future versions.
+
+![GitQlient - Editing a WIP](/GitQlient/assets/5_edit_view_file.png "GitQlient - Editing a WIP")
+
 ## <a name="amend-view"></a>Amending a commit
 
 The same view applies when you want to amend a commit it just have some minor differences.
@@ -298,6 +324,18 @@ Finally, the last view is the submoules view. Since a submodule is basically a l
 
 ### Fold behaviour
 
+It is possible to fold the branches widget by clicking on the left button (arrow pointing right). It will fold the widget and show a minimalistic version:
+
+![GitQlient - Branches minimalistic widget](/GitQlient/assets/6_branches_widget_minimal.png "GitQlient - Branches minimalistic widget")
+
+You can unfold by pressing the back button (arrow pointing left)
+
+To help you to keep a reference of the information in the different tables, you can clicking over an icon and it will show a menu with the branches, tags, etc.
+
+![GitQlient - Branches minimalistic widget](/GitQlient/assets/6_branches_widget_minimal_menu.png "GitQlient - Branches minimalistic widget")
+
+### Tables fold behaviour
+
 It is possible to fold the tags, stashes and submodules view. Just click over the title of the list and it will fold. To unfold, click over the header again. This will give you more space if you want to concentrate in the branches.
 
 # <a name="the-diff-view"></a>The Diff View
@@ -314,18 +352,11 @@ Indistinctly on how you open the diff view (by double-clicking a commit or by co
 
 However, in GitQlient I didn't want just to throw all the information in the same view and let the user deal with it. Instead, I wanted to provide an easy way to access all the diffs you open and make it easier to navigate between them and their files.
 
-To achieve that you will find in the top left corner a space reserved for the diff buttons. The diff buttons are the list of already opened diffs you have done. In the list there can be two different types of diffs:
+To achieve that you will find in the top left corner all the information about the base commit you are comparing as well as the list of files that have been modified compared to the commit show in the lower part. Both commit diffs and file diffs are opened now in tabs and you can open the file diffs by double clicking the file in the list or through the context menu. Once you close the last tab the view will automatically close and return to the previous window you were.
 
-- Commit: Shows an icon that simulates a list and the text is always *Commit diff* followed by the two commits that are compared.
-- File: Shows the icon of a file followed by the name of the file and the two commits that are compared in that diff.
+The diff view includes now two different modes: "Full file view" and "Split file view".
 
-To close the button just press the cross at the end of it. Once you close the last button the view will automatically close and return to the previous window you were.
-
-![GitQlient - Diff buttons](/GitQlient/assets/4_diff_buttons.png "GitQlient - Diff buttons")
-
-When click on a button, it will show the diff of that file or commit in the view. In addition it will reload the files list in the bottom left corner. The files shown there are those that had changes between the commits selected. To open the diff of one of these files, just double click the file. You also can open the blame by accessing through the context menu.
-
-![GitQlient - Commit diff files list](/GitQlient/assets/4_diff_buttons.png "GitQlient - Commit diff files list")
+![GitQlient - View buttons](/GitQlient/assets/4c_diff_view.png "GitQlient - View buttons")
 
 Finally, both in the commit and file diff the text have different colors.
 

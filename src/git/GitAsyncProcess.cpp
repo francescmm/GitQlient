@@ -2,7 +2,7 @@
 
 #include <BenchmarkTool.h>
 
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 GitAsyncProcess::GitAsyncProcess(const QString &workingDir)
    : AGitProcess(workingDir)

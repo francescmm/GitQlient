@@ -9,7 +9,7 @@
 #include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 int main(int argc, char *argv[])
 {
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
    QFontDatabase::addApplicationFont(":/UbuntuMono");
 
    GitQlientSettings settings;
-   settings.setValue("isGitQlient", true);
+   settings.setGlobalValue("isGitQlient", true);
 
    GitQlient mainWin(arguments);
 

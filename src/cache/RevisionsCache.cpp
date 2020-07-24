@@ -1,4 +1,6 @@
 #include "RevisionsCache.h"
+#include <GitQlientSettings.h>
+#include <GitHubRestApi.h>
 
 #include <QLogger.h>
 
@@ -32,7 +34,7 @@ void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArra
    mRevisionFilesMap.clear();
    mLanes.clear();
 
-   for (auto reference : mReferences)
+   for (auto reference : qAsConst(mReferences))
       reference->clearReferences();
 
    mReferences.clear();
@@ -72,6 +74,16 @@ void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArra
    }
 }
 
+void RevisionsCache::setupGitPlatform(const QSharedPointer<IRestApi> &api)
+{
+   if (mApi)
+      disconnect(mApi.get(), &IRestApi::pullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
+
+   mApi = api;
+
+   connect(mApi.get(), &IRestApi::pullRequestsReceived, this, &RevisionsCache::setPullRequestStatus);
+}
+
 CommitInfo RevisionsCache::getCommitInfoByRow(int row)
 {
    QMutexLocker lock(&mMutex);
@@ -88,7 +100,7 @@ int RevisionsCache::getCommitPos(const QString &sha)
    const auto iter = std::find_if(mCommitsMap.begin(), mCommitsMap.end(),
                                   [sha](const CommitInfo &commit) { return commit.sha().startsWith(sha); });
 
-   if (iter != mCommitsMap.constEnd())
+   if (iter != mCommitsMap.end())
       return mCommits.indexOf(&iter.value());
 
    return -1;
@@ -153,7 +165,7 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 
       if (mTmpChildsStorage.contains(sha))
       {
-         for (auto child : mTmpChildsStorage.values(sha))
+         for (auto &child : mTmpChildsStorage.values(sha))
             mCommitsMap[sha].addChildReference(child);
 
          mTmpChildsStorage.remove(sha);
@@ -399,26 +411,53 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Typ
    QMutexLocker lock(&mMutex);
    QVector<QPair<QString, QStringList>> branches;
 
-   for (auto commit : mReferences)
+   for (auto commit : qAsConst(mReferences))
       branches.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(type)));
 
    return branches;
 }
 
-QMap<QString, QString> RevisionsCache::getTags() const
+QMap<QString, QString> RevisionsCache::getTags(References::Type tagType) const
 {
    QMap<QString, QString> tags;
 
-   for (auto commit : mReferences)
+   if (tagType == References::Type::LocalTag)
    {
-      const auto sha = commit->sha();
-      const auto tagNames = commit->getReferences(References::Type::Tag);
+      for (auto commit : mReferences)
+      {
+         const auto sha = commit->sha();
+         const auto tagNames = commit->getReferences(tagType);
 
-      for (const auto &tag : tagNames)
-         tags[tag] = sha;
+         for (const auto &tag : tagNames)
+            tags[tag] = sha;
+      }
    }
+   else
+      tags = mRemoteTags;
 
    return tags;
+}
+
+void RevisionsCache::updateTags(const QMap<QString, QString> &remoteTags)
+{
+   mRemoteTags = remoteTags;
+}
+
+void RevisionsCache::setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus)
+{
+   mPullRequestsStatus = std::move(prStatus);
+
+   emit signalCacheUpdated();
+}
+
+ServerPullRequest RevisionsCache::getPullRequestStatus(const QString &sha)
+{
+   return mPullRequestsStatus.value(sha);
+}
+
+void RevisionsCache::refreshPRsCache()
+{
+   mApi->requestPullRequestsState();
 }
 
 void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)

@@ -6,14 +6,14 @@
 #include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 GitTags::GitTags(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
 {
 }
 
-QVector<QString> GitTags::getRemoteTags() const
+QMap<QString, QString> GitTags::getRemoteTags() const
 {
    BenchmarkStart();
 
@@ -21,7 +21,7 @@ QVector<QString> GitTags::getRemoteTags() const
 
    const auto ret = mGitBase->run("git ls-remote --tags");
 
-   QVector<QString> tags;
+   QMap<QString, QString> tags;
 
    if (ret.success)
    {
@@ -29,11 +29,12 @@ QVector<QString> GitTags::getRemoteTags() const
 
       for (const auto &tag : tagsTmp)
       {
-         if (tag != "\n" && !tag.isEmpty() && !tag.contains("^{}"))
+         if (tag != "\n" && !tag.isEmpty() && tag.contains("^{}"))
          {
-            const auto tagName = tag.split('\t').last().remove("refs/tags/");
+            const auto sha = tag.split('\t').constFirst();
+            const auto tagName = tag.split('\t').last().remove("refs/tags/").remove("^{}");
 
-            tags.append(tagName);
+            tags.insert(tagName, sha);
          }
       }
    }

@@ -50,6 +50,8 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<RevisionsCache> &c
    ui->setupUi(this);
    setAttribute(Qt::WA_DeleteOnClose);
 
+   ui->amendFrame->setVisible(false);
+
    ui->lCounter->setText(QString::number(kMaxTitleChars));
    ui->leCommitTitle->setMaxLength(kMaxTitleChars);
    ui->teDescription->setMaximumHeight(125);
@@ -77,11 +79,9 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<RevisionsCache> &c
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
            &CommitChangesWidget::showUnstagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
-           [this](QListWidgetItem *item) { requestDiff(item->toolTip()); });
+           [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
 
    ui->pbCancelAmend->setVisible(false);
-   ui->leAuthorName->setVisible(false);
-   ui->leAuthorEmail->setVisible(false);
    ui->pbCommit->setText(tr("Commit"));
 }
 
@@ -394,7 +394,7 @@ void CommitChangesWidget::updateCounter(const QString &text)
 
 bool CommitChangesWidget::hasConflicts()
 {
-   for (const auto &pair : mCurrentFilesCache.values())
+   for (const auto &pair : qAsConst(mCurrentFilesCache))
       if (pair.second->data(GitQlientRole::U_IsConflict).toBool())
          return true;
 

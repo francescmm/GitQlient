@@ -7,7 +7,7 @@
 #include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 bool GitUserInfo::isValid() const
 {
@@ -206,4 +206,61 @@ GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
 
    BenchmarkEnd();
    return GitExecResult();
+}
+
+GitExecResult GitConfig::getGitValue(const QString &key) const
+{
+   BenchmarkStart();
+
+   QLog_Debug("Git", QString("Getting value for config key {%1}").arg(key));
+
+   const auto ret = mGitBase->run(QString("git config --get %1").arg(key));
+
+   BenchmarkEnd();
+
+   return ret;
+}
+
+QString GitConfig::getServerUrl() const
+{
+   auto serverUrl = getGitValue("remote.origin.url").output.toString().trimmed();
+
+   if (serverUrl.startsWith("git@"))
+   {
+      serverUrl.remove("git@");
+      serverUrl.replace(":", "/");
+   }
+   else if (serverUrl.startsWith("https://"))
+   {
+      serverUrl.remove("https://");
+   }
+
+   serverUrl = serverUrl.mid(0, serverUrl.indexOf("/"));
+
+   return serverUrl;
+}
+
+QPair<QString, QString> GitConfig::getCurrentRepoAndOwner() const
+{
+   auto serverUrl = getGitValue("remote.origin.url").output.toString().trimmed();
+   QString repo;
+
+   if (serverUrl.startsWith("git@"))
+   {
+      serverUrl.remove("git@");
+      repo = serverUrl.mid(serverUrl.lastIndexOf(":") + 1);
+      serverUrl.replace(":", "/");
+   }
+   else if (serverUrl.startsWith("https://"))
+   {
+      serverUrl.remove("https://");
+      repo = serverUrl.mid(serverUrl.indexOf("/") + 1);
+   }
+
+   serverUrl = serverUrl.mid(0, serverUrl.indexOf("/"));
+   repo.remove(".git");
+
+   const auto parts = repo.split("/");
+
+   return qMakePair(parts.constFirst(), parts.constLast());
 }

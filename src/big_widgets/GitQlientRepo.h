@@ -40,6 +40,7 @@ class BlameWidget;
 class MergeWidget;
 class QTimer;
 class ProgressDlg;
+class IRestApi;
 
 enum class ControlsMainViews;
 
@@ -47,17 +48,6 @@ namespace Ui
 {
 class MainWindow;
 }
-
-/*!
- \brief The cofniguration regarding auto udpates for the GitQlientRepo class.
-
-*/
-struct GitQlientRepoConfig
-{
-   int mAutoFetchSecs = 300; /*!< The auto-fetch interval in seconds. Default value: 300. */
-   int mAutoFileUpdateSecs
-       = 5; /*!< The interval where GitQlient retrieves information from disk for the current WIP. Default: 10 secs.*/
-};
 
 /*!
  \brief The GitQlientRepo class is the main widget that stores all the subwidgets that act over the repository. This
@@ -101,12 +91,6 @@ public:
    ~GitQlientRepo() override;
 
    /*!
-    \brief Sets the configuration for the timers.
-
-    \param config The new configuration.
-   */
-   void setConfig(const GitQlientRepoConfig &config);
-   /*!
     \brief Gets the current working dir.
 
     \return QString The current working dir.
@@ -129,7 +113,6 @@ protected:
 
 private:
    QString mCurrentDir;
-   GitQlientRepoConfig mConfig;
    QSharedPointer<RevisionsCache> mGitQlientCache;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitRepoLoader> mGitLoader;
@@ -142,9 +125,11 @@ private:
    MergeWidget *mMergeWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
+   QTimer *mAutoPrUpdater = nullptr;
    QPointer<ProgressDlg> mProgressDlg;
    QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
+   QSharedPointer<IRestApi> mApi;
 
    bool mIsInit = false;
    QThread *m_loaderThread;
@@ -264,4 +249,9 @@ private:
 
    */
    void updateWip();
+
+   /**
+    * @brief updateTagsOnCache Updates the remote tags in the cache.
+    */
+   void updateTagsOnCache();
 };

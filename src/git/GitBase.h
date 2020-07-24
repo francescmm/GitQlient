@@ -48,6 +48,8 @@ public:
 
    void setWorkingDir(const QString &workingDir);
 
+   QString getGitDir() const;
+
    void updateCurrentBranch();
 
    QString getCurrentBranch();

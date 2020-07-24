@@ -26,12 +26,14 @@
 #include <RevisionFiles.h>
 #include <lanes.h>
 #include <CommitInfo.h>
+#include <ServerPullRequest.h>
 
+#include <QSharedPointer>
 #include <QObject>
 #include <QHash>
 #include <QMutex>
 
-struct WorkingDirInfo;
+class IRestApi;
 
 struct WipRevisionInfo
 {
@@ -62,6 +64,7 @@ public:
    ~RevisionsCache();
 
    void setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits);
+   void setupGitPlatform(const QSharedPointer<IRestApi> &api);
 
    int count() const;
 
@@ -85,7 +88,12 @@ public:
    bool pendingLocalChanges();
 
    QVector<QPair<QString, QStringList>> getBranches(References::Type type);
-   QMap<QString, QString> getTags() const;
+   QMap<QString, QString> getTags(References::Type tagType) const;
+
+   void updateTags(const QMap<QString, QString> &remoteTags);
+
+   ServerPullRequest getPullRequestStatus(const QString &sha);
+   void refreshPRsCache();
 
 private:
    friend class GitRepoLoader;
@@ -102,6 +110,9 @@ private:
    QVector<QString> mDirNames;
    QVector<QString> mFileNames;
    QVector<QString> mUntrackedfiles;
+   QMap<QString, QString> mRemoteTags;
+   QMap<QString, ServerPullRequest> mPullRequestsStatus;
+   QSharedPointer<IRestApi> mApi;
 
    struct FileNamesLoader
    {
@@ -128,4 +139,5 @@ private:
    QVector<CommitInfo *>::const_iterator searchCommit(CommitInfo::Field field, const QString &text,
                                                       int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);
+   void setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus);
 };

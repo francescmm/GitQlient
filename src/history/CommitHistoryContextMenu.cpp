@@ -2,22 +2,30 @@
 
 #include <GitQlientStyles.h>
 #include <GitLocal.h>
+#include <GitTags.h>
 #include <GitPatches.h>
 #include <GitBase.h>
 #include <GitStashes.h>
 #include <GitBranches.h>
 #include <GitRemote.h>
+#include <GitConfig.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
 #include <PullDlg.h>
+#include <CreateIssueDlg.h>
+#include <CreatePullRequestDlg.h>
+#include <GitHubRestApi.h>
+#include <GitQlientSettings.h>
+#include <MergePullRequestDlg.h>
 
 #include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
 #include <QFileDialog>
 #include <QProcess>
+#include <QDesktopServices>
 
 #include <QLogger.h>
 
@@ -121,6 +129,64 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          connect(resetHardAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetHard);
       }
    }
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto remoteUrl = gitConfig->getServerUrl();
+   const auto isGitHub = remoteUrl.contains("github", Qt::CaseInsensitive);
+   const auto isGitLab = remoteUrl.contains("gitlab", Qt::CaseInsensitive);
+
+   if (isGitHub || isGitLab)
+   {
+      addSeparator();
+
+      const auto gitServerMenu = new QMenu(isGitHub ? "GitHub" : "GitLab", this);
+      addMenu(gitServerMenu);
+
+      if (const auto pr = mCache->getPullRequestStatus(mShas.first()); mShas.count() == 1 && pr.isValid())
+      {
+         const auto prInfo = mCache->getPullRequestStatus(mShas.first());
+
+         const auto checksMenu = new QMenu("Checks", gitServerMenu);
+         gitServerMenu->addMenu(checksMenu);
+
+         for (const auto &check : prInfo.state.checks)
+         {
+            const auto link = check.url;
+            checksMenu->addAction(QIcon(QString(":/icons/%1").arg(check.state)), check.name, this,
+                                  [link]() { QDesktopServices::openUrl(link); });
+         }
+
+         if (isGitHub)
+         {
+            const auto link = mCache->getPullRequestStatus(mShas.first()).url;
+            connect(gitServerMenu->addAction("Merge PR"), &QAction::triggered, this, [this, pr]() {
+               const auto mergeDlg = new MergePullRequestDlg(mGit, pr, mShas.first(), this);
+               connect(mergeDlg, &MergePullRequestDlg::signalRepositoryUpdated, this,
+                       &CommitHistoryContextMenu::signalRepositoryUpdated);
+
+               mergeDlg->exec();
+            });
+         }
+
+         const auto link = mCache->getPullRequestStatus(mShas.first()).url;
+         connect(gitServerMenu->addAction("Open PR on browser"), &QAction::triggered, this,
+                 [link]() { QDesktopServices::openUrl(link); });
+
+         gitServerMenu->addSeparator();
+      }
+
+      connect(gitServerMenu->addAction("New Issue"), &QAction::triggered, this, [this]() {
+         const auto createIssue = new CreateIssueDlg(mGit, this);
+         createIssue->exec();
+      });
+      connect(gitServerMenu->addAction("New Pull Request"), &QAction::triggered, this, [this]() {
+         const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
+         connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, this,
+                 &CommitHistoryContextMenu::signalRefreshPRsCache);
+
+         prDlg->exec();
+      });
+   }
 }
 
 void CommitHistoryContextMenu::createMultipleShasMenu()
@@ -216,7 +282,9 @@ void CommitHistoryContextMenu::checkoutBranch()
    const auto action = qobject_cast<QAction *>(sender());
    auto isLocal = action->data().toBool();
    auto branchName = action->text();
-   branchName.remove("origin/");
+
+   if (isLocal)
+      branchName.remove("origin/");
 
    QScopedPointer<GitBranches> git(new GitBranches(mGit));
    const auto ret = isLocal ? git->checkoutLocalBranch(branchName) : git->checkoutRemoteBranch(branchName);
@@ -336,10 +404,16 @@ void CommitHistoryContextMenu::push()
       const auto ret = dlg.exec();
 
       if (ret == QDialog::Accepted)
+      {
+         emit signalRefreshPRsCache();
          emit signalRepositoryUpdated();
+      }
    }
    else if (ret.success)
+   {
+      emit signalRefreshPRsCache();
       emit signalRepositoryUpdated();
+   }
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
@@ -388,7 +462,13 @@ void CommitHistoryContextMenu::fetch()
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
 
    if (git->fetch())
+   {
+      QScopedPointer<GitTags> gitTags(new GitTags(mGit));
+      const auto remoteTags = gitTags->getRemoteTags();
+
+      mCache->updateTags(remoteTags);
       emit signalRepositoryUpdated();
+   }
 }
 
 void CommitHistoryContextMenu::resetSoft()

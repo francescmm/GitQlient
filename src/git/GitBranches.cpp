@@ -7,7 +7,7 @@
 #include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 GitBranches::GitBranches(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
@@ -108,7 +108,7 @@ GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
    if (localBranch.startsWith("origin/"))
       localBranch.remove("origin/");
 
-   auto ret = mGitBase->run(QString("git checkout -b %1 %2").arg(localBranch).arg(branchName));
+   auto ret = mGitBase->run(QString("git checkout -b %1 %2").arg(localBranch, branchName));
    const auto output = ret.output.toString();
 
    if (ret.success && !output.contains("fatal:"))

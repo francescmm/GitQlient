@@ -39,7 +39,9 @@ CommitInfo::CommitInfo(const QByteArray &b)
       mShortLog = fields.at(5);
 
       for (auto i = 6; i < fields.count(); ++i)
-         mLongLog += fields.at(i);
+         mLongLog += fields.at(i) + '\n';
+
+      mLongLog = mLongLog.trimmed();
    }
 }
 
@@ -81,7 +83,7 @@ QString CommitInfo::getFieldStr(CommitInfo::Field field) const
 
 bool CommitInfo::isValid() const
 {
-   QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
+   static QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
 
    return !mSha.isEmpty() && hexMatcher.exactMatch(mSha);
 }

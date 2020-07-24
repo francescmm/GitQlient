@@ -28,7 +28,7 @@ GitConfigDlg::GitConfigDlg(const QSharedPointer<GitBase> &gitBase, QWidget *pare
    ui->leLocalEmail->setText(localConfig.mUserEmail);
    ui->leLocalName->setText(localConfig.mUserName);
 
-   connect(ui->checkBox, &QCheckBox::stateChanged, this, &GitConfigDlg::copyGlobalSettings);
+   connect(ui->checkBox, &CheckBox::stateChanged, this, &GitConfigDlg::copyGlobalSettings);
    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &GitConfigDlg::accept);
 }
 

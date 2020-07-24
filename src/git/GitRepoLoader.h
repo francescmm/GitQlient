@@ -41,6 +41,7 @@ signals:
    void signalLoadingStarted(int total);
    void signalLoadingFinished();
    void cancelAllProcesses(QPrivateSignal);
+   void signalRefreshPRsCache(const QString repoName, const QString &repoOwner, const QString &serverUrl);
 
 public:
    explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache,

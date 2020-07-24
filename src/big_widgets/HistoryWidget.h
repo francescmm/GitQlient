@@ -35,9 +35,11 @@ class QStackedWidget;
 class WipWidget;
 class AmendWidget;
 class CommitInfoWidget;
-class QCheckBox;
+class CheckBox;
 class RepositoryViewDelegate;
-class FileEditor;
+class FullDiffWidget;
+class FileDiffWidget;
+class BranchesWidgetMinimal;
 
 /*!
  \brief The HistoryWidget is the responsible fro showing the history of the repository. It is the first widget shown
@@ -214,6 +216,12 @@ public:
    void onNewRevisions(int totalCommits);
 
 private:
+   enum class Pages
+   {
+      Graph,
+      FileDiff
+   };
+
    QSharedPointer<GitBase> mGit;
    QSharedPointer<RevisionsCache> mCache;
    CommitHistoryModel *mRepositoryModel = nullptr;
@@ -221,13 +229,14 @@ private:
    BranchesWidget *mBranchesWidget = nullptr;
    QLineEdit *mSearchInput = nullptr;
    QStackedWidget *mCommitStackedWidget = nullptr;
+   QStackedWidget *mCenterStackedWidget = nullptr;
    WipWidget *mWipWidget = nullptr;
    AmendWidget *mAmendWidget = nullptr;
    CommitInfoWidget *mCommitInfoWidget = nullptr;
-   QCheckBox *mChShowAllBranches = nullptr;
+   CheckBox *mChShowAllBranches = nullptr;
    RepositoryViewDelegate *mItemDelegate = nullptr;
    QFrame *mGraphFrame = nullptr;
-   FileEditor *mFileEditor = nullptr;
+   FileDiffWidget *mFileDiff = nullptr;
 
    /*!
     \brief Performs a search based on the input of the search QLineEdit with the users input.
@@ -247,12 +256,6 @@ private:
     \param index The index from the model.
    */
    void commitSelected(const QModelIndex &index);
-   /*!
-    \brief Retrieves the SHA from the QModelIndex and triggers the \ref signalOpenDiff signal.
-
-    \param index The index from the model.
-   */
-   void openDiff(const QModelIndex &index);
    /*!
     \brief Action that stores in the settings the new value for the check box to show all the branches. It also triggers
     the \ref signalAllBranchesActive signal.
@@ -275,20 +278,28 @@ private:
    void mergeBranch(const QString &current, const QString &branchToMerge);
 
    /**
-    * @brief startEditFile Shows the file edition windows with the content of @p fileName loaded on it.
-    * @param fileName The full path of the file that will be opened.
-    * @param line The line to put the cursor.
-    * @param column The column to put the cursor.
+    * @brief endEditFile Closes the file diff view.
     */
-   void startEditFile(const QString &fileName);
-
-   /**
-    * @brief endEditFile Closes the file editor.
-    */
-   void endEditFile();
+   void returnToView();
 
    /**
     * @brief cherryPickCommit Cherry-picks the commit defined by the SHA in the QLineEdit of the filter.
     */
    void cherryPickCommit();
+
+   /**
+    * @brief showFileDiff Shows the file diff.
+    * @param sha The base commit SHA.
+    * @param parentSha The commit SHA to compare with.
+    * @param fileName The file name to diff.
+    */
+   void showFileDiff(const QString &sha, const QString &parentSha, const QString &fileName);
+
+   /**
+    * @brief showFileDiff Shows the file diff.
+    * @param sha The base commit SHA.
+    * @param parentSha The commit SHA to compare with.
+    * @param fileName The file name to diff.
+    */
+   void showFileDiffEdition(const QString &sha, const QString &parentSha, const QString &fileName);
 };

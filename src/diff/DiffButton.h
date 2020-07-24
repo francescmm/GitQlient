@@ -24,6 +24,7 @@
  ***************************************************************************************/
 #include <QFrame>
 
+class QLabel;
 class QPushButton;
 
 /*!
@@ -57,6 +58,24 @@ public:
     \param parent The parent widget if needed.
    */
    explicit DiffButton(const QString &text, const QString &icon, QWidget *parent = nullptr);
+
+   /*!
+    \brief Default constructor.
+
+    \param text The text that will be shown in the button.
+    \param icon The icon that represents the diff: file or commit.
+    \param selectable Sets the button as selectable, it can be kept pressed.
+    \param closable True to show the close option.
+    \param parent The parent widget if needed.
+    */
+   explicit DiffButton(const QString &text, const QString &icon, bool selectable, bool closable,
+                       QWidget *parent = nullptr);
+
+   /**
+    * @brief setText Adds a text to the button.
+    * @param text The text to show.
+    */
+   void setText(const QString &text) const;
    /*!
     \brief Sets the button as it is selected.
    */
@@ -65,6 +84,18 @@ public:
     \brief Unsets the select status of the button.
    */
    void setUnselected();
+
+   /**
+    * @brief setSelectable Sets the button as selectable, it can be kept pressed.
+    * @param isSelectable True if selectable.
+    */
+   void setSelectable(bool isSelectable);
+
+   /**
+    * @brief isClosable Configures the button to show the close option.
+    * @param closable True to show the close option.
+    */
+   void setClosable(bool closable) const;
 
 protected:
    /*!
@@ -75,5 +106,7 @@ protected:
 
 private:
    bool mPressed = false;
+   bool mSelectable = true;
+   QLabel *mLabel = nullptr;
    QPushButton *mCloseBtn = nullptr;
 };

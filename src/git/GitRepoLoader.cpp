@@ -1,9 +1,12 @@
 #include "GitRepoLoader.h"
 
 #include <GitBase.h>
+#include <GitConfig.h>
 #include <RevisionsCache.h>
 #include <GitRequestorProcess.h>
 #include <GitBranches.h>
+#include <GitQlientSettings.h>
+#include <GitHubRestApi.h>
 
 #include <QLogger.h>
 #include <BenchmarkTool.h>
@@ -11,7 +14,7 @@
 #include <QDir>
 
 using namespace QLogger;
-using namespace GitQlientTools;
+using namespace Benchmarker;
 
 static const QString GIT_LOG_FORMAT("%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ");
 
@@ -20,6 +23,7 @@ GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<Rev
    , mGitBase(gitBase)
    , mRevCache(std::move(cache))
 {
+   connect(this, &GitRepoLoader::signalRefreshPRsCache, mRevCache.get(), &RevisionsCache::refreshPRsCache);
 }
 
 bool GitRepoLoader::loadRepository()
@@ -101,7 +105,6 @@ void GitRepoLoader::loadReferences()
          ret.output = ret.output.toString().trimmed();
 
       QString prevRefSha;
-      const auto curBranchSHA = ret.output.toString();
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
       const auto referencesList = ret3.output.toString().split('\n', Qt::SkipEmptyParts);
@@ -122,7 +125,7 @@ void GitRepoLoader::loadReferences()
 
             if (refName.startsWith("refs/tags/"))
             {
-               type = References::Type::Tag;
+               type = References::Type::LocalTag;
                name = refName.mid(10, reference.length());
                name.remove("^{}");
             }
@@ -204,6 +207,17 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
    BenchmarkStart();
 
    QLog_Info("Git", "Revisions received!");
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+   const auto serverUrl = gitConfig->getServerUrl();
+
+   if (serverUrl.contains("github"))
+   {
+      QLog_Info("Git", "Requesting PR status!");
+      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+
+      emit signalRefreshPRsCache(repoInfo.first, repoInfo.second, serverUrl);
+   }
 
    QLog_Debug("Git", "Processing revisions...");
 

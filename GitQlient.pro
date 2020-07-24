@@ -6,7 +6,7 @@ greaterThan(QT_MINOR_VERSION, 12) {
 }
 
 TARGET = GitQlient
-QT += widgets core
+QT += widgets core network
 DEFINES += QT_DEPRECATED_WARNINGS
 QMAKE_LFLAGS += -no-pie
 
@@ -21,9 +21,11 @@ SOURCES += src/main.cpp
 include(src/App.pri)
 include(QLogger/QLogger.pri)
 include(BenchmarkTool/BenchmarkLib/BenchmarkTool.pri)
+include(QPinnableTabWidget/QPinnableTabWidget.pri)
 
 INCLUDEPATH += QLogger \
-    BenchmarkTool/BenchmarkLib
+    BenchmarkTool/BenchmarkLib \
+    QPinnableTabWidget
 
 OTHER_FILES += \
     $$PWD/LICENSE \
@@ -63,3 +65,6 @@ macos{
 
    QMAKE_EXTRA_TARGETS += dmg
 }
+
+SUBDIRS += \
+   GitQlientApp.pro

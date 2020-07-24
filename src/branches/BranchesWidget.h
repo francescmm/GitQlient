@@ -31,6 +31,8 @@ class QListWidgetItem;
 class QLabel;
 class GitBase;
 class RevisionsCache;
+class QPushButton;
+class BranchesWidgetMinimal;
 
 /*!
  \brief BranchesWidget is the widget that creates the layout that contains all the widgets related with the display of
@@ -98,6 +100,15 @@ public:
 
    */
    void clear();
+   /**
+    * @brief fullView Shows the full branches view.
+    */
+   void fullView();
+
+   /**
+    * @brief minimalView Shows the minimalistic branches view.
+    */
+   void minimalView();
 
 private:
    QSharedPointer<RevisionsCache> mCache;
@@ -113,6 +124,9 @@ private:
    QLabel *mStashesArrow = nullptr;
    QLabel *mSubmodulesCount = nullptr;
    QLabel *mSubmodulesArrow = nullptr;
+   QPushButton *mMinimize = nullptr;
+   QFrame *mFullBranchFrame = nullptr;
+   BranchesWidgetMinimal *mMinimal = nullptr;
 
    /*!
     \brief Method that for a given \p branch process all the informatio and creates the item that will be stored in the
@@ -195,4 +209,9 @@ private:
     \param item The stash item from the stashes list.
    */
    void onStashClicked(QListWidgetItem *item);
+
+   /**
+    * @brief onFetchPerformed Updates the remote tags in the cache.
+    */
+   void onFetchPerformed();
 };

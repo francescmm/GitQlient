@@ -35,7 +35,7 @@ class GitLocal : public QObject
    Q_OBJECT
 
 signals:
-   void signalWipUpdated() const;
+   void signalWipUpdated();
 
 public:
    enum class CommitResetType
@@ -50,10 +50,10 @@ public:
    GitExecResult cherryPickAbort() const;
    GitExecResult cherryPickContinue() const;
    GitExecResult checkoutCommit(const QString &sha) const;
-   GitExecResult markFileAsResolved(const QString &fileName) const;
+   GitExecResult markFileAsResolved(const QString &fileName);
    bool checkoutFile(const QString &fileName) const;
    GitExecResult resetFile(const QString &fileName) const;
-   bool resetCommit(const QString &sha, CommitResetType type) const;
+   bool resetCommit(const QString &sha, CommitResetType type);
    GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg) const;
    GitExecResult ammendCommit(const QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
                               const QString &author = QString()) const;

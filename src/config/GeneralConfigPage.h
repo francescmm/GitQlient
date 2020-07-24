@@ -26,7 +26,7 @@
 #include <QFrame>
 
 class QSpinBox;
-class QCheckBox;
+class CheckBox;
 class QComboBox;
 class QLabel;
 class QPushButton;
@@ -35,8 +35,6 @@ class QLineEdit;
 /*!
  \brief The GeneralConfigPage shows the available configuration for GitQlient. The configurable options are the
 following:
-- Auto-fetch: The user can configure the interval where the auto-fetch runs. It performs a git fetch.
-- Auto-prune: The user can configure the interval where GitQlient performs a prune.
 - Disable logs: The user can enable or disable logs.
 - Log level: The user can configure the level of the logs for GitQlient.
 
@@ -54,13 +52,9 @@ public:
    explicit GeneralConfigPage(QWidget *parent = nullptr);
 
 private:
-   QSpinBox *mAutoFetch = nullptr;
-   QCheckBox *mAutoPrune = nullptr;
-   QCheckBox *mDisableLogs = nullptr;
+   CheckBox *mDisableLogs = nullptr;
    QComboBox *mLevelCombo = nullptr;
-   QCheckBox *mAutoFormat = nullptr;
    QLabel *mStatusLabel = nullptr;
-   QLineEdit *mExternalEditor = nullptr;
    QComboBox *mStylesSchema = nullptr;
    QPushButton *mReset = nullptr;
    QPushButton *mApply = nullptr;
