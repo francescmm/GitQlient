@@ -16,8 +16,6 @@ using namespace QLogger;
 
 GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    : QFrame(parent)
-   , mAutoFetch(new QSpinBox())
-   , mAutoPrune(new CheckBox())
    , mDisableLogs(new CheckBox())
    , mLevelCombo(new QComboBox())
    , mStatusLabel(new QLabel())
@@ -29,29 +27,6 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    setAttribute(Qt::WA_DeleteOnClose);
 
    GitQlientSettings settings;
-
-   mAutoFetch->setRange(0, 60);
-   // mAutoFetch->setValue(settings.localValue("autoFetch", 0).toInt());
-
-   const auto labelAutoFetch = new QLabel(tr("The interval is expected to be in minutes. "
-                                             "Choose a value between 0 (for disabled) and 60"));
-   labelAutoFetch->setWordWrap(true);
-
-   const auto fetchLayout = new QVBoxLayout();
-   fetchLayout->setAlignment(Qt::AlignTop);
-   fetchLayout->setContentsMargins(QMargins());
-   fetchLayout->setSpacing(0);
-   fetchLayout->addWidget(mAutoFetch);
-   fetchLayout->addWidget(labelAutoFetch);
-
-   const auto fetchLayoutLabel = new QVBoxLayout();
-   fetchLayoutLabel->setAlignment(Qt::AlignTop);
-   fetchLayoutLabel->setContentsMargins(QMargins());
-   fetchLayoutLabel->setSpacing(0);
-   fetchLayoutLabel->addWidget(new QLabel(tr("Auto-Fetch interval")));
-   fetchLayoutLabel->addStretch();
-
-   // mAutoPrune->setChecked(settings.getLocalValue("autoPrune", true).toBool());
 
    mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
 
@@ -80,11 +55,7 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    layout->setContentsMargins(20, 20, 20, 20);
    layout->setSpacing(20);
    layout->setAlignment(Qt::AlignTop);
-   layout->addLayout(fetchLayoutLabel, 0, 0);
-   layout->addLayout(fetchLayout, row, 1);
-   layout->addWidget(new QLabel(tr("Auto-Prune")), ++row, 0);
-   layout->addWidget(mAutoPrune, row, 1);
-   layout->addWidget(new QLabel(tr("Disable logs")), ++row, 0);
+   layout->addWidget(new QLabel(tr("Disable logs")), row, 0);
    layout->addWidget(mDisableLogs, row, 1);
    layout->addWidget(new QLabel(tr("Set log level")), ++row, 0);
    layout->addWidget(mLevelCombo, row, 1);
@@ -97,8 +68,6 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
 void GeneralConfigPage::resetChanges()
 {
    GitQlientSettings settings;
-   mAutoFetch->setValue(settings.localValue("autoFetch", 0).toInt());
-   // mAutoPrune->setChecked(settings.getLocalValue("autoPrune", true).toBool());
    mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
    mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", 2).toInt());
    mStylesSchema->setCurrentText(settings.globalValue("colorSchema", "bright").toString());
@@ -111,8 +80,6 @@ void GeneralConfigPage::resetChanges()
 void GeneralConfigPage::applyChanges()
 {
    GitQlientSettings settings;
-   // settings.setLocalValue(mGit->getGitDir(), "autoFetch", mAutoFetch->value());
-   // settings.setLocalValue(mGit->getGitDir(),"autoPrune", mAutoPrune->isChecked());
    settings.setGlobalValue("logsDisabled", mDisableLogs->isChecked());
    settings.setGlobalValue("logsLevel", mLevelCombo->currentIndex());
    settings.setGlobalValue("colorSchema", mStylesSchema->currentText());

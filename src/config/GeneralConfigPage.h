@@ -35,8 +35,6 @@ class QLineEdit;
 /*!
  \brief The GeneralConfigPage shows the available configuration for GitQlient. The configurable options are the
 following:
-- Auto-fetch: The user can configure the interval where the auto-fetch runs. It performs a git fetch.
-- Auto-prune: The user can configure the interval where GitQlient performs a prune.
 - Disable logs: The user can enable or disable logs.
 - Log level: The user can configure the level of the logs for GitQlient.
 
@@ -54,8 +52,6 @@ public:
    explicit GeneralConfigPage(QWidget *parent = nullptr);
 
 private:
-   QSpinBox *mAutoFetch = nullptr;
-   CheckBox *mAutoPrune = nullptr;
    CheckBox *mDisableLogs = nullptr;
    QComboBox *mLevelCombo = nullptr;
    QLabel *mStatusLabel = nullptr;

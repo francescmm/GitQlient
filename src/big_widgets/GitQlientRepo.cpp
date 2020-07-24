@@ -93,11 +93,10 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    showHistoryView();
 
    GitQlientSettings settings;
-   const auto fetchInterval
-       = settings.localValue(mGitBase->getGitDir(), "autoFetch", mConfig.mAutoFetchSecs).toInt();
+   const auto fetchInterval = settings.localValue(mGitBase->getGitDir(), "AutoFetch", 5).toInt();
 
-   mAutoFetch->setInterval(fetchInterval * 1000);
-   mAutoFilesUpdate->setInterval(mConfig.mAutoFileUpdateSecs * 1000);
+   mAutoFetch->setInterval(fetchInterval * 60 * 1000);
+   mAutoFilesUpdate->setInterval(15000);
 
    connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
    connect(mAutoFilesUpdate, &QTimer::timeout, this, &GitQlientRepo::updateUiFromWatcher);
@@ -163,21 +162,6 @@ GitQlientRepo::~GitQlientRepo()
 
    m_loaderThread->exit();
    m_loaderThread->deleteLater();
-}
-
-void GitQlientRepo::setConfig(const GitQlientRepoConfig &config)
-{
-   QLog_Debug("UI", QString("Setting GitQlientRepo configuration."));
-
-   mConfig = config;
-
-   mAutoFetch->stop();
-   mAutoFetch->setInterval(mConfig.mAutoFetchSecs);
-   mAutoFetch->start();
-
-   mAutoFilesUpdate->stop();
-   mAutoFilesUpdate->setInterval(mConfig.mAutoFileUpdateSecs);
-   mAutoFilesUpdate->start();
 }
 
 void GitQlientRepo::updateCache()

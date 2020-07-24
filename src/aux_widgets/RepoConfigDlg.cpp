@@ -3,6 +3,8 @@
 
 #include <GitConfig.h>
 #include <GitQlientStyles.h>
+#include <GitQlientSettings.h>
+#include <GitBase.h>
 
 #include <QLabel>
 #include <QLineEdit>
@@ -14,6 +16,9 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    , mGit(git)
 {
    ui->setupUi(this);
+
+   GitQlientSettings settings;
+   ui->autoFetch->setValue(settings.localValue(mGit->getGitDir(), "AutoFetch", 5).toInt());
 
    ui->tabWidget->setCurrentIndex(0);
 
@@ -66,6 +71,9 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
 
 RepoConfigDlg::~RepoConfigDlg()
 {
+   GitQlientSettings settings;
+   settings.setLocalValue(mGit->getGitDir(), "AutoFetch", ui->autoFetch->value());
+
    delete ui;
 }
 
