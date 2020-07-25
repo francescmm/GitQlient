@@ -1,12 +1,12 @@
-#include "ConfigWidget.h"
+﻿#include "ConfigWidget.h"
 
 #include <GeneralConfigPage.h>
 #include <CreateRepoDlg.h>
 #include <ProgressDlg.h>
 #include <GitQlientSettings.h>
-#include <ClickableFrame.h>
 #include <GitBase.h>
 #include <GitConfig.h>
+#include <ButtonLink.hpp>
 
 #include <QPushButton>
 #include <QGridLayout>
@@ -18,6 +18,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QtGlobal>
+#include <QDesktopServices>
 
 #include <QLogger.h>
 
@@ -40,45 +41,34 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    line->setObjectName("separator");
 
    // Adding buttons to open or init repos
-   const auto repoSubtitle = new QLabel(tr("Repository options"));
-   repoSubtitle->setObjectName("subtitle");
-
    const auto repoOptionsFrame = new QFrame();
-   const auto repoOptionsLayout = new QVBoxLayout(repoOptionsFrame);
-   repoOptionsLayout->setSpacing(20);
+   const auto repoOptionsLayout = new QHBoxLayout(repoOptionsFrame);
+   repoOptionsLayout->setSpacing(0);
    repoOptionsLayout->setContentsMargins(QMargins());
-   repoOptionsLayout->addWidget(repoSubtitle);
    repoOptionsLayout->addWidget(mOpenRepo);
-   repoOptionsLayout->addWidget(mCloneRepo);
-   repoOptionsLayout->addWidget(mInitRepo);
-   repoOptionsLayout->addWidget(line);
-
-   const auto version
-       = new ClickableFrame(QString("About GitQlient v%1 ...").arg(VER), Qt::AlignLeft | Qt::AlignVCenter);
-   version->setLinkStyle();
-   connect(version, &ClickableFrame::clicked, this, &ConfigWidget::showAbout);
-   version->setToolTip(QString("%1").arg(SHA_VER));
-   repoOptionsLayout->addWidget(version);
    repoOptionsLayout->addStretch();
+   repoOptionsLayout->addWidget(mCloneRepo);
+   repoOptionsLayout->addStretch();
+   repoOptionsLayout->addWidget(mInitRepo);
 
-   const auto usedSubtitle = new QLabel(tr("Configuration"));
-   usedSubtitle->setObjectName("subtitle");
+   const auto projectsFrame = new QFrame();
+   mRecentProjectsLayout = new QVBoxLayout(projectsFrame);
+   mRecentProjectsLayout->setContentsMargins(QMargins());
+   mRecentProjectsLayout->addWidget(createRecentProjectsPage());
 
-   const auto configFrame = new QFrame();
-   const auto configLayout = new QVBoxLayout(configFrame);
-   configLayout->setContentsMargins(QMargins());
-   configLayout->setSpacing(20);
-   configLayout->addWidget(usedSubtitle);
-   configLayout->addWidget(createConfigWidget());
-   configLayout->addStretch();
+   const auto mostUsedProjectsFrame = new QFrame();
+   mUsedProjectsLayout = new QVBoxLayout(mostUsedProjectsFrame);
+   mUsedProjectsLayout->setContentsMargins(QMargins());
+   mUsedProjectsLayout->addWidget(createUsedProjectsPage());
 
    const auto widgetsLayout = new QHBoxLayout();
-   widgetsLayout->setContentsMargins(QMargins());
-   widgetsLayout->setSpacing(150);
-   widgetsLayout->addWidget(repoOptionsFrame);
-   widgetsLayout->addWidget(configFrame);
+   widgetsLayout->setSpacing(10);
+   widgetsLayout->setContentsMargins(0, 10, 0, 10);
+   widgetsLayout->addWidget(projectsFrame);
+   widgetsLayout->addStretch();
+   widgetsLayout->addWidget(mostUsedProjectsFrame);
 
-   const auto title = new QLabel(tr("Welcome to GitQlient"));
+   const auto title = new QLabel(tr("GitQlient %1").arg(VER));
    title->setObjectName("title");
 
    const auto gitqlientIcon = new QLabel();
@@ -88,24 +78,56 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    const auto titleLayout = new QHBoxLayout();
    titleLayout->setContentsMargins(QMargins());
    titleLayout->setSpacing(10);
+   titleLayout->addStretch();
    titleLayout->addWidget(gitqlientIcon);
    titleLayout->addWidget(title);
    titleLayout->addStretch();
 
    const auto lineTitle = new QFrame();
-   lineTitle->setObjectName("separator");
+   lineTitle->setObjectName("orangeHSeparator");
 
-   const auto centerLayout = new QVBoxLayout();
-   centerLayout->setSpacing(20);
+   const auto lineTitle2 = new QFrame();
+   lineTitle2->setObjectName("orangeHSeparator");
+
+   const auto version = new ButtonLink(QString("About GitQlient..."));
+   connect(version, &ButtonLink::clicked, this, &ConfigWidget::showAbout);
+   version->setToolTip(QString("%1").arg(SHA_VER));
+
+   const auto goToRepo = new ButtonLink(QString("Source code"));
+   connect(goToRepo, &ButtonLink::clicked, this,
+           []() { QDesktopServices::openUrl(QUrl("https://www.github.com/francescmm/GitQlient")); });
+   goToRepo->setToolTip(QString("Get the source code in GitHub"));
+
+   const auto goToBlog = new ButtonLink(QString("Francesc's blog"));
+   connect(goToBlog, &ButtonLink::clicked, this,
+           []() { QDesktopServices::openUrl(QUrl("https://www.francescmm.com/")); });
+   goToBlog->setToolTip(QString("Go to Francesc's blog"));
+
+   const auto promoLayout = new QHBoxLayout();
+   promoLayout->setContentsMargins(QMargins());
+   promoLayout->setSpacing(0);
+   promoLayout->addWidget(version);
+   promoLayout->addStretch();
+   promoLayout->addWidget(goToRepo);
+   promoLayout->addStretch();
+   promoLayout->addWidget(goToBlog);
+
+   const auto centerFrame = new QFrame();
+   centerFrame->setObjectName("InitWidget");
+   const auto centerLayout = new QVBoxLayout(centerFrame);
+   centerLayout->setSpacing(10);
    centerLayout->setContentsMargins(QMargins());
    centerLayout->addLayout(titleLayout);
    centerLayout->addWidget(lineTitle);
+   centerLayout->addWidget(repoOptionsFrame);
    centerLayout->addLayout(widgetsLayout);
+   centerLayout->addWidget(lineTitle2);
+   centerLayout->addLayout(promoLayout);
    centerLayout->addStretch();
 
    const auto layout = new QGridLayout(this);
    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, 0);
-   layout->addLayout(centerLayout, 1, 1);
+   layout->addWidget(centerFrame, 1, 1);
    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 2);
 
    connect(mOpenRepo, &QPushButton::clicked, this, &ConfigWidget::openRepo);
@@ -155,115 +177,43 @@ void ConfigWidget::initRepo()
    cloneDlg.exec();
 }
 
-QWidget *ConfigWidget::createConfigWidget()
-{
-   mBtnGroup = new QButtonGroup();
-   mBtnGroup->addButton(new QPushButton(tr("General")), 0);
-   mBtnGroup->addButton(new QPushButton(tr("Most used repos")), 1);
-   mBtnGroup->addButton(new QPushButton(tr("Recent repos")), 2);
-
-   const auto firstBtn = mBtnGroup->button(2);
-   firstBtn->setProperty("selected", true);
-   firstBtn->style()->unpolish(firstBtn);
-   firstBtn->style()->polish(firstBtn);
-
-   const auto buttons = mBtnGroup->buttons();
-   const auto buttonsLayout = new QVBoxLayout();
-   buttonsLayout->setContentsMargins(QMargins());
-
-   auto count = 0;
-   for (auto btn : buttons)
-   {
-      buttonsLayout->addWidget(btn);
-
-      if (count < buttons.count() - 1)
-      {
-         ++count;
-         const auto line = new QFrame();
-         line->setObjectName("separator2px");
-         buttonsLayout->addWidget(line);
-      }
-   }
-
-   buttonsLayout->addStretch();
-
-   const auto projectsFrame = new QFrame();
-   mRecentProjectsLayout = new QVBoxLayout(projectsFrame);
-   mRecentProjectsLayout->setContentsMargins(QMargins());
-   mRecentProjectsLayout->addWidget(createRecentProjectsPage());
-
-   const auto mostUsedProjectsFrame = new QFrame();
-   mUsedProjectsLayout = new QVBoxLayout(mostUsedProjectsFrame);
-   mUsedProjectsLayout->setContentsMargins(QMargins());
-   mUsedProjectsLayout->addWidget(createUsedProjectsPage());
-
-   const auto stackedWidget = new QStackedWidget();
-   stackedWidget->setMinimumHeight(300);
-   stackedWidget->addWidget(new GeneralConfigPage());
-   stackedWidget->addWidget(mostUsedProjectsFrame);
-   stackedWidget->addWidget(projectsFrame);
-   stackedWidget->setCurrentIndex(2);
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-   connect(mBtnGroup, &QButtonGroup::idClicked, this, [this, stackedWidget](int index) {
-#else
-   connect(mBtnGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), this, [this, stackedWidget](int index) {
-#endif
-      const auto selectedBtn = mBtnGroup->button(index);
-      const auto buttons = mBtnGroup->buttons();
-
-      for (auto btn : buttons)
-      {
-         btn->setProperty("selected", selectedBtn == btn);
-         btn->style()->unpolish(btn);
-         btn->style()->polish(btn);
-      }
-
-      stackedWidget->setCurrentIndex(index);
-   });
-
-   const auto tabWidget = new QFrame();
-   tabWidget->setObjectName("tabWidget");
-
-   const auto layout = new QHBoxLayout(tabWidget);
-   layout->setSpacing(0);
-   layout->setContentsMargins(QMargins());
-   layout->addLayout(buttonsLayout);
-   layout->addWidget(stackedWidget);
-
-   return tabWidget;
-}
-
 QWidget *ConfigWidget::createRecentProjectsPage()
 {
    delete mInnerWidget;
    mInnerWidget = new QFrame();
-   mInnerWidget->setObjectName("recentProjects");
+
+   auto title = new QLabel(tr("Recent"));
+   title->setStyleSheet("font-size: 14pt;");
 
    const auto innerLayout = new QVBoxLayout(mInnerWidget);
-   innerLayout->setSpacing(0);
+   innerLayout->setContentsMargins(QMargins());
+   innerLayout->setSpacing(10);
+   innerLayout->addWidget(title);
 
    const auto projects = mSettings->getRecentProjects();
 
    for (auto project : projects)
    {
       const auto projectName = project.mid(project.lastIndexOf("/") + 1);
-      const auto labelText = QString("%1 <%2>").arg(projectName, project);
-      const auto clickableFrame = new ClickableFrame(labelText, Qt::AlignLeft);
-      connect(clickableFrame, &ClickableFrame::clicked, this, [this, project]() { emit signalOpenRepo(project); });
+      const auto labelText = QString("%1<br><em>%2</em>").arg(projectName, project);
+      const auto clickableFrame = new ButtonLink(labelText);
+      connect(clickableFrame, &ButtonLink::clicked, this, [this, project]() { emit signalOpenRepo(project); });
       innerLayout->addWidget(clickableFrame);
    }
 
    innerLayout->addStretch();
 
-   const auto clear = new QPushButton("Clear list");
-   clear->setObjectName("warnButton");
-   connect(clear, &QPushButton::clicked, this, [this]() {
+   const auto clear = new ButtonLink("Clear list");
+   connect(clear, &ButtonLink::clicked, this, [this]() {
       mSettings->clearRecentProjects();
 
       mRecentProjectsLayout->addWidget(createRecentProjectsPage());
    });
 
+   const auto lineTitle = new QFrame();
+   lineTitle->setObjectName("separator");
+
+   innerLayout->addWidget(lineTitle);
    innerLayout->addWidget(clear);
 
    return mInnerWidget;
@@ -273,32 +223,39 @@ QWidget *ConfigWidget::createUsedProjectsPage()
 {
    delete mMostUsedInnerWidget;
    mMostUsedInnerWidget = new QFrame();
-   mMostUsedInnerWidget->setObjectName("recentProjects");
+
+   auto title = new QLabel(tr("Most used"));
+   title->setStyleSheet("font-size: 14pt;");
 
    const auto innerLayout = new QVBoxLayout(mMostUsedInnerWidget);
-   innerLayout->setSpacing(0);
+   innerLayout->setContentsMargins(QMargins());
+   innerLayout->setSpacing(10);
+   innerLayout->addWidget(title);
 
    const auto projects = mSettings->getMostUsedProjects();
 
    for (auto project : projects)
    {
       const auto projectName = project.mid(project.lastIndexOf("/") + 1);
-      const auto labelText = QString("%1 <%2>").arg(projectName, project);
-      const auto clickableFrame = new ClickableFrame(labelText, Qt::AlignLeft);
-      connect(clickableFrame, &ClickableFrame::clicked, this, [this, project]() { emit signalOpenRepo(project); });
+      const auto labelText = QString("%1<br><em>%2</em>").arg(projectName, project);
+      const auto clickableFrame = new ButtonLink(labelText);
+      connect(clickableFrame, &ButtonLink::clicked, this, [this, project]() { emit signalOpenRepo(project); });
       innerLayout->addWidget(clickableFrame);
    }
 
    innerLayout->addStretch();
 
-   const auto clear = new QPushButton("Clear list");
-   clear->setObjectName("warnButton");
-   connect(clear, &QPushButton::clicked, this, [this]() {
+   const auto clear = new ButtonLink("Clear list");
+   connect(clear, &ButtonLink::clicked, this, [this]() {
       mSettings->clearMostUsedProjects();
 
       mUsedProjectsLayout->addWidget(createUsedProjectsPage());
    });
 
+   const auto lineTitle = new QFrame();
+   lineTitle->setObjectName("separator");
+
+   innerLayout->addWidget(lineTitle);
    innerLayout->addWidget(clear);
 
    return mMostUsedInnerWidget;
@@ -333,9 +290,9 @@ void ConfigWidget::showAbout()
          "bug or problem, please report it in <a href='https://github.com/francescmm/GitQlient/issues'>the issues "
          "page</a> so I can fix it as soon as possible.<br><br>"
          "If you want to integrate GitQlient into QtCreator, there I also provide a plugin that you can download from "
-         "<a href='https://github.com/francescmm/GitQlientPlugin/releases'>here</a>. Just make sure you pick the right "
+         "<a href='https://github.com/francescmm/GitQlient/releases'>here</a>. Just make sure you pick the right "
          "version and follow the instructions in the main page of the repo.<br><br>"
-         "GitQlient can be compiled from Qt 5.9 on.<br><br>"
+         "GitQlient can be compiled from Qt 5.12 on.<br><br>"
          "Copyright &copy; 2019 - 2020 GitQlient (Francesc Martínez)";
 
    QMessageBox::about(this, tr("About GitQlient v%1").arg(VER), aboutMsg);

@@ -339,12 +339,12 @@ ConfigWidget
 
 QFrame#separator, QFrame#separator2px
 {
-   background-color: #202122;
+    background-color: #202122;
 }
 
-QFrame#orangeSeparator
+#orangeSeparator, #orangeHSeparator
 {
-   background-color: #D89000;
+    background-color: #D89000;
 }
 
 QPushButton#bigButton

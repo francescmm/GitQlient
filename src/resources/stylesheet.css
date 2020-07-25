@@ -4,6 +4,18 @@
    font-size: 10pt;
 }
 
+#InitWidget
+{
+   max-width: 800px;
+   min-width: 800px;
+}
+
+ButtonLink
+{
+   padding: 2px;
+   padding-left: 0;
+}
+
 CheckBox::indicator:unchecked
 ,CheckBox::indicator:unchecked:disabled
 ,CheckBox::indicator:checked
@@ -358,7 +370,13 @@ QFrame#separator2px
    max-height: 2px;
 }
 
-QFrame#orangeSeparator
+#orangeHSeparator
+{
+   min-height: 1px;
+   max-height: 1px;
+}
+
+#orangeSeparator
 {
    min-width: 1px;
    max-width: 1px;

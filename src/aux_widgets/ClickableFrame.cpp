@@ -19,17 +19,23 @@ ClickableFrame::ClickableFrame(const QString &text, Qt::Alignment alignment, QWi
    layout->setSpacing(0);
    layout->addWidget(mText = new QLabel(text));
    layout->setAlignment(alignment);
+
+   mText->setTextFormat(Qt::RichText);
 }
 
 void ClickableFrame::mousePressEvent(QMouseEvent *e)
 {
    mPressed = rect().contains(e->pos()) && e->button() == Qt::LeftButton;
+
+   QFrame::mousePressEvent(e);
 }
 
 void ClickableFrame::mouseReleaseEvent(QMouseEvent *e)
 {
    if (mPressed && rect().contains(e->pos()) && e->button() == Qt::LeftButton)
       emit clicked();
+
+   QFrame::mouseReleaseEvent(e);
 }
 
 void ClickableFrame::enterEvent(QEvent *event)

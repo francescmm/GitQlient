@@ -101,12 +101,6 @@ private:
    */
    void initRepo();
    /*!
-    \brief creates the config widget.
-
-    \return QWidget The resultant widget.
-   */
-   QWidget *createConfigWidget();
-   /*!
     \brief Creates the recent projects page.
 
     \return QWidget The resultant widget.
