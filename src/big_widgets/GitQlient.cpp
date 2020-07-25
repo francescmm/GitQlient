@@ -265,7 +265,7 @@ void GitQlient::closeTab(int tabIndex)
 void GitQlient::restorePinnedRepos()
 {
    GitQlientSettings settings;
-   const auto pinnedRepos = settings.globalValue("PinnedRepos", QStringList()).toStringList();
+   const auto pinnedRepos = settings.globalValue(GitQlientSettings::PinnedRepos, QStringList()).toStringList();
 
    for (auto &repo : pinnedRepos)
       addNewRepoTab(repo, true);
