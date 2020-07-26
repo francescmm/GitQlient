@@ -120,4 +120,9 @@ private:
     * @param pinnedRepos The list of repos to restore
     */
    void restorePinnedRepos();
+   /**
+    * @brief onSuccessOpen Refreshes the UI for the most used and most recent projects lists.
+    * @param fullPath The full path of the project successfully opened.
+    */
+   void onSuccessOpen(const QString &fullPath);
 };

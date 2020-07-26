@@ -198,15 +198,8 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
       const auto index = pinned ? mRepos->addPinnedTab(repo, repoName) : mRepos->addTab(repo, repoName);
 
       connect(repo, &GitQlientRepo::signalEditFile, this, &GitQlient::signalEditDocument);
-      connect(repo, &GitQlientRepo::signalOpenSubmodule, this, [this](const QString &repoName) {
-         const auto currentDir = dynamic_cast<GitQlientRepo *>(sender())->currentDir();
-
-         auto submoduleDir = QString("%1/%2").arg(currentDir, repoName);
-
-         QLog_Info("UI", QString("Adding a new tab for the submodule {%1} in {%2}").arg(repoName, currentDir));
-
-         addRepoTab(submoduleDir);
-      });
+      connect(repo, &GitQlientRepo::signalOpenSubmodule, this, &GitQlient::addRepoTab);
+      connect(repo, &GitQlientRepo::repoOpened, this, &GitQlient::onSuccessOpen);
 
       repo->setRepository(repoName);
 
@@ -269,4 +262,12 @@ void GitQlient::restorePinnedRepos()
 
    for (auto &repo : pinnedRepos)
       addNewRepoTab(repo, true);
+}
+
+void GitQlient::onSuccessOpen(const QString &fullPath)
+{
+   GitQlientSettings settings;
+   settings.setProjectOpened(fullPath);
+
+   mConfigWidget->onRepoOpened();
 }

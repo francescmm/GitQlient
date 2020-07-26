@@ -74,7 +74,16 @@ signals:
     */
    void signalEditFile(const QString &fileName, int line, int column);
 
+   /**
+    * @brief signalLoadRepo Signal used to trigger the data update in a different thread.
+    */
    void signalLoadRepo();
+
+   /**
+    * @brief repoOpened Signal triggered when the repo was successfully opened.
+    * @param repoPath The absolute path to the repository opened.
+    */
+   void repoOpened(const QString &repoPath);
 
 public:
    /*!

@@ -69,7 +69,7 @@ void GitQlientSettings::saveRecentProjects(const QString &projectPath)
 
 void GitQlientSettings::clearRecentProjects()
 {
-   remove("Config/RecentProjects");
+   globalSettings.remove("Config/RecentProjects");
 }
 
 void GitQlientSettings::saveMostUsedProjects(const QString &projectPath)
@@ -94,8 +94,8 @@ void GitQlientSettings::saveMostUsedProjects(const QString &projectPath)
 
 void GitQlientSettings::clearMostUsedProjects()
 {
-   remove("Config/UsedProjects");
-   remove("Config/UsedProjectsCount");
+   globalSettings.remove("Config/UsedProjects");
+   globalSettings.remove("Config/UsedProjectsCount");
 }
 
 QStringList GitQlientSettings::getMostUsedProjects() const

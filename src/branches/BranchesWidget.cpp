@@ -194,8 +194,9 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
 
    mSubmodulesList->setMouseTracking(true);
    mSubmodulesList->setContextMenuPolicy(Qt::CustomContextMenu);
-   connect(mSubmodulesList, &QListWidget::itemDoubleClicked, this,
-           [this](QListWidgetItem *item) { emit signalOpenSubmodule(item->text()); });
+   connect(mSubmodulesList, &QListWidget::itemDoubleClicked, this, [this](QListWidgetItem *item) {
+      emit signalOpenSubmodule(mGit->getWorkingDir().append("/").append(item->text()));
+   });
 
    /* SUBMODULES START */
 
@@ -638,8 +639,9 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
       });
 
       const auto openSubmoduleAction = menu->addAction(tr("Open"));
-      connect(openSubmoduleAction, &QAction::triggered, this,
-              [this, submoduleName]() { emit signalOpenSubmodule(submoduleName); });
+      connect(openSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
+         emit signalOpenSubmodule(mGit->getWorkingDir().append("/").append(submoduleName));
+      });
 
       /*
       const auto deleteSubmoduleAction = menu->addAction(tr("Delete"));

@@ -281,8 +281,7 @@ void GitQlientRepo::onRepoLoadFinished()
 
       mCurrentDir = mGitBase->getWorkingDir();
 
-      GitQlientSettings settings;
-      settings.setProjectOpened(mCurrentDir);
+      emit repoOpened(mCurrentDir);
 
       setWidgetsEnabled(true);
 
