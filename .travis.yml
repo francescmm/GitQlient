@@ -26,7 +26,7 @@ deploy:
   file: "${FILE}"
   prerelease: true
   draft: true
+  skip_cleanup: true
   on:
     tags: true
     repo: francescmm/GitQlient
-    branch: master
