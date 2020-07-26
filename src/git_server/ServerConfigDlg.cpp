@@ -53,10 +53,6 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *pa
 
    ui->leEndPoint->setHidden(true);
 
-   ui->cbServer->insertItem(GitHub, "GitHub", repoUrls.value(GitHub));
-   ui->cbServer->insertItem(GitHubEnterprise, "GitHub Enterprise", repoUrls.value(GitHubEnterprise));
-   ui->cbServer->insertItem(GitLab, "GitLab", repoUrls.value(GitLab));
-
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto serverUrl = gitConfig->getServerUrl();
 
@@ -66,8 +62,19 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *pa
    ui->leEndPoint->setText(
        settings.globalValue(QString("%1/endpoint").arg(serverUrl), repoUrls.value(GitHub)).toString());
 
-   const auto index = repoUrls.key(ui->leEndPoint->text(), GitHubEnterprise);
-   ui->cbServer->setCurrentIndex(index);
+   if (serverUrl.contains("github"))
+   {
+      ui->cbServer->insertItem(GitHub, "GitHub", repoUrls.value(GitHub));
+      ui->cbServer->insertItem(GitHubEnterprise, "GitHub Enterprise", repoUrls.value(GitHubEnterprise));
+
+      const auto index = repoUrls.key(ui->leEndPoint->text(), GitHubEnterprise);
+      ui->cbServer->setCurrentIndex(index);
+   }
+   else
+   {
+      ui->cbServer->insertItem(GitLab, "GitLab", repoUrls.value(GitLab));
+      ui->cbServer->setVisible(false);
+   }
 
    connect(ui->leUserToken, &QLineEdit::editingFinished, this, &ServerConfigDlg::checkToken);
    connect(ui->leUserToken, &QLineEdit::returnPressed, this, &ServerConfigDlg::accept);
