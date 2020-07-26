@@ -26,9 +26,9 @@ using namespace QLogger;
 
 ConfigWidget::ConfigWidget(QWidget *parent)
    : QFrame(parent)
-   , mOpenRepo(new QPushButton(tr("Open existing repo")))
-   , mCloneRepo(new QPushButton(tr("Clone new repo")))
-   , mInitRepo(new QPushButton(tr("Init new repo")))
+   , mOpenRepo(new QPushButton(tr("OPEN")))
+   , mCloneRepo(new QPushButton(tr("CLONE")))
+   , mInitRepo(new QPushButton(tr("NEW")))
    , mSettings(new GitQlientSettings())
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -204,6 +204,7 @@ QWidget *ConfigWidget::createRecentProjectsPage()
    innerLayout->addStretch();
 
    const auto clear = new ButtonLink("Clear list");
+   clear->setVisible(!projects.isEmpty());
    connect(clear, &ButtonLink::clicked, this, [this]() {
       mSettings->clearRecentProjects();
 
@@ -246,6 +247,7 @@ QWidget *ConfigWidget::createUsedProjectsPage()
    innerLayout->addStretch();
 
    const auto clear = new ButtonLink("Clear list");
+   clear->setVisible(!projects.isEmpty());
    connect(clear, &ButtonLink::clicked, this, [this]() {
       mSettings->clearMostUsedProjects();
 

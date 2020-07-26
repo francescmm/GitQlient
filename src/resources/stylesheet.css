@@ -396,8 +396,9 @@ QPushButton#bigButton
 {
     max-height: 30px;
     min-height: 30px;
-    border-width: 2px;
-    border-style: solid;
+    max-width: 200px;
+    min-width: 200px;
+    border-width: 0;
 }
 
 QFrame#tabWidget > QPushButton, QFrame#tabWidget > QPushButton[selected=false]

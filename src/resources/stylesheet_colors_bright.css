@@ -318,11 +318,6 @@ QFrame#orangeSeparator
    background-color: #D89000;
 }
 
-QPushButton#bigButton
-{
-    border-color: #101112;
-}
-
 QFrame#tabWidget > QPushButton[selected=true], QFrame#tabWidget > QPushButton[selected=true]:hover
 {
     background-color: #C6C6C7;
