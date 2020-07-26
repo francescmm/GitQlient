@@ -93,7 +93,7 @@ QColor GitQlientStyles::getBackgroundColor()
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
 
    QColor c;
-   c.setNamedColor(colorSchema == "dark" ? "#2E2F30" : "white");
+   c.setNamedColor(colorSchema == "dark" ? QString("#2E2F30") : QString("white"));
 
    return c;
 }
@@ -104,7 +104,7 @@ QColor GitQlientStyles::getTabColor()
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
 
    QColor c;
-   c.setNamedColor(colorSchema == "dark" ? "#404142" : "white");
+   c.setNamedColor(colorSchema == "dark" ? QString("#404142") : QString("white"));
 
    return c;
 }

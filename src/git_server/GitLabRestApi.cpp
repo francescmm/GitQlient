@@ -59,7 +59,7 @@ void GitLabRestApi::createIssue(const ServerIssue &issue)
 
    QUrlQuery query;
    query.addQueryItem("title", issue.title);
-   query.addQueryItem("description", issue.body);
+   query.addQueryItem("description", QString::fromUtf8(issue.body));
 
    if (!issue.assignees.isEmpty())
       query.addQueryItem("assignee_ids", mUserId);
@@ -87,7 +87,7 @@ void GitLabRestApi::createPullRequest(const ServerPullRequest &pr)
 
    QUrlQuery query;
    query.addQueryItem("title", pr.title);
-   query.addQueryItem("description", pr.body);
+   query.addQueryItem("description", QString::fromUtf8(pr.body));
    query.addQueryItem("assignee_ids", mUserId);
    query.addQueryItem("target_branch", pr.base);
    query.addQueryItem("source_branch", pr.head);

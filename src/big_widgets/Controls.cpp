@@ -552,7 +552,7 @@ void Controls::processUpdateFile()
 void Controls::processChangeLog()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   mChangeLog = reply->readAll();
+   mChangeLog = QString::fromUtf8(reply->readAll());
 }
 
 void Controls::showInfoMessage()

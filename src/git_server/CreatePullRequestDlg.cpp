@@ -65,7 +65,7 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> 
 
    if (f.open(QIODevice::ReadOnly))
    {
-      ui->teDescription->setText(f.readAll());
+      ui->teDescription->setText(QString::fromUtf8(f.readAll()));
       f.close();
    }
 }

@@ -226,7 +226,7 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
          {
             item->setData(GitQlientRole::U_IsConflict, isConflict);
 
-            const auto newName = fileName + QString(" (conflicts)");
+            const auto newName = QString(fileName + " (conflicts)");
             item->setText(newName);
             item->setData(GitQlientRole::U_Name, newName);
          }

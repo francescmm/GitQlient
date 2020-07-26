@@ -65,7 +65,7 @@ std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply, QStrin
 
 QUrl IRestApi::formatUrl(const QString page) const
 {
-   auto tmpUrl = mAuth.endpointUrl + page;
+   auto tmpUrl = QString(mAuth.endpointUrl + page);
 
    if (tmpUrl.endsWith("/"))
       tmpUrl = tmpUrl.left(tmpUrl.size() - 1);
