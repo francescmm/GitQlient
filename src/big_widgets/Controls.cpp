@@ -515,23 +515,18 @@ void Controls::processUpdateFile()
    mLatestGitQlient = json["latest-version"].toString();
    const auto changeLogUrl = json["changelog"].toString();
 
+   QJsonObject os;
+   auto platformSupported = true;
 #if defined(Q_OS_WIN)
-   const auto os = json["windows"].toObject();
+   os = json["windows"].toObject();
 #elif defined(Q_OS_LINUX)
-   const auto os = json["linux"].toObject();
+   os = json["linux"].toObject();
 #elif defined(Q_OS_OSX)
-   const auto os = json["osx"].toObject();
-#elif defined(Q_OS_HAIKU)
-   QJsonObject os;
-   QLog_Error("Ui", QString("Platform not supported for updates"));
-   return;
+   os = json["osx"].toObject();
 #else
-   QJsonObject os;
+   platformSupported = false;
    QLog_Error("Ui", QString("Platform not supported for updates"));
-   return;
 #endif
-
-   mGitQlientDownloadUrl = os["download-url"].toString();
 
    const auto newVersion = mLatestGitQlient.split(".");
    const auto nv = newVersion.at(0).toInt() * 10000 + newVersion.at(1).toInt() * 100 + newVersion.at(2).toInt();
@@ -540,20 +535,33 @@ void Controls::processUpdateFile()
 
    if (nv > cv)
    {
-      mVersionCheck->setVisible(true);
+      if (!platformSupported)
+      {
+         QMessageBox::information(
+             this, tr("New version available!"),
+             tr("There is a new version of GitQlient available but your OS doesn't have a binary built. If you want to "
+                "get the latest version, pleas <a href='https://github.com/francescmm/GitQlient/releases/tag/v%1'>get "
+                "the source code from GitHub</a>.")
+                 .arg(mLatestGitQlient));
+      }
+      else
+      {
+         mGitQlientDownloadUrl = os["download-url"].toString();
+         mVersionCheck->setVisible(true);
 
-      QTimer::singleShot(200, this, [this, changeLogUrl] {
-         QNetworkRequest request;
-         request.setRawHeader("User-Agent", "GitQlient");
-         request.setRawHeader("X-Custom-User-Agent", "GitQlient");
-         request.setRawHeader("Content-Type", "application/json");
-         request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
-         request.setUrl(QUrl(changeLogUrl));
+         QTimer::singleShot(200, this, [this, changeLogUrl] {
+            QNetworkRequest request;
+            request.setRawHeader("User-Agent", "GitQlient");
+            request.setRawHeader("X-Custom-User-Agent", "GitQlient");
+            request.setRawHeader("Content-Type", "application/json");
+            request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+            request.setUrl(QUrl(changeLogUrl));
 
-         const auto reply = mManager->get(request);
+            const auto reply = mManager->get(request);
 
-         connect(reply, &QNetworkReply::finished, this, &Controls::processChangeLog);
-      });
+            connect(reply, &QNetworkReply::finished, this, &Controls::processChangeLog);
+         });
+      }
    }
 }
 
