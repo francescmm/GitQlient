@@ -82,7 +82,7 @@ QString GitHistory::getFileDiff(const QString &currentSha, const QString &previo
 
    QLog_Debug("Git", QString("Executing getFileDiff: {%1} between {%2} and {%3}").arg(file, currentSha, previousSha));
 
-   const auto ret = mGitBase->run(QString("git diff -U15000 %1 %2 %3").arg(previousSha, currentSha, file));
+   const auto ret = mGitBase->run(QString("git diff -w -U15000 %1 %2 %3").arg(previousSha, currentSha, file));
 
    if (ret.success)
    {

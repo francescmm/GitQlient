@@ -27,9 +27,9 @@ void GitBase::setWorkingDir(const QString &workingDir)
    mWorkingDirectory = workingDir;
 }
 
-QString GitBase::getGitDir() const
+QString GitBase::getGitQlientSettingsDir() const
 {
-   return mWorkingDirectory + "/.git";
+   return mWorkingDirectory + "/.gitqlient";
 }
 
 GitExecResult GitBase::run(const QString &cmd) const

@@ -104,12 +104,6 @@ public:
     */
    void setFullViewEnabled(bool enable);
 
-   /**
-    * @brief editMode Enters in edit mode for the give file.
-    * @param fileName The full path of the file.
-    */
-   void editMode(const QString &fileName);
-
 private:
    QString mCurrentFile;
    QPushButton *mBack = nullptr;
@@ -138,10 +132,6 @@ private:
     */
    void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
                     QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);
-   /**
-    * @brief moveTop Moves to the first diff chunk.
-    */
-   void moveTop();
    /**
     * @brief moveChunkUp Moves to the previous diff chunk.
     */

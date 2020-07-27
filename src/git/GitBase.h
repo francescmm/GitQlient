@@ -48,7 +48,7 @@ public:
 
    void setWorkingDir(const QString &workingDir);
 
-   QString getGitDir() const;
+   QString getGitQlientSettingsDir() const;
 
    void updateCurrentBranch();
 

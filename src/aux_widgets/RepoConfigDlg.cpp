@@ -18,7 +18,7 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    ui->setupUi(this);
 
    GitQlientSettings settings;
-   ui->autoFetch->setValue(settings.localValue(mGit->getGitDir(), "AutoFetch", 5).toInt());
+   ui->autoFetch->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "AutoFetch", 5).toInt());
 
    ui->tabWidget->setCurrentIndex(0);
 
@@ -72,7 +72,7 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
 RepoConfigDlg::~RepoConfigDlg()
 {
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitDir(), "AutoFetch", ui->autoFetch->value());
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "AutoFetch", ui->autoFetch->value());
 
    delete ui;
 }

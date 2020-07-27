@@ -93,7 +93,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    showHistoryView();
 
    GitQlientSettings settings;
-   const auto fetchInterval = settings.localValue(mGitBase->getGitDir(), "AutoFetch", 5).toInt();
+   const auto fetchInterval = settings.localValue(mGitBase->getGitQlientSettingsDir(), "AutoFetch", 5).toInt();
 
    mAutoFetch->setInterval(fetchInterval * 60 * 1000);
    mAutoFilesUpdate->setInterval(15000);
@@ -151,7 +151,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(this, &GitQlientRepo::signalLoadRepo, mGitLoader.data(), &GitRepoLoader::loadRepository);
    m_loaderThread->start();
 
-   mGitLoader->setShowAll(settings.localValue(mGitBase->getGitDir(), "ShowAllBranches", true).toBool());
+   mGitLoader->setShowAll(settings.localValue(mGitBase->getGitQlientSettingsDir(), "ShowAllBranches", true).toBool());
 }
 
 GitQlientRepo::~GitQlientRepo()

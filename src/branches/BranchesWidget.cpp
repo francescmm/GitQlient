@@ -102,7 +102,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    tagLayout->addWidget(mTagsList);
 
    GitQlientSettings settings;
-   if (const auto visible = settings.localValue(mGit->getGitDir(), "TagsHeader", true).toBool(); !visible)
+   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "TagsHeader", true).toBool(); !visible)
    {
       mTagsList->setVisible(!visible);
       onTagsHeaderClicked();
@@ -135,7 +135,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    stashLayout->addWidget(stashFrame);
    stashLayout->addWidget(mStashesList);
 
-   if (const auto visible = settings.localValue(mGit->getGitDir(), "StashesHeader", true).toBool(); !visible)
+   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool(); !visible)
    {
       mStashesList->setVisible(!visible);
       onStashesHeaderClicked();
@@ -170,7 +170,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    submoduleLayout->addWidget(submoduleFrame);
    submoduleLayout->addWidget(mSubmodulesList);
 
-   if (const auto visible = settings.localValue(mGit->getGitDir(), "SubmodulesHeader", true).toBool(); !visible)
+   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool(); !visible)
    {
       mSubmodulesList->setVisible(!visible);
       onSubmodulesHeaderClicked();
@@ -660,7 +660,7 @@ void BranchesWidget::onTagsHeaderClicked()
    mTagsList->setVisible(!tagsAreVisible);
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitDir(), "TagsHeader", !tagsAreVisible);
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "TagsHeader", !tagsAreVisible);
 }
 
 void BranchesWidget::onStashesHeaderClicked()
@@ -671,7 +671,7 @@ void BranchesWidget::onStashesHeaderClicked()
    mStashesList->setVisible(!stashesAreVisible);
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitDir(), "StashesHeader", !stashesAreVisible);
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "StashesHeader", !stashesAreVisible);
 }
 
 void BranchesWidget::onSubmodulesHeaderClicked()
@@ -682,7 +682,7 @@ void BranchesWidget::onSubmodulesHeaderClicked()
    mSubmodulesList->setVisible(!submodulesAreVisible);
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitDir(), "SubmodulesHeader", !submodulesAreVisible);
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", !submodulesAreVisible);
 }
 
 void BranchesWidget::onTagClicked(QListWidgetItem *item)
