@@ -23,27 +23,27 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QListWidget>
+#include <QMenu>
 
-class UntrackedFilesList : public QListWidget
+class GitBase;
+
+class UntrackedMenu : public QMenu
 {
    Q_OBJECT
 
 signals:
-   void signalStageFile(QListWidgetItem *item);
+   void signalStageFile();
    void signalCheckoutPerformed();
-   void signalShowDiff(const QString &fileName);
 
 public:
-   explicit UntrackedFilesList(QWidget *parent = nullptr);
+   explicit UntrackedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, QWidget *parent = nullptr);
    void setWorkingDirectory(const QString &workingDir) { mWorkingDir = workingDir; }
 
 private:
+   QSharedPointer<GitBase> mGit;
+   QString mFileName;
    QString mWorkingDir;
-   QListWidgetItem *mSelectedItem = nullptr;
 
-   void onContextMenu(const QPoint &pos);
-   void onStageFile();
    void onDeleteFile();
-   void onDoubleClick(QListWidgetItem *item);
+   bool addEntryToGitIgnore(const QString &entry);
 };

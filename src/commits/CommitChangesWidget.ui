@@ -344,7 +344,7 @@
     </widget>
    </item>
    <item row="1" column="1" colspan="2">
-    <widget class="UntrackedFilesList" name="untrackedFilesList">
+    <widget class="QListWidget" name="untrackedFilesList">
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>
      </property>
@@ -486,11 +486,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>UntrackedFilesList</class>
-   <extends>QListWidget</extends>
-   <header>UntrackedFilesList.h</header>
-  </customwidget>
   <customwidget>
    <class>StagedFilesList</class>
    <extends>QListWidget</extends>

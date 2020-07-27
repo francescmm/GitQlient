@@ -10,6 +10,7 @@
 #include <UnstagedMenu.h>
 #include <RevisionsCache.h>
 #include <FileWidget.h>
+#include <UntrackedMenu.h>
 
 #include <QDir>
 #include <QKeyEvent>
@@ -55,7 +56,6 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<RevisionsCache> &c
    ui->lCounter->setText(QString::number(kMaxTitleChars));
    ui->leCommitTitle->setMaxLength(kMaxTitleChars);
    ui->teDescription->setMaximumHeight(125);
-   ui->untrackedFilesList->setWorkingDirectory(mGit->getWorkingDir());
 
    QIcon stagedIcon(":/icons/staged");
    ui->stagedFilesIcon->setPixmap(stagedIcon.pixmap(15, 15));
@@ -69,11 +69,10 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<RevisionsCache> &c
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitChangesWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitChangesWidget::commitChanges);
    connect(ui->pbCommit, &QPushButton::clicked, this, &CommitChangesWidget::commitChanges);
-   connect(ui->untrackedFilesList, &UntrackedFilesList::signalShowDiff, this, &CommitChangesWidget::requestDiff);
-   connect(ui->untrackedFilesList, &UntrackedFilesList::signalStageFile, this,
-           &CommitChangesWidget::addFileToCommitList);
-   connect(ui->untrackedFilesList, &UntrackedFilesList::signalCheckoutPerformed, this,
-           &CommitChangesWidget::signalCheckoutPerformed);
+   connect(ui->untrackedFilesList, &QListWidget::itemDoubleClicked, this,
+           [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
+   connect(ui->untrackedFilesList, &QListWidget::customContextMenuRequested, this,
+           &CommitChangesWidget::showUntrackedMenu);
    connect(ui->stagedFilesList, &StagedFilesList::signalResetFile, this, &CommitChangesWidget::resetFile);
    connect(ui->stagedFilesList, &StagedFilesList::signalShowDiff, this, &CommitChangesWidget::requestDiff);
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
@@ -410,7 +409,24 @@ void CommitChangesWidget::clear()
    ui->leCommitTitle->clear();
    ui->teDescription->clear();
    ui->pbCommit->setEnabled(false);
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-   ui->lUntrackedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
+   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+   ui->lUntrackedCount->setText(QString("(%1)").arg(ui->untrackedFilesList->count()));
+}
+
+void CommitChangesWidget::showUntrackedMenu(const QPoint &pos)
+{
+   const auto item = ui->untrackedFilesList->itemAt(pos);
+
+   if (item)
+   {
+      const auto fileName = item->toolTip();
+      const auto contextMenu = new UntrackedMenu(mGit, fileName, this);
+      connect(contextMenu, &UntrackedMenu::signalStageFile, this, [this, item]() { addFileToCommitList(item); });
+      connect(contextMenu, &UntrackedMenu::signalCheckoutPerformed, this,
+              &CommitChangesWidget::signalCheckoutPerformed);
+
+      const auto parentPos = ui->untrackedFilesList->mapToParent(pos);
+      contextMenu->popup(mapToGlobal(parentPos));
+   }
 }

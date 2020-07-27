@@ -83,12 +83,6 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
       }
    });
 
-   /*
-   QAction *removeAction = nullptr;
-   connect(removeAction = addAction("Remove file"), &QAction::triggered, this, []() {});
-   removeAction->setDisabled(true);
-   */
-
    addSeparator();
 
    connect(addAction("Add all files to commit"), &QAction::triggered, this, &UnstagedMenu::signalCommitAll);

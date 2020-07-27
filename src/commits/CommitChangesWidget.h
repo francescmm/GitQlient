@@ -76,6 +76,7 @@ protected:
 
    virtual bool commitChanges() = 0;
    virtual void showUnstagedMenu(const QPoint &pos) = 0;
+   void showUntrackedMenu(const QPoint &pos);
 
    virtual void insertFiles(const RevisionFiles &files, QListWidget *fileList) final;
    virtual void prepareCache() final;
