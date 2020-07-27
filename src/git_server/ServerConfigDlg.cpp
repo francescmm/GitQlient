@@ -19,6 +19,7 @@
 #include <QJsonArray>
 #include <QFile>
 #include <QMessageBox>
+#include <QDesktopServices>
 
 #include <utility>
 
@@ -75,6 +76,14 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *pa
       ui->cbServer->insertItem(GitLab, "GitLab", repoUrls.value(GitLab));
       ui->cbServer->setVisible(false);
    }
+
+   ui->lAccessToken->setText(tr("How to get a token?"));
+   connect(ui->lAccessToken, &ButtonLink::clicked, [serverUrl]() {
+      const auto url = serverUrl.contains("github")
+          ? "https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token"
+          : "https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html";
+      QDesktopServices::openUrl(QUrl(url));
+   });
 
    connect(ui->leUserToken, &QLineEdit::editingFinished, this, &ServerConfigDlg::checkToken);
    connect(ui->leUserToken, &QLineEdit::returnPressed, this, &ServerConfigDlg::accept);
