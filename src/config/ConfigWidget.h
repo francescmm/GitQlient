@@ -126,4 +126,9 @@ private:
     * @brief showAbout Shows GitQlient about info.
     */
    void showAbout();
+
+   /**
+    * @brief openConfigDlg Opens the config dialog.
+    */
+   void openConfigDlg();
 };

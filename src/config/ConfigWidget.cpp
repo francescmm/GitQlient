@@ -1,6 +1,6 @@
 ﻿#include "ConfigWidget.h"
 
-#include <GeneralConfigPage.h>
+#include <GeneralConfigDlg.h>
 #include <CreateRepoDlg.h>
 #include <ProgressDlg.h>
 #include <GitQlientSettings.h>
@@ -75,6 +75,10 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    QIcon stagedIcon(":/icons/GitQlientLogoSVG");
    gitqlientIcon->setPixmap(stagedIcon.pixmap(96, 96));
 
+   const auto configBtn = new QPushButton();
+   configBtn->setIcon(QIcon(":/icons/config"));
+   connect(configBtn, &QPushButton::clicked, this, &ConfigWidget::openConfigDlg);
+
    const auto titleLayout = new QHBoxLayout();
    titleLayout->setContentsMargins(QMargins());
    titleLayout->setSpacing(10);
@@ -82,6 +86,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    titleLayout->addWidget(gitqlientIcon);
    titleLayout->addWidget(title);
    titleLayout->addStretch();
+   titleLayout->addWidget(configBtn);
 
    const auto lineTitle = new QFrame();
    lineTitle->setObjectName("orangeHSeparator");
@@ -298,6 +303,12 @@ void ConfigWidget::showAbout()
          "Copyright &copy; 2019 - 2020 GitQlient (Francesc Martínez)";
 
    QMessageBox::about(this, tr("About GitQlient v%1").arg(VER), aboutMsg);
+}
+
+void ConfigWidget::openConfigDlg()
+{
+   GeneralConfigDlg dlg;
+   dlg.exec();
 }
 
 void ConfigWidget::onRepoOpened()

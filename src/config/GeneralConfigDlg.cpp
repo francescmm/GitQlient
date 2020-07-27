@@ -1,31 +1,30 @@
-#include "GeneralConfigPage.h"
+#include "GeneralConfigDlg.h"
 
 #include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
 #include <QLogger.h>
 #include <CheckBox.h>
 
-#include <QTimer>
 #include <QSpinBox>
 #include <QComboBox>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QMessageBox>
 
 using namespace QLogger;
 
-GeneralConfigPage::GeneralConfigPage(QWidget *parent)
-   : QFrame(parent)
+GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
+   : QDialog(parent)
    , mDisableLogs(new CheckBox())
    , mLevelCombo(new QComboBox())
-   , mStatusLabel(new QLabel())
    , mStylesSchema(new QComboBox())
+   , mClose(new QPushButton(tr("Close")))
    , mReset(new QPushButton(tr("Reset")))
    , mApply(new QPushButton(tr("Apply")))
 
 {
-   setAttribute(Qt::WA_DeleteOnClose);
-
    GitQlientSettings settings;
 
    mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
@@ -33,21 +32,24 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    mLevelCombo->addItems({ "Trace", "Debug", "Info", "Warning", "Error", "Fatal" });
    mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", 2).toInt());
 
+   const auto currentStyle = settings.globalValue("colorSchema", "dark").toString();
    mStylesSchema->addItems({ "dark", "bright" });
-   mStylesSchema->setCurrentText(settings.globalValue("colorSchema", "bright").toString());
+   mStylesSchema->setCurrentText(currentStyle);
+   connect(mStylesSchema, &QComboBox::currentTextChanged, this, [this, currentStyle](const QString &newText) {
+      if (newText != currentStyle)
+         mShowResetMsg = true;
+   });
 
-   mStatusLabel->setObjectName("configLabel");
-
-   connect(mReset, &QPushButton::clicked, this, &GeneralConfigPage::resetChanges);
-   connect(mApply, &QPushButton::clicked, this, &GeneralConfigPage::applyChanges);
+   connect(mClose, &QPushButton::clicked, this, &GeneralConfigDlg::close);
+   connect(mReset, &QPushButton::clicked, this, &GeneralConfigDlg::resetChanges);
+   connect(mApply, &QPushButton::clicked, this, &GeneralConfigDlg::accept);
 
    const auto buttonsLayout = new QHBoxLayout();
    buttonsLayout->setContentsMargins(QMargins());
-   buttonsLayout->setSpacing(0);
+   buttonsLayout->setSpacing(20);
+   buttonsLayout->addWidget(mClose);
+   buttonsLayout->addStretch();
    buttonsLayout->addWidget(mReset);
-   buttonsLayout->addStretch();
-   buttonsLayout->addWidget(mStatusLabel);
-   buttonsLayout->addStretch();
    buttonsLayout->addWidget(mApply);
 
    auto row = 0;
@@ -63,29 +65,30 @@ GeneralConfigPage::GeneralConfigPage(QWidget *parent)
    layout->addWidget(mStylesSchema, row, 1);
    layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), ++row, 0, 1, 2);
    layout->addLayout(buttonsLayout, ++row, 0, 1, 2);
+
+   setFixedSize(400, 200);
+
+   setStyleSheet(GitQlientStyles::getStyles());
 }
 
-void GeneralConfigPage::resetChanges()
+void GeneralConfigDlg::resetChanges()
 {
    GitQlientSettings settings;
    mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
    mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", 2).toInt());
    mStylesSchema->setCurrentText(settings.globalValue("colorSchema", "bright").toString());
-
-   QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
-
-   mStatusLabel->setText(tr("Changes reseted."));
 }
 
-void GeneralConfigPage::applyChanges()
+void GeneralConfigDlg::accept()
 {
    GitQlientSettings settings;
    settings.setGlobalValue("logsDisabled", mDisableLogs->isChecked());
    settings.setGlobalValue("logsLevel", mLevelCombo->currentIndex());
    settings.setGlobalValue("colorSchema", mStylesSchema->currentText());
 
-   QTimer::singleShot(3000, mStatusLabel, &QLabel::clear);
-   mStatusLabel->setText(tr("Changes applied! \n Reset is needed if the color schema changed."));
+   if (mShowResetMsg)
+      QMessageBox::information(this, tr("Reset needed!"),
+                               tr("You need to restart GitQlient to see the changes in the styles applid."));
 
    const auto logger = QLoggerManager::getInstance();
    logger->overwriteLogLevel(static_cast<LogLevel>(mLevelCombo->currentIndex()));
@@ -94,4 +97,6 @@ void GeneralConfigPage::applyChanges()
       logger->pause();
    else
       logger->resume();
+
+   QDialog::accept();
 }

@@ -5,10 +5,10 @@ FORMS += \
 
 HEADERS += \
     $$PWD/ConfigWidget.h \
-    $$PWD/GeneralConfigPage.h \
+    $$PWD/GeneralConfigDlg.h \
     $$PWD/GitConfigDlg.h
 
 SOURCES += \
     $$PWD/ConfigWidget.cpp \
-    $$PWD/GeneralConfigPage.cpp \
+    $$PWD/GeneralConfigDlg.cpp \
     $$PWD/GitConfigDlg.cpp

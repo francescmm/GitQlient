@@ -23,7 +23,7 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QFrame>
+#include <QDialog>
 
 class QSpinBox;
 class CheckBox;
@@ -39,7 +39,7 @@ following:
 - Log level: The user can configure the level of the logs for GitQlient.
 
 */
-class GeneralConfigPage : public QFrame
+class GeneralConfigDlg : public QDialog
 {
    Q_OBJECT
 
@@ -49,13 +49,14 @@ public:
 
     \param parent The parent widget if needed.
    */
-   explicit GeneralConfigPage(QWidget *parent = nullptr);
+   explicit GeneralConfigDlg(QWidget *parent = nullptr);
 
 private:
    CheckBox *mDisableLogs = nullptr;
    QComboBox *mLevelCombo = nullptr;
-   QLabel *mStatusLabel = nullptr;
    QComboBox *mStylesSchema = nullptr;
+   bool mShowResetMsg = false;
+   QPushButton *mClose = nullptr;
    QPushButton *mReset = nullptr;
    QPushButton *mApply = nullptr;
 
@@ -68,5 +69,5 @@ private:
     \brief Applies the changes into the settings system.
 
    */
-   void applyChanges();
+   void accept() override;
 };
