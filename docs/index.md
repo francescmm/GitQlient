@@ -72,14 +72,11 @@ The first screen you will see when opening GitQlient is the *Initial screen*. It
 
 ## <a name="gitqlient-configuration"></a>GitQlient configuration
 
-In the GitQlient configuration, you can change some internal parameters that GitQlient uses to update the view and internal data. The available options are:
+In the GitQlient configuration (small button in the right to the logo), you can change some internal parameters that GitQlient uses to update the view and internal data. The available options are:
 
-- Auto-Fetch interval: defined in minutes (from 0 to 60) this interval is used to fetch automatically the changes in the remote repository.
-- Auto-Prune: if active, GitQlient will perform prune actions when it does the automatic fetch.
 - Disable logs: if active, it disables GitQlient logs.
 - Log level: Allows you to choose the threshold of the levels that GitQlient will write. The higher level, the lesser amount of logs.
-- Auto-format files (not operative): if active, every time that you make a commit, it will perform an auto-formating of the code. The formatting will be done by using clang and the clang-format file defined at the root of the repository.
-- External editor: application that will be used to open files to edit them.
+- Styles schema: For the moment you can choose between dark (default) and bright color schema.
 
 ## <a name="init-repo"></a>Initializing a new repository
 
