@@ -521,6 +521,14 @@ void Controls::processUpdateFile()
    const auto os = json["linux"].toObject();
 #elif defined(Q_OS_OSX)
    const auto os = json["osx"].toObject();
+#elif defined(Q_OS_HAIKU)
+   QJsonObject os;
+   QLog_Error("Ui", QString("Platform not supported for updates"));
+   return;
+#else
+   QJsonObject os;
+   QLog_Error("Ui", QString("Platform not supported for updates"));
+   return;
 #endif
 
    mGitQlientDownloadUrl = os["download-url"].toString();
