@@ -35,7 +35,7 @@ enum GitServerPlatform
    Bitbucket
 };
 
-static const QMap<GitServerPlatform, QString> repoUrls { { GitHub, "https://api.github.com/repos" },
+static const QMap<GitServerPlatform, QString> repoUrls { { GitHub, "https://api.github.com" },
                                                          { GitHubEnterprise, "" },
                                                          { GitLab, "https://gitlab.com/api/v4" } };
 }

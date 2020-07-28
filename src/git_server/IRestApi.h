@@ -140,12 +140,6 @@ protected:
    ServerAuthentication mAuth;
 
    /**
-    * @brief formatUrl General method that formats the server url by uniting their different parts.
-    * @param page The page to attach to the server API URL.
-    * @return Returns a url object with the final URL to be used.
-    */
-   QUrl formatUrl(const QString page) const;
-   /**
     * @brief createRequest Creates a request to be consumed by the Git remote server.
     * @param page The destination page of the request.
     * @return Returns a QNetworkRequest object with the configuration needed by the server.

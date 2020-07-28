@@ -23,6 +23,15 @@ std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply, QStrin
    const auto jsonDoc = QJsonDocument::fromJson(data);
    const auto url = reply->url().path();
 
+   if (reply->error() != QNetworkReply::NoError)
+   {
+      QLog_Error("Ui", QString("Error #%1 - %2.").arg(QString::number(reply->error()), reply->errorString()));
+
+      errorString = reply->errorString();
+
+      return std::nullopt;
+   }
+
    if (jsonDoc.isNull())
    {
       QLog_Error("Ui", QString("Error when parsing Json. Current data:\n%1").arg(QString::fromUtf8(data)));
@@ -61,14 +70,4 @@ std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply, QStrin
    reply->deleteLater();
 
    return jsonDoc;
-}
-
-QUrl IRestApi::formatUrl(const QString page) const
-{
-   auto tmpUrl = QString(mAuth.endpointUrl + page);
-
-   if (tmpUrl.endsWith("/"))
-      tmpUrl = tmpUrl.left(tmpUrl.size() - 1);
-
-   return QUrl(tmpUrl);
 }

@@ -51,6 +51,7 @@ public:
 
 private:
    QMap<QString, ServerPullRequest> mPulls;
+   QString mRepoEndpoint;
    int mPrRequested = 0;
 
    QNetworkRequest createRequest(const QString &page) const override;

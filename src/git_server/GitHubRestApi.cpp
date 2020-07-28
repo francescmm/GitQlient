@@ -25,12 +25,12 @@ GitHubRestApi::GitHubRestApi(QString repoOwner, QString repoName, const ServerAu
    if (repoName.endsWith("/"))
       repoName = repoName.left(repoName.size() - 1);
 
-   mAuth.endpointUrl = mAuth.endpointUrl + repoOwner + repoName;
+   mRepoEndpoint = QString("/repos") + repoOwner + repoName;
 }
 
 void GitHubRestApi::testConnection()
 {
-   auto request = createRequest("");
+   auto request = createRequest("/user/repos");
 
    const auto reply = mManager->get(request);
 
@@ -51,7 +51,7 @@ void GitHubRestApi::createIssue(const ServerIssue &issue)
    QJsonDocument doc(issue.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
 
-   auto request = createRequest("/issues");
+   auto request = createRequest(mRepoEndpoint + "/issues");
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
    const auto reply = mManager->post(request, data);
 
@@ -63,7 +63,7 @@ void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
    QJsonDocument doc(issue.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
 
-   auto request = createRequest(QString("/issues/%1").arg(issueNumber));
+   auto request = createRequest(QString(mRepoEndpoint + "/issues/%1").arg(issueNumber));
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
    const auto reply = mManager->post(request, data);
 
@@ -84,7 +84,7 @@ void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
    QJsonDocument doc(pullRequest.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
 
-   auto request = createRequest("/pulls");
+   auto request = createRequest(mRepoEndpoint + "/pulls");
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
 
    const auto reply = mManager->post(request, data);
@@ -93,14 +93,14 @@ void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
 
 void GitHubRestApi::requestLabels()
 {
-   const auto reply = mManager->get(createRequest("/labels"));
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + "/labels"));
 
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onLabelsReceived);
 }
 
 void GitHubRestApi::requestMilestones()
 {
-   const auto reply = mManager->get(createRequest("/milestones"));
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + "/milestones"));
 
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onMilestonesReceived);
 }
@@ -108,14 +108,14 @@ void GitHubRestApi::requestMilestones()
 void GitHubRestApi::requestPullRequestsState()
 {
    QTimer::singleShot(1500, this, [this]() {
-      const auto reply = mManager->get(createRequest("/pulls"));
+      const auto reply = mManager->get(createRequest(mRepoEndpoint + "/pulls"));
       connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::processPullRequets);
    });
 }
 
 void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
 {
-   const auto reply = mManager->put(createRequest(QString("/pulls/%1/merge").arg(number)), data);
+   const auto reply = mManager->put(createRequest(mRepoEndpoint + QString("/pulls/%1/merge").arg(number)), data);
 
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestMerged);
 }
@@ -123,7 +123,7 @@ void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
-   request.setUrl(formatUrl(page));
+   request.setUrl(mAuth.endpointUrl + page);
    request.setRawHeader("User-Agent", "GitQlient");
    request.setRawHeader("X-Custom-User-Agent", "GitQlient");
    request.setRawHeader("Content-Type", "application/json");
@@ -270,7 +270,7 @@ void GitHubRestApi::processPullRequets()
 
          mPulls.insert(prInfo.state.sha, prInfo);
 
-         auto request = createRequest(QString("/commits/%1/status").arg(prInfo.state.sha));
+         auto request = createRequest(mRepoEndpoint + QString("/commits/%1/status").arg(prInfo.state.sha));
          const auto reply = mManager->get(request);
          connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestStatusReceived);
 
