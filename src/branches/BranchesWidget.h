@@ -106,9 +106,20 @@ public:
    void fullView();
 
    /**
+    * @brief returnToSavedView Returns to the view mode previously saved. This methods bypasses the forceMinimalView.
+    * method.
+    */
+   void returnToSavedView();
+
+   /**
     * @brief minimalView Shows the minimalistic branches view.
     */
    void minimalView();
+
+   /**
+    * @brief forceMinimalView Forces the minimal view but temporarily: id doesn't save the state.
+    */
+   void forceMinimalView();
 
 private:
    QSharedPointer<RevisionsCache> mCache;

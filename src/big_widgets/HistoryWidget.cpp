@@ -118,7 +118,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });
 
    mChShowAllBranches = new CheckBox(tr("Show all branches"));
-   mChShowAllBranches->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "ShowAllBranches", true).toBool());
+   mChShowAllBranches->setChecked(
+       settings.localValue(mGit->getGitQlientSettingsDir(), "ShowAllBranches", true).toBool());
    connect(mChShowAllBranches, &CheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
 
    const auto graphOptionsLayout = new QHBoxLayout();
@@ -362,13 +363,12 @@ void HistoryWidget::onAmendCommit(const QString &sha)
 {
    mCommitStackedWidget->setCurrentIndex(2);
    mAmendWidget->configure(sha);
-   mBranchesWidget->fullView();
 }
 
 void HistoryWidget::returnToView()
 {
    mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
-   mBranchesWidget->fullView();
+   mBranchesWidget->returnToSavedView();
 }
 
 void HistoryWidget::cherryPickCommit()
@@ -412,7 +412,7 @@ void HistoryWidget::showFileDiff(const QString &sha, const QString &parentSha, c
    {
       mFileDiff->configure(sha, parentSha, fileName);
       mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
-      mBranchesWidget->minimalView();
+      mBranchesWidget->forceMinimalView();
    }
    else
       emit signalShowDiff(sha, parentSha, fileName);
@@ -424,7 +424,7 @@ void HistoryWidget::showFileDiffEdition(const QString &sha, const QString &paren
    {
       mFileDiff->configure(sha, parentSha, fileName, true);
       mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
-      mBranchesWidget->minimalView();
+      mBranchesWidget->forceMinimalView();
    }
    else
       emit signalShowDiff(sha, parentSha, fileName);

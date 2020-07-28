@@ -349,16 +349,33 @@ void BranchesWidget::fullView()
    mMinimal->setVisible(false);
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MinimalBranchesView", false);
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MinimalBranchesView", mMinimal->isVisible());
+}
+
+void BranchesWidget::returnToSavedView()
+{
+   GitQlientSettings settings;
+   const auto savedState = settings.localValue(mGit->getGitQlientSettingsDir(), "MinimalBranchesView", false).toBool();
+
+   if (savedState != mMinimal->isVisible())
+   {
+      mFullBranchFrame->setVisible(!savedState);
+      mMinimal->setVisible(savedState);
+   }
 }
 
 void BranchesWidget::minimalView()
 {
-   mFullBranchFrame->setVisible(false);
-   mMinimal->setVisible(true);
+   forceMinimalView();
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MinimalBranchesView", true);
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MinimalBranchesView", mMinimal->isVisible());
+}
+
+void BranchesWidget::forceMinimalView()
+{
+   mFullBranchFrame->setVisible(false);
+   mMinimal->setVisible(true);
 }
 
 void BranchesWidget::processLocalBranch(const QString &sha, QString branch)
