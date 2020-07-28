@@ -214,4 +214,11 @@ private:
     * @brief onFetchPerformed Updates the remote tags in the cache.
     */
    void onFetchPerformed();
+
+   /**
+    * @brief onStashSelected Gets the SHA for a given stash and notifies the UI that it should select it in the
+    * repository view.
+    * @param stash The stash name.
+    */
+   void onStashSelected(const QString &stashId);
 };

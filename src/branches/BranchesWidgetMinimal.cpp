@@ -18,10 +18,15 @@ BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<RevisionsCache
    , mCache(cache)
    , mBack(new QPushButton())
    , mLocal(new QToolButton())
+   , mLocalMenu(new QMenu(mLocal))
    , mRemote(new QToolButton())
+   , mRemoteMenu(new QMenu(mRemote))
    , mTags(new QToolButton())
+   , mTagsMenu(new QMenu(mTags))
    , mStashes(new QToolButton())
+   , mStashesMenu(new QMenu(mStashes))
    , mSubmodules(new QToolButton())
+   , mSubmodulesMenu(new QMenu(mSubmodules))
 {
    mBack->setIcon(QIcon(":/icons/back"));
    connect(mBack, &QPushButton::clicked, this, &BranchesWidgetMinimal::showFullBranchesView);
@@ -35,15 +40,41 @@ BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<RevisionsCache
    layout->addWidget(mTags, 3, 0);
    layout->addWidget(mStashes, 4, 0);
    layout->addWidget(mSubmodules, 5, 0);
-}
 
-void BranchesWidgetMinimal::configure()
-{
-   configureLocalMenu();
-   configureRemoteMenu();
-   configureTagsMenu();
-   configureStashesMenu();
-   configureSubmodulesMenu();
+   mLocalMenu->installEventFilter(this);
+   mLocal->setMenu(mLocalMenu);
+   mLocal->setIcon(QIcon(":/icons/local"));
+   mLocal->setPopupMode(QToolButton::InstantPopup);
+   mLocal->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+   mLocal->setText("   " + QString::number(mLocalMenu->actions().count()));
+
+   mRemoteMenu->installEventFilter(this);
+   mRemote->setMenu(mRemoteMenu);
+   mRemote->setIcon(QIcon(":/icons/server"));
+   mRemote->setPopupMode(QToolButton::InstantPopup);
+   mRemote->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+   mRemote->setText("   " + QString::number(mRemoteMenu->actions().count()));
+
+   mTagsMenu->installEventFilter(this);
+   mTags->setMenu(mTagsMenu);
+   mTags->setIcon(QIcon(":/icons/tags"));
+   mTags->setPopupMode(QToolButton::InstantPopup);
+   mTags->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+   mTags->setText("   " + QString::number(mTagsMenu->actions().count()));
+
+   mStashesMenu->installEventFilter(this);
+   mStashes->setMenu(mStashesMenu);
+   mStashes->setIcon(QIcon(":/icons/stashes"));
+   mStashes->setPopupMode(QToolButton::InstantPopup);
+   mStashes->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+   mStashes->setText("   " + QString::number(mStashesMenu->actions().count()));
+
+   mSubmodulesMenu->installEventFilter(this);
+   mSubmodules->setMenu(mSubmodulesMenu);
+   mSubmodules->setIcon(QIcon(":/icons/submodules"));
+   mSubmodules->setPopupMode(QToolButton::InstantPopup);
+   mSubmodules->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+   mSubmodules->setText("   " + QString::number(mSubmodulesMenu->actions().count()));
 }
 
 bool BranchesWidgetMinimal::eventFilter(QObject *obj, QEvent *event)
@@ -61,140 +92,47 @@ bool BranchesWidgetMinimal::eventFilter(QObject *obj, QEvent *event)
    return false;
 }
 
-#include <QStyle>
-void BranchesWidgetMinimal::configureLocalMenu()
+void BranchesWidgetMinimal::addActionToMenu(const QString &sha, const QString &name, QMenu *menu)
 {
-   auto branches = mCache->getBranches(References::Type::LocalBranch);
-   auto count = 0;
+   const auto action = new QAction(name);
+   action->setData(sha);
+   connect(action, &QAction::triggered, this, [this, sha] { emit commitSelected(sha); });
 
-   if (!branches.isEmpty())
-   {
-      const auto menu = new QMenu(mLocal);
-      menu->installEventFilter(this);
-
-      for (const auto &pair : branches)
-      {
-         for (const auto &branch : pair.second)
-         {
-            if (!branch.contains("HEAD->"))
-            {
-               ++count;
-               const auto action = new QAction(branch);
-               action->setData(pair.first);
-               menu->addAction(action);
-            }
-         }
-      }
-
-      mLocal->setMenu(menu);
-   }
-
-   mLocal->setIcon(QIcon(":/icons/local"));
-   mLocal->setText("   " + QString::number(count));
-   mLocal->setPopupMode(QToolButton::InstantPopup);
-   mLocal->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+   menu->addAction(action);
 }
 
-void BranchesWidgetMinimal::configureRemoteMenu()
+void BranchesWidgetMinimal::configureLocalMenu(const QString &sha, const QString &branch)
 {
-   auto branches = mCache->getBranches(References::Type::RemoteBranches);
-   auto count = 0;
-
-   if (!branches.isEmpty())
-   {
-      const auto menu = new QMenu(mRemote);
-      menu->installEventFilter(this);
-
-      for (const auto &pair : branches)
-      {
-         for (const auto &branch : pair.second)
-         {
-            if (!branch.contains("HEAD->"))
-            {
-               ++count;
-               const auto action = new QAction(branch);
-               action->setData(pair.first);
-               menu->addAction(action);
-            }
-         }
-      }
-
-      mRemote->setMenu(menu);
-   }
-
-   mRemote->setIcon(QIcon(":/icons/server"));
-   mRemote->setText("   " + QString::number(count));
-   mRemote->setPopupMode(QToolButton::InstantPopup);
-   mRemote->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+   addActionToMenu(sha, branch, mLocalMenu);
+   mLocal->setText("   " + QString::number(mLocalMenu->actions().count()));
 }
 
-void BranchesWidgetMinimal::configureTagsMenu()
+void BranchesWidgetMinimal::configureRemoteMenu(const QString &sha, const QString &branch)
 {
-   const auto localTags = mCache->getTags(References::Type::LocalTag);
-   const auto remoteTags = mCache->getTags(References::Type::RemoteTag);
-
-   if (!localTags.isEmpty())
-   {
-      const auto menu = new QMenu(mTags);
-      menu->installEventFilter(this);
-
-      for (const auto &tag : localTags.toStdMap())
-      {
-         const auto action = new QAction(tag.first);
-         action->setData(tag.second);
-         menu->addAction(action);
-      }
-
-      mTags->setMenu(menu);
-   }
-
-   mTags->setIcon(QIcon(":/icons/tags"));
-   mTags->setText("   " + QString::number(localTags.count()));
-   mTags->setPopupMode(QToolButton::InstantPopup);
-   mTags->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+   addActionToMenu(sha, branch, mRemoteMenu);
+   mRemote->setText("   " + QString::number(mRemoteMenu->actions().count()));
 }
 
-void BranchesWidgetMinimal::configureStashesMenu()
+void BranchesWidgetMinimal::configureTagsMenu(const QString &sha, const QString &tag)
 {
-   QScopedPointer<GitStashes> git(new GitStashes(mGit));
-   const auto stashes = git->getStashes();
-
-   if (!stashes.isEmpty())
-   {
-      const auto menu = new QMenu(mStashes);
-      menu->installEventFilter(this);
-
-      for (const auto &stash : stashes)
-      {
-         const auto stashId = stash.split(":").first();
-         const auto stashDesc = stash.split("}: ").last();
-         const auto action = new QAction(stashDesc);
-         action->setData(stashId);
-         menu->addAction(action);
-      }
-
-      mStashes->setMenu(menu);
-   }
-
-   mStashes->setIcon(QIcon(":/icons/stashes"));
-   mStashes->setText("   " + QString::number(stashes.count()));
-   mStashes->setPopupMode(QToolButton::InstantPopup);
-   mStashes->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+   addActionToMenu(sha, tag, mTagsMenu);
+   mTags->setText("   " + QString::number(mTagsMenu->actions().count()));
 }
 
-void BranchesWidgetMinimal::configureSubmodulesMenu()
+void BranchesWidgetMinimal::configureStashesMenu(const QString &stashId, const QString &name)
 {
-   QScopedPointer<GitSubmodules> gitSM(new GitSubmodules(mGit));
-   const auto submodules = gitSM->getSubmodules();
-   const auto menu = new QMenu(mSubmodules);
-   menu->installEventFilter(this);
+   const auto action = new QAction(name);
+   action->setData(stashId);
+   connect(action, &QAction::triggered, this, [this, stashId] { emit stashSelected(stashId); });
 
-   for (const auto &submodule : submodules)
-      menu->addAction(new QAction(submodule));
+   mStashesMenu->addAction(action);
+   mStashes->setText("   " + QString::number(mStashesMenu->actions().count()));
+}
 
-   mSubmodules->setIcon(QIcon(":/icons/submodules"));
-   mSubmodules->setText("   " + QString::number(submodules.count()));
-   mSubmodules->setPopupMode(QToolButton::InstantPopup);
-   mSubmodules->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-   mSubmodules->setMenu(menu);
+void BranchesWidgetMinimal::configureSubmodulesMenu(const QString &name)
+{
+   const auto action = new QAction(name);
+   action->setData(name);
+   mSubmodulesMenu->addAction(action);
+   mSubmodules->setText("   " + QString::number(mSubmodulesMenu->actions().count()));
 }
