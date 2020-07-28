@@ -67,6 +67,8 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    style()->unpolish(this);
    setStyleSheet(GitQlientStyles::getStyles());
    style()->polish(this);
+
+   setAttribute(Qt::WA_DeleteOnClose);
 }
 
 RepoConfigDlg::~RepoConfigDlg()
