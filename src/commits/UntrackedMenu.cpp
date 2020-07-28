@@ -53,7 +53,7 @@ void UntrackedMenu::onDeleteFile()
    QLog_Info("UI", "Removing paht: " + path);
 
    QProcess p;
-   p.setWorkingDirectory(mWorkingDir);
+   p.setWorkingDirectory(mGit->getWorkingDir());
    p.start("rm", { "-rf", path });
 
    if (p.waitForFinished())

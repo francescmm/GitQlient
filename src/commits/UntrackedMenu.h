@@ -37,12 +37,10 @@ signals:
 
 public:
    explicit UntrackedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, QWidget *parent = nullptr);
-   void setWorkingDirectory(const QString &workingDir) { mWorkingDir = workingDir; }
 
 private:
    QSharedPointer<GitBase> mGit;
    QString mFileName;
-   QString mWorkingDir;
 
    void onDeleteFile();
    bool addEntryToGitIgnore(const QString &entry);
