@@ -17,7 +17,8 @@ HEADERS += \
     $$PWD/Highlighter.h \
     $$PWD/ProgressDlg.h \
     $$PWD/PullDlg.h \
-    $$PWD/RepoConfigDlg.h
+    $$PWD/RepoConfigDlg.h \
+    $$PWD/WaitingDlg.h
 
 SOURCES += \
     $$PWD/BranchDlg.cpp \
@@ -30,4 +31,5 @@ SOURCES += \
     $$PWD/Highlighter.cpp \
     $$PWD/ProgressDlg.cpp \
     $$PWD/PullDlg.cpp \
-    $$PWD/RepoConfigDlg.cpp
+    $$PWD/RepoConfigDlg.cpp \
+    $$PWD/WaitingDlg.cpp

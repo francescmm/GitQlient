@@ -9,7 +9,7 @@
 #include <QLogger.h>
 #include <BlameWidget.h>
 #include <CommitInfo.h>
-#include <ProgressDlg.h>
+#include <WaitingDlg.h>
 #include <GitConfigDlg.h>
 #include <Controls.h>
 #include <HistoryWidget.h>
@@ -259,10 +259,10 @@ void GitQlientRepo::showFileHistory(const QString &fileName)
 
 void GitQlientRepo::createProgressDialog()
 {
-   if (!mProgressDlg)
+   if (!mWaitDlg)
    {
-      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 0, true);
-      mProgressDlg->exec();
+      mWaitDlg = new WaitingDlg(tr("Loading repository..."));
+      mWaitDlg->exec();
 
       QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
    }
@@ -270,9 +270,6 @@ void GitQlientRepo::createProgressDialog()
 
 void GitQlientRepo::onRepoLoadFinished()
 {
-   if (mProgressDlg)
-      mProgressDlg->close();
-
    if (!mIsInit)
    {
       updateTagsOnCache();
@@ -314,6 +311,9 @@ void GitQlientRepo::onRepoLoadFinished()
    mHistoryWidget->loadBranches();
    mHistoryWidget->onNewRevisions(totalCommits);
    mBlameWidget->onNewRevisions(totalCommits);
+
+   if (mWaitDlg)
+      mWaitDlg->close();
 }
 
 void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
