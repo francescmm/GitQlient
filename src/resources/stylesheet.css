@@ -665,3 +665,35 @@ QMessageBox
     padding: 0;
 }
 
+QSpinBox
+{
+    border-style: solid;
+    border-width: 1px;
+    max-height: 25px;
+    min-height: 25px;
+}
+
+QSpinBox::up-button
+{
+    width: 16px; /* 16 + 2*1px border-width = 15px padding + 3px parent border */
+    border: 0px;
+}
+
+QSpinBox::up-arrow {
+    image: url(:/icons/arrow_up);
+    width: 14px;
+    height: 7px;
+}
+
+QSpinBox::down-button
+{
+    width: 16px;
+    border: 0px;
+}
+
+QSpinBox::down-arrow {
+    image: url(:/icons/arrow_down);
+    width: 14px;
+    height: 7px;
+}
+

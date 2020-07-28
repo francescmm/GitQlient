@@ -63,6 +63,7 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
 
    ui->tab->setStyleSheet(QString("background-color: %1;").arg(color));
    ui->tab_2->setStyleSheet(QString("background-color: %1;").arg(color));
+   ui->tab_3->setStyleSheet(QString("background-color: %1;").arg(color));
 
    style()->unpolish(this);
    setStyleSheet(GitQlientStyles::getStyles());

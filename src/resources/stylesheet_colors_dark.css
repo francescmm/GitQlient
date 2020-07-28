@@ -672,3 +672,19 @@ BranchesWidgetMinimal > DiffButton
     background-color: #606162;
 }
 
+QSpinBox
+{
+    color: white;
+    border-color: #D89000;
+}
+
+QSpinBox::up-button:hover, QSpinBox::down-button:hover
+{
+    background: #606162;
+}
+
+QSpinBox::up-button, QSpinBox::down-button
+{
+    border-color: #D89000;
+}
+

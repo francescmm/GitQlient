@@ -6,7 +6,7 @@ greaterThan(QT_MINOR_VERSION, 12) {
 }
 
 TARGET = GitQlient
-QT += widgets core network
+QT += widgets core network svg
 DEFINES += QT_DEPRECATED_WARNINGS
 QMAKE_LFLAGS += -no-pie
 
