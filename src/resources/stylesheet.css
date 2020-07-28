@@ -665,3 +665,10 @@ QMessageBox
     padding: 0;
 }
 
+QDialog > QPushButton
+{
+   max-height: 20px;
+   min-height: 20px;
+   min-width: 75px;
+}
+
