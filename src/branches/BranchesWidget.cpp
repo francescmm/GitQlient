@@ -276,6 +276,7 @@ void BranchesWidget::showBranches()
    QLog_Info("UI", QString("Loading branches data"));
 
    clear();
+   mMinimal->clearActions();
 
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 

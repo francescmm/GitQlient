@@ -84,6 +84,7 @@ BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<RevisionsCache
 
 bool BranchesWidgetMinimal::eventFilter(QObject *obj, QEvent *event)
 {
+
    if (const auto menu = qobject_cast<QMenu *>(obj); menu && event->type() == QEvent::Show)
    {
       auto localPos = menu->parentWidget()->pos();
@@ -94,6 +95,7 @@ bool BranchesWidgetMinimal::eventFilter(QObject *obj, QEvent *event)
       menu->move(pos);
       return true;
    }
+
    return false;
 }
 
@@ -140,4 +142,13 @@ void BranchesWidgetMinimal::configureSubmodulesMenu(const QString &name)
    action->setData(name);
    mSubmodulesMenu->addAction(action);
    mSubmodules->setText("   " + QString::number(mSubmodulesMenu->actions().count()));
+}
+
+void BranchesWidgetMinimal::clearActions()
+{
+   mLocalMenu->clear();
+   mRemoteMenu->clear();
+   mTagsMenu->clear();
+   mStashesMenu->clear();
+   mSubmodulesMenu->clear();
 }

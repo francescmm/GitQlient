@@ -26,6 +26,8 @@ public:
    void configureStashesMenu(const QString &stashId, const QString &name);
    void configureSubmodulesMenu(const QString &name);
 
+   void clearActions();
+
 private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<RevisionsCache> mCache;
@@ -40,6 +42,7 @@ private:
    QMenu *mStashesMenu = nullptr;
    QToolButton *mSubmodules = nullptr;
    QMenu *mSubmodulesMenu = nullptr;
+   QMenu *mCurrentMenuShown = nullptr;
 
    bool eventFilter(QObject *obj, QEvent *event);
    void addActionToMenu(const QString &sha, const QString &name, QMenu *menu);
