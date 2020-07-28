@@ -58,5 +58,6 @@ public:
 
 protected:
    QString mWorkingDirectory;
+   QString mGitDirectory;
    QString mCurrentBranch;
 };

@@ -10,11 +10,26 @@ using namespace QLogger;
 using namespace Benchmarker;
 
 #include <QDir>
+#include <QFileInfo>
 
 GitBase::GitBase(const QString &workingDirectory, QObject *parent)
    : QObject(parent)
    , mWorkingDirectory(workingDirectory)
+   , mGitDirectory(mWorkingDirectory + "/.git")
 {
+   QFileInfo fileInfo(mGitDirectory);
+
+   if (fileInfo.isFile())
+   {
+      QFile f(fileInfo.filePath());
+
+      if (f.open(QIODevice::ReadOnly))
+      {
+         auto path = f.readAll().split(':').last().trimmed();
+         mGitDirectory = mWorkingDirectory + "/" + path;
+         f.close();
+      }
+   }
 }
 
 QString GitBase::getWorkingDir() const
@@ -29,7 +44,7 @@ void GitBase::setWorkingDir(const QString &workingDir)
 
 QString GitBase::getGitQlientSettingsDir() const
 {
-   return mWorkingDirectory + "/.gitqlient";
+   return mGitDirectory;
 }
 
 GitExecResult GitBase::run(const QString &cmd) const
