@@ -25,6 +25,10 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
    , mApply(new QPushButton(tr("Apply")))
 
 {
+   mClose->setMinimumWidth(75);
+   mReset->setMinimumWidth(75);
+   mApply->setMinimumWidth(75);
+
    GitQlientSettings settings;
 
    mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
