@@ -675,7 +675,7 @@ QSpinBox
 
 QSpinBox::up-button
 {
-    width: 16px; /* 16 + 2*1px border-width = 15px padding + 3px parent border */
+    width: 16px;
     border: 0px;
 }
 
@@ -691,9 +691,17 @@ QSpinBox::down-button
     border: 0px;
 }
 
-QSpinBox::down-arrow {
+QSpinBox::down-arrow
+{
     image: url(:/icons/arrow_down);
     width: 14px;
     height: 7px;
+}
+
+QDialog > QPushButton
+{
+   max-height: 20px;
+   min-height: 20px;
+   min-width: 75px;
 }
 

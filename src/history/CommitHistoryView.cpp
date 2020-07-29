@@ -154,7 +154,7 @@ void CommitHistoryView::onHeaderContextMenu(const QPoint &pos)
    const auto menu = new QMenu(this);
    const auto total = header()->count();
 
-   for (auto column = 0; column < total; ++column)
+   for (auto column = 3; column < total; ++column)
    {
       const auto columnName = model()->headerData(column, Qt::Horizontal, Qt::DisplayRole).toString();
       const auto action = menu->addAction(columnName);

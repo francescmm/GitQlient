@@ -49,7 +49,9 @@ CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<Revision
 
 void CommitHistoryContextMenu::createIndividualShaMenu()
 {
-   if (mShas.count() == 1)
+   const auto singleSelection = mShas.count() == 1;
+
+   if (singleSelection)
    {
       const auto sha = mShas.first();
 
@@ -117,6 +119,12 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          connect(copyShaAction, &QAction::triggered, this,
                  [this]() { QApplication::clipboard()->setText(mShas.first()); });
 
+         const auto copyTitleAction = addAction("Copy commit title");
+         connect(copyTitleAction, &QAction::triggered, this, [this]() {
+            const auto title = mCache->getCommitInfo(mShas.first()).shortLog();
+            QApplication::clipboard()->setText(title);
+         });
+
          addSeparator();
 
          const auto resetSoftAction = addAction("Reset - Soft");
@@ -142,7 +150,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
       const auto gitServerMenu = new QMenu(isGitHub ? "GitHub" : "GitLab", this);
       addMenu(gitServerMenu);
 
-      if (const auto pr = mCache->getPullRequestStatus(mShas.first()); mShas.count() == 1 && pr.isValid())
+      if (const auto pr = mCache->getPullRequestStatus(mShas.first()); singleSelection && pr.isValid())
       {
          const auto prInfo = mCache->getPullRequestStatus(mShas.first());
 
