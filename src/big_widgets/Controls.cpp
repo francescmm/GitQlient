@@ -319,14 +319,19 @@ void Controls::pullCurrentBranch()
    const auto ret = git->pull();
    QApplication::restoreOverrideCursor();
 
+   const auto msg = ret.output.toString();
+
    if (ret.success)
-      emit signalRepositoryUpdated();
+   {
+      if (msg.toLower().contains("merge conflict"))
+         emit signalPullConflict();
+      else
+         emit signalRepositoryUpdated();
+   }
    else
    {
-      const auto errorMsg = ret.output.toString();
-
-      if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
-          && errorMsg.contains("causing a conflict", Qt::CaseInsensitive))
+      if (msg.contains("error: could not apply", Qt::CaseInsensitive)
+          && msg.contains("causing a conflict", Qt::CaseInsensitive))
       {
          emit signalPullConflict();
       }
@@ -336,7 +341,7 @@ void Controls::pullCurrentBranch()
                             QString("There were problems during the pull operation. Please, see the detailed "
                                     "description for more information."),
                             QMessageBox::Ok, this);
-         msgBox.setDetailedText(errorMsg);
+         msgBox.setDetailedText(msg);
          msgBox.setStyleSheet(GitQlientStyles::getStyles());
          msgBox.exec();
       }
