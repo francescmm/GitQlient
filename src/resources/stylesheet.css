@@ -115,7 +115,7 @@ CommitDiffWidget
    min-height: 350px;
 }
 
-CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView
+CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView, MergeWidget > QListWidget
 {
    border: 0;
    outline: 0;
@@ -132,7 +132,7 @@ QListWidget::item, BlameWidget > QTreeView::item
    max-height: 25px;
 }
 
-CommitChangesWidget > QListWidget::item
+CommitChangesWidget > QListWidget::item, MergeWidget > QListWidget::item
 {
    padding: 0;
 }
@@ -182,7 +182,7 @@ CommitInfoWidget, CommitChangesWidget
     min-width: 300px;
 }
 
-CommitChangesWidget > QListWidget
+CommitChangesWidget > QListWidget, MergeWidget > QListWidget
 {
     border-width: 1px;
     border-style: solid;
@@ -609,9 +609,9 @@ QPushButton#Abort, QPushButton#Merge
 
 #FilesListTitle
 {
-   padding: 5px;
    max-height: 30px;
    min-height: 30px;
+   padding-left: 10px;
 }
 
 MergeWidget > #leCommitTitle

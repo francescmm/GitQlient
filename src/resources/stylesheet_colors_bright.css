@@ -119,7 +119,7 @@ QListWidget::item:disabled
     color: #606162;
 }
 
-CommitHistoryView, FullDiffWidget > QTextEdit, CommitChangesWidget > QFrame > QListWidget, FileListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget > QTextEdit, QListWidget, FileListWidget, QTreeWidget
 {
     background-color: white;
     color: black;

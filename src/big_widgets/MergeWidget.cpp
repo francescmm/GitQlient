@@ -8,17 +8,17 @@
 #include <FileDiffWidget.h>
 #include <CommitInfo.h>
 #include <RevisionFiles.h>
-#include <ConflictButton.h>
 #include <FileEditor.h>
 #include <GitQlientSettings.h>
+#include <QPinnableTabWidget.h>
 
+#include <QListWidget>
 #include <QPushButton>
 #include <QLineEdit>
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QScrollArea>
-#include <QStackedWidget>
 #include <QFile>
 #include <QMessageBox>
 
@@ -27,41 +27,16 @@ MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, c
    : QFrame(parent)
    , mGitQlientCache(gitQlientCache)
    , mGit(git)
-   , mCenterStackedWidget(new QStackedWidget())
+   , mConflictFiles(new QListWidget())
+   , mMergedFiles(new QListWidget())
    , mCommitTitle(new QLineEdit())
    , mDescription(new QTextEdit())
    , mMergeBtn(new QPushButton(tr("Merge && Commit")))
    , mAbortBtn(new QPushButton(tr("Abort merge")))
-   , mFileEditor(new FileEditor())
+   , mFileDiff(new FileDiffWidget(mGit, mGitQlientCache))
 {
-   mCenterStackedWidget->setCurrentIndex(0);
-   mCenterStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-   const auto conflictBtnFrame = new QFrame();
-   conflictBtnFrame->setObjectName("DiffButtonsFrame");
-
-   mConflictBtnContainer = new QVBoxLayout(conflictBtnFrame);
-   mConflictBtnContainer->setContentsMargins(QMargins());
-   mConflictBtnContainer->setSpacing(5);
-   mConflictBtnContainer->setAlignment(Qt::AlignTop);
-
-   const auto conflictScrollArea = new QScrollArea();
-   conflictScrollArea->setWidget(conflictBtnFrame);
-   conflictScrollArea->setWidgetResizable(true);
-   conflictScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
-
    const auto autoMergedBtnFrame = new QFrame();
    autoMergedBtnFrame->setObjectName("DiffButtonsFrame");
-
-   mAutoMergedBtnContainer = new QVBoxLayout(autoMergedBtnFrame);
-   mAutoMergedBtnContainer->setContentsMargins(QMargins());
-   mAutoMergedBtnContainer->setSpacing(5);
-   mAutoMergedBtnContainer->setAlignment(Qt::AlignTop);
-
-   const auto autoMergedScrollArea = new QScrollArea();
-   autoMergedScrollArea->setWidget(autoMergedBtnFrame);
-   autoMergedScrollArea->setWidgetResizable(true);
-   autoMergedScrollArea->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
 
    mCommitTitle->setObjectName("leCommitTitle");
 
@@ -95,29 +70,34 @@ MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, c
    const auto conflictsLabel = new QLabel(tr("Conflicts"));
    conflictsLabel->setObjectName("FilesListTitle");
 
-   const auto automergeLabel = new QLabel(tr("Other files"));
+   const auto automergeLabel = new QLabel(tr("Changes to be commited"));
    automergeLabel->setObjectName("FilesListTitle");
 
    const auto mergeLayout = new QVBoxLayout(mergeFrame);
    mergeLayout->setContentsMargins(QMargins());
    mergeLayout->setSpacing(0);
    mergeLayout->addWidget(conflictsLabel);
-   mergeLayout->addWidget(conflictScrollArea);
-   mergeLayout->addSpacerItem(new QSpacerItem(1, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
+   mergeLayout->addWidget(mConflictFiles);
+   mergeLayout->addStretch(1);
    mergeLayout->addWidget(automergeLabel);
-   mergeLayout->addWidget(autoMergedScrollArea);
-   mergeLayout->addSpacerItem(new QSpacerItem(1, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
+   mergeLayout->addWidget(mMergedFiles);
+   mergeLayout->addStretch(2);
    mergeLayout->addLayout(mergeInfoLayout);
 
-   mFileEditor->setVisible(false);
+   mFileDiff->hideBackButton();
 
    const auto layout = new QHBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->addWidget(mergeFrame);
-   layout->addWidget(mCenterStackedWidget);
-   layout->addWidget(mFileEditor);
+   layout->addWidget(mFileDiff);
 
-   connect(mFileEditor, &FileEditor::signalEditionClosed, this, &MergeWidget::endEditFile);
+   connect(mFileDiff, &FileDiffWidget::fileStaged, this, &MergeWidget::onConflictResolved);
+   // connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
+
+   connect(mConflictFiles, &QListWidget::itemClicked, this, &MergeWidget::changeDiffView);
+   connect(mConflictFiles, &QListWidget::itemDoubleClicked, this, &MergeWidget::changeDiffView);
+   connect(mMergedFiles, &QListWidget::itemClicked, this, &MergeWidget::changeDiffView);
+   connect(mMergedFiles, &QListWidget::itemDoubleClicked, this, &MergeWidget::changeDiffView);
    connect(mAbortBtn, &QPushButton::clicked, this, &MergeWidget::abort);
    connect(mMergeBtn, &QPushButton::clicked, this, &MergeWidget::commit);
 }
@@ -126,7 +106,9 @@ void MergeWidget::configure(const RevisionFiles &files, ConflictReason reason)
 {
    mReason = reason;
 
-   mFileEditor->finishEdition();
+   mConflictFiles->clear();
+   mMergedFiles->clear();
+   mFileDiff->clear();
 
    QFile mergeMsg(mGit->getWorkingDir() + "/.git/MERGE_MSG");
 
@@ -146,59 +128,32 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
 {
    for (auto i = 0; i < files.count(); ++i)
    {
-      const auto fileInConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
       const auto fileName = files.getFile(i);
-      const auto fileBtn = new ConflictButton(fileName, fileInConflict, mGit);
-      fileBtn->setObjectName("FileBtn");
-
-      connect(fileBtn, &ConflictButton::clicked, this, &MergeWidget::changeDiffView);
-      connect(fileBtn, &ConflictButton::updateRequested, this, &MergeWidget::onUpdateRequested);
-      connect(fileBtn, &ConflictButton::resolved, this, &MergeWidget::onConflictResolved);
-
-      GitQlientSettings settings;
-      if (!settings.globalValue("isGitQlient", false).toBool())
-         connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::signalEditFile);
-      else
-         connect(fileBtn, &ConflictButton::signalEditFile, this, &MergeWidget::startEditFile);
-
-      const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
-      const auto fileDiffWidget = new FileDiffWidget(mGit, mGitQlientCache);
-      fileDiffWidget->configure(CommitInfo::ZERO_SHA, wip.parent(0), fileName);
-
-      mConflictButtons.insert(fileBtn, fileDiffWidget);
-
-      const auto index = mCenterStackedWidget->addWidget(fileDiffWidget);
+      const auto fileInConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
+      const auto item = new QListWidgetItem(fileName);
+      item->setData(Qt::UserRole, fileInConflict);
 
       if (fileInConflict)
       {
-         mConflictBtnContainer->addWidget(fileBtn);
+         mConflictFiles->addItem(item);
 
-         if (mCenterStackedWidget->count() == 0)
-            mCenterStackedWidget->setCurrentIndex(index);
+         if (mConflictFiles->count() == 1)
+         {
+            mConflictFiles->setCurrentItem(item);
+            changeDiffView(item);
+         }
       }
       else
-         mAutoMergedBtnContainer->addWidget(fileBtn);
+         mMergedFiles->addItem(item);
    }
 }
 
-void MergeWidget::changeDiffView()
+void MergeWidget::changeDiffView(QListWidgetItem *item)
 {
-   if (!mFileEditor->isVisible())
-   {
-      const auto end = mConflictButtons.constEnd();
+   const auto file = item->text();
+   const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-      for (auto iter = mConflictButtons.constBegin(); iter != end; ++iter)
-      {
-         if (iter.key() != sender())
-         {
-            iter.key()->blockSignals(true);
-            iter.key()->setChecked(false);
-            iter.key()->blockSignals(false);
-         }
-         else
-            mCenterStackedWidget->setCurrentWidget(iter.value());
-      }
-   }
+   mFileDiff->configure(CommitInfo::ZERO_SHA, wip.parent(0), mGit->getWorkingDir() + "/" + file);
 }
 
 void MergeWidget::abort()
@@ -281,49 +236,20 @@ void MergeWidget::commit()
 
 void MergeWidget::removeMergeComponents()
 {
-   const auto end = mConflictButtons.constEnd();
-
-   for (auto iter = mConflictButtons.constBegin(); iter != end; ++iter)
-   {
-      mCenterStackedWidget->removeWidget(iter.value());
-      iter.value()->setParent(nullptr);
-      delete iter.value();
-
-      iter.key()->setParent(nullptr);
-      delete iter.key();
-   }
-
-   mConflictButtons.clear();
    mCommitTitle->clear();
    mDescription->clear();
+
+   mConflictFiles->clear();
+   mMergedFiles->clear();
+   mFileDiff->clear();
 }
 
-void MergeWidget::onConflictResolved()
+void MergeWidget::onConflictResolved(const QString &)
 {
-   const auto conflictButton = qobject_cast<ConflictButton *>(sender());
-   mAutoMergedBtnContainer->addWidget(conflictButton);
+   const auto currentRow = mConflictFiles->currentRow();
+   const auto currentConflict = mConflictFiles->takeItem(currentRow);
+   const auto fileName = currentConflict->text();
+   delete currentConflict;
 
-   mConflictButtons.value(conflictButton)->reload();
-}
-
-void MergeWidget::onUpdateRequested()
-{
-   const auto conflictButton = qobject_cast<ConflictButton *>(sender());
-   mConflictButtons.value(conflictButton)->reload();
-}
-
-void MergeWidget::startEditFile()
-{
-   mCenterStackedWidget->setVisible(false);
-
-   const auto fileName = qobject_cast<ConflictButton *>(sender())->getFileName();
-
-   mFileEditor->editFile(fileName);
-   mFileEditor->setVisible(true);
-}
-
-void MergeWidget::endEditFile()
-{
-   mCenterStackedWidget->setVisible(true);
-   mFileEditor->setVisible(false);
+   mMergedFiles->addItem(fileName);
 }

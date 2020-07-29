@@ -253,6 +253,11 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
    }
 }
 
+void FileDiffWidget::hideBackButton() const
+{
+   mBack->setVisible(true);
+}
+
 void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
                                  QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData)
 {
@@ -391,6 +396,10 @@ void FileDiffWidget::enterEditionMode(bool enter)
       mFileEditor->editFile(mCurrentFile);
       mViewStackedWidget->setCurrentIndex(1);
    }
+   else if (mFileVsFile)
+      setSplitViewEnabled(true);
+   else
+      setFullViewEnabled(true);
 }
 
 void FileDiffWidget::endEditFile()

@@ -88,6 +88,7 @@ public:
     \param currentSha The base SHA.
     \param previousSha The SHA to compare to.
     \param file The file that will show the diff.
+    \param editMode Enters edit mode directly.
     \return bool Returns true if the configuration was applied, otherwise false.
    */
    bool configure(const QString &currentSha, const QString &previousSha, const QString &file, bool editMode = false);
@@ -103,6 +104,11 @@ public:
     * @param enable True to enable, otherwise false.
     */
    void setFullViewEnabled(bool enable);
+
+   /**
+    * @brief hideBackButton Hides the back button.
+    */
+   void hideBackButton() const;
 
 private:
    QString mCurrentFile;

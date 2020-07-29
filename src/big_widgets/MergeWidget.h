@@ -29,15 +29,15 @@
 class GitBase;
 class QVBoxLayout;
 class QPushButton;
-class QStackedWidget;
 class MergeInfoWidget;
 class QLineEdit;
 class QTextEdit;
 class FileDiffWidget;
 class RevisionFiles;
 class RevisionsCache;
-class ConflictButton;
 class FileEditor;
+class QListWidget;
+class QListWidgetItem;
 
 /**
  * @brief The MergeWidget class creates the layout for when a merge happens. The layout is composed by two lists of
@@ -95,16 +95,14 @@ public:
 private:
    QSharedPointer<RevisionsCache> mGitQlientCache;
    QSharedPointer<GitBase> mGit;
-   QVBoxLayout *mConflictBtnContainer = nullptr;
-   QVBoxLayout *mAutoMergedBtnContainer = nullptr;
-   QStackedWidget *mCenterStackedWidget = nullptr;
+   QListWidget *mConflictFiles = nullptr;
+   QListWidget *mMergedFiles = nullptr;
    QLineEdit *mCommitTitle = nullptr;
    QTextEdit *mDescription = nullptr;
    QPushButton *mMergeBtn = nullptr;
    QPushButton *mAbortBtn = nullptr;
-   QMap<ConflictButton *, FileDiffWidget *> mConflictButtons;
    ConflictReason mReason = ConflictReason::Merge;
-   FileEditor *mFileEditor = nullptr;
+   FileDiffWidget *mFileDiff = nullptr;
 
    /**
     * @brief Fills both lists of ConflictButton.
@@ -113,11 +111,11 @@ private:
     */
    void fillButtonFileList(const RevisionFiles &files);
    /**
-    * @brief Changes the current diff view of a file when a button is clicked.
+    * @brief Changes the current diff view of a file when a file in the list is clicked.
     *
-    * @param fileBtnChecked True if the ConflictButton is selected.
+    * @param item The selected item of the list.
     */
-   void changeDiffView();
+   void changeDiffView(QListWidgetItem *item);
    /**
     * @brief Aborts the current merge.
     *
@@ -136,24 +134,7 @@ private:
    /**
     * @brief When a conflict is marked as resolved the button is moved to the solved list. This action is triggered by a
     * ConflictButton.
-    *
+    * @param fileName The file name of the file whose conflict is resolved.
     */
-   void onConflictResolved();
-   /**
-    * @brief Updates the current file diff view. This action is triggered by a ConflictButton.
-    *
-    */
-   void onUpdateRequested();
-   /**
-    * @brief startEditFile Shows the file edition windows with the content of @p fileName loaded on it.
-    * @param fileName The full path of the file that will be opened.
-    * @param line The line to put the cursor.
-    * @param column The column to put the cursor.
-    */
-   void startEditFile();
-
-   /**
-    * @brief endEditFile Closes the file editor.
-    */
-   void endEditFile();
+   void onConflictResolved(const QString &fileName);
 };
