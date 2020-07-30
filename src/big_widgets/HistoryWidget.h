@@ -40,6 +40,7 @@ class RepositoryViewDelegate;
 class FullDiffWidget;
 class FileDiffWidget;
 class BranchesWidgetMinimal;
+class QPushButton;
 
 /*!
  \brief The HistoryWidget is the responsible fro showing the history of the repository. It is the first widget shown
@@ -219,7 +220,8 @@ private:
    enum class Pages
    {
       Graph,
-      FileDiff
+      FileDiff,
+      FullDiff
    };
 
    QSharedPointer<GitBase> mGit;
@@ -237,6 +239,8 @@ private:
    RepositoryViewDelegate *mItemDelegate = nullptr;
    QFrame *mGraphFrame = nullptr;
    FileDiffWidget *mFileDiff = nullptr;
+   FullDiffWidget *mFullDiffWidget = nullptr;
+   QPushButton *mReturnFromFull = nullptr;
 
    /*!
     \brief Performs a search based on the input of the search QLineEdit with the users input.
@@ -302,4 +306,11 @@ private:
     * @param fileName The file name to diff.
     */
    void showFileDiffEdition(const QString &sha, const QString &parentSha, const QString &fileName);
+
+   /**
+    * @brief showFullDiff Shows the full commit diff.
+    * @param sha The base commit SHA.
+    * @param parentSha The commit SHA to compare with.
+    */
+   void showFullDiff();
 };
