@@ -218,6 +218,9 @@ void FileDiffWidget::setSplitViewEnabled(bool enable)
    mFullView->setChecked(!mFileVsFile);
    mFullView->blockSignals(false);
 
+   mGoNext->setEnabled(true);
+   mGoPrevious->setEnabled(true);
+
    if (enable)
    {
       mSave->setDisabled(true);
@@ -242,6 +245,9 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
    mSplitView->blockSignals(true);
    mSplitView->setChecked(mFileVsFile);
    mSplitView->blockSignals(false);
+
+   mGoNext->setDisabled(true);
+   mGoPrevious->setDisabled(true);
 
    if (enable)
    {
