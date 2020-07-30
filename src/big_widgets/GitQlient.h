@@ -74,6 +74,12 @@ public:
    */
    void setArgumentsPostInit(const QStringList &arguments);
 
+   /**
+    * @brief restorePinnedRepos This method restores the pinned repos from the last session
+    * @param pinnedRepos The list of repos to restore
+    */
+   void restorePinnedRepos();
+
 private:
    QPinnableTabWidget *mRepos = nullptr;
    ConfigWidget *mConfigWidget = nullptr;
@@ -115,11 +121,6 @@ private:
    */
    void closeTab(int tabIndex);
 
-   /**
-    * @brief restorePinnedRepos This method restores the pinned repos from the last session
-    * @param pinnedRepos The list of repos to restore
-    */
-   void restorePinnedRepos();
    /**
     * @brief onSuccessOpen Refreshes the UI for the most used and most recent projects lists.
     * @param fullPath The full path of the project successfully opened.

@@ -61,7 +61,6 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
    connect(mConfigWidget, &ConfigWidget::signalOpenRepo, this, &GitQlient::addRepoTab);
 
-   restorePinnedRepos();
    setRepositories(repos);
 
    BenchmarkEnd();

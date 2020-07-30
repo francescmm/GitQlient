@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QFontDatabase>
 #include <QIcon>
+#include <QTimer>
 
 #include <GitQlient.h>
 #include <GitQlientSettings.h>
@@ -39,6 +40,8 @@ int main(int argc, char *argv[])
    GitQlient mainWin(arguments);
 
    mainWin.showMaximized();
+
+   QTimer::singleShot(500, &mainWin, &GitQlient::restorePinnedRepos);
 
    const auto ret = app.exec();
 
