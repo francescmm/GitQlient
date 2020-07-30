@@ -58,9 +58,10 @@ public:
 
     \param sha The base commit SHA.
     \param diffToSha The commit SHA to comapre to.
+    \param diffData The diff data returned by the git command.
     \return True if there is a diff to load, otherwise false.
    */
-   bool loadDiff(const QString &sha, const QString &diffToSha);
+   void loadDiff(const QString &sha, const QString &diffToSha, const QString &diffData);
 
 private:
    QString mPreviousDiffText;

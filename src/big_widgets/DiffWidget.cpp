@@ -6,6 +6,7 @@
 #include <FullDiffWidget.h>
 #include <CommitDiffWidget.h>
 #include <GitQlientSettings.h>
+#include <GitHistory.h>
 
 #include <QPinnableTabWidget.h>
 #include <QLogger.h>
@@ -129,10 +130,14 @@ bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 
    if (!mDiffWidgets.contains(id))
    {
-      const auto fullDiffWidget = new FullDiffWidget(mGit, mCache);
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
+      const auto ret = git->getCommitDiff(sha, parentSha);
 
-      if (fullDiffWidget->loadDiff(sha, parentSha))
+      if (ret.success && !ret.output.toString().isEmpty())
       {
+         const auto fullDiffWidget = new FullDiffWidget(mGit, mCache);
+         fullDiffWidget->loadDiff(sha, parentSha, ret.output.toString());
+
          mInfoPanelBase->configure(mCache->getCommitInfo(sha));
          mInfoPanelParent->configure(mCache->getCommitInfo(parentSha));
 
@@ -144,16 +149,14 @@ bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 
          mCommitDiffWidget->configure(sha, parentSha);
          mCommitDiffWidget->setVisible(true);
+
+         return true;
       }
       else
-      {
-         delete fullDiffWidget;
-
          QMessageBox::information(this, tr("No diff to show!"),
                                   tr("There is no diff to show between commit SHAs {%1} and {%2}").arg(sha, parentSha));
 
-         return false;
-      }
+      return false;
    }
    else
    {
