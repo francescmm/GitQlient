@@ -123,7 +123,7 @@ void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
-   request.setUrl(mAuth.endpointUrl + page);
+   request.setUrl(QString(mAuth.endpointUrl + page));
    request.setRawHeader("User-Agent", "GitQlient");
    request.setRawHeader("X-Custom-User-Agent", "GitQlient");
    request.setRawHeader("Content-Type", "application/json");

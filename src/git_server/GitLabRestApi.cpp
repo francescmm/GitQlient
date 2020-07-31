@@ -126,7 +126,7 @@ void GitLabRestApi::requestPullRequestsState() { }
 QNetworkRequest GitLabRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
-   request.setUrl(mAuth.endpointUrl + page);
+   request.setUrl(QString(mAuth.endpointUrl + page));
    request.setRawHeader("User-Agent", "GitQlient");
    request.setRawHeader("X-Custom-User-Agent", "GitQlient");
    request.setRawHeader("Content-Type", "application/json");

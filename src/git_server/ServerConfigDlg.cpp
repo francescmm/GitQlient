@@ -82,7 +82,7 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *pa
       const auto url = serverUrl.contains("github")
           ? "https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token"
           : "https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html";
-      QDesktopServices::openUrl(QUrl(url));
+      QDesktopServices::openUrl(QUrl(QString::fromUtf8(url)));
    });
 
    connect(ui->leUserToken, &QLineEdit::editingFinished, this, &ServerConfigDlg::checkToken);
