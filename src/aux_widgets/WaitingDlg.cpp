@@ -11,6 +11,7 @@ WaitingDlg::WaitingDlg(const QString &labelText)
 {
    const auto layout = new QHBoxLayout(this);
    layout->addWidget(new QLabel(labelText));
+
    setAttribute(Qt::WA_DeleteOnClose);
    setWindowModality(Qt::ApplicationModal);
    setWindowFlags(Qt::FramelessWindowHint);

@@ -46,6 +46,12 @@ public:
    explicit WaitingDlg(const QString &labelText);
 
    /**
+    * @brief Closes the dialog by user's action.
+    */
+   void close();
+
+protected:
+   /**
     * @brief Detects the press event to avoid closing the dialog when the Esc key is pressed.
     *
     * @param e The press event
@@ -58,10 +64,6 @@ public:
     * @param e The close event
     */
    void closeEvent(QCloseEvent *e) override;
-   /**
-    * @brief Closes the dialog by user's action.
-    */
-   void close();
 
 private:
    bool mPrepareToClose = false;
