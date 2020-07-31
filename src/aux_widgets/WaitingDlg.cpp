@@ -21,9 +21,7 @@ WaitingDlg::WaitingDlg(const QString &labelText)
 
 void WaitingDlg::keyPressEvent(QKeyEvent *e)
 {
-   const auto key = e->key();
-
-   if (key == Qt::Key_Escape)
+   if (e->key() == Qt::Key_Escape)
       return;
 
    QDialog::keyPressEvent(e);
