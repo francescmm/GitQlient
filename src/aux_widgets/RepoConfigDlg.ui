@@ -80,7 +80,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QCheckBox" name="pruneOnFetch">
+        <widget class="CheckBox" name="pruneOnFetch">
          <property name="text">
           <string/>
          </property>
@@ -111,7 +111,7 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QCheckBox" name="clangFormat">
+        <widget class="CheckBox" name="clangFormat">
          <property name="text">
           <string/>
          </property>
@@ -151,6 +151,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>CheckBox.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources.qrc"/>
  </resources>
