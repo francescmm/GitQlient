@@ -103,10 +103,10 @@ ConfigWidget::ConfigWidget(QWidget *parent)
            []() { QDesktopServices::openUrl(QUrl("https://www.github.com/francescmm/GitQlient")); });
    goToRepo->setToolTip(QString("Get the source code in GitHub"));
 
-   const auto goToBlog = new ButtonLink(QString("Francesc's blog"));
+   const auto goToBlog = new ButtonLink(QString("Report an issue"));
    connect(goToBlog, &ButtonLink::clicked, this,
-           []() { QDesktopServices::openUrl(QUrl("https://www.francescmm.com/")); });
-   goToBlog->setToolTip(QString("Go to Francesc's blog"));
+           []() { QDesktopServices::openUrl(QUrl("https://github.com/francescmm/GitQlient/issues")); });
+   goToBlog->setToolTip(QString("Report an issue in GitHub"));
 
    const auto promoLayout = new QHBoxLayout();
    promoLayout->setContentsMargins(QMargins());
