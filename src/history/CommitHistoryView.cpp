@@ -7,9 +7,10 @@
 #include <CommitInfo.h>
 #include <RevisionsCache.h>
 #include <GitConfig.h>
+#include <GitQlientSettings.h>
+#include <GitBase.h>
 
 #include <QHeaderView>
-#include <QSettings>
 #include <QDateTime>
 
 #include <QLogger.h>
@@ -86,14 +87,15 @@ void CommitHistoryView::filterBySha(const QStringList &shaList)
 
 CommitHistoryView::~CommitHistoryView()
 {
-   QSettings s;
-   s.setValue(QString("%1").arg(objectName()), header()->saveState());
+   GitQlientSettings s;
+   s.setLocalValue(mGit->getGitQlientSettingsDir(), QString("%1").arg(objectName()), header()->saveState());
 }
 
 void CommitHistoryView::setupGeometry()
 {
-   QSettings s;
-   const auto previousState = s.value(QString("%1").arg(objectName()), QByteArray()).toByteArray();
+   GitQlientSettings s;
+   const auto previousState
+       = s.localValue(mGit->getGitQlientSettingsDir(), QString("%1").arg(objectName()), QByteArray()).toByteArray();
 
    if (previousState.isEmpty())
    {
