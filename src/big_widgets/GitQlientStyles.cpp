@@ -59,10 +59,7 @@ QColor GitQlientStyles::getGraphSelectionColor()
    QColor c;
 
    if (colorSchema == "dark")
-   {
-      c.setNamedColor("#404142");
-      c.setAlphaF(0.75);
-   }
+      c.setNamedColor("#505152");
    else
       c.setNamedColor("#C6C6C7");
 
@@ -77,10 +74,7 @@ QColor GitQlientStyles::getGraphHoverColor()
    QColor c;
 
    if (colorSchema == "dark")
-   {
       c.setNamedColor("#404142");
-      c.setAlphaF(0.4);
-   }
    else
       c.setNamedColor("#EFEFEF");
 
