@@ -2,6 +2,7 @@
 
 #include <GitBase.h>
 #include <GitConfig.h>
+#include <GitQlientSettings.h>
 
 #include <QLogger.h>
 #include <BenchmarkTool.h>
@@ -66,7 +67,12 @@ bool GitRemote::fetch()
 
    QLog_Debug("Git", QString("Executing fetch with prune"));
 
-   const auto ret = mGitBase->run("git fetch --all --tags --prune --force").success;
+   GitQlientSettings settings;
+   const auto pruneOnFetch = settings.localValue(mGitBase->getGitQlientSettingsDir(), "PruneOnFetch", true).toBool();
+
+   const auto cmd
+       = QString("git fetch --all --tags --force").arg(pruneOnFetch ? QString("--prune --prune-tags") : QString());
+   const auto ret = mGitBase->run(cmd).success;
 
    BenchmarkEnd();
 
