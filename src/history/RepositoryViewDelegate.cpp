@@ -59,10 +59,26 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       paintLog(p, newOpt, commit, index.data().toString());
    else
    {
+
       p->setPen(GitQlientStyles::getTextColor());
       newOpt.rect.setX(newOpt.rect.x() + 10);
 
+      QTextOption textalignment(Qt::AlignLeft | Qt::AlignVCenter);
       auto text = index.data().toString();
+
+      if (index.column() == static_cast<int>(CommitHistoryColumns::Date))
+      {
+         textalignment = QTextOption(Qt::AlignRight | Qt::AlignVCenter);
+         const auto prev = QDateTime::fromString(mView->indexAbove(index).data().toString(), "dd MMM yyyy hh:mm");
+         const auto current = QDateTime::fromString(text, "dd MMM yyyy hh:mm");
+
+         if (current.date() == prev.date())
+            text = current.toString("hh:mm");
+         else
+            text = current.toString("dd MMM yyyy - hh:mm");
+
+         newOpt.rect.setWidth(newOpt.rect.width() - 5);
+      }
 
       if (index.column() == static_cast<int>(CommitHistoryColumns::Sha))
       {
@@ -83,8 +99,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
          p->setFont(font);
       }
 
-      p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()),
-                  QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
+      p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()), textalignment);
    }
 }
 

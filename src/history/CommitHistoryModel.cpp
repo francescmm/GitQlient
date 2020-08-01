@@ -102,7 +102,8 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    auto tooltip = sha == CommitInfo::ZERO_SHA
        ? QString()
        : QString("<p>%1 - %2<p></p>%3</p>%4")
-             .arg(r.author().split("<").first(), d.toString(locale.dateFormat(QLocale::ShortFormat)), sha, auxMessage);
+             .arg(r.author().split("<").first(), d.toString(locale.dateTimeFormat(QLocale::ShortFormat)), sha,
+                  auxMessage);
 
    if (const auto pr = mCache->getPullRequestStatus(sha); pr.isValid())
       tooltip.append(QString("<p><b>PR state: </b>%1.</p>").arg(pr.state.state));

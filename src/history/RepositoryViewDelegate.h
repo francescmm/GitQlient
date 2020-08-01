@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <QStyledItemDelegate>
+#include <QDateTime>
 
 class CommitHistoryView;
 class RevisionsCache;
