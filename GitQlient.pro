@@ -28,10 +28,7 @@ INCLUDEPATH += QLogger \
     QPinnableTabWidget
 
 OTHER_FILES += \
-    $$PWD/LICENSE \
-    $$PWD/README.md \
-    $$PWD/.travis.yml \
-    $$PWD/docs/*.md
+    $$PWD/LICENSE
 
 VERSION = 1.2.0
 
@@ -65,6 +62,3 @@ macos{
 
    QMAKE_EXTRA_TARGETS += dmg
 }
-
-SUBDIRS += \
-   GitQlientApp.pro
