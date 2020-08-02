@@ -225,6 +225,13 @@ void HistoryWidget::updateUiFromWatcher()
       mWipWidget->configure(CommitInfo::ZERO_SHA);
    else if (commitStackedIndex == 2)
       mAmendWidget->reload();
+
+   const auto viewIndex = mCenterStackedWidget->currentIndex();
+
+   if (viewIndex == static_cast<int>(Pages::FileDiff))
+      mFileDiff->reload();
+   else if (viewIndex == static_cast<int>(Pages::FullDiff))
+      mFullDiffWidget->reload();
 }
 
 void HistoryWidget::focusOnCommit(const QString &sha)
