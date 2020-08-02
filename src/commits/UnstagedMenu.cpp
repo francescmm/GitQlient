@@ -68,8 +68,8 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
    });
 
    connect(addAction("Ignore extension"), &QAction::triggered, this, [this]() {
-      const auto msgBoxRet = QMessageBox::question(this, tr("Ignoring file"),
-                                                   tr("Are you sure you want to add the file to the black list?"));
+      const auto msgBoxRet = QMessageBox::question(
+          this, tr("Ignoring file"), tr("Are you sure you want to add the file extension to the black list?"));
 
       if (msgBoxRet == QMessageBox::Yes)
       {
@@ -87,8 +87,8 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
 
    connect(addAction("Add all files to commit"), &QAction::triggered, this, &UnstagedMenu::signalCommitAll);
    connect(addAction("Revert all changes"), &QAction::triggered, this, [this]() {
-      const auto msgBoxRet = QMessageBox::question(this, tr("Ignoring file"),
-                                                   tr("Are you sure you want to add the file to the black list?"));
+      const auto msgBoxRet
+          = QMessageBox::question(this, tr("Ignoring file"), tr("Are you sure you want to undo all the changes?"));
       if (msgBoxRet == QMessageBox::Yes)
          emit signalRevertAll();
    });

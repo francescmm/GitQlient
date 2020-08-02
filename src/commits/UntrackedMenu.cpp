@@ -30,8 +30,8 @@ UntrackedMenu::UntrackedMenu(const QSharedPointer<GitBase> &git, const QString &
    });
 
    connect(addAction("Ignore extension"), &QAction::triggered, this, [this]() {
-      const auto msgBoxRet = QMessageBox::question(this, tr("Ignoring file"),
-                                                   tr("Are you sure you want to add the file to the black list?"));
+      const auto msgBoxRet = QMessageBox::question(
+          this, tr("Ignoring file"), tr("Are you sure you want to add the file extension to the black list?"));
 
       if (msgBoxRet == QMessageBox::Yes)
       {
