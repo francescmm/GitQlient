@@ -161,7 +161,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
 
    if (add)
    {
-      const auto gitMenu = new QMenu(mStashBtn);
+      const auto gitMenu = new QMenu(mGitPlatform);
 
       action = gitMenu->addAction(tr("New Issue"));
       connect(action, &QAction::triggered, this, &Controls::createNewIssue);
