@@ -215,6 +215,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
 
    mMinimize->setObjectName("MinimizeBtn");
    mMinimize->setIcon(QIcon(":/icons/arrow_right"));
+   mMinimize->setToolTip(tr("Show minimalist view"));
    connect(mMinimize, &QPushButton::clicked, this, &BranchesWidget::minimalView);
 
    mFullBranchFrame = new QFrame();

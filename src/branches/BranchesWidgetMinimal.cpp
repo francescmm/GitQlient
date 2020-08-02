@@ -29,6 +29,7 @@ BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<RevisionsCache
    , mSubmodulesMenu(new QMenu(mSubmodules))
 {
    mBack->setIcon(QIcon(":/icons/back"));
+   mBack->setToolTip(tr("Full view"));
    connect(mBack, &QPushButton::clicked, this, &BranchesWidgetMinimal::showFullBranchesView);
 
    const auto layout = new QVBoxLayout(this);
@@ -48,6 +49,7 @@ BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<RevisionsCache
    mLocal->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
    mLocal->setText("   " + QString::number(mLocalMenu->actions().count()));
    mLocal->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+   mLocal->setToolTip(tr("Local branches"));
 
    mRemoteMenu->installEventFilter(this);
    mRemote->setMenu(mRemoteMenu);
@@ -56,6 +58,7 @@ BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<RevisionsCache
    mRemote->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
    mRemote->setText("   " + QString::number(mRemoteMenu->actions().count()));
    mRemote->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+   mRemote->setToolTip(tr("Remote branches"));
 
    mTagsMenu->installEventFilter(this);
    mTags->setMenu(mTagsMenu);
@@ -64,6 +67,7 @@ BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<RevisionsCache
    mTags->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
    mTags->setText("   " + QString::number(mTagsMenu->actions().count()));
    mTags->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+   mTags->setToolTip(tr("Tags"));
 
    mStashesMenu->installEventFilter(this);
    mStashes->setMenu(mStashesMenu);
@@ -72,6 +76,7 @@ BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<RevisionsCache
    mStashes->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
    mStashes->setText("   " + QString::number(mStashesMenu->actions().count()));
    mStashes->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+   mStashes->setToolTip(tr("Stashes"));
 
    mSubmodulesMenu->installEventFilter(this);
    mSubmodules->setMenu(mSubmodulesMenu);
@@ -80,6 +85,7 @@ BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<RevisionsCache
    mSubmodules->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
    mSubmodules->setText("   " + QString::number(mSubmodulesMenu->actions().count()));
    mSubmodules->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+   mSubmodules->setToolTip(tr("Submodules"));
 }
 
 bool BranchesWidgetMinimal::eventFilter(QObject *obj, QEvent *event)
