@@ -105,7 +105,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
 
    const auto goToBlog = new ButtonLink(QString("Report an issue"));
    connect(goToBlog, &ButtonLink::clicked, this,
-           []() { QDesktopServices::openUrl(QUrl("https://github.com/francescmm/GitQlient/issues")); });
+           []() { QDesktopServices::openUrl(QUrl("https://github.com/francescmm/GitQlient/issues/new/choose")); });
    goToBlog->setToolTip(QString("Report an issue in GitHub"));
 
    const auto promoLayout = new QHBoxLayout();
