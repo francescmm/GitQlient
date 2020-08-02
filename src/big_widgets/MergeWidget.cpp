@@ -92,7 +92,6 @@ MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, c
    layout->addWidget(mFileDiff);
 
    connect(mFileDiff, &FileDiffWidget::fileStaged, this, &MergeWidget::onConflictResolved);
-   // connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
 
    connect(mConflictFiles, &QListWidget::itemClicked, this, &MergeWidget::changeDiffView);
    connect(mConflictFiles, &QListWidget::itemDoubleClicked, this, &MergeWidget::changeDiffView);

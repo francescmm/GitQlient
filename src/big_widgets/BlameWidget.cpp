@@ -41,6 +41,7 @@ BlameWidget::BlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSha
    mRepoView->setSelectionBehavior(QAbstractItemView::SelectRows);
    mRepoView->setSelectionMode(QAbstractItemView::SingleSelection);
    mRepoView->setContextMenuPolicy(Qt::CustomContextMenu);
+   mRepoView->header()->setContextMenuPolicy(Qt::NoContextMenu);
    mRepoView->activateFilter(true);
    mRepoView->filterBySha({});
    connect(mRepoView, &CommitHistoryView::customContextMenuRequested, this, &BlameWidget::showRepoViewMenu);

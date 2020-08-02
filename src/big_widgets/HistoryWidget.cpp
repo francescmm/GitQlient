@@ -52,7 +52,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    mCommitStackedWidget->addWidget(mCommitInfoWidget);
    mCommitStackedWidget->addWidget(mWipWidget);
    mCommitStackedWidget->addWidget(mAmendWidget);
-   mCommitStackedWidget->setFixedWidth(310);
+   mCommitStackedWidget->setFixedWidth(300);
 
    connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mWipWidget, &WipWidget::signalChangesCommitted, this, &HistoryWidget::returnToView);
@@ -180,7 +180,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
 
    const auto layout = new QHBoxLayout(this);
    layout->setContentsMargins(QMargins());
-   layout->setSpacing(15);
+   layout->setSpacing(10);
    layout->addWidget(mCommitStackedWidget);
    layout->addWidget(mCenterStackedWidget);
    layout->addWidget(mBranchesWidget);

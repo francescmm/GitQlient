@@ -37,6 +37,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<Revisio
    diffsLayout->setSpacing(0);
    diffsLayout->addWidget(mInfoPanelBase);
    diffsLayout->addWidget(mCommitDiffWidget);
+   diffsLayout->addItem(new QSpacerItem(300, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
    diffsLayout->addStretch();
    diffsLayout->addWidget(mInfoPanelParent);
 
