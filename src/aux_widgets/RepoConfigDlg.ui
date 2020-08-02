@@ -43,27 +43,13 @@
        <property name="spacing">
         <number>10</number>
        </property>
-       <item row="2" column="1">
-        <widget class="CheckBox" name="pruneOnFetch">
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_3">
          <property name="text">
-          <string/>
+          <string>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</string>
          </property>
-         <property name="checked">
+         <property name="wordWrap">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="CheckBox" name="clangFormat">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Auto-Fetch interval</string>
          </property>
         </widget>
        </item>
@@ -74,18 +60,22 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="2" column="1">
+        <widget class="CheckBox" name="pruneOnFetch">
+         <property name="text">
+          <string/>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+         <property name="checked">
+          <bool>true</bool>
          </property>
-        </spacer>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Auto-Fetch interval</string>
+         </property>
+        </widget>
        </item>
        <item row="0" column="1">
         <widget class="QSpinBox" name="autoFetch">
@@ -107,13 +97,37 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_3">
+       <item row="3" column="1">
+        <widget class="CheckBox" name="clangFormat">
          <property name="text">
-          <string>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</string>
+          <string/>
          </property>
-         <property name="wordWrap">
-          <bool>true</bool>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="1">
+        <widget class="CheckBox" name="updateOnPull">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Update submodules when pull</string>
          </property>
         </widget>
        </item>
@@ -158,6 +172,13 @@
    <header>CheckBox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>autoFetch</tabstop>
+  <tabstop>pruneOnFetch</tabstop>
+  <tabstop>clangFormat</tabstop>
+  <tabstop>updateOnPull</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources.qrc"/>
  </resources>

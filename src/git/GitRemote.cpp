@@ -2,6 +2,7 @@
 
 #include <GitBase.h>
 #include <GitConfig.h>
+#include <GitSubmodules.h>
 #include <GitQlientSettings.h>
 
 #include <QLogger.h>
@@ -54,7 +55,23 @@ GitExecResult GitRemote::pull()
 
    QLog_Debug("Git", QString("Executing pull"));
 
-   const auto ret = mGitBase->run("git pull");
+   auto ret = mGitBase->run("git pull");
+
+   GitQlientSettings settings;
+   const auto updateOnPull = settings.localValue(mGitBase->getGitQlientSettingsDir(), "UpdateOnPull", true).toBool();
+
+   if (ret.success && updateOnPull)
+   {
+      QScopedPointer<GitSubmodules> git(new GitSubmodules(mGitBase));
+      const auto updateRet = git->submoduleUpdate(QString());
+
+      if (!updateRet)
+      {
+         return { updateRet,
+                  "There was a problem updating the submodules after pull. Please review that you don't have any local "
+                  "modifications in the submodules" };
+      }
+   }
 
    BenchmarkEnd();
 
