@@ -241,44 +241,15 @@ QList<QString> CommitHistoryView::getSelectedShaList() const
 {
    const auto indexes = selectedIndexes();
    QMap<QDateTime, QString> shas;
-   QVector<QVector<QString>> godVector;
 
    for (auto index : indexes)
    {
       const auto sha = mCommitHistoryModel->sha(index.row());
       const auto dtStr
           = mCommitHistoryModel->index(index.row(), static_cast<int>(CommitHistoryColumns::Date)).data().toString();
-      const auto dt = QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm");
 
-      shas.insert(dt, sha);
-
-      const auto commit = mCache->getCommitInfo(sha);
-      auto branches = commit.getReferences(References::Type::LocalBranch)
-          + commit.getReferences(References::Type::RemoteBranches);
-
-      std::sort(branches.begin(), branches.end());
-
-      if (!branches.isEmpty())
-         godVector.append(branches.toVector());
+      shas.insert(QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm"), sha);
    }
 
-   auto commitsInSameBranch = false;
-
-   if (godVector.count() > 1)
-   {
-      QVector<QString> common;
-
-      for (auto i = 0; i < godVector.count() - 1; ++i)
-      {
-         QVector<QString> aux;
-         std::set_intersection(godVector.at(i).constBegin(), godVector.at(i).constEnd(),
-                               godVector.at(i + 1).constBegin(), godVector.at(i + 1).constEnd(),
-                               std::back_inserter(aux));
-         common = aux;
-      }
-
-      commitsInSameBranch = !common.isEmpty();
-   }
-
-   return commitsInSameBranch || shas.count() == 1 ? shas.values() : QList<QString>();
+   return shas.count() >= 1 ? shas.values() : QList<QString>();
 }
