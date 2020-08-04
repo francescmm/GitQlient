@@ -39,7 +39,6 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    , mBlame(new QToolButton())
    , mPullBtn(new QToolButton())
    , mPushBtn(new QToolButton())
-   , mStashBtn(new QToolButton())
    , mRefreshBtn(new QToolButton())
    , mConfigBtn(new QToolButton())
    , mGitPlatform(new QToolButton())
@@ -69,7 +68,9 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    mBlame->setToolTip("Blame");
    mBlame->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-   const auto menu = new QMenu(mPullBtn);
+   const auto mPullOptions = new QToolButton();
+
+   const auto menu = new QMenu(mPullOptions);
    menu->installEventFilter(this);
 
    auto action = menu->addAction(tr("Fetch all"));
@@ -82,34 +83,31 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    connect(action, &QAction::triggered, this, &Controls::pruneBranches);
    menu->addSeparator();
 
-   mPullBtn->setMenu(menu);
    mPullBtn->setIconSize(QSize(22, 22));
-   mPullBtn->setToolTip(tr("Remote actions"));
+   mPullBtn->setToolTip(tr("Pull"));
    mPullBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mPullBtn->setPopupMode(QToolButton::InstantPopup);
    mPullBtn->setIcon(QIcon(":/icons/git_pull"));
-   mPullBtn->setObjectName("ToolButtonWithMenu");
+   mPullBtn->setObjectName("ToolButtonAboveMenu");
+
+   mPullOptions->setMenu(menu);
+   mPullOptions->setIcon(QIcon(":/icons/arrow_down"));
+   mPullOptions->setIconSize(QSize(22, 22));
+   mPullOptions->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mPullOptions->setPopupMode(QToolButton::InstantPopup);
+   mPullOptions->setToolTip("Remote actions");
+   mPullOptions->setObjectName("ToolButtonWithMenu");
+
+   const auto pullLayout = new QVBoxLayout();
+   pullLayout->setContentsMargins(QMargins());
+   pullLayout->setSpacing(0);
+   pullLayout->addWidget(mPullBtn);
+   pullLayout->addWidget(mPullOptions);
 
    mPushBtn->setIcon(QIcon(":/icons/git_push"));
    mPushBtn->setIconSize(QSize(22, 22));
    mPushBtn->setToolTip(tr("Push"));
    mPushBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-
-   const auto stashMenu = new QMenu(mStashBtn);
-   stashMenu->installEventFilter(this);
-
-   action = stashMenu->addAction(tr("Stash push"));
-   connect(action, &QAction::triggered, this, &Controls::stashCurrentWork);
-
-   action = stashMenu->addAction(tr("Stash pop"));
-   connect(action, &QAction::triggered, this, &Controls::popStashedWork);
-
-   mStashBtn->setMenu(stashMenu);
-   mStashBtn->setIcon(QIcon(":/icons/git_stash"));
-   mStashBtn->setIconSize(QSize(22, 22));
-   mStashBtn->setToolTip(tr("Stash actions"));
-   mStashBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mStashBtn->setPopupMode(QToolButton::InstantPopup);
 
    mRefreshBtn->setIcon(QIcon(":/icons/refresh"));
    mRefreshBtn->setIconSize(QSize(22, 22));
@@ -121,16 +119,25 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    mConfigBtn->setToolTip(tr("Config"));
    mConfigBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
+   const auto separator = new QFrame();
+   separator->setObjectName("orangeSeparator");
+   separator->setFixedHeight(20);
+
+   const auto separator2 = new QFrame();
+   separator2->setObjectName("orangeSeparator");
+   separator2->setFixedHeight(20);
+
    const auto hLayout = new QHBoxLayout();
    hLayout->setContentsMargins(QMargins());
    hLayout->addStretch();
-   hLayout->setSpacing(0);
+   hLayout->setSpacing(5);
    hLayout->addWidget(mHistory);
    hLayout->addWidget(mDiff);
    hLayout->addWidget(mBlame);
-   hLayout->addWidget(mPullBtn);
+   hLayout->addWidget(separator);
+   hLayout->addLayout(pullLayout);
    hLayout->addWidget(mPushBtn);
-   hLayout->addWidget(mStashBtn);
+   hLayout->addWidget(separator2);
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto remoteUrl = gitConfig->getServerUrl();
@@ -298,7 +305,6 @@ void Controls::enableButtons(bool enabled)
    mBlame->setEnabled(enabled);
    mPullBtn->setEnabled(enabled);
    mPushBtn->setEnabled(enabled);
-   mStashBtn->setEnabled(enabled);
    mRefreshBtn->setEnabled(enabled);
    mGitPlatform->setEnabled(enabled);
 }

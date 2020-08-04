@@ -169,7 +169,6 @@ private:
    QToolButton *mBlame = nullptr;
    QToolButton *mPullBtn = nullptr;
    QToolButton *mPushBtn = nullptr;
-   QToolButton *mStashBtn = nullptr;
    QToolButton *mRefreshBtn = nullptr;
    QToolButton *mConfigBtn = nullptr;
    QToolButton *mGitPlatform = nullptr;

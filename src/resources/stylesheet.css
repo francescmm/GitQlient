@@ -49,23 +49,18 @@ ClickableFrame
 
 Controls > QToolButton
 {
-max-width: 40px;
-min-width: 40px;
-max-height: 40px;
-min-height: 40px;
+   max-width: 35px;
+   min-width: 35px;
+   max-height: 35px;
+   min-height: 35px;
 }
 
 Controls > QToolButton:menu-indicator, BranchesWidgetMinimal > QToolButton:menu-indicator,
-Controls > QToolButton:menu-button
+Controls > QToolButton:menu-button, #ToolButtonWithMenu:menu-button, #ToolButtonWithMenu:menu-indicator
 {
     image: none;
     height: 0px;
     width: 0px;
-}
-
-#ToolButtonWithMenu
-{
-   border-bottom: 1px solid #D89000;
 }
 
 
@@ -711,5 +706,24 @@ QDialog > QPushButton
    max-height: 20px;
    min-height: 20px;
    min-width: 75px;
+}
+
+#ToolButtonWithMenu
+{
+   max-width: 45px;
+   min-width: 45px;
+   max-height: 10px;
+   min-height: 10px;
+   padding: 0;
+}
+
+#ToolButtonAboveMenu
+{
+   max-width: 35px;
+   min-width: 35px;
+   max-height: 25px;
+   min-height: 25px;
+   padding-bottom: 0;
+   padding-top: 10px;
 }
 
