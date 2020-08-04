@@ -38,10 +38,12 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    , mDiff(new QToolButton())
    , mBlame(new QToolButton())
    , mPullBtn(new QToolButton())
+   , mPullOptions(new QToolButton())
    , mPushBtn(new QToolButton())
    , mRefreshBtn(new QToolButton())
    , mConfigBtn(new QToolButton())
    , mGitPlatform(new QToolButton())
+   , mGitOptions(new QToolButton())
    , mVersionCheck(new QToolButton())
    , mDownloadLog(new QProgressBar())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
@@ -67,8 +69,6 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    mBlame->setIconSize(QSize(22, 22));
    mBlame->setToolTip("Blame");
    mBlame->setToolButtonStyle(Qt::ToolButtonIconOnly);
-
-   const auto mPullOptions = new QToolButton();
 
    const auto menu = new QMenu(mPullOptions);
    menu->installEventFilter(this);
@@ -163,7 +163,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
 
    if (add)
    {
-      const auto gitMenu = new QMenu(mGitPlatform);
+      const auto gitMenu = new QMenu(mGitOptions);
       gitMenu->installEventFilter(this);
 
       action = gitMenu->addAction(tr("New Issue"));
@@ -176,14 +176,33 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       action = gitMenu->addAction(tr("Config server"));
       connect(action, &QAction::triggered, this, &Controls::configServer);
 
-      mGitPlatform->setMenu(gitMenu);
       mGitPlatform->setIcon(gitPlatformIcon);
       mGitPlatform->setIconSize(QSize(22, 22));
-      mGitPlatform->setToolTip(name.append(" actions"));
+      mGitPlatform->setToolTip(name);
       mGitPlatform->setToolButtonStyle(Qt::ToolButtonIconOnly);
       mGitPlatform->setPopupMode(QToolButton::InstantPopup);
+      mGitPlatform->setObjectName("ToolButtonAboveMenu");
 
-      hLayout->addWidget(mGitPlatform);
+      mGitOptions->setMenu(gitMenu);
+      mGitOptions->setIcon(QIcon(":/icons/arrow_down"));
+      mGitOptions->setIconSize(QSize(22, 22));
+      mGitOptions->setToolButtonStyle(Qt::ToolButtonIconOnly);
+      mGitOptions->setPopupMode(QToolButton::InstantPopup);
+      mGitOptions->setToolTip("Git platform actions");
+      mGitOptions->setObjectName("ToolButtonWithMenu");
+
+      const auto gitLayout = new QVBoxLayout();
+      gitLayout->setContentsMargins(QMargins());
+      gitLayout->setSpacing(0);
+      gitLayout->addWidget(mGitPlatform);
+      gitLayout->addWidget(mGitOptions);
+
+      const auto separator3 = new QFrame();
+      separator3->setObjectName("orangeSeparator");
+      separator3->setFixedHeight(20);
+
+      hLayout->addLayout(gitLayout);
+      hLayout->addWidget(separator3);
 
       connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
       connect(mGitPlatform, &QToolButton::toggled, this, [this](bool checked) {

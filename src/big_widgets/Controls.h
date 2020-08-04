@@ -168,10 +168,12 @@ private:
    QToolButton *mDiff = nullptr;
    QToolButton *mBlame = nullptr;
    QToolButton *mPullBtn = nullptr;
+   QToolButton *mPullOptions = nullptr;
    QToolButton *mPushBtn = nullptr;
    QToolButton *mRefreshBtn = nullptr;
    QToolButton *mConfigBtn = nullptr;
    QToolButton *mGitPlatform = nullptr;
+   QToolButton *mGitOptions = nullptr;
    QToolButton *mVersionCheck = nullptr;
    QProgressBar *mDownloadLog = nullptr;
    QPushButton *mMergeWarning = nullptr;
