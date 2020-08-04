@@ -17,6 +17,7 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
 {
    ui->setupUi(this);
 
+   ui->labelClangFormat->setVisible(false);
    ui->clangFormat->setVisible(false);
 
    GitQlientSettings settings;

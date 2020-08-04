@@ -91,7 +91,7 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="label_4">
+        <widget class="QLabel" name="labelClangFormat">
          <property name="text">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run clang-format before commit&lt;br/&gt;(Requires clang-format)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
