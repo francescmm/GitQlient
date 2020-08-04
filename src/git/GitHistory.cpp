@@ -3,10 +3,8 @@
 #include <GitBase.h>
 
 #include <QLogger.h>
-#include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace Benchmarker;
 
 GitHistory::GitHistory(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
@@ -15,20 +13,16 @@ GitHistory::GitHistory(const QSharedPointer<GitBase> &gitBase)
 
 GitExecResult GitHistory::blame(const QString &file, const QString &commitFrom)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing blame: {%1} from {%2}").arg(file, commitFrom));
 
    const auto ret = mGitBase->run(QString("git annotate %1 %2").arg(file, commitFrom));
-
-   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitHistory::history(const QString &file)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing history: {%1}").arg(file));
 
@@ -37,14 +31,11 @@ GitExecResult GitHistory::history(const QString &file)
    if (ret.success && ret.output.toString().isEmpty())
       ret.success = false;
 
-   BenchmarkEnd();
-
    return ret;
 }
 
 GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffToSha)
 {
-   BenchmarkStart();
 
    if (!sha.isEmpty())
    {
@@ -64,21 +55,16 @@ GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffT
       else
          runCmd = "git diff HEAD ";
 
-      BenchmarkEnd();
-
       return mGitBase->run(runCmd);
    }
    else
       QLog_Warning("Git", QString("Executing getCommitDiff with empty SHA"));
-
-   BenchmarkEnd();
 
    return qMakePair(false, QString());
 }
 
 QString GitHistory::getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing getFileDiff: {%1} between {%2} and {%3}").arg(file, currentSha, previousSha));
 
@@ -86,17 +72,15 @@ QString GitHistory::getFileDiff(const QString &currentSha, const QString &previo
 
    if (ret.success)
    {
-      BenchmarkEnd();
+
       return ret.output.toString();
    }
 
-   BenchmarkEnd();
    return QString();
 }
 
 GitExecResult GitHistory::getDiffFiles(const QString &sha, const QString &diffToSha)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing getDiffFiles: {%1} to {%2}").arg(sha, diffToSha));
 
@@ -104,8 +88,6 @@ GitExecResult GitHistory::getDiffFiles(const QString &sha, const QString &diffTo
 
    if (!diffToSha.isEmpty() && sha != CommitInfo::ZERO_SHA)
       runCmd.append(diffToSha + " " + sha);
-
-   BenchmarkEnd();
 
    return mGitBase->run(runCmd);
 }

@@ -1,5 +1,5 @@
-# General stuff
-CONFIG += qt warn_on c++17 c++1z
+#General stuff
+CONFIG += qt warn_on c++ 17 c++1z
 
 greaterThan(QT_MINOR_VERSION, 12) {
 !msvc:QMAKE_CXXFLAGS += -Werror
@@ -10,20 +10,18 @@ QT += widgets core network svg
 DEFINES += QT_DEPRECATED_WARNINGS
 QMAKE_LFLAGS += -no-pie
 
-# Default rules for deployment.
+#Default rules for deployment.
 qnx: target.path = $$(HOME)/$${TARGET}/bin
 else: unix:!android: target.path = /$$(HOME)/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-# project files
+#project files
 SOURCES += src/main.cpp
 
 include(src/App.pri)
 include(QLogger/QLogger.pri)
-include(BenchmarkTool/BenchmarkLib/BenchmarkTool.pri)
 
-INCLUDEPATH += QLogger \
-    BenchmarkTool/BenchmarkLib
+INCLUDEPATH += QLogger
 
 OTHER_FILES += \
     $$PWD/LICENSE
@@ -43,7 +41,7 @@ debug {
 macos{
    BUNDLE_FILENAME = $${TARGET}.app
    DMG_FILENAME = "GitQlient-$$(VERSION).dmg"
-   # Target for pretty DMG generation
+#Target for pretty DMG generation
    dmg.commands += echo "Generate DMG";
    dmg.commands += macdeployqt $$BUNDLE_FILENAME &&
    dmg.commands += create-dmg \

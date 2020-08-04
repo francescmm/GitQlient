@@ -4,10 +4,8 @@
 #include <GitConfig.h>
 
 #include <QLogger.h>
-#include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace Benchmarker;
 
 GitBranches::GitBranches(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
@@ -16,20 +14,16 @@ GitBranches::GitBranches(const QSharedPointer<GitBase> &gitBase)
 
 GitExecResult GitBranches::getBranches()
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", "Executing getBranches");
 
    const auto ret = mGitBase->run(QString("git branch -a"));
-
-   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QString &right)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git",
               QString("Executing getDistanceBetweenBranches: {origin/%1} and {%2}")
@@ -52,39 +46,31 @@ GitExecResult GitBranches::getDistanceBetweenBranches(bool toMaster, const QStri
       result = gitBase->run(gitCmd);
    }
 
-   BenchmarkEnd();
-
    return result;
 }
 
 GitExecResult GitBranches::createBranchFromAnotherBranch(const QString &oldName, const QString &newName)
 {
-   BenchmarkStart();
+
    QLog_Debug("Git", QString("Executing createBranchFromAnotherBranch: {%1} and {%2}").arg(oldName, newName));
 
    const auto ret = mGitBase->run(QString("git branch %1 %2").arg(newName, oldName));
-
-   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitBranches::createBranchAtCommit(const QString &commitSha, const QString &branchName)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing createBranchAtCommit: {%1} at {%2}").arg(branchName, commitSha));
 
    const auto ret = mGitBase->run(QString("git branch %1 %2").arg(branchName, commitSha));
-
-   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitBranches::checkoutLocalBranch(const QString &branchName)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing checkoutRemoteBranch: {%1}").arg(branchName));
 
@@ -93,14 +79,11 @@ GitExecResult GitBranches::checkoutLocalBranch(const QString &branchName)
    if (ret.success)
       mGitBase->updateCurrentBranch();
 
-   BenchmarkEnd();
-
    return ret;
 }
 
 GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing checkoutRemoteBranch: {%1}").arg(branchName));
 
@@ -126,14 +109,11 @@ GitExecResult GitBranches::checkoutRemoteBranch(const QString &branchName)
          ret.success = false;
    }
 
-   BenchmarkEnd();
-
    return ret;
 }
 
 GitExecResult GitBranches::checkoutNewLocalBranch(const QString &branchName)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing checkoutNewLocalBranch: {%1}").arg(branchName));
 
@@ -142,14 +122,11 @@ GitExecResult GitBranches::checkoutNewLocalBranch(const QString &branchName)
    if (ret.success)
       mGitBase->updateCurrentBranch();
 
-   BenchmarkEnd();
-
    return ret;
 }
 
 GitExecResult GitBranches::renameBranch(const QString &oldName, const QString &newName)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing renameBranch: {%1} at {%2}").arg(oldName, newName));
 
@@ -158,27 +135,21 @@ GitExecResult GitBranches::renameBranch(const QString &oldName, const QString &n
    if (ret.success)
       mGitBase->updateCurrentBranch();
 
-   BenchmarkEnd();
-
    return ret;
 }
 
 GitExecResult GitBranches::removeLocalBranch(const QString &branchName)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing removeLocalBranch: {%1}").arg(branchName));
 
    const auto ret = mGitBase->run(QString("git branch -D %1").arg(branchName));
-
-   BenchmarkEnd();
 
    return ret;
 }
 
 GitExecResult GitBranches::removeRemoteBranch(const QString &branchName)
 {
-   BenchmarkStart();
 
    auto branch = branchName;
    branch = branch.mid(branch.indexOf('/') + 1);
@@ -192,14 +163,11 @@ GitExecResult GitBranches::removeRemoteBranch(const QString &branchName)
    ret = mGitBase->run(
        QString("git push --delete %2 %1").arg(branch, ret.success ? ret.output.toString() : QString("origin")));
 
-   BenchmarkEnd();
-
    return ret;
 }
 
 GitExecResult GitBranches::getLastCommitOfBranch(const QString &branch)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing getLastCommitOfBranch: {%1}").arg(branch));
 
@@ -208,27 +176,21 @@ GitExecResult GitBranches::getLastCommitOfBranch(const QString &branch)
    if (ret.success)
       ret.output = ret.output.toString().trimmed();
 
-   BenchmarkEnd();
-
    return ret;
 }
 
 GitExecResult GitBranches::pushUpstream(const QString &branchName)
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing pushUpstream: {%1}").arg(branchName));
 
    const auto ret = mGitBase->run(QString("git push --set-upstream origin %1").arg(branchName));
-
-   BenchmarkEnd();
 
    return ret;
 }
 
 QMap<QString, QStringList> GitBranches::getTrackingBranches() const
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing getTrackingBranches"));
 
@@ -260,8 +222,6 @@ QMap<QString, QStringList> GitBranches::getTrackingBranches() const
          }
       }
    }
-
-   BenchmarkEnd();
 
    return trackings;
 }

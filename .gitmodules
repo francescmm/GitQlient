@@ -1,6 +1,3 @@
 [submodule "QLogger"]
 	path = QLogger
 	url = https://github.com/francescmm/QLogger.git
-[submodule "BenchmarkTool"]
-	path = BenchmarkTool
-	url = https://github.com/francescmm/BenchmarkTool.git
