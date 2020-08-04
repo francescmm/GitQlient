@@ -76,9 +76,6 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    auto action = menu->addAction(tr("Fetch all"));
    connect(action, &QAction::triggered, this, &Controls::fetchAll);
 
-   action = menu->addAction(tr("Pull"));
-   connect(action, &QAction::triggered, this, &Controls::pullCurrentBranch);
-
    action = menu->addAction(tr("Prune"));
    connect(action, &QAction::triggered, this, &Controls::pruneBranches);
    menu->addSeparator();
