@@ -249,6 +249,7 @@ GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringLis
 
    if (!toAdd.isEmpty())
    {
+      /* Post-poned in v1.2.0
       GitQlientSettings settings;
       const auto clangFormatOnCommit
           = settings.localValue(mGitBase->getGitQlientSettingsDir(), "ClangFormatOnCommit", false).toBool();
@@ -262,6 +263,7 @@ GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringLis
          if (!clangFormat.waitForFinished(10000))
             QLog_Error("Git", QString("Clang-Format error: %1").arg(clangFormat.errorString()));
       }
+      */
 
       const auto ret = mGitBase->run("git add -- " + quote(toAdd));
 
