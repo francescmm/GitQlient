@@ -4,10 +4,8 @@
 #include <QTextStream>
 
 #include <QLogger.h>
-#include <BenchmarkTool.h>
 
 using namespace QLogger;
-using namespace Benchmarker;
 
 namespace
 {
@@ -115,13 +113,10 @@ AGitProcess::AGitProcess(const QString &workingDir)
 
 void AGitProcess::onCancel()
 {
-   BenchmarkStart();
 
    mCanceling = true;
 
    waitForFinished();
-
-   BenchmarkEnd();
 }
 
 void AGitProcess::onReadyStandardOutput()

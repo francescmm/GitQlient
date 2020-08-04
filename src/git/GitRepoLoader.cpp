@@ -9,12 +9,10 @@
 #include <GitHubRestApi.h>
 
 #include <QLogger.h>
-#include <BenchmarkTool.h>
 
 #include <QDir>
 
 using namespace QLogger;
-using namespace Benchmarker;
 
 static const QString GIT_LOG_FORMAT("%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ");
 
@@ -28,7 +26,6 @@ GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<Rev
 
 bool GitRepoLoader::loadRepository()
 {
-   BenchmarkStart();
 
    if (mLocked)
       QLog_Warning("Git", "Git is currently loading data.");
@@ -52,8 +49,6 @@ bool GitRepoLoader::loadRepository()
 
             requestRevisions();
 
-            BenchmarkEnd();
-
             return true;
          }
          else
@@ -61,14 +56,11 @@ bool GitRepoLoader::loadRepository()
       }
    }
 
-   BenchmarkEnd();
-
    return false;
 }
 
 bool GitRepoLoader::configureRepoDirectory()
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", "Configuring repository directory.");
 
@@ -79,19 +71,14 @@ bool GitRepoLoader::configureRepoDirectory()
       QDir d(QString("%1/%2").arg(mGitBase->getWorkingDir(), ret.output.toString().trimmed()));
       mGitBase->setWorkingDir(d.absolutePath());
 
-      BenchmarkEnd();
-
       return true;
    }
-
-   BenchmarkEnd();
 
    return false;
 }
 
 void GitRepoLoader::loadReferences()
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", "Loading references.");
 
@@ -179,13 +166,10 @@ void GitRepoLoader::loadReferences()
          prevRefSha = revSha;
       }
    }
-
-   BenchmarkEnd();
 }
 
 void GitRepoLoader::requestRevisions()
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", "Loading revisions.");
 
@@ -198,13 +182,10 @@ void GitRepoLoader::requestRevisions()
    connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
 
    requestor->run(baseCmd);
-
-   BenchmarkEnd();
 }
 
 void GitRepoLoader::processRevision(const QByteArray &ba)
 {
-   BenchmarkStart();
 
    QLog_Info("Git", "Revisions received!");
 
@@ -235,14 +216,11 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    mLocked = false;
 
-   BenchmarkEnd();
-
    emit signalLoadingFinished();
 }
 
 WipRevisionInfo GitRepoLoader::processWip()
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing processWip."));
 
@@ -263,24 +241,18 @@ WipRevisionInfo GitRepoLoader::processWip()
       return { parentSha, diffIndex, diffIndexCached };
    }
 
-   BenchmarkEnd();
-
    return {};
 }
 
 void GitRepoLoader::updateWipRevision()
 {
-   BenchmarkStart();
 
    if (const auto wipInfo = processWip(); wipInfo.isValid())
       mRevCache->updateWipCommit(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
-
-   BenchmarkEnd();
 }
 
 QVector<QString> GitRepoLoader::getUntrackedFiles() const
 {
-   BenchmarkStart();
 
    QLog_Debug("Git", QString("Executing getUntrackedFiles."));
 
@@ -298,8 +270,6 @@ QVector<QString> GitRepoLoader::getUntrackedFiles() const
 #else
    const auto ret = mGitBase->run(runCmd).output.toString().split('\n', QString::SkipEmptyParts).toVector();
 #endif
-
-   BenchmarkEnd();
 
    return ret;
 }
