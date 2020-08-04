@@ -263,6 +263,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       mGitPlatform->setChecked(!checked);
       mGitPlatform->blockSignals(false);
    });
+   connect(mPullBtn, &QToolButton::clicked, this, &Controls::pullCurrentBranch);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
    connect(mConfigBtn, &QToolButton::clicked, this, &Controls::showConfigDlg);
