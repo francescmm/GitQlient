@@ -53,30 +53,30 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    mHistory->setCheckable(true);
    mHistory->setIcon(QIcon(":/icons/git_orange"));
    mHistory->setIconSize(QSize(22, 22));
-   mHistory->setText("View");
-   mHistory->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mHistory->setToolTip("View");
+   mHistory->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
    mDiff->setCheckable(true);
    mDiff->setIcon(QIcon(":/icons/diff"));
    mDiff->setIconSize(QSize(22, 22));
-   mDiff->setText("Diff");
-   mDiff->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mDiff->setToolTip("Diff");
+   mDiff->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mDiff->setEnabled(false);
 
    mBlame->setCheckable(true);
    mBlame->setIcon(QIcon(":/icons/blame"));
    mBlame->setIconSize(QSize(22, 22));
-   mBlame->setText("Blame");
-   mBlame->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mBlame->setToolTip("Blame");
+   mBlame->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
    const auto menu = new QMenu(mPullBtn);
+   menu->installEventFilter(this);
 
    auto action = menu->addAction(tr("Fetch all"));
    connect(action, &QAction::triggered, this, &Controls::fetchAll);
 
    action = menu->addAction(tr("Pull"));
    connect(action, &QAction::triggered, this, &Controls::pullCurrentBranch);
-   mPullBtn->setDefaultAction(action);
 
    action = menu->addAction(tr("Prune"));
    connect(action, &QAction::triggered, this, &Controls::pruneBranches);
@@ -84,21 +84,22 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
 
    mPullBtn->setMenu(menu);
    mPullBtn->setIconSize(QSize(22, 22));
-   mPullBtn->setText(tr("Pull"));
-   mPullBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-   mPullBtn->setPopupMode(QToolButton::MenuButtonPopup);
+   mPullBtn->setToolTip(tr("Remote actions"));
+   mPullBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mPullBtn->setPopupMode(QToolButton::InstantPopup);
    mPullBtn->setIcon(QIcon(":/icons/git_pull"));
+   mPullBtn->setObjectName("ToolButtonWithMenu");
 
    mPushBtn->setIcon(QIcon(":/icons/git_push"));
    mPushBtn->setIconSize(QSize(22, 22));
-   mPushBtn->setText(tr("Push"));
-   mPushBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mPushBtn->setToolTip(tr("Push"));
+   mPushBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
    const auto stashMenu = new QMenu(mStashBtn);
+   stashMenu->installEventFilter(this);
 
    action = stashMenu->addAction(tr("Stash push"));
    connect(action, &QAction::triggered, this, &Controls::stashCurrentWork);
-   mStashBtn->setDefaultAction(action);
 
    action = stashMenu->addAction(tr("Stash pop"));
    connect(action, &QAction::triggered, this, &Controls::popStashedWork);
@@ -106,33 +107,27 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    mStashBtn->setMenu(stashMenu);
    mStashBtn->setIcon(QIcon(":/icons/git_stash"));
    mStashBtn->setIconSize(QSize(22, 22));
-   mStashBtn->setText(tr("Stash"));
-   mStashBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-   mStashBtn->setPopupMode(QToolButton::MenuButtonPopup);
+   mStashBtn->setToolTip(tr("Stash actions"));
+   mStashBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mStashBtn->setPopupMode(QToolButton::InstantPopup);
 
    mRefreshBtn->setIcon(QIcon(":/icons/refresh"));
    mRefreshBtn->setIconSize(QSize(22, 22));
-   mRefreshBtn->setText(tr("Refresh"));
-   mRefreshBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mRefreshBtn->setToolTip(tr("Refresh"));
+   mRefreshBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
    mConfigBtn->setIcon(QIcon(":/icons/config"));
    mConfigBtn->setIconSize(QSize(22, 22));
-   mConfigBtn->setText(tr("Config"));
-   mConfigBtn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-
-   const auto verticalFrame = new QFrame();
-   verticalFrame->setObjectName("orangeSeparator");
-
-   const auto verticalFrame2 = new QFrame();
-   verticalFrame2->setObjectName("orangeSeparator");
+   mConfigBtn->setToolTip(tr("Config"));
+   mConfigBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
    const auto hLayout = new QHBoxLayout();
    hLayout->setContentsMargins(QMargins());
    hLayout->addStretch();
+   hLayout->setSpacing(0);
    hLayout->addWidget(mHistory);
    hLayout->addWidget(mDiff);
    hLayout->addWidget(mBlame);
-   hLayout->addWidget(verticalFrame);
    hLayout->addWidget(mPullBtn);
    hLayout->addWidget(mPushBtn);
    hLayout->addWidget(mStashBtn);
@@ -161,7 +156,8 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
 
    if (add)
    {
-      const auto gitMenu = new QMenu(mStashBtn);
+      const auto gitMenu = new QMenu(mGitPlatform);
+      gitMenu->installEventFilter(this);
 
       action = gitMenu->addAction(tr("New Issue"));
       connect(action, &QAction::triggered, this, &Controls::createNewIssue);
@@ -171,19 +167,15 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
 
       gitMenu->addSeparator();
       action = gitMenu->addAction(tr("Config server"));
-      mGitPlatform->setDefaultAction(action);
       connect(action, &QAction::triggered, this, &Controls::configServer);
 
       mGitPlatform->setMenu(gitMenu);
       mGitPlatform->setIcon(gitPlatformIcon);
       mGitPlatform->setIconSize(QSize(22, 22));
-      mGitPlatform->setText(name);
-      mGitPlatform->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-      mGitPlatform->setPopupMode(QToolButton::MenuButtonPopup);
+      mGitPlatform->setToolTip(name.append(" actions"));
+      mGitPlatform->setToolButtonStyle(Qt::ToolButtonIconOnly);
+      mGitPlatform->setPopupMode(QToolButton::InstantPopup);
 
-      const auto verticalFrame3 = new QFrame();
-      verticalFrame3->setObjectName("orangeSeparator");
-      hLayout->addWidget(verticalFrame3);
       hLayout->addWidget(mGitPlatform);
 
       connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
@@ -206,19 +198,18 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    mVersionCheck->setIconSize(QSize(22, 22));
    mVersionCheck->setText(tr("New version"));
    mVersionCheck->setObjectName("longToolButton");
-   mVersionCheck->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+   mVersionCheck->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mVersionCheck->setVisible(false);
 
    mDownloadLog->setVisible(false);
 
    checkNewGitQlientVersion();
 
-   hLayout->addWidget(verticalFrame2);
    hLayout->addWidget(mRefreshBtn);
    hLayout->addWidget(mVersionCheck);
    hLayout->addWidget(mDownloadLog);
-   hLayout->addStretch();
    hLayout->addWidget(mConfigBtn);
+   hLayout->addStretch();
 
    mMergeWarning->setObjectName("MergeWarningButton");
    mMergeWarning->setVisible(false);
@@ -627,4 +618,21 @@ void Controls::downloadFile()
 
       reply->deleteLater();
    });
+}
+
+bool Controls::eventFilter(QObject *obj, QEvent *event)
+{
+
+   if (const auto menu = qobject_cast<QMenu *>(obj); menu && event->type() == QEvent::Show)
+   {
+      auto localPos = menu->parentWidget()->pos();
+      localPos.setX(localPos.x());
+      auto pos = mapToGlobal(localPos);
+      menu->show();
+      pos.setY(pos.y() + menu->parentWidget()->height());
+      menu->move(pos);
+      return true;
+   }
+
+   return false;
 }

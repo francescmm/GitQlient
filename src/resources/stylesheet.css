@@ -49,17 +49,25 @@ ClickableFrame
 
 Controls > QToolButton
 {
-    max-width: 65px;
-    min-width: 65px;
-    max-height: 50px;
-    min-height: 50px;
+max-width: 40px;
+min-width: 40px;
+max-height: 40px;
+min-height: 40px;
 }
 
-QToolButton#longToolButton
+Controls > QToolButton:menu-indicator, BranchesWidgetMinimal > QToolButton:menu-indicator,
+Controls > QToolButton:menu-button
 {
-    max-width: 75px;
-    min-width: 75px;
+    image: none;
+    height: 0px;
+    width: 0px;
 }
+
+#ToolButtonWithMenu
+{
+   border-bottom: 1px solid #D89000;
+}
+
 
 QPushButton, QToolButton
 {

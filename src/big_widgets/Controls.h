@@ -250,4 +250,6 @@ private:
     * @brief downloadFile Downloads the latest release of GitQlient.
     */
    void downloadFile();
+
+   bool eventFilter(QObject *obj, QEvent *event);
 };
