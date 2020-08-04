@@ -126,22 +126,26 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0" colspan="4">
-    <widget class="QLineEdit" name="leUserToken">
-     <property name="echoMode">
-      <enum>QLineEdit::Password</enum>
-     </property>
-     <property name="placeholderText">
-      <string>Set the user token</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="4" colspan="3">
-    <widget class="ButtonLink" name="lAccessToken">
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
+   <item row="1" column="0" colspan="7">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="leUserToken">
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+       <property name="placeholderText">
+        <string>Set the user token</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ButtonLink" name="lAccessToken">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -154,7 +158,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>leUserName</tabstop>
-  <tabstop>leUserToken</tabstop>
   <tabstop>leEndPoint</tabstop>
   <tabstop>pbTest</tabstop>
   <tabstop>pbAccept</tabstop>
