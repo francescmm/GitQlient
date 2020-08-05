@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 
    GitQlient mainWin(arguments);
 
-   mainWin.showMaximized();
+   mainWin.show();
 
    QTimer::singleShot(500, &mainWin, &GitQlient::restorePinnedRepos);
 

@@ -59,6 +59,12 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    connect(mConfigWidget, &ConfigWidget::signalOpenRepo, this, &GitQlient::addRepoTab);
 
    setRepositories(repos);
+
+   GitQlientSettings settings;
+   const auto geometry = settings.globalValue("GitQlientGeometry", saveGeometry()).toByteArray();
+
+   if (!geometry.isNull())
+      restoreGeometry(geometry);
 }
 
 GitQlient::~GitQlient()
@@ -77,6 +83,7 @@ GitQlient::~GitQlient()
    }
 
    settings.setGlobalValue(GitQlientSettings::PinnedRepos, pinnedRepos);
+   settings.setGlobalValue("GitQlientGeometry", saveGeometry());
 
    QLog_Info("UI", "*            Closing GitQlient            *\n\n");
 }
