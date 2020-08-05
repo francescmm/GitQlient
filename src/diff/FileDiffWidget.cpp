@@ -132,7 +132,7 @@ void FileDiffWidget::clear()
 bool FileDiffWidget::reload()
 {
    if (mCurrentSha == CommitInfo::ZERO_SHA)
-      return configure(mCurrentSha, mPreviousSha, mCurrentFile);
+      return configure(mCurrentSha, mPreviousSha, mCurrentFile, mEdition->isChecked());
 
    return false;
 }
