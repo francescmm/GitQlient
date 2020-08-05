@@ -74,7 +74,8 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<RevisionsCache> &c
    connect(ui->untrackedFilesList, &QListWidget::customContextMenuRequested, this,
            &CommitChangesWidget::showUntrackedMenu);
    connect(ui->stagedFilesList, &StagedFilesList::signalResetFile, this, &CommitChangesWidget::resetFile);
-   connect(ui->stagedFilesList, &StagedFilesList::signalShowDiff, this, &CommitChangesWidget::requestDiff);
+   connect(ui->stagedFilesList, &StagedFilesList::signalShowDiff, this,
+           [this](const QString &fileName) { requestDiff(mGit->getWorkingDir() + "/" + fileName); });
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
            &CommitChangesWidget::showUnstagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
