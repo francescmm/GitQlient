@@ -185,7 +185,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       mGitOptions->setIconSize(QSize(22, 22));
       mGitOptions->setToolButtonStyle(Qt::ToolButtonIconOnly);
       mGitOptions->setPopupMode(QToolButton::InstantPopup);
-      mGitOptions->setToolTip("Git platform actions");
+      mGitOptions->setToolTip(name.append(" actions"));
       mGitOptions->setObjectName("ToolButtonWithMenu");
 
       const auto gitLayout = new QVBoxLayout();
@@ -201,7 +201,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       hLayout->addLayout(gitLayout);
       hLayout->addWidget(separator3);
 
-      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
+      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::configServer);
       connect(mGitPlatform, &QToolButton::toggled, this, [this](bool checked) {
          mDiff->blockSignals(true);
          mDiff->setChecked(!checked);
@@ -321,9 +321,12 @@ void Controls::enableButtons(bool enabled)
    mHistory->setEnabled(enabled);
    mBlame->setEnabled(enabled);
    mPullBtn->setEnabled(enabled);
+   mPullOptions->setEnabled(enabled);
    mPushBtn->setEnabled(enabled);
    mRefreshBtn->setEnabled(enabled);
    mGitPlatform->setEnabled(enabled);
+   mGitOptions->setEnabled(enabled);
+   mConfigBtn->setEnabled(enabled);
 }
 
 void Controls::pullCurrentBranch()
