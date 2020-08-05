@@ -10,6 +10,7 @@
 #include <ServerConfigDlg.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
+#include <GitQlientUpdater.h>
 #include <QLogger.h>
 
 #include <QApplication>
@@ -45,11 +46,12 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    , mGitPlatform(new QToolButton())
    , mGitOptions(new QToolButton())
    , mVersionCheck(new QToolButton())
-   , mDownloadLog(new QProgressBar())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
-   , mManager(new QNetworkAccessManager())
+   , mUpdater(new GitQlientUpdater(this))
 {
    setAttribute(Qt::WA_DeleteOnClose);
+
+   connect(mUpdater, &GitQlientUpdater::newVersionAvailable, this, [this]() { mVersionCheck->setVisible(true); });
 
    mHistory->setCheckable(true);
    mHistory->setIcon(QIcon(":/icons/git_orange"));
@@ -224,14 +226,11 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    mVersionCheck->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mVersionCheck->setVisible(false);
 
-   mDownloadLog->setVisible(false);
-
-   checkNewGitQlientVersion();
+   mUpdater->checkNewGitQlientVersion();
 
    hLayout->addWidget(mRefreshBtn);
-   hLayout->addWidget(mVersionCheck);
-   hLayout->addWidget(mDownloadLog);
    hLayout->addWidget(mConfigBtn);
+   hLayout->addWidget(mVersionCheck);
    hLayout->addStretch();
 
    mMergeWarning->setObjectName("MergeWarningButton");
@@ -284,7 +283,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
    connect(mConfigBtn, &QToolButton::clicked, this, &Controls::showConfigDlg);
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
-   connect(mVersionCheck, &QToolButton::clicked, this, &Controls::showInfoMessage);
+   connect(mVersionCheck, &QToolButton::clicked, mUpdater, &GitQlientUpdater::showInfoMessage);
 
    enableButtons(false);
 }
@@ -503,147 +502,6 @@ void Controls::configServer()
 {
    const auto configDlg = new ServerConfigDlg(mGit, this);
    configDlg->exec();
-}
-
-void Controls::checkNewGitQlientVersion()
-{
-   QNetworkRequest request;
-   request.setRawHeader("User-Agent", "GitQlient");
-   request.setRawHeader("X-Custom-User-Agent", "GitQlient");
-   request.setRawHeader("Content-Type", "application/json");
-   request.setUrl(QUrl("https://github.com/francescmm/ci-utils/releases/download/gq_update/updates.json"));
-   request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
-
-   const auto reply = mManager->get(request);
-   connect(reply, &QNetworkReply::finished, this, &Controls::processUpdateFile);
-}
-
-void Controls::processUpdateFile()
-{
-   const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto data = reply->readAll();
-   const auto jsonDoc = QJsonDocument::fromJson(data);
-   const auto url = reply->url().path();
-
-   if (jsonDoc.isNull())
-   {
-      QLog_Error("Ui", QString("Error when parsing Json. Current data:\n%1").arg(QString::fromUtf8(data)));
-      return;
-   }
-
-   QVector<ServerLabel> labels;
-   const auto json = jsonDoc.object();
-
-   mLatestGitQlient = json["latest-version"].toString();
-   const auto changeLogUrl = json["changelog"].toString();
-
-   QJsonObject os;
-   auto platformSupported = true;
-#if defined(Q_OS_WIN)
-   os = json["windows"].toObject();
-#elif defined(Q_OS_LINUX)
-   os = json["linux"].toObject();
-#elif defined(Q_OS_OSX)
-   os = json["osx"].toObject();
-#else
-   platformSupported = false;
-   QLog_Error("Ui", QString("Platform not supported for updates"));
-#endif
-
-   const auto newVersion = mLatestGitQlient.split(".");
-   const auto nv = newVersion.at(0).toInt() * 10000 + newVersion.at(1).toInt() * 100 + newVersion.at(2).toInt();
-   const auto curVersion = QString("%1").arg(VER).split(".");
-   const auto cv = curVersion.at(0).toInt() * 10000 + curVersion.at(1).toInt() * 100 + curVersion.at(2).toInt();
-
-   if (nv > cv)
-   {
-      if (!platformSupported)
-      {
-         QMessageBox::information(
-             this, tr("New version available!"),
-             tr("There is a new version of GitQlient available but your OS doesn't have a binary built. If you want to "
-                "get the latest version, pleas <a href='https://github.com/francescmm/GitQlient/releases/tag/v%1'>get "
-                "the source code from GitHub</a>.")
-                 .arg(mLatestGitQlient));
-      }
-      else
-      {
-         mGitQlientDownloadUrl = os["download-url"].toString();
-         mVersionCheck->setVisible(true);
-
-         QTimer::singleShot(200, this, [this, changeLogUrl] {
-            QNetworkRequest request;
-            request.setRawHeader("User-Agent", "GitQlient");
-            request.setRawHeader("X-Custom-User-Agent", "GitQlient");
-            request.setRawHeader("Content-Type", "application/json");
-            request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
-            request.setUrl(QUrl(changeLogUrl));
-
-            const auto reply = mManager->get(request);
-
-            connect(reply, &QNetworkReply::finished, this, &Controls::processChangeLog);
-         });
-      }
-   }
-}
-
-void Controls::processChangeLog()
-{
-   const auto reply = qobject_cast<QNetworkReply *>(sender());
-   mChangeLog = QString::fromUtf8(reply->readAll());
-}
-
-void Controls::showInfoMessage()
-{
-   QMessageBox msgBox(QMessageBox::Information, tr("New version of GitQlient!"),
-                      QString("There is a new version of GitQlient available. Your current vrsion is {%1} and the new "
-                              "one is {%2}. You can read more about the new changes in the detailed description.")
-                          .arg(VER, mLatestGitQlient),
-                      QMessageBox::Ok | QMessageBox::Close, this);
-   msgBox.setButtonText(QMessageBox::Ok, tr("Download"));
-   msgBox.setDetailedText(mChangeLog);
-   msgBox.setStyleSheet(GitQlientStyles::getStyles());
-
-   if (msgBox.exec() == QMessageBox::Ok)
-      downloadFile();
-}
-
-void Controls::downloadFile()
-{
-   QNetworkRequest request;
-   request.setRawHeader("User-Agent", "GitQlient");
-   request.setRawHeader("X-Custom-User-Agent", "GitQlient");
-   request.setRawHeader("Content-Type", "application/octet-stream");
-   request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
-   request.setUrl(QUrl(mGitQlientDownloadUrl));
-
-   const auto fileName = mGitQlientDownloadUrl.split("/").last();
-
-   const auto reply = mManager->get(request);
-
-   connect(reply, &QNetworkReply::downloadProgress, this, [this](qint64 read, qint64 total) {
-      mDownloadLog->setVisible(true);
-      mDownloadLog->setMaximum(total);
-      mDownloadLog->setValue(read);
-   });
-
-   connect(reply, &QNetworkReply::finished, this, [this, reply, fileName]() {
-      mDownloadLog->setVisible(false);
-
-      const auto b = reply->readAll();
-      const auto destination
-          = QStandardPaths::standardLocations(QStandardPaths::DownloadLocation).first() + "/" + fileName;
-      QFile file(destination);
-      if (file.open(QIODevice::WriteOnly))
-      {
-         QDataStream out(&file);
-         out << b;
-
-         file.close();
-      }
-
-      reply->deleteLater();
-   });
 }
 
 bool Controls::eventFilter(QObject *obj, QEvent *event)
