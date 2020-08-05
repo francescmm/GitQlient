@@ -255,6 +255,22 @@ void HistoryWidget::onNewRevisions(int totalCommits)
        QItemSelectionModel::Select);
 }
 
+void HistoryWidget::keyPressEvent(QKeyEvent *event)
+{
+   if (event->key() == Qt::Key_Shift)
+      mReverseSearch = true;
+
+   QFrame::keyPressEvent(event);
+}
+
+void HistoryWidget::keyReleaseEvent(QKeyEvent *event)
+{
+   if (event->key() == Qt::Key_Shift)
+      mReverseSearch = false;
+
+   QFrame::keyReleaseEvent(event);
+}
+
 void HistoryWidget::showFullDiff()
 {
    const auto commit = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
@@ -292,10 +308,12 @@ void HistoryWidget::search()
             startingRow = selectedItems.constFirst().row();
          }
 
-         commitInfo = mCache->getCommitInfoByField(CommitInfo::Field::SHORT_LOG, text, startingRow + 1);
+         commitInfo = mCache->getCommitInfoByField(CommitInfo::Field::SHORT_LOG, text, startingRow + 1, mReverseSearch);
 
          if (commitInfo.isValid())
             goToSha(commitInfo.sha());
+         else
+            QMessageBox::information(this, tr("Not found!"), tr("No commits where found based on the search text."));
       }
    }
 }

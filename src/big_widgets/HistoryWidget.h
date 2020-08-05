@@ -216,6 +216,10 @@ public:
    */
    void onNewRevisions(int totalCommits);
 
+protected:
+   void keyPressEvent(QKeyEvent *event) override;
+   void keyReleaseEvent(QKeyEvent *event) override;
+
 private:
    enum class Pages
    {
@@ -241,6 +245,7 @@ private:
    FileDiffWidget *mFileDiff = nullptr;
    FullDiffWidget *mFullDiffWidget = nullptr;
    QPushButton *mReturnFromFull = nullptr;
+   bool mReverseSearch = false;
 
    /*!
     \brief Performs a search based on the input of the search QLineEdit with the users input.

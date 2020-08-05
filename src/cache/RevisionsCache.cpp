@@ -106,15 +106,34 @@ int RevisionsCache::getCommitPos(const QString &sha)
    return -1;
 }
 
-CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint)
+CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint,
+                                                bool reverse)
 {
    QMutexLocker lock(&mMutex);
-   auto commitIter = searchCommit(field, text, startingPoint);
+   CommitInfo commit;
 
-   if (commitIter == mCommits.constEnd() && startingPoint > 0)
-      commitIter = searchCommit(field, text);
+   if (!reverse)
+   {
+      auto commitIter = searchCommit(field, text, startingPoint);
 
-   return commitIter != mCommits.constEnd() ? **commitIter : CommitInfo();
+      if (commitIter == mCommits.constEnd())
+         commitIter = searchCommit(field, text);
+
+      if (commitIter != mCommits.constEnd())
+         commit = **commitIter;
+   }
+   else
+   {
+      auto commitIter = reverseSearchCommit(field, text, startingPoint);
+
+      if (commitIter == mCommits.crend())
+         commitIter = reverseSearchCommit(field, text);
+
+      if (commitIter != mCommits.crend())
+         commit = **commitIter;
+   }
+
+   return commit;
 }
 
 CommitInfo RevisionsCache::getCommitInfo(const QString &sha)
@@ -518,6 +537,19 @@ QVector<CommitInfo *>::const_iterator RevisionsCache::searchCommit(CommitInfo::F
 {
    return std::find_if(mCommits.constBegin() + startingPoint, mCommits.constEnd(),
                        [field, text](CommitInfo *info) { return info->getFieldStr(field).contains(text); });
+}
+
+QVector<CommitInfo *>::const_reverse_iterator
+RevisionsCache::reverseSearchCommit(CommitInfo::Field field, const QString &text, int startingPoint) const
+{
+   const auto startEndPos = startingPoint > 0 ? mCommits.count() - startingPoint + 1 : 0;
+
+   return std::find_if(mCommits.crbegin() + startEndPos, mCommits.crend(),
+                       [this, startEndPos, field, text](CommitInfo *info) {
+                          const auto currentsha = (*(mCommits.crbegin() + startEndPos))->sha();
+                          const auto sha = info->sha();
+                          return info->getFieldStr(field).contains(text);
+                       });
 }
 
 void RevisionsCache::resetLanes(const CommitInfo &c, bool isFork)
