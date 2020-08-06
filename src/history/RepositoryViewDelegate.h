@@ -31,7 +31,7 @@ class RevisionsCache;
 class GitBase;
 class Lane;
 class CommitInfo;
-class ServerPullRequest;
+struct ServerPullRequest;
 
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
