@@ -31,8 +31,6 @@
 #include <QMap>
 #include <QNetworkRequest>
 
-#include <optional>
-
 class QNetworkAccessManager;
 class QNetworkReply;
 struct ServerIssue;
@@ -96,7 +94,7 @@ public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
    virtual ~IRestApi() = default;
 
-   static std::optional<QJsonDocument> validateData(QNetworkReply *reply, QString &errorString);
+   static QJsonDocument validateData(QNetworkReply *reply, QString &errorString);
 
    /**
     * @brief testConnection Tests the connection agains the server.

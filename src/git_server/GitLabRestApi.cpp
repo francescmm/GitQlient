@@ -45,7 +45,7 @@ void GitLabRestApi::testConnection()
       QString errorStr;
       const auto tmpDoc = validateData(reply, errorStr);
 
-      if (tmpDoc.has_value())
+      if (!tmpDoc.isEmpty())
          emit connectionTested();
       else
          emit errorOccurred(errorStr);
@@ -157,10 +157,10 @@ void GitLabRestApi::onUserInfoReceived()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc.value();
-      const auto list = tmpDoc->toVariant().toList();
+      const auto doc = tmpDoc;
+      const auto list = tmpDoc.toVariant().toList();
 
       if (!list.isEmpty())
       {
@@ -190,9 +190,9 @@ void GitLabRestApi::onProjectsReceived()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto projectsObj = tmpDoc->toVariant().toList();
+      const auto projectsObj = tmpDoc.toVariant().toList();
 
       for (const auto projObj : projectsObj)
       {
@@ -218,9 +218,9 @@ void GitLabRestApi::onLabelsReceived()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto labelsObj = tmpDoc->toVariant().toList();
+      const auto labelsObj = tmpDoc.toVariant().toList();
 
       QVector<ServerLabel> labels;
 
@@ -250,9 +250,9 @@ void GitLabRestApi::onMilestonesReceived()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto milestonesObj = tmpDoc->toVariant().toList();
+      const auto milestonesObj = tmpDoc.toVariant().toList();
 
       QVector<ServerMilestone> milestones;
 
@@ -280,11 +280,11 @@ void GitLabRestApi::onIssueCreated()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc.value();
+      const auto doc = tmpDoc;
       const auto issue = doc.object();
-      const auto list = tmpDoc->toVariant().toList();
+      const auto list = tmpDoc.toVariant().toList();
       const auto url = issue[QStringLiteral("web_url")].toString();
 
       emit issueCreated(url);
@@ -299,11 +299,11 @@ void GitLabRestApi::onMergeRequestCreated()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc.value();
+      const auto doc = tmpDoc;
       const auto issue = doc.object();
-      const auto list = tmpDoc->toVariant().toList();
+      const auto list = tmpDoc.toVariant().toList();
       const auto url = issue[QStringLiteral("web_url")].toString();
 
       emit pullRequestCreated(url);

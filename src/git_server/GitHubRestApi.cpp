@@ -39,7 +39,7 @@ void GitHubRestApi::testConnection()
       QString errorStr;
       const auto tmpDoc = validateData(reply, errorStr);
 
-      if (tmpDoc.has_value())
+      if (!tmpDoc.isEmpty())
          emit connectionTested();
       else
          emit errorOccurred(errorStr);
@@ -72,7 +72,7 @@ void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
       QString errorStr;
       const auto tmpDoc = validateData(reply, errorStr);
 
-      if (tmpDoc.has_value())
+      if (!tmpDoc.isEmpty())
          emit issueUpdated();
       else
          emit errorOccurred(errorStr);
@@ -143,9 +143,9 @@ void GitHubRestApi::onLabelsReceived()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc.value();
+      const auto doc = tmpDoc;
 
       QVector<ServerLabel> labels;
       const auto labelsArray = doc.array();
@@ -176,9 +176,9 @@ void GitHubRestApi::onMilestonesReceived()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc.value();
+      const auto doc = tmpDoc;
       QVector<ServerMilestone> milestones;
       const auto labelsArray = doc.array();
 
@@ -207,9 +207,9 @@ void GitHubRestApi::onIssueCreated()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc.value();
+      const auto doc = tmpDoc;
       const auto issue = doc.object();
       const auto url = issue[QStringLiteral("html_url")].toString();
 
@@ -225,9 +225,9 @@ void GitHubRestApi::onPullRequestCreated()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc.value();
+      const auto doc = tmpDoc;
       const auto issue = doc.object();
       const auto url = issue[QStringLiteral("html_url")].toString();
 
@@ -243,9 +243,9 @@ void GitHubRestApi::processPullRequets()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc.value();
+      const auto doc = tmpDoc;
       const auto prs = doc.array();
 
       mPulls.clear();
@@ -287,13 +287,13 @@ void GitHubRestApi::onPullRequestStatusReceived()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
    {
       auto sha = reply->url().toString();
       sha.remove("/status");
       sha = sha.mid(sha.lastIndexOf("/") + 1);
 
-      const auto obj = tmpDoc.value().object();
+      const auto obj = tmpDoc.object();
 
       mPulls[sha].state.state = obj["state"].toString();
 
@@ -334,7 +334,7 @@ void GitHubRestApi::onPullRequestMerged()
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
-   if (tmpDoc.has_value())
+   if (!tmpDoc.isEmpty())
       emit pullRequestMerged();
    else
       emit errorOccurred(errorStr);

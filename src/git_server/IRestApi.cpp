@@ -17,7 +17,7 @@ IRestApi::IRestApi(const ServerAuthentication &auth, QObject *parent)
 {
 }
 
-std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply, QString &errorString)
+QJsonDocument IRestApi::validateData(QNetworkReply *reply, QString &errorString)
 {
    const auto data = reply->readAll();
    const auto jsonDoc = QJsonDocument::fromJson(data);
@@ -29,13 +29,13 @@ std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply, QStrin
 
       errorString = reply->errorString();
 
-      return std::nullopt;
+      return QJsonDocument();
    }
 
    if (jsonDoc.isNull())
    {
       QLog_Error("Ui", QString("Error when parsing Json. Current data:\n%1").arg(QString::fromUtf8(data)));
-      return std::nullopt;
+      return QJsonDocument();
    }
 
    const auto jsonObject = jsonDoc.object();
@@ -55,7 +55,7 @@ std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply, QStrin
 
          QLog_Error("Ui", errorString);
 
-         return std::nullopt;
+         return QJsonDocument();
       }
    }
    else if (jsonObject.contains(QStringLiteral("error")))
@@ -64,7 +64,7 @@ std::optional<QJsonDocument> IRestApi::validateData(QNetworkReply *reply, QStrin
 
       QLog_Error("Ui", errorString);
 
-      return std::nullopt;
+      return QJsonDocument();
    }
 
    reply->deleteLater();
