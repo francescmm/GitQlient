@@ -63,17 +63,18 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *pa
    ui->leEndPoint->setText(
        settings.globalValue(QString("%1/endpoint").arg(serverUrl), repoUrls.value(GitHub)).toString());
 
+   ui->cbServer->insertItem(GitHub, "GitHub", repoUrls.value(GitHub));
+   ui->cbServer->insertItem(GitHubEnterprise, "GitHub Enterprise", repoUrls.value(GitHubEnterprise));
+
    if (serverUrl.contains("github"))
    {
-      ui->cbServer->insertItem(GitHub, "GitHub", repoUrls.value(GitHub));
-      ui->cbServer->insertItem(GitHubEnterprise, "GitHub Enterprise", repoUrls.value(GitHubEnterprise));
-
       const auto index = repoUrls.key(ui->leEndPoint->text(), GitHubEnterprise);
       ui->cbServer->setCurrentIndex(index);
    }
    else
    {
       ui->cbServer->insertItem(GitLab, "GitLab", repoUrls.value(GitLab));
+      ui->cbServer->setCurrentIndex(GitLab);
       ui->cbServer->setVisible(false);
    }
 
