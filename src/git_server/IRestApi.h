@@ -31,6 +31,8 @@
 #include <QMap>
 #include <QNetworkRequest>
 
+#include <optional>
+
 class QNetworkAccessManager;
 class QNetworkReply;
 struct ServerIssue;
