@@ -10,7 +10,7 @@ QToolButton
     color: white;
 }
 
-QToolButton:checked
+QToolButton:checked, QToolButton:checked:hover
 {
    background-color: #202122;
 }
