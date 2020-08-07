@@ -175,6 +175,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       action = gitMenu->addAction(tr("Config server"));
       connect(action, &QAction::triggered, this, &Controls::configServer);
 
+      mGitPlatform->setCheckable(true);
       mGitPlatform->setIcon(gitPlatformIcon);
       mGitPlatform->setIconSize(QSize(22, 22));
       mGitPlatform->setToolTip(name);
@@ -183,6 +184,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       mGitPlatform->setObjectName("ToolButtonAboveMenu");
 
       mGitOptions->setMenu(gitMenu);
+      mGitOptions->setCheckable(true);
       mGitOptions->setIcon(QIcon(":/icons/arrow_down"));
       mGitOptions->setIconSize(QSize(22, 22));
       mGitOptions->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -203,8 +205,9 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       hLayout->addLayout(gitLayout);
       hLayout->addWidget(separator3);
 
-      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::configServer);
+      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
       connect(mGitPlatform, &QToolButton::toggled, this, [this](bool checked) {
+         mGitOptions->setChecked(true);
          mDiff->blockSignals(true);
          mDiff->setChecked(!checked);
          mDiff->blockSignals(false);
@@ -252,6 +255,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       mBlame->blockSignals(false);
       mGitPlatform->blockSignals(true);
       mGitPlatform->setChecked(!checked);
+      mGitOptions->setChecked(!checked);
       mGitPlatform->blockSignals(false);
    });
    connect(mDiff, &QToolButton::clicked, this, &Controls::signalGoDiff);
@@ -264,6 +268,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       mBlame->blockSignals(false);
       mGitPlatform->blockSignals(true);
       mGitPlatform->setChecked(!checked);
+      mGitOptions->setChecked(!checked);
       mGitPlatform->blockSignals(false);
    });
    connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
@@ -276,6 +281,7 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
       mDiff->blockSignals(false);
       mGitPlatform->blockSignals(true);
       mGitPlatform->setChecked(!checked);
+      mGitOptions->setChecked(!checked);
       mGitPlatform->blockSignals(false);
    });
    connect(mPullBtn, &QToolButton::clicked, this, &Controls::pullCurrentBranch);
@@ -309,6 +315,7 @@ void Controls::toggleButton(ControlsMainViews view)
          break;
       case ControlsMainViews::SERVER:
          mGitPlatform->setChecked(true);
+         mGitOptions->setChecked(true);
          break;
       default:
          break;

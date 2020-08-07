@@ -45,6 +45,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mDiffWidget(new DiffWidget(mGitBase, mGitQlientCache))
    , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
+   , mGitServerWidget(new QFrame())
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
@@ -83,6 +84,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    mStackedLayout->addWidget(mDiffWidget);
    mStackedLayout->addWidget(mBlameWidget);
    mStackedLayout->addWidget(mMergeWidget);
+   mStackedLayout->addWidget(mGitServerWidget);
 
    const auto mainLayout = new QVBoxLayout(this);
    mainLayout->setSpacing(0);
@@ -106,6 +108,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mControls, &Controls::signalGoBlame, this, &GitQlientRepo::showBlameView);
    connect(mControls, &Controls::signalGoDiff, this, &GitQlientRepo::showDiffView);
    connect(mControls, &Controls::signalGoMerge, this, &GitQlientRepo::showMergeView);
+   connect(mControls, &Controls::signalGoServer, this, &GitQlientRepo::showGitServerView);
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
    connect(mControls, &Controls::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
@@ -397,6 +400,12 @@ void GitQlientRepo::showMergeView()
 {
    mStackedLayout->setCurrentWidget(mMergeWidget);
    mControls->toggleButton(ControlsMainViews::MERGE);
+}
+
+void GitQlientRepo::showGitServerView()
+{
+   mStackedLayout->setCurrentWidget(mGitServerWidget);
+   mControls->toggleButton(ControlsMainViews::SERVER);
 }
 
 void GitQlientRepo::showPreviousView()

@@ -132,6 +132,7 @@ private:
    DiffWidget *mDiffWidget = nullptr;
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
+   QFrame *mGitServerWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    QTimer *mAutoPrUpdater = nullptr;
@@ -247,6 +248,12 @@ private:
     \brief Shows the merge view.
    */
    void showMergeView();
+
+   /**
+    * @brief showGitServerView Shows the configured git server view.
+    */
+   void showGitServerView();
+
    /*!
     \brief Opens the previous view. This method is used when the diff view is closed and GitQlientRepo must return to
     the previous one.
