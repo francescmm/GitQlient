@@ -21,6 +21,7 @@
 #include <GitBase.h>
 #include <GitHistory.h>
 #include <GitHubRestApi.h>
+#include <GitServerWidget.h>
 
 #include <QTimer>
 #include <QDirIterator>
@@ -45,7 +46,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mDiffWidget(new DiffWidget(mGitBase, mGitQlientCache))
    , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
-   , mGitServerWidget(new QFrame())
+   , mGitServerWidget(new GitServerWidget())
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {

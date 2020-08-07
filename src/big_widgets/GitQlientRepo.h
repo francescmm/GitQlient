@@ -38,6 +38,7 @@ class HistoryWidget;
 class DiffWidget;
 class BlameWidget;
 class MergeWidget;
+class GitServerWidget;
 class QTimer;
 class WaitingDlg;
 class IRestApi;
@@ -132,7 +133,7 @@ private:
    DiffWidget *mDiffWidget = nullptr;
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
-   QFrame *mGitServerWidget = nullptr;
+   GitServerWidget *mGitServerWidget = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    QTimer *mAutoPrUpdater = nullptr;
