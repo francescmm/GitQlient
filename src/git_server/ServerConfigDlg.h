@@ -34,6 +34,12 @@ class GitBase;
 class QNetworkAccessManager;
 class QNetworkReply;
 
+struct ServerConfigData
+{
+   QString user;
+   QString token;
+};
+
 /**
  * @brief The ServerConfigDlg class creates a small dialog where the user can add the user name and the user token of
  * the remote git platform being used.
@@ -47,13 +53,17 @@ class ServerConfigDlg : public QDialog
 {
    Q_OBJECT
 
+signals:
+   void configured();
+
 public:
    /**
     * @brief Constructor builds the UI layout and configures some widgets based on the configuration.
     *
     * @param parent The parent widget if needed
     */
-   explicit ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit ServerConfigDlg(const QSharedPointer<GitBase> &git, const ServerConfigData &data,
+                            QWidget *parent = nullptr);
    /**
     * @brief Destructor that deallocates the Ui::ServerConfigDlg class.
     */
@@ -92,4 +102,9 @@ private:
     * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
     */
    void onGitServerError(const QString &error);
+
+   /**
+    * @brief onDataValidated Stores the data in the settings and sends a success signal. Finally it closes the dialog.
+    */
+   void onDataValidated(const QString &userId = QString());
 };

@@ -25,6 +25,8 @@
 
 #include <QFrame>
 
+class GitBase;
+
 class GitServerWidget : public QFrame
 {
    Q_OBJECT
@@ -32,5 +34,12 @@ class GitServerWidget : public QFrame
 signals:
 
 public:
-   explicit GitServerWidget(QWidget *parent = nullptr);
+   explicit GitServerWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+
+   bool configure();
+
+private:
+   QSharedPointer<GitBase> mGit;
+
+   void createWidget();
 };

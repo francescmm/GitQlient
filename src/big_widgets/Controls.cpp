@@ -7,7 +7,6 @@
 #include <GitConfig.h>
 #include <BranchDlg.h>
 #include <RepoConfigDlg.h>
-#include <ServerConfigDlg.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
 #include <GitQlientUpdater.h>
@@ -170,10 +169,6 @@ Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPoi
 
       action = gitMenu->addAction(tr("New %1").arg(prName));
       connect(action, &QAction::triggered, this, &Controls::createNewPullRequest);
-
-      gitMenu->addSeparator();
-      action = gitMenu->addAction(tr("Config server"));
-      connect(action, &QAction::triggered, this, &Controls::configServer);
 
       mGitPlatform->setCheckable(true);
       mGitPlatform->setIcon(gitPlatformIcon);
@@ -503,12 +498,6 @@ void Controls::createNewPullRequest()
    connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, this, &Controls::signalRefreshPRsCache);
 
    prDlg->exec();
-}
-
-void Controls::configServer()
-{
-   const auto configDlg = new ServerConfigDlg(mGit, this);
-   configDlg->exec();
 }
 
 bool Controls::eventFilter(QObject *obj, QEvent *event)

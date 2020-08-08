@@ -46,7 +46,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mDiffWidget(new DiffWidget(mGitBase, mGitQlientCache))
    , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
-   , mGitServerWidget(new GitServerWidget())
+   , mGitServerWidget(new GitServerWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
@@ -405,8 +405,13 @@ void GitQlientRepo::showMergeView()
 
 void GitQlientRepo::showGitServerView()
 {
-   mStackedLayout->setCurrentWidget(mGitServerWidget);
-   mControls->toggleButton(ControlsMainViews::SERVER);
+   if (mGitServerWidget->configure())
+   {
+      mStackedLayout->setCurrentWidget(mGitServerWidget);
+      mControls->toggleButton(ControlsMainViews::SERVER);
+   }
+   else
+      showPreviousView();
 }
 
 void GitQlientRepo::showPreviousView()

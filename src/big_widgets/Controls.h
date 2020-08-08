@@ -219,10 +219,5 @@ private:
     */
    void createNewPullRequest();
 
-   /**
-    * @brief configServer Shows the dialog to configure this repository's server.
-    */
-   void configServer();
-
    bool eventFilter(QObject *obj, QEvent *event);
 };
