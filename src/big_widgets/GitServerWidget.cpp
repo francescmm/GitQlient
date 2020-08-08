@@ -14,6 +14,7 @@
 #include <QPushButton>
 #include <QToolButton>
 #include <QHBoxLayout>
+#include <QScrollArea>
 
 GitServerWidget::GitServerWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent)
@@ -182,9 +183,13 @@ QWidget *GitServerWidget::createIssuesWidget()
    mIssuesLayout->setContentsMargins(QMargins());
    mIssuesLayout->setSpacing(10);
 
+   const auto scrollArea = new QScrollArea();
+   scrollArea->setWidget(issuesWidget);
+   scrollArea->setWidgetResizable(true);
+
    mApi->requestIssues();
 
-   return issuesWidget;
+   return scrollArea;
 }
 
 void GitServerWidget::onIssuesReceived(const QVector<ServerIssue> &issues)

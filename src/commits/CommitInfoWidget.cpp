@@ -7,7 +7,6 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDateTime>
-#include <QScrollArea>
 
 #include <QLogger.h>
 

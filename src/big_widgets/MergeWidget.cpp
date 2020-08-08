@@ -18,7 +18,6 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QLabel>
-#include <QScrollArea>
 #include <QFile>
 #include <QMessageBox>
 
