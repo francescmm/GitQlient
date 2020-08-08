@@ -29,14 +29,29 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QStringList>
+#include <QDateTime>
 
 struct ServerIssue
 {
+   ServerIssue() = default;
+   ServerIssue(const QString &_title, const QByteArray &_body, const ServerMilestone &goal, const QStringList &_labels,
+               const QVector<GitServer::User> &_assignees)
+      : title(_title)
+      , body(_body)
+      , milestone(goal)
+      , labels(_labels)
+      , assignees(_assignees)
+   {
+   }
+
    QString title;
    QByteArray body;
    ServerMilestone milestone;
    QStringList labels;
-   QVector<GitServer::Assignee> assignees;
+   GitServer::User creator;
+   QVector<GitServer::User> assignees;
+   QString url;
+   QDateTime creation;
 
    QJsonObject toJson() const
    {

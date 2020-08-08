@@ -739,3 +739,21 @@ QPushButton#NormalButton
    min-width: 150px;
 }
 
+/* GitServerWidget */
+QScrollArea
+{
+   background: transparent;
+}
+
+/* IssueButton */
+ButtonLink#IssueTitle
+{
+   font-size: 12pt;
+   font-weight: bold;
+}
+
+QLabel#IssueLabel
+{
+   padding-left: 5px;
+}
+

@@ -168,7 +168,7 @@ void CreatePullRequestDlg::onPullRequestCreated(QString url)
          }
       }
 
-      GitServer::Assignee sAssignee;
+      GitServer::User sAssignee;
       sAssignee.name = mUserName;
 
       mApi->updateIssue(mIssue, { ui->leTitle->text(), "", milestone, labels, { sAssignee } });

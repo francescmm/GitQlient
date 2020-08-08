@@ -358,6 +358,12 @@ void GitHubRestApi::onIssuesReceived()
       {
          ServerIssue issue;
          issue.title = issueData["title"].toString();
+         issue.url = issueData["html_url"].toString();
+         issue.creation = issueData["created_at"].toVariant().toDateTime();
+
+         issue.creator = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
+                           issueData["user"].toObject()["avatar_url"].toString(),
+                           issueData["user"].toObject()["html_url"].toString() };
 
          const auto labels = issueData["labels"].toArray();
 
@@ -368,7 +374,7 @@ void GitHubRestApi::onIssuesReceived()
 
          for (auto assignee : assignees)
          {
-            GitServer::Assignee sAssignee;
+            GitServer::User sAssignee;
             sAssignee.id = assignee["id"].toInt();
             sAssignee.url = assignee["html_url"].toString();
             sAssignee.name = assignee["login"].toString();

@@ -24,11 +24,24 @@
  ***************************************************************************************/
 
 #include <QFrame>
+#include <ServerIssue.h>
 
-struct ServerIssue;
+class ButtonLink;
+class QLabel;
+class QNetworkAccessManager;
 
 class IssueButton : public QFrame
 {
 public:
    IssueButton(const ServerIssue &issueData, QWidget *parent = nullptr);
+
+private:
+   QNetworkAccessManager *mManager;
+   ServerIssue mIssue;
+   QLabel *mCreator = nullptr;
+   ButtonLink *mTitle = nullptr;
+   QLabel *mLabels = nullptr;
+   QLabel *mMilestone = nullptr;
+
+   void storeCreatorAvatar();
 };

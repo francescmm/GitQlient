@@ -73,11 +73,16 @@ void CreateIssueDlg::accept()
       ServerMilestone sMilestone;
       sMilestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
 
-      GitServer::Assignee sAssignee;
+      GitServer::User sAssignee;
       sAssignee.name = mUserName;
 
-      mApi->createIssue(
-          { ui->leTitle->text(), ui->teDescription->toPlainText().toUtf8(), sMilestone, labels, { sAssignee } });
+      mApi->createIssue({
+          ui->leTitle->text(),
+          ui->teDescription->toPlainText().toUtf8(),
+          sMilestone,
+          labels,
+          { sAssignee },
+      });
    }
 }
 

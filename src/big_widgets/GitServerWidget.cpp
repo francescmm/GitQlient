@@ -196,6 +196,6 @@ void GitServerWidget::onIssuesReceived(const QVector<ServerIssue> &issues)
 {
    for (auto &issue : issues)
    {
-      mIssuesLayout->addWidget(new IssueButton(issue));
+      mIssuesLayout->addWidget(new IssueButton(issue, this));
    }
 }

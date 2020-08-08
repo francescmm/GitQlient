@@ -28,7 +28,7 @@
 namespace GitServer
 {
 
-struct Assignee
+struct User
 {
    int id;
    QString name;
