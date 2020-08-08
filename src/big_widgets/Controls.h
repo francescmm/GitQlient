@@ -174,7 +174,6 @@ private:
    QToolButton *mRefreshBtn = nullptr;
    QToolButton *mConfigBtn = nullptr;
    QToolButton *mGitPlatform = nullptr;
-   QToolButton *mGitOptions = nullptr;
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;
@@ -208,16 +207,6 @@ private:
     * \brief Shows the config dialog for both Local and Global user data.
     */
    void showConfigDlg();
-
-   /**
-    * @brief createNewIssue Shows the dialog to create a new issue on the server.
-    */
-   void createNewIssue();
-
-   /**
-    * @brief createNewPullRequest Shows the dialog to create a new pull request on the server.
-    */
-   void createNewPullRequest();
 
    bool eventFilter(QObject *obj, QEvent *event);
 };

@@ -25,7 +25,9 @@
 
 #include <QFrame>
 
+class RevisionsCache;
 class GitBase;
+class QPushButton;
 
 class GitServerWidget : public QFrame
 {
@@ -34,12 +36,46 @@ class GitServerWidget : public QFrame
 signals:
 
 public:
-   explicit GitServerWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit GitServerWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+                            QWidget *parent = nullptr);
 
+   /**
+    * @brief configure Configures the widget by showing the config dialog or the full content if it was already
+    * configured.
+    * @return Returns true if configured, otherwise false.
+    */
    bool configure();
 
 private:
+   QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QPushButton *mSplitView = nullptr;
+   QPushButton *mUnifiedView = nullptr;
+   QPushButton *mNewIssue = nullptr;
+   QPushButton *mNewPr = nullptr;
 
+   /**
+    * @brief createWidget Creates all the contents of the GitServerWidget.
+    */
    void createWidget();
+
+   /**
+    * @brief showUnifiedView Shows the unified view.
+    */
+   void showUnifiedView();
+
+   /**
+    * @brief showSplitView Shows the split view.
+    */
+   void showSplitView();
+
+   /**
+    * @brief createNewIssue Shows the dialog to create a new issue on the server.
+    */
+   void createNewIssue();
+
+   /**
+    * @brief createNewPullRequest Shows the dialog to create a new pull request on the server.
+    */
+   void createNewPullRequest();
 };
