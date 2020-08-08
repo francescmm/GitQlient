@@ -105,7 +105,12 @@ void GitHubRestApi::requestMilestones()
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onMilestonesReceived);
 }
 
-void GitHubRestApi::requestIssues() { }
+void GitHubRestApi::requestIssues()
+{
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + "/issues"));
+
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onIssuesReceived);
+}
 
 void GitHubRestApi::requestPullRequests() { }
 
@@ -149,10 +154,8 @@ void GitHubRestApi::onLabelsReceived()
 
    if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc;
-
       QVector<ServerLabel> labels;
-      const auto labelsArray = doc.array();
+      const auto labelsArray = tmpDoc.array();
 
       for (auto label : labelsArray)
       {
@@ -182,9 +185,8 @@ void GitHubRestApi::onMilestonesReceived()
 
    if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc;
       QVector<ServerMilestone> milestones;
-      const auto labelsArray = doc.array();
+      const auto labelsArray = tmpDoc.array();
 
       for (auto label : labelsArray)
       {
@@ -213,8 +215,7 @@ void GitHubRestApi::onIssueCreated()
 
    if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc;
-      const auto issue = doc.object();
+      const auto issue = tmpDoc.object();
       const auto url = issue[QStringLiteral("html_url")].toString();
 
       emit issueCreated(url);
@@ -231,8 +232,7 @@ void GitHubRestApi::onPullRequestCreated()
 
    if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc;
-      const auto issue = doc.object();
+      const auto issue = tmpDoc.object();
       const auto url = issue[QStringLiteral("html_url")].toString();
 
       emit pullRequestCreated(url);
@@ -249,8 +249,7 @@ void GitHubRestApi::processPullRequets()
 
    if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc;
-      const auto prs = doc.array();
+      const auto prs = tmpDoc.array();
 
       mPulls.clear();
 
@@ -342,4 +341,55 @@ void GitHubRestApi::onPullRequestMerged()
       emit pullRequestMerged();
    else
       emit errorOccurred(errorStr);
+}
+
+void GitHubRestApi::onIssuesReceived()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
+
+   if (!tmpDoc.isEmpty())
+   {
+      QVector<ServerIssue> issues;
+      const auto issuesArray = tmpDoc.array();
+
+      for (const auto &issueData : issuesArray)
+      {
+         ServerIssue issue;
+         issue.title = issueData["title"].toString();
+
+         const auto labels = issueData["labels"].toArray();
+
+         for (auto label : labels)
+            issue.labels.append(label["name"].toString());
+
+         const auto assignees = issueData["assignees"].toArray();
+
+         for (auto assignee : assignees)
+         {
+            GitServer::Assignee sAssignee;
+            sAssignee.id = assignee["id"].toInt();
+            sAssignee.url = assignee["html_url"].toString();
+            sAssignee.name = assignee["login"].toString();
+            sAssignee.avatar = assignee["avatar_url"].toString();
+
+            issue.assignees.append(sAssignee);
+         }
+
+         ServerMilestone sMilestone { issueData["milestone"].toObject()[QStringLiteral("id")].toInt(),
+                                      issueData["milestone"].toObject()[QStringLiteral("number")].toInt(),
+                                      issueData["milestone"].toObject()[QStringLiteral("node_id")].toString(),
+                                      issueData["milestone"].toObject()[QStringLiteral("title")].toString(),
+                                      issueData["milestone"].toObject()[QStringLiteral("description")].toString(),
+                                      issueData["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
+
+         issue.milestone = sMilestone;
+
+         issues.append(issue);
+      }
+
+      if (!issues.isEmpty())
+         emit issuesReceived(issues);
+   }
 }

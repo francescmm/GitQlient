@@ -64,8 +64,8 @@ void GitLabRestApi::createIssue(const ServerIssue &issue)
    if (!issue.assignees.isEmpty())
       query.addQueryItem("assignee_ids", mUserId);
 
-   if (issue.milestone != -1)
-      query.addQueryItem("milestone_id", QString::number(issue.milestone));
+   if (issue.milestone.id != -1)
+      query.addQueryItem("milestone_id", QString::number(issue.milestone.id));
 
    if (!issue.labels.isEmpty())
       query.addQueryItem("labels", issue.labels.join(","));
@@ -93,8 +93,8 @@ void GitLabRestApi::createPullRequest(const ServerPullRequest &pr)
    query.addQueryItem("source_branch", pr.head);
    query.addQueryItem("allow_collaboration", QVariant(pr.maintainerCanModify).toString());
 
-   if (pr.milestone != -1)
-      query.addQueryItem("milestone_id", QString::number(pr.milestone));
+   if (pr.milestone.id != -1)
+      query.addQueryItem("milestone_id", QString::number(pr.milestone.id));
 
    if (!pr.labels.isEmpty())
       query.addQueryItem("labels", pr.labels.join(","));

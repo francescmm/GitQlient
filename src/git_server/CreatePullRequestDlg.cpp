@@ -109,7 +109,10 @@ void CreatePullRequestDlg::accept()
       }
 
       pr.labels = labels;
-      pr.milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
+
+      ServerMilestone milestone;
+      milestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
+      pr.milestone = milestone;
    }
    else
       pr.head = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
@@ -151,7 +154,8 @@ void CreatePullRequestDlg::onPullRequestCreated(QString url)
    {
       mIssue = mFinalUrl.mid(mFinalUrl.lastIndexOf("/") + 1, mFinalUrl.count() - 1).toInt();
 
-      const auto milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
+      ServerMilestone milestone;
+      milestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
 
       QStringList labels;
 
@@ -164,7 +168,10 @@ void CreatePullRequestDlg::onPullRequestCreated(QString url)
          }
       }
 
-      mApi->updateIssue(mIssue, { ui->leTitle->text(), "", milestone, labels, { mUserName } });
+      GitServer::Assignee sAssignee;
+      sAssignee.name = mUserName;
+
+      mApi->updateIssue(mIssue, { ui->leTitle->text(), "", milestone, labels, { sAssignee } });
    }
    else
       onPullRequestUpdated();

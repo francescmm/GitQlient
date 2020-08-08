@@ -68,12 +68,16 @@ void CreateIssueDlg::accept()
          }
       }
 
-      const auto milestone = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
-
       ui->pbAccept->setEnabled(false);
 
+      ServerMilestone sMilestone;
+      sMilestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
+
+      GitServer::Assignee sAssignee;
+      sAssignee.name = mUserName;
+
       mApi->createIssue(
-          { ui->leTitle->text(), ui->teDescription->toPlainText().toUtf8(), milestone, labels, { mUserName } });
+          { ui->leTitle->text(), ui->teDescription->toPlainText().toUtf8(), sMilestone, labels, { sAssignee } });
    }
 }
 

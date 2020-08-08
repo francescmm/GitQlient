@@ -9,6 +9,7 @@
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
 #include <ServerIssue.h>
+#include <IssueButton.h>
 
 #include <QPushButton>
 #include <QToolButton>
@@ -183,4 +184,10 @@ QWidget *GitServerWidget::createIssuesWidget()
    return issuesWidget;
 }
 
-void GitServerWidget::onIssuesReceived(const QVector<ServerIssue> &) { }
+void GitServerWidget::onIssuesReceived(const QVector<ServerIssue> &issues)
+{
+   for (auto &issue : issues)
+   {
+      mIssuesLayout->addWidget(new IssueButton(issue));
+   }
+}

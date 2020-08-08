@@ -64,4 +64,5 @@ private:
    void processPullRequets();
    void onPullRequestStatusReceived();
    void onPullRequestMerged();
+   void onIssuesReceived();
 };

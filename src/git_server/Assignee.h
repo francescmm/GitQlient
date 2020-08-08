@@ -23,46 +23,17 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <ServerMilestone.h>
-#include <Assignee.h>
+#include <QString>
 
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QStringList>
-
-struct ServerIssue
+namespace GitServer
 {
-   QString title;
-   QByteArray body;
-   ServerMilestone milestone;
-   QStringList labels;
-   QVector<GitServer::Assignee> assignees;
 
-   QJsonObject toJson() const
-   {
-      QJsonObject object;
-
-      if (!title.isEmpty())
-         object.insert("title", title);
-
-      if (!body.isEmpty())
-         object.insert("body", body.toStdString().c_str());
-
-      if (milestone.id != -1)
-         object.insert("milestone", milestone.id);
-
-      QJsonArray array;
-      auto count = 0;
-      for (auto assignee : assignees)
-         array.insert(count++, assignee.name);
-      object.insert("assignees", array);
-
-      QJsonArray labelsArray;
-      count = 0;
-      for (auto label : labels)
-         labelsArray.insert(count++, label);
-      object.insert("labels", labelsArray);
-
-      return object;
-   }
+struct Assignee
+{
+   int id;
+   QString name;
+   QString avatar;
+   QString url;
 };
+
+}
