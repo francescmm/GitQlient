@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <ServerMilestone.h>
+#include <ServerLabel.h>
 #include <Assignee.h>
 
 #include <QJsonObject>
@@ -34,8 +35,8 @@
 struct ServerIssue
 {
    ServerIssue() = default;
-   ServerIssue(const QString &_title, const QByteArray &_body, const ServerMilestone &goal, const QStringList &_labels,
-               const QVector<GitServer::User> &_assignees)
+   ServerIssue(const QString &_title, const QByteArray &_body, const ServerMilestone &goal,
+               const QVector<ServerLabel> &_labels, const QVector<GitServer::User> &_assignees)
       : title(_title)
       , body(_body)
       , milestone(goal)
@@ -47,7 +48,7 @@ struct ServerIssue
    QString title;
    QByteArray body;
    ServerMilestone milestone;
-   QStringList labels;
+   QVector<ServerLabel> labels;
    GitServer::User creator;
    QVector<GitServer::User> assignees;
    QString url;
@@ -75,7 +76,7 @@ struct ServerIssue
       QJsonArray labelsArray;
       count = 0;
       for (auto label : labels)
-         labelsArray.insert(count++, label);
+         labelsArray.insert(count++, label.name);
       object.insert("labels", labelsArray);
 
       return object;

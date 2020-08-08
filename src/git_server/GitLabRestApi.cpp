@@ -68,7 +68,14 @@ void GitLabRestApi::createIssue(const ServerIssue &issue)
       query.addQueryItem("milestone_id", QString::number(issue.milestone.id));
 
    if (!issue.labels.isEmpty())
-      query.addQueryItem("labels", issue.labels.join(","));
+   {
+      QStringList labelsList;
+
+      for (auto &label : issue.labels)
+         labelsList.append(label.name);
+
+      query.addQueryItem("labels", labelsList.join(","));
+   }
 
    url.setQuery(query);
    request.setUrl(url);
@@ -97,7 +104,14 @@ void GitLabRestApi::createPullRequest(const ServerPullRequest &pr)
       query.addQueryItem("milestone_id", QString::number(pr.milestone.id));
 
    if (!pr.labels.isEmpty())
-      query.addQueryItem("labels", pr.labels.join(","));
+   {
+      QStringList labelsList;
+
+      for (auto &label : pr.labels)
+         labelsList.append(label.name);
+
+      query.addQueryItem("labels", labelsList.join(","));
+   }
 
    url.setQuery(query);
    request.setUrl(url);

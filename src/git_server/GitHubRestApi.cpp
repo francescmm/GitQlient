@@ -368,7 +368,11 @@ void GitHubRestApi::onIssuesReceived()
          const auto labels = issueData["labels"].toArray();
 
          for (auto label : labels)
-            issue.labels.append(label["name"].toString());
+         {
+            issue.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
+                                  label["name"].toString(), label["description"].toString(), label["color"].toString(),
+                                  label["default"].toBool() });
+         }
 
          const auto assignees = issueData["assignees"].toArray();
 

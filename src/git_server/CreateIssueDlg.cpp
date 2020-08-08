@@ -57,14 +57,18 @@ void CreateIssueDlg::accept()
       QMessageBox::warning(this, tr("Empty fields"), tr("Please, complete all fields with valid data."));
    else
    {
-      QStringList labels;
+      QVector<ServerLabel> labels;
 
       if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
       {
          for (auto i = 0; i < cbModel->rowCount(); ++i)
          {
             if (cbModel->item(i)->checkState() == Qt::Checked)
-               labels.append(cbModel->item(i)->text());
+            {
+               ServerLabel sLabel;
+               sLabel.name = cbModel->item(i)->text();
+               labels.append(sLabel);
+            }
          }
       }
 

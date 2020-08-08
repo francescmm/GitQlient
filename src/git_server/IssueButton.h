@@ -38,9 +38,8 @@ public:
 private:
    QNetworkAccessManager *mManager;
    ServerIssue mIssue;
-   QLabel *mCreator = nullptr;
+   QLabel *mAvatar = nullptr;
    ButtonLink *mTitle = nullptr;
-   QLabel *mLabels = nullptr;
    QLabel *mMilestone = nullptr;
 
    void storeCreatorAvatar();

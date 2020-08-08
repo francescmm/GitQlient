@@ -97,14 +97,18 @@ void CreatePullRequestDlg::accept()
    {
       pr.head = ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
 
-      QStringList labels;
+      QVector<ServerLabel> labels;
 
       if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
       {
          for (auto i = 0; i < cbModel->rowCount(); ++i)
          {
             if (cbModel->item(i)->checkState() == Qt::Checked)
-               labels.append(cbModel->item(i)->text());
+            {
+               ServerLabel sLabel;
+               sLabel.name = cbModel->item(i)->text();
+               labels.append(sLabel);
+            }
          }
       }
 
@@ -157,14 +161,18 @@ void CreatePullRequestDlg::onPullRequestCreated(QString url)
       ServerMilestone milestone;
       milestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
 
-      QStringList labels;
+      QVector<ServerLabel> labels;
 
       if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
       {
          for (auto i = 0; i < cbModel->rowCount(); ++i)
          {
             if (cbModel->item(i)->checkState() == Qt::Checked)
-               labels.append(cbModel->item(i)->text());
+            {
+               ServerLabel sLabel;
+               sLabel.name = cbModel->item(i)->text();
+               labels.append(sLabel);
+            }
          }
       }
 
