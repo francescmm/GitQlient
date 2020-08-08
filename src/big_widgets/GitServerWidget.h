@@ -59,6 +59,7 @@ private:
    QPushButton *mNewPr = nullptr;
    QVBoxLayout *mIssuesLayout = nullptr;
    IRestApi *mApi = nullptr;
+   bool mConfigured = false;
 
    /**
     * @brief createWidget Creates all the contents of the GitServerWidget.

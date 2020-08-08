@@ -25,6 +25,9 @@ GitServerWidget::GitServerWidget(const QSharedPointer<RevisionsCache> &cache, co
 
 bool GitServerWidget::configure()
 {
+   if (mConfigured)
+      return true;
+
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto serverUrl = gitConfig->getServerUrl();
 
@@ -32,15 +35,15 @@ bool GitServerWidget::configure()
    const auto user = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
    const auto token = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
 
-   auto moveOn = true;
-
    if (user.isEmpty() || token.isEmpty())
    {
       const auto configDlg = new ServerConfigDlg(mGit, { user, token }, this);
-      moveOn = configDlg->exec() == QDialog::Accepted;
+      mConfigured = configDlg->exec() == QDialog::Accepted;
    }
+   else
+      mConfigured = true;
 
-   if (moveOn)
+   if (mConfigured)
    {
       const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
       const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
@@ -57,7 +60,7 @@ bool GitServerWidget::configure()
       createWidget();
    }
 
-   return moveOn;
+   return mConfigured;
 }
 
 void GitServerWidget::createWidget()
