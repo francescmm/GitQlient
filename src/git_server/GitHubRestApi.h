@@ -46,6 +46,8 @@ public:
    void createPullRequest(const ServerPullRequest &pullRequest) override;
    void requestLabels() override;
    void requestMilestones() override;
+   void requestIssues() override;
+   void requestPullRequests() override;
    void requestPullRequestsState() override;
    void mergePullRequest(int number, const QByteArray &data) override;
 

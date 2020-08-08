@@ -28,6 +28,10 @@
 class RevisionsCache;
 class GitBase;
 class QPushButton;
+class QToolButton;
+class IRestApi;
+class QVBoxLayout;
+struct ServerIssue;
 
 class GitServerWidget : public QFrame
 {
@@ -49,10 +53,12 @@ public:
 private:
    QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
-   QPushButton *mSplitView = nullptr;
-   QPushButton *mUnifiedView = nullptr;
+   QToolButton *mSplitView = nullptr;
+   QToolButton *mUnifiedView = nullptr;
    QPushButton *mNewIssue = nullptr;
    QPushButton *mNewPr = nullptr;
+   QVBoxLayout *mIssuesLayout = nullptr;
+   IRestApi *mApi = nullptr;
 
    /**
     * @brief createWidget Creates all the contents of the GitServerWidget.
@@ -78,4 +84,14 @@ private:
     * @brief createNewPullRequest Shows the dialog to create a new pull request on the server.
     */
    void createNewPullRequest();
+
+   /**
+    * @brief createIssuesWidget Creates the issues widget.
+    */
+   QWidget *createIssuesWidget();
+
+   /**
+    * @brief onIssuesReceived Process the information about the issues received by the Git server.
+    */
+   void onIssuesReceived(const QVector<ServerIssue> &issues);
 };

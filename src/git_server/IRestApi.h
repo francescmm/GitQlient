@@ -71,6 +71,11 @@ signals:
     */
    void issueUpdated();
    /**
+    * @brief issuesReceived Signal triggered when the issues has been received.
+    * @param issues The list of issues.
+    */
+   void issuesReceived(const QVector<ServerIssue> &issues);
+   /**
     * @brief pullRequestCreated Signal triggered when a pull request has been created.
     * @param url The url of the pull request.
     */
@@ -124,6 +129,15 @@ public:
     * @brief requestMilestones Requests the milestones to the remote Git server.
     */
    virtual void requestMilestones() = 0;
+   /**
+    * @brief requestIssues Requests the issues to the remote Git server.
+    */
+   virtual void requestIssues() = 0;
+
+   /**
+    * @brief requestPullRequests Requests the pull request to the remote Git server.
+    */
+   virtual void requestPullRequests() = 0;
    /**
     * @brief requestPullRequestsState Requests the pull request state to the remote Git server.
     */

@@ -105,6 +105,10 @@ void GitHubRestApi::requestMilestones()
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onMilestonesReceived);
 }
 
+void GitHubRestApi::requestIssues() { }
+
+void GitHubRestApi::requestPullRequests() { }
+
 void GitHubRestApi::requestPullRequestsState()
 {
    QTimer::singleShot(1500, this, [this]() {

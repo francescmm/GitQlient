@@ -6,8 +6,12 @@
 #include <GitBase.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
+#include <GitHubRestApi.h>
+#include <GitLabRestApi.h>
+#include <ServerIssue.h>
 
 #include <QPushButton>
+#include <QToolButton>
 #include <QHBoxLayout>
 
 GitServerWidget::GitServerWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
@@ -36,7 +40,21 @@ bool GitServerWidget::configure()
    }
 
    if (moveOn)
+   {
+      const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
+      const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
+      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+      const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
+
+      if (serverUrl.contains("github"))
+         mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint });
+      else if (serverUrl.contains("gitlab"))
+         mApi = new GitLabRestApi(userName, repoInfo.second, serverUrl, { userName, userToken, endpoint });
+
+      connect(mApi, &IRestApi::issuesReceived, this, &GitServerWidget::onIssuesReceived);
+
       createWidget();
+   }
 
    return moveOn;
 }
@@ -49,7 +67,7 @@ void GitServerWidget::createWidget()
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto prLabel = gitConfig->getServerUrl().contains("github") ? "pull request" : "merge request";
 
-   mUnifiedView = new QPushButton();
+   mUnifiedView = new QToolButton();
    mUnifiedView->setIcon(QIcon(":/icons/unified_view"));
    mUnifiedView->setIconSize({ 30, 30 });
    mUnifiedView->setObjectName("IconButton");
@@ -57,7 +75,7 @@ void GitServerWidget::createWidget()
    mUnifiedView->setChecked(isUnified);
    connect(mUnifiedView, &QPushButton::clicked, this, &GitServerWidget::showUnifiedView);
 
-   mSplitView = new QPushButton();
+   mSplitView = new QToolButton();
    mSplitView->setIcon(QIcon(":/icons/split_view"));
    mSplitView->setIconSize({ 30, 30 });
    mSplitView->setCheckable(true);
@@ -85,13 +103,15 @@ void GitServerWidget::createWidget()
    const auto separator = new QFrame();
    separator->setObjectName("orangeHSeparator");
 
+   const auto issuesWidget = createIssuesWidget();
+
    const auto centralFrame = new QFrame();
    const auto centralLayout = new QVBoxLayout(centralFrame);
    centralLayout->setContentsMargins(QMargins());
    centralLayout->setSpacing(10);
    centralLayout->addLayout(buttonsLayout);
    centralLayout->addWidget(separator);
-   centralLayout->addStretch();
+   centralLayout->addWidget(issuesWidget);
 
    const auto mainLayout = new QGridLayout();
    mainLayout->setColumnStretch(0, 1);
@@ -101,6 +121,7 @@ void GitServerWidget::createWidget()
    mainLayout->setSpacing(0);
    mainLayout->addWidget(centralFrame, 0, 1);
 
+   delete layout();
    setLayout(mainLayout);
 }
 
@@ -142,3 +163,24 @@ void GitServerWidget::createNewPullRequest()
 
    prDlg->exec();
 }
+
+QWidget *GitServerWidget::createIssuesWidget()
+{
+   const auto issuesWidget = new QFrame();
+   issuesWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+   issuesWidget->setObjectName("IssuesWidget");
+   issuesWidget->setStyleSheet("#IssuesWidget{"
+                               "border: 1px solid #404142;"
+                               "border-radius: 10px;"
+                               "background-color: #606162;"
+                               "}");
+   mIssuesLayout = new QVBoxLayout(issuesWidget);
+   mIssuesLayout->setContentsMargins(QMargins());
+   mIssuesLayout->setSpacing(10);
+
+   mApi->requestIssues();
+
+   return issuesWidget;
+}
+
+void GitServerWidget::onIssuesReceived(const QVector<ServerIssue> &) { }
