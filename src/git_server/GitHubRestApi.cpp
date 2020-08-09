@@ -352,6 +352,7 @@ void GitHubRestApi::onPullRequestMerged()
 void GitHubRestApi::onIssuesReceived()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto url = reply->url();
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 

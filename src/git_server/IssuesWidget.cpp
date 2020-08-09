@@ -3,6 +3,10 @@
 #include <IRestApi.h>
 #include <CreateIssueDlg.h>
 #include <IssueItem.h>
+#include <GitQlientSettings.h>
+#include <GitConfig.h>
+#include <GitHubRestApi.h>
+#include <GitLabRestApi.h>
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -11,12 +15,25 @@
 
 using namespace GitServer;
 
-IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, IRestApi *api, QWidget *parent)
+IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
-   , mApi(api)
+   , mConfig(config)
 {
-   const auto headerTitle = new QLabel(tr("Issues"));
+   GitQlientSettings settings;
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto serverUrl = gitConfig->getServerUrl();
+   const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
+   const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
+   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+   const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
+
+   if (serverUrl.contains("github"))
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint });
+   else if (serverUrl.contains("gitlab"))
+      mApi = new GitLabRestApi(userName, repoInfo.second, serverUrl, { userName, userToken, endpoint });
+
+   const auto headerTitle = new QLabel(mConfig == Config::Issues ? tr("Issues") : tr("Pull Requests"));
    headerTitle->setObjectName("HeaderTitle");
 
    const auto newIssue = new QPushButton(tr("New issue"));
@@ -32,23 +49,7 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, IRestApi *api, QW
    headerLayout->addStretch();
    headerLayout->addWidget(newIssue);
 
-   const auto issuesWidget = new QFrame();
-   issuesWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-   issuesWidget->setObjectName("IssuesWidget");
-   issuesWidget->setStyleSheet("#IssuesWidget{"
-                               "background-color: #2E2F30;"
-                               "}");
-   mIssuesLayout = new QVBoxLayout(issuesWidget);
-   mIssuesLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
-   mIssuesLayout->setContentsMargins(QMargins());
-   mIssuesLayout->setSpacing(0);
-
-   const auto separator = new QFrame();
-   separator->setObjectName("orangeHSeparator");
-
-   const auto scrollArea = new QScrollArea();
-   scrollArea->setWidget(issuesWidget);
-   scrollArea->setWidgetResizable(true);
+   mIssuesLayout = new QVBoxLayout();
 
    const auto footerFrame = new QFrame();
    footerFrame->setObjectName("IssuesFooterFrame");
@@ -57,16 +58,15 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, IRestApi *api, QW
    issuesLayout->setContentsMargins(QMargins());
    issuesLayout->setSpacing(0);
    issuesLayout->addWidget(headerFrame);
-   issuesLayout->addWidget(separator);
-   issuesLayout->addWidget(scrollArea);
+   issuesLayout->addLayout(mIssuesLayout);
    issuesLayout->addWidget(footerFrame);
 }
 
-void IssuesWidget::loadData(Config config)
+void IssuesWidget::loadData()
 {
    connect(mApi, &IRestApi::issuesReceived, this, &IssuesWidget::onIssuesReceived);
 
-   if (config == Config::Issues)
+   if (mConfig == Config::Issues)
       mApi->requestIssues();
    else
       mApi->requestPullRequests();
@@ -80,20 +80,37 @@ void IssuesWidget::createNewIssue()
 
 void IssuesWidget::onIssuesReceived(const QVector<Issue> &issues)
 {
+   delete mIssuesWidget;
+   delete mScrollArea;
+
+   mIssuesWidget = new QFrame();
+   mIssuesWidget->setObjectName("IssuesWidget");
+   mIssuesWidget->setStyleSheet("#IssuesWidget{"
+                                "background-color: #2E2F30;"
+                                "}");
+   const auto issuesLayout = new QVBoxLayout(mIssuesWidget);
+   issuesLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
+   issuesLayout->setContentsMargins(QMargins());
+   issuesLayout->setSpacing(0);
+
+   mScrollArea = new QScrollArea();
+   mScrollArea->setWidget(mIssuesWidget);
+   mScrollArea->setWidgetResizable(true);
+
+   mIssuesLayout->addWidget(mScrollArea);
+
    auto totalIssues = issues.count();
    auto count = 0;
 
    for (auto &issue : issues)
    {
-      mIssuesLayout->addWidget(new IssueItem(issue));
+      issuesLayout->addWidget(new IssueItem(issue));
 
       if (count++ < totalIssues - 1)
       {
          const auto separator = new QFrame();
          separator->setObjectName("orangeHSeparator");
-         mIssuesLayout->addWidget(separator);
+         issuesLayout->addWidget(separator);
       }
    }
-
-   mIssuesLayout->addStretch();
 }

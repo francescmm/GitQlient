@@ -26,6 +26,7 @@
 #include <QFrame>
 
 class QVBoxLayout;
+class QScrollArea;
 class GitBase;
 
 namespace GitServer
@@ -45,14 +46,17 @@ public:
       Issues,
       PullRequests
    };
-   explicit IssuesWidget(const QSharedPointer<GitBase> &git, GitServer::IRestApi *api, QWidget *parent = nullptr);
+   explicit IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QWidget *parent = nullptr);
 
-   void loadData(Config config);
+   void loadData();
 
 private:
    QSharedPointer<GitBase> mGit;
    GitServer::IRestApi *mApi = nullptr;
+   Config mConfig;
    QVBoxLayout *mIssuesLayout = nullptr;
+   QFrame *mIssuesWidget = nullptr;
+   QScrollArea *mScrollArea = nullptr;
 
    void createNewIssue();
    void onIssuesReceived(const QVector<GitServer::Issue> &issues);

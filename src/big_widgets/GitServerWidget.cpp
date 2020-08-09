@@ -14,6 +14,7 @@
 #include <QToolButton>
 #include <QHBoxLayout>
 #include <QScrollArea>
+#include <QStackedLayout>
 #include <QLabel>
 
 using namespace GitServer;
@@ -47,19 +48,7 @@ bool GitServerWidget::configure()
       mConfigured = true;
 
    if (mConfigured)
-   {
-      const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
-      const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
-      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-      const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
-
-      if (serverUrl.contains("github"))
-         mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint });
-      else if (serverUrl.contains("gitlab"))
-         mApi = new GitLabRestApi(userName, repoInfo.second, serverUrl, { userName, userToken, endpoint });
-
       createWidget();
-   }
 
    return mConfigured;
 }
@@ -103,17 +92,21 @@ void GitServerWidget::createWidget()
    const auto separator = new QFrame();
    separator->setObjectName("orangeHSeparator");
 
-   const auto issues = new IssuesWidget(mGit, mApi);
-
    const auto centralFrame = new QFrame();
    const auto centralLayout = new QVBoxLayout(centralFrame);
    centralLayout->setContentsMargins(QMargins());
    centralLayout->setSpacing(10);
    centralLayout->addLayout(buttonsLayout);
    centralLayout->addWidget(separator);
-   centralLayout->addWidget(issues);
 
-   issues->loadData(IssuesWidget::Config::Issues);
+   const auto issues = new IssuesWidget(mGit, IssuesWidget::Config::Issues);
+   const auto pullRequests = new IssuesWidget(mGit, IssuesWidget::Config::PullRequests);
+
+   centralLayout->addWidget(issues);
+   centralLayout->addWidget(pullRequests);
+
+   issues->loadData();
+   pullRequests->loadData();
 
    const auto mainLayout = new QGridLayout();
    mainLayout->setColumnStretch(0, 1);
