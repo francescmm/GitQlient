@@ -23,32 +23,20 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QFrame>
-
-class QVBoxLayout;
-class GitBase;
+#include <QString>
 
 namespace GitServer
 {
-class IRestApi;
-struct Issue;
-}
 
-class IssuesWidget : public QFrame
+struct Label
 {
-   Q_OBJECT
-signals:
-
-public:
-   explicit IssuesWidget(const QSharedPointer<GitBase> &git, GitServer::IRestApi *api, QWidget *parent = nullptr);
-
-   void loadData();
-
-private:
-   QSharedPointer<GitBase> mGit;
-   GitServer::IRestApi *mApi = nullptr;
-   QVBoxLayout *mIssuesLayout = nullptr;
-
-   void createNewIssue();
-   void onIssuesReceived(const QVector<GitServer::Issue> &issues);
+   int id;
+   QString nodeId;
+   QString url;
+   QString name;
+   QString description;
+   QString colorHex;
+   bool isDefault;
 };
+
+}

@@ -29,9 +29,13 @@ class RevisionsCache;
 class GitBase;
 class QPushButton;
 class QToolButton;
-class IRestApi;
 class QVBoxLayout;
-struct ServerIssue;
+
+namespace GitServer
+{
+class IRestApi;
+struct Issue;
+}
 
 class GitServerWidget : public QFrame
 {
@@ -56,7 +60,7 @@ private:
    QToolButton *mSplitView = nullptr;
    QToolButton *mUnifiedView = nullptr;
    QPushButton *mNewPr = nullptr;
-   IRestApi *mApi = nullptr;
+   GitServer::IRestApi *mApi = nullptr;
    bool mConfigured = false;
 
    /**

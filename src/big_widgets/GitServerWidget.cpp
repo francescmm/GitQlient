@@ -16,6 +16,8 @@
 #include <QScrollArea>
 #include <QLabel>
 
+using namespace GitServer;
+
 GitServerWidget::GitServerWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent)
    : QFrame(parent)
@@ -101,13 +103,17 @@ void GitServerWidget::createWidget()
    const auto separator = new QFrame();
    separator->setObjectName("orangeHSeparator");
 
+   const auto issues = new IssuesWidget(mGit, mApi);
+
    const auto centralFrame = new QFrame();
    const auto centralLayout = new QVBoxLayout(centralFrame);
    centralLayout->setContentsMargins(QMargins());
    centralLayout->setSpacing(10);
    centralLayout->addLayout(buttonsLayout);
    centralLayout->addWidget(separator);
-   centralLayout->addWidget(new IssuesWidget(mGit, mApi));
+   centralLayout->addWidget(issues);
+
+   issues->loadData();
 
    const auto mainLayout = new QGridLayout();
    mainLayout->setColumnStretch(0, 1);

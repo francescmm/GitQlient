@@ -9,8 +9,10 @@
 #include <QMessageBox>
 #include <QJsonDocument>
 
-MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr,
-                                         const QString &sha, QWidget *parent)
+using namespace GitServer;
+
+MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, const PullRequest &pr, const QString &sha,
+                                         QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::MergePullRequestDlg)
    , mGit(git)

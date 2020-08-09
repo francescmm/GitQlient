@@ -31,7 +31,11 @@ class RevisionsCache;
 class GitBase;
 class Lane;
 class CommitInfo;
-struct ServerPullRequest;
+
+namespace GitServer
+{
+struct PullRequest;
+}
 
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
@@ -136,7 +140,8 @@ private:
     * @param startPoint The starting X coordinate for the tag.
     * @param pr The PullRequest status.
     */
-   void paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const ServerPullRequest &pr) const;
+   void paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
+                      const GitServer::PullRequest &pr) const;
 
    /**
     * @brief getMergeColor Returns the color to be used for painting the external circle of the node. This methods

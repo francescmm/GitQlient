@@ -10,7 +10,7 @@
 #include <CommitHistoryModel.h>
 #include <RevisionsCache.h>
 #include <GitBase.h>
-#include <ServerPullRequest.h>
+#include <PullRequest.h>
 
 #include <QSortFilterProxyModel>
 #include <QPainter>
@@ -21,6 +21,8 @@
 #include <QToolTip>
 #include <QApplication>
 #include <QClipboard>
+
+using namespace GitServer;
 
 static const int MIN_VIEW_WIDTH_PX = 480;
 
@@ -490,20 +492,20 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 }
 
 void RepositoryViewDelegate::paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
-                                           const ServerPullRequest &pr) const
+                                           const PullRequest &pr) const
 {
    QColor c;
 
    switch (pr.state.eState)
    {
-      case ServerPullRequest::HeadState::State::Failure:
+      case PullRequest::HeadState::State::Failure:
          c = GitQlientStyles::getRed();
          break;
-      case ServerPullRequest::HeadState::State::Success:
+      case PullRequest::HeadState::State::Success:
          c = GitQlientStyles::getGreen();
          break;
       default:
-      case ServerPullRequest::HeadState::State::Pending:
+      case PullRequest::HeadState::State::Pending:
          c = GitQlientStyles::getOrange();
          break;
    }

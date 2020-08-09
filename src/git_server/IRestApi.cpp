@@ -9,6 +9,7 @@
 #include <QLogger.h>
 
 using namespace QLogger;
+using namespace GitServer;
 
 IRestApi::IRestApi(const ServerAuthentication &auth, QObject *parent)
    : QObject(parent)

@@ -25,6 +25,9 @@
 
 #include <IRestApi.h>
 
+namespace GitServer
+{
+
 class GitLabRestApi final : public IRestApi
 {
    Q_OBJECT
@@ -34,9 +37,9 @@ public:
                           const ServerAuthentication &auth, QObject *parent = nullptr);
 
    void testConnection() override;
-   void createIssue(const ServerIssue &issue) override;
-   void updateIssue(int issueNumber, const ServerIssue &issue) override;
-   void createPullRequest(const ServerPullRequest &pr) override;
+   void createIssue(const Issue &issue) override;
+   void updateIssue(int issueNumber, const Issue &issue) override;
+   void createPullRequest(const PullRequest &pr) override;
    void requestLabels() override;
    void requestMilestones() override;
    void requestIssues() override { }
@@ -64,3 +67,5 @@ private:
    void onIssueCreated();
    void onMergeRequestCreated();
 };
+
+}

@@ -41,7 +41,11 @@ class MergeWidget;
 class GitServerWidget;
 class QTimer;
 class WaitingDlg;
+
+namespace GitServer
+{
 class IRestApi;
+}
 
 enum class ControlsMainViews;
 
@@ -140,7 +144,7 @@ private:
    QPointer<WaitingDlg> mWaitDlg;
    QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
-   QSharedPointer<IRestApi> mApi;
+   QSharedPointer<GitServer::IRestApi> mApi;
 
    bool mIsInit = false;
    QThread *m_loaderThread;

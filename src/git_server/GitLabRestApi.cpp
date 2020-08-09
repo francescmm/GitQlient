@@ -1,6 +1,6 @@
 #include "GitLabRestApi.h"
 #include <GitQlientSettings.h>
-#include <ServerIssue.h>
+#include <Issue.h>
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -9,6 +9,8 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QTimer>
+
+using namespace GitServer;
 
 GitLabRestApi::GitLabRestApi(const QString &userName, const QString &repoName, const QString &settingsKey,
                              const ServerAuthentication &auth, QObject *parent)
@@ -52,7 +54,7 @@ void GitLabRestApi::testConnection()
    });
 }
 
-void GitLabRestApi::createIssue(const ServerIssue &issue)
+void GitLabRestApi::createIssue(const Issue &issue)
 {
    auto request = createRequest(QString("/projects/%1/issues").arg(mRepoId));
    auto url = request.url();
@@ -85,9 +87,9 @@ void GitLabRestApi::createIssue(const ServerIssue &issue)
    connect(reply, &QNetworkReply::finished, this, &GitLabRestApi::onIssueCreated);
 }
 
-void GitLabRestApi::updateIssue(int, const ServerIssue &) { }
+void GitLabRestApi::updateIssue(int, const Issue &) { }
 
-void GitLabRestApi::createPullRequest(const ServerPullRequest &pr)
+void GitLabRestApi::createPullRequest(const PullRequest &pr)
 {
    auto request = createRequest(QString("/projects/%1/merge_requests").arg(mRepoId));
    auto url = request.url();
@@ -236,18 +238,18 @@ void GitLabRestApi::onLabelsReceived()
    {
       const auto labelsObj = tmpDoc.toVariant().toList();
 
-      QVector<ServerLabel> labels;
+      QVector<Label> labels;
 
       for (const auto labelObj : labelsObj)
       {
          const auto labelMap = labelObj.toMap();
-         ServerLabel sLabel { labelMap.value("id").toString().toInt(),
-                              "",
-                              "",
-                              labelMap.value("name").toString(),
-                              labelMap.value("description").toString(),
-                              labelMap.value("color").toString(),
-                              "" };
+         Label sLabel { labelMap.value("id").toString().toInt(),
+                        "",
+                        "",
+                        labelMap.value("name").toString(),
+                        labelMap.value("description").toString(),
+                        labelMap.value("color").toString(),
+                        "" };
 
          labels.append(std::move(sLabel));
       }
@@ -268,12 +270,12 @@ void GitLabRestApi::onMilestonesReceived()
    {
       const auto milestonesObj = tmpDoc.toVariant().toList();
 
-      QVector<ServerMilestone> milestones;
+      QVector<Milestone> milestones;
 
       for (const auto milestoneObj : milestonesObj)
       {
          const auto labelMap = milestoneObj.toMap();
-         ServerMilestone sMilestone {
+         Milestone sMilestone {
             labelMap.value("id").toString().toInt(),  labelMap.value("id").toString().toInt(),
             labelMap.value("iid").toString(),         labelMap.value("title").toString(),
             labelMap.value("description").toString(), labelMap.value("state").toString() == "active"

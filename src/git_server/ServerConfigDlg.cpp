@@ -24,6 +24,7 @@
 #include <utility>
 
 using namespace QLogger;
+using namespace GitServer;
 
 namespace
 {

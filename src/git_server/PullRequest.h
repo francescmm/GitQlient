@@ -23,14 +23,65 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QString>
+#include <Issue.h>
 
-struct ServerMilestone
+namespace GitServer
 {
-   int id;
-   int number;
-   QString nodeId;
-   QString title;
-   QString description;
-   bool isOpen;
+
+struct PullRequest : public Issue
+{
+   struct Details
+   {
+   };
+
+   struct HeadState
+   {
+      enum class State
+      {
+         Failure,
+         Success,
+         Pending
+      };
+
+      struct Check
+      {
+         QString description;
+         QString state;
+         QString url;
+         QString name;
+      };
+
+      QString sha;
+      QString state;
+      State eState;
+      QVector<Check> checks;
+   };
+
+   QString head;
+   QString base;
+   bool isOpen = true;
+   bool maintainerCanModify = true;
+   bool draft = false;
+   int id = 0;
+   QString url;
+   Details details;
+   HeadState state;
+
+   QJsonObject toJson() const
+   {
+      QJsonObject object;
+
+      object.insert("title", title);
+      object.insert("head", head);
+      object.insert("base", base);
+      object.insert("body", body.toStdString().c_str());
+      object.insert("maintainer_can_modify", maintainerCanModify);
+      object.insert("draft", draft);
+
+      return object;
+   }
+
+   bool isValid() const { return !title.isEmpty(); }
 };
+
+}

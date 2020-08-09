@@ -23,9 +23,9 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <ServerMilestone.h>
-#include <ServerLabel.h>
-#include <ServerPullRequest.h>
+#include <Milestone.h>
+#include <Label.h>
+#include <PullRequest.h>
 
 #include <QObject>
 #include <QMap>
@@ -33,7 +33,11 @@
 
 class QNetworkAccessManager;
 class QNetworkReply;
-struct ServerIssue;
+
+namespace GitServer
+{
+
+struct Issue;
 
 struct ServerAuthentication
 {
@@ -55,12 +59,12 @@ signals:
     * @brief labelsReceived Signal triggered after the labels are received and processed.
     * @param labels The processed lables.
     */
-   void labelsReceived(const QVector<ServerLabel> &labels);
+   void labelsReceived(const QVector<Label> &labels);
    /**
     * @brief milestonesReceived Signal triggered after the milestones are received and processed.
     * @param milestones The processed milestones.
     */
-   void milestonesReceived(const QVector<ServerMilestone> &milestones);
+   void milestonesReceived(const QVector<Milestone> &milestones);
    /**
     * @brief issueCreated Signal triggered when an issue has been created.
     * @param url The url of the issue.
@@ -74,7 +78,7 @@ signals:
     * @brief issuesReceived Signal triggered when the issues has been received.
     * @param issues The list of issues.
     */
-   void issuesReceived(const QVector<ServerIssue> &issues);
+   void issuesReceived(const QVector<Issue> &issues);
    /**
     * @brief pullRequestCreated Signal triggered when a pull request has been created.
     * @param url The url of the pull request.
@@ -84,7 +88,7 @@ signals:
     * @brief pullRequestsReceived Signal triggered when the pull requests are received and processed.
     * @param prs The list of pull requests ordered by SHA.
     */
-   void pullRequestsReceived(QMap<QString, ServerPullRequest> prs);
+   void pullRequestsReceived(QMap<QString, PullRequest> prs);
    /**
     * @brief pullRequestMerged Signal triggered when the pull request has been merged.
     */
@@ -109,18 +113,18 @@ public:
     * @brief createIssue Creates a new issue in the remote Git server.
     * @param issue The informatio of the issue.
     */
-   virtual void createIssue(const ServerIssue &issue) = 0;
+   virtual void createIssue(const Issue &issue) = 0;
    /**
     * @brief updateIssue Updates an existing issue or pull request, if it doesn't exist it reports an error.
     * @param issueNumber The issue number to update.
     * @param issue The updated information of the issue.
     */
-   virtual void updateIssue(int issueNumber, const ServerIssue &issue) = 0;
+   virtual void updateIssue(int issueNumber, const Issue &issue) = 0;
    /**
     * @brief createPullRequest Creates a pull request in the remote Git server.
     * @param pullRequest The information of the pull request.
     */
-   virtual void createPullRequest(const ServerPullRequest &pullRequest) = 0;
+   virtual void createPullRequest(const PullRequest &pullRequest) = 0;
    /**
     * @brief requestLabels Requests the labels to the remote Git server.
     */
@@ -160,3 +164,5 @@ protected:
     */
    virtual QNetworkRequest createRequest(const QString &page) const = 0;
 };
+
+}

@@ -9,6 +9,8 @@
 #include <QPushButton>
 #include <QScrollArea>
 
+using namespace GitServer;
+
 IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, IRestApi *api, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
@@ -58,7 +60,10 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, IRestApi *api, QW
    issuesLayout->addWidget(separator);
    issuesLayout->addWidget(scrollArea);
    issuesLayout->addWidget(footerFrame);
+}
 
+void IssuesWidget::loadData()
+{
    connect(mApi, &IRestApi::issuesReceived, this, &IssuesWidget::onIssuesReceived);
 
    mApi->requestIssues();
@@ -70,7 +75,7 @@ void IssuesWidget::createNewIssue()
    createIssue->exec();
 }
 
-void IssuesWidget::onIssuesReceived(const QVector<ServerIssue> &issues)
+void IssuesWidget::onIssuesReceived(const QVector<Issue> &issues)
 {
    auto totalIssues = issues.count();
    auto count = 0;

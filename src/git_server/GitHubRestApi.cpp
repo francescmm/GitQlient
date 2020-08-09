@@ -1,5 +1,5 @@
 #include "GitHubRestApi.h"
-#include <ServerIssue.h>
+#include <Issue.h>
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -12,6 +12,7 @@
 #include <QLogger.h>
 
 using namespace QLogger;
+using namespace GitServer;
 
 GitHubRestApi::GitHubRestApi(QString repoOwner, QString repoName, const ServerAuthentication &auth, QObject *parent)
    : IRestApi(auth, parent)
@@ -46,7 +47,7 @@ void GitHubRestApi::testConnection()
    });
 }
 
-void GitHubRestApi::createIssue(const ServerIssue &issue)
+void GitHubRestApi::createIssue(const Issue &issue)
 {
    QJsonDocument doc(issue.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
@@ -58,7 +59,7 @@ void GitHubRestApi::createIssue(const ServerIssue &issue)
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onIssueCreated);
 }
 
-void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
+void GitHubRestApi::updateIssue(int issueNumber, const Issue &issue)
 {
    QJsonDocument doc(issue.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
@@ -79,7 +80,7 @@ void GitHubRestApi::updateIssue(int issueNumber, const ServerIssue &issue)
    });
 }
 
-void GitHubRestApi::createPullRequest(const ServerPullRequest &pullRequest)
+void GitHubRestApi::createPullRequest(const PullRequest &pullRequest)
 {
    QJsonDocument doc(pullRequest.toJson());
    const auto data = doc.toJson(QJsonDocument::Compact);
@@ -154,19 +155,19 @@ void GitHubRestApi::onLabelsReceived()
 
    if (!tmpDoc.isEmpty())
    {
-      QVector<ServerLabel> labels;
+      QVector<Label> labels;
       const auto labelsArray = tmpDoc.array();
 
       for (auto label : labelsArray)
       {
          const auto jobObject = label.toObject();
-         ServerLabel sLabel { jobObject[QStringLiteral("id")].toInt(),
-                              jobObject[QStringLiteral("node_id")].toString(),
-                              jobObject[QStringLiteral("url")].toString(),
-                              jobObject[QStringLiteral("name")].toString(),
-                              jobObject[QStringLiteral("description")].toString(),
-                              jobObject[QStringLiteral("color")].toString(),
-                              jobObject[QStringLiteral("default")].toBool() };
+         Label sLabel { jobObject[QStringLiteral("id")].toInt(),
+                        jobObject[QStringLiteral("node_id")].toString(),
+                        jobObject[QStringLiteral("url")].toString(),
+                        jobObject[QStringLiteral("name")].toString(),
+                        jobObject[QStringLiteral("description")].toString(),
+                        jobObject[QStringLiteral("color")].toString(),
+                        jobObject[QStringLiteral("default")].toBool() };
 
          labels.append(std::move(sLabel));
       }
@@ -185,18 +186,18 @@ void GitHubRestApi::onMilestonesReceived()
 
    if (!tmpDoc.isEmpty())
    {
-      QVector<ServerMilestone> milestones;
+      QVector<Milestone> milestones;
       const auto labelsArray = tmpDoc.array();
 
       for (auto label : labelsArray)
       {
          const auto jobObject = label.toObject();
-         ServerMilestone sMilestone { jobObject[QStringLiteral("id")].toInt(),
-                                      jobObject[QStringLiteral("number")].toInt(),
-                                      jobObject[QStringLiteral("node_id")].toString(),
-                                      jobObject[QStringLiteral("title")].toString(),
-                                      jobObject[QStringLiteral("description")].toString(),
-                                      jobObject[QStringLiteral("state")].toString() == "open" };
+         Milestone sMilestone { jobObject[QStringLiteral("id")].toInt(),
+                                jobObject[QStringLiteral("number")].toInt(),
+                                jobObject[QStringLiteral("node_id")].toString(),
+                                jobObject[QStringLiteral("title")].toString(),
+                                jobObject[QStringLiteral("description")].toString(),
+                                jobObject[QStringLiteral("state")].toString() == "open" };
 
          milestones.append(std::move(sMilestone));
       }
@@ -253,7 +254,7 @@ void GitHubRestApi::processPullRequets()
 
       mPulls.clear();
 
-      ServerPullRequest prInfo;
+      PullRequest prInfo;
 
       for (const auto &pr : prs)
       {
@@ -301,9 +302,9 @@ void GitHubRestApi::onPullRequestStatusReceived()
       mPulls[sha].state.state = obj["state"].toString();
 
       mPulls[sha].state.eState = mPulls[sha].state.state == "success"
-          ? ServerPullRequest::HeadState::State::Success
-          : mPulls[sha].state.state == "failure" ? ServerPullRequest::HeadState::State::Failure
-                                                 : ServerPullRequest::HeadState::State::Pending;
+          ? PullRequest::HeadState::State::Success
+          : mPulls[sha].state.state == "failure" ? PullRequest::HeadState::State::Failure
+                                                 : PullRequest::HeadState::State::Pending;
 
       const auto statuses = obj["statuses"].toArray();
 
@@ -316,8 +317,8 @@ void GitHubRestApi::onPullRequestStatusReceived()
          else if (statusStr == "error")
             statusStr = "failure";
 
-         ServerPullRequest::HeadState::Check check { status["description"].toString(), statusStr,
-                                                     status["target_url"].toString(), status["context"].toString() };
+         PullRequest::HeadState::Check check { status["description"].toString(), statusStr,
+                                               status["target_url"].toString(), status["context"].toString() };
 
          mPulls[sha].state.checks.append(check);
       }
@@ -351,12 +352,13 @@ void GitHubRestApi::onIssuesReceived()
 
    if (!tmpDoc.isEmpty())
    {
-      QVector<ServerIssue> issues;
+      QVector<Issue> issues;
       const auto issuesArray = tmpDoc.array();
 
       for (const auto &issueData : issuesArray)
       {
-         ServerIssue issue;
+         Issue issue;
+         issue.number = issueData["number"].toInt();
          issue.title = issueData["title"].toString();
          issue.url = issueData["html_url"].toString();
          issue.creation = issueData["created_at"].toVariant().toDateTime();
@@ -387,12 +389,12 @@ void GitHubRestApi::onIssuesReceived()
             issue.assignees.append(sAssignee);
          }
 
-         ServerMilestone sMilestone { issueData["milestone"].toObject()[QStringLiteral("id")].toInt(),
-                                      issueData["milestone"].toObject()[QStringLiteral("number")].toInt(),
-                                      issueData["milestone"].toObject()[QStringLiteral("node_id")].toString(),
-                                      issueData["milestone"].toObject()[QStringLiteral("title")].toString(),
-                                      issueData["milestone"].toObject()[QStringLiteral("description")].toString(),
-                                      issueData["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
+         Milestone sMilestone { issueData["milestone"].toObject()[QStringLiteral("id")].toInt(),
+                                issueData["milestone"].toObject()[QStringLiteral("number")].toInt(),
+                                issueData["milestone"].toObject()[QStringLiteral("node_id")].toString(),
+                                issueData["milestone"].toObject()[QStringLiteral("title")].toString(),
+                                issueData["milestone"].toObject()[QStringLiteral("description")].toString(),
+                                issueData["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
 
          issue.milestone = sMilestone;
 

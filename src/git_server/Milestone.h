@@ -25,13 +25,17 @@
 
 #include <QString>
 
-struct ServerLabel
+namespace GitServer
+{
+
+struct Milestone
 {
    int id;
+   int number;
    QString nodeId;
-   QString url;
-   QString name;
+   QString title;
    QString description;
-   QString colorHex;
-   bool isDefault;
+   bool isOpen;
 };
+
+}

@@ -24,8 +24,6 @@
  ***************************************************************************************/
 
 #include <QDialog>
-#include <ServerMilestone.h>
-#include <ServerLabel.h>
 
 namespace Ui
 {
@@ -33,8 +31,14 @@ class CreatePullRequestDlg;
 }
 
 class GitBase;
-class IRestApi;
 class RevisionsCache;
+
+namespace GitServer
+{
+struct Milestone;
+struct Label;
+class IRestApi;
+}
 
 /**
  * @brief The CreatePullRequestDlg class configures the UI so the user can create pull requests in the git remote
@@ -68,7 +72,7 @@ private:
    Ui::CreatePullRequestDlg *ui;
    QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
-   IRestApi *mApi;
+   GitServer::IRestApi *mApi;
    QString mUserName;
    int mIssue;
    QString mFinalUrl;
@@ -81,12 +85,12 @@ private:
     * @brief onMilestones Process the reply from the server when the milestones request is done.
     * @param milestones The list of milestones to process.
     */
-   void onMilestones(const QVector<ServerMilestone> &milestones);
+   void onMilestones(const QVector<GitServer::Milestone> &milestones);
    /**
     * @brief onLabels Process the reply from the server when the labels request is done.
     * @param labels The list of labels to process.
     */
-   void onLabels(const QVector<ServerLabel> &labels);
+   void onLabels(const QVector<GitServer::Label> &labels);
    /**
     * @brief onPullRequestCreated Shows a message box with the url of the pull request already created.
     * @param url The url that links to the pull request.

@@ -5,6 +5,7 @@
 #include <QLogger.h>
 
 using namespace QLogger;
+using namespace GitServer;
 
 RevisionsCache::RevisionsCache(QObject *parent)
    : QObject(parent)
@@ -462,14 +463,14 @@ void RevisionsCache::updateTags(const QMap<QString, QString> &remoteTags)
    mRemoteTags = remoteTags;
 }
 
-void RevisionsCache::setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus)
+void RevisionsCache::setPullRequestStatus(QMap<QString, PullRequest> prStatus)
 {
    mPullRequestsStatus = std::move(prStatus);
 
    emit signalCacheUpdated();
 }
 
-ServerPullRequest RevisionsCache::getPullRequestStatus(const QString &sha)
+PullRequest RevisionsCache::getPullRequestStatus(const QString &sha)
 {
    return mPullRequestsStatus.value(sha);
 }

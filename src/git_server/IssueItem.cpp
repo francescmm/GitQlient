@@ -1,6 +1,7 @@
 #include <IssueItem.h>
 
 #include <ButtonLink.hpp>
+#include <Issue.h>
 
 #include <QDir>
 #include <QFile>
@@ -12,10 +13,11 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 
-IssueItem::IssueItem(const ServerIssue &issueData, QWidget *parent)
+using namespace GitServer;
+
+IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    : QFrame(parent)
    , mManager(new QNetworkAccessManager())
-   , mIssue(issueData)
    , mAvatar(new QLabel())
 {
    setObjectName("IssueItem");
@@ -23,14 +25,15 @@ IssueItem::IssueItem(const ServerIssue &issueData, QWidget *parent)
    /*
    const auto fileName
        = QString("%1/%2.png").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation),
-   mIssue.creator.name);
+   issueData.creator.name);
 
    if (!QFile(fileName).exists())
    {
       QNetworkRequest request;
-      request.setUrl(mIssue.creator.avatar);
+      request.setUrl(issueData.creator.avatar);
       const auto reply = mManager->get(request);
-      connect(reply, &QNetworkReply::finished, this, &IssueButton::storeCreatorAvatar);
+      connect(reply, &QNetworkReply::finished, this, [fileName = issueData.creator.name, this]() {
+   storeCreatorAvatar(fileName); });
    }
    else
    {
@@ -41,11 +44,11 @@ IssueItem::IssueItem(const ServerIssue &issueData, QWidget *parent)
    }
    */
 
-   const auto title = new ButtonLink(mIssue.title);
+   const auto title = new ButtonLink(issueData.title);
    title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
    title->setWordWrap(true);
    title->setObjectName("IssueTitle");
-   connect(title, &ButtonLink::clicked, [url = mIssue.url]() { QDesktopServices::openUrl(QUrl(url)); });
+   connect(title, &ButtonLink::clicked, [url = issueData.url]() { QDesktopServices::openUrl(QUrl(url)); });
 
    const auto titleLayout = new QHBoxLayout();
    titleLayout->setContentsMargins(QMargins());
@@ -57,18 +60,18 @@ IssueItem::IssueItem(const ServerIssue &issueData, QWidget *parent)
    creationLayout->setContentsMargins(QMargins());
    creationLayout->setSpacing(0);
    creationLayout->addWidget(new QLabel(tr("Created by ")));
-   const auto creator = new ButtonLink(QString("<b>%1</b>").arg(mIssue.creator.name));
+   const auto creator = new ButtonLink(QString("<b>%1</b>").arg(issueData.creator.name));
    creator->setObjectName("CreatorLink");
-   connect(creator, &ButtonLink::clicked, [url = mIssue.creator.url]() { QDesktopServices::openUrl(url); });
+   connect(creator, &ButtonLink::clicked, [url = issueData.creator.url]() { QDesktopServices::openUrl(url); });
 
    creationLayout->addWidget(creator);
 
    const auto whenLabel
-       = new QLabel(QString::fromUtf8(" %2 days ago").arg(mIssue.creation.daysTo(QDateTime::currentDateTime())));
+       = new QLabel(QString::fromUtf8(" %2 days ago").arg(issueData.creation.daysTo(QDateTime::currentDateTime())));
    creationLayout->addWidget(whenLabel);
    creationLayout->addStretch();
 
-   whenLabel->setToolTip(mIssue.creation.toString(Qt::SystemLocaleShortDate));
+   whenLabel->setToolTip(issueData.creation.toString(Qt::SystemLocaleShortDate));
 
    const auto labelsLayout = new QHBoxLayout();
    labelsLayout->setContentsMargins(QMargins());
@@ -76,7 +79,7 @@ IssueItem::IssueItem(const ServerIssue &issueData, QWidget *parent)
 
    QStringList labelsList;
 
-   for (auto &label : mIssue.labels)
+   for (auto &label : issueData.labels)
    {
       auto labelWidget = new QLabel();
       labelWidget->setStyleSheet(QString("QLabel {"
@@ -91,7 +94,7 @@ IssueItem::IssueItem(const ServerIssue &issueData, QWidget *parent)
       labelsLayout->addWidget(labelWidget);
    }
 
-   const auto milestone = new QLabel(QString("%1").arg(mIssue.milestone.title));
+   const auto milestone = new QLabel(QString("%1").arg(issueData.milestone.title));
    milestone->setObjectName("IssueLabel");
    labelsLayout->addWidget(milestone);
    labelsLayout->addStretch();
@@ -103,7 +106,7 @@ IssueItem::IssueItem(const ServerIssue &issueData, QWidget *parent)
    layout->addLayout(titleLayout, row++, 1);
    layout->addLayout(creationLayout, row++, 1);
 
-   if (!mIssue.assignees.isEmpty())
+   if (!issueData.assignees.isEmpty())
    {
       const auto assigneeLayout = new QHBoxLayout();
       assigneeLayout->setContentsMargins(QMargins());
@@ -111,8 +114,8 @@ IssueItem::IssueItem(const ServerIssue &issueData, QWidget *parent)
       assigneeLayout->addWidget(new QLabel(tr("Assigned to ")));
 
       auto count = 0;
-      const auto totalAssignees = mIssue.assignees.count();
-      for (auto &assignee : mIssue.assignees)
+      const auto totalAssignees = issueData.assignees.count();
+      for (auto &assignee : issueData.assignees)
       {
          const auto assigneLabel = new ButtonLink(QString("<b>%1</b>").arg(assignee.name));
          assigneLabel->setObjectName("CreatorLink");
@@ -132,7 +135,7 @@ IssueItem::IssueItem(const ServerIssue &issueData, QWidget *parent)
    layout->addWidget(mAvatar, 0, 0, row, 1);
 }
 
-void IssueItem::storeCreatorAvatar()
+void IssueItem::storeCreatorAvatar(const QString &fileName)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    const auto data = reply->readAll();
@@ -141,7 +144,7 @@ void IssueItem::storeCreatorAvatar()
    if (!dir.exists())
       dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
 
-   QString path = dir.absolutePath() + "/" + mIssue.creator.name + ".png";
+   QString path = dir.absolutePath() + "/" + fileName + ".png";
    QFile file(path);
    if (file.open(QIODevice::WriteOnly))
    {

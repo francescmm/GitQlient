@@ -6,14 +6,18 @@
 #include <GitQlientSettings.h>
 #include <GitBase.h>
 #include <GitConfig.h>
-#include <ServerPullRequest.h>
+#include <PullRequest.h>
 #include <RevisionsCache.h>
-#include <ServerIssue.h>
+#include <Issue.h>
+#include <Milestone.h>
+#include <Label.h>
 
 #include <QStandardItemModel>
 #include <QMessageBox>
 #include <QTimer>
 #include <QFile>
+
+using namespace GitServer;
 
 CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache,
                                            const QSharedPointer<GitBase> &git, QWidget *parent)
@@ -86,7 +90,7 @@ void CreatePullRequestDlg::accept()
           tr("The base branch and the branch to merge from cannot be the same. Please, select different branches."));
    }
 
-   ServerPullRequest pr;
+   PullRequest pr;
    pr.title = ui->leTitle->text(), pr.body = ui->teDescription->toPlainText().toUtf8();
    pr.head = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
    pr.base = ui->cbDestination->currentText().remove(0, ui->cbDestination->currentText().indexOf("/") + 1);
@@ -97,7 +101,7 @@ void CreatePullRequestDlg::accept()
    {
       pr.head = ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
 
-      QVector<ServerLabel> labels;
+      QVector<Label> labels;
 
       if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
       {
@@ -105,7 +109,7 @@ void CreatePullRequestDlg::accept()
          {
             if (cbModel->item(i)->checkState() == Qt::Checked)
             {
-               ServerLabel sLabel;
+               Label sLabel;
                sLabel.name = cbModel->item(i)->text();
                labels.append(sLabel);
             }
@@ -114,7 +118,7 @@ void CreatePullRequestDlg::accept()
 
       pr.labels = labels;
 
-      ServerMilestone milestone;
+      Milestone milestone;
       milestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
       pr.milestone = milestone;
    }
@@ -126,7 +130,7 @@ void CreatePullRequestDlg::accept()
    mApi->createPullRequest(pr);
 }
 
-void CreatePullRequestDlg::onMilestones(const QVector<ServerMilestone> &milestones)
+void CreatePullRequestDlg::onMilestones(const QVector<Milestone> &milestones)
 {
    ui->cbMilesone->addItem("Select milestone", -1);
 
@@ -136,7 +140,7 @@ void CreatePullRequestDlg::onMilestones(const QVector<ServerMilestone> &mileston
    ui->cbMilesone->setCurrentIndex(0);
 }
 
-void CreatePullRequestDlg::onLabels(const QVector<ServerLabel> &labels)
+void CreatePullRequestDlg::onLabels(const QVector<Label> &labels)
 {
    const auto model = new QStandardItemModel(labels.count(), 0, this);
    auto count = 0;
@@ -158,10 +162,10 @@ void CreatePullRequestDlg::onPullRequestCreated(QString url)
    {
       mIssue = mFinalUrl.mid(mFinalUrl.lastIndexOf("/") + 1, mFinalUrl.count() - 1).toInt();
 
-      ServerMilestone milestone;
+      Milestone milestone;
       milestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
 
-      QVector<ServerLabel> labels;
+      QVector<Label> labels;
 
       if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
       {
@@ -169,7 +173,7 @@ void CreatePullRequestDlg::onPullRequestCreated(QString url)
          {
             if (cbModel->item(i)->checkState() == Qt::Checked)
             {
-               ServerLabel sLabel;
+               Label sLabel;
                sLabel.name = cbModel->item(i)->text();
                labels.append(sLabel);
             }

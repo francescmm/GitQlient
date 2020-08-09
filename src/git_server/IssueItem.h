@@ -24,21 +24,24 @@
  ***************************************************************************************/
 
 #include <QFrame>
-#include <ServerIssue.h>
 
 class ButtonLink;
 class QLabel;
 class QNetworkAccessManager;
 
+namespace GitServer
+{
+struct Issue;
+}
+
 class IssueItem : public QFrame
 {
 public:
-   IssueItem(const ServerIssue &issueData, QWidget *parent = nullptr);
+   IssueItem(const GitServer::Issue &issueData, QWidget *parent = nullptr);
 
 private:
    QNetworkAccessManager *mManager;
-   ServerIssue mIssue;
    QLabel *mAvatar = nullptr;
 
-   void storeCreatorAvatar();
+   void storeCreatorAvatar(const QString &fileName);
 };

@@ -4,11 +4,13 @@
 #include <GitLabRestApi.h>
 #include <GitQlientSettings.h>
 #include <GitConfig.h>
-#include <ServerIssue.h>
+#include <Issue.h>
 
 #include <QMessageBox>
 #include <QStandardItemModel>
 #include <QStandardItem>
+
+using namespace GitServer;
 
 CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *parent)
    : QDialog(parent)
@@ -57,7 +59,7 @@ void CreateIssueDlg::accept()
       QMessageBox::warning(this, tr("Empty fields"), tr("Please, complete all fields with valid data."));
    else
    {
-      QVector<ServerLabel> labels;
+      QVector<Label> labels;
 
       if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
       {
@@ -65,7 +67,7 @@ void CreateIssueDlg::accept()
          {
             if (cbModel->item(i)->checkState() == Qt::Checked)
             {
-               ServerLabel sLabel;
+               Label sLabel;
                sLabel.name = cbModel->item(i)->text();
                labels.append(sLabel);
             }
@@ -74,7 +76,7 @@ void CreateIssueDlg::accept()
 
       ui->pbAccept->setEnabled(false);
 
-      ServerMilestone sMilestone;
+      Milestone sMilestone;
       sMilestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
 
       GitServer::User sAssignee;
@@ -90,7 +92,7 @@ void CreateIssueDlg::accept()
    }
 }
 
-void CreateIssueDlg::onMilestones(const QVector<ServerMilestone> &milestones)
+void CreateIssueDlg::onMilestones(const QVector<Milestone> &milestones)
 {
    ui->cbMilesone->addItem("Select milestone", -1);
 
@@ -100,7 +102,7 @@ void CreateIssueDlg::onMilestones(const QVector<ServerMilestone> &milestones)
    ui->cbMilesone->setCurrentIndex(0);
 }
 
-void CreateIssueDlg::onLabels(const QVector<ServerLabel> &labels)
+void CreateIssueDlg::onLabels(const QVector<Label> &labels)
 {
    const auto model = new QStandardItemModel(labels.count(), 0, this);
    auto count = 0;

@@ -23,7 +23,7 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <ServerPullRequest.h>
+#include <PullRequest.h>
 
 #include <QDialog>
 
@@ -33,7 +33,12 @@ class MergePullRequestDlg;
 }
 
 class GitBase;
+
+namespace GitServer
+{
 class IRestApi;
+class PullRequest;
+}
 
 /**
  * @brief The MergePullRequestDlg class creates the layout for the UI so the user can merge pull requests directly from
@@ -57,7 +62,7 @@ public:
     * @param sha The sha of the current commit to check that is the current sha in the server.
     * @param parent The parent widget.
     */
-   explicit MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr, const QString &sha,
+   explicit MergePullRequestDlg(const QSharedPointer<GitBase> git, const GitServer::PullRequest &pr, const QString &sha,
                                 QWidget *parent = nullptr);
    /**
     * Destructor
@@ -67,9 +72,9 @@ public:
 private:
    Ui::MergePullRequestDlg *ui;
    QSharedPointer<GitBase> mGit;
-   ServerPullRequest mPr;
+   GitServer::PullRequest mPr;
    QString mSha;
-   IRestApi *mApi;
+   GitServer::IRestApi *mApi;
    QString mUserName;
 
    /**

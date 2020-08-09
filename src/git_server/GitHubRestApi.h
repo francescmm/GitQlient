@@ -30,7 +30,11 @@
 
 class QJsonDocument;
 class QNetworkReply;
-struct ServerIssue;
+
+namespace GitServer
+{
+
+struct Issue;
 
 class GitHubRestApi final : public IRestApi
 {
@@ -41,9 +45,9 @@ public:
                           QObject *parent = nullptr);
 
    void testConnection() override;
-   void createIssue(const ServerIssue &issue) override;
-   void updateIssue(int issueNumber, const ServerIssue &issue) override;
-   void createPullRequest(const ServerPullRequest &pullRequest) override;
+   void createIssue(const Issue &issue) override;
+   void updateIssue(int issueNumber, const Issue &issue) override;
+   void createPullRequest(const PullRequest &pullRequest) override;
    void requestLabels() override;
    void requestMilestones() override;
    void requestIssues() override;
@@ -52,7 +56,7 @@ public:
    void mergePullRequest(int number, const QByteArray &data) override;
 
 private:
-   QMap<QString, ServerPullRequest> mPulls;
+   QMap<QString, PullRequest> mPulls;
    QString mRepoEndpoint;
    int mPrRequested = 0;
 
@@ -66,3 +70,5 @@ private:
    void onPullRequestMerged();
    void onIssuesReceived();
 };
+
+}

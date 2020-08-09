@@ -23,63 +23,68 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QString>
+#include <Milestone.h>
+#include <Label.h>
+#include <User.h>
+
 #include <QJsonObject>
-#include <QVector>
-#include <ServerIssue.h>
+#include <QJsonArray>
+#include <QStringList>
+#include <QDateTime>
 
-struct ServerPullRequest : public ServerIssue
+namespace GitServer
 {
-   struct Details
+
+struct Issue
+{
+   Issue() = default;
+   Issue(const QString &_title, const QByteArray &_body, const Milestone &goal, const QVector<Label> &_labels,
+         const QVector<GitServer::User> &_assignees)
+      : title(_title)
+      , body(_body)
+      , milestone(goal)
+      , labels(_labels)
+      , assignees(_assignees)
    {
-   };
+   }
 
-   struct HeadState
-   {
-      enum class State
-      {
-         Failure,
-         Success,
-         Pending
-      };
-
-      struct Check
-      {
-         QString description;
-         QString state;
-         QString url;
-         QString name;
-      };
-
-      QString sha;
-      QString state;
-      State eState;
-      QVector<Check> checks;
-   };
-
-   QString head;
-   QString base;
-   bool isOpen = true;
-   bool maintainerCanModify = true;
-   bool draft = false;
-   int id = 0;
+   int number;
+   QString title;
+   QByteArray body;
+   Milestone milestone;
+   QVector<Label> labels;
+   GitServer::User creator;
+   QVector<GitServer::User> assignees;
    QString url;
-   Details details;
-   HeadState state;
+   QDateTime creation;
 
    QJsonObject toJson() const
    {
       QJsonObject object;
 
-      object.insert("title", title);
-      object.insert("head", head);
-      object.insert("base", base);
-      object.insert("body", body.toStdString().c_str());
-      object.insert("maintainer_can_modify", maintainerCanModify);
-      object.insert("draft", draft);
+      if (!title.isEmpty())
+         object.insert("title", title);
+
+      if (!body.isEmpty())
+         object.insert("body", body.toStdString().c_str());
+
+      if (milestone.id != -1)
+         object.insert("milestone", milestone.id);
+
+      QJsonArray array;
+      auto count = 0;
+      for (auto assignee : assignees)
+         array.insert(count++, assignee.name);
+      object.insert("assignees", array);
+
+      QJsonArray labelsArray;
+      count = 0;
+      for (auto label : labels)
+         labelsArray.insert(count++, label.name);
+      object.insert("labels", labelsArray);
 
       return object;
    }
-
-   bool isValid() const { return !title.isEmpty(); }
 };
+
+}

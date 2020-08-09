@@ -34,6 +34,7 @@
 #include <QStackedLayout>
 
 using namespace QLogger;
+using namespace GitServer;
 
 GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    : QFrame(parent)
