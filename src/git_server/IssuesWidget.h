@@ -25,62 +25,24 @@
 
 #include <QFrame>
 
-class RevisionsCache;
-class GitBase;
-class QPushButton;
-class QToolButton;
-class IRestApi;
 class QVBoxLayout;
+class IRestApi;
+class GitBase;
 struct ServerIssue;
 
-class GitServerWidget : public QFrame
+class IssuesWidget : public QFrame
 {
    Q_OBJECT
-
 signals:
 
 public:
-   explicit GitServerWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
-                            QWidget *parent = nullptr);
-
-   /**
-    * @brief configure Configures the widget by showing the config dialog or the full content if it was already
-    * configured.
-    * @return Returns true if configured, otherwise false.
-    */
-   bool configure();
+   explicit IssuesWidget(const QSharedPointer<GitBase> &git, IRestApi *api, QWidget *parent = nullptr);
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
-   QToolButton *mSplitView = nullptr;
-   QToolButton *mUnifiedView = nullptr;
-   QPushButton *mNewPr = nullptr;
    IRestApi *mApi = nullptr;
-   bool mConfigured = false;
+   QVBoxLayout *mIssuesLayout = nullptr;
 
-   /**
-    * @brief createWidget Creates all the contents of the GitServerWidget.
-    */
-   void createWidget();
-
-   /**
-    * @brief showUnifiedView Shows the unified view.
-    */
-   void showUnifiedView();
-
-   /**
-    * @brief showSplitView Shows the split view.
-    */
-   void showSplitView();
-
-   /**
-    * @brief createNewIssue Shows the dialog to create a new issue on the server.
-    */
    void createNewIssue();
-
-   /**
-    * @brief createNewPullRequest Shows the dialog to create a new pull request on the server.
-    */
-   void createNewPullRequest();
+   void onIssuesReceived(const QVector<ServerIssue> &issues);
 };

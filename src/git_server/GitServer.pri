@@ -14,6 +14,7 @@ HEADERS += \
    $$PWD/GitLabRestApi.h \
    $$PWD/IRestApi.h \
    $$PWD/IssueItem.h \
+   $$PWD/IssuesWidget.h \
    $$PWD/MergePullRequestDlg.h \
    $$PWD/ServerConfigDlg.h \
    $$PWD/ServerIssue.h \
@@ -28,5 +29,6 @@ SOURCES += \
    $$PWD/GitLabRestApi.cpp \
    $$PWD/IRestApi.cpp \
    $$PWD/IssueItem.cpp \
+   $$PWD/IssuesWidget.cpp \
    $$PWD/MergePullRequestDlg.cpp \
    $$PWD/ServerConfigDlg.cpp
