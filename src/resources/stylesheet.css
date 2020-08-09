@@ -745,6 +745,54 @@ QScrollArea
    background: transparent;
 }
 
+#IssuesHeaderFrame
+{
+   background-color: #202122;
+}
+
+#IssuesFooterFrame
+{
+   background-color: #2E2F30;
+}
+
+#IssuesHeaderFrame
+{
+   padding: 10px;
+   border-top: 1px solid #404142;
+   border-top-right-radius: 10px;
+   border-top-left-radius: 10px;
+}
+
+#IssuesFooterFrame
+{
+   min-height: 10px;
+   max-height: 10px;
+   border-bootom: 1px solid #404142;
+   border-bottom-right-radius: 10px;
+   border-bottom-left-radius: 10px;
+}
+
+#ButtonIssuesHeaderFrame
+{
+   background: #404142;
+   max-height: 20px;
+   min-height: 20px;
+   border: 1px solid #D89000;
+}
+
+#ButtonIssuesHeaderFrame:hover
+{
+   background: #606162;
+}
+
+#HeaderTitle
+{
+   font-variant: small-caps;
+   font-size: 18pt;
+   font-weight: bold;
+   qproperty-alignment: AlignCenter;
+}
+
 /* IssueButton */
 #IssueButton
 {

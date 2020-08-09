@@ -15,6 +15,7 @@
 #include <QToolButton>
 #include <QHBoxLayout>
 #include <QScrollArea>
+#include <QLabel>
 
 GitServerWidget::GitServerWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent)
@@ -88,10 +89,6 @@ void GitServerWidget::createWidget()
    mSplitView->setObjectName("IconButton");
    connect(mSplitView, &QPushButton::clicked, this, &GitServerWidget::showSplitView);
 
-   mNewIssue = new QPushButton(tr("New issue"));
-   mNewIssue->setObjectName("NormalButton");
-   connect(mNewIssue, &QPushButton::clicked, this, &GitServerWidget::createNewIssue);
-
    mNewPr = new QPushButton(tr("New %1").arg(QString::fromUtf8(prLabel)));
    mNewPr->setObjectName("NormalButton");
    connect(mNewPr, &QPushButton::clicked, this, &GitServerWidget::createNewPullRequest);
@@ -102,7 +99,6 @@ void GitServerWidget::createWidget()
    buttonsLayout->addWidget(mUnifiedView);
    buttonsLayout->addWidget(mSplitView);
    buttonsLayout->addStretch();
-   buttonsLayout->addWidget(mNewIssue);
    buttonsLayout->addWidget(mNewPr);
 
    const auto separator = new QFrame();
@@ -168,30 +164,58 @@ void GitServerWidget::createNewPullRequest()
 
    prDlg->exec();
 }
-#include <QLabel>
+
 QWidget *GitServerWidget::createIssuesWidget()
 {
+   const auto headerTitle = new QLabel(tr("Issues"));
+   headerTitle->setObjectName("HeaderTitle");
+
+   const auto newIssue = new QPushButton(tr("New issue"));
+   newIssue->setObjectName("ButtonIssuesHeaderFrame");
+   connect(newIssue, &QPushButton::clicked, this, &GitServerWidget::createNewIssue);
+
+   const auto headerFrame = new QFrame();
+   headerFrame->setObjectName("IssuesHeaderFrame");
+   const auto headerLayout = new QHBoxLayout(headerFrame);
+   headerLayout->setContentsMargins(QMargins());
+   headerLayout->setSpacing(0);
+   headerLayout->addWidget(headerTitle);
+   headerLayout->addStretch();
+   headerLayout->addWidget(newIssue);
+
    const auto issuesWidget = new QFrame();
    issuesWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
    issuesWidget->setObjectName("IssuesWidget");
    issuesWidget->setStyleSheet("#IssuesWidget{"
-                               "border: 1px solid #404142;"
-                               "border-radius: 10px;"
                                "background-color: #2E2F30;"
                                "}");
    mIssuesLayout = new QVBoxLayout(issuesWidget);
    mIssuesLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
    mIssuesLayout->setContentsMargins(QMargins());
    mIssuesLayout->setSpacing(0);
-   mIssuesLayout->addWidget(new QLabel(tr("Header")));
+
+   const auto separator = new QFrame();
+   separator->setObjectName("orangeHSeparator");
 
    const auto scrollArea = new QScrollArea();
    scrollArea->setWidget(issuesWidget);
    scrollArea->setWidgetResizable(true);
 
+   const auto footerFrame = new QFrame();
+   footerFrame->setObjectName("IssuesFooterFrame");
+
+   const auto issuesFrame = new QFrame();
+   const auto issuesLayout = new QVBoxLayout(issuesFrame);
+   issuesLayout->setContentsMargins(QMargins());
+   issuesLayout->setSpacing(0);
+   issuesLayout->addWidget(headerFrame);
+   issuesLayout->addWidget(separator);
+   issuesLayout->addWidget(scrollArea);
+   issuesLayout->addWidget(footerFrame);
+
    mApi->requestIssues();
 
-   return scrollArea;
+   return issuesFrame;
 }
 
 void GitServerWidget::onIssuesReceived(const QVector<ServerIssue> &issues)

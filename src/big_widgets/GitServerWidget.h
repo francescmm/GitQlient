@@ -55,7 +55,6 @@ private:
    QSharedPointer<GitBase> mGit;
    QToolButton *mSplitView = nullptr;
    QToolButton *mUnifiedView = nullptr;
-   QPushButton *mNewIssue = nullptr;
    QPushButton *mNewPr = nullptr;
    QVBoxLayout *mIssuesLayout = nullptr;
    IRestApi *mApi = nullptr;
