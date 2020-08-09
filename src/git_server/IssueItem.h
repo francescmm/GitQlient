@@ -30,10 +30,10 @@ class ButtonLink;
 class QLabel;
 class QNetworkAccessManager;
 
-class IssueButton : public QFrame
+class IssueItem : public QFrame
 {
 public:
-   IssueButton(const ServerIssue &issueData, QWidget *parent = nullptr);
+   IssueItem(const ServerIssue &issueData, QWidget *parent = nullptr);
 
 private:
    QNetworkAccessManager *mManager;

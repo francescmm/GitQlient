@@ -1,4 +1,4 @@
-#include <IssueButton.h>
+#include <IssueItem.h>
 
 #include <ButtonLink.hpp>
 
@@ -12,13 +12,13 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 
-IssueButton::IssueButton(const ServerIssue &issueData, QWidget *parent)
+IssueItem::IssueItem(const ServerIssue &issueData, QWidget *parent)
    : QFrame(parent)
    , mManager(new QNetworkAccessManager())
    , mIssue(issueData)
    , mAvatar(new QLabel())
 {
-   setObjectName("IssueButton");
+   setObjectName("IssueItem");
 
    /*
    const auto fileName
@@ -132,7 +132,7 @@ IssueButton::IssueButton(const ServerIssue &issueData, QWidget *parent)
    layout->addWidget(mAvatar, 0, 0, row, 1);
 }
 
-void IssueButton::storeCreatorAvatar()
+void IssueItem::storeCreatorAvatar()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    const auto data = reply->readAll();

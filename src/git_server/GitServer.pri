@@ -13,7 +13,7 @@ HEADERS += \
    $$PWD/GitHubRestApi.h \
    $$PWD/GitLabRestApi.h \
    $$PWD/IRestApi.h \
-   $$PWD/IssueButton.h \
+   $$PWD/IssueItem.h \
    $$PWD/MergePullRequestDlg.h \
    $$PWD/ServerConfigDlg.h \
    $$PWD/ServerIssue.h \
@@ -27,6 +27,6 @@ SOURCES += \
    $$PWD/GitHubRestApi.cpp \
    $$PWD/GitLabRestApi.cpp \
    $$PWD/IRestApi.cpp \
-   $$PWD/IssueButton.cpp \
+   $$PWD/IssueItem.cpp \
    $$PWD/MergePullRequestDlg.cpp \
    $$PWD/ServerConfigDlg.cpp
