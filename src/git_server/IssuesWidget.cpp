@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QScrollArea>
+#include <QTimer>
 
 using namespace GitServer;
 
@@ -60,6 +61,10 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QW
    issuesLayout->addWidget(headerFrame);
    issuesLayout->addLayout(mIssuesLayout);
    issuesLayout->addWidget(footerFrame);
+
+   const auto timer = new QTimer();
+   connect(timer, &QTimer::timeout, this, &IssuesWidget::loadData);
+   timer->start(300000);
 }
 
 void IssuesWidget::loadData()
