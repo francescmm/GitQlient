@@ -54,6 +54,12 @@ public:
     */
    bool configure();
 
+   /**
+    * @brief isConfigured Returns the current state of the widget
+    * @return True if configured, otherwise false.
+    */
+   bool isConfigured() const { return mConfigured; }
+
 private:
    QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;

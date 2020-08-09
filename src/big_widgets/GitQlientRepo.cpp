@@ -82,6 +82,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
       mGitQlientCache->setupGitPlatform(mApi);
    }
 
+   mGitServerWidget->configure();
+
    mStackedLayout->addWidget(mHistoryWidget);
    mStackedLayout->addWidget(mDiffWidget);
    mStackedLayout->addWidget(mBlameWidget);
@@ -406,7 +408,7 @@ void GitQlientRepo::showMergeView()
 
 void GitQlientRepo::showGitServerView()
 {
-   if (mGitServerWidget->configure())
+   if (mGitServerWidget->isConfigured())
    {
       mStackedLayout->setCurrentWidget(mGitServerWidget);
       mControls->toggleButton(ControlsMainViews::SERVER);
