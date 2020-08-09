@@ -746,10 +746,21 @@ QScrollArea
 }
 
 /* IssueButton */
+#IssueButton
+{
+   background-color: #2E2F30;
+}
+
 ButtonLink#IssueTitle
 {
+   padding: 0;
    font-size: 12pt;
    font-weight: bold;
+}
+
+ButtonLink#CreatorLink
+{
+   padding: 0;
 }
 
 QLabel#IssueLabel

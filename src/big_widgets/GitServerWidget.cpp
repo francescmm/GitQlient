@@ -168,7 +168,7 @@ void GitServerWidget::createNewPullRequest()
 
    prDlg->exec();
 }
-
+#include <QLabel>
 QWidget *GitServerWidget::createIssuesWidget()
 {
    const auto issuesWidget = new QFrame();
@@ -177,11 +177,13 @@ QWidget *GitServerWidget::createIssuesWidget()
    issuesWidget->setStyleSheet("#IssuesWidget{"
                                "border: 1px solid #404142;"
                                "border-radius: 10px;"
-                               "background-color: #606162;"
+                               "background-color: #2E2F30;"
                                "}");
    mIssuesLayout = new QVBoxLayout(issuesWidget);
+   mIssuesLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
    mIssuesLayout->setContentsMargins(QMargins());
-   mIssuesLayout->setSpacing(10);
+   mIssuesLayout->setSpacing(0);
+   mIssuesLayout->addWidget(new QLabel(tr("Header")));
 
    const auto scrollArea = new QScrollArea();
    scrollArea->setWidget(issuesWidget);
@@ -194,8 +196,20 @@ QWidget *GitServerWidget::createIssuesWidget()
 
 void GitServerWidget::onIssuesReceived(const QVector<ServerIssue> &issues)
 {
+   auto totalIssues = issues.count();
+   auto count = 0;
+
    for (auto &issue : issues)
    {
-      mIssuesLayout->addWidget(new IssueButton(issue, this));
+      mIssuesLayout->addWidget(new IssueButton(issue));
+
+      if (count++ < totalIssues - 1)
+      {
+         const auto separator = new QFrame();
+         separator->setObjectName("orangeHSeparator");
+         mIssuesLayout->addWidget(separator);
+      }
    }
+
+   mIssuesLayout->addStretch();
 }

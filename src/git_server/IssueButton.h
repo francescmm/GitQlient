@@ -39,8 +39,6 @@ private:
    QNetworkAccessManager *mManager;
    ServerIssue mIssue;
    QLabel *mAvatar = nullptr;
-   ButtonLink *mTitle = nullptr;
-   QLabel *mMilestone = nullptr;
 
    void storeCreatorAvatar();
 };

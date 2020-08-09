@@ -17,33 +17,8 @@ IssueButton::IssueButton(const ServerIssue &issueData, QWidget *parent)
    , mManager(new QNetworkAccessManager())
    , mIssue(issueData)
    , mAvatar(new QLabel())
-   , mTitle(new ButtonLink(mIssue.title))
-   , mMilestone(new QLabel(QString("%1").arg(mIssue.milestone.title)))
-
 {
-   const auto labelsLayout = new QHBoxLayout();
-   labelsLayout->setContentsMargins(5, 0, 0, 0);
-   labelsLayout->setSpacing(5);
-
-   QStringList labelsList;
-
-   for (auto &label : mIssue.labels)
-   {
-      auto labelWidget = new QLabel();
-      labelWidget->setStyleSheet(QString("QLabel {"
-                                         "background-color: #%1;"
-                                         "border-radius: 7px;"
-                                         "min-height: 15px;"
-                                         "max-height: 15px;"
-                                         "min-width: 15px;"
-                                         "max-width: 15px;}")
-                                     .arg(label.colorHex));
-      labelWidget->setToolTip(label.name);
-      labelsLayout->addWidget(labelWidget);
-   }
-
-   labelsLayout->addWidget(mMilestone);
-   labelsLayout->addStretch();
+   setObjectName("IssueButton");
 
    /*
    const auto fileName
@@ -66,20 +41,24 @@ IssueButton::IssueButton(const ServerIssue &issueData, QWidget *parent)
    }
    */
 
-   mTitle->setObjectName("IssueTitle");
+   const auto title = new ButtonLink(mIssue.title);
+   title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+   title->setWordWrap(true);
+   title->setObjectName("IssueTitle");
+   connect(title, &ButtonLink::clicked, [url = mIssue.url]() { QDesktopServices::openUrl(QUrl(url)); });
 
-   // mCreation->setObjectName("IssueLabel");
-
-   mMilestone->setObjectName("IssueLabel");
-
-   const auto separator = new QFrame();
-   separator->setObjectName("orangeHSeparator");
+   const auto titleLayout = new QHBoxLayout();
+   titleLayout->setContentsMargins(QMargins());
+   titleLayout->setSpacing(0);
+   titleLayout->addWidget(title);
+   titleLayout->addStretch();
 
    const auto creationLayout = new QHBoxLayout();
-   creationLayout->setContentsMargins(5, 0, 0, 0);
+   creationLayout->setContentsMargins(QMargins());
    creationLayout->setSpacing(0);
    creationLayout->addWidget(new QLabel(tr("Created by ")));
-   const auto creator = new ButtonLink(mIssue.creator.name);
+   const auto creator = new ButtonLink(QString("<b>%1</b>").arg(mIssue.creator.name));
+   creator->setObjectName("CreatorLink");
    connect(creator, &ButtonLink::clicked, [url = mIssue.creator.url]() { QDesktopServices::openUrl(url); });
 
    creationLayout->addWidget(creator);
@@ -91,25 +70,66 @@ IssueButton::IssueButton(const ServerIssue &issueData, QWidget *parent)
 
    whenLabel->setToolTip(mIssue.creation.toString(Qt::SystemLocaleShortDate));
 
+   const auto labelsLayout = new QHBoxLayout();
+   labelsLayout->setContentsMargins(QMargins());
+   labelsLayout->setSpacing(10);
+
+   QStringList labelsList;
+
+   for (auto &label : mIssue.labels)
+   {
+      auto labelWidget = new QLabel();
+      labelWidget->setStyleSheet(QString("QLabel {"
+                                         "background-color: #%1;"
+                                         "border-radius: 7px;"
+                                         "min-height: 15px;"
+                                         "max-height: 15px;"
+                                         "min-width: 15px;"
+                                         "max-width: 15px;}")
+                                     .arg(label.colorHex));
+      labelWidget->setToolTip(label.name);
+      labelsLayout->addWidget(labelWidget);
+   }
+
+   const auto milestone = new QLabel(QString("%1").arg(mIssue.milestone.title));
+   milestone->setObjectName("IssueLabel");
+   labelsLayout->addWidget(milestone);
+   labelsLayout->addStretch();
+
+   auto row = 0;
    const auto layout = new QGridLayout(this);
-   layout->setContentsMargins(QMargins());
+   layout->setContentsMargins(0, 10, 0, 10);
    layout->setSpacing(5);
-   layout->addWidget(mAvatar, 0, 0, 4, 1);
-   layout->addWidget(mTitle, 0, 1);
-   layout->addLayout(creationLayout, 1, 1);
-   layout->addLayout(labelsLayout, 2, 1);
-   layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed), 3, 1);
-   layout->addWidget(separator, 4, 0, 1, 2);
+   layout->addLayout(titleLayout, row++, 1);
+   layout->addLayout(creationLayout, row++, 1);
 
-   /*
-   QStringList assignees;
-   for (auto &assignee : mIssue.assignees)
-      assignees.append(assignee.name);
+   if (!mIssue.assignees.isEmpty())
+   {
+      const auto assigneeLayout = new QHBoxLayout();
+      assigneeLayout->setContentsMargins(QMargins());
+      assigneeLayout->setSpacing(0);
+      assigneeLayout->addWidget(new QLabel(tr("Assigned to ")));
 
-   layout->addWidget(new QLabel(assignees.join(", ")), 3, 0);
-   */
+      auto count = 0;
+      const auto totalAssignees = mIssue.assignees.count();
+      for (auto &assignee : mIssue.assignees)
+      {
+         const auto assigneLabel = new ButtonLink(QString("<b>%1</b>").arg(assignee.name));
+         assigneLabel->setObjectName("CreatorLink");
+         connect(assigneLabel, &ButtonLink::clicked, [url = assignee.url]() { QDesktopServices::openUrl(url); });
+         assigneeLayout->addWidget(assigneLabel);
 
-   connect(mTitle, &ButtonLink::clicked, [url = mIssue.url]() { QDesktopServices::openUrl(QUrl(url)); });
+         if (count++ < totalAssignees - 1)
+            assigneeLayout->addWidget(new QLabel(", "));
+      }
+      assigneeLayout->addStretch();
+
+      layout->addLayout(assigneeLayout, row++, 1);
+   }
+
+   layout->addLayout(labelsLayout, row++, 1);
+
+   layout->addWidget(mAvatar, 0, 0, row, 1);
 }
 
 void IssueButton::storeCreatorAvatar()
