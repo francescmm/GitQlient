@@ -40,9 +40,14 @@ class IssuesWidget : public QFrame
 signals:
 
 public:
+   enum class Config
+   {
+      Issues,
+      PullRequests
+   };
    explicit IssuesWidget(const QSharedPointer<GitBase> &git, GitServer::IRestApi *api, QWidget *parent = nullptr);
 
-   void loadData();
+   void loadData(Config config);
 
 private:
    QSharedPointer<GitBase> mGit;

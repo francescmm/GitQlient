@@ -62,11 +62,14 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, IRestApi *api, QW
    issuesLayout->addWidget(footerFrame);
 }
 
-void IssuesWidget::loadData()
+void IssuesWidget::loadData(Config config)
 {
    connect(mApi, &IRestApi::issuesReceived, this, &IssuesWidget::onIssuesReceived);
 
-   mApi->requestIssues();
+   if (config == Config::Issues)
+      mApi->requestIssues();
+   else
+      mApi->requestPullRequests();
 }
 
 void IssuesWidget::createNewIssue()

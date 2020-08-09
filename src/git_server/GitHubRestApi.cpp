@@ -113,7 +113,12 @@ void GitHubRestApi::requestIssues()
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onIssuesReceived);
 }
 
-void GitHubRestApi::requestPullRequests() { }
+void GitHubRestApi::requestPullRequests()
+{
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + "/pulls"));
+
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onIssuesReceived);
+}
 
 void GitHubRestApi::requestPullRequestsState()
 {

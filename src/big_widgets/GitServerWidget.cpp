@@ -113,7 +113,7 @@ void GitServerWidget::createWidget()
    centralLayout->addWidget(separator);
    centralLayout->addWidget(issues);
 
-   issues->loadData();
+   issues->loadData(IssuesWidget::Config::Issues);
 
    const auto mainLayout = new QGridLayout();
    mainLayout->setColumnStretch(0, 1);
