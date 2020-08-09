@@ -9,6 +9,7 @@ FORMS += \
 HEADERS += \
    $$PWD/CreateIssueDlg.h \
    $$PWD/CreatePullRequestDlg.h \
+   $$PWD/IssueDetailedView.h \
    $$PWD/IssueItem.h \
    $$PWD/IssuesWidget.h \
    $$PWD/MergePullRequestDlg.h \
@@ -17,6 +18,7 @@ HEADERS += \
 SOURCES += \
    $$PWD/CreateIssueDlg.cpp \
    $$PWD/CreatePullRequestDlg.cpp \
+   $$PWD/IssueDetailedView.cpp \
    $$PWD/IssueItem.cpp \
    $$PWD/IssuesWidget.cpp \
    $$PWD/MergePullRequestDlg.cpp \

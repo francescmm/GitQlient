@@ -9,6 +9,7 @@
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
 #include <IssuesWidget.h>
+#include <IssueDetailedView.h>
 
 #include <QPushButton>
 #include <QToolButton>
@@ -93,17 +94,19 @@ void GitServerWidget::createWidget()
    separator->setObjectName("orangeHSeparator");
 
    const auto centralFrame = new QFrame();
-   const auto centralLayout = new QVBoxLayout(centralFrame);
+   const auto centralLayout = new QGridLayout(centralFrame);
    centralLayout->setContentsMargins(QMargins());
    centralLayout->setSpacing(10);
-   centralLayout->addLayout(buttonsLayout);
-   centralLayout->addWidget(separator);
+   centralLayout->addLayout(buttonsLayout, 0, 0, 1, 2);
+   centralLayout->addWidget(separator, 1, 0, 1, 2);
 
    const auto issues = new IssuesWidget(mGit, IssuesWidget::Config::Issues);
    const auto pullRequests = new IssuesWidget(mGit, IssuesWidget::Config::PullRequests);
+   const auto detailedView = new IssueDetailedView(mGit, IssueDetailedView::Config::Issues);
 
-   centralLayout->addWidget(issues);
-   centralLayout->addWidget(pullRequests);
+   centralLayout->addWidget(issues, 2, 0);
+   centralLayout->addWidget(pullRequests, 3, 0);
+   centralLayout->addWidget(detailedView, 2, 1, 2, 1);
 
    issues->loadData();
    pullRequests->loadData();
