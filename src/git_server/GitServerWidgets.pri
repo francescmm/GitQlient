@@ -7,6 +7,7 @@ FORMS += \
    $$PWD/ServerConfigDlg.ui
 
 HEADERS += \
+   $$PWD/CircularPixmap.h \
    $$PWD/CreateIssueDlg.h \
    $$PWD/CreatePullRequestDlg.h \
    $$PWD/IssueDetailedView.h \
@@ -16,6 +17,7 @@ HEADERS += \
    $$PWD/ServerConfigDlg.h \
 
 SOURCES += \
+   $$PWD/CircularPixmap.cpp \
    $$PWD/CreateIssueDlg.cpp \
    $$PWD/CreatePullRequestDlg.cpp \
    $$PWD/IssueDetailedView.cpp \

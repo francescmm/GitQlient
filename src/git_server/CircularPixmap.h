@@ -23,23 +23,14 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QFrame>
+#include <QLabel>
 
-#include <Issue.h>
-
-class ButtonLink;
-class QLabel;
-
-class IssueItem : public QFrame
+class CircularPixmap : public QLabel
 {
-   Q_OBJECT
-
-signals:
-   void selected(const GitServer::Issue &issue);
-
 public:
-   IssueItem(const GitServer::Issue &issueData, QWidget *parent = nullptr);
+   explicit CircularPixmap(QWidget *parent = nullptr);
+   explicit CircularPixmap(const QString &filePath, QWidget *parent = nullptr);
 
-private:
-   GitServer::Issue mIssue;
+protected:
+   void paintEvent(QPaintEvent *e) override;
 };

@@ -7,6 +7,7 @@
 #include <GitConfig.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
+#include <CircularPixmap.h>
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -249,12 +250,11 @@ void IssueDetailedView::onCommentReceived(int issue, const QVector<GitServer::Co
          innerLayout->addSpacing(20);
          innerLayout->addWidget(body);
 
-         const auto fileName
-             = QString("%1/%2.png")
-                   .arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), comment.creator.name);
+         const auto fileName = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation),
+                                                    comment.creator.name);
 
-         const auto avatar = new QLabel();
-         avatar->setFixedSize(30, 30);
+         const auto avatar = new CircularPixmap();
+         avatar->setFixedSize(50, 50);
          avatar->setObjectName("Avatar");
          if (!QFile(fileName).exists())
          {
@@ -267,7 +267,7 @@ void IssueDetailedView::onCommentReceived(int issue, const QVector<GitServer::Co
          else
          {
             QPixmap img(fileName);
-            img = img.scaled(30, 30);
+            img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
             avatar->setPixmap(img);
          }
@@ -293,7 +293,7 @@ void IssueDetailedView::storeCreatorAvatar(QLabel *avatar, const QString &fileNa
    if (!dir.exists())
       dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
 
-   QString path = dir.absolutePath() + "/" + fileName + ".png";
+   QString path = dir.absolutePath() + "/" + fileName;
    QFile file(path);
    if (file.open(QIODevice::WriteOnly))
    {
@@ -301,7 +301,7 @@ void IssueDetailedView::storeCreatorAvatar(QLabel *avatar, const QString &fileNa
       file.close();
 
       QPixmap img(path);
-      img = img.scaled(25, 25);
+      img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
       avatar->setPixmap(img);
    }

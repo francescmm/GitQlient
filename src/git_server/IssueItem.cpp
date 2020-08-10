@@ -8,42 +8,14 @@
 #include <QUrl>
 #include <QGridLayout>
 #include <QDesktopServices>
-#include <QNetworkAccessManager>
-#include <QStandardPaths>
-#include <QNetworkRequest>
-#include <QNetworkReply>
 
 using namespace GitServer;
 
 IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    : QFrame(parent)
-   , mManager(new QNetworkAccessManager())
-   , mAvatar(new QLabel())
    , mIssue(issueData)
 {
    setObjectName("IssueItem");
-
-   /*
-   const auto fileName
-       = QString("%1/%2.png").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation),
-   issueData.creator.name);
-
-   if (!QFile(fileName).exists())
-   {
-      QNetworkRequest request;
-      request.setUrl(issueData.creator.avatar);
-      const auto reply = mManager->get(request);
-      connect(reply, &QNetworkReply::finished, this, [fileName = issueData.creator.name, this]() {
-   storeCreatorAvatar(fileName); });
-   }
-   else
-   {
-      QPixmap img(fileName);
-      img = img.scaled(25, 25);
-
-      mAvatar->setPixmap(img);
-   }
-   */
 
    const auto title = new ButtonLink(issueData.title);
    title->setWordWrap(false);
@@ -102,12 +74,11 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    labelsLayout->addWidget(milestone);
    labelsLayout->addStretch();
 
-   auto row = 0;
-   const auto layout = new QGridLayout(this);
+   const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(0, 10, 0, 10);
    layout->setSpacing(5);
-   layout->addLayout(titleLayout, row++, 1);
-   layout->addLayout(creationLayout, row++, 1);
+   layout->addLayout(titleLayout);
+   layout->addLayout(creationLayout);
 
    if (!issueData.assignees.isEmpty())
    {
@@ -130,35 +101,8 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
       }
       assigneeLayout->addStretch();
 
-      layout->addLayout(assigneeLayout, row++, 1);
+      layout->addLayout(assigneeLayout);
    }
 
-   layout->addLayout(labelsLayout, row++, 1);
-
-   layout->addWidget(mAvatar, 0, 0, row, 1);
-}
-
-void IssueItem::storeCreatorAvatar(const QString &fileName)
-{
-   const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto data = reply->readAll();
-
-   QDir dir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
-   if (!dir.exists())
-      dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
-
-   QString path = dir.absolutePath() + "/" + fileName + ".png";
-   QFile file(path);
-   if (file.open(QIODevice::WriteOnly))
-   {
-      file.write(data);
-      file.close();
-
-      QPixmap img(path);
-      img = img.scaled(25, 25);
-
-      mAvatar->setPixmap(img);
-   }
-
-   reply->deleteLater();
+   layout->addLayout(labelsLayout);
 }
