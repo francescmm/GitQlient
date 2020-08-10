@@ -138,7 +138,7 @@ void IssueDetailedView::loadData(const GitServer::Issue &issue)
 
    const auto days = mIssue.creation.daysTo(QDateTime::currentDateTime());
    const auto whenText = days <= 30 ? QString::fromUtf8(" %1 days ago").arg(days)
-                                    : QString(" on %1").arg(mIssue.creation.toString(Qt::SystemLocaleShortDate));
+                                    : QString(" on %1").arg(mIssue.creation.date().toString(Qt::SystemLocaleShortDate));
 
    const auto whenLabel = new QLabel(whenText);
    whenLabel->setToolTip(mIssue.creation.toString(Qt::SystemLocaleShortDate));
@@ -225,8 +225,9 @@ void IssueDetailedView::onCommentReceived(int issue, const QVector<GitServer::Co
          creationLayout->addWidget(creator);
 
          const auto days = comment.creation.daysTo(QDateTime::currentDateTime());
-         const auto whenText = days <= 30 ? QString::fromUtf8(" %1 days ago").arg(days)
-                                          : QString(" on %1").arg(comment.creation.toString(Qt::SystemLocaleShortDate));
+         const auto whenText = days <= 30
+             ? QString::fromUtf8(" %1 days ago").arg(days)
+             : QString(" on %1").arg(comment.creation.date().toString(Qt::SystemLocaleShortDate));
 
          const auto whenLabel = new QLabel(whenText);
          whenLabel->setToolTip(comment.creation.toString(Qt::SystemLocaleShortDate));

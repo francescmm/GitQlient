@@ -66,8 +66,11 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
 
    creationLayout->addWidget(creator);
 
-   const auto whenLabel
-       = new QLabel(QString::fromUtf8(" %2 days ago").arg(issueData.creation.daysTo(QDateTime::currentDateTime())));
+   const auto days = mIssue.creation.daysTo(QDateTime::currentDateTime());
+   const auto whenText = days <= 30 ? QString::fromUtf8(" %1 days ago").arg(days)
+                                    : QString(" on %1").arg(mIssue.creation.date().toString(Qt::SystemLocaleShortDate));
+
+   const auto whenLabel = new QLabel(whenText);
    whenLabel->setToolTip(issueData.creation.toString(Qt::SystemLocaleShortDate));
 
    creationLayout->addWidget(whenLabel);
