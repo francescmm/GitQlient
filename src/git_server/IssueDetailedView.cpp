@@ -34,6 +34,8 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, Config 
    else if (serverUrl.contains("gitlab"))
       mApi = new GitLabRestApi(userName, repoInfo.second, serverUrl, { userName, userToken, endpoint });
 
+   // connect(mApi, &IRestApi::commentReceived, this, &IssueDetailedView::onCommentReceived);
+
    const auto headerTitle = new QLabel(tr("Detailed View"));
    headerTitle->setObjectName("HeaderTitle");
 
@@ -59,10 +61,10 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, Config 
    issuesLayout->addWidget(footerFrame);
 
    const auto timer = new QTimer();
-   connect(timer, &QTimer::timeout, this, &IssueDetailedView::loadData);
+   // connect(timer, &QTimer::timeout, this, &IssueDetailedView::loadData);
    timer->start(300000);
 }
 
-void IssueDetailedView::loadData() { }
+void IssueDetailedView::loadData(int) { }
 
-void IssueDetailedView::onDataReceived() { }
+void IssueDetailedView::onCommentReceived() { }

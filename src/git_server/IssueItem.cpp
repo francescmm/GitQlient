@@ -61,7 +61,7 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    creationLayout->addWidget(new QLabel(tr("Created by ")));
    const auto creator = new ButtonLink(QString("<b>%1</b>").arg(issueData.creator.name));
    creator->setObjectName("CreatorLink");
-   connect(creator, &ButtonLink::clicked, [url = issueData.creator.url]() { QDesktopServices::openUrl(url); });
+   connect(creator, &ButtonLink::clicked, [this, id = issueData.number]() { emit selected(id); });
 
    creationLayout->addWidget(creator);
 

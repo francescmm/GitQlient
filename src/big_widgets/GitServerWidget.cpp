@@ -84,8 +84,13 @@ void GitServerWidget::createWidget()
    centralLayout->addLayout(buttonsLayout, 0, 0, 1, 2);
    centralLayout->addWidget(separator, 1, 0, 1, 2);
 
+   const auto detailedView = new IssueDetailedView(mGit, IssueDetailedView::Config::Issues);
+
    const auto issues = new IssuesWidget(mGit, IssuesWidget::Config::Issues);
+   connect(issues, &IssuesWidget::selected, detailedView, &IssueDetailedView::loadData);
+
    const auto pullRequests = new IssuesWidget(mGit, IssuesWidget::Config::PullRequests);
+   connect(pullRequests, &IssuesWidget::selected, detailedView, &IssueDetailedView::loadData);
 
    const auto issuesLayout = new QVBoxLayout();
    issuesLayout->setContentsMargins(QMargins());
@@ -94,7 +99,6 @@ void GitServerWidget::createWidget()
    issuesLayout->addWidget(issues);
    issuesLayout->addWidget(pullRequests);
 
-   const auto detailedView = new IssueDetailedView(mGit, IssueDetailedView::Config::Issues);
    const auto detailsLayout = new QVBoxLayout();
    detailsLayout->setContentsMargins(QMargins());
    detailsLayout->setSpacing(10);

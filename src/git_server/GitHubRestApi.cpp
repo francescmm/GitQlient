@@ -363,7 +363,7 @@ void GitHubRestApi::onIssuesReceived()
 
       for (const auto &issueData : issuesArray)
       {
-         Issue issue;
+         auto issue = url.url().endsWith("/pulls") ? PullRequest() : Issue();
          issue.number = issueData["number"].toInt();
          issue.title = issueData["title"].toString();
          issue.url = issueData["html_url"].toString();

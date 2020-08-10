@@ -40,6 +40,7 @@ class IssuesWidget : public QFrame
 {
    Q_OBJECT
 signals:
+   void selected(int id);
 
 public:
    enum class Config

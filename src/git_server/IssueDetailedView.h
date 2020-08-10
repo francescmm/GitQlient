@@ -48,7 +48,7 @@ public:
    };
    explicit IssueDetailedView(const QSharedPointer<GitBase> &git, Config config, QWidget *parent = nullptr);
 
-   void loadData();
+   void loadData(int issueId);
 
 private:
    QSharedPointer<GitBase> mGit;
@@ -58,5 +58,5 @@ private:
    QFrame *mIssueDetailedView = nullptr;
    QScrollArea *mScrollArea = nullptr;
 
-   void onDataReceived();
+   void onCommentReceived();
 };

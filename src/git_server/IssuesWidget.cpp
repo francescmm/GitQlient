@@ -106,7 +106,9 @@ void IssuesWidget::onIssuesReceived(const QVector<Issue> &issues)
 
    for (auto &issue : issues)
    {
-      issuesLayout->addWidget(new IssueItem(issue));
+      const auto issueItem = new IssueItem(issue);
+      connect(issueItem, &IssueItem::selected, this, &IssuesWidget::selected);
+      issuesLayout->addWidget(issueItem);
 
       if (count++ < totalIssues - 1)
       {

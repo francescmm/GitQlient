@@ -36,6 +36,11 @@ struct Issue;
 
 class IssueItem : public QFrame
 {
+   Q_OBJECT
+
+signals:
+   void selected(int id);
+
 public:
    IssueItem(const GitServer::Issue &issueData, QWidget *parent = nullptr);
 
