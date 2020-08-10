@@ -727,12 +727,6 @@ QDialog > QPushButton
    padding-top: 10px;
 }
 
-QPushButton
-{
-   max-height: 35px;
-   min-height: 35px;
-}
-
 QPushButton#NormalButton
 {
    max-width: 150px;
