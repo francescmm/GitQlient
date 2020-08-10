@@ -23,68 +23,18 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <Issue.h>
+#include <User.h>
 
-#include <QMap>
+#include <QDateTime>
 
 namespace GitServer
 {
-
-struct PullRequest : public Issue
+struct Comment
 {
-   struct Details
-   {
-   };
-
-   struct HeadState
-   {
-      enum class State
-      {
-         Failure,
-         Success,
-         Pending
-      };
-
-      struct Check
-      {
-         QString description;
-         QString state;
-         QString url;
-         QString name;
-      };
-
-      QString sha;
-      QString state;
-      State eState;
-      QVector<Check> checks;
-   };
-
-   QString head;
-   QString base;
-   bool isOpen = true;
-   bool maintainerCanModify = true;
-   bool draft = false;
-   int id = 0;
-   QString url;
-   Details details;
-   HeadState state;
-   QMap<int, Comment> reviews;
-
-   QJsonObject toJson() const
-   {
-      QJsonObject object;
-
-      object.insert("title", title);
-      object.insert("head", head);
-      object.insert("base", base);
-      object.insert("body", body.toStdString().c_str());
-      object.insert("maintainer_can_modify", maintainerCanModify);
-      object.insert("draft", draft);
-
-      return object;
-   }
-
-   bool isValid() const { return !title.isEmpty(); }
+   int id;
+   QString body;
+   User creator;
+   QDateTime creation;
+   QString association;
 };
-
 }

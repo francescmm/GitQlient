@@ -99,6 +99,13 @@ signals:
     */
    void errorOccurred(const QString &errorStr);
 
+   /**
+    * @brief commentsReceived Signal triggered when the comments for an issue has been received.
+    * @param issueNumber The issue number.
+    * @param comments The commentes.
+    */
+   void commentsReceived(int issueNumber, const QVector<Comment> &comments);
+
 public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
    virtual ~IRestApi() = default;
@@ -152,6 +159,13 @@ public:
     * @param data Byte array in JSON format with the necessary data to merge the pull request.
     */
    virtual void mergePullRequest(int number, const QByteArray &data) = 0;
+
+   /**
+    * @brief requestComments Requests all the comments of an issue. This doesn't get the reviews and coments on reviews
+    * for a pull request.
+    * @param issue The issue number to query.
+    */
+   virtual void requestComments(int issue) = 0;
 
 protected:
    QNetworkAccessManager *mManager = nullptr;

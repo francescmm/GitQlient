@@ -4,6 +4,8 @@
 
 #include <QLogger.h>
 
+#include <QTimer>
+
 using namespace QLogger;
 using namespace GitServer;
 
@@ -477,7 +479,7 @@ PullRequest RevisionsCache::getPullRequestStatus(const QString &sha)
 
 void RevisionsCache::refreshPRsCache()
 {
-   mApi->requestPullRequestsState();
+   QTimer::singleShot(1500, this, [this]() { mApi->requestPullRequestsState(); });
 }
 
 void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)

@@ -25,21 +25,18 @@
 
 #include <QFrame>
 
+#include <Issue.h>
+
 class ButtonLink;
 class QLabel;
 class QNetworkAccessManager;
-
-namespace GitServer
-{
-struct Issue;
-}
 
 class IssueItem : public QFrame
 {
    Q_OBJECT
 
 signals:
-   void selected(int id);
+   void selected(const GitServer::Issue &issue);
 
 public:
    IssueItem(const GitServer::Issue &issueData, QWidget *parent = nullptr);
@@ -47,6 +44,7 @@ public:
 private:
    QNetworkAccessManager *mManager;
    QLabel *mAvatar = nullptr;
+   GitServer::Issue mIssue;
 
    void storeCreatorAvatar(const QString &fileName);
 };

@@ -24,15 +24,21 @@
  ***************************************************************************************/
 
 #include <QFrame>
+#include <QMap>
+
+#include <Issue.h>
 
 class QVBoxLayout;
 class QScrollArea;
 class GitBase;
+class QNetworkAccessManager;
+class QLabel;
+class QHBoxLayout;
 
 namespace GitServer
 {
 class IRestApi;
-struct Issue;
+struct Comment;
 }
 
 class IssueDetailedView : public QFrame
@@ -48,15 +54,21 @@ public:
    };
    explicit IssueDetailedView(const QSharedPointer<GitBase> &git, Config config, QWidget *parent = nullptr);
 
-   void loadData(int issueId);
+   void loadData(const GitServer::Issue &issue);
 
 private:
+   GitServer::Issue mIssue;
+   bool mLoaded = false;
    QSharedPointer<GitBase> mGit;
    GitServer::IRestApi *mApi = nullptr;
    Config mConfig;
+   QNetworkAccessManager *mManager;
    QVBoxLayout *mIssuesLayout = nullptr;
+   QFrame *mIssuesFrame = nullptr;
    QFrame *mIssueDetailedView = nullptr;
+   QHBoxLayout *mIssueDetailedViewLayout = nullptr;
    QScrollArea *mScrollArea = nullptr;
 
-   void onCommentReceived();
+   void onCommentReceived(int issue, const QVector<GitServer::Comment> &comments);
+   void storeCreatorAvatar(QLabel *avatar, const QString &fileName);
 };

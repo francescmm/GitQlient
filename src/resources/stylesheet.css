@@ -769,7 +769,7 @@ IssuesWidget
 {
    min-height: 10px;
    max-height: 10px;
-   border-bootom: 1px solid #404142;
+   border-bottom: 1px solid #404142;
    border-bottom-right-radius: 10px;
    border-bottom-left-radius: 10px;
 }
@@ -801,6 +801,13 @@ IssuesWidget
    background-color: #2E2F30;
 }
 
+#IssueViewTitle
+{
+   padding: 0;
+   font-size: 18pt;
+   font-weight: bold;
+}
+
 ButtonLink#IssueTitle
 {
    padding: 0;
@@ -808,13 +815,25 @@ ButtonLink#IssueTitle
    font-weight: bold;
 }
 
-ButtonLink#CreatorLink
+#CreatorLink
 {
    padding: 0;
 }
 
-QLabel#IssueLabel
+#IssueLabel
 {
    padding-left: 5px;
 }
+
+#IssuesViewFrame
+{
+   background: #2E2F30;
+}
+
+#IssueIntro
+{
+   border-radius: 10px;
+   background: #404142;
+}
+
 

@@ -26,6 +26,7 @@
 #include <Milestone.h>
 #include <Label.h>
 #include <User.h>
+#include <Comment.h>
 
 #include <QJsonObject>
 #include <QJsonArray>
@@ -53,10 +54,11 @@ struct Issue
    QByteArray body;
    Milestone milestone;
    QVector<Label> labels;
-   GitServer::User creator;
-   QVector<GitServer::User> assignees;
+   User creator;
+   QVector<User> assignees;
    QString url;
    QDateTime creation;
+   QVector<Comment> comments;
 
    QJsonObject toJson() const
    {

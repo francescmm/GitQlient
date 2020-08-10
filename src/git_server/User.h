@@ -34,6 +34,7 @@ struct User
    QString name;
    QString avatar;
    QString url;
+   QString type;
 };
 
 }

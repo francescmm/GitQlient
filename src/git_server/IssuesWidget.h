@@ -40,7 +40,7 @@ class IssuesWidget : public QFrame
 {
    Q_OBJECT
 signals:
-   void selected(int id);
+   void selected(const GitServer::Issue &issue);
 
 public:
    enum class Config

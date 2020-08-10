@@ -122,10 +122,8 @@ void GitHubRestApi::requestPullRequests()
 
 void GitHubRestApi::requestPullRequestsState()
 {
-   QTimer::singleShot(1500, this, [this]() {
-      const auto reply = mManager->get(createRequest(mRepoEndpoint + "/pulls"));
-      connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::processPullRequets);
-   });
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + "/pulls"));
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::processPullRequets);
 }
 
 void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
@@ -133,6 +131,13 @@ void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
    const auto reply = mManager->put(createRequest(mRepoEndpoint + QString("/pulls/%1/merge").arg(number)), data);
 
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestMerged);
+}
+
+void GitHubRestApi::requestComments(int issue)
+{
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/issues/%1/comments").arg(issue)));
+
+   connect(reply, &QNetworkReply::finished, this, [this, issue]() { onCommentsReceived(issue); });
 }
 
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
@@ -366,12 +371,14 @@ void GitHubRestApi::onIssuesReceived()
          auto issue = url.url().endsWith("/pulls") ? PullRequest() : Issue();
          issue.number = issueData["number"].toInt();
          issue.title = issueData["title"].toString();
+         issue.body = issueData["body"].toString().toUtf8();
          issue.url = issueData["html_url"].toString();
          issue.creation = issueData["created_at"].toVariant().toDateTime();
 
-         issue.creator = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
-                           issueData["user"].toObject()["avatar_url"].toString(),
-                           issueData["user"].toObject()["html_url"].toString() };
+         issue.creator
+             = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
+                 issueData["user"].toObject()["avatar_url"].toString(),
+                 issueData["user"].toObject()["html_url"].toString(), issueData["user"].toObject()["type"].toString() };
 
          const auto labels = issueData["labels"].toArray();
 
@@ -409,5 +416,40 @@ void GitHubRestApi::onIssuesReceived()
 
       if (!issues.isEmpty())
          emit issuesReceived(issues);
+   }
+}
+
+void GitHubRestApi::onCommentsReceived(int issueNumber)
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto url = reply->url();
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
+
+   if (!tmpDoc.isEmpty())
+   {
+      QVector<Comment> comments;
+      const auto commentsArray = tmpDoc.array();
+
+      for (const auto &commentData : commentsArray)
+      {
+         Comment c;
+         c.id = commentData["id"].toInt();
+         c.body = commentData["body"].toString();
+         c.creation = commentData["created_at"].toVariant().toDateTime();
+         c.association = commentData["author_association"].toString();
+
+         GitServer::User sAssignee;
+         sAssignee.id = commentData["user"].toObject()["id"].toInt();
+         sAssignee.url = commentData["user"].toObject()["html_url"].toString();
+         sAssignee.name = commentData["user"].toObject()["login"].toString();
+         sAssignee.avatar = commentData["user"].toObject()["avatar_url"].toString();
+         sAssignee.type = commentData["user"].toObject()["type"].toString();
+
+         c.creator = sAssignee;
+         comments.append(std::move(c));
+      }
+
+      emit commentsReceived(issueNumber, comments);
    }
 }

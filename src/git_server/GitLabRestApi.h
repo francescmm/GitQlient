@@ -46,6 +46,7 @@ public:
    void requestPullRequests() override { }
    void requestPullRequestsState() override;
    void mergePullRequest(int, const QByteArray &) override { }
+   void requestComments(int) override { }
 
    QString getUserId() const { return mUserId; }
 

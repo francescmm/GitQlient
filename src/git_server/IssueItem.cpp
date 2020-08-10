@@ -19,6 +19,7 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    : QFrame(parent)
    , mManager(new QNetworkAccessManager())
    , mAvatar(new QLabel())
+   , mIssue(issueData)
 {
    setObjectName("IssueItem");
 
@@ -40,14 +41,14 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
       QPixmap img(fileName);
       img = img.scaled(25, 25);
 
-      mCreator->setPixmap(img);
+      mAvatar->setPixmap(img);
    }
    */
 
    const auto title = new ButtonLink(issueData.title);
    title->setWordWrap(false);
    title->setObjectName("IssueTitle");
-   connect(title, &ButtonLink::clicked, [url = issueData.url]() { QDesktopServices::openUrl(QUrl(url)); });
+   connect(title, &ButtonLink::clicked, [this]() { emit selected(mIssue); });
 
    const auto titleLayout = new QHBoxLayout();
    titleLayout->setContentsMargins(QMargins());
@@ -61,16 +62,16 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    creationLayout->addWidget(new QLabel(tr("Created by ")));
    const auto creator = new ButtonLink(QString("<b>%1</b>").arg(issueData.creator.name));
    creator->setObjectName("CreatorLink");
-   connect(creator, &ButtonLink::clicked, [this, id = issueData.number]() { emit selected(id); });
+   connect(creator, &ButtonLink::clicked, [this]() { QDesktopServices::openUrl(mIssue.url); });
 
    creationLayout->addWidget(creator);
 
    const auto whenLabel
        = new QLabel(QString::fromUtf8(" %2 days ago").arg(issueData.creation.daysTo(QDateTime::currentDateTime())));
+   whenLabel->setToolTip(issueData.creation.toString(Qt::SystemLocaleShortDate));
+
    creationLayout->addWidget(whenLabel);
    creationLayout->addStretch();
-
-   whenLabel->setToolTip(issueData.creation.toString(Qt::SystemLocaleShortDate));
 
    const auto labelsLayout = new QHBoxLayout();
    labelsLayout->setContentsMargins(QMargins());
