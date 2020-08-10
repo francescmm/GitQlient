@@ -27,9 +27,6 @@
 
 class RevisionsCache;
 class GitBase;
-class QPushButton;
-class QToolButton;
-class QVBoxLayout;
 
 namespace GitServer
 {
@@ -63,9 +60,6 @@ public:
 private:
    QSharedPointer<RevisionsCache> mCache;
    QSharedPointer<GitBase> mGit;
-   QToolButton *mSplitView = nullptr;
-   QToolButton *mUnifiedView = nullptr;
-   QPushButton *mNewPr = nullptr;
    GitServer::IRestApi *mApi = nullptr;
    bool mConfigured = false;
 
@@ -73,16 +67,6 @@ private:
     * @brief createWidget Creates all the contents of the GitServerWidget.
     */
    void createWidget();
-
-   /**
-    * @brief showUnifiedView Shows the unified view.
-    */
-   void showUnifiedView();
-
-   /**
-    * @brief showSplitView Shows the split view.
-    */
-   void showSplitView();
 
    /**
     * @brief createNewIssue Shows the dialog to create a new issue on the server.

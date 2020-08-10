@@ -56,44 +56,23 @@ bool GitServerWidget::configure()
 
 void GitServerWidget::createWidget()
 {
-   GitQlientSettings settings;
-   const auto isUnified = settings.localValue(mGit->getGitQlientSettingsDir(), "GitUnifiedServerView", true).toBool();
-
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto prLabel = gitConfig->getServerUrl().contains("github") ? "pull request" : "merge request";
-
-   mUnifiedView = new QToolButton();
-   mUnifiedView->setIcon(QIcon(":/icons/unified_view"));
-   mUnifiedView->setIconSize({ 30, 30 });
-   mUnifiedView->setObjectName("IconButton");
-   mUnifiedView->setCheckable(true);
-   mUnifiedView->setChecked(isUnified);
-   connect(mUnifiedView, &QPushButton::clicked, this, &GitServerWidget::showUnifiedView);
-
-   mSplitView = new QToolButton();
-   mSplitView->setIcon(QIcon(":/icons/split_view"));
-   mSplitView->setIconSize({ 30, 30 });
-   mSplitView->setCheckable(true);
-   mSplitView->setChecked(!isUnified);
-   mSplitView->setObjectName("IconButton");
-   connect(mSplitView, &QPushButton::clicked, this, &GitServerWidget::showSplitView);
 
    const auto newIssue = new QPushButton(tr("New issue"));
    newIssue->setObjectName("NormalButton");
    connect(newIssue, &QPushButton::clicked, this, &GitServerWidget::createNewIssue);
 
-   mNewPr = new QPushButton(tr("New %1").arg(QString::fromUtf8(prLabel)));
-   mNewPr->setObjectName("NormalButton");
-   connect(mNewPr, &QPushButton::clicked, this, &GitServerWidget::createNewPullRequest);
+   const auto newPr = new QPushButton(tr("New %1").arg(QString::fromUtf8(prLabel)));
+   newPr->setObjectName("NormalButton");
+   connect(newPr, &QPushButton::clicked, this, &GitServerWidget::createNewPullRequest);
 
    const auto buttonsLayout = new QHBoxLayout();
    buttonsLayout->setContentsMargins(QMargins());
    buttonsLayout->setSpacing(10);
-   buttonsLayout->addWidget(mUnifiedView);
-   buttonsLayout->addWidget(mSplitView);
    buttonsLayout->addStretch();
    buttonsLayout->addWidget(newIssue);
-   buttonsLayout->addWidget(mNewPr);
+   buttonsLayout->addWidget(newPr);
 
    const auto separator = new QFrame();
    separator->setObjectName("orangeHSeparator");
@@ -140,26 +119,6 @@ void GitServerWidget::createWidget()
 
    delete layout();
    setLayout(mainLayout);
-}
-
-void GitServerWidget::showUnifiedView()
-{
-   mSplitView->blockSignals(true);
-   mSplitView->setChecked(false);
-   mSplitView->blockSignals(false);
-   mUnifiedView->blockSignals(true);
-   mUnifiedView->setChecked(true);
-   mUnifiedView->blockSignals(false);
-}
-
-void GitServerWidget::showSplitView()
-{
-   mSplitView->blockSignals(true);
-   mSplitView->setChecked(true);
-   mSplitView->blockSignals(false);
-   mUnifiedView->blockSignals(true);
-   mUnifiedView->setChecked(false);
-   mUnifiedView->blockSignals(false);
 }
 
 void GitServerWidget::createNewIssue()
