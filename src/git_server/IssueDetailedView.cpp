@@ -20,6 +20,7 @@
 #include <QFile>
 #include <QDir>
 #include <QNetworkAccessManager>
+#include <QTextEdit>
 
 using namespace GitServer;
 
@@ -130,7 +131,6 @@ void IssueDetailedView::loadData(const GitServer::Issue &issue)
    titleLayout->setContentsMargins(QMargins());
    titleLayout->setSpacing(0);
    titleLayout->addWidget(title);
-   titleLayout->addStretch();
 
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
@@ -142,11 +142,12 @@ void IssueDetailedView::loadData(const GitServer::Issue &issue)
    creationLayout->addWidget(creator);
 
    const auto days = mIssue.creation.daysTo(QDateTime::currentDateTime());
-   const auto whenText = days <= 30 ? QString::fromUtf8(" %1 days ago").arg(days)
-                                    : QString(" on %1").arg(mIssue.creation.date().toString(Qt::SystemLocaleShortDate));
+   const auto whenText = days <= 30
+       ? QString::fromUtf8(" %1 days ago").arg(days)
+       : QString(" on %1").arg(mIssue.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    const auto whenLabel = new QLabel(whenText);
-   whenLabel->setToolTip(mIssue.creation.toString(Qt::SystemLocaleShortDate));
+   whenLabel->setToolTip(mIssue.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    creationLayout->addWidget(whenLabel);
    creationLayout->addStretch();
@@ -166,7 +167,6 @@ void IssueDetailedView::loadData(const GitServer::Issue &issue)
          if (count++ < totalAssignees - 1)
             creationLayout->addWidget(new QLabel(", "));
       }
-      creationLayout->addStretch();
    }
 
    const auto labelsLayout = new QHBoxLayout();
@@ -205,7 +205,14 @@ void IssueDetailedView::loadData(const GitServer::Issue &issue)
    layout->addLayout(labelsLayout);
    layout->addSpacing(20);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+   const auto textEdit = new QTextEdit();
+   textEdit->setMarkdown(mIssue.body);
+   const auto body = new QLabel(textEdit->toHtml());
+   delete textEdit;
+#else
    const auto body = new QLabel(mIssue.body);
+#endif
    body->setWordWrap(true);
    layout->addWidget(body);
 
@@ -232,16 +239,23 @@ void IssueDetailedView::onCommentReceived(int issue, const QVector<GitServer::Co
          const auto days = comment.creation.daysTo(QDateTime::currentDateTime());
          const auto whenText = days <= 30
              ? QString::fromUtf8(" %1 days ago").arg(days)
-             : QString(" on %1").arg(comment.creation.date().toString(Qt::SystemLocaleShortDate));
+             : QString(" on %1").arg(comment.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
          const auto whenLabel = new QLabel(whenText);
-         whenLabel->setToolTip(comment.creation.toString(Qt::SystemLocaleShortDate));
+         whenLabel->setToolTip(comment.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
          creationLayout->addWidget(whenLabel);
          creationLayout->addStretch();
          creationLayout->addWidget(new QLabel(comment.association));
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+         const auto textEdit = new QTextEdit();
+         textEdit->setMarkdown(comment.body);
+         const auto body = new QLabel(textEdit->toHtml());
+         delete textEdit;
+#else
          const auto body = new QLabel(comment.body);
+#endif
          body->setWordWrap(true);
 
          const auto frame = new QFrame();

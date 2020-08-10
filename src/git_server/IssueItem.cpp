@@ -8,6 +8,7 @@
 #include <QUrl>
 #include <QGridLayout>
 #include <QDesktopServices>
+#include <QLocale>
 
 using namespace GitServer;
 
@@ -39,11 +40,12 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    creationLayout->addWidget(creator);
 
    const auto days = mIssue.creation.daysTo(QDateTime::currentDateTime());
-   const auto whenText = days <= 30 ? QString::fromUtf8(" %1 days ago").arg(days)
-                                    : QString(" on %1").arg(mIssue.creation.date().toString(Qt::SystemLocaleShortDate));
+   const auto whenText = days <= 30
+       ? QString::fromUtf8(" %1 days ago").arg(days)
+       : QString(" on %1").arg(mIssue.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    const auto whenLabel = new QLabel(whenText);
-   whenLabel->setToolTip(issueData.creation.toString(Qt::SystemLocaleShortDate));
+   whenLabel->setToolTip(issueData.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    creationLayout->addWidget(whenLabel);
    creationLayout->addStretch();
