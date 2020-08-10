@@ -45,8 +45,7 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    */
 
    const auto title = new ButtonLink(issueData.title);
-   title->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-   title->setWordWrap(true);
+   title->setWordWrap(false);
    title->setObjectName("IssueTitle");
    connect(title, &ButtonLink::clicked, [url = issueData.url]() { QDesktopServices::openUrl(QUrl(url)); });
 
