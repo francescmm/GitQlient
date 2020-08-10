@@ -46,7 +46,6 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, Config 
    headerLayout->addStretch();
 
    mIssuesLayout = new QVBoxLayout();
-   mIssuesLayout->addStretch();
 
    const auto footerFrame = new QFrame();
    footerFrame->setObjectName("IssuesFooterFrame");

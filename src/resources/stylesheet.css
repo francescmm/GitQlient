@@ -757,6 +757,8 @@ QScrollArea
 
 #IssuesHeaderFrame
 {
+   max-height: 27px;
+   min-height: 27px;
    padding: 10px;
    border-top: 1px solid #404142;
    border-top-right-radius: 10px;

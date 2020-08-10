@@ -79,8 +79,7 @@ void GitServerWidget::createWidget()
    connect(mSplitView, &QPushButton::clicked, this, &GitServerWidget::showSplitView);
 
    const auto newIssue = new QPushButton(tr("New issue"));
-   mNewPr->setObjectName("NormalButton");
-   newIssue->setObjectName("ButtonIssuesHeaderFrame");
+   newIssue->setObjectName("NormalButton");
    connect(newIssue, &QPushButton::clicked, this, &GitServerWidget::createNewIssue);
 
    mNewPr = new QPushButton(tr("New %1").arg(QString::fromUtf8(prLabel)));
@@ -93,6 +92,7 @@ void GitServerWidget::createWidget()
    buttonsLayout->addWidget(mUnifiedView);
    buttonsLayout->addWidget(mSplitView);
    buttonsLayout->addStretch();
+   buttonsLayout->addWidget(newIssue);
    buttonsLayout->addWidget(mNewPr);
 
    const auto separator = new QFrame();
@@ -107,11 +107,25 @@ void GitServerWidget::createWidget()
 
    const auto issues = new IssuesWidget(mGit, IssuesWidget::Config::Issues);
    const auto pullRequests = new IssuesWidget(mGit, IssuesWidget::Config::PullRequests);
-   const auto detailedView = new IssueDetailedView(mGit, IssueDetailedView::Config::Issues);
 
-   centralLayout->addWidget(issues, 2, 0);
-   centralLayout->addWidget(pullRequests, 3, 0);
-   centralLayout->addWidget(detailedView, 2, 1, 2, 1);
+   const auto issuesLayout = new QVBoxLayout();
+   issuesLayout->setContentsMargins(QMargins());
+   issuesLayout->setSpacing(10);
+   issuesLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+   issuesLayout->addWidget(issues);
+   issuesLayout->addWidget(pullRequests);
+   // issuesLayout->addStretch();
+
+   const auto detailedView = new IssueDetailedView(mGit, IssueDetailedView::Config::Issues);
+   const auto detailsLayout = new QVBoxLayout();
+   detailsLayout->setContentsMargins(QMargins());
+   detailsLayout->setSpacing(10);
+   detailsLayout->setAlignment(Qt::AlignTop);
+   detailsLayout->addWidget(detailedView);
+   detailsLayout->addStretch();
+
+   centralLayout->addLayout(issuesLayout, 2, 0);
+   centralLayout->addLayout(detailsLayout, 2, 1);
 
    issues->loadData();
    pullRequests->loadData();

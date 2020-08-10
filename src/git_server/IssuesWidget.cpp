@@ -7,6 +7,7 @@
 #include <GitConfig.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
+#include <ClickableFrame.h>
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -20,6 +21,7 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QW
    : QFrame(parent)
    , mGit(git)
    , mConfig(config)
+   , mArrow(new QLabel())
 {
    GitQlientSettings settings;
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
@@ -37,14 +39,18 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QW
    const auto headerTitle = new QLabel(mConfig == Config::Issues ? tr("Issues") : tr("Pull Requests"));
    headerTitle->setObjectName("HeaderTitle");
 
-   const auto headerFrame = new QFrame();
+   const auto headerFrame = new ClickableFrame();
    headerFrame->setObjectName("IssuesHeaderFrame");
+   connect(headerFrame, &ClickableFrame::clicked, this, &IssuesWidget::onHeaderClicked);
+
+   mArrow->setPixmap(QIcon(":/icons/arrow_up").pixmap(QSize(15, 15)));
+
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
    headerLayout->setSpacing(0);
    headerLayout->addWidget(headerTitle);
    headerLayout->addStretch();
-   // headerLayout->addWidget(newIssue);
+   headerLayout->addWidget(mArrow);
 
    mIssuesLayout = new QVBoxLayout();
 
@@ -54,6 +60,7 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QW
    const auto issuesLayout = new QVBoxLayout(this);
    issuesLayout->setContentsMargins(QMargins());
    issuesLayout->setSpacing(0);
+   issuesLayout->setAlignment(Qt::AlignTop);
    issuesLayout->addWidget(headerFrame);
    issuesLayout->addLayout(mIssuesLayout);
    issuesLayout->addWidget(footerFrame);
@@ -107,5 +114,33 @@ void IssuesWidget::onIssuesReceived(const QVector<Issue> &issues)
          separator->setObjectName("orangeHSeparator");
          issuesLayout->addWidget(separator);
       }
+   }
+
+   const auto icon = QIcon(mScrollArea->isVisible() ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+   mArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+
+   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+}
+
+void IssuesWidget::onHeaderClicked()
+{
+   if (mScrollArea)
+   {
+      const auto issuesVisible = mScrollArea->isVisible();
+
+      mScrollArea->setWidgetResizable(issuesVisible);
+
+      const auto icon = QIcon(issuesVisible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+      mArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+      mScrollArea->setVisible(!issuesVisible);
+      /*
+      GitQlientSettings settings;
+      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "TagsHeader", !tagsAreVisible);
+      */
+
+      if (issuesVisible)
+         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+      else
+         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
    }
 }

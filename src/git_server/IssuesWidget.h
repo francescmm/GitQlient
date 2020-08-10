@@ -28,6 +28,7 @@
 class QVBoxLayout;
 class QScrollArea;
 class GitBase;
+class QLabel;
 
 namespace GitServer
 {
@@ -57,6 +58,8 @@ private:
    QVBoxLayout *mIssuesLayout = nullptr;
    QFrame *mIssuesWidget = nullptr;
    QScrollArea *mScrollArea = nullptr;
+   QLabel *mArrow = nullptr;
 
    void onIssuesReceived(const QVector<GitServer::Issue> &issues);
+   void onHeaderClicked();
 };
