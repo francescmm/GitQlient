@@ -58,6 +58,5 @@ private:
    QFrame *mIssuesWidget = nullptr;
    QScrollArea *mScrollArea = nullptr;
 
-   void createNewIssue();
    void onIssuesReceived(const QVector<GitServer::Issue> &issues);
 };

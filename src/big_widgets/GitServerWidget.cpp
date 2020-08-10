@@ -78,6 +78,11 @@ void GitServerWidget::createWidget()
    mSplitView->setObjectName("IconButton");
    connect(mSplitView, &QPushButton::clicked, this, &GitServerWidget::showSplitView);
 
+   const auto newIssue = new QPushButton(tr("New issue"));
+   mNewPr->setObjectName("NormalButton");
+   newIssue->setObjectName("ButtonIssuesHeaderFrame");
+   connect(newIssue, &QPushButton::clicked, this, &GitServerWidget::createNewIssue);
+
    mNewPr = new QPushButton(tr("New %1").arg(QString::fromUtf8(prLabel)));
    mNewPr->setObjectName("NormalButton");
    connect(mNewPr, &QPushButton::clicked, this, &GitServerWidget::createNewPullRequest);
@@ -141,6 +146,12 @@ void GitServerWidget::showSplitView()
    mUnifiedView->blockSignals(true);
    mUnifiedView->setChecked(false);
    mUnifiedView->blockSignals(false);
+}
+
+void GitServerWidget::createNewIssue()
+{
+   const auto createIssue = new CreateIssueDlg(mGit, this);
+   createIssue->exec();
 }
 
 void GitServerWidget::createNewPullRequest()

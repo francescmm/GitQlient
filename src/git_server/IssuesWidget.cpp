@@ -37,10 +37,6 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QW
    const auto headerTitle = new QLabel(mConfig == Config::Issues ? tr("Issues") : tr("Pull Requests"));
    headerTitle->setObjectName("HeaderTitle");
 
-   const auto newIssue = new QPushButton(tr("New issue"));
-   newIssue->setObjectName("ButtonIssuesHeaderFrame");
-   connect(newIssue, &QPushButton::clicked, this, &IssuesWidget::createNewIssue);
-
    const auto headerFrame = new QFrame();
    headerFrame->setObjectName("IssuesHeaderFrame");
    const auto headerLayout = new QHBoxLayout(headerFrame);
@@ -48,7 +44,7 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QW
    headerLayout->setSpacing(0);
    headerLayout->addWidget(headerTitle);
    headerLayout->addStretch();
-   headerLayout->addWidget(newIssue);
+   // headerLayout->addWidget(newIssue);
 
    mIssuesLayout = new QVBoxLayout();
 
@@ -75,12 +71,6 @@ void IssuesWidget::loadData()
       mApi->requestIssues();
    else
       mApi->requestPullRequests();
-}
-
-void IssuesWidget::createNewIssue()
-{
-   const auto createIssue = new CreateIssueDlg(mGit, this);
-   createIssue->exec();
 }
 
 void IssuesWidget::onIssuesReceived(const QVector<Issue> &issues)
