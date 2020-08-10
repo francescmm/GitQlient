@@ -47,6 +47,9 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, Config 
    const auto headerTitle = new QLabel(tr("Detailed View"));
    headerTitle->setObjectName("HeaderTitle");
 
+   const auto addComment = new QPushButton();
+   addComment->setIcon(QIcon(":/icons/comment"));
+
    const auto headerFrame = new QFrame();
    headerFrame->setObjectName("IssuesHeaderFrame");
    const auto headerLayout = new QHBoxLayout(headerFrame);
@@ -54,6 +57,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, Config 
    headerLayout->setSpacing(0);
    headerLayout->addWidget(headerTitle);
    headerLayout->addStretch();
+   headerLayout->addWidget(addComment);
 
    mIssueDetailedView = new QFrame();
 

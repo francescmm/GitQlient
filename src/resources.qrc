@@ -82,6 +82,7 @@
         <file alias="arrow_right">resources/icons/arrow_right.svg</file>
         <file alias="unified_view">resources/icons/unified_view.svg</file>
         <file alias="pull_request">resources/icons/pull_request.svg</file>
+        <file alias="comment">resources/icons/comment.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>
