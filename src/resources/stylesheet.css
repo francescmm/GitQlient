@@ -739,6 +739,12 @@ QScrollArea
    background: transparent;
 }
 
+IssuesWidget
+{
+   max-width: 500px;
+   min-width: 500px;
+}
+
 #IssuesHeaderFrame
 {
    background-color: #202122;

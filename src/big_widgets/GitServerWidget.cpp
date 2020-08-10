@@ -93,7 +93,6 @@ void GitServerWidget::createWidget()
    issuesLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
    issuesLayout->addWidget(issues);
    issuesLayout->addWidget(pullRequests);
-   // issuesLayout->addStretch();
 
    const auto detailedView = new IssueDetailedView(mGit, IssueDetailedView::Config::Issues);
    const auto detailsLayout = new QVBoxLayout();
@@ -101,7 +100,6 @@ void GitServerWidget::createWidget()
    detailsLayout->setSpacing(10);
    detailsLayout->setAlignment(Qt::AlignTop);
    detailsLayout->addWidget(detailedView);
-   detailsLayout->addStretch();
 
    centralLayout->addLayout(issuesLayout, 2, 0);
    centralLayout->addLayout(detailsLayout, 2, 1);
@@ -111,7 +109,7 @@ void GitServerWidget::createWidget()
 
    const auto mainLayout = new QGridLayout();
    mainLayout->setColumnStretch(0, 1);
-   mainLayout->setColumnStretch(1, 3);
+   mainLayout->setColumnStretch(1, 5);
    mainLayout->setColumnStretch(2, 1);
    mainLayout->setContentsMargins(QMargins());
    mainLayout->setSpacing(0);
