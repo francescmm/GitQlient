@@ -28,9 +28,12 @@
 class CircularPixmap : public QLabel
 {
 public:
-   explicit CircularPixmap(QWidget *parent = nullptr);
+   explicit CircularPixmap(const QSize &size, QWidget *parent = nullptr);
    explicit CircularPixmap(const QString &filePath, QWidget *parent = nullptr);
 
 protected:
    void paintEvent(QPaintEvent *e) override;
+
+private:
+   QSize mSize;
 };

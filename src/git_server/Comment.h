@@ -33,8 +33,8 @@ struct Diff
 {
    QString diff;
    QString file;
-   int position;
-   int originalPosition;
+   int line;
+   int originalLine;
 };
 
 struct Comment
@@ -65,9 +65,9 @@ struct Review : public Comment
    QString state;
 };
 
-struct ReviewComment : public Comment
+struct CodeReview : public Comment
 {
-   ReviewComment() = default;
+   CodeReview() = default;
 
    Diff diff;
    int replyToId;

@@ -3,37 +3,41 @@
 #include <QPainter>
 #include <QPainterPath>
 
-CircularPixmap::CircularPixmap(QWidget *parent)
+CircularPixmap::CircularPixmap(const QSize &size, QWidget *parent)
    : QLabel(parent)
+   , mSize(size)
 {
 }
 
 CircularPixmap::CircularPixmap(const QString &filePath, QWidget *parent)
    : QLabel(parent)
+   , mSize(50, 50)
 {
    QPixmap px(filePath);
-   px = px.scaled(50, 50);
+   px = px.scaled(mSize.width(), mSize.height());
 
    setPixmap(filePath);
-   setFixedSize(50, 50);
+   setFixedSize(mSize);
 }
-
-void CircularPixmap::paintEvent(QPaintEvent *)
+#include <QPaintEvent>
+void CircularPixmap::paintEvent(QPaintEvent *e)
 {
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
    if (pixmap())
 #endif
    {
+      const auto rect = e->rect();
+      const auto startX = (rect.width() - mSize.width()) / 2;
       QPainter painter(this);
       painter.setRenderHint(QPainter::Antialiasing);
 
       QPainterPath path;
-      path.addEllipse(0, 0, 50, 50);
+      path.addEllipse(startX, 0, mSize.width(), mSize.height());
       painter.setClipPath(path);
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-      painter.drawPixmap(0, 0, 50, 50, *pixmap());
+      painter.drawPixmap(0, 0, mSize.width(), mSize.height(), *pixmap());
 #else
-      painter.drawPixmap(0, 0, 50, 50, pixmap(Qt::ReturnByValue));
+      painter.drawPixmap(startX, 0, mSize.width(), mSize.height(), pixmap(Qt::ReturnByValue));
 #endif
    }
 }

@@ -830,4 +830,9 @@ ButtonLink#IssueTitle
    background: #404142;
 }
 
+#CodeReviewComment
+{
+   border-radius: 10px;
+   background-color: #505152;
+}
 

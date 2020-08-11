@@ -482,7 +482,9 @@ void GitHubRestApi::onReviewsReceived(PullRequest pr)
          Review r;
          r.id = id;
          r.body = commentData["body"].toString();
-         r.creation = commentData["created_at"].toVariant().toDateTime();
+         r.creation = commentData["submitted_at"].toVariant().toDateTime();
+         r.state = commentData["state"].toString();
+         r.association = commentData["author_association"].toString();
 
          GitServer::User sAssignee;
          sAssignee.id = commentData["user"].toObject()["id"].toInt();
@@ -517,20 +519,20 @@ void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
 
    if (!tmpDoc.isEmpty())
    {
-      QVector<ReviewComment> comments;
+      QVector<CodeReview> comments;
       const auto commentsArray = tmpDoc.array();
 
       for (const auto &commentData : commentsArray)
       {
-         ReviewComment c;
+         CodeReview c;
          c.id = commentData["id"].toInt();
          c.body = commentData["body"].toString();
          c.creation = commentData["created_at"].toVariant().toDateTime();
          c.association = commentData["author_association"].toString();
          c.diff.diff = commentData["diff_hunk"].toString();
          c.diff.file = commentData["path"].toString();
-         c.diff.position = commentData["position"].toInt();
-         c.diff.originalPosition = commentData["original_position"].toInt();
+         c.diff.line = commentData["line"].toInt();
+         c.diff.originalLine = commentData["original_line"].toInt();
          c.reviewId = commentData["pull_request_review_id"].toInt();
          c.replyToId = commentData["in_reply_to_id"].toInt();
 

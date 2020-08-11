@@ -80,7 +80,7 @@ struct PullRequest : public Issue
    QString url;
    HeadState state;
    QMap<int, Review> reviews;
-   QVector<ReviewComment> reviewComment;
+   QVector<CodeReview> reviewComment;
 
    QJsonObject toJson() const
    {

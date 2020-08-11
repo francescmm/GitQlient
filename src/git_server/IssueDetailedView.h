@@ -77,6 +77,6 @@ private:
    void processReviews(const GitServer::PullRequest &pr);
 
    QHBoxLayout *createBubbleForComment(const GitServer::Comment &comment);
-   QHBoxLayout *createBubbleForReview(const GitServer::Review &review,
-                                      const QVector<GitServer::ReviewComment> &comments);
+   QHBoxLayout *createBubbleForReview(const GitServer::Review &review, QVector<GitServer::CodeReview> &codeReviews);
+   QLayout *createBubbleForCodeReview(const QVector<GitServer::CodeReview> &reviews);
 };
