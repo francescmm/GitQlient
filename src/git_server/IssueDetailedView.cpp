@@ -368,15 +368,37 @@ QHBoxLayout *IssueDetailedView::createBubbleForReview(const Review &review, QVec
       }
    }
 
-   if (reviews.isEmpty())
+   if (reviews.isEmpty() && review.state == QString::fromUtf8("COMMENTED"))
       return nullptr;
 
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
    creationLayout->setSpacing(0);
 
-   const auto header
-       = QString("<b>%1</b> (%2) started a review ").arg(review.creator.name, review.association.toLower());
+   const auto frame = new QFrame();
+   auto fullBubble = false;
+   QString header;
+
+   if (review.state == QString::fromUtf8("COMMENTED"))
+   {
+      frame->setObjectName("IssueIntro");
+
+      header = QString("<b>%1</b> (%2) started a review ").arg(review.creator.name, review.association.toLower());
+      fullBubble = true;
+   }
+   else if (review.state == QString::fromUtf8("CHANGES_REQUESTED"))
+   {
+      frame->setObjectName("IssueIntroChangesRequested");
+
+      header = QString("<b>%1</b> (%2) requested changes ").arg(review.creator.name, review.association.toLower());
+   }
+   else if (review.state == QString::fromUtf8("APPROVED"))
+   {
+      frame->setObjectName("IssueIntroApproved");
+
+      header = QString("<b>%1</b> (%2) approved the PR ").arg(review.creator.name, review.association.toLower());
+   }
+
    const auto days = review.creation.daysTo(QDateTime::currentDateTime());
    const auto whenText = days <= 30
        ? days != 0 ? QString::fromUtf8(" %1 days ago").arg(days) : QString::fromUtf8(" today")
@@ -388,28 +410,29 @@ QHBoxLayout *IssueDetailedView::createBubbleForReview(const Review &review, QVec
    creationLayout->addWidget(whenLabel);
    creationLayout->addStretch();
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-   const auto textEdit = new QTextEdit();
-   textEdit->setMarkdown(review.body);
-   const auto body = new QLabel(textEdit->toHtml());
-   delete textEdit;
-#else
-   const auto body = new QLabel(review.body);
-#endif
-   body->setWordWrap(true);
-
-   const auto frame = new QFrame();
-   frame->setObjectName("IssueIntro");
-
    const auto innerLayout = new QVBoxLayout(frame);
    innerLayout->setContentsMargins(10, 10, 10, 10);
    innerLayout->setSpacing(20);
    innerLayout->addLayout(creationLayout);
    innerLayout->addSpacing(20);
-   innerLayout->addWidget(body);
 
-   if (const auto layouts = createBubbleForCodeReview(reviews); layouts)
-      innerLayout->addLayout(layouts);
+   if (fullBubble)
+   {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+      const auto textEdit = new QTextEdit();
+      textEdit->setMarkdown(review.body);
+      const auto body = new QLabel(textEdit->toHtml());
+      delete textEdit;
+#else
+      const auto body = new QLabel(review.body);
+#endif
+      body->setWordWrap(true);
+
+      innerLayout->addWidget(body);
+
+      if (const auto layouts = createBubbleForCodeReview(reviews); layouts)
+         innerLayout->addLayout(layouts);
+   }
 
    const auto fileName
        = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), review.creator.name);

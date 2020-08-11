@@ -830,6 +830,18 @@ ButtonLink#IssueTitle
    background: #404142;
 }
 
+#IssueIntroApproved
+{
+   border-radius: 10px;
+   background: #729943;
+}
+
+#IssueIntroChangesRequested
+{
+   border-radius: 10px;
+   background: #D89000;
+}
+
 #CodeReviewComment
 {
    border-radius: 10px;
