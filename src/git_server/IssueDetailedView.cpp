@@ -24,10 +24,9 @@
 
 using namespace GitServer;
 
-IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, Config config, QWidget *parent)
+IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
-   , mConfig(config)
    , mManager(new QNetworkAccessManager())
 {
    GitQlientSettings settings;
@@ -44,6 +43,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, Config 
       mApi = new GitLabRestApi(userName, repoInfo.second, serverUrl, { userName, userToken, endpoint });
 
    connect(mApi, &IRestApi::commentsReceived, this, &IssueDetailedView::onCommentReceived);
+   connect(mApi, &IRestApi::reviewsReceived, this, &IssueDetailedView::onReviewsReceived);
 
    const auto headerTitle = new QLabel(tr("Detailed View"));
    headerTitle->setObjectName("HeaderTitle");
@@ -95,8 +95,10 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, Config 
    timer->start(300000);
 }
 
-void IssueDetailedView::loadData(const GitServer::Issue &issue)
+void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
 {
+   mConfig = config;
+
    if (mLoaded && mIssue.number == issue.number)
       return;
 
@@ -250,80 +252,192 @@ void IssueDetailedView::onCommentReceived(const Issue &issue)
 {
    if (issue.number == mIssue.number)
    {
-      for (auto &comment : issue.comments)
-      {
-         const auto creationLayout = new QHBoxLayout();
-         creationLayout->setContentsMargins(QMargins());
-         creationLayout->setSpacing(0);
-         creationLayout->addWidget(new QLabel(tr("Comment by ")));
+      if (mConfig == Config::PullRequests)
+         mApi->requestReviews(PullRequest(issue));
+      else
+         processComments(issue);
+   }
+}
 
-         const auto creator = new QLabel(QString("<b>%1</b>").arg(comment.creator.name));
-         creator->setObjectName("CreatorLink");
+void IssueDetailedView::processComments(const Issue &issue)
+{
+   for (auto &comment : issue.comments)
+   {
+      const auto layout = createBubbleForComment(comment);
+      mIssuesLayout->addLayout(layout);
+   }
+}
 
-         creationLayout->addWidget(creator);
+void IssueDetailedView::processReviews(const PullRequest &) { }
 
-         const auto days = comment.creation.daysTo(QDateTime::currentDateTime());
-         const auto whenText = days <= 30
-             ? QString::fromUtf8(" %1 days ago").arg(days)
-             : QString(" on %1").arg(comment.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+QHBoxLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
+{
+   const auto creationLayout = new QHBoxLayout();
+   creationLayout->setContentsMargins(QMargins());
+   creationLayout->setSpacing(0);
+   creationLayout->addWidget(new QLabel(tr("Comment by ")));
 
-         const auto whenLabel = new QLabel(whenText);
-         whenLabel->setToolTip(comment.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
+   const auto creator = new QLabel(QString("<b>%1</b>").arg(comment.creator.name));
+   creator->setObjectName("CreatorLink");
 
-         creationLayout->addWidget(whenLabel);
-         creationLayout->addStretch();
-         creationLayout->addWidget(new QLabel(comment.association));
+   creationLayout->addWidget(creator);
+
+   const auto days = comment.creation.daysTo(QDateTime::currentDateTime());
+   const auto whenText = days <= 30
+       ? QString::fromUtf8(" %1 days ago").arg(days)
+       : QString(" on %1").arg(comment.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+
+   const auto whenLabel = new QLabel(whenText);
+   whenLabel->setToolTip(comment.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
+
+   creationLayout->addWidget(whenLabel);
+   creationLayout->addStretch();
+   creationLayout->addWidget(new QLabel(comment.association));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-         const auto textEdit = new QTextEdit();
-         textEdit->setMarkdown(comment.body);
-         const auto body = new QLabel(textEdit->toHtml());
-         delete textEdit;
+   const auto textEdit = new QTextEdit();
+   textEdit->setMarkdown(comment.body);
+   const auto body = new QLabel(textEdit->toHtml());
+   delete textEdit;
 #else
-         const auto body = new QLabel(comment.body);
+   const auto body = new QLabel(comment.body);
 #endif
-         body->setWordWrap(true);
+   body->setWordWrap(true);
 
-         const auto frame = new QFrame();
-         frame->setObjectName("IssueIntro");
+   const auto frame = new QFrame();
+   frame->setObjectName("IssueIntro");
 
-         const auto innerLayout = new QVBoxLayout(frame);
-         innerLayout->setContentsMargins(10, 10, 10, 10);
-         innerLayout->setSpacing(5);
-         innerLayout->addLayout(creationLayout);
-         innerLayout->addSpacing(20);
-         innerLayout->addWidget(body);
+   const auto innerLayout = new QVBoxLayout(frame);
+   innerLayout->setContentsMargins(10, 10, 10, 10);
+   innerLayout->setSpacing(5);
+   innerLayout->addLayout(creationLayout);
+   innerLayout->addSpacing(20);
+   innerLayout->addWidget(body);
 
-         const auto fileName = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation),
-                                                    comment.creator.name);
+   const auto fileName
+       = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), comment.creator.name);
 
-         const auto avatar = new CircularPixmap();
-         avatar->setFixedSize(50, 50);
-         avatar->setObjectName("Avatar");
-         if (!QFile(fileName).exists())
-         {
-            QNetworkRequest request;
-            request.setUrl(comment.creator.avatar);
-            const auto reply = mManager->get(request);
-            connect(reply, &QNetworkReply::finished, this,
-                    [fileName = comment.creator.name, this, avatar]() { storeCreatorAvatar(avatar, fileName); });
-         }
-         else
-         {
-            QPixmap img(fileName);
-            img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-            avatar->setPixmap(img);
-         }
-
-         const auto layout = new QHBoxLayout();
-         layout->setContentsMargins(QMargins());
-         layout->setSpacing(30);
-         layout->addSpacing(30);
-         layout->addWidget(avatar);
-         layout->addWidget(frame);
-
-         mIssuesLayout->addLayout(layout);
-      }
+   const auto avatar = new CircularPixmap();
+   avatar->setFixedSize(50, 50);
+   avatar->setObjectName("Avatar");
+   if (!QFile(fileName).exists())
+   {
+      QNetworkRequest request;
+      request.setUrl(comment.creator.avatar);
+      const auto reply = mManager->get(request);
+      connect(reply, &QNetworkReply::finished, this,
+              [fileName = comment.creator.name, this, avatar]() { storeCreatorAvatar(avatar, fileName); });
    }
+   else
+   {
+      QPixmap img(fileName);
+      img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+      avatar->setPixmap(img);
+   }
+
+   const auto layout = new QHBoxLayout();
+   layout->setContentsMargins(QMargins());
+   layout->setSpacing(30);
+   layout->addSpacing(30);
+   layout->addWidget(avatar);
+   layout->addWidget(frame);
+
+   return layout;
+}
+
+QHBoxLayout *IssueDetailedView::createBubbleForReview(const Review &review, const QVector<ReviewComment> &)
+{
+   const auto creationLayout = new QHBoxLayout();
+   creationLayout->setContentsMargins(QMargins());
+   creationLayout->setSpacing(0);
+   creationLayout->addWidget(new QLabel(tr("Comment by ")));
+
+   const auto creator = new QLabel(QString("<b>%1</b>").arg(review.creator.name));
+   creator->setObjectName("CreatorLink");
+
+   creationLayout->addWidget(creator);
+
+   const auto days = review.creation.daysTo(QDateTime::currentDateTime());
+   const auto whenText = days <= 30
+       ? QString::fromUtf8(" %1 days ago").arg(days)
+       : QString(" on %1").arg(review.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+
+   const auto whenLabel = new QLabel(whenText);
+   whenLabel->setToolTip(review.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
+
+   creationLayout->addWidget(whenLabel);
+   creationLayout->addStretch();
+   creationLayout->addWidget(new QLabel(review.association));
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+   const auto textEdit = new QTextEdit();
+   textEdit->setMarkdown(review.body);
+   const auto body = new QLabel(textEdit->toHtml());
+   delete textEdit;
+#else
+   const auto body = new QLabel(review.body);
+#endif
+   body->setWordWrap(true);
+
+   const auto frame = new QFrame();
+   frame->setObjectName("IssueIntro");
+
+   const auto innerLayout = new QVBoxLayout(frame);
+   innerLayout->setContentsMargins(10, 10, 10, 10);
+   innerLayout->setSpacing(5);
+   innerLayout->addLayout(creationLayout);
+   innerLayout->addSpacing(20);
+   innerLayout->addWidget(body);
+
+   const auto fileName
+       = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), review.creator.name);
+
+   const auto avatar = new CircularPixmap();
+   avatar->setFixedSize(50, 50);
+   avatar->setObjectName("Avatar");
+   if (!QFile(fileName).exists())
+   {
+      QNetworkRequest request;
+      request.setUrl(review.creator.avatar);
+      const auto reply = mManager->get(request);
+      connect(reply, &QNetworkReply::finished, this,
+              [fileName = review.creator.name, this, avatar]() { storeCreatorAvatar(avatar, fileName); });
+   }
+   else
+   {
+      QPixmap img(fileName);
+      img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+      avatar->setPixmap(img);
+   }
+
+   const auto layout = new QHBoxLayout();
+   layout->setContentsMargins(QMargins());
+   layout->setSpacing(30);
+   layout->addSpacing(30);
+   layout->addWidget(avatar);
+   layout->addWidget(frame);
+
+   return layout;
+}
+
+void IssueDetailedView::onReviewsReceived(PullRequest pr)
+{
+   QMultiMap<QDateTime, QHBoxLayout *> bubblesMap;
+
+   for (const auto comment : pr.comments)
+   {
+      const auto layout = createBubbleForComment(comment);
+      bubblesMap.insert(comment.creation, layout);
+   }
+
+   for (const auto review : pr.reviews)
+   {
+      const auto layout = createBubbleForReview(review, pr.reviewComment);
+      bubblesMap.insert(review.creation, layout);
+   }
+
+   for (auto layout : bubblesMap)
+      mIssuesLayout->addLayout(layout);
 }

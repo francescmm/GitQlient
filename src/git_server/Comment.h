@@ -29,12 +29,49 @@
 
 namespace GitServer
 {
+struct Diff
+{
+   QString diff;
+   QString file;
+   int position;
+   int originalPosition;
+};
+
 struct Comment
 {
+   Comment() = default;
+   Comment(int _id, const QString _body, const User &_user, const QDateTime dt, const QString relation)
+      : id(_id)
+      , body(_body)
+      , creator(_user)
+      , creation(dt)
+      , association(relation)
+   {
+   }
+
+   virtual ~Comment() = default;
+
    int id;
    QString body;
    User creator;
    QDateTime creation;
    QString association;
 };
+
+struct Review : public Comment
+{
+   Review() = default;
+
+   QString state;
+};
+
+struct ReviewComment : public Comment
+{
+   ReviewComment() = default;
+
+   Diff diff;
+   int replyToId;
+   int reviewId;
+};
+
 }

@@ -32,9 +32,21 @@ namespace GitServer
 
 struct PullRequest : public Issue
 {
-   struct Details
+   PullRequest() = default;
+
+   PullRequest(const Issue &issue)
    {
-   };
+      number = issue.number;
+      title = issue.title;
+      body = issue.body;
+      milestone = issue.milestone;
+      labels = issue.labels;
+      creator = issue.creator;
+      assignees = issue.assignees;
+      url = issue.url;
+      creation = issue.creation;
+      comments = issue.comments;
+   }
 
    struct HeadState
    {
@@ -66,9 +78,9 @@ struct PullRequest : public Issue
    bool draft = false;
    int id = 0;
    QString url;
-   Details details;
    HeadState state;
-   QMap<int, Comment> reviews;
+   QMap<int, Review> reviews;
+   QVector<ReviewComment> reviewComment;
 
    QJsonObject toJson() const
    {

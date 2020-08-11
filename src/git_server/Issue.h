@@ -32,6 +32,7 @@
 #include <QJsonArray>
 #include <QStringList>
 #include <QDateTime>
+#include <QScopedPointer>
 
 namespace GitServer
 {

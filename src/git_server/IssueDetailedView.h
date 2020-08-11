@@ -39,6 +39,7 @@ namespace GitServer
 {
 class IRestApi;
 struct Issue;
+struct PullRequest;
 }
 
 class IssueDetailedView : public QFrame
@@ -52,9 +53,9 @@ public:
       Issues,
       PullRequests
    };
-   explicit IssueDetailedView(const QSharedPointer<GitBase> &git, Config config, QWidget *parent = nullptr);
+   explicit IssueDetailedView(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
 
-   void loadData(const GitServer::Issue &issue);
+   void loadData(Config config, const GitServer::Issue &issue);
 
 private:
    GitServer::Issue mIssue;
@@ -71,4 +72,11 @@ private:
 
    void storeCreatorAvatar(QLabel *avatar, const QString &fileName);
    void onCommentReceived(const GitServer::Issue &issue);
+   void onReviewsReceived(GitServer::PullRequest pr);
+   void processComments(const GitServer::Issue &issue);
+   void processReviews(const GitServer::PullRequest &pr);
+
+   QHBoxLayout *createBubbleForComment(const GitServer::Comment &comment);
+   QHBoxLayout *createBubbleForReview(const GitServer::Review &review,
+                                      const QVector<GitServer::ReviewComment> &comments);
 };

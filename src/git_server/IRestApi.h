@@ -101,10 +101,15 @@ signals:
 
    /**
     * @brief commentsReceived Signal triggered when the comments for an issue has been received.
-    * @param issueNumber The issue number.
-    * @param comments The commentes.
+    * @param issue The issue with the comments.
     */
    void commentsReceived(const Issue &issue);
+
+   /**
+    * @brief reviewsReceived Signal triggered when the reviews for a Pull Request has been received.
+    * @param pr The Pull Request with the reviews.
+    */
+   void reviewsReceived(const PullRequest &pr);
 
 public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
@@ -166,6 +171,12 @@ public:
     * @param issue The issue number to query.
     */
    virtual void requestComments(const Issue &issue) = 0;
+
+   /**
+    * @brief requestReviews Requests all the reviews in a Pull Requests.
+    * @param pr The Pull Request to query.
+    */
+   virtual void requestReviews(const PullRequest &pr) = 0;
 
 protected:
    QNetworkAccessManager *mManager = nullptr;

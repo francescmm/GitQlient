@@ -140,6 +140,13 @@ void GitHubRestApi::requestComments(const Issue &issue)
    connect(reply, &QNetworkReply::finished, this, [this, issue]() { onCommentsReceived(issue); });
 }
 
+void GitHubRestApi::requestReviews(const PullRequest &pr)
+{
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1/reviews").arg(pr.number)));
+
+   connect(reply, &QNetworkReply::finished, this, [this, pr]() { onReviewsReceived(pr); });
+}
+
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
@@ -330,7 +337,7 @@ void GitHubRestApi::onPullRequestStatusReceived()
          PullRequest::HeadState::Check check { status["description"].toString(), statusStr,
                                                status["target_url"].toString(), status["context"].toString() };
 
-         mPulls[sha].state.checks.append(check);
+         mPulls[sha].state.checks.append(std::move(check));
       }
 
       --mPrRequested;
@@ -411,7 +418,7 @@ void GitHubRestApi::onIssuesReceived()
 
          issue.milestone = sMilestone;
 
-         issues.append(issue);
+         issues.append(std::move(issue));
       }
 
       if (!issues.isEmpty())
@@ -446,12 +453,100 @@ void GitHubRestApi::onCommentsReceived(Issue issue)
          sAssignee.avatar = commentData["user"].toObject()["avatar_url"].toString();
          sAssignee.type = commentData["user"].toObject()["type"].toString();
 
-         c.creator = sAssignee;
+         c.creator = std::move(sAssignee);
          comments.append(std::move(c));
       }
 
       issue.comments = comments;
 
       emit commentsReceived(issue);
+   }
+}
+
+void GitHubRestApi::onReviewsReceived(PullRequest pr)
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto url = reply->url();
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
+
+   if (!tmpDoc.isEmpty())
+   {
+      QMap<int, Review> reviews;
+      const auto commentsArray = tmpDoc.array();
+
+      for (const auto &commentData : commentsArray)
+      {
+         auto id = commentData["id"].toInt();
+
+         Review r;
+         r.id = id;
+         r.body = commentData["body"].toString();
+         r.creation = commentData["created_at"].toVariant().toDateTime();
+
+         GitServer::User sAssignee;
+         sAssignee.id = commentData["user"].toObject()["id"].toInt();
+         sAssignee.url = commentData["user"].toObject()["html_url"].toString();
+         sAssignee.name = commentData["user"].toObject()["login"].toString();
+         sAssignee.avatar = commentData["user"].toObject()["avatar_url"].toString();
+         sAssignee.type = commentData["user"].toObject()["type"].toString();
+
+         r.creator = std::move(sAssignee);
+         reviews.insert(id, std::move(r));
+      }
+
+      pr.reviews = reviews;
+
+      QTimer::singleShot(200, this, [this, pr]() { requestReviewComments(pr); });
+   }
+}
+
+void GitHubRestApi::requestReviewComments(const PullRequest &pr)
+{
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1/comments").arg(pr.number)));
+
+   connect(reply, &QNetworkReply::finished, this, [this, pr]() { onReviewCommentsReceived(pr); });
+}
+
+void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto url = reply->url();
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
+
+   if (!tmpDoc.isEmpty())
+   {
+      QVector<ReviewComment> comments;
+      const auto commentsArray = tmpDoc.array();
+
+      for (const auto &commentData : commentsArray)
+      {
+         ReviewComment c;
+         c.id = commentData["id"].toInt();
+         c.body = commentData["body"].toString();
+         c.creation = commentData["created_at"].toVariant().toDateTime();
+         c.association = commentData["author_association"].toString();
+         c.diff.diff = commentData["diff_hunk"].toString();
+         c.diff.file = commentData["path"].toString();
+         c.diff.position = commentData["position"].toInt();
+         c.diff.originalPosition = commentData["original_position"].toInt();
+         c.reviewId = commentData["pull_request_review_id"].toInt();
+         c.replyToId = commentData["in_reply_to_id"].toInt();
+
+         GitServer::User sAssignee;
+         sAssignee.id = commentData["user"].toObject()["id"].toInt();
+         sAssignee.url = commentData["user"].toObject()["html_url"].toString();
+         sAssignee.name = commentData["user"].toObject()["login"].toString();
+         sAssignee.avatar = commentData["user"].toObject()["avatar_url"].toString();
+         sAssignee.type = commentData["user"].toObject()["type"].toString();
+
+         c.creator = std::move(sAssignee);
+         comments.append(std::move(c));
+      }
+
+      pr.reviewComment = comments;
+
+      emit reviewsReceived(pr);
    }
 }
