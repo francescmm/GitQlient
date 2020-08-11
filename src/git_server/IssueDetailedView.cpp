@@ -207,7 +207,7 @@ void IssueDetailedView::loadData(const GitServer::Issue &issue)
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    const auto textEdit = new QTextEdit();
-   textEdit->setMarkdown(mIssue.body);
+   textEdit->setMarkdown(QString::fromUtf8(mIssue.body));
    const auto body = new QLabel(textEdit->toHtml());
    delete textEdit;
 #else
