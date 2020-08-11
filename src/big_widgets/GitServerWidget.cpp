@@ -105,6 +105,8 @@ void GitServerWidget::createWidget()
    detailsLayout->setAlignment(Qt::AlignTop);
    detailsLayout->addWidget(detailedView);
 
+   centralLayout->setColumnStretch(0, 1);
+   centralLayout->setColumnStretch(1, 2);
    centralLayout->addLayout(issuesLayout, 2, 0);
    centralLayout->addLayout(detailsLayout, 2, 1);
 
@@ -113,7 +115,7 @@ void GitServerWidget::createWidget()
 
    const auto mainLayout = new QGridLayout();
    mainLayout->setColumnStretch(0, 1);
-   mainLayout->setColumnStretch(1, 5);
+   mainLayout->setColumnStretch(1, 8);
    mainLayout->setColumnStretch(2, 1);
    mainLayout->setContentsMargins(QMargins());
    mainLayout->setSpacing(0);

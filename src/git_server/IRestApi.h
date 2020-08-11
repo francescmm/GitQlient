@@ -104,7 +104,7 @@ signals:
     * @param issueNumber The issue number.
     * @param comments The commentes.
     */
-   void commentsReceived(int issueNumber, const QVector<Comment> &comments);
+   void commentsReceived(const Issue &issue);
 
 public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
@@ -165,7 +165,7 @@ public:
     * for a pull request.
     * @param issue The issue number to query.
     */
-   virtual void requestComments(int issue) = 0;
+   virtual void requestComments(const Issue &issue) = 0;
 
 protected:
    QNetworkAccessManager *mManager = nullptr;

@@ -133,9 +133,9 @@ void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestMerged);
 }
 
-void GitHubRestApi::requestComments(int issue)
+void GitHubRestApi::requestComments(const Issue &issue)
 {
-   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/issues/%1/comments").arg(issue)));
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/issues/%1/comments").arg(issue.number)));
 
    connect(reply, &QNetworkReply::finished, this, [this, issue]() { onCommentsReceived(issue); });
 }
@@ -419,7 +419,7 @@ void GitHubRestApi::onIssuesReceived()
    }
 }
 
-void GitHubRestApi::onCommentsReceived(int issueNumber)
+void GitHubRestApi::onCommentsReceived(Issue issue)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    const auto url = reply->url();
@@ -450,6 +450,8 @@ void GitHubRestApi::onCommentsReceived(int issueNumber)
          comments.append(std::move(c));
       }
 
-      emit commentsReceived(issueNumber, comments);
+      issue.comments = comments;
+
+      emit commentsReceived(issue);
    }
 }

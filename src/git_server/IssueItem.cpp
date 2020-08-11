@@ -19,7 +19,7 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    setObjectName("IssueItem");
 
    const auto title = new ButtonLink(issueData.title);
-   title->setWordWrap(false);
+   title->setWordWrap(true);
    title->setObjectName("IssueTitle");
    connect(title, &ButtonLink::clicked, [this]() { emit selected(mIssue); });
 
@@ -27,7 +27,6 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    titleLayout->setContentsMargins(QMargins());
    titleLayout->setSpacing(0);
    titleLayout->addWidget(title);
-   titleLayout->addStretch();
 
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());

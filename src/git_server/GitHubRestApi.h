@@ -54,7 +54,7 @@ public:
    void requestPullRequests() override;
    void requestPullRequestsState() override;
    void mergePullRequest(int number, const QByteArray &data) override;
-   void requestComments(int issue) override;
+   void requestComments(const Issue &issue) override;
 
 private:
    QMap<QString, PullRequest> mPulls;
@@ -70,7 +70,7 @@ private:
    void onPullRequestStatusReceived();
    void onPullRequestMerged();
    void onIssuesReceived();
-   void onCommentsReceived(int issueNumber);
+   void onCommentsReceived(Issue issue);
 };
 
 }

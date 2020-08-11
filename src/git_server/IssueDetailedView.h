@@ -38,7 +38,7 @@ class QHBoxLayout;
 namespace GitServer
 {
 class IRestApi;
-struct Comment;
+struct Issue;
 }
 
 class IssueDetailedView : public QFrame
@@ -69,6 +69,6 @@ private:
    QHBoxLayout *mIssueDetailedViewLayout = nullptr;
    QScrollArea *mScrollArea = nullptr;
 
-   void onCommentReceived(int issue, const QVector<GitServer::Comment> &comments);
    void storeCreatorAvatar(QLabel *avatar, const QString &fileName);
+   void onCommentReceived(const GitServer::Issue &issue);
 };

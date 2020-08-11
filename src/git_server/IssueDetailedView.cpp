@@ -218,19 +218,45 @@ void IssueDetailedView::loadData(const GitServer::Issue &issue)
 
    mIssuesLayout->addWidget(frame);
 
-   mApi->requestComments(mIssue.number);
+   mApi->requestComments(mIssue);
 }
 
-void IssueDetailedView::onCommentReceived(int issue, const QVector<GitServer::Comment> &comments)
+void IssueDetailedView::storeCreatorAvatar(QLabel *avatar, const QString &fileName)
 {
-   if (issue == mIssue.number)
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto data = reply->readAll();
+
+   QDir dir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+   if (!dir.exists())
+      dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+
+   QString path = dir.absolutePath() + "/" + fileName;
+   QFile file(path);
+   if (file.open(QIODevice::WriteOnly))
    {
-      for (auto &comment : comments)
+      file.write(data);
+      file.close();
+
+      QPixmap img(path);
+      img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+      avatar->setPixmap(img);
+   }
+
+   reply->deleteLater();
+}
+
+void IssueDetailedView::onCommentReceived(const Issue &issue)
+{
+   if (issue.number == mIssue.number)
+   {
+      for (auto &comment : issue.comments)
       {
          const auto creationLayout = new QHBoxLayout();
          creationLayout->setContentsMargins(QMargins());
          creationLayout->setSpacing(0);
          creationLayout->addWidget(new QLabel(tr("Comment by ")));
+
          const auto creator = new QLabel(QString("<b>%1</b>").arg(comment.creator.name));
          creator->setObjectName("CreatorLink");
 
@@ -300,29 +326,4 @@ void IssueDetailedView::onCommentReceived(int issue, const QVector<GitServer::Co
          mIssuesLayout->addLayout(layout);
       }
    }
-}
-
-void IssueDetailedView::storeCreatorAvatar(QLabel *avatar, const QString &fileName)
-{
-   const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto data = reply->readAll();
-
-   QDir dir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
-   if (!dir.exists())
-      dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
-
-   QString path = dir.absolutePath() + "/" + fileName;
-   QFile file(path);
-   if (file.open(QIODevice::WriteOnly))
-   {
-      file.write(data);
-      file.close();
-
-      QPixmap img(path);
-      img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-      avatar->setPixmap(img);
-   }
-
-   reply->deleteLater();
 }
