@@ -345,11 +345,10 @@ QHBoxLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
    return layout;
 }
 
-QHBoxLayout *IssueDetailedView::createBubbleForReview(const Review &review, QVector<CodeReview> &codeReviews)
+QLayout *IssueDetailedView::createBubbleForReview(const Review &review, QVector<CodeReview> &codeReviews)
 {
-   Q_UNUSED(codeReviews);
-   QVector<CodeReview> reviews;
-   auto codeReviewId = -1;
+   QMap<int, QVector<CodeReview>> reviews;
+   QVector<int> codeReviewIds;
 
    QMutableVectorIterator<CodeReview> iter(codeReviews);
    while (iter.hasNext())
@@ -357,112 +356,164 @@ QHBoxLayout *IssueDetailedView::createBubbleForReview(const Review &review, QVec
       auto &codeReview = iter.next();
       if (codeReview.reviewId == review.id)
       {
-         codeReviewId = codeReview.id;
-         reviews.append(codeReview);
+         codeReviewIds.append(codeReview.id);
+         reviews[codeReview.id].append(codeReview);
          iter.remove();
       }
-      else if (codeReviewId == codeReview.replyToId)
+      else if (codeReviewIds.contains(codeReview.replyToId))
       {
-         reviews.append(codeReview);
+         reviews[codeReview.replyToId].append(codeReview);
          iter.remove();
       }
    }
 
-   if (reviews.isEmpty() && review.state == QString::fromUtf8("COMMENTED"))
-      return nullptr;
+   const auto layouts = new QVBoxLayout();
 
-   const auto creationLayout = new QHBoxLayout();
-   creationLayout->setContentsMargins(QMargins());
-   creationLayout->setSpacing(0);
-
-   const auto frame = new QFrame();
-   auto fullBubble = false;
-   QString header;
-
-   if (review.state == QString::fromUtf8("COMMENTED"))
+   // Create the review bubble
+   if (review.state != QString::fromUtf8("COMMENTED"))
    {
-      frame->setObjectName("IssueIntro");
+      const auto frame = new QFrame();
+      QString header;
 
-      header = QString("<b>%1</b> (%2) started a review ").arg(review.creator.name, review.association.toLower());
-      fullBubble = true;
-   }
-   else if (review.state == QString::fromUtf8("CHANGES_REQUESTED"))
-   {
-      frame->setObjectName("IssueIntroChangesRequested");
+      if (review.state == QString::fromUtf8("CHANGES_REQUESTED"))
+      {
+         frame->setObjectName("IssueIntroChangesRequested");
 
-      header = QString("<b>%1</b> (%2) requested changes ").arg(review.creator.name, review.association.toLower());
-   }
-   else if (review.state == QString::fromUtf8("APPROVED"))
-   {
-      frame->setObjectName("IssueIntroApproved");
+         header = QString("<b>%1</b> (%2) requested changes ").arg(review.creator.name, review.association.toLower());
+      }
+      else if (review.state == QString::fromUtf8("APPROVED"))
+      {
+         frame->setObjectName("IssueIntroApproved");
 
-      header = QString("<b>%1</b> (%2) approved the PR ").arg(review.creator.name, review.association.toLower());
-   }
+         header = QString("<b>%1</b> (%2) approved the PR ").arg(review.creator.name, review.association.toLower());
+      }
 
-   const auto days = review.creation.daysTo(QDateTime::currentDateTime());
-   const auto whenText = days <= 30
-       ? days != 0 ? QString::fromUtf8(" %1 days ago").arg(days) : QString::fromUtf8(" today")
-       : QString(" on %1").arg(review.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+      const auto days = review.creation.daysTo(QDateTime::currentDateTime());
+      const auto whenText = days <= 30
+          ? days != 0 ? QString::fromUtf8(" %1 days ago").arg(days) : QString::fromUtf8(" today")
+          : QString(" on %1").arg(review.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
-   const auto whenLabel = new QLabel(header + whenText);
-   whenLabel->setToolTip(review.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
+      const auto whenLabel = new QLabel(header + whenText);
+      whenLabel->setToolTip(review.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
-   creationLayout->addWidget(whenLabel);
-   creationLayout->addStretch();
+      const auto creationLayout = new QHBoxLayout();
+      creationLayout->setContentsMargins(QMargins());
+      creationLayout->setSpacing(0);
+      creationLayout->addWidget(whenLabel);
+      creationLayout->addStretch();
 
-   const auto innerLayout = new QVBoxLayout(frame);
-   innerLayout->setContentsMargins(10, 10, 10, 10);
-   innerLayout->setSpacing(20);
-   innerLayout->addLayout(creationLayout);
-   innerLayout->addSpacing(20);
+      const auto innerLayout = new QVBoxLayout(frame);
+      innerLayout->setContentsMargins(10, 10, 10, 10);
+      innerLayout->setSpacing(20);
+      innerLayout->addLayout(creationLayout);
+      innerLayout->addSpacing(20);
 
-   if (fullBubble)
-   {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-      const auto textEdit = new QTextEdit();
-      textEdit->setMarkdown(review.body);
-      const auto body = new QLabel(textEdit->toHtml());
-      delete textEdit;
-#else
-      const auto body = new QLabel(review.body);
-#endif
-      body->setWordWrap(true);
+      const auto fileName
+          = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), review.creator.name);
 
-      innerLayout->addWidget(body);
+      const auto avatar = new CircularPixmap(QSize(50, 50));
+      avatar->setObjectName("Avatar");
+      if (!QFile(fileName).exists())
+      {
+         QNetworkRequest request;
+         request.setUrl(review.creator.avatar);
+         const auto reply = mManager->get(request);
+         connect(reply, &QNetworkReply::finished, this,
+                 [fileName = review.creator.name, this, avatar]() { storeCreatorAvatar(avatar, fileName); });
+      }
+      else
+      {
+         QPixmap img(fileName);
+         img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-      if (const auto layouts = createBubbleForCodeReview(reviews); layouts)
-         innerLayout->addLayout(layouts);
-   }
+         avatar->setPixmap(img);
+      }
 
-   const auto fileName
-       = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), review.creator.name);
+      const auto layout = new QHBoxLayout();
+      layout->setContentsMargins(QMargins());
+      layout->setSpacing(30);
+      layout->addSpacing(30);
+      layout->addWidget(avatar);
+      layout->addWidget(frame);
 
-   const auto avatar = new CircularPixmap(QSize(50, 50));
-   avatar->setObjectName("Avatar");
-   if (!QFile(fileName).exists())
-   {
-      QNetworkRequest request;
-      request.setUrl(review.creator.avatar);
-      const auto reply = mManager->get(request);
-      connect(reply, &QNetworkReply::finished, this,
-              [fileName = review.creator.name, this, avatar]() { storeCreatorAvatar(avatar, fileName); });
-   }
-   else
-   {
-      QPixmap img(fileName);
-      img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-      avatar->setPixmap(img);
+      layouts->addLayout(layout);
    }
 
-   const auto layout = new QHBoxLayout();
-   layout->setContentsMargins(QMargins());
-   layout->setSpacing(30);
-   layout->addSpacing(30);
-   layout->addWidget(avatar);
-   layout->addWidget(frame);
+   // Create the reviews associated with the current one
 
-   return layout;
+   if (!reviews.isEmpty())
+   {
+      for (auto &codeReviews : reviews)
+      {
+         std::sort(codeReviews.begin(), codeReviews.end(),
+                   [](const CodeReview &r1, const CodeReview &r2) { return r1.creation < r2.creation; });
+         const auto firstReview = codeReviews.first();
+         const auto creationLayout = new QHBoxLayout();
+         creationLayout->setContentsMargins(QMargins());
+         creationLayout->setSpacing(0);
+
+         const auto header = QString("<b>%1</b> (%2) started a review ")
+                                 .arg(firstReview.creator.name, firstReview.association.toLower());
+         const auto days = firstReview.creation.daysTo(QDateTime::currentDateTime());
+         const auto whenText = days <= 30
+             ? days != 0 ? QString::fromUtf8(" %1 days ago").arg(days) : QString::fromUtf8(" today")
+             : QString(" on %1").arg(firstReview.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+
+         const auto whenLabel = new QLabel(header + whenText);
+         whenLabel->setToolTip(firstReview.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
+
+         creationLayout->addWidget(whenLabel);
+         creationLayout->addStretch();
+
+         const auto frame = new QFrame();
+         frame->setObjectName("IssueIntro");
+
+         const auto innerLayout = new QVBoxLayout(frame);
+         innerLayout->setContentsMargins(10, 10, 10, 10);
+         innerLayout->setSpacing(20);
+         innerLayout->addLayout(creationLayout);
+
+         const auto code = new QLabel(QString("%1\n%2").arg(firstReview.diff.file, firstReview.diff.diff));
+         code->setWordWrap(true);
+
+         innerLayout->addWidget(code);
+
+         if (const auto layouts = createBubbleForCodeReview(codeReviews); layouts)
+            innerLayout->addLayout(layouts);
+
+         const auto fileName = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation),
+                                                    review.creator.name);
+
+         const auto avatar = new CircularPixmap(QSize(50, 50));
+         avatar->setObjectName("Avatar");
+         if (!QFile(fileName).exists())
+         {
+            QNetworkRequest request;
+            request.setUrl(review.creator.avatar);
+            const auto reply = mManager->get(request);
+            connect(reply, &QNetworkReply::finished, this,
+                    [fileName = review.creator.name, this, avatar]() { storeCreatorAvatar(avatar, fileName); });
+         }
+         else
+         {
+            QPixmap img(fileName);
+            img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+            avatar->setPixmap(img);
+         }
+
+         const auto layout = new QHBoxLayout();
+         layout->setContentsMargins(QMargins());
+         layout->setSpacing(30);
+         layout->addSpacing(30);
+         layout->addWidget(avatar);
+         layout->addWidget(frame);
+
+         layouts->addLayout(layout);
+      }
+   }
+
+   return layouts;
 }
 
 QLayout *IssueDetailedView::createBubbleForCodeReview(const QVector<CodeReview> &reviews)
@@ -550,7 +601,7 @@ QLayout *IssueDetailedView::createBubbleForCodeReview(const QVector<CodeReview> 
 
 void IssueDetailedView::onReviewsReceived(PullRequest pr)
 {
-   QMultiMap<QDateTime, QHBoxLayout *> bubblesMap;
+   QMultiMap<QDateTime, QLayout *> bubblesMap;
 
    for (const auto comment : pr.comments)
    {
@@ -561,10 +612,14 @@ void IssueDetailedView::onReviewsReceived(PullRequest pr)
    for (const auto review : pr.reviews)
    {
       const auto layout = createBubbleForReview(review, pr.reviewComment);
-      bubblesMap.insert(review.creation, layout);
+
+      if (layout)
+         bubblesMap.insert(review.creation, layout);
    }
 
    for (auto layout : bubblesMap)
+   {
       if (layout)
          mIssuesLayout->addLayout(layout);
+   }
 }
