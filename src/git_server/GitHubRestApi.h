@@ -59,6 +59,8 @@ public:
 
 private:
    QMap<QString, PullRequest> mPulls;
+   QMap<int, PullRequest> mPullRequests;
+   int mPullRequestsRequested = 0;
    QString mRepoEndpoint;
    int mPrRequested = 0;
 
@@ -73,6 +75,7 @@ private:
    void onIssuesReceived();
    void onPullRequestReceived();
    void onCommentsReceived(Issue issue);
+   void onPullRequestDetailesReceived();
    void onReviewsReceived(PullRequest pr);
 
    void requestReviewComments(const PullRequest &pr);

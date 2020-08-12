@@ -25,10 +25,14 @@
 
 #include <QFrame>
 
-#include <Issue.h>
-
 class ButtonLink;
 class QLabel;
+
+namespace GitServer
+{
+struct Issue;
+struct PullRequest;
+}
 
 class IssueItem : public QFrame
 {
@@ -39,7 +43,9 @@ signals:
 
 public:
    IssueItem(const GitServer::Issue &issueData, QWidget *parent = nullptr);
+   IssueItem(const GitServer::PullRequest &issueData, QWidget *parent = nullptr);
 
 private:
-   GitServer::Issue mIssue;
+   QLabel *mComments = nullptr;
+   void fillWidget(const GitServer::Issue &issueData);
 };

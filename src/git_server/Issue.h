@@ -59,6 +59,7 @@ struct Issue
    QVector<User> assignees;
    QString url;
    QDateTime creation;
+   int commentsCount = 0;
    QVector<Comment> comments;
 
    QJsonObject toJson() const

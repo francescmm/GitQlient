@@ -1,7 +1,7 @@
 #include <IssueItem.h>
 
 #include <ButtonLink.hpp>
-#include <Issue.h>
+#include <PullRequest.h>
 
 #include <QDir>
 #include <QFile>
@@ -14,14 +14,30 @@ using namespace GitServer;
 
 IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    : QFrame(parent)
-   , mIssue(issueData)
+   , mComments(new QLabel())
+{
+   fillWidget(issueData);
+
+   mComments->setText(QString::number(issueData.commentsCount));
+}
+
+IssueItem::IssueItem(const PullRequest &issueData, QWidget *parent)
+   : QFrame(parent)
+   , mComments(new QLabel())
+{
+   fillWidget(issueData);
+
+   mComments->setText(QString::number(issueData.commentsCount + issueData.reviewCommentsCount));
+}
+
+void IssueItem::fillWidget(const Issue &issueData)
 {
    setObjectName("IssueItem");
 
    const auto title = new ButtonLink(issueData.title);
    title->setWordWrap(true);
    title->setObjectName("IssueTitle");
-   connect(title, &ButtonLink::clicked, [this]() { emit selected(mIssue); });
+   connect(title, &ButtonLink::clicked, [this, issueData]() { emit selected(issueData); });
 
    const auto titleLayout = new QHBoxLayout();
    titleLayout->setContentsMargins(QMargins());
@@ -34,14 +50,14 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    creationLayout->addWidget(new QLabel(tr("Created by ")));
    const auto creator = new ButtonLink(QString("<b>%1</b>").arg(issueData.creator.name));
    creator->setObjectName("CreatorLink");
-   connect(creator, &ButtonLink::clicked, [this]() { QDesktopServices::openUrl(mIssue.url); });
+   connect(creator, &ButtonLink::clicked, [url = issueData.url]() { QDesktopServices::openUrl(url); });
 
    creationLayout->addWidget(creator);
 
-   const auto days = mIssue.creation.daysTo(QDateTime::currentDateTime());
+   const auto days = issueData.creation.daysTo(QDateTime::currentDateTime());
    const auto whenText = days <= 30
        ? QString::fromUtf8(" %1 days ago").arg(days)
-       : QString(" on %1").arg(mIssue.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+       : QString(" on %1").arg(issueData.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    const auto whenLabel = new QLabel(whenText);
    whenLabel->setToolTip(issueData.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
@@ -75,8 +91,8 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    labelsLayout->addWidget(milestone);
    labelsLayout->addStretch();
 
-   const auto layout = new QVBoxLayout(this);
-   layout->setContentsMargins(10, 10, 10, 10);
+   const auto layout = new QVBoxLayout();
+   layout->setContentsMargins(QMargins());
    layout->setSpacing(5);
    layout->addLayout(titleLayout);
    layout->addLayout(creationLayout);
@@ -106,4 +122,20 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    }
 
    layout->addLayout(labelsLayout);
+
+   QPixmap pic(":/icons/comment");
+   pic = pic.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+   const auto icon = new QLabel();
+   icon->setPixmap(pic);
+
+   const auto commentsLayout = new QGridLayout();
+   commentsLayout->addWidget(mComments, 0, 0);
+   commentsLayout->addWidget(icon, 0, 1);
+   commentsLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding), 1, 0, 1, 2);
+
+   const auto mainLayout = new QHBoxLayout(this);
+   mainLayout->setContentsMargins(10, 10, 10, 10);
+   mainLayout->addLayout(layout);
+   mainLayout->addLayout(commentsLayout);
 }

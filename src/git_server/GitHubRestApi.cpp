@@ -440,6 +440,7 @@ void GitHubRestApi::onIssuesReceived()
             issue.body = issueData["body"].toString().toUtf8();
             issue.url = issueData["html_url"].toString();
             issue.creation = issueData["created_at"].toVariant().toDateTime();
+            issue.commentsCount = issueData["comments"].toInt();
 
             issue.creator
                 = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
@@ -489,6 +490,8 @@ void GitHubRestApi::onIssuesReceived()
 
 void GitHubRestApi::onPullRequestReceived()
 {
+   mPullRequests.clear();
+
    const auto reply = qobject_cast<QNetworkReply *>(sender());
 
    if (const auto pagination = QString::fromUtf8(reply->rawHeader("Link")); !pagination.isEmpty())
@@ -522,29 +525,20 @@ void GitHubRestApi::onPullRequestReceived()
 
    if (!tmpDoc.isEmpty())
    {
-      QVector<PullRequest> issues;
       const auto issuesArray = tmpDoc.array();
+      mPullRequestsRequested = issuesArray.count();
 
       for (const auto &issueData : issuesArray)
       {
-         PullRequest issue;
-         issue.number = issueData["number"].toInt();
-         issue.title = issueData["title"].toString();
-         issue.body = issueData["body"].toString().toUtf8();
-         issue.url = issueData["html_url"].toString();
-         issue.creation = issueData["created_at"].toVariant().toDateTime();
-         issue.commentsCount = issueData["comments"].toInt();
-         issue.reviewCommentsCount = issueData["review_comments"].toInt();
-         issue.commits = issueData["commits"].toInt();
-         issue.additions = issueData["aditions"].toInt();
-         issue.deletions = issueData["deletions"].toInt();
-         issue.changedFiles = issueData["changed_files"].toInt();
-         issue.merged = issueData["merged"].toBool();
-         issue.mergeable = issueData["mergeable"].toBool();
-         issue.rebaseable = issueData["rebaseable"].toBool();
-         issue.mergeableState = issueData["mergeable_state"].toString();
+         const auto number = issueData["number"].toInt();
+         PullRequest pr;
+         pr.number = issueData["number"].toInt();
+         pr.title = issueData["title"].toString();
+         pr.body = issueData["body"].toString().toUtf8();
+         pr.url = issueData["html_url"].toString();
+         pr.creation = issueData["created_at"].toVariant().toDateTime();
 
-         issue.creator
+         pr.creator
              = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
                  issueData["user"].toObject()["avatar_url"].toString(),
                  issueData["user"].toObject()["html_url"].toString(), issueData["user"].toObject()["type"].toString() };
@@ -553,9 +547,9 @@ void GitHubRestApi::onPullRequestReceived()
 
          for (auto label : labels)
          {
-            issue.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
-                                  label["name"].toString(), label["description"].toString(), label["color"].toString(),
-                                  label["default"].toBool() });
+            pr.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
+                               label["name"].toString(), label["description"].toString(), label["color"].toString(),
+                               label["default"].toBool() });
          }
 
          const auto assignees = issueData["assignees"].toArray();
@@ -568,7 +562,7 @@ void GitHubRestApi::onPullRequestReceived()
             sAssignee.name = assignee["login"].toString();
             sAssignee.avatar = assignee["avatar_url"].toString();
 
-            issue.assignees.append(sAssignee);
+            pr.assignees.append(sAssignee);
          }
 
          Milestone sMilestone { issueData["milestone"].toObject()[QStringLiteral("id")].toInt(),
@@ -578,13 +572,20 @@ void GitHubRestApi::onPullRequestReceived()
                                 issueData["milestone"].toObject()[QStringLiteral("description")].toString(),
                                 issueData["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
 
-         issue.milestone = sMilestone;
+         pr.milestone = sMilestone;
 
-         issues.append(std::move(issue));
+         mPullRequests.insert(number, std::move(pr));
+
+         QTimer::singleShot(200, [this, number]() {
+            const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1").arg(number)));
+            connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestDetailesReceived);
+         });
       }
 
-      if (!issues.isEmpty())
-         emit pullRequestsReceived(issues);
+      auto prs = mPullRequests.values().toVector();
+      std::sort(prs.begin(), prs.end(),
+                [](const PullRequest &p1, const PullRequest &p2) { return p1.creation > p2.creation; });
+      emit pullRequestsReceived(prs);
    }
 }
 
@@ -622,6 +623,40 @@ void GitHubRestApi::onCommentsReceived(Issue issue)
       issue.comments = comments;
 
       emit commentsReceived(issue);
+   }
+}
+
+void GitHubRestApi::onPullRequestDetailesReceived()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
+
+   if (!tmpDoc.isEmpty())
+   {
+      const auto prInfo = tmpDoc.object();
+
+      auto &issue = mPullRequests[prInfo["number"].toInt()];
+      issue.commentsCount = prInfo["comments"].toInt();
+      issue.reviewCommentsCount = prInfo["review_comments"].toInt();
+      issue.commits = prInfo["commits"].toInt();
+      issue.additions = prInfo["aditions"].toInt();
+      issue.deletions = prInfo["deletions"].toInt();
+      issue.changedFiles = prInfo["changed_files"].toInt();
+      issue.merged = prInfo["merged"].toBool();
+      issue.mergeable = prInfo["mergeable"].toBool();
+      issue.rebaseable = prInfo["rebaseable"].toBool();
+      issue.mergeableState = prInfo["mergeable_state"].toString();
+
+      --mPullRequestsRequested;
+
+      if (mPullRequestsRequested == 0)
+      {
+         auto prs = mPullRequests.values().toVector();
+         std::sort(prs.begin(), prs.end(),
+                   [](const PullRequest &p1, const PullRequest &p2) { return p1.creation > p2.creation; });
+         emit pullRequestsReceived(prs);
+      }
    }
 }
 
