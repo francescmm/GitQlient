@@ -76,7 +76,7 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    labelsLayout->addStretch();
 
    const auto layout = new QVBoxLayout(this);
-   layout->setContentsMargins(0, 10, 0, 10);
+   layout->setContentsMargins(10, 10, 10, 10);
    layout->setSpacing(5);
    layout->addLayout(titleLayout);
    layout->addLayout(creationLayout);
