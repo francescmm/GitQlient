@@ -50,8 +50,8 @@ public:
    void createPullRequest(const PullRequest &pullRequest) override;
    void requestLabels() override;
    void requestMilestones() override;
-   void requestIssues() override;
-   void requestPullRequests() override;
+   void requestIssues(int page = -1) override;
+   void requestPullRequests(int page = -1) override;
    void requestPullRequestsState() override;
    void mergePullRequest(int number, const QByteArray &data) override;
    void requestComments(const Issue &issue) override;
@@ -67,10 +67,11 @@ private:
    void onMilestonesReceived();
    void onIssueCreated();
    void onPullRequestCreated();
-   void processPullRequets();
+   void processPullRequetsState();
    void onPullRequestStatusReceived();
    void onPullRequestMerged();
    void onIssuesReceived();
+   void onPullRequestReceived();
    void onCommentsReceived(Issue issue);
    void onReviewsReceived(PullRequest pr);
 

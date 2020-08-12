@@ -81,6 +81,16 @@ struct PullRequest : public Issue
    HeadState state;
    QMap<int, Review> reviews;
    QVector<CodeReview> reviewComment;
+   int commentsCount = 0;
+   int reviewCommentsCount = 0;
+   int commits = 0;
+   int additions = 0;
+   int deletions = 0;
+   int changedFiles = 0;
+   bool merged = false;
+   bool mergeable = false;
+   bool rebaseable = false;
+   QString mergeableState;
 
    QJsonObject toJson() const
    {

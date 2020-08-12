@@ -744,7 +744,7 @@ QScrollArea
    background-color: #202122;
 }
 
-#IssuesFooterFrame
+#IssuesFooterFrame, #IssuesFooterFramePagination
 {
    background-color: #2E2F30;
 }
@@ -763,6 +763,10 @@ QScrollArea
 {
    min-height: 10px;
    max-height: 10px;
+}
+
+#IssuesFooterFrame, #IssuesFooterFramePagination
+{
    border-bottom: 1px solid #404142;
    border-bottom-right-radius: 10px;
    border-bottom-left-radius: 10px;

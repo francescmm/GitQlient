@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QTimer>
+#include <QUrlQuery>
 
 #include <QLogger.h>
 
@@ -106,24 +107,54 @@ void GitHubRestApi::requestMilestones()
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onMilestonesReceived);
 }
 
-void GitHubRestApi::requestIssues()
+void GitHubRestApi::requestIssues(int page)
 {
-   const auto reply = mManager->get(createRequest(mRepoEndpoint + "/issues"));
+   auto request = createRequest(mRepoEndpoint + "/issues");
+   auto url = request.url();
+   QUrlQuery query;
+
+   if (page != -1)
+   {
+      query.addQueryItem("page", QString::number(page));
+      url.setQuery(query);
+   }
+
+   query.addQueryItem("per_page", QString::number(100));
+   url.setQuery(query);
+
+   request.setUrl(url);
+
+   const auto reply = mManager->get(request);
 
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onIssuesReceived);
 }
 
-void GitHubRestApi::requestPullRequests()
+void GitHubRestApi::requestPullRequests(int page)
 {
-   const auto reply = mManager->get(createRequest(mRepoEndpoint + "/pulls"));
+   auto request = createRequest(mRepoEndpoint + "/pulls");
+   auto url = request.url();
+   QUrlQuery query;
 
-   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onIssuesReceived);
+   if (page != -1)
+   {
+      query.addQueryItem("page", QString::number(page));
+      url.setQuery(query);
+   }
+
+   query.addQueryItem("per_page", QString::number(100));
+   url.setQuery(query);
+
+   request.setUrl(url);
+
+   const auto reply = mManager->get(request);
+
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestReceived);
 }
 
 void GitHubRestApi::requestPullRequestsState()
 {
    const auto reply = mManager->get(createRequest(mRepoEndpoint + "/pulls"));
-   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::processPullRequets);
+   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::processPullRequetsState);
 }
 
 void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
@@ -259,7 +290,7 @@ void GitHubRestApi::onPullRequestCreated()
       emit errorOccurred(errorStr);
 }
 
-void GitHubRestApi::processPullRequets()
+void GitHubRestApi::processPullRequetsState()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
@@ -343,7 +374,7 @@ void GitHubRestApi::onPullRequestStatusReceived()
       --mPrRequested;
 
       if (mPrRequested == 0)
-         emit pullRequestsReceived(mPulls);
+         emit pullRequestsStateReceived(mPulls);
    }
    else
       emit errorOccurred(errorStr);
@@ -364,6 +395,32 @@ void GitHubRestApi::onPullRequestMerged()
 void GitHubRestApi::onIssuesReceived()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
+
+   if (const auto pagination = QString::fromUtf8(reply->rawHeader("Link")); !pagination.isEmpty())
+   {
+      QStringList pages = pagination.split(",");
+      auto current = 0;
+      auto next = 0;
+      auto total = 0;
+
+      for (auto page : pages)
+      {
+         const auto values = page.trimmed().remove("<").remove(">").split(";");
+
+         if (values.last().contains("next"))
+         {
+            next = values.first().split("page=").last().toInt();
+            current = next - 1;
+         }
+         else if (values.last().contains("last"))
+            total = values.first().split("page=").last().toInt();
+      }
+
+      emit paginationPresent(current, next, total);
+   }
+   else
+      emit paginationPresent(0, 0, 0);
+
    const auto url = reply->url();
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
@@ -375,12 +432,117 @@ void GitHubRestApi::onIssuesReceived()
 
       for (const auto &issueData : issuesArray)
       {
-         auto issue = url.url().endsWith("/pulls") ? PullRequest() : Issue();
+         if (const auto issueObj = issueData.toObject(); !issueObj.contains("pull_request"))
+         {
+            Issue issue;
+            issue.number = issueData["number"].toInt();
+            issue.title = issueData["title"].toString();
+            issue.body = issueData["body"].toString().toUtf8();
+            issue.url = issueData["html_url"].toString();
+            issue.creation = issueData["created_at"].toVariant().toDateTime();
+
+            issue.creator
+                = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
+                    issueData["user"].toObject()["avatar_url"].toString(),
+                    issueData["user"].toObject()["html_url"].toString(),
+                    issueData["user"].toObject()["type"].toString() };
+
+            const auto labels = issueData["labels"].toArray();
+
+            for (auto label : labels)
+            {
+               issue.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
+                                     label["name"].toString(), label["description"].toString(),
+                                     label["color"].toString(), label["default"].toBool() });
+            }
+
+            const auto assignees = issueData["assignees"].toArray();
+
+            for (auto assignee : assignees)
+            {
+               GitServer::User sAssignee;
+               sAssignee.id = assignee["id"].toInt();
+               sAssignee.url = assignee["html_url"].toString();
+               sAssignee.name = assignee["login"].toString();
+               sAssignee.avatar = assignee["avatar_url"].toString();
+
+               issue.assignees.append(sAssignee);
+            }
+
+            Milestone sMilestone { issueData["milestone"].toObject()[QStringLiteral("id")].toInt(),
+                                   issueData["milestone"].toObject()[QStringLiteral("number")].toInt(),
+                                   issueData["milestone"].toObject()[QStringLiteral("node_id")].toString(),
+                                   issueData["milestone"].toObject()[QStringLiteral("title")].toString(),
+                                   issueData["milestone"].toObject()[QStringLiteral("description")].toString(),
+                                   issueData["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
+
+            issue.milestone = sMilestone;
+
+            issues.append(std::move(issue));
+         }
+      }
+
+      if (!issues.isEmpty())
+         emit issuesReceived(issues);
+   }
+}
+
+void GitHubRestApi::onPullRequestReceived()
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+
+   if (const auto pagination = QString::fromUtf8(reply->rawHeader("Link")); !pagination.isEmpty())
+   {
+      QStringList pages = pagination.split(",");
+      auto current = 0;
+      auto next = 0;
+      auto total = 0;
+
+      for (auto page : pages)
+      {
+         const auto values = page.trimmed().remove("<").remove(">").split(";");
+
+         if (values.last().contains("next"))
+         {
+            next = values.first().split("page=").last().toInt();
+            current = next - 1;
+         }
+         else if (values.last().contains("last"))
+            total = values.first().split("page=").last().toInt();
+      }
+
+      emit paginationPresent(current, next, total);
+   }
+   else
+      emit paginationPresent(0, 0, 0);
+
+   const auto url = reply->url();
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
+
+   if (!tmpDoc.isEmpty())
+   {
+      QVector<PullRequest> issues;
+      const auto issuesArray = tmpDoc.array();
+
+      for (const auto &issueData : issuesArray)
+      {
+         PullRequest issue;
          issue.number = issueData["number"].toInt();
          issue.title = issueData["title"].toString();
          issue.body = issueData["body"].toString().toUtf8();
          issue.url = issueData["html_url"].toString();
          issue.creation = issueData["created_at"].toVariant().toDateTime();
+         issue.commentsCount = issueData["comments"].toInt();
+         issue.reviewCommentsCount = issueData["review_comments"].toInt();
+         issue.commits = issueData["commits"].toInt();
+         issue.additions = issueData["aditions"].toInt();
+         issue.deletions = issueData["deletions"].toInt();
+         issue.changedFiles = issueData["changed_files"].toInt();
+         issue.merged = issueData["merged"].toBool();
+         issue.mergeable = issueData["mergeable"].toBool();
+         issue.rebaseable = issueData["rebaseable"].toBool();
+         issue.mergeableState = issueData["mergeable_state"].toString();
 
          issue.creator
              = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
@@ -422,7 +584,7 @@ void GitHubRestApi::onIssuesReceived()
       }
 
       if (!issues.isEmpty())
-         emit issuesReceived(issues);
+         emit pullRequestsReceived(issues);
    }
 }
 

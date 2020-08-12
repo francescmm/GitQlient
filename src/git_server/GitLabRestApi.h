@@ -42,8 +42,8 @@ public:
    void createPullRequest(const PullRequest &pr) override;
    void requestLabels() override;
    void requestMilestones() override;
-   void requestIssues() override { }
-   void requestPullRequests() override { }
+   void requestIssues(int) override { }
+   void requestPullRequests(int) override { }
    void requestPullRequestsState() override;
    void mergePullRequest(int, const QByteArray &) override { }
    void requestComments(const Issue &) override { }

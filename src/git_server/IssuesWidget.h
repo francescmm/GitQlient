@@ -29,11 +29,13 @@ class QVBoxLayout;
 class QScrollArea;
 class GitBase;
 class QLabel;
+class QSpinBox;
 
 namespace GitServer
 {
 class IRestApi;
 struct Issue;
+struct PullRequest;
 }
 
 class IssuesWidget : public QFrame
@@ -62,5 +64,9 @@ private:
    QLabel *mArrow = nullptr;
 
    void onIssuesReceived(const QVector<GitServer::Issue> &issues);
+   void onPullRequestsReceived(const QVector<GitServer::PullRequest> &pr);
    void onHeaderClicked();
+
+private slots:
+   void loadPage(int page = -1);
 };

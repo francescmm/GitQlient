@@ -79,6 +79,12 @@ signals:
     * @param issues The list of issues.
     */
    void issuesReceived(const QVector<Issue> &issues);
+
+   /**
+    * @brief pullRequestsReceived Signal triggered when the pull requests has been received.
+    * @param prs The list of prs.
+    */
+   void pullRequestsReceived(const QVector<PullRequest> &prs);
    /**
     * @brief pullRequestCreated Signal triggered when a pull request has been created.
     * @param url The url of the pull request.
@@ -88,7 +94,7 @@ signals:
     * @brief pullRequestsReceived Signal triggered when the pull requests are received and processed.
     * @param prs The list of pull requests ordered by SHA.
     */
-   void pullRequestsReceived(QMap<QString, PullRequest> prs);
+   void pullRequestsStateReceived(QMap<QString, PullRequest> prs);
    /**
     * @brief pullRequestMerged Signal triggered when the pull request has been merged.
     */
@@ -110,6 +116,15 @@ signals:
     * @param pr The Pull Request with the reviews.
     */
    void reviewsReceived(const PullRequest &pr);
+
+   /**
+    * @brief paginationPresent Signal triggered when the issues or pull requests are so many that they are sent
+    * paginated.
+    * @param current The current page.
+    * @param next The next page.
+    * @param total The total of pages.
+    */
+   void paginationPresent(int current, int next, int total);
 
 public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
@@ -148,12 +163,12 @@ public:
    /**
     * @brief requestIssues Requests the issues to the remote Git server.
     */
-   virtual void requestIssues() = 0;
+   virtual void requestIssues(int page = -1) = 0;
 
    /**
     * @brief requestPullRequests Requests the pull request to the remote Git server.
     */
-   virtual void requestPullRequests() = 0;
+   virtual void requestPullRequests(int page = -1) = 0;
    /**
     * @brief requestPullRequestsState Requests the pull request state to the remote Git server.
     */
