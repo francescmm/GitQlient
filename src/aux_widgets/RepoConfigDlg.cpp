@@ -9,6 +9,30 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QStyle>
+#include <QDir>
+#include <QProcess>
+#include <QStandardPaths>
+
+namespace
+{
+qint64 dirSize(QString dirPath)
+{
+   qint64 size = 0;
+   QDir dir(dirPath);
+
+   QDir::Filters fileFilters = QDir::Files | QDir::System | QDir::Hidden;
+   for (QString filePath : dir.entryList(fileFilters))
+   {
+      QFileInfo fi(dir, filePath);
+      size += fi.size();
+   }
+
+   QDir::Filters dirFilters = QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden;
+   for (QString childDirPath : dir.entryList(dirFilters))
+      size += dirSize(dirPath + QDir::separator() + childDirPath);
+   return size;
+}
+}
 
 RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QDialog(parent)
@@ -27,6 +51,7 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
        settings.localValue(mGit->getGitQlientSettingsDir(), "ClangFormatOnCommit", false).toBool());
    ui->updateOnPull->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", false).toBool());
    ui->tabWidget->setCurrentIndex(0);
+   connect(ui->pbClearCache, &ButtonLink::clicked, this, &RepoConfigDlg::clearCache);
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto localConfig = gitConfig->getLocalConfig();
@@ -76,6 +101,8 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    style()->polish(this);
 
    setAttribute(Qt::WA_DeleteOnClose);
+
+   calculateCacheSize();
 }
 
 RepoConfigDlg::~RepoConfigDlg()
@@ -129,4 +156,32 @@ void RepoConfigDlg::setConfig()
       default:
          break;
    }
+}
+
+void RepoConfigDlg::clearCache()
+{
+   const auto path = QString("%1").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+   QProcess p;
+   p.setWorkingDirectory(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+   p.start("rm", { "-rf", path });
+
+   if (p.waitForFinished())
+      calculateCacheSize();
+}
+
+void RepoConfigDlg::calculateCacheSize()
+{
+   auto size = 0;
+   const auto dirPath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+   QDir dir(dirPath);
+   QDir::Filters dirFilters = QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden | QDir::Files;
+   const auto &list = dir.entryInfoList(dirFilters);
+
+   for (const QFileInfo &file : list)
+   {
+      size += file.size();
+      size += dirSize(dirPath + "/" + file.fileName());
+   }
+
+   ui->lCacheSize->setText(QString("%1 KB").arg(size / 1024.0));
 }

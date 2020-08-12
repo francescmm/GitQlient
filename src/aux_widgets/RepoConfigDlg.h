@@ -28,6 +28,8 @@ private:
 
    void addUserConfig(const QStringList &elements, QGridLayout *layout);
    void setConfig();
+   void clearCache();
+   void calculateCacheSize();
 };
 
 #endif // REPOCONFIGDLG_H
