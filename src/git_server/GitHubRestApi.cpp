@@ -576,10 +576,12 @@ void GitHubRestApi::onPullRequestReceived()
 
          mPullRequests.insert(number, std::move(pr));
 
+         /*
          QTimer::singleShot(200, [this, number]() {
             const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1").arg(number)));
             connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestDetailesReceived);
          });
+         */
       }
 
       auto prs = mPullRequests.values().toVector();
