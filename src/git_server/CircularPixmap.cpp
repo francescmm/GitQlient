@@ -35,7 +35,7 @@ void CircularPixmap::paintEvent(QPaintEvent *e)
       path.addEllipse(startX, 0, mSize.width(), mSize.height());
       painter.setClipPath(path);
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-      painter.drawPixmap(0, 0, mSize.width(), mSize.height(), *pixmap());
+      painter.drawPixmap(startX, 0, mSize.width(), mSize.height(), *pixmap());
 #else
       painter.drawPixmap(startX, 0, mSize.width(), mSize.height(), pixmap(Qt::ReturnByValue));
 #endif
