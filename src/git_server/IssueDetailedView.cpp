@@ -345,16 +345,56 @@ QLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
    return layout;
 }
 
-QLayout *IssueDetailedView::createBubbleForReview(const Review &review, QVector<CodeReview> &codeReviews)
+QLayout *IssueDetailedView::createBubbleForReview(const Review &review)
+{
+   const auto frame = new QFrame();
+   QString header;
+
+   if (review.state == QString::fromUtf8("CHANGES_REQUESTED"))
+   {
+      frame->setObjectName("IssueIntroChangesRequested");
+
+      header = QString("<b>%1</b> (%2) requested changes ").arg(review.creator.name, review.association.toLower());
+   }
+   else if (review.state == QString::fromUtf8("APPROVED"))
+   {
+      frame->setObjectName("IssueIntroApproved");
+
+      header = QString("<b>%1</b> (%2) approved the PR ").arg(review.creator.name, review.association.toLower());
+   }
+
+   const auto creationLayout = new QHBoxLayout();
+   creationLayout->setContentsMargins(QMargins());
+   creationLayout->setSpacing(0);
+   creationLayout->addWidget(createHeadline(review.creation, header));
+   creationLayout->addStretch();
+
+   const auto innerLayout = new QVBoxLayout(frame);
+   innerLayout->setContentsMargins(10, 10, 10, 10);
+   innerLayout->setSpacing(20);
+   innerLayout->addLayout(creationLayout);
+   innerLayout->addSpacing(20);
+
+   const auto layout = new QHBoxLayout();
+   layout->setContentsMargins(QMargins());
+   layout->setSpacing(30);
+   layout->addSpacing(30);
+   layout->addWidget(createAvatar(review.creator.name, review.creator.avatar));
+   layout->addWidget(frame);
+
+   return layout;
+}
+
+void IssueDetailedView::createBubbleForCodeReview(int reviewId, QVector<CodeReview> comments, QVBoxLayout *layouts)
 {
    QMap<int, QVector<CodeReview>> reviews;
    QVector<int> codeReviewIds;
 
-   QMutableVectorIterator<CodeReview> iter(codeReviews);
+   QMutableVectorIterator<CodeReview> iter(comments);
    while (iter.hasNext())
    {
       auto &codeReview = iter.next();
-      if (codeReview.reviewId == review.id)
+      if (codeReview.reviewId == reviewId)
       {
          codeReviewIds.append(codeReview.id);
          reviews[codeReview.id].append(codeReview);
@@ -367,49 +407,6 @@ QLayout *IssueDetailedView::createBubbleForReview(const Review &review, QVector<
       }
    }
 
-   const auto layouts = new QVBoxLayout();
-
-   // Create the review bubble
-   if (review.state != QString::fromUtf8("COMMENTED"))
-   {
-      const auto frame = new QFrame();
-      QString header;
-
-      if (review.state == QString::fromUtf8("CHANGES_REQUESTED"))
-      {
-         frame->setObjectName("IssueIntroChangesRequested");
-
-         header = QString("<b>%1</b> (%2) requested changes ").arg(review.creator.name, review.association.toLower());
-      }
-      else if (review.state == QString::fromUtf8("APPROVED"))
-      {
-         frame->setObjectName("IssueIntroApproved");
-
-         header = QString("<b>%1</b> (%2) approved the PR ").arg(review.creator.name, review.association.toLower());
-      }
-
-      const auto creationLayout = new QHBoxLayout();
-      creationLayout->setContentsMargins(QMargins());
-      creationLayout->setSpacing(0);
-      creationLayout->addWidget(createHeadline(review.creation, header));
-      creationLayout->addStretch();
-
-      const auto innerLayout = new QVBoxLayout(frame);
-      innerLayout->setContentsMargins(10, 10, 10, 10);
-      innerLayout->setSpacing(20);
-      innerLayout->addLayout(creationLayout);
-      innerLayout->addSpacing(20);
-
-      const auto layout = new QHBoxLayout();
-      layout->setContentsMargins(QMargins());
-      layout->setSpacing(30);
-      layout->addSpacing(30);
-      layout->addWidget(createAvatar(review.creator.name, review.creator.avatar));
-      layout->addWidget(frame);
-
-      layouts->addLayout(layout);
-   }
-
    if (!reviews.isEmpty())
    {
       for (auto &codeReviews : reviews)
@@ -417,18 +414,13 @@ QLayout *IssueDetailedView::createBubbleForReview(const Review &review, QVector<
          std::sort(codeReviews.begin(), codeReviews.end(),
                    [](const CodeReview &r1, const CodeReview &r2) { return r1.creation < r2.creation; });
 
-         const auto commentsLayout = createBubbleForCodeComment(codeReviews);
-         const auto firstReview = codeReviews.first();
-
-         const auto layout = createBubbleForCodeReview(firstReview, commentsLayout);
-         layouts->addLayout(layout);
+         const auto commentsLayout = createBubbleForCodeReviewInitial(codeReviews);
+         layouts->addLayout(createBubbleForCodeReviewComments(codeReviews.first(), commentsLayout));
       }
    }
-
-   return layouts;
 }
 
-QLayout *IssueDetailedView::createBubbleForCodeReview(const CodeReview &review, QLayout *commentsLayout)
+QLayout *IssueDetailedView::createBubbleForCodeReviewComments(const CodeReview &review, QLayout *commentsLayout)
 {
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
@@ -464,7 +456,7 @@ QLayout *IssueDetailedView::createBubbleForCodeReview(const CodeReview &review, 
    return layout;
 }
 
-QLayout *IssueDetailedView::createBubbleForCodeComment(const QVector<CodeReview> &reviews)
+QLayout *IssueDetailedView::createBubbleForCodeReviewInitial(const QVector<CodeReview> &reviews)
 {
    const auto layout = new QGridLayout();
    layout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -527,10 +519,14 @@ void IssueDetailedView::onReviewsReceived(PullRequest pr)
 
    for (const auto review : pr.reviews)
    {
-      const auto layout = createBubbleForReview(review, pr.reviewComment);
+      const auto layouts = new QVBoxLayout();
 
-      if (layout)
-         bubblesMap.insert(review.creation, layout);
+      if (review.state != QString::fromUtf8("COMMENTED"))
+         layouts->addLayout(createBubbleForReview(review));
+
+      createBubbleForCodeReview(review.id, pr.reviewComment, layouts);
+
+      bubblesMap.insert(review.creation, layouts);
    }
 
    for (auto layout : bubblesMap)

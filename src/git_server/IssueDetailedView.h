@@ -78,7 +78,8 @@ private:
    QLabel *createHeadline(const QDateTime &dt, const QString &prefix = QString());
 
    QLayout *createBubbleForComment(const GitServer::Comment &comment);
-   QLayout *createBubbleForReview(const GitServer::Review &review, QVector<GitServer::CodeReview> &codeReviews);
-   QLayout *createBubbleForCodeReview(const GitServer::CodeReview &review, QLayout *commentsLayout);
-   QLayout *createBubbleForCodeComment(const QVector<GitServer::CodeReview> &reviews);
+   QLayout *createBubbleForReview(const GitServer::Review &review);
+   void createBubbleForCodeReview(int reviewId, QVector<GitServer::CodeReview> comments, QVBoxLayout *layouts);
+   QLayout *createBubbleForCodeReviewComments(const GitServer::CodeReview &review, QLayout *commentsLayout);
+   QLayout *createBubbleForCodeReviewInitial(const QVector<GitServer::CodeReview> &reviews);
 };
