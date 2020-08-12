@@ -125,7 +125,7 @@ void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
 
    mIssue = issue;
 
-   const auto title = new QLabel(mIssue.title);
+   const auto title = new QLabel(QString("#%1 - %2").arg(QString::number(mIssue.number), mIssue.title));
    title->setWordWrap(false);
    title->setObjectName("IssueViewTitle");
 
