@@ -70,13 +70,15 @@ private:
    QHBoxLayout *mIssueDetailedViewLayout = nullptr;
    QScrollArea *mScrollArea = nullptr;
 
-   void storeCreatorAvatar(QLabel *avatar, const QString &fileName);
+   void storeCreatorAvatar(QLabel *avatar, const QString &fileName) const;
    void onCommentReceived(const GitServer::Issue &issue);
    void onReviewsReceived(GitServer::PullRequest pr);
    void processComments(const GitServer::Issue &issue);
-   void processReviews(const GitServer::PullRequest &pr);
+   QLabel *createAvatar(const QString &userName, const QString &avatarUrl) const;
+   QLabel *createWhenText(const QDateTime &dt, const QString &prefix = QString());
 
    QHBoxLayout *createBubbleForComment(const GitServer::Comment &comment);
    QLayout *createBubbleForReview(const GitServer::Review &review, QVector<GitServer::CodeReview> &codeReviews);
-   QLayout *createBubbleForCodeReview(const QVector<GitServer::CodeReview> &reviews);
+   QLayout *createBubbleForCodeReview(const GitServer::CodeReview &review, QLayout *commentsLayout);
+   QLayout *createBubbleForCodeComment(const QVector<GitServer::CodeReview> &reviews);
 };
