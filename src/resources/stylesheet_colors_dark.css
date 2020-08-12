@@ -670,6 +670,7 @@ QSpinBox
 {
     color: white;
     border-color: #D89000;
+    background-color: transparent;
 }
 
 QSpinBox::up-button:hover, QSpinBox::down-button:hover
