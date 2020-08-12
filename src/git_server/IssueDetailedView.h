@@ -75,9 +75,9 @@ private:
    void onReviewsReceived(GitServer::PullRequest pr);
    void processComments(const GitServer::Issue &issue);
    QLabel *createAvatar(const QString &userName, const QString &avatarUrl) const;
-   QLabel *createWhenText(const QDateTime &dt, const QString &prefix = QString());
+   QLabel *createHeadline(const QDateTime &dt, const QString &prefix = QString());
 
-   QHBoxLayout *createBubbleForComment(const GitServer::Comment &comment);
+   QLayout *createBubbleForComment(const GitServer::Comment &comment);
    QLayout *createBubbleForReview(const GitServer::Review &review, QVector<GitServer::CodeReview> &codeReviews);
    QLayout *createBubbleForCodeReview(const GitServer::CodeReview &review, QLayout *commentsLayout);
    QLayout *createBubbleForCodeComment(const QVector<GitServer::CodeReview> &reviews);

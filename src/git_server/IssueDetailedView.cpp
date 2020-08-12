@@ -143,7 +143,7 @@ void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
    creator->setObjectName("CreatorLink");
 
    creationLayout->addWidget(creator);
-   creationLayout->addWidget(createWhenText(mIssue.creation));
+   creationLayout->addWidget(createHeadline(mIssue.creation));
    creationLayout->addStretch();
 
    if (!mIssue.assignees.isEmpty())
@@ -262,7 +262,7 @@ QLabel *IssueDetailedView::createAvatar(const QString &userName, const QString &
    return avatar;
 }
 
-QLabel *IssueDetailedView::createWhenText(const QDateTime &dt, const QString &prefix)
+QLabel *IssueDetailedView::createHeadline(const QDateTime &dt, const QString &prefix)
 {
    const auto days = dt.daysTo(QDateTime::currentDateTime());
    const auto whenText = days <= 30
@@ -300,7 +300,7 @@ void IssueDetailedView::storeCreatorAvatar(QLabel *avatar, const QString &fileNa
    reply->deleteLater();
 }
 
-QHBoxLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
+QLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
 {
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
@@ -311,7 +311,7 @@ QHBoxLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
    creator->setObjectName("CreatorLink");
 
    creationLayout->addWidget(creator);
-   creationLayout->addWidget(createWhenText(comment.creation));
+   creationLayout->addWidget(createHeadline(comment.creation));
    creationLayout->addStretch();
    creationLayout->addWidget(new QLabel(comment.association));
 
@@ -391,7 +391,7 @@ QLayout *IssueDetailedView::createBubbleForReview(const Review &review, QVector<
       const auto creationLayout = new QHBoxLayout();
       creationLayout->setContentsMargins(QMargins());
       creationLayout->setSpacing(0);
-      creationLayout->addWidget(createWhenText(review.creation, header));
+      creationLayout->addWidget(createHeadline(review.creation, header));
       creationLayout->addStretch();
 
       const auto innerLayout = new QVBoxLayout(frame);
@@ -437,7 +437,7 @@ QLayout *IssueDetailedView::createBubbleForCodeReview(const CodeReview &review, 
    const auto header
        = QString("<b>%1</b> (%2) started a review ").arg(review.creator.name, review.association.toLower());
 
-   creationLayout->addWidget(createWhenText(review.creation, header));
+   creationLayout->addWidget(createHeadline(review.creation, header));
    creationLayout->addStretch();
 
    const auto frame = new QFrame();
@@ -475,7 +475,7 @@ QLayout *IssueDetailedView::createBubbleForCodeComment(const QVector<CodeReview>
 
    for (auto &review : reviews)
    {
-      const auto creator = createWhenText(review.creation, QString("<b>%1</b><br/>").arg(review.creator.name));
+      const auto creator = createHeadline(review.creation, QString("<b>%1</b><br/>").arg(review.creator.name));
       creator->setObjectName("CodeReviewAuthor");
       creator->setAlignment(Qt::AlignCenter);
       creator->setToolTip(review.association);
