@@ -295,9 +295,9 @@ QLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
    const auto body = new QTextEdit();
    body->setMarkdown(comment.body);
    body->setReadOnly(true);
-   show();
+   body->show();
    const auto height = body->document()->size().height();
-   body->setMinimumHeight(height / 2);
+   body->setMinimumHeight(height * 3 / 4);
 #else
    const auto body = new QLabel(comment.body);
    body->setWordWrap(true);
@@ -464,7 +464,7 @@ QLayout *IssueDetailedView::createBubbleForCodeReviewInitial(const QVector<CodeR
       body->setReadOnly(true);
       body->show();
       const auto height = body->document()->size().height();
-      body->setMinimumHeight(height / 2);
+      body->setMinimumHeight(height * 3 / 4);
 #else
       const auto body = new QLabel(review.body);
       body->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
