@@ -41,7 +41,7 @@ class FullDiffWidget;
 class FileDiffWidget;
 class BranchesWidgetMinimal;
 class QPushButton;
-
+class GitServerCache;
 /*!
  \brief The HistoryWidget is the responsible fro showing the history of the repository. It is the first widget shown
  when a repository is open and manages all the signals from its subwidgets to the GitQlientRepo class. It also creates
@@ -157,7 +157,7 @@ public:
     \param parent The parent widget if needed.
    */
    explicit HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
-                          QWidget *parent = nullptr);
+                          const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
    /*!
     \brief Destructor.
 
@@ -230,6 +230,7 @@ private:
 
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitCache> mCache;
+   QSharedPointer<GitServerCache> mGitServerCache;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;

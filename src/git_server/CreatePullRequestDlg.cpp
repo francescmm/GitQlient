@@ -19,8 +19,8 @@
 
 using namespace GitServer;
 
-CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache,
-                                           const QSharedPointer<GitBase> &git, QWidget *parent)
+CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                                           QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::CreatePullRequestDlg)
    , mCache(cache)
@@ -154,9 +154,9 @@ void CreatePullRequestDlg::onLabels(const QVector<Label> &labels)
    ui->labelsListView->setModel(model);
 }
 
-void CreatePullRequestDlg::onPullRequestCreated(QString url)
+void CreatePullRequestDlg::onPullRequestCreated(const PullRequest &pr)
 {
-   mFinalUrl = url;
+   mFinalUrl = pr.url;
 
    if (dynamic_cast<GitHubRestApi *>(mApi))
    {

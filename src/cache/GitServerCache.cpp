@@ -43,6 +43,8 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
            [this](const PullRequest &pr) { mPullRequests[pr.number] = pr; });
    connect(mApi.get(), &IRestApi::issueCreated, this, []() {});
    connect(mApi.get(), &IRestApi::pullRequestCreated, this, []() {});
+   connect(mApi.get(), &IRestApi::pullRequestCreated, this,
+           [this](const PullRequest &pr) { mPullRequests[pr.number] = pr; });
 
    mApi->requestLabels();
    mApi->requestMilestones();
@@ -54,10 +56,20 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
    connect(mApi.get(), &IRestApi::milestonesReceived, this, [](){});
    connect(mApi.get(), &IRestApi::milestonesReceived, this, [](){});
    connect(mApi.get(), &IRestApi::milestonesReceived, this, [](){});
-   connect(mApi.get(), &IRestApi::milestonesReceived, this, [](){});
    */
 
    return mInit;
+}
+
+PullRequest GitServerCache::getPullRequest(const QString &sha) const
+{
+   const auto iter = std::find_if(mPullRequests.constBegin(), mPullRequests.constEnd(),
+                                  [sha](const GitServer::PullRequest &pr) { return pr.state.sha == sha; });
+
+   if (iter != mPullRequests.constEnd())
+      return *iter;
+
+   return PullRequest();
 }
 
 GitServer::Platform GitServerCache::getPlatform() const

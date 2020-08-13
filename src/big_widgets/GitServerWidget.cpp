@@ -1,9 +1,6 @@
 #include <GitServerWidget.h>
 
 #include <ServerConfigDlg.h>
-#include <GitConfig.h>
-#include <GitQlientSettings.h>
-#include <GitBase.h>
 #include <GitServerCache.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
@@ -136,12 +133,5 @@ void GitServerWidget::createNewIssue()
 void GitServerWidget::createNewPullRequest()
 {
    const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
-
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
-
-   if (serverUrl.contains("github"))
-      connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, mCache.get(), &GitCache::refreshPRsCache);
-
    prDlg->exec();
 }

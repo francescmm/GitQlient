@@ -17,10 +17,11 @@
 using namespace QLogger;
 
 CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                                     QWidget *parent)
+                                     const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QTreeView(parent)
    , mCache(cache)
    , mGit(git)
+   , mGitServerCache(gitServerCache)
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -212,8 +213,8 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
 
       if (!shas.isEmpty())
       {
-         const auto menu = new CommitHistoryContextMenu(mCache, mGit, shas, this);
-         connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, mCache.get(), &GitCache::refreshPRsCache);
+         const auto menu = new CommitHistoryContextMenu(mCache, mGit, mGitServerCache, shas, this);
+         // connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, mCache.get(), &GitCache::refreshPRsCache);
          connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,

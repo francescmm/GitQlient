@@ -4,8 +4,6 @@
 
 #include <QLogger.h>
 
-#include <QTimer>
-
 using namespace QLogger;
 using namespace GitServer;
 
@@ -77,16 +75,6 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &co
    }
 }
 
-void GitCache::setupGitPlatform(const QSharedPointer<IRestApi> &api)
-{
-   if (mApi)
-      disconnect(mApi.get(), &IRestApi::pullRequestsStateReceived, this, &GitCache::setPullRequestStatus);
-
-   mApi = api;
-
-   connect(mApi.get(), &IRestApi::pullRequestsStateReceived, this, &GitCache::setPullRequestStatus);
-}
-
 CommitInfo GitCache::getCommitInfoByRow(int row)
 {
    QMutexLocker lock(&mMutex);
@@ -109,8 +97,7 @@ int GitCache::getCommitPos(const QString &sha)
    return -1;
 }
 
-CommitInfo GitCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint,
-                                                bool reverse)
+CommitInfo GitCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint, bool reverse)
 {
    QMutexLocker lock(&mMutex);
    CommitInfo commit;
@@ -198,8 +185,7 @@ void GitCache::insertCommitInfo(CommitInfo rev, int orderIdx)
    }
 }
 
-void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIndex,
-                                       const QString &diffIndexCache)
+void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
 {
    QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
 
@@ -465,23 +451,6 @@ void GitCache::updateTags(const QMap<QString, QString> &remoteTags)
    mRemoteTags = remoteTags;
 }
 
-void GitCache::setPullRequestStatus(QMap<QString, PullRequest> prStatus)
-{
-   mPullRequestsStatus = std::move(prStatus);
-
-   emit signalCacheUpdated();
-}
-
-PullRequest GitCache::getPullRequestStatus(const QString &sha)
-{
-   return mPullRequestsStatus.value(sha);
-}
-
-void GitCache::refreshPRsCache()
-{
-   QTimer::singleShot(1500, this, [this]() { mApi->requestPullRequestsState(); });
-}
-
 void GitCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
@@ -536,7 +505,7 @@ void GitCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum,
 }
 
 QVector<CommitInfo *>::const_iterator GitCache::searchCommit(CommitInfo::Field field, const QString &text,
-                                                                   const int startingPoint) const
+                                                             const int startingPoint) const
 {
    return std::find_if(mCommits.constBegin() + startingPoint, mCommits.constEnd(),
                        [field, text](CommitInfo *info) { return info->getFieldStr(field).contains(text); });

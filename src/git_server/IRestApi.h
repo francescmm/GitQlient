@@ -89,12 +89,12 @@ signals:
     * @brief pullRequestCreated Signal triggered when a pull request has been created.
     * @param url The url of the pull request.
     */
-   void pullRequestCreated(QString url);
+   void pullRequestCreated(const PullRequest &pr);
    /**
     * @brief pullRequestsReceived Signal triggered when the pull requests are received and processed.
-    * @param prs The list of pull requests ordered by SHA.
+    * @param pr The pull request that got the state updated.
     */
-   void pullRequestsStateReceived(QMap<QString, PullRequest> prs);
+   void pullRequestsStateReceived(const PullRequest &pr);
    /**
     * @brief pullRequestMerged Signal triggered when the pull request has been merged.
     */
@@ -169,10 +169,6 @@ public:
     * @brief requestPullRequests Requests the pull request to the remote Git server.
     */
    virtual void requestPullRequests(int page = -1) = 0;
-   /**
-    * @brief requestPullRequestsState Requests the pull request state to the remote Git server.
-    */
-   virtual void requestPullRequestsState() = 0;
    /**
     * @brief mergePullRequest Merges a pull request into the destination branch.
     * @param number The number of the pull request.

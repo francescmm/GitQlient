@@ -29,6 +29,7 @@ class GitCache;
 class GitBase;
 class CommitHistoryModel;
 class ShaFilterProxyModel;
+class GitServerCache;
 
 /**
  * @brief The CommitHistoryView is the class that represents the View in a MVC pattern. It shows the data provided by
@@ -90,7 +91,7 @@ public:
     * @param parent The parent widget if needed.
     */
    explicit CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                              QWidget *parent = nullptr);
+                              const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
    /**
     * @brief Destructor.
     */
@@ -153,6 +154,7 @@ public:
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitServerCache> mGitServerCache;
    CommitHistoryModel *mCommitHistoryModel = nullptr;
    ShaFilterProxyModel *mProxyModel = nullptr;
    bool mIsFiltering = false;

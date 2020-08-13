@@ -37,6 +37,7 @@ namespace GitServer
 {
 struct Milestone;
 struct Label;
+struct PullRequest;
 class IRestApi;
 }
 
@@ -95,7 +96,7 @@ private:
     * @brief onPullRequestCreated Shows a message box with the url of the pull request already created.
     * @param url The url that links to the pull request.
     */
-   void onPullRequestCreated(QString url);
+   void onPullRequestCreated(const GitServer::PullRequest &pr);
    /**
     * @brief onPullRequestUpdated On GitHub, some parameters in the Pull Request are configured in an second update
     * call. This indicates the widget that that update was successfully and triggers the message box to inform of the

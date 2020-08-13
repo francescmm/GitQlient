@@ -51,6 +51,7 @@ public:
 
    QVector<GitServer::PullRequest> getPullRequests() const { return mPullRequests.values().toVector(); }
    GitServer::PullRequest getPullRequest(int number) const { return mPullRequests.value(number); }
+   GitServer::PullRequest getPullRequest(const QString &sha) const;
    QVector<GitServer::Issue> getIssues() const { return mIssues.values().toVector(); }
    GitServer::Issue getIssue(int number) const { return mIssues.value(number); }
    QVector<GitServer::Label> getLabels() const { return mLabels; }

@@ -31,6 +31,7 @@ class GitCache;
 class GitBase;
 class Lane;
 class CommitInfo;
+class GitServerCache;
 
 namespace GitServer
 {
@@ -59,7 +60,7 @@ public:
     * @param view The view that uses the delegate.
     */
    RepositoryViewDelegate(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                          CommitHistoryView *view);
+                          const QSharedPointer<GitServerCache> &gitServerCache, CommitHistoryView *view);
 
    /**
     * @brief Overrided method to paint the different columns and rows in the view.
@@ -83,6 +84,7 @@ protected:
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitServerCache> mGitServerCache;
    CommitHistoryView *mView = nullptr;
    int diffTargetRow = -1;
    int mColumnPressed = -1;

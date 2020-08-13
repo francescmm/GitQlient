@@ -137,8 +137,6 @@ void GitLabRestApi::requestMilestones()
    connect(reply, &QNetworkReply::finished, this, &GitLabRestApi::onMilestonesReceived);
 }
 
-void GitLabRestApi::requestPullRequestsState() { }
-
 QNetworkRequest GitLabRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
@@ -322,7 +320,7 @@ void GitLabRestApi::onMergeRequestCreated()
       const auto list = tmpDoc.toVariant().toList();
       const auto url = issue[QStringLiteral("web_url")].toString();
 
-      emit pullRequestCreated(url);
+      emit pullRequestCreated(PullRequest());
    }
    else
       emit errorOccurred(errorStr);

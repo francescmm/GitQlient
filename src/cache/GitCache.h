@@ -26,17 +26,11 @@
 #include <RevisionFiles.h>
 #include <lanes.h>
 #include <CommitInfo.h>
-#include <PullRequest.h>
 
 #include <QSharedPointer>
 #include <QObject>
 #include <QHash>
 #include <QMutex>
-
-namespace GitServer
-{
-class IRestApi;
-}
 
 struct WipRevisionInfo
 {
@@ -67,7 +61,6 @@ public:
    ~GitCache();
 
    void setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits);
-   void setupGitPlatform(const QSharedPointer<GitServer::IRestApi> &api);
 
    int count() const;
 
@@ -95,7 +88,6 @@ public:
 
    void updateTags(const QMap<QString, QString> &remoteTags);
 
-   GitServer::PullRequest getPullRequestStatus(const QString &sha);
    void refreshPRsCache();
 
 private:
@@ -114,8 +106,6 @@ private:
    QVector<QString> mFileNames;
    QVector<QString> mUntrackedfiles;
    QMap<QString, QString> mRemoteTags;
-   QMap<QString, GitServer::PullRequest> mPullRequestsStatus;
-   QSharedPointer<GitServer::IRestApi> mApi;
 
    struct FileNamesLoader
    {
@@ -144,5 +134,4 @@ private:
    QVector<CommitInfo *>::const_reverse_iterator reverseSearchCommit(CommitInfo::Field field, const QString &text,
                                                                      int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);
-   void setPullRequestStatus(QMap<QString, GitServer::PullRequest> prStatus);
 };

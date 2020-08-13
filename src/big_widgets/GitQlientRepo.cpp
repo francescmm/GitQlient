@@ -44,7 +44,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mGitServerCache(new GitServerCache())
    , mGitBase(new GitBase(repoPath))
    , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache))
-   , mHistoryWidget(new HistoryWidget(mGitQlientCache, mGitBase))
+   , mHistoryWidget(new HistoryWidget(mGitQlientCache, mGitBase, mGitServerCache))
    , mStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGitQlientCache, mGitBase))
    , mDiffWidget(new DiffWidget(mGitBase, mGitQlientCache))
@@ -66,23 +66,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
    mGitServerCache->init(serverUrl, repoInfo);
-
-   if (serverUrl.contains("github"))
-   {
-      mAutoPrUpdater = new QTimer();
-      mAutoPrUpdater->start(300 * 1000);
-
-      connect(mAutoPrUpdater, &QTimer::timeout, mGitQlientCache.get(), &GitCache::refreshPRsCache);
-      connect(mControls, &Controls::signalRefreshPRsCache, mGitQlientCache.get(), &GitCache::refreshPRsCache);
-
-      GitQlientSettings settings;
-      const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
-      const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
-      const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
-
-      mApi.reset(new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint }));
-      mGitQlientCache->setupGitPlatform(mApi);
-   }
 
    mStackedLayout->addWidget(mHistoryWidget);
    mStackedLayout->addWidget(mDiffWidget);

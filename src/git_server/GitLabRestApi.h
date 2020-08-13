@@ -44,7 +44,6 @@ public:
    void requestMilestones() override;
    void requestIssues(int) override { }
    void requestPullRequests(int) override { }
-   void requestPullRequestsState() override;
    void mergePullRequest(int, const QByteArray &) override { }
    void requestComments(const Issue &) override { }
    void requestReviews(const PullRequest &) override { }

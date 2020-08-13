@@ -52,28 +52,24 @@ public:
    void requestMilestones() override;
    void requestIssues(int page = -1) override;
    void requestPullRequests(int page = -1) override;
-   void requestPullRequestsState() override;
    void mergePullRequest(int number, const QByteArray &data) override;
    void requestComments(const Issue &issue) override;
    void requestReviews(const PullRequest &pr) override;
 
 private:
-   QMap<QString, PullRequest> mPulls;
    QMap<int, PullRequest> mPullRequests;
    int mPullRequestsRequested = 0;
    QString mRepoEndpoint;
-   int mPrRequested = 0;
 
    QNetworkRequest createRequest(const QString &page) const override;
    void onLabelsReceived();
    void onMilestonesReceived();
    void onIssueCreated();
    void onPullRequestCreated();
-   void processPullRequetsState();
-   void onPullRequestStatusReceived();
    void onPullRequestMerged();
-   void onIssuesReceived();
    void onPullRequestReceived();
+   void onPullRequestStatusReceived(PullRequest pr);
+   void onIssuesReceived();
    void onCommentsReceived(Issue issue);
    void onPullRequestDetailesReceived();
    void onReviewsReceived(PullRequest pr);

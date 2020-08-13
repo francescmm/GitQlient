@@ -1,5 +1,6 @@
 ﻿#include "RepositoryViewDelegate.h"
 
+#include <GitServerCache.h>
 #include <GitQlientStyles.h>
 #include <GitLocal.h>
 #include <Lane.h>
@@ -27,9 +28,12 @@ using namespace GitServer;
 static const int MIN_VIEW_WIDTH_PX = 480;
 
 RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<GitCache> &cache,
-                                               const QSharedPointer<GitBase> &git, CommitHistoryView *view)
+                                               const QSharedPointer<GitBase> &git,
+                                               const QSharedPointer<GitServerCache> &gitServerCache,
+                                               CommitHistoryView *view)
    : mCache(cache)
    , mGit(git)
+   , mGitServerCache(gitServerCache)
    , mView(view)
 {
 }
@@ -400,10 +404,13 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto offset = 0;
 
-   if (const auto pr = mCache->getPullRequestStatus(commit.sha()); pr.isValid())
+   if (mGitServerCache)
    {
-      offset = 5;
-      paintPrStatus(p, opt, offset, pr);
+      if (const auto pr = mGitServerCache->getPullRequest(commit.sha()); pr.isValid())
+      {
+         offset = 5;
+         paintPrStatus(p, opt, offset, pr);
+      }
    }
 
    if (commit.hasReferences() && !mView->hasActiveFilter())

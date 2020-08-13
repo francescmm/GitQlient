@@ -3,16 +3,18 @@
 #include <CommitHistoryColumns.h>
 #include <CommitInfo.h>
 #include <GitCache.h>
+#include <GitServerCache.h>
 #include <GitBase.h>
 
 #include <QDateTime>
 #include <QLocale>
 
 CommitHistoryModel::CommitHistoryModel(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                                       QObject *p)
+                                       const QSharedPointer<GitServerCache> &gitServerCache, QObject *p)
    : QAbstractItemModel(p)
    , mCache(cache)
    , mGit(git)
+   , mGitServerCache(gitServerCache)
 {
    mColumns.insert(CommitHistoryColumns::TreeViewIcon, "");
    mColumns.insert(CommitHistoryColumns::Graph, "Graph");
@@ -105,8 +107,11 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
              .arg(r.author().split("<").first(), d.toString(locale.dateTimeFormat(QLocale::ShortFormat)), sha,
                   auxMessage);
 
-   if (const auto pr = mCache->getPullRequestStatus(sha); pr.isValid())
-      tooltip.append(QString("<p><b>PR state: </b>%1.</p>").arg(pr.state.state));
+   if (mGitServerCache)
+   {
+      if (const auto pr = mGitServerCache->getPullRequest(sha); pr.isValid())
+         tooltip.append(QString("<p><b>PR state: </b>%1.</p>").arg(pr.state.state));
+   }
 
    return tooltip;
 }

@@ -21,7 +21,6 @@ GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<Git
    , mGitBase(gitBase)
    , mRevCache(std::move(cache))
 {
-   connect(this, &GitRepoLoader::signalRefreshPRsCache, mRevCache.get(), &GitCache::refreshPRsCache);
 }
 
 bool GitRepoLoader::loadRepository()
