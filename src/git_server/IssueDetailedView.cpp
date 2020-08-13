@@ -21,6 +21,8 @@
 #include <QDir>
 #include <QNetworkAccessManager>
 #include <QTextEdit>
+#include <QScrollBar>
+#include <QScrollArea>
 
 using namespace GitServer;
 
@@ -92,7 +94,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, QWidget
 
    const auto timer = new QTimer();
    // connect(timer, &QTimer::timeout, this, &IssueDetailedView::loadData);
-   timer->start(300000);
+   timer->start(900000);
 }
 
 void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
@@ -201,14 +203,16 @@ void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
    layout->addSpacing(20);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-   const auto textEdit = new QTextEdit();
-   textEdit->setMarkdown(QString::fromUtf8(mIssue.body));
-   const auto body = new QLabel(textEdit->toHtml());
-   delete textEdit;
+   const auto body = new QTextEdit();
+   body->setMarkdown(QString::fromUtf8(mIssue.body));
+   body->setReadOnly(true);
+   body->show();
+   const auto height = body->document()->size().height();
+   body->setFixedHeight(height);
 #else
    const auto body = new QLabel(mIssue.body);
-#endif
    body->setWordWrap(true);
+#endif
    layout->addWidget(body);
 
    mIssuesLayout->addWidget(frame);
@@ -316,14 +320,16 @@ QLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
    creationLayout->addWidget(new QLabel(comment.association));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-   const auto textEdit = new QTextEdit();
-   textEdit->setMarkdown(comment.body);
-   const auto body = new QLabel(textEdit->toHtml());
-   delete textEdit;
+   const auto body = new QTextEdit();
+   body->setMarkdown(comment.body);
+   body->setReadOnly(true);
+   body->show();
+   const auto height = body->document()->size().height();
+   body->setMinimumHeight(height / 2);
 #else
    const auto body = new QLabel(comment.body);
-#endif
    body->setWordWrap(true);
+#endif
 
    const auto frame = new QFrame();
    frame->setObjectName("IssueIntro");
@@ -481,15 +487,17 @@ QLayout *IssueDetailedView::createBubbleForCodeReviewInitial(const QVector<CodeR
       avatarLayout->addStretch();
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-      const auto textEdit = new QTextEdit();
-      textEdit->setMarkdown(review.body);
-      const auto body = new QLabel(textEdit->toHtml());
-      delete textEdit;
+      const auto body = new QTextEdit();
+      body->setMarkdown(review.body);
+      body->setReadOnly(true);
+      body->show();
+      const auto height = body->document()->size().height();
+      body->setMinimumHeight(height / 2);
 #else
       const auto body = new QLabel(review.body);
-#endif
       body->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
       body->setWordWrap(true);
+#endif
 
       const auto frame = new QFrame();
       frame->setObjectName("CodeReviewComment");
@@ -534,4 +542,6 @@ void IssueDetailedView::onReviewsReceived(PullRequest pr)
       if (layout)
          mIssuesLayout->addLayout(layout);
    }
+
+   mIssuesLayout->addStretch();
 }

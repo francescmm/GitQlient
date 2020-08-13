@@ -4,6 +4,12 @@
    font-size: 10pt;
 }
 
+a
+{
+   color: white;
+   font-decoration: italic;
+}
+
 #InitWidget
 {
    max-width: 800px;
@@ -850,5 +856,12 @@ ButtonLink#IssueTitle
 {
    border-radius: 10px;
    background-color: #505152;
+}
+
+IssueDetailedView QTextEdit
+{
+   background: transparent;
+   color: white;
+   border: none;
 }
 

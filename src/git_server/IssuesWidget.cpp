@@ -95,7 +95,7 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QW
 
    const auto timer = new QTimer();
    connect(timer, &QTimer::timeout, this, &IssuesWidget::loadData);
-   timer->start(300000);
+   timer->start(900000);
 }
 
 void IssuesWidget::loadData()
