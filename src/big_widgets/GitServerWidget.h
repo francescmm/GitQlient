@@ -24,9 +24,11 @@
  ***************************************************************************************/
 
 #include <QFrame>
+#include <ConfigData.h>
 
 class GitCache;
 class GitBase;
+class GitServerCache;
 
 namespace GitServer
 {
@@ -42,14 +44,14 @@ signals:
 
 public:
    explicit GitServerWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                            QWidget *parent = nullptr);
+                            const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
 
    /**
     * @brief configure Configures the widget by showing the config dialog or the full content if it was already
     * configured.
     * @return Returns true if configured, otherwise false.
     */
-   bool configure();
+   bool configure(const GitServer::ConfigData &config = GitServer::ConfigData());
 
    /**
     * @brief isConfigured Returns the current state of the widget
@@ -60,7 +62,7 @@ public:
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
-   GitServer::IRestApi *mApi = nullptr;
+   QSharedPointer<GitServerCache> mGitServerCache;
    bool mConfigured = false;
 
    /**

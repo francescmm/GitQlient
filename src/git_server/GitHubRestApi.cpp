@@ -485,6 +485,9 @@ void GitHubRestApi::onIssuesReceived()
 
       if (!issues.isEmpty())
          emit issuesReceived(issues);
+
+      for (auto &issue : issues)
+         QTimer::singleShot(200, this, [this, issue]() { requestComments(issue); });
    }
 }
 

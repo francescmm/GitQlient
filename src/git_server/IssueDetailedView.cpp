@@ -1,13 +1,9 @@
 ﻿#include <IssueDetailedView.h>
 
-#include <IRestApi.h>
-#include <CreateIssueDlg.h>
 #include <IssueItem.h>
-#include <GitQlientSettings.h>
-#include <GitConfig.h>
-#include <GitHubRestApi.h>
-#include <GitLabRestApi.h>
 #include <CircularPixmap.h>
+#include <GitServerCache.h>
+#include <Issue.h>
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -26,27 +22,11 @@
 
 using namespace GitServer;
 
-IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git, QWidget *parent)
+IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
-   , mGit(git)
+   , mGitServerCache(gitServerCache)
    , mManager(new QNetworkAccessManager())
 {
-   GitQlientSettings settings;
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
-   const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
-   const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
-   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-   const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
-
-   if (serverUrl.contains("github"))
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint });
-   else if (serverUrl.contains("gitlab"))
-      mApi = new GitLabRestApi(userName, repoInfo.second, serverUrl, { userName, userToken, endpoint });
-
-   connect(mApi, &IRestApi::commentsReceived, this, &IssueDetailedView::onCommentReceived);
-   connect(mApi, &IRestApi::reviewsReceived, this, &IssueDetailedView::onReviewsReceived);
-
    const auto headerTitle = new QLabel(tr("Detailed View"));
    headerTitle->setObjectName("HeaderTitle");
 
@@ -217,18 +197,10 @@ void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
 
    mIssuesLayout->addWidget(frame);
 
-   mApi->requestComments(mIssue);
-}
-
-void IssueDetailedView::onCommentReceived(const Issue &issue)
-{
-   if (issue.number == mIssue.number)
-   {
-      if (mConfig == Config::PullRequests)
-         mApi->requestReviews(PullRequest(issue));
-      else
-         processComments(issue);
-   }
+   if (mConfig == Config::Issues)
+      processComments(mGitServerCache->getIssue(issue.number));
+   else
+      onReviewsReceived(mGitServerCache->getPullRequest(issue.number));
 }
 
 void IssueDetailedView::processComments(const Issue &issue)
@@ -323,7 +295,7 @@ QLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
    const auto body = new QTextEdit();
    body->setMarkdown(comment.body);
    body->setReadOnly(true);
-   body->show();
+   show();
    const auto height = body->document()->size().height();
    body->setMinimumHeight(height / 2);
 #else

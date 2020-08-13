@@ -25,20 +25,16 @@
 
 #include <QDialog>
 
+#include <ConfigData.h>
+
 namespace Ui
 {
 class ServerConfigDlg;
 }
 
-class GitBase;
 class QNetworkAccessManager;
 class QNetworkReply;
-
-struct ServerConfigData
-{
-   QString user;
-   QString token;
-};
+class GitServerCache;
 
 /**
  * @brief The ServerConfigDlg class creates a small dialog where the user can add the user name and the user token of
@@ -62,7 +58,7 @@ public:
     *
     * @param parent The parent widget if needed
     */
-   explicit ServerConfigDlg(const QSharedPointer<GitBase> &git, const ServerConfigData &data,
+   explicit ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServerCache, const GitServer::ConfigData &data,
                             QWidget *parent = nullptr);
    /**
     * @brief Destructor that deallocates the Ui::ServerConfigDlg class.
@@ -71,7 +67,8 @@ public:
 
 private:
    Ui::ServerConfigDlg *ui = nullptr;
-   QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitServerCache> mGitServerCache;
+   GitServer::ConfigData mData;
    QNetworkAccessManager *mManager;
 
    /**

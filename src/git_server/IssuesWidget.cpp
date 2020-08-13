@@ -1,12 +1,7 @@
 #include <IssuesWidget.h>
 
-#include <IRestApi.h>
-#include <CreateIssueDlg.h>
+#include <GitServerCache.h>
 #include <IssueItem.h>
-#include <GitQlientSettings.h>
-#include <GitConfig.h>
-#include <GitHubRestApi.h>
-#include <GitLabRestApi.h>
 #include <ClickableFrame.h>
 
 #include <QVBoxLayout>
@@ -18,43 +13,16 @@
 
 using namespace GitServer;
 
-IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QWidget *parent)
+IssuesWidget::IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache, Config config, QWidget *parent)
    : QFrame(parent)
-   , mGit(git)
+   , mGitServerCache(gitServerCache)
    , mConfig(config)
    , mArrow(new QLabel())
 {
-   GitQlientSettings settings;
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
-   const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
-   const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
-   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-   const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
-
-   if (serverUrl.contains("github"))
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint });
-   else if (serverUrl.contains("gitlab"))
-      mApi = new GitLabRestApi(userName, repoInfo.second, serverUrl, { userName, userToken, endpoint });
-
    const auto pagesSpinBox = new QSpinBox(this);
    connect(pagesSpinBox, SIGNAL(valueChanged(int)), this, SLOT(loadPage(int)));
 
    const auto pagesLabel = new QLabel(tr("Page: "));
-
-   connect(mApi, &IRestApi::issuesReceived, this, &IssuesWidget::onIssuesReceived);
-   connect(mApi, &IRestApi::pullRequestsReceived, this, &IssuesWidget::onPullRequestsReceived);
-   connect(mApi, &IRestApi::paginationPresent, this, [pagesSpinBox, pagesLabel](int current, int, int total) {
-      if (total != 0)
-      {
-         pagesSpinBox->blockSignals(true);
-         pagesSpinBox->setRange(1, total);
-         pagesSpinBox->setValue(current);
-         pagesSpinBox->setVisible(true);
-         pagesLabel->setVisible(true);
-         pagesSpinBox->blockSignals(false);
-      }
-   });
 
    const auto headerTitle = new QLabel(mConfig == Config::Issues ? tr("Issues") : tr("Pull Requests"));
    headerTitle->setObjectName("HeaderTitle");
@@ -96,6 +64,24 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitBase> &git, Config config, QW
    const auto timer = new QTimer();
    connect(timer, &QTimer::timeout, this, &IssuesWidget::loadData);
    timer->start(900000);
+
+   if (mConfig == Config::Issues)
+      onIssuesReceived(mGitServerCache->getIssues());
+   else
+      onPullRequestsReceived(mGitServerCache->getPullRequests());
+   /*
+   connect(mApi, &IRestApi::paginationPresent, this, [pagesSpinBox, pagesLabel](int current, int, int total) {
+      if (total != 0)
+      {
+         pagesSpinBox->blockSignals(true);
+         pagesSpinBox->setRange(1, total);
+         pagesSpinBox->setValue(current);
+         pagesSpinBox->setVisible(true);
+         pagesLabel->setVisible(true);
+         pagesSpinBox->blockSignals(false);
+      }
+   });
+*/
 }
 
 void IssuesWidget::loadData()
@@ -214,8 +200,9 @@ void IssuesWidget::onHeaderClicked()
    }
 }
 
-void IssuesWidget::loadPage(int page)
+void IssuesWidget::loadPage(int)
 {
+   /*
    if (page == -1)
    {
       if (mConfig == Config::Issues)
@@ -230,4 +217,5 @@ void IssuesWidget::loadPage(int page)
       else
          mApi->requestPullRequests(page);
    }
+*/
 }

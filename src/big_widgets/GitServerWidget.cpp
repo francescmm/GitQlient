@@ -4,12 +4,14 @@
 #include <GitConfig.h>
 #include <GitQlientSettings.h>
 #include <GitBase.h>
+#include <GitServerCache.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
 #include <IssuesWidget.h>
 #include <IssueDetailedView.h>
+#include <Platform.h>
 
 #include <QPushButton>
 #include <QToolButton>
@@ -21,28 +23,22 @@
 using namespace GitServer;
 
 GitServerWidget::GitServerWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                                 QWidget *parent)
+                                 const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
+   , mGitServerCache(gitServerCache)
 {
 }
 
-bool GitServerWidget::configure()
+bool GitServerWidget::configure(const GitServer::ConfigData &config)
 {
    if (mConfigured)
       return true;
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
-
-   GitQlientSettings settings;
-   const auto user = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
-   const auto token = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
-
-   if (user.isEmpty() || token.isEmpty())
+   if (config.user.isEmpty() || config.token.isEmpty())
    {
-      const auto configDlg = new ServerConfigDlg(mGit, { user, token }, this);
+      const auto configDlg = new ServerConfigDlg(mGitServerCache, config, this);
       mConfigured = configDlg->exec() == QDialog::Accepted;
    }
    else
@@ -56,8 +52,8 @@ bool GitServerWidget::configure()
 
 void GitServerWidget::createWidget()
 {
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto prLabel = gitConfig->getServerUrl().contains("github") ? "pull request" : "merge request";
+   const auto prLabel
+       = mGitServerCache->getPlatform() == GitServer::Platform::GitHub ? "pull request" : "merge request";
 
    const auto newIssue = new QPushButton(tr("New issue"));
    newIssue->setObjectName("NormalButton");
@@ -84,15 +80,15 @@ void GitServerWidget::createWidget()
    centralLayout->addLayout(buttonsLayout, 0, 0, 1, 2);
    centralLayout->addWidget(separator, 1, 0, 1, 2);
 
-   const auto detailedView = new IssueDetailedView(mGit);
+   const auto detailedView = new IssueDetailedView(mGitServerCache);
 
-   const auto issues = new IssuesWidget(mGit, IssuesWidget::Config::Issues);
+   const auto issues = new IssuesWidget(mGitServerCache, IssuesWidget::Config::Issues);
    connect(issues, &IssuesWidget::selected, detailedView,
            [config = IssueDetailedView::Config::Issues, detailedView](const GitServer::Issue &issue) {
               detailedView->loadData(config, issue);
            });
 
-   const auto pullRequests = new IssuesWidget(mGit, IssuesWidget::Config::PullRequests);
+   const auto pullRequests = new IssuesWidget(mGitServerCache, IssuesWidget::Config::PullRequests);
    connect(pullRequests, &IssuesWidget::selected, detailedView,
            [config = IssueDetailedView::Config::PullRequests, detailedView](const GitServer::Issue &issue) {
               detailedView->loadData(config, issue);

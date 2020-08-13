@@ -22,6 +22,8 @@
 #include <GitHistory.h>
 #include <GitHubRestApi.h>
 #include <GitServerWidget.h>
+#include <GitServerCache.h>
+#include <ConfigData.h>
 
 #include <QTimer>
 #include <QDirIterator>
@@ -39,6 +41,7 @@ using namespace GitServer;
 GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    : QFrame(parent)
    , mGitQlientCache(new GitCache())
+   , mGitServerCache(new GitServerCache())
    , mGitBase(new GitBase(repoPath))
    , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache))
    , mHistoryWidget(new HistoryWidget(mGitQlientCache, mGitBase))
@@ -47,7 +50,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mDiffWidget(new DiffWidget(mGitBase, mGitQlientCache))
    , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
-   , mGitServerWidget(new GitServerWidget(mGitQlientCache, mGitBase))
+   , mGitServerWidget(new GitServerWidget(mGitQlientCache, mGitBase, mGitServerCache))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
@@ -60,6 +63,9 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
    const auto serverUrl = gitConfig->getServerUrl();
+   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+
+   mGitServerCache->init(serverUrl, repoInfo);
 
    if (serverUrl.contains("github"))
    {
@@ -69,10 +75,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
       connect(mAutoPrUpdater, &QTimer::timeout, mGitQlientCache.get(), &GitCache::refreshPRsCache);
       connect(mControls, &Controls::signalRefreshPRsCache, mGitQlientCache.get(), &GitCache::refreshPRsCache);
 
-      QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
-      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-      const auto serverUrl = gitConfig->getServerUrl();
-
       GitQlientSettings settings;
       const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
       const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
@@ -81,8 +83,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
       mApi.reset(new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint }));
       mGitQlientCache->setupGitPlatform(mApi);
    }
-
-   mGitServerWidget->configure();
 
    mStackedLayout->addWidget(mHistoryWidget);
    mStackedLayout->addWidget(mDiffWidget);
@@ -408,6 +408,23 @@ void GitQlientRepo::showMergeView()
 
 void GitQlientRepo::showGitServerView()
 {
+   if (!mGitServerWidget->isConfigured())
+   {
+      QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+      const auto serverUrl = gitConfig->getServerUrl();
+
+      GitQlientSettings settings;
+      const auto user = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
+      const auto token = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
+
+      GitServer::ConfigData data;
+      data.user = user;
+      data.token = token;
+      data.serverUrl = serverUrl;
+
+      mGitServerWidget->configure(data);
+   }
+
    if (mGitServerWidget->isConfigured())
    {
       mStackedLayout->setCurrentWidget(mGitServerWidget);

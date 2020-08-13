@@ -7,6 +7,7 @@
 #include <GitQlientSettings.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
+#include <GitServerCache.h>
 
 #include <QLogger.h>
 
@@ -41,10 +42,12 @@ static const QMap<GitServerPlatform, QString> repoUrls { { GitHub, "https://api.
                                                          { GitLab, "https://gitlab.com/api/v4" } };
 }
 
-ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, const ServerConfigData &data, QWidget *parent)
+ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServerCache,
+                                 const GitServer::ConfigData &data, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::ServerConfigDlg)
-   , mGit(git)
+   , mGitServerCache(gitServerCache)
+   , mData(data)
    , mManager(new QNetworkAccessManager())
 {
    setStyleSheet(GitQlientStyles::getStyles());
@@ -55,19 +58,16 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, const Serve
 
    ui->leEndPoint->setHidden(true);
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
-
    GitQlientSettings settings;
-   ui->leUserName->setText(data.user);
-   ui->leUserToken->setText(data.token);
+   ui->leUserName->setText(mData.user);
+   ui->leUserToken->setText(mData.token);
    ui->leEndPoint->setText(
-       settings.globalValue(QString("%1/endpoint").arg(serverUrl), repoUrls.value(GitHub)).toString());
+       settings.globalValue(QString("%1/endpoint").arg(mData.serverUrl), repoUrls.value(GitHub)).toString());
 
    ui->cbServer->insertItem(GitHub, "GitHub", repoUrls.value(GitHub));
    ui->cbServer->insertItem(GitHubEnterprise, "GitHub Enterprise", repoUrls.value(GitHubEnterprise));
 
-   if (serverUrl.contains("github"))
+   if (mData.serverUrl.contains("github"))
    {
       const auto index = repoUrls.key(ui->leEndPoint->text(), GitHubEnterprise);
       ui->cbServer->setCurrentIndex(index);
@@ -80,8 +80,8 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitBase> &git, const Serve
    }
 
    ui->lAccessToken->setText(tr("How to get a token?"));
-   connect(ui->lAccessToken, &ButtonLink::clicked, [serverUrl]() {
-      const auto url = serverUrl.contains("github")
+   connect(ui->lAccessToken, &ButtonLink::clicked, [this]() {
+      const auto url = mData.serverUrl.contains("github")
           ? "https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token"
           : "https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html";
       QDesktopServices::openUrl(QUrl(QString::fromUtf8(url)));
@@ -111,21 +111,16 @@ void ServerConfigDlg::accept()
    const auto endpoint = ui->cbServer->currentIndex() == GitHubEnterprise ? ui->leEndPoint->text()
                                                                           : ui->cbServer->currentData().toString();
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
-   const auto parts = gitConfig->getCurrentRepoAndOwner();
+   const auto userName = ui->leUserName->text();
    IRestApi *api = nullptr;
    QString userId;
 
    if (ui->cbServer->currentIndex() == GitLab)
-   {
-      api = new GitLabRestApi(ui->leUserName->text(), parts.second, serverUrl,
-                              { ui->leUserName->text(), ui->leUserToken->text(), endpoint });
-   }
+      api = new GitLabRestApi(userName, mData.repoInfo.second, mData.serverUrl,
+                              { userName, ui->leUserToken->text(), endpoint });
    else
-   {
-      api = new GitHubRestApi(parts.first, parts.second, { ui->leUserName->text(), ui->leUserToken->text(), endpoint });
-   }
+      api = new GitHubRestApi(mData.repoInfo.first, mData.repoInfo.second,
+                              { userName, ui->leUserToken->text(), endpoint });
 
    api->testConnection();
 
@@ -145,19 +140,16 @@ void ServerConfigDlg::testToken()
    {
       const auto endpoint = ui->cbServer->currentIndex() == GitHubEnterprise ? ui->leEndPoint->text()
                                                                              : ui->cbServer->currentData().toString();
-      QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-      const auto serverUrl = gitConfig->getServerUrl();
-      const auto parts = gitConfig->getCurrentRepoAndOwner();
       IRestApi *api = nullptr;
 
       if (ui->cbServer->currentIndex() == GitLab)
       {
-         api = new GitLabRestApi(ui->leUserName->text(), parts.second, serverUrl,
+         api = new GitLabRestApi(ui->leUserName->text(), mData.repoInfo.second, mData.serverUrl,
                                  { ui->leUserName->text(), ui->leUserToken->text(), endpoint });
       }
       else
       {
-         api = new GitHubRestApi(parts.first, parts.second,
+         api = new GitHubRestApi(mData.repoInfo.first, mData.repoInfo.second,
                                  { ui->leUserName->text(), ui->leUserToken->text(), endpoint });
       }
 
@@ -186,19 +178,18 @@ void ServerConfigDlg::onGitServerError(const QString &error)
 
 void ServerConfigDlg::onDataValidated(const QString &userId)
 {
+   mGitServerCache->init(mData.serverUrl, mData.repoInfo);
+
    const auto endpoint = ui->cbServer->currentIndex() == GitHubEnterprise ? ui->leEndPoint->text()
                                                                           : ui->cbServer->currentData().toString();
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
-
    GitQlientSettings settings;
-   settings.setGlobalValue(QString("%1/user").arg(serverUrl), ui->leUserName->text());
-   settings.setGlobalValue(QString("%1/token").arg(serverUrl), ui->leUserToken->text());
-   settings.setGlobalValue(QString("%1/endpoint").arg(serverUrl), endpoint);
+   settings.setGlobalValue(QString("%1/user").arg(mData.serverUrl), ui->leUserName->text());
+   settings.setGlobalValue(QString("%1/token").arg(mData.serverUrl), ui->leUserToken->text());
+   settings.setGlobalValue(QString("%1/endpoint").arg(mData.serverUrl), endpoint);
 
    if (ui->cbServer->currentIndex() == GitLab)
-      settings.setGlobalValue(QString("%1/userId").arg(serverUrl), userId);
+      settings.setGlobalValue(QString("%1/userId").arg(mData.serverUrl), userId);
 
    emit configured();
 

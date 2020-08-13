@@ -30,14 +30,13 @@
 
 class QVBoxLayout;
 class QScrollArea;
-class GitBase;
 class QNetworkAccessManager;
 class QLabel;
 class QHBoxLayout;
+class GitServerCache;
 
 namespace GitServer
 {
-class IRestApi;
 struct Issue;
 struct PullRequest;
 }
@@ -53,15 +52,14 @@ public:
       Issues,
       PullRequests
    };
-   explicit IssueDetailedView(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit IssueDetailedView(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
 
    void loadData(Config config, const GitServer::Issue &issue);
 
 private:
    GitServer::Issue mIssue;
    bool mLoaded = false;
-   QSharedPointer<GitBase> mGit;
-   GitServer::IRestApi *mApi = nullptr;
+   QSharedPointer<GitServerCache> mGitServerCache;
    Config mConfig;
    QNetworkAccessManager *mManager;
    QVBoxLayout *mIssuesLayout = nullptr;
@@ -71,7 +69,6 @@ private:
    QScrollArea *mScrollArea = nullptr;
 
    void storeCreatorAvatar(QLabel *avatar, const QString &fileName) const;
-   void onCommentReceived(const GitServer::Issue &issue);
    void onReviewsReceived(GitServer::PullRequest pr);
    void processComments(const GitServer::Issue &issue);
    QLabel *createAvatar(const QString &userName, const QString &avatarUrl) const;

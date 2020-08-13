@@ -41,6 +41,7 @@ class MergeWidget;
 class GitServerWidget;
 class QTimer;
 class WaitingDlg;
+class GitServerCache;
 
 namespace GitServer
 {
@@ -128,6 +129,7 @@ protected:
 private:
    QString mCurrentDir;
    QSharedPointer<GitCache> mGitQlientCache;
+   QSharedPointer<GitServerCache> mGitServerCache;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitRepoLoader> mGitLoader;
    HistoryWidget *mHistoryWidget = nullptr;

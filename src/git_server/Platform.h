@@ -23,49 +23,11 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QFrame>
-
-class QVBoxLayout;
-class QScrollArea;
-class QLabel;
-class QSpinBox;
-class GitServerCache;
-
 namespace GitServer
 {
-struct Issue;
-struct PullRequest;
-}
-
-class IssuesWidget : public QFrame
+enum class Platform
 {
-   Q_OBJECT
-signals:
-   void selected(const GitServer::Issue &issue);
-
-public:
-   enum class Config
-   {
-      Issues,
-      PullRequests
-   };
-   explicit IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache, Config config,
-                         QWidget *parent = nullptr);
-
-   void loadData();
-
-private:
-   QSharedPointer<GitServerCache> mGitServerCache;
-   Config mConfig;
-   QVBoxLayout *mIssuesLayout = nullptr;
-   QFrame *mIssuesWidget = nullptr;
-   QScrollArea *mScrollArea = nullptr;
-   QLabel *mArrow = nullptr;
-
-   void onIssuesReceived(const QVector<GitServer::Issue> &issues);
-   void onPullRequestsReceived(const QVector<GitServer::PullRequest> &pr);
-   void onHeaderClicked();
-
-private slots:
-   void loadPage(int page = -1);
+   GitLab,
+   GitHub
 };
+}

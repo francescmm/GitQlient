@@ -75,7 +75,6 @@ private:
    GitServer::PullRequest mPr;
    QString mSha;
    GitServer::IRestApi *mApi;
-   QString mUserName;
 
    /**
     * @brief accept Checks the data introduced by the user and triggers the connection agains the server.
