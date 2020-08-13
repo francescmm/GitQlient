@@ -112,24 +112,16 @@ void ServerConfigDlg::accept()
                                                                           : ui->cbServer->currentData().toString();
 
    const auto userName = ui->leUserName->text();
-   IRestApi *api = nullptr;
-   QString userId;
 
-   if (ui->cbServer->currentIndex() == GitLab)
-      api = new GitLabRestApi(userName, mData.repoInfo.second, mData.serverUrl,
-                              { userName, ui->leUserToken->text(), endpoint });
-   else
-      api = new GitHubRestApi(mData.repoInfo.first, mData.repoInfo.second,
-                              { userName, ui->leUserToken->text(), endpoint });
+   GitQlientSettings settings;
+   settings.setGlobalValue(QString("%1/user").arg(mData.serverUrl), ui->leUserName->text());
+   settings.setGlobalValue(QString("%1/token").arg(mData.serverUrl), ui->leUserToken->text());
+   settings.setGlobalValue(QString("%1/endpoint").arg(mData.serverUrl), endpoint);
 
-   api->testConnection();
+   connect(mGitServerCache.get(), &GitServerCache::errorOccurred, this, &ServerConfigDlg::onGitServerError);
+   connect(mGitServerCache.get(), &GitServerCache::connectionTested, this, [this]() { onDataValidated(); });
 
-   connect(api, &IRestApi::connectionTested, this, [this, api]() {
-      const auto gitLab = dynamic_cast<GitLabRestApi *>(api);
-      onDataValidated(gitLab ? gitLab->getUserId() : QString());
-   });
-
-   connect(api, &IRestApi::errorOccurred, this, &ServerConfigDlg::onGitServerError);
+   mGitServerCache->init(mData.serverUrl, mData.repoInfo);
 }
 
 void ServerConfigDlg::testToken()
@@ -145,12 +137,12 @@ void ServerConfigDlg::testToken()
       if (ui->cbServer->currentIndex() == GitLab)
       {
          api = new GitLabRestApi(ui->leUserName->text(), mData.repoInfo.second, mData.serverUrl,
-                                 { ui->leUserName->text(), ui->leUserToken->text(), endpoint });
+                                 { ui->leUserName->text(), ui->leUserToken->text(), endpoint }, this);
       }
       else
       {
          api = new GitHubRestApi(mData.repoInfo.first, mData.repoInfo.second,
-                                 { ui->leUserName->text(), ui->leUserToken->text(), endpoint });
+                                 { ui->leUserName->text(), ui->leUserToken->text(), endpoint }, this);
       }
 
       api->testConnection();
@@ -176,21 +168,8 @@ void ServerConfigDlg::onGitServerError(const QString &error)
    QMessageBox::warning(this, tr("API access error!"), error);
 }
 
-void ServerConfigDlg::onDataValidated(const QString &userId)
+void ServerConfigDlg::onDataValidated()
 {
-   mGitServerCache->init(mData.serverUrl, mData.repoInfo);
-
-   const auto endpoint = ui->cbServer->currentIndex() == GitHubEnterprise ? ui->leEndPoint->text()
-                                                                          : ui->cbServer->currentData().toString();
-
-   GitQlientSettings settings;
-   settings.setGlobalValue(QString("%1/user").arg(mData.serverUrl), ui->leUserName->text());
-   settings.setGlobalValue(QString("%1/token").arg(mData.serverUrl), ui->leUserToken->text());
-   settings.setGlobalValue(QString("%1/endpoint").arg(mData.serverUrl), endpoint);
-
-   if (ui->cbServer->currentIndex() == GitLab)
-      settings.setGlobalValue(QString("%1/userId").arg(mData.serverUrl), userId);
-
    emit configured();
 
    QDialog::accept();

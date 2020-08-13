@@ -395,6 +395,7 @@ void GitQlientRepo::showGitServerView()
    {
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
       const auto serverUrl = gitConfig->getServerUrl();
+      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
       GitQlientSettings settings;
       const auto user = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
@@ -404,6 +405,7 @@ void GitQlientRepo::showGitServerView()
       data.user = user;
       data.token = token;
       data.serverUrl = serverUrl;
+      data.repoInfo = repoInfo;
 
       mGitServerWidget->configure(data);
    }

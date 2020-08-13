@@ -43,6 +43,10 @@ class GitServerCache : public QObject
 {
    Q_OBJECT
 
+signals:
+   void connectionTested();
+   void errorOccurred(const QString &error);
+
 public:
    explicit GitServerCache(QObject *parent = nullptr);
    ~GitServerCache();
@@ -61,14 +65,18 @@ public:
 
 private:
    bool mInit = false;
+   int mPreSteps = -1;
+   bool mWaitingConfirmation = false;
    QScopedPointer<GitServer::IRestApi> mApi;
    QMap<int, GitServer::PullRequest> mPullRequests;
    QMap<int, GitServer::Issue> mIssues;
    QVector<GitServer::Label> mLabels;
    QVector<GitServer::Milestone> mMilestones;
 
+   void onConnectionTested();
    void initLabels(const QVector<GitServer::Label> &labels);
    void initMilestones(const QVector<GitServer::Milestone> &milestones);
    void initIssues(const QVector<GitServer::Issue> &issues);
    void initPullRequests(const QVector<GitServer::PullRequest> &prs);
+   void triggerSignalConditionally();
 };

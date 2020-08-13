@@ -45,6 +45,19 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
    connect(mApi.get(), &IRestApi::pullRequestCreated, this, []() {});
    connect(mApi.get(), &IRestApi::pullRequestCreated, this,
            [this](const PullRequest &pr) { mPullRequests[pr.number] = pr; });
+   connect(mApi.get(), &IRestApi::errorOccurred, this, &GitServerCache::errorOccurred);
+   connect(mApi.get(), &IRestApi::connectionTested, this, &GitServerCache::onConnectionTested);
+
+   mApi->testConnection();
+
+   mWaitingConfirmation = true;
+
+   return mInit;
+}
+
+void GitServerCache::onConnectionTested()
+{
+   mPreSteps = 3;
 
    mApi->requestLabels();
    mApi->requestMilestones();
@@ -52,12 +65,9 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
    mApi->requestPullRequests();
 
    /*
-   connect(mApi.get(), &IRestApi::errorOccurred, this, []() {});
    connect(mApi.get(), &IRestApi::milestonesReceived, this, [](){});
    connect(mApi.get(), &IRestApi::milestonesReceived, this, [](){});
    */
-
-   return mInit;
 }
 
 PullRequest GitServerCache::getPullRequest(const QString &sha) const
@@ -82,21 +92,41 @@ GitServer::Platform GitServerCache::getPlatform() const
 void GitServerCache::initLabels(const QVector<Label> &labels)
 {
    mLabels = labels;
+
+   triggerSignalConditionally();
 }
 
 void GitServerCache::initMilestones(const QVector<Milestone> &milestones)
 {
    mMilestones = milestones;
+
+   triggerSignalConditionally();
 }
 
 void GitServerCache::initIssues(const QVector<Issue> &issues)
 {
    for (auto &issue : issues)
       mIssues.insert(issue.number, issue);
+
+   triggerSignalConditionally();
 }
 
 void GitServerCache::initPullRequests(const QVector<PullRequest> &prs)
 {
    for (auto &pr : prs)
       mPullRequests.insert(pr.number, pr);
+
+   triggerSignalConditionally();
+}
+
+void GitServerCache::triggerSignalConditionally()
+{
+   --mPreSteps;
+
+   if (mWaitingConfirmation && mPreSteps == 0)
+   {
+      mWaitingConfirmation = false;
+      mPreSteps = -1;
+      emit connectionTested();
+   }
 }

@@ -103,5 +103,5 @@ private:
    /**
     * @brief onDataValidated Stores the data in the settings and sends a success signal. Finally it closes the dialog.
     */
-   void onDataValidated(const QString &userId = QString());
+   void onDataValidated();
 };

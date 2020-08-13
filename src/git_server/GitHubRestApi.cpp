@@ -258,51 +258,7 @@ void GitHubRestApi::onIssueCreated()
 
    if (!tmpDoc.isEmpty())
    {
-      const auto issueData = tmpDoc.object();
-      Issue issue;
-      issue.number = issueData["number"].toInt();
-      issue.title = issueData["title"].toString();
-      issue.body = issueData["body"].toString().toUtf8();
-      issue.url = issueData["html_url"].toString();
-      issue.creation = issueData["created_at"].toVariant().toDateTime();
-      issue.commentsCount = issueData["comments"].toInt();
-
-      issue.creator
-          = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
-              issueData["user"].toObject()["avatar_url"].toString(),
-              issueData["user"].toObject()["html_url"].toString(), issueData["user"].toObject()["type"].toString() };
-
-      const auto labels = issueData["labels"].toArray();
-
-      for (auto label : labels)
-      {
-         issue.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
-                               label["name"].toString(), label["description"].toString(), label["color"].toString(),
-                               label["default"].toBool() });
-      }
-
-      const auto assignees = issueData["assignees"].toArray();
-
-      for (auto assignee : assignees)
-      {
-         GitServer::User sAssignee;
-         sAssignee.id = assignee["id"].toInt();
-         sAssignee.url = assignee["html_url"].toString();
-         sAssignee.name = assignee["login"].toString();
-         sAssignee.avatar = assignee["avatar_url"].toString();
-
-         issue.assignees.append(sAssignee);
-      }
-
-      Milestone sMilestone { issueData["milestone"].toObject()[QStringLiteral("id")].toInt(),
-                             issueData["milestone"].toObject()[QStringLiteral("number")].toInt(),
-                             issueData["milestone"].toObject()[QStringLiteral("node_id")].toString(),
-                             issueData["milestone"].toObject()[QStringLiteral("title")].toString(),
-                             issueData["milestone"].toObject()[QStringLiteral("description")].toString(),
-                             issueData["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
-
-      issue.milestone = sMilestone;
-
+      const auto issue = issueFromJson(tmpDoc.object());
       emit issueCreated(issue);
    }
    else
@@ -317,61 +273,12 @@ void GitHubRestApi::onPullRequestCreated()
 
    if (!tmpDoc.isEmpty())
    {
+      const auto pr = prFromJson(tmpDoc.object());
 
-      const auto issueData = tmpDoc.object();
-      const auto number = issueData["number"].toInt();
-      PullRequest pr;
-      pr.number = issueData["number"].toInt();
-      pr.title = issueData["title"].toString();
-      pr.body = issueData["body"].toString().toUtf8();
-      pr.url = issueData["html_url"].toString();
-      pr.head = issueData["head"].toObject()["ref"].toString();
-      pr.state.sha = issueData["head"].toObject()["sha"].toString();
-      pr.base = issueData["base"].toObject()["ref"].toString();
-      pr.isOpen = issueData["state"].toString() == "open";
-      pr.draft = issueData["draft"].toBool();
-      pr.creation = issueData["created_at"].toVariant().toDateTime();
-
-      pr.creator
-          = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
-              issueData["user"].toObject()["avatar_url"].toString(),
-              issueData["user"].toObject()["html_url"].toString(), issueData["user"].toObject()["type"].toString() };
-
-      const auto labels = issueData["labels"].toArray();
-
-      for (auto label : labels)
-      {
-         pr.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
-                            label["name"].toString(), label["description"].toString(), label["color"].toString(),
-                            label["default"].toBool() });
-      }
-
-      const auto assignees = issueData["assignees"].toArray();
-
-      for (auto assignee : assignees)
-      {
-         GitServer::User sAssignee;
-         sAssignee.id = assignee["id"].toInt();
-         sAssignee.url = assignee["html_url"].toString();
-         sAssignee.name = assignee["login"].toString();
-         sAssignee.avatar = assignee["avatar_url"].toString();
-
-         pr.assignees.append(sAssignee);
-      }
-
-      Milestone sMilestone { issueData["milestone"].toObject()[QStringLiteral("id")].toInt(),
-                             issueData["milestone"].toObject()[QStringLiteral("number")].toInt(),
-                             issueData["milestone"].toObject()[QStringLiteral("node_id")].toString(),
-                             issueData["milestone"].toObject()[QStringLiteral("title")].toString(),
-                             issueData["milestone"].toObject()[QStringLiteral("description")].toString(),
-                             issueData["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
-
-      pr.milestone = sMilestone;
-
-      mPullRequests.insert(number, std::move(pr));
+      mPullRequests.insert(pr.number, std::move(pr));
 
       /*
-         QTimer::singleShot(200, [this, number]() {
+         QTimer::singleShot(200, [this, number = pr.number]() {
             const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1").arg(number)));
             connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestDetailesReceived);
          });
@@ -442,59 +349,11 @@ void GitHubRestApi::onPullRequestReceived()
 
       for (const auto &issueData : issuesArray)
       {
-         const auto number = issueData["number"].toInt();
-         PullRequest pr;
-         pr.number = issueData["number"].toInt();
-         pr.title = issueData["title"].toString();
-         pr.body = issueData["body"].toString().toUtf8();
-         pr.url = issueData["html_url"].toString();
-         pr.head = issueData["head"].toObject()["ref"].toString();
-         pr.state.sha = issueData["head"].toObject()["sha"].toString();
-         pr.base = issueData["base"].toObject()["ref"].toString();
-         pr.isOpen = issueData["state"].toString() == "open";
-         pr.draft = issueData["draft"].toBool();
-         pr.creation = issueData["created_at"].toVariant().toDateTime();
-
-         pr.creator
-             = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
-                 issueData["user"].toObject()["avatar_url"].toString(),
-                 issueData["user"].toObject()["html_url"].toString(), issueData["user"].toObject()["type"].toString() };
-
-         const auto labels = issueData["labels"].toArray();
-
-         for (auto label : labels)
-         {
-            pr.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
-                               label["name"].toString(), label["description"].toString(), label["color"].toString(),
-                               label["default"].toBool() });
-         }
-
-         const auto assignees = issueData["assignees"].toArray();
-
-         for (auto assignee : assignees)
-         {
-            GitServer::User sAssignee;
-            sAssignee.id = assignee["id"].toInt();
-            sAssignee.url = assignee["html_url"].toString();
-            sAssignee.name = assignee["login"].toString();
-            sAssignee.avatar = assignee["avatar_url"].toString();
-
-            pr.assignees.append(sAssignee);
-         }
-
-         Milestone sMilestone { issueData["milestone"].toObject()[QStringLiteral("id")].toInt(),
-                                issueData["milestone"].toObject()[QStringLiteral("number")].toInt(),
-                                issueData["milestone"].toObject()[QStringLiteral("node_id")].toString(),
-                                issueData["milestone"].toObject()[QStringLiteral("title")].toString(),
-                                issueData["milestone"].toObject()[QStringLiteral("description")].toString(),
-                                issueData["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
-
-         pr.milestone = sMilestone;
-
-         mPullRequests.insert(number, std::move(pr));
+         const auto pr = prFromJson(issueData.toObject());
+         mPullRequests.insert(pr.number, std::move(pr));
 
          /*
-         QTimer::singleShot(200, [this, number]() {
+         QTimer::singleShot(200, [this, number = pr.number]() {
             const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1").arg(number)));
             connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestDetailesReceived);
          });
@@ -582,7 +441,6 @@ void GitHubRestApi::onIssuesReceived()
    else
       emit paginationPresent(0, 0, 0);
 
-   const auto url = reply->url();
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
@@ -594,54 +452,7 @@ void GitHubRestApi::onIssuesReceived()
       for (const auto &issueData : issuesArray)
       {
          if (const auto issueObj = issueData.toObject(); !issueObj.contains("pull_request"))
-         {
-            Issue issue;
-            issue.number = issueData["number"].toInt();
-            issue.title = issueData["title"].toString();
-            issue.body = issueData["body"].toString().toUtf8();
-            issue.url = issueData["html_url"].toString();
-            issue.creation = issueData["created_at"].toVariant().toDateTime();
-            issue.commentsCount = issueData["comments"].toInt();
-
-            issue.creator
-                = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
-                    issueData["user"].toObject()["avatar_url"].toString(),
-                    issueData["user"].toObject()["html_url"].toString(),
-                    issueData["user"].toObject()["type"].toString() };
-
-            const auto labels = issueData["labels"].toArray();
-
-            for (auto label : labels)
-            {
-               issue.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
-                                     label["name"].toString(), label["description"].toString(),
-                                     label["color"].toString(), label["default"].toBool() });
-            }
-
-            const auto assignees = issueData["assignees"].toArray();
-
-            for (auto assignee : assignees)
-            {
-               GitServer::User sAssignee;
-               sAssignee.id = assignee["id"].toInt();
-               sAssignee.url = assignee["html_url"].toString();
-               sAssignee.name = assignee["login"].toString();
-               sAssignee.avatar = assignee["avatar_url"].toString();
-
-               issue.assignees.append(sAssignee);
-            }
-
-            Milestone sMilestone { issueData["milestone"].toObject()[QStringLiteral("id")].toInt(),
-                                   issueData["milestone"].toObject()[QStringLiteral("number")].toInt(),
-                                   issueData["milestone"].toObject()[QStringLiteral("node_id")].toString(),
-                                   issueData["milestone"].toObject()[QStringLiteral("title")].toString(),
-                                   issueData["milestone"].toObject()[QStringLiteral("description")].toString(),
-                                   issueData["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
-
-            issue.milestone = sMilestone;
-
-            issues.append(std::move(issue));
-         }
+            issues.append(issueFromJson(issueObj));
       }
 
       if (!issues.isEmpty())
@@ -811,4 +622,104 @@ void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
 
       emit reviewsReceived(pr);
    }
+}
+
+Issue GitHubRestApi::issueFromJson(const QJsonObject &json) const
+{
+   Issue issue;
+   issue.number = json["number"].toInt();
+   issue.title = json["title"].toString();
+   issue.body = json["body"].toString().toUtf8();
+   issue.url = json["html_url"].toString();
+   issue.creation = json["created_at"].toVariant().toDateTime();
+   issue.commentsCount = json["comments"].toInt();
+
+   issue.creator = { json["user"].toObject()["id"].toInt(), json["user"].toObject()["login"].toString(),
+                     json["user"].toObject()["avatar_url"].toString(), json["user"].toObject()["html_url"].toString(),
+                     json["user"].toObject()["type"].toString() };
+
+   const auto labels = json["labels"].toArray();
+
+   for (auto label : labels)
+   {
+      issue.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
+                            label["name"].toString(), label["description"].toString(), label["color"].toString(),
+                            label["default"].toBool() });
+   }
+
+   const auto assignees = json["assignees"].toArray();
+
+   for (auto assignee : assignees)
+   {
+      GitServer::User sAssignee;
+      sAssignee.id = assignee["id"].toInt();
+      sAssignee.url = assignee["html_url"].toString();
+      sAssignee.name = assignee["login"].toString();
+      sAssignee.avatar = assignee["avatar_url"].toString();
+
+      issue.assignees.append(sAssignee);
+   }
+
+   Milestone sMilestone { json["milestone"].toObject()[QStringLiteral("id")].toInt(),
+                          json["milestone"].toObject()[QStringLiteral("number")].toInt(),
+                          json["milestone"].toObject()[QStringLiteral("node_id")].toString(),
+                          json["milestone"].toObject()[QStringLiteral("title")].toString(),
+                          json["milestone"].toObject()[QStringLiteral("description")].toString(),
+                          json["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
+
+   issue.milestone = sMilestone;
+
+   return issue;
+}
+
+PullRequest GitHubRestApi::prFromJson(const QJsonObject &json) const
+{
+   PullRequest pr;
+   pr.number = json["number"].toInt();
+   pr.title = json["title"].toString();
+   pr.body = json["body"].toString().toUtf8();
+   pr.url = json["html_url"].toString();
+   pr.head = json["head"].toObject()["ref"].toString();
+   pr.state.sha = json["head"].toObject()["sha"].toString();
+   pr.base = json["base"].toObject()["ref"].toString();
+   pr.isOpen = json["state"].toString() == "open";
+   pr.draft = json["draft"].toBool();
+   pr.creation = json["created_at"].toVariant().toDateTime();
+
+   pr.creator = { json["user"].toObject()["id"].toInt(), json["user"].toObject()["login"].toString(),
+                  json["user"].toObject()["avatar_url"].toString(), json["user"].toObject()["html_url"].toString(),
+                  json["user"].toObject()["type"].toString() };
+
+   const auto labels = json["labels"].toArray();
+
+   for (auto label : labels)
+   {
+      pr.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
+                         label["name"].toString(), label["description"].toString(), label["color"].toString(),
+                         label["default"].toBool() });
+   }
+
+   const auto assignees = json["assignees"].toArray();
+
+   for (auto assignee : assignees)
+   {
+      GitServer::User sAssignee;
+      sAssignee.id = assignee["id"].toInt();
+      sAssignee.url = assignee["html_url"].toString();
+      sAssignee.name = assignee["login"].toString();
+      sAssignee.avatar = assignee["avatar_url"].toString();
+
+      pr.assignees.append(sAssignee);
+   }
+
+   Milestone sMilestone { json["milestone"].toObject()[QStringLiteral("id")].toInt(),
+                          json["milestone"].toObject()[QStringLiteral("number")].toInt(),
+                          json["milestone"].toObject()[QStringLiteral("node_id")].toString(),
+                          json["milestone"].toObject()[QStringLiteral("title")].toString(),
+                          json["milestone"].toObject()[QStringLiteral("description")].toString(),
+                          json["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
+
+   pr.milestone = sMilestone;
+
+   return pr;
 }

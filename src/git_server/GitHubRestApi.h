@@ -76,6 +76,9 @@ private:
 
    void requestReviewComments(const PullRequest &pr);
    void onReviewCommentsReceived(PullRequest pr);
+
+   Issue issueFromJson(const QJsonObject &json) const;
+   PullRequest prFromJson(const QJsonObject &json) const;
 };
 
 }

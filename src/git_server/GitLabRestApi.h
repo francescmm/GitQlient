@@ -42,7 +42,7 @@ public:
    void createPullRequest(const PullRequest &pr) override;
    void requestLabels() override;
    void requestMilestones() override;
-   void requestIssues(int) override { }
+   void requestIssues(int) override;
    void requestPullRequests(int) override { }
    void mergePullRequest(int, const QByteArray &) override { }
    void requestComments(const Issue &) override { }
@@ -56,6 +56,8 @@ private:
    QString mSettingsKey;
    QString mUserId;
    QString mRepoId;
+   int mPreRequisites = -1;
+   bool mTestRequested = false;
 
    QNetworkRequest createRequest(const QString &page) const override;
 
@@ -66,7 +68,11 @@ private:
    void onLabelsReceived();
    void onMilestonesReceived();
    void onIssueCreated();
+   void onIssueReceived();
    void onMergeRequestCreated();
+
+   Issue issueFromJson(const QJsonObject &json) const;
+   PullRequest prFromJson(const QJsonObject &json) const;
 };
 
 }
