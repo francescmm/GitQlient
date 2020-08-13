@@ -69,7 +69,7 @@ signals:
     * @brief issueCreated Signal triggered when an issue has been created.
     * @param url The url of the issue.
     */
-   void issueCreated(QString url);
+   void issueCreated(const Issue &issue);
    /**
     * @brief issueUpdated Signal triggered when an issue has been updated.
     */

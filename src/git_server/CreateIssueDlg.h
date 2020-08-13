@@ -37,6 +37,7 @@ namespace GitServer
 class IRestApi;
 struct Label;
 struct Milestone;
+struct Issue;
 }
 
 /**
@@ -83,7 +84,7 @@ private:
     * box with the url of the issue.
     * @param url The url of the issue.
     */
-   void onIssueCreated(QString url);
+   void onIssueCreated(const GitServer::Issue &issue);
 
    /**
     * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.

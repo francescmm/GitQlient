@@ -116,10 +116,10 @@ void CreateIssueDlg::onLabels(const QVector<Label> &labels)
    ui->labelsListView->setModel(model);
 }
 
-void CreateIssueDlg::onIssueCreated(QString url)
+void CreateIssueDlg::onIssueCreated(const GitServer::Issue &issue)
 {
    QMessageBox::information(this, tr("Issue created"),
-                            tr("The issue has been created. You can <a href=\"%1\">find it here</a>.").arg(url));
+                            tr("The issue has been created. You can <a href=\"%1\">find it here</a>.").arg(issue.url));
 
    QDialog::accept();
 }

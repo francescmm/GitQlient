@@ -301,7 +301,7 @@ void GitLabRestApi::onIssueCreated()
       const auto list = tmpDoc.toVariant().toList();
       const auto url = issue[QStringLiteral("web_url")].toString();
 
-      emit issueCreated(url);
+      emit issueCreated(Issue());
    }
    else
       emit errorOccurred(errorStr);

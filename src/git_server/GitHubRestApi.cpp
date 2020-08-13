@@ -258,10 +258,52 @@ void GitHubRestApi::onIssueCreated()
 
    if (!tmpDoc.isEmpty())
    {
-      const auto issue = tmpDoc.object();
-      const auto url = issue[QStringLiteral("html_url")].toString();
+      const auto issueData = tmpDoc.object();
+      Issue issue;
+      issue.number = issueData["number"].toInt();
+      issue.title = issueData["title"].toString();
+      issue.body = issueData["body"].toString().toUtf8();
+      issue.url = issueData["html_url"].toString();
+      issue.creation = issueData["created_at"].toVariant().toDateTime();
+      issue.commentsCount = issueData["comments"].toInt();
 
-      emit issueCreated(url);
+      issue.creator
+          = { issueData["user"].toObject()["id"].toInt(), issueData["user"].toObject()["login"].toString(),
+              issueData["user"].toObject()["avatar_url"].toString(),
+              issueData["user"].toObject()["html_url"].toString(), issueData["user"].toObject()["type"].toString() };
+
+      const auto labels = issueData["labels"].toArray();
+
+      for (auto label : labels)
+      {
+         issue.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
+                               label["name"].toString(), label["description"].toString(), label["color"].toString(),
+                               label["default"].toBool() });
+      }
+
+      const auto assignees = issueData["assignees"].toArray();
+
+      for (auto assignee : assignees)
+      {
+         GitServer::User sAssignee;
+         sAssignee.id = assignee["id"].toInt();
+         sAssignee.url = assignee["html_url"].toString();
+         sAssignee.name = assignee["login"].toString();
+         sAssignee.avatar = assignee["avatar_url"].toString();
+
+         issue.assignees.append(sAssignee);
+      }
+
+      Milestone sMilestone { issueData["milestone"].toObject()[QStringLiteral("id")].toInt(),
+                             issueData["milestone"].toObject()[QStringLiteral("number")].toInt(),
+                             issueData["milestone"].toObject()[QStringLiteral("node_id")].toString(),
+                             issueData["milestone"].toObject()[QStringLiteral("title")].toString(),
+                             issueData["milestone"].toObject()[QStringLiteral("description")].toString(),
+                             issueData["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
+
+      issue.milestone = sMilestone;
+
+      emit issueCreated(issue);
    }
    else
       emit errorOccurred(errorStr);
