@@ -1,4 +1,4 @@
-#include "RevisionsCache.h"
+#include "GitCache.h"
 #include <GitQlientSettings.h>
 #include <GitHubRestApi.h>
 
@@ -9,20 +9,20 @@
 using namespace QLogger;
 using namespace GitServer;
 
-RevisionsCache::RevisionsCache(QObject *parent)
+GitCache::GitCache(QObject *parent)
    : QObject(parent)
    , mMutex(QMutex::Recursive)
 {
 }
 
-RevisionsCache::~RevisionsCache()
+GitCache::~GitCache()
 {
    mCommits.clear();
    mCommitsMap.clear();
    mReferences.clear();
 }
 
-void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits)
+void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits)
 {
    QMutexLocker lock(&mMutex);
 
@@ -77,17 +77,17 @@ void RevisionsCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArra
    }
 }
 
-void RevisionsCache::setupGitPlatform(const QSharedPointer<IRestApi> &api)
+void GitCache::setupGitPlatform(const QSharedPointer<IRestApi> &api)
 {
    if (mApi)
-      disconnect(mApi.get(), &IRestApi::pullRequestsStateReceived, this, &RevisionsCache::setPullRequestStatus);
+      disconnect(mApi.get(), &IRestApi::pullRequestsStateReceived, this, &GitCache::setPullRequestStatus);
 
    mApi = api;
 
-   connect(mApi.get(), &IRestApi::pullRequestsStateReceived, this, &RevisionsCache::setPullRequestStatus);
+   connect(mApi.get(), &IRestApi::pullRequestsStateReceived, this, &GitCache::setPullRequestStatus);
 }
 
-CommitInfo RevisionsCache::getCommitInfoByRow(int row)
+CommitInfo GitCache::getCommitInfoByRow(int row)
 {
    QMutexLocker lock(&mMutex);
 
@@ -96,7 +96,7 @@ CommitInfo RevisionsCache::getCommitInfoByRow(int row)
    return commit ? *commit : CommitInfo();
 }
 
-int RevisionsCache::getCommitPos(const QString &sha)
+int GitCache::getCommitPos(const QString &sha)
 {
    QMutexLocker lock(&mMutex);
 
@@ -109,7 +109,7 @@ int RevisionsCache::getCommitPos(const QString &sha)
    return -1;
 }
 
-CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint,
+CommitInfo GitCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint,
                                                 bool reverse)
 {
    QMutexLocker lock(&mMutex);
@@ -139,7 +139,7 @@ CommitInfo RevisionsCache::getCommitInfoByField(CommitInfo::Field field, const Q
    return commit;
 }
 
-CommitInfo RevisionsCache::getCommitInfo(const QString &sha)
+CommitInfo GitCache::getCommitInfo(const QString &sha)
 {
    QMutexLocker lock(&mMutex);
 
@@ -165,12 +165,12 @@ CommitInfo RevisionsCache::getCommitInfo(const QString &sha)
    return CommitInfo();
 }
 
-RevisionFiles RevisionsCache::getRevisionFile(const QString &sha1, const QString &sha2) const
+RevisionFiles GitCache::getRevisionFile(const QString &sha1, const QString &sha2) const
 {
    return mRevisionFilesMap.value(qMakePair(sha1, sha2));
 }
 
-void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
+void GitCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 {
    if (!mConfigured)
    {
@@ -198,7 +198,7 @@ void RevisionsCache::insertCommitInfo(CommitInfo rev, int orderIdx)
    }
 }
 
-void RevisionsCache::insertWipRevision(const QString &parentSha, const QString &diffIndex,
+void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIndex,
                                        const QString &diffIndexCache)
 {
    QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
@@ -232,7 +232,7 @@ void RevisionsCache::insertWipRevision(const QString &parentSha, const QString &
    mCommits[0] = &mCommitsMap[sha];
 }
 
-bool RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)
+bool GitCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)
 {
    const auto key = qMakePair(sha1, sha2);
 
@@ -248,7 +248,7 @@ bool RevisionsCache::insertRevisionFile(const QString &sha1, const QString &sha2
    return false;
 }
 
-void RevisionsCache::insertReference(const QString &sha, References::Type type, const QString &reference)
+void GitCache::insertReference(const QString &sha, References::Type type, const QString &reference)
 {
    QMutexLocker lock(&mMutex);
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
@@ -264,23 +264,23 @@ void RevisionsCache::insertReference(const QString &sha, References::Type type, 
    }
 }
 
-void RevisionsCache::insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances)
+void GitCache::insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances)
 {
    mLocalBranchDistances[name] = distances;
 }
 
-void RevisionsCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
+void GitCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
 {
    if (mConfigured)
       insertWipRevision(parentSha, diffIndex, diffIndexCache);
 }
 
-bool RevisionsCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
+bool GitCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
 {
    return mRevisionFilesMap.contains(qMakePair(sha1, sha2));
 }
 
-QVector<Lane> RevisionsCache::calculateLanes(const CommitInfo &c)
+QVector<Lane> GitCache::calculateLanes(const CommitInfo &c)
 {
    const auto sha = c.sha();
 
@@ -307,7 +307,7 @@ QVector<Lane> RevisionsCache::calculateLanes(const CommitInfo &c)
    return lanes;
 }
 
-RevisionFiles RevisionsCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
+RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
 {
    RevisionFiles rf;
    auto parNum = 1;
@@ -364,7 +364,7 @@ RevisionFiles RevisionsCache::parseDiffFormat(const QString &buf, FileNamesLoade
    return rf;
 }
 
-void RevisionsCache::appendFileName(const QString &name, FileNamesLoader &fl)
+void GitCache::appendFileName(const QString &name, FileNamesLoader &fl)
 {
    int idx = name.lastIndexOf('/') + 1;
    const QString &dr = name.left(idx);
@@ -393,7 +393,7 @@ void RevisionsCache::appendFileName(const QString &name, FileNamesLoader &fl)
    fl.files.append(name);
 }
 
-void RevisionsCache::flushFileNames(FileNamesLoader &fl)
+void GitCache::flushFileNames(FileNamesLoader &fl)
 {
    if (!fl.rf)
       return;
@@ -412,7 +412,7 @@ void RevisionsCache::flushFileNames(FileNamesLoader &fl)
    fl.rf = nullptr;
 }
 
-bool RevisionsCache::pendingLocalChanges()
+bool GitCache::pendingLocalChanges()
 {
    QMutexLocker lock(&mMutex);
    auto localChanges = false;
@@ -428,7 +428,7 @@ bool RevisionsCache::pendingLocalChanges()
    return localChanges;
 }
 
-QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Type type)
+QVector<QPair<QString, QStringList>> GitCache::getBranches(References::Type type)
 {
    QMutexLocker lock(&mMutex);
    QVector<QPair<QString, QStringList>> branches;
@@ -439,7 +439,7 @@ QVector<QPair<QString, QStringList>> RevisionsCache::getBranches(References::Typ
    return branches;
 }
 
-QMap<QString, QString> RevisionsCache::getTags(References::Type tagType) const
+QMap<QString, QString> GitCache::getTags(References::Type tagType) const
 {
    QMap<QString, QString> tags;
 
@@ -460,29 +460,29 @@ QMap<QString, QString> RevisionsCache::getTags(References::Type tagType) const
    return tags;
 }
 
-void RevisionsCache::updateTags(const QMap<QString, QString> &remoteTags)
+void GitCache::updateTags(const QMap<QString, QString> &remoteTags)
 {
    mRemoteTags = remoteTags;
 }
 
-void RevisionsCache::setPullRequestStatus(QMap<QString, PullRequest> prStatus)
+void GitCache::setPullRequestStatus(QMap<QString, PullRequest> prStatus)
 {
    mPullRequestsStatus = std::move(prStatus);
 
    emit signalCacheUpdated();
 }
 
-PullRequest RevisionsCache::getPullRequestStatus(const QString &sha)
+PullRequest GitCache::getPullRequestStatus(const QString &sha)
 {
    return mPullRequestsStatus.value(sha);
 }
 
-void RevisionsCache::refreshPRsCache()
+void GitCache::refreshPRsCache()
 {
    QTimer::singleShot(1500, this, [this]() { mApi->requestPullRequestsState(); });
 }
 
-void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
+void GitCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
    const QStringList sl(rowSt.split('\t', Qt::SkipEmptyParts));
@@ -535,7 +535,7 @@ void RevisionsCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int p
    rf.setOnlyModified(false);
 }
 
-QVector<CommitInfo *>::const_iterator RevisionsCache::searchCommit(CommitInfo::Field field, const QString &text,
+QVector<CommitInfo *>::const_iterator GitCache::searchCommit(CommitInfo::Field field, const QString &text,
                                                                    const int startingPoint) const
 {
    return std::find_if(mCommits.constBegin() + startingPoint, mCommits.constEnd(),
@@ -543,7 +543,7 @@ QVector<CommitInfo *>::const_iterator RevisionsCache::searchCommit(CommitInfo::F
 }
 
 QVector<CommitInfo *>::const_reverse_iterator
-RevisionsCache::reverseSearchCommit(CommitInfo::Field field, const QString &text, int startingPoint) const
+GitCache::reverseSearchCommit(CommitInfo::Field field, const QString &text, int startingPoint) const
 {
    const auto startEndPos = startingPoint > 0 ? mCommits.count() - startingPoint + 1 : 0;
 
@@ -555,7 +555,7 @@ RevisionsCache::reverseSearchCommit(CommitInfo::Field field, const QString &text
                        });
 }
 
-void RevisionsCache::resetLanes(const CommitInfo &c, bool isFork)
+void GitCache::resetLanes(const CommitInfo &c, bool isFork)
 {
    const auto nextSha = c.parentsCount() == 0 ? QString() : c.parent(0);
 
@@ -569,12 +569,12 @@ void RevisionsCache::resetLanes(const CommitInfo &c, bool isFork)
       mLanes.afterBranch();
 }
 
-int RevisionsCache::count() const
+int GitCache::count() const
 {
    return mCommits.count();
 }
 
-RevisionFiles RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
+RevisionFiles GitCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
 {
    FileNamesLoader fl;
    auto rf = parseDiffFormat(diffIndex, fl);
@@ -611,7 +611,7 @@ RevisionFiles RevisionsCache::fakeWorkDirRevFile(const QString &diffIndex, const
    return rf;
 }
 
-RevisionFiles RevisionsCache::parseDiff(const QString &logDiff)
+RevisionFiles GitCache::parseDiff(const QString &logDiff)
 {
    FileNamesLoader fl;
 
@@ -622,7 +622,7 @@ RevisionFiles RevisionsCache::parseDiff(const QString &logDiff)
    return rf;
 }
 
-void RevisionsCache::setUntrackedFilesList(const QVector<QString> &untrackedFiles)
+void GitCache::setUntrackedFilesList(const QVector<QString> &untrackedFiles)
 {
    mUntrackedfiles = untrackedFiles;
 }

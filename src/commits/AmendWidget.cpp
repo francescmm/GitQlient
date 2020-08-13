@@ -1,7 +1,7 @@
 #include <AmendWidget.h>
 #include <ui_CommitChangesWidget.h>
 
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitRepoLoader.h>
 #include <GitBase.h>
 #include <GitLocal.h>
@@ -14,7 +14,7 @@
 
 using namespace QLogger;
 
-AmendWidget::AmendWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+AmendWidget::AmendWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                          QWidget *parent)
    : CommitChangesWidget(cache, git, parent)
 {

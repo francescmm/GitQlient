@@ -5,7 +5,7 @@
 #include <CommitHistoryContextMenu.h>
 #include <ShaFilterProxyModel.h>
 #include <CommitInfo.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitConfig.h>
 #include <GitQlientSettings.h>
 #include <GitBase.h>
@@ -16,7 +16,7 @@
 #include <QLogger.h>
 using namespace QLogger;
 
-CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                      QWidget *parent)
    : QTreeView(parent)
    , mCache(cache)
@@ -34,7 +34,7 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache
    connect(header(), &QHeaderView::customContextMenuRequested, this, &CommitHistoryView::onHeaderContextMenu);
    connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
 
-   connect(mCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryView::refreshView);
+   connect(mCache.get(), &GitCache::signalCacheUpdated, this, &CommitHistoryView::refreshView);
 
    connect(this, &CommitHistoryView::doubleClicked, this, [this](const QModelIndex &index) {
       if (mCommitHistoryModel)
@@ -213,8 +213,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
       if (!shas.isEmpty())
       {
          const auto menu = new CommitHistoryContextMenu(mCache, mGit, shas, this);
-         connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, mCache.get(),
-                 &RevisionsCache::refreshPRsCache);
+         connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, mCache.get(), &GitCache::refreshPRsCache);
          connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,

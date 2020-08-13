@@ -7,7 +7,7 @@
 
 using namespace QLogger;
 
-GitMerge::GitMerge(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> cache)
+GitMerge::GitMerge(const QSharedPointer<GitBase> &gitBase, QSharedPointer<GitCache> cache)
    : mGitBase(gitBase)
    , mCache(cache)
 {

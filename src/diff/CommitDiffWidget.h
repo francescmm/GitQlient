@@ -27,7 +27,7 @@
 
 class GitBase;
 class FileListWidget;
-class RevisionsCache;
+class GitCache;
 
 /*!
  \brief The CommitDiffWidget creates the layout that contains the information of a commit diff. This widget is located
@@ -77,7 +77,7 @@ public:
     \param cache The repository internal cache.
     \param parent The parent widget if needed.
    */
-   explicit CommitDiffWidget(QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache,
+   explicit CommitDiffWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cache,
                              QWidget *parent = nullptr);
 
    /*!
@@ -90,7 +90,7 @@ public:
 
 private:
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    FileListWidget *fileListWidget = nullptr;
    QString mFirstShaStr;
    QString mSecondShaStr;

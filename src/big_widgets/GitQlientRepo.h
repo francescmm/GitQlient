@@ -28,7 +28,7 @@
 #include <QPointer>
 
 class GitBase;
-class RevisionsCache;
+class GitCache;
 class GitRepoLoader;
 class QCloseEvent;
 class QFileSystemWatcher;
@@ -127,7 +127,7 @@ protected:
 
 private:
    QString mCurrentDir;
-   QSharedPointer<RevisionsCache> mGitQlientCache;
+   QSharedPointer<GitCache> mGitQlientCache;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitRepoLoader> mGitLoader;
    HistoryWidget *mHistoryWidget = nullptr;

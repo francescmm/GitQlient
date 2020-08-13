@@ -27,7 +27,7 @@
 #include <QDateTime>
 
 class CommitHistoryView;
-class RevisionsCache;
+class GitCache;
 class GitBase;
 class Lane;
 class CommitInfo;
@@ -58,7 +58,7 @@ public:
     * @param git The git object to execute git commands.
     * @param view The view that uses the delegate.
     */
-   RepositoryViewDelegate(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   RepositoryViewDelegate(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                           CommitHistoryView *view);
 
    /**
@@ -81,7 +81,7 @@ protected:
                     const QModelIndex &index) override;
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    CommitHistoryView *mView = nullptr;
    int diffTargetRow = -1;

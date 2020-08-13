@@ -25,7 +25,7 @@
 
 #include <QFrame>
 
-class RevisionsCache;
+class GitCache;
 class GitBase;
 class CommitHistoryModel;
 class CommitHistoryView;
@@ -156,7 +156,7 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
+   explicit HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
                           QWidget *parent = nullptr);
    /*!
     \brief Destructor.
@@ -229,7 +229,7 @@ private:
    };
 
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;

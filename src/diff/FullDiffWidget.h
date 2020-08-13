@@ -45,7 +45,7 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+   explicit FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
                            QWidget *parent = nullptr);
 
    /*!

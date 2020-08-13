@@ -25,7 +25,7 @@
 
 #include <QFrame>
 
-class RevisionsCache;
+class GitCache;
 class GitBase;
 
 namespace GitServer
@@ -41,7 +41,7 @@ class GitServerWidget : public QFrame
 signals:
 
 public:
-   explicit GitServerWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit GitServerWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                             QWidget *parent = nullptr);
 
    /**
@@ -58,7 +58,7 @@ public:
    bool isConfigured() const { return mConfigured; }
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    GitServer::IRestApi *mApi = nullptr;
    bool mConfigured = false;

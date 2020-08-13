@@ -7,7 +7,7 @@
 #include <GitBase.h>
 #include <GitConfig.h>
 #include <PullRequest.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <Issue.h>
 #include <Milestone.h>
 #include <Label.h>
@@ -19,7 +19,7 @@
 
 using namespace GitServer;
 
-CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache,
+CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache,
                                            const QSharedPointer<GitBase> &git, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::CreatePullRequestDlg)

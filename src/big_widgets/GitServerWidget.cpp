@@ -20,7 +20,7 @@
 
 using namespace GitServer;
 
-GitServerWidget::GitServerWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+GitServerWidget::GitServerWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
@@ -145,7 +145,7 @@ void GitServerWidget::createNewPullRequest()
    const auto serverUrl = gitConfig->getServerUrl();
 
    if (serverUrl.contains("github"))
-      connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, mCache.get(), &RevisionsCache::refreshPRsCache);
+      connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, mCache.get(), &GitCache::refreshPRsCache);
 
    prDlg->exec();
 }

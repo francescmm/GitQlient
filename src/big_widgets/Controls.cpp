@@ -30,7 +30,7 @@
 
 using namespace QLogger;
 
-Controls::Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
+Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)

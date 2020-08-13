@@ -1,6 +1,6 @@
 ﻿#include "FileBlameWidget.h"
 
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <FileDiffView.h>
 #include <GitHistory.h>
 #include <CommitInfo.h>
@@ -25,7 +25,7 @@ qint64 kSecondsOldest = QDateTime::currentDateTime().toSecsSinceEpoch();
 qint64 kIncrementSecs = 0;
 }
 
-FileBlameWidget::FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+FileBlameWidget::FileBlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent)
    : QFrame(parent)
    , mCache(cache)

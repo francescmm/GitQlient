@@ -5,7 +5,7 @@
 #include <FileListDelegate.h>
 #include <GitHistory.h>
 #include <GitQlientStyles.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitBase.h>
 
 #include <QApplication>
@@ -17,7 +17,7 @@
 #include <QMenu>
 #include <QItemDelegate>
 
-FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache, QWidget *p)
+FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *p)
    : QListWidget(p)
    , mGit(git)
    , mCache(std::move(cache))

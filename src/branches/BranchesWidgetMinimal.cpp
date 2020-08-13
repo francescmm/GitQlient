@@ -1,6 +1,6 @@
 #include "BranchesWidgetMinimal.h"
 
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitSubmodules.h>
 #include <GitStashes.h>
 
@@ -11,7 +11,7 @@
 #include <QPushButton>
 #include <QEvent>
 
-BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<RevisionsCache> &cache,
+BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<GitCache> &cache,
                                              const QSharedPointer<GitBase> git, QWidget *parent)
    : QFrame(parent)
    , mGit(git)

@@ -26,7 +26,7 @@
 #include <QListWidget>
 
 class GitBase;
-class RevisionsCache;
+class GitCache;
 class FileListDelegate;
 
 class FileListWidget : public QListWidget
@@ -45,7 +45,7 @@ signals:
    void signalEditFile(const QString &fileName, int line, int column);
 
 public:
-   explicit FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+   explicit FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
                            QWidget *parent = nullptr);
    ~FileListWidget() override;
 
@@ -53,7 +53,7 @@ public:
 
 private:
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    FileListDelegate *mFileDelegate = nullptr;
    QString mCurrentSha;
 

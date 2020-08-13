@@ -31,7 +31,7 @@ class CreatePullRequestDlg;
 }
 
 class GitBase;
-class RevisionsCache;
+class GitCache;
 
 namespace GitServer
 {
@@ -61,7 +61,7 @@ public:
     * @param git The git object to perform Git operations.
     * @param parent The parent widget.
     */
-   explicit CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit CreatePullRequestDlg(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                  QWidget *parent = nullptr);
    /**
     * Destructor
@@ -70,7 +70,7 @@ public:
 
 private:
    Ui::CreatePullRequestDlg *ui;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    GitServer::IRestApi *mApi;
    QString mUserName;

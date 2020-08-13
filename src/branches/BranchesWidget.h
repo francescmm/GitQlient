@@ -30,7 +30,7 @@ class QListWidget;
 class QListWidgetItem;
 class QLabel;
 class GitBase;
-class RevisionsCache;
+class GitCache;
 class QPushButton;
 class BranchesWidgetMinimal;
 
@@ -87,7 +87,7 @@ public:
     \param git The git object to perform Git commands.
     \param parent The parent widget if needed.
    */
-   explicit BranchesWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit BranchesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                            QWidget *parent = nullptr);
    /*!
     \brief This method configures the widget gathering all the information regarding branches, tags, stashes and
@@ -122,7 +122,7 @@ public:
    void forceMinimalView();
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    BranchTreeWidget *mLocalBranchesTree = nullptr;
    BranchTreeWidget *mRemoteBranchesTree = nullptr;

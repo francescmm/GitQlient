@@ -2,7 +2,7 @@
 #include <ui_CommitChangesWidget.h>
 
 #include <GitQlientRole.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitRepoLoader.h>
 #include <GitLocal.h>
 #include <UnstagedMenu.h>
@@ -16,7 +16,7 @@
 
 using namespace QLogger;
 
-WipWidget::WipWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
+WipWidget::WipWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : CommitChangesWidget(cache, git, parent)
 {
    mCurrentSha = CommitInfo::ZERO_SHA;

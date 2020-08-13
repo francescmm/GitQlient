@@ -25,7 +25,7 @@
 
 #include <QTreeView>
 
-class RevisionsCache;
+class GitCache;
 class GitBase;
 class CommitHistoryModel;
 class ShaFilterProxyModel;
@@ -89,7 +89,7 @@ public:
     * @param git The git object to perform Git commands.
     * @param parent The parent widget if needed.
     */
-   explicit CommitHistoryView(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                               QWidget *parent = nullptr);
    /**
     * @brief Destructor.
@@ -151,7 +151,7 @@ public:
    QModelIndexList selectedIndexes() const override;
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    CommitHistoryModel *mCommitHistoryModel = nullptr;
    ShaFilterProxyModel *mProxyModel = nullptr;

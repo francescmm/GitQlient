@@ -4,7 +4,7 @@
 #include <GitHistory.h>
 #include <FileDiffView.h>
 #include <CommitInfo.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitQlientSettings.h>
 #include <CheckBox.h>
 #include <FileEditor.h>
@@ -18,7 +18,7 @@
 #include <QStackedWidget>
 #include <QMessageBox>
 
-FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
                                QWidget *parent)
    : IDiffWidget(git, cache, parent)
    , mBack(new QPushButton())

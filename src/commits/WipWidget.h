@@ -27,7 +27,7 @@
 
 class QListWidget;
 class QListWidgetItem;
-class RevisionsCache;
+class GitCache;
 class GitBase;
 class RevisionFiles;
 
@@ -41,7 +41,7 @@ class WipWidget : public CommitChangesWidget
    Q_OBJECT
 
 public:
-   explicit WipWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit WipWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                       QWidget *parent = nullptr);
 
    ~WipWidget() = default;

@@ -21,7 +21,7 @@
 #include <QFile>
 #include <QMessageBox>
 
-MergeWidget::MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, const QSharedPointer<GitBase> &git,
+MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const QSharedPointer<GitBase> &git,
                          QWidget *parent)
    : QFrame(parent)
    , mGitQlientCache(gitQlientCache)

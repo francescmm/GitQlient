@@ -12,7 +12,7 @@
 #include <BranchDlg.h>
 #include <TagDlg.h>
 #include <CommitInfo.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <PullDlg.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
@@ -31,7 +31,7 @@
 
 using namespace QLogger;
 
-CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<RevisionsCache> &cache,
+CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache,
                                                    const QSharedPointer<GitBase> &git, const QStringList &shas,
                                                    QWidget *parent)
    : QMenu(parent)

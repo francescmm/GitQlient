@@ -28,12 +28,12 @@
 #include <QSharedPointer>
 
 class GitBase;
-class RevisionsCache;
+class GitCache;
 
 class GitMerge
 {
 public:
-   explicit GitMerge(const QSharedPointer<GitBase> &gitBase, QSharedPointer<RevisionsCache> cache);
+   explicit GitMerge(const QSharedPointer<GitBase> &gitBase, QSharedPointer<GitCache> cache);
 
    GitExecResult merge(const QString &into, QStringList sources);
    GitExecResult abortMerge() const;
@@ -41,5 +41,5 @@ public:
 
 private:
    QSharedPointer<GitBase> mGitBase;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
 };

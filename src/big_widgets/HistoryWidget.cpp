@@ -35,7 +35,7 @@
 
 using namespace QLogger;
 
-HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
+HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
                              QWidget *parent)
    : QFrame(parent)
    , mGit(git)

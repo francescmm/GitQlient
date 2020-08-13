@@ -34,7 +34,7 @@ class QLineEdit;
 class QTextEdit;
 class FileDiffWidget;
 class RevisionFiles;
-class RevisionsCache;
+class GitCache;
 class FileEditor;
 class QListWidget;
 class QListWidgetItem;
@@ -82,7 +82,7 @@ public:
     * @param git The git object to perform Git operations.
     * @param parent The parent widget if needed.
     */
-   explicit MergeWidget(const QSharedPointer<RevisionsCache> &gitQlientCache, const QSharedPointer<GitBase> &git,
+   explicit MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const QSharedPointer<GitBase> &git,
                         QWidget *parent = nullptr);
 
    /**
@@ -93,7 +93,7 @@ public:
    void configure(const RevisionFiles &files, ConflictReason reason);
 
 private:
-   QSharedPointer<RevisionsCache> mGitQlientCache;
+   QSharedPointer<GitCache> mGitQlientCache;
    QSharedPointer<GitBase> mGit;
    QListWidget *mConflictFiles = nullptr;
    QListWidget *mMergedFiles = nullptr;

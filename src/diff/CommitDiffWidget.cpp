@@ -1,12 +1,12 @@
 #include "CommitDiffWidget.h"
 
 #include <FileListWidget.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 
 #include <QVBoxLayout>
 #include <QLabel>
 
-CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache, QWidget *parent)
+CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cache, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)

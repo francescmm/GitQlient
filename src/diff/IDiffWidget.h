@@ -3,7 +3,7 @@
 #include <QFrame>
 
 class GitBase;
-class RevisionsCache;
+class GitCache;
 
 class IDiffWidget : public QFrame
 {
@@ -11,7 +11,7 @@ class IDiffWidget : public QFrame
 signals:
 
 public:
-   explicit IDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+   explicit IDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
                         QWidget *parent = nullptr);
 
    /*!
@@ -35,7 +35,7 @@ public:
 
 protected:
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QString mCurrentSha;
    QString mPreviousSha;
 };

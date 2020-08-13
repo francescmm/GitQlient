@@ -2,7 +2,7 @@
 
 #include <GitBase.h>
 #include <GitConfig.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitRequestorProcess.h>
 #include <GitBranches.h>
 #include <GitQlientSettings.h>
@@ -16,12 +16,12 @@ using namespace QLogger;
 
 static const QString GIT_LOG_FORMAT("%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ");
 
-GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache, QObject *parent)
+GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache, QObject *parent)
    : QObject(parent)
    , mGitBase(gitBase)
    , mRevCache(std::move(cache))
 {
-   connect(this, &GitRepoLoader::signalRefreshPRsCache, mRevCache.get(), &RevisionsCache::refreshPRsCache);
+   connect(this, &GitRepoLoader::signalRefreshPRsCache, mRevCache.get(), &GitCache::refreshPRsCache);
 }
 
 bool GitRepoLoader::loadRepository()
@@ -135,7 +135,7 @@ void GitRepoLoader::loadReferences()
             if (localBranches)
             {
                const auto git = new GitBranches(mGitBase);
-               RevisionsCache::LocalBranchDistances distances;
+               GitCache::LocalBranchDistances distances;
 
                const auto distToMaster = git->getDistanceBetweenBranches(true, name);
                auto toMaster = distToMaster.output.toString();

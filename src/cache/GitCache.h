@@ -47,7 +47,7 @@ struct WipRevisionInfo
    bool isValid() const { return !parentSha.isEmpty() || !diffIndex.isEmpty() || !diffIndexCached.isEmpty(); }
 };
 
-class RevisionsCache : public QObject
+class GitCache : public QObject
 {
    Q_OBJECT
 
@@ -63,8 +63,8 @@ public:
       int behindOrigin = 0;
    };
 
-   explicit RevisionsCache(QObject *parent = nullptr);
-   ~RevisionsCache();
+   explicit GitCache(QObject *parent = nullptr);
+   ~GitCache();
 
    void setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits);
    void setupGitPlatform(const QSharedPointer<GitServer::IRestApi> &api);

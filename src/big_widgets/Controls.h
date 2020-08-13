@@ -28,7 +28,7 @@
 class QToolButton;
 class QPushButton;
 class GitBase;
-class RevisionsCache;
+class GitCache;
 class QNetworkAccessManager;
 class QProgressBar;
 class GitQlientUpdater;
@@ -109,7 +109,7 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                      QWidget *parent = nullptr);
    /*!
     \brief Process the toggled button and triggers its corresponding action.
@@ -163,7 +163,7 @@ public:
 
 private:
    QString mCurrentSha;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QToolButton *mHistory = nullptr;
    QToolButton *mDiff = nullptr;

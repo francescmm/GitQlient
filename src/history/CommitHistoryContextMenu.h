@@ -25,7 +25,7 @@
 
 #include <QMenu>
 
-class RevisionsCache;
+class GitCache;
 class GitBase;
 
 /*!
@@ -92,11 +92,11 @@ public:
     \param shas The list of SHAs selected.
     \param parent The parent widget if needed.
    */
-   explicit CommitHistoryContextMenu(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                      const QStringList &shas, QWidget *parent = nullptr);
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QStringList mShas;
 

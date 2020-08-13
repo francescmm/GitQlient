@@ -8,7 +8,7 @@
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryView.h>
 #include <CommitHistoryModel.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitBase.h>
 #include <PullRequest.h>
 
@@ -26,7 +26,7 @@ using namespace GitServer;
 
 static const int MIN_VIEW_WIDTH_PX = 480;
 
-RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<RevisionsCache> &cache,
+RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<GitCache> &cache,
                                                const QSharedPointer<GitBase> &git, CommitHistoryView *view)
    : mCache(cache)
    , mGit(git)

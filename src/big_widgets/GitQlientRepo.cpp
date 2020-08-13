@@ -15,7 +15,7 @@
 #include <HistoryWidget.h>
 #include <DiffWidget.h>
 #include <MergeWidget.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitRepoLoader.h>
 #include <GitConfig.h>
 #include <GitBase.h>
@@ -38,7 +38,7 @@ using namespace GitServer;
 
 GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    : QFrame(parent)
-   , mGitQlientCache(new RevisionsCache())
+   , mGitQlientCache(new GitCache())
    , mGitBase(new GitBase(repoPath))
    , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache))
    , mHistoryWidget(new HistoryWidget(mGitQlientCache, mGitBase))
@@ -66,8 +66,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
       mAutoPrUpdater = new QTimer();
       mAutoPrUpdater->start(300 * 1000);
 
-      connect(mAutoPrUpdater, &QTimer::timeout, mGitQlientCache.get(), &RevisionsCache::refreshPRsCache);
-      connect(mControls, &Controls::signalRefreshPRsCache, mGitQlientCache.get(), &RevisionsCache::refreshPRsCache);
+      connect(mAutoPrUpdater, &QTimer::timeout, mGitQlientCache.get(), &GitCache::refreshPRsCache);
+      connect(mControls, &Controls::signalRefreshPRsCache, mGitQlientCache.get(), &GitCache::refreshPRsCache);
 
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();

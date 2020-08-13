@@ -2,7 +2,7 @@
 
 #include <CommitInfo.h>
 #include <GitHistory.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitQlientStyles.h>
 
 #include <QScrollBar>
@@ -59,7 +59,7 @@ void FullDiffWidget::DiffHighlighter::highlightBlock(const QString &text)
       setFormat(0, text.length(), myFormat);
 }
 
-FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
                                QWidget *parent)
    : IDiffWidget(git, cache, parent)
    , mDiffWidget(new QTextEdit())
