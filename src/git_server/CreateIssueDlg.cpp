@@ -3,7 +3,7 @@
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
 #include <GitQlientSettings.h>
-#include <GitConfig.h>
+#include <GitServerCache.h>
 #include <Issue.h>
 
 #include <QMessageBox>
@@ -12,37 +12,18 @@
 
 using namespace GitServer;
 
-CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *parent)
+CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::CreateIssueDlg)
-   , mGit(git)
+   , mGitServerCache(gitServerCache)
 {
    ui->setupUi(this);
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
+   connect(mGitServerCache->getApi(), &IRestApi::issueUpdated, this, &CreateIssueDlg::onIssueCreated);
+   connect(mGitServerCache.get(), &GitServerCache::errorOccurred, this, &CreateIssueDlg::onGitServerError);
 
-   GitQlientSettings settings;
-   mUserName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
-   const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
-   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-   const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
-
-   if (serverUrl.contains("github"))
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken, endpoint });
-   else
-   {
-      mApi = new GitLabRestApi(mUserName, repoInfo.second, serverUrl, { mUserName, userToken, endpoint });
-      mUserName = dynamic_cast<GitLabRestApi *>(mApi)->getUserId();
-   }
-
-   connect(mApi, &IRestApi::issueUpdated, this, &CreateIssueDlg::onIssueCreated);
-   connect(mApi, &IRestApi::milestonesReceived, this, &CreateIssueDlg::onMilestones);
-   connect(mApi, &IRestApi::labelsReceived, this, &CreateIssueDlg::onLabels);
-   connect(mApi, &IRestApi::errorOccurred, this, &CreateIssueDlg::onGitServerError);
-
-   mApi->requestMilestones();
-   mApi->requestLabels();
+   onMilestones(mGitServerCache->getMilestones());
+   onLabels(mGitServerCache->getLabels());
 
    connect(ui->pbAccept, &QPushButton::clicked, this, &CreateIssueDlg::accept);
    connect(ui->pbClose, &QPushButton::clicked, this, &CreateIssueDlg::reject);
@@ -80,9 +61,9 @@ void CreateIssueDlg::accept()
       sMilestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
 
       GitServer::User sAssignee;
-      sAssignee.name = mUserName;
+      sAssignee.name = mGitServerCache->getUserName();
 
-      mApi->createIssue({
+      mGitServerCache->getApi()->createIssue({
           ui->leTitle->text(),
           ui->teDescription->toPlainText().toUtf8(),
           sMilestone,

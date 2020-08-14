@@ -50,6 +50,11 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
    return mInit;
 }
 
+QString GitServerCache::getUserName() const
+{
+   return mApi->getUserName();
+}
+
 void GitServerCache::onConnectionTested()
 {
    mPreSteps = 3;

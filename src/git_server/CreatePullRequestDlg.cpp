@@ -4,8 +4,7 @@
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
 #include <GitQlientSettings.h>
-#include <GitBase.h>
-#include <GitConfig.h>
+#include <GitServerCache.h>
 #include <PullRequest.h>
 #include <GitCache.h>
 #include <Issue.h>
@@ -19,37 +18,21 @@
 
 using namespace GitServer;
 
-CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                                           QWidget *parent)
+CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache,
+                                           const QSharedPointer<GitServerCache> &gitServerCache,
+                                           const QString &workingDir, const QString &currentBranch, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::CreatePullRequestDlg)
    , mCache(cache)
-   , mGit(git)
+   , mGitServerCache(gitServerCache)
 {
    ui->setupUi(this);
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
+   connect(mGitServerCache->getApi(), &IRestApi::pullRequestUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
+   connect(mGitServerCache.get(), &GitServerCache::errorOccurred, this, &CreatePullRequestDlg::onGitServerError);
 
-   GitQlientSettings settings;
-   mUserName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
-   const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
-   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-   const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
-
-   if (serverUrl.contains("github"))
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken, endpoint });
-   else if (serverUrl.contains("gitlab"))
-      mApi = new GitLabRestApi(mUserName, repoInfo.second, serverUrl, { mUserName, userToken, endpoint });
-
-   connect(mApi, &IRestApi::issueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
-   connect(mApi, &IRestApi::pullRequestUpdated, this, &CreatePullRequestDlg::onPullRequestCreated);
-   connect(mApi, &IRestApi::milestonesReceived, this, &CreatePullRequestDlg::onMilestones);
-   connect(mApi, &IRestApi::labelsReceived, this, &CreatePullRequestDlg::onLabels);
-   connect(mApi, &IRestApi::errorOccurred, this, &CreatePullRequestDlg::onGitServerError);
-
-   mApi->requestMilestones();
-   mApi->requestLabels();
+   onMilestones(mGitServerCache->getMilestones());
+   onLabels(mGitServerCache->getLabels());
 
    const auto branches = mCache->getBranches(References::Type::RemoteBranches);
 
@@ -59,13 +42,13 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
       ui->cbDestination->addItems(value.second);
    }
 
-   const auto index = ui->cbOrigin->findText(mGit->getCurrentBranch(), Qt::MatchEndsWith);
+   const auto index = ui->cbOrigin->findText(currentBranch, Qt::MatchEndsWith);
    ui->cbOrigin->setCurrentIndex(index);
 
    connect(ui->pbCreate, &QPushButton::clicked, this, &CreatePullRequestDlg::accept);
    connect(ui->pbClose, &QPushButton::clicked, this, &CreatePullRequestDlg::reject);
 
-   QFile f(mGit->getWorkingDir() + "/.github/PULL_REQUEST_TEMPLATE.md");
+   QFile f(workingDir + "/.github/PULL_REQUEST_TEMPLATE.md");
 
    if (f.open(QIODevice::ReadOnly))
    {
@@ -92,12 +75,13 @@ void CreatePullRequestDlg::accept()
 
    PullRequest pr;
    pr.title = ui->leTitle->text(), pr.body = ui->teDescription->toPlainText().toUtf8();
-   pr.head = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
+   pr.head = mGitServerCache->getUserName() + ":"
+       + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
    pr.base = ui->cbDestination->currentText().remove(0, ui->cbDestination->currentText().indexOf("/") + 1);
    pr.maintainerCanModify = ui->chModify->isChecked();
    pr.draft = ui->chDraft->isChecked();
 
-   if (dynamic_cast<GitLabRestApi *>(mApi))
+   if (mGitServerCache->getPlatform() == Platform::GitLab)
    {
       pr.head = ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
 
@@ -121,13 +105,19 @@ void CreatePullRequestDlg::accept()
       Milestone milestone;
       milestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
       pr.milestone = milestone;
+
+      GitServer::User sAssignee;
+      sAssignee.name = mGitServerCache->getUserName();
+
+      pr.assignees.append(sAssignee);
    }
    else
-      pr.head = mUserName + ":" + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
+      pr.head = mGitServerCache->getUserName() + ":"
+          + ui->cbOrigin->currentText().remove(0, ui->cbOrigin->currentText().indexOf("/") + 1);
 
    ui->pbCreate->setEnabled(false);
 
-   mApi->createPullRequest(pr);
+   mGitServerCache->getApi()->createPullRequest(pr);
 }
 
 void CreatePullRequestDlg::onMilestones(const QVector<Milestone> &milestones)
@@ -154,47 +144,12 @@ void CreatePullRequestDlg::onLabels(const QVector<Label> &labels)
    ui->labelsListView->setModel(model);
 }
 
-void CreatePullRequestDlg::onPullRequestCreated(const PullRequest &pr)
+void CreatePullRequestDlg::onPullRequestUpdated(const PullRequest &pr)
 {
-   mFinalUrl = pr.url;
-
-   if (dynamic_cast<GitHubRestApi *>(mApi))
-   {
-      mIssue = mFinalUrl.mid(mFinalUrl.lastIndexOf("/") + 1, mFinalUrl.count() - 1).toInt();
-
-      Milestone milestone;
-      milestone.id = ui->cbMilesone->count() > 0 ? ui->cbMilesone->currentData().toInt() : -1;
-
-      QVector<Label> labels;
-
-      if (const auto cbModel = qobject_cast<QStandardItemModel *>(ui->labelsListView->model()))
-      {
-         for (auto i = 0; i < cbModel->rowCount(); ++i)
-         {
-            if (cbModel->item(i)->checkState() == Qt::Checked)
-            {
-               Label sLabel;
-               sLabel.name = cbModel->item(i)->text();
-               labels.append(sLabel);
-            }
-         }
-      }
-
-      GitServer::User sAssignee;
-      sAssignee.name = mUserName;
-
-      mApi->updatePullRequest(mIssue, Issue { ui->leTitle->text(), "", milestone, labels, { sAssignee } });
-   }
-   else
-      onPullRequestUpdated();
-}
-
-void CreatePullRequestDlg::onPullRequestUpdated()
-{
-   QTimer::singleShot(200, [this]() {
+   QTimer::singleShot(200, [this, pr]() {
       QMessageBox::information(
           this, tr("Pull Request created"),
-          tr("The Pull Request has been created. You can <a href=\"%1\">find it here</a>.").arg(mFinalUrl));
+          tr("The Pull Request has been created. You can <a href=\"%1\">find it here</a>.").arg(pr.url));
 
       emit signalRefreshPRsCache();
 

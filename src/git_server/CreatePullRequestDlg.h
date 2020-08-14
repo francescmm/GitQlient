@@ -30,7 +30,7 @@ namespace Ui
 class CreatePullRequestDlg;
 }
 
-class GitBase;
+class GitServerCache;
 class GitCache;
 
 namespace GitServer
@@ -62,8 +62,9 @@ public:
     * @param git The git object to perform Git operations.
     * @param parent The parent widget.
     */
-   explicit CreatePullRequestDlg(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                                 QWidget *parent = nullptr);
+   explicit CreatePullRequestDlg(const QSharedPointer<GitCache> &cache,
+                                 const QSharedPointer<GitServerCache> &gitServerCache, const QString &workingDir,
+                                 const QString &currentBranch, QWidget *parent = nullptr);
    /**
     * Destructor
     */
@@ -72,11 +73,7 @@ public:
 private:
    Ui::CreatePullRequestDlg *ui;
    QSharedPointer<GitCache> mCache;
-   QSharedPointer<GitBase> mGit;
-   GitServer::IRestApi *mApi;
-   QString mUserName;
-   int mIssue;
-   QString mFinalUrl;
+   QSharedPointer<GitServerCache> mGitServerCache;
 
    /**
     * @brief accept Checks the data introduced by the user and connects to the server to create a pull request.
@@ -93,16 +90,11 @@ private:
     */
    void onLabels(const QVector<GitServer::Label> &labels);
    /**
-    * @brief onPullRequestCreated Shows a message box with the url of the pull request already created.
-    * @param url The url that links to the pull request.
-    */
-   void onPullRequestCreated(const GitServer::PullRequest &pr);
-   /**
     * @brief onPullRequestUpdated On GitHub, some parameters in the Pull Request are configured in an second update
     * call. This indicates the widget that that update was successfully and triggers the message box to inform of the
     * link to the PR.
     */
-   void onPullRequestUpdated();
+   void onPullRequestUpdated(const GitServer::PullRequest &pr);
    /**
     * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
     */

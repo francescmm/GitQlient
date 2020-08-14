@@ -9,6 +9,8 @@
 #include <IssuesWidget.h>
 #include <IssueDetailedView.h>
 #include <Platform.h>
+#include <GitBase.h>
+#include <GitQlientSettings.h>
 
 #include <QPushButton>
 #include <QToolButton>
@@ -126,12 +128,13 @@ void GitServerWidget::createWidget()
 
 void GitServerWidget::createNewIssue()
 {
-   const auto createIssue = new CreateIssueDlg(mGit, this);
+   const auto createIssue = new CreateIssueDlg(mGitServerCache, this);
    createIssue->exec();
 }
 
 void GitServerWidget::createNewPullRequest()
 {
-   const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
+   const auto prDlg
+       = new CreatePullRequestDlg(mCache, mGitServerCache, mGit->getWorkingDir(), mGit->getCurrentBranch(), this);
    prDlg->exec();
 }

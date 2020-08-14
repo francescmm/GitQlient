@@ -182,11 +182,12 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
       }
 
       connect(gitServerMenu->addAction("New Issue"), &QAction::triggered, this, [this]() {
-         const auto createIssue = new CreateIssueDlg(mGit, this);
+         const auto createIssue = new CreateIssueDlg(mGitServerCache, this);
          createIssue->exec();
       });
       connect(gitServerMenu->addAction("New Pull Request"), &QAction::triggered, this, [this]() {
-         const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
+         const auto prDlg
+             = new CreatePullRequestDlg(mCache, mGitServerCache, mGit->getWorkingDir(), mGit->getCurrentBranch(), this);
          connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, this,
                  &CommitHistoryContextMenu::signalRefreshPRsCache);
 

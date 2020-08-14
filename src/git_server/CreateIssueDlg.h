@@ -30,11 +30,10 @@ namespace Ui
 class CreateIssueDlg;
 }
 
-class GitBase;
+class GitServerCache;
 
 namespace GitServer
 {
-class IRestApi;
 struct Label;
 struct Milestone;
 struct Issue;
@@ -53,7 +52,7 @@ public:
     * @param git The git object to perform Git operations.
     * @param parent The parent widget.
     */
-   explicit CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *parent = nullptr);
+   explicit CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
    /**
     * Destructor.
     */
@@ -61,9 +60,7 @@ public:
 
 private:
    Ui::CreateIssueDlg *ui;
-   QSharedPointer<GitBase> mGit;
-   GitServer::IRestApi *mApi;
-   QString mUserName;
+   QSharedPointer<GitServerCache> mGitServerCache;
 
    /**
     * @brief accept Process the user input data and does a request to create an issue.

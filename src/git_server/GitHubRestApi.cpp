@@ -117,7 +117,19 @@ void GitHubRestApi::createPullRequest(const PullRequest &pullRequest)
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
 
    const auto reply = mManager->post(request, data);
-   connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestCreated);
+   connect(reply, &QNetworkReply::finished, this, [this]() {
+      const auto reply = qobject_cast<QNetworkReply *>(sender());
+      QString errorStr;
+      const auto tmpDoc = validateData(reply, errorStr);
+
+      if (!tmpDoc.isEmpty())
+      {
+         const auto pr = prFromJson(tmpDoc.object());
+         emit pullRequestUpdated(pr);
+
+         updatePullRequest(pr.number, pr);
+      }
+   });
 }
 
 void GitHubRestApi::requestLabels()

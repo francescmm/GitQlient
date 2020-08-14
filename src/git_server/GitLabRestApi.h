@@ -36,6 +36,8 @@ public:
    explicit GitLabRestApi(const QString &userName, const QString &repoName, const QString &settingsKey,
                           const ServerAuthentication &auth, QObject *parent = nullptr);
 
+   QString getUserName() const override { return mUserId; }
+
    void testConnection() override;
    void createIssue(const Issue &issue) override;
    void updateIssue(int issueNumber, const Issue &issue) override;

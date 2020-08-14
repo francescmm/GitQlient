@@ -114,6 +114,8 @@ public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
    virtual ~IRestApi() = default;
 
+   virtual QString getUserName() const { return mAuth.userName; }
+
    static QJsonDocument validateData(QNetworkReply *reply, QString &errorString);
 
    /**

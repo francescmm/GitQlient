@@ -53,6 +53,8 @@ public:
 
    bool init(const QString &serverUrl, const QPair<QString, QString> &repoInfo);
 
+   QString getUserName() const;
+
    QVector<GitServer::PullRequest> getPullRequests() const { return mPullRequests.values().toVector(); }
    GitServer::PullRequest getPullRequest(int number) const { return mPullRequests.value(number); }
    GitServer::PullRequest getPullRequest(const QString &sha) const;
@@ -62,6 +64,7 @@ public:
    QVector<GitServer::Milestone> getMilestones() const { return mMilestones; }
 
    GitServer::Platform getPlatform() const;
+   GitServer::IRestApi *getApi() const { return mApi.get(); }
 
 private:
    bool mInit = false;
