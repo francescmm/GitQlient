@@ -83,6 +83,10 @@
         <file alias="unified_view">resources/icons/unified_view.svg</file>
         <file alias="pull_request">resources/icons/pull_request.svg</file>
         <file alias="comment">resources/icons/comment.svg</file>
+        <file alias="comments">resources/icons/comments.svg</file>
+        <file alias="commit">resources/icons/commit.svg</file>
+        <file alias="add_comment">resources/icons/add_comment.svg</file>
+        <file alias="changes">resources/icons/changes.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>
