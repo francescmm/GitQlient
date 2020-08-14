@@ -688,3 +688,20 @@ MergeWidget > QPinnableTabWidget
     background: #404142;
 }
 
+QToolButton#Pagination
+{
+    background-color: #404142;
+    color: white;
+}
+
+QToolButton#Pagination:checked, QToolButton#Pagination:checked:hover
+{
+   background-color: #202122;
+   border-color: #404142;
+}
+
+QToolButton#Pagination:!checked:hover
+{
+   background-color: #606162;
+}
+

@@ -865,3 +865,9 @@ IssueDetailedView QTextEdit
    border: none;
 }
 
+QToolButton#Pagination:checked, QToolButton#Pagination:checked:hover
+{
+   border-width: 1px;
+   border-style: solid;
+}
+

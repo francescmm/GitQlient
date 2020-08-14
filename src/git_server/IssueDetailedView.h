@@ -34,6 +34,7 @@ class QNetworkAccessManager;
 class QLabel;
 class QHBoxLayout;
 class GitServerCache;
+class QButtonGroup;
 
 namespace GitServer
 {
@@ -53,15 +54,24 @@ public:
       PullRequests
    };
    explicit IssueDetailedView(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+   ~IssueDetailedView();
 
    void loadData(Config config, const GitServer::Issue &issue);
 
 private:
+   enum class Buttons
+   {
+      Comments,
+      Changes,
+      Commits
+   };
+
    GitServer::Issue mIssue;
    bool mLoaded = false;
    QSharedPointer<GitServerCache> mGitServerCache;
    Config mConfig;
    QNetworkAccessManager *mManager;
+   QButtonGroup *mBtnGroup = nullptr;
    QVBoxLayout *mIssuesLayout = nullptr;
    QFrame *mIssuesFrame = nullptr;
    QFrame *mIssueDetailedView = nullptr;

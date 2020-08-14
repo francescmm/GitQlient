@@ -20,6 +20,8 @@
 #include <QTextEdit>
 #include <QScrollBar>
 #include <QScrollArea>
+#include <QToolButton>
+#include <QButtonGroup>
 
 using namespace GitServer;
 
@@ -27,20 +29,48 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitSe
    : QFrame(parent)
    , mGitServerCache(gitServerCache)
    , mManager(new QNetworkAccessManager())
+   , mBtnGroup(new QButtonGroup())
 {
    const auto headerTitle = new QLabel(tr("Detailed View"));
    headerTitle->setObjectName("HeaderTitle");
 
-   const auto addComment = new QPushButton();
-   addComment->setIcon(QIcon(":/icons/comment"));
+   const auto comments = new QToolButton();
+   comments->setIcon(QIcon(":/icons/comments"));
+   comments->setObjectName("Pagination");
+   comments->setCheckable(true);
+   comments->setChecked(true);
+   comments->setDisabled(true);
+   mBtnGroup->addButton(comments, static_cast<int>(Buttons::Comments));
+
+   const auto changes = new QToolButton();
+   changes->setIcon(QIcon(":/icons/changes"));
+   changes->setCheckable(true);
+   changes->setObjectName("Pagination");
+   changes->setDisabled(true);
+   mBtnGroup->addButton(changes, static_cast<int>(Buttons::Changes));
+
+   const auto commits = new QToolButton();
+   commits->setIcon(QIcon(":/icons/commit"));
+   commits->setCheckable(true);
+   commits->setObjectName("Pagination");
+   commits->setDisabled(true);
+   mBtnGroup->addButton(commits, static_cast<int>(Buttons::Commits));
+
+   const auto addComment = new QToolButton();
+   addComment->setDisabled(true);
+   addComment->setIcon(QIcon(":/icons/add_comment"));
 
    const auto headerFrame = new QFrame();
    headerFrame->setObjectName("IssuesHeaderFrame");
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
-   headerLayout->setSpacing(0);
+   headerLayout->setSpacing(10);
    headerLayout->addWidget(headerTitle);
    headerLayout->addStretch();
+   headerLayout->addWidget(comments);
+   headerLayout->addWidget(changes);
+   headerLayout->addWidget(commits);
+   headerLayout->addSpacing(20);
    headerLayout->addWidget(addComment);
 
    mIssueDetailedView = new QFrame();
@@ -78,6 +108,11 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitSe
    timer->start(900000);
 }
 
+IssueDetailedView::~IssueDetailedView()
+{
+   delete mBtnGroup;
+}
+
 void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
 {
    connect(mGitServerCache.get(), &GitServerCache::issueUpdated, this, &IssueDetailedView::processComments,
@@ -108,7 +143,7 @@ void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
    scroll->setWidgetResizable(true);
    scroll->setWidget(issuesFrame);
 
-   const auto aLayout = new QHBoxLayout(mIssueDetailedView);
+   const auto aLayout = new QVBoxLayout(mIssueDetailedView);
    aLayout->setContentsMargins(QMargins());
    aLayout->setSpacing(0);
    aLayout->addWidget(scroll);
@@ -216,11 +251,15 @@ void IssueDetailedView::processComments(const Issue &issue)
    if (mIssueNumber != issue.number)
       return;
 
+   mBtnGroup->button(static_cast<int>(Buttons::Comments))->setEnabled(true);
+
    for (auto &comment : issue.comments)
    {
       const auto layout = createBubbleForComment(comment);
       mIssuesLayout->addLayout(layout);
    }
+
+   mIssuesLayout->addStretch();
 }
 
 QLabel *IssueDetailedView::createAvatar(const QString &userName, const QString &avatarUrl) const
@@ -308,7 +347,7 @@ QLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
    body->setReadOnly(true);
    body->show();
    const auto height = body->document()->size().height();
-   body->setMinimumHeight(height * 3 / 4);
+   body->setMaximumHeight(height);
 #else
    const auto body = new QLabel(comment.body);
    body->setWordWrap(true);
@@ -323,6 +362,7 @@ QLayout *IssueDetailedView::createBubbleForComment(const Comment &comment)
    innerLayout->addLayout(creationLayout);
    innerLayout->addSpacing(20);
    innerLayout->addWidget(body);
+   innerLayout->addStretch();
 
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
@@ -475,7 +515,7 @@ QLayout *IssueDetailedView::createBubbleForCodeReviewInitial(const QVector<CodeR
       body->setReadOnly(true);
       body->show();
       const auto height = body->document()->size().height();
-      body->setMinimumHeight(height * 3 / 4);
+      body->setMaximumHeight(height);
 #else
       const auto body = new QLabel(review.body);
       body->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -502,6 +542,8 @@ void IssueDetailedView::onReviewsReceived(const PullRequest &pr)
 {
    if (mIssueNumber != pr.number)
       return;
+
+   mBtnGroup->button(static_cast<int>(Buttons::Comments))->setEnabled(true);
 
    QMultiMap<QDateTime, QLayout *> bubblesMap;
 
@@ -530,4 +572,5 @@ void IssueDetailedView::onReviewsReceived(const PullRequest &pr)
    }
 
    mIssuesLayout->addStretch();
+   mIssuesLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding));
 }
