@@ -45,6 +45,8 @@ class GitServerCache : public QObject
 
 signals:
    void connectionTested();
+   void issueUpdated(const GitServer::Issue &issue);
+   void prUpdated(const GitServer::PullRequest &pr);
    void errorOccurred(const QString &error);
 
 public:
@@ -55,10 +57,10 @@ public:
 
    QString getUserName() const;
 
-   QVector<GitServer::PullRequest> getPullRequests() const { return mPullRequests.values().toVector(); }
+   QVector<GitServer::PullRequest> getPullRequests() const;
    GitServer::PullRequest getPullRequest(int number) const { return mPullRequests.value(number); }
    GitServer::PullRequest getPullRequest(const QString &sha) const;
-   QVector<GitServer::Issue> getIssues() const { return mIssues.values().toVector(); }
+   QVector<GitServer::Issue> getIssues() const;
    GitServer::Issue getIssue(int number) const { return mIssues.value(number); }
    QVector<GitServer::Label> getLabels() const { return mLabels; }
    QVector<GitServer::Milestone> getMilestones() const { return mMilestones; }
@@ -76,10 +78,14 @@ private:
    QVector<GitServer::Label> mLabels;
    QVector<GitServer::Milestone> mMilestones;
 
+   void triggerSignalConditionally();
+
    void onConnectionTested();
+   void onIssueUpdated(const GitServer::Issue &issue);
+   void onPRUpdated(const GitServer::PullRequest &pr);
+
    void initLabels(const QVector<GitServer::Label> &labels);
    void initMilestones(const QVector<GitServer::Milestone> &milestones);
    void initIssues(const QVector<GitServer::Issue> &issues);
    void initPullRequests(const QVector<GitServer::PullRequest> &prs);
-   void triggerSignalConditionally();
 };

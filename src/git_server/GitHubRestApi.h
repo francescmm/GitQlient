@@ -70,7 +70,7 @@ private:
    void onPullRequestStatusReceived(PullRequest pr);
    void onIssuesReceived();
    void onCommentsReceived(Issue issue);
-   void onPullRequestDetailesReceived(PullRequest pr);
+   void onPullRequestDetailsReceived(PullRequest pr);
    void onReviewsReceived(PullRequest pr);
 
    void requestReviewComments(const PullRequest &pr);

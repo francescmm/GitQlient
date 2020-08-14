@@ -3,6 +3,7 @@
 #include <IssueItem.h>
 #include <CircularPixmap.h>
 #include <GitServerCache.h>
+#include <IRestApi.h>
 #include <Issue.h>
 
 #include <QVBoxLayout>
@@ -79,10 +80,17 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitSe
 
 void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
 {
+   connect(mGitServerCache.get(), &GitServerCache::issueUpdated, this, &IssueDetailedView::processComments,
+           Qt::UniqueConnection);
+   connect(mGitServerCache.get(), &GitServerCache::prUpdated, this, &IssueDetailedView::onReviewsReceived,
+           Qt::UniqueConnection);
+
    mConfig = config;
 
    if (mLoaded && mIssue.number == issue.number)
       return;
+
+   mIssueNumber = issue.number;
 
    delete mIssueDetailedView;
 
@@ -198,13 +206,16 @@ void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
    mIssuesLayout->addWidget(frame);
 
    if (mConfig == Config::Issues)
-      processComments(mGitServerCache->getIssue(issue.number));
+      mGitServerCache->getApi()->requestComments(issue);
    else
-      onReviewsReceived(mGitServerCache->getPullRequest(issue.number));
+      mGitServerCache->getApi()->requestReviews(issue);
 }
 
 void IssueDetailedView::processComments(const Issue &issue)
 {
+   if (mIssueNumber != issue.number)
+      return;
+
    for (auto &comment : issue.comments)
    {
       const auto layout = createBubbleForComment(comment);
@@ -487,8 +498,11 @@ QLayout *IssueDetailedView::createBubbleForCodeReviewInitial(const QVector<CodeR
    return layout;
 }
 
-void IssueDetailedView::onReviewsReceived(PullRequest pr)
+void IssueDetailedView::onReviewsReceived(const PullRequest &pr)
 {
+   if (mIssueNumber != pr.number)
+      return;
+
    QMultiMap<QDateTime, QLayout *> bubblesMap;
 
    for (const auto comment : pr.comments)

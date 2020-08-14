@@ -37,9 +37,8 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
    connect(mApi.get(), &IRestApi::milestonesReceived, this, &GitServerCache::initMilestones);
    connect(mApi.get(), &IRestApi::issuesReceived, this, &GitServerCache::initIssues);
    connect(mApi.get(), &IRestApi::pullRequestsReceived, this, &GitServerCache::initPullRequests);
-   connect(mApi.get(), &IRestApi::issueUpdated, this, [this](const Issue &issue) { mIssues[issue.number] = issue; });
-   connect(mApi.get(), &IRestApi::pullRequestUpdated, this,
-           [this](const PullRequest &pr) { mPullRequests[pr.number] = pr; });
+   connect(mApi.get(), &IRestApi::issueUpdated, this, &GitServerCache::onIssueUpdated);
+   connect(mApi.get(), &IRestApi::pullRequestUpdated, this, &GitServerCache::onPRUpdated);
    connect(mApi.get(), &IRestApi::errorOccurred, this, &GitServerCache::errorOccurred);
    connect(mApi.get(), &IRestApi::connectionTested, this, &GitServerCache::onConnectionTested);
 
@@ -53,6 +52,16 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
 QString GitServerCache::getUserName() const
 {
    return mApi->getUserName();
+}
+
+QVector<PullRequest> GitServerCache::getPullRequests() const
+{
+   auto pullRequests = mPullRequests.values().toVector();
+
+   std::sort(pullRequests.begin(), pullRequests.end(),
+             [](const PullRequest &p1, const PullRequest &p2) { return p1.creation > p2.creation; });
+
+   return pullRequests;
 }
 
 void GitServerCache::onConnectionTested()
@@ -70,6 +79,20 @@ void GitServerCache::onConnectionTested()
    */
 }
 
+void GitServerCache::onIssueUpdated(const Issue &issue)
+{
+   mIssues[issue.number] = issue;
+
+   emit issueUpdated(issue);
+}
+
+void GitServerCache::onPRUpdated(const PullRequest &pr)
+{
+   mPullRequests[pr.number] = pr;
+
+   emit prUpdated(pr);
+}
+
 PullRequest GitServerCache::getPullRequest(const QString &sha) const
 {
    const auto iter = std::find_if(mPullRequests.constBegin(), mPullRequests.constEnd(),
@@ -79,6 +102,15 @@ PullRequest GitServerCache::getPullRequest(const QString &sha) const
       return *iter;
 
    return PullRequest();
+}
+
+QVector<Issue> GitServerCache::getIssues() const
+{
+   auto issues = mIssues.values().toVector();
+
+   std::sort(issues.begin(), issues.end(), [](const Issue &i1, const Issue &i2) { return i1.creation > i2.creation; });
+
+   return issues;
 }
 
 GitServer::Platform GitServerCache::getPlatform() const

@@ -174,7 +174,7 @@ void IssuesWidget::onPullRequestsReceived(const QVector<PullRequest> &pr)
    const auto icon = QIcon(mScrollArea->isVisible() ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
    mArrow->setPixmap(icon.pixmap(QSize(15, 15)));
 
-   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 }
 
 void IssuesWidget::onHeaderClicked()
@@ -188,9 +188,11 @@ void IssuesWidget::onHeaderClicked()
       const auto icon = QIcon(issuesVisible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
       mArrow->setPixmap(icon.pixmap(QSize(15, 15)));
       mScrollArea->setVisible(!issuesVisible);
+
       /*
       GitQlientSettings settings;
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "TagsHeader", !tagsAreVisible);
+      settings.setLocalValue(mGit->getGitQlientSettingsDir(),
+      QString("IssuesWidgetHeader/%1").arg(static_cast<int>(mConfig), !tagsAreVisible);
       */
 
       if (issuesVisible)

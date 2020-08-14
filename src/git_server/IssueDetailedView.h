@@ -67,9 +67,10 @@ private:
    QFrame *mIssueDetailedView = nullptr;
    QHBoxLayout *mIssueDetailedViewLayout = nullptr;
    QScrollArea *mScrollArea = nullptr;
+   int mIssueNumber = -1;
 
    void storeCreatorAvatar(QLabel *avatar, const QString &fileName) const;
-   void onReviewsReceived(GitServer::PullRequest pr);
+   void onReviewsReceived(const GitServer::PullRequest &pr);
    void processComments(const GitServer::Issue &issue);
    QLabel *createAvatar(const QString &userName, const QString &avatarUrl) const;
    QLabel *createHeadline(const QDateTime &dt, const QString &prefix = QString());

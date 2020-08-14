@@ -384,12 +384,12 @@ void GitHubRestApi::onPullRequestReceived()
       for (const auto &issueData : issuesArray)
       {
          const auto pr = prFromJson(issueData.toObject());
-         pullRequests.insert(pr.number, std::move(pr));
+         pullRequests.append(pr);
 
          /*
          QTimer::singleShot(200, [this, number = pr.number]() {
             const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1").arg(number)));
-            connect(reply, &QNetworkReply::finished, this, [this, pr]() { onPullRequestDetailesReceived(pr); });
+            connect(reply, &QNetworkReply::finished, this, [this, pr]() { onPullRequestDetailsReceived(pr); });
          });
          */
          QTimer::singleShot(200, [this, pr]() {
@@ -537,7 +537,7 @@ void GitHubRestApi::onCommentsReceived(Issue issue)
    }
 }
 
-void GitHubRestApi::onPullRequestDetailesReceived(PullRequest pr)
+void GitHubRestApi::onPullRequestDetailsReceived(PullRequest pr)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
