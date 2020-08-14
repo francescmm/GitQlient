@@ -34,7 +34,7 @@ void IssueItem::fillWidget(const Issue &issueData)
 {
    setObjectName("IssueItem");
 
-   const auto title = new ButtonLink(issueData.title);
+   const auto title = new ButtonLink(QString("#%1 - %2").arg(issueData.number).arg(issueData.title));
    title->setWordWrap(true);
    title->setObjectName("IssueTitle");
    connect(title, &ButtonLink::clicked, [this, issueData]() { emit selected(issueData); });
