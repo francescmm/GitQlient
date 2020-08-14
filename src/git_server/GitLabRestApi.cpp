@@ -166,15 +166,17 @@ void GitLabRestApi::requestIssues(int)
    connect(reply, &QNetworkReply::finished, this, &GitLabRestApi::onIssueReceived);
 }
 
+void GitLabRestApi::requestPullRequests(int) { }
+
 void GitLabRestApi::onIssueReceived()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
+   QVector<Issue> issues;
 
    if (!tmpDoc.isEmpty())
    {
-      QVector<Issue> issues;
       const auto issuesArray = tmpDoc.array();
 
       for (const auto &issueData : issuesArray)
@@ -182,10 +184,11 @@ void GitLabRestApi::onIssueReceived()
          if (const auto issueObj = issueData.toObject(); !issueObj.contains("pull_request"))
             issues.append(issueFromJson(issueObj));
       }
-
-      if (!issues.isEmpty())
-         emit issuesReceived(issues);
    }
+   else
+      emit errorOccurred(errorStr);
+
+   emit issuesReceived(issues);
 }
 
 QNetworkRequest GitLabRestApi::createRequest(const QString &page) const
@@ -292,12 +295,11 @@ void GitLabRestApi::onLabelsReceived()
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
+   QVector<Label> labels;
 
    if (!tmpDoc.isEmpty())
    {
       const auto labelsObj = tmpDoc.toVariant().toList();
-
-      QVector<Label> labels;
 
       for (const auto labelObj : labelsObj)
       {
@@ -312,11 +314,11 @@ void GitLabRestApi::onLabelsReceived()
 
          labels.append(std::move(sLabel));
       }
-
-      emit labelsReceived(labels);
    }
    else
       emit errorOccurred(errorStr);
+
+   emit labelsReceived(labels);
 }
 
 void GitLabRestApi::onMilestonesReceived()
@@ -359,7 +361,7 @@ void GitLabRestApi::onIssueCreated()
    {
       const auto issue = issueFromJson(tmpDoc.object());
 
-      emit issueCreated(issue);
+      emit issueUpdated(issue);
    }
    else
       emit errorOccurred(errorStr);
@@ -374,7 +376,7 @@ void GitLabRestApi::onMergeRequestCreated()
    if (!tmpDoc.isEmpty())
    {
       const auto issue = prFromJson(tmpDoc.object());
-      emit pullRequestCreated(issue);
+      emit pullRequestUpdated(issue);
    }
    else
       emit errorOccurred(errorStr);

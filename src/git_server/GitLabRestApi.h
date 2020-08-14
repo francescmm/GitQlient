@@ -39,11 +39,12 @@ public:
    void testConnection() override;
    void createIssue(const Issue &issue) override;
    void updateIssue(int issueNumber, const Issue &issue) override;
+   void updatePullRequest(int, const PullRequest &) override { }
    void createPullRequest(const PullRequest &pr) override;
    void requestLabels() override;
    void requestMilestones() override;
    void requestIssues(int) override;
-   void requestPullRequests(int) override { }
+   void requestPullRequests(int) override;
    void mergePullRequest(int, const QByteArray &) override { }
    void requestComments(const Issue &) override { }
    void requestReviews(const PullRequest &) override { }

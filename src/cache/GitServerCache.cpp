@@ -37,13 +37,8 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
    connect(mApi.get(), &IRestApi::milestonesReceived, this, &GitServerCache::initMilestones);
    connect(mApi.get(), &IRestApi::issuesReceived, this, &GitServerCache::initIssues);
    connect(mApi.get(), &IRestApi::pullRequestsReceived, this, &GitServerCache::initPullRequests);
-   connect(mApi.get(), &IRestApi::commentsReceived, this,
-           [this](const Issue &issue) { mIssues[issue.number] = issue; });
-   connect(mApi.get(), &IRestApi::reviewsReceived, this,
-           [this](const PullRequest &pr) { mPullRequests[pr.number] = pr; });
-   connect(mApi.get(), &IRestApi::issueCreated, this, [this](const Issue &issue) { mIssues[issue.number] = issue; });
-   connect(mApi.get(), &IRestApi::pullRequestCreated, this, []() {});
-   connect(mApi.get(), &IRestApi::pullRequestCreated, this,
+   connect(mApi.get(), &IRestApi::issueUpdated, this, [this](const Issue &issue) { mIssues[issue.number] = issue; });
+   connect(mApi.get(), &IRestApi::pullRequestUpdated, this,
            [this](const PullRequest &pr) { mPullRequests[pr.number] = pr; });
    connect(mApi.get(), &IRestApi::errorOccurred, this, &GitServerCache::errorOccurred);
    connect(mApi.get(), &IRestApi::connectionTested, this, &GitServerCache::onConnectionTested);

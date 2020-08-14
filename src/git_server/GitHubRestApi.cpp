@@ -74,8 +74,35 @@ void GitHubRestApi::updateIssue(int issueNumber, const Issue &issue)
       QString errorStr;
       const auto tmpDoc = validateData(reply, errorStr);
 
-      if (!tmpDoc.isEmpty())
-         emit issueUpdated();
+      if (const auto issueObj = tmpDoc.object(); !issueObj.contains("pull_request"))
+      {
+         const auto issue = issueFromJson(issueObj);
+         emit issueUpdated(issue);
+      }
+      else
+         emit errorOccurred(errorStr);
+   });
+}
+
+void GitHubRestApi::updatePullRequest(int number, const PullRequest &pr)
+{
+   QJsonDocument doc(Issue(pr).toJson());
+   const auto data = doc.toJson(QJsonDocument::Compact);
+
+   auto request = createRequest(QString(mRepoEndpoint + "/issues/%1").arg(number));
+   request.setRawHeader("Content-Length", QByteArray::number(data.size()));
+   const auto reply = mManager->post(request, data);
+
+   connect(reply, &QNetworkReply::finished, this, [this]() {
+      const auto reply = qobject_cast<QNetworkReply *>(sender());
+      QString errorStr;
+      const auto tmpDoc = validateData(reply, errorStr);
+
+      if (const auto issueObj = tmpDoc.object(); issueObj.contains("pull_request"))
+      {
+         const auto pr = prFromJson(issueObj);
+         emit pullRequestUpdated(pr);
+      }
       else
          emit errorOccurred(errorStr);
    });
@@ -194,10 +221,10 @@ void GitHubRestApi::onLabelsReceived()
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
+   QVector<Label> labels;
 
    if (!tmpDoc.isEmpty())
    {
-      QVector<Label> labels;
       const auto labelsArray = tmpDoc.array();
 
       for (auto label : labelsArray)
@@ -213,11 +240,11 @@ void GitHubRestApi::onLabelsReceived()
 
          labels.append(std::move(sLabel));
       }
-
-      emit labelsReceived(labels);
    }
    else
       emit errorOccurred(errorStr);
+
+   emit labelsReceived(labels);
 }
 
 void GitHubRestApi::onMilestonesReceived()
@@ -225,10 +252,10 @@ void GitHubRestApi::onMilestonesReceived()
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
+   QVector<Milestone> milestones;
 
    if (!tmpDoc.isEmpty())
    {
-      QVector<Milestone> milestones;
       const auto labelsArray = tmpDoc.array();
 
       for (auto label : labelsArray)
@@ -243,11 +270,11 @@ void GitHubRestApi::onMilestonesReceived()
 
          milestones.append(std::move(sMilestone));
       }
-
-      emit milestonesReceived(milestones);
    }
    else
       emit errorOccurred(errorStr);
+
+   emit milestonesReceived(milestones);
 }
 
 void GitHubRestApi::onIssueCreated()
@@ -259,7 +286,7 @@ void GitHubRestApi::onIssueCreated()
    if (!tmpDoc.isEmpty())
    {
       const auto issue = issueFromJson(tmpDoc.object());
-      emit issueCreated(issue);
+      emit issueUpdated(issue);
    }
    else
       emit errorOccurred(errorStr);
@@ -275,12 +302,10 @@ void GitHubRestApi::onPullRequestCreated()
    {
       const auto pr = prFromJson(tmpDoc.object());
 
-      mPullRequests.insert(pr.number, std::move(pr));
-
       /*
          QTimer::singleShot(200, [this, number = pr.number]() {
             const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1").arg(number)));
-            connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestDetailesReceived);
+            connect(reply, &QNetworkReply::finished, this, [this, pr]() { onPullRequestDetailesReceived(pr); });
          });
          */
       QTimer::singleShot(200, [this, pr]() {
@@ -289,7 +314,7 @@ void GitHubRestApi::onPullRequestCreated()
          connect(reply, &QNetworkReply::finished, this, [this, pr] { onPullRequestStatusReceived(pr); });
       });
 
-      emit pullRequestCreated(pr);
+      emit pullRequestUpdated(pr);
    }
    else
       emit errorOccurred(errorStr);
@@ -309,8 +334,6 @@ void GitHubRestApi::onPullRequestMerged()
 
 void GitHubRestApi::onPullRequestReceived()
 {
-   mPullRequests.clear();
-
    const auto reply = qobject_cast<QNetworkReply *>(sender());
 
    if (const auto pagination = QString::fromUtf8(reply->rawHeader("Link")); !pagination.isEmpty())
@@ -341,21 +364,20 @@ void GitHubRestApi::onPullRequestReceived()
    const auto url = reply->url();
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
+   QVector<PullRequest> pullRequests;
 
    if (!tmpDoc.isEmpty())
    {
       const auto issuesArray = tmpDoc.array();
-      mPullRequestsRequested = issuesArray.count();
-
       for (const auto &issueData : issuesArray)
       {
          const auto pr = prFromJson(issueData.toObject());
-         mPullRequests.insert(pr.number, std::move(pr));
+         pullRequests.insert(pr.number, std::move(pr));
 
          /*
          QTimer::singleShot(200, [this, number = pr.number]() {
             const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1").arg(number)));
-            connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestDetailesReceived);
+            connect(reply, &QNetworkReply::finished, this, [this, pr]() { onPullRequestDetailesReceived(pr); });
          });
          */
          QTimer::singleShot(200, [this, pr]() {
@@ -364,12 +386,14 @@ void GitHubRestApi::onPullRequestReceived()
             connect(reply, &QNetworkReply::finished, this, [this, pr] { onPullRequestStatusReceived(pr); });
          });
       }
-
-      auto prs = mPullRequests.values().toVector();
-      std::sort(prs.begin(), prs.end(),
-                [](const PullRequest &p1, const PullRequest &p2) { return p1.creation > p2.creation; });
-      emit pullRequestsReceived(prs);
    }
+   else
+      emit errorOccurred(errorStr);
+
+   std::sort(pullRequests.begin(), pullRequests.end(),
+             [](const PullRequest &p1, const PullRequest &p2) { return p1.creation > p2.creation; });
+
+   emit pullRequestsReceived(pullRequests);
 }
 
 void GitHubRestApi::onPullRequestStatusReceived(PullRequest pr)
@@ -406,7 +430,7 @@ void GitHubRestApi::onPullRequestStatusReceived(PullRequest pr)
          pr.state.checks.append(std::move(check));
       }
 
-      emit pullRequestsStateReceived(pr);
+      emit pullRequestUpdated(pr);
    }
    else
       emit errorOccurred(errorStr);
@@ -443,10 +467,10 @@ void GitHubRestApi::onIssuesReceived()
 
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
+   QVector<Issue> issues;
 
    if (!tmpDoc.isEmpty())
    {
-      QVector<Issue> issues;
       const auto issuesArray = tmpDoc.array();
 
       for (const auto &issueData : issuesArray)
@@ -454,13 +478,14 @@ void GitHubRestApi::onIssuesReceived()
          if (const auto issueObj = issueData.toObject(); !issueObj.contains("pull_request"))
             issues.append(issueFromJson(issueObj));
       }
-
-      if (!issues.isEmpty())
-         emit issuesReceived(issues);
-
-      for (auto &issue : issues)
-         QTimer::singleShot(200, this, [this, issue]() { requestComments(issue); });
    }
+   else
+      emit errorOccurred(errorStr);
+
+   emit issuesReceived(issues);
+
+   for (auto &issue : issues)
+      QTimer::singleShot(200, this, [this, issue]() { requestComments(issue); });
 }
 
 void GitHubRestApi::onCommentsReceived(Issue issue)
@@ -496,11 +521,11 @@ void GitHubRestApi::onCommentsReceived(Issue issue)
 
       issue.comments = comments;
 
-      emit commentsReceived(issue);
+      emit issueUpdated(issue);
    }
 }
 
-void GitHubRestApi::onPullRequestDetailesReceived()
+void GitHubRestApi::onPullRequestDetailesReceived(PullRequest pr)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
@@ -510,27 +535,18 @@ void GitHubRestApi::onPullRequestDetailesReceived()
    {
       const auto prInfo = tmpDoc.object();
 
-      auto &issue = mPullRequests[prInfo["number"].toInt()];
-      issue.commentsCount = prInfo["comments"].toInt();
-      issue.reviewCommentsCount = prInfo["review_comments"].toInt();
-      issue.commits = prInfo["commits"].toInt();
-      issue.additions = prInfo["aditions"].toInt();
-      issue.deletions = prInfo["deletions"].toInt();
-      issue.changedFiles = prInfo["changed_files"].toInt();
-      issue.merged = prInfo["merged"].toBool();
-      issue.mergeable = prInfo["mergeable"].toBool();
-      issue.rebaseable = prInfo["rebaseable"].toBool();
-      issue.mergeableState = prInfo["mergeable_state"].toString();
+      pr.commentsCount = prInfo["comments"].toInt();
+      pr.reviewCommentsCount = prInfo["review_comments"].toInt();
+      pr.commits = prInfo["commits"].toInt();
+      pr.additions = prInfo["aditions"].toInt();
+      pr.deletions = prInfo["deletions"].toInt();
+      pr.changedFiles = prInfo["changed_files"].toInt();
+      pr.merged = prInfo["merged"].toBool();
+      pr.mergeable = prInfo["mergeable"].toBool();
+      pr.rebaseable = prInfo["rebaseable"].toBool();
+      pr.mergeableState = prInfo["mergeable_state"].toString();
 
-      --mPullRequestsRequested;
-
-      if (mPullRequestsRequested == 0)
-      {
-         auto prs = mPullRequests.values().toVector();
-         std::sort(prs.begin(), prs.end(),
-                   [](const PullRequest &p1, const PullRequest &p2) { return p1.creation > p2.creation; });
-         emit pullRequestsReceived(prs);
-      }
+      emit pullRequestUpdated(pr);
    }
 }
 
@@ -620,7 +636,7 @@ void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
 
       pr.reviewComment = comments;
 
-      emit reviewsReceived(pr);
+      emit pullRequestUpdated(pr);
    }
 }
 

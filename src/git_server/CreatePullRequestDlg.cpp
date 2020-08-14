@@ -43,7 +43,7 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
       mApi = new GitLabRestApi(mUserName, repoInfo.second, serverUrl, { mUserName, userToken, endpoint });
 
    connect(mApi, &IRestApi::issueUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
-   connect(mApi, &IRestApi::pullRequestCreated, this, &CreatePullRequestDlg::onPullRequestCreated);
+   connect(mApi, &IRestApi::pullRequestUpdated, this, &CreatePullRequestDlg::onPullRequestCreated);
    connect(mApi, &IRestApi::milestonesReceived, this, &CreatePullRequestDlg::onMilestones);
    connect(mApi, &IRestApi::labelsReceived, this, &CreatePullRequestDlg::onLabels);
    connect(mApi, &IRestApi::errorOccurred, this, &CreatePullRequestDlg::onGitServerError);
@@ -183,7 +183,7 @@ void CreatePullRequestDlg::onPullRequestCreated(const PullRequest &pr)
       GitServer::User sAssignee;
       sAssignee.name = mUserName;
 
-      mApi->updateIssue(mIssue, { ui->leTitle->text(), "", milestone, labels, { sAssignee } });
+      mApi->updatePullRequest(mIssue, Issue { ui->leTitle->text(), "", milestone, labels, { sAssignee } });
    }
    else
       onPullRequestUpdated();

@@ -36,7 +36,7 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *paren
       mUserName = dynamic_cast<GitLabRestApi *>(mApi)->getUserId();
    }
 
-   connect(mApi, &IRestApi::issueCreated, this, &CreateIssueDlg::onIssueCreated);
+   connect(mApi, &IRestApi::issueUpdated, this, &CreateIssueDlg::onIssueCreated);
    connect(mApi, &IRestApi::milestonesReceived, this, &CreateIssueDlg::onMilestones);
    connect(mApi, &IRestApi::labelsReceived, this, &CreateIssueDlg::onLabels);
    connect(mApi, &IRestApi::errorOccurred, this, &CreateIssueDlg::onGitServerError);

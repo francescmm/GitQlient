@@ -65,15 +65,7 @@ signals:
     * @param milestones The processed milestones.
     */
    void milestonesReceived(const QVector<Milestone> &milestones);
-   /**
-    * @brief issueCreated Signal triggered when an issue has been created.
-    * @param url The url of the issue.
-    */
-   void issueCreated(const Issue &issue);
-   /**
-    * @brief issueUpdated Signal triggered when an issue has been updated.
-    */
-   void issueUpdated();
+
    /**
     * @brief issuesReceived Signal triggered when the issues has been received.
     * @param issues The list of issues.
@@ -85,37 +77,17 @@ signals:
     * @param prs The list of prs.
     */
    void pullRequestsReceived(const QVector<PullRequest> &prs);
-   /**
-    * @brief pullRequestCreated Signal triggered when a pull request has been created.
-    * @param url The url of the pull request.
-    */
-   void pullRequestCreated(const PullRequest &pr);
-   /**
-    * @brief pullRequestsReceived Signal triggered when the pull requests are received and processed.
-    * @param pr The pull request that got the state updated.
-    */
-   void pullRequestsStateReceived(const PullRequest &pr);
+
    /**
     * @brief pullRequestMerged Signal triggered when the pull request has been merged.
     */
    void pullRequestMerged();
+
    /**
     * @brief errorOccurred Signal triggered when an error happened.
     * @param errorStr The error in string format.
     */
    void errorOccurred(const QString &errorStr);
-
-   /**
-    * @brief commentsReceived Signal triggered when the comments for an issue has been received.
-    * @param issue The issue with the comments.
-    */
-   void commentsReceived(const Issue &issue);
-
-   /**
-    * @brief reviewsReceived Signal triggered when the reviews for a Pull Request has been received.
-    * @param pr The Pull Request with the reviews.
-    */
-   void reviewsReceived(const PullRequest &pr);
 
    /**
     * @brief paginationPresent Signal triggered when the issues or pull requests are so many that they are sent
@@ -125,6 +97,18 @@ signals:
     * @param total The total of pages.
     */
    void paginationPresent(int current, int next, int total);
+
+   /**
+    * @brief issueCreated Signal triggered when an issue has been created.
+    * @param url The url of the issue.
+    */
+   void issueUpdated(const Issue &issue);
+
+   /**
+    * @brief pullRequestUpdated Signal triggered when a pull request has been updated.
+    * @param pr The updated pull request.
+    */
+   void pullRequestUpdated(const PullRequest &pr);
 
 public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
@@ -147,6 +131,13 @@ public:
     * @param issue The updated information of the issue.
     */
    virtual void updateIssue(int issueNumber, const Issue &issue) = 0;
+
+   /**
+    * @brief updatePullRequest Updates a pull request.
+    * @param number The number of the PR
+    * @param pr The pr to extract the data
+    */
+   virtual void updatePullRequest(int number, const PullRequest &pr) = 0;
    /**
     * @brief createPullRequest Creates a pull request in the remote Git server.
     * @param pullRequest The information of the pull request.

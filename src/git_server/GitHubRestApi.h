@@ -47,6 +47,7 @@ public:
    void testConnection() override;
    void createIssue(const Issue &issue) override;
    void updateIssue(int issueNumber, const Issue &issue) override;
+   void updatePullRequest(int number, const PullRequest &pr) override;
    void createPullRequest(const PullRequest &pullRequest) override;
    void requestLabels() override;
    void requestMilestones() override;
@@ -57,8 +58,6 @@ public:
    void requestReviews(const PullRequest &pr) override;
 
 private:
-   QMap<int, PullRequest> mPullRequests;
-   int mPullRequestsRequested = 0;
    QString mRepoEndpoint;
 
    QNetworkRequest createRequest(const QString &page) const override;
@@ -71,7 +70,7 @@ private:
    void onPullRequestStatusReceived(PullRequest pr);
    void onIssuesReceived();
    void onCommentsReceived(Issue issue);
-   void onPullRequestDetailesReceived();
+   void onPullRequestDetailesReceived(PullRequest pr);
    void onReviewsReceived(PullRequest pr);
 
    void requestReviewComments(const PullRequest &pr);
