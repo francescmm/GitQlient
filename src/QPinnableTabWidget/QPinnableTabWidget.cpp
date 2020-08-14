@@ -187,7 +187,7 @@ void QPinnableTabWidget::showContextMenu()
    else
       connect(actions->addAction("Pin"), &QAction::triggered, this, &QPinnableTabWidget::pintTab);
 
-   connect(actions->addAction("Close"), &QAction::triggered, this, [this]() { removeTab(mClickedTab); });
+   connect(actions->addAction("Close"), &QAction::triggered, this, [this]() { tabCloseRequested(mClickedTab); });
 
    actions->exec(QCursor::pos());
 }
