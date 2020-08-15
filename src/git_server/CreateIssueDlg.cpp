@@ -87,7 +87,7 @@ void CreateIssueDlg::onLabels(const QVector<Label> &labels)
 {
    const auto model = new QStandardItemModel(labels.count(), 0, this);
    auto count = 0;
-   for (auto label : labels)
+   for (const auto &label : labels)
    {
       const auto item = new QStandardItem(label.name);
       item->setCheckable(true);

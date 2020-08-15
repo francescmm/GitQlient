@@ -56,12 +56,12 @@ QString GitServerCache::getUserName() const
 
 QVector<PullRequest> GitServerCache::getPullRequests() const
 {
-   auto pullRequests = mPullRequests.values().toVector();
+   auto pullRequests = mPullRequests.values();
 
    std::sort(pullRequests.begin(), pullRequests.end(),
              [](const PullRequest &p1, const PullRequest &p2) { return p1.creation > p2.creation; });
 
-   return pullRequests;
+   return pullRequests.toVector();
 }
 
 void GitServerCache::onConnectionTested()
@@ -106,11 +106,11 @@ PullRequest GitServerCache::getPullRequest(const QString &sha) const
 
 QVector<Issue> GitServerCache::getIssues() const
 {
-   auto issues = mIssues.values().toVector();
+   auto issues = mIssues.values();
 
    std::sort(issues.begin(), issues.end(), [](const Issue &i1, const Issue &i2) { return i1.creation > i2.creation; });
 
-   return issues;
+   return issues.toVector();
 }
 
 GitServer::Platform GitServerCache::getPlatform() const

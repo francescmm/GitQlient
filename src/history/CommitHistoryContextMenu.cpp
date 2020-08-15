@@ -164,7 +164,6 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          if (isGitHub)
          {
-            const auto link = mGitServerCache->getPullRequest(mShas.first()).url;
             connect(gitServerMenu->addAction("Merge PR"), &QAction::triggered, this, [this, pr]() {
                const auto mergeDlg = new MergePullRequestDlg(mGit, pr, mShas.first(), this);
                connect(mergeDlg, &MergePullRequestDlg::signalRepositoryUpdated, this,

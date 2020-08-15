@@ -227,7 +227,6 @@ void GitLabRestApi::onUserInfoReceived()
 
    if (!tmpDoc.isEmpty())
    {
-      const auto doc = tmpDoc;
       const auto list = tmpDoc.toVariant().toList();
 
       if (!list.isEmpty())
@@ -267,7 +266,7 @@ void GitLabRestApi::onProjectsReceived()
    {
       const auto projectsObj = tmpDoc.toVariant().toList();
 
-      for (const auto projObj : projectsObj)
+      for (const auto &projObj : projectsObj)
       {
          const auto labelMap = projObj.toMap();
 
@@ -301,7 +300,7 @@ void GitLabRestApi::onLabelsReceived()
    {
       const auto labelsObj = tmpDoc.toVariant().toList();
 
-      for (const auto labelObj : labelsObj)
+      for (const auto &labelObj : labelsObj)
       {
          const auto labelMap = labelObj.toMap();
          Label sLabel { labelMap.value("id").toString().toInt(),
@@ -333,7 +332,7 @@ void GitLabRestApi::onMilestonesReceived()
 
       QVector<Milestone> milestones;
 
-      for (const auto milestoneObj : milestonesObj)
+      for (const auto &milestoneObj : milestonesObj)
       {
          const auto labelMap = milestoneObj.toMap();
          Milestone sMilestone {
@@ -398,7 +397,7 @@ Issue GitLabRestApi::issueFromJson(const QJsonObject &json) const
 
    const auto labels = json["labels"].toArray();
 
-   for (auto label : labels)
+   for (const auto &label : labels)
    {
       Label sLabel;
       sLabel.name = label.toString();
@@ -407,7 +406,7 @@ Issue GitLabRestApi::issueFromJson(const QJsonObject &json) const
 
    const auto assignees = json["assignees"].toArray();
 
-   for (auto assignee : assignees)
+   for (const auto &assignee : assignees)
    {
       GitServer::User sAssignee;
       sAssignee.id = assignee["id"].toInt();
@@ -451,7 +450,7 @@ PullRequest GitLabRestApi::prFromJson(const QJsonObject &json) const
 
    const auto labels = json["labels"].toArray();
 
-   for (auto label : labels)
+   for (const auto &label : labels)
    {
       Label sLabel;
       sLabel.name = label.toString();

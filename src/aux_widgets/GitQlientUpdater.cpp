@@ -55,7 +55,6 @@ void GitQlientUpdater::processUpdateFile()
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    const auto data = reply->readAll();
    const auto jsonDoc = QJsonDocument::fromJson(data);
-   const auto url = reply->url().path();
 
    if (jsonDoc.isNull())
    {
@@ -161,8 +160,8 @@ void GitQlientUpdater::downloadFile()
       mDownloadLog = nullptr;
 
       const auto b = reply->readAll();
-      const auto destination
-          = QStandardPaths::standardLocations(QStandardPaths::DownloadLocation).first() + "/" + fileName;
+      const auto destination = QString("%1/%2").arg(
+          QStandardPaths::standardLocations(QStandardPaths::DownloadLocation).constFirst(), fileName);
       QFile file(destination);
       if (file.open(QIODevice::WriteOnly))
       {

@@ -180,7 +180,9 @@ void GitCache::insertCommitInfo(CommitInfo rev, int orderIdx)
          mTmpChildsStorage.remove(sha);
       }
 
-      for (const auto &parent : mCommitsMap.value(sha).parents())
+      const auto parents = mCommitsMap.value(sha).parents();
+
+      for (const auto &parent : parents)
          mTmpChildsStorage.insert(parent, &mCommitsMap[sha]);
    }
 }
@@ -517,11 +519,7 @@ GitCache::reverseSearchCommit(CommitInfo::Field field, const QString &text, int 
    const auto startEndPos = startingPoint > 0 ? mCommits.count() - startingPoint + 1 : 0;
 
    return std::find_if(mCommits.crbegin() + startEndPos, mCommits.crend(),
-                       [this, startEndPos, field, text](CommitInfo *info) {
-                          const auto currentsha = (*(mCommits.crbegin() + startEndPos))->sha();
-                          const auto sha = info->sha();
-                          return info->getFieldStr(field).contains(text);
-                       });
+                       [field, text](CommitInfo *info) { return info->getFieldStr(field).contains(text); });
 }
 
 void GitCache::resetLanes(const CommitInfo &c, bool isFork)

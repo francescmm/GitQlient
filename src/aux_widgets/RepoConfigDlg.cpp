@@ -20,16 +20,19 @@ qint64 dirSize(QString dirPath)
    qint64 size = 0;
    QDir dir(dirPath);
 
-   QDir::Filters fileFilters = QDir::Files | QDir::System | QDir::Hidden;
-   for (QString filePath : dir.entryList(fileFilters))
+   auto entryList = dir.entryList(QDir::Files | QDir::System | QDir::Hidden);
+
+   for (const auto &filePath : qAsConst(entryList))
    {
       QFileInfo fi(dir, filePath);
       size += fi.size();
    }
 
-   QDir::Filters dirFilters = QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden;
-   for (QString childDirPath : dir.entryList(dirFilters))
+   entryList = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden);
+
+   for (const auto &childDirPath : qAsConst(entryList))
       size += dirSize(dirPath + QDir::separator() + childDirPath);
+
    return size;
 }
 }

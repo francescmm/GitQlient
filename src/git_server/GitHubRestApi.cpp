@@ -222,8 +222,7 @@ QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
    request.setRawHeader(
        QByteArray("Authorization"),
        QByteArray("Basic ")
-           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName).arg(mAuth.userPass).toLocal8Bit())
-                 .toBase64());
+           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName, mAuth.userPass).toLocal8Bit()).toBase64());
 
    return request;
 }
@@ -239,7 +238,7 @@ void GitHubRestApi::onLabelsReceived()
    {
       const auto labelsArray = tmpDoc.array();
 
-      for (auto label : labelsArray)
+      for (const auto &label : labelsArray)
       {
          const auto jobObject = label.toObject();
          Label sLabel { jobObject[QStringLiteral("id")].toInt(),
@@ -270,7 +269,7 @@ void GitHubRestApi::onMilestonesReceived()
    {
       const auto labelsArray = tmpDoc.array();
 
-      for (auto label : labelsArray)
+      for (const auto &label : labelsArray)
       {
          const auto jobObject = label.toObject();
          Milestone sMilestone { jobObject[QStringLiteral("id")].toInt(),
@@ -320,7 +319,7 @@ void GitHubRestApi::onPullRequestCreated()
             connect(reply, &QNetworkReply::finished, this, [this, pr]() { onPullRequestDetailesReceived(pr); });
          });
          */
-      QTimer::singleShot(200, [this, pr]() {
+      QTimer::singleShot(200, this, [this, pr]() {
          auto request = createRequest(mRepoEndpoint + QString("/commits/%1/status").arg(pr.state.sha));
          const auto reply = mManager->get(request);
          connect(reply, &QNetworkReply::finished, this, [this, pr] { onPullRequestStatusReceived(pr); });
@@ -355,7 +354,7 @@ void GitHubRestApi::onPullRequestReceived()
       auto next = 0;
       auto total = 0;
 
-      for (auto page : pages)
+      for (const auto &page : pages)
       {
          const auto values = page.trimmed().remove("<").remove(">").split(";");
 
@@ -373,7 +372,6 @@ void GitHubRestApi::onPullRequestReceived()
    else
       emit paginationPresent(0, 0, 0);
 
-   const auto url = reply->url();
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
    QVector<PullRequest> pullRequests;
@@ -392,7 +390,7 @@ void GitHubRestApi::onPullRequestReceived()
             connect(reply, &QNetworkReply::finished, this, [this, pr]() { onPullRequestDetailsReceived(pr); });
          });
          */
-         QTimer::singleShot(200, [this, pr]() {
+         QTimer::singleShot(200, this, [this, pr]() {
             auto request = createRequest(mRepoEndpoint + QString("/commits/%1/status").arg(pr.state.sha));
             const auto reply = mManager->get(request);
             connect(reply, &QNetworkReply::finished, this, [this, pr] { onPullRequestStatusReceived(pr); });
@@ -427,7 +425,7 @@ void GitHubRestApi::onPullRequestStatusReceived(PullRequest pr)
 
       const auto statuses = obj["statuses"].toArray();
 
-      for (auto status : statuses)
+      for (const auto &status : statuses)
       {
          auto statusStr = status["state"].toString();
 
@@ -459,7 +457,7 @@ void GitHubRestApi::onIssuesReceived()
       auto next = 0;
       auto total = 0;
 
-      for (auto page : pages)
+      for (const auto &page : pages)
       {
          const auto values = page.trimmed().remove("<").remove(">").split(";");
 
@@ -503,7 +501,6 @@ void GitHubRestApi::onIssuesReceived()
 void GitHubRestApi::onCommentsReceived(Issue issue)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto url = reply->url();
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
@@ -565,7 +562,6 @@ void GitHubRestApi::onPullRequestDetailsReceived(PullRequest pr)
 void GitHubRestApi::onReviewsReceived(PullRequest pr)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto url = reply->url();
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
@@ -612,7 +608,6 @@ void GitHubRestApi::requestReviewComments(const PullRequest &pr)
 void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto url = reply->url();
    QString errorStr;
    const auto tmpDoc = validateData(reply, errorStr);
 
@@ -668,7 +663,7 @@ Issue GitHubRestApi::issueFromJson(const QJsonObject &json) const
 
    const auto labels = json["labels"].toArray();
 
-   for (auto label : labels)
+   for (const auto &label : labels)
    {
       issue.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
                             label["name"].toString(), label["description"].toString(), label["color"].toString(),
@@ -677,7 +672,7 @@ Issue GitHubRestApi::issueFromJson(const QJsonObject &json) const
 
    const auto assignees = json["assignees"].toArray();
 
-   for (auto assignee : assignees)
+   for (const auto &assignee : assignees)
    {
       GitServer::User sAssignee;
       sAssignee.id = assignee["id"].toInt();
@@ -720,7 +715,7 @@ PullRequest GitHubRestApi::prFromJson(const QJsonObject &json) const
 
    const auto labels = json["labels"].toArray();
 
-   for (auto label : labels)
+   for (const auto &label : labels)
    {
       pr.labels.append({ label["id"].toInt(), label["node_id"].toString(), label["url"].toString(),
                          label["name"].toString(), label["description"].toString(), label["color"].toString(),
@@ -729,7 +724,7 @@ PullRequest GitHubRestApi::prFromJson(const QJsonObject &json) const
 
    const auto assignees = json["assignees"].toArray();
 
-   for (auto assignee : assignees)
+   for (const auto &assignee : assignees)
    {
       GitServer::User sAssignee;
       sAssignee.id = assignee["id"].toInt();

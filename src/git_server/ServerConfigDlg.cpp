@@ -37,9 +37,9 @@ enum GitServerPlatform
    Bitbucket
 };
 
-static const QMap<GitServerPlatform, QString> repoUrls { { GitHub, "https://api.github.com" },
-                                                         { GitHubEnterprise, "" },
-                                                         { GitLab, "https://gitlab.com/api/v4" } };
+static const QMap<GitServerPlatform, const char *> repoUrls { { GitHub, "https://api.github.com" },
+                                                              { GitHubEnterprise, "" },
+                                                              { GitLab, "https://gitlab.com/api/v4" } };
 }
 
 ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServerCache,
@@ -69,7 +69,7 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServer
 
    if (mData.serverUrl.contains("github"))
    {
-      const auto index = repoUrls.key(ui->leEndPoint->text(), GitHubEnterprise);
+      const auto index = repoUrls.key(ui->leEndPoint->text().toUtf8(), GitHubEnterprise);
       ui->cbServer->setCurrentIndex(index);
    }
    else
@@ -110,9 +110,6 @@ void ServerConfigDlg::accept()
 {
    const auto endpoint = ui->cbServer->currentIndex() == GitHubEnterprise ? ui->leEndPoint->text()
                                                                           : ui->cbServer->currentData().toString();
-
-   const auto userName = ui->leUserName->text();
-
    GitQlientSettings settings;
    settings.setGlobalValue(QString("%1/user").arg(mData.serverUrl), ui->leUserName->text());
    settings.setGlobalValue(QString("%1/token").arg(mData.serverUrl), ui->leUserToken->text());

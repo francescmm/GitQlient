@@ -18,8 +18,7 @@
 #include <QStackedWidget>
 #include <QMessageBox>
 
-FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
-                               QWidget *parent)
+FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *parent)
    : IDiffWidget(git, cache, parent)
    , mBack(new QPushButton())
    , mGoPrevious(new QPushButton())
@@ -273,7 +272,8 @@ void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector
    int newFileRow = 1;
    mChunks.clear();
 
-   for (auto line : text.split("\n"))
+   const auto lines = text.split("\n");
+   for (auto line : lines)
    {
       if (mFileVsFile)
       {

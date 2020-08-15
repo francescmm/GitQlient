@@ -134,7 +134,7 @@ void CreatePullRequestDlg::onLabels(const QVector<Label> &labels)
 {
    const auto model = new QStandardItemModel(labels.count(), 0, this);
    auto count = 0;
-   for (auto label : labels)
+   for (const auto &label : labels)
    {
       const auto item = new QStandardItem(label.name);
       item->setCheckable(true);
@@ -146,7 +146,7 @@ void CreatePullRequestDlg::onLabels(const QVector<Label> &labels)
 
 void CreatePullRequestDlg::onPullRequestUpdated(const PullRequest &pr)
 {
-   QTimer::singleShot(200, [this, pr]() {
+   QTimer::singleShot(200, this, [this, pr]() {
       QMessageBox::information(
           this, tr("Pull Request created"),
           tr("The Pull Request has been created. You can <a href=\"%1\">find it here</a>.").arg(pr.url));

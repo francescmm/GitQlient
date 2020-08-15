@@ -59,24 +59,24 @@ signals:
     * @brief labelsReceived Signal triggered after the labels are received and processed.
     * @param labels The processed lables.
     */
-   void labelsReceived(const QVector<Label> &labels);
+   void labelsReceived(const QVector<GitServer::Label> &labels);
    /**
     * @brief milestonesReceived Signal triggered after the milestones are received and processed.
     * @param milestones The processed milestones.
     */
-   void milestonesReceived(const QVector<Milestone> &milestones);
+   void milestonesReceived(const QVector<GitServer::Milestone> &milestones);
 
    /**
     * @brief issuesReceived Signal triggered when the issues has been received.
     * @param issues The list of issues.
     */
-   void issuesReceived(const QVector<Issue> &issues);
+   void issuesReceived(const QVector<GitServer::Issue> &issues);
 
    /**
     * @brief pullRequestsReceived Signal triggered when the pull requests has been received.
     * @param prs The list of prs.
     */
-   void pullRequestsReceived(const QVector<PullRequest> &prs);
+   void pullRequestsReceived(const QVector<GitServer::PullRequest> &prs);
 
    /**
     * @brief pullRequestMerged Signal triggered when the pull request has been merged.
@@ -102,13 +102,13 @@ signals:
     * @brief issueCreated Signal triggered when an issue has been created.
     * @param url The url of the issue.
     */
-   void issueUpdated(const Issue &issue);
+   void issueUpdated(const GitServer::Issue &issue);
 
    /**
     * @brief pullRequestUpdated Signal triggered when a pull request has been updated.
     * @param pr The updated pull request.
     */
-   void pullRequestUpdated(const PullRequest &pr);
+   void pullRequestUpdated(const GitServer::PullRequest &pr);
 
 public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);

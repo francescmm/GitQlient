@@ -77,13 +77,15 @@ struct Issue
 
       QJsonArray array;
       auto count = 0;
-      for (auto assignee : assignees)
+
+      for (const auto &assignee : assignees)
          array.insert(count++, assignee.name);
       object.insert("assignees", array);
 
       QJsonArray labelsArray;
       count = 0;
-      for (auto label : labels)
+
+      for (const auto &label : labels)
          labelsArray.insert(count++, label.name);
       object.insert("labels", labelsArray);
 

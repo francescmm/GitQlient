@@ -14,7 +14,7 @@
 
 using namespace QLogger;
 
-static const QString GIT_LOG_FORMAT("%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ");
+static const char *GIT_LOG_FORMAT("%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ");
 
 GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache, QObject *parent)
    : QObject(parent)
@@ -173,7 +173,7 @@ void GitRepoLoader::requestRevisions()
    QLog_Debug("Git", "Loading revisions.");
 
    const auto baseCmd = QString("git log --date-order --no-color --log-size --parents --boundary -z --pretty=format:")
-                            .append(GIT_LOG_FORMAT)
+                            .append(QString::fromUtf8(GIT_LOG_FORMAT))
                             .append(mShowAll ? QString("--all") : mGitBase->getCurrentBranch());
 
    const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());

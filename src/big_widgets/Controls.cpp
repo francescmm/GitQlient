@@ -314,7 +314,7 @@ void Controls::pullCurrentBranch()
 
    if (ret.success)
    {
-      if (msg.toLower().contains("merge conflict"))
+      if (msg.contains("merge conflict", Qt::CaseInsensitive))
          emit signalPullConflict();
       else
          emit signalRepositoryUpdated();

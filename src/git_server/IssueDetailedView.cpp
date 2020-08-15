@@ -419,20 +419,20 @@ void IssueDetailedView::createBubbleForCodeReview(int reviewId, QVector<CodeRevi
    QMap<int, QVector<CodeReview>> reviews;
    QVector<int> codeReviewIds;
 
-   QMutableVectorIterator<CodeReview> iter(comments);
-   while (iter.hasNext())
+   auto iter = comments.begin();
+
+   while (iter != comments.end())
    {
-      auto &codeReview = iter.next();
-      if (codeReview.reviewId == reviewId)
+      if (iter->reviewId == reviewId)
       {
-         codeReviewIds.append(codeReview.id);
-         reviews[codeReview.id].append(codeReview);
-         iter.remove();
+         codeReviewIds.append(iter->id);
+         reviews[iter->id].append(*iter);
+         comments.erase(iter);
       }
-      else if (codeReviewIds.contains(codeReview.replyToId))
+      else if (codeReviewIds.contains(iter->replyToId))
       {
-         reviews[codeReview.replyToId].append(codeReview);
-         iter.remove();
+         reviews[iter->replyToId].append(*iter);
+         comments.erase(iter);
       }
    }
 
@@ -547,13 +547,13 @@ void IssueDetailedView::onReviewsReceived(const PullRequest &pr)
 
    QMultiMap<QDateTime, QLayout *> bubblesMap;
 
-   for (const auto comment : pr.comments)
+   for (const auto &comment : pr.comments)
    {
       const auto layout = createBubbleForComment(comment);
       bubblesMap.insert(comment.creation, layout);
    }
 
-   for (const auto review : pr.reviews)
+   for (const auto &review : pr.reviews)
    {
       const auto layouts = new QVBoxLayout();
 
