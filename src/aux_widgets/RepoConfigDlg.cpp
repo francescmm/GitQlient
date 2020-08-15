@@ -61,6 +61,8 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    ui->leBsToken->setVisible(false);
    ui->leBsTokenLabel->setVisible(false);
 
+   const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
+   ui->chBoxBuildSystem->setChecked(isConfigured);
    connect(ui->chBoxBuildSystem, &QCheckBox::stateChanged, this, &RepoConfigDlg::toggleBsAccesInfo);
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
@@ -133,6 +135,8 @@ RepoConfigDlg::~RepoConfigDlg()
       settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", bsUser);
       settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", bsToken);
    }
+   else
+      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false);
 
    delete ui;
 }
