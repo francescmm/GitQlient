@@ -88,6 +88,12 @@
         <file alias="add_comment">resources/icons/add_comment.svg</file>
         <file alias="changes">resources/icons/changes.svg</file>
         <file alias="build_system">resources/icons/build_system.svg</file>
+        <file alias="yellow">resources/icons/yellow.svg</file>
+        <file alias="red">resources/icons/red.svg</file>
+        <file alias="orange">resources/icons/orange.svg</file>
+        <file alias="grey">resources/icons/grey.svg</file>
+        <file alias="green">resources/icons/green.svg</file>
+        <file alias="dark_grey">resources/icons/dark_grey.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>
