@@ -43,6 +43,11 @@ class QTimer;
 class WaitingDlg;
 class GitServerCache;
 
+namespace QJenkins
+{
+class JenkinsWidget;
+}
+
 namespace GitServer
 {
 class IRestApi;
@@ -140,6 +145,7 @@ private:
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
    GitServerWidget *mGitServerWidget = nullptr;
+   QJenkins::JenkinsWidget *mJenkins = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    QTimer *mAutoPrUpdater = nullptr;
@@ -260,6 +266,11 @@ private:
     * @brief showGitServerView Shows the configured git server view.
     */
    void showGitServerView();
+
+   /**
+    * @brief showBuildSystemView Shows the build system view.
+    */
+   void showBuildSystemView();
 
    /*!
     \brief Opens the previous view. This method is used when the diff view is closed and GitQlientRepo must return to

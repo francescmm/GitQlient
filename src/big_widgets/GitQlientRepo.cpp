@@ -24,6 +24,7 @@
 #include <GitServerWidget.h>
 #include <GitServerCache.h>
 #include <ConfigData.h>
+#include <JenkinsWidget.h>
 
 #include <QTimer>
 #include <QDirIterator>
@@ -37,6 +38,7 @@
 
 using namespace QLogger;
 using namespace GitServer;
+using namespace QJenkins;
 
 GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    : QFrame(parent)
@@ -51,6 +53,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
    , mGitServerWidget(new GitServerWidget(mGitQlientCache, mGitBase, mGitServerCache))
+   , mJenkins(new JenkinsWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
@@ -72,6 +75,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    mStackedLayout->addWidget(mBlameWidget);
    mStackedLayout->addWidget(mMergeWidget);
    mStackedLayout->addWidget(mGitServerWidget);
+   mStackedLayout->addWidget(mJenkins);
 
    const auto mainLayout = new QVBoxLayout(this);
    mainLayout->setSpacing(0);
@@ -96,6 +100,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mControls, &Controls::signalGoDiff, this, &GitQlientRepo::showDiffView);
    connect(mControls, &Controls::signalGoMerge, this, &GitQlientRepo::showMergeView);
    connect(mControls, &Controls::signalGoServer, this, &GitQlientRepo::showGitServerView);
+   connect(mControls, &Controls::signalGoBuildSystem, this, &GitQlientRepo::showBuildSystemView);
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
    connect(mControls, &Controls::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
@@ -417,6 +422,12 @@ void GitQlientRepo::showGitServerView()
    }
    else
       showPreviousView();
+}
+
+void GitQlientRepo::showBuildSystemView()
+{
+   mStackedLayout->setCurrentWidget(mJenkins);
+   mControls->toggleButton(ControlsMainViews::BuildSystem);
 }
 
 void GitQlientRepo::showPreviousView()
