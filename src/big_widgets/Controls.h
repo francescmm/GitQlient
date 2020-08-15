@@ -32,6 +32,7 @@ class GitCache;
 class QNetworkAccessManager;
 class QProgressBar;
 class GitQlientUpdater;
+class GitServerCache;
 
 /*!
  \brief Enum used to configure the different views handled by the Controls widget.
@@ -110,7 +111,7 @@ public:
     \param parent The parent widget if needed.
    */
    explicit Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                     QWidget *parent = nullptr);
+                     const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
    /*!
     \brief Process the toggled button and triggers its corresponding action.
 
@@ -165,6 +166,7 @@ private:
    QString mCurrentSha;
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitServerCache> mGitServerCache;
    QToolButton *mHistory = nullptr;
    QToolButton *mDiff = nullptr;
    QToolButton *mBlame = nullptr;
@@ -177,6 +179,7 @@ private:
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;
+   bool mGoGitServerView = false;
 
    /*!
     \brief Pulls the current branch.
@@ -207,6 +210,11 @@ private:
     * \brief Shows the config dialog for both Local and Global user data.
     */
    void showConfigDlg();
+
+   /**
+    * @brief initGitServerConnection Connects to the Git Server platform and retrieves data.
+    */
+   void initGitServerConnection();
 
    bool eventFilter(QObject *obj, QEvent *event);
 };

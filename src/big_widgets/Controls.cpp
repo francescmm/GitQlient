@@ -10,6 +10,7 @@
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
 #include <GitQlientUpdater.h>
+#include <GitServerCache.h>
 #include <QLogger.h>
 
 #include <QApplication>
@@ -30,10 +31,12 @@
 
 using namespace QLogger;
 
-Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
+Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                   const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
+   , mGitServerCache(gitServerCache)
    , mHistory(new QToolButton())
    , mDiff(new QToolButton())
    , mBlame(new QToolButton())
@@ -179,7 +182,15 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
       hLayout->addWidget(mGitPlatform);
       hLayout->addWidget(separator3);
 
-      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
+      connect(mGitServerCache.get(), &GitServerCache::connectionTested, this, [this]() {
+         if (mGoGitServerView)
+            emit signalGoServer();
+
+         mGoGitServerView = false;
+      });
+      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::initGitServerConnection);
+
+      // connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
       connect(mGitPlatform, &QToolButton::toggled, this, [this](bool checked) {
          mDiff->blockSignals(true);
          mDiff->setChecked(!checked);
@@ -457,6 +468,17 @@ void Controls::showConfigDlg()
 {
    const auto configDlg = new RepoConfigDlg(mGit, this);
    configDlg->exec();
+}
+
+void Controls::initGitServerConnection()
+{
+   mGoGitServerView = true;
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto serverUrl = gitConfig->getServerUrl();
+   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+
+   mGitServerCache->init(serverUrl, repoInfo);
 }
 
 bool Controls::eventFilter(QObject *obj, QEvent *event)
