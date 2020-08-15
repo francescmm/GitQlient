@@ -322,7 +322,7 @@ void GitQlientRepo::showHistoryView()
    mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
 
    mStackedLayout->setCurrentWidget(mHistoryWidget);
-   mControls->toggleButton(ControlsMainViews::HISTORY);
+   mControls->toggleButton(ControlsMainViews::History);
 }
 
 void GitQlientRepo::showBlameView()
@@ -330,7 +330,7 @@ void GitQlientRepo::showBlameView()
    mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
 
    mStackedLayout->setCurrentWidget(mBlameWidget);
-   mControls->toggleButton(ControlsMainViews::BLAME);
+   mControls->toggleButton(ControlsMainViews::Blame);
 }
 
 void GitQlientRepo::showDiffView()
@@ -338,7 +338,7 @@ void GitQlientRepo::showDiffView()
    mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
 
    mStackedLayout->setCurrentWidget(mDiffWidget);
-   mControls->toggleButton(ControlsMainViews::DIFF);
+   mControls->toggleButton(ControlsMainViews::Diff);
 }
 
 void GitQlientRepo::showWarningMerge()
@@ -386,7 +386,7 @@ void GitQlientRepo::showPullConflict()
 void GitQlientRepo::showMergeView()
 {
    mStackedLayout->setCurrentWidget(mMergeWidget);
-   mControls->toggleButton(ControlsMainViews::MERGE);
+   mControls->toggleButton(ControlsMainViews::Merge);
 }
 
 void GitQlientRepo::showGitServerView()
@@ -413,7 +413,7 @@ void GitQlientRepo::showGitServerView()
    if (mGitServerWidget->isConfigured())
    {
       mStackedLayout->setCurrentWidget(mGitServerWidget);
-      mControls->toggleButton(ControlsMainViews::SERVER);
+      mControls->toggleButton(ControlsMainViews::GitServer);
    }
    else
       showPreviousView();
