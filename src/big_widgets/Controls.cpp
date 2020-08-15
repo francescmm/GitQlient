@@ -28,6 +28,7 @@
 #include <QProgressBar>
 #include <QFile>
 #include <QStandardPaths>
+#include <QButtonGroup>
 
 using namespace QLogger;
 
@@ -49,6 +50,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    , mVersionCheck(new QToolButton())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
    , mUpdater(new GitQlientUpdater(this))
+   , mBtnGroup(new QButtonGroup())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -59,6 +61,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mHistory->setIconSize(QSize(22, 22));
    mHistory->setToolTip("View");
    mHistory->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mBtnGroup->addButton(mHistory, static_cast<int>(ControlsMainViews::HISTORY));
 
    mDiff->setCheckable(true);
    mDiff->setIcon(QIcon(":/icons/diff"));
@@ -66,12 +69,14 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mDiff->setToolTip("Diff");
    mDiff->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mDiff->setEnabled(false);
+   mBtnGroup->addButton(mDiff, static_cast<int>(ControlsMainViews::DIFF));
 
    mBlame->setCheckable(true);
    mBlame->setIcon(QIcon(":/icons/blame"));
    mBlame->setIconSize(QSize(22, 22));
    mBlame->setToolTip("Blame");
    mBlame->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mBtnGroup->addButton(mBlame, static_cast<int>(ControlsMainViews::BLAME));
 
    const auto menu = new QMenu(mPullOptions);
    menu->installEventFilter(this);
@@ -169,6 +174,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
       mGitPlatform->setToolTip(name);
       mGitPlatform->setToolButtonStyle(Qt::ToolButtonIconOnly);
       mGitPlatform->setPopupMode(QToolButton::InstantPopup);
+      mBtnGroup->addButton(mGitPlatform, static_cast<int>(ControlsMainViews::SERVER));
 
       const auto gitLayout = new QVBoxLayout();
       gitLayout->setContentsMargins(QMargins());
@@ -189,19 +195,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
          mGoGitServerView = false;
       });
       connect(mGitPlatform, &QToolButton::clicked, this, &Controls::initGitServerConnection);
-
-      // connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
-      connect(mGitPlatform, &QToolButton::toggled, this, [this](bool checked) {
-         mDiff->blockSignals(true);
-         mDiff->setChecked(!checked);
-         mDiff->blockSignals(false);
-         mBlame->blockSignals(true);
-         mBlame->setChecked(!checked);
-         mBlame->blockSignals(false);
-         mHistory->blockSignals(true);
-         mHistory->setChecked(!checked);
-         mHistory->blockSignals(false);
-      });
    }
    else
       mGitPlatform->setVisible(false);
@@ -230,41 +223,8 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    vLayout->addWidget(mMergeWarning);
 
    connect(mHistory, &QToolButton::clicked, this, &Controls::signalGoRepo);
-   connect(mHistory, &QToolButton::toggled, this, [this](bool checked) {
-      mDiff->blockSignals(true);
-      mDiff->setChecked(!checked);
-      mDiff->blockSignals(false);
-      mBlame->blockSignals(true);
-      mBlame->setChecked(!checked);
-      mBlame->blockSignals(false);
-      mGitPlatform->blockSignals(true);
-      mGitPlatform->setChecked(!checked);
-      mGitPlatform->blockSignals(false);
-   });
    connect(mDiff, &QToolButton::clicked, this, &Controls::signalGoDiff);
-   connect(mDiff, &QToolButton::toggled, this, [this](bool checked) {
-      mHistory->blockSignals(true);
-      mHistory->setChecked(!checked);
-      mHistory->blockSignals(false);
-      mBlame->blockSignals(true);
-      mBlame->setChecked(!checked);
-      mBlame->blockSignals(false);
-      mGitPlatform->blockSignals(true);
-      mGitPlatform->setChecked(!checked);
-      mGitPlatform->blockSignals(false);
-   });
    connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
-   connect(mBlame, &QToolButton::toggled, this, [this](bool checked) {
-      mHistory->blockSignals(true);
-      mHistory->setChecked(!checked);
-      mHistory->blockSignals(false);
-      mDiff->blockSignals(true);
-      mDiff->setChecked(!checked);
-      mDiff->blockSignals(false);
-      mGitPlatform->blockSignals(true);
-      mGitPlatform->setChecked(!checked);
-      mGitPlatform->blockSignals(false);
-   });
    connect(mPullBtn, &QToolButton::clicked, this, &Controls::pullCurrentBranch);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
@@ -277,29 +237,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
 void Controls::toggleButton(ControlsMainViews view)
 {
-   switch (view)
-   {
-      case ControlsMainViews::HISTORY:
-         mHistory->setChecked(true);
-         break;
-      case ControlsMainViews::DIFF:
-         mDiff->setChecked(true);
-         break;
-      case ControlsMainViews::BLAME:
-         mBlame->setChecked(true);
-         break;
-      case ControlsMainViews::MERGE:
-         mHistory->setChecked(true);
-         mHistory->blockSignals(true);
-         mHistory->setChecked(false);
-         mHistory->blockSignals(false);
-         break;
-      case ControlsMainViews::SERVER:
-         mGitPlatform->setChecked(true);
-         break;
-      default:
-         break;
-   }
+   mBtnGroup->button(static_cast<int>(view))->setChecked(true);
 }
 
 void Controls::enableButtons(bool enabled)

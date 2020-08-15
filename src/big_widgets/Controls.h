@@ -33,6 +33,7 @@ class QNetworkAccessManager;
 class QProgressBar;
 class GitQlientUpdater;
 class GitServerCache;
+class QButtonGroup;
 
 /*!
  \brief Enum used to configure the different views handled by the Controls widget.
@@ -179,6 +180,7 @@ private:
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;
+   QButtonGroup *mBtnGroup = nullptr;
    bool mGoGitServerView = false;
 
    /*!
