@@ -56,14 +56,27 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    ui->tabWidget->setCurrentIndex(0);
    connect(ui->pbClearCache, &ButtonLink::clicked, this, &RepoConfigDlg::clearCache);
 
-   ui->leBsUser->setVisible(false);
-   ui->leBsUserLabel->setVisible(false);
-   ui->leBsToken->setVisible(false);
-   ui->leBsTokenLabel->setVisible(false);
-
    const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
    ui->chBoxBuildSystem->setChecked(isConfigured);
    connect(ui->chBoxBuildSystem, &QCheckBox::stateChanged, this, &RepoConfigDlg::toggleBsAccesInfo);
+
+   ui->leBsUser->setVisible(isConfigured);
+   ui->leBsUserLabel->setVisible(isConfigured);
+   ui->leBsToken->setVisible(isConfigured);
+   ui->leBsTokenLabel->setVisible(isConfigured);
+   ui->leBsUrl->setVisible(isConfigured);
+   ui->leBsUrlLabel->setVisible(isConfigured);
+
+   if (isConfigured)
+   {
+      const auto url = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", "").toString();
+      const auto user = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", "").toString();
+      const auto token = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", "").toString();
+
+      ui->leBsUrl->setText(url);
+      ui->leBsUser->setText(user);
+      ui->leBsToken->setText(token);
+   }
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto localConfig = gitConfig->getLocalConfig();
@@ -107,6 +120,7 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    ui->tab->setStyleSheet(QString("background-color: %1;").arg(color));
    ui->tab_2->setStyleSheet(QString("background-color: %1;").arg(color));
    ui->tab_3->setStyleSheet(QString("background-color: %1;").arg(color));
+   ui->tab_4->setStyleSheet(QString("background-color: %1;").arg(color));
 
    style()->unpolish(this);
    setStyleSheet(GitQlientStyles::getStyles());
@@ -128,10 +142,12 @@ RepoConfigDlg::~RepoConfigDlg()
    const auto showBs = ui->chBoxBuildSystem->isChecked();
    const auto bsUser = ui->leBsUser->text();
    const auto bsToken = ui->leBsToken->text();
+   const auto bsUrl = ui->leBsUrl->text();
 
-   if (showBs && !bsUser.isEmpty() && !bsToken.isEmpty())
+   if (showBs && !bsUser.isEmpty() && !bsToken.isEmpty() && !bsUrl.isEmpty())
    {
       settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", showBs);
+      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", bsUrl);
       settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", bsUser);
       settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", bsToken);
    }
@@ -213,8 +229,11 @@ void RepoConfigDlg::calculateCacheSize()
 
 void RepoConfigDlg::toggleBsAccesInfo()
 {
-   ui->leBsUser->setVisible(ui->chBoxBuildSystem->isChecked());
-   ui->leBsUserLabel->setVisible(ui->chBoxBuildSystem->isChecked());
-   ui->leBsToken->setVisible(ui->chBoxBuildSystem->isChecked());
-   ui->leBsTokenLabel->setVisible(ui->chBoxBuildSystem->isChecked());
+   const auto visible = ui->chBoxBuildSystem->isChecked();
+   ui->leBsUser->setVisible(visible);
+   ui->leBsUserLabel->setVisible(visible);
+   ui->leBsToken->setVisible(visible);
+   ui->leBsTokenLabel->setVisible(visible);
+   ui->leBsUrl->setVisible(visible);
+   ui->leBsUrlLabel->setVisible(visible);
 }
