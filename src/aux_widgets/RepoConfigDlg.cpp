@@ -56,6 +56,13 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    ui->tabWidget->setCurrentIndex(0);
    connect(ui->pbClearCache, &ButtonLink::clicked, this, &RepoConfigDlg::clearCache);
 
+   ui->leBsUser->setVisible(false);
+   ui->leBsUserLabel->setVisible(false);
+   ui->leBsToken->setVisible(false);
+   ui->leBsTokenLabel->setVisible(false);
+
+   connect(ui->chBoxBuildSystem, &QCheckBox::stateChanged, this, &RepoConfigDlg::toggleBsAccesInfo);
+
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto localConfig = gitConfig->getLocalConfig();
 
@@ -115,6 +122,17 @@ RepoConfigDlg::~RepoConfigDlg()
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "PruneOnFetch", ui->pruneOnFetch->isChecked());
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "ClangFormatOnCommit", ui->clangFormat->isChecked());
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", ui->updateOnPull->isChecked());
+
+   const auto showBs = ui->chBoxBuildSystem->isChecked();
+   const auto bsUser = ui->leBsUser->text();
+   const auto bsToken = ui->leBsToken->text();
+
+   if (showBs && !bsUser.isEmpty() && !bsToken.isEmpty())
+   {
+      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", showBs);
+      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", bsUser);
+      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", bsToken);
+   }
 
    delete ui;
 }
@@ -187,4 +205,12 @@ void RepoConfigDlg::calculateCacheSize()
    }
 
    ui->lCacheSize->setText(QString("%1 KB").arg(size / 1024.0));
+}
+
+void RepoConfigDlg::toggleBsAccesInfo()
+{
+   ui->leBsUser->setVisible(ui->chBoxBuildSystem->isChecked());
+   ui->leBsUserLabel->setVisible(ui->chBoxBuildSystem->isChecked());
+   ui->leBsToken->setVisible(ui->chBoxBuildSystem->isChecked());
+   ui->leBsTokenLabel->setVisible(ui->chBoxBuildSystem->isChecked());
 }
