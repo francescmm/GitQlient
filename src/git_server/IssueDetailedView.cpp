@@ -36,7 +36,8 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitSe
 
    const auto comments = new QToolButton();
    comments->setIcon(QIcon(":/icons/comments"));
-   comments->setObjectName("Pagination");
+   comments->setObjectName("ViewBtnOption");
+   comments->setToolTip(tr("Comments view"));
    comments->setCheckable(true);
    comments->setChecked(true);
    comments->setDisabled(true);
@@ -44,21 +45,24 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitSe
 
    const auto changes = new QToolButton();
    changes->setIcon(QIcon(":/icons/changes"));
+   changes->setObjectName("ViewBtnOption");
+   changes->setToolTip(tr("Changes view"));
    changes->setCheckable(true);
-   changes->setObjectName("Pagination");
    changes->setDisabled(true);
    mBtnGroup->addButton(changes, static_cast<int>(Buttons::Changes));
 
    const auto commits = new QToolButton();
    commits->setIcon(QIcon(":/icons/commit"));
+   commits->setObjectName("ViewBtnOption");
+   commits->setToolTip(tr("Commits view"));
    commits->setCheckable(true);
-   commits->setObjectName("Pagination");
    commits->setDisabled(true);
    mBtnGroup->addButton(commits, static_cast<int>(Buttons::Commits));
 
    const auto addComment = new QToolButton();
    addComment->setDisabled(true);
    addComment->setIcon(QIcon(":/icons/add_comment"));
+   addComment->setToolTip(tr("Add new comment"));
 
    const auto headerFrame = new QFrame();
    headerFrame->setObjectName("IssuesHeaderFrame");
