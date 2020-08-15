@@ -146,10 +146,9 @@ RepoConfigDlg::~RepoConfigDlg()
 
    if (showBs && !bsUser.isEmpty() && !bsToken.isEmpty() && !bsUrl.isEmpty())
    {
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", showBs);
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", bsUrl);
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", bsUser);
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", bsToken);
+      ui->leBsUrl->setText(settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", "").toString());
+      ui->leBsUser->setText(settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", "").toString());
+      ui->leBsToken->setText(settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", "").toString());
    }
    else
       settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false);
