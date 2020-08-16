@@ -14,7 +14,7 @@ StageFetcher::StageFetcher(const QString &user, const QString &token, const Jenk
 
 void StageFetcher::triggerFetch()
 {
-   get(mBuild.url.append("wfapi/describe"), true);
+   get(mBuild.url.append("wfapi/describe"), 443, true);
 }
 
 void StageFetcher::processData(const QJsonDocument &json)

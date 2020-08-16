@@ -34,8 +34,6 @@ JobButton::JobButton(const JenkinsJobInfo &job, QWidget *parent)
    layout->addWidget(icon);
    layout->addWidget(name);
    layout->addStretch();
-
-   setStyleSheet("border: 1px solid black;");
 }
 
 void JobButton::mousePressEvent(QMouseEvent *e)

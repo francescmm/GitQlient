@@ -17,10 +17,9 @@ IFetcher::IFetcher(const QString &user, const QString &token, QObject *parent)
    , mToken(token)
    , mAccessManager(new QNetworkAccessManager(this))
 {
-   connect(mAccessManager, &QNetworkAccessManager::finished, this, &IFetcher::processReply);
 }
 
-QNetworkReply *IFetcher::get(const QString &urlStr, int port, bool customUrl)
+void IFetcher::get(const QString &urlStr, int port, bool customUrl)
 {
    QSettings settings;
 
@@ -37,11 +36,13 @@ QNetworkReply *IFetcher::get(const QString &urlStr, int port, bool customUrl)
       request.setRawHeader(QByteArray("Authorization"),
                            QString("Basic %1:%2").arg(mUser, mToken).toLocal8Bit().toBase64());
 
-   return mAccessManager->get(request);
+   const auto reply = mAccessManager->get(request);
+   connect(reply, &QNetworkReply::finished, this, &IFetcher::processReply);
 }
 
-void IFetcher::processReply(QNetworkReply *reply)
+void IFetcher::processReply()
 {
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
    const auto data = reply->readAll();
 
    if (data.isEmpty())

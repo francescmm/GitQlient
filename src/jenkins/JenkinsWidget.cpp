@@ -17,6 +17,8 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
    , mGit(git)
    , mTabWidget(new QTabWidget())
 {
+   setObjectName("JenkinsWidget");
+
    GitQlientSettings settings;
    const auto url = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", "").toString();
    const auto user = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", "").toString();
@@ -42,7 +44,8 @@ void JenkinsWidget::configureGeneralView(const QVector<JenkinsViewInfo> &views)
 
    for (auto &view : views)
    {
-      const auto container = new JobContainer(user, token, view);
+      const auto container = new JobContainer(user, token, view, this);
+      container->setObjectName("JobContainer");
       connect(container, &JobContainer::signalJobInfoReceived, mPanel, &JenkinsJobPanel::onJobInfoReceived);
       mTabWidget->addTab(container, view.name);
    }

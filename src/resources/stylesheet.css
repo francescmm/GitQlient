@@ -871,3 +871,15 @@ QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
    border-style: solid;
 }
 
+#JobContainer
+{
+   background: #2E2F30;
+}
+
+#JenkinsWidget, #JobButton, #JobContainerScrollArea
+{
+   background: transparent;
+   outline: none;
+   border: none;
+}
+

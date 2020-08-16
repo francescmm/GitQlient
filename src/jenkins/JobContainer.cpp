@@ -13,11 +13,13 @@ JobContainer::JobContainer(const QString &user, const QString &token, const Jenk
    : QFrame(parent)
 {
    const auto auxFrame = new QFrame();
+   auxFrame->setObjectName("JobContainer");
    mLayout = new QVBoxLayout(auxFrame);
-   mLayout->setContentsMargins(QMargins());
+   mLayout->setContentsMargins(10, 10, 10, 10);
    mLayout->setSpacing(10);
 
    const auto scrollArea = new QScrollArea();
+   scrollArea->setObjectName("JobContainerScrollArea");
    scrollArea->setWidget(auxFrame);
    scrollArea->setWidgetResizable(true);
 
@@ -36,6 +38,7 @@ void JobContainer::addJobs(const QVector<JenkinsJobInfo> &jobs)
    for (const auto &job : jobs)
    {
       const auto button = new JobButton(job);
+      button->setObjectName("JobButton");
       connect(button, &JobButton::clicked, this, &JobContainer::showJobInfo);
       mLayout->addWidget(button);
    }
