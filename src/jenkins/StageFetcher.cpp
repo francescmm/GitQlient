@@ -4,7 +4,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-namespace QJenkins
+namespace Jenkins
 {
 StageFetcher::StageFetcher(const QString &user, const QString &token, const JenkinsJobBuildInfo &build)
    : IFetcher(user, token)

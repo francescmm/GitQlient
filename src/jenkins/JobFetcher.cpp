@@ -11,7 +11,7 @@
 
 using namespace QLogger;
 
-namespace QJenkins
+namespace Jenkins
 {
 
 JobFetcher::JobFetcher(const QString &user, const QString &token, const QString &jobUrl, QObject *parent)
@@ -32,7 +32,7 @@ void JobFetcher::processData(const QJsonDocument &json)
    const auto jsonObject = json.object();
 
    if (!jsonObject.contains(QStringLiteral("jobs")))
-      QLog_Debug("QJenkins", "Jobs not found.");
+      QLog_Debug("Jenkins", "Jobs not found.");
 
    const auto array = jsonObject[QStringLiteral("jobs")].toArray();
 

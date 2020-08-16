@@ -8,7 +8,7 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QJsonDocument;
 
-namespace QJenkins
+namespace Jenkins
 {
 class IFetcher : public QObject
 {

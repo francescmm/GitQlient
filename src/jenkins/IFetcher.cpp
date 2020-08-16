@@ -9,7 +9,7 @@
 
 using namespace QLogger;
 
-namespace QJenkins
+namespace Jenkins
 {
 IFetcher::IFetcher(const QString &user, const QString &token, QObject *parent)
    : QObject(parent)
@@ -30,8 +30,6 @@ void IFetcher::get(const QString &urlStr, int port, bool customUrl)
 
    QNetworkRequest request(url);
 
-   const auto userName = settings.value("jenkinsServerUser", "").toString();
-
    if (!mUser.isEmpty() && !mToken.isEmpty())
       request.setRawHeader(QByteArray("Authorization"),
                            QString("Basic %1:%2").arg(mUser, mToken).toLocal8Bit().toBase64());
@@ -46,14 +44,14 @@ void IFetcher::processReply()
    const auto data = reply->readAll();
 
    if (data.isEmpty())
-      QLog_Warning("QJenkins", QString("Reply from {%1} is empty.").arg(reply->url().toString()));
+      QLog_Warning("Jenkins", QString("Reply from {%1} is empty.").arg(reply->url().toString()));
 
    const auto json = QJsonDocument::fromJson(data);
 
    if (json.isNull())
    {
-      QLog_Error("QJenkins", QString("Data from {%1} is not a valid JSON").arg(reply->url().toString()));
-      QLog_Trace("QJenkins", QString("Data received:\n%1").arg(QString::fromUtf8(data)));
+      QLog_Error("Jenkins", QString("Data from {%1} is not a valid JSON").arg(reply->url().toString()));
+      QLog_Trace("Jenkins", QString("Data received:\n%1").arg(QString::fromUtf8(data)));
       return;
    }
 

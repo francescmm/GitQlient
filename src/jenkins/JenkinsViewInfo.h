@@ -2,7 +2,7 @@
 
 #include <QString>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 struct JenkinsViewInfo

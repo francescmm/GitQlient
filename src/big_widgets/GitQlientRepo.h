@@ -43,7 +43,7 @@ class QTimer;
 class WaitingDlg;
 class GitServerCache;
 
-namespace QJenkins
+namespace Jenkins
 {
 class JenkinsWidget;
 }
@@ -145,7 +145,7 @@ private:
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
    GitServerWidget *mGitServerWidget = nullptr;
-   QJenkins::JenkinsWidget *mJenkins = nullptr;
+   Jenkins::JenkinsWidget *mJenkins = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    QTimer *mAutoPrUpdater = nullptr;

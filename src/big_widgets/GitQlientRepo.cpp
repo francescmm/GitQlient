@@ -38,7 +38,7 @@
 
 using namespace QLogger;
 using namespace GitServer;
-using namespace QJenkins;
+using namespace Jenkins;
 
 GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    : QFrame(parent)

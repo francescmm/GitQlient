@@ -7,7 +7,7 @@
 #include <QHBoxLayout>
 #include <QMouseEvent>
 
-namespace QJenkins
+namespace Jenkins
 {
 JobButton::JobButton(const JenkinsJobInfo &job, QWidget *parent)
    : QFrame(parent)

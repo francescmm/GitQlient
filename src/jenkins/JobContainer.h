@@ -5,7 +5,7 @@
 
 class QVBoxLayout;
 
-namespace QJenkins
+namespace Jenkins
 {
 
 struct JenkinsViewInfo;

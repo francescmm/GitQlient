@@ -9,7 +9,7 @@
 #include <QButtonGroup>
 #include <QButtonGroup>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 JenkinsJobPanel::JenkinsJobPanel(const QString &user, const QString &token, QWidget *parent)

@@ -4,7 +4,7 @@
 #include <QString>
 #include <QMap>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 struct JenkinsStageInfo

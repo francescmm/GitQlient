@@ -7,7 +7,7 @@
 class QTabWidget;
 class GitBase;
 
-namespace QJenkins
+namespace Jenkins
 {
 
 class RepoFetcher;

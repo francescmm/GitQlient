@@ -9,7 +9,7 @@
 #include <QTabWidget>
 #include <QHBoxLayout>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent)

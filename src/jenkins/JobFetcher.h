@@ -3,7 +3,7 @@
 #include <IFetcher.h>
 #include <JenkinsJobInfo.h>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 class JobFetcher final : public IFetcher

@@ -3,7 +3,7 @@
 #include <QFrame>
 #include <JenkinsJobInfo.h>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 class JobButton : public QFrame

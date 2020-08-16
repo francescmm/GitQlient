@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 JobContainer::JobContainer(const QString &user, const QString &token, const JenkinsViewInfo &viewInfo, QWidget *parent)

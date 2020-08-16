@@ -8,7 +8,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 BuildGeneralInfoFetcher::BuildGeneralInfoFetcher(const QString &user, const QString &token,

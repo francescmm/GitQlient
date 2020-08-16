@@ -9,7 +9,7 @@ class QVBoxLayout;
 class QButtonGroup;
 class QRadioButton;
 
-namespace QJenkins
+namespace Jenkins
 {
 
 class JenkinsJobPanel : public QFrame

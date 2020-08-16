@@ -3,7 +3,7 @@
 #include <IFetcher.h>
 #include <JenkinsViewInfo.h>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 class RepoFetcher final : public IFetcher

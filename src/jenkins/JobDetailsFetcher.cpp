@@ -4,7 +4,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 JobDetailsFetcher::JobDetailsFetcher(const QString &user, const QString &token, const JenkinsJobInfo &info)

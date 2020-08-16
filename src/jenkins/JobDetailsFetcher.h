@@ -5,7 +5,7 @@
 
 #include <QMutex>
 
-namespace QJenkins
+namespace Jenkins
 {
 
 class JobDetailsFetcher : public IFetcher

@@ -10,7 +10,7 @@
 
 using namespace QLogger;
 
-namespace QJenkins
+namespace Jenkins
 {
 
 RepoFetcher::RepoFetcher(const QString &user, const QString &token, const QString &url, QObject *parent)
@@ -31,7 +31,7 @@ void RepoFetcher::processData(const QJsonDocument &json)
 
    if (!jsonObject.contains(QStringLiteral("views")))
    {
-      QLog_Info("QJenkins", "Views are absent.");
+      QLog_Info("Jenkins", "Views are absent.");
       return;
    }
 
