@@ -14,6 +14,7 @@ HEADERS += \
    $$PWD/IssueItem.h \
    $$PWD/IssuesWidget.h \
    $$PWD/MergePullRequestDlg.h \
+   $$PWD/PrCommitsList.h \
    $$PWD/ServerConfigDlg.h \
 
 SOURCES += \
@@ -24,4 +25,5 @@ SOURCES += \
    $$PWD/IssueItem.cpp \
    $$PWD/IssuesWidget.cpp \
    $$PWD/MergePullRequestDlg.cpp \
+   $$PWD/PrCommitsList.cpp \
    $$PWD/ServerConfigDlg.cpp

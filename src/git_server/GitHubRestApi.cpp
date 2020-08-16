@@ -213,14 +213,7 @@ void GitHubRestApi::requestReviews(const PullRequest &pr)
 
 void GitHubRestApi::requestCommitsFromPR(const GitServer::PullRequest &pr)
 {
-   auto request = createRequest(mRepoEndpoint + QString("/issues/%1/commits").arg(pr.number));
-   auto url = request.url();
-   QUrlQuery query;
-
-   query.addQueryItem("per_page", QString::number(250));
-   url.setQuery(query);
-
-   request.setUrl(url);
+   auto request = createRequest(mRepoEndpoint + QString("/pulls/%1/commits").arg(pr.number));
    const auto reply = mManager->get(request);
 
    connect(reply, &QNetworkReply::finished, this, [this, pr]() { onCommitsReceived(pr); });
@@ -696,6 +689,10 @@ void GitHubRestApi::onCommitsReceived(PullRequest pr)
          sCommitter.type = commitData["committer"].toObject()["type"].toString();
 
          c.commiter = std::move(sCommitter);
+
+         c.message = commitData["commit"].toObject()["message"].toString();
+         c.authorCommittedTimestamp
+             = commitData["commit"].toObject()["author"].toObject()["date"].toVariant().toDateTime();
 
          commits.append(std::move(c));
       }

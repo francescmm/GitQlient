@@ -35,6 +35,7 @@ class QLabel;
 class QHBoxLayout;
 class GitServerCache;
 class QButtonGroup;
+class PrCommitsList;
 
 namespace GitServer
 {
@@ -70,13 +71,14 @@ private:
    bool mLoaded = false;
    QSharedPointer<GitServerCache> mGitServerCache;
    Config mConfig;
-   QNetworkAccessManager *mManager;
+   QNetworkAccessManager *mManager = nullptr;
    QButtonGroup *mBtnGroup = nullptr;
    QVBoxLayout *mIssuesLayout = nullptr;
    QFrame *mIssuesFrame = nullptr;
    QFrame *mIssueDetailedView = nullptr;
    QHBoxLayout *mIssueDetailedViewLayout = nullptr;
    QScrollArea *mScrollArea = nullptr;
+   PrCommitsList *commitsList = nullptr;
    int mIssueNumber = -1;
 
    void storeCreatorAvatar(QLabel *avatar, const QString &fileName) const;
@@ -90,4 +92,6 @@ private:
    void createBubbleForCodeReview(int reviewId, QVector<GitServer::CodeReview> comments, QVBoxLayout *layouts);
    QLayout *createBubbleForCodeReviewComments(const GitServer::CodeReview &review, QLayout *commentsLayout);
    QLayout *createBubbleForCodeReviewInitial(const QVector<GitServer::CodeReview> &reviews);
+
+   void showView(int view);
 };

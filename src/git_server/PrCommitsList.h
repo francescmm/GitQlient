@@ -23,21 +23,35 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <User.h>
+#include <QFrame>
 
-#include <QDateTime>
+class GitServerCache;
+class QLayout;
+class QLabel;
+class QNetworkAccessManager;
+class QScrollArea;
 
 namespace GitServer
 {
-
-struct Commit
-{
-   QString sha;
-   QString url;
-   QString message;
-   User commiter;
-   User author;
-   QDateTime authorCommittedTimestamp;
-};
-
+struct PullRequest;
+struct Commit;
 }
+
+class PrCommitsList : public QFrame
+{
+public:
+   explicit PrCommitsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+
+   void loadData(int number);
+
+private:
+   QSharedPointer<GitServerCache> mGitServerCache;
+   QNetworkAccessManager *mManager = nullptr;
+   QScrollArea *mScroll = nullptr;
+   int mPrNumber = -1;
+
+   void onCommitsReceived(const GitServer::PullRequest &pr);
+   QLayout *createBubbleForComment(const GitServer::Commit &commit);
+   QLabel *createAvatar(const QString &userName, const QString &avatarUrl) const;
+   void storeCreatorAvatar(QLabel *avatar, const QString &fileName) const;
+};
