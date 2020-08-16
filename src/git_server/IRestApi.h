@@ -182,6 +182,12 @@ public:
     */
    virtual void requestReviews(const PullRequest &pr) = 0;
 
+   /**
+    * @brief requestCommitsFromPR Requests all the commits from a PR.
+    * @param prNumber The Pr number.
+    */
+   virtual void requestCommitsFromPR(const GitServer::PullRequest &pr) = 0;
+
 protected:
    QNetworkAccessManager *mManager = nullptr;
    ServerAuthentication mAuth;

@@ -56,6 +56,7 @@ public:
    void mergePullRequest(int number, const QByteArray &data) override;
    void requestComments(const Issue &issue) override;
    void requestReviews(const PullRequest &pr) override;
+   void requestCommitsFromPR(const GitServer::PullRequest &pr) override;
 
 private:
    QString mRepoEndpoint;
@@ -75,6 +76,7 @@ private:
 
    void requestReviewComments(const PullRequest &pr);
    void onReviewCommentsReceived(PullRequest pr);
+   void onCommitsReceived(PullRequest pr);
 
    Issue issueFromJson(const QJsonObject &json) const;
    PullRequest prFromJson(const QJsonObject &json) const;
