@@ -11,9 +11,8 @@
 namespace Jenkins
 {
 
-BuildGeneralInfoFetcher::BuildGeneralInfoFetcher(const QString &user, const QString &token,
-                                                 const JenkinsJobBuildInfo &build)
-   : IFetcher(user, token)
+BuildGeneralInfoFetcher::BuildGeneralInfoFetcher(const Config &config, const JenkinsJobBuildInfo &build)
+   : IFetcher(config)
    , mBuild(build)
 {
 }
@@ -50,7 +49,7 @@ void BuildGeneralInfoFetcher::processData(const QJsonDocument &json)
       }
    }
 
-   const auto stagesFetcher = new StageFetcher(mUser, mToken, mBuild);
+   const auto stagesFetcher = new StageFetcher(mConfig, mBuild);
    connect(stagesFetcher, &StageFetcher::signalStagesReceived, this, &BuildGeneralInfoFetcher::appendStages);
 
    stagesFetcher->triggerFetch();

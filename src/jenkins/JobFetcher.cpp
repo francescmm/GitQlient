@@ -14,8 +14,8 @@ using namespace QLogger;
 namespace Jenkins
 {
 
-JobFetcher::JobFetcher(const QString &user, const QString &token, const QString &jobUrl, QObject *parent)
-   : IFetcher(user, token, parent)
+JobFetcher::JobFetcher(const Config &config, const QString &jobUrl, QObject *parent)
+   : IFetcher(config, parent)
    , mJobUrl(jobUrl)
 {
 }
@@ -55,7 +55,7 @@ void JobFetcher::processData(const QJsonDocument &json)
 
    for (const auto &jobInfo : mJobs)
    {
-      const auto jobRequest = new JobDetailsFetcher(mUser, mToken, jobInfo);
+      const auto jobRequest = new JobDetailsFetcher(mConfig, jobInfo);
       connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, this, &JobFetcher::updateJobs);
       connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, jobRequest, &JobDetailsFetcher::deleteLater);
 

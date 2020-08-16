@@ -6,8 +6,8 @@
 
 namespace Jenkins
 {
-StageFetcher::StageFetcher(const QString &user, const QString &token, const JenkinsJobBuildInfo &build)
-   : IFetcher(user, token)
+StageFetcher::StageFetcher(const Config &config, const JenkinsJobBuildInfo &build)
+   : IFetcher(config)
    , mBuild(build)
 {
 }

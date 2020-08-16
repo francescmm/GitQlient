@@ -13,8 +13,8 @@ using namespace QLogger;
 namespace Jenkins
 {
 
-RepoFetcher::RepoFetcher(const QString &user, const QString &token, const QString &url, QObject *parent)
-   : IFetcher(user, token, parent)
+RepoFetcher::RepoFetcher(const IFetcher::Config &config, const QString &url, QObject *parent)
+   : IFetcher(config, parent)
    , mUrl(url)
 {
    triggerFetch();

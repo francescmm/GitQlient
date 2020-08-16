@@ -12,10 +12,9 @@
 namespace Jenkins
 {
 
-JenkinsJobPanel::JenkinsJobPanel(const QString &user, const QString &token, QWidget *parent)
+JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent)
    : QFrame(parent)
-   , mUser(user)
-   , mToken(token)
+   , mConfig(config)
    , mName(new QLabel())
    , mUrl(new QLabel())
    , mBuildable(new QCheckBox(tr("is buildable")))
@@ -62,7 +61,7 @@ void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &job)
 
    for (const auto &build : mRequestedJob.builds)
    {
-      const auto buildFetcher = new BuildGeneralInfoFetcher(mUser, mToken, build);
+      const auto buildFetcher = new BuildGeneralInfoFetcher(mConfig, build);
       connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, this, &JenkinsJobPanel::appendJobsData);
 
       buildFetcher->triggerFetch();

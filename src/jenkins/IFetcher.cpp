@@ -2,7 +2,7 @@
 
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QSettings>
+#include <QNetworkRequest>
 #include <QJsonDocument>
 
 #include <QLogger.h>
@@ -11,18 +11,14 @@ using namespace QLogger;
 
 namespace Jenkins
 {
-IFetcher::IFetcher(const QString &user, const QString &token, QObject *parent)
+IFetcher::IFetcher(const Config &config, QObject *parent)
    : QObject(parent)
-   , mUser(user)
-   , mToken(token)
-   , mAccessManager(new QNetworkAccessManager(this))
+   , mConfig(config)
 {
 }
 
 void IFetcher::get(const QString &urlStr, int port, bool customUrl)
 {
-   QSettings settings;
-
    const auto apiUrl = urlStr.endsWith("api/json") || customUrl ? urlStr : urlStr + "api/json";
 
    QUrl url(apiUrl);
@@ -30,11 +26,11 @@ void IFetcher::get(const QString &urlStr, int port, bool customUrl)
 
    QNetworkRequest request(url);
 
-   if (!mUser.isEmpty() && !mToken.isEmpty())
+   if (!mConfig.user.isEmpty() && !mConfig.token.isEmpty())
       request.setRawHeader(QByteArray("Authorization"),
-                           QString("Basic %1:%2").arg(mUser, mToken).toLocal8Bit().toBase64());
+                           QString("Basic %1:%2").arg(mConfig.user, mConfig.token).toLocal8Bit().toBase64());
 
-   const auto reply = mAccessManager->get(request);
+   const auto reply = mConfig.accessManager->get(request);
    connect(reply, &QNetworkReply::finished, this, &IFetcher::processReply);
 }
 

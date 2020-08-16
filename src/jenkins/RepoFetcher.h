@@ -14,7 +14,7 @@ signals:
    void signalViewsReceived(const QVector<JenkinsViewInfo> &views);
 
 public:
-   explicit RepoFetcher(const QString &user, const QString &token, const QString &url, QObject *parent = nullptr);
+   explicit RepoFetcher(const IFetcher::Config &config, const QString &url, QObject *parent = nullptr);
 
    void triggerFetch() override;
 

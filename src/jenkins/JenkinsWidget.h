@@ -3,6 +3,7 @@
 #include <QWidget>
 
 #include <JenkinsViewInfo.h>
+#include <IFetcher.h>
 
 class QTabWidget;
 class GitBase;
@@ -23,6 +24,7 @@ public:
 
 private:
    QSharedPointer<GitBase> mGit;
+   IFetcher::Config mConfig;
    QTabWidget *mTabWidget = nullptr;
    JenkinsJobPanel *mPanel = nullptr;
    RepoFetcher *mRepoFetcher = nullptr;

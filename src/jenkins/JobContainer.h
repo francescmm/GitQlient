@@ -1,7 +1,9 @@
 #pragma once
 
-#include <QFrame>
 #include <JenkinsJobInfo.h>
+#include <IFetcher.h>
+
+#include <QFrame>
 
 class QVBoxLayout;
 
@@ -18,8 +20,7 @@ signals:
    void signalJobInfoReceived(const JenkinsJobInfo &job);
 
 public:
-   explicit JobContainer(const QString &user, const QString &token, const JenkinsViewInfo &viewInfo,
-                         QWidget *parent = nullptr);
+   explicit JobContainer(const IFetcher::Config &config, const JenkinsViewInfo &viewInfo, QWidget *parent = nullptr);
 
 private:
    QVBoxLayout *mLayout = nullptr;

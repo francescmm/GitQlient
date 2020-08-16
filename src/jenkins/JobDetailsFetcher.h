@@ -16,7 +16,7 @@ signals:
    void signalJobDetailsRecieved(const JenkinsJobInfo &updatedInfo);
 
 public:
-   JobDetailsFetcher(const QString &user, const QString &token, const JenkinsJobInfo &info);
+   JobDetailsFetcher(const Config &config, const JenkinsJobInfo &info);
 
    void triggerFetch() override;
 

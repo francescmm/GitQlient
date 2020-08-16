@@ -9,7 +9,7 @@
 namespace Jenkins
 {
 
-JobContainer::JobContainer(const QString &user, const QString &token, const JenkinsViewInfo &viewInfo, QWidget *parent)
+JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo &viewInfo, QWidget *parent)
    : QFrame(parent)
 {
    const auto auxFrame = new QFrame();
@@ -28,7 +28,7 @@ JobContainer::JobContainer(const QString &user, const QString &token, const Jenk
    layout->setSpacing(0);
    layout->addWidget(scrollArea);
 
-   const auto jobFetcher = new JobFetcher(user, token, viewInfo.url);
+   const auto jobFetcher = new JobFetcher(config, viewInfo.url);
    connect(jobFetcher, &JobFetcher::signalJobsReceived, this, &JobContainer::addJobs);
    jobFetcher->triggerFetch();
 }
