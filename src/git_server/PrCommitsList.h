@@ -51,7 +51,7 @@ private:
    int mPrNumber = -1;
 
    void onCommitsReceived(const GitServer::PullRequest &pr);
-   QLayout *createBubbleForComment(const GitServer::Commit &commit);
+   QFrame *createBubbleForComment(const GitServer::Commit &commit);
    QLabel *createAvatar(const QString &userName, const QString &avatarUrl) const;
    void storeCreatorAvatar(QLabel *avatar, const QString &fileName) const;
 };

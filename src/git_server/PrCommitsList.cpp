@@ -6,6 +6,10 @@
 #include <CircularPixmap.h>
 #include <ButtonLink.hpp>
 
+#include <QApplication>
+#include <QClipboard>
+#include <QToolTip>
+#include <QCursor>
 #include <QLabel>
 #include <QScrollArea>
 #include <QStandardPaths>
@@ -67,14 +71,14 @@ void PrCommitsList::onCommitsReceived(const GitServer::PullRequest &pr)
 
    for (auto &commit : pr.commits)
    {
-      const auto layout = createBubbleForComment(commit);
-      commitsLayout->addLayout(layout);
+      const auto bubble = createBubbleForComment(commit);
+      commitsLayout->addWidget(bubble);
    }
 
    commitsLayout->addStretch();
 }
 
-QLayout *PrCommitsList::createBubbleForComment(const GitServer::Commit &commit)
+QFrame *PrCommitsList::createBubbleForComment(const GitServer::Commit &commit)
 {
    const auto days = commit.authorCommittedTimestamp.daysTo(QDateTime::currentDateTime());
    const auto whenText = days <= 30
@@ -90,35 +94,37 @@ QLayout *PrCommitsList::createBubbleForComment(const GitServer::Commit &commit)
    const auto frame = new QFrame();
    frame->setObjectName("IssueIntro");
 
-   const auto innerLayout = new QVBoxLayout(frame);
-   innerLayout->setContentsMargins(10, 10, 10, 10);
-   innerLayout->setSpacing(5);
-   innerLayout->addWidget(link);
-   innerLayout->addWidget(creator);
-   innerLayout->addStretch();
+   const auto layout = new QGridLayout(frame);
+   layout->setAlignment(Qt::AlignVertical_Mask);
+   layout->setContentsMargins(10, 10, 10, 10);
+   layout->setHorizontalSpacing(10);
+   layout->setVerticalSpacing(5);
+   layout->addWidget(createAvatar(commit.author.name, commit.author.avatar), 0, 0, 2, 1);
+   layout->addWidget(link, 0, 1);
+   layout->addWidget(creator, 1, 1);
+   layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), 1, 2);
 
-   const auto layout = new QHBoxLayout();
-   layout->setContentsMargins(QMargins());
-   layout->setSpacing(30);
-   layout->addSpacing(30);
-   layout->addWidget(createAvatar(commit.author.name, commit.author.avatar));
+   const auto shaLink = new ButtonLink(commit.sha);
+   connect(shaLink, &ButtonLink::clicked, this, [this, sha = commit.sha]() {
+      QApplication::clipboard()->setText(sha);
+      QToolTip::showText(QCursor::pos(), tr("Copied!"), this);
+   });
+
+   layout->addWidget(shaLink, 0, 3, 3, 1);
 
    if (commit.author.name != commit.commiter.name)
       layout->addWidget(createAvatar(commit.commiter.name, commit.commiter.avatar));
 
-   layout->addWidget(frame);
-   layout->setStretch(0, 1);
-   layout->setStretch(1, 10);
-
-   return layout;
+   return frame;
 }
 
 QLabel *PrCommitsList::createAvatar(const QString &userName, const QString &avatarUrl) const
 {
    const auto fileName
        = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), userName);
-   const auto avatar = new CircularPixmap(QSize(50, 50));
+   const auto avatar = new CircularPixmap(QSize(30, 30));
    avatar->setObjectName("Avatar");
+   avatar->setCentered(true);
 
    if (!QFile(fileName).exists())
    {
@@ -131,7 +137,7 @@ QLabel *PrCommitsList::createAvatar(const QString &userName, const QString &avat
    else
    {
       QPixmap img(fileName);
-      img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+      img = img.scaled(30, 30, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
       avatar->setPixmap(img);
    }
