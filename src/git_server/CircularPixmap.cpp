@@ -28,16 +28,18 @@ void CircularPixmap::paintEvent(QPaintEvent *e)
    {
       const auto rect = e->rect();
       const auto startX = (rect.width() - mSize.width()) / 2;
+      const auto startY = mCenterPosition ? (rect.height() - mSize.height()) / 2 : 0;
+
       QPainter painter(this);
       painter.setRenderHint(QPainter::Antialiasing);
 
       QPainterPath path;
-      path.addEllipse(startX, 0, mSize.width(), mSize.height());
+      path.addEllipse(startX, startY, mSize.width(), mSize.height());
       painter.setClipPath(path);
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
       painter.drawPixmap(startX, 0, mSize.width(), mSize.height(), *pixmap());
 #else
-      painter.drawPixmap(startX, 0, mSize.width(), mSize.height(), pixmap(Qt::ReturnByValue));
+      painter.drawPixmap(startX, startY, mSize.width(), mSize.height(), pixmap(Qt::ReturnByValue));
 #endif
    }
 }

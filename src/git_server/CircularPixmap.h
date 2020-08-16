@@ -31,9 +31,12 @@ public:
    explicit CircularPixmap(const QSize &size, QWidget *parent = nullptr);
    explicit CircularPixmap(const QString &filePath, QWidget *parent = nullptr);
 
+   void setCentered(bool centered) { mCenterPosition = centered; }
+
 protected:
    void paintEvent(QPaintEvent *e) override;
 
 private:
    QSize mSize;
+   bool mCenterPosition = false;
 };
