@@ -4,7 +4,13 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient/branch/master)
 [![Build Status](https://travis-ci.org/francescmm/GitQlient.svg?branch=master)](https://travis-ci.org/francescmm/GitQlient)
 
-GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client originally forked from QGit. Nowadays it goes beyond of just a fork and adds a lot of new functionality.  Some of the major feature you can find are:
+GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git
+client originally forked from QGit. Nowadays it goes beyond of just a fork and
+adds a lot of new functionality.
+
+![GitQlient main screen](/docs/assets/GitQlient.png)
+
+Some of the major feature you can find are:
 
 1. New features:
     1. Easy access to remote actions like: push, pull, submodules management and branches
@@ -14,6 +20,8 @@ GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git 
     5. Allow to open several repositories in the same window
     6. Better visualization of the commits and the work in progress
     7. Better visualization of the repository view
+    8. GitHub/GitLab integration
+    9. Embedded text editor with syntax highlight for C++
 2. Improved UI experience
     1. Easy access to the main Git actions
     2. Better code separation between Views and Models
