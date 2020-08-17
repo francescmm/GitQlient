@@ -147,7 +147,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
    {
       addSeparator();
 
-      const auto gitServerMenu = new QMenu(isGitHub ? "GitHub" : "GitLab", this);
+      const auto gitServerMenu = new QMenu(QString::fromUtf8(isGitHub ? "GitHub" : "GitLab"), this);
       addMenu(gitServerMenu);
 
       if (const auto pr = mCache->getPullRequestStatus(mShas.first()); singleSelection && pr.isValid())

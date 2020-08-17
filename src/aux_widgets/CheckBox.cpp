@@ -5,6 +5,8 @@
 #include <QStyleOptionButton>
 #include <QStylePainter>
 
+#include <array>
+
 namespace
 {
 static std::array<QString, 6> indicators { ":/icons/qcb",   ":/icons/qcb_c",   ":/icons/qcb_i",
