@@ -237,7 +237,7 @@ void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
    const auto height = body->document()->size().height();
    body->setFixedHeight(height);
 #else
-   const auto body = new QLabel(mIssue.body);
+   const auto body = new QLabel(QString::fromUtf8((mIssue.body)));
    body->setWordWrap(true);
 #endif
    layout->addWidget(body);
