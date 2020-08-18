@@ -5,6 +5,7 @@
 #include <GitServerCache.h>
 #include <IRestApi.h>
 #include <Issue.h>
+#include <PrCommitsList.h>
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -59,6 +60,8 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitSe
    commits->setDisabled(true);
    mBtnGroup->addButton(commits, static_cast<int>(Buttons::Commits));
 
+   connect(mBtnGroup, &QButtonGroup::idClicked, this, &IssueDetailedView::showView);
+
    const auto addComment = new QToolButton();
    addComment->setDisabled(true);
    addComment->setIcon(QIcon(":/icons/add_comment"));
@@ -100,11 +103,15 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitSe
    const auto footerFrame = new QFrame();
    footerFrame->setObjectName("IssuesFooterFrame");
 
+   commitsList = new PrCommitsList(mGitServerCache);
+   commitsList->setVisible(false);
+
    const auto issuesLayout = new QVBoxLayout(this);
    issuesLayout->setContentsMargins(QMargins());
    issuesLayout->setSpacing(0);
    issuesLayout->addWidget(headerFrame);
    issuesLayout->addLayout(mIssueDetailedViewLayout);
+   issuesLayout->addWidget(commitsList);
    issuesLayout->addWidget(footerFrame);
 
    const auto timer = new QTimer();
@@ -247,7 +254,10 @@ void IssueDetailedView::loadData(Config config, const GitServer::Issue &issue)
    if (mConfig == Config::Issues)
       mGitServerCache->getApi()->requestComments(issue);
    else
+   {
+      mBtnGroup->button(static_cast<int>(Buttons::Commits))->setEnabled(true);
       mGitServerCache->getApi()->requestReviews(issue);
+   }
 }
 
 void IssueDetailedView::processComments(const Issue &issue)
@@ -540,6 +550,24 @@ QLayout *IssueDetailedView::createBubbleForCodeReviewInitial(const QVector<CodeR
    }
 
    return layout;
+}
+
+void IssueDetailedView::showView(int view)
+{
+   switch (static_cast<Buttons>(view))
+   {
+      case Buttons::Comments:
+         mIssueDetailedView->setVisible(true);
+         commitsList->setVisible(false);
+         break;
+      case Buttons::Commits:
+         mIssueDetailedView->setVisible(false);
+         commitsList->loadData(mIssue.number);
+         commitsList->setVisible(true);
+         break;
+      default:
+         break;
+   }
 }
 
 void IssueDetailedView::onReviewsReceived(const PullRequest &pr)
