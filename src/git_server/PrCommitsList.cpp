@@ -88,7 +88,12 @@ QFrame *PrCommitsList::createBubbleForComment(const GitServer::Commit &commit)
 
    const auto creator = new QLabel(QString("Committed by <b>%1</b> %2").arg(commit.author.name, whenText));
 
-   const auto link = new ButtonLink(QString("<b>%1</b>").arg(commit.message.split("\n\n").constFirst()));
+   auto commitMsg = commit.message.split("\n\n").constFirst();
+
+   if (commitMsg.count() >= 47)
+      commitMsg = commitMsg.left(47).append("...");
+
+   const auto link = new ButtonLink(QString("<b>%1</b>").arg(commitMsg));
    connect(link, &ButtonLink::clicked, [url = commit.url]() { QDesktopServices::openUrl(url); });
 
    const auto frame = new QFrame();

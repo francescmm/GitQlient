@@ -62,26 +62,9 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
 
    mIssue = issue;
 
-   const auto title = new QLabel(QString("#%1 - %2").arg(QString::number(mIssue.number), mIssue.title));
-   title->setWordWrap(false);
-   title->setObjectName("IssueViewTitle");
-
-   const auto titleLayout = new QHBoxLayout();
-   titleLayout->setContentsMargins(QMargins());
-   titleLayout->setSpacing(0);
-   titleLayout->addWidget(title);
-
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
    creationLayout->setSpacing(0);
-   creationLayout->addWidget(new QLabel(tr("Created by ")));
-
-   const auto creator = new QLabel(QString("<b>%1</b>").arg(mIssue.creator.name));
-   creator->setObjectName("CreatorLink");
-
-   creationLayout->addWidget(creator);
-   creationLayout->addWidget(createHeadline(mIssue.creation));
-   creationLayout->addStretch();
 
    if (!mIssue.assignees.isEmpty())
    {
@@ -98,13 +81,9 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
          if (count++ < totalAssignees - 1)
             creationLayout->addWidget(new QLabel(", "));
       }
+
+      creationLayout->addStretch();
    }
-
-   const auto labelsLayout = new QHBoxLayout();
-   labelsLayout->setContentsMargins(QMargins());
-   labelsLayout->setSpacing(10);
-
-   QStringList labelsList;
 
    for (auto &label : mIssue.labels)
    {
@@ -118,24 +97,20 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
                                          "max-width: 15px;}")
                                      .arg(label.colorHex));
       labelWidget->setToolTip(label.name);
-      labelsLayout->addWidget(labelWidget);
+      creationLayout->addWidget(labelWidget);
    }
 
    const auto milestone = new QLabel(QString("%1").arg(mIssue.milestone.title));
    milestone->setObjectName("IssueLabel");
-   labelsLayout->addWidget(milestone);
-   labelsLayout->addStretch();
+   creationLayout->addWidget(milestone);
 
    const auto frame = new QFrame();
    frame->setObjectName("IssueIntro");
 
    const auto layout = new QVBoxLayout(frame);
    layout->setContentsMargins(10, 10, 10, 10);
-   layout->setSpacing(5);
-   layout->addLayout(titleLayout);
+   layout->setSpacing(10);
    layout->addLayout(creationLayout);
-   layout->addLayout(labelsLayout);
-   layout->addSpacing(20);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    const auto body = new QTextEdit();

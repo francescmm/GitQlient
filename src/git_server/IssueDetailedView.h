@@ -28,6 +28,7 @@
 
 #include <Issue.h>
 
+class QLabel;
 class GitServerCache;
 class QButtonGroup;
 class PrCommentsList;
@@ -66,6 +67,8 @@ private:
 
    GitServer::Issue mIssue;
    QButtonGroup *mBtnGroup = nullptr;
+   QLabel *mTitleLabel = nullptr;
+   QLabel *mCreationLabel = nullptr;
    QStackedLayout *mStackedLayout = nullptr;
    PrCommentsList *mPrCommentsList = nullptr;
    PrCommitsList *mPrCommitsList = nullptr;

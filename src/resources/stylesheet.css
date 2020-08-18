@@ -745,7 +745,7 @@ QScrollArea
    background: transparent;
 }
 
-#IssuesHeaderFrame
+#IssuesHeaderFrame, #IssuesHeaderFrameBig
 {
    background-color: #202122;
 }
@@ -755,7 +755,7 @@ QScrollArea
    background-color: #2E2F30;
 }
 
-#IssuesHeaderFrame
+#IssuesHeaderFrame, #IssuesHeaderFrameBig
 {
    max-height: 27px;
    min-height: 27px;
@@ -763,6 +763,12 @@ QScrollArea
    border-top: 1px solid #404142;
    border-top-right-radius: 10px;
    border-top-left-radius: 10px;
+}
+
+#IssuesHeaderFrameBig
+{
+    max-height: 40px;
+    min-height: 40px;
 }
 
 #IssuesFooterFrame
