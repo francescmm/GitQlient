@@ -23,53 +23,58 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QFrame>
-#include <QMap>
-
 #include <Issue.h>
+#include <GitServerCache.h>
 
-class GitServerCache;
-class QButtonGroup;
-class PrCommentsList;
-class PrCommitsList;
-class QStackedLayout;
+#include <QFrame>
 
 namespace GitServer
 {
 struct Issue;
 struct PullRequest;
+struct Comment;
+struct Review;
+struct CodeReview;
 }
 
-class IssueDetailedView : public QFrame
-{
-   Q_OBJECT
-signals:
+class QLabel;
+class QVBoxLayout;
+class QNetworkAccessManager;
+class QHBoxLayout;
+class QScrollArea;
 
+class PrCommentsList : public QFrame
+{
 public:
    enum class Config
    {
       Issues,
       PullRequests
    };
-   explicit IssueDetailedView(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
-   ~IssueDetailedView();
+
+   explicit PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
 
    void loadData(Config config, const GitServer::Issue &issue);
 
 private:
-   enum class Buttons
-   {
-      Comments,
-      Changes,
-      Commits
-   };
-
+   QSharedPointer<GitServerCache> mGitServerCache;
+   QNetworkAccessManager *mManager = nullptr;
+   QVBoxLayout *mIssuesLayout = nullptr;
+   QFrame *mIssuesFrame = nullptr;
+   Config mConfig;
    GitServer::Issue mIssue;
-   QButtonGroup *mBtnGroup = nullptr;
-   QStackedLayout *mStackedLayout = nullptr;
-   PrCommentsList *mPrCommentsList = nullptr;
-   PrCommitsList *mPrCommitsList = nullptr;
+   QScrollArea *mScroll = nullptr;
+   bool mLoaded = false;
+   int mIssueNumber = -1;
 
-private slots:
-   void showView(int view);
+   void processComments(const GitServer::Issue &issue);
+   QLabel *createAvatar(const QString &userName, const QString &avatarUrl) const;
+   QLabel *createHeadline(const QDateTime &dt, const QString &prefix = QString());
+   void storeCreatorAvatar(QLabel *avatar, const QString &fileName) const;
+   QLayout *createBubbleForComment(const GitServer::Comment &comment);
+   QLayout *createBubbleForReview(const GitServer::Review &review);
+   void createBubbleForCodeReview(int reviewId, QVector<GitServer::CodeReview> comments, QVBoxLayout *layouts);
+   QLayout *createBubbleForCodeReviewComments(const GitServer::CodeReview &review, QLayout *commentsLayout);
+   QLayout *createBubbleForCodeReviewInitial(const QVector<GitServer::CodeReview> &reviews);
+   void onReviewsReceived(const GitServer::PullRequest &pr);
 };

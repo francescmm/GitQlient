@@ -54,13 +54,13 @@ void PrCommitsList::onCommitsReceived(const GitServer::PullRequest &pr)
    commitsLayout->setAlignment(Qt::AlignTop);
    commitsLayout->setSpacing(30);
 
-   const auto issuesFrame = new QFrame();
-   issuesFrame->setObjectName("IssuesViewFrame");
-   issuesFrame->setLayout(commitsLayout);
+   const auto mIssuesFrame = new QFrame();
+   mIssuesFrame->setObjectName("IssuesViewFrame");
+   mIssuesFrame->setLayout(commitsLayout);
 
    mScroll = new QScrollArea();
    mScroll->setWidgetResizable(true);
-   mScroll->setWidget(issuesFrame);
+   mScroll->setWidget(mIssuesFrame);
 
    delete layout();
 
