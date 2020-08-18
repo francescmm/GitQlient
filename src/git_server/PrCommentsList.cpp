@@ -315,7 +315,6 @@ QLayout *PrCommentsList::createBubbleForReview(const Review &review)
    innerLayout->setContentsMargins(10, 10, 10, 10);
    innerLayout->setSpacing(20);
    innerLayout->addLayout(creationLayout);
-   innerLayout->addSpacing(20);
 
    const auto layout = new QHBoxLayout();
    layout->setContentsMargins(QMargins());
