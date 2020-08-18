@@ -24,6 +24,7 @@ PrCommitsList::PrCommitsList(const QSharedPointer<GitServerCache> &gitServerCach
    , mGitServerCache(gitServerCache)
    , mManager(new QNetworkAccessManager())
 {
+   setObjectName("IssuesViewFrame");
 }
 
 void PrCommitsList::loadData(int number)
@@ -88,7 +89,7 @@ QFrame *PrCommitsList::createBubbleForComment(const GitServer::Commit &commit)
 
    const auto creator = new QLabel(QString("Committed by <b>%1</b> %2").arg(commit.author.name, whenText));
 
-   auto commitMsg = commit.message.split("\n\n").constFirst();
+   auto commitMsg = commit.message.split("\n\n").constFirst().trimmed();
 
    if (commitMsg.count() >= 47)
       commitMsg = commitMsg.left(47).append("...");
@@ -142,9 +143,12 @@ QLabel *PrCommitsList::createAvatar(const QString &userName, const QString &avat
    else
    {
       QPixmap img(fileName);
-      img = img.scaled(30, 30, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+      if (!img.isNull())
+      {
+         img = img.scaled(30, 30, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-      avatar->setPixmap(img);
+         avatar->setPixmap(img);
+      }
    }
 
    return avatar;
@@ -167,9 +171,13 @@ void PrCommitsList::storeCreatorAvatar(QLabel *avatar, const QString &fileName) 
       file.close();
 
       QPixmap img(path);
-      img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-      avatar->setPixmap(img);
+      if (!img.isNull())
+      {
+         img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+         avatar->setPixmap(img);
+      }
    }
 
    reply->deleteLater();

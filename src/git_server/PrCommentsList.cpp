@@ -32,10 +32,6 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
            Qt::UniqueConnection);
 
    mConfig = config;
-
-   if (mLoaded && mIssue.number == issue.number)
-      return;
-
    mIssueNumber = issue.number;
 
    delete mIssuesFrame;
@@ -168,9 +164,13 @@ QLabel *PrCommentsList::createAvatar(const QString &userName, const QString &ava
    else
    {
       QPixmap img(fileName);
-      img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-      avatar->setPixmap(img);
+      if (!img.isNull())
+      {
+         img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+         avatar->setPixmap(img);
+      }
    }
 
    return avatar;
@@ -206,9 +206,13 @@ void PrCommentsList::storeCreatorAvatar(QLabel *avatar, const QString &fileName)
       file.close();
 
       QPixmap img(path);
-      img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
-      avatar->setPixmap(img);
+      if (!img.isNull())
+      {
+         img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+         avatar->setPixmap(img);
+      }
    }
 
    reply->deleteLater();

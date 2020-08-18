@@ -123,9 +123,7 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, const Issue &
 
    mPrCommentsList->loadData(static_cast<PrCommentsList::Config>(config), issue);
 
-   if (config == Config::PullRequests)
-      mBtnGroup->button(static_cast<int>(Buttons::Commits))->setEnabled(true);
-
+   mBtnGroup->button(static_cast<int>(Buttons::Commits))->setEnabled(config == Config::PullRequests);
    mBtnGroup->button(static_cast<int>(Buttons::Comments))->setEnabled(true);
 }
 

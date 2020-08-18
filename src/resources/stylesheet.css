@@ -800,7 +800,7 @@ QScrollArea
 #HeaderTitle
 {
    font-variant: small-caps;
-   font-size: 18pt;
+   font-size: 16pt;
    font-weight: bold;
    qproperty-alignment: AlignCenter;
 }
