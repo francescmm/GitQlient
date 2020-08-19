@@ -3,6 +3,7 @@
 #include <GitServerCache.h>
 #include <IssueItem.h>
 #include <ClickableFrame.h>
+#include <IRestApi.h>
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -10,6 +11,7 @@
 #include <QScrollArea>
 #include <QTimer>
 #include <QSpinBox>
+#include <QToolButton>
 
 using namespace GitServer;
 
@@ -33,11 +35,20 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache,
 
    mArrow->setPixmap(QIcon(":/icons/arrow_up").pixmap(QSize(15, 15)));
 
+   mRefreshBtn = new QToolButton();
+   mRefreshBtn->setIcon(QIcon(":/icons/refresh"));
+   mRefreshBtn->setObjectName("ViewBtnOption");
+   mRefreshBtn->setToolTip(tr("Refresh"));
+   mRefreshBtn->setDisabled(true);
+   connect(mRefreshBtn, &QToolButton::clicked, this, &IssuesWidget::refreshData);
+
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
    headerLayout->setSpacing(0);
    headerLayout->addWidget(headerTitle);
    headerLayout->addStretch();
+   headerLayout->addWidget(mRefreshBtn);
+   headerLayout->addSpacing(10);
    headerLayout->addWidget(mArrow);
 
    mIssuesLayout = new QVBoxLayout();
@@ -129,6 +140,8 @@ void IssuesWidget::onPullRequestsReceived(const QVector<PullRequest> &pr)
 
 void IssuesWidget::createContent(QVector<IssueItem *> items)
 {
+   mRefreshBtn->setEnabled(true);
+
    delete mIssuesWidget;
    delete mScrollArea;
 
@@ -190,6 +203,14 @@ void IssuesWidget::onHeaderClicked()
       else
          setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
    }
+}
+
+void IssuesWidget::refreshData()
+{
+   if (mConfig == Config::Issues)
+      mGitServerCache->getApi()->requestIssues();
+   else if (mConfig == Config::PullRequests)
+      mGitServerCache->getApi()->requestPullRequests();
 }
 
 void IssuesWidget::loadPage(int)

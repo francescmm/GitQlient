@@ -96,9 +96,12 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
       creationLayout->addWidget(labelWidget);
    }
 
-   const auto milestone = new QLabel(QString("%1").arg(mIssue.milestone.title));
-   milestone->setObjectName("IssueLabel");
-   creationLayout->addWidget(milestone);
+   if (!mIssue.milestone.title.isEmpty())
+   {
+      const auto milestone = new QLabel(QString("%1").arg(mIssue.milestone.title));
+      milestone->setObjectName("IssueLabel");
+      creationLayout->addWidget(milestone);
+   }
 
    const auto frame = new QFrame();
    frame->setObjectName("IssueIntro");
