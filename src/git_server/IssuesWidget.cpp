@@ -101,85 +101,65 @@ void IssuesWidget::loadData()
 
 void IssuesWidget::onIssuesReceived(const QVector<Issue> &issues)
 {
-   delete mIssuesWidget;
-   delete mScrollArea;
-
-   mIssuesWidget = new QFrame();
-   mIssuesWidget->setObjectName("IssuesWidget");
-   mIssuesWidget->setStyleSheet("#IssuesWidget{"
-                                "background-color: #2E2F30;"
-                                "}");
-   const auto issuesLayout = new QVBoxLayout(mIssuesWidget);
-   issuesLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
-   issuesLayout->setContentsMargins(QMargins());
-   issuesLayout->setSpacing(0);
-
-   mScrollArea = new QScrollArea();
-   mScrollArea->setWidget(mIssuesWidget);
-   mScrollArea->setWidgetResizable(true);
-
-   mIssuesLayout->addWidget(mScrollArea);
-
-   auto totalIssues = issues.count();
-   auto count = 0;
+   QVector<IssueItem *> items;
 
    for (auto &issue : issues)
    {
       const auto issueItem = new IssueItem(issue);
       connect(issueItem, &IssueItem::selected, this, &IssuesWidget::selected);
-      issuesLayout->addWidget(issueItem);
-
-      if (count++ < totalIssues - 1)
-      {
-         const auto separator = new QFrame();
-         separator->setObjectName("orangeHSeparator");
-         issuesLayout->addWidget(separator);
-      }
+      items.append(issueItem);
    }
 
-   const auto icon = QIcon(mScrollArea->isVisible() ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
-   mArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-
-   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+   createContent(items);
 }
 
 void IssuesWidget::onPullRequestsReceived(const QVector<PullRequest> &pr)
 {
+   QVector<IssueItem *> items;
+
+   for (auto &issue : pr)
+   {
+      const auto issueItem = new IssueItem(issue);
+      connect(issueItem, &IssueItem::selected, this, &IssuesWidget::selected);
+      items.append(issueItem);
+   }
+
+   createContent(items);
+}
+
+void IssuesWidget::createContent(QVector<IssueItem *> items)
+{
    delete mIssuesWidget;
    delete mScrollArea;
 
+   const auto issuesLayout = new QVBoxLayout();
+   issuesLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
+   issuesLayout->setContentsMargins(QMargins());
+   issuesLayout->setSpacing(0);
+
+   for (auto item : items)
+   {
+      issuesLayout->addWidget(item);
+
+      const auto separator = new QFrame();
+      separator->setObjectName("orangeHSeparator");
+      issuesLayout->addWidget(separator);
+   }
+
+   issuesLayout->addStretch();
+
    mIssuesWidget = new QFrame();
+   mIssuesWidget->setLayout(issuesLayout);
    mIssuesWidget->setObjectName("IssuesWidget");
    mIssuesWidget->setStyleSheet("#IssuesWidget{"
                                 "background-color: #2E2F30;"
                                 "}");
-   const auto issuesLayout = new QVBoxLayout(mIssuesWidget);
-   issuesLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
-   issuesLayout->setContentsMargins(QMargins());
-   issuesLayout->setSpacing(0);
 
    mScrollArea = new QScrollArea();
    mScrollArea->setWidget(mIssuesWidget);
    mScrollArea->setWidgetResizable(true);
 
    mIssuesLayout->addWidget(mScrollArea);
-
-   auto totalIssues = pr.count();
-   auto count = 0;
-
-   for (auto &issue : pr)
-   {
-      const auto issueItem = new IssueItem(issue);
-      connect(issueItem, &IssueItem::selected, this, &IssuesWidget::selected);
-      issuesLayout->addWidget(issueItem);
-
-      if (count++ < totalIssues - 1)
-      {
-         const auto separator = new QFrame();
-         separator->setObjectName("orangeHSeparator");
-         issuesLayout->addWidget(separator);
-      }
-   }
 
    const auto icon = QIcon(mScrollArea->isVisible() ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
    mArrow->setPixmap(icon.pixmap(QSize(15, 15)));

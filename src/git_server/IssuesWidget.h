@@ -30,6 +30,7 @@ class QScrollArea;
 class QLabel;
 class QSpinBox;
 class GitServerCache;
+class IssueItem;
 
 namespace GitServer
 {
@@ -64,6 +65,7 @@ private:
 
    void onIssuesReceived(const QVector<GitServer::Issue> &issues);
    void onPullRequestsReceived(const QVector<GitServer::PullRequest> &pr);
+   void createContent(QVector<IssueItem *> items);
    void onHeaderClicked();
 
 private slots:
