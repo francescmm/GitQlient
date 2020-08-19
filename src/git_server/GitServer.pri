@@ -2,6 +2,7 @@ INCLUDEPATH += $$PWD
 
 HEADERS += \
    $$PWD/Comment.h \
+   $$PWD/Commit.h \
    $$PWD/ConfigData.h \
    $$PWD/GitHubRestApi.h \
    $$PWD/GitLabRestApi.h \

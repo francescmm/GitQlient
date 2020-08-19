@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <Issue.h>
+#include <Commit.h>
 
 #include <QMap>
 
@@ -82,7 +83,7 @@ struct PullRequest : public Issue
    QMap<int, Review> reviews;
    QVector<CodeReview> reviewComment;
    int reviewCommentsCount = 0;
-   int commits = 0;
+   int commitCount = 0;
    int additions = 0;
    int deletions = 0;
    int changedFiles = 0;
@@ -90,6 +91,7 @@ struct PullRequest : public Issue
    bool mergeable = false;
    bool rebaseable = false;
    QString mergeableState;
+   QVector<Commit> commits;
 
    QJsonObject toJson() const
    {
@@ -106,6 +108,10 @@ struct PullRequest : public Issue
    }
 
    bool isValid() const { return !title.isEmpty(); }
+
+public:
+   int getCommits() const;
+   void setCommits(int value);
 };
 
 }

@@ -30,6 +30,8 @@ class QScrollArea;
 class QLabel;
 class QSpinBox;
 class GitServerCache;
+class IssueItem;
+class QToolButton;
 
 namespace GitServer
 {
@@ -61,10 +63,13 @@ private:
    QFrame *mIssuesWidget = nullptr;
    QScrollArea *mScrollArea = nullptr;
    QLabel *mArrow = nullptr;
+   QToolButton *mRefreshBtn = nullptr;
 
    void onIssuesReceived(const QVector<GitServer::Issue> &issues);
    void onPullRequestsReceived(const QVector<GitServer::PullRequest> &pr);
+   void createContent(QVector<IssueItem *> items);
    void onHeaderClicked();
+   void refreshData();
 
 private slots:
    void loadPage(int page = -1);

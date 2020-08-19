@@ -211,6 +211,14 @@ void GitHubRestApi::requestReviews(const PullRequest &pr)
    connect(reply, &QNetworkReply::finished, this, [this, pr]() { onReviewsReceived(pr); });
 }
 
+void GitHubRestApi::requestCommitsFromPR(const GitServer::PullRequest &pr)
+{
+   auto request = createRequest(mRepoEndpoint + QString("/pulls/%1/commits").arg(pr.number));
+   const auto reply = mManager->get(request);
+
+   connect(reply, &QNetworkReply::finished, this, [this, pr]() { onCommitsReceived(pr); });
+}
+
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
@@ -546,7 +554,7 @@ void GitHubRestApi::onPullRequestDetailsReceived(PullRequest pr)
 
       pr.commentsCount = prInfo["comments"].toInt();
       pr.reviewCommentsCount = prInfo["review_comments"].toInt();
-      pr.commits = prInfo["commits"].toInt();
+      pr.commitCount = prInfo["commits"].toInt();
       pr.additions = prInfo["aditions"].toInt();
       pr.deletions = prInfo["deletions"].toInt();
       pr.changedFiles = prInfo["changed_files"].toInt();
@@ -641,7 +649,55 @@ void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
          comments.append(std::move(c));
       }
 
-      pr.reviewComment = comments;
+      pr.reviewComment = std::move(comments);
+
+      emit pullRequestUpdated(pr);
+   }
+}
+
+void GitHubRestApi::onCommitsReceived(PullRequest pr)
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   QString errorStr;
+   const auto tmpDoc = validateData(reply, errorStr);
+
+   if (!tmpDoc.isEmpty())
+   {
+      QVector<Commit> commits;
+      const auto commitsArray = tmpDoc.array();
+
+      for (const auto &commitData : commitsArray)
+      {
+         Commit c;
+         c.url = commitData["html_url"].toString();
+         c.sha = commitData["sha"].toString();
+
+         GitServer::User sAuthor;
+         sAuthor.id = commitData["author"].toObject()["id"].toInt();
+         sAuthor.url = commitData["author"].toObject()["html_url"].toString();
+         sAuthor.name = commitData["author"].toObject()["login"].toString();
+         sAuthor.avatar = commitData["author"].toObject()["avatar_url"].toString();
+         sAuthor.type = commitData["author"].toObject()["type"].toString();
+
+         c.author = std::move(sAuthor);
+
+         GitServer::User sCommitter;
+         sCommitter.id = commitData["committer"].toObject()["id"].toInt();
+         sCommitter.url = commitData["committer"].toObject()["html_url"].toString();
+         sCommitter.name = commitData["committer"].toObject()["login"].toString();
+         sCommitter.avatar = commitData["committer"].toObject()["avatar_url"].toString();
+         sCommitter.type = commitData["committer"].toObject()["type"].toString();
+
+         c.commiter = std::move(sCommitter);
+
+         c.message = commitData["commit"].toObject()["message"].toString();
+         c.authorCommittedTimestamp
+             = commitData["commit"].toObject()["author"].toObject()["date"].toVariant().toDateTime();
+
+         commits.append(std::move(c));
+      }
+
+      pr.commits = std::move(commits);
 
       emit pullRequestUpdated(pr);
    }

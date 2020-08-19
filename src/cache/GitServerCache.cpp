@@ -141,6 +141,8 @@ void GitServerCache::initIssues(const QVector<Issue> &issues)
       mIssues.insert(issue.number, issue);
 
    triggerSignalConditionally();
+
+   emit issuesReceived();
 }
 
 void GitServerCache::initPullRequests(const QVector<PullRequest> &prs)
@@ -149,6 +151,8 @@ void GitServerCache::initPullRequests(const QVector<PullRequest> &prs)
       mPullRequests.insert(pr.number, pr);
 
    triggerSignalConditionally();
+
+   emit prReceived();
 }
 
 void GitServerCache::triggerSignalConditionally()

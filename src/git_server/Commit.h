@@ -23,20 +23,21 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QLabel>
+#include <User.h>
 
-class CircularPixmap : public QLabel
+#include <QDateTime>
+
+namespace GitServer
 {
-public:
-   explicit CircularPixmap(const QSize &size, QWidget *parent = nullptr);
-   explicit CircularPixmap(const QString &filePath, QWidget *parent = nullptr);
 
-   void setCentered(bool centered) { mCenterPosition = centered; }
-
-protected:
-   void paintEvent(QPaintEvent *e) override;
-
-private:
-   QSize mSize;
-   bool mCenterPosition = false;
+struct Commit
+{
+   QString sha;
+   QString url;
+   QString message;
+   User commiter;
+   User author;
+   QDateTime authorCommittedTimestamp;
 };
+
+}

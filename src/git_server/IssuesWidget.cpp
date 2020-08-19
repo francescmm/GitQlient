@@ -3,6 +3,7 @@
 #include <GitServerCache.h>
 #include <IssueItem.h>
 #include <ClickableFrame.h>
+#include <IRestApi.h>
 
 #include <QVBoxLayout>
 #include <QLabel>
@@ -10,6 +11,7 @@
 #include <QScrollArea>
 #include <QTimer>
 #include <QSpinBox>
+#include <QToolButton>
 
 using namespace GitServer;
 
@@ -33,11 +35,20 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache,
 
    mArrow->setPixmap(QIcon(":/icons/arrow_up").pixmap(QSize(15, 15)));
 
+   mRefreshBtn = new QToolButton();
+   mRefreshBtn->setIcon(QIcon(":/icons/refresh"));
+   mRefreshBtn->setObjectName("ViewBtnOption");
+   mRefreshBtn->setToolTip(tr("Refresh"));
+   mRefreshBtn->setDisabled(true);
+   connect(mRefreshBtn, &QToolButton::clicked, this, &IssuesWidget::refreshData);
+
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
    headerLayout->setSpacing(0);
    headerLayout->addWidget(headerTitle);
    headerLayout->addStretch();
+   headerLayout->addWidget(mRefreshBtn);
+   headerLayout->addSpacing(10);
    headerLayout->addWidget(mArrow);
 
    mIssuesLayout = new QVBoxLayout();
@@ -65,10 +76,20 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache,
    connect(timer, &QTimer::timeout, this, &IssuesWidget::loadData);
    timer->start(900000);
 
-   if (mConfig == Config::Issues)
-      onIssuesReceived(mGitServerCache->getIssues());
-   else
-      onPullRequestsReceived(mGitServerCache->getPullRequests());
+   connect(mGitServerCache.get(), &GitServerCache::issuesReceived, this, [this]() {
+      if (mConfig == Config::Issues)
+         onIssuesReceived(mGitServerCache->getIssues());
+   });
+
+   onIssuesReceived(mGitServerCache->getIssues());
+
+   connect(mGitServerCache.get(), &GitServerCache::prReceived, this, [this]() {
+      if (mConfig == Config::PullRequests)
+         onPullRequestsReceived(mGitServerCache->getPullRequests());
+   });
+
+   onPullRequestsReceived(mGitServerCache->getPullRequests());
+
    /*
    connect(mApi, &IRestApi::paginationPresent, this, [pagesSpinBox, pagesLabel](int current, int, int total) {
       if (total != 0)
@@ -91,85 +112,67 @@ void IssuesWidget::loadData()
 
 void IssuesWidget::onIssuesReceived(const QVector<Issue> &issues)
 {
-   delete mIssuesWidget;
-   delete mScrollArea;
-
-   mIssuesWidget = new QFrame();
-   mIssuesWidget->setObjectName("IssuesWidget");
-   mIssuesWidget->setStyleSheet("#IssuesWidget{"
-                                "background-color: #2E2F30;"
-                                "}");
-   const auto issuesLayout = new QVBoxLayout(mIssuesWidget);
-   issuesLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
-   issuesLayout->setContentsMargins(QMargins());
-   issuesLayout->setSpacing(0);
-
-   mScrollArea = new QScrollArea();
-   mScrollArea->setWidget(mIssuesWidget);
-   mScrollArea->setWidgetResizable(true);
-
-   mIssuesLayout->addWidget(mScrollArea);
-
-   auto totalIssues = issues.count();
-   auto count = 0;
+   QVector<IssueItem *> items;
 
    for (auto &issue : issues)
    {
       const auto issueItem = new IssueItem(issue);
       connect(issueItem, &IssueItem::selected, this, &IssuesWidget::selected);
-      issuesLayout->addWidget(issueItem);
-
-      if (count++ < totalIssues - 1)
-      {
-         const auto separator = new QFrame();
-         separator->setObjectName("orangeHSeparator");
-         issuesLayout->addWidget(separator);
-      }
+      items.append(issueItem);
    }
 
-   const auto icon = QIcon(mScrollArea->isVisible() ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
-   mArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-
-   setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+   createContent(items);
 }
 
 void IssuesWidget::onPullRequestsReceived(const QVector<PullRequest> &pr)
 {
+   QVector<IssueItem *> items;
+
+   for (auto &issue : pr)
+   {
+      const auto issueItem = new IssueItem(issue);
+      connect(issueItem, &IssueItem::selected, this, &IssuesWidget::selected);
+      items.append(issueItem);
+   }
+
+   createContent(items);
+}
+
+void IssuesWidget::createContent(QVector<IssueItem *> items)
+{
+   mRefreshBtn->setEnabled(true);
+
    delete mIssuesWidget;
    delete mScrollArea;
 
+   const auto issuesLayout = new QVBoxLayout();
+   issuesLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
+   issuesLayout->setContentsMargins(QMargins());
+   issuesLayout->setSpacing(0);
+
+   for (auto item : items)
+   {
+      issuesLayout->addWidget(item);
+
+      const auto separator = new QFrame();
+      separator->setObjectName("orangeHSeparator");
+      issuesLayout->addWidget(separator);
+   }
+
+   issuesLayout->addStretch();
+
    mIssuesWidget = new QFrame();
+   mIssuesWidget->setLayout(issuesLayout);
    mIssuesWidget->setObjectName("IssuesWidget");
    mIssuesWidget->setStyleSheet("#IssuesWidget{"
                                 "background-color: #2E2F30;"
                                 "}");
-   const auto issuesLayout = new QVBoxLayout(mIssuesWidget);
-   issuesLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
-   issuesLayout->setContentsMargins(QMargins());
-   issuesLayout->setSpacing(0);
 
    mScrollArea = new QScrollArea();
    mScrollArea->setWidget(mIssuesWidget);
    mScrollArea->setWidgetResizable(true);
 
    mIssuesLayout->addWidget(mScrollArea);
-
-   auto totalIssues = pr.count();
-   auto count = 0;
-
-   for (auto &issue : pr)
-   {
-      const auto issueItem = new IssueItem(issue);
-      connect(issueItem, &IssueItem::selected, this, &IssuesWidget::selected);
-      issuesLayout->addWidget(issueItem);
-
-      if (count++ < totalIssues - 1)
-      {
-         const auto separator = new QFrame();
-         separator->setObjectName("orangeHSeparator");
-         issuesLayout->addWidget(separator);
-      }
-   }
 
    const auto icon = QIcon(mScrollArea->isVisible() ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
    mArrow->setPixmap(icon.pixmap(QSize(15, 15)));
@@ -200,6 +203,14 @@ void IssuesWidget::onHeaderClicked()
       else
          setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
    }
+}
+
+void IssuesWidget::refreshData()
+{
+   if (mConfig == Config::Issues)
+      mGitServerCache->getApi()->requestIssues();
+   else if (mConfig == Config::PullRequests)
+      mGitServerCache->getApi()->requestPullRequests();
 }
 
 void IssuesWidget::loadPage(int)

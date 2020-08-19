@@ -50,6 +50,7 @@ public:
    void mergePullRequest(int, const QByteArray &) override { }
    void requestComments(const Issue &) override { }
    void requestReviews(const PullRequest &) override { }
+   void requestCommitsFromPR(const GitServer::PullRequest &) override { }
 
    QString getUserId() const { return mUserId; }
 

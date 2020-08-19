@@ -23,20 +23,35 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QLabel>
+#include <QFrame>
 
-class CircularPixmap : public QLabel
+class GitServerCache;
+class QLayout;
+class QLabel;
+class QNetworkAccessManager;
+class QScrollArea;
+
+namespace GitServer
+{
+struct PullRequest;
+struct Commit;
+}
+
+class PrCommitsList : public QFrame
 {
 public:
-   explicit CircularPixmap(const QSize &size, QWidget *parent = nullptr);
-   explicit CircularPixmap(const QString &filePath, QWidget *parent = nullptr);
+   explicit PrCommitsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
 
-   void setCentered(bool centered) { mCenterPosition = centered; }
-
-protected:
-   void paintEvent(QPaintEvent *e) override;
+   void loadData(int number);
 
 private:
-   QSize mSize;
-   bool mCenterPosition = false;
+   QSharedPointer<GitServerCache> mGitServerCache;
+   QNetworkAccessManager *mManager = nullptr;
+   QScrollArea *mScroll = nullptr;
+   int mPrNumber = -1;
+
+   void onCommitsReceived(const GitServer::PullRequest &pr);
+   QFrame *createBubbleForComment(const GitServer::Commit &commit);
+   QLabel *createAvatar(const QString &userName, const QString &avatarUrl) const;
+   void storeCreatorAvatar(QLabel *avatar, const QString &fileName) const;
 };
