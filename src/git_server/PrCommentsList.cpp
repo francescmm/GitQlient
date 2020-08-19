@@ -60,7 +60,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
 
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
-   creationLayout->setSpacing(0);
+   creationLayout->setSpacing(5);
 
    if (!mIssue.assignees.isEmpty())
    {
