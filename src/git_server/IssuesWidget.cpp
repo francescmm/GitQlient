@@ -65,10 +65,20 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache,
    connect(timer, &QTimer::timeout, this, &IssuesWidget::loadData);
    timer->start(900000);
 
-   if (mConfig == Config::Issues)
-      onIssuesReceived(mGitServerCache->getIssues());
-   else
-      onPullRequestsReceived(mGitServerCache->getPullRequests());
+   connect(mGitServerCache.get(), &GitServerCache::issuesReceived, this, [this]() {
+      if (mConfig == Config::Issues)
+         onIssuesReceived(mGitServerCache->getIssues());
+   });
+
+   onIssuesReceived(mGitServerCache->getIssues());
+
+   connect(mGitServerCache.get(), &GitServerCache::prReceived, this, [this]() {
+      if (mConfig == Config::PullRequests)
+         onPullRequestsReceived(mGitServerCache->getPullRequests());
+   });
+
+   onPullRequestsReceived(mGitServerCache->getPullRequests());
+
    /*
    connect(mApi, &IRestApi::paginationPresent, this, [pagesSpinBox, pagesLabel](int current, int, int total) {
       if (total != 0)

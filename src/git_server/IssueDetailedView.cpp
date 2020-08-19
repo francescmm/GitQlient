@@ -68,6 +68,8 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitSe
    headLine->addWidget(mTitleLabel);
    headLine->addWidget(mCreationLabel);
 
+   mCreationLabel->setVisible(false);
+
    const auto headerFrame = new QFrame();
    headerFrame->setObjectName("IssuesHeaderFrameBig");
    const auto headerLayout = new QHBoxLayout(headerFrame);
@@ -120,6 +122,7 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, const Issue &
 
    mCreationLabel->setText(QString("Created by <b>%1</b>%2").arg(mIssue.creator.name, whenText));
    mCreationLabel->setToolTip(issue.creation.toString(QLocale().dateTimeFormat(QLocale::ShortFormat)));
+   mCreationLabel->setVisible(true);
 
    mPrCommentsList->loadData(static_cast<PrCommentsList::Config>(config), issue);
 

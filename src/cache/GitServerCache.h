@@ -46,7 +46,9 @@ class GitServerCache : public QObject
 signals:
    void connectionTested();
    void issueUpdated(const GitServer::Issue &issue);
+   void issuesReceived();
    void prUpdated(const GitServer::PullRequest &pr);
+   void prReceived();
    void errorOccurred(const QString &error);
 
 public:

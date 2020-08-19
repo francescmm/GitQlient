@@ -77,9 +77,9 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
          if (count++ < totalAssignees - 1)
             creationLayout->addWidget(new QLabel(", "));
       }
-
-      creationLayout->addStretch();
    }
+
+   creationLayout->addStretch();
 
    for (auto &label : mIssue.labels)
    {
