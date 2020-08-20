@@ -16,7 +16,8 @@ HEADERS += \
    $$PWD/MergePullRequestDlg.h \
     $$PWD/PrCommentsList.h \
    $$PWD/PrCommitsList.h \
-   $$PWD/ServerConfigDlg.h \
+   $$PWD/ServerConfigDlg.h \ \
+   $$PWD/SourceCodeReview.h
 
 SOURCES += \
    $$PWD/CircularPixmap.cpp \
@@ -28,4 +29,5 @@ SOURCES += \
    $$PWD/MergePullRequestDlg.cpp \
    $$PWD/PrCommentsList.cpp \
    $$PWD/PrCommitsList.cpp \
-   $$PWD/ServerConfigDlg.cpp
+   $$PWD/ServerConfigDlg.cpp \
+   $$PWD/SourceCodeReview.cpp

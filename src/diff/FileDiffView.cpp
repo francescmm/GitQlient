@@ -122,7 +122,7 @@ void FileDiffView::moveScrollBarToPos(int value)
 int FileDiffView::lineNumberAreaWidth()
 {
    auto digits = 1;
-   auto max = std::max(1, blockCount());
+   auto max = std::max(1, blockCount() + mStartingLine);
 
    while (max >= 10)
    {
@@ -172,18 +172,27 @@ void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
    painter.fillRect(event->rect(), QColor(GitQlientStyles::getBackgroundColor()));
 
    auto block = firstVisibleBlock();
-   auto blockNumber = block.blockNumber();
+   auto blockNumber = block.blockNumber() + mStartingLine;
    auto top = blockBoundingGeometry(block).translated(contentOffset()).top();
    auto bottom = top + blockBoundingRect(block).height();
+   auto lineCorrection = 0;
 
    while (block.isValid() && top <= event->rect().bottom())
    {
+
       if (block.isVisible() && bottom >= event->rect().top())
       {
-         const auto number = QString::number(blockNumber + 1);
-         painter.setPen(GitQlientStyles::getTextColor());
-         painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - 3, fontMetrics().height(),
-                          Qt::AlignRight, number);
+         const auto skipDeletion = mUnified && !block.text().startsWith("-") && !block.text().startsWith("@");
+
+         if (!mUnified || skipDeletion)
+         {
+            const auto number = QString::number(blockNumber + 1 + lineCorrection);
+            painter.setPen(GitQlientStyles::getTextColor());
+            painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - 3, fontMetrics().height(),
+                             Qt::AlignRight, number);
+         }
+         else
+            --lineCorrection;
       }
 
       block = block.next();

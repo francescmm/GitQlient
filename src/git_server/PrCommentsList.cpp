@@ -4,6 +4,7 @@
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
 #include <CircularPixmap.h>
+#include <SourceCodeReview.h>
 
 #include <QNetworkAccessManager>
 #include <QVBoxLayout>
@@ -329,8 +330,7 @@ QLayout *PrCommentsList::createBubbleForCodeReviewComments(const GitServer::Code
    innerLayout->setSpacing(20);
    innerLayout->addLayout(creationLayout);
 
-   const auto code = new QLabel(QString("%1\n%2").arg(review.diff.file, review.diff.diff));
-   code->setWordWrap(true);
+   const auto code = new SourceCodeReview(review.diff.file, review.diff.diff, review.diff.line);
 
    innerLayout->addWidget(code);
    innerLayout->addLayout(commentsLayout);
