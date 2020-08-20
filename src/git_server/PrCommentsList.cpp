@@ -13,6 +13,7 @@
 #include <QFile>
 #include <QStandardPaths>
 #include <QNetworkReply>
+#include <QTextEdit>
 
 using namespace GitServer;
 

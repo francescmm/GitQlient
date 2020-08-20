@@ -26,6 +26,8 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
    , mCache(cache)
    , mGitServerCache(gitServerCache)
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    ui->setupUi(this);
 
    connect(mGitServerCache->getApi(), &IRestApi::pullRequestUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
