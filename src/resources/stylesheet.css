@@ -877,3 +877,19 @@ QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
    border-style: solid;
 }
 
+SourceCodeReview > FileDiffView
+{
+    border: none;
+    font-size: 11pt;
+}
+
+SourceCodeReview QLabel
+{
+    background: #2E2F30;
+    padding: 10px;
+    font-weight: bold;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #D89000;
+}
+

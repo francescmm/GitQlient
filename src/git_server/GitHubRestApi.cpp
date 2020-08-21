@@ -633,9 +633,17 @@ void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
          c.association = commentData["author_association"].toString();
          c.diff.diff = commentData["diff_hunk"].toString();
          c.diff.file = commentData["path"].toString();
-         // if (commentData["position"])
-         c.diff.line = commentData["position"].toInt();
-         c.diff.originalLine = commentData["original_position"].toInt();
+
+         if (commentData.toObject().contains("line"))
+            c.diff.line = commentData["line"].toInt();
+         else
+            c.diff.line = commentData["position"].toInt();
+
+         if (commentData.toObject().contains("original_line"))
+            c.diff.originalLine = commentData["original_line"].toInt();
+         else
+            c.diff.originalLine = commentData["original_position"].toInt();
+
          c.reviewId = commentData["pull_request_review_id"].toInt();
          c.replyToId = commentData["in_reply_to_id"].toInt();
 

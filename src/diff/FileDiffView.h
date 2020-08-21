@@ -106,6 +106,8 @@ public:
 
    void setUnifiedDiff(bool unified) { mUnified = unified; }
 
+   int getLineHeight() const;
+
 protected:
    /*!
     \brief Overloaded method to process the resize event. Used to set an updated geometry to the line number area.
