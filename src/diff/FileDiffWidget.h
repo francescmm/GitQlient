@@ -131,14 +131,6 @@ private:
    QStackedWidget *mViewStackedWidget = nullptr;
 
    /**
-    * @brief processDiff Process the diff to configure the navigation parameters.
-    * @param text
-    * @param newFileData
-    * @param oldFileData
-    */
-   void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
-                    QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);
-   /**
     * @brief moveChunkUp Moves to the previous diff chunk.
     */
    void moveChunkUp();

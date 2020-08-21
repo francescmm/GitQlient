@@ -11,7 +11,7 @@ class PrChangesList : public QFrame
 public:
    explicit PrChangesList(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
 
-   void loadData(const QString &headBranch, const QString &baseBranch);
+   void loadData(const QString &baseBranch, const QString &headBranch);
 
 private:
    QSharedPointer<GitBase> mGit;

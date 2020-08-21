@@ -34,6 +34,11 @@ GitExecResult GitHistory::history(const QString &file)
    return ret;
 }
 
+GitExecResult GitHistory::getBranchesDiff(const QString &base, const QString &head)
+{
+   return mGitBase->run(QString("git diff %1...%2").arg(base, head));
+}
+
 GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffToSha)
 {
 

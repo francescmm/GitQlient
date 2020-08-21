@@ -36,6 +36,7 @@ public:
 
    GitExecResult blame(const QString &file, const QString &commitFrom);
    GitExecResult history(const QString &file);
+   GitExecResult getBranchesDiff(const QString &base, const QString &head);
    GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
    QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
    GitExecResult getDiffFiles(const QString &sha, const QString &diffToSha);
