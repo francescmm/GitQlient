@@ -9,7 +9,7 @@ SourceCodeReview::SourceCodeReview(const QString &filePath, const QString &sourc
    : QFrame(parent)
 {
    auto lines = sourceCode.split("\n");
-   auto hunkDescription = lines.takeFirst();
+   const auto hunkDescription = lines.takeFirst();
    auto hunkRemoved = false;
 
    if (hunkDescription.split("@@", Qt::SkipEmptyParts).count() == 1)
@@ -44,9 +44,11 @@ SourceCodeReview::SourceCodeReview(const QString &filePath, const QString &sourc
    diff->setUnifiedDiff(true);
    diff->loadDiff(summary.trimmed());
    diff->setTextInteractionFlags(Qt::NoTextInteraction);
+   diff->setMinimumWidth(800);
+   diff->show();
 
-   const auto height = diff->getLineHeight();
-   diff->setFixedHeight(linesCount * height + linesCount + 1);
+   const auto height = diff->getHeight();
+   diff->setFixedHeight(height + 10);
 
    const auto mainLayout = new QVBoxLayout(this);
    mainLayout->setContentsMargins(QMargins());

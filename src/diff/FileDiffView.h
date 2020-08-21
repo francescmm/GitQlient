@@ -106,7 +106,7 @@ public:
 
    void setUnifiedDiff(bool unified) { mUnified = unified; }
 
-   int getLineHeight() const;
+   int getHeight() const;
 
 protected:
    /*!

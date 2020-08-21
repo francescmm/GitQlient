@@ -119,11 +119,18 @@ void FileDiffView::moveScrollBarToPos(int value)
                   .arg(objectName(), QString::number(value)));
 }
 
-int FileDiffView::getLineHeight() const
+int FileDiffView::getHeight() const
 {
-   const auto block = firstVisibleBlock();
+   auto block = firstVisibleBlock();
+   auto height = 0;
 
-   return blockBoundingRect(block).height();
+   while (block.isValid())
+   {
+      height += blockBoundingRect(block).height();
+      block = block.next();
+   }
+
+   return height;
 }
 
 int FileDiffView::lineNumberAreaWidth()
