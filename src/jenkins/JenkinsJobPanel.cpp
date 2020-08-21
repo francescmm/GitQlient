@@ -84,7 +84,7 @@ void JenkinsJobPanel::appendJobsData(const JenkinsJobBuildInfo &build)
 
    if (mTmpBuildsCounter == 0)
    {
-      for (const auto build : mRequestedJob.builds)
+      for (const auto &build : mRequestedJob.builds)
       {
          const auto btn = new QRadioButton(tr("%1 - %2").arg(build.number).arg(build.result));
          mBuilds.append(btn);

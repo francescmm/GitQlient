@@ -40,6 +40,11 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
    connect(mRepoFetcher, &RepoFetcher::signalViewsReceived, this, &JenkinsWidget::configureGeneralView);
 }
 
+void JenkinsWidget::reload() const
+{
+   mRepoFetcher->triggerFetch();
+}
+
 void JenkinsWidget::configureGeneralView(const QVector<JenkinsViewInfo> &views)
 {
    GitQlientSettings settings;

@@ -426,6 +426,7 @@ void GitQlientRepo::showGitServerView()
 
 void GitQlientRepo::showBuildSystemView()
 {
+   mJenkins->reload();
    mStackedLayout->setCurrentWidget(mJenkins);
    mControls->toggleButton(ControlsMainViews::BuildSystem);
 }

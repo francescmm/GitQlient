@@ -22,6 +22,8 @@ public:
    JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    ~JenkinsWidget() override = default;
 
+   void reload() const;
+
 private:
    QSharedPointer<GitBase> mGit;
    IFetcher::Config mConfig;

@@ -17,7 +17,6 @@ RepoFetcher::RepoFetcher(const IFetcher::Config &config, const QString &url, QOb
    : IFetcher(config, parent)
    , mUrl(url)
 {
-   triggerFetch();
 }
 
 void RepoFetcher::triggerFetch()
