@@ -34,6 +34,8 @@ class QButtonGroup;
 class PrCommentsList;
 class PrCommitsList;
 class QStackedLayout;
+class GitBase;
+class PrChangesList;
 
 namespace GitServer
 {
@@ -52,7 +54,8 @@ public:
       Issues,
       PullRequests
    };
-   explicit IssueDetailedView(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+   explicit IssueDetailedView(const QSharedPointer<GitBase> &git, const QSharedPointer<GitServerCache> &gitServerCache,
+                              QWidget *parent = nullptr);
    ~IssueDetailedView();
 
    void loadData(Config config, const GitServer::Issue &issue);
@@ -65,12 +68,15 @@ private:
       Commits
    };
 
+   QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitServerCache> mGitServerCache;
    GitServer::Issue mIssue;
    QButtonGroup *mBtnGroup = nullptr;
    QLabel *mTitleLabel = nullptr;
    QLabel *mCreationLabel = nullptr;
    QStackedLayout *mStackedLayout = nullptr;
    PrCommentsList *mPrCommentsList = nullptr;
+   PrChangesList *mPrChangesList = nullptr;
    PrCommitsList *mPrCommitsList = nullptr;
 
 private slots:

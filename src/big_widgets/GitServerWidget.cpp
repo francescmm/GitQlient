@@ -79,7 +79,7 @@ void GitServerWidget::createWidget()
    centralLayout->addLayout(buttonsLayout, 0, 0, 1, 2);
    centralLayout->addWidget(separator, 1, 0, 1, 2);
 
-   const auto detailedView = new IssueDetailedView(mGitServerCache);
+   const auto detailedView = new IssueDetailedView(mGit, mGitServerCache);
 
    const auto issues = new IssuesWidget(mGitServerCache, IssuesWidget::Config::Issues);
    connect(issues, &IssuesWidget::selected, detailedView,

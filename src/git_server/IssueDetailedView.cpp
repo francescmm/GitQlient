@@ -6,6 +6,7 @@
 #include <IRestApi.h>
 #include <Issue.h>
 #include <PrCommitsList.h>
+#include <PrChangesList.h>
 #include <PrCommentsList.h>
 
 #include <QLocale>
@@ -16,12 +17,18 @@
 
 using namespace GitServer;
 
-IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
+IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
+                                     const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
+   , mGit(git)
+   , mGitServerCache(gitServerCache)
    , mBtnGroup(new QButtonGroup())
    , mTitleLabel(new QLabel())
    , mCreationLabel(new QLabel())
-   , mPrCommentsList(new PrCommentsList(gitServerCache))
+   , mPrCommentsList(new PrCommentsList(mGitServerCache))
+   , mPrChangesList(new PrChangesList(mGit))
+   , mPrCommitsList(new PrCommitsList(mGitServerCache))
+
 {
    mTitleLabel->setText(tr("Detailed View"));
    mTitleLabel->setObjectName("HeaderTitle");
@@ -86,12 +93,11 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitServerCache> &gitSe
    const auto footerFrame = new QFrame();
    footerFrame->setObjectName("IssuesFooterFrame");
 
-   mPrCommitsList = new PrCommitsList(gitServerCache);
    mPrCommitsList->setVisible(false);
 
    mStackedLayout = new QStackedLayout();
    mStackedLayout->insertWidget(static_cast<int>(Buttons::Comments), mPrCommentsList);
-   mStackedLayout->insertWidget(static_cast<int>(Buttons::Changes), new QFrame());
+   mStackedLayout->insertWidget(static_cast<int>(Buttons::Changes), mPrChangesList);
    mStackedLayout->insertWidget(static_cast<int>(Buttons::Commits), mPrCommitsList);
    mStackedLayout->setCurrentWidget(mPrCommentsList);
 
@@ -126,7 +132,16 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, const Issue &
 
    mPrCommentsList->loadData(static_cast<PrCommentsList::Config>(config), issue);
 
+   if (config == Config::PullRequests)
+   {
+      mPrCommitsList->loadData(mIssue.number);
+
+      const auto pr = mGitServerCache->getPullRequest(issue.number);
+      mPrChangesList->loadData(pr.head, pr.base);
+   }
+
    mBtnGroup->button(static_cast<int>(Buttons::Commits))->setEnabled(config == Config::PullRequests);
+   mBtnGroup->button(static_cast<int>(Buttons::Changes))->setEnabled(config == Config::PullRequests);
    mBtnGroup->button(static_cast<int>(Buttons::Comments))->setEnabled(true);
 }
 
@@ -135,7 +150,7 @@ void IssueDetailedView::showView(int view)
    switch (static_cast<Buttons>(view))
    {
       case Buttons::Commits:
-         mPrCommitsList->loadData(mIssue.number);
+
          break;
       default:
          break;
