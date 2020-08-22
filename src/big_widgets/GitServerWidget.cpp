@@ -72,8 +72,7 @@ void GitServerWidget::createWidget()
    const auto separator = new QFrame();
    separator->setObjectName("orangeHSeparator");
 
-   const auto centralFrame = new QFrame();
-   const auto centralLayout = new QGridLayout(centralFrame);
+   const auto centralLayout = new QGridLayout();
    centralLayout->setContentsMargins(QMargins());
    centralLayout->setSpacing(10);
    centralLayout->addLayout(buttonsLayout, 0, 0, 1, 2);
@@ -107,23 +106,15 @@ void GitServerWidget::createWidget()
    detailsLayout->addWidget(detailedView);
 
    centralLayout->setColumnStretch(0, 1);
-   centralLayout->setColumnStretch(1, 2);
+   centralLayout->setColumnStretch(1, 3);
    centralLayout->addLayout(issuesLayout, 2, 0);
    centralLayout->addLayout(detailsLayout, 2, 1);
 
    issues->loadData();
    pullRequests->loadData();
 
-   const auto mainLayout = new QGridLayout();
-   mainLayout->setColumnStretch(0, 1);
-   mainLayout->setColumnStretch(1, 8);
-   mainLayout->setColumnStretch(2, 1);
-   mainLayout->setContentsMargins(QMargins());
-   mainLayout->setSpacing(0);
-   mainLayout->addWidget(centralFrame, 0, 1);
-
    delete layout();
-   setLayout(mainLayout);
+   setLayout(centralLayout);
 }
 
 void GitServerWidget::createNewIssue()

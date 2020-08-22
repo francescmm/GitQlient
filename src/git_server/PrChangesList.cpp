@@ -42,13 +42,13 @@ void PrChangesList::loadData(const QString &baseBranch, const QString &headBranc
             const auto oldFile = new FileDiffView();
             oldFile->show();
             oldFile->setMinimumHeight(oldFile->getHeight());
-            oldFile->setStartingLine(change.oldFileStartLine);
+            oldFile->setStartingLine(change.oldFileStartLine - 1);
             oldFile->loadDiff(change.oldData.first.join("\n"), change.oldData.second);
 
             const auto newFile = new FileDiffView();
             newFile->show();
             newFile->setMinimumHeight(oldFile->getHeight());
-            newFile->setStartingLine(change.newFileStartLine);
+            newFile->setStartingLine(change.newFileStartLine - 1);
             newFile->loadDiff(change.newData.first.join("\n"), change.newData.second);
 
             mainLayout->addWidget(oldFile, row, 0);

@@ -135,7 +135,7 @@ int FileDiffView::getHeight() const
 
 int FileDiffView::lineNumberAreaWidth()
 {
-   auto digits = 1;
+   auto digits = 4;
    auto max = std::max(1, blockCount() + mStartingLine);
 
    while (max >= 10)
@@ -152,7 +152,7 @@ int FileDiffView::lineNumberAreaWidth()
    width = fontMetrics().boundingRect(QLatin1Char('9')).width();
 #endif
 
-   return 8 + width * digits;
+   return width * digits;
 }
 
 void FileDiffView::updateLineNumberAreaWidth(int /* newBlockCount */)
@@ -191,6 +191,13 @@ void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
    auto bottom = top + blockBoundingRect(block).height();
    auto lineCorrection = 0;
 
+   auto offset = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+   offset = fontMetrics().horizontalAdvance(QLatin1Char(' '));
+#else
+   offset = fontMetrics().boundingRect(QLatin1Char(' ')).width();
+#endif
+
    while (block.isValid() && top <= event->rect().bottom())
    {
 
@@ -202,8 +209,11 @@ void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
          {
             const auto number = QString::number(blockNumber + 1 + lineCorrection);
             painter.setPen(GitQlientStyles::getTextColor());
-            painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - 3, fontMetrics().height(),
+            painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - offset, fontMetrics().height(),
                              Qt::AlignRight, number);
+
+            painter.drawLine(mLineNumberArea->width() - 1, event->rect().y(), mLineNumberArea->width() - 1,
+                             event->rect().height());
          }
          else
             --lineCorrection;

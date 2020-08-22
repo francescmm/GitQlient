@@ -106,6 +106,10 @@ public:
 
    void setUnifiedDiff(bool unified) { mUnified = unified; }
 
+   /**
+    * @brief getHeight Gets the approximated height of the widget based on the text of the QTextDocument.
+    * @return The height.
+    */
    int getHeight() const;
 
 protected:
