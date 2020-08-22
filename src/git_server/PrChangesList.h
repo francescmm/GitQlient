@@ -3,6 +3,7 @@
 #include <QFrame>
 
 class GitBase;
+class FileDiffView;
 
 class PrChangesList : public QFrame
 {
@@ -15,4 +16,6 @@ public:
 
 private:
    QSharedPointer<GitBase> mGit;
+   FileDiffView *mOldFile = nullptr;
+   FileDiffView *mNewFile = nullptr;
 };

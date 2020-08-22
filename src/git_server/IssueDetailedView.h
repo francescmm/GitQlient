@@ -58,7 +58,7 @@ public:
                               QWidget *parent = nullptr);
    ~IssueDetailedView();
 
-   void loadData(Config config, const GitServer::Issue &issue);
+   void loadData(Config config, int issueNum);
 
 private:
    enum class Buttons
@@ -70,7 +70,7 @@ private:
 
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitServerCache> mGitServerCache;
-   GitServer::Issue mIssue;
+   int mIssueNumber = 0;
    QButtonGroup *mBtnGroup = nullptr;
    QLabel *mTitleLabel = nullptr;
    QLabel *mCreationLabel = nullptr;

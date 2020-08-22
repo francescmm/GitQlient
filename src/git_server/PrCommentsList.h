@@ -54,7 +54,7 @@ public:
 
    explicit PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
 
-   void loadData(Config config, const GitServer::Issue &issue);
+   void loadData(Config config, int issueNumber);
 
 private:
    QSharedPointer<GitServerCache> mGitServerCache;
@@ -62,7 +62,6 @@ private:
    QVBoxLayout *mIssuesLayout = nullptr;
    QFrame *mIssuesFrame = nullptr;
    Config mConfig;
-   GitServer::Issue mIssue;
    QScrollArea *mScroll = nullptr;
    bool mLoaded = false;
    int mIssueNumber = -1;

@@ -114,9 +114,12 @@ IssueDetailedView::~IssueDetailedView()
    delete mBtnGroup;
 }
 
-void IssueDetailedView::loadData(IssueDetailedView::Config config, const Issue &issue)
+void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum)
 {
-   mIssue = issue;
+   mIssueNumber = issueNum;
+
+   auto issue
+       = config == Config::Issues ? mGitServerCache->getIssue(issueNum) : mGitServerCache->getPullRequest(issueNum);
 
    const auto title = issue.title.count() >= 40 ? issue.title.left(40).append("...") : issue.title;
    mTitleLabel->setText(QString("#%1 - %2").arg(issue.number).arg(title));
@@ -126,15 +129,15 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, const Issue &
        ? days != 0 ? QString::fromUtf8(" %1 days ago").arg(days) : QString::fromUtf8(" today")
        : QString(" on %1").arg(issue.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
-   mCreationLabel->setText(QString("Created by <b>%1</b>%2").arg(mIssue.creator.name, whenText));
+   mCreationLabel->setText(QString("Created by <b>%1</b>%2").arg(issue.creator.name, whenText));
    mCreationLabel->setToolTip(issue.creation.toString(QLocale().dateTimeFormat(QLocale::ShortFormat)));
    mCreationLabel->setVisible(true);
 
-   mPrCommentsList->loadData(static_cast<PrCommentsList::Config>(config), issue);
+   mPrCommentsList->loadData(static_cast<PrCommentsList::Config>(config), issueNum);
 
    if (config == Config::PullRequests)
    {
-      mPrCommitsList->loadData(mIssue.number);
+      mPrCommitsList->loadData(issue.number);
 
       const auto pr = mGitServerCache->getPullRequest(issue.number);
       mPrChangesList->loadData(pr.base, pr.head);

@@ -26,7 +26,7 @@ PrCommentsList::PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCa
    setObjectName("IssuesViewFrame");
 }
 
-void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Issue &issue)
+void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
 {
    connect(mGitServerCache.get(), &GitServerCache::issueUpdated, this, &PrCommentsList::processComments,
            Qt::UniqueConnection);
@@ -34,7 +34,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
            Qt::UniqueConnection);
 
    mConfig = config;
-   mIssueNumber = issue.number;
+   mIssueNumber = issueNumber;
 
    delete mIssuesFrame;
    delete mScroll;
@@ -58,19 +58,20 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
    aLayout->setSpacing(0);
    aLayout->addWidget(mScroll);
 
-   mIssue = issue;
-
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
    creationLayout->setSpacing(5);
 
-   if (!mIssue.assignees.isEmpty())
+   auto issue = config == Config::Issues ? mGitServerCache->getIssue(mIssueNumber)
+                                         : mGitServerCache->getPullRequest(mIssueNumber);
+
+   if (!issue.assignees.isEmpty())
    {
       creationLayout->addWidget(new QLabel(tr("Assigned to ")));
 
       auto count = 0;
-      const auto totalAssignees = mIssue.assignees.count();
-      for (auto &assignee : mIssue.assignees)
+      const auto totalAssignees = issue.assignees.count();
+      for (auto &assignee : issue.assignees)
       {
          const auto assigneLabel = new QLabel(QString("<b>%1</b>").arg(assignee.name));
          assigneLabel->setObjectName("CreatorLink");
@@ -83,7 +84,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
 
    creationLayout->addStretch();
 
-   for (auto &label : mIssue.labels)
+   for (auto &label : issue.labels)
    {
       auto labelWidget = new QLabel();
       labelWidget->setStyleSheet(QString("QLabel {"
@@ -98,9 +99,9 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
       creationLayout->addWidget(labelWidget);
    }
 
-   if (!mIssue.milestone.title.isEmpty())
+   if (!issue.milestone.title.isEmpty())
    {
-      const auto milestone = new QLabel(QString("%1").arg(mIssue.milestone.title));
+      const auto milestone = new QLabel(QString("%1").arg(issue.milestone.title));
       milestone->setObjectName("IssueLabel");
       creationLayout->addWidget(milestone);
    }
@@ -115,7 +116,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    const auto body = new QTextEdit();
-   body->setMarkdown(QString::fromUtf8(mIssue.body));
+   body->setMarkdown(QString::fromUtf8(issue.body));
    body->setReadOnly(true);
    body->show();
    const auto height = body->document()->size().height();
@@ -131,7 +132,10 @@ void PrCommentsList::loadData(PrCommentsList::Config config, const GitServer::Is
    if (mConfig == Config::Issues)
       mGitServerCache->getApi()->requestComments(issue);
    else
-      mGitServerCache->getApi()->requestReviews(issue);
+   {
+      const auto pr = mGitServerCache->getPullRequest(mIssueNumber);
+      mGitServerCache->getApi()->requestReviews(static_cast<PullRequest>(pr));
+   }
 }
 
 void PrCommentsList::processComments(const Issue &issue)
@@ -403,7 +407,7 @@ void PrCommentsList::onReviewsReceived(const PullRequest &pr)
    if (mIssueNumber != pr.number)
       return;
 
-   disconnect(mGitServerCache.get(), &GitServerCache::prUpdated, this, &PrCommentsList::onReviewsReceived);
+   // disconnect(mGitServerCache.get(), &GitServerCache::prUpdated, this, &PrCommentsList::onReviewsReceived);
 
    QMultiMap<QDateTime, QLayout *> bubblesMap;
 

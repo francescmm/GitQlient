@@ -39,7 +39,7 @@ class IssueItem : public QFrame
    Q_OBJECT
 
 signals:
-   void selected(const GitServer::Issue &issue);
+   void selected(int issueNum);
 
 public:
    IssueItem(const GitServer::Issue &issueData, QWidget *parent = nullptr);

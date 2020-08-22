@@ -34,10 +34,24 @@ namespace DiffHelper
 struct DiffChange
 {
    QString newFileName;
+   int newFileStartLine;
    QString oldFileName;
+   int oldFileStartLine;
    QString header;
    QString content;
+   QPair<QStringList, QVector<DiffInfo::ChunkInfo>> oldData;
+   QPair<QStringList, QVector<DiffInfo::ChunkInfo>> newData;
 };
+
+inline void extractLinesFromHeader(QString header, int &startOldFile, int &startNewFile)
+{
+   header = header.split(" @@ ").first();
+   header.remove("@");
+   header = header.trimmed();
+   auto modifications = header.split(" ");
+   startOldFile = std::abs(modifications.first().split(",").first().toInt());
+   startNewFile = std::abs(modifications.last().split(",").first().toInt());
+}
 
 inline QVector<DiffChange> splitDiff(const QString &diff)
 {
@@ -77,16 +91,20 @@ inline QVector<DiffChange> splitDiff(const QString &diff)
          {
             if (line.startsWith("@@"))
             {
+               change.header = line;
+
                if (change.content.isEmpty())
-                  change.header = line;
+                  extractLinesFromHeader(change.header, change.oldFileStartLine, change.newFileStartLine);
                else
                {
                   changes.append(change);
                   change.content.clear();
+
+                  extractLinesFromHeader(change.header, change.oldFileStartLine, change.newFileStartLine);
                }
             }
             else
-               change.content.append(line);
+               change.content.append(line + "\n");
          }
 
          changes.append(change);

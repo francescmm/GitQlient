@@ -83,14 +83,14 @@ void GitServerWidget::createWidget()
 
    const auto issues = new IssuesWidget(mGitServerCache, IssuesWidget::Config::Issues);
    connect(issues, &IssuesWidget::selected, detailedView,
-           [config = IssueDetailedView::Config::Issues, detailedView](const GitServer::Issue &issue) {
-              detailedView->loadData(config, issue);
+           [config = IssueDetailedView::Config::Issues, detailedView](int issueNum) {
+              detailedView->loadData(config, issueNum);
            });
 
    const auto pullRequests = new IssuesWidget(mGitServerCache, IssuesWidget::Config::PullRequests);
    connect(pullRequests, &IssuesWidget::selected, detailedView,
-           [config = IssueDetailedView::Config::PullRequests, detailedView](const GitServer::Issue &issue) {
-              detailedView->loadData(config, issue);
+           [config = IssueDetailedView::Config::PullRequests, detailedView](int issueNum) {
+              detailedView->loadData(config, issueNum);
            });
 
    const auto issuesLayout = new QVBoxLayout();
