@@ -12,7 +12,7 @@ using namespace GitServer;
 IssuesList::IssuesList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : AGitServerItemList(gitServerCache, parent)
 {
-   mHeaderIconLabel->setPixmap(QIcon(":/icons/new_issue").pixmap(QSize(15, 15)));
+   mHeaderIconLabel->setPixmap(QIcon(":/icons/issues").pixmap(QSize(15, 15)));
    mHeaderTitle->setText("Issues");
 
    connect(mGitServerCache.get(), &GitServerCache::issuesReceived, this,

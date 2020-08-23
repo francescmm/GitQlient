@@ -61,7 +61,7 @@ void GitServerWidget::createWidget()
    connect(newIssue, &QPushButton::clicked, this, &GitServerWidget::createNewIssue);
 
    const auto newPr = new QPushButton();
-   newPr->setIcon(QIcon(":/icons/pull_request"));
+   newPr->setIcon(QIcon(":/icons/new_pr"));
    newPr->setToolTip(tr("Create a new %1").arg(prLabel));
    connect(newPr, &QPushButton::clicked, this, &GitServerWidget::createNewPullRequest);
 
