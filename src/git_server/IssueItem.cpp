@@ -37,7 +37,7 @@ void IssueItem::fillWidget(const Issue &issueData)
    const auto title = new ButtonLink(QString("#%1 - %2").arg(issueData.number).arg(issueData.title));
    title->setWordWrap(true);
    title->setObjectName("IssueTitle");
-   connect(title, &ButtonLink::clicked, this, [this, issueData]() { emit selected(issueData); });
+   connect(title, &ButtonLink::clicked, this, [this, issueNum = issueData.number]() { emit selected(issueNum); });
 
    const auto titleLayout = new QHBoxLayout();
    titleLayout->setContentsMargins(QMargins());
@@ -76,7 +76,6 @@ void IssueItem::fillWidget(const Issue &issueData)
       auto labelWidget = new QLabel();
       labelWidget->setStyleSheet(QString("QLabel {"
                                          "background-color: #%1;"
-                                         "border-radius: 7px;"
                                          "min-height: 15px;"
                                          "max-height: 15px;"
                                          "min-width: 15px;"

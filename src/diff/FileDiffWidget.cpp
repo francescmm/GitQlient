@@ -9,6 +9,7 @@
 #include <CheckBox.h>
 #include <FileEditor.h>
 #include <GitLocal.h>
+#include <DiffHelper.h>
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -169,7 +170,7 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
       QPair<QStringList, QVector<DiffInfo::ChunkInfo>> oldData;
       QPair<QStringList, QVector<DiffInfo::ChunkInfo>> newData;
 
-      processDiff(text, newData, oldData);
+      mChunks = DiffHelper::processDiff(text, mFileVsFile, newData, oldData);
 
       mOldFile->blockSignals(true);
       mOldFile->loadDiff(oldData.first.join('\n'), oldData.second);
@@ -261,87 +262,6 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
 void FileDiffWidget::hideBackButton() const
 {
    mBack->setVisible(true);
-}
-
-void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
-                                 QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData)
-{
-   DiffInfo diff;
-   // int newFileVariation = 0;
-   int oldFileRow = 1;
-   int newFileRow = 1;
-   mChunks.clear();
-
-   const auto lines = text.split("\n");
-   for (auto line : lines)
-   {
-      if (mFileVsFile)
-      {
-         if (line.startsWith('-'))
-         {
-            line.remove(0, 1);
-
-            if (diff.oldFile.startLine == -1)
-               diff.oldFile.startLine = oldFileRow;
-
-            oldFileData.first.append(line);
-
-            ++oldFileRow;
-         }
-         else if (line.startsWith('+'))
-         {
-            line.remove(0, 1);
-
-            if (diff.newFile.startLine == -1)
-            {
-               diff.newFile.startLine = newFileRow;
-               diff.newFile.addition = true;
-            }
-
-            newFileData.first.append(line);
-
-            ++newFileRow;
-         }
-         else
-         {
-            line.remove(0, 1);
-
-            if (diff.oldFile.startLine != -1)
-               diff.oldFile.endLine = oldFileRow - 1;
-
-            if (diff.newFile.startLine != -1)
-               diff.newFile.endLine = newFileRow - 1;
-
-            if (diff.isValid())
-            {
-               if (diff.newFile.isValid())
-               {
-                  newFileData.second.append(diff.newFile);
-                  mChunks.append(diff.newFile);
-               }
-
-               if (diff.oldFile.isValid())
-               {
-                  oldFileData.second.append(diff.oldFile);
-                  mChunks.append(diff.oldFile);
-               }
-            }
-
-            oldFileData.first.append(line);
-            newFileData.first.append(line);
-
-            diff = DiffInfo();
-
-            ++oldFileRow;
-            ++newFileRow;
-         }
-      }
-      else
-      {
-         oldFileData.first.append(line);
-         newFileData.first.append(line);
-      }
-   }
 }
 
 void FileDiffWidget::moveChunkUp()

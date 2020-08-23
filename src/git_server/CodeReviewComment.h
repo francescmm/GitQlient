@@ -25,52 +25,18 @@
 
 #include <QFrame>
 
-class QVBoxLayout;
-class QScrollArea;
 class QLabel;
-class QSpinBox;
-class GitServerCache;
-class IssueItem;
-class QToolButton;
 
 namespace GitServer
 {
-struct Issue;
-struct PullRequest;
+struct CodeReview;
 }
 
-class IssuesWidget : public QFrame
+class CodeReviewComment : public QFrame
 {
-   Q_OBJECT
-signals:
-   void selected(const GitServer::Issue &issue);
-
 public:
-   enum class Config
-   {
-      Issues,
-      PullRequests
-   };
-   explicit IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache, Config config,
-                         QWidget *parent = nullptr);
-
-   void loadData();
+   explicit CodeReviewComment(const GitServer::CodeReview &review, QWidget *parent = nullptr);
 
 private:
-   QSharedPointer<GitServerCache> mGitServerCache;
-   Config mConfig;
-   QVBoxLayout *mIssuesLayout = nullptr;
-   QFrame *mIssuesWidget = nullptr;
-   QScrollArea *mScrollArea = nullptr;
-   QLabel *mArrow = nullptr;
-   QToolButton *mRefreshBtn = nullptr;
-
-   void onIssuesReceived(const QVector<GitServer::Issue> &issues);
-   void onPullRequestsReceived(const QVector<GitServer::PullRequest> &pr);
-   void createContent(QVector<IssueItem *> items);
-   void onHeaderClicked();
-   void refreshData();
-
-private slots:
-   void loadPage(int page = -1);
+   QLabel *createHeadline(const QDateTime &dt, const QString &prefix);
 };

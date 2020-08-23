@@ -87,6 +87,9 @@
         <file alias="commit">resources/icons/commit.svg</file>
         <file alias="add_comment">resources/icons/add_comment.svg</file>
         <file alias="changes">resources/icons/changes.svg</file>
+        <file alias="new_issue">resources/icons/new_issue.svg</file>
+        <file alias="issues">resources/icons/issues.svg</file>
+        <file alias="new_pr">resources/icons/new_pull_request.svg</file>
         <file alias="build_system">resources/icons/build_system.svg</file>
         <file alias="yellow">resources/icons/yellow.svg</file>
         <file alias="red">resources/icons/red.svg</file>

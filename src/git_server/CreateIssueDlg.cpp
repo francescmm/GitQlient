@@ -17,6 +17,8 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCa
    , ui(new Ui::CreateIssueDlg)
    , mGitServerCache(gitServerCache)
 {
+   setAttribute(Qt::WA_DeleteOnClose);
+
    ui->setupUi(this);
 
    connect(mGitServerCache->getApi(), &IRestApi::issueUpdated, this, &CreateIssueDlg::onIssueCreated);

@@ -1,4 +1,4 @@
-#include <IssuesWidget.h>
+#include <AGitServerItemList.h>
 
 #include <GitServerCache.h>
 #include <IssueItem.h>
@@ -15,10 +15,11 @@
 
 using namespace GitServer;
 
-IssuesWidget::IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache, Config config, QWidget *parent)
+AGitServerItemList::AGitServerItemList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
    , mGitServerCache(gitServerCache)
-   , mConfig(config)
+   , mHeaderIconLabel(new QLabel())
+   , mHeaderTitle(new QLabel())
    , mArrow(new QLabel())
 {
    const auto pagesSpinBox = new QSpinBox(this);
@@ -26,29 +27,21 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache,
 
    const auto pagesLabel = new QLabel(tr("Page: "));
 
-   const auto headerTitle = new QLabel(mConfig == Config::Issues ? tr("Issues") : tr("Pull Requests"));
-   headerTitle->setObjectName("HeaderTitle");
+   mHeaderTitle->setObjectName("HeaderTitle");
 
    const auto headerFrame = new ClickableFrame();
    headerFrame->setObjectName("IssuesHeaderFrame");
-   connect(headerFrame, &ClickableFrame::clicked, this, &IssuesWidget::onHeaderClicked);
+   connect(headerFrame, &ClickableFrame::clicked, this, &AGitServerItemList::onHeaderClicked);
 
    mArrow->setPixmap(QIcon(":/icons/arrow_up").pixmap(QSize(15, 15)));
-
-   mRefreshBtn = new QToolButton();
-   mRefreshBtn->setIcon(QIcon(":/icons/refresh"));
-   mRefreshBtn->setObjectName("ViewBtnOption");
-   mRefreshBtn->setToolTip(tr("Refresh"));
-   mRefreshBtn->setDisabled(true);
-   connect(mRefreshBtn, &QToolButton::clicked, this, &IssuesWidget::refreshData);
 
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
    headerLayout->setSpacing(0);
-   headerLayout->addWidget(headerTitle);
-   headerLayout->addStretch();
-   headerLayout->addWidget(mRefreshBtn);
+   headerLayout->addWidget(mHeaderIconLabel);
    headerLayout->addSpacing(10);
+   headerLayout->addWidget(mHeaderTitle);
+   headerLayout->addStretch();
    headerLayout->addWidget(mArrow);
 
    mIssuesLayout = new QVBoxLayout();
@@ -73,22 +66,8 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache,
    issuesLayout->addWidget(footerFrame);
 
    const auto timer = new QTimer();
-   connect(timer, &QTimer::timeout, this, &IssuesWidget::loadData);
+   connect(timer, &QTimer::timeout, this, &AGitServerItemList::loadData);
    timer->start(900000);
-
-   connect(mGitServerCache.get(), &GitServerCache::issuesReceived, this, [this]() {
-      if (mConfig == Config::Issues)
-         onIssuesReceived(mGitServerCache->getIssues());
-   });
-
-   onIssuesReceived(mGitServerCache->getIssues());
-
-   connect(mGitServerCache.get(), &GitServerCache::prReceived, this, [this]() {
-      if (mConfig == Config::PullRequests)
-         onPullRequestsReceived(mGitServerCache->getPullRequests());
-   });
-
-   onPullRequestsReceived(mGitServerCache->getPullRequests());
 
    /*
    connect(mApi, &IRestApi::paginationPresent, this, [pagesSpinBox, pagesLabel](int current, int, int total) {
@@ -105,43 +84,13 @@ IssuesWidget::IssuesWidget(const QSharedPointer<GitServerCache> &gitServerCache,
 */
 }
 
-void IssuesWidget::loadData()
+void AGitServerItemList::loadData()
 {
    loadPage();
 }
 
-void IssuesWidget::onIssuesReceived(const QVector<Issue> &issues)
+void AGitServerItemList::createContent(QVector<IssueItem *> items)
 {
-   QVector<IssueItem *> items;
-
-   for (auto &issue : issues)
-   {
-      const auto issueItem = new IssueItem(issue);
-      connect(issueItem, &IssueItem::selected, this, &IssuesWidget::selected);
-      items.append(issueItem);
-   }
-
-   createContent(items);
-}
-
-void IssuesWidget::onPullRequestsReceived(const QVector<PullRequest> &pr)
-{
-   QVector<IssueItem *> items;
-
-   for (auto &issue : pr)
-   {
-      const auto issueItem = new IssueItem(issue);
-      connect(issueItem, &IssueItem::selected, this, &IssuesWidget::selected);
-      items.append(issueItem);
-   }
-
-   createContent(items);
-}
-
-void IssuesWidget::createContent(QVector<IssueItem *> items)
-{
-   mRefreshBtn->setEnabled(true);
-
    delete mIssuesWidget;
    delete mScrollArea;
 
@@ -180,7 +129,7 @@ void IssuesWidget::createContent(QVector<IssueItem *> items)
    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 }
 
-void IssuesWidget::onHeaderClicked()
+void AGitServerItemList::onHeaderClicked()
 {
    if (mScrollArea)
    {
@@ -205,15 +154,7 @@ void IssuesWidget::onHeaderClicked()
    }
 }
 
-void IssuesWidget::refreshData()
-{
-   if (mConfig == Config::Issues)
-      mGitServerCache->getApi()->requestIssues();
-   else if (mConfig == Config::PullRequests)
-      mGitServerCache->getApi()->requestPullRequests();
-}
-
-void IssuesWidget::loadPage(int)
+void AGitServerItemList::loadPage(int)
 {
    /*
    if (page == -1)

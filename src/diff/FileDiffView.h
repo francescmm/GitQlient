@@ -90,13 +90,27 @@ public:
     * @param text The text representing a diff
     * @return True if correctly loaded, otherwise false.
     */
-   void loadDiff(QString text, const QVector<DiffInfo::ChunkInfo> &fileDiffInfo);
+   void loadDiff(QString text, const QVector<DiffInfo::ChunkInfo> &fileDiffInfo = QVector<DiffInfo::ChunkInfo>());
 
    /**
     * @brief moveScrollBarToPos Moves the vertical scroll bar to the value defined in @p value.
     * @param value The new scroll bar value.
     */
    void moveScrollBarToPos(int value);
+
+   /**
+    * @brief setStartingLine Makes the widget start from the line @p lineNumber.
+    * @param lineNumber The starting line number.
+    */
+   void setStartingLine(int lineNumber) { mStartingLine = lineNumber; }
+
+   void setUnifiedDiff(bool unified) { mUnified = unified; }
+
+   /**
+    * @brief getHeight Gets the approximated height of the widget based on the text of the QTextDocument.
+    * @return The height.
+    */
+   int getHeight() const;
 
 protected:
    /*!
@@ -151,4 +165,6 @@ private:
 
    LineNumberArea *mLineNumberArea = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
+   int mStartingLine = 0;
+   bool mUnified = false;
 };

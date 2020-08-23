@@ -25,8 +25,13 @@
 
 #include <QFrame>
 
-class ButtonLink;
+class QVBoxLayout;
+class QScrollArea;
 class QLabel;
+class QSpinBox;
+class GitServerCache;
+class IssueItem;
+class QToolButton;
 
 namespace GitServer
 {
@@ -34,18 +39,33 @@ struct Issue;
 struct PullRequest;
 }
 
-class IssueItem : public QFrame
+class AGitServerItemList : public QFrame
 {
    Q_OBJECT
-
 signals:
    void selected(int issueNum);
 
 public:
-   IssueItem(const GitServer::Issue &issueData, QWidget *parent = nullptr);
-   IssueItem(const GitServer::PullRequest &issueData, QWidget *parent = nullptr);
+   explicit AGitServerItemList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+
+   virtual void refreshData() = 0;
+   void loadData();
+
+protected:
+   QSharedPointer<GitServerCache> mGitServerCache;
+   QLabel *mHeaderIconLabel = nullptr;
+   QLabel *mHeaderTitle = nullptr;
+
+   void createContent(QVector<IssueItem *> items);
 
 private:
-   QLabel *mComments = nullptr;
-   void fillWidget(const GitServer::Issue &issueData);
+   QVBoxLayout *mIssuesLayout = nullptr;
+   QFrame *mIssuesWidget = nullptr;
+   QScrollArea *mScrollArea = nullptr;
+   QLabel *mArrow = nullptr;
+
+   void onHeaderClicked();
+
+private slots:
+   void loadPage(int page = -1);
 };

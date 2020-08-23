@@ -733,12 +733,6 @@ QDialog > QPushButton
    padding-top: 10px;
 }
 
-QPushButton#NormalButton
-{
-   max-width: 150px;
-   min-width: 150px;
-}
-
 /* GitServerWidget */
 QScrollArea
 {
@@ -757,12 +751,7 @@ QScrollArea
 
 #IssuesHeaderFrame, #IssuesHeaderFrameBig
 {
-   max-height: 27px;
-   min-height: 27px;
    padding: 10px;
-   border-top: 1px solid #404142;
-   border-top-right-radius: 10px;
-   border-top-left-radius: 10px;
 }
 
 #IssuesHeaderFrameBig
@@ -780,8 +769,6 @@ QScrollArea
 #IssuesFooterFrame, #IssuesFooterFramePagination
 {
    border-bottom: 1px solid #404142;
-   border-bottom-right-radius: 10px;
-   border-bottom-left-radius: 10px;
 }
 
 #ButtonIssuesHeaderFrame
@@ -800,9 +787,8 @@ QScrollArea
 #HeaderTitle
 {
    font-variant: small-caps;
-   font-size: 16pt;
+   font-size: 12pt;
    font-weight: bold;
-   qproperty-alignment: AlignCenter;
 }
 
 /* IssueButton */
@@ -811,17 +797,10 @@ QScrollArea
    background-color: #2E2F30;
 }
 
-#IssueViewTitle
-{
-   padding: 0;
-   font-size: 18pt;
-   font-weight: bold;
-}
-
 ButtonLink#IssueTitle
 {
    padding: 0;
-   font-size: 12pt;
+   font-size: 11pt;
    font-weight: bold;
 }
 
@@ -877,6 +856,39 @@ QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
    border-style: solid;
 }
 
+PrChangesList FileDiffView
+{
+   border: 0;
+   background-color: #404142;
+}
+
+#PrChangeListItem
+{
+   border: 1px solid white;
+}
+
+#ChangeFileName
+{
+   padding: 10px;
+}
+
+SourceCodeReview > FileDiffView
+{
+    border: 0;
+    font-size: 11pt;
+}
+
+SourceCodeReview QLabel
+{
+    background: #2E2F30;
+    padding: 10px;
+    font-weight: bold;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #D89000;
+}
+
+/* JENKINS */
 #JobContainer
 {
    background: #2E2F30;

@@ -119,10 +119,24 @@ void FileDiffView::moveScrollBarToPos(int value)
                   .arg(objectName(), QString::number(value)));
 }
 
+int FileDiffView::getHeight() const
+{
+   auto block = firstVisibleBlock();
+   auto height = 0;
+
+   while (block.isValid())
+   {
+      height += blockBoundingRect(block).height();
+      block = block.next();
+   }
+
+   return height;
+}
+
 int FileDiffView::lineNumberAreaWidth()
 {
-   auto digits = 1;
-   auto max = std::max(1, blockCount());
+   auto digits = 4;
+   auto max = std::max(1, blockCount() + mStartingLine);
 
    while (max >= 10)
    {
@@ -138,7 +152,7 @@ int FileDiffView::lineNumberAreaWidth()
    width = fontMetrics().boundingRect(QLatin1Char('9')).width();
 #endif
 
-   return 8 + width * digits;
+   return width * digits;
 }
 
 void FileDiffView::updateLineNumberAreaWidth(int /* newBlockCount */)
@@ -172,18 +186,37 @@ void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
    painter.fillRect(event->rect(), QColor(GitQlientStyles::getBackgroundColor()));
 
    auto block = firstVisibleBlock();
-   auto blockNumber = block.blockNumber();
+   auto blockNumber = block.blockNumber() + mStartingLine;
    auto top = blockBoundingGeometry(block).translated(contentOffset()).top();
    auto bottom = top + blockBoundingRect(block).height();
+   auto lineCorrection = 0;
+
+   auto offset = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+   offset = fontMetrics().horizontalAdvance(QLatin1Char(' '));
+#else
+   offset = fontMetrics().boundingRect(QLatin1Char(' ')).width();
+#endif
 
    while (block.isValid() && top <= event->rect().bottom())
    {
+
       if (block.isVisible() && bottom >= event->rect().top())
       {
-         const auto number = QString::number(blockNumber + 1);
-         painter.setPen(GitQlientStyles::getTextColor());
-         painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - 3, fontMetrics().height(),
-                          Qt::AlignRight, number);
+         const auto skipDeletion = mUnified && !block.text().startsWith("-") && !block.text().startsWith("@");
+
+         if (!mUnified || skipDeletion)
+         {
+            const auto number = QString::number(blockNumber + 1 + lineCorrection);
+            painter.setPen(GitQlientStyles::getTextColor());
+            painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - offset, fontMetrics().height(),
+                             Qt::AlignRight, number);
+
+            painter.drawLine(mLineNumberArea->width() - 1, event->rect().y(), mLineNumberArea->width() - 1,
+                             event->rect().height());
+         }
+         else
+            --lineCorrection;
       }
 
       block = block.next();

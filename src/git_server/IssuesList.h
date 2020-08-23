@@ -23,29 +23,17 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QFrame>
+#include <AGitServerItemList.h>
 
-class ButtonLink;
-class QLabel;
-
-namespace GitServer
-{
-struct Issue;
-struct PullRequest;
-}
-
-class IssueItem : public QFrame
+class IssuesList : public AGitServerItemList
 {
    Q_OBJECT
 
-signals:
-   void selected(int issueNum);
-
 public:
-   IssueItem(const GitServer::Issue &issueData, QWidget *parent = nullptr);
-   IssueItem(const GitServer::PullRequest &issueData, QWidget *parent = nullptr);
+   explicit IssuesList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+
+   void refreshData() override;
 
 private:
-   QLabel *mComments = nullptr;
-   void fillWidget(const GitServer::Issue &issueData);
+   void onIssuesReceived(const QVector<GitServer::Issue> &issues);
 };

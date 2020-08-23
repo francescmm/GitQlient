@@ -5,6 +5,7 @@
 #include <GitLabRestApi.h>
 #include <CircularPixmap.h>
 #include <ButtonLink.hpp>
+#include <AvatarHelper.h>
 
 #include <QApplication>
 #include <QClipboard>
@@ -122,63 +123,4 @@ QFrame *PrCommitsList::createBubbleForComment(const GitServer::Commit &commit)
       layout->addWidget(createAvatar(commit.commiter.name, commit.commiter.avatar));
 
    return frame;
-}
-
-QLabel *PrCommitsList::createAvatar(const QString &userName, const QString &avatarUrl) const
-{
-   const auto fileName
-       = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), userName);
-   const auto avatar = new CircularPixmap(QSize(30, 30));
-   avatar->setObjectName("Avatar");
-   avatar->setCentered(true);
-
-   if (!QFile(fileName).exists())
-   {
-      QNetworkRequest request;
-      request.setUrl(avatarUrl);
-      const auto reply = mManager->get(request);
-      connect(reply, &QNetworkReply::finished, this,
-              [userName, this, avatar]() { storeCreatorAvatar(avatar, userName); });
-   }
-   else
-   {
-      QPixmap img(fileName);
-      if (!img.isNull())
-      {
-         img = img.scaled(30, 30, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-         avatar->setPixmap(img);
-      }
-   }
-
-   return avatar;
-}
-
-void PrCommitsList::storeCreatorAvatar(QLabel *avatar, const QString &fileName) const
-{
-   const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto data = reply->readAll();
-
-   QDir dir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
-   if (!dir.exists())
-      dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
-
-   QString path = dir.absolutePath() + "/" + fileName;
-   QFile file(path);
-   if (file.open(QIODevice::WriteOnly))
-   {
-      file.write(data);
-      file.close();
-
-      QPixmap img(path);
-
-      if (!img.isNull())
-      {
-         img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-         avatar->setPixmap(img);
-      }
-   }
-
-   reply->deleteLater();
 }
