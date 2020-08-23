@@ -32,7 +32,8 @@ class PrList : public AGitServerItemList
 public:
    explicit PrList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
 
-private:
    void refreshData() override;
+
+private:
    void onPullRequestsReceived(const QVector<GitServer::PullRequest> &pr);
 };

@@ -18,6 +18,7 @@ using namespace GitServer;
 AGitServerItemList::AGitServerItemList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
    , mGitServerCache(gitServerCache)
+   , mHeaderIconLabel(new QLabel())
    , mHeaderTitle(new QLabel())
    , mArrow(new QLabel())
 {
@@ -34,20 +35,13 @@ AGitServerItemList::AGitServerItemList(const QSharedPointer<GitServerCache> &git
 
    mArrow->setPixmap(QIcon(":/icons/arrow_up").pixmap(QSize(15, 15)));
 
-   mRefreshBtn = new QToolButton();
-   mRefreshBtn->setIcon(QIcon(":/icons/refresh"));
-   mRefreshBtn->setObjectName("ViewBtnOption");
-   mRefreshBtn->setToolTip(tr("Refresh"));
-   mRefreshBtn->setDisabled(true);
-   connect(mRefreshBtn, &QToolButton::clicked, this, &AGitServerItemList::refreshData);
-
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
    headerLayout->setSpacing(0);
+   headerLayout->addWidget(mHeaderIconLabel);
+   headerLayout->addSpacing(10);
    headerLayout->addWidget(mHeaderTitle);
    headerLayout->addStretch();
-   headerLayout->addWidget(mRefreshBtn);
-   headerLayout->addSpacing(10);
    headerLayout->addWidget(mArrow);
 
    mIssuesLayout = new QVBoxLayout();
@@ -97,8 +91,6 @@ void AGitServerItemList::loadData()
 
 void AGitServerItemList::createContent(QVector<IssueItem *> items)
 {
-   mRefreshBtn->setEnabled(true);
-
    delete mIssuesWidget;
    delete mScrollArea;
 

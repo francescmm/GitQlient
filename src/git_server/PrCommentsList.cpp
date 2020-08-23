@@ -154,11 +154,11 @@ void PrCommentsList::processComments(const Issue &issue)
    mIssuesLayout->addStretch();
 }
 
-QLabel *PrCommentsList::createAvatar(const QString &userName, const QString &avatarUrl) const
+QLabel *PrCommentsList::createAvatar(const QString &userName, const QString &avatarUrl, const QSize &avatarSize) const
 {
    const auto fileName
        = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), userName);
-   const auto avatar = new CircularPixmap(QSize(50, 50));
+   const auto avatar = new CircularPixmap(avatarSize);
    avatar->setObjectName("Avatar");
 
    if (!QFile(fileName).exists())
@@ -176,7 +176,7 @@ QLabel *PrCommentsList::createAvatar(const QString &userName, const QString &ava
 
       if (!img.isNull())
       {
-         img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+         img = img.scaled(avatarSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
          avatar->setPixmap(img);
       }
@@ -351,7 +351,7 @@ QLayout *PrCommentsList::createBubbleForCodeReviewComments(const GitServer::Code
 
 QLayout *PrCommentsList::createBubbleForCodeReviewInitial(const QVector<GitServer::CodeReview> &reviews)
 {
-   const auto layout = new QGridLayout();
+   const auto layout = new QHBoxLayout();
    layout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
    layout->setContentsMargins(QMargins());
    layout->setSpacing(20);
@@ -369,7 +369,8 @@ QLayout *PrCommentsList::createBubbleForCodeReviewInitial(const QVector<GitServe
       avatarLayout->setContentsMargins(QMargins());
       avatarLayout->setSpacing(0);
       avatarLayout->addStretch();
-      avatarLayout->addWidget(createAvatar(review.creator.name, review.creator.avatar));
+      avatarLayout->addWidget(createAvatar(review.creator.name, review.creator.avatar, QSize(20, 20)));
+      avatarLayout->addSpacing(5);
       avatarLayout->addWidget(creator);
       avatarLayout->addStretch();
 
@@ -393,8 +394,8 @@ QLayout *PrCommentsList::createBubbleForCodeReviewInitial(const QVector<GitServe
       innerLayout->setContentsMargins(10, 10, 10, 10);
       innerLayout->addWidget(body);
 
-      layout->addLayout(avatarLayout, row, 0);
-      layout->addWidget(frame, row, 1);
+      layout->addLayout(avatarLayout);
+      layout->addWidget(frame);
 
       ++row;
    }

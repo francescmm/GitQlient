@@ -32,7 +32,8 @@ class IssuesList : public AGitServerItemList
 public:
    explicit IssuesList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
 
-private:
    void refreshData() override;
+
+private:
    void onIssuesReceived(const QVector<GitServer::Issue> &issues);
 };

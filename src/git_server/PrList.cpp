@@ -5,12 +5,14 @@
 #include <GitServerCache.h>
 
 #include <QLabel>
+#include <QIcon>
 
 using namespace GitServer;
 
 PrList::PrList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : AGitServerItemList(gitServerCache, parent)
 {
+   mHeaderIconLabel->setPixmap(QIcon(":/icons/pull_request").pixmap(QSize(15, 15)));
    mHeaderTitle->setText("Pull Requests");
 
    connect(mGitServerCache.get(), &GitServerCache::prReceived, this,

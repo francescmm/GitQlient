@@ -87,6 +87,7 @@
         <file alias="commit">resources/icons/commit.svg</file>
         <file alias="add_comment">resources/icons/add_comment.svg</file>
         <file alias="changes">resources/icons/changes.svg</file>
+        <file alias="new_issue">resources/icons/new_issue.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

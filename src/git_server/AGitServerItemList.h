@@ -48,10 +48,12 @@ signals:
 public:
    explicit AGitServerItemList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
 
+   virtual void refreshData() = 0;
    void loadData();
 
 protected:
    QSharedPointer<GitServerCache> mGitServerCache;
+   QLabel *mHeaderIconLabel = nullptr;
    QLabel *mHeaderTitle = nullptr;
 
    void createContent(QVector<IssueItem *> items);
@@ -61,10 +63,8 @@ private:
    QFrame *mIssuesWidget = nullptr;
    QScrollArea *mScrollArea = nullptr;
    QLabel *mArrow = nullptr;
-   QToolButton *mRefreshBtn = nullptr;
 
    void onHeaderClicked();
-   virtual void refreshData() = 0;
 
 private slots:
    void loadPage(int page = -1);

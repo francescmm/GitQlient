@@ -67,7 +67,8 @@ private:
    int mIssueNumber = -1;
 
    void processComments(const GitServer::Issue &issue);
-   QLabel *createAvatar(const QString &userName, const QString &avatarUrl) const;
+   QLabel *createAvatar(const QString &userName, const QString &avatarUrl,
+                        const QSize &avatarSize = QSize(50, 50)) const;
    QLabel *createHeadline(const QDateTime &dt, const QString &prefix = QString());
    void storeCreatorAvatar(QLabel *avatar, const QString &fileName) const;
    QLayout *createBubbleForComment(const GitServer::Comment &comment);

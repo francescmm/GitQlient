@@ -52,32 +52,30 @@ bool GitServerWidget::configure(const GitServer::ConfigData &config)
 
 void GitServerWidget::createWidget()
 {
-   const auto prLabel
-       = mGitServerCache->getPlatform() == GitServer::Platform::GitHub ? "pull request" : "merge request";
+   const auto prLabel = QString::fromUtf8(
+       mGitServerCache->getPlatform() == GitServer::Platform::GitHub ? "pull request" : "merge request");
 
-   const auto newIssue = new QPushButton(tr("New issue"));
-   newIssue->setObjectName("NormalButton");
+   const auto newIssue = new QPushButton();
+   newIssue->setIcon(QIcon(":/icons/new_issue"));
+   newIssue->setToolTip("Create a new issue");
    connect(newIssue, &QPushButton::clicked, this, &GitServerWidget::createNewIssue);
 
-   const auto newPr = new QPushButton(tr("New %1").arg(QString::fromUtf8(prLabel)));
-   newPr->setObjectName("NormalButton");
+   const auto newPr = new QPushButton();
+   newPr->setIcon(QIcon(":/icons/pull_request"));
+   newPr->setToolTip(tr("Create a new %1").arg(prLabel));
    connect(newPr, &QPushButton::clicked, this, &GitServerWidget::createNewPullRequest);
+
+   const auto refresh = new QPushButton();
+   refresh->setIcon(QIcon(":/icons/refresh"));
+   refresh->setToolTip(tr("Refresh"));
 
    const auto buttonsLayout = new QHBoxLayout();
    buttonsLayout->setContentsMargins(QMargins());
    buttonsLayout->setSpacing(10);
-   buttonsLayout->addStretch();
    buttonsLayout->addWidget(newIssue);
    buttonsLayout->addWidget(newPr);
-
-   const auto separator = new QFrame();
-   separator->setObjectName("orangeHSeparator");
-
-   const auto centralLayout = new QGridLayout();
-   centralLayout->setContentsMargins(QMargins());
-   centralLayout->setSpacing(10);
-   centralLayout->addLayout(buttonsLayout, 0, 0, 1, 2);
-   centralLayout->addWidget(separator, 1, 0, 1, 2);
+   buttonsLayout->addWidget(refresh);
+   buttonsLayout->addStretch();
 
    const auto detailedView = new IssueDetailedView(mGit, mGitServerCache);
 
@@ -93,6 +91,11 @@ void GitServerWidget::createWidget()
               detailedView->loadData(config, issueNum);
            });
 
+   connect(refresh, &QPushButton::clicked, this, [issues, pullRequests]() {
+      issues->refreshData();
+      pullRequests->refreshData();
+   });
+
    const auto issuesLayout = new QVBoxLayout();
    issuesLayout->setContentsMargins(QMargins());
    issuesLayout->setSpacing(10);
@@ -106,6 +109,10 @@ void GitServerWidget::createWidget()
    detailsLayout->setAlignment(Qt::AlignTop);
    detailsLayout->addWidget(detailedView);
 
+   const auto centralLayout = new QGridLayout();
+   centralLayout->setContentsMargins(10, 10, 10, 10);
+   centralLayout->setSpacing(10);
+   centralLayout->addLayout(buttonsLayout, 0, 0, 1, 2);
    centralLayout->setColumnStretch(0, 1);
    centralLayout->setColumnStretch(1, 3);
    centralLayout->addLayout(issuesLayout, 2, 0);
