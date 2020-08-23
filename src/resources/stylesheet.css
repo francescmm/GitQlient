@@ -756,8 +756,8 @@ QScrollArea
 
 #IssuesHeaderFrameBig
 {
-    max-height: 30px;
-    min-height: 30px;
+    max-height: 40px;
+    min-height: 40px;
 }
 
 #IssuesFooterFrame
@@ -789,7 +789,6 @@ QScrollArea
    font-variant: small-caps;
    font-size: 12pt;
    font-weight: bold;
-   qproperty-alignment: AlignCenter;
 }
 
 /* IssueButton */
@@ -857,9 +856,26 @@ QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
    border-style: solid;
 }
 
+
+PrChangesList FileDiffView
+{
+   border: 0;
+   background-color: #404142;
+}
+
+#PrChangeListItem
+{
+   border: 1px solid white;
+}
+
+#ChangeFileName
+{
+   padding: 10px;
+}
+
 SourceCodeReview > FileDiffView
 {
-    border: none;
+    border: 0;
     font-size: 11pt;
 }
 

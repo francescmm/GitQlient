@@ -76,7 +76,6 @@ void IssueItem::fillWidget(const Issue &issueData)
       auto labelWidget = new QLabel();
       labelWidget->setStyleSheet(QString("QLabel {"
                                          "background-color: #%1;"
-                                         "border-radius: 7px;"
                                          "min-height: 15px;"
                                          "max-height: 15px;"
                                          "min-width: 15px;"

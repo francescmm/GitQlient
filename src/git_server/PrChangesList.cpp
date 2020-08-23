@@ -3,8 +3,10 @@
 #include <DiffHelper.h>
 #include <GitHistory.h>
 #include <FileDiffView.h>
+#include <PrChangeListItem.h>
 
 #include <QGridLayout>
+#include <QLabel>
 #include <QScrollArea>
 
 PrChangesList::PrChangesList(const QSharedPointer<GitBase> &git, QWidget *parent)
@@ -25,37 +27,19 @@ void PrChangesList::loadData(const QString &baseBranch, const QString &headBranc
    {
       auto diff = ret.output.toString();
       auto changes = DiffHelper::splitDiff(diff);
-      auto row = 0;
 
       if (!changes.isEmpty())
       {
          delete layout();
 
-         const auto mainLayout = new QGridLayout();
-         mainLayout->setContentsMargins(QMargins());
-         mainLayout->setSpacing(10);
+         const auto mainLayout = new QVBoxLayout();
+         mainLayout->setContentsMargins(10, 10, 10, 10);
+         mainLayout->setSpacing(0);
 
          for (auto &change : changes)
          {
-            DiffHelper::processDiff(change.content, true, change.newData, change.oldData);
-
-            const auto oldFile = new FileDiffView();
-            oldFile->show();
-            oldFile->setMinimumHeight(oldFile->getHeight());
-            oldFile->setStartingLine(change.oldFileStartLine - 1);
-            oldFile->loadDiff(change.oldData.first.join("\n"), change.oldData.second);
-
-            const auto newFile = new FileDiffView();
-            newFile->show();
-            newFile->setMinimumHeight(oldFile->getHeight());
-            newFile->setStartingLine(change.newFileStartLine - 1);
-            newFile->loadDiff(change.newData.first.join("\n"), change.newData.second);
-
-            mainLayout->addWidget(oldFile, row, 0);
-            mainLayout->addWidget(newFile, row, 1);
-            mainLayout->addItem(new QSpacerItem(1, 10, QSizePolicy::Fixed, QSizePolicy::Fixed), ++row, 0, 1, 2);
-
-            ++row;
+            mainLayout->addWidget(new PrChangeListItem(change));
+            mainLayout->addSpacing(10);
          }
 
          const auto mIssuesFrame = new QFrame();

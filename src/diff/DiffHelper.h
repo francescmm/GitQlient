@@ -67,8 +67,8 @@ inline QVector<DiffChange> splitDiff(const QString &diff)
 
          auto filesStr = lines.takeFirst();
          auto files = filesStr.trimmed().split(" ");
-         change.newFileName = files.constFirst();
-         change.oldFileName = files.constLast();
+         change.newFileName = files.first().remove("a/");
+         change.oldFileName = files.last().remove("b/");
 
          auto isA = lines.constFirst().startsWith("copy ") || lines.constFirst().startsWith("index ")
              || lines.constFirst().startsWith("new ");

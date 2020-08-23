@@ -15,6 +15,7 @@ HEADERS += \
    $$PWD/IssueItem.h \
    $$PWD/IssuesList.h \
    $$PWD/MergePullRequestDlg.h \
+   $$PWD/PrChangeListItem.h \
     $$PWD/PrChangesList.h \
     $$PWD/PrCommentsList.h \
    $$PWD/PrCommitsList.h \
@@ -31,6 +32,7 @@ SOURCES += \
    $$PWD/IssueItem.cpp \
    $$PWD/IssuesList.cpp \
    $$PWD/MergePullRequestDlg.cpp \
+   $$PWD/PrChangeListItem.cpp \
    $$PWD/PrChangesList.cpp \
    $$PWD/PrCommentsList.cpp \
    $$PWD/PrCommitsList.cpp \
