@@ -6,7 +6,8 @@
 #include <CreatePullRequestDlg.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
-#include <IssuesWidget.h>
+#include <IssuesList.h>
+#include <PrList.h>
 #include <IssueDetailedView.h>
 #include <Platform.h>
 #include <GitBase.h>
@@ -80,14 +81,14 @@ void GitServerWidget::createWidget()
 
    const auto detailedView = new IssueDetailedView(mGit, mGitServerCache);
 
-   const auto issues = new IssuesWidget(mGitServerCache, IssuesWidget::Config::Issues);
-   connect(issues, &IssuesWidget::selected, detailedView,
+   const auto issues = new IssuesList(mGitServerCache);
+   connect(issues, &AGitServerItemList::selected, detailedView,
            [config = IssueDetailedView::Config::Issues, detailedView](int issueNum) {
               detailedView->loadData(config, issueNum);
            });
 
-   const auto pullRequests = new IssuesWidget(mGitServerCache, IssuesWidget::Config::PullRequests);
-   connect(pullRequests, &IssuesWidget::selected, detailedView,
+   const auto pullRequests = new PrList(mGitServerCache);
+   connect(pullRequests, &AGitServerItemList::selected, detailedView,
            [config = IssueDetailedView::Config::PullRequests, detailedView](int issueNum) {
               detailedView->loadData(config, issueNum);
            });
