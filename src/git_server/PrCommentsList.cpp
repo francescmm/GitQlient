@@ -5,6 +5,8 @@
 #include <GitLabRestApi.h>
 #include <CircularPixmap.h>
 #include <SourceCodeReview.h>
+#include <AvatarHelper.h>
+#include <CodeReviewComment.h>
 
 #include <QNetworkAccessManager>
 #include <QVBoxLayout>
@@ -154,37 +156,6 @@ void PrCommentsList::processComments(const Issue &issue)
    mIssuesLayout->addStretch();
 }
 
-QLabel *PrCommentsList::createAvatar(const QString &userName, const QString &avatarUrl, const QSize &avatarSize) const
-{
-   const auto fileName
-       = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), userName);
-   const auto avatar = new CircularPixmap(avatarSize);
-   avatar->setObjectName("Avatar");
-
-   if (!QFile(fileName).exists())
-   {
-      QNetworkRequest request;
-      request.setUrl(avatarUrl);
-      request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
-      const auto reply = mManager->get(request);
-      connect(reply, &QNetworkReply::finished, this,
-              [userName, this, avatar]() { storeCreatorAvatar(avatar, userName); });
-   }
-   else
-   {
-      QPixmap img(fileName);
-
-      if (!img.isNull())
-      {
-         img = img.scaled(avatarSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-         avatar->setPixmap(img);
-      }
-   }
-
-   return avatar;
-}
-
 QLabel *PrCommentsList::createHeadline(const QDateTime &dt, const QString &prefix)
 {
    const auto days = dt.daysTo(QDateTime::currentDateTime());
@@ -198,33 +169,47 @@ QLabel *PrCommentsList::createHeadline(const QDateTime &dt, const QString &prefi
    return label;
 }
 
-void PrCommentsList::storeCreatorAvatar(QLabel *avatar, const QString &fileName) const
+void PrCommentsList::onReviewsReceived(const PullRequest &pr)
 {
-   const auto reply = qobject_cast<QNetworkReply *>(sender());
-   const auto data = reply->readAll();
+   if (mIssueNumber != pr.number)
+      return;
 
-   QDir dir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
-   if (!dir.exists())
-      dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+   // disconnect(mGitServerCache.get(), &GitServerCache::prUpdated, this, &PrCommentsList::onReviewsReceived);
 
-   QString path = dir.absolutePath() + "/" + fileName;
-   QFile file(path);
-   if (file.open(QIODevice::WriteOnly))
+   QMultiMap<QDateTime, QLayout *> bubblesMap;
+
+   for (const auto &comment : pr.comments)
    {
-      file.write(data);
-      file.close();
-
-      QPixmap img(path);
-
-      if (!img.isNull())
-      {
-         img = img.scaled(50, 50, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-         avatar->setPixmap(img);
-      }
+      const auto layout = createBubbleForComment(comment);
+      bubblesMap.insert(comment.creation, layout);
    }
 
-   reply->deleteLater();
+   for (const auto &review : pr.reviews)
+   {
+      const auto layouts = new QVBoxLayout();
+
+      if (review.state != QString::fromUtf8("COMMENTED"))
+      {
+         const auto reviewLayout = createBubbleForReview(review);
+         layouts->addLayout(reviewLayout);
+      }
+
+      auto codeReviewsLayouts = createBubbleForCodeReview(review.id, pr.reviewComment);
+
+      for (auto layout : codeReviewsLayouts)
+         layouts->addLayout(layout);
+
+      bubblesMap.insert(review.creation, layouts);
+   }
+
+   for (auto layout : bubblesMap)
+   {
+      if (layout)
+         mIssuesLayout->addLayout(layout);
+   }
+
+   mIssuesLayout->addStretch();
+   mIssuesLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding));
 }
 
 QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
@@ -314,136 +299,11 @@ QLayout *PrCommentsList::createBubbleForReview(const Review &review)
    return layout;
 }
 
-QLayout *PrCommentsList::createBubbleForCodeReviewComments(const GitServer::CodeReview &review, QLayout *commentsLayout)
-{
-   const auto creationLayout = new QHBoxLayout();
-   creationLayout->setContentsMargins(QMargins());
-   creationLayout->setSpacing(0);
-
-   const auto header
-       = QString("<b>%1</b> (%2) started a review ").arg(review.creator.name, review.association.toLower());
-
-   creationLayout->addWidget(createHeadline(review.creation, header));
-   creationLayout->addStretch();
-
-   const auto frame = new QFrame();
-   frame->setObjectName("IssueIntro");
-
-   const auto innerLayout = new QVBoxLayout(frame);
-   innerLayout->setContentsMargins(10, 10, 10, 10);
-   innerLayout->setSpacing(20);
-   innerLayout->addLayout(creationLayout);
-
-   const auto code = new SourceCodeReview(review.diff.file, review.diff.diff, review.diff.line);
-
-   innerLayout->addWidget(code);
-   innerLayout->addLayout(commentsLayout);
-
-   const auto layout = new QHBoxLayout();
-   layout->setContentsMargins(QMargins());
-   layout->setSpacing(30);
-   layout->addSpacing(30);
-   layout->addWidget(createAvatar(review.creator.name, review.creator.avatar));
-   layout->addWidget(frame);
-
-   return layout;
-}
-
-QLayout *PrCommentsList::createBubbleForCodeReviewInitial(const QVector<GitServer::CodeReview> &reviews)
-{
-   const auto layout = new QHBoxLayout();
-   layout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-   layout->setContentsMargins(QMargins());
-   layout->setSpacing(20);
-
-   auto row = 0;
-
-   for (auto &review : reviews)
-   {
-      const auto creator = createHeadline(review.creation, QString("<b>%1</b><br/>").arg(review.creator.name));
-      creator->setObjectName("CodeReviewAuthor");
-      creator->setAlignment(Qt::AlignCenter);
-      creator->setToolTip(review.association);
-
-      const auto avatarLayout = new QVBoxLayout();
-      avatarLayout->setContentsMargins(QMargins());
-      avatarLayout->setSpacing(0);
-      avatarLayout->addStretch();
-      avatarLayout->addWidget(createAvatar(review.creator.name, review.creator.avatar, QSize(20, 20)));
-      avatarLayout->addSpacing(5);
-      avatarLayout->addWidget(creator);
-      avatarLayout->addStretch();
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-      const auto body = new QTextEdit();
-      body->setMarkdown(review.body);
-      body->setReadOnly(true);
-      body->show();
-      const auto height = body->document()->size().height();
-      body->setMaximumHeight(height);
-#else
-      const auto body = new QLabel(review.body);
-      body->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-      body->setWordWrap(true);
-#endif
-
-      const auto frame = new QFrame();
-      frame->setObjectName("CodeReviewComment");
-
-      const auto innerLayout = new QVBoxLayout(frame);
-      innerLayout->setContentsMargins(10, 10, 10, 10);
-      innerLayout->addWidget(body);
-
-      layout->addLayout(avatarLayout);
-      layout->addWidget(frame);
-
-      ++row;
-   }
-
-   return layout;
-}
-
-void PrCommentsList::onReviewsReceived(const PullRequest &pr)
-{
-   if (mIssueNumber != pr.number)
-      return;
-
-   // disconnect(mGitServerCache.get(), &GitServerCache::prUpdated, this, &PrCommentsList::onReviewsReceived);
-
-   QMultiMap<QDateTime, QLayout *> bubblesMap;
-
-   for (const auto &comment : pr.comments)
-   {
-      const auto layout = createBubbleForComment(comment);
-      bubblesMap.insert(comment.creation, layout);
-   }
-
-   for (const auto &review : pr.reviews)
-   {
-      const auto layouts = new QVBoxLayout();
-
-      if (review.state != QString::fromUtf8("COMMENTED"))
-         layouts->addLayout(createBubbleForReview(review));
-
-      createBubbleForCodeReview(review.id, pr.reviewComment, layouts);
-
-      bubblesMap.insert(review.creation, layouts);
-   }
-
-   for (auto layout : bubblesMap)
-   {
-      if (layout)
-         mIssuesLayout->addLayout(layout);
-   }
-
-   mIssuesLayout->addStretch();
-   mIssuesLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding));
-}
-
-void PrCommentsList::createBubbleForCodeReview(int reviewId, QVector<CodeReview> comments, QVBoxLayout *layouts)
+QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVector<CodeReview> comments)
 {
    QMap<int, QVector<CodeReview>> reviews;
    QVector<int> codeReviewIds;
+   QVector<QLayout *> listOfCodeReviews;
 
    auto iter = comments.begin();
 
@@ -466,8 +326,49 @@ void PrCommentsList::createBubbleForCodeReview(int reviewId, QVector<CodeReview>
          std::sort(codeReviews.begin(), codeReviews.end(),
                    [](const CodeReview &r1, const CodeReview &r2) { return r1.creation < r2.creation; });
 
-         const auto commentsLayout = createBubbleForCodeReviewInitial(codeReviews);
-         layouts->addLayout(createBubbleForCodeReviewComments(codeReviews.first(), commentsLayout));
+         const auto commentsLayout = new QVBoxLayout();
+         commentsLayout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+         commentsLayout->setContentsMargins(QMargins());
+         commentsLayout->setSpacing(20);
+
+         for (auto &comment : codeReviews)
+            commentsLayout->addWidget(new CodeReviewComment(comment));
+
+         const auto review = codeReviews.constFirst();
+
+         const auto creationLayout = new QHBoxLayout();
+         creationLayout->setContentsMargins(QMargins());
+         creationLayout->setSpacing(0);
+
+         const auto header
+             = QString("<b>%1</b> (%2) started a review ").arg(review.creator.name, review.association.toLower());
+
+         creationLayout->addWidget(createHeadline(review.creation, header));
+         creationLayout->addStretch();
+
+         const auto frame = new QFrame();
+         frame->setObjectName("IssueIntro");
+
+         const auto innerLayout = new QVBoxLayout(frame);
+         innerLayout->setContentsMargins(10, 10, 10, 10);
+         innerLayout->setSpacing(20);
+         innerLayout->addLayout(creationLayout);
+
+         const auto code = new SourceCodeReview(review.diff.file, review.diff.diff, review.diff.line);
+
+         innerLayout->addWidget(code);
+         innerLayout->addLayout(commentsLayout);
+
+         const auto layout = new QHBoxLayout();
+         layout->setContentsMargins(QMargins());
+         layout->setSpacing(30);
+         layout->addSpacing(30);
+         layout->addWidget(createAvatar(review.creator.name, review.creator.avatar));
+         layout->addWidget(frame);
+
+         listOfCodeReviews.append(layout);
       }
    }
+
+   return listOfCodeReviews;
 }

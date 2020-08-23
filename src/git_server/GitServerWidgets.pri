@@ -8,7 +8,9 @@ FORMS += \
 
 HEADERS += \
    $$PWD/AGitServerItemList.h \
+   $$PWD/AvatarHelper.h \
    $$PWD/CircularPixmap.h \
+   $$PWD/CodeReviewComment.h \
    $$PWD/CreateIssueDlg.h \
    $$PWD/CreatePullRequestDlg.h \
    $$PWD/IssueDetailedView.h \
@@ -26,6 +28,7 @@ HEADERS += \
 SOURCES += \
    $$PWD/AGitServerItemList.cpp \
    $$PWD/CircularPixmap.cpp \
+   $$PWD/CodeReviewComment.cpp \
    $$PWD/CreateIssueDlg.cpp \
    $$PWD/CreatePullRequestDlg.cpp \
    $$PWD/IssueDetailedView.cpp \

@@ -67,14 +67,9 @@ private:
    int mIssueNumber = -1;
 
    void processComments(const GitServer::Issue &issue);
-   QLabel *createAvatar(const QString &userName, const QString &avatarUrl,
-                        const QSize &avatarSize = QSize(50, 50)) const;
    QLabel *createHeadline(const QDateTime &dt, const QString &prefix = QString());
-   void storeCreatorAvatar(QLabel *avatar, const QString &fileName) const;
+   void onReviewsReceived(const GitServer::PullRequest &pr);
    QLayout *createBubbleForComment(const GitServer::Comment &comment);
    QLayout *createBubbleForReview(const GitServer::Review &review);
-   void createBubbleForCodeReview(int reviewId, QVector<GitServer::CodeReview> comments, QVBoxLayout *layouts);
-   QLayout *createBubbleForCodeReviewComments(const GitServer::CodeReview &review, QLayout *commentsLayout);
-   QLayout *createBubbleForCodeReviewInitial(const QVector<GitServer::CodeReview> &reviews);
-   void onReviewsReceived(const GitServer::PullRequest &pr);
+   QVector<QLayout *> createBubbleForCodeReview(int reviewId, QVector<GitServer::CodeReview> comments);
 };

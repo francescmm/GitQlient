@@ -25,31 +25,18 @@
 
 #include <QFrame>
 
-class GitServerCache;
-class QLayout;
 class QLabel;
-class QNetworkAccessManager;
-class QScrollArea;
 
 namespace GitServer
 {
-struct PullRequest;
-struct Commit;
+struct CodeReview;
 }
 
-class PrCommitsList : public QFrame
+class CodeReviewComment : public QFrame
 {
 public:
-   explicit PrCommitsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
-
-   void loadData(int number);
+   explicit CodeReviewComment(const GitServer::CodeReview &review, QWidget *parent = nullptr);
 
 private:
-   QSharedPointer<GitServerCache> mGitServerCache;
-   QNetworkAccessManager *mManager = nullptr;
-   QScrollArea *mScroll = nullptr;
-   int mPrNumber = -1;
-
-   void onCommitsReceived(const GitServer::PullRequest &pr);
-   QFrame *createBubbleForComment(const GitServer::Commit &commit);
+   QLabel *createHeadline(const QDateTime &dt, const QString &prefix);
 };
