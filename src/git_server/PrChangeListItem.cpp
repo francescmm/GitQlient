@@ -15,13 +15,13 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
 
    DiffHelper::processDiff(change.content, true, change.newData, change.oldData);
 
-   const auto oldFile = new FileDiffView();
+   const auto oldFile = new FileDiffView(true);
    oldFile->show();
    oldFile->setMinimumHeight(oldFile->getHeight());
    oldFile->setStartingLine(change.oldFileStartLine - 1);
    oldFile->loadDiff(change.oldData.first.join("\n"), change.oldData.second);
 
-   const auto newFile = new FileDiffView();
+   const auto newFile = new FileDiffView(true);
    newFile->show();
    newFile->setMinimumHeight(oldFile->getHeight());
    newFile->setStartingLine(change.newFileStartLine - 1);

@@ -57,18 +57,26 @@
 #include <QPainter>
 #include <QTextBlock>
 #include <QScrollBar>
+#include <QIcon>
 
 #include <QLogger.h>
 
 using namespace QLogger;
 
-FileDiffView::FileDiffView(QWidget *parent)
+FileDiffView::FileDiffView(bool allowComments, QWidget *parent)
    : QPlainTextEdit(parent)
    , mLineNumberArea(new LineNumberArea(this))
    , mDiffHighlighter(new FileDiffHighlighter(document()))
+   , mCommentsAllowed(allowComments)
 {
    setAttribute(Qt::WA_DeleteOnClose);
    setReadOnly(true);
+
+   if (mCommentsAllowed)
+   {
+      installEventFilter(this);
+      setMouseTracking(true);
+   }
 
    connect(this, &FileDiffView::blockCountChanged, this, &FileDiffView::updateLineNumberAreaWidth);
    connect(this, &FileDiffView::updateRequest, this, &FileDiffView::updateLineNumberArea);
@@ -135,7 +143,7 @@ int FileDiffView::getHeight() const
 
 int FileDiffView::lineNumberAreaWidth()
 {
-   auto digits = 4;
+   auto digits = 6;
    auto max = std::max(1, blockCount() + mStartingLine);
 
    while (max >= 10)
@@ -180,6 +188,55 @@ void FileDiffView::resizeEvent(QResizeEvent *e)
    mLineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
 }
 
+bool FileDiffView::eventFilter(QObject *obj, QEvent *event)
+{
+   if (event->type() == QEvent::Enter || event->type() == QEvent::Move)
+   {
+      const auto height = mLineNumberArea->width();
+      const auto helpPos = mapFromGlobal(QCursor::pos());
+      const auto x = helpPos.x();
+      if (x >= 0 && x <= height)
+      {
+         QTextCursor cursor = cursorForPosition(helpPos);
+         mRow = cursor.block().blockNumber() + mStartingLine + 1;
+
+         repaint();
+      }
+   }
+   else if (event->type() == QEvent::Leave)
+   {
+      mRow = -1;
+      repaint();
+   }
+
+   return QPlainTextEdit::eventFilter(obj, event);
+}
+
+void FileDiffView::mouseMoveEvent(QMouseEvent *e)
+{
+   if (mCommentsAllowed)
+   {
+      if (mLineNumberArea->rect().contains(e->pos()))
+      {
+         const auto height = mLineNumberArea->width();
+         const auto helpPos = mapFromGlobal(QCursor::pos());
+         const auto x = helpPos.x();
+         if (x >= 0 && x <= height)
+         {
+            QTextCursor cursor = cursorForPosition(helpPos);
+            mRow = cursor.block().blockNumber() + mStartingLine + 1;
+
+            repaint();
+         }
+      }
+      else
+      {
+         mRow = -1;
+         repaint();
+      }
+   }
+}
+
 void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
    QPainter painter(mLineNumberArea);
@@ -207,13 +264,19 @@ void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
 
          if (!mUnified || skipDeletion)
          {
-            const auto number = QString::number(blockNumber + 1 + lineCorrection);
+            const auto number = blockNumber + 1 + lineCorrection;
             painter.setPen(GitQlientStyles::getTextColor());
-            painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - offset, fontMetrics().height(),
-                             Qt::AlignRight, number);
 
-            painter.drawLine(mLineNumberArea->width() - 1, event->rect().y(), mLineNumberArea->width() - 1,
-                             event->rect().height());
+            if (mRow == number)
+            {
+               const auto width = mLineNumberArea->width();
+               const auto height = fontMetrics().height();
+               painter.drawPixmap(width - height, static_cast<int>(top), height, height,
+                                  QIcon(":/icons/add_comment").pixmap(height, height));
+            }
+
+            painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - offset * 3, fontMetrics().height(),
+                             Qt::AlignRight, QString::number(number));
          }
          else
             --lineCorrection;
@@ -230,6 +293,7 @@ FileDiffView::LineNumberArea::LineNumberArea(FileDiffView *editor)
    : QWidget(editor)
 {
    fileDiffWidget = editor;
+   setMouseTracking(true);
 }
 
 QSize FileDiffView::LineNumberArea::sizeHint() const
@@ -240,4 +304,22 @@ QSize FileDiffView::LineNumberArea::sizeHint() const
 void FileDiffView::LineNumberArea::paintEvent(QPaintEvent *event)
 {
    fileDiffWidget->lineNumberAreaPaintEvent(event);
+}
+
+void FileDiffView::LineNumberArea::mouseMoveEvent(QMouseEvent *e)
+{
+   fileDiffWidget->mouseMoveEvent(e);
+}
+
+void FileDiffView::LineNumberArea::mousePressEvent(QMouseEvent *e)
+{
+   if (fileDiffWidget->mCommentsAllowed)
+      mPressed = rect().contains(e->pos());
+}
+#include <QMessageBox>
+void FileDiffView::LineNumberArea::mouseReleaseEvent(QMouseEvent *e)
+{
+   if (fileDiffWidget->mCommentsAllowed && mPressed && rect().contains(e->pos())) { }
+
+   mPressed = false;
 }

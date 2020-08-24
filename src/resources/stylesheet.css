@@ -879,7 +879,7 @@ PrChangesList FileDiffView
     padding: 10px;
 }
 
-SourceCodeReview > FileDiffView
+SourceCodeReview > FileDiffView, #PrChangeListItem > FileDiffView
 {
     border: 0;
     font-size: 11pt;

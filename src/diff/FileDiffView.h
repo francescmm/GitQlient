@@ -78,7 +78,7 @@ public:
 
     \param parent The parent widget if needed.
    */
-   explicit FileDiffView(QWidget *parent = nullptr);
+   explicit FileDiffView(bool allowComments = false, QWidget *parent = nullptr);
 
    /**
     * @brief Default constructor
@@ -104,6 +104,10 @@ public:
     */
    void setStartingLine(int lineNumber) { mStartingLine = lineNumber; }
 
+   /**
+    * @brief setUnifiedDiff Sets the diff as unified view.
+    * @param unified True if unified view must be shown.
+    */
    void setUnifiedDiff(bool unified) { mUnified = unified; }
 
    /**
@@ -119,6 +123,10 @@ protected:
     \param event The resize event.
    */
    void resizeEvent(QResizeEvent *event) override;
+
+   bool eventFilter(QObject *target, QEvent *event) override;
+
+   void mouseMoveEvent(QMouseEvent *e) override;
 
 private:
    /*!
@@ -158,13 +166,19 @@ private:
 
    protected:
       void paintEvent(QPaintEvent *event) override;
+      void mouseMoveEvent(QMouseEvent *e) override;
+      void mousePressEvent(QMouseEvent *e) override;
+      void mouseReleaseEvent(QMouseEvent *e) override;
 
    private:
       FileDiffView *fileDiffWidget;
+      bool mPressed = false;
    };
 
    LineNumberArea *mLineNumberArea = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    int mStartingLine = 0;
    bool mUnified = false;
+   int mRow = -1;
+   bool mCommentsAllowed = false;
 };
