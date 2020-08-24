@@ -56,59 +56,53 @@ inline void extractLinesFromHeader(QString header, int &startOldFile, int &start
 inline QVector<DiffChange> splitDiff(const QString &diff)
 {
    QVector<DiffHelper::DiffChange> changes;
-   const auto chunks = diff.split("diff --git");
+   const auto chunks = diff.split("diff --git", Qt::SkipEmptyParts);
 
    for (const auto &chunk : chunks)
    {
-      if (!chunk.isEmpty())
+      auto lines = chunk.split("\n");
+      DiffHelper::DiffChange change;
+
+      auto filesStr = lines.takeFirst();
+      auto files = filesStr.trimmed().split(" ");
+      change.newFileName = files.first().remove("a/");
+      change.oldFileName = files.last().remove("b/");
+
+      auto isA = lines.constFirst().startsWith("copy ") || lines.constFirst().startsWith("index ")
+          || lines.constFirst().startsWith("new ");
+      auto isB = lines.constFirst().startsWith("old ") || lines.constFirst().startsWith("rename ")
+          || lines.constFirst().startsWith("similarity ");
+      auto isC = lines.constFirst().startsWith("+++ ") || lines.constFirst().startsWith("--- ");
+
+      while (isA || isB || isC)
       {
-         auto lines = chunk.split("\n");
-         DiffHelper::DiffChange change;
+         lines.takeFirst();
 
-         auto filesStr = lines.takeFirst();
-         auto files = filesStr.trimmed().split(" ");
-         change.newFileName = files.first().remove("a/");
-         change.oldFileName = files.last().remove("b/");
-
-         auto isA = lines.constFirst().startsWith("copy ") || lines.constFirst().startsWith("index ")
+         isA = lines.constFirst().startsWith("copy ") || lines.constFirst().startsWith("index ")
              || lines.constFirst().startsWith("new ");
-         auto isB = lines.constFirst().startsWith("old ") || lines.constFirst().startsWith("rename ")
+         isB = lines.constFirst().startsWith("old ") || lines.constFirst().startsWith("rename ")
              || lines.constFirst().startsWith("similarity ");
-         auto isC = lines.constFirst().startsWith("+++ ") || lines.constFirst().startsWith("--- ");
-
-         while (isA || isB || isC)
-         {
-            lines.takeFirst();
-
-            isA = lines.constFirst().startsWith("copy ") || lines.constFirst().startsWith("index ")
-                || lines.constFirst().startsWith("new ");
-            isB = lines.constFirst().startsWith("old ") || lines.constFirst().startsWith("rename ")
-                || lines.constFirst().startsWith("similarity ");
-            isC = lines.constFirst().startsWith("+++ ") || lines.constFirst().startsWith("--- ");
-         }
-
-         for (auto &line : lines)
-         {
-            if (line.startsWith("@@"))
-            {
-               change.header = line;
-
-               if (change.content.isEmpty())
-                  extractLinesFromHeader(change.header, change.oldFileStartLine, change.newFileStartLine);
-               else
-               {
-                  changes.append(change);
-                  change.content.clear();
-
-                  extractLinesFromHeader(change.header, change.oldFileStartLine, change.newFileStartLine);
-               }
-            }
-            else
-               change.content.append(line + "\n");
-         }
-
-         changes.append(change);
+         isC = lines.constFirst().startsWith("+++ ") || lines.constFirst().startsWith("--- ");
       }
+
+      for (auto &line : lines)
+      {
+         if (line.startsWith("@@"))
+         {
+            if (!change.content.isEmpty())
+            {
+               changes.append(change);
+               change.content.clear();
+            }
+
+            change.header = line;
+            extractLinesFromHeader(change.header, change.oldFileStartLine, change.newFileStartLine);
+         }
+         else
+            change.content.append(line + "\n");
+      }
+
+      changes.append(change);
    }
    return changes;
 }

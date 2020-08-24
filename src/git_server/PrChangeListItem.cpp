@@ -27,17 +27,34 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
    newFile->setStartingLine(change.newFileStartLine - 1);
    newFile->loadDiff(change.newData.first.join("\n"), change.newData.second);
 
-   const auto oFileName = new QLabel(change.oldFileName);
-   oFileName->setObjectName("ChangeFileName");
+   const auto fileName = change.oldFileName == change.newFileName
+       ? change.newFileName
+       : QString("%1 -> %2").arg(change.oldFileName, change.newFileName);
 
-   const auto nFileName = new QLabel(change.newFileName);
-   nFileName->setObjectName("ChangeFileName");
+   const auto fileNameLabel = new QLabel(fileName);
+   fileNameLabel->setObjectName("ChangeFileName");
 
-   const auto mainLayout = new QGridLayout(this);
+   const auto headerLabel = new QLabel(change.header);
+   headerLabel->setObjectName("ChangeHeader");
+
+   const auto diffLayout = new QHBoxLayout();
+   diffLayout->setContentsMargins(QMargins());
+   diffLayout->setSpacing(5);
+   diffLayout->addWidget(oldFile);
+   diffLayout->addWidget(newFile);
+
+   const auto headerLayout = new QVBoxLayout();
+   headerLayout->setContentsMargins(QMargins());
+   headerLayout->addWidget(fileNameLabel);
+   headerLayout->addWidget(headerLabel);
+
+   const auto headerFrame = new QFrame();
+   headerFrame->setObjectName("ChangeHeaderFrame");
+   headerFrame->setLayout(headerLayout);
+
+   const auto mainLayout = new QVBoxLayout(this);
    mainLayout->setContentsMargins(QMargins());
    mainLayout->setSpacing(0);
-   mainLayout->addWidget(oFileName, 0, 0);
-   mainLayout->addWidget(nFileName, 0, 1);
-   mainLayout->addWidget(oldFile, 1, 0);
-   mainLayout->addWidget(newFile, 1, 1);
+   mainLayout->addWidget(headerFrame);
+   mainLayout->addLayout(diffLayout);
 }
