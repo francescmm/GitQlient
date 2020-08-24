@@ -124,7 +124,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    const auto height = body->document()->size().height();
    body->setFixedHeight(height);
 #else
-   const auto body = new QLabel(QString::fromUtf8((mIssue.body)));
+   const auto body = new QLabel(QString::fromUtf8((issue.body)));
    body->setWordWrap(true);
 #endif
    layout->addWidget(body);
