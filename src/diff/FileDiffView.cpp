@@ -212,83 +212,6 @@ bool FileDiffView::eventFilter(QObject *obj, QEvent *event)
    return QPlainTextEdit::eventFilter(obj, event);
 }
 
-void FileDiffView::mouseMoveEvent(QMouseEvent *e)
-{
-   if (mCommentsAllowed)
-   {
-      if (mLineNumberArea->rect().contains(e->pos()))
-      {
-         const auto height = mLineNumberArea->width();
-         const auto helpPos = mapFromGlobal(QCursor::pos());
-         const auto x = helpPos.x();
-         if (x >= 0 && x <= height)
-         {
-            QTextCursor cursor = cursorForPosition(helpPos);
-            mRow = cursor.block().blockNumber() + mStartingLine + 1;
-
-            repaint();
-         }
-      }
-      else
-      {
-         mRow = -1;
-         repaint();
-      }
-   }
-}
-
-void FileDiffView::lineNumberAreaPaintEvent(QPaintEvent *event)
-{
-   QPainter painter(mLineNumberArea);
-   painter.fillRect(event->rect(), QColor(GitQlientStyles::getBackgroundColor()));
-
-   auto block = firstVisibleBlock();
-   auto blockNumber = block.blockNumber() + mStartingLine;
-   auto top = blockBoundingGeometry(block).translated(contentOffset()).top();
-   auto bottom = top + blockBoundingRect(block).height();
-   auto lineCorrection = 0;
-
-   auto offset = 0;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-   offset = fontMetrics().horizontalAdvance(QLatin1Char(' '));
-#else
-   offset = fontMetrics().boundingRect(QLatin1Char(' ')).width();
-#endif
-
-   while (block.isValid() && top <= event->rect().bottom())
-   {
-
-      if (block.isVisible() && bottom >= event->rect().top())
-      {
-         const auto skipDeletion = mUnified && !block.text().startsWith("-") && !block.text().startsWith("@");
-
-         if (!mUnified || skipDeletion)
-         {
-            const auto number = blockNumber + 1 + lineCorrection;
-            painter.setPen(GitQlientStyles::getTextColor());
-
-            if (mRow == number)
-            {
-               const auto width = mLineNumberArea->width();
-               const auto height = fontMetrics().height();
-               painter.drawPixmap(width - height, static_cast<int>(top), height, height,
-                                  QIcon(":/icons/add_comment").pixmap(height, height));
-            }
-
-            painter.drawText(0, static_cast<int>(top), mLineNumberArea->width() - offset * 3, fontMetrics().height(),
-                             Qt::AlignRight, QString::number(number));
-         }
-         else
-            --lineCorrection;
-      }
-
-      block = block.next();
-      top = bottom;
-      bottom = top + blockBoundingRect(block).height();
-      ++blockNumber;
-   }
-}
-
 FileDiffView::LineNumberArea::LineNumberArea(FileDiffView *editor)
    : QWidget(editor)
 {
@@ -303,12 +226,79 @@ QSize FileDiffView::LineNumberArea::sizeHint() const
 
 void FileDiffView::LineNumberArea::paintEvent(QPaintEvent *event)
 {
-   fileDiffWidget->lineNumberAreaPaintEvent(event);
+   QPainter painter(this);
+   painter.fillRect(event->rect(), QColor(GitQlientStyles::getBackgroundColor()));
+
+   auto block = fileDiffWidget->firstVisibleBlock();
+   auto blockNumber = block.blockNumber() + fileDiffWidget->mStartingLine;
+   auto top = fileDiffWidget->blockBoundingGeometry(block).translated(fileDiffWidget->contentOffset()).top();
+   auto bottom = top + fileDiffWidget->blockBoundingRect(block).height();
+   auto lineCorrection = 0;
+
+   auto offset = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
+   offset = fileDiffWidget->fontMetrics().horizontalAdvance(QLatin1Char(' '));
+#else
+   offset = fileDiffWidget->fontMetrics().boundingRect(QLatin1Char(' ')).width();
+#endif
+
+   while (block.isValid() && top <= event->rect().bottom())
+   {
+
+      if (block.isVisible() && bottom >= event->rect().top())
+      {
+         const auto skipDeletion
+             = fileDiffWidget->mUnified && !block.text().startsWith("-") && !block.text().startsWith("@");
+
+         if (!fileDiffWidget->mUnified || skipDeletion)
+         {
+            const auto number = blockNumber + 1 + lineCorrection;
+            painter.setPen(GitQlientStyles::getTextColor());
+
+            if (fileDiffWidget->mRow == number)
+            {
+               const auto height = fontMetrics().height();
+               painter.drawPixmap(width() - height, static_cast<int>(top), height, height,
+                                  QIcon(":/icons/add_comment").pixmap(height, height));
+            }
+
+            painter.drawText(0, static_cast<int>(top), width() - offset * 3, fontMetrics().height(), Qt::AlignRight,
+                             QString::number(number));
+         }
+         else
+            --lineCorrection;
+      }
+
+      block = block.next();
+      top = bottom;
+      bottom = top + fileDiffWidget->blockBoundingRect(block).height();
+      ++blockNumber;
+   }
 }
 
 void FileDiffView::LineNumberArea::mouseMoveEvent(QMouseEvent *e)
 {
-   fileDiffWidget->mouseMoveEvent(e);
+   if (fileDiffWidget->mCommentsAllowed)
+   {
+      if (fileDiffWidget->mLineNumberArea->rect().contains(e->pos()))
+      {
+         const auto height = width();
+         const auto helpPos = mapFromGlobal(QCursor::pos());
+         const auto x = helpPos.x();
+         if (x >= 0 && x <= height)
+         {
+            QTextCursor cursor = fileDiffWidget->cursorForPosition(helpPos);
+            fileDiffWidget->mRow = cursor.block().blockNumber() + fileDiffWidget->mStartingLine + 1;
+
+            repaint();
+         }
+      }
+      else
+      {
+         fileDiffWidget->mRow = -1;
+         repaint();
+      }
+   }
 }
 
 void FileDiffView::LineNumberArea::mousePressEvent(QMouseEvent *e)

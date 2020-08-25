@@ -126,8 +126,6 @@ protected:
 
    bool eventFilter(QObject *target, QEvent *event) override;
 
-   void mouseMoveEvent(QMouseEvent *e) override;
-
 private:
    /*!
     \brief Updates the line number area width based on the number of the line.
@@ -142,13 +140,6 @@ private:
     \param dy The increment.
    */
    void updateLineNumberArea(const QRect &rect, int dy);
-
-   /*!
-    \brief Method called by the line number area to paint the content of the QPlainTextEdit.
-
-    \param event The paint event.
-    */
-   void lineNumberAreaPaintEvent(QPaintEvent *event);
 
    /*!
     \brief Returns the width of the line number area.
@@ -181,4 +172,6 @@ private:
    bool mUnified = false;
    int mRow = -1;
    bool mCommentsAllowed = false;
+
+   friend class LineNumberArea;
 };
