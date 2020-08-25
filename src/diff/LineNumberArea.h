@@ -32,6 +32,7 @@ class LineNumberArea : public QWidget
 public:
    LineNumberArea(FileDiffView *editor, bool allowComments = false);
 
+   int widthInDigitsSize();
    QSize sizeHint() const override;
    void setEditor(FileDiffView *editor);
    bool commentsAllowed() const { return mCommentsAllowed; }

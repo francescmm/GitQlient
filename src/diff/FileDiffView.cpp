@@ -143,22 +143,15 @@ int FileDiffView::getHeight() const
 
 int FileDiffView::lineNumberAreaWidth()
 {
-   auto digits = 6;
-   auto max = std::max(1, blockCount() + mStartingLine);
+   const auto width = fontMetrics().horizontalAdvance(QLatin1Char('9'));
+   auto digits = mLineNumberArea ? mLineNumberArea->widthInDigitsSize() : 0;
+   auto max = blockCount() + mStartingLine;
 
    while (max >= 10)
    {
       max /= 10;
       ++digits;
    }
-
-   int width;
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-   width = fontMetrics().horizontalAdvance(QLatin1Char('9'));
-#else
-   width = fontMetrics().boundingRect(QLatin1Char('9')).width();
-#endif
 
    return width * digits;
 }

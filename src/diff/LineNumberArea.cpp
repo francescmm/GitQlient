@@ -15,6 +15,14 @@ LineNumberArea::LineNumberArea(FileDiffView *editor, bool allowComments)
    setMouseTracking(true);
 }
 
+int LineNumberArea::widthInDigitsSize()
+{
+   if (mCommentsAllowed)
+      return 6;
+
+   return 4;
+}
+
 QSize LineNumberArea::sizeHint() const
 {
    return { fileDiffWidget->lineNumberAreaWidth(), 0 };
@@ -31,18 +39,13 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
    QPainter painter(this);
    painter.fillRect(event->rect(), QColor(GitQlientStyles::getBackgroundColor()));
 
+   const auto fontHeight = fileDiffWidget->fontMetrics().horizontalAdvance(QLatin1Char(' '));
+   const auto offset = fontHeight * (mCommentsAllowed ? 3 : 2);
    auto block = fileDiffWidget->firstVisibleBlock();
    auto blockNumber = block.blockNumber() + fileDiffWidget->mStartingLine;
    auto top = fileDiffWidget->blockBoundingGeometry(block).translated(fileDiffWidget->contentOffset()).top();
    auto bottom = top + fileDiffWidget->blockBoundingRect(block).height();
    auto lineCorrection = 0;
-
-   auto offset = 0;
-#if QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
-   offset = fileDiffWidget->fontMetrics().horizontalAdvance(QLatin1Char(' '));
-#else
-   offset = fileDiffWidget->fontMetrics().boundingRect(QLatin1Char(' ')).width();
-#endif
 
    while (block.isValid() && top <= event->rect().bottom())
    {
@@ -54,17 +57,19 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
 
          if (!fileDiffWidget->mUnified || skipDeletion)
          {
+            const auto thisWidth = width();
+            (void)thisWidth;
+            const auto height = fileDiffWidget->fontMetrics().height();
             const auto number = blockNumber + 1 + lineCorrection;
             painter.setPen(GitQlientStyles::getTextColor());
 
             if (fileDiffWidget->mRow == number)
             {
-               const auto height = fontMetrics().height();
                painter.drawPixmap(width() - height, static_cast<int>(top), height, height,
                                   QIcon(":/icons/add_comment").pixmap(height, height));
             }
 
-            painter.drawText(0, static_cast<int>(top), width() - offset * 3, fontMetrics().height(), Qt::AlignRight,
+            painter.drawText(0, static_cast<int>(top), width() - offset, height, Qt::AlignRight,
                              QString::number(number));
          }
          else
