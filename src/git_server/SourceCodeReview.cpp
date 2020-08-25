@@ -1,6 +1,7 @@
 #include <SourceCodeReview.h>
 
 #include <FileDiffView.h>
+#include <LineNumberArea.h>
 
 #include <QLabel>
 #include <QVBoxLayout>

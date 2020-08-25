@@ -10,6 +10,7 @@
 #include <FileEditor.h>
 #include <GitLocal.h>
 #include <DiffHelper.h>
+#include <LineNumberArea.h>
 
 #include <QHBoxLayout>
 #include <QPushButton>

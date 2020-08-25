@@ -2,6 +2,7 @@
 
 #include <DiffHelper.h>
 #include <FileDiffView.h>
+#include <LineNumberArea.h>
 
 #include <QGridLayout>
 #include <QLabel>

@@ -1,6 +1,7 @@
-#include "FileDiffEditor.h"
+#include <FileDiffEditor.h>
 
 #include <GitQlientStyles.h>
+#include <LineNumberArea.h>
 
 FileDiffEditor::FileDiffEditor(QWidget *parent)
    : FileDiffView(parent)
