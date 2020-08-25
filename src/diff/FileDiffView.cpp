@@ -63,20 +63,12 @@
 
 using namespace QLogger;
 
-FileDiffView::FileDiffView(bool allowComments, QWidget *parent)
+FileDiffView::FileDiffView(QWidget *parent)
    : QPlainTextEdit(parent)
-   , mLineNumberArea(new LineNumberArea(this))
    , mDiffHighlighter(new FileDiffHighlighter(document()))
-   , mCommentsAllowed(allowComments)
 {
    setAttribute(Qt::WA_DeleteOnClose);
    setReadOnly(true);
-
-   if (mCommentsAllowed)
-   {
-      installEventFilter(this);
-      setMouseTracking(true);
-   }
 
    connect(this, &FileDiffView::blockCountChanged, this, &FileDiffView::updateLineNumberAreaWidth);
    connect(this, &FileDiffView::updateRequest, this, &FileDiffView::updateLineNumberArea);
@@ -86,6 +78,17 @@ FileDiffView::FileDiffView(bool allowComments, QWidget *parent)
 FileDiffView::~FileDiffView()
 {
    delete mDiffHighlighter;
+}
+
+void FileDiffView::addNumberArea(LineNumberArea *numberArea)
+{
+   mLineNumberArea = numberArea;
+
+   if (mLineNumberArea->commentsAllowed())
+   {
+      installEventFilter(this);
+      setMouseTracking(true);
+   }
 }
 
 void FileDiffView::loadDiff(QString text, const QVector<DiffInfo::ChunkInfo> &fileDiffInfo)
@@ -170,27 +173,33 @@ void FileDiffView::updateLineNumberAreaWidth(int /* newBlockCount */)
 
 void FileDiffView::updateLineNumberArea(const QRect &rect, int dy)
 {
-   if (dy != 0)
-      mLineNumberArea->scroll(0, dy);
-   else
-      mLineNumberArea->update(0, rect.y(), mLineNumberArea->width(), rect.height());
+   if (mLineNumberArea)
+   {
+      if (dy != 0)
+         mLineNumberArea->scroll(0, dy);
+      else
+         mLineNumberArea->update(0, rect.y(), mLineNumberArea->width(), rect.height());
 
-   if (rect.contains(viewport()->rect()))
-      updateLineNumberAreaWidth(0);
+      if (rect.contains(viewport()->rect()))
+         updateLineNumberAreaWidth(0);
+   }
 }
 
 void FileDiffView::resizeEvent(QResizeEvent *e)
 {
    QPlainTextEdit::resizeEvent(e);
 
-   const auto cr = contentsRect();
+   if (mLineNumberArea)
+   {
+      const auto cr = contentsRect();
 
-   mLineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+      mLineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+   }
 }
 
 bool FileDiffView::eventFilter(QObject *obj, QEvent *event)
 {
-   if (event->type() == QEvent::Enter || event->type() == QEvent::Move)
+   if (mLineNumberArea && event->type() == QEvent::Enter)
    {
       const auto height = mLineNumberArea->width();
       const auto helpPos = mapFromGlobal(QCursor::pos());
@@ -212,19 +221,26 @@ bool FileDiffView::eventFilter(QObject *obj, QEvent *event)
    return QPlainTextEdit::eventFilter(obj, event);
 }
 
-FileDiffView::LineNumberArea::LineNumberArea(FileDiffView *editor)
+LineNumberArea::LineNumberArea(FileDiffView *editor, bool allowComments)
    : QWidget(editor)
+   , mCommentsAllowed(allowComments)
 {
    fileDiffWidget = editor;
    setMouseTracking(true);
 }
 
-QSize FileDiffView::LineNumberArea::sizeHint() const
+QSize LineNumberArea::sizeHint() const
 {
    return { fileDiffWidget->lineNumberAreaWidth(), 0 };
 }
 
-void FileDiffView::LineNumberArea::paintEvent(QPaintEvent *event)
+void LineNumberArea::setEditor(FileDiffView *editor)
+{
+   fileDiffWidget = editor;
+   setParent(editor);
+}
+
+void LineNumberArea::paintEvent(QPaintEvent *event)
 {
    QPainter painter(this);
    painter.fillRect(event->rect(), QColor(GitQlientStyles::getBackgroundColor()));
@@ -276,11 +292,11 @@ void FileDiffView::LineNumberArea::paintEvent(QPaintEvent *event)
    }
 }
 
-void FileDiffView::LineNumberArea::mouseMoveEvent(QMouseEvent *e)
+void LineNumberArea::mouseMoveEvent(QMouseEvent *e)
 {
-   if (fileDiffWidget->mCommentsAllowed)
+   if (mCommentsAllowed)
    {
-      if (fileDiffWidget->mLineNumberArea->rect().contains(e->pos()))
+      if (rect().contains(e->pos()))
       {
          const auto height = width();
          const auto helpPos = mapFromGlobal(QCursor::pos());
@@ -301,15 +317,15 @@ void FileDiffView::LineNumberArea::mouseMoveEvent(QMouseEvent *e)
    }
 }
 
-void FileDiffView::LineNumberArea::mousePressEvent(QMouseEvent *e)
+void LineNumberArea::mousePressEvent(QMouseEvent *e)
 {
-   if (fileDiffWidget->mCommentsAllowed)
+   if (mCommentsAllowed)
       mPressed = rect().contains(e->pos());
 }
-#include <QMessageBox>
-void FileDiffView::LineNumberArea::mouseReleaseEvent(QMouseEvent *e)
+
+void LineNumberArea::mouseReleaseEvent(QMouseEvent *e)
 {
-   if (fileDiffWidget->mCommentsAllowed && mPressed && rect().contains(e->pos())) { }
+   if (mCommentsAllowed && mPressed && rect().contains(e->pos())) { }
 
    mPressed = false;
 }

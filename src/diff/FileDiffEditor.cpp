@@ -7,6 +7,8 @@ FileDiffEditor::FileDiffEditor(QWidget *parent)
 {
    setReadOnly(false);
 
+   addNumberArea(new LineNumberArea(this));
+
    connect(this, &FileDiffView::cursorPositionChanged, this, &FileDiffEditor::highlightCurrentLine);
 
    highlightCurrentLine();

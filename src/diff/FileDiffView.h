@@ -56,6 +56,29 @@
 
 class FileDiffHighlighter;
 
+class FileDiffView;
+
+class LineNumberArea : public QWidget
+{
+public:
+   LineNumberArea(FileDiffView *editor, bool allowComments = false);
+
+   QSize sizeHint() const override;
+   void setEditor(FileDiffView *editor);
+   bool commentsAllowed() const { return mCommentsAllowed; }
+
+protected:
+   void paintEvent(QPaintEvent *event) override;
+   void mouseMoveEvent(QMouseEvent *e) override;
+   void mousePressEvent(QMouseEvent *e) override;
+   void mouseReleaseEvent(QMouseEvent *e) override;
+
+private:
+   FileDiffView *fileDiffWidget;
+   bool mPressed = false;
+   bool mCommentsAllowed = false;
+};
+
 /*!
  \brief The FileDiffView is an overload QPlainTextEdit class used to show the contents of a file diff between two
  commits.
@@ -78,12 +101,14 @@ public:
 
     \param parent The parent widget if needed.
    */
-   explicit FileDiffView(bool allowComments = false, QWidget *parent = nullptr);
+   explicit FileDiffView(QWidget *parent = nullptr);
 
    /**
     * @brief Default constructor
     */
    ~FileDiffView();
+
+   void addNumberArea(LineNumberArea *numberArea);
 
    /**
     * @brief loadDiff Loads the text edit based on a diff text.
@@ -148,30 +173,11 @@ private:
     */
    int lineNumberAreaWidth();
 
-   class LineNumberArea : public QWidget
-   {
-   public:
-      LineNumberArea(FileDiffView *editor);
-
-      QSize sizeHint() const override;
-
-   protected:
-      void paintEvent(QPaintEvent *event) override;
-      void mouseMoveEvent(QMouseEvent *e) override;
-      void mousePressEvent(QMouseEvent *e) override;
-      void mouseReleaseEvent(QMouseEvent *e) override;
-
-   private:
-      FileDiffView *fileDiffWidget;
-      bool mPressed = false;
-   };
-
    LineNumberArea *mLineNumberArea = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    int mStartingLine = 0;
    bool mUnified = false;
    int mRow = -1;
-   bool mCommentsAllowed = false;
 
    friend class LineNumberArea;
 };
