@@ -895,3 +895,11 @@ SourceCodeReview QLabel
     border-bottom-color: #D89000;
 }
 
+#OutdatedLabel
+{
+    background: #FF2222;
+    color: white;
+    border-radius: 7px;
+    padding: 5px;
+}
+

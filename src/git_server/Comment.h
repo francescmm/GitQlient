@@ -72,6 +72,7 @@ struct CodeReview : public Comment
    Diff diff;
    int replyToId;
    int reviewId;
+   bool outdated;
 };
 
 }

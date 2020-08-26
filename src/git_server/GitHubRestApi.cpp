@@ -627,6 +627,7 @@ void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
       for (const auto &commentData : commentsArray)
       {
          CodeReview c;
+         c.outdated = false;
          c.id = commentData["id"].toInt();
          c.body = commentData["body"].toString();
          c.creation = commentData["created_at"].toVariant().toDateTime();
@@ -637,7 +638,12 @@ void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
          if (commentData.toObject().contains("line"))
             c.diff.line = commentData["line"].toInt();
          else
-            c.diff.line = commentData["position"].toInt();
+         {
+            if (commentData["position"].toInt() != 0)
+               c.diff.line = commentData["position"].toInt();
+            else
+               c.outdated = true;
+         }
 
          if (commentData.toObject().contains("original_line"))
             c.diff.originalLine = commentData["original_line"].toInt();

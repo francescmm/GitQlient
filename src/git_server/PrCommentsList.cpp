@@ -7,6 +7,7 @@
 #include <SourceCodeReview.h>
 #include <AvatarHelper.h>
 #include <CodeReviewComment.h>
+#include <ButtonLink.hpp>
 
 #include <QNetworkAccessManager>
 #include <QVBoxLayout>
@@ -169,7 +170,7 @@ QLabel *PrCommentsList::createHeadline(const QDateTime &dt, const QString &prefi
    return label;
 }
 
-void PrCommentsList::onReviewsReceived(const PullRequest &pr)
+void PrCommentsList::onReviewsReceived(PullRequest pr)
 {
    if (mIssueNumber != pr.number)
       return;
@@ -299,7 +300,7 @@ QLayout *PrCommentsList::createBubbleForReview(const Review &review)
    return layout;
 }
 
-QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVector<CodeReview> comments)
+QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVector<CodeReview> &comments)
 {
    QMap<int, QVector<CodeReview>> reviews;
    QVector<int> codeReviewIds;
@@ -313,10 +314,15 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
       {
          codeReviewIds.append(iter->id);
          reviews[iter->id].append(*iter);
+         comments.erase(iter);
       }
       else if (codeReviewIds.contains(iter->replyToId))
+      {
          reviews[iter->replyToId].append(*iter);
-      comments.erase(iter);
+         comments.erase(iter);
+      }
+      else
+         ++iter;
    }
 
    if (!reviews.isEmpty())
@@ -325,14 +331,6 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
       {
          std::sort(codeReviews.begin(), codeReviews.end(),
                    [](const CodeReview &r1, const CodeReview &r2) { return r1.creation < r2.creation; });
-
-         const auto commentsLayout = new QVBoxLayout();
-         commentsLayout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-         commentsLayout->setContentsMargins(QMargins());
-         commentsLayout->setSpacing(20);
-
-         for (auto &comment : codeReviews)
-            commentsLayout->addWidget(new CodeReviewComment(comment));
 
          const auto review = codeReviews.constFirst();
 
@@ -346,6 +344,20 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
          creationLayout->addWidget(createHeadline(review.creation, header));
          creationLayout->addStretch();
 
+         const auto codeReviewFrame = new QFrame();
+
+         if (review.outdated)
+         {
+            const auto outdatedLabel = new ButtonLink(tr("Outdated"));
+            outdatedLabel->setObjectName("OutdatedLabel");
+            creationLayout->addWidget(outdatedLabel);
+
+            codeReviewFrame->setVisible(false);
+
+            connect(outdatedLabel, &ButtonLink::clicked, this,
+                    [codeReviewFrame]() { codeReviewFrame->setVisible(!codeReviewFrame->isVisible()); });
+         }
+
          const auto frame = new QFrame();
          frame->setObjectName("IssueIntro");
 
@@ -354,10 +366,23 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
          innerLayout->setSpacing(20);
          innerLayout->addLayout(creationLayout);
 
+         const auto codeReviewLayout = new QVBoxLayout(codeReviewFrame);
+
+         innerLayout->addWidget(codeReviewFrame);
+
          const auto code = new SourceCodeReview(review.diff.file, review.diff.diff, review.diff.line);
 
-         innerLayout->addWidget(code);
-         innerLayout->addLayout(commentsLayout);
+         codeReviewLayout->addWidget(code);
+
+         const auto commentsLayout = new QVBoxLayout();
+         commentsLayout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+         commentsLayout->setContentsMargins(QMargins());
+         commentsLayout->setSpacing(20);
+
+         for (auto &comment : codeReviews)
+            commentsLayout->addWidget(new CodeReviewComment(comment));
+
+         codeReviewLayout->addLayout(commentsLayout);
 
          const auto layout = new QHBoxLayout();
          layout->setContentsMargins(QMargins());
