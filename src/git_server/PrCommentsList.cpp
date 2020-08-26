@@ -373,6 +373,7 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
          const auto code = new SourceCodeReview(review.diff.file, review.diff.diff, review.diff.line);
 
          codeReviewLayout->addWidget(code);
+         codeReviewLayout->addSpacing(20);
 
          const auto commentsLayout = new QVBoxLayout();
          commentsLayout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
