@@ -36,7 +36,7 @@ void PrChangesList::loadData(const QString &baseBranch, const QString &headBranc
          delete layout();
 
          const auto mainLayout = new QVBoxLayout();
-         mainLayout->setContentsMargins(10, 10, 10, 10);
+         mainLayout->setContentsMargins(20, 20, 20, 20);
          mainLayout->setSpacing(0);
 
          for (auto &change : changes)

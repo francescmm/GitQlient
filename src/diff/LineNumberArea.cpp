@@ -34,7 +34,6 @@ void LineNumberArea::setEditor(FileDiffView *editor)
 void LineNumberArea::paintEvent(QPaintEvent *event)
 {
    QPainter painter(this);
-   painter.fillRect(event->rect(), QColor(GitQlientStyles::getBackgroundColor()));
 
    const auto fontWidth = fileDiffWidget->fontMetrics().horizontalAdvance(QLatin1Char(' '));
    const auto offset = fontWidth * (mCommentsAllowed ? 4 : 1);
@@ -60,7 +59,7 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
 
             if (mBookmarks.contains(number))
             {
-               painter.drawPixmap(0, static_cast<int>(top), height, height,
+               painter.drawPixmap(6, static_cast<int>(top), height, height,
                                   QIcon(":/icons/comments").pixmap(height, height));
 
                painter.setPen(QColor("#D89000"));

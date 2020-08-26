@@ -13,7 +13,6 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
    : QFrame(parent)
    , mNewFileStartingLine(change.newFileStartLine)
    , mNewFileName(change.newFileName)
-   , mNewFileDiff(new FileDiffView())
 {
    setObjectName("PrChangeListItem");
 
@@ -23,20 +22,25 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
 
    const auto oldFile = new FileDiffView();
    const auto numberArea = new LineNumberArea(oldFile, true);
+   numberArea->setObjectName("LineNumberArea");
    oldFile->addNumberArea(numberArea);
    numberArea->setEditor(oldFile);
+   oldFile->setStartingLine(change.oldFileStartLine - 1);
+   oldFile->loadDiff(change.oldData.first.join("\n").trimmed(), change.oldData.second);
+   oldFile->setMinimumWidth(535);
    oldFile->show();
    oldFile->setMinimumHeight(oldFile->getHeight());
-   oldFile->setStartingLine(change.oldFileStartLine - 1);
-   oldFile->loadDiff(change.oldData.first.join("\n"), change.oldData.second);
 
+   mNewFileDiff = new FileDiffView();
    mNewNumberArea = new LineNumberArea(mNewFileDiff, true);
+   mNewNumberArea->setObjectName("LineNumberArea");
    mNewNumberArea->setEditor(mNewFileDiff);
-   mNewFileDiff->addNumberArea(mNewNumberArea);
-   mNewFileDiff->show();
-   mNewFileDiff->setMinimumHeight(oldFile->getHeight());
    mNewFileDiff->setStartingLine(change.newFileStartLine - 1);
-   mNewFileDiff->loadDiff(change.newData.first.join("\n"), change.newData.second);
+   mNewFileDiff->loadDiff(change.newData.first.join("\n").trimmed(), change.newData.second);
+   mNewFileDiff->addNumberArea(mNewNumberArea);
+   mNewFileDiff->setMinimumWidth(535);
+   mNewFileDiff->show();
+   mNewFileDiff->setMinimumHeight(mNewFileDiff->getHeight());
 
    const auto fileName = change.oldFileName == change.newFileName
        ? change.newFileName

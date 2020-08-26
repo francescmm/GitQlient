@@ -903,3 +903,8 @@ SourceCodeReview QLabel
     padding: 5px;
 }
 
+#LineNumberArea
+{
+   border-right: 1px solid white;
+}
+
