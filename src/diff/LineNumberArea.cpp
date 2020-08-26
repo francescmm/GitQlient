@@ -63,9 +63,14 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
             const auto number = blockNumber + 1 + lineCorrection;
             painter.setPen(GitQlientStyles::getTextColor());
 
-            if (fileDiffWidget->mRow == number)
+            if (mBookmarks.contains(number))
             {
-               painter.drawPixmap(width() - height, static_cast<int>(top), height, height,
+               painter.drawPixmap(0, static_cast<int>(top), height, height,
+                                  QIcon(":/icons/comments").pixmap(height, height));
+            }
+            else if (fileDiffWidget->mRow == number)
+            {
+               painter.drawPixmap(width() - height - 4, static_cast<int>(top), height, height,
                                   QIcon(":/icons/add_comment").pixmap(height, height));
             }
 

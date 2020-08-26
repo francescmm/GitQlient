@@ -25,17 +25,23 @@
 
 #include <QWidget>
 
+#include <QMap>
+
 class FileDiffView;
 
 class LineNumberArea : public QWidget
 {
 public:
+   using BookmarkLine = int;
+   using BookmarkCommentId = int;
+
    LineNumberArea(FileDiffView *editor, bool allowComments = false);
 
    int widthInDigitsSize();
    QSize sizeHint() const override;
    void setEditor(FileDiffView *editor);
    bool commentsAllowed() const { return mCommentsAllowed; }
+   void setCommentBookmarks(const QMap<BookmarkLine, BookmarkCommentId> &bookmarks) { mBookmarks = bookmarks; }
 
 protected:
    void paintEvent(QPaintEvent *event) override;
@@ -47,4 +53,5 @@ private:
    FileDiffView *fileDiffWidget;
    bool mPressed = false;
    bool mCommentsAllowed = false;
+   QMap<BookmarkLine, BookmarkCommentId> mBookmarks;
 };
