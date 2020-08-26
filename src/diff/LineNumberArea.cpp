@@ -17,10 +17,7 @@ LineNumberArea::LineNumberArea(FileDiffView *editor, bool allowComments)
 
 int LineNumberArea::widthInDigitsSize()
 {
-   if (mCommentsAllowed)
-      return 6;
-
-   return 4;
+   return 3;
 }
 
 QSize LineNumberArea::sizeHint() const
@@ -39,8 +36,8 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
    QPainter painter(this);
    painter.fillRect(event->rect(), QColor(GitQlientStyles::getBackgroundColor()));
 
-   const auto fontHeight = fileDiffWidget->fontMetrics().horizontalAdvance(QLatin1Char(' '));
-   const auto offset = fontHeight * (mCommentsAllowed ? 3 : 2);
+   const auto fontWidth = fileDiffWidget->fontMetrics().horizontalAdvance(QLatin1Char(' '));
+   const auto offset = fontWidth * (mCommentsAllowed ? 4 : 1);
    auto block = fileDiffWidget->firstVisibleBlock();
    auto blockNumber = block.blockNumber() + fileDiffWidget->mStartingLine;
    auto top = fileDiffWidget->blockBoundingGeometry(block).translated(fileDiffWidget->contentOffset()).top();
@@ -57,8 +54,6 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
 
          if (!fileDiffWidget->mUnified || skipDeletion)
          {
-            const auto thisWidth = width();
-            (void)thisWidth;
             const auto height = fileDiffWidget->fontMetrics().height();
             const auto number = blockNumber + 1 + lineCorrection;
             painter.setPen(GitQlientStyles::getTextColor());
@@ -67,11 +62,15 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
             {
                painter.drawPixmap(0, static_cast<int>(top), height, height,
                                   QIcon(":/icons/comments").pixmap(height, height));
+
+               painter.setPen(QColor("#D89000"));
             }
             else if (fileDiffWidget->mRow == number)
             {
-               painter.drawPixmap(width() - height - 4, static_cast<int>(top), height, height,
+               painter.drawPixmap(width() - height - fontWidth, static_cast<int>(top), height, height,
                                   QIcon(":/icons/add_comment").pixmap(height, height));
+
+               painter.setPen(QColor("#D89000"));
             }
 
             painter.drawText(0, static_cast<int>(top), width() - offset, height, Qt::AlignRight,

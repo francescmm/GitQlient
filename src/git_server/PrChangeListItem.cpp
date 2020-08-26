@@ -19,6 +19,8 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
 
    DiffHelper::processDiff(change.content, true, change.newData, change.oldData);
 
+   mNewFileEndingLine = change.newData.first.count();
+
    const auto oldFile = new FileDiffView();
    const auto numberArea = new LineNumberArea(oldFile, true);
    oldFile->addNumberArea(numberArea);

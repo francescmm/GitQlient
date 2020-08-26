@@ -153,7 +153,15 @@ int FileDiffView::lineNumberAreaWidth()
       ++digits;
    }
 
-   return width * digits;
+   auto offset = 0;
+
+   if (mLineNumberArea && mLineNumberArea->commentsAllowed())
+   {
+      const auto padding = 3;
+      offset = (fontMetrics().height() * 2 + padding * 4);
+   }
+
+   return offset + (width * digits);
 }
 
 void FileDiffView::updateLineNumberAreaWidth(int /* newBlockCount */)

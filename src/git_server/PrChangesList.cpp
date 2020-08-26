@@ -119,7 +119,7 @@ void PrChangesList::onReviewsReceived(PullRequest pr)
 
       for (auto bookmark : bookmarksPerFile.values(iter->getFileName()))
       {
-         if (iter->getStartingLine() >= bookmark.first)
+         if (bookmark.first >= iter->getStartingLine() && bookmark.first <= iter->getEndingLine())
             bookmarks.insert(bookmark.first, bookmark.second);
       }
 
