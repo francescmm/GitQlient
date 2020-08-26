@@ -11,13 +11,16 @@ using namespace DiffHelper;
 
 PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
    : QFrame(parent)
+   , mNewFileStartingLine(change.newFileStartLine)
+   , mNewFileName(change.newFileName)
+   , mNewFileDiff(new FileDiffView())
 {
    setObjectName("PrChangeListItem");
 
    DiffHelper::processDiff(change.content, true, change.newData, change.oldData);
 
    const auto oldFile = new FileDiffView();
-   auto numberArea = new LineNumberArea(oldFile, true);
+   const auto numberArea = new LineNumberArea(oldFile, true);
    oldFile->addNumberArea(numberArea);
    numberArea->setEditor(oldFile);
    oldFile->show();
@@ -25,13 +28,13 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
    oldFile->setStartingLine(change.oldFileStartLine - 1);
    oldFile->loadDiff(change.oldData.first.join("\n"), change.oldData.second);
 
-   const auto newFile = new FileDiffView();
-   numberArea = new LineNumberArea(newFile, true);
-   newFile->addNumberArea(numberArea);
-   newFile->show();
-   newFile->setMinimumHeight(oldFile->getHeight());
-   newFile->setStartingLine(change.newFileStartLine - 1);
-   newFile->loadDiff(change.newData.first.join("\n"), change.newData.second);
+   mNewNumberArea = new LineNumberArea(mNewFileDiff, true);
+   mNewNumberArea->setEditor(mNewFileDiff);
+   mNewFileDiff->addNumberArea(mNewNumberArea);
+   mNewFileDiff->show();
+   mNewFileDiff->setMinimumHeight(oldFile->getHeight());
+   mNewFileDiff->setStartingLine(change.newFileStartLine - 1);
+   mNewFileDiff->loadDiff(change.newData.first.join("\n"), change.newData.second);
 
    const auto fileName = change.oldFileName == change.newFileName
        ? change.newFileName
@@ -47,7 +50,7 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
    diffLayout->setContentsMargins(QMargins());
    diffLayout->setSpacing(5);
    diffLayout->addWidget(oldFile);
-   diffLayout->addWidget(newFile);
+   diffLayout->addWidget(mNewFileDiff);
 
    const auto headerLayout = new QVBoxLayout();
    headerLayout->setContentsMargins(QMargins());
@@ -63,4 +66,9 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
    mainLayout->setSpacing(0);
    mainLayout->addWidget(headerFrame);
    mainLayout->addLayout(diffLayout);
+}
+
+void PrChangeListItem::setBookmarks(const QMap<int, int> &bookmarks)
+{
+   mNewNumberArea->setCommentBookmarks(bookmarks);
 }
