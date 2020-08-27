@@ -215,6 +215,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    mMergeWarning->setObjectName("MergeWarningButton");
    mMergeWarning->setVisible(false);
+   mBtnGroup->addButton(mMergeWarning, static_cast<int>(ControlsMainViews::MERGE));
 
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(0, 10, 0, 10);
