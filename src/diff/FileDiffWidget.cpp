@@ -10,6 +10,7 @@
 #include <FileEditor.h>
 #include <GitLocal.h>
 #include <DiffHelper.h>
+#include <LineNumberArea.h>
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -35,6 +36,9 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mFileEditor(new FileEditor())
    , mViewStackedWidget(new QStackedWidget())
 {
+   mNewFile->addNumberArea(new LineNumberArea(mNewFile));
+   mOldFile->addNumberArea(new LineNumberArea(mOldFile));
+
    mNewFile->setObjectName("newFile");
    mOldFile->setObjectName("oldFile");
 

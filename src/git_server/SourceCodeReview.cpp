@@ -1,6 +1,7 @@
 #include <SourceCodeReview.h>
 
 #include <FileDiffView.h>
+#include <LineNumberArea.h>
 
 #include <QLabel>
 #include <QVBoxLayout>
@@ -40,6 +41,7 @@ SourceCodeReview::SourceCodeReview(const QString &filePath, const QString &sourc
    }
 
    const auto diff = new FileDiffView();
+   diff->addNumberArea(new LineNumberArea(diff));
    diff->setStartingLine(commentLine - linesCount + 1);
    diff->setUnifiedDiff(true);
    diff->loadDiff(summary.trimmed());

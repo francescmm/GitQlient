@@ -23,53 +23,35 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <Issue.h>
-#include <GitServerCache.h>
+#include <QWidget>
 
-#include <QFrame>
+#include <QMap>
 
-namespace GitServer
-{
-struct Issue;
-struct PullRequest;
-struct Comment;
-struct Review;
-struct CodeReview;
-}
+class FileDiffView;
 
-class QLabel;
-class QVBoxLayout;
-class QNetworkAccessManager;
-class QHBoxLayout;
-class QScrollArea;
-
-class PrCommentsList : public QFrame
+class LineNumberArea : public QWidget
 {
 public:
-   enum class Config
-   {
-      Issues,
-      PullRequests
-   };
+   using BookmarkLine = int;
+   using BookmarkCommentId = int;
 
-   explicit PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+   LineNumberArea(FileDiffView *editor, bool allowComments = false);
 
-   void loadData(Config config, int issueNumber);
+   int widthInDigitsSize();
+   QSize sizeHint() const override;
+   void setEditor(FileDiffView *editor);
+   bool commentsAllowed() const { return mCommentsAllowed; }
+   void setCommentBookmarks(const QMap<BookmarkLine, BookmarkCommentId> &bookmarks) { mBookmarks = bookmarks; }
+
+protected:
+   void paintEvent(QPaintEvent *event) override;
+   void mouseMoveEvent(QMouseEvent *e) override;
+   void mousePressEvent(QMouseEvent *e) override;
+   void mouseReleaseEvent(QMouseEvent *e) override;
 
 private:
-   QSharedPointer<GitServerCache> mGitServerCache;
-   QNetworkAccessManager *mManager = nullptr;
-   QVBoxLayout *mIssuesLayout = nullptr;
-   QFrame *mIssuesFrame = nullptr;
-   Config mConfig;
-   QScrollArea *mScroll = nullptr;
-   bool mLoaded = false;
-   int mIssueNumber = -1;
-
-   void processComments(const GitServer::Issue &issue);
-   QLabel *createHeadline(const QDateTime &dt, const QString &prefix = QString());
-   void onReviewsReceived(GitServer::PullRequest pr);
-   QLayout *createBubbleForComment(const GitServer::Comment &comment);
-   QLayout *createBubbleForReview(const GitServer::Review &review);
-   QVector<QLayout *> createBubbleForCodeReview(int reviewId, QVector<GitServer::CodeReview> &comments);
+   FileDiffView *fileDiffWidget;
+   bool mPressed = false;
+   bool mCommentsAllowed = false;
+   QMap<BookmarkLine, BookmarkCommentId> mBookmarks;
 };

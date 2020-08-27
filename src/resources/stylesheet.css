@@ -859,20 +859,26 @@ QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
 PrChangesList FileDiffView
 {
    border: 0;
-   background-color: #404142;
+   background: #404142;
 }
 
 #PrChangeListItem
 {
-   border: 1px solid white;
+   background: transparent;
 }
 
 #ChangeFileName
 {
+   font-weight: bold;
+}
+
+#ChangeHeaderFrame
+{
+    background: #202122;
    padding: 10px;
 }
 
-SourceCodeReview > FileDiffView
+SourceCodeReview > FileDiffView, #PrChangeListItem > FileDiffView
 {
     border: 0;
     font-size: 11pt;
@@ -886,6 +892,19 @@ SourceCodeReview QLabel
     border-bottom-style: solid;
     border-bottom-width: 1px;
     border-bottom-color: #D89000;
+}
+
+#OutdatedLabel
+{
+    background: #FF2222;
+    color: white;
+    border-radius: 7px;
+    padding: 5px;
+}
+
+#LineNumberArea
+{
+   border-right: 1px solid white;
 }
 
 /* JENKINS */

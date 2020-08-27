@@ -56,6 +56,8 @@
 
 class FileDiffHighlighter;
 
+class LineNumberArea;
+
 /*!
  \brief The FileDiffView is an overload QPlainTextEdit class used to show the contents of a file diff between two
  commits.
@@ -85,6 +87,8 @@ public:
     */
    ~FileDiffView();
 
+   void addNumberArea(LineNumberArea *numberArea);
+
    /**
     * @brief loadDiff Loads the text edit based on a diff text.
     * @param text The text representing a diff
@@ -104,6 +108,10 @@ public:
     */
    void setStartingLine(int lineNumber) { mStartingLine = lineNumber; }
 
+   /**
+    * @brief setUnifiedDiff Sets the diff as unified view.
+    * @param unified True if unified view must be shown.
+    */
    void setUnifiedDiff(bool unified) { mUnified = unified; }
 
    /**
@@ -119,6 +127,8 @@ protected:
     \param event The resize event.
    */
    void resizeEvent(QResizeEvent *event) override;
+
+   bool eventFilter(QObject *target, QEvent *event) override;
 
 private:
    /*!
@@ -136,35 +146,17 @@ private:
    void updateLineNumberArea(const QRect &rect, int dy);
 
    /*!
-    \brief Method called by the line number area to paint the content of the QPlainTextEdit.
-
-    \param event The paint event.
-    */
-   void lineNumberAreaPaintEvent(QPaintEvent *event);
-
-   /*!
     \brief Returns the width of the line number area.
 
     \return int The width in pixels.
     */
    int lineNumberAreaWidth();
 
-   class LineNumberArea : public QWidget
-   {
-   public:
-      LineNumberArea(FileDiffView *editor);
-
-      QSize sizeHint() const override;
-
-   protected:
-      void paintEvent(QPaintEvent *event) override;
-
-   private:
-      FileDiffView *fileDiffWidget;
-   };
-
    LineNumberArea *mLineNumberArea = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    int mStartingLine = 0;
    bool mUnified = false;
+   int mRow = -1;
+
+   friend class LineNumberArea;
 };

@@ -107,6 +107,9 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    issuesLayout->addWidget(headerFrame);
    issuesLayout->addLayout(mStackedLayout);
    issuesLayout->addWidget(footerFrame);
+
+   connect(mGitServerCache.get(), &GitServerCache::prUpdated, mPrChangesList, &PrChangesList::onReviewsReceived,
+           Qt::UniqueConnection);
 }
 
 IssueDetailedView::~IssueDetailedView()
