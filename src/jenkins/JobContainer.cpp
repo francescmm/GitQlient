@@ -35,13 +35,29 @@ JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo
 
 void JobContainer::addJobs(const QVector<JenkinsJobInfo> &jobs)
 {
+   QVector<JenkinsViewInfo> views;
+
    for (const auto &job : jobs)
    {
-      const auto button = new JobButton(job);
-      button->setObjectName("JobButton");
-      connect(button, &JobButton::clicked, this, &JobContainer::showJobInfo);
-      mLayout->addWidget(button);
+      if (job.builds.isEmpty() && job.color.isEmpty())
+      {
+         JenkinsViewInfo view;
+         view.name = job.name;
+         view.url = job.url;
+
+         views.append(std::move(view));
+      }
+      else
+      {
+         const auto button = new JobButton(job);
+         button->setObjectName("JobButton");
+         connect(button, &JobButton::clicked, this, &JobContainer::showJobInfo);
+         mLayout->addWidget(button);
+      }
    }
+
+   if (!views.isEmpty())
+      emit signalJobAreViews(views);
 }
 
 void JobContainer::showJobInfo()

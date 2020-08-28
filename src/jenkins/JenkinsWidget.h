@@ -7,6 +7,10 @@
 
 class QTabWidget;
 class GitBase;
+class QStackedLayout;
+class QButtonGroup;
+class QHBoxLayout;
+class QVBoxLayout;
 
 namespace Jenkins
 {
@@ -27,9 +31,12 @@ public:
 private:
    QSharedPointer<GitBase> mGit;
    IFetcher::Config mConfig;
-   QTabWidget *mTabWidget = nullptr;
+   QStackedLayout *mStackedLayout = nullptr;
    JenkinsJobPanel *mPanel = nullptr;
    RepoFetcher *mRepoFetcher = nullptr;
+   QHBoxLayout *mBodyLayout = nullptr;
+   QButtonGroup *mBtnGroup = nullptr;
+   QVBoxLayout *mButtonsLayout = nullptr;
 
    void configureGeneralView(const QVector<JenkinsViewInfo> &views);
 };
