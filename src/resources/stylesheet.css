@@ -61,6 +61,7 @@ Controls > QToolButton
    min-height: 35px;
 }
 
+QToolButton:menu-indicator, QToolButton::menu-button,
 Controls > QToolButton:menu-indicator, BranchesWidgetMinimal > QToolButton:menu-indicator,
 Controls > QToolButton:menu-button, #ToolButtonWithMenu:menu-button, #ToolButtonWithMenu:menu-indicator
 {

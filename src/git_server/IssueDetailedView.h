@@ -36,6 +36,7 @@ class PrCommitsList;
 class QStackedLayout;
 class GitBase;
 class PrChangesList;
+class QToolButton;
 
 namespace GitServer
 {
@@ -68,6 +69,13 @@ private:
       Commits
    };
 
+   enum class ReviewState
+   {
+      None,
+      Approved,
+      RequestChanges
+   };
+
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitServerCache> mGitServerCache;
    int mIssueNumber = 0;
@@ -78,6 +86,7 @@ private:
    PrCommentsList *mPrCommentsList = nullptr;
    PrChangesList *mPrChangesList = nullptr;
    PrCommitsList *mPrCommitsList = nullptr;
+   QToolButton *mReviewBtn = nullptr;
 
 private slots:
    void showView(int view);

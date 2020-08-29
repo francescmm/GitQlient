@@ -14,6 +14,7 @@
 #include <QToolButton>
 #include <QButtonGroup>
 #include <QStackedLayout>
+#include <QMenu>
 
 using namespace GitServer;
 
@@ -28,6 +29,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    , mPrCommentsList(new PrCommentsList(mGitServerCache))
    , mPrChangesList(new PrChangesList(mGit))
    , mPrCommitsList(new PrCommitsList(mGitServerCache))
+   , mReviewBtn(new QToolButton())
 
 {
    mTitleLabel->setText(tr("Detailed View"));
@@ -64,10 +66,54 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    connect(mBtnGroup, SIGNAL(buttonClicked(int)), this, SLOT(showView(int)));
 #endif
 
-   const auto addComment = new QToolButton();
-   addComment->setDisabled(true);
-   addComment->setIcon(QIcon(":/icons/add_comment"));
-   addComment->setToolTip(tr("Add new comment"));
+   const auto actionGroup = new QActionGroup(this);
+   const auto reviewMenu = new QMenu(mReviewBtn);
+   mReviewBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mReviewBtn->setPopupMode(QToolButton::InstantPopup);
+   mReviewBtn->setIcon(QIcon(":/icons/review_comment"));
+   mReviewBtn->setToolTip(tr("Start review"));
+   mReviewBtn->setDisabled(true);
+   mReviewBtn->setMenu(reviewMenu);
+
+   auto action = new QAction(tr("Only comments"));
+   action->setToolTip(tr("Comment"));
+   action->setCheckable(true);
+   action->setChecked(true);
+   action->setData(static_cast<int>(ReviewState::None));
+   actionGroup->addAction(action);
+   reviewMenu->addAction(action);
+
+   action = new QAction(tr("Review: Approve"));
+   action->setCheckable(true);
+   action->setToolTip(tr("The comments will be part of a review"));
+   action->setData(static_cast<int>(ReviewState::Approved));
+   actionGroup->addAction(action);
+   reviewMenu->addAction(action);
+
+   action = new QAction(tr("Review: Request changes"));
+   action->setCheckable(true);
+   action->setToolTip(tr("The comments will be part of a review"));
+   action->setData(static_cast<int>(ReviewState::RequestChanges));
+   actionGroup->addAction(action);
+   reviewMenu->addAction(action);
+
+   connect(actionGroup, &QActionGroup::triggered, this, [this](QAction *sender) {
+      switch (static_cast<ReviewState>(sender->data().toInt()))
+      {
+         case ReviewState::None:
+            mReviewBtn->setIcon(QIcon(":/icons/review_comment"));
+            mReviewBtn->setToolTip(tr("Comment"));
+            break;
+         case ReviewState::Approved:
+            mReviewBtn->setIcon(QIcon(":/icons/review_approve"));
+            mReviewBtn->setToolTip(tr("Approved"));
+            break;
+         case ReviewState::RequestChanges:
+            mReviewBtn->setIcon(QIcon(":/icons/review_change"));
+            mReviewBtn->setToolTip(tr("Request changes"));
+            break;
+      }
+   });
 
    const auto headLine = new QVBoxLayout();
    headLine->setContentsMargins(QMargins());
@@ -88,7 +134,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    headerLayout->addWidget(changes);
    headerLayout->addWidget(commits);
    headerLayout->addSpacing(20);
-   headerLayout->addWidget(addComment);
+   headerLayout->addWidget(mReviewBtn);
 
    const auto footerFrame = new QFrame();
    footerFrame->setObjectName("IssuesFooterFrame");
@@ -109,11 +155,11 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    issuesLayout->addWidget(footerFrame);
 
    connect(mPrCommentsList, &PrCommentsList::frameReviewLink, mPrChangesList, &PrChangesList::addLinks);
-   connect(mPrChangesList, &PrChangesList::gotoReview, this, [this]() {
+   connect(mPrChangesList, &PrChangesList::gotoReview, this, [this](int frameId) {
       mBtnGroup->button(static_cast<int>(Buttons::Comments))->setChecked(true);
       showView(static_cast<int>(Buttons::Comments));
+      mPrCommentsList->highLightComment(frameId);
    });
-   connect(mPrChangesList, &PrChangesList::gotoReview, mPrCommentsList, &PrCommentsList::highLightComment);
 }
 
 IssueDetailedView::~IssueDetailedView()
@@ -153,6 +199,7 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum)
    mBtnGroup->button(static_cast<int>(Buttons::Commits))->setEnabled(config == Config::PullRequests);
    mBtnGroup->button(static_cast<int>(Buttons::Changes))->setEnabled(config == Config::PullRequests);
    mBtnGroup->button(static_cast<int>(Buttons::Comments))->setEnabled(true);
+   mReviewBtn->setEnabled(config == Config::PullRequests);
 }
 
 void IssueDetailedView::showView(int view)
