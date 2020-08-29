@@ -42,6 +42,8 @@ void PrChangesList::loadData(const QString &baseBranch, const QString &headBranc
          for (auto &change : changes)
          {
             const auto changeListItem = new PrChangeListItem(change);
+            connect(changeListItem, &PrChangeListItem::gotoReview, this, &PrChangesList::gotoReview);
+
             mListItems.append(changeListItem);
 
             mainLayout->addWidget(changeListItem);
@@ -121,6 +123,41 @@ void PrChangesList::onReviewsReceived(PullRequest pr)
       {
          if (bookmark.first >= iter->getStartingLine() && bookmark.first <= iter->getEndingLine())
             bookmarks.insert(bookmark.first, bookmark.second);
+      }
+
+      if (!bookmarks.isEmpty())
+         iter->setBookmarks(bookmarks);
+   }
+}
+
+void PrChangesList::addLinks(PullRequest pr, const QMap<int, int> &reviewLinkToComments)
+{
+   QMultiMap<QString, QPair<int, int>> bookmarksPerFile;
+
+   for (auto reviewId : reviewLinkToComments)
+   {
+      for (auto review : pr.reviewComment)
+      {
+         if (review.id == reviewId)
+         {
+            if (!review.outdated)
+               bookmarksPerFile.insert(review.diff.file, { review.diff.line, review.id });
+            else
+               bookmarksPerFile.insert(review.diff.file, { review.diff.originalLine, review.id });
+
+            break;
+         }
+      }
+   }
+
+   for (auto iter : mListItems)
+   {
+      QMap<int, int> bookmarks;
+
+      for (auto bookmark : bookmarksPerFile.values(iter->getFileName()))
+      {
+         if (bookmark.first >= iter->getStartingLine() && bookmark.first <= iter->getEndingLine())
+            bookmarks.insert(bookmark.first, reviewLinkToComments.key(bookmark.second));
       }
 
       if (!bookmarks.isEmpty())

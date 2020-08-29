@@ -31,9 +31,14 @@ class FileDiffView;
 
 class LineNumberArea : public QWidget
 {
+   Q_OBJECT
+
+signals:
+   void gotoReview(int linkId);
+
 public:
    using BookmarkLine = int;
-   using BookmarkCommentId = int;
+   using LinkId = int;
 
    LineNumberArea(FileDiffView *editor, bool allowComments = false);
 
@@ -41,7 +46,7 @@ public:
    QSize sizeHint() const override;
    void setEditor(FileDiffView *editor);
    bool commentsAllowed() const { return mCommentsAllowed; }
-   void setCommentBookmarks(const QMap<BookmarkLine, BookmarkCommentId> &bookmarks) { mBookmarks = bookmarks; }
+   void setCommentBookmarks(const QMap<BookmarkLine, LinkId> &bookmarks) { mBookmarks = bookmarks; }
 
 protected:
    void paintEvent(QPaintEvent *event) override;
@@ -53,5 +58,5 @@ private:
    FileDiffView *fileDiffWidget;
    bool mPressed = false;
    bool mCommentsAllowed = false;
-   QMap<BookmarkLine, BookmarkCommentId> mBookmarks;
+   QMap<BookmarkLine, LinkId> mBookmarks;
 };

@@ -108,8 +108,12 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    issuesLayout->addLayout(mStackedLayout);
    issuesLayout->addWidget(footerFrame);
 
-   connect(mGitServerCache.get(), &GitServerCache::prUpdated, mPrChangesList, &PrChangesList::onReviewsReceived,
-           Qt::UniqueConnection);
+   connect(mPrCommentsList, &PrCommentsList::frameReviewLink, mPrChangesList, &PrChangesList::addLinks);
+   connect(mPrChangesList, &PrChangesList::gotoReview, this, [this]() {
+      mBtnGroup->button(static_cast<int>(Buttons::Comments))->setChecked(true);
+      showView(static_cast<int>(Buttons::Comments));
+   });
+   connect(mPrChangesList, &PrChangesList::gotoReview, mPrCommentsList, &PrCommentsList::highLightComment);
 }
 
 IssueDetailedView::~IssueDetailedView()

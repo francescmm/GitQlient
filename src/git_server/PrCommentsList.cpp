@@ -18,6 +18,8 @@
 #include <QStandardPaths>
 #include <QNetworkReply>
 #include <QTextEdit>
+#include <QPropertyAnimation>
+#include <QSequentialAnimationGroup>
 
 using namespace GitServer;
 
@@ -141,6 +143,28 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    }
 }
 
+void PrCommentsList::highLightComment(int frameId)
+{
+   const auto daFrame = mComments.value(frameId);
+
+   mScroll->ensureWidgetVisible(daFrame);
+
+   const auto animationGoup = new QSequentialAnimationGroup();
+   auto animation = new QPropertyAnimation(daFrame, "color");
+   animation->setDuration(500);
+   animation->setStartValue(QColor("#404142"));
+   animation->setEndValue(QColor("#606162"));
+   animationGoup->addAnimation(animation);
+
+   animation = new QPropertyAnimation(daFrame, "color");
+   animation->setDuration(500);
+   animation->setStartValue(QColor("#606162"));
+   animation->setEndValue(QColor("#404142"));
+   animationGoup->addAnimation(animation);
+
+   animationGoup->start();
+}
+
 void PrCommentsList::processComments(const Issue &issue)
 {
    disconnect(mGitServerCache.get(), &GitServerCache::issueUpdated, this, &PrCommentsList::processComments);
@@ -175,7 +199,10 @@ void PrCommentsList::onReviewsReceived(PullRequest pr)
    if (mIssueNumber != pr.number)
       return;
 
-   // disconnect(mGitServerCache.get(), &GitServerCache::prUpdated, this, &PrCommentsList::onReviewsReceived);
+   mFrameLinks.clear();
+   mComments.clear();
+
+   const auto originalPr = pr;
 
    QMultiMap<QDateTime, QLayout *> bubblesMap;
 
@@ -208,6 +235,8 @@ void PrCommentsList::onReviewsReceived(PullRequest pr)
       if (layout)
          mIssuesLayout->addLayout(layout);
    }
+
+   emit frameReviewLink(originalPr, mFrameLinks);
 
    mIssuesLayout->addStretch();
    mIssuesLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding));
@@ -346,6 +375,8 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
 
          const auto codeReviewFrame = new QFrame();
 
+         const auto frame = new HighlightningFrame();
+
          if (review.outdated)
          {
             const auto outdatedLabel = new ButtonLink(tr("Outdated"));
@@ -357,9 +388,6 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
             connect(outdatedLabel, &ButtonLink::clicked, this,
                     [codeReviewFrame]() { codeReviewFrame->setVisible(!codeReviewFrame->isVisible()); });
          }
-
-         const auto frame = new QFrame();
-         frame->setObjectName("IssueIntro");
 
          const auto innerLayout = new QVBoxLayout(frame);
          innerLayout->setContentsMargins(10, 10, 10, 10);
@@ -385,6 +413,11 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
 
          codeReviewLayout->addLayout(commentsLayout);
 
+         mFrameLinks.insert(mCommentId, review.id);
+         mComments.insert(mCommentId, frame);
+
+         ++mCommentId;
+
          const auto layout = new QHBoxLayout();
          layout->setContentsMargins(QMargins());
          layout->setSpacing(30);
@@ -397,4 +430,23 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
    }
 
    return listOfCodeReviews;
+}
+
+HighlightningFrame::HighlightningFrame(QWidget *parent)
+   : QFrame(parent)
+{
+   setObjectName("IssueIntro");
+}
+
+void HighlightningFrame::setColor(QColor color)
+{
+   setStyleSheet(QString("#IssueIntro { background-color: rgb(%1, %2, %3); }")
+                     .arg(color.red())
+                     .arg(color.green())
+                     .arg(color.blue()));
+}
+
+QColor HighlightningFrame::color()
+{
+   return Qt::black; // getter is not really needed for now
 }

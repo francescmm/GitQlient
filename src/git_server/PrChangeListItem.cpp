@@ -18,7 +18,7 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
 
    DiffHelper::processDiff(change.content, true, change.newData, change.oldData);
 
-   mNewFileEndingLine = change.newData.first.count();
+   mNewFileEndingLine = mNewFileStartingLine + change.newData.first.count();
 
    const auto oldFile = new FileDiffView();
    const auto numberArea = new LineNumberArea(oldFile, true);
@@ -41,6 +41,8 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
    mNewFileDiff->setMinimumWidth(535);
    mNewFileDiff->show();
    mNewFileDiff->setMinimumHeight(mNewFileDiff->getHeight());
+
+   connect(mNewNumberArea, &LineNumberArea::gotoReview, this, &PrChangeListItem::gotoReview);
 
    const auto fileName = change.oldFileName == change.newFileName
        ? change.newFileName

@@ -119,7 +119,20 @@ void LineNumberArea::mousePressEvent(QMouseEvent *e)
 
 void LineNumberArea::mouseReleaseEvent(QMouseEvent *e)
 {
-   if (mCommentsAllowed && mPressed && rect().contains(e->pos())) { }
+   if (mCommentsAllowed && mPressed && rect().contains(e->pos()))
+   {
+      const auto height = width();
+      const auto helpPos = mapFromGlobal(QCursor::pos());
+      const auto x = helpPos.x();
+      if (x >= 0 && x <= height)
+      {
+         const auto cursor = fileDiffWidget->cursorForPosition(helpPos);
+         const auto row = cursor.block().blockNumber() + fileDiffWidget->mStartingLine + 1;
+         const auto linkId = mBookmarks.value(row);
+
+         emit gotoReview(linkId);
+      }
+   }
 
    mPressed = false;
 }
