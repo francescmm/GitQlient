@@ -20,6 +20,8 @@
 #include <QTextEdit>
 #include <QPropertyAnimation>
 #include <QSequentialAnimationGroup>
+#include <QPushButton>
+#include <QIcon>
 
 using namespace GitServer;
 
@@ -374,20 +376,7 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
          creationLayout->addStretch();
 
          const auto codeReviewFrame = new QFrame();
-
          const auto frame = new HighlightningFrame();
-
-         if (review.outdated)
-         {
-            const auto outdatedLabel = new ButtonLink(tr("Outdated"));
-            outdatedLabel->setObjectName("OutdatedLabel");
-            creationLayout->addWidget(outdatedLabel);
-
-            codeReviewFrame->setVisible(false);
-
-            connect(outdatedLabel, &ButtonLink::clicked, this,
-                    [codeReviewFrame]() { codeReviewFrame->setVisible(!codeReviewFrame->isVisible()); });
-         }
 
          const auto innerLayout = new QVBoxLayout(frame);
          innerLayout->setContentsMargins(10, 10, 10, 10);
@@ -412,6 +401,60 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
             commentsLayout->addWidget(new CodeReviewComment(comment));
 
          codeReviewLayout->addLayout(commentsLayout);
+
+         if (review.outdated)
+         {
+            const auto outdatedLabel = new ButtonLink(tr("Outdated"));
+            outdatedLabel->setObjectName("OutdatedLabel");
+            creationLayout->addWidget(outdatedLabel);
+
+            codeReviewFrame->setVisible(false);
+
+            connect(outdatedLabel, &ButtonLink::clicked, this,
+                    [codeReviewFrame]() { codeReviewFrame->setVisible(!codeReviewFrame->isVisible()); });
+         }
+         else
+         {
+            const auto addComment = new QPushButton();
+            addComment->setCheckable(true);
+            addComment->setChecked(false);
+            addComment->setIcon(QIcon(":/icons/add_comment"));
+            addComment->setToolTip(tr("Add new comment"));
+
+            creationLayout->addWidget(addComment);
+
+            const auto inputTextEdit = new QTextEdit();
+            inputTextEdit->setPlaceholderText(tr("Add your comment..."));
+            inputTextEdit->setObjectName("AddReviewInput");
+
+            const auto cancel = new QPushButton(tr("Cancel"));
+            const auto add = new QPushButton(tr("Comment"));
+            const auto btnsLayout = new QHBoxLayout();
+            btnsLayout->setContentsMargins(QMargins());
+            btnsLayout->setSpacing(0);
+            btnsLayout->addWidget(cancel);
+            btnsLayout->addStretch();
+            btnsLayout->addWidget(add);
+
+            const auto inputFrame = new QFrame();
+            inputFrame->setVisible(false);
+            const auto inputLayout = new QVBoxLayout(inputFrame);
+            inputLayout->setContentsMargins(QMargins());
+            inputLayout->addSpacing(20);
+            inputLayout->setSpacing(10);
+            inputLayout->addWidget(inputTextEdit);
+            inputLayout->addLayout(btnsLayout);
+
+            codeReviewLayout->addWidget(inputFrame);
+
+            connect(cancel, &QPushButton::clicked, this, [inputTextEdit, addComment]() {
+               inputTextEdit->clear();
+               addComment->toggle();
+            });
+            connect(add, &QPushButton::clicked, this, []() {});
+            connect(addComment, &QPushButton::toggled, this,
+                    [inputFrame](bool checked) { inputFrame->setVisible(checked); });
+         }
 
          mFrameLinks.insert(mCommentId, review.id);
          mComments.insert(mCommentId, frame);

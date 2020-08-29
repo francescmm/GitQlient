@@ -908,3 +908,11 @@ SourceCodeReview QLabel
    border-right: 1px solid white;
 }
 
+#AddReviewInput
+{
+   background: #505152;
+   border: 1px solid #2E2F30;
+   border-radius: 10px;
+   padding: 5px;
+}
+
