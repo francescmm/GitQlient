@@ -452,8 +452,10 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
                addComment->toggle();
             });
             connect(add, &QPushButton::clicked, this, []() {});
-            connect(addComment, &QPushButton::toggled, this,
-                    [inputFrame](bool checked) { inputFrame->setVisible(checked); });
+            connect(addComment, &QPushButton::toggled, this, [inputFrame, inputTextEdit](bool checked) {
+               inputFrame->setVisible(checked);
+               inputTextEdit->setFocus();
+            });
          }
 
          mFrameLinks.insert(mCommentId, review.id);
