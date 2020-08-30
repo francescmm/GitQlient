@@ -15,6 +15,7 @@
 #include <QButtonGroup>
 #include <QStackedLayout>
 #include <QMenu>
+#include <QEvent>
 
 using namespace GitServer;
 
@@ -26,11 +27,11 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    , mBtnGroup(new QButtonGroup())
    , mTitleLabel(new QLabel())
    , mCreationLabel(new QLabel())
+   , mStackedLayout(new QStackedLayout())
    , mPrCommentsList(new PrCommentsList(mGitServerCache))
    , mPrChangesList(new PrChangesList(mGit))
    , mPrCommitsList(new PrCommitsList(mGitServerCache))
    , mReviewBtn(new QToolButton())
-
 {
    mTitleLabel->setText(tr("Detailed View"));
    mTitleLabel->setObjectName("HeaderTitle");
@@ -61,13 +62,14 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    mBtnGroup->addButton(commits, static_cast<int>(Buttons::Commits));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-   connect(mBtnGroup, &QButtonGroup::idClicked, this, &IssueDetailedView::showView);
+   connect(mBtnGroup, &QButtonGroup::idClicked, mStackedLayout, &QStackedLayout::setCurrentIndex);
 #else
-   connect(mBtnGroup, SIGNAL(buttonClicked(int)), this, SLOT(showView(int)));
+   connect(mBtnGroup, SIGNAL(buttonClicked(int)), mStackedLayout, SLOT(setCurrentIndex(int)));
 #endif
 
    const auto actionGroup = new QActionGroup(this);
    const auto reviewMenu = new QMenu(mReviewBtn);
+   reviewMenu->installEventFilter(this);
    mReviewBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mReviewBtn->setPopupMode(QToolButton::InstantPopup);
    mReviewBtn->setIcon(QIcon(":/icons/review_comment"));
@@ -141,7 +143,6 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
 
    mPrCommitsList->setVisible(false);
 
-   mStackedLayout = new QStackedLayout();
    mStackedLayout->insertWidget(static_cast<int>(Buttons::Comments), mPrCommentsList);
    mStackedLayout->insertWidget(static_cast<int>(Buttons::Changes), mPrChangesList);
    mStackedLayout->insertWidget(static_cast<int>(Buttons::Commits), mPrCommitsList);
@@ -157,7 +158,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    connect(mPrCommentsList, &PrCommentsList::frameReviewLink, mPrChangesList, &PrChangesList::addLinks);
    connect(mPrChangesList, &PrChangesList::gotoReview, this, [this](int frameId) {
       mBtnGroup->button(static_cast<int>(Buttons::Comments))->setChecked(true);
-      showView(static_cast<int>(Buttons::Comments));
+      mStackedLayout->setCurrentIndex(static_cast<int>(Buttons::Comments));
       mPrCommentsList->highLightComment(frameId);
    });
 }
@@ -202,16 +203,18 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum)
    mReviewBtn->setEnabled(config == Config::PullRequests);
 }
 
-void IssueDetailedView::showView(int view)
+bool IssueDetailedView::eventFilter(QObject *obj, QEvent *event)
 {
-   switch (static_cast<Buttons>(view))
+   if (const auto menu = qobject_cast<QMenu *>(obj); menu && event->type() == QEvent::Show)
    {
-      case Buttons::Commits:
-
-         break;
-      default:
-         break;
+      auto localPos = menu->parentWidget()->pos();
+      localPos.setX(localPos.x() - menu->width() + menu->parentWidget()->width());
+      auto pos = mapToGlobal(localPos);
+      menu->show();
+      pos.setY(pos.y() + menu->parentWidget()->height());
+      menu->move(pos);
+      return true;
    }
 
-   mStackedLayout->setCurrentIndex(view);
+   return false;
 }

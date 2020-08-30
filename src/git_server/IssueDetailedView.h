@@ -61,6 +61,9 @@ public:
 
    void loadData(Config config, int issueNum);
 
+protected:
+   bool eventFilter(QObject *obj, QEvent *event);
+
 private:
    enum class Buttons
    {
@@ -87,7 +90,4 @@ private:
    PrChangesList *mPrChangesList = nullptr;
    PrCommitsList *mPrCommitsList = nullptr;
    QToolButton *mReviewBtn = nullptr;
-
-private slots:
-   void showView(int view);
 };
