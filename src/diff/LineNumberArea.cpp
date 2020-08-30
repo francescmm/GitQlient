@@ -130,7 +130,9 @@ void LineNumberArea::mouseReleaseEvent(QMouseEvent *e)
          const auto row = cursor.block().blockNumber() + fileDiffWidget->mStartingLine + 1;
          const auto linkId = mBookmarks.value(row, -1);
 
-         if (linkId != -1)
+         if (linkId == -1)
+            emit addComment();
+         else
             emit gotoReview(linkId);
       }
    }

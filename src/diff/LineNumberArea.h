@@ -35,6 +35,7 @@ class LineNumberArea : public QWidget
 
 signals:
    void gotoReview(int linkId);
+   void addComment();
 
 public:
    using BookmarkLine = int;
