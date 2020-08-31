@@ -12,6 +12,11 @@ class FileDiffView;
 
 class PrChangeListItem : public QFrame
 {
+   Q_OBJECT
+
+signals:
+   void gotoReview(int linkId);
+
 public:
    explicit PrChangeListItem(DiffHelper::DiffChange change, QWidget *parent = nullptr);
 

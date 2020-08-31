@@ -61,6 +61,7 @@ Controls > QToolButton
    min-height: 35px;
 }
 
+QToolButton:menu-indicator, QToolButton::menu-button,
 Controls > QToolButton:menu-indicator, BranchesWidgetMinimal > QToolButton:menu-indicator,
 Controls > QToolButton:menu-button, #ToolButtonWithMenu:menu-button, #ToolButtonWithMenu:menu-indicator
 {
@@ -905,6 +906,14 @@ SourceCodeReview QLabel
 #LineNumberArea
 {
    border-right: 1px solid white;
+}
+
+#AddReviewInput
+{
+   background: #505152;
+   border: 1px solid #2E2F30;
+   border-radius: 10px;
+   padding: 5px;
 }
 
 /* JENKINS */

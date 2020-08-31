@@ -36,6 +36,7 @@ class PrCommitsList;
 class QStackedLayout;
 class GitBase;
 class PrChangesList;
+class QToolButton;
 
 namespace GitServer
 {
@@ -60,12 +61,22 @@ public:
 
    void loadData(Config config, int issueNum);
 
+protected:
+   bool eventFilter(QObject *obj, QEvent *event);
+
 private:
    enum class Buttons
    {
       Comments,
       Changes,
       Commits
+   };
+
+   enum class ReviewState
+   {
+      None,
+      Approved,
+      RequestChanges
    };
 
    QSharedPointer<GitBase> mGit;
@@ -78,7 +89,5 @@ private:
    PrCommentsList *mPrCommentsList = nullptr;
    PrChangesList *mPrChangesList = nullptr;
    PrCommitsList *mPrCommitsList = nullptr;
-
-private slots:
-   void showView(int view);
+   QToolButton *mReviewBtn = nullptr;
 };

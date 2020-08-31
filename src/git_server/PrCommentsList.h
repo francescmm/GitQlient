@@ -43,8 +43,25 @@ class QNetworkAccessManager;
 class QHBoxLayout;
 class QScrollArea;
 
+class HighlightningFrame : public QFrame
+{
+   Q_OBJECT
+   Q_PROPERTY(QColor color READ color WRITE setColor)
+
+public:
+   explicit HighlightningFrame(QWidget *parent = nullptr);
+
+   void setColor(QColor color);
+   QColor color();
+};
+
 class PrCommentsList : public QFrame
 {
+   Q_OBJECT
+
+signals:
+   void frameReviewLink(GitServer::PullRequest pr, const QMap<int, int> &links);
+
 public:
    enum class Config
    {
@@ -55,6 +72,7 @@ public:
    explicit PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
 
    void loadData(Config config, int issueNumber);
+   void highLightComment(int frameId);
 
 private:
    QSharedPointer<GitServerCache> mGitServerCache;
@@ -65,6 +83,9 @@ private:
    QScrollArea *mScroll = nullptr;
    bool mLoaded = false;
    int mIssueNumber = -1;
+   QMap<int, QFrame *> mComments;
+   QMap<int, int> mFrameLinks;
+   inline static int mCommentId = 0;
 
    void processComments(const GitServer::Issue &issue);
    QLabel *createHeadline(const QDateTime &dt, const QString &prefix = QString());

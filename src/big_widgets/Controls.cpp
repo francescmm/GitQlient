@@ -463,7 +463,6 @@ void Controls::initGitServerConnection()
 
 bool Controls::eventFilter(QObject *obj, QEvent *event)
 {
-
    if (const auto menu = qobject_cast<QMenu *>(obj); menu && event->type() == QEvent::Show)
    {
       auto localPos = menu->parentWidget()->pos();
