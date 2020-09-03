@@ -53,7 +53,7 @@ void JobFetcher::processData(const QJsonDocument &json)
 
    mJobsToUpdated = mJobs.count();
 
-   for (const auto &jobInfo : mJobs)
+   for (const auto &jobInfo : qAsConst(mJobs))
    {
       const auto jobRequest = new JobDetailsFetcher(mConfig, jobInfo);
       connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, this, &JobFetcher::updateJobs);

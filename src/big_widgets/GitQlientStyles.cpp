@@ -129,6 +129,11 @@ QColor GitQlientStyles::getOrange()
    return QColor("#FF9320");
 }
 
+QColor GitQlientStyles::getGitQlientOrange()
+{
+   return QColor("#D89000");
+}
+
 std::array<QColor, GitQlientStyles::kBranchColors> GitQlientStyles::getBranchColors()
 {
    static std::array<QColor, kBranchColors> colors { { getTextColor(), getRed(), getBlue(), getGreen(), getOrange(),

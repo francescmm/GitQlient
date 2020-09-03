@@ -58,10 +58,6 @@ void JenkinsWidget::reload() const
 
 void JenkinsWidget::configureGeneralView(const QVector<JenkinsViewInfo> &views)
 {
-   GitQlientSettings settings;
-   const auto user = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", "").toString();
-   const auto token = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", "").toString();
-
    for (auto &view : views)
    {
       const auto button = new QPushButton(view.name);

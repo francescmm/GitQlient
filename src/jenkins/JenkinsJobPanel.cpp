@@ -59,7 +59,7 @@ void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &job)
 
    mTmpBuildsCounter = mRequestedJob.builds.count();
 
-   for (const auto &build : mRequestedJob.builds)
+   for (const auto &build : qAsConst(mRequestedJob.builds))
    {
       const auto buildFetcher = new BuildGeneralInfoFetcher(mConfig, build);
       connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, this, &JenkinsJobPanel::appendJobsData);
@@ -67,7 +67,7 @@ void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &job)
       buildFetcher->triggerFetch();
    }
 
-   for (const auto button : mBuilds)
+   for (const auto button : qAsConst(mBuilds))
    {
       mBuildsGroup->removeButton(button);
       delete button;
@@ -84,7 +84,7 @@ void JenkinsJobPanel::appendJobsData(const JenkinsJobBuildInfo &build)
 
    if (mTmpBuildsCounter == 0)
    {
-      for (const auto &build : mRequestedJob.builds)
+      for (const auto &build : qAsConst(mRequestedJob.builds))
       {
          const auto btn = new QRadioButton(tr("%1 - %2").arg(build.number).arg(build.result));
          mBuilds.append(btn);

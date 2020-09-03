@@ -343,7 +343,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          QColor color = activeColor;
 
          if (mCache->pendingLocalChanges())
-            color = QColor("#D89000");
+            color = GitQlientStyles::getGitQlientOrange();
 
          paintGraphLane(p, LaneType::BRANCH, false, 0, LANE_WIDTH, color, activeColor, activeColor, true,
                         commit.parentsCount() != 0);
