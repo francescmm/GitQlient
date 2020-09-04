@@ -113,6 +113,16 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
       creationLayout->addWidget(milestone);
    }
 
+   creationLayout->addStretch();
+
+   const auto addComment = new QPushButton();
+   addComment->setCheckable(true);
+   addComment->setChecked(false);
+   addComment->setIcon(QIcon(":/icons/add_comment"));
+   addComment->setToolTip(tr("Add new comment"));
+
+   creationLayout->addWidget(addComment);
+
    const auto frame = new QFrame();
    frame->setObjectName("IssueIntro");
 
