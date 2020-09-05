@@ -6,7 +6,7 @@
 #include <QFrame>
 
 class QLabel;
-class QCheckBox;
+class CheckBox;
 class QVBoxLayout;
 class QButtonGroup;
 class QRadioButton;
@@ -27,8 +27,8 @@ private:
    IFetcher::Config mConfig;
    QLabel *mName = nullptr;
    QLabel *mUrl = nullptr;
-   QCheckBox *mBuildable = nullptr;
-   QCheckBox *mInQueue = nullptr;
+   CheckBox *mBuildable = nullptr;
+   CheckBox *mInQueue = nullptr;
    QLabel *mHealthDesc = nullptr;
    QVBoxLayout *mBuildListLayout = nullptr;
    QButtonGroup *mBuildsGroup = nullptr;

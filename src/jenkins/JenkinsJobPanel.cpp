@@ -1,8 +1,9 @@
-#include "JenkinsJobPanel.h"
+#include <JenkinsJobPanel.h>
+
 #include <BuildGeneralInfoFetcher.h>
+#include <CheckBox.h>
 
 #include <QLabel>
-#include <QCheckBox>
 #include <QGridLayout>
 #include <QScrollArea>
 #include <QRadioButton>
@@ -17,8 +18,8 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    , mConfig(config)
    , mName(new QLabel())
    , mUrl(new QLabel())
-   , mBuildable(new QCheckBox(tr("is buildable")))
-   , mInQueue(new QCheckBox(tr("is in queue")))
+   , mBuildable(new CheckBox(tr("is buildable")))
+   , mInQueue(new CheckBox(tr("is in queue")))
    , mHealthDesc(new QLabel())
    , mBuildsGroup(new QButtonGroup())
 {
@@ -42,10 +43,11 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    layout->addWidget(new QLabel(tr("URL: ")), 1, 0);
    layout->addWidget(mUrl, 1, 1);
    layout->addWidget(new QLabel(tr("Description: ")), 2, 0);
+   layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 2);
    layout->addWidget(mHealthDesc, 2, 1);
    layout->addWidget(mBuildable, 3, 0, 1, 2);
    layout->addWidget(mInQueue, 4, 0, 1, 2);
-   layout->addWidget(scrollArea, 5, 0, 1, 2);
+   layout->addWidget(scrollArea, 5, 0, 1, 3);
 }
 
 void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &job)
