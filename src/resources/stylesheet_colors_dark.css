@@ -710,3 +710,18 @@ QToolButton#ViewBtnOption:!checked:hover
     background: #606162;
 }
 
+#JenkinsWidgetTabButton:!checked
+{
+    background: #202122;
+}
+
+#JenkinsWidgetTabButton:!checked:hover
+{
+    background: #505152;
+}
+
+#JenkinsWidgetTabButton:checked
+{
+    background: #2E2F30;
+}
+

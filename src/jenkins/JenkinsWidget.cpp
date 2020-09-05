@@ -72,6 +72,7 @@ void JenkinsWidget::configureGeneralView(const QVector<JenkinsViewInfo> &views)
       if (!mViews.contains(view))
       {
          const auto button = new QPushButton(view.name);
+         button->setObjectName("JenkinsWidgetTabButton");
          button->setCheckable(true);
 
          const auto container = new JobContainer(mConfig, view, this);
