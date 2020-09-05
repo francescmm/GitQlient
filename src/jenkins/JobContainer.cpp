@@ -22,6 +22,7 @@ JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo
    scrollArea->setObjectName("JobContainerScrollArea");
    scrollArea->setWidget(auxFrame);
    scrollArea->setWidgetResizable(true);
+   scrollArea->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
 
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
@@ -55,6 +56,8 @@ void JobContainer::addJobs(const QVector<JenkinsJobInfo> &jobs)
          mLayout->addWidget(button);
       }
    }
+
+   mLayout->addStretch();
 
    if (!views.isEmpty())
       emit signalJobAreViews(views);

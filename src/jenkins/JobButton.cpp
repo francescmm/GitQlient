@@ -26,13 +26,11 @@ JobButton::JobButton(const JenkinsJobInfo &job, QWidget *parent)
    const auto icon = new QLabel();
    icon->setPixmap(QIcon(QString(":/icons/%1").arg(mJob.color)).pixmap(22, 22));
 
-   const auto name = new QLabel(mJob.name);
-
    const auto layout = new QHBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->setSpacing(20);
    layout->addWidget(icon);
-   layout->addWidget(name);
+   layout->addWidget(new QLabel(mJob.name));
    layout->addStretch();
 }
 

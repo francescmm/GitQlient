@@ -705,3 +705,8 @@ QToolButton#ViewBtnOption:!checked:hover
    background-color: #606162;
 }
 
+#JobButton:hover
+{
+    background: #606162;
+}
+

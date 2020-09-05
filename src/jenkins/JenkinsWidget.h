@@ -37,6 +37,7 @@ private:
    QHBoxLayout *mBodyLayout = nullptr;
    QButtonGroup *mBtnGroup = nullptr;
    QVBoxLayout *mButtonsLayout = nullptr;
+   QVector<JenkinsViewInfo> mViews;
 
    void configureGeneralView(const QVector<JenkinsViewInfo> &views);
 };
