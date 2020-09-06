@@ -5,68 +5,98 @@
 
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include <QTreeWidget>
 
 namespace Jenkins
 {
 
 JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo &viewInfo, QWidget *parent)
    : QFrame(parent)
+   , mJobsTree(new QTreeWidget())
 {
-   const auto auxFrame = new QFrame();
-   auxFrame->setObjectName("JobContainer");
-   mLayout = new QVBoxLayout(auxFrame);
-   mLayout->setContentsMargins(10, 10, 10, 10);
-   mLayout->setSpacing(10);
-
-   const auto scrollArea = new QScrollArea();
-   scrollArea->setObjectName("JobContainerScrollArea");
-   scrollArea->setWidget(auxFrame);
-   scrollArea->setWidgetResizable(true);
-   scrollArea->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+   connect(mJobsTree, &QTreeWidget::itemClicked, this, &JobContainer::showJobInfo);
 
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->setSpacing(0);
-   layout->addWidget(scrollArea);
+   layout->addWidget(mJobsTree);
 
    const auto jobFetcher = new JobFetcher(config, viewInfo.url);
    connect(jobFetcher, &JobFetcher::signalJobsReceived, this, &JobContainer::addJobs);
    jobFetcher->triggerFetch();
 }
 
-void JobContainer::addJobs(const QVector<JenkinsJobInfo> &jobs)
+void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
 {
    QVector<JenkinsViewInfo> views;
 
-   for (const auto &job : jobs)
+   const auto keys = jobs.uniqueKeys();
+   for (const auto &key : keys)
    {
-      if (job.builds.isEmpty() && job.color.isEmpty())
-      {
-         JenkinsViewInfo view;
-         view.name = job.name;
-         view.url = job.url;
+      QTreeWidgetItem *item = nullptr;
 
-         views.append(std::move(view));
-      }
-      else
+      if (keys.count() > 1)
       {
-         const auto button = new JobButton(job);
-         button->setObjectName("JobButton");
-         connect(button, &JobButton::clicked, this, &JobContainer::showJobInfo);
-         mLayout->addWidget(button);
+         item = new QTreeWidgetItem({ key });
+         mJobsTree->addTopLevelItem(item);
       }
+
+      const auto values = jobs.values(key);
+      auto count = 0;
+
+      for (const auto &job : qAsConst(values))
+      {
+         if (job.builds.isEmpty() && job.color.isEmpty())
+         {
+            JenkinsViewInfo view;
+            view.name = job.name;
+            view.url = job.url;
+
+            views.append(std::move(view));
+         }
+         else
+         {
+            ++count;
+            QTreeWidgetItem *jobItem = nullptr;
+
+            if (item)
+               jobItem = new QTreeWidgetItem(item, { job.name });
+            else
+               jobItem = new QTreeWidgetItem(mJobsTree, { job.name });
+
+            QVariant v;
+            v.setValue(job);
+            jobItem->setData(0, Qt::UserRole, std::move(v));
+            jobItem->setIcon(0, getIconForJob(job));
+         }
+      }
+
+      if (item)
+         item->setExpanded(true);
    }
-
-   mLayout->addStretch();
 
    if (!views.isEmpty())
       emit signalJobAreViews(views);
 }
 
-void JobContainer::showJobInfo()
+void JobContainer::showJobInfo(QTreeWidgetItem *item, int column)
 {
-   if (auto btn = qobject_cast<JobButton *>(sender()))
-      emit signalJobInfoReceived(btn->getJenkinsJob());
+   const auto job = qvariant_cast<JenkinsJobInfo>(item->data(column, Qt::UserRole));
+   emit signalJobInfoReceived(job);
+}
+
+QIcon JobContainer::getIconForJob(JenkinsJobInfo job) const
+{
+   job.color.remove("_anime");
+
+   if (job.color.contains("blue"))
+      job.color = "green";
+   else if (job.color.contains("disabled") || job.color.contains("grey") || job.color.contains("notbuilt"))
+      job.color = "grey";
+   else if (job.color.contains("aborted"))
+      job.color = "dark_grey";
+
+   return QIcon(QString(":/icons/%1").arg(job.color)).pixmap(22, 22);
 }
 
 }

@@ -3,6 +3,7 @@
 #include <QDateTime>
 #include <QString>
 #include <QMap>
+#include <QMetaType>
 
 namespace Jenkins
 {
@@ -51,3 +52,5 @@ struct JenkinsJobInfo
 };
 
 }
+
+Q_DECLARE_METATYPE(Jenkins::JenkinsJobInfo);

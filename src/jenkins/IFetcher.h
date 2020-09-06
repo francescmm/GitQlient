@@ -28,7 +28,7 @@ public:
 protected:
    IFetcher::Config mConfig;
 
-   virtual void get(const QString &urlStr, int port = 443, bool customUrl = false) final;
+   virtual void get(const QString &urlStr, bool customUrl = false) final;
 
 private:
    virtual void processReply() final;

@@ -14,7 +14,7 @@ StageFetcher::StageFetcher(const Config &config, const JenkinsJobBuildInfo &buil
 
 void StageFetcher::triggerFetch()
 {
-   get(mBuild.url.append("wfapi/describe"), 443, true);
+   get(mBuild.url.append("wfapi/describe"), true);
 }
 
 void StageFetcher::processData(const QJsonDocument &json)

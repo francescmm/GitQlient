@@ -31,24 +31,45 @@ void JobFetcher::processData(const QJsonDocument &json)
 {
    const auto jsonObject = json.object();
 
-   if (!jsonObject.contains(QStringLiteral("jobs")))
+   if (!jsonObject.contains(QStringLiteral("views")))
+      QLog_Debug("Jenkins", "Views not found.");
+   else if (!jsonObject.contains(QStringLiteral("jobs")))
       QLog_Debug("Jenkins", "Jobs not found.");
 
-   const auto array = jsonObject[QStringLiteral("jobs")].toArray();
+   const auto views = jsonObject[QStringLiteral("views")].toArray();
 
-   for (const auto &job : array)
+   for (const auto &view : views)
    {
-      QJsonObject jobObject = job.toObject();
-      JenkinsJobInfo jobInfo;
+      const auto _class = view[QStringLiteral("_class")].toString();
+      const auto generalView = _class.contains("AllView");
+      const auto jsonObject = view.toObject();
+      const auto jobs = jsonObject[QStringLiteral("jobs")].toArray();
 
-      if (jobObject.contains(QStringLiteral("name")))
-         jobInfo.name = jobObject[QStringLiteral("name")].toString();
-      if (jobObject.contains(QStringLiteral("url")))
-         jobInfo.url = jobObject[QStringLiteral("url")].toString();
-      if (jobObject.contains(QStringLiteral("color")))
-         jobInfo.color = jobObject[QStringLiteral("color")].toString();
+      for (const auto &job : jobs)
+      {
+         QJsonObject jobObject = job.toObject();
+         QString url;
 
-      mJobs.append(jobInfo);
+         if (jobObject.contains(QStringLiteral("url")))
+            url = jobObject[QStringLiteral("url")].toString();
+
+         if (jobObject[QStringLiteral("_class")].toString().contains("WorkflowMultiBranchProject") && !generalView)
+         {
+            get(url);
+         }
+         else if (jobObject[QStringLiteral("_class")].toString().contains("WorkflowJob"))
+         {
+            JenkinsJobInfo jobInfo;
+            jobInfo.url = url;
+
+            if (jobObject.contains(QStringLiteral("name")))
+               jobInfo.name = jobObject[QStringLiteral("name")].toString();
+            if (jobObject.contains(QStringLiteral("color")))
+               jobInfo.color = jobObject[QStringLiteral("color")].toString();
+
+            mJobs.insert(view[QStringLiteral("name")].toString(), jobInfo);
+         }
+      }
    }
 
    mJobsToUpdated = mJobs.count();

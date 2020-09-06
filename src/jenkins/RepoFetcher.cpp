@@ -38,15 +38,41 @@ void RepoFetcher::processData(const QJsonDocument &json)
    QVector<JenkinsViewInfo> viewsInfo;
    viewsInfo.reserve(views.count());
 
-   for (const auto &job : views)
+   for (const auto &view : views)
    {
-      const auto jobObject = job.toObject();
-      JenkinsViewInfo info;
-      if (jobObject.contains(QStringLiteral("name")))
-         info.name = jobObject[QStringLiteral("name")].toString();
-      if (jobObject.contains(QStringLiteral("url")))
-         info.url = jobObject[QStringLiteral("url")].toString();
-      viewsInfo.append(info);
+      auto appendView = false;
+      const auto viewObject = view.toObject();
+      const auto jobs = viewObject[QStringLiteral("jobs")].toArray();
+
+      for (const auto &job : jobs)
+      {
+         QJsonObject jobObject = job.toObject();
+         QString url;
+
+         if (jobObject.contains(QStringLiteral("url")))
+            url = jobObject[QStringLiteral("url")].toString();
+
+         if (jobObject[QStringLiteral("_class")].toString().contains("WorkflowMultiBranchProject"))
+         {
+            JenkinsViewInfo info;
+            info.url = url;
+
+            if (jobObject.contains(QStringLiteral("name")))
+               info.name = jobObject[QStringLiteral("name")].toString();
+
+            viewsInfo.append(info);
+         }
+         else if (jobObject[QStringLiteral("_class")].toString().contains("WorkflowJob"))
+            appendView = true;
+      }
+
+      if (appendView)
+      {
+         JenkinsViewInfo info;
+         info.url = viewObject[QStringLiteral("url")].toString();
+         info.name = info.url.split("/", Qt::SkipEmptyParts).constLast();
+         viewsInfo.prepend(info);
+      }
    }
 
    emit signalViewsReceived(viewsInfo);

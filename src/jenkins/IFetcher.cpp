@@ -7,6 +7,8 @@
 
 #include <QLogger.h>
 
+#include <QUrlQuery>
+
 using namespace QLogger;
 
 namespace Jenkins
@@ -17,12 +19,18 @@ IFetcher::IFetcher(const Config &config, QObject *parent)
 {
 }
 
-void IFetcher::get(const QString &urlStr, int port, bool customUrl)
+void IFetcher::get(const QString &urlStr, bool customUrl)
 {
    const auto apiUrl = urlStr.endsWith("api/json") || customUrl ? urlStr : urlStr + "api/json";
 
    QUrl url(apiUrl);
-   url.setPort(port);
+
+   if (!customUrl)
+   {
+      QUrlQuery query;
+      query.addQueryItem("tree", "views[*[*]]");
+      url.setQuery(query);
+   }
 
    QNetworkRequest request(url);
 

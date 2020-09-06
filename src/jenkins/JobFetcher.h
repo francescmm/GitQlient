@@ -11,7 +11,7 @@ class JobFetcher final : public IFetcher
    Q_OBJECT
 
 signals:
-   void signalJobsReceived(const QVector<JenkinsJobInfo> &jobs);
+   void signalJobsReceived(const QMultiMap<QString, JenkinsJobInfo> &jobs);
 
 public:
    explicit JobFetcher(const IFetcher::Config &config, const QString &jobUrl, QObject *parent = nullptr);
@@ -20,7 +20,7 @@ public:
 
 private:
    QString mJobUrl;
-   QVector<JenkinsJobInfo> mJobs;
+   QMultiMap<QString, JenkinsJobInfo> mJobs;
    int mJobsToUpdated = 0;
 
    void processData(const QJsonDocument &json) override;
