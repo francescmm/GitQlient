@@ -229,7 +229,7 @@
       <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Untracked files</string>
+         <string>Untracked files </string>
         </property>
        </widget>
       </item>

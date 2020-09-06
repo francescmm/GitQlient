@@ -33,7 +33,7 @@ struct JenkinsJobBuildInfo
 
 struct JenkinsJobInfo
 {
-   bool operator==(const JenkinsJobInfo &info) const { return url == info.url; }
+   bool operator==(const JenkinsJobInfo &info) const { return name == info.name; }
 
    struct HealthStatus
    {

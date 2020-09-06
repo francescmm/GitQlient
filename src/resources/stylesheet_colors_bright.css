@@ -185,7 +185,8 @@ QLabel#lCounter
 }
 
 CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles,
-CommitChangesWidget > QFrame#untrackedFiles > QLabel, CommitChangesWidget > QFrame#unstagedFiles > QLabel, CommitChangesWidget > QFrame#stagedFiles > QLabel
+CommitChangesWidget > QFrame#untrackedFiles > QLabel, CommitChangesWidget > QFrame#unstagedFiles > QLabel, CommitChangesWidget > QFrame#stagedFiles > QLabel,
+#JobContainerHeader
 {
     background: #404142;
     color: white;

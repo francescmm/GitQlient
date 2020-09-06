@@ -15,7 +15,7 @@ JobDetailsFetcher::JobDetailsFetcher(const IFetcher::Config &config, const Jenki
 
 void JobDetailsFetcher::triggerFetch()
 {
-   get(mInfo.url);
+   get(mInfo.url + QString::fromUtf8("api/json"), true);
 }
 
 void JobDetailsFetcher::processData(const QJsonDocument &json)

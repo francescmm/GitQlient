@@ -45,8 +45,8 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
    mBodyLayout->addLayout(mStackedLayout);
 
    const auto layout = new QHBoxLayout(this);
-   layout->setContentsMargins(10, 10, 10, 10);
-   layout->setSpacing(10);
+   layout->setContentsMargins(QMargins());
+   layout->setSpacing(0);
    layout->addLayout(mBodyLayout);
    layout->addWidget(mPanel = new JenkinsJobPanel(mConfig));
    layout->setStretch(0, 30);

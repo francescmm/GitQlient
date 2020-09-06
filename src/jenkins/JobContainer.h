@@ -6,8 +6,9 @@
 #include <QFrame>
 
 class QVBoxLayout;
-class QTreeWidget;
 class QTreeWidgetItem;
+class QListWidget;
+class QLabel;
 
 namespace Jenkins
 {
@@ -26,10 +27,10 @@ public:
    explicit JobContainer(const IFetcher::Config &config, const JenkinsViewInfo &viewInfo, QWidget *parent = nullptr);
 
 private:
-   QTreeWidget *mJobsTree = nullptr;
-
    void addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs);
    void showJobInfo(QTreeWidgetItem *item, int column);
    QIcon getIconForJob(JenkinsJobInfo job) const;
+   void createHeader(const QString &name, QListWidget *listWidget);
+   void onHeaderClicked(QListWidget *listWidget, QLabel *mTagArrow);
 };
 }

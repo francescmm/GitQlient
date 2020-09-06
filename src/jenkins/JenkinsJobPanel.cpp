@@ -23,6 +23,8 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    , mHealthDesc(new QLabel())
    , mBuildsGroup(new QButtonGroup())
 {
+   setObjectName("JenkinsJobPanel");
+
    mBuildable->setDisabled(true);
    mInQueue->setDisabled(true);
 
@@ -36,7 +38,7 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    scrollArea->setWidgetResizable(true);
 
    const auto layout = new QGridLayout(this);
-   layout->setContentsMargins(QMargins());
+   layout->setContentsMargins(0, 10, 10, 10);
    layout->setSpacing(10);
    layout->addWidget(new QLabel(tr("Job name: ")), 0, 0);
    layout->addWidget(mName, 0, 1);

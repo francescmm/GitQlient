@@ -178,7 +178,8 @@ QLabel#lCounter
     color: #A3A3A4;
 }
 
-CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles
+CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles,
+#JobContainerHeader
 {
     background: #202122;
     border: none;
@@ -723,5 +724,15 @@ QToolButton#ViewBtnOption:!checked:hover
 #JenkinsWidgetTabButton:checked
 {
     background: #2E2F30;
+}
+
+JobContainer, #JenkinsJobPanel
+{
+    background: #2E2F30;
+}
+
+#JobContainerHeader
+{
+    padding-left: 10px;
 }
 

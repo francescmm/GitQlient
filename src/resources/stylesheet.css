@@ -270,7 +270,7 @@ QLabel#lCounter
     qproperty-alignment: AlignCenter;
 }
 
-CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles
+CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles, #JobContainerHeader
 {
     max-height: 30px;
     min-height: 30px;
