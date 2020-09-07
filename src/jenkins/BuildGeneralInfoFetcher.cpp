@@ -19,7 +19,7 @@ BuildGeneralInfoFetcher::BuildGeneralInfoFetcher(const Config &config, const Jen
 
 void BuildGeneralInfoFetcher::triggerFetch()
 {
-   get(mBuild.url);
+   get(mBuild.url + QString::fromUtf8("api/json"), true);
 }
 
 void BuildGeneralInfoFetcher::processData(const QJsonDocument &json)

@@ -726,7 +726,7 @@ QToolButton#ViewBtnOption:!checked:hover
     background: #2E2F30;
 }
 
-JobContainer, #JenkinsJobPanel
+JobContainer, #JenkinsJobPanel, #JobPanelTabWidget, JenkinsJobPanel#JenkinsJobPanel > QTabWidget > QScrollBar
 {
     background: #2E2F30;
 }
@@ -734,5 +734,18 @@ JobContainer, #JenkinsJobPanel
 #JobContainerHeader
 {
     padding-left: 10px;
+}
+
+#JenkinsOutput
+{
+    background: #404142;
+    color: white;
+}
+
+#JenkinsOutput > QLineEdit
+{
+    border-color: #202122;
+    background-color: #606162;
+    color: white;
 }
 

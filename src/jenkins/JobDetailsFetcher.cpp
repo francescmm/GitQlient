@@ -66,7 +66,7 @@ void JobDetailsFetcher::readBuildsListFor(QJsonObject &jsonObject)
             build.number = buildObject[QStringLiteral("number")].toInt();
             build.url = buildObject[QStringLiteral("url")].toString();
 
-            mInfo.builds.insert(build.number, build);
+            mInfo.builds.append(build);
          }
       }
    }

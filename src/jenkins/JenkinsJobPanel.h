@@ -8,8 +8,12 @@
 class QLabel;
 class CheckBox;
 class QVBoxLayout;
+class QHBoxLayout;
 class QButtonGroup;
 class QRadioButton;
+class QTabWidget;
+class QNetworkAccessManager;
+class QPlainTextEdit;
 
 namespace Jenkins
 {
@@ -30,12 +34,22 @@ private:
    CheckBox *mBuildable = nullptr;
    CheckBox *mInQueue = nullptr;
    QLabel *mHealthDesc = nullptr;
+   QFrame *mScrollFrame = nullptr;
    QVBoxLayout *mBuildListLayout = nullptr;
-   QButtonGroup *mBuildsGroup = nullptr;
-   QVector<QRadioButton *> mBuilds;
+   QHBoxLayout *mLastBuildLayout = nullptr;
+   QFrame *mLastBuildFrame = nullptr;
+   QTabWidget *mTabWidget = nullptr;
    JenkinsJobInfo mRequestedJob;
    int mTmpBuildsCounter = 0;
+   QVector<QWidget *> mTempWidgets;
+   QVector<QString> mDownloadedFiles;
+   QNetworkAccessManager *mManager = nullptr;
+   QMap<int, int> mTabBuildMap;
 
    void appendJobsData(const JenkinsJobBuildInfo &build);
+   void fillBuildLayout(const Jenkins::JenkinsJobBuildInfo &build, QHBoxLayout *layout);
+   void requestFile(const Jenkins::JenkinsJobBuildInfo &build);
+   void storeFile(int buildNumber);
+   void findString(QString s, QPlainTextEdit *textEdit);
 };
 }

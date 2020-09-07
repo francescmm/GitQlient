@@ -4,9 +4,26 @@
 #include <QString>
 #include <QMap>
 #include <QMetaType>
+#include <QColor>
 
 namespace Jenkins
 {
+
+inline QColor resultColor(const QString &result)
+{
+   if (result == "SUCCESS")
+      return QColor("#00AF18");
+   else if (result == "UNSTABLE")
+      return QColor("#D89000");
+   else if (result == "FAILURE" || result == "FAILED")
+      return QColor("#FF2222");
+   else if (result == "ABORTED")
+      return QColor("#5B5B5B");
+   else if (result == "NOT_BUILT")
+      return QColor("#C8C8C8");
+
+   return QColor("#C8C8C8");
+}
 
 struct JenkinsStageInfo
 {
@@ -48,7 +65,7 @@ struct JenkinsJobInfo
    bool buildable;
    bool inQueue;
    HealthStatus healthStatus;
-   QMap<int, JenkinsJobBuildInfo> builds;
+   QVector<JenkinsJobBuildInfo> builds;
 };
 
 }

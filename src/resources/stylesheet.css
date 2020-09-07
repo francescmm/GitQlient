@@ -735,7 +735,7 @@ QDialog > QPushButton
 }
 
 /* GitServerWidget */
-QScrollArea
+QScrollArea, #TransparentScrollArea
 {
    background: transparent;
 }
