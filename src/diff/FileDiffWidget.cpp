@@ -112,6 +112,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mSave->setDisabled(true);
    mSave->setToolTip(tr("Save"));
    connect(mSave, &QPushButton::clicked, mFileEditor, &FileEditor::saveFile);
+   connect(mSave, &QPushButton::clicked, mEdition, &QPushButton::toggle);
 
    mStage->setIcon(QIcon(":/icons/staged"));
    mStage->setToolTip(tr("Stage file"));
