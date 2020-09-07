@@ -33,6 +33,7 @@ class QPushButton;
 class CheckBox;
 class FileEditor;
 class QStackedWidget;
+class QLabel;
 
 /*!
  \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
@@ -121,6 +122,7 @@ private:
    QPushButton *mSave = nullptr;
    QPushButton *mStage = nullptr;
    QPushButton *mRevert = nullptr;
+   QLabel *mFileNameLabel = nullptr;
    FileDiffView *mNewFile = nullptr;
    FileDiffView *mOldFile = nullptr;
    QVector<int> mModifications;
