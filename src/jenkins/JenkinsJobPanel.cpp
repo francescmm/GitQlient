@@ -19,6 +19,7 @@
 #include <QStandardPaths>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QMessageBox>
 
 namespace Jenkins
 {
@@ -275,6 +276,8 @@ void JenkinsJobPanel::findString(QString s, QPlainTextEdit *textEdit)
       if (!textEdit->find(s))
       {
          textEdit->setTextCursor(cursorSaved);
+
+         QMessageBox::information(this, tr("Text not found"), tr("Text not found."));
       }
    }
 }
