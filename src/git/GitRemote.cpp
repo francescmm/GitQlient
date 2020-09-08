@@ -76,7 +76,7 @@ bool GitRemote::fetch()
    const auto pruneOnFetch = settings.localValue(mGitBase->getGitQlientSettingsDir(), "PruneOnFetch", true).toBool();
 
    const auto cmd
-       = QString("git fetch --all --tags --force").arg(pruneOnFetch ? QString("--prune --prune-tags") : QString());
+       = QString("git fetch --all --tags --force %1").arg(pruneOnFetch ? QString("--prune --prune-tags") : QString());
    const auto ret = mGitBase->run(cmd).success;
 
    return ret;
