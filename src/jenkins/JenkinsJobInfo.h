@@ -16,7 +16,7 @@ inline QColor resultColor(const QString &result)
    else if (result == "UNSTABLE")
       return QColor("#D89000");
    else if (result == "FAILURE" || result == "FAILED")
-      return QColor("#FF2222");
+      return QColor("#C12020");
    else if (result == "ABORTED")
       return QColor("#5B5B5B");
    else if (result == "NOT_BUILT")
