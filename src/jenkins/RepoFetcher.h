@@ -15,6 +15,7 @@ signals:
 
 public:
    explicit RepoFetcher(const IFetcher::Config &config, const QString &url, QObject *parent = nullptr);
+   ~RepoFetcher();
 
    void triggerFetch() override;
 

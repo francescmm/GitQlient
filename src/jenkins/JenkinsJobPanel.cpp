@@ -4,6 +4,10 @@
 #include <CheckBox.h>
 #include <ButtonLink.hpp>
 
+#include <QLogger.h>
+
+#include <QAuthenticator>
+#include <QUrlQuery>
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPlainTextEdit>
@@ -24,6 +28,8 @@
 #include <QPushButton>
 #include <QDesktopServices>
 #include <QMessageBox>
+
+using namespace QLogger;
 
 namespace Jenkins
 {
@@ -330,18 +336,33 @@ void JenkinsJobPanel::createBuildConfigPanel()
       {
          const auto check = new CheckBox();
          check->setChecked(config.defaultValue.toBool());
+         mBuildValues[config.name] = qMakePair(JobConfigFieldType::Bool, config.defaultValue);
+         connect(check, &CheckBox::stateChanged, this, [this, name = config.name](int checkState) {
+            mBuildValues[name] = qMakePair(JobConfigFieldType::Bool, checkState == Qt::Checked);
+         });
+
          buildLayout->addWidget(check, row, 1);
       }
       else if (config.fieldType == JobConfigFieldType::String)
       {
          const auto lineEdit = new QLineEdit();
          lineEdit->setText(config.defaultValue.toString());
+         mBuildValues[config.name] = qMakePair(JobConfigFieldType::Bool, config.defaultValue);
+         connect(lineEdit, &QLineEdit::textChanged, this, [this, name = config.name](const QString &text) {
+            mBuildValues[name] = qMakePair(JobConfigFieldType::String, text);
+         });
+
          buildLayout->addWidget(lineEdit, row, 1);
       }
       else if (config.fieldType == JobConfigFieldType::Choice)
       {
          const auto combo = new QComboBox();
          combo->addItems(config.choicesValues);
+         mBuildValues[config.name] = qMakePair(JobConfigFieldType::Bool, config.defaultValue);
+         connect(combo, &QComboBox::currentTextChanged, this, [this, name = config.name](const QString &text) {
+            mBuildValues[name] = qMakePair(JobConfigFieldType::String, text);
+         });
+
          if (!config.defaultValue.toString().isEmpty())
             combo->setCurrentText(config.defaultValue.toString());
 
@@ -354,19 +375,46 @@ void JenkinsJobPanel::createBuildConfigPanel()
    const auto btnsLayout = new QHBoxLayout();
    btnsLayout->setContentsMargins(QMargins());
    btnsLayout->setSpacing(0);
-   auto btn = new QPushButton(tr("Clear"));
+
+   const auto btn = new QPushButton(tr("Build"));
    btn->setFixedSize(100, 30);
+   btn->setObjectName("pbCommit");
+   connect(btn, &QPushButton::clicked, this, &JenkinsJobPanel::triggerBuild);
+
    btnsLayout->addWidget(btn);
    btnsLayout->addStretch();
-   btn = new QPushButton(tr("Build"));
-   btn->setFixedSize(100, 30);
-   btnsLayout->addWidget(btn);
+
    buildLayout->addLayout(btnsLayout, row, 0, 1, 2);
    buildLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), row, 3);
 
    mTabWidget->addTab(buildFrame, tr("Build with params"));
 }
 
-void JenkinsJobPanel::triggerBuild() { }
+void JenkinsJobPanel::triggerBuild()
+{
+   const auto endpoint = QString::fromUtf8("buildWithParameters");
+   QUrl url(mRequestedJob.url.endsWith("/") ? QString("%1%2").arg(mRequestedJob.url, endpoint)
+                                            : QString("%1/%2").arg(mRequestedJob.url, endpoint));
+   QNetworkRequest request(url);
+
+   if (!mConfig.user.isEmpty() && !mConfig.token.isEmpty())
+   {
+      const auto data = QString("%1:%2").arg(mConfig.user, mConfig.token).toLocal8Bit().toBase64();
+      request.setRawHeader("Authorization", QString(QString::fromUtf8("Basic ") + data).toLocal8Bit());
+   }
+
+   QUrlQuery query;
+
+   const auto end = mBuildValues.constEnd();
+   for (auto iter = mBuildValues.constBegin(); iter != end; ++iter)
+   {
+      const auto value = iter->second.toString();
+      if (!value.isEmpty())
+         query.addQueryItem(iter.key(), value);
+   }
+
+   const auto queryData = query.query().toUtf8();
+   mManager->post(request, queryData);
+}
 
 }

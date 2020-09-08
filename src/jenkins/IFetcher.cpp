@@ -19,6 +19,11 @@ IFetcher::IFetcher(const Config &config, QObject *parent)
 {
 }
 
+IFetcher::~IFetcher()
+{
+   QLog_Debug("Jenkins", "Destroying repo fetcher object.");
+}
+
 void IFetcher::get(const QString &urlStr, bool customUrl)
 {
    const auto apiUrl = urlStr.endsWith("api/json") || customUrl ? urlStr : urlStr + "api/json";
@@ -35,8 +40,10 @@ void IFetcher::get(const QString &urlStr, bool customUrl)
    QNetworkRequest request(url);
 
    if (!mConfig.user.isEmpty() && !mConfig.token.isEmpty())
-      request.setRawHeader(QByteArray("Authorization"),
-                           QString("Basic %1:%2").arg(mConfig.user, mConfig.token).toLocal8Bit().toBase64());
+   {
+      const auto data = QString("%1:%2").arg(mConfig.user, mConfig.token).toLocal8Bit().toBase64();
+      request.setRawHeader("Authorization", QString(QString::fromUtf8("Basic ") + data).toLocal8Bit());
+   }
 
    const auto reply = mConfig.accessManager->get(request);
    connect(reply, &QNetworkReply::finished, this, &IFetcher::processReply);

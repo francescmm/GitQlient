@@ -22,6 +22,7 @@ public:
    };
 
    explicit IFetcher(const IFetcher::Config &config, QObject *parent = nullptr);
+   ~IFetcher();
 
    virtual void triggerFetch() = 0;
 

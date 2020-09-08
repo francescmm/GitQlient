@@ -19,6 +19,11 @@ RepoFetcher::RepoFetcher(const IFetcher::Config &config, const QString &url, QOb
 {
 }
 
+RepoFetcher::~RepoFetcher()
+{
+   QLog_Debug("Jenkins", "Destroying repo fetcher object.");
+}
+
 void RepoFetcher::triggerFetch()
 {
    get(mUrl);

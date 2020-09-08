@@ -48,6 +48,7 @@ private:
    QVector<QString> mDownloadedFiles;
    QNetworkAccessManager *mManager = nullptr;
    QMap<int, int> mTabBuildMap;
+   QMap<QString, QPair<JobConfigFieldType, QVariant>> mBuildValues;
 
    void appendJobsData(const JenkinsJobBuildInfo &build);
    void fillBuildLayout(const Jenkins::JenkinsJobBuildInfo &build, QHBoxLayout *layout);
