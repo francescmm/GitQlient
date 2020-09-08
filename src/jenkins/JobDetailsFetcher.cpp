@@ -7,8 +7,8 @@
 namespace Jenkins
 {
 
-JobDetailsFetcher::JobDetailsFetcher(const IFetcher::Config &config, const JenkinsJobInfo &info)
-   : IFetcher(config)
+JobDetailsFetcher::JobDetailsFetcher(const IFetcher::Config &config, const JenkinsJobInfo &info, QObject *parent)
+   : IFetcher(config, parent)
    , mInfo(info)
 {
 }

@@ -97,6 +97,8 @@ void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &job)
    {
       const auto buildFetcher = new BuildGeneralInfoFetcher(mConfig, build);
       connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, this, &JenkinsJobPanel::appendJobsData);
+      connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, buildFetcher,
+              &BuildGeneralInfoFetcher::deleteLater);
 
       buildFetcher->triggerFetch();
    }

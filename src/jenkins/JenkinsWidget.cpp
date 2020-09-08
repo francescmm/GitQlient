@@ -56,6 +56,7 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
 
    mRepoFetcher = new RepoFetcher(mConfig, url);
    connect(mRepoFetcher, &RepoFetcher::signalViewsReceived, this, &JenkinsWidget::configureGeneralView);
+   connect(mRepoFetcher, &RepoFetcher::signalViewsReceived, mRepoFetcher, &RepoFetcher::deleteLater);
 
    connect(mBtnGroup, &QButtonGroup::idClicked, mStackedLayout, &QStackedLayout::setCurrentIndex);
 }

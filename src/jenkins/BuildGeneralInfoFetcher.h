@@ -14,7 +14,7 @@ signals:
    void signalBuildInfoReceived(const JenkinsJobBuildInfo &buildInfo);
 
 public:
-   BuildGeneralInfoFetcher(const IFetcher::Config &config, const JenkinsJobBuildInfo &build);
+   BuildGeneralInfoFetcher(const IFetcher::Config &config, const JenkinsJobBuildInfo &build, QObject *parent = nullptr);
 
    void triggerFetch() override;
 

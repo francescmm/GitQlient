@@ -14,7 +14,7 @@ signals:
    void signalStagesReceived(const QVector<JenkinsStageInfo> stages);
 
 public:
-   StageFetcher(const IFetcher::Config &config, const JenkinsJobBuildInfo &build);
+   StageFetcher(const IFetcher::Config &config, const JenkinsJobBuildInfo &build, QObject *parent = nullptr);
 
    void triggerFetch() override;
 

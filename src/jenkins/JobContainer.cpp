@@ -23,6 +23,7 @@ JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo
 
    const auto jobFetcher = new JobFetcher(config, viewInfo.url);
    connect(jobFetcher, &JobFetcher::signalJobsReceived, this, &JobContainer::addJobs);
+   connect(jobFetcher, &JobFetcher::signalJobsReceived, jobFetcher, &JobContainer::deleteLater);
    jobFetcher->triggerFetch();
 }
 
