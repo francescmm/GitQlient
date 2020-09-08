@@ -3,6 +3,7 @@
 #include <JobFetcher.h>
 #include <JobButton.h>
 #include <ClickableFrame.h>
+#include <JenkinsJobPanel.h>
 
 #include <QVBoxLayout>
 #include <QScrollArea>
@@ -15,11 +16,20 @@ namespace Jenkins
 
 JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo &viewInfo, QWidget *parent)
    : QFrame(parent)
+   , mView(viewInfo)
+   , mJobListLayout(new QVBoxLayout())
+   , mJobPanel(new JenkinsJobPanel(config))
 {
+   mJobListLayout->setContentsMargins(QMargins());
+   mJobListLayout->setSpacing(0);
 
-   const auto layout = new QVBoxLayout(this);
-   layout->setContentsMargins(10, 10, 10, 10);
-   layout->setSpacing(0);
+   mMainLayout = new QHBoxLayout(this);
+   mMainLayout->setContentsMargins(10, 10, 10, 10);
+   mMainLayout->setSpacing(10);
+   mMainLayout->addLayout(mJobListLayout);
+   mMainLayout->addWidget(mJobPanel);
+   mMainLayout->setStretch(0, 30);
+   mMainLayout->setStretch(1, 70);
 
    const auto jobFetcher = new JobFetcher(config, viewInfo.url);
    connect(jobFetcher, &JobFetcher::signalJobsReceived, this, &JobContainer::addJobs);
@@ -39,6 +49,8 @@ void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
    if (!splitView)
    {
       mJobsTree = new QTreeWidget();
+      mJobListLayout->addWidget(mJobsTree);
+      mJobListLayout->addStretch();
       connect(mJobsTree, &QTreeWidget::itemClicked, this, &JobContainer::showJobInfo);
    }
 
@@ -53,11 +65,11 @@ void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
 
          connect(listWidget, &QListWidget::itemClicked, this, [this](QListWidgetItem *item) {
             const auto job = qvariant_cast<JenkinsJobInfo>(item->data(Qt::UserRole));
-            emit signalJobInfoReceived(job);
+            mJobPanel->onJobInfoReceived(job);
          });
 
          createHeader(key, listWidget);
-         layout()->addWidget(listWidget);
+         mJobListLayout->addWidget(listWidget);
       }
       else
       {
@@ -65,7 +77,8 @@ void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
          mJobsTree->addTopLevelItem(item);
       }
 
-      const auto values = jobs.values(key);
+      auto values = jobs.values(key);
+      std::sort(values.begin(), values.end());
 
       for (const auto &job : qAsConst(values))
       {
@@ -116,7 +129,7 @@ void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
 void JobContainer::showJobInfo(QTreeWidgetItem *item, int column)
 {
    const auto job = qvariant_cast<JenkinsJobInfo>(item->data(column, Qt::UserRole));
-   emit signalJobInfoReceived(job);
+   mJobPanel->onJobInfoReceived(job);
 }
 
 QIcon JobContainer::getIconForJob(JenkinsJobInfo job) const
@@ -153,7 +166,7 @@ void JobContainer::createHeader(const QString &name, QListWidget *listWidget)
    connect(headerFrame, &ClickableFrame::clicked, this,
            [this, listWidget, headerArrow]() { onHeaderClicked(listWidget, headerArrow); });
 
-   layout()->addWidget(headerFrame);
+   mJobListLayout->addWidget(headerFrame);
 }
 
 void JobContainer::onHeaderClicked(QListWidget *listWidget, QLabel *arrowIcon)

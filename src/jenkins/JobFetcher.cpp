@@ -62,8 +62,11 @@ void JobFetcher::processData(const QJsonDocument &json)
             JenkinsJobInfo jobInfo;
             jobInfo.url = url;
 
-            if (jobObject.contains(QStringLiteral("name")))
+            if (jobObject.contains(QStringLiteral("displayName")))
+               jobInfo.name = jobObject[QStringLiteral("displayName")].toString();
+            else
                jobInfo.name = jobObject[QStringLiteral("name")].toString();
+
             if (jobObject.contains(QStringLiteral("color")))
                jobInfo.color = jobObject[QStringLiteral("color")].toString();
 
@@ -89,13 +92,13 @@ void JobFetcher::updateJobs(const JenkinsJobInfo &updatedInfo)
    auto iter = std::find(mJobs.begin(), mJobs.end(), updatedInfo);
 
    iter->builds = updatedInfo.builds;
+   iter->configFields = updatedInfo.configFields;
+   iter->healthStatus = updatedInfo.healthStatus;
 
    --mJobsToUpdated;
 
    if (mJobsToUpdated == 0)
-   {
       emit signalJobsReceived(mJobs);
-   }
 }
 
 }

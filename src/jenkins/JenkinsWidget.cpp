@@ -2,7 +2,6 @@
 
 #include <RepoFetcher.h>
 #include <JobContainer.h>
-#include <JenkinsJobPanel.h>
 #include <GitQlientSettings.h>
 #include <GitBase.h>
 
@@ -48,15 +47,11 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
    layout->setContentsMargins(QMargins());
    layout->setSpacing(0);
    layout->addLayout(mBodyLayout);
-   layout->addWidget(mPanel = new JenkinsJobPanel(mConfig));
-   layout->setStretch(0, 30);
-   layout->setStretch(1, 70);
 
    setMinimumSize(800, 600);
 
-   mRepoFetcher = new RepoFetcher(mConfig, url);
+   mRepoFetcher = new RepoFetcher(mConfig, url, this);
    connect(mRepoFetcher, &RepoFetcher::signalViewsReceived, this, &JenkinsWidget::configureGeneralView);
-   connect(mRepoFetcher, &RepoFetcher::signalViewsReceived, mRepoFetcher, &RepoFetcher::deleteLater);
 
    connect(mBtnGroup, &QButtonGroup::idClicked, mStackedLayout, &QStackedLayout::setCurrentIndex);
 }
@@ -78,7 +73,6 @@ void JenkinsWidget::configureGeneralView(const QVector<JenkinsViewInfo> &views)
 
          const auto container = new JobContainer(mConfig, view, this);
          container->setObjectName("JobContainer");
-         connect(container, &JobContainer::signalJobInfoReceived, mPanel, &JenkinsJobPanel::onJobInfoReceived);
          connect(container, &JobContainer::signalJobAreViews, this, &JenkinsWidget::configureGeneralView);
 
          mButtonsLayout->addWidget(button);

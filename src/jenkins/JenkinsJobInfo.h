@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QMetaType>
 #include <QColor>
+#include <QVariant>
 
 namespace Jenkins
 {
@@ -48,9 +49,25 @@ struct JenkinsJobBuildInfo
    QVector<JenkinsStageInfo> stages;
 };
 
+enum class JobConfigFieldType
+{
+   Bool,
+   String,
+   Choice
+};
+
+struct JenkinsJobBuildConfig
+{
+   JobConfigFieldType fieldType;
+   QString name;
+   QVariant defaultValue;
+   QStringList choicesValues;
+};
+
 struct JenkinsJobInfo
 {
    bool operator==(const JenkinsJobInfo &info) const { return name == info.name; }
+   bool operator<(const JenkinsJobInfo &info) const { return name < info.name; }
 
    struct HealthStatus
    {
@@ -66,6 +83,7 @@ struct JenkinsJobInfo
    bool inQueue;
    HealthStatus healthStatus;
    QVector<JenkinsJobBuildInfo> builds;
+   QVector<JenkinsJobBuildConfig> configFields;
 };
 
 }

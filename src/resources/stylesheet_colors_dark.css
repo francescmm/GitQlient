@@ -50,6 +50,13 @@ QLabel
     color: white;
 }
 
+QLineEdit
+{
+    border-color: #D89000;
+    background-color: #404142;
+    color: white;
+}
+
 #labelTitle, #commitInfoFrame, #labelDescription,
 #labelAuthor, #labelDateTime
 {
@@ -154,12 +161,12 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget > QTextEdit, CommitChangesWidget > QLineEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget > QTextEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-color: #202122
 }
 
-CommitChangesWidget > QLineEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+#leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     background-color: #606162;
     color: white;
@@ -231,13 +238,6 @@ QHeaderView:section
 BranchDlg
 {
     background-color: #404142;
-    color: white;
-}
-
-BranchDlg > QLineEdit
-{
-    border-color: #202122;
-    background-color: #606162;
     color: white;
 }
 
@@ -357,23 +357,9 @@ GeneralConfigPage, #recentProjects
     background-color: #606162;
 }
 
-GeneralConfigPage > QLineEdit
-{
-    border-color: #202122;
-    background-color: #2E2F30;
-    color: white;
-}
-
 QDialog
 {
     background-color: #404142;
-}
-
-QDialog > QLineEdit
-{
-    border-color: #202122;
-    background-color: #606162;
-    color: white;
 }
 
 QMessageBox
@@ -631,11 +617,6 @@ RepoConfigDlg
    background-color: #2E2F30;
 }
 
-QLineEdit
-{
-   color: white;
-}
-
 PullDlg QLabel#lQuestion
 {
    color: white;
@@ -739,13 +720,6 @@ JobContainer, #JenkinsJobPanel, #JobPanelTabWidget, JenkinsJobPanel#JenkinsJobPa
 #JenkinsOutput
 {
     background: #404142;
-    color: white;
-}
-
-#JenkinsOutput > QLineEdit
-{
-    border-color: #202122;
-    background-color: #606162;
     color: white;
 }
 

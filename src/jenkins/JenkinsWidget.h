@@ -16,7 +16,6 @@ namespace Jenkins
 {
 
 class RepoFetcher;
-class JenkinsJobPanel;
 
 class JenkinsWidget : public QWidget
 {
@@ -32,7 +31,6 @@ private:
    QSharedPointer<GitBase> mGit;
    IFetcher::Config mConfig;
    QStackedLayout *mStackedLayout = nullptr;
-   JenkinsJobPanel *mPanel = nullptr;
    RepoFetcher *mRepoFetcher = nullptr;
    QHBoxLayout *mBodyLayout = nullptr;
    QButtonGroup *mBtnGroup = nullptr;

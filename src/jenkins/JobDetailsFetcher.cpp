@@ -24,6 +24,7 @@ void JobDetailsFetcher::processData(const QJsonDocument &json)
 
    readHealthReportsPartFor(jsonObject);
    readBuildsListFor(jsonObject);
+   retrieveBuildConfig(jsonObject[QStringLiteral("property")].toArray());
    readBuildableFlagFor(jsonObject);
    readIsQueuedFlagFor(jsonObject);
 
@@ -70,6 +71,46 @@ void JobDetailsFetcher::readBuildsListFor(QJsonObject &jsonObject)
          }
       }
    }
+}
+
+void JobDetailsFetcher::retrieveBuildConfig(const QJsonArray &propertyArray)
+{
+   QVector<JenkinsJobBuildConfig> configParams;
+
+   for (const auto &property : propertyArray)
+   {
+      auto propertyObj = property.toObject();
+
+      if (propertyObj[QStringLiteral("_class")].toString().contains("ParametersDefinitionProperty"))
+      {
+         const auto params = propertyObj[QStringLiteral("parameterDefinitions")].toArray();
+
+         for (const auto &config : params)
+         {
+            JenkinsJobBuildConfig jobConfig;
+            jobConfig.name = config[QStringLiteral("name")].toString();
+
+            if (config[QStringLiteral("type")].toString() == "BooleanParameterDefinition")
+               jobConfig.fieldType = JobConfigFieldType::Bool;
+            else if (config[QStringLiteral("type")].toString() == "StringParameterDefinition")
+               jobConfig.fieldType = JobConfigFieldType::String;
+            else if (config[QStringLiteral("type")].toString() == "ChoiceParameterDefinition")
+            {
+               jobConfig.fieldType = JobConfigFieldType::Choice;
+
+               for (const auto &choiceValue : config[QStringLiteral("choices")].toArray())
+                  jobConfig.choicesValues.append(choiceValue.toString());
+            }
+
+            jobConfig.defaultValue
+                = config[QStringLiteral("defaultParameterValue")].toObject()[QStringLiteral("value")].toVariant();
+
+            configParams.append(jobConfig);
+         }
+      }
+   }
+
+   mInfo.configFields = configParams;
 }
 
 void JobDetailsFetcher::readBuildableFlagFor(QJsonObject &)

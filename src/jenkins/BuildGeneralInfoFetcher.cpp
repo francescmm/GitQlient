@@ -50,9 +50,8 @@ void BuildGeneralInfoFetcher::processData(const QJsonDocument &json)
       }
    }
 
-   const auto stagesFetcher = new StageFetcher(mConfig, mBuild);
+   const auto stagesFetcher = new StageFetcher(mConfig, mBuild, this);
    connect(stagesFetcher, &StageFetcher::signalStagesReceived, this, &BuildGeneralInfoFetcher::appendStages);
-   connect(stagesFetcher, &StageFetcher::signalStagesReceived, stagesFetcher, &StageFetcher::deleteLater);
 
    stagesFetcher->triggerFetch();
 }

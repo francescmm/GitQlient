@@ -14,6 +14,8 @@ class QRadioButton;
 class QTabWidget;
 class QNetworkAccessManager;
 class QPlainTextEdit;
+class QPushButton;
+class ButtonLink;
 
 namespace Jenkins
 {
@@ -30,9 +32,10 @@ public:
 private:
    IFetcher::Config mConfig;
    QLabel *mName = nullptr;
-   QLabel *mUrl = nullptr;
+   ButtonLink *mUrl = nullptr;
    CheckBox *mBuildable = nullptr;
    CheckBox *mInQueue = nullptr;
+   QPushButton *mBuild = nullptr;
    QLabel *mHealthDesc = nullptr;
    QFrame *mScrollFrame = nullptr;
    QVBoxLayout *mBuildListLayout = nullptr;
@@ -51,5 +54,7 @@ private:
    void requestFile(const Jenkins::JenkinsJobBuildInfo &build);
    void storeFile(int buildNumber);
    void findString(QString s, QPlainTextEdit *textEdit);
+   void createBuildConfigPanel();
+   void triggerBuild();
 };
 }

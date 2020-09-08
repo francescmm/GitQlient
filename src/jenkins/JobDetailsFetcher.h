@@ -29,6 +29,7 @@ private:
    void processData(const QJsonDocument &json) override;
    void readHealthReportsPartFor(QJsonObject &jsonObject);
    void readBuildsListFor(QJsonObject &jsonObject);
+   void retrieveBuildConfig(const QJsonArray &propertyArray);
    void readBuildableFlagFor(QJsonObject &jsonObject);
    void readIsQueuedFlagFor(QJsonObject &jsonObject);
 };

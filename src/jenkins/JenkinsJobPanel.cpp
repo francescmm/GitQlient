@@ -4,6 +4,7 @@
 #include <CheckBox.h>
 #include <ButtonLink.hpp>
 
+#include <QComboBox>
 #include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QUrl>
@@ -20,6 +21,9 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QDesktopServices>
+#include <QMessageBox>
 
 namespace Jenkins
 {
@@ -28,9 +32,10 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    : QFrame(parent)
    , mConfig(config)
    , mName(new QLabel())
-   , mUrl(new QLabel())
+   , mUrl(new ButtonLink())
    , mBuildable(new CheckBox(tr("is buildable")))
    , mInQueue(new CheckBox(tr("is in queue")))
+   , mBuild(new QPushButton(tr("Trigger build")))
    , mHealthDesc(new QLabel())
    , mManager(new QNetworkAccessManager(this))
 {
@@ -52,11 +57,14 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    mTabWidget = new QTabWidget();
    mTabWidget->addTab(scrollArea, "Previous builds");
 
+   mBuild->setVisible(false);
+
    const auto layout = new QGridLayout(this);
-   layout->setContentsMargins(0, 10, 10, 10);
+   layout->setContentsMargins(QMargins());
    layout->setSpacing(10);
    layout->addWidget(new QLabel(tr("Job name: ")), 0, 0);
    layout->addWidget(mName, 0, 1);
+   layout->addWidget(mBuild, 0, 2);
    layout->addWidget(new QLabel(tr("URL: ")), 1, 0);
    layout->addWidget(mUrl, 1, 1);
    layout->addWidget(new QLabel(tr("Description: ")), 2, 0);
@@ -66,42 +74,53 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    layout->addWidget(mInQueue, 4, 0, 1, 2);
    layout->addWidget(mLastBuildFrame, 5, 0, 1, 3);
    layout->addWidget(mTabWidget, 6, 0, 1, 3);
+
+   connect(mUrl, &ButtonLink::clicked, this, [this]() { QDesktopServices::openUrl(mUrl->text()); });
+   connect(mBuild, &QPushButton::clicked, this, &JenkinsJobPanel::triggerBuild);
 }
 
 void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &job)
 {
-   for (const auto &widget : qAsConst(mTempWidgets))
-      delete widget;
-
-   mTempWidgets.clear();
-
-   delete mBuildListLayout;
-   delete mLastBuildLayout;
-
-   mTabWidget->setCurrentIndex(0);
-   mTabBuildMap.clear();
-
-   for (auto i = 1; i < mTabWidget->count(); ++i)
-      mTabWidget->removeTab(i);
-
-   mRequestedJob = job;
-   mName->setText(mRequestedJob.name);
-   mUrl->setText(mRequestedJob.url);
-   mHealthDesc->setText(mRequestedJob.healthStatus.description);
-   mBuildable->setChecked(mRequestedJob.buildable);
-   mInQueue->setChecked(mRequestedJob.inQueue);
-
-   mTmpBuildsCounter = mRequestedJob.builds.count();
-
-   for (const auto &build : qAsConst(mRequestedJob.builds))
+   if (mTmpBuildsCounter == 0)
    {
-      const auto buildFetcher = new BuildGeneralInfoFetcher(mConfig, build);
-      connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, this, &JenkinsJobPanel::appendJobsData);
-      connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, buildFetcher,
-              &BuildGeneralInfoFetcher::deleteLater);
+      for (const auto &widget : qAsConst(mTempWidgets))
+         delete widget;
 
-      buildFetcher->triggerFetch();
+      mTempWidgets.clear();
+
+      delete mBuildListLayout;
+      delete mLastBuildLayout;
+
+      mTabWidget->setCurrentIndex(0);
+      mTabBuildMap.clear();
+
+      for (auto i = 1; i < mTabWidget->count(); ++i)
+         mTabWidget->removeTab(i);
+
+      mRequestedJob = job;
+      mName->setText(mRequestedJob.name);
+      mUrl->setText(mRequestedJob.url);
+      mHealthDesc->setText(mRequestedJob.healthStatus.description);
+      mBuildable->setChecked(mRequestedJob.buildable);
+      mInQueue->setChecked(mRequestedJob.inQueue);
+
+      mTmpBuildsCounter = mRequestedJob.builds.count();
+
+      for (const auto &build : qAsConst(mRequestedJob.builds))
+      {
+         const auto buildFetcher = new BuildGeneralInfoFetcher(mConfig, build, this);
+         connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, this,
+                 &JenkinsJobPanel::appendJobsData);
+         connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, buildFetcher,
+                 &BuildGeneralInfoFetcher::deleteLater);
+
+         buildFetcher->triggerFetch();
+      }
    }
+   else
+      QMessageBox::warning(
+          this, tr("Request in progress"),
+          tr("There is a request in progress. Please, wait until the builds and stages for this job have been loaded"));
 }
 
 void JenkinsJobPanel::appendJobsData(const JenkinsJobBuildInfo &build)
@@ -140,6 +159,13 @@ void JenkinsJobPanel::appendJobsData(const JenkinsJobBuildInfo &build)
 
          mBuildListLayout->addLayout(stagesLayout);
       }
+
+      const auto hasCustomBuildConfig = !mRequestedJob.configFields.isEmpty();
+
+      mBuild->setVisible(!hasCustomBuildConfig);
+
+      if (hasCustomBuildConfig)
+         createBuildConfigPanel();
 
       mBuildListLayout->addStretch();
    }
@@ -283,5 +309,64 @@ void JenkinsJobPanel::findString(QString s, QPlainTextEdit *textEdit)
       }
    }
 }
+
+void JenkinsJobPanel::createBuildConfigPanel()
+{
+   const auto buildFrame = new QFrame();
+   buildFrame->setObjectName("buildFrame");
+   buildFrame->setStyleSheet("#buildFrame { background: #404142; }");
+
+   const auto buildLayout = new QGridLayout(buildFrame);
+   buildLayout->setContentsMargins(10, 10, 10, 10);
+   buildLayout->setSpacing(10);
+
+   auto row = 0;
+
+   for (const auto &config : mRequestedJob.configFields)
+   {
+      buildLayout->addWidget(new QLabel(config.name), row, 0);
+
+      if (config.fieldType == JobConfigFieldType::Bool)
+      {
+         const auto check = new CheckBox();
+         check->setChecked(config.defaultValue.toBool());
+         buildLayout->addWidget(check, row, 1);
+      }
+      else if (config.fieldType == JobConfigFieldType::String)
+      {
+         const auto lineEdit = new QLineEdit();
+         lineEdit->setText(config.defaultValue.toString());
+         buildLayout->addWidget(lineEdit, row, 1);
+      }
+      else if (config.fieldType == JobConfigFieldType::Choice)
+      {
+         const auto combo = new QComboBox();
+         combo->addItems(config.choicesValues);
+         if (!config.defaultValue.toString().isEmpty())
+            combo->setCurrentText(config.defaultValue.toString());
+
+         buildLayout->addWidget(combo, row, 1);
+      }
+
+      ++row;
+   }
+
+   const auto btnsLayout = new QHBoxLayout();
+   btnsLayout->setContentsMargins(QMargins());
+   btnsLayout->setSpacing(0);
+   auto btn = new QPushButton(tr("Clear"));
+   btn->setFixedSize(100, 30);
+   btnsLayout->addWidget(btn);
+   btnsLayout->addStretch();
+   btn = new QPushButton(tr("Build"));
+   btn->setFixedSize(100, 30);
+   btnsLayout->addWidget(btn);
+   buildLayout->addLayout(btnsLayout, row, 0, 1, 2);
+   buildLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), row, 3);
+
+   mTabWidget->addTab(buildFrame, tr("Build with params"));
+}
+
+void JenkinsJobPanel::triggerBuild() { }
 
 }

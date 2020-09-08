@@ -681,6 +681,7 @@ QSpinBox
     border-width: 1px;
     max-height: 25px;
     min-height: 25px;
+    padding-left: 10px;
 }
 
 QSpinBox::up-button
