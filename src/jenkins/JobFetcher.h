@@ -20,10 +20,7 @@ public:
 
 private:
    QString mJobUrl;
-   QMultiMap<QString, JenkinsJobInfo> mJobs;
-   int mJobsToUpdated = 0;
 
    void processData(const QJsonDocument &json) override;
-   void updateJobs(const JenkinsJobInfo &updatedInfo);
 };
 }

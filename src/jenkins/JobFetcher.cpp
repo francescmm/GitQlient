@@ -22,14 +22,13 @@ JobFetcher::JobFetcher(const Config &config, const QString &jobUrl, QObject *par
 
 void JobFetcher::triggerFetch()
 {
-   mJobsToUpdated = -1;
-
    get(mJobUrl);
 }
 
 void JobFetcher::processData(const QJsonDocument &json)
 {
    const auto jsonObject = json.object();
+   QMultiMap<QString, JenkinsJobInfo> jobsMap;
 
    if (!jsonObject.contains(QStringLiteral("views")))
       QLog_Debug("Jenkins", "Views not found.");
@@ -70,35 +69,12 @@ void JobFetcher::processData(const QJsonDocument &json)
             if (jobObject.contains(QStringLiteral("color")))
                jobInfo.color = jobObject[QStringLiteral("color")].toString();
 
-            mJobs.insert(view[QStringLiteral("name")].toString(), jobInfo);
+            jobsMap.insert(view[QStringLiteral("name")].toString(), jobInfo);
          }
       }
    }
 
-   mJobsToUpdated = mJobs.count();
-
-   for (const auto &jobInfo : qAsConst(mJobs))
-   {
-      const auto jobRequest = new JobDetailsFetcher(mConfig, jobInfo);
-      connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, this, &JobFetcher::updateJobs);
-      connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, jobRequest, &JobDetailsFetcher::deleteLater);
-
-      jobRequest->triggerFetch();
-   }
-}
-
-void JobFetcher::updateJobs(const JenkinsJobInfo &updatedInfo)
-{
-   auto iter = std::find(mJobs.begin(), mJobs.end(), updatedInfo);
-
-   iter->builds = updatedInfo.builds;
-   iter->configFields = updatedInfo.configFields;
-   iter->healthStatus = updatedInfo.healthStatus;
-
-   --mJobsToUpdated;
-
-   if (mJobsToUpdated == 0)
-      emit signalJobsReceived(mJobs);
+   emit signalJobsReceived(jobsMap);
 }
 
 }

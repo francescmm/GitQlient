@@ -54,6 +54,11 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    mScrollFrame->setObjectName("TransparentScrollArea");
 
    mLastBuildFrame = new QFrame();
+   const auto lastBuildScrollArea = new QScrollArea();
+   lastBuildScrollArea->setWidget(mLastBuildFrame);
+   lastBuildScrollArea->setWidgetResizable(true);
+   lastBuildScrollArea->setFixedHeight(140);
+   lastBuildScrollArea->setStyleSheet("background: #404142;");
 
    const auto scrollArea = new QScrollArea();
    scrollArea->setWidget(mScrollFrame);
@@ -78,7 +83,7 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    layout->addWidget(mHealthDesc, 2, 1);
    layout->addWidget(mBuildable, 3, 0, 1, 2);
    layout->addWidget(mInQueue, 4, 0, 1, 2);
-   layout->addWidget(mLastBuildFrame, 5, 0, 1, 3);
+   layout->addWidget(lastBuildScrollArea, 5, 0, 1, 3);
    layout->addWidget(mTabWidget, 6, 0, 1, 3);
 
    connect(mUrl, &ButtonLink::clicked, this, [this]() { QDesktopServices::openUrl(mUrl->text()); });
@@ -87,7 +92,13 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
 
 void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &job)
 {
-   if (mTmpBuildsCounter == 0)
+   if (mTmpBuildsCounter != 0 && job == mRequestedJob)
+   {
+      QMessageBox::warning(
+          this, tr("Request in progress"),
+          tr("There is a request in progress. Please, wait until the builds and stages for this job have been loaded"));
+   }
+   else
    {
       for (const auto &widget : qAsConst(mTempWidgets))
          delete widget;
@@ -116,23 +127,26 @@ void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &job)
       {
          const auto buildFetcher = new BuildGeneralInfoFetcher(mConfig, build, this);
          connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, this,
-                 &JenkinsJobPanel::appendJobsData);
+                 [this](const JenkinsJobBuildInfo &build) { appendJobsData(mRequestedJob.name, build); });
          connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, buildFetcher,
                  &BuildGeneralInfoFetcher::deleteLater);
 
          buildFetcher->triggerFetch();
       }
    }
-   else
-      QMessageBox::warning(
-          this, tr("Request in progress"),
-          tr("There is a request in progress. Please, wait until the builds and stages for this job have been loaded"));
 }
 
-void JenkinsJobPanel::appendJobsData(const JenkinsJobBuildInfo &build)
+void JenkinsJobPanel::appendJobsData(const QString &jobName, const JenkinsJobBuildInfo &build)
 {
+   if (jobName != mRequestedJob.name)
+      return;
+
    auto iter = std::find(mRequestedJob.builds.begin(), mRequestedJob.builds.end(), build);
-   *iter = build;
+
+   if (iter == mRequestedJob.builds.end())
+      mRequestedJob.builds.append(build);
+   else
+      *iter = build;
 
    --mTmpBuildsCounter;
 
@@ -235,6 +249,7 @@ void JenkinsJobPanel::fillBuildLayout(const JenkinsJobBuildInfo &build, QHBoxLay
       stageLayout->setSpacing(0);
       stageLayout->addWidget(label);
       stageLayout->addWidget(time);
+      stageLayout->addStretch();
 
       layout->addLayout(stageLayout);
    }

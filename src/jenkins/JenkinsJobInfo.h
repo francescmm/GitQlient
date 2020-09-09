@@ -67,6 +67,7 @@ struct JenkinsJobBuildConfig
 struct JenkinsJobInfo
 {
    bool operator==(const JenkinsJobInfo &info) const { return name == info.name; }
+   bool operator!=(const JenkinsJobInfo &info) const { return !(name == info.name); }
    bool operator<(const JenkinsJobInfo &info) const { return name < info.name; }
 
    struct HealthStatus

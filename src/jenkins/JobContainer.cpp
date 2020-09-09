@@ -4,6 +4,7 @@
 #include <JobButton.h>
 #include <ClickableFrame.h>
 #include <JenkinsJobPanel.h>
+#include <JobDetailsFetcher.h>
 
 #include <QVBoxLayout>
 #include <QScrollArea>
@@ -16,6 +17,7 @@ namespace Jenkins
 
 JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo &viewInfo, QWidget *parent)
    : QFrame(parent)
+   , mConfig(config)
    , mView(viewInfo)
    , mJobListLayout(new QVBoxLayout())
    , mJobPanel(new JenkinsJobPanel(config))
@@ -65,7 +67,7 @@ void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
 
          connect(listWidget, &QListWidget::itemClicked, this, [this](QListWidgetItem *item) {
             const auto job = qvariant_cast<JenkinsJobInfo>(item->data(Qt::UserRole));
-            mJobPanel->onJobInfoReceived(job);
+            requestUpdatedJobInfo(job);
          });
 
          createHeader(key, listWidget);
@@ -126,10 +128,29 @@ void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
       emit signalJobAreViews(views);
 }
 
+void JobContainer::requestUpdatedJobInfo(const JenkinsJobInfo &jobInfo)
+{
+   const auto jobRequest = new JobDetailsFetcher(mConfig, jobInfo);
+   connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, this,
+           [this, jobInfo](const JenkinsJobInfo &newInfo) { onJobInfoReceived(jobInfo, newInfo); });
+   connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, jobRequest, &JobDetailsFetcher::deleteLater);
+
+   jobRequest->triggerFetch();
+}
+
+void JobContainer::onJobInfoReceived(JenkinsJobInfo oldInfo, const JenkinsJobInfo &newInfo)
+{
+   oldInfo.builds = newInfo.builds;
+   oldInfo.configFields = newInfo.configFields;
+   oldInfo.healthStatus = newInfo.healthStatus;
+
+   mJobPanel->onJobInfoReceived(oldInfo);
+}
+
 void JobContainer::showJobInfo(QTreeWidgetItem *item, int column)
 {
    const auto job = qvariant_cast<JenkinsJobInfo>(item->data(column, Qt::UserRole));
-   mJobPanel->onJobInfoReceived(job);
+   requestUpdatedJobInfo(job);
 }
 
 QIcon JobContainer::getIconForJob(JenkinsJobInfo job) const

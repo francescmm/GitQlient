@@ -50,7 +50,7 @@ private:
    QMap<int, int> mTabBuildMap;
    QMap<QString, QPair<JobConfigFieldType, QVariant>> mBuildValues;
 
-   void appendJobsData(const JenkinsJobBuildInfo &build);
+   void appendJobsData(const QString &jobName, const JenkinsJobBuildInfo &build);
    void fillBuildLayout(const Jenkins::JenkinsJobBuildInfo &build, QHBoxLayout *layout);
    void requestFile(const Jenkins::JenkinsJobBuildInfo &build);
    void storeFile(int buildNumber);

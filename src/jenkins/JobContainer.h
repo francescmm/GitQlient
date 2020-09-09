@@ -27,12 +27,15 @@ public:
    explicit JobContainer(const IFetcher::Config &config, const JenkinsViewInfo &viewInfo, QWidget *parent = nullptr);
 
 private:
+   IFetcher::Config mConfig;
    JenkinsViewInfo mView;
    QHBoxLayout *mMainLayout = nullptr;
    QVBoxLayout *mJobListLayout = nullptr;
    JenkinsJobPanel *mJobPanel = nullptr;
 
    void addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs);
+   void requestUpdatedJobInfo(const JenkinsJobInfo &jobInfo);
+   void onJobInfoReceived(JenkinsJobInfo oldInfo, const JenkinsJobInfo &newInfo);
    void showJobInfo(QTreeWidgetItem *item, int column);
    QIcon getIconForJob(JenkinsJobInfo job) const;
    void createHeader(const QString &name, QListWidget *listWidget);
