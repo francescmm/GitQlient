@@ -27,16 +27,13 @@ class JenkinsJobPanel : public QFrame
 public:
    explicit JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent = nullptr);
 
-   void onJobInfoReceived(const JenkinsJobInfo &job);
+   void loadJobInfo(const JenkinsJobInfo &job);
 
 private:
    IFetcher::Config mConfig;
    QLabel *mName = nullptr;
    ButtonLink *mUrl = nullptr;
-   CheckBox *mBuildable = nullptr;
-   CheckBox *mInQueue = nullptr;
    QPushButton *mBuild = nullptr;
-   QLabel *mHealthDesc = nullptr;
    QFrame *mScrollFrame = nullptr;
    QVBoxLayout *mBuildListLayout = nullptr;
    QHBoxLayout *mLastBuildLayout = nullptr;

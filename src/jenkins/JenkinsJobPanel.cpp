@@ -38,17 +38,13 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    : QFrame(parent)
    , mConfig(config)
    , mName(new QLabel())
-   , mUrl(new ButtonLink())
-   , mBuildable(new CheckBox(tr("is buildable")))
-   , mInQueue(new CheckBox(tr("is in queue")))
+   , mUrl(new ButtonLink(tr("Open job in Jenkins...")))
    , mBuild(new QPushButton(tr("Trigger build")))
-   , mHealthDesc(new QLabel())
    , mManager(new QNetworkAccessManager(this))
 {
    setObjectName("JenkinsJobPanel");
 
-   mBuildable->setDisabled(true);
-   mInQueue->setDisabled(true);
+   mName->setObjectName("JenkinsJobPanelTitle");
 
    mScrollFrame = new QFrame();
    mScrollFrame->setObjectName("TransparentScrollArea");
@@ -69,28 +65,28 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    mTabWidget->addTab(scrollArea, "Previous builds");
 
    mBuild->setVisible(false);
+   mBuild->setObjectName("pbCommit");
 
-   const auto layout = new QGridLayout(this);
+   const auto linkLayout = new QHBoxLayout();
+   linkLayout->setContentsMargins(QMargins());
+   linkLayout->setSpacing(0);
+   linkLayout->addWidget(mUrl);
+   linkLayout->addStretch();
+   linkLayout->addWidget(mBuild);
+
+   const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->setSpacing(10);
-   layout->addWidget(new QLabel(tr("Job name: ")), 0, 0);
-   layout->addWidget(mName, 0, 1);
-   layout->addWidget(mBuild, 0, 2);
-   layout->addWidget(new QLabel(tr("URL: ")), 1, 0);
-   layout->addWidget(mUrl, 1, 1);
-   layout->addWidget(new QLabel(tr("Description: ")), 2, 0);
-   layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 2);
-   layout->addWidget(mHealthDesc, 2, 1);
-   layout->addWidget(mBuildable, 3, 0, 1, 2);
-   layout->addWidget(mInQueue, 4, 0, 1, 2);
-   layout->addWidget(lastBuildScrollArea, 5, 0, 1, 3);
-   layout->addWidget(mTabWidget, 6, 0, 1, 3);
+   layout->addWidget(mName);
+   layout->addLayout(linkLayout);
+   layout->addWidget(lastBuildScrollArea);
+   layout->addWidget(mTabWidget);
 
-   connect(mUrl, &ButtonLink::clicked, this, [this]() { QDesktopServices::openUrl(mUrl->text()); });
+   connect(mUrl, &ButtonLink::clicked, this, [this]() { QDesktopServices::openUrl(mRequestedJob.url); });
    connect(mBuild, &QPushButton::clicked, this, &JenkinsJobPanel::triggerBuild);
 }
 
-void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &job)
+void JenkinsJobPanel::loadJobInfo(const JenkinsJobInfo &job)
 {
    if (mTmpBuildsCounter != 0 && job == mRequestedJob)
    {
@@ -116,10 +112,7 @@ void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &job)
 
       mRequestedJob = job;
       mName->setText(mRequestedJob.name);
-      mUrl->setText(mRequestedJob.url);
-      mHealthDesc->setText(mRequestedJob.healthStatus.description);
-      mBuildable->setChecked(mRequestedJob.buildable);
-      mInQueue->setChecked(mRequestedJob.inQueue);
+      mBuild->setVisible(false);
 
       mTmpBuildsCounter = mRequestedJob.builds.count();
 

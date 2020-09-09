@@ -144,7 +144,7 @@ void JobContainer::onJobInfoReceived(JenkinsJobInfo oldInfo, const JenkinsJobInf
    oldInfo.configFields = newInfo.configFields;
    oldInfo.healthStatus = newInfo.healthStatus;
 
-   mJobPanel->onJobInfoReceived(oldInfo);
+   mJobPanel->loadJobInfo(oldInfo);
 }
 
 void JobContainer::showJobInfo(QTreeWidgetItem *item, int column)

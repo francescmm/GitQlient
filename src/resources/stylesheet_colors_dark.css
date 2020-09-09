@@ -712,6 +712,15 @@ JobContainer, #JenkinsJobPanel, #JobPanelTabWidget, JenkinsJobPanel#JenkinsJobPa
     background: #2E2F30;
 }
 
+#JenkinsJobPanelTitle
+{
+    background: #202122;
+    padding: 10px;
+    qproperty-alignment: AlignCenter;
+    font-weight: bold;
+    font-size: 16pt;
+}
+
 #JobContainerHeader
 {
     padding-left: 10px;
