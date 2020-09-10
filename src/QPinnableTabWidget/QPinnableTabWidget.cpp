@@ -181,7 +181,10 @@ void QPinnableTabWidget::clickRequested(int index)
 
 void QPinnableTabWidget::showContextMenu()
 {
-   if (!mPrepareMenu)
+   if (!mPrepareMenu || mPolicy == ContextMenuPolicy::ShowNever)
+      return;
+
+   if (mPolicy == ContextMenuPolicy::OnlyUnpinned && mTabState.value(mClickedTab))
       return;
 
    const auto actions = new QMenu(this);

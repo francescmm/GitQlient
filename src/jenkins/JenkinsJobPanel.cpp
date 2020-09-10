@@ -3,6 +3,7 @@
 #include <BuildGeneralInfoFetcher.h>
 #include <CheckBox.h>
 #include <ButtonLink.hpp>
+#include <QPinnableTabWidget.h>
 
 #include <QLogger.h>
 
@@ -20,7 +21,6 @@
 #include <QRadioButton>
 #include <QButtonGroup>
 #include <QButtonGroup>
-#include <QTabWidget>
 #include <QStandardPaths>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -61,8 +61,9 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    scrollArea->setWidgetResizable(true);
    scrollArea->setStyleSheet("background: #404142;");
 
-   mTabWidget = new QTabWidget();
-   mTabWidget->addTab(scrollArea, "Previous builds");
+   mTabWidget = new QPinnableTabWidget();
+   mTabWidget->addPinnedTab(scrollArea, "Previous builds");
+   mTabWidget->setContextMenuPolicy(QPinnableTabWidget::ContextMenuPolicy::ShowNever);
 
    mBuild->setVisible(false);
    mBuild->setObjectName("pbCommit");
@@ -395,7 +396,7 @@ void JenkinsJobPanel::createBuildConfigPanel()
    buildLayout->addLayout(btnsLayout, row, 0, 1, 2);
    buildLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), row, 3);
 
-   mTabWidget->addTab(buildFrame, tr("Build with params"));
+   mTabWidget->addPinnedTab(buildFrame, tr("Build with params"));
 }
 
 void JenkinsJobPanel::triggerBuild()

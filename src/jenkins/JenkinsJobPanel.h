@@ -11,7 +11,7 @@ class QVBoxLayout;
 class QHBoxLayout;
 class QButtonGroup;
 class QRadioButton;
-class QTabWidget;
+class QPinnableTabWidget;
 class QNetworkAccessManager;
 class QPlainTextEdit;
 class QPushButton;
@@ -38,7 +38,7 @@ private:
    QVBoxLayout *mBuildListLayout = nullptr;
    QHBoxLayout *mLastBuildLayout = nullptr;
    QFrame *mLastBuildFrame = nullptr;
-   QTabWidget *mTabWidget = nullptr;
+   QPinnableTabWidget *mTabWidget = nullptr;
    JenkinsJobInfo mRequestedJob;
    int mTmpBuildsCounter = 0;
    QVector<QWidget *> mTempWidgets;

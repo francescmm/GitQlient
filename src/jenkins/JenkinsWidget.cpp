@@ -8,7 +8,6 @@
 #include <QButtonGroup>
 #include <QStackedLayout>
 #include <QPushButton>
-#include <QTabWidget>
 #include <QHBoxLayout>
 #include <QNetworkAccessManager>
 

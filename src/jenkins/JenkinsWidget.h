@@ -5,7 +5,6 @@
 #include <JenkinsViewInfo.h>
 #include <IFetcher.h>
 
-class QTabWidget;
 class GitBase;
 class QStackedLayout;
 class QButtonGroup;
