@@ -73,11 +73,10 @@ void PrChangesList::onReviewsReceived(PullRequest pr)
 
    auto comments = pr.reviewComment;
 
-   for (const auto &review : pr.reviews)
+   for (const auto &review : qAsConst(pr.reviews))
    {
       QMap<int, QVector<CodeReview>> reviews;
       QVector<int> codeReviewIds;
-      QVector<QLayout *> listOfCodeReviews;
 
       auto iter = comments.begin();
 
@@ -115,11 +114,12 @@ void PrChangesList::onReviewsReceived(PullRequest pr)
       }
    }
 
-   for (auto iter : mListItems)
+   for (auto iter : qAsConst(mListItems))
    {
       QMap<int, int> bookmarks;
+      const auto values = bookmarksPerFile.values(iter->getFileName());
 
-      for (auto bookmark : bookmarksPerFile.values(iter->getFileName()))
+      for (auto bookmark : qAsConst(values))
       {
          if (bookmark.first >= iter->getStartingLine() && bookmark.first <= iter->getEndingLine())
             bookmarks.insert(bookmark.first, bookmark.second);
@@ -136,7 +136,7 @@ void PrChangesList::addLinks(PullRequest pr, const QMap<int, int> &reviewLinkToC
 
    for (auto reviewId : reviewLinkToComments)
    {
-      for (auto review : pr.reviewComment)
+      for (const auto &review : qAsConst(pr.reviewComment))
       {
          if (review.id == reviewId)
          {
@@ -150,11 +150,12 @@ void PrChangesList::addLinks(PullRequest pr, const QMap<int, int> &reviewLinkToC
       }
    }
 
-   for (auto iter : mListItems)
+   for (const auto &iter : qAsConst(mListItems))
    {
       QMap<int, int> bookmarks;
 
-      for (auto bookmark : bookmarksPerFile.values(iter->getFileName()))
+      const auto values = bookmarksPerFile.values(iter->getFileName());
+      for (const auto &bookmark : values)
       {
          if (bookmark.first >= iter->getStartingLine() && bookmark.first <= iter->getEndingLine())
             bookmarks.insert(bookmark.first, reviewLinkToComments.key(bookmark.second));

@@ -24,6 +24,7 @@
 #include <GitServerWidget.h>
 #include <GitServerCache.h>
 #include <ConfigData.h>
+#include <JenkinsWidget.h>
 
 #include <QTimer>
 #include <QDirIterator>
@@ -37,6 +38,7 @@
 
 using namespace QLogger;
 using namespace GitServer;
+using namespace Jenkins;
 
 GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    : QFrame(parent)
@@ -51,6 +53,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
    , mGitServerWidget(new GitServerWidget(mGitQlientCache, mGitBase, mGitServerCache))
+   , mJenkins(new JenkinsWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
@@ -72,6 +75,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    mStackedLayout->addWidget(mBlameWidget);
    mStackedLayout->addWidget(mMergeWidget);
    mStackedLayout->addWidget(mGitServerWidget);
+   mStackedLayout->addWidget(mJenkins);
 
    const auto mainLayout = new QVBoxLayout(this);
    mainLayout->setSpacing(0);
@@ -96,6 +100,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mControls, &Controls::signalGoDiff, this, &GitQlientRepo::showDiffView);
    connect(mControls, &Controls::signalGoMerge, this, &GitQlientRepo::showMergeView);
    connect(mControls, &Controls::signalGoServer, this, &GitQlientRepo::showGitServerView);
+   connect(mControls, &Controls::signalGoBuildSystem, this, &GitQlientRepo::showBuildSystemView);
    connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
    connect(mControls, &Controls::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
@@ -132,6 +137,9 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, &GitQlientRepo::updateCache);
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, mControls, &Controls::disableMergeWarning);
    connect(mMergeWidget, &MergeWidget::signalEditFile, this, &GitQlientRepo::signalEditFile);
+
+   connect(mJenkins, &JenkinsWidget::gotoBranch, this, &GitQlientRepo::focusHistoryOnBranch);
+   connect(mJenkins, &JenkinsWidget::gotoPullRequest, this, &GitQlientRepo::focusHistoryOnPr);
 
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::createProgressDialog);
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished);
@@ -322,7 +330,7 @@ void GitQlientRepo::showHistoryView()
    mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
 
    mStackedLayout->setCurrentWidget(mHistoryWidget);
-   mControls->toggleButton(ControlsMainViews::HISTORY);
+   mControls->toggleButton(ControlsMainViews::History);
 }
 
 void GitQlientRepo::showBlameView()
@@ -330,7 +338,7 @@ void GitQlientRepo::showBlameView()
    mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
 
    mStackedLayout->setCurrentWidget(mBlameWidget);
-   mControls->toggleButton(ControlsMainViews::BLAME);
+   mControls->toggleButton(ControlsMainViews::Blame);
 }
 
 void GitQlientRepo::showDiffView()
@@ -338,7 +346,7 @@ void GitQlientRepo::showDiffView()
    mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
 
    mStackedLayout->setCurrentWidget(mDiffWidget);
-   mControls->toggleButton(ControlsMainViews::DIFF);
+   mControls->toggleButton(ControlsMainViews::Diff);
 }
 
 void GitQlientRepo::showWarningMerge()
@@ -386,7 +394,7 @@ void GitQlientRepo::showPullConflict()
 void GitQlientRepo::showMergeView()
 {
    mStackedLayout->setCurrentWidget(mMergeWidget);
-   mControls->toggleButton(ControlsMainViews::MERGE);
+   mControls->toggleButton(ControlsMainViews::Merge);
 }
 
 void GitQlientRepo::showGitServerView()
@@ -413,10 +421,17 @@ void GitQlientRepo::showGitServerView()
    if (mGitServerWidget->isConfigured())
    {
       mStackedLayout->setCurrentWidget(mGitServerWidget);
-      mControls->toggleButton(ControlsMainViews::SERVER);
+      mControls->toggleButton(ControlsMainViews::GitServer);
    }
    else
       showPreviousView();
+}
+
+void GitQlientRepo::showBuildSystemView()
+{
+   mJenkins->reload();
+   mStackedLayout->setCurrentWidget(mJenkins);
+   mControls->toggleButton(ControlsMainViews::BuildSystem);
 }
 
 void GitQlientRepo::showPreviousView()
@@ -438,6 +453,36 @@ void GitQlientRepo::updateTagsOnCache()
    const auto remoteTags = gitTags->getRemoteTags();
 
    mGitQlientCache->updateTags(remoteTags);
+}
+
+void GitQlientRepo::focusHistoryOnBranch(const QString &branch)
+{
+   auto found = false;
+   const auto fullBranch = QString("origin/%1").arg(branch);
+   const auto remoteBranches = mGitQlientCache->getBranches(References::Type::RemoteBranches);
+
+   for (const auto &remote : remoteBranches)
+   {
+      if (remote.second.contains(fullBranch))
+      {
+         found = true;
+         mHistoryWidget->focusOnCommit(remote.first);
+         showHistoryView();
+      }
+   }
+
+   if (!found)
+      QMessageBox::information(
+          this, tr("Branch not found"),
+          tr("The branch couldn't be found. Please, make sure you fetched and have the latest changes."));
+}
+
+void GitQlientRepo::focusHistoryOnPr(int prNumber)
+{
+   const auto pr = mGitServerCache->getPullRequest(prNumber);
+
+   mHistoryWidget->focusOnCommit(pr.state.sha);
+   showHistoryView();
 }
 
 void GitQlientRepo::openCommitDiff(const QString currentSha)

@@ -50,6 +50,13 @@ QLabel
     color: white;
 }
 
+QLineEdit
+{
+    border-color: #D89000;
+    background-color: #404142;
+    color: white;
+}
+
 #labelTitle, #commitInfoFrame, #labelDescription,
 #labelAuthor, #labelDateTime
 {
@@ -154,12 +161,12 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget > QTextEdit, CommitChangesWidget > QLineEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget > QTextEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-color: #202122
 }
 
-CommitChangesWidget > QLineEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+#leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     background-color: #606162;
     color: white;
@@ -178,7 +185,8 @@ QLabel#lCounter
     color: #A3A3A4;
 }
 
-CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles
+CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles,
+#JobContainerHeader
 {
     background: #202122;
     border: none;
@@ -230,13 +238,6 @@ QHeaderView:section
 BranchDlg
 {
     background-color: #404142;
-    color: white;
-}
-
-BranchDlg > QLineEdit
-{
-    border-color: #202122;
-    background-color: #606162;
     color: white;
 }
 
@@ -356,23 +357,9 @@ GeneralConfigPage, #recentProjects
     background-color: #606162;
 }
 
-GeneralConfigPage > QLineEdit
-{
-    border-color: #202122;
-    background-color: #2E2F30;
-    color: white;
-}
-
 QDialog
 {
     background-color: #404142;
-}
-
-QDialog > QLineEdit
-{
-    border-color: #202122;
-    background-color: #606162;
-    color: white;
 }
 
 QMessageBox
@@ -630,11 +617,6 @@ RepoConfigDlg
    background-color: #2E2F30;
 }
 
-QLineEdit
-{
-   color: white;
-}
-
 PullDlg QLabel#lQuestion
 {
    color: white;
@@ -703,5 +685,50 @@ QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
 QToolButton#ViewBtnOption:!checked:hover
 {
    background-color: #606162;
+}
+
+#JobButton:hover
+{
+    background: #606162;
+}
+
+#JenkinsWidgetTabButton:!checked
+{
+    background: #202122;
+}
+
+#JenkinsWidgetTabButton:!checked:hover
+{
+    background: #505152;
+}
+
+#JenkinsWidgetTabButton:checked
+{
+    background: #2E2F30;
+}
+
+JobContainer, #JenkinsJobPanel, #JobPanelTabWidget, JenkinsJobPanel#JenkinsJobPanel > QTabWidget > QScrollBar
+{
+    background: #2E2F30;
+}
+
+#JenkinsJobPanelTitle
+{
+    background: #202122;
+    padding: 10px;
+    qproperty-alignment: AlignCenter;
+    font-weight: bold;
+    font-size: 16pt;
+}
+
+#JobContainerHeader
+{
+    padding-left: 10px;
+}
+
+#JenkinsOutput
+{
+    background: #404142;
+    color: white;
 }
 

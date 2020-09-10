@@ -30,6 +30,7 @@ private:
    void setConfig();
    void clearCache();
    void calculateCacheSize();
+   void toggleBsAccesInfo();
 };
 
 #endif // REPOCONFIGDLG_H

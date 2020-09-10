@@ -11,6 +11,7 @@
 #include <CreatePullRequestDlg.h>
 #include <GitQlientUpdater.h>
 #include <GitServerCache.h>
+#include <GitQlientSettings.h>
 #include <QLogger.h>
 
 #include <QApplication>
@@ -47,6 +48,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    , mRefreshBtn(new QToolButton())
    , mConfigBtn(new QToolButton())
    , mGitPlatform(new QToolButton())
+   , mBuildSystem(new QToolButton())
    , mVersionCheck(new QToolButton())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
    , mUpdater(new GitQlientUpdater(this))
@@ -61,7 +63,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mHistory->setIconSize(QSize(22, 22));
    mHistory->setToolTip("View");
    mHistory->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mBtnGroup->addButton(mHistory, static_cast<int>(ControlsMainViews::HISTORY));
+   mBtnGroup->addButton(mHistory, static_cast<int>(ControlsMainViews::History));
 
    mDiff->setCheckable(true);
    mDiff->setIcon(QIcon(":/icons/diff"));
@@ -69,14 +71,14 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mDiff->setToolTip("Diff");
    mDiff->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mDiff->setEnabled(false);
-   mBtnGroup->addButton(mDiff, static_cast<int>(ControlsMainViews::DIFF));
+   mBtnGroup->addButton(mDiff, static_cast<int>(ControlsMainViews::Diff));
 
    mBlame->setCheckable(true);
    mBlame->setIcon(QIcon(":/icons/blame"));
    mBlame->setIconSize(QSize(22, 22));
    mBlame->setToolTip("Blame");
    mBlame->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mBtnGroup->addButton(mBlame, static_cast<int>(ControlsMainViews::BLAME));
+   mBtnGroup->addButton(mBlame, static_cast<int>(ControlsMainViews::Blame));
 
    const auto menu = new QMenu(mPullOptions);
    menu->installEventFilter(this);
@@ -144,60 +146,26 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    hLayout->addWidget(mPushBtn);
    hLayout->addWidget(separator2);
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto remoteUrl = gitConfig->getServerUrl();
-   QIcon gitPlatformIcon;
-   QString name;
-   QString prName;
-   auto add = true;
+   createGitPlatformButton(hLayout);
 
-   if (remoteUrl.contains("github", Qt::CaseInsensitive))
-   {
-      gitPlatformIcon = QIcon(":/icons/github");
-      name = "GitHub";
-      prName = tr("Pull Request");
-   }
-   else if (remoteUrl.contains("gitlab", Qt::CaseInsensitive))
-   {
-      gitPlatformIcon = QIcon(":/icons/gitlab");
-      name = "GitLab";
-      prName = tr("Merge Request");
-   }
-   else
-      add = false;
+   mBuildSystem->setCheckable(true);
+   mBuildSystem->setIcon(QIcon(":/icons/build_system"));
+   mBuildSystem->setIconSize(QSize(22, 22));
+   mBuildSystem->setToolTip("Jenkins");
+   mBuildSystem->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mBuildSystem->setPopupMode(QToolButton::InstantPopup);
+   mBtnGroup->addButton(mBuildSystem, static_cast<int>(ControlsMainViews::BuildSystem));
 
-   if (add)
-   {
-      mGitPlatform->setCheckable(true);
-      mGitPlatform->setIcon(gitPlatformIcon);
-      mGitPlatform->setIconSize(QSize(22, 22));
-      mGitPlatform->setToolTip(name);
-      mGitPlatform->setToolButtonStyle(Qt::ToolButtonIconOnly);
-      mGitPlatform->setPopupMode(QToolButton::InstantPopup);
-      mBtnGroup->addButton(mGitPlatform, static_cast<int>(ControlsMainViews::SERVER));
+   connect(mBuildSystem, &QToolButton::clicked, this, &Controls::signalGoBuildSystem);
 
-      const auto gitLayout = new QVBoxLayout();
-      gitLayout->setContentsMargins(QMargins());
-      gitLayout->setSpacing(0);
-      gitLayout->addWidget(mGitPlatform);
+   hLayout->addWidget(mBuildSystem);
 
-      const auto separator3 = new QFrame();
-      separator3->setObjectName("orangeSeparator");
-      separator3->setFixedHeight(20);
+   configBuildSystemButton();
 
-      hLayout->addWidget(mGitPlatform);
-      hLayout->addWidget(separator3);
-
-      connect(mGitServerCache.get(), &GitServerCache::connectionTested, this, [this]() {
-         if (mGoGitServerView)
-            emit signalGoServer();
-
-         mGoGitServerView = false;
-      });
-      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::initGitServerConnection);
-   }
-   else
-      mGitPlatform->setVisible(false);
+   const auto separator3 = new QFrame();
+   separator3->setObjectName("orangeSeparator");
+   separator3->setFixedHeight(20);
+   hLayout->addWidget(separator3);
 
    mVersionCheck->setIcon(QIcon(":/icons/get_gitqlient"));
    mVersionCheck->setIconSize(QSize(22, 22));
@@ -215,7 +183,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    mMergeWarning->setObjectName("MergeWarningButton");
    mMergeWarning->setVisible(false);
-   mBtnGroup->addButton(mMergeWarning, static_cast<int>(ControlsMainViews::MERGE));
+   mBtnGroup->addButton(mMergeWarning, static_cast<int>(ControlsMainViews::Merge));
 
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(0, 10, 0, 10);
@@ -251,6 +219,17 @@ void Controls::enableButtons(bool enabled)
    mRefreshBtn->setEnabled(enabled);
    mGitPlatform->setEnabled(enabled);
    mConfigBtn->setEnabled(enabled);
+
+   if (enabled)
+   {
+      GitQlientSettings settings;
+      const auto isConfigured
+          = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
+
+      mBuildSystem->setEnabled(isConfigured);
+   }
+   else
+      mBuildSystem->setEnabled(false);
 }
 
 void Controls::pullCurrentBranch()
@@ -325,7 +304,7 @@ void Controls::enableDiff()
 
 ControlsMainViews Controls::getCurrentSelectedButton() const
 {
-   return mBlame->isChecked() ? ControlsMainViews::BLAME : ControlsMainViews::HISTORY;
+   return mBlame->isChecked() ? ControlsMainViews::Blame : ControlsMainViews::History;
 }
 
 void Controls::pushCurrentBranch()
@@ -407,6 +386,68 @@ void Controls::showConfigDlg()
 {
    const auto configDlg = new RepoConfigDlg(mGit, this);
    configDlg->exec();
+
+   configBuildSystemButton();
+}
+
+void Controls::createGitPlatformButton(QHBoxLayout *layout)
+{
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto remoteUrl = gitConfig->getServerUrl();
+   QIcon gitPlatformIcon;
+   QString name;
+   QString prName;
+   auto add = true;
+
+   if (remoteUrl.contains("github", Qt::CaseInsensitive))
+   {
+      gitPlatformIcon = QIcon(":/icons/github");
+      name = "GitHub";
+      prName = tr("Pull Request");
+   }
+   else if (remoteUrl.contains("gitlab", Qt::CaseInsensitive))
+   {
+      gitPlatformIcon = QIcon(":/icons/gitlab");
+      name = "GitLab";
+      prName = tr("Merge Request");
+   }
+   else
+      add = false;
+
+   if (add)
+   {
+      mGitPlatform->setCheckable(true);
+      mGitPlatform->setIcon(gitPlatformIcon);
+      mGitPlatform->setIconSize(QSize(22, 22));
+      mGitPlatform->setToolTip(name);
+      mGitPlatform->setToolButtonStyle(Qt::ToolButtonIconOnly);
+      mGitPlatform->setPopupMode(QToolButton::InstantPopup);
+      mBtnGroup->addButton(mGitPlatform, static_cast<int>(ControlsMainViews::GitServer));
+
+      const auto gitLayout = new QVBoxLayout();
+      gitLayout->setContentsMargins(QMargins());
+      gitLayout->setSpacing(0);
+      gitLayout->addWidget(mGitPlatform);
+
+      layout->addWidget(mGitPlatform);
+
+      connect(mGitServerCache.get(), &GitServerCache::connectionTested, this, [this]() {
+         if (mGoGitServerView)
+            emit signalGoServer();
+
+         mGoGitServerView = false;
+      });
+      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::initGitServerConnection);
+   }
+   else
+      mGitPlatform->setVisible(false);
+}
+
+void Controls::configBuildSystemButton()
+{
+   GitQlientSettings settings;
+   const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
+   mBuildSystem->setEnabled(isConfigured);
 }
 
 void Controls::initGitServerConnection()

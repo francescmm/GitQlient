@@ -270,7 +270,7 @@ QLabel#lCounter
     qproperty-alignment: AlignCenter;
 }
 
-CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles
+CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles, #JobContainerHeader
 {
     max-height: 30px;
     min-height: 30px;
@@ -681,6 +681,7 @@ QSpinBox
     border-width: 1px;
     max-height: 25px;
     min-height: 25px;
+    padding-left: 10px;
 }
 
 QSpinBox::up-button
@@ -735,7 +736,7 @@ QDialog > QPushButton
 }
 
 /* GitServerWidget */
-QScrollArea
+QScrollArea, #TransparentScrollArea
 {
    background: transparent;
 }
@@ -857,7 +858,6 @@ QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
    border-style: solid;
 }
 
-
 PrChangesList FileDiffView
 {
    border: 0;
@@ -877,7 +877,7 @@ PrChangesList FileDiffView
 #ChangeHeaderFrame
 {
     background: #202122;
-    padding: 10px;
+   padding: 10px;
 }
 
 SourceCodeReview > FileDiffView, #PrChangeListItem > FileDiffView
@@ -915,5 +915,18 @@ SourceCodeReview QLabel
    border: 1px solid #2E2F30;
    border-radius: 10px;
    padding: 5px;
+}
+
+/* JENKINS */
+#JobContainer
+{
+   background: #2E2F30;
+}
+
+#JenkinsWidget, #JobButton, #JobContainerScrollArea
+{
+   background: transparent;
+   outline: none;
+   border: none;
 }
 

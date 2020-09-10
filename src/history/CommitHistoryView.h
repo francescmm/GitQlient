@@ -167,11 +167,6 @@ private:
     */
    void showContextMenu(const QPoint &p);
    /**
-    * @brief Saves the state of the header (width of the columns, which columns, etc) when the widget is going to be
-    * destroyed.
-    */
-   void saveHeaderState();
-   /**
     * @brief Configures the tree view and how the columns look like.
     *
     * @fn setupGeometry

@@ -34,6 +34,7 @@ class QProgressBar;
 class GitQlientUpdater;
 class GitServerCache;
 class QButtonGroup;
+class QHBoxLayout;
 
 /*!
  \brief Enum used to configure the different views handled by the Controls widget.
@@ -41,11 +42,12 @@ class QButtonGroup;
 */
 enum class ControlsMainViews
 {
-   HISTORY,
-   DIFF,
-   BLAME,
-   MERGE,
-   SERVER
+   History,
+   Diff,
+   Blame,
+   Merge,
+   GitServer,
+   BuildSystem
 };
 
 /*!
@@ -80,9 +82,14 @@ signals:
    void signalGoMerge();
 
    /**
-    * @brief signalGoManagement Signal triggered when the user selected the Git remote platform viewer.
+    * @brief signalGoManagement Signal triggered when the user selected the Git remote platform view.
     */
    void signalGoServer();
+
+   /**
+    * @brief signalGoBuildSystem Signal triggered when the user selected the Build System view.
+    */
+   void signalGoBuildSystem();
 
    /*!
     \brief Signal triggered when the user manually forces a refresh of the repository data.
@@ -177,6 +184,7 @@ private:
    QToolButton *mRefreshBtn = nullptr;
    QToolButton *mConfigBtn = nullptr;
    QToolButton *mGitPlatform = nullptr;
+   QToolButton *mBuildSystem = nullptr;
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;
@@ -212,6 +220,16 @@ private:
     * \brief Shows the config dialog for both Local and Global user data.
     */
    void showConfigDlg();
+
+   /**
+    * @brief createGitPlatformButton Createst the git platform button if the user has enabled it.
+    */
+   void createGitPlatformButton(QHBoxLayout *layout);
+
+   /**
+    * @brief createBuildSystemButton Creates the build system platform button if the user has enabled it.
+    */
+   void configBuildSystemButton();
 
    /**
     * @brief initGitServerConnection Connects to the Git Server platform and retrieves data.

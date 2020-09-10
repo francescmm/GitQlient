@@ -106,6 +106,12 @@ public:
     \return QColor
    */
    static QColor getOrange();
+
+   /**
+    * @brief getGitQlientOrange Gets the GitQlient oficial orange color.
+    * @return QColor
+    */
+   static QColor getGitQlientOrange();
    /*!
     \brief Gets the total count of branch colors.
 

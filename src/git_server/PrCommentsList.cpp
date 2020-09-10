@@ -218,13 +218,13 @@ void PrCommentsList::onReviewsReceived(PullRequest pr)
 
    QMultiMap<QDateTime, QLayout *> bubblesMap;
 
-   for (const auto &comment : pr.comments)
+   for (const auto &comment : qAsConst(pr.comments))
    {
       const auto layout = createBubbleForComment(comment);
       bubblesMap.insert(comment.creation, layout);
    }
 
-   for (const auto &review : pr.reviews)
+   for (const auto &review : qAsConst(pr.reviews))
    {
       const auto layouts = new QVBoxLayout();
 

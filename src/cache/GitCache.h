@@ -88,8 +88,6 @@ public:
 
    void updateTags(const QMap<QString, QString> &remoteTags);
 
-   void refreshPRsCache();
-
 private:
    friend class GitRepoLoader;
 

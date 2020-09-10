@@ -33,7 +33,6 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, cons
    header()->setSortIndicatorShown(false);
    header()->setContextMenuPolicy(Qt::CustomContextMenu);
    connect(header(), &QHeaderView::customContextMenuRequested, this, &CommitHistoryView::onHeaderContextMenu);
-   connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
 
    connect(mCache.get(), &GitCache::signalCacheUpdated, this, &CommitHistoryView::refreshView);
 
@@ -229,12 +228,6 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
       else
          QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
    }
-}
-
-void CommitHistoryView::saveHeaderState()
-{
-   QSettings s;
-   s.setValue(QString("%1").arg(objectName()), header()->saveState());
 }
 
 QList<QString> CommitHistoryView::getSelectedShaList() const

@@ -43,6 +43,11 @@ class QTimer;
 class WaitingDlg;
 class GitServerCache;
 
+namespace Jenkins
+{
+class JenkinsWidget;
+}
+
 namespace GitServer
 {
 class IRestApi;
@@ -140,6 +145,7 @@ private:
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
    GitServerWidget *mGitServerWidget = nullptr;
+   Jenkins::JenkinsWidget *mJenkins = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    QTimer *mAutoPrUpdater = nullptr;
@@ -261,6 +267,11 @@ private:
     */
    void showGitServerView();
 
+   /**
+    * @brief showBuildSystemView Shows the build system view.
+    */
+   void showBuildSystemView();
+
    /*!
     \brief Opens the previous view. This method is used when the diff view is closed and GitQlientRepo must return to
     the previous one.
@@ -277,4 +288,16 @@ private:
     * @brief updateTagsOnCache Updates the remote tags in the cache.
     */
    void updateTagsOnCache();
+
+   /**
+    * @brief focusHistoryOnBranch Opens the graph view and focuses on the SHA of the last commit of the given branch.
+    * @param branch The branch.
+    */
+   void focusHistoryOnBranch(const QString &branch);
+
+   /**
+    * @brief focusHistoryOnPr Opens the graph view and focuses on the SHA of the PR number.
+    * @param prNumber The PR to put the focus on.
+    */
+   void focusHistoryOnPr(int prNumber);
 };

@@ -31,6 +31,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mSave(new QPushButton())
    , mStage(new QPushButton())
    , mRevert(new QPushButton())
+   , mFileNameLabel(new QLabel())
    , mNewFile(new FileDiffView())
    , mOldFile(new FileDiffView())
    , mFileEditor(new FileEditor())
@@ -55,6 +56,9 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    optionsLayout->addWidget(mStage);
    optionsLayout->addWidget(mRevert);
    optionsLayout->addStretch();
+   optionsLayout->addWidget(mFileNameLabel);
+   optionsLayout->addStretch();
+   optionsLayout->addItem(new QSpacerItem(350, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
 
    const auto diffLayout = new QHBoxLayout();
    diffLayout->setContentsMargins(QMargins());
@@ -108,6 +112,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mSave->setDisabled(true);
    mSave->setToolTip(tr("Save"));
    connect(mSave, &QPushButton::clicked, mFileEditor, &FileEditor::saveFile);
+   connect(mSave, &QPushButton::clicked, mEdition, &QPushButton::toggle);
 
    mStage->setIcon(QIcon(":/icons/staged"));
    mStage->setToolTip(tr("Stage file"));
@@ -144,6 +149,8 @@ bool FileDiffWidget::reload()
 bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file,
                                bool editMode)
 {
+   mFileNameLabel->setText(file);
+
    const auto isWip = currentSha == CommitInfo::ZERO_SHA;
    mBack->setVisible(isWip);
    mEdition->setVisible(isWip);

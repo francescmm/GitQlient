@@ -518,14 +518,10 @@ void CommitHistoryContextMenu::merge(const QString &branchFrom)
 
 void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 {
-   auto isCommitInCurrentBranch = false;
-   const auto currentBranch = mGit->getCurrentBranch();
    const auto commitInfo = mCache->getCommitInfo(sha);
-   const auto remoteBranches = commitInfo.getReferences(References::Type::RemoteBranches);
+   auto remoteBranches = commitInfo.getReferences(References::Type::RemoteBranches);
    const auto localBranches = commitInfo.getReferences(References::Type::LocalBranch);
 
-   QScopedPointer<GitBranches> git(new GitBranches(mGit));
-   const auto tracking = git->getTrackingBranches();
    QMap<QString, bool> branchTracking;
 
    if (remoteBranches.isEmpty())
@@ -535,22 +531,26 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
    }
    else
    {
-      for (const auto &remote : remoteBranches)
+      for (const auto &local : localBranches)
       {
-         if (tracking.contains(remote))
-         {
-            for (const auto &local : tracking[remote])
-            {
-               if (!branchTracking.contains(local))
-                  branchTracking.insert(local, true);
-            }
-         }
-         else
-            branchTracking.insert(remote, false);
+         const auto iter = std::find_if(remoteBranches.begin(), remoteBranches.end(), [local](const QString &remote) {
+            if (remote.contains(local))
+               return true;
+            return false;
+         });
+
+         branchTracking.insert(local, true);
+
+         if (iter != remoteBranches.end())
+            remoteBranches.erase(iter);
       }
+      for (const auto &remote : remoteBranches)
+         branchTracking.insert(remote, false);
    }
 
    QList<QAction *> branchesToCheckout;
+   auto isCommitInCurrentBranch = false;
+   const auto currentBranch = mGit->getCurrentBranch();
 
    for (const auto &pair : branchTracking.toStdMap())
    {
