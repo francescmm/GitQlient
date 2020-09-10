@@ -288,4 +288,16 @@ private:
     * @brief updateTagsOnCache Updates the remote tags in the cache.
     */
    void updateTagsOnCache();
+
+   /**
+    * @brief focusHistoryOnBranch Opens the graph view and focuses on the SHA of the last commit of the given branch.
+    * @param branch The branch.
+    */
+   void focusHistoryOnBranch(const QString &branch);
+
+   /**
+    * @brief focusHistoryOnPr Opens the graph view and focuses on the SHA of the PR number.
+    * @param prNumber The PR to put the focus on.
+    */
+   void focusHistoryOnPr(int prNumber);
 };

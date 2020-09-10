@@ -73,6 +73,8 @@ void JenkinsWidget::configureGeneralView(const QVector<JenkinsViewInfo> &views)
          const auto container = new JobContainer(mConfig, view, this);
          container->setObjectName("JobContainer");
          connect(container, &JobContainer::signalJobAreViews, this, &JenkinsWidget::configureGeneralView);
+         connect(container, &JobContainer::gotoBranch, this, &JenkinsWidget::gotoBranch);
+         connect(container, &JobContainer::gotoPullRequest, this, &JenkinsWidget::gotoPullRequest);
 
          mButtonsLayout->addWidget(button);
          const auto id = mStackedLayout->addWidget(container);

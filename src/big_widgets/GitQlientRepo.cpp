@@ -138,6 +138,9 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, mControls, &Controls::disableMergeWarning);
    connect(mMergeWidget, &MergeWidget::signalEditFile, this, &GitQlientRepo::signalEditFile);
 
+   connect(mJenkins, &JenkinsWidget::gotoBranch, this, &GitQlientRepo::focusHistoryOnBranch);
+   connect(mJenkins, &JenkinsWidget::gotoPullRequest, this, &GitQlientRepo::focusHistoryOnPr);
+
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::createProgressDialog);
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished);
 
@@ -450,6 +453,36 @@ void GitQlientRepo::updateTagsOnCache()
    const auto remoteTags = gitTags->getRemoteTags();
 
    mGitQlientCache->updateTags(remoteTags);
+}
+
+void GitQlientRepo::focusHistoryOnBranch(const QString &branch)
+{
+   auto found = false;
+   const auto fullBranch = QString("origin/%1").arg(branch);
+   const auto remoteBranches = mGitQlientCache->getBranches(References::Type::RemoteBranches);
+
+   for (const auto &remote : remoteBranches)
+   {
+      if (remote.second.contains(fullBranch))
+      {
+         found = true;
+         mHistoryWidget->focusOnCommit(remote.first);
+         showHistoryView();
+      }
+   }
+
+   if (!found)
+      QMessageBox::information(
+          this, tr("Branch not found"),
+          tr("The branch couldn't be found. Please, make sure you fetched and have the latest changes."));
+}
+
+void GitQlientRepo::focusHistoryOnPr(int prNumber)
+{
+   const auto pr = mGitServerCache->getPullRequest(prNumber);
+
+   mHistoryWidget->focusOnCommit(pr.state.sha);
+   showHistoryView();
 }
 
 void GitQlientRepo::openCommitDiff(const QString currentSha)

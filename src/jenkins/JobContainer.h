@@ -22,6 +22,8 @@ class JobContainer : public QFrame
 
 signals:
    void signalJobAreViews(const QVector<JenkinsViewInfo> &views);
+   void gotoPullRequest(int prNumber);
+   void gotoBranch(const QString &branchName);
 
 public:
    explicit JobContainer(const IFetcher::Config &config, const JenkinsViewInfo &viewInfo, QWidget *parent = nullptr);

@@ -37,7 +37,7 @@ namespace Jenkins
 JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent)
    : QFrame(parent)
    , mConfig(config)
-   , mName(new QLabel())
+   , mName(new ButtonLink())
    , mUrl(new ButtonLink(tr("Open job in Jenkins...")))
    , mBuild(new QPushButton(tr("Trigger build")))
    , mManager(new QNetworkAccessManager(this))
@@ -83,6 +83,15 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    layout->addWidget(lastBuildScrollArea);
    layout->addWidget(mTabWidget);
 
+   connect(mName, &ButtonLink::clicked, this, [this]() {
+      if (mRequestedJob.name.startsWith("PR-"))
+      {
+         const auto num = mRequestedJob.name.split("-").last().toInt();
+         emit gotoPullRequest(num);
+      }
+      else
+         emit gotoBranch(mRequestedJob.name);
+   });
    connect(mUrl, &ButtonLink::clicked, this, [this]() { QDesktopServices::openUrl(mRequestedJob.url); });
    connect(mBuild, &QPushButton::clicked, this, &JenkinsJobPanel::triggerBuild);
 }

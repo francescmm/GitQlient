@@ -37,6 +37,9 @@ JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo
    connect(jobFetcher, &JobFetcher::signalJobsReceived, this, &JobContainer::addJobs);
    connect(jobFetcher, &JobFetcher::signalJobsReceived, jobFetcher, &JobContainer::deleteLater);
    jobFetcher->triggerFetch();
+
+   connect(mJobPanel, &JenkinsJobPanel::gotoBranch, this, &JobContainer::gotoBranch);
+   connect(mJobPanel, &JenkinsJobPanel::gotoPullRequest, this, &JobContainer::gotoPullRequest);
 }
 
 void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)

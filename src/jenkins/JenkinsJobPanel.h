@@ -5,7 +5,6 @@
 
 #include <QFrame>
 
-class QLabel;
 class CheckBox;
 class QVBoxLayout;
 class QHBoxLayout;
@@ -24,6 +23,10 @@ class JenkinsJobPanel : public QFrame
 {
    Q_OBJECT
 
+signals:
+   void gotoPullRequest(int prNumber);
+   void gotoBranch(const QString &branchName);
+
 public:
    explicit JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent = nullptr);
 
@@ -31,7 +34,7 @@ public:
 
 private:
    IFetcher::Config mConfig;
-   QLabel *mName = nullptr;
+   ButtonLink *mName = nullptr;
    ButtonLink *mUrl = nullptr;
    QPushButton *mBuild = nullptr;
    QFrame *mScrollFrame = nullptr;

@@ -20,6 +20,10 @@ class JenkinsWidget : public QWidget
 {
    Q_OBJECT
 
+signals:
+   void gotoPullRequest(int prNumber);
+   void gotoBranch(const QString &branchName);
+
 public:
    JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    ~JenkinsWidget() override = default;
