@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QMap>
 
 #include <JenkinsViewInfo.h>
 #include <IFetcher.h>
@@ -10,11 +11,13 @@ class QStackedLayout;
 class QButtonGroup;
 class QHBoxLayout;
 class QVBoxLayout;
+class QTimer;
 
 namespace Jenkins
 {
 
 class RepoFetcher;
+class JobContainer;
 
 class JenkinsWidget : public QWidget
 {
@@ -39,6 +42,8 @@ private:
    QButtonGroup *mBtnGroup = nullptr;
    QVBoxLayout *mButtonsLayout = nullptr;
    QVector<JenkinsViewInfo> mViews;
+   QMap<QString, JobContainer *> mJobsMap;
+   QTimer *mTimer = nullptr;
 
    void configureGeneralView(const QVector<JenkinsViewInfo> &views);
 };

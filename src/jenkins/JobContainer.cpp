@@ -19,6 +19,7 @@ JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo
    : QFrame(parent)
    , mConfig(config)
    , mView(viewInfo)
+   , mJobFetcher(new JobFetcher(config, viewInfo.url, this))
    , mJobListLayout(new QVBoxLayout())
    , mJobPanel(new JenkinsJobPanel(config))
 {
@@ -33,13 +34,16 @@ JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo
    mMainLayout->setStretch(0, 30);
    mMainLayout->setStretch(1, 70);
 
-   const auto jobFetcher = new JobFetcher(config, viewInfo.url);
-   connect(jobFetcher, &JobFetcher::signalJobsReceived, this, &JobContainer::addJobs);
-   connect(jobFetcher, &JobFetcher::signalJobsReceived, jobFetcher, &JobContainer::deleteLater);
-   jobFetcher->triggerFetch();
+   connect(mJobFetcher, &JobFetcher::signalJobsReceived, this, &JobContainer::addJobs);
+   mJobFetcher->triggerFetch();
 
    connect(mJobPanel, &JenkinsJobPanel::gotoBranch, this, &JobContainer::gotoBranch);
    connect(mJobPanel, &JenkinsJobPanel::gotoPullRequest, this, &JobContainer::gotoPullRequest);
+}
+
+void JobContainer::reload()
+{
+   mJobFetcher->triggerFetch();
 }
 
 void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
@@ -48,10 +52,9 @@ void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
 
    const auto keys = jobs.uniqueKeys();
    const auto totalKeys = keys.count();
-   QTreeWidget *mJobsTree = nullptr;
    const auto splitView = totalKeys <= 2;
 
-   if (!splitView)
+   if (!splitView && !mJobsTree)
    {
       mJobsTree = new QTreeWidget();
       mJobListLayout->addWidget(mJobsTree);
@@ -66,15 +69,21 @@ void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
 
       if (splitView)
       {
-         listWidget = new QListWidget();
+         if (mListsMap.contains(key))
+            listWidget = mListsMap.value(key);
+         else
+         {
+            listWidget = new QListWidget();
+            mListsMap.insert(key, listWidget);
 
-         connect(listWidget, &QListWidget::itemClicked, this, [this](QListWidgetItem *item) {
-            const auto job = qvariant_cast<JenkinsJobInfo>(item->data(Qt::UserRole));
-            requestUpdatedJobInfo(job);
-         });
+            connect(listWidget, &QListWidget::itemClicked, this, [this](QListWidgetItem *item) {
+               const auto job = qvariant_cast<JenkinsJobInfo>(item->data(Qt::UserRole));
+               requestUpdatedJobInfo(job);
+            });
 
-         createHeader(key, listWidget);
-         mJobListLayout->addWidget(listWidget);
+            createHeader(key, listWidget);
+            mJobListLayout->addWidget(listWidget);
+         }
       }
       else
       {
@@ -87,6 +96,11 @@ void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)
 
       for (const auto &job : qAsConst(values))
       {
+         if (mJobsList.contains(job))
+            continue;
+
+         mJobsList.append(job);
+
          if (job.builds.isEmpty() && job.color.isEmpty())
          {
             JenkinsViewInfo view;

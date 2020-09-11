@@ -57,5 +57,8 @@ private:
    void findString(QString s, QPlainTextEdit *textEdit);
    void createBuildConfigPanel();
    void triggerBuild();
+   void showArtifacts(const Jenkins::JenkinsJobBuildInfo &build);
+   void downloadArtifact(const JenkinsJobBuildInfo::Artifact &artifact, int number);
+   void storeArtifact(const QString &fileName, int buildNumber);
 };
 }

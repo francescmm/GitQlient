@@ -5,6 +5,7 @@
 #include <GitQlientSettings.h>
 #include <GitBase.h>
 
+#include <QTimer>
 #include <QButtonGroup>
 #include <QStackedLayout>
 #include <QPushButton>
@@ -21,6 +22,7 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
    , mBodyLayout(new QHBoxLayout())
    , mBtnGroup(new QButtonGroup())
    , mButtonsLayout(new QVBoxLayout())
+   , mTimer(new QTimer(this))
 {
    setObjectName("JenkinsWidget");
 
@@ -53,11 +55,15 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
    connect(mRepoFetcher, &RepoFetcher::signalViewsReceived, this, &JenkinsWidget::configureGeneralView);
 
    connect(mBtnGroup, &QButtonGroup::idClicked, mStackedLayout, &QStackedLayout::setCurrentIndex);
+
+   mTimer->setInterval(15 * 60 * 1000); // 15 mins
 }
 
 void JenkinsWidget::reload() const
 {
+   mTimer->stop();
    mRepoFetcher->triggerFetch();
+   mTimer->start();
 }
 
 void JenkinsWidget::configureGeneralView(const QVector<JenkinsViewInfo> &views)
@@ -76,6 +82,8 @@ void JenkinsWidget::configureGeneralView(const QVector<JenkinsViewInfo> &views)
          connect(container, &JobContainer::gotoBranch, this, &JenkinsWidget::gotoBranch);
          connect(container, &JobContainer::gotoPullRequest, this, &JenkinsWidget::gotoPullRequest);
 
+         mJobsMap.insert(view.name, container);
+
          mButtonsLayout->addWidget(button);
          const auto id = mStackedLayout->addWidget(container);
          mBtnGroup->addButton(button, id);
@@ -85,6 +93,8 @@ void JenkinsWidget::configureGeneralView(const QVector<JenkinsViewInfo> &views)
          if (mViews.count() == 1)
             button->setChecked(true);
       }
+      else
+         mJobsMap[view.name]->reload();
    }
 }
 

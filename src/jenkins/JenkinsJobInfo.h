@@ -37,6 +37,12 @@ struct JenkinsStageInfo
 
 struct JenkinsJobBuildInfo
 {
+   struct Artifact
+   {
+      QString fileName;
+      QString url;
+   };
+
    bool operator==(const JenkinsJobBuildInfo &build) const { return url == build.url; }
 
    int number;
@@ -45,7 +51,7 @@ struct JenkinsJobBuildInfo
    int duration;
    QString result;
    QString user;
-
+   QVector<Artifact> artifacts;
    QVector<JenkinsStageInfo> stages;
 };
 

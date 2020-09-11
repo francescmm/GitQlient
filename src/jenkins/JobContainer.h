@@ -11,10 +11,12 @@ class QTreeWidgetItem;
 class QListWidget;
 class QLabel;
 class QHBoxLayout;
+class QTreeWidget;
 
 namespace Jenkins
 {
 class JenkinsJobPanel;
+class JobFetcher;
 
 class JobContainer : public QFrame
 {
@@ -28,12 +30,18 @@ signals:
 public:
    explicit JobContainer(const IFetcher::Config &config, const JenkinsViewInfo &viewInfo, QWidget *parent = nullptr);
 
+   void reload();
+
 private:
    IFetcher::Config mConfig;
    JenkinsViewInfo mView;
+   JobFetcher *mJobFetcher = nullptr;
    QHBoxLayout *mMainLayout = nullptr;
    QVBoxLayout *mJobListLayout = nullptr;
    JenkinsJobPanel *mJobPanel = nullptr;
+   QVector<JenkinsJobInfo> mJobsList;
+   QTreeWidget *mJobsTree = nullptr;
+   QMap<QString, QListWidget *> mListsMap;
 
    void addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs);
    void requestUpdatedJobInfo(const JenkinsJobInfo &jobInfo);

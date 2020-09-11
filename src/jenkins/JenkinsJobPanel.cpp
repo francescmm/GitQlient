@@ -205,7 +205,10 @@ void JenkinsJobPanel::fillBuildLayout(const JenkinsJobBuildInfo &build, QHBoxLay
                                "qproperty-alignment: AlignCenter;"
                                "}")
                            .arg(Jenkins::resultColor(build.result).name()));
-   connect(mark, &ButtonLink::clicked, this, [this, build]() { requestFile(build); });
+   connect(mark, &ButtonLink::clicked, this, [this, build]() {
+      showArtifacts(build);
+      requestFile(build);
+   });
 
    mTempWidgets.append(mark);
 
@@ -286,7 +289,6 @@ void JenkinsJobPanel::storeFile(int buildNumber)
 
    if (!data.isEmpty())
    {
-
       const auto text = new QPlainTextEdit(QString::fromUtf8(data));
       text->setReadOnly(true);
       text->setObjectName("JenkinsOutput");
@@ -433,6 +435,82 @@ void JenkinsJobPanel::triggerBuild()
 
    const auto queryData = query.query().toUtf8();
    mManager->post(request, queryData);
+}
+
+void JenkinsJobPanel::showArtifacts(const JenkinsJobBuildInfo &build)
+{
+   const auto artifactsLayout = new QVBoxLayout();
+   artifactsLayout->setContentsMargins(QMargins());
+   artifactsLayout->setSpacing(10);
+
+   const auto artifactsFrame = new QFrame();
+   artifactsFrame->setLayout(artifactsLayout);
+   artifactsFrame->setObjectName("artifactsFrame");
+   artifactsFrame->setStyleSheet("#artifactsFrame{ background: #404142; }");
+
+   const auto scroll = new QScrollArea();
+   scroll->setWidget(artifactsFrame);
+   scroll->setWidgetResizable(true);
+   scroll->setObjectName("artifactsFrame");
+   scroll->setStyleSheet("#artifactsFrame{ background: #404142; }");
+
+   for (const auto &artifact : build.artifacts)
+   {
+      const auto fileLink = new ButtonLink(artifact.fileName);
+      connect(fileLink, &ButtonLink::clicked, this,
+              [this, artifact, num = build.number]() { downloadArtifact(artifact, num); });
+      artifactsLayout->addWidget(fileLink);
+   }
+
+   mTabWidget->addTab(scroll, tr("Artifacts for #%1").arg(build.number));
+}
+
+void JenkinsJobPanel::downloadArtifact(const JenkinsJobBuildInfo::Artifact &artifact, int number)
+{
+   QNetworkRequest request(artifact.url);
+
+   if (!mConfig.user.isEmpty() && !mConfig.token.isEmpty())
+   {
+      const auto data = QString("%1:%2").arg(mConfig.user, mConfig.token).toLocal8Bit().toBase64();
+      request.setRawHeader("Authorization", QString(QString::fromUtf8("Basic ") + data).toLocal8Bit());
+   }
+
+   const auto reply = mManager->get(request);
+   connect(reply, &QNetworkReply::finished, this,
+           [this, fileName = artifact.fileName, number] { storeArtifact(fileName, number); });
+}
+
+void JenkinsJobPanel::storeArtifact(const QString &fileName, int buildNumber)
+{
+   const auto reply = qobject_cast<QNetworkReply *>(sender());
+   const auto data = reply->readAll();
+
+   if (!data.isEmpty())
+   {
+      auto fullPath = QString("%1/%2_%3")
+                          .arg(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation),
+                               QString::number(buildNumber), fileName);
+      QFile f(fullPath);
+
+      if (f.exists())
+      {
+         QMessageBox::warning(this, tr("File already exists!"),
+                              tr("The file already exists in %1.")
+                                  .arg(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)));
+      }
+      else if (f.open(QIODevice::WriteOnly))
+      {
+         f.write(data);
+         f.close();
+
+         QMessageBox::information(
+             this, tr("File downloaded!"),
+             tr("The file (%1) has been downloaded in: %2")
+                 .arg(fileName, QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)));
+      }
+   }
+   else
+      QMessageBox::warning(this, tr("File download error!"), tr("The file (%1) couldn't be downloaded.").arg(fileName));
 }
 
 }

@@ -36,7 +36,7 @@ void BuildGeneralInfoFetcher::processData(const QJsonDocument &json)
 
    if (jsonObject.contains(QStringLiteral("culprits")))
    {
-      QJsonArray culprits = jsonObject[QStringLiteral("culprits")].toArray();
+      const auto culprits = jsonObject[QStringLiteral("culprits")].toArray();
 
       for (const auto &item : culprits)
       {
@@ -47,6 +47,20 @@ void BuildGeneralInfoFetcher::processData(const QJsonDocument &json)
             mBuild.user = obj[QStringLiteral("fullName")].toString();
             break;
          }
+      }
+   }
+
+   if (jsonObject.contains(QStringLiteral("artifacts")))
+   {
+      const auto artifacts = jsonObject[QStringLiteral("artifacts")].toArray();
+
+      for (const auto artifact : artifacts)
+      {
+         JenkinsJobBuildInfo::Artifact sArtifact;
+         sArtifact.fileName = artifact[QStringLiteral("fileName")].toString();
+         sArtifact.url = QString("%1artifact/%2").arg(jsonObject[QStringLiteral("url")].toString(), sArtifact.fileName);
+
+         mBuild.artifacts.append(sArtifact);
       }
    }
 
