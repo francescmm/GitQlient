@@ -2,6 +2,7 @@
 
 #include <QTemporaryFile>
 #include <QTextStream>
+#include <GitQlientSettings.h>
 
 #include <QLogger.h>
 
@@ -144,8 +145,11 @@ bool AGitProcess::execute(const QString &command)
       env << "GIT_TRACE=0"; // avoid choking on debug traces
       env << "GIT_FLUSH=0"; // skip the fflush() in 'git log'
 
+      GitQlientSettings settings;
+      const auto gitAlternative = settings.globalValue("gitLocation", "").toString();
+
       setEnvironment(env);
-      setProgram(arguments.takeFirst());
+      setProgram(gitAlternative.isEmpty() ? arguments.takeFirst() : gitAlternative);
       setArguments(arguments);
       start();
 

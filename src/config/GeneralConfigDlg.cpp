@@ -20,11 +20,14 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
    , mDisableLogs(new CheckBox())
    , mLevelCombo(new QComboBox())
    , mStylesSchema(new QComboBox())
+   , mGitLocation(new QLineEdit())
    , mClose(new QPushButton(tr("Close")))
    , mReset(new QPushButton(tr("Reset")))
    , mApply(new QPushButton(tr("Apply")))
 
 {
+   mGitLocation->setPlaceholderText(tr("Git location if not in PATH"));
+
    mClose->setMinimumWidth(75);
    mReset->setMinimumWidth(75);
    mApply->setMinimumWidth(75);
@@ -67,6 +70,8 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
    layout->addWidget(mLevelCombo, row, 1);
    layout->addWidget(new QLabel(tr("Styles schema")), ++row, 0);
    layout->addWidget(mStylesSchema, row, 1);
+   layout->addWidget(new QLabel(tr("Git location (if not in PATH):")), ++row, 0);
+   layout->addWidget(mGitLocation, row, 1);
    layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), ++row, 0, 1, 2);
    layout->addLayout(buttonsLayout, ++row, 0, 1, 2);
 
@@ -81,6 +86,7 @@ void GeneralConfigDlg::resetChanges()
    mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
    mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", 2).toInt());
    mStylesSchema->setCurrentText(settings.globalValue("colorSchema", "bright").toString());
+   mGitLocation->setText(settings.globalValue("gitLocation", "").toString());
 }
 
 void GeneralConfigDlg::accept()
@@ -89,6 +95,7 @@ void GeneralConfigDlg::accept()
    settings.setGlobalValue("logsDisabled", mDisableLogs->isChecked());
    settings.setGlobalValue("logsLevel", mLevelCombo->currentIndex());
    settings.setGlobalValue("colorSchema", mStylesSchema->currentText());
+   settings.setGlobalValue("gitLocation", mGitLocation->text());
 
    if (mShowResetMsg)
       QMessageBox::information(this, tr("Reset needed!"),
