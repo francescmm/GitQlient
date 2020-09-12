@@ -262,10 +262,19 @@ private:
    */
    void showMergeView();
 
+   bool configureGitServer() const;
+
    /**
     * @brief showGitServerView Shows the configured git server view.
     */
    void showGitServerView();
+
+   /**
+    * @brief showGitServerPrView Shows the configured git server view opening the details of the pull request identified
+    * by the given @p prNumber.
+    * @param prNumber The pull request number to show the details.
+    */
+   void showGitServerPrView(int prNumber);
 
    /**
     * @brief showBuildSystemView Shows the build system view.

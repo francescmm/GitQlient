@@ -147,6 +147,11 @@ signals:
     \brief Signal triggered  when the WIP needs to be updated.
    */
    void signalUpdateWip();
+   /**
+    * @brief showPrDetailedView Signal that makes the view change to the Pull Request detailed view
+    * @param pr The pull request number to show.
+    */
+   void showPrDetailedView(int pr);
 
 public:
    /*!

@@ -29,6 +29,7 @@
 class GitCache;
 class GitBase;
 class GitServerCache;
+class IssueDetailedView;
 
 namespace GitServer
 {
@@ -59,10 +60,17 @@ public:
     */
    bool isConfigured() const { return mConfigured; }
 
+   /**
+    * @brief openPullRequest The method opens the PR view directly.
+    * @param prNumber The PR number.
+    */
+   void openPullRequest(int prNumber);
+
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitServerCache> mGitServerCache;
+   IssueDetailedView *mDetailedView = nullptr;
    bool mConfigured = false;
 
    /**

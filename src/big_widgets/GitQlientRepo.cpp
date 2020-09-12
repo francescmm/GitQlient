@@ -124,6 +124,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mHistoryWidget, &HistoryWidget::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mHistoryWidget, &HistoryWidget::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
    connect(mHistoryWidget, &HistoryWidget::signalUpdateWip, this, &GitQlientRepo::updateWip);
+   connect(mHistoryWidget, &HistoryWidget::showPrDetailedView, this, &GitQlientRepo::showGitServerPrView);
 
    connect(mDiffWidget, &DiffWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mDiffWidget, &DiffWidget::signalDiffEmpty, mControls, &Controls::disableDiff);
@@ -397,8 +398,10 @@ void GitQlientRepo::showMergeView()
    mControls->toggleButton(ControlsMainViews::Merge);
 }
 
-void GitQlientRepo::showGitServerView()
+bool GitQlientRepo::configureGitServer() const
 {
+   bool isConfigured = false;
+
    if (!mGitServerWidget->isConfigured())
    {
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
@@ -415,16 +418,32 @@ void GitQlientRepo::showGitServerView()
       data.serverUrl = serverUrl;
       data.repoInfo = repoInfo;
 
-      mGitServerWidget->configure(data);
+      isConfigured = mGitServerWidget->configure(data);
    }
+   else
+      isConfigured = true;
 
-   if (mGitServerWidget->isConfigured())
+   return isConfigured;
+}
+
+void GitQlientRepo::showGitServerView()
+{
+   if (configureGitServer())
    {
       mStackedLayout->setCurrentWidget(mGitServerWidget);
       mControls->toggleButton(ControlsMainViews::GitServer);
    }
    else
       showPreviousView();
+}
+
+void GitQlientRepo::showGitServerPrView(int prNumber)
+{
+   if (configureGitServer())
+   {
+      showGitServerView();
+      mGitServerWidget->openPullRequest(prNumber);
+   }
 }
 
 void GitQlientRepo::showBuildSystemView()

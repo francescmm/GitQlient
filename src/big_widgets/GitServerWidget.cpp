@@ -28,6 +28,7 @@ GitServerWidget::GitServerWidget(const QSharedPointer<GitCache> &cache, const QS
    , mCache(cache)
    , mGit(git)
    , mGitServerCache(gitServerCache)
+   , mDetailedView(new IssueDetailedView(mGit, mGitServerCache))
 {
 }
 
@@ -48,6 +49,11 @@ bool GitServerWidget::configure(const GitServer::ConfigData &config)
       createWidget();
 
    return mConfigured;
+}
+
+void GitServerWidget::openPullRequest(int prNumber)
+{
+   mDetailedView->loadData(IssueDetailedView::Config::PullRequests, prNumber);
 }
 
 void GitServerWidget::createWidget()
@@ -77,19 +83,12 @@ void GitServerWidget::createWidget()
    buttonsLayout->addWidget(refresh);
    buttonsLayout->addStretch();
 
-   const auto detailedView = new IssueDetailedView(mGit, mGitServerCache);
-
    const auto issues = new IssuesList(mGitServerCache);
-   connect(issues, &AGitServerItemList::selected, detailedView,
-           [config = IssueDetailedView::Config::Issues, detailedView](int issueNum) {
-              detailedView->loadData(config, issueNum);
-           });
+   connect(issues, &AGitServerItemList::selected, mDetailedView,
+           [this](int issueNum) { mDetailedView->loadData(IssueDetailedView::Config::Issues, issueNum); });
 
    const auto pullRequests = new PrList(mGitServerCache);
-   connect(pullRequests, &AGitServerItemList::selected, detailedView,
-           [config = IssueDetailedView::Config::PullRequests, detailedView](int issueNum) {
-              detailedView->loadData(config, issueNum);
-           });
+   connect(pullRequests, &AGitServerItemList::selected, this, &GitServerWidget::openPullRequest);
 
    connect(refresh, &QPushButton::clicked, this, [issues, pullRequests]() {
       issues->refreshData();
@@ -107,7 +106,7 @@ void GitServerWidget::createWidget()
    detailsLayout->setContentsMargins(QMargins());
    detailsLayout->setSpacing(10);
    detailsLayout->setAlignment(Qt::AlignTop);
-   detailsLayout->addWidget(detailedView);
+   detailsLayout->addWidget(mDetailedView);
 
    const auto centralLayout = new QGridLayout();
    centralLayout->setContentsMargins(10, 10, 10, 10);
