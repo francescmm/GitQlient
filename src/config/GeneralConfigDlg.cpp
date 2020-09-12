@@ -4,6 +4,7 @@
 #include <GitQlientStyles.h>
 #include <QLogger.h>
 #include <CheckBox.h>
+#include <ButtonLink.hpp>
 
 #include <QSpinBox>
 #include <QComboBox>
@@ -12,6 +13,10 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 using namespace QLogger;
 
@@ -72,10 +77,21 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
    layout->addWidget(mStylesSchema, row, 1);
    layout->addWidget(new QLabel(tr("Git location (if not in PATH):")), ++row, 0);
    layout->addWidget(mGitLocation, row, 1);
+
+   const auto exportLink = new ButtonLink(tr("Export config..."));
+   connect(exportLink, &ButtonLink::clicked, this, &GeneralConfigDlg::exportConfig);
+
+   layout->addWidget(exportLink, ++row, 0, 1, 2);
+
+   const auto importLink = new ButtonLink(tr("Import config..."));
+   connect(importLink, &ButtonLink::clicked, this, &GeneralConfigDlg::importConfig);
+
+   layout->addWidget(importLink, ++row, 0, 1, 2);
+
    layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), ++row, 0, 1, 2);
    layout->addLayout(buttonsLayout, ++row, 0, 1, 2);
 
-   setFixedSize(400, 200);
+   setFixedSize(500, 300);
 
    setStyleSheet(GitQlientStyles::getStyles());
 }
@@ -110,4 +126,69 @@ void GeneralConfigDlg::accept()
       logger->resume();
 
    QDialog::accept();
+}
+
+void GeneralConfigDlg::importConfig()
+{
+   const auto fileDialog
+       = new QFileDialog(this, tr("Select a config file..."),
+                         QStandardPaths::writableLocation(QStandardPaths::HomeLocation), "GitQlient.conf");
+   fileDialog->setFileMode(QFileDialog::ExistingFile);
+
+   if (fileDialog->exec())
+   {
+      const auto file = fileDialog->selectedFiles().first();
+
+      QFile f(file);
+
+      if (f.open(QIODevice::ReadOnly))
+      {
+         QJsonDocument doc;
+         doc.fromJson(f.readAll());
+
+         const auto obj = doc.object();
+
+         mDisableLogs->setChecked(obj[QStringLiteral("logsDisabled")].toBool());
+         mLevelCombo->setCurrentIndex(obj[QStringLiteral("logsLevel")].toInt());
+         mStylesSchema->setCurrentText(obj[QStringLiteral("colorSchema")].toString());
+         mGitLocation->setText(obj[QStringLiteral("gitLocation")].toString());
+
+         QMessageBox::information(this, tr("External configuration loaded!"),
+                                  tr("The configuration has been loaded successfully. Remember to apply the changes."));
+
+         f.close();
+      }
+   }
+}
+
+void GeneralConfigDlg::exportConfig()
+{
+   const auto fileDialog
+       = new QFileDialog(this, tr("Select a folder..."), QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
+                         "GitQlient.conf");
+   fileDialog->setOption(QFileDialog::ShowDirsOnly, true);
+   fileDialog->setFileMode(QFileDialog::Directory);
+
+   if (fileDialog->exec())
+   {
+      QJsonObject obj;
+      obj.insert("logsDisabled", mDisableLogs->isChecked());
+      obj.insert("logsLevel", mLevelCombo->currentIndex());
+      obj.insert("colorSchema", mStylesSchema->currentText());
+      obj.insert("gitLocation", mGitLocation->text());
+
+      QJsonDocument doc(obj);
+
+      const auto fullPath = QString("%1/%2").arg(fileDialog->directory().path(), QString::fromUtf8("GitQlient.conf"));
+      QFile f(fullPath);
+
+      if (f.open(QIODevice::WriteOnly))
+      {
+         f.write(doc.toJson());
+         f.close();
+
+         QMessageBox::information(this, tr("Configuration exported!"),
+                                  tr("The configuration has been stored in {%1}").arg(fullPath));
+      }
+   }
 }

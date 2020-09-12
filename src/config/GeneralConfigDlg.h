@@ -71,4 +71,14 @@ private:
 
    */
    void accept() override;
+
+   /**
+    * @brief importConfig Imports an external configuration.
+    */
+   void importConfig();
+
+   /**
+    * @brief exportConfig Exports the configuration to an external file.
+    */
+   void exportConfig();
 };
