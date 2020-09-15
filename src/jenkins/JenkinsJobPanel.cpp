@@ -4,9 +4,11 @@
 #include <CheckBox.h>
 #include <ButtonLink.hpp>
 #include <QPinnableTabWidget.h>
+#include <JobDetailsFetcher.h>
 
 #include <QLogger.h>
 
+#include <QTimer>
 #include <QAuthenticator>
 #include <QUrlQuery>
 #include <QComboBox>
@@ -112,7 +114,10 @@ void JenkinsJobPanel::loadJobInfo(const JenkinsJobInfo &job)
       mTempWidgets.clear();
 
       delete mBuildListLayout;
+      mBuildListLayout = nullptr;
+
       delete mLastBuildLayout;
+      mLastBuildLayout = nullptr;
 
       mTabWidget->setCurrentIndex(0);
       mTabBuildMap.clear();
@@ -122,19 +127,24 @@ void JenkinsJobPanel::loadJobInfo(const JenkinsJobInfo &job)
 
       mRequestedJob = job;
       mName->setText(mRequestedJob.name);
-      mBuild->setVisible(false);
 
       mTmpBuildsCounter = mRequestedJob.builds.count();
 
-      for (const auto &build : qAsConst(mRequestedJob.builds))
+      if (mRequestedJob.builds.isEmpty())
+         mBuild->setVisible(true);
+      else
       {
-         const auto buildFetcher = new BuildGeneralInfoFetcher(mConfig, build, this);
-         connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, this,
-                 [this](const JenkinsJobBuildInfo &build) { appendJobsData(mRequestedJob.name, build); });
-         connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, buildFetcher,
-                 &BuildGeneralInfoFetcher::deleteLater);
+         mBuild->setVisible(false);
+         for (const auto &build : qAsConst(mRequestedJob.builds))
+         {
+            const auto buildFetcher = new BuildGeneralInfoFetcher(mConfig, build, this);
+            connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, this,
+                    [this](const JenkinsJobBuildInfo &build) { appendJobsData(mRequestedJob.name, build); });
+            connect(buildFetcher, &BuildGeneralInfoFetcher::signalBuildInfoReceived, buildFetcher,
+                    &BuildGeneralInfoFetcher::deleteLater);
 
-         buildFetcher->triggerFetch();
+            buildFetcher->triggerFetch();
+         }
       }
    }
 }
@@ -412,7 +422,7 @@ void JenkinsJobPanel::createBuildConfigPanel()
 
 void JenkinsJobPanel::triggerBuild()
 {
-   const auto endpoint = QString::fromUtf8("buildWithParameters");
+   const auto endpoint = QString::fromUtf8(mRequestedJob.builds.isEmpty() ? "build" : "buildWithParameters");
    QUrl url(mRequestedJob.url.endsWith("/") ? QString("%1%2").arg(mRequestedJob.url, endpoint)
                                             : QString("%1/%2").arg(mRequestedJob.url, endpoint));
    QNetworkRequest request(url);
@@ -435,6 +445,25 @@ void JenkinsJobPanel::triggerBuild()
 
    const auto queryData = query.query().toUtf8();
    mManager->post(request, queryData);
+
+   QTimer::singleShot(10000, this, [this]() {
+      const auto jobRequest = new JobDetailsFetcher(mConfig, mRequestedJob);
+      connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, this, [this](const JenkinsJobInfo &newInfo) {
+         mRequestedJob.builds = newInfo.builds;
+         mRequestedJob.configFields = newInfo.configFields;
+         mRequestedJob.healthStatus = newInfo.healthStatus;
+
+         loadJobInfo(mRequestedJob);
+      });
+      connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, jobRequest, &JobDetailsFetcher::deleteLater);
+
+      jobRequest->triggerFetch();
+   });
+
+   mBuild->setVisible(false);
+
+   QMessageBox::information(this, tr("Update requested"),
+                            tr("The build has been triggered and the information will be refreshed in 10 secs."));
 }
 
 void JenkinsJobPanel::showArtifacts(const JenkinsJobBuildInfo &build)

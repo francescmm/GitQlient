@@ -60,5 +60,6 @@ private:
    void showArtifacts(const Jenkins::JenkinsJobBuildInfo &build);
    void downloadArtifact(const JenkinsJobBuildInfo::Artifact &artifact, int number);
    void storeArtifact(const QString &fileName, int buildNumber);
+   void reloadJobInfo();
 };
 }
