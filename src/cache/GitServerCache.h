@@ -25,6 +25,7 @@
 
 #include <QObject>
 #include <QMap>
+#include <QVector>
 
 #include <PullRequest.h>
 #include <Issue.h>
@@ -68,7 +69,7 @@ public:
    QVector<GitServer::Milestone> getMilestones() const { return mMilestones; }
 
    GitServer::Platform getPlatform() const;
-   GitServer::IRestApi *getApi() const { return mApi.get(); }
+   GitServer::IRestApi *getApi() const;
 
 private:
    bool mInit = false;

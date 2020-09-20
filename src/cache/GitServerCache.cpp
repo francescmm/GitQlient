@@ -33,14 +33,14 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
    else
       mInit = false;
 
-   connect(mApi.get(), &IRestApi::labelsReceived, this, &GitServerCache::initLabels);
-   connect(mApi.get(), &IRestApi::milestonesReceived, this, &GitServerCache::initMilestones);
-   connect(mApi.get(), &IRestApi::issuesReceived, this, &GitServerCache::initIssues);
-   connect(mApi.get(), &IRestApi::pullRequestsReceived, this, &GitServerCache::initPullRequests);
-   connect(mApi.get(), &IRestApi::issueUpdated, this, &GitServerCache::onIssueUpdated);
-   connect(mApi.get(), &IRestApi::pullRequestUpdated, this, &GitServerCache::onPRUpdated);
-   connect(mApi.get(), &IRestApi::errorOccurred, this, &GitServerCache::errorOccurred);
-   connect(mApi.get(), &IRestApi::connectionTested, this, &GitServerCache::onConnectionTested);
+   connect(getApi(), &IRestApi::labelsReceived, this, &GitServerCache::initLabels);
+   connect(getApi(), &IRestApi::milestonesReceived, this, &GitServerCache::initMilestones);
+   connect(getApi(), &IRestApi::issuesReceived, this, &GitServerCache::initIssues);
+   connect(getApi(), &IRestApi::pullRequestsReceived, this, &GitServerCache::initPullRequests);
+   connect(getApi(), &IRestApi::issueUpdated, this, &GitServerCache::onIssueUpdated);
+   connect(getApi(), &IRestApi::pullRequestUpdated, this, &GitServerCache::onPRUpdated);
+   connect(getApi(), &IRestApi::errorOccurred, this, &GitServerCache::errorOccurred);
+   connect(getApi(), &IRestApi::connectionTested, this, &GitServerCache::onConnectionTested);
 
    mApi->testConnection();
 
@@ -115,10 +115,15 @@ QVector<Issue> GitServerCache::getIssues() const
 
 GitServer::Platform GitServerCache::getPlatform() const
 {
-   if (dynamic_cast<GitHubRestApi *>(mApi.get()))
+   if (dynamic_cast<GitHubRestApi *>(getApi()))
       return Platform::GitHub;
 
    return Platform::GitLab;
+}
+
+IRestApi *GitServerCache::getApi() const
+{
+   return mApi.get();
 }
 
 void GitServerCache::initLabels(const QVector<Label> &labels)

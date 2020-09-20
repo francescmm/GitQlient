@@ -3,6 +3,7 @@
 *.swp
 *.AppImage
 usr/*
+build/*
 
 /*.o
 /GitQlient

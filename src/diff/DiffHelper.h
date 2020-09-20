@@ -27,6 +27,7 @@
 
 #include <QStringList>
 #include <QPair>
+#include <QVector>
 
 namespace DiffHelper
 {
@@ -56,7 +57,14 @@ inline void extractLinesFromHeader(QString header, int &startOldFile, int &start
 inline QVector<DiffChange> splitDiff(const QString &diff)
 {
    QVector<DiffHelper::DiffChange> changes;
-   const auto chunks = diff.split("diff --git", Qt::SkipEmptyParts);
+
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+   const auto flag = Qt::SkipEmptyParts;
+#else
+   const auto flag = QString::SkipEmptyParts;
+#endif
+
+   const auto chunks = diff.split("diff --gti", flag);
 
    for (const auto &chunk : chunks)
    {

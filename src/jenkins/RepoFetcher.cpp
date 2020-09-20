@@ -73,9 +73,15 @@ void RepoFetcher::processData(const QJsonDocument &json)
 
       if (appendView)
       {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+         const auto flag = Qt::SkipEmptyParts;
+#else
+         const auto flag = QString::SkipEmptyParts;
+#endif
+
          JenkinsViewInfo info;
          info.url = viewObject[QStringLiteral("url")].toString();
-         info.name = info.url.split("/", Qt::SkipEmptyParts).constLast();
+         info.name = info.url.split("/", flag).constLast();
          viewsInfo.prepend(info);
       }
    }

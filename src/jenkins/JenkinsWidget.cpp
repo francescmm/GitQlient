@@ -54,7 +54,11 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
    mRepoFetcher = new RepoFetcher(mConfig, url, this);
    connect(mRepoFetcher, &RepoFetcher::signalViewsReceived, this, &JenkinsWidget::configureGeneralView);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    connect(mBtnGroup, &QButtonGroup::idClicked, mStackedLayout, &QStackedLayout::setCurrentIndex);
+#else
+   connect(mBtnGroup, SIGNAL(buttonClicked(int)), mStackedLayout, SLOT(setCurrentIndex(int)));
+#endif
 
    mTimer->setInterval(15 * 60 * 1000); // 15 mins
 }

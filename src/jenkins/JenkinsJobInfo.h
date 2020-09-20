@@ -6,6 +6,7 @@
 #include <QMetaType>
 #include <QColor>
 #include <QVariant>
+#include <QVector>
 
 namespace Jenkins
 {

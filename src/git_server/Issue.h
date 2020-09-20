@@ -28,6 +28,7 @@
 #include <User.h>
 #include <Comment.h>
 
+#include <QVector>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QStringList>

@@ -13,7 +13,13 @@ SourceCodeReview::SourceCodeReview(const QString &filePath, const QString &sourc
    const auto hunkDescription = lines.takeFirst();
    auto hunkRemoved = false;
 
-   if (hunkDescription.split("@@", Qt::SkipEmptyParts).count() == 1)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+   const auto flag = Qt::SkipEmptyParts;
+#else
+   const auto flag = QString::SkipEmptyParts;
+#endif
+
+   if (hunkDescription.split("@@", flag).count() == 1)
    {
       --commentLine;
       hunkRemoved = true;
