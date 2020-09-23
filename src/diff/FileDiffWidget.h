@@ -123,6 +123,7 @@ private:
    QPushButton *mStage = nullptr;
    QPushButton *mRevert = nullptr;
    QLabel *mFileNameLabel = nullptr;
+   QFrame *mTitleFrame = nullptr;
    FileDiffView *mNewFile = nullptr;
    FileDiffView *mOldFile = nullptr;
    QVector<int> mModifications;

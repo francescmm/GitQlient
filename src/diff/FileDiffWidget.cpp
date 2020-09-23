@@ -32,6 +32,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mStage(new QPushButton())
    , mRevert(new QPushButton())
    , mFileNameLabel(new QLabel())
+   , mTitleFrame(new QFrame())
    , mNewFile(new FileDiffView())
    , mOldFile(new FileDiffView())
    , mFileEditor(new FileEditor())
@@ -44,7 +45,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mOldFile->setObjectName("oldFile");
 
    const auto optionsLayout = new QHBoxLayout();
-   optionsLayout->setContentsMargins(5, 0, 0, 0);
+   optionsLayout->setContentsMargins(5, 5, 0, 0);
    optionsLayout->setSpacing(5);
    optionsLayout->addWidget(mBack);
    optionsLayout->addWidget(mGoPrevious);
@@ -68,9 +69,10 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mViewStackedWidget->addWidget(diffFrame);
    mViewStackedWidget->addWidget(mFileEditor);
 
-   const auto titleFrame = new QFrame();
-   titleFrame->setObjectName("fileTitleFrame");
-   const auto titleLayout = new QHBoxLayout(titleFrame);
+   mTitleFrame->setObjectName("fileTitleFrame");
+   mTitleFrame->setVisible(false);
+
+   const auto titleLayout = new QHBoxLayout(mTitleFrame);
    titleLayout->setContentsMargins(0, 10, 0, 10);
    titleLayout->setSpacing(0);
    titleLayout->addStretch();
@@ -80,7 +82,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
    vLayout->setSpacing(5);
-   vLayout->addWidget(titleFrame);
+   vLayout->addWidget(mTitleFrame);
    vLayout->addLayout(optionsLayout);
    vLayout->addWidget(mViewStackedWidget);
 
@@ -156,6 +158,7 @@ bool FileDiffWidget::reload()
 bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file,
                                bool editMode)
 {
+
    mFileNameLabel->setText(file);
 
    const auto isWip = currentSha == CommitInfo::ZERO_SHA;
@@ -164,6 +167,7 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    mSave->setVisible(isWip);
    mStage->setVisible(isWip);
    mRevert->setVisible(isWip);
+   mTitleFrame->setVisible(isWip);
 
    mCurrentFile = file;
    mCurrentSha = currentSha;
