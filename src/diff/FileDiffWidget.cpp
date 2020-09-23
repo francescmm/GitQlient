@@ -44,8 +44,8 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mOldFile->setObjectName("oldFile");
 
    const auto optionsLayout = new QHBoxLayout();
-   optionsLayout->setContentsMargins(10, 10, 0, 0);
-   optionsLayout->setSpacing(10);
+   optionsLayout->setContentsMargins(5, 0, 0, 0);
+   optionsLayout->setSpacing(5);
    optionsLayout->addWidget(mBack);
    optionsLayout->addWidget(mGoPrevious);
    optionsLayout->addWidget(mGoNext);
@@ -56,9 +56,6 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    optionsLayout->addWidget(mStage);
    optionsLayout->addWidget(mRevert);
    optionsLayout->addStretch();
-   optionsLayout->addWidget(mFileNameLabel);
-   optionsLayout->addStretch();
-   optionsLayout->addItem(new QSpacerItem(350, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
 
    const auto diffLayout = new QHBoxLayout();
    diffLayout->setContentsMargins(QMargins());
@@ -71,9 +68,19 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mViewStackedWidget->addWidget(diffFrame);
    mViewStackedWidget->addWidget(mFileEditor);
 
+   const auto titleFrame = new QFrame();
+   titleFrame->setObjectName("fileTitleFrame");
+   const auto titleLayout = new QHBoxLayout(titleFrame);
+   titleLayout->setContentsMargins(0, 10, 0, 10);
+   titleLayout->setSpacing(0);
+   titleLayout->addStretch();
+   titleLayout->addWidget(mFileNameLabel);
+   titleLayout->addStretch();
+
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
-   vLayout->setSpacing(10);
+   vLayout->setSpacing(5);
+   vLayout->addWidget(titleFrame);
    vLayout->addLayout(optionsLayout);
    vLayout->addWidget(mViewStackedWidget);
 
