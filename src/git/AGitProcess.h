@@ -48,7 +48,7 @@ protected:
    bool mRealError = false;
    bool mCanceling = false;
    bool execute(const QString &command);
-   virtual void onFinished(int, QProcess::ExitStatus exitStatus);
+   virtual void onFinished(int exitCode, QProcess::ExitStatus exitStatus);
 
 private:
    void onReadyStandardOutput();
