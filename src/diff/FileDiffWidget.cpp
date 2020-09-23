@@ -12,6 +12,7 @@
 #include <DiffHelper.h>
 #include <LineNumberArea.h>
 
+#include <QLineEdit>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
@@ -58,10 +59,34 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    optionsLayout->addWidget(mRevert);
    optionsLayout->addStretch();
 
+   const auto searchNew = new QLineEdit();
+   searchNew->setObjectName("SearchInput");
+   searchNew->setPlaceholderText(tr("Press Enter to search a text... "));
+   connect(searchNew, &QLineEdit::editingFinished, this,
+           [this, searchNew]() { findString(searchNew->text(), mNewFile); });
+
+   const auto newFileLayout = new QVBoxLayout();
+   newFileLayout->setContentsMargins(QMargins());
+   newFileLayout->setSpacing(5);
+   newFileLayout->addWidget(searchNew);
+   newFileLayout->addWidget(mNewFile);
+
+   const auto searchOld = new QLineEdit();
+   searchOld->setPlaceholderText(tr("Press Enter to search a text... "));
+   searchOld->setObjectName("SearchInput");
+   connect(searchOld, &QLineEdit::editingFinished, this,
+           [this, searchOld]() { findString(searchOld->text(), mNewFile); });
+
+   const auto oldFileLayout = new QVBoxLayout();
+   oldFileLayout->setContentsMargins(QMargins());
+   oldFileLayout->setSpacing(5);
+   oldFileLayout->addWidget(searchOld);
+   oldFileLayout->addWidget(mOldFile);
+
    const auto diffLayout = new QHBoxLayout();
-   diffLayout->setContentsMargins(QMargins());
-   diffLayout->addWidget(mNewFile);
-   diffLayout->addWidget(mOldFile);
+   diffLayout->setContentsMargins(10, 0, 10, 0);
+   diffLayout->addLayout(newFileLayout);
+   diffLayout->addLayout(oldFileLayout);
 
    const auto diffFrame = new QFrame();
    diffFrame->setLayout(diffLayout);
@@ -383,6 +408,28 @@ void FileDiffWidget::revertFile()
       {
          emit fileReverted(mCurrentFile);
          emit exitRequested();
+      }
+   }
+}
+
+void FileDiffWidget::findString(const QString &s, QPlainTextEdit *textEdit)
+{
+   if (!s.isEmpty())
+   {
+      QTextCursor cursor = textEdit->textCursor();
+      QTextCursor cursorSaved = cursor;
+
+      if (!textEdit->find(s))
+      {
+         cursor.movePosition(QTextCursor::Start);
+         textEdit->setTextCursor(cursor);
+
+         if (!textEdit->find(s))
+         {
+            textEdit->setTextCursor(cursorSaved);
+
+            QMessageBox::information(this, tr("Text not found"), tr("Text not found."));
+         }
       }
    }
 }

@@ -34,6 +34,8 @@ class CheckBox;
 class FileEditor;
 class QStackedWidget;
 class QLabel;
+class QLineEdit;
+class QPlainTextEdit;
 
 /*!
  \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
@@ -164,4 +166,11 @@ private:
     * @brief revertFile Revert all the changes to the file.
     */
    void revertFile();
+
+   /**
+    * @brief findString Finds a string in a given @p textEdit document.
+    * @param s The string to look for.
+    * @param textEdit The text edit document
+    */
+   void findString(const QString &s, QPlainTextEdit *textEdit);
 };
