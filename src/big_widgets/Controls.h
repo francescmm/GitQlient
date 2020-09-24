@@ -32,7 +32,6 @@ class GitCache;
 class QNetworkAccessManager;
 class QProgressBar;
 class GitQlientUpdater;
-class GitServerCache;
 class QButtonGroup;
 class QHBoxLayout;
 
@@ -119,7 +118,7 @@ public:
     \param parent The parent widget if needed.
    */
    explicit Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                     const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+                     QWidget *parent = nullptr);
    /*!
     \brief Process the toggled button and triggers its corresponding action.
 
@@ -174,7 +173,6 @@ private:
    QString mCurrentSha;
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<GitServerCache> mGitServerCache;
    QToolButton *mHistory = nullptr;
    QToolButton *mDiff = nullptr;
    QToolButton *mBlame = nullptr;
@@ -230,11 +228,6 @@ private:
     * @brief createBuildSystemButton Creates the build system platform button if the user has enabled it.
     */
    void configBuildSystemButton();
-
-   /**
-    * @brief initGitServerConnection Connects to the Git Server platform and retrieves data.
-    */
-   void initGitServerConnection();
 
    bool eventFilter(QObject *obj, QEvent *event);
 };

@@ -10,7 +10,6 @@
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
 #include <GitQlientUpdater.h>
-#include <GitServerCache.h>
 #include <GitQlientSettings.h>
 #include <QLogger.h>
 
@@ -33,12 +32,10 @@
 
 using namespace QLogger;
 
-Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                   const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
+Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
-   , mGitServerCache(gitServerCache)
    , mHistory(new QToolButton())
    , mDiff(new QToolButton())
    , mBlame(new QToolButton())
@@ -431,13 +428,7 @@ void Controls::createGitPlatformButton(QHBoxLayout *layout)
 
       layout->addWidget(mGitPlatform);
 
-      connect(mGitServerCache.get(), &GitServerCache::connectionTested, this, [this]() {
-         if (mGoGitServerView)
-            emit signalGoServer();
-
-         mGoGitServerView = false;
-      });
-      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::initGitServerConnection);
+      connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
    }
    else
       mGitPlatform->setVisible(false);
@@ -448,17 +439,6 @@ void Controls::configBuildSystemButton()
    GitQlientSettings settings;
    const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
    mBuildSystem->setEnabled(isConfigured);
-}
-
-void Controls::initGitServerConnection()
-{
-   mGoGitServerView = true;
-
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
-   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-
-   mGitServerCache->init(serverUrl, repoInfo);
 }
 
 bool Controls::eventFilter(QObject *obj, QEvent *event)
