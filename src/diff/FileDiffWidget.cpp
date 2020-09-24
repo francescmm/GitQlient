@@ -63,7 +63,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    searchNew->setObjectName("SearchInput");
    searchNew->setPlaceholderText(tr("Press Enter to search a text... "));
    connect(searchNew, &QLineEdit::editingFinished, this,
-           [this, searchNew]() { findString(searchNew->text(), mNewFile); });
+           [this, searchNew]() { DiffHelper::findString(searchNew->text(), mNewFile, this); });
 
    const auto newFileLayout = new QVBoxLayout();
    newFileLayout->setContentsMargins(QMargins());
@@ -75,7 +75,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    searchOld->setPlaceholderText(tr("Press Enter to search a text... "));
    searchOld->setObjectName("SearchInput");
    connect(searchOld, &QLineEdit::editingFinished, this,
-           [this, searchOld]() { findString(searchOld->text(), mNewFile); });
+           [this, searchOld]() { DiffHelper::findString(searchOld->text(), mNewFile, this); });
 
    const auto oldFileLayout = new QVBoxLayout();
    oldFileLayout->setContentsMargins(QMargins());
@@ -345,14 +345,6 @@ void FileDiffWidget::moveChunkDown()
    }
 }
 
-void FileDiffWidget::moveBottomChunk()
-{
-   mCurrentChunkLine = mNewFile->blockCount();
-
-   mNewFile->moveScrollBarToPos(mNewFile->blockCount());
-   mOldFile->moveScrollBarToPos(mOldFile->blockCount());
-}
-
 void FileDiffWidget::enterEditionMode(bool enter)
 {
    if (enter)
@@ -408,28 +400,6 @@ void FileDiffWidget::revertFile()
       {
          emit fileReverted(mCurrentFile);
          emit exitRequested();
-      }
-   }
-}
-
-void FileDiffWidget::findString(const QString &s, QPlainTextEdit *textEdit)
-{
-   if (!s.isEmpty())
-   {
-      QTextCursor cursor = textEdit->textCursor();
-      QTextCursor cursorSaved = cursor;
-
-      if (!textEdit->find(s))
-      {
-         cursor.movePosition(QTextCursor::Start);
-         textEdit->setTextCursor(cursor);
-
-         if (!textEdit->find(s))
-         {
-            textEdit->setTextCursor(cursorSaved);
-
-            QMessageBox::information(this, tr("Text not found"), tr("Text not found."));
-         }
       }
    }
 }

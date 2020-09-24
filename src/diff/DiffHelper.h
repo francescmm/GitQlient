@@ -28,6 +28,8 @@
 #include <QStringList>
 #include <QPair>
 #include <QVector>
+#include <QPlainTextEdit>
+#include <QMessageBox>
 
 namespace DiffHelper
 {
@@ -198,4 +200,27 @@ inline QVector<DiffInfo::ChunkInfo> processDiff(const QString &text, bool fileVs
 
    return chunks;
 }
+
+inline void findString(const QString &s, QPlainTextEdit *textEdit, QWidget *managerWidget)
+{
+   if (!s.isEmpty())
+   {
+      QTextCursor cursor = textEdit->textCursor();
+      QTextCursor cursorSaved = cursor;
+
+      if (!textEdit->find(s))
+      {
+         cursor.movePosition(QTextCursor::Start);
+         textEdit->setTextCursor(cursor);
+
+         if (!textEdit->find(s))
+         {
+            textEdit->setTextCursor(cursorSaved);
+
+            QMessageBox::information(managerWidget, textEdit->tr("Text not found"), textEdit->tr("Text not found."));
+         }
+      }
+   }
+}
+
 }

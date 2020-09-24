@@ -238,7 +238,7 @@ FullDiffWidget
     border: none;
 }
 
-FullDiffWidget > QTextEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget > QPlainTextEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-width: 1px;
     border-style: solid;

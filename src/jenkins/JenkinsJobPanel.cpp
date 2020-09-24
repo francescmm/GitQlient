@@ -5,6 +5,7 @@
 #include <ButtonLink.hpp>
 #include <QPinnableTabWidget.h>
 #include <JobDetailsFetcher.h>
+#include <DiffHelper.h>
 
 #include <QLogger.h>
 
@@ -306,7 +307,8 @@ void JenkinsJobPanel::storeFile(int buildNumber)
 
       const auto find = new QLineEdit();
       find->setPlaceholderText(tr("Find text... "));
-      connect(find, &QLineEdit::editingFinished, this, [this, text, find]() { findString(find->text(), text); });
+      connect(find, &QLineEdit::editingFinished, this,
+              [this, text, find]() { DiffHelper::findString(find->text(), text, this); });
       mTempWidgets.append(find);
 
       const auto frame = new QFrame();
@@ -325,25 +327,6 @@ void JenkinsJobPanel::storeFile(int buildNumber)
    }
 
    reply->deleteLater();
-}
-
-void JenkinsJobPanel::findString(QString s, QPlainTextEdit *textEdit)
-{
-   QTextCursor cursor = textEdit->textCursor();
-   QTextCursor cursorSaved = cursor;
-
-   if (!textEdit->find(s))
-   {
-      cursor.movePosition(QTextCursor::Start);
-      textEdit->setTextCursor(cursor);
-
-      if (!textEdit->find(s))
-      {
-         textEdit->setTextCursor(cursorSaved);
-
-         QMessageBox::information(this, tr("Text not found"), tr("Text not found."));
-      }
-   }
 }
 
 void JenkinsJobPanel::createBuildConfigPanel()

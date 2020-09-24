@@ -119,7 +119,7 @@ QListWidget::item:disabled
     color: #606162;
 }
 
-CommitHistoryView, FullDiffWidget > QTextEdit, QListWidget, FileListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget > QPlainTextEdit, QListWidget, FileListWidget, QTreeWidget
 {
     background-color: white;
     color: black;
@@ -160,7 +160,7 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget > QTextEdit, CommitChangesWidget > QLineEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget > QPlainTextEdit, CommitChangesWidget > QLineEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-color: #404142;
 }

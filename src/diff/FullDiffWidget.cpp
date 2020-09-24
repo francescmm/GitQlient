@@ -4,14 +4,17 @@
 #include <GitHistory.h>
 #include <GitCache.h>
 #include <GitQlientStyles.h>
+#include <DiffHelper.h>
 
 #include <QScrollBar>
 #include <QTextCharFormat>
 #include <QTextCodec>
 #include <QVBoxLayout>
+#include <QLineEdit>
+#include <QPushButton>
 
-FullDiffWidget::DiffHighlighter::DiffHighlighter(QTextEdit *p)
-   : QSyntaxHighlighter(p)
+FullDiffWidget::DiffHighlighter::DiffHighlighter(QTextDocument *document)
+   : QSyntaxHighlighter(document)
 {
 }
 
@@ -59,28 +62,52 @@ void FullDiffWidget::DiffHighlighter::highlightBlock(const QString &text)
       setFormat(0, text.length(), myFormat);
 }
 
-FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
-                               QWidget *parent)
+FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *parent)
    : IDiffWidget(git, cache, parent)
-   , mDiffWidget(new QTextEdit())
+   , mGoPrevious(new QPushButton())
+   , mGoNext(new QPushButton())
+   , mDiffWidget(new QPlainTextEdit())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
-   diffHighlighter = new DiffHighlighter(mDiffWidget);
+   diffHighlighter = new DiffHighlighter(mDiffWidget->document());
 
    QFont font;
    font.setFamily(QString::fromUtf8("Ubuntu Mono"));
    mDiffWidget->setFont(font);
    mDiffWidget->setObjectName("textEditDiff");
    mDiffWidget->setUndoRedoEnabled(false);
-   mDiffWidget->setLineWrapMode(QTextEdit::NoWrap);
+   mDiffWidget->setLineWrapMode(QPlainTextEdit::NoWrap);
    mDiffWidget->setReadOnly(true);
    mDiffWidget->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
+   const auto search = new QLineEdit();
+   search->setPlaceholderText(tr("Press Enter to search a text... "));
+   search->setObjectName("SearchInput");
+   connect(search, &QLineEdit::editingFinished, this,
+           [this, search]() { DiffHelper::findString(search->text(), mDiffWidget, this); });
+
+   const auto optionsLayout = new QHBoxLayout();
+   optionsLayout->setContentsMargins(QMargins());
+   optionsLayout->setSpacing(5);
+   optionsLayout->addWidget(mGoPrevious);
+   optionsLayout->addWidget(mGoNext);
+   optionsLayout->addStretch();
+
    const auto layout = new QVBoxLayout(this);
-   layout->setContentsMargins(QMargins());
+   layout->setContentsMargins(10, 10, 10, 10);
    layout->setSpacing(10);
+   layout->addLayout(optionsLayout);
+   layout->addWidget(search);
    layout->addWidget(mDiffWidget);
+
+   mGoPrevious->setIcon(QIcon(":/icons/arrow_up"));
+   mGoPrevious->setToolTip(tr("Previous change"));
+   connect(mGoPrevious, &QPushButton::clicked, this, &FullDiffWidget::moveChunkUp);
+
+   mGoNext->setToolTip(tr("Next change"));
+   mGoNext->setIcon(QIcon(":/icons/arrow_down"));
+   connect(mGoNext, &QPushButton::clicked, this, &FullDiffWidget::moveChunkDown);
 }
 
 bool FullDiffWidget::reload()
@@ -106,6 +133,16 @@ void FullDiffWidget::processData(const QString &fileChunk)
    {
       mPreviousDiffText = fileChunk;
 
+      auto count = 0;
+
+      for (const auto &chunk : fileChunk.split("\n"))
+      {
+         if (chunk.startsWith("diff --"))
+            mFilePositions.append(count);
+
+         ++count;
+      }
+
       const auto pos = mDiffWidget->verticalScrollBar()->value();
 
       mDiffWidget->setUpdatesEnabled(false);
@@ -114,6 +151,36 @@ void FullDiffWidget::processData(const QString &fileChunk)
       mDiffWidget->moveCursor(QTextCursor::Start);
       mDiffWidget->verticalScrollBar()->setValue(pos);
       mDiffWidget->setUpdatesEnabled(true);
+   }
+}
+
+void FullDiffWidget::moveChunkUp()
+{
+   const auto currentPos = mDiffWidget->verticalScrollBar()->value();
+
+   const auto iter = std::find_if(mFilePositions.crbegin(), mFilePositions.crend(),
+                                  [currentPos](int pos) { return currentPos > pos; });
+
+   if (iter != mFilePositions.crend())
+   {
+      blockSignals(true);
+      mDiffWidget->verticalScrollBar()->setValue(*iter);
+      blockSignals(false);
+   }
+}
+
+void FullDiffWidget::moveChunkDown()
+{
+   const auto currentPos = mDiffWidget->verticalScrollBar()->value();
+
+   const auto iter = std::find_if(mFilePositions.cbegin(), mFilePositions.cend(),
+                                  [currentPos](int pos) { return currentPos < pos; });
+
+   if (iter != mFilePositions.cend())
+   {
+      blockSignals(true);
+      mDiffWidget->verticalScrollBar()->setValue(*iter);
+      blockSignals(false);
    }
 }
 

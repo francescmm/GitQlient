@@ -116,12 +116,12 @@ QListWidget::item:disabled, QListView::item:disabled
     color: #606162;
 }
 
-CommitHistoryView, FullDiffWidget > QTextEdit, CommitChangesWidget > QListWidget, FileListWidget, QTreeWidget, MergeWidget > QListWidget
+CommitHistoryView, FullDiffWidget > QPlainTextEdit, CommitChangesWidget > QListWidget, FileListWidget, QTreeWidget, MergeWidget > QListWidget
 {
     background-color: #2E2F30;
 }
 
-CommitHistoryView, FullDiffWidget > QTextEdit, CommitChangesWidget > QListWidget, QTreeWidget, MergeWidget > QListWidget
+CommitHistoryView, FullDiffWidget > QPlainTextEdit, CommitChangesWidget > QListWidget, QTreeWidget, MergeWidget > QListWidget
 {
     color: white;
 }
@@ -161,7 +161,7 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget > QTextEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget > QPlainTextEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-color: #202122
 }

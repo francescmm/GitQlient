@@ -54,7 +54,6 @@ private:
    void fillBuildLayout(const Jenkins::JenkinsJobBuildInfo &build, QHBoxLayout *layout);
    void requestFile(const Jenkins::JenkinsJobBuildInfo &build);
    void storeFile(int buildNumber);
-   void findString(QString s, QPlainTextEdit *textEdit);
    void createBuildConfigPanel();
    void triggerBuild();
    void showArtifacts(const Jenkins::JenkinsJobBuildInfo &build);

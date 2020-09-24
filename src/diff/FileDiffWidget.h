@@ -143,10 +143,6 @@ private:
     * @brief moveChunkDown Moves to the following diff chunk.
     */
    void moveChunkDown();
-   /**
-    * @brief moveBottomChunk Moves to the last diff chunk.
-    */
-   void moveBottomChunk();
 
    /**
     * @brief enterEditionMode Enters edition mode
@@ -166,11 +162,4 @@ private:
     * @brief revertFile Revert all the changes to the file.
     */
    void revertFile();
-
-   /**
-    * @brief findString Finds a string in a given @p textEdit document.
-    * @param s The string to look for.
-    * @param textEdit The text edit document
-    */
-   void findString(const QString &s, QPlainTextEdit *textEdit);
 };
