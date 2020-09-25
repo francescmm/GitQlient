@@ -19,7 +19,7 @@ BuildRequires: qt5-qtsvg-devel
 {{{ git_setup_macro }}}
 
 %build
-%qmake_qt5
+%qmake_qt5 GitQlient.pro
 %make_build
 
 %install
