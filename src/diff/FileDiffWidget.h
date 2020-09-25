@@ -127,6 +127,7 @@ private:
    QLabel *mFileNameLabel = nullptr;
    QFrame *mTitleFrame = nullptr;
    FileDiffView *mNewFile = nullptr;
+   QLineEdit *mSearchOld = nullptr;
    FileDiffView *mOldFile = nullptr;
    QVector<int> mModifications;
    bool mFileVsFile = false;

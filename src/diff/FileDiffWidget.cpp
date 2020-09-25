@@ -35,6 +35,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mFileNameLabel(new QLabel())
    , mTitleFrame(new QFrame())
    , mNewFile(new FileDiffView())
+   , mSearchOld(new QLineEdit())
    , mOldFile(new FileDiffView())
    , mFileEditor(new FileEditor())
    , mViewStackedWidget(new QStackedWidget())
@@ -71,16 +72,15 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    newFileLayout->addWidget(searchNew);
    newFileLayout->addWidget(mNewFile);
 
-   const auto searchOld = new QLineEdit();
-   searchOld->setPlaceholderText(tr("Press Enter to search a text... "));
-   searchOld->setObjectName("SearchInput");
-   connect(searchOld, &QLineEdit::editingFinished, this,
-           [this, searchOld]() { DiffHelper::findString(searchOld->text(), mNewFile, this); });
+   mSearchOld->setPlaceholderText(tr("Press Enter to search a text... "));
+   mSearchOld->setObjectName("SearchInput");
+   connect(mSearchOld, &QLineEdit::editingFinished, this,
+           [this]() { DiffHelper::findString(mSearchOld->text(), mNewFile, this); });
 
    const auto oldFileLayout = new QVBoxLayout();
    oldFileLayout->setContentsMargins(QMargins());
    oldFileLayout->setSpacing(5);
-   oldFileLayout->addWidget(searchOld);
+   oldFileLayout->addWidget(mSearchOld);
    oldFileLayout->addWidget(mOldFile);
 
    const auto diffLayout = new QHBoxLayout();
@@ -159,7 +159,10 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mViewStackedWidget->setCurrentIndex(0);
 
    if (!mFileVsFile)
+   {
       mOldFile->setHidden(true);
+      mSearchOld->setHidden(true);
+   }
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
@@ -255,6 +258,7 @@ void FileDiffWidget::setSplitViewEnabled(bool enable)
    mFileVsFile = enable;
 
    mOldFile->setVisible(mFileVsFile);
+   mSearchOld->setVisible(mFileVsFile);
 
    GitQlientSettings settings;
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
@@ -283,6 +287,7 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
    mFileVsFile = !enable;
 
    mOldFile->setVisible(mFileVsFile);
+   mSearchOld->setVisible(mFileVsFile);
 
    GitQlientSettings settings;
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
