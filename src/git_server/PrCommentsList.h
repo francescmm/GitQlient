@@ -72,7 +72,7 @@ public:
    explicit PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
 
    void loadData(Config config, int issueNumber);
-   void highLightComment(int frameId);
+   void highlightComment(int frameId);
 
 private:
    QSharedPointer<GitServerCache> mGitServerCache;

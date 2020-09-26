@@ -115,19 +115,11 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
 
    creationLayout->addStretch();
 
-   const auto addComment = new QPushButton();
-   addComment->setCheckable(true);
-   addComment->setChecked(false);
-   addComment->setIcon(QIcon(":/icons/add_comment"));
-   addComment->setToolTip(tr("Add new comment"));
-
-   creationLayout->addWidget(addComment);
-
    const auto frame = new QFrame();
-   frame->setObjectName("IssueIntro");
+   frame->setObjectName("IssueDescription");
 
    const auto layout = new QVBoxLayout(frame);
-   layout->setContentsMargins(10, 10, 10, 10);
+   layout->setContentsMargins(QMargins());
    layout->setSpacing(10);
    layout->addLayout(creationLayout);
 
@@ -146,6 +138,11 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
 
    mIssuesLayout->addWidget(frame);
 
+   const auto separator = new QFrame();
+   separator->setObjectName("orangeHSeparator");
+
+   mIssuesLayout->addWidget(separator);
+
    if (mConfig == Config::Issues)
       mGitServerCache->getApi()->requestComments(issue);
    else
@@ -155,7 +152,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    }
 }
 
-void PrCommentsList::highLightComment(int frameId)
+void PrCommentsList::highlightComment(int frameId)
 {
    const auto daFrame = mComments.value(frameId);
 

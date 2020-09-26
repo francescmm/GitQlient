@@ -816,7 +816,7 @@ ButtonLink#IssueTitle
    padding-left: 5px;
 }
 
-#IssuesViewFrame
+#IssuesViewFrame, #IssueDescription
 {
    background: #2E2F30;
 }

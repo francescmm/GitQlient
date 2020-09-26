@@ -117,6 +117,12 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
       }
    });
 
+   const auto addComment = new QPushButton();
+   addComment->setCheckable(true);
+   addComment->setChecked(false);
+   addComment->setIcon(QIcon(":/icons/add_comment"));
+   addComment->setToolTip(tr("Add new comment"));
+
    const auto headLine = new QVBoxLayout();
    headLine->setContentsMargins(QMargins());
    headLine->setSpacing(5);
@@ -137,6 +143,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    headerLayout->addWidget(commits);
    headerLayout->addSpacing(20);
    headerLayout->addWidget(mReviewBtn);
+   headerLayout->addWidget(addComment);
 
    const auto footerFrame = new QFrame();
    footerFrame->setObjectName("IssuesFooterFrame");
@@ -159,7 +166,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    connect(mPrChangesList, &PrChangesList::gotoReview, this, [this](int frameId) {
       mBtnGroup->button(static_cast<int>(Buttons::Comments))->setChecked(true);
       mStackedLayout->setCurrentIndex(static_cast<int>(Buttons::Comments));
-      mPrCommentsList->highLightComment(frameId);
+      mPrCommentsList->highlightComment(frameId);
    });
 }
 
