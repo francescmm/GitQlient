@@ -14,7 +14,8 @@ void FileDiffHighlighter::highlightBlock(const QString &text)
 
    if (!text.isEmpty())
    {
-      QTextCharFormat myFormat;
+      QTextBlockFormat myFormat;
+      QTextCharFormat format;
       const auto currentLine = currentBlock().blockNumber() + 1;
 
       if (!mFileDiffInfo.isEmpty())
@@ -24,9 +25,12 @@ void FileDiffHighlighter::highlightBlock(const QString &text)
             if (diff.startLine <= currentLine && currentLine <= diff.endLine)
             {
                if (diff.addition)
-                  myFormat.setForeground(GitQlientStyles::getGreen());
+               {
+                  myFormat.setBackground(GitQlientStyles::getGreen());
+                  // myFormat.setForeground(GitQlientStyles::getGreen());
+               }
                else
-                  myFormat.setForeground(GitQlientStyles::getRed());
+                  myFormat.setBackground(GitQlientStyles::getRed());
             }
          }
       }
@@ -36,7 +40,7 @@ void FileDiffHighlighter::highlightBlock(const QString &text)
          {
             case '@':
                myFormat.setForeground(GitQlientStyles::getOrange());
-               myFormat.setFontWeight(QFont::ExtraBold);
+               format.setFontWeight(QFont::ExtraBold);
                break;
             case '+':
                myFormat.setForeground(GitQlientStyles::getGreen());
@@ -50,6 +54,9 @@ void FileDiffHighlighter::highlightBlock(const QString &text)
       }
 
       if (myFormat.isValid())
-         setFormat(0, text.length(), myFormat);
+      {
+         QTextCursor(currentBlock()).setBlockFormat(myFormat);
+         setFormat(0, currentBlock().length(), format);
+      }
    }
 }
