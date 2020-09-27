@@ -101,10 +101,12 @@ GitExecResult GitHistory::getDiffFiles(const QString &sha, const QString &diffTo
 {
    QLog_Debug("Git", QString("Executing getDiffFiles: {%1} to {%2}").arg(sha, diffToSha));
 
-   QString runCmd = QString("git diff-tree -C --no-color -r -m ");
+   auto runCmd = QString("git diff-tree -C --no-color -r -m ");
 
    if (!diffToSha.isEmpty() && sha != CommitInfo::ZERO_SHA)
       runCmd.append(diffToSha + " " + sha);
+   else
+      runCmd.append("4b825dc642cb6eb9a060e54bf8d69288fbee4904 " + sha);
 
    return mGitBase->run(runCmd);
 }

@@ -25,7 +25,6 @@ GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<Git
 
 bool GitRepoLoader::loadRepository()
 {
-
    if (mLocked)
       QLog_Warning("Git", "Git is currently loading data.");
    else
@@ -60,7 +59,6 @@ bool GitRepoLoader::loadRepository()
 
 bool GitRepoLoader::configureRepoDirectory()
 {
-
    QLog_Debug("Git", "Configuring repository directory.");
 
    const auto ret = mGitBase->run("git rev-parse --show-cdup");
@@ -78,7 +76,6 @@ bool GitRepoLoader::configureRepoDirectory()
 
 void GitRepoLoader::loadReferences()
 {
-
    QLog_Debug("Git", "Loading references.");
 
    const auto ret3 = mGitBase->run("git show-ref -d");
@@ -169,7 +166,6 @@ void GitRepoLoader::loadReferences()
 
 void GitRepoLoader::requestRevisions()
 {
-
    QLog_Debug("Git", "Loading revisions.");
 
    const auto baseCmd = QString("git log --date-order --no-color --log-size --parents --boundary -z --pretty=format:")
@@ -185,7 +181,6 @@ void GitRepoLoader::requestRevisions()
 
 void GitRepoLoader::processRevision(const QByteArray &ba)
 {
-
    QLog_Info("Git", "Revisions received!");
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
@@ -220,7 +215,6 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
 WipRevisionInfo GitRepoLoader::processWip()
 {
-
    QLog_Debug("Git", QString("Executing processWip."));
 
    mRevCache->setUntrackedFilesList(getUntrackedFiles());
@@ -229,13 +223,24 @@ WipRevisionInfo GitRepoLoader::processWip()
 
    if (ret.success)
    {
-      const auto parentSha = ret.output.toString().trimmed();
+      auto parentSha = ret.output.toString().trimmed();
+      QString diffIndex;
+      QString diffIndexCached;
 
-      const auto ret3 = mGitBase->run(QString("git diff-index %1").arg(parentSha));
-      const auto diffIndex = ret3.success ? ret3.output.toString() : QString();
+      if (!parentSha.isEmpty())
+      {
+         const auto ret3 = mGitBase->run(QString("git diff-index %1").arg(parentSha));
+         diffIndex = ret3.success ? ret3.output.toString() : QString();
 
-      const auto ret4 = mGitBase->run(QString("git diff-index --cached %1").arg(parentSha));
-      const auto diffIndexCached = ret4.success ? ret4.output.toString() : QString();
+         const auto ret4 = mGitBase->run(QString("git diff-index --cached %1").arg(parentSha));
+         diffIndexCached = ret4.success ? ret4.output.toString() : QString();
+      }
+      else
+      {
+         parentSha = "-";
+         diffIndex = "-";
+         diffIndexCached = "-";
+      }
 
       return { parentSha, diffIndex, diffIndexCached };
    }
@@ -245,14 +250,12 @@ WipRevisionInfo GitRepoLoader::processWip()
 
 void GitRepoLoader::updateWipRevision()
 {
-
    if (const auto wipInfo = processWip(); wipInfo.isValid())
       mRevCache->updateWipCommit(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
 }
 
 QVector<QString> GitRepoLoader::getUntrackedFiles() const
 {
-
    QLog_Debug("Git", QString("Executing getUntrackedFiles."));
 
    auto runCmd = QString("git ls-files --others");

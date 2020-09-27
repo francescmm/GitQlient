@@ -26,9 +26,6 @@ void WipWidget::configure(const QString &sha)
 {
    const auto commit = mCache->getCommitInfo(sha);
 
-   if (commit.parentsCount() <= 0)
-      return;
-
    if (!mCache->containsRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0)))
    {
       QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));

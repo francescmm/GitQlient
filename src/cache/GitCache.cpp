@@ -189,20 +189,28 @@ void GitCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 
 void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
 {
-   QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(parentSha));
+   auto newParentSha = parentSha;
 
-   const auto key = qMakePair(CommitInfo::ZERO_SHA, parentSha);
+   if (parentSha == "-")
+   {
+      newParentSha = "";
+      QLog_Debug("Git", QString("Updating the WIP commit. There are no commits in the repo."));
+   }
+
+   QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(newParentSha));
+
+   const auto key = qMakePair(CommitInfo::ZERO_SHA, newParentSha);
    const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
 
-   insertRevisionFile(CommitInfo::ZERO_SHA, parentSha, fakeRevFile);
+   insertRevisionFile(CommitInfo::ZERO_SHA, newParentSha, fakeRevFile);
 
    const auto log
        = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
 
    QStringList parents;
 
-   if (!parentSha.isEmpty())
-      parents.append(parentSha);
+   if (!newParentSha.isEmpty())
+      parents.append(newParentSha);
 
    CommitInfo c(CommitInfo::ZERO_SHA, parents, QString("-"), QDateTime::currentDateTime().toSecsSinceEpoch(), log);
 
@@ -223,8 +231,10 @@ void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIn
 bool GitCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)
 {
    const auto key = qMakePair(sha1, sha2);
+   const auto emptyShas = !sha1.isEmpty() && !sha2.isEmpty();
+   const auto isWip = sha1 == CommitInfo::ZERO_SHA;
 
-   if (!sha1.isEmpty() && !sha2.isEmpty() && mRevisionFilesMap.value(key) != file)
+   if ((emptyShas || isWip) && mRevisionFilesMap.value(key) != file)
    {
       QLog_Debug("Git", QString("Adding the revisions files between {%1} and {%2}.").arg(sha1, sha2));
 
