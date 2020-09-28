@@ -44,7 +44,8 @@ desktop-file-install                                    \
 --dir=%{buildroot}%{_datadir}/applications              \
 AppImage/GitQlient/usr/share/applications/GitQlient.desktop
 
-cp -a AppImage/GitQlient/usr/share/icons %{_datadir}/icons
+install -dD %{buildroot}%{_datadir}/icons
+cp -a AppImage/GitQlient/usr/share/icons/* %{buildroot}%{_datadir}/icons/
 
 %files
 %doc README.md
