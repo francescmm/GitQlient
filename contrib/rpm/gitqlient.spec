@@ -9,16 +9,11 @@ VCS:        {{{ git_vcs }}}
 
 Source:     {{{ git_pack }}}
 
-%if 0%{?fedora_version} || 0%{?rhel_version} || 0%{?centos_version}
-BuildRequires: qt5-qtbase-devel
-BuildRequires: qt5-qtsvg-devel
-%endif
-
-%if 0%{?suse_version}
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(Qt5Svg)
-%endif
+BuildRequires:  pkgconfig(Qt5Widgets)
+BuildRequires:  pkgconfig(Qt5Network)
 
 %description
 %{summary}.
