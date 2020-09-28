@@ -66,14 +66,17 @@ bool QLoggerManager::addDestination(const QString &fileDest, const QStringList &
          const auto log = new QLoggerWriter(fileDest, level);
          log->stop(mIsStop);
 
-         const auto threadId
-             = QString("%1").arg((quintptr)QThread::currentThread(), QT_POINTER_SIZE * 2, 16, QChar('0'));
-
-         log->enqueue(QDateTime::currentDateTime(), threadId, module, LogLevel::Info, "", -1, "Adding destination!");
-
          mModuleDest.insert(module, log);
 
-         log->start();
+         if (!mIsStop)
+         {
+            const auto threadId
+                = QString("%1").arg((quintptr)QThread::currentThread(), QT_POINTER_SIZE * 2, 16, QChar('0'));
+
+            log->enqueue(QDateTime::currentDateTime(), threadId, module, LogLevel::Info, "", -1, "Adding destination!");
+
+            log->start();
+         }
 
          allAdded = true;
       }
