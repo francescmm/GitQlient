@@ -126,11 +126,13 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
 #ifdef DEBUG
    logLevel = LogLevel::Trace;
 #else
-   logLevel = static_cast<LogLevel>(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Info)).toInt());
+   logLevel = static_cast<LogLevel>(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
 #endif
 
-   if (arguments.contains("-noLog") || settings.globalValue("logsDisabled", false).toBool())
+   if (arguments.contains("-noLog") || settings.globalValue("logsDisabled", true).toBool())
       QLoggerManager::getInstance()->pause();
+   else
+      QLoggerManager::getInstance()->overwriteLogLevel(logLevel);
 
    QLog_Info("UI", QString("Getting arguments {%1}").arg(arguments.join(", ")));
 

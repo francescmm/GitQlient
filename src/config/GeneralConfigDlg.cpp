@@ -31,7 +31,7 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
    , mApply(new QPushButton(tr("Apply")))
 
 {
-   mGitLocation->setPlaceholderText(tr("Git location if not in PATH"));
+   mGitLocation->setPlaceholderText(tr("Git location..."));
 
    mClose->setMinimumWidth(75);
    mReset->setMinimumWidth(75);
@@ -39,10 +39,10 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
 
    GitQlientSettings settings;
 
-   mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
+   mDisableLogs->setChecked(settings.globalValue("logsDisabled", true).toBool());
 
    mLevelCombo->addItems({ "Trace", "Debug", "Info", "Warning", "Error", "Fatal" });
-   mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", 2).toInt());
+   mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
 
    const auto currentStyle = settings.globalValue("colorSchema", "dark").toString();
    mStylesSchema->addItems({ "dark", "bright" });
