@@ -23,8 +23,9 @@ BuildRequires: qt5-qtsvg-devel
 %make_build
 
 %install
-%make_install
-install -p -m 755 GitQlient %{buildroot}%{_bindir}/GitQlient
+#installs files into the user home directory by default
+#%make_install
+install -D -p -m755 GitQlient %{buildroot}%{_bindir}/GitQlient
 
 %files
 %doc README.md
