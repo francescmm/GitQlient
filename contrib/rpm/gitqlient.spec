@@ -16,6 +16,8 @@ BuildRequires:  pkgconfig(Qt5Svg)
 BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  pkgconfig(Qt5Network)
 
+BuildRequires: desktop-file-utils
+
 %description
 %{summary}.
 
@@ -36,10 +38,15 @@ qmake-qt5 -makefile QMAKE_CFLAGS+="%optflags" QMAKE_CXXFLAGS+="%optflags" QMAKE_
 #%make_install
 install -D -p -m755 GitQlient %{buildroot}%{_bindir}/GitQlient
 
+desktop-file-install                                    \
+--dir=%{buildroot}%{_datadir}/applications              \
+AppImage/GitQlient/usr/share/applications/GitQlient.desktop
+
 %files
 %doc README.md
 %license LICENSE
 %{_bindir}/GitQlient
+%{_datadir}/applications/GitQlient.desktop
 
 %changelog
 {{{ git_changelog }}}
