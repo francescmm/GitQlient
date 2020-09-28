@@ -24,6 +24,7 @@ BuildRequires: qt5-qtsvg-devel
 
 %install
 %make_install
+install -p -m 755 GitQlient %{buildroot}%{_bindir}/GitQlient
 
 %files
 %doc README.md
