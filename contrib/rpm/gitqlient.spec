@@ -27,7 +27,12 @@ BuildRequires:  pkgconfig(Qt5Network)
 {{{ git_setup_macro }}}
 
 %build
+%if 0%{?suse_version}
+qmake-qt5 QMAKE_CFLAGS+="%optflags" QMAKE_CXXFLAGS+="%optflags" QMAKE_STRIP="/bin/true"
+%else
 %qmake_qt5 GitQlient.pro
+%endif
+
 %make_build
 
 %install
