@@ -26,6 +26,7 @@ BuildRequires: desktop-file-utils
 
 %build
 %if 0%{?suse_version}
+#https://en.opensuse.org/openSUSE:Build_system_recipes#qmake
 qmake-qt5 -makefile QMAKE_CFLAGS+="%optflags" QMAKE_CXXFLAGS+="%optflags" QMAKE_STRIP="/bin/true" GitQlient.pro
 %else
 %qmake_qt5 GitQlient.pro
@@ -34,6 +35,7 @@ qmake-qt5 -makefile QMAKE_CFLAGS+="%optflags" QMAKE_CXXFLAGS+="%optflags" QMAKE_
 %make_build
 
 %install
+
 #installs files into the user home directory by default
 #%make_install
 install -D -p -m755 GitQlient %{buildroot}%{_bindir}/GitQlient
@@ -42,11 +44,14 @@ desktop-file-install                                    \
 --dir=%{buildroot}%{_datadir}/applications              \
 AppImage/GitQlient/usr/share/applications/GitQlient.desktop
 
+cp -a AppImage/GitQlient/usr/share/icons %{_datadir}/icons
+
 %files
 %doc README.md
 %license LICENSE
 %{_bindir}/GitQlient
 %{_datadir}/applications/GitQlient.desktop
+%{_datadir}/icons
 
 %changelog
 {{{ git_changelog }}}
