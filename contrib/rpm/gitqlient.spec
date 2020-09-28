@@ -28,7 +28,7 @@ BuildRequires:  pkgconfig(Qt5Network)
 
 %build
 %if 0%{?suse_version}
-qmake-qt5 QMAKE_CFLAGS+="%optflags" QMAKE_CXXFLAGS+="%optflags" QMAKE_STRIP="/bin/true"
+qmake-qt5 -makefile QMAKE_CFLAGS+="%optflags" QMAKE_CXXFLAGS+="%optflags" QMAKE_STRIP="/bin/true" GitQlient.pro
 %else
 %qmake_qt5 GitQlient.pro
 %endif
