@@ -40,6 +40,7 @@ public:
    GitExecResult getCommitDiff(const QString &sha, const QString &diffToSha);
    QString getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file);
    GitExecResult getDiffFiles(const QString &sha, const QString &diffToSha);
+   GitExecResult getUntrackedFileDiff(const QString &file) const;
 
 private:
    QSharedPointer<GitBase> mGitBase;

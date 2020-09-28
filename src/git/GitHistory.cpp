@@ -89,10 +89,7 @@ QString GitHistory::getFileDiff(const QString &currentSha, const QString &previo
    const auto ret = mGitBase->run(QString("git diff -w -U15000 %1 %2 %3").arg(previousSha, currentSha, file));
 
    if (ret.success)
-   {
-
       return ret.output.toString();
-   }
 
    return QString();
 }
@@ -109,4 +106,26 @@ GitExecResult GitHistory::getDiffFiles(const QString &sha, const QString &diffTo
       runCmd.append("4b825dc642cb6eb9a060e54bf8d69288fbee4904 " + sha);
 
    return mGitBase->run(runCmd);
+}
+
+GitExecResult GitHistory::getUntrackedFileDiff(const QString &file) const
+{
+   QLog_Debug("Git", QString("Executing getUntrackedFileDiff for file {%1}").arg(file));
+
+   auto cmd = QString("git add --intent-to-add %1").arg(file);
+
+   if (auto ret = mGitBase->run(cmd); ret.success)
+   {
+      cmd = QString("git diff %1").arg(file);
+
+      const auto retDiff = mGitBase->run(cmd);
+
+      cmd = QString("git reset %1").arg(file);
+
+      mGitBase->run(cmd);
+
+      return { true, retDiff.output };
+   }
+   else
+      return { false, "" };
 }

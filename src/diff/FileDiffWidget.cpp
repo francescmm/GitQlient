@@ -186,6 +186,19 @@ bool FileDiffWidget::reload()
 bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file,
                                bool editMode)
 {
+   auto destFile = file;
+
+   if (destFile.contains("-->"))
+      destFile = destFile.split("--> ").last().split("(").first().trimmed();
+
+   QScopedPointer<GitHistory> git(new GitHistory(mGit));
+   auto text = git->getFileDiff(currentSha == CommitInfo::ZERO_SHA ? QString() : currentSha, previousSha, destFile);
+
+   if (text.isEmpty())
+   {
+      if (const auto ret = git->getUntrackedFileDiff(destFile); ret.success)
+         text = ret.output.toString();
+   }
 
    mFileNameLabel->setText(file);
 
@@ -200,14 +213,6 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    mCurrentFile = file;
    mCurrentSha = currentSha;
    mPreviousSha = previousSha;
-
-   auto destFile = file;
-
-   if (destFile.contains("-->"))
-      destFile = destFile.split("--> ").last().split("(").first().trimmed();
-
-   QScopedPointer<GitHistory> git(new GitHistory(mGit));
-   auto text = git->getFileDiff(currentSha == CommitInfo::ZERO_SHA ? QString() : currentSha, previousSha, destFile);
 
    auto pos = 0;
    for (auto i = 0; i < 5; ++i)
