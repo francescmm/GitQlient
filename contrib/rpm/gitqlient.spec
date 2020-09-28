@@ -9,6 +9,11 @@ VCS:        {{{ git_vcs }}}
 
 Source:     {{{ git_pack }}}
 
+%if 0%{?fedora_version} || 0%{?rhel_version} || 0%{?centos_version}
+BuildRequires:  qt5-rpm-macros
+BuildRequires:  /usr/bin/qmake-qt5
+%endif
+
 BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(Qt5Svg)
