@@ -109,7 +109,7 @@ QColor GitQlientStyles::getBlue()
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
 
    QColor c;
-   c.setNamedColor(colorSchema == "dark" ? "#579BD5" : "#325CC7");
+   c.setNamedColor(QString::fromUtf8(colorSchema == "dark" ? "#579BD5" : "#325CC7"));
 
    return c;
 }

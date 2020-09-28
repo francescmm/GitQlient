@@ -23,12 +23,10 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <qpinnabletabwidget_global.h>
-
 #include <QTabWidget>
 #include <QMap>
 
-class QPinnableTabWidgetLIB_EXPORT QPinnableTabWidget : public QTabWidget
+class QPinnableTabWidget : public QTabWidget
 {
    Q_OBJECT
 
