@@ -158,6 +158,8 @@
  </customwidgets>
  <tabstops>
   <tabstop>leUserName</tabstop>
+  <tabstop>leUserToken</tabstop>
+  <tabstop>cbServer</tabstop>
   <tabstop>leEndPoint</tabstop>
   <tabstop>pbTest</tabstop>
   <tabstop>pbAccept</tabstop>

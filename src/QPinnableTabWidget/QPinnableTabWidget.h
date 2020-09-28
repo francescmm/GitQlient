@@ -31,6 +31,13 @@ class QPinnableTabWidget : public QTabWidget
    Q_OBJECT
 
 public:
+   enum class ContextMenuPolicy
+   {
+      OnlyUnpinned,
+      ShowAlways,
+      ShowNever
+   };
+
    explicit QPinnableTabWidget(QWidget *parent = nullptr);
    ~QPinnableTabWidget() override = default;
 
@@ -47,6 +54,8 @@ public:
 
    bool tabsClosable() const { return QTabWidget::tabsClosable(); }
 
+   void setContextMenuPolicy(ContextMenuPolicy policy) { mPolicy = policy; }
+
    void clear();
 
    bool isPinned(int index);
@@ -62,6 +71,7 @@ private:
    bool mPrepareMenu = false;
    int mClickedTab = -1;
    int mLastPinTab = 0;
+   ContextMenuPolicy mPolicy;
 
    void clickRequested(int index);
    void showContextMenu();

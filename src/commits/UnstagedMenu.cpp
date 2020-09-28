@@ -54,7 +54,9 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
 
    addSeparator();
 
-   connect(addAction("Ignore file"), &QAction::triggered, this, [this]() {
+   const auto ignoreMenu = addMenu(tr("Ignore"));
+
+   connect(ignoreMenu->addAction("Ignore file"), &QAction::triggered, this, [this]() {
       const auto ret = QMessageBox::question(this, tr("Ignoring file"),
                                              tr("Are you sure you want to add the file to the black list?"));
 
@@ -67,15 +69,31 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
       }
    });
 
-   connect(addAction("Ignore extension"), &QAction::triggered, this, [this]() {
+   connect(ignoreMenu->addAction("Ignore extension"), &QAction::triggered, this, [this]() {
       const auto msgBoxRet = QMessageBox::question(
-          this, tr("Ignoring file"), tr("Are you sure you want to add the file extension to the black list?"));
+          this, tr("Ignoring extension"), tr("Are you sure you want to add the file extension to the black list?"));
 
       if (msgBoxRet == QMessageBox::Yes)
       {
          auto fileParts = mFileName.split(".");
          fileParts.takeFirst();
          const auto extension = QString("*.%1").arg(fileParts.join("."));
+         const auto ret = addEntryToGitIgnore(extension);
+
+         if (ret)
+            emit signalCheckedOut(ret);
+      }
+   });
+
+   connect(ignoreMenu->addAction("Ignore containing folder"), &QAction::triggered, this, [this]() {
+      const auto msgBoxRet = QMessageBox::question(
+          this, tr("Ignoring folder"), tr("Are you sure you want to add the containing folder to the black list?"));
+
+      if (msgBoxRet == QMessageBox::Yes)
+      {
+         const auto path = mFileName.lastIndexOf("/");
+         const auto folder = mFileName.left(path);
+         const auto extension = QString("%1/*").arg(folder);
          const auto ret = addEntryToGitIgnore(extension);
 
          if (ret)

@@ -55,6 +55,7 @@ private:
    CheckBox *mDisableLogs = nullptr;
    QComboBox *mLevelCombo = nullptr;
    QComboBox *mStylesSchema = nullptr;
+   QLineEdit *mGitLocation = nullptr;
    bool mShowResetMsg = false;
    QPushButton *mClose = nullptr;
    QPushButton *mReset = nullptr;
@@ -70,4 +71,14 @@ private:
 
    */
    void accept() override;
+
+   /**
+    * @brief importConfig Imports an external configuration.
+    */
+   void importConfig();
+
+   /**
+    * @brief exportConfig Exports the configuration to an external file.
+    */
+   void exportConfig();
 };

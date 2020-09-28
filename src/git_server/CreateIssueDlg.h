@@ -24,16 +24,20 @@
  ***************************************************************************************/
 
 #include <QDialog>
-#include <ServerMilestone.h>
-#include <ServerLabel.h>
 
 namespace Ui
 {
 class CreateIssueDlg;
 }
 
-class GitBase;
-class IRestApi;
+class GitServerCache;
+
+namespace GitServer
+{
+struct Label;
+struct Milestone;
+struct Issue;
+}
 
 /**
  * @brief The CreateIssueDlg class presents the UI where the user can create issues in the remote Git server.
@@ -48,7 +52,7 @@ public:
     * @param git The git object to perform Git operations.
     * @param parent The parent widget.
     */
-   explicit CreateIssueDlg(const QSharedPointer<GitBase> git, QWidget *parent = nullptr);
+   explicit CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
    /**
     * Destructor.
     */
@@ -56,9 +60,7 @@ public:
 
 private:
    Ui::CreateIssueDlg *ui;
-   QSharedPointer<GitBase> mGit;
-   IRestApi *mApi;
-   QString mUserName;
+   QSharedPointer<GitServerCache> mGitServerCache;
 
    /**
     * @brief accept Process the user input data and does a request to create an issue.
@@ -68,18 +70,18 @@ private:
     * @brief onMilestones Process the reply from the server when the milestones request is done.
     * @param milestones The list of milestones to process.
     */
-   void onMilestones(const QVector<ServerMilestone> &milestones);
+   void onMilestones(const QVector<GitServer::Milestone> &milestones);
    /**
     * @brief onLabels Process the reply from the server when the labels request is done.
     * @param labels The list of labels to process.
     */
-   void onLabels(const QVector<ServerLabel> &labels);
+   void onLabels(const QVector<GitServer::Label> &labels);
    /**
     * @brief onIssueCreated Process the reply from the server if the issue was successfully created. It shows a message
     * box with the url of the issue.
     * @param url The url of the issue.
     */
-   void onIssueCreated(QString url);
+   void onIssueCreated(const GitServer::Issue &issue);
 
    /**
     * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.

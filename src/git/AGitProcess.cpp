@@ -2,6 +2,7 @@
 
 #include <QTemporaryFile>
 #include <QTextStream>
+#include <GitQlientSettings.h>
 
 #include <QLogger.h>
 
@@ -144,8 +145,11 @@ bool AGitProcess::execute(const QString &command)
       env << "GIT_TRACE=0"; // avoid choking on debug traces
       env << "GIT_FLUSH=0"; // skip the fflush() in 'git log'
 
+      GitQlientSettings settings;
+      const auto gitAlternative = settings.globalValue("gitLocation", "").toString();
+
       setEnvironment(env);
-      setProgram(arguments.takeFirst());
+      setProgram(gitAlternative.isEmpty() ? arguments.takeFirst() : gitAlternative);
       setArguments(arguments);
       start();
 
@@ -160,15 +164,15 @@ bool AGitProcess::execute(const QString &command)
    return processStarted;
 }
 
-void AGitProcess::onFinished(int, QProcess::ExitStatus exitStatus)
+void AGitProcess::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
    QLog_Debug("Git", QString("Process {%1} finished.").arg(mCommand));
 
    const auto errorOutput = readAllStandardError();
 
    mErrorOutput = QString::fromUtf8(errorOutput);
-   mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error")
-       || errorOutput.toLower().contains("could not read username");
+   mRealError = exitStatus != QProcess::NormalExit || (exitStatus == QProcess::NormalExit && exitCode != 0)
+       || mCanceling || errorOutput.contains("error") || errorOutput.toLower().contains("could not read username");
 
    if (mRealError)
       mRunOutput = mErrorOutput;

@@ -10,7 +10,7 @@
 #include <ClickableFrame.h>
 #include <AddSubmoduleDlg.h>
 #include <StashesContextMenu.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitQlientBranchItemRole.h>
 #include <GitQlientSettings.h>
 #include <BranchesWidgetMinimal.h>
@@ -48,7 +48,7 @@ QTreeWidgetItem *getChild(QTreeWidgetItem *parent, const QString &childName)
 }
 }
 
-BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
@@ -242,8 +242,10 @@ BranchesWidget::BranchesWidget(const QSharedPointer<RevisionsCache> &cache, cons
    connect(mMinimal, &BranchesWidgetMinimal::commitSelected, this, &BranchesWidget::signalSelectCommit);
    connect(mMinimal, &BranchesWidgetMinimal::stashSelected, this, &BranchesWidget::onStashSelected);
 
+   /*
    connect(mLocalBranchesTree, &BranchTreeWidget::signalRefreshPRsCache, mCache.get(),
-           &RevisionsCache::refreshPRsCache);
+           &GitCache::refreshPRsCache);
+*/
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, mRemoteBranchesTree,
            &BranchTreeWidget::clearSelection);

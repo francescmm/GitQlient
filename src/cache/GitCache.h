@@ -26,14 +26,11 @@
 #include <RevisionFiles.h>
 #include <lanes.h>
 #include <CommitInfo.h>
-#include <ServerPullRequest.h>
 
 #include <QSharedPointer>
 #include <QObject>
 #include <QHash>
 #include <QMutex>
-
-class IRestApi;
 
 struct WipRevisionInfo
 {
@@ -44,7 +41,7 @@ struct WipRevisionInfo
    bool isValid() const { return !parentSha.isEmpty() || !diffIndex.isEmpty() || !diffIndexCached.isEmpty(); }
 };
 
-class RevisionsCache : public QObject
+class GitCache : public QObject
 {
    Q_OBJECT
 
@@ -60,11 +57,10 @@ public:
       int behindOrigin = 0;
    };
 
-   explicit RevisionsCache(QObject *parent = nullptr);
-   ~RevisionsCache();
+   explicit GitCache(QObject *parent = nullptr);
+   ~GitCache();
 
    void setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits);
-   void setupGitPlatform(const QSharedPointer<IRestApi> &api);
 
    int count() const;
 
@@ -92,9 +88,6 @@ public:
 
    void updateTags(const QMap<QString, QString> &remoteTags);
 
-   ServerPullRequest getPullRequestStatus(const QString &sha);
-   void refreshPRsCache();
-
 private:
    friend class GitRepoLoader;
 
@@ -111,8 +104,6 @@ private:
    QVector<QString> mFileNames;
    QVector<QString> mUntrackedfiles;
    QMap<QString, QString> mRemoteTags;
-   QMap<QString, ServerPullRequest> mPullRequestsStatus;
-   QSharedPointer<IRestApi> mApi;
 
    struct FileNamesLoader
    {
@@ -141,5 +132,4 @@ private:
    QVector<CommitInfo *>::const_reverse_iterator reverseSearchCommit(CommitInfo::Field field, const QString &text,
                                                                      int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);
-   void setPullRequestStatus(QMap<QString, ServerPullRequest> prStatus);
 };

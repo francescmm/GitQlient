@@ -23,15 +23,20 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QString>
+#include <QLabel>
 
-struct ServerLabel
+class CircularPixmap : public QLabel
 {
-   int id;
-   QString nodeId;
-   QString url;
-   QString name;
-   QString description;
-   QString colorHex;
-   bool isDefault;
+public:
+   explicit CircularPixmap(const QSize &size, QWidget *parent = nullptr);
+   explicit CircularPixmap(const QString &filePath, QWidget *parent = nullptr);
+
+   void setCentered(bool centered) { mCenterPosition = centered; }
+
+protected:
+   void paintEvent(QPaintEvent *e) override;
+
+private:
+   QSize mSize;
+   bool mCenterPosition = false;
 };

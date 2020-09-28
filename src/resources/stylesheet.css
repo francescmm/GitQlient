@@ -4,6 +4,12 @@
    font-size: 10pt;
 }
 
+a
+{
+   color: white;
+   font-decoration: italic;
+}
+
 #InitWidget
 {
    max-width: 800px;
@@ -55,6 +61,7 @@ Controls > QToolButton
    min-height: 35px;
 }
 
+QToolButton:menu-indicator, QToolButton::menu-button,
 Controls > QToolButton:menu-indicator, BranchesWidgetMinimal > QToolButton:menu-indicator,
 Controls > QToolButton:menu-button, #ToolButtonWithMenu:menu-button, #ToolButtonWithMenu:menu-indicator
 {
@@ -231,7 +238,7 @@ FullDiffWidget
     border: none;
 }
 
-FullDiffWidget > QTextEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget > QPlainTextEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-width: 1px;
     border-style: solid;
@@ -263,7 +270,7 @@ QLabel#lCounter
     qproperty-alignment: AlignCenter;
 }
 
-CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles
+CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles, #JobContainerHeader
 {
     max-height: 30px;
     min-height: 30px;
@@ -674,6 +681,7 @@ QSpinBox
     border-width: 1px;
     max-height: 25px;
     min-height: 25px;
+    padding-left: 10px;
 }
 
 QSpinBox::up-button
@@ -725,5 +733,200 @@ QDialog > QPushButton
    min-height: 25px;
    padding-bottom: 0;
    padding-top: 10px;
+}
+
+/* GitServerWidget */
+QScrollArea, #TransparentScrollArea
+{
+   background: transparent;
+}
+
+#IssuesHeaderFrame, #IssuesHeaderFrameBig
+{
+   background-color: #202122;
+}
+
+#IssuesFooterFrame, #IssuesFooterFramePagination
+{
+   background-color: #2E2F30;
+}
+
+#IssuesHeaderFrame, #IssuesHeaderFrameBig
+{
+   padding: 10px;
+}
+
+#IssuesHeaderFrameBig
+{
+    max-height: 40px;
+    min-height: 40px;
+}
+
+#IssuesFooterFrame
+{
+   min-height: 10px;
+   max-height: 10px;
+}
+
+#IssuesFooterFrame, #IssuesFooterFramePagination
+{
+   border-bottom: 1px solid #404142;
+}
+
+#ButtonIssuesHeaderFrame
+{
+   background: #404142;
+   max-height: 20px;
+   min-height: 20px;
+   border: 1px solid #D89000;
+}
+
+#ButtonIssuesHeaderFrame:hover
+{
+   background: #606162;
+}
+
+#HeaderTitle
+{
+   font-variant: small-caps;
+   font-size: 12pt;
+   font-weight: bold;
+}
+
+/* IssueButton */
+#IssueItem
+{
+   background-color: #2E2F30;
+}
+
+ButtonLink#IssueTitle
+{
+   padding: 0;
+   font-size: 11pt;
+   font-weight: bold;
+}
+
+#CreatorLink
+{
+   padding: 0;
+}
+
+#IssueLabel
+{
+   padding-left: 5px;
+}
+
+#IssuesViewFrame, #IssueDescription
+{
+   background: #2E2F30;
+}
+
+#IssueIntro
+{
+   border-radius: 10px;
+   background: #404142;
+}
+
+#IssueIntroApproved
+{
+   border-radius: 10px;
+   background: #729943;
+}
+
+#IssueIntroChangesRequested
+{
+   border-radius: 10px;
+   background: #D89000;
+}
+
+#CodeReviewComment
+{
+   border-radius: 10px;
+   background-color: #505152;
+}
+
+IssueDetailedView QTextEdit
+{
+   background: transparent;
+   color: white;
+   border: none;
+}
+
+QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
+{
+   border-width: 1px;
+   border-style: solid;
+}
+
+PrChangesList FileDiffView
+{
+   border: 0;
+   background: #404142;
+}
+
+#PrChangeListItem
+{
+   background: transparent;
+}
+
+#ChangeFileName
+{
+   font-weight: bold;
+}
+
+#ChangeHeaderFrame
+{
+    background: #202122;
+   padding: 10px;
+}
+
+SourceCodeReview > FileDiffView, #PrChangeListItem > FileDiffView
+{
+    border: 0;
+    font-size: 11pt;
+}
+
+SourceCodeReview QLabel
+{
+    background: #2E2F30;
+    padding: 10px;
+    font-weight: bold;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #D89000;
+}
+
+#OutdatedLabel
+{
+    background: #C8C8C8;
+    color: white;
+    border-radius: 7px;
+    padding: 5px;
+}
+
+#LineNumberArea
+{
+   border-right: 1px solid white;
+}
+
+#AddReviewInput
+{
+   background: #505152;
+   border: 1px solid #2E2F30;
+   border-radius: 10px;
+   padding: 5px;
+}
+
+/* JENKINS */
+#JobContainer
+{
+   background: #2E2F30;
+}
+
+#JenkinsWidget, #JobButton, #JobContainerScrollArea
+{
+   background: transparent;
+   outline: none;
+   border: none;
 }
 

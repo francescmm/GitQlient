@@ -27,11 +27,16 @@
 #include <QDateTime>
 
 class CommitHistoryView;
-class RevisionsCache;
+class GitCache;
 class GitBase;
 class Lane;
 class CommitInfo;
-struct ServerPullRequest;
+class GitServerCache;
+
+namespace GitServer
+{
+struct PullRequest;
+}
 
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
@@ -54,8 +59,8 @@ public:
     * @param git The git object to execute git commands.
     * @param view The view that uses the delegate.
     */
-   RepositoryViewDelegate(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
-                          CommitHistoryView *view);
+   RepositoryViewDelegate(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                          const QSharedPointer<GitServerCache> &gitServerCache, CommitHistoryView *view);
 
    /**
     * @brief Overrided method to paint the different columns and rows in the view.
@@ -77,8 +82,9 @@ protected:
                     const QModelIndex &index) override;
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitServerCache> mGitServerCache;
    CommitHistoryView *mView = nullptr;
    int diffTargetRow = -1;
    int mColumnPressed = -1;
@@ -136,7 +142,8 @@ private:
     * @param startPoint The starting X coordinate for the tag.
     * @param pr The PullRequest status.
     */
-   void paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const ServerPullRequest &pr) const;
+   void paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
+                      const GitServer::PullRequest &pr) const;
 
    /**
     * @brief getMergeColor Returns the color to be used for painting the external circle of the node. This methods

@@ -14,7 +14,6 @@
         <file alias="tags">resources/icons/tags.svg</file>
         <file alias="file">resources/icons/file.svg</file>
         <file alias="git_prune">resources/icons/git_prune.svg</file>
-        <file alias="pull_request">resources/icons/pull_requests.svg</file>
         <file alias="arrow_down">resources/icons/arrow_down.svg</file>
         <file alias="arrow_up">resources/icons/arrow_up.svg</file>
         <file alias="staged">resources/icons/files_staged.svg</file>
@@ -81,6 +80,26 @@
         <file alias="qcbb_i">resources/icons/qcheckbox_bright_indet.svg</file>
         <file alias="split_view">resources/icons/split_view.svg</file>
         <file alias="arrow_right">resources/icons/arrow_right.svg</file>
+        <file alias="unified_view">resources/icons/unified_view.svg</file>
+        <file alias="pull_request">resources/icons/pull_request.svg</file>
+        <file alias="comment">resources/icons/comment.svg</file>
+        <file alias="comments">resources/icons/comments.svg</file>
+        <file alias="commit">resources/icons/commit.svg</file>
+        <file alias="add_comment">resources/icons/add_comment.svg</file>
+        <file alias="changes">resources/icons/changes.svg</file>
+        <file alias="new_issue">resources/icons/new_issue.svg</file>
+        <file alias="issues">resources/icons/issues.svg</file>
+        <file alias="new_pr">resources/icons/new_pull_request.svg</file>
+        <file alias="build_system">resources/icons/build_system.svg</file>
+        <file alias="yellow">resources/icons/yellow.svg</file>
+        <file alias="red">resources/icons/red.svg</file>
+        <file alias="orange">resources/icons/orange.svg</file>
+        <file alias="grey">resources/icons/grey.svg</file>
+        <file alias="green">resources/icons/green.svg</file>
+        <file alias="dark_grey">resources/icons/dark_grey.svg</file>
+        <file alias="review_comment">resources/icons/add_review.svg</file>
+        <file alias="review_approve">resources/icons/review_approved.svg</file>
+        <file alias="review_change">resources/icons/review_change.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

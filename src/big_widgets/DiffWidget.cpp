@@ -1,6 +1,6 @@
 #include "DiffWidget.h"
 
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <CommitInfoPanel.h>
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
@@ -16,7 +16,7 @@
 
 using namespace QLogger;
 
-DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<RevisionsCache> cache, QWidget *parent)
+DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<GitCache> cache, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)

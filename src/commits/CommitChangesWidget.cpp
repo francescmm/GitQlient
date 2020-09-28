@@ -8,7 +8,7 @@
 #include <CommitInfo.h>
 #include <RevisionFiles.h>
 #include <UnstagedMenu.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <FileWidget.h>
 #include <UntrackedMenu.h>
 
@@ -41,7 +41,7 @@ enum GitQlientRole
    U_Name
 };
 
-CommitChangesWidget::CommitChangesWidget(const QSharedPointer<RevisionsCache> &cache,
+CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache,
                                          const QSharedPointer<GitBase> &git, QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::CommitChangesWidget)

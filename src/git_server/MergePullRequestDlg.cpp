@@ -9,8 +9,10 @@
 #include <QMessageBox>
 #include <QJsonDocument>
 
-MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, const ServerPullRequest &pr,
-                                         const QString &sha, QWidget *parent)
+using namespace GitServer;
+
+MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, const PullRequest &pr, const QString &sha,
+                                         QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::MergePullRequestDlg)
    , mGit(git)
@@ -23,18 +25,15 @@ MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, cons
    const auto serverUrl = gitConfig->getServerUrl();
 
    GitQlientSettings settings;
-   mUserName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
+   const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
    const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
    const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
    const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
 
    if (serverUrl.contains("github"))
-      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { mUserName, userToken, endpoint });
+      mApi = new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint });
    else
-   {
-      mApi = new GitLabRestApi(mUserName, repoInfo.second, serverUrl, { mUserName, userToken, endpoint });
-      mUserName = dynamic_cast<GitLabRestApi *>(mApi)->getUserId();
-   }
+      mApi = new GitLabRestApi(userName, repoInfo.second, serverUrl, { userName, userToken, endpoint });
 
    connect(mApi, &GitHubRestApi::pullRequestMerged, this, &MergePullRequestDlg::onPRMerged);
    connect(mApi, &IRestApi::errorOccurred, this, &MergePullRequestDlg::onGitServerError);

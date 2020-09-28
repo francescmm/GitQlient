@@ -35,7 +35,7 @@ class AmendWidget : public CommitChangesWidget
    Q_OBJECT
 
 public:
-   explicit AmendWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit AmendWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                         QWidget *parent = nullptr);
 
    ~AmendWidget() = default;

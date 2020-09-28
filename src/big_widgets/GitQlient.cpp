@@ -226,13 +226,12 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
 
 void GitQlient::closeTab(int tabIndex)
 {
-
    auto repoToRemove = dynamic_cast<GitQlientRepo *>(mRepos->widget(tabIndex));
 
    QLog_Info("UI", QString("Removing repository {%1}").arg(repoToRemove->currentDir()));
 
    mCurrentRepos.remove(repoToRemove->currentDir());
-   mRepos->removeTab(tabIndex);
+   // mRepos->removeTab(tabIndex);
    repoToRemove->close();
 }
 

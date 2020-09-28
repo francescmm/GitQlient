@@ -1,19 +1,18 @@
 #include <CommitInfoWidget.h>
 #include <CommitInfoPanel.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <CommitInfo.h>
 #include <FileListWidget.h>
 
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDateTime>
-#include <QScrollArea>
 
 #include <QLogger.h>
 
 using namespace QLogger;
 
-CommitInfoWidget::CommitInfoWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+CommitInfoWidget::CommitInfoWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                    QWidget *parent)
    : QWidget(parent)
    , mCache(cache)

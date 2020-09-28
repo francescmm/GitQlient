@@ -24,7 +24,7 @@
  ***************************************************************************************/
 
 #include <GitExecResult.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 
 #include <QObject>
 #include <QSharedPointer>

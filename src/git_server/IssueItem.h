@@ -23,43 +23,29 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QStringList>
+#include <QFrame>
 
-struct ServerIssue
+class ButtonLink;
+class QLabel;
+
+namespace GitServer
 {
-   QString title;
-   QByteArray body;
-   int milestone;
-   QStringList labels;
-   QStringList assignees;
+struct Issue;
+struct PullRequest;
+}
 
-   QJsonObject toJson() const
-   {
-      QJsonObject object;
+class IssueItem : public QFrame
+{
+   Q_OBJECT
 
-      if (!title.isEmpty())
-         object.insert("title", title);
+signals:
+   void selected(int issueNum);
 
-      if (!body.isEmpty())
-         object.insert("body", body.toStdString().c_str());
+public:
+   IssueItem(const GitServer::Issue &issueData, QWidget *parent = nullptr);
+   IssueItem(const GitServer::PullRequest &issueData, QWidget *parent = nullptr);
 
-      if (milestone != -1)
-         object.insert("milestone", milestone);
-
-      QJsonArray array;
-      auto count = 0;
-      for (auto assignee : assignees)
-         array.insert(count++, assignee);
-      object.insert("assignees", array);
-
-      QJsonArray labelsArray;
-      count = 0;
-      for (auto label : labels)
-         labelsArray.insert(count++, label);
-      object.insert("labels", labelsArray);
-
-      return object;
-   }
+private:
+   QLabel *mComments = nullptr;
+   void fillWidget(const GitServer::Issue &issueData);
 };

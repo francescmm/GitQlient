@@ -35,11 +35,12 @@
 
 using namespace QLogger;
 
-HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
-                             QWidget *parent)
+HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
+                             const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)
+   , mGitServerCache(gitServerCache)
    , mReturnFromFull(new QPushButton())
 {
    mCommitInfoWidget = new CommitInfoWidget(mCache, git);
@@ -79,8 +80,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
-   mRepositoryModel = new CommitHistoryModel(mCache, git);
-   mRepositoryView = new CommitHistoryView(mCache, git);
+   mRepositoryModel = new CommitHistoryModel(mCache, git, mGitServerCache);
+   mRepositoryView = new CommitHistoryView(mCache, git, mGitServerCache);
 
    connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &HistoryWidget::signalViewUpdated);
    connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, [this](const QString &sha) {
@@ -100,10 +101,12 @@ HistoryWidget::HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const 
    connect(mRepositoryView, &CommitHistoryView::signalCherryPickConflict, this,
            &HistoryWidget::signalCherryPickConflict);
    connect(mRepositoryView, &CommitHistoryView::signalPullConflict, this, &HistoryWidget::signalPullConflict);
+   connect(mRepositoryView, &CommitHistoryView::showPrDetailedView, this, &HistoryWidget::showPrDetailedView);
 
    mRepositoryView->setObjectName("historyGraphView");
    mRepositoryView->setModel(mRepositoryModel);
-   mRepositoryView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, git, mRepositoryView));
+   mRepositoryView->setItemDelegate(mItemDelegate
+                                    = new RepositoryViewDelegate(cache, git, mGitServerCache, mRepositoryView));
    mRepositoryView->setEnabled(true);
 
    mBranchesWidget = new BranchesWidget(mCache, git);

@@ -28,7 +28,7 @@
 
 class QListWidget;
 class QListWidgetItem;
-class RevisionsCache;
+class GitCache;
 class GitBase;
 class RevisionFiles;
 
@@ -58,7 +58,7 @@ signals:
    void signalEditFile(const QString &fileName, int line, int column);
 
 public:
-   explicit CommitChangesWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit CommitChangesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                 QWidget *parent = nullptr);
 
    ~CommitChangesWidget();
@@ -69,7 +69,7 @@ public:
 
 protected:
    Ui::CommitChangesWidget *ui = nullptr;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QString mCurrentSha;
    QMap<QString, QPair<bool, QListWidgetItem *>> mCurrentFilesCache;

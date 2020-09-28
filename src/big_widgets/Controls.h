@@ -28,10 +28,12 @@
 class QToolButton;
 class QPushButton;
 class GitBase;
-class RevisionsCache;
+class GitCache;
 class QNetworkAccessManager;
 class QProgressBar;
 class GitQlientUpdater;
+class QButtonGroup;
+class QHBoxLayout;
 
 /*!
  \brief Enum used to configure the different views handled by the Controls widget.
@@ -39,11 +41,12 @@ class GitQlientUpdater;
 */
 enum class ControlsMainViews
 {
-   HISTORY,
-   DIFF,
-   BLAME,
-   MERGE,
-   SERVER
+   History,
+   Diff,
+   Blame,
+   Merge,
+   GitServer,
+   BuildSystem
 };
 
 /*!
@@ -78,9 +81,14 @@ signals:
    void signalGoMerge();
 
    /**
-    * @brief signalGoManagement Signal triggered when the user selected the Git remote platform viewer.
+    * @brief signalGoManagement Signal triggered when the user selected the Git remote platform view.
     */
    void signalGoServer();
+
+   /**
+    * @brief signalGoBuildSystem Signal triggered when the user selected the Build System view.
+    */
+   void signalGoBuildSystem();
 
    /*!
     \brief Signal triggered when the user manually forces a refresh of the repository data.
@@ -109,7 +117,7 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit Controls(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                      QWidget *parent = nullptr);
    /*!
     \brief Process the toggled button and triggers its corresponding action.
@@ -163,7 +171,7 @@ public:
 
 private:
    QString mCurrentSha;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QToolButton *mHistory = nullptr;
    QToolButton *mDiff = nullptr;
@@ -174,10 +182,12 @@ private:
    QToolButton *mRefreshBtn = nullptr;
    QToolButton *mConfigBtn = nullptr;
    QToolButton *mGitPlatform = nullptr;
-   QToolButton *mGitOptions = nullptr;
+   QToolButton *mBuildSystem = nullptr;
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;
+   QButtonGroup *mBtnGroup = nullptr;
+   bool mGoGitServerView = false;
 
    /*!
     \brief Pulls the current branch.
@@ -210,19 +220,14 @@ private:
    void showConfigDlg();
 
    /**
-    * @brief createNewIssue Shows the dialog to create a new issue on the server.
+    * @brief createGitPlatformButton Createst the git platform button if the user has enabled it.
     */
-   void createNewIssue();
+   void createGitPlatformButton(QHBoxLayout *layout);
 
    /**
-    * @brief createNewPullRequest Shows the dialog to create a new pull request on the server.
+    * @brief createBuildSystemButton Creates the build system platform button if the user has enabled it.
     */
-   void createNewPullRequest();
-
-   /**
-    * @brief configServer Shows the dialog to configure this repository's server.
-    */
-   void configServer();
+   void configBuildSystemButton();
 
    bool eventFilter(QObject *obj, QEvent *event);
 };

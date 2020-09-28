@@ -30,7 +30,7 @@
 #include <QVector>
 
 class GitBase;
-class RevisionsCache;
+class GitCache;
 struct WipRevisionInfo;
 
 class GitRepoLoader : public QObject
@@ -44,7 +44,7 @@ signals:
    void signalRefreshPRsCache(const QString repoName, const QString &repoOwner, const QString &serverUrl);
 
 public:
-   explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<RevisionsCache> cache,
+   explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache,
                           QObject *parent = nullptr);
    bool loadRepository();
    void updateWipRevision();
@@ -55,7 +55,7 @@ private:
    bool mShowAll = true;
    bool mLocked = false;
    QSharedPointer<GitBase> mGitBase;
-   QSharedPointer<RevisionsCache> mRevCache;
+   QSharedPointer<GitCache> mRevCache;
 
    bool configureRepoDirectory();
    void loadReferences();

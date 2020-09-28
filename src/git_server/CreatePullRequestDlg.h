@@ -24,17 +24,22 @@
  ***************************************************************************************/
 
 #include <QDialog>
-#include <ServerMilestone.h>
-#include <ServerLabel.h>
 
 namespace Ui
 {
 class CreatePullRequestDlg;
 }
 
-class GitBase;
+class GitServerCache;
+class GitCache;
+
+namespace GitServer
+{
+struct Milestone;
+struct Label;
+struct PullRequest;
 class IRestApi;
-class RevisionsCache;
+}
 
 /**
  * @brief The CreatePullRequestDlg class configures the UI so the user can create pull requests in the git remote
@@ -57,8 +62,9 @@ public:
     * @param git The git object to perform Git operations.
     * @param parent The parent widget.
     */
-   explicit CreatePullRequestDlg(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
-                                 QWidget *parent = nullptr);
+   explicit CreatePullRequestDlg(const QSharedPointer<GitCache> &cache,
+                                 const QSharedPointer<GitServerCache> &gitServerCache, const QString &workingDir,
+                                 const QString &currentBranch, QWidget *parent = nullptr);
    /**
     * Destructor
     */
@@ -66,12 +72,8 @@ public:
 
 private:
    Ui::CreatePullRequestDlg *ui;
-   QSharedPointer<RevisionsCache> mCache;
-   QSharedPointer<GitBase> mGit;
-   IRestApi *mApi;
-   QString mUserName;
-   int mIssue;
-   QString mFinalUrl;
+   QSharedPointer<GitCache> mCache;
+   QSharedPointer<GitServerCache> mGitServerCache;
 
    /**
     * @brief accept Checks the data introduced by the user and connects to the server to create a pull request.
@@ -81,23 +83,18 @@ private:
     * @brief onMilestones Process the reply from the server when the milestones request is done.
     * @param milestones The list of milestones to process.
     */
-   void onMilestones(const QVector<ServerMilestone> &milestones);
+   void onMilestones(const QVector<GitServer::Milestone> &milestones);
    /**
     * @brief onLabels Process the reply from the server when the labels request is done.
     * @param labels The list of labels to process.
     */
-   void onLabels(const QVector<ServerLabel> &labels);
-   /**
-    * @brief onPullRequestCreated Shows a message box with the url of the pull request already created.
-    * @param url The url that links to the pull request.
-    */
-   void onPullRequestCreated(QString url);
+   void onLabels(const QVector<GitServer::Label> &labels);
    /**
     * @brief onPullRequestUpdated On GitHub, some parameters in the Pull Request are configured in an second update
     * call. This indicates the widget that that update was successfully and triggers the message box to inform of the
     * link to the PR.
     */
-   void onPullRequestUpdated();
+   void onPullRequestUpdated(const GitServer::PullRequest &pr);
    /**
     * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
     */

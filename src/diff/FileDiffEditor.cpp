@@ -1,11 +1,14 @@
-#include "FileDiffEditor.h"
+#include <FileDiffEditor.h>
 
 #include <GitQlientStyles.h>
+#include <LineNumberArea.h>
 
 FileDiffEditor::FileDiffEditor(QWidget *parent)
    : FileDiffView(parent)
 {
    setReadOnly(false);
+
+   addNumberArea(new LineNumberArea(this));
 
    connect(this, &FileDiffView::cursorPositionChanged, this, &FileDiffEditor::highlightCurrentLine);
 

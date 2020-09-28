@@ -56,6 +56,8 @@
 
 class FileDiffHighlighter;
 
+class LineNumberArea;
+
 /*!
  \brief The FileDiffView is an overload QPlainTextEdit class used to show the contents of a file diff between two
  commits.
@@ -85,18 +87,38 @@ public:
     */
    ~FileDiffView();
 
+   void addNumberArea(LineNumberArea *numberArea);
+
    /**
     * @brief loadDiff Loads the text edit based on a diff text.
     * @param text The text representing a diff
     * @return True if correctly loaded, otherwise false.
     */
-   void loadDiff(QString text, const QVector<DiffInfo::ChunkInfo> &fileDiffInfo);
+   void loadDiff(QString text, const QVector<DiffInfo::ChunkInfo> &fileDiffInfo = QVector<DiffInfo::ChunkInfo>());
 
    /**
     * @brief moveScrollBarToPos Moves the vertical scroll bar to the value defined in @p value.
     * @param value The new scroll bar value.
     */
    void moveScrollBarToPos(int value);
+
+   /**
+    * @brief setStartingLine Makes the widget start from the line @p lineNumber.
+    * @param lineNumber The starting line number.
+    */
+   void setStartingLine(int lineNumber) { mStartingLine = lineNumber; }
+
+   /**
+    * @brief setUnifiedDiff Sets the diff as unified view.
+    * @param unified True if unified view must be shown.
+    */
+   void setUnifiedDiff(bool unified) { mUnified = unified; }
+
+   /**
+    * @brief getHeight Gets the approximated height of the widget based on the text of the QTextDocument.
+    * @return The height.
+    */
+   int getHeight() const;
 
 protected:
    /*!
@@ -105,6 +127,8 @@ protected:
     \param event The resize event.
    */
    void resizeEvent(QResizeEvent *event) override;
+
+   bool eventFilter(QObject *target, QEvent *event) override;
 
 private:
    /*!
@@ -122,33 +146,17 @@ private:
    void updateLineNumberArea(const QRect &rect, int dy);
 
    /*!
-    \brief Method called by the line number area to paint the content of the QPlainTextEdit.
-
-    \param event The paint event.
-    */
-   void lineNumberAreaPaintEvent(QPaintEvent *event);
-
-   /*!
     \brief Returns the width of the line number area.
 
     \return int The width in pixels.
     */
    int lineNumberAreaWidth();
 
-   class LineNumberArea : public QWidget
-   {
-   public:
-      LineNumberArea(FileDiffView *editor);
-
-      QSize sizeHint() const override;
-
-   protected:
-      void paintEvent(QPaintEvent *event) override;
-
-   private:
-      FileDiffView *fileDiffWidget;
-   };
-
    LineNumberArea *mLineNumberArea = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
+   int mStartingLine = 0;
+   bool mUnified = false;
+   int mRow = -1;
+
+   friend class LineNumberArea;
 };

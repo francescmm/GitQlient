@@ -25,10 +25,11 @@
 
 #include <QTreeView>
 
-class RevisionsCache;
+class GitCache;
 class GitBase;
 class CommitHistoryModel;
 class ShaFilterProxyModel;
+class GitServerCache;
 
 /**
  * @brief The CommitHistoryView is the class that represents the View in a MVC pattern. It shows the data provided by
@@ -80,6 +81,11 @@ signals:
     * \brief signalPullConflict Signal triggered when trying to pull and a conflict happens.
     */
    void signalPullConflict();
+   /**
+    * @brief showPrDetailedView Signal that makes the view change to the Pull Request detailed view
+    * @param pr The pull request number to show.
+    */
+   void showPrDetailedView(int pr);
 
 public:
    /**
@@ -89,8 +95,8 @@ public:
     * @param git The git object to perform Git commands.
     * @param parent The parent widget if needed.
     */
-   explicit CommitHistoryView(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
-                              QWidget *parent = nullptr);
+   explicit CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                              const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
    /**
     * @brief Destructor.
     */
@@ -151,8 +157,9 @@ public:
    QModelIndexList selectedIndexes() const override;
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitServerCache> mGitServerCache;
    CommitHistoryModel *mCommitHistoryModel = nullptr;
    ShaFilterProxyModel *mProxyModel = nullptr;
    bool mIsFiltering = false;
@@ -164,11 +171,6 @@ private:
     * @param p The point where the context menu will be shown.
     */
    void showContextMenu(const QPoint &p);
-   /**
-    * @brief Saves the state of the header (width of the columns, which columns, etc) when the widget is going to be
-    * destroyed.
-    */
-   void saveHeaderState();
    /**
     * @brief Configures the tree view and how the columns look like.
     *

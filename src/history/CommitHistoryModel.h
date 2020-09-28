@@ -26,9 +26,10 @@
 #include <QAbstractItemModel>
 #include <QSharedPointer>
 
-class RevisionsCache;
+class GitCache;
 class GitBase;
 class CommitInfo;
+class GitServerCache;
 enum class CommitHistoryColumns;
 
 /**
@@ -48,8 +49,8 @@ public:
     * @param git The git object to execute Git operations.
     * @param parent The parent widget if needed.
     */
-   explicit CommitHistoryModel(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
-                               QObject *parent = nullptr);
+   explicit CommitHistoryModel(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                               const QSharedPointer<GitServerCache> &gitServerCache, QObject *parent = nullptr);
 
    /**
     * @brief Clears the contents without deleting the cache.
@@ -131,8 +132,9 @@ public:
    int columnCount() const { return mColumns.count(); }
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitServerCache> mGitServerCache;
    QMap<CommitHistoryColumns, QString> mColumns;
 
    /**

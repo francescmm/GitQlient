@@ -1,5 +1,6 @@
 #include "CommitHistoryContextMenu.h"
 
+#include <GitServerCache.h>
 #include <GitQlientStyles.h>
 #include <GitLocal.h>
 #include <GitTags.h>
@@ -8,11 +9,10 @@
 #include <GitStashes.h>
 #include <GitBranches.h>
 #include <GitRemote.h>
-#include <GitConfig.h>
 #include <BranchDlg.h>
 #include <TagDlg.h>
 #include <CommitInfo.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <PullDlg.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
@@ -31,12 +31,14 @@
 
 using namespace QLogger;
 
-CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<RevisionsCache> &cache,
-                                                   const QSharedPointer<GitBase> &git, const QStringList &shas,
-                                                   QWidget *parent)
+CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache,
+                                                   const QSharedPointer<GitBase> &git,
+                                                   const QSharedPointer<GitServerCache> &gitServerCache,
+                                                   const QStringList &shas, QWidget *parent)
    : QMenu(parent)
    , mCache(cache)
    , mGit(git)
+   , mGitServerCache(gitServerCache)
    , mShas(shas)
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -138,21 +140,17 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
       }
    }
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto remoteUrl = gitConfig->getServerUrl();
-   const auto isGitHub = remoteUrl.contains("github", Qt::CaseInsensitive);
-   const auto isGitLab = remoteUrl.contains("gitlab", Qt::CaseInsensitive);
-
-   if (isGitHub || isGitLab)
+   if (mGitServerCache)
    {
+      const auto isGitHub = mGitServerCache->getPlatform() == GitServer::Platform::GitHub;
       addSeparator();
 
       const auto gitServerMenu = new QMenu(QString::fromUtf8(isGitHub ? "GitHub" : "GitLab"), this);
       addMenu(gitServerMenu);
 
-      if (const auto pr = mCache->getPullRequestStatus(mShas.first()); singleSelection && pr.isValid())
+      if (const auto pr = mGitServerCache->getPullRequest(mShas.first()); singleSelection && pr.isValid())
       {
-         const auto prInfo = mCache->getPullRequestStatus(mShas.first());
+         const auto prInfo = mGitServerCache->getPullRequest(mShas.first());
 
          const auto checksMenu = new QMenu("Checks", gitServerMenu);
          gitServerMenu->addMenu(checksMenu);
@@ -166,7 +164,6 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          if (isGitHub)
          {
-            const auto link = mCache->getPullRequestStatus(mShas.first()).url;
             connect(gitServerMenu->addAction("Merge PR"), &QAction::triggered, this, [this, pr]() {
                const auto mergeDlg = new MergePullRequestDlg(mGit, pr, mShas.first(), this);
                connect(mergeDlg, &MergePullRequestDlg::signalRepositoryUpdated, this,
@@ -176,19 +173,20 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
             });
          }
 
-         const auto link = mCache->getPullRequestStatus(mShas.first()).url;
-         connect(gitServerMenu->addAction("Open PR on browser"), &QAction::triggered, this,
-                 [link]() { QDesktopServices::openUrl(link); });
+         const auto link = mGitServerCache->getPullRequest(mShas.first()).url;
+         connect(gitServerMenu->addAction("Show PR detailed view"), &QAction::triggered, this,
+                 [this, num = pr.number]() { emit showPrDetailedView(num); });
 
          gitServerMenu->addSeparator();
       }
 
       connect(gitServerMenu->addAction("New Issue"), &QAction::triggered, this, [this]() {
-         const auto createIssue = new CreateIssueDlg(mGit, this);
+         const auto createIssue = new CreateIssueDlg(mGitServerCache, this);
          createIssue->exec();
       });
       connect(gitServerMenu->addAction("New Pull Request"), &QAction::triggered, this, [this]() {
-         const auto prDlg = new CreatePullRequestDlg(mCache, mGit, this);
+         const auto prDlg
+             = new CreatePullRequestDlg(mCache, mGitServerCache, mGit->getWorkingDir(), mGit->getCurrentBranch(), this);
          connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, this,
                  &CommitHistoryContextMenu::signalRefreshPRsCache);
 
@@ -520,14 +518,10 @@ void CommitHistoryContextMenu::merge(const QString &branchFrom)
 
 void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 {
-   auto isCommitInCurrentBranch = false;
-   const auto currentBranch = mGit->getCurrentBranch();
    const auto commitInfo = mCache->getCommitInfo(sha);
-   const auto remoteBranches = commitInfo.getReferences(References::Type::RemoteBranches);
+   auto remoteBranches = commitInfo.getReferences(References::Type::RemoteBranches);
    const auto localBranches = commitInfo.getReferences(References::Type::LocalBranch);
 
-   QScopedPointer<GitBranches> git(new GitBranches(mGit));
-   const auto tracking = git->getTrackingBranches();
    QMap<QString, bool> branchTracking;
 
    if (remoteBranches.isEmpty())
@@ -537,22 +531,26 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
    }
    else
    {
-      for (const auto &remote : remoteBranches)
+      for (const auto &local : localBranches)
       {
-         if (tracking.contains(remote))
-         {
-            for (const auto &local : tracking[remote])
-            {
-               if (!branchTracking.contains(local))
-                  branchTracking.insert(local, true);
-            }
-         }
-         else
-            branchTracking.insert(remote, false);
+         const auto iter = std::find_if(remoteBranches.begin(), remoteBranches.end(), [local](const QString &remote) {
+            if (remote.contains(local))
+               return true;
+            return false;
+         });
+
+         branchTracking.insert(local, true);
+
+         if (iter != remoteBranches.end())
+            remoteBranches.erase(iter);
       }
+      for (const auto &remote : remoteBranches)
+         branchTracking.insert(remote, false);
    }
 
    QList<QAction *> branchesToCheckout;
+   auto isCommitInCurrentBranch = false;
+   const auto currentBranch = mGit->getCurrentBranch();
 
    for (const auto &pair : branchTracking.toStdMap())
    {

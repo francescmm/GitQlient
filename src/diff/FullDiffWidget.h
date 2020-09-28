@@ -26,7 +26,9 @@
 #include <IDiffWidget.h>
 
 #include <QSyntaxHighlighter>
-#include <QTextEdit>
+
+class QPlainTextEdit;
+class QPushButton;
 
 /*!
  \brief The FullDiffWidget class is an overload class inherited from QTextEdit that process the output from a diff for a
@@ -45,7 +47,7 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+   explicit FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
                            QWidget *parent = nullptr);
 
    /*!
@@ -64,13 +66,16 @@ public:
    void loadDiff(const QString &sha, const QString &diffToSha, const QString &diffData);
 
 private:
+   QPushButton *mGoPrevious = nullptr;
+   QPushButton *mGoNext = nullptr;
    QString mPreviousDiffText;
-   QTextEdit *mDiffWidget = nullptr;
+   QPlainTextEdit *mDiffWidget = nullptr;
+   QVector<int> mFilePositions;
 
    class DiffHighlighter : public QSyntaxHighlighter
    {
    public:
-      DiffHighlighter(QTextEdit *p);
+      DiffHighlighter(QTextDocument *document);
       void highlightBlock(const QString &text) override;
    };
 
@@ -82,4 +87,12 @@ private:
     \param fileChunk The file chuck to compare.
    */
    void processData(const QString &fileChunk);
+   /**
+    * @brief moveChunkUp Moves to the previous diff chunk.
+    */
+   void moveChunkUp();
+   /**
+    * @brief moveChunkDown Moves to the following diff chunk.
+    */
+   void moveChunkDown();
 };

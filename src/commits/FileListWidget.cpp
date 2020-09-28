@@ -5,7 +5,7 @@
 #include <FileListDelegate.h>
 #include <GitHistory.h>
 #include <GitQlientStyles.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitBase.h>
 
 #include <QApplication>
@@ -17,7 +17,7 @@
 #include <QMenu>
 #include <QItemDelegate>
 
-FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache, QWidget *p)
+FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *p)
    : QListWidget(p)
    , mGit(git)
    , mCache(std::move(cache))
@@ -69,7 +69,7 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 
    if (mCache->containsRevisionFile(mCurrentSha, compareToSha))
       files = mCache->getRevisionFile(mCurrentSha, compareToSha);
-   else if (!compareToSha.isEmpty())
+   else
    {
       QScopedPointer<GitHistory> git(new GitHistory(mGit));
       const auto ret = git->getDiffFiles(mCurrentSha, compareToSha);

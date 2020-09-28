@@ -33,6 +33,9 @@ class QPushButton;
 class CheckBox;
 class FileEditor;
 class QStackedWidget;
+class QLabel;
+class QLineEdit;
+class QPlainTextEdit;
 
 /*!
  \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
@@ -69,7 +72,7 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
+   explicit FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
                            QWidget *parent = nullptr);
 
    /*!
@@ -121,7 +124,10 @@ private:
    QPushButton *mSave = nullptr;
    QPushButton *mStage = nullptr;
    QPushButton *mRevert = nullptr;
+   QLabel *mFileNameLabel = nullptr;
+   QFrame *mTitleFrame = nullptr;
    FileDiffView *mNewFile = nullptr;
+   QLineEdit *mSearchOld = nullptr;
    FileDiffView *mOldFile = nullptr;
    QVector<int> mModifications;
    bool mFileVsFile = false;
@@ -131,14 +137,6 @@ private:
    QStackedWidget *mViewStackedWidget = nullptr;
 
    /**
-    * @brief processDiff Process the diff to configure the navigation parameters.
-    * @param text
-    * @param newFileData
-    * @param oldFileData
-    */
-   void processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
-                    QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData);
-   /**
     * @brief moveChunkUp Moves to the previous diff chunk.
     */
    void moveChunkUp();
@@ -146,10 +144,6 @@ private:
     * @brief moveChunkDown Moves to the following diff chunk.
     */
    void moveChunkDown();
-   /**
-    * @brief moveBottomChunk Moves to the last diff chunk.
-    */
-   void moveBottomChunk();
 
    /**
     * @brief enterEditionMode Enters edition mode

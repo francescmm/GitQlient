@@ -23,63 +23,20 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QString>
-#include <QJsonObject>
-#include <QVector>
-#include <ServerIssue.h>
+#include <QFrame>
 
-struct ServerPullRequest : public ServerIssue
+class QLabel;
+
+namespace GitServer
 {
-   struct Details
-   {
-   };
+struct CodeReview;
+}
 
-   struct HeadState
-   {
-      enum class State
-      {
-         Failure,
-         Success,
-         Pending
-      };
+class CodeReviewComment : public QFrame
+{
+public:
+   explicit CodeReviewComment(const GitServer::CodeReview &review, QWidget *parent = nullptr);
 
-      struct Check
-      {
-         QString description;
-         QString state;
-         QString url;
-         QString name;
-      };
-
-      QString sha;
-      QString state;
-      State eState;
-      QVector<Check> checks;
-   };
-
-   QString head;
-   QString base;
-   bool isOpen = true;
-   bool maintainerCanModify = true;
-   bool draft = false;
-   int id = 0;
-   QString url;
-   Details details;
-   HeadState state;
-
-   QJsonObject toJson() const
-   {
-      QJsonObject object;
-
-      object.insert("title", title);
-      object.insert("head", head);
-      object.insert("base", base);
-      object.insert("body", body.toStdString().c_str());
-      object.insert("maintainer_can_modify", maintainerCanModify);
-      object.insert("draft", draft);
-
-      return object;
-   }
-
-   bool isValid() const { return !title.isEmpty(); }
+private:
+   QLabel *createHeadline(const QDateTime &dt, const QString &prefix);
 };

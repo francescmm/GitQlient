@@ -25,7 +25,10 @@
 
 #include <QString>
 
-struct ServerMilestone
+namespace GitServer
+{
+
+struct Milestone
 {
    int id;
    int number;
@@ -34,3 +37,5 @@ struct ServerMilestone
    QString description;
    bool isOpen;
 };
+
+}

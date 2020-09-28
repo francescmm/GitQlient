@@ -119,7 +119,7 @@ QListWidget::item:disabled
     color: #606162;
 }
 
-CommitHistoryView, FullDiffWidget > QTextEdit, QListWidget, FileListWidget, QTreeWidget
+CommitHistoryView, FullDiffWidget > QPlainTextEdit, QListWidget, FileListWidget, QTreeWidget
 {
     background-color: white;
     color: black;
@@ -160,7 +160,7 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget > QTextEdit, CommitChangesWidget > QLineEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget > QPlainTextEdit, CommitChangesWidget > QLineEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-color: #404142;
 }
@@ -185,7 +185,8 @@ QLabel#lCounter
 }
 
 CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles,
-CommitChangesWidget > QFrame#untrackedFiles > QLabel, CommitChangesWidget > QFrame#unstagedFiles > QLabel, CommitChangesWidget > QFrame#stagedFiles > QLabel
+CommitChangesWidget > QFrame#untrackedFiles > QLabel, CommitChangesWidget > QFrame#unstagedFiles > QLabel, CommitChangesWidget > QFrame#stagedFiles > QLabel,
+#JobContainerHeader
 {
     background: #404142;
     color: white;

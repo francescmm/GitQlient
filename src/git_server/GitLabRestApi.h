@@ -25,6 +25,9 @@
 
 #include <IRestApi.h>
 
+namespace GitServer
+{
+
 class GitLabRestApi final : public IRestApi
 {
    Q_OBJECT
@@ -33,14 +36,21 @@ public:
    explicit GitLabRestApi(const QString &userName, const QString &repoName, const QString &settingsKey,
                           const ServerAuthentication &auth, QObject *parent = nullptr);
 
+   QString getUserName() const override { return mUserId; }
+
    void testConnection() override;
-   void createIssue(const ServerIssue &issue) override;
-   void updateIssue(int issueNumber, const ServerIssue &issue) override;
-   void createPullRequest(const ServerPullRequest &pr) override;
+   void createIssue(const Issue &issue) override;
+   void updateIssue(int issueNumber, const Issue &issue) override;
+   void updatePullRequest(int, const PullRequest &) override { }
+   void createPullRequest(const PullRequest &pr) override;
    void requestLabels() override;
    void requestMilestones() override;
-   void requestPullRequestsState() override;
+   void requestIssues(int) override;
+   void requestPullRequests(int) override;
    void mergePullRequest(int, const QByteArray &) override { }
+   void requestComments(const Issue &) override { }
+   void requestReviews(const PullRequest &) override { }
+   void requestCommitsFromPR(const GitServer::PullRequest &) override { }
 
    QString getUserId() const { return mUserId; }
 
@@ -50,6 +60,8 @@ private:
    QString mSettingsKey;
    QString mUserId;
    QString mRepoId;
+   int mPreRequisites = -1;
+   bool mTestRequested = false;
 
    QNetworkRequest createRequest(const QString &page) const override;
 
@@ -60,5 +72,11 @@ private:
    void onLabelsReceived();
    void onMilestonesReceived();
    void onIssueCreated();
+   void onIssueReceived();
    void onMergeRequestCreated();
+
+   Issue issueFromJson(const QJsonObject &json) const;
+   PullRequest prFromJson(const QJsonObject &json) const;
 };
+
+}

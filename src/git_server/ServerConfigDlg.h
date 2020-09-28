@@ -25,14 +25,16 @@
 
 #include <QDialog>
 
+#include <ConfigData.h>
+
 namespace Ui
 {
 class ServerConfigDlg;
 }
 
-class GitBase;
 class QNetworkAccessManager;
 class QNetworkReply;
+class GitServerCache;
 
 /**
  * @brief The ServerConfigDlg class creates a small dialog where the user can add the user name and the user token of
@@ -47,13 +49,17 @@ class ServerConfigDlg : public QDialog
 {
    Q_OBJECT
 
+signals:
+   void configured();
+
 public:
    /**
     * @brief Constructor builds the UI layout and configures some widgets based on the configuration.
     *
     * @param parent The parent widget if needed
     */
-   explicit ServerConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServerCache, const GitServer::ConfigData &data,
+                            QWidget *parent = nullptr);
    /**
     * @brief Destructor that deallocates the Ui::ServerConfigDlg class.
     */
@@ -61,7 +67,8 @@ public:
 
 private:
    Ui::ServerConfigDlg *ui = nullptr;
-   QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitServerCache> mGitServerCache;
+   GitServer::ConfigData mData;
    QNetworkAccessManager *mManager;
 
    /**
@@ -92,4 +99,9 @@ private:
     * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
     */
    void onGitServerError(const QString &error);
+
+   /**
+    * @brief onDataValidated Stores the data in the settings and sends a success signal. Finally it closes the dialog.
+    */
+   void onDataValidated();
 };

@@ -2,7 +2,7 @@
 
 #include <QFrame>
 
-class RevisionsCache;
+class GitCache;
 class GitBase;
 class QPushButton;
 class QToolButton;
@@ -17,7 +17,7 @@ signals:
    void stashSelected(const QString &stashId);
 
 public:
-   explicit BranchesWidgetMinimal(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
+   explicit BranchesWidgetMinimal(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
                                   QWidget *parent = nullptr);
 
    void configureLocalMenu(const QString &sha, const QString &branch);
@@ -30,7 +30,7 @@ public:
 
 private:
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QPushButton *mBack = nullptr;
    QToolButton *mLocal = nullptr;
    QMenu *mLocalMenu = nullptr;

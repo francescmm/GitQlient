@@ -28,7 +28,7 @@
 #include <QPointer>
 
 class GitBase;
-class RevisionsCache;
+class GitCache;
 class GitRepoLoader;
 class QCloseEvent;
 class QFileSystemWatcher;
@@ -38,9 +38,20 @@ class HistoryWidget;
 class DiffWidget;
 class BlameWidget;
 class MergeWidget;
+class GitServerWidget;
 class QTimer;
 class WaitingDlg;
+class GitServerCache;
+
+namespace Jenkins
+{
+class JenkinsWidget;
+}
+
+namespace GitServer
+{
 class IRestApi;
+}
 
 enum class ControlsMainViews;
 
@@ -122,7 +133,8 @@ protected:
 
 private:
    QString mCurrentDir;
-   QSharedPointer<RevisionsCache> mGitQlientCache;
+   QSharedPointer<GitCache> mGitQlientCache;
+   QSharedPointer<GitServerCache> mGitServerCache;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitRepoLoader> mGitLoader;
    HistoryWidget *mHistoryWidget = nullptr;
@@ -132,13 +144,15 @@ private:
    DiffWidget *mDiffWidget = nullptr;
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
+   GitServerWidget *mGitServerWidget = nullptr;
+   Jenkins::JenkinsWidget *mJenkins = nullptr;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    QTimer *mAutoPrUpdater = nullptr;
    QPointer<WaitingDlg> mWaitDlg;
    QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
-   QSharedPointer<IRestApi> mApi;
+   QSharedPointer<GitServer::IRestApi> mApi;
 
    bool mIsInit = false;
    QThread *m_loaderThread;
@@ -247,6 +261,26 @@ private:
     \brief Shows the merge view.
    */
    void showMergeView();
+
+   bool configureGitServer() const;
+
+   /**
+    * @brief showGitServerView Shows the configured git server view.
+    */
+   void showGitServerView();
+
+   /**
+    * @brief showGitServerPrView Shows the configured git server view opening the details of the pull request identified
+    * by the given @p prNumber.
+    * @param prNumber The pull request number to show the details.
+    */
+   void showGitServerPrView(int prNumber);
+
+   /**
+    * @brief showBuildSystemView Shows the build system view.
+    */
+   void showBuildSystemView();
+
    /*!
     \brief Opens the previous view. This method is used when the diff view is closed and GitQlientRepo must return to
     the previous one.
@@ -263,4 +297,16 @@ private:
     * @brief updateTagsOnCache Updates the remote tags in the cache.
     */
    void updateTagsOnCache();
+
+   /**
+    * @brief focusHistoryOnBranch Opens the graph view and focuses on the SHA of the last commit of the given branch.
+    * @param branch The branch.
+    */
+   void focusHistoryOnBranch(const QString &branch);
+
+   /**
+    * @brief focusHistoryOnPr Opens the graph view and focuses on the SHA of the PR number.
+    * @param prNumber The PR to put the focus on.
+    */
+   void focusHistoryOnPr(int prNumber);
 };

@@ -1,5 +1,6 @@
 ﻿#include "RepositoryViewDelegate.h"
 
+#include <GitServerCache.h>
 #include <GitQlientStyles.h>
 #include <GitLocal.h>
 #include <Lane.h>
@@ -8,9 +9,9 @@
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryView.h>
 #include <CommitHistoryModel.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitBase.h>
-#include <ServerPullRequest.h>
+#include <PullRequest.h>
 
 #include <QSortFilterProxyModel>
 #include <QPainter>
@@ -22,12 +23,17 @@
 #include <QApplication>
 #include <QClipboard>
 
+using namespace GitServer;
+
 static const int MIN_VIEW_WIDTH_PX = 480;
 
-RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<RevisionsCache> &cache,
-                                               const QSharedPointer<GitBase> &git, CommitHistoryView *view)
+RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<GitCache> &cache,
+                                               const QSharedPointer<GitBase> &git,
+                                               const QSharedPointer<GitServerCache> &gitServerCache,
+                                               CommitHistoryView *view)
    : mCache(cache)
    , mGit(git)
+   , mGitServerCache(gitServerCache)
    , mView(view)
 {
 }
@@ -337,7 +343,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          QColor color = activeColor;
 
          if (mCache->pendingLocalChanges())
-            color = QColor("#D89000");
+            color = GitQlientStyles::getGitQlientOrange();
 
          paintGraphLane(p, LaneType::BRANCH, false, 0, LANE_WIDTH, color, activeColor, activeColor, true,
                         commit.parentsCount() != 0);
@@ -398,10 +404,13 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto offset = 0;
 
-   if (const auto pr = mCache->getPullRequestStatus(commit.sha()); pr.isValid())
+   if (mGitServerCache)
    {
-      offset = 5;
-      paintPrStatus(p, opt, offset, pr);
+      if (const auto pr = mGitServerCache->getPullRequest(commit.sha()); pr.isValid())
+      {
+         offset = 5;
+         paintPrStatus(p, opt, offset, pr);
+      }
    }
 
    if (commit.hasReferences() && !mView->hasActiveFilter())
@@ -490,20 +499,20 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 }
 
 void RepositoryViewDelegate::paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
-                                           const ServerPullRequest &pr) const
+                                           const PullRequest &pr) const
 {
    QColor c;
 
    switch (pr.state.eState)
    {
-      case ServerPullRequest::HeadState::State::Failure:
+      case PullRequest::HeadState::State::Failure:
          c = GitQlientStyles::getRed();
          break;
-      case ServerPullRequest::HeadState::State::Success:
+      case PullRequest::HeadState::State::Success:
          c = GitQlientStyles::getGreen();
          break;
       default:
-      case ServerPullRequest::HeadState::State::Pending:
+      case PullRequest::HeadState::State::Pending:
          c = GitQlientStyles::getOrange();
          break;
    }

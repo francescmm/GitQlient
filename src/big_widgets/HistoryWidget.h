@@ -25,7 +25,7 @@
 
 #include <QFrame>
 
-class RevisionsCache;
+class GitCache;
 class GitBase;
 class CommitHistoryModel;
 class CommitHistoryView;
@@ -41,7 +41,7 @@ class FullDiffWidget;
 class FileDiffWidget;
 class BranchesWidgetMinimal;
 class QPushButton;
-
+class GitServerCache;
 /*!
  \brief The HistoryWidget is the responsible fro showing the history of the repository. It is the first widget shown
  when a repository is open and manages all the signals from its subwidgets to the GitQlientRepo class. It also creates
@@ -147,6 +147,11 @@ signals:
     \brief Signal triggered  when the WIP needs to be updated.
    */
    void signalUpdateWip();
+   /**
+    * @brief showPrDetailedView Signal that makes the view change to the Pull Request detailed view
+    * @param pr The pull request number to show.
+    */
+   void showPrDetailedView(int pr);
 
 public:
    /*!
@@ -156,8 +161,8 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit HistoryWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> git,
-                          QWidget *parent = nullptr);
+   explicit HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
+                          const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
    /*!
     \brief Destructor.
 
@@ -229,7 +234,8 @@ private:
    };
 
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
+   QSharedPointer<GitServerCache> mGitServerCache;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;

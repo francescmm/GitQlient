@@ -5,7 +5,7 @@
 #include <CommitHistoryContextMenu.h>
 #include <ShaFilterProxyModel.h>
 #include <CommitInfo.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitConfig.h>
 #include <GitQlientSettings.h>
 #include <GitBase.h>
@@ -16,11 +16,12 @@
 #include <QLogger.h>
 using namespace QLogger;
 
-CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
-                                     QWidget *parent)
+CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                                     const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QTreeView(parent)
    , mCache(cache)
    , mGit(git)
+   , mGitServerCache(gitServerCache)
 {
    setEnabled(false);
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -32,9 +33,8 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<RevisionsCache> &cache
    header()->setSortIndicatorShown(false);
    header()->setContextMenuPolicy(Qt::CustomContextMenu);
    connect(header(), &QHeaderView::customContextMenuRequested, this, &CommitHistoryView::onHeaderContextMenu);
-   connect(header(), &QHeaderView::sectionResized, this, &CommitHistoryView::saveHeaderState);
 
-   connect(mCache.get(), &RevisionsCache::signalCacheUpdated, this, &CommitHistoryView::refreshView);
+   connect(mCache.get(), &GitCache::signalCacheUpdated, this, &CommitHistoryView::refreshView);
 
    connect(this, &CommitHistoryView::doubleClicked, this, [this](const QModelIndex &index) {
       if (mCommitHistoryModel)
@@ -212,9 +212,8 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
 
       if (!shas.isEmpty())
       {
-         const auto menu = new CommitHistoryContextMenu(mCache, mGit, shas, this);
-         connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, mCache.get(),
-                 &RevisionsCache::refreshPRsCache);
+         const auto menu = new CommitHistoryContextMenu(mCache, mGit, mGitServerCache, shas, this);
+         // connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, mCache.get(), &GitCache::refreshPRsCache);
          connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,
@@ -224,17 +223,12 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
          connect(menu, &CommitHistoryContextMenu::signalCherryPickConflict, this,
                  &CommitHistoryView::signalCherryPickConflict);
          connect(menu, &CommitHistoryContextMenu::signalPullConflict, this, &CommitHistoryView::signalPullConflict);
+         connect(menu, &CommitHistoryContextMenu::showPrDetailedView, this, &CommitHistoryView::showPrDetailedView);
          menu->exec(viewport()->mapToGlobal(pos));
       }
       else
          QLog_Warning("UI", "SHAs selected belong to different branches. They need to share at least one branch.");
    }
-}
-
-void CommitHistoryView::saveHeaderState()
-{
-   QSettings s;
-   s.setValue(QString("%1").arg(objectName()), header()->saveState());
 }
 
 QList<QString> CommitHistoryView::getSelectedShaList() const

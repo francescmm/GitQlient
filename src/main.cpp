@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
    auto argNum = argc;
 
    while (argNum--)
-      arguments.prepend(argv[argNum]);
+      arguments.prepend(QString::fromUtf8(argv[argNum]));
 
    QApplication::setOrganizationName("CescSoftware");
    QApplication::setOrganizationDomain("francescmm.com");

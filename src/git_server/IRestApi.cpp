@@ -9,6 +9,7 @@
 #include <QLogger.h>
 
 using namespace QLogger;
+using namespace GitServer;
 
 IRestApi::IRestApi(const ServerAuthentication &auth, QObject *parent)
    : QObject(parent)
@@ -21,7 +22,6 @@ QJsonDocument IRestApi::validateData(QNetworkReply *reply, QString &errorString)
 {
    const auto data = reply->readAll();
    const auto jsonDoc = QJsonDocument::fromJson(data);
-   const auto url = reply->url().path();
 
    if (reply->error() != QNetworkReply::NoError)
    {
@@ -48,7 +48,7 @@ QJsonDocument IRestApi::validateData(QNetworkReply *reply, QString &errorString)
       {
          const auto errors = jsonObject[QStringLiteral("errors")].toArray();
 
-         for (auto error : errors)
+         for (const auto &error : errors)
             details = error[QStringLiteral("message")].toString();
 
          errorString = message + ". " + details;

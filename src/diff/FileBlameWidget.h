@@ -30,7 +30,7 @@ class GitBase;
 class QScrollArea;
 class ClickableFrame;
 class QLabel;
-class RevisionsCache;
+class GitCache;
 
 /*!
  \brief The FileBalmeWidget class is the widget that creates the view for the blame of a file. It is formed by two
@@ -59,7 +59,7 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit FileBlameWidget(const QSharedPointer<RevisionsCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit FileBlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                             QWidget *parent = nullptr);
 
    /*!
@@ -93,7 +93,7 @@ public:
    QString getCurrentFile() const { return mCurrentFile; }
 
 private:
-   QSharedPointer<RevisionsCache> mCache;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QFrame *mAnotation = nullptr;
    QLabel *mCurrentSha = nullptr;

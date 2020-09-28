@@ -23,9 +23,9 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <ServerMilestone.h>
-#include <ServerLabel.h>
-#include <ServerPullRequest.h>
+#include <Milestone.h>
+#include <Label.h>
+#include <PullRequest.h>
 
 #include <QObject>
 #include <QMap>
@@ -33,7 +33,11 @@
 
 class QNetworkAccessManager;
 class QNetworkReply;
-struct ServerIssue;
+
+namespace GitServer
+{
+
+struct Issue;
 
 struct ServerAuthentication
 {
@@ -55,44 +59,62 @@ signals:
     * @brief labelsReceived Signal triggered after the labels are received and processed.
     * @param labels The processed lables.
     */
-   void labelsReceived(const QVector<ServerLabel> &labels);
+   void labelsReceived(const QVector<GitServer::Label> &labels);
    /**
     * @brief milestonesReceived Signal triggered after the milestones are received and processed.
     * @param milestones The processed milestones.
     */
-   void milestonesReceived(const QVector<ServerMilestone> &milestones);
+   void milestonesReceived(const QVector<GitServer::Milestone> &milestones);
+
    /**
-    * @brief issueCreated Signal triggered when an issue has been created.
-    * @param url The url of the issue.
+    * @brief issuesReceived Signal triggered when the issues has been received.
+    * @param issues The list of issues.
     */
-   void issueCreated(QString url);
+   void issuesReceived(const QVector<GitServer::Issue> &issues);
+
    /**
-    * @brief issueUpdated Signal triggered when an issue has been updated.
+    * @brief pullRequestsReceived Signal triggered when the pull requests has been received.
+    * @param prs The list of prs.
     */
-   void issueUpdated();
-   /**
-    * @brief pullRequestCreated Signal triggered when a pull request has been created.
-    * @param url The url of the pull request.
-    */
-   void pullRequestCreated(QString url);
-   /**
-    * @brief pullRequestsReceived Signal triggered when the pull requests are received and processed.
-    * @param prs The list of pull requests ordered by SHA.
-    */
-   void pullRequestsReceived(QMap<QString, ServerPullRequest> prs);
+   void pullRequestsReceived(const QVector<GitServer::PullRequest> &prs);
+
    /**
     * @brief pullRequestMerged Signal triggered when the pull request has been merged.
     */
    void pullRequestMerged();
+
    /**
     * @brief errorOccurred Signal triggered when an error happened.
     * @param errorStr The error in string format.
     */
    void errorOccurred(const QString &errorStr);
 
+   /**
+    * @brief paginationPresent Signal triggered when the issues or pull requests are so many that they are sent
+    * paginated.
+    * @param current The current page.
+    * @param next The next page.
+    * @param total The total of pages.
+    */
+   void paginationPresent(int current, int next, int total);
+
+   /**
+    * @brief issueCreated Signal triggered when an issue has been created.
+    * @param url The url of the issue.
+    */
+   void issueUpdated(const GitServer::Issue &issue);
+
+   /**
+    * @brief pullRequestUpdated Signal triggered when a pull request has been updated.
+    * @param pr The updated pull request.
+    */
+   void pullRequestUpdated(const GitServer::PullRequest &pr);
+
 public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
    virtual ~IRestApi() = default;
+
+   virtual QString getUserName() const { return mAuth.userName; }
 
    static QJsonDocument validateData(QNetworkReply *reply, QString &errorString);
 
@@ -104,18 +126,25 @@ public:
     * @brief createIssue Creates a new issue in the remote Git server.
     * @param issue The informatio of the issue.
     */
-   virtual void createIssue(const ServerIssue &issue) = 0;
+   virtual void createIssue(const Issue &issue) = 0;
    /**
     * @brief updateIssue Updates an existing issue or pull request, if it doesn't exist it reports an error.
     * @param issueNumber The issue number to update.
     * @param issue The updated information of the issue.
     */
-   virtual void updateIssue(int issueNumber, const ServerIssue &issue) = 0;
+   virtual void updateIssue(int issueNumber, const Issue &issue) = 0;
+
+   /**
+    * @brief updatePullRequest Updates a pull request.
+    * @param number The number of the PR
+    * @param pr The pr to extract the data
+    */
+   virtual void updatePullRequest(int number, const PullRequest &pr) = 0;
    /**
     * @brief createPullRequest Creates a pull request in the remote Git server.
     * @param pullRequest The information of the pull request.
     */
-   virtual void createPullRequest(const ServerPullRequest &pullRequest) = 0;
+   virtual void createPullRequest(const PullRequest &pullRequest) = 0;
    /**
     * @brief requestLabels Requests the labels to the remote Git server.
     */
@@ -125,15 +154,39 @@ public:
     */
    virtual void requestMilestones() = 0;
    /**
-    * @brief requestPullRequestsState Requests the pull request state to the remote Git server.
+    * @brief requestIssues Requests the issues to the remote Git server.
     */
-   virtual void requestPullRequestsState() = 0;
+   virtual void requestIssues(int page = -1) = 0;
+
+   /**
+    * @brief requestPullRequests Requests the pull request to the remote Git server.
+    */
+   virtual void requestPullRequests(int page = -1) = 0;
    /**
     * @brief mergePullRequest Merges a pull request into the destination branch.
     * @param number The number of the pull request.
     * @param data Byte array in JSON format with the necessary data to merge the pull request.
     */
    virtual void mergePullRequest(int number, const QByteArray &data) = 0;
+
+   /**
+    * @brief requestComments Requests all the comments of an issue. This doesn't get the reviews and coments on reviews
+    * for a pull request.
+    * @param issue The issue number to query.
+    */
+   virtual void requestComments(const Issue &issue) = 0;
+
+   /**
+    * @brief requestReviews Requests all the reviews in a Pull Requests.
+    * @param pr The Pull Request to query.
+    */
+   virtual void requestReviews(const PullRequest &pr) = 0;
+
+   /**
+    * @brief requestCommitsFromPR Requests all the commits from a PR.
+    * @param prNumber The Pr number.
+    */
+   virtual void requestCommitsFromPR(const GitServer::PullRequest &pr) = 0;
 
 protected:
    QNetworkAccessManager *mManager = nullptr;
@@ -146,3 +199,5 @@ protected:
     */
    virtual QNetworkRequest createRequest(const QString &page) const = 0;
 };
+
+}

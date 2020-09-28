@@ -4,12 +4,15 @@
 #include <GitHistory.h>
 #include <FileDiffView.h>
 #include <CommitInfo.h>
-#include <RevisionsCache.h>
+#include <GitCache.h>
 #include <GitQlientSettings.h>
 #include <CheckBox.h>
 #include <FileEditor.h>
 #include <GitLocal.h>
+#include <DiffHelper.h>
+#include <LineNumberArea.h>
 
+#include <QLineEdit>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QLabel>
@@ -18,8 +21,7 @@
 #include <QStackedWidget>
 #include <QMessageBox>
 
-FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<RevisionsCache> cache,
-                               QWidget *parent)
+FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *parent)
    : IDiffWidget(git, cache, parent)
    , mBack(new QPushButton())
    , mGoPrevious(new QPushButton())
@@ -30,17 +32,23 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mSave(new QPushButton())
    , mStage(new QPushButton())
    , mRevert(new QPushButton())
+   , mFileNameLabel(new QLabel())
+   , mTitleFrame(new QFrame())
    , mNewFile(new FileDiffView())
+   , mSearchOld(new QLineEdit())
    , mOldFile(new FileDiffView())
    , mFileEditor(new FileEditor())
    , mViewStackedWidget(new QStackedWidget())
 {
+   mNewFile->addNumberArea(new LineNumberArea(mNewFile));
+   mOldFile->addNumberArea(new LineNumberArea(mOldFile));
+
    mNewFile->setObjectName("newFile");
    mOldFile->setObjectName("oldFile");
 
    const auto optionsLayout = new QHBoxLayout();
-   optionsLayout->setContentsMargins(10, 10, 0, 0);
-   optionsLayout->setSpacing(10);
+   optionsLayout->setContentsMargins(5, 5, 0, 0);
+   optionsLayout->setSpacing(5);
    optionsLayout->addWidget(mBack);
    optionsLayout->addWidget(mGoPrevious);
    optionsLayout->addWidget(mGoNext);
@@ -52,10 +60,33 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    optionsLayout->addWidget(mRevert);
    optionsLayout->addStretch();
 
+   const auto searchNew = new QLineEdit();
+   searchNew->setObjectName("SearchInput");
+   searchNew->setPlaceholderText(tr("Press Enter to search a text... "));
+   connect(searchNew, &QLineEdit::editingFinished, this,
+           [this, searchNew]() { DiffHelper::findString(searchNew->text(), mNewFile, this); });
+
+   const auto newFileLayout = new QVBoxLayout();
+   newFileLayout->setContentsMargins(QMargins());
+   newFileLayout->setSpacing(5);
+   newFileLayout->addWidget(searchNew);
+   newFileLayout->addWidget(mNewFile);
+
+   mSearchOld->setPlaceholderText(tr("Press Enter to search a text... "));
+   mSearchOld->setObjectName("SearchInput");
+   connect(mSearchOld, &QLineEdit::editingFinished, this,
+           [this]() { DiffHelper::findString(mSearchOld->text(), mNewFile, this); });
+
+   const auto oldFileLayout = new QVBoxLayout();
+   oldFileLayout->setContentsMargins(QMargins());
+   oldFileLayout->setSpacing(5);
+   oldFileLayout->addWidget(mSearchOld);
+   oldFileLayout->addWidget(mOldFile);
+
    const auto diffLayout = new QHBoxLayout();
-   diffLayout->setContentsMargins(QMargins());
-   diffLayout->addWidget(mNewFile);
-   diffLayout->addWidget(mOldFile);
+   diffLayout->setContentsMargins(10, 0, 10, 0);
+   diffLayout->addLayout(newFileLayout);
+   diffLayout->addLayout(oldFileLayout);
 
    const auto diffFrame = new QFrame();
    diffFrame->setLayout(diffLayout);
@@ -63,9 +94,20 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mViewStackedWidget->addWidget(diffFrame);
    mViewStackedWidget->addWidget(mFileEditor);
 
+   mTitleFrame->setObjectName("fileTitleFrame");
+   mTitleFrame->setVisible(false);
+
+   const auto titleLayout = new QHBoxLayout(mTitleFrame);
+   titleLayout->setContentsMargins(0, 10, 0, 10);
+   titleLayout->setSpacing(0);
+   titleLayout->addStretch();
+   titleLayout->addWidget(mFileNameLabel);
+   titleLayout->addStretch();
+
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
-   vLayout->setSpacing(10);
+   vLayout->setSpacing(5);
+   vLayout->addWidget(mTitleFrame);
    vLayout->addLayout(optionsLayout);
    vLayout->addWidget(mViewStackedWidget);
 
@@ -104,6 +146,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mSave->setDisabled(true);
    mSave->setToolTip(tr("Save"));
    connect(mSave, &QPushButton::clicked, mFileEditor, &FileEditor::saveFile);
+   connect(mSave, &QPushButton::clicked, mEdition, &QPushButton::toggle);
 
    mStage->setIcon(QIcon(":/icons/staged"));
    mStage->setToolTip(tr("Stage file"));
@@ -116,7 +159,10 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mViewStackedWidget->setCurrentIndex(0);
 
    if (!mFileVsFile)
+   {
       mOldFile->setHidden(true);
+      mSearchOld->setHidden(true);
+   }
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
@@ -140,12 +186,16 @@ bool FileDiffWidget::reload()
 bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file,
                                bool editMode)
 {
+
+   mFileNameLabel->setText(file);
+
    const auto isWip = currentSha == CommitInfo::ZERO_SHA;
    mBack->setVisible(isWip);
    mEdition->setVisible(isWip);
    mSave->setVisible(isWip);
    mStage->setVisible(isWip);
    mRevert->setVisible(isWip);
+   mTitleFrame->setVisible(isWip);
 
    mCurrentFile = file;
    mCurrentSha = currentSha;
@@ -170,7 +220,7 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
       QPair<QStringList, QVector<DiffInfo::ChunkInfo>> oldData;
       QPair<QStringList, QVector<DiffInfo::ChunkInfo>> newData;
 
-      processDiff(text, newData, oldData);
+      mChunks = DiffHelper::processDiff(text, mFileVsFile, newData, oldData);
 
       mOldFile->blockSignals(true);
       mOldFile->loadDiff(oldData.first.join('\n'), oldData.second);
@@ -208,6 +258,7 @@ void FileDiffWidget::setSplitViewEnabled(bool enable)
    mFileVsFile = enable;
 
    mOldFile->setVisible(mFileVsFile);
+   mSearchOld->setVisible(mFileVsFile);
 
    GitQlientSettings settings;
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
@@ -236,6 +287,7 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
    mFileVsFile = !enable;
 
    mOldFile->setVisible(mFileVsFile);
+   mSearchOld->setVisible(mFileVsFile);
 
    GitQlientSettings settings;
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
@@ -262,86 +314,6 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
 void FileDiffWidget::hideBackButton() const
 {
    mBack->setVisible(true);
-}
-
-void FileDiffWidget::processDiff(const QString &text, QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
-                                 QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData)
-{
-   DiffInfo diff;
-   // int newFileVariation = 0;
-   int oldFileRow = 1;
-   int newFileRow = 1;
-   mChunks.clear();
-
-   for (auto line : text.split("\n"))
-   {
-      if (mFileVsFile)
-      {
-         if (line.startsWith('-'))
-         {
-            line.remove(0, 1);
-
-            if (diff.oldFile.startLine == -1)
-               diff.oldFile.startLine = oldFileRow;
-
-            oldFileData.first.append(line);
-
-            ++oldFileRow;
-         }
-         else if (line.startsWith('+'))
-         {
-            line.remove(0, 1);
-
-            if (diff.newFile.startLine == -1)
-            {
-               diff.newFile.startLine = newFileRow;
-               diff.newFile.addition = true;
-            }
-
-            newFileData.first.append(line);
-
-            ++newFileRow;
-         }
-         else
-         {
-            line.remove(0, 1);
-
-            if (diff.oldFile.startLine != -1)
-               diff.oldFile.endLine = oldFileRow - 1;
-
-            if (diff.newFile.startLine != -1)
-               diff.newFile.endLine = newFileRow - 1;
-
-            if (diff.isValid())
-            {
-               if (diff.newFile.isValid())
-               {
-                  newFileData.second.append(diff.newFile);
-                  mChunks.append(diff.newFile);
-               }
-
-               if (diff.oldFile.isValid())
-               {
-                  oldFileData.second.append(diff.oldFile);
-                  mChunks.append(diff.oldFile);
-               }
-            }
-
-            oldFileData.first.append(line);
-            newFileData.first.append(line);
-
-            diff = DiffInfo();
-
-            ++oldFileRow;
-            ++newFileRow;
-         }
-      }
-      else
-      {
-         oldFileData.first.append(line);
-         newFileData.first.append(line);
-      }
-   }
 }
 
 void FileDiffWidget::moveChunkUp()
@@ -376,14 +348,6 @@ void FileDiffWidget::moveChunkDown()
       mNewFile->moveScrollBarToPos(mCurrentChunkLine - 1);
       mOldFile->moveScrollBarToPos(mCurrentChunkLine - 1);
    }
-}
-
-void FileDiffWidget::moveBottomChunk()
-{
-   mCurrentChunkLine = mNewFile->blockCount();
-
-   mNewFile->moveScrollBarToPos(mNewFile->blockCount());
-   mOldFile->moveScrollBarToPos(mOldFile->blockCount());
 }
 
 void FileDiffWidget::enterEditionMode(bool enter)
