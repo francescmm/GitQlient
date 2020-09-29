@@ -10,10 +10,15 @@ QT += widgets core network svg
 DEFINES += QT_DEPRECATED_WARNINGS
 QMAKE_LFLAGS += -no-pie
 
-#Default rules for deployment.
-qnx: target.path = $$(HOME)/$${TARGET}/bin
-else: unix:!android: target.path = /$$(HOME)/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+unix {
+   isEmpty(PREFIX) {
+      PREFIX = /usr/local
+   }
+
+   target.path = $$PREFIX/bin
+}
+
+INSTALLS += target
 
 #project files
 SOURCES += src/main.cpp
