@@ -9,8 +9,8 @@ g++ --version
 qmake --version
 $QTDIR/bin/qmake ../GitQlient.pro
 make -j 4
-mkdir -p ../AppImage/GitQlient/usr/bin
-cp gitqlient ../AppImage/GitQlient/usr/bin
+mkdir -p ../AppImage/gitqlient/usr/bin
+cp gitqlient ../AppImage/gitqlient/usr/bin
 cd ../AppImage
 wget -q -O linuxdeployqt https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
 chmod +x linuxdeployqt

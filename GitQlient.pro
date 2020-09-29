@@ -47,7 +47,7 @@ DEFINES += \
 
 macos{
    BUNDLE_FILENAME = $${TARGET}.app
-   DMG_FILENAME = "GitQlient-$$(VERSION).dmg"
+   DMG_FILENAME = "gitqlient-$$(VERSION).dmg"
 #Target for pretty DMG generation
    dmg.commands += echo "Generate DMG";
    dmg.commands += macdeployqt $$BUNDLE_FILENAME &&
