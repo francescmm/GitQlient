@@ -12,7 +12,7 @@ QMAKE_LFLAGS += -no-pie
 
 isEmpty(PREFIX):PREFIX = /usr/local
 
-target.path = $$PREFIX/bin/
+target.path = $$PREFIX/bin
 INSTALLS += target
 
 #project files
