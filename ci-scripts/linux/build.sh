@@ -14,6 +14,6 @@ cp gitqlient ../AppImage/gitqlient/usr/bin
 cd ../AppImage
 wget -q -O linuxdeployqt https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
 chmod +x linuxdeployqt
-./linuxdeployqt GitQlient/usr/share/applications/*.desktop -appimage -no-translations -bundle-non-qt-libs -verbose=2 -extra-plugins=iconengines,imageformats
+./linuxdeployqt gitqlient/usr/share/applications/*.desktop -appimage -no-translations -bundle-non-qt-libs -verbose=2 -extra-plugins=iconengines,imageformats
 chmod +x gitqlient-*
 cp gitqlient-* ../
