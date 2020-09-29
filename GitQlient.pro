@@ -5,7 +5,7 @@ greaterThan(QT_MINOR_VERSION, 12) {
 !msvc:QMAKE_CXXFLAGS += -Werror
 }
 
-TARGET = GitQlient
+TARGET = gitqlient
 QT += widgets core network svg
 DEFINES += QT_DEPRECATED_WARNINGS
 QMAKE_LFLAGS += -no-pie

@@ -2,6 +2,6 @@
 Type=Application
 Name=GitQlient
 Comment=A multi-platform Git client made with Qt
-Exec=GitQlient
-Icon=GitQlient
+Exec=gitqlient
+Icon=gitqlient
 Categories=Office;
