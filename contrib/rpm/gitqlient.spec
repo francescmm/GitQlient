@@ -31,7 +31,7 @@ qmake-qt5 -makefile \
    QMAKE_CFLAGS+="%optflags" \
    QMAKE_CXXFLAGS+="%optflags" \
    QMAKE_STRIP="/bin/true" \
-   PREFIX=%{_prefix}
+   PREFIX=%{_prefix} \
    GitQlient.pro
 %else
 %qmake_qt5 PREFIX=%{_prefix} GitQlient.pro
