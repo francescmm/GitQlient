@@ -37,7 +37,7 @@ class GitBase;
 namespace GitServer
 {
 class IRestApi;
-class PullRequest;
+struct PullRequest;
 }
 
 /**
