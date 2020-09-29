@@ -10,9 +10,14 @@ QT += widgets core network svg
 DEFINES += QT_DEPRECATED_WARNINGS
 QMAKE_LFLAGS += -no-pie
 
-isEmpty(PREFIX):PREFIX = /usr/local
+unix {
+   isEmpty(PREFIX) {
+      PREFIX = /usr/local
+   }
 
-target.path = $$PREFIX/bin
+   target.path = $$PREFIX/bin
+}
+
 INSTALLS += target
 
 #project files
