@@ -45,13 +45,13 @@ make install INSTALL_ROOT=%{buildroot}
 desktop-file-validate %{buildroot}%{_datadir}/applications/gitqlient.desktop
 
 install -dD %{buildroot}%{_datadir}/icons
-cp -a AppImage/GitQlient/usr/share/icons/* %{buildroot}%{_datadir}/icons/
+cp -a AppImage/gitqlient/usr/share/icons/* %{buildroot}%{_datadir}/icons/
 
 %files
 %doc README.md
 %license LICENSE
-%{_bindir}/GitQlient
-%{_datadir}/applications/GitQlient.desktop
+%{_bindir}/gitqlient
+%{_datadir}/applications/gitqlient.desktop
 %{_datadir}/icons
 
 %changelog
