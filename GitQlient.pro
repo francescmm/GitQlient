@@ -16,6 +16,11 @@ unix {
    }
 
    target.path = $$PREFIX/bin
+
+   application.path = $$PREFIX/share/applications
+   application.files = AppImage/gitqlient/usr/share/applications/gitqlient.desktop
+
+   INSTALLS += application
 }
 
 INSTALLS += target
