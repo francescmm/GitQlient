@@ -42,9 +42,7 @@ qmake-qt5 -makefile \
 %install
 make install INSTALL_ROOT=%{buildroot}
 
-desktop-file-install                                    \
---dir=%{buildroot}%{_datadir}/applications              \
-AppImage/GitQlient/usr/share/applications/GitQlient.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/gitqlient.desktop
 
 install -dD %{buildroot}%{_datadir}/icons
 cp -a AppImage/GitQlient/usr/share/icons/* %{buildroot}%{_datadir}/icons/
