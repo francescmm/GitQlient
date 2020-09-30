@@ -116,7 +116,8 @@ QPushButton:hover
 {
     padding: 8px 10px;
     font-weight: bold;
-    font-family: Ubuntu Mono;
+    font-family: "DejaVu Sans Mono";
+    font-size: 8pt;
 }
 
 CommitDiffWidget
@@ -264,7 +265,7 @@ QLabel#lCounter
     border-width: 1px;
     border-style: solid;
     border-left-width: 0;
-    font-family: Ubuntu Mono;
+    font-family: "DejaVu Sans Mono";
     max-width: 29px;
     min-width: 29px;
     qproperty-alignment: AlignCenter;
@@ -278,7 +279,8 @@ CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedF
 
 FileDiffView
 {
-    font-family: "Ubuntu Mono";
+    font-family: "DejaVu Sans Mono";
+    font-size: 8pt;
 }
 
 #leCommitTitle
@@ -535,6 +537,7 @@ QLabel#normalLabel
     padding-left: 5px;
     max-height: 22px;
     min-height: 22px;
+    font-size: 9pt;
 }
 
 QLabel#numberLabel
@@ -545,6 +548,7 @@ QLabel#numberLabel
     border-right-style: solid;
     max-height: 22px;
     min-height: 22px;
+    font-size: 9pt;
 }
 
 QLabel#authorFirstOfItsName, QLabel#authorPrimusInterPares

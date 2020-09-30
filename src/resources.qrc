@@ -105,8 +105,8 @@
         <file alias="stylesheet">resources/stylesheet.css</file>
         <file alias="colors_bright">resources/stylesheet_colors_bright.css</file>
         <file alias="colors_dark">resources/stylesheet_colors_dark.css</file>
-        <file alias="Ubuntu">resources/Ubuntu.ttf</file>
-        <file alias="UbuntuMono">resources/UbuntuMono.ttf</file>
         <file>resources.rc</file>
+        <file alias="DejaVuSans">resources/DejaVuSans.ttf</file>
+        <file alias="DejaVuSansMono">resources/DejaVuSansMono.ttf</file>
     </qresource>
 </RCC>

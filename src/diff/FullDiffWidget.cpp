@@ -73,7 +73,7 @@ FullDiffWidget::FullDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    diffHighlighter = new DiffHighlighter(mDiffWidget->document());
 
    QFont font;
-   font.setFamily(QString::fromUtf8("Ubuntu Mono"));
+   font.setFamily(QString::fromUtf8("DejaVu Sans Mono"));
    mDiffWidget->setFont(font);
    mDiffWidget->setObjectName("textEditDiff");
    mDiffWidget->setUndoRedoEnabled(false);

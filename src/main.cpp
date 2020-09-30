@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
    QApplication::setApplicationName("GitQlient");
    QApplication::setWindowIcon(QIcon(":/icons/GitQlientLogoIco"));
 
-   QFontDatabase::addApplicationFont(":/Ubuntu");
-   QFontDatabase::addApplicationFont(":/UbuntuMono");
+   QFontDatabase::addApplicationFont(":/DejaVuSans");
+   QFontDatabase::addApplicationFont(":/DejaVuSansMono");
 
    GitQlientSettings settings;
    settings.setGlobalValue("isGitQlient", true);

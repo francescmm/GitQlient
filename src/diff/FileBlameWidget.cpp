@@ -1,4 +1,4 @@
-﻿#include "FileBlameWidget.h"
+#include "FileBlameWidget.h"
 
 #include <GitCache.h>
 #include <FileDiffView.h>
@@ -46,8 +46,8 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<GitCache> &cache, const QS
    mInfoFont.setPointSize(9);
 
    mCodeFont = QFont(mInfoFont);
-   mCodeFont.setFamily("Ubuntu Mono");
-   mCodeFont.setPointSize(10);
+   mCodeFont.setFamily("DejaVu Sans Mono");
+   mCodeFont.setPointSize(8);
 
    mScrollArea = new QScrollArea();
    mScrollArea->setWidget(mAnotation);

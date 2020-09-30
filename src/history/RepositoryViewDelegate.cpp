@@ -88,8 +88,8 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
       if (index.column() == static_cast<int>(CommitHistoryColumns::Sha))
       {
-         newOpt.font.setPointSize(10);
-         newOpt.font.setFamily("Ubuntu Mono");
+         newOpt.font.setPointSize(8);
+         newOpt.font.setFamily("DejaVu Sans Mono");
          text = text.left(8);
       }
 
