@@ -42,19 +42,14 @@ qmake-qt5 -makefile \
 %install
 make install INSTALL_ROOT=%{buildroot}
 
-desktop-file-install                                    \
---dir=%{buildroot}%{_datadir}/applications              \
-AppImage/GitQlient/usr/share/applications/GitQlient.desktop
-
-install -dD %{buildroot}%{_datadir}/icons
-cp -a AppImage/GitQlient/usr/share/icons/* %{buildroot}%{_datadir}/icons/
+desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 
 %files
 %doc README.md
 %license LICENSE
-%{_bindir}/GitQlient
-%{_datadir}/applications/GitQlient.desktop
-%{_datadir}/icons
+%{_bindir}/gitqlient
+%{_datadir}/applications/%{name}.desktop
+%{_datadir}/icons/hicolor/*/apps/%{name}.*
 
 %changelog
 {{{ git_changelog }}}
