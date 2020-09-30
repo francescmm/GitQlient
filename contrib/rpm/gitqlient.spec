@@ -42,7 +42,7 @@ qmake-qt5 -makefile \
 %install
 make install INSTALL_ROOT=%{buildroot}
 
-desktop-file-validate %{buildroot}%{_datadir}/applications/gitqlient.desktop
+desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 
 %files
 %doc README.md
