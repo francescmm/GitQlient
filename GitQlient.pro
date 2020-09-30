@@ -18,29 +18,29 @@ unix {
    target.path = $$PREFIX/bin
 
    application.path = $$PREFIX/share/applications
-   application.files = AppImage/gitqlient/usr/share/applications/gitqlient.desktop
+   application.files = $$PWD/src/resources/gitqlient.desktop
    INSTALLS += application
 
    iconsvg.path = $$PREFIX/share/icons/hicolor/scalable/apps
-   iconsvg.extra = \$(QINSTALL) src/resources/icons/GitQlientLogo.svg \$(INSTALL_ROOT)$${iconsvg.path}/$${TARGET}.svg
+   iconsvg.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo.svg \$(INSTALL_ROOT)$${iconsvg.path}/$${TARGET}.svg
    icon16.path = $$PREFIX/share/icons/hicolor/16x16/apps
-   icon16.extra = \$(QINSTALL) src/resources/icons/GitQlientLogo16.png \$(INSTALL_ROOT)$${icon16.path}/$${TARGET}.png
+   icon16.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo16.png \$(INSTALL_ROOT)$${icon16.path}/$${TARGET}.png
    icon24.path = $$PREFIX/share/icons/hicolor/24x24/apps
-   icon24.extra = \$(QINSTALL) src/resources/icons/GitQlientLogo24.png \$(INSTALL_ROOT)$${icon24.path}/$${TARGET}.png
+   icon24.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo24.png \$(INSTALL_ROOT)$${icon24.path}/$${TARGET}.png
    icon32.path = $$PREFIX/share/icons/hicolor/32x32/apps
-   icon32.extra = \$(QINSTALL) src/resources/icons/GitQlientLogo32.png \$(INSTALL_ROOT)$${icon32.path}/$${TARGET}.png
+   icon32.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo32.png \$(INSTALL_ROOT)$${icon32.path}/$${TARGET}.png
    icon48.path = $$PREFIX/share/icons/hicolor/48x48/apps
-   icon48.extra = \$(QINSTALL) src/resources/icons/GitQlientLogo48.png \$(INSTALL_ROOT)$${icon48.path}/$${TARGET}.png
+   icon48.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo48.png \$(INSTALL_ROOT)$${icon48.path}/$${TARGET}.png
    icon64.path = $$PREFIX/share/icons/hicolor/64x64/apps
-   icon64.extra = \$(QINSTALL) src/resources/icons/GitQlientLogo64.png \$(INSTALL_ROOT)$${icon64.path}/$${TARGET}.png
+   icon64.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo64.png \$(INSTALL_ROOT)$${icon64.path}/$${TARGET}.png
    icon96.path = $$PREFIX/share/icons/hicolor/96x96/apps
-   icon96.extra = \$(QINSTALL) src/resources/icons/GitQlientLogo96.png \$(INSTALL_ROOT)$${icon96.path}/$${TARGET}.png
+   icon96.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo96.png \$(INSTALL_ROOT)$${icon96.path}/$${TARGET}.png
    icon128.path = $$PREFIX/share/icons/hicolor/128x128/apps
-   icon128.extra = \$(QINSTALL) src/resources/icons/GitQlientLogo128.png \$(INSTALL_ROOT)$${icon128.path}/$${TARGET}.png
+   icon128.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo128.png \$(INSTALL_ROOT)$${icon128.path}/$${TARGET}.png
    icon256.path = $$PREFIX/share/icons/hicolor/256x256/apps
-   icon256.extra = \$(QINSTALL) src/resources/icons/GitQlientLogo256.png \$(INSTALL_ROOT)$${icon256.path}/$${TARGET}.png
+   icon256.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo256.png \$(INSTALL_ROOT)$${icon256.path}/$${TARGET}.png
    icon512.path = $$PREFIX/share/icons/hicolor/512x512/apps
-   icon512.extra = \$(QINSTALL) src/resources/icons/GitQlientLogo512.png \$(INSTALL_ROOT)$${icon512.path}/$${TARGET}.png
+   icon512.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo512.png \$(INSTALL_ROOT)$${icon512.path}/$${TARGET}.png
    INSTALLS += iconsvg icon16 icon24 icon32 icon48 icon64 icon96 icon128 icon256 icon512
 }
 
