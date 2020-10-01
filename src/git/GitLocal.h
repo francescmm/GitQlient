@@ -46,12 +46,14 @@ public:
    };
 
    explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
+   GitExecResult stageFile(const QString &fileName) const;
    GitExecResult cherryPickCommit(const QString &sha) const;
    GitExecResult cherryPickAbort() const;
    GitExecResult cherryPickContinue() const;
    GitExecResult checkoutCommit(const QString &sha) const;
    GitExecResult markFileAsResolved(const QString &fileName);
    bool checkoutFile(const QString &fileName) const;
+
    GitExecResult resetFile(const QString &fileName) const;
    bool resetCommit(const QString &sha, CommitResetType type);
    GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg) const;

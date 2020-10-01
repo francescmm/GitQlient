@@ -31,7 +31,7 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<GitCache> &cache, const 
    verticalLayout->addWidget(fileListWidget);
 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
-           [this](QListWidgetItem *item) { emit signalOpenFileCommit(mCurrentSha, mParentSha, item->text()); });
+           [this](QListWidgetItem *item) { emit signalOpenFileCommit(mCurrentSha, mParentSha, item->text(), false); });
    connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitInfoWidget::signalShowFileHistory);
    connect(fileListWidget, &FileListWidget::signalEditFile, this, &CommitInfoWidget::signalEditFile);
 }

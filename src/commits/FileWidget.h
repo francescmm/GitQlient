@@ -42,10 +42,12 @@ public:
    QString text() const;
    void setText(const QString &text);
    QSize sizeHint() const override;
-   void setTextColor(const QColor &color) const;
+   void setTextColor(const QColor &color);
+   QColor getTextColor() const { return mColor; }
 
 private:
    QIcon mIcon;
    QPushButton *mButton = nullptr;
    QLabel *mText = nullptr;
+   QColor mColor;
 };

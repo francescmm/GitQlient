@@ -16,7 +16,8 @@ public:
       COPIED = 16,
       UNKNOWN = 32,
       IN_INDEX = 64,
-      CONFLICT = 128
+      CONFLICT = 128,
+      PARTIALLY_CACHED = 256
    };
 
    RevisionFiles() = default;
@@ -30,7 +31,7 @@ public:
    int count() const { return mFiles.count(); }
    bool statusCmp(int idx, StatusFlag sf) const;
    const QString extendedStatus(int idx) const;
-   void setStatus(const QString &rowSt);
+   void setStatus(const QString &rowSt, bool isStaged = false);
    void setStatus(RevisionFiles::StatusFlag flag);
    void setStatus(int pos, RevisionFiles::StatusFlag flag);
    void appendStatus(int pos, RevisionFiles::StatusFlag flag);

@@ -305,7 +305,7 @@ QVector<Lane> GitCache::calculateLanes(const CommitInfo &c)
    return lanes;
 }
 
-RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
+RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl, bool)
 {
    RevisionFiles rf;
    auto parNum = 1;
@@ -340,6 +340,8 @@ RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
          }
          else
          {
+            const auto fileIsCached = !line.split(" ").at(3).startsWith("000000000");
+
             if (line.at(98) == '\t') // Faster parsing in normal case
             {
                if (fl.rf != &rf)
@@ -348,7 +350,8 @@ RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl)
                   fl.rf = &rf;
                }
                appendFileName(line.mid(99), fl);
-               rf.setStatus(line.at(97));
+               const auto flag = line.at(97);
+               rf.setStatus(flag, fileIsCached);
                rf.mergeParent.append(parNum);
             }
             else // It's a rename or a copy, we are not in fast path now!
@@ -571,7 +574,7 @@ RevisionFiles GitCache::fakeWorkDirRevFile(const QString &diffIndex, const QStri
       rf.mergeParent.append(1);
    }
 
-   RevisionFiles cachedFiles = parseDiffFormat(diffIndexCache, fl);
+   RevisionFiles cachedFiles = parseDiffFormat(diffIndexCache, fl, true);
    flushFileNames(fl);
 
    for (auto i = 0; i < rf.count(); i++)
@@ -580,8 +583,8 @@ RevisionFiles GitCache::fakeWorkDirRevFile(const QString &diffIndex, const QStri
       {
          if (cachedFiles.statusCmp(i, RevisionFiles::CONFLICT))
             rf.appendStatus(i, RevisionFiles::CONFLICT);
-
-         rf.appendStatus(i, RevisionFiles::IN_INDEX);
+         else if (rf.statusCmp(i, RevisionFiles::MODIFIED) && !rf.statusCmp(i, RevisionFiles::IN_INDEX))
+            rf.appendStatus(i, RevisionFiles::PARTIALLY_CACHED);
       }
    }
 

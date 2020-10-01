@@ -44,7 +44,8 @@ QSize FileWidget::sizeHint() const
    return size;
 }
 
-void FileWidget::setTextColor(const QColor &color) const
+void FileWidget::setTextColor(const QColor &color)
 {
-   mText->setStyleSheet(QString("color: %1").arg(color.name()));
+   mColor = color;
+   mText->setStyleSheet(QString("color: %1").arg(mColor.name()));
 }

@@ -94,7 +94,8 @@ public:
     \param editMode Enters edit mode directly.
     \return bool Returns true if the configuration was applied, otherwise false.
    */
-   bool configure(const QString &currentSha, const QString &previousSha, const QString &file, bool editMode = false);
+   bool configure(const QString &currentSha, const QString &previousSha, const QString &file, bool isCached,
+                  bool editMode = false);
 
    /**
     * @brief setFileVsFileEnable Enables the widget to show file vs file view.
@@ -115,6 +116,7 @@ public:
 
 private:
    QString mCurrentFile;
+   bool mIsCached = false;
    QPushButton *mBack = nullptr;
    QPushButton *mGoPrevious = nullptr;
    QPushButton *mGoNext = nullptr;
