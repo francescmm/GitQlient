@@ -108,7 +108,7 @@ void MergeWidget::configure(const RevisionFiles &files, ConflictReason reason)
    mMergedFiles->clear();
    mFileDiff->clear();
 
-   QFile mergeMsg(mGit->getWorkingDir() + "/.git/MERGE_MSG");
+   QFile mergeMsg(QString(mGit->getGitQlientSettingsDir() + QString::fromUtf8("/MERGE_MSG")));
 
    if (mergeMsg.open(QIODevice::ReadOnly))
    {
