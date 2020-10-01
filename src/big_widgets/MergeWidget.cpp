@@ -151,7 +151,7 @@ void MergeWidget::changeDiffView(QListWidgetItem *item)
    const auto file = item->text();
    const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   mFileDiff->configure(CommitInfo::ZERO_SHA, wip.parent(0), mGit->getWorkingDir() + "/" + file);
+   mFileDiff->configure(CommitInfo::ZERO_SHA, wip.parent(0), mGit->getWorkingDir() + "/" + file, false);
 }
 
 void MergeWidget::abort()

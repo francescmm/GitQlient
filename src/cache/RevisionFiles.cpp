@@ -29,13 +29,15 @@ const QString RevisionFiles::extendedStatus(int idx) const
    return !mRenamedFiles.isEmpty() && idx < mRenamedFiles.count() ? mRenamedFiles.at(idx) : "";
 }
 
-void RevisionFiles::setStatus(const QString &rowSt)
+void RevisionFiles::setStatus(const QString &rowSt, bool isStaged)
 {
    switch (rowSt.at(0).toLatin1())
    {
       case 'M':
       case 'T':
          mFileStatus.append(RevisionFiles::MODIFIED);
+         if (isStaged)
+            mFileStatus[mFileStatus.count() - 1] |= RevisionFiles::IN_INDEX;
          break;
       case 'U':
          mFileStatus.append(RevisionFiles::MODIFIED);

@@ -25,8 +25,9 @@ CommitDiffWidget::CommitDiffWidget(QSharedPointer<GitBase> git, QSharedPointer<G
    layout->setSpacing(10);
    layout->addWidget(fileListWidget);
 
-   connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
-           [this](QListWidgetItem *item) { emit signalOpenFileCommit(mFirstShaStr, mSecondShaStr, item->text()); });
+   connect(fileListWidget, &FileListWidget::itemDoubleClicked, this, [this](QListWidgetItem *item) {
+      emit signalOpenFileCommit(mFirstShaStr, mSecondShaStr, item->text(), false);
+   });
    connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitDiffWidget::signalShowFileHistory);
    connect(fileListWidget, &FileListWidget::signalEditFile, this, &CommitDiffWidget::signalEditFile);
 }

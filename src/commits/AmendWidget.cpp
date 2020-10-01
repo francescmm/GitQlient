@@ -14,8 +14,7 @@
 
 using namespace QLogger;
 
-AmendWidget::AmendWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                         QWidget *parent)
+AmendWidget::AmendWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : CommitChangesWidget(cache, git, parent)
 {
    ui->pbCommit->setText(tr("Amend"));
@@ -53,7 +52,7 @@ void AmendWidget::configure(const QString &sha)
       ui->leCommitTitle->setText(commit.shortLog());
 
       blockSignals(true);
-      mCurrentFilesCache.clear();
+      mInternalCache.clear();
       ui->untrackedFilesList->clear();
       ui->unstagedFilesList->clear();
       ui->stagedFilesList->clear();

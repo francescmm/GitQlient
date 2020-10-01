@@ -82,13 +82,19 @@ GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffT
    return qMakePair(false, QString());
 }
 
-QString GitHistory::getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
+QString GitHistory::getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file,
+                                bool isCached)
 {
    QLog_Debug("Git", QString("Executing getFileDiff: {%1} between {%2} and {%3}").arg(file, currentSha, previousSha));
 
-   const auto ret = mGitBase->run(QString("git diff -w -U15000 %1 %2 %3").arg(previousSha, currentSha, file));
+   auto cmd = QString("git diff %1 -w -U15000 ").arg(QString::fromUtf8(isCached ? "--cached" : ""));
 
-   if (ret.success)
+   if (currentSha.isEmpty() || currentSha == CommitInfo::ZERO_SHA)
+      cmd.append(file);
+   else
+      cmd.append(QString("%1 %2 %3").arg(previousSha, currentSha, file));
+
+   if (const auto ret = mGitBase->run(cmd); ret.success)
       return ret.output.toString();
 
    return QString();

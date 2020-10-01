@@ -20,14 +20,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QTimer>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QProgressBar>
-#include <QFile>
-#include <QStandardPaths>
 #include <QButtonGroup>
 
 using namespace QLogger;
@@ -398,18 +391,20 @@ void Controls::createGitPlatformButton(QHBoxLayout *layout)
 
    if (remoteUrl.contains("github", Qt::CaseInsensitive))
    {
+      add = true;
+
       gitPlatformIcon = QIcon(":/icons/github");
       name = "GitHub";
       prName = tr("Pull Request");
    }
    else if (remoteUrl.contains("gitlab", Qt::CaseInsensitive))
    {
+      add = true;
+
       gitPlatformIcon = QIcon(":/icons/gitlab");
       name = "GitLab";
       prName = tr("Merge Request");
    }
-   else
-      add = false;
 
    if (add)
    {

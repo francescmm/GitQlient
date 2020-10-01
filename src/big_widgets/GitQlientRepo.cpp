@@ -315,9 +315,10 @@ void GitQlientRepo::onRepoLoadFinished()
       mWaitDlg->close();
 }
 
-void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
+void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file,
+                                 bool isCached)
 {
-   const auto loaded = mDiffWidget->loadFileDiff(currentSha, previousSha, file);
+   const auto loaded = mDiffWidget->loadFileDiff(currentSha, previousSha, file, isCached);
 
    if (loaded)
    {

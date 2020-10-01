@@ -72,8 +72,7 @@ public:
     \param cache The internal repository cache for the repository.
     \param parent The parent wiget if needed.
    */
-   explicit DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<GitCache> cache,
-                       QWidget *parent = nullptr);
+   explicit DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<GitCache> cache, QWidget *parent = nullptr);
    /*!
     \brief Destructor
 
@@ -99,7 +98,7 @@ public:
     \param file The file to show the diff of.
     \return bool Returns true if the file diff was loaded correctly.
    */
-   bool loadFileDiff(const QString &sha, const QString &previousSha, const QString &file);
+   bool loadFileDiff(const QString &sha, const QString &previousSha, const QString &file, bool isCached);
    /*!
     \brief Loads a full commit diff.
 

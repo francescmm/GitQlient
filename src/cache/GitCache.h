@@ -123,7 +123,7 @@ private:
    void insertWipRevision(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
    QVector<Lane> calculateLanes(const CommitInfo &c);
-   RevisionFiles parseDiffFormat(const QString &buf, FileNamesLoader &fl);
+   RevisionFiles parseDiffFormat(const QString &buf, FileNamesLoader &fl, bool cached = false);
    void appendFileName(const QString &name, FileNamesLoader &fl);
    void flushFileNames(FileNamesLoader &fl);
    void setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);

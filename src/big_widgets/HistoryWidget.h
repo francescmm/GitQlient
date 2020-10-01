@@ -103,7 +103,7 @@ signals:
     \param parentSha The commit SHA to compare to.
     \param fileName The file name for the diff.
    */
-   void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName);
+   void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
 
    /**
     * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
@@ -308,7 +308,7 @@ private:
     * @param parentSha The commit SHA to compare with.
     * @param fileName The file name to diff.
     */
-   void showFileDiff(const QString &sha, const QString &parentSha, const QString &fileName);
+   void showFileDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
 
    /**
     * @brief showFileDiff Shows the file diff.

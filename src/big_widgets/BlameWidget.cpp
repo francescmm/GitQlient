@@ -224,7 +224,7 @@ void BlameWidget::showRepoViewMenu(const QPoint &pos)
    const auto fileDiff = menu->addAction(tr("Show file diff"));
    connect(fileDiff, &QAction::triggered, this, [this, sha, previousSha]() {
       const auto currentFile = qobject_cast<FileBlameWidget *>(mTabWidget->currentWidget())->getCurrentFile();
-      emit showFileDiff(sha, previousSha, currentFile);
+      emit showFileDiff(sha, previousSha, currentFile, false);
    });
 
    const auto commitDiff = menu->addAction(tr("Show commit diff"));
