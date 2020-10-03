@@ -54,9 +54,10 @@
 #include <FileDiffHighlighter.h>
 #include <LineNumberArea.h>
 
-#include <QScrollBar>
-
 #include <QLogger.h>
+
+#include <QScrollBar>
+#include <QMenu>
 
 using namespace QLogger;
 
@@ -66,7 +67,9 @@ FileDiffView::FileDiffView(QWidget *parent)
 {
    setAttribute(Qt::WA_DeleteOnClose);
    setReadOnly(true);
+   setContextMenuPolicy(Qt::CustomContextMenu);
 
+   connect(this, &FileDiffView::customContextMenuRequested, this, &FileDiffView::showStagingMenu);
    connect(this, &FileDiffView::blockCountChanged, this, &FileDiffView::updateLineNumberAreaWidth);
    connect(this, &FileDiffView::updateRequest, this, &FileDiffView::updateLineNumberArea);
    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &FileDiffView::signalScrollChanged);
@@ -94,7 +97,9 @@ void FileDiffView::loadDiff(QString text, const QVector<DiffInfo::ChunkInfo> &fi
               QString("FileDiffView::loadDiff - {%1} move scroll to pos {%2}")
                   .arg(objectName(), QString::number(verticalScrollBar()->value())));
 
-   mDiffHighlighter->setDiffInfo(fileDiffInfo);
+   mFileDiffInfo = fileDiffInfo;
+
+   mDiffHighlighter->setDiffInfo(mFileDiffInfo);
 
    const auto pos = verticalScrollBar()->value();
    auto cursor = textCursor();
@@ -217,4 +222,34 @@ bool FileDiffView::eventFilter(QObject *obj, QEvent *event)
    }
 
    return QPlainTextEdit::eventFilter(obj, event);
+}
+
+void FileDiffView::showStagingMenu(const QPoint &cursorPos)
+{
+   const auto helpPos = mapFromGlobal(QCursor::pos());
+   const auto x = helpPos.x();
+   auto row = -1;
+
+   if (x >= 0 && x > mLineNumberArea->width())
+   {
+      const auto cursor = cursorForPosition(helpPos);
+      row = cursor.block().blockNumber() + mStartingLine + 1;
+
+      if (row != -1)
+      {
+         const auto chunk
+             = std::find_if(mFileDiffInfo.cbegin(), mFileDiffInfo.cend(), [row](const DiffInfo::ChunkInfo &chunk) {
+                  return chunk.startLine <= row && row <= chunk.endLine;
+               });
+
+         if (chunk != mFileDiffInfo.cend())
+         {
+            const auto menu = new QMenu(this);
+            menu->addAction(tr("Stage line"));
+            menu->addAction(tr("Stage chunk"));
+            menu->move(viewport()->mapToGlobal(cursorPos));
+            menu->exec();
+         }
+      }
+   }
 }

@@ -128,7 +128,19 @@ protected:
    */
    void resizeEvent(QResizeEvent *event) override;
 
+   /**
+    * @brief eventFilter Custom event filter to enable the mechanism of storing comments (used by Jenkins view).
+    * @param target The target object of the event.
+    * @param event The event that was triggered.
+    * @return True if filtered, otherwise false.
+    */
    bool eventFilter(QObject *target, QEvent *event) override;
+
+   /**
+    * @brief showStagingMenu Shows the context menu to stage lines or chunks.
+    * @param cursorPos The curren position of the mouse cursor.
+    */
+   void showStagingMenu(const QPoint &cursorPos);
 
 private:
    /*!
@@ -152,6 +164,7 @@ private:
     */
    int lineNumberAreaWidth();
 
+   QVector<DiffInfo::ChunkInfo> mFileDiffInfo;
    LineNumberArea *mLineNumberArea = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    int mStartingLine = 0;
