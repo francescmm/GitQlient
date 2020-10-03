@@ -164,6 +164,10 @@ private:
     */
    int lineNumberAreaWidth();
 
+   void stageLine();
+
+   void stageChunk();
+
    QVector<DiffInfo::ChunkInfo> mFileDiffInfo;
    LineNumberArea *mLineNumberArea = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;

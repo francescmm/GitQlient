@@ -169,6 +169,10 @@ int FileDiffView::lineNumberAreaWidth()
    return offset + (width * digits);
 }
 
+void FileDiffView::stageLine() { }
+
+void FileDiffView::stageChunk() { }
+
 void FileDiffView::updateLineNumberAreaWidth(int /* newBlockCount */)
 {
    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
@@ -245,8 +249,12 @@ void FileDiffView::showStagingMenu(const QPoint &cursorPos)
          if (chunk != mFileDiffInfo.cend())
          {
             const auto menu = new QMenu(this);
-            menu->addAction(tr("Stage line"));
-            menu->addAction(tr("Stage chunk"));
+            const auto stageLine = menu->addAction(tr("Stage line"));
+            connect(stageLine, &QAction::triggered, this, &FileDiffView::stageLine);
+
+            const auto stageChunk = menu->addAction(tr("Stage chunk"));
+            connect(stageChunk, &QAction::triggered, this, &FileDiffView::stageChunk);
+
             menu->move(viewport()->mapToGlobal(cursorPos));
             menu->exec();
          }
