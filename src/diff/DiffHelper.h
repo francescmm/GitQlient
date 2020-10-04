@@ -184,9 +184,9 @@ inline DiffInfo processDiff(const QString &text, QPair<QStringList, QVector<Chun
       }
    }
 
-   diffInfo.fullDiff = text;
-   diffInfo.newFileDiff = newFileData.first.join("\n");
-   diffInfo.oldFileDiff = oldFileData.first.join("\n");
+   diffInfo.fullDiff = lines;
+   diffInfo.newFileDiff = newFileData.first;
+   diffInfo.oldFileDiff = oldFileData.first;
 
    return diffInfo;
 }

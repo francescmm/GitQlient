@@ -25,11 +25,16 @@
 
 #include <QVector>
 #include <QUuid>
+#include <QStringList>
 
 struct ChunkDiffInfo
 {
    struct ChunkInfo
    {
+      ChunkInfo(const QString &_id)
+         : id(_id)
+      {
+      }
       int startLine = -1;
       int endLine = -1;
       bool addition = false;
@@ -38,7 +43,11 @@ struct ChunkDiffInfo
       bool isValid() const { return startLine != -1 && endLine != -1; }
    };
 
-   ChunkDiffInfo() = default;
+   ChunkDiffInfo()
+      : newFile(ChunkInfo(id))
+      , oldFile(ChunkInfo(id))
+   {
+   }
    ChunkDiffInfo(bool baseOld, const ChunkInfo &_newFile, const ChunkInfo &_oldFile)
       : baseIsOldFile(baseOld)
       , newFile(_newFile)
@@ -47,7 +56,7 @@ struct ChunkDiffInfo
       newFile.id = id;
       oldFile.id = id;
    }
-
+   bool operator==(const ChunkDiffInfo &info) const { return id == info.id; }
    bool isValid() const { return newFile.isValid() || oldFile.isValid(); }
 
    QString id = QUuid::createUuid().toString();
@@ -58,8 +67,8 @@ struct ChunkDiffInfo
 
 struct DiffInfo
 {
-   QString fullDiff;
-   QString newFileDiff;
-   QString oldFileDiff;
+   QStringList fullDiff;
+   QStringList newFileDiff;
+   QStringList oldFileDiff;
    QVector<ChunkDiffInfo> chunks;
 };

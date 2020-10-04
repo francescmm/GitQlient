@@ -74,6 +74,12 @@ signals:
     */
    void signalScrollChanged(int value);
 
+   /**
+    * @brief signalStageChunk Signal triggered when the user orders to stage a chunk.
+    * @param id The internal chunk id.
+    */
+   void signalStageChunk(const QString &id);
+
 public:
    /*!
     \brief Default constructor.
@@ -166,8 +172,6 @@ private:
    int lineNumberAreaWidth();
 
    void stageLine();
-
-   void stageChunk();
 
    QVector<ChunkDiffInfo::ChunkInfo> mFileDiffInfo;
    LineNumberArea *mLineNumberArea = nullptr;

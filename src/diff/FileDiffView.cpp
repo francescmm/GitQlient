@@ -249,7 +249,8 @@ void FileDiffView::showStagingMenu(const QPoint &cursorPos)
             connect(stageLine, &QAction::triggered, this, &FileDiffView::stageLine);
 
             const auto stageChunk = menu->addAction(tr("Stage chunk"));
-            connect(stageChunk, &QAction::triggered, this, &FileDiffView::stageChunk);
+            connect(stageChunk, &QAction::triggered, this,
+                    [this, chunkId = chunk->id]() { emit signalStageChunk(chunkId); });
 
             menu->move(viewport()->mapToGlobal(cursorPos));
             menu->exec();
@@ -259,5 +260,3 @@ void FileDiffView::showStagingMenu(const QPoint &cursorPos)
 }
 
 void FileDiffView::stageLine() { }
-
-void FileDiffView::stageChunk() { }
