@@ -31,6 +31,7 @@ class GitCloneProcess final : public AGitProcess
 
 signals:
    void signalProgress(QString stepDescription, int value);
+   void signalCloningFailure(int error, QString description);
 
 public:
    explicit GitCloneProcess(const QString &workingDir);
