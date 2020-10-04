@@ -147,17 +147,6 @@ GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &
          notSel.append(fp);
    }
 
-   if (!notSel.empty())
-   {
-      const auto ret = mGitBase->run("git reset -- " + quote(notSel));
-
-      if (!ret.success)
-      {
-
-         return ret;
-      }
-   }
-
    // call git reset to remove not selected files from index
    const auto updIdx = updateIndex(allCommitFiles, selFiles);
 
@@ -187,26 +176,6 @@ GitExecResult GitLocal::ammendCommit(const QStringList &selFiles, const Revision
          notSel.append(fp);
    }
 
-   if (!notSel.empty())
-   {
-      const auto ret = mGitBase->run("git reset -- " + quote(notSel));
-
-      if (!ret.success)
-      {
-
-         return ret;
-      }
-   }
-
-   // call git reset to remove not selected files from index
-   const auto updIdx = updateIndex(allCommitFiles, selFiles);
-
-   if (!updIdx.success)
-   {
-
-      return updIdx;
-   }
-
    QLog_Debug("Git", QString("Amending files"));
 
    QString cmtOptions;
@@ -221,7 +190,7 @@ GitExecResult GitLocal::ammendCommit(const QStringList &selFiles, const Revision
 
 GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringList &selFiles) const
 {
-   QStringList toAdd, toRemove;
+   QStringList toRemove;
 
    for (const auto &file : selFiles)
    {
@@ -229,40 +198,11 @@ GitExecResult GitLocal::updateIndex(const RevisionFiles &files, const QStringLis
 
       if (index != -1 && files.statusCmp(index, RevisionFiles::DELETED))
          toRemove << file;
-      else
-         toAdd << file;
    }
 
    if (!toRemove.isEmpty())
    {
       const auto ret = mGitBase->run("git rm --cached --ignore-unmatch -- " + quote(toRemove));
-
-      if (!ret.success)
-      {
-
-         return ret;
-      }
-   }
-
-   if (!toAdd.isEmpty())
-   {
-      /* Post-poned in v1.2.0
-      GitQlientSettings settings;
-      const auto clangFormatOnCommit
-          = settings.localValue(mGitBase->getGitQlientSettingsDir(), "ClangFormatOnCommit", false).toBool();
-
-      if (clangFormatOnCommit)
-      {
-         QProcess clangFormat;
-         clangFormat.setWorkingDirectory(mGitBase->getWorkingDir());
-         clangFormat.start(QString("clang-format"), QStringList() << "-i" << toAdd);
-
-         if (!clangFormat.waitForFinished(10000))
-            QLog_Error("Git", QString("Clang-Format error: %1").arg(clangFormat.errorString()));
-      }
-      */
-
-      const auto ret = mGitBase->run("git add -- " + quote(toAdd));
 
       if (!ret.success)
       {
