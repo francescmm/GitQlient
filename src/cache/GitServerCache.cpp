@@ -31,7 +31,10 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
    else if (serverUrl.contains("gitlab"))
       mApi.reset(new GitLabRestApi(userName, repoInfo.second, serverUrl, { userName, userToken, endpoint }));
    else
+   {
       mInit = false;
+      return mInit;
+   }
 
    connect(getApi(), &IRestApi::labelsReceived, this, &GitServerCache::initLabels);
    connect(getApi(), &IRestApi::milestonesReceived, this, &GitServerCache::initMilestones);

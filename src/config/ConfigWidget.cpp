@@ -144,6 +144,8 @@ ConfigWidget::ConfigWidget(QWidget *parent)
 
    connect(mGit.data(), &GitConfig::signalCloningProgress, this, &ConfigWidget::updateProgressDialog,
            Qt::DirectConnection);
+   connect(mGit.data(), &GitConfig::signalCloningFailure, this, &ConfigWidget::showError,
+           Qt::DirectConnection);
 }
 
 ConfigWidget::~ConfigWidget()
@@ -285,6 +287,14 @@ void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
 
    mProgressDlg->setLabelText(stepDescription);
    mProgressDlg->repaint();
+}
+
+void ConfigWidget::showError(int, QString description)
+{
+    if (mProgressDlg)
+        mProgressDlg->deleteLater();
+
+    QMessageBox::critical(this, tr("Error!"), description);
 }
 
 void ConfigWidget::showAbout()

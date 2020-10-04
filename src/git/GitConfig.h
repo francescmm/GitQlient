@@ -45,6 +45,7 @@ class GitConfig : public QObject
 
 signals:
    void signalCloningProgress(QString stepDescription, int value);
+   void signalCloningFailure(int error, QString failure);
 
 public:
    explicit GitConfig(QSharedPointer<GitBase> gitBase, QObject *parent = nullptr);
