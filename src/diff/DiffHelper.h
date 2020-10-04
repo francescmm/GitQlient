@@ -42,8 +42,8 @@ struct DiffChange
    int oldFileStartLine;
    QString header;
    QString content;
-   QPair<QStringList, QVector<DiffInfo::ChunkInfo>> oldData;
-   QPair<QStringList, QVector<DiffInfo::ChunkInfo>> newData;
+   QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> oldData;
+   QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> newData;
 };
 
 inline void extractLinesFromHeader(QString header, int &startOldFile, int &startNewFile)
@@ -117,88 +117,78 @@ inline QVector<DiffChange> splitDiff(const QString &diff)
    return changes;
 }
 
-inline QVector<DiffInfo::ChunkInfo> processDiff(const QString &text, bool fileVsFile,
-                                                QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &newFileData,
-                                                QPair<QStringList, QVector<DiffInfo::ChunkInfo>> &oldFileData)
+inline DiffInfo processDiff(const QString &text, QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> &newFileData,
+                            QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> &oldFileData)
 {
-   DiffInfo diff;
-   // int newFileVariation = 0;
+   DiffInfo diffInfo;
+   ChunkDiffInfo diff;
    int oldFileRow = 1;
    int newFileRow = 1;
-   QVector<DiffInfo::ChunkInfo> chunks;
 
    const auto lines = text.split("\n");
    for (auto line : lines)
    {
-      if (fileVsFile)
+      if (line.startsWith('-'))
       {
-         if (line.startsWith('-'))
+         line.remove(0, 1);
+
+         if (diff.oldFile.startLine == -1)
+            diff.oldFile.startLine = oldFileRow;
+
+         oldFileData.first.append(line);
+
+         ++oldFileRow;
+      }
+      else if (line.startsWith('+'))
+      {
+         line.remove(0, 1);
+
+         if (diff.newFile.startLine == -1)
          {
-            line.remove(0, 1);
-
-            if (diff.oldFile.startLine == -1)
-               diff.oldFile.startLine = oldFileRow;
-
-            oldFileData.first.append(line);
-
-            ++oldFileRow;
+            diff.newFile.startLine = newFileRow;
+            diff.newFile.addition = true;
          }
-         else if (line.startsWith('+'))
-         {
-            line.remove(0, 1);
 
-            if (diff.newFile.startLine == -1)
-            {
-               diff.newFile.startLine = newFileRow;
-               diff.newFile.addition = true;
-            }
+         newFileData.first.append(line);
 
-            newFileData.first.append(line);
-
-            ++newFileRow;
-         }
-         else
-         {
-            line.remove(0, 1);
-
-            if (diff.oldFile.startLine != -1)
-               diff.oldFile.endLine = oldFileRow - 1;
-
-            if (diff.newFile.startLine != -1)
-               diff.newFile.endLine = newFileRow - 1;
-
-            if (diff.isValid())
-            {
-               if (diff.newFile.isValid())
-               {
-                  newFileData.second.append(diff.newFile);
-                  chunks.append(diff.newFile);
-               }
-
-               if (diff.oldFile.isValid())
-               {
-                  oldFileData.second.append(diff.oldFile);
-                  chunks.append(diff.oldFile);
-               }
-            }
-
-            oldFileData.first.append(line);
-            newFileData.first.append(line);
-
-            diff = DiffInfo();
-
-            ++oldFileRow;
-            ++newFileRow;
-         }
+         ++newFileRow;
       }
       else
       {
+         line.remove(0, 1);
+
+         if (diff.oldFile.startLine != -1)
+            diff.oldFile.endLine = oldFileRow - 1;
+
+         if (diff.newFile.startLine != -1)
+            diff.newFile.endLine = newFileRow - 1;
+
+         if (diff.isValid())
+         {
+            if (diff.newFile.isValid())
+               newFileData.second.append(diff.newFile);
+
+            if (diff.oldFile.isValid())
+               oldFileData.second.append(diff.oldFile);
+
+            diffInfo.chunks.append(diff);
+         }
+
          oldFileData.first.append(line);
          newFileData.first.append(line);
+
+         diff = ChunkDiffInfo();
+
+         ++oldFileRow;
+         ++newFileRow;
       }
    }
 
-   return chunks;
+   diffInfo.fullDiff = text;
+   diffInfo.newFileDiff = newFileData.first.join("\n");
+   diffInfo.oldFileDiff = oldFileData.first.join("\n");
+
+   return diffInfo;
 }
 
 inline void findString(const QString &s, QPlainTextEdit *textEdit, QWidget *managerWidget)

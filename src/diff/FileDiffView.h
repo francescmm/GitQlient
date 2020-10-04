@@ -94,7 +94,8 @@ public:
     * @param text The text representing a diff
     * @return True if correctly loaded, otherwise false.
     */
-   void loadDiff(QString text, const QVector<DiffInfo::ChunkInfo> &fileDiffInfo = QVector<DiffInfo::ChunkInfo>());
+   void loadDiff(const QString &text,
+                 const QVector<ChunkDiffInfo::ChunkInfo> &fileDiffInfo = QVector<ChunkDiffInfo::ChunkInfo>());
 
    /**
     * @brief moveScrollBarToPos Moves the vertical scroll bar to the value defined in @p value.
@@ -168,7 +169,7 @@ private:
 
    void stageChunk();
 
-   QVector<DiffInfo::ChunkInfo> mFileDiffInfo;
+   QVector<ChunkDiffInfo::ChunkInfo> mFileDiffInfo;
    LineNumberArea *mLineNumberArea = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    int mStartingLine = 0;

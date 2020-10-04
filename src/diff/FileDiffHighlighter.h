@@ -55,8 +55,8 @@ public:
     * @brief setDiffInfo Sets the file diff information that will be used to colour the foreground and background text.
     * @param fileDiffInfo The file diff information.
     */
-   void setDiffInfo(const QVector<DiffInfo::ChunkInfo> &fileDiffInfo) { mFileDiffInfo = fileDiffInfo; }
+   void setDiffInfo(const QVector<ChunkDiffInfo::ChunkInfo> &fileDiffInfo) { mFileDiffInfo = fileDiffInfo; }
 
 private:
-   QVector<DiffInfo::ChunkInfo> mFileDiffInfo;
+   QVector<ChunkDiffInfo::ChunkInfo> mFileDiffInfo;
 };

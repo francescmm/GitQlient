@@ -23,19 +23,43 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-struct DiffInfo
+#include <QVector>
+#include <QUuid>
+
+struct ChunkDiffInfo
 {
    struct ChunkInfo
    {
       int startLine = -1;
       int endLine = -1;
       bool addition = false;
+      QString id;
 
       bool isValid() const { return startLine != -1 && endLine != -1; }
    };
 
+   ChunkDiffInfo() = default;
+   ChunkDiffInfo(bool baseOld, const ChunkInfo &_newFile, const ChunkInfo &_oldFile)
+      : baseIsOldFile(baseOld)
+      , newFile(_newFile)
+      , oldFile(_oldFile)
+   {
+      newFile.id = id;
+      oldFile.id = id;
+   }
+
    bool isValid() const { return newFile.isValid() || oldFile.isValid(); }
 
+   QString id = QUuid::createUuid().toString();
+   bool baseIsOldFile = true;
    ChunkInfo newFile;
    ChunkInfo oldFile;
+};
+
+struct DiffInfo
+{
+   QString fullDiff;
+   QString newFileDiff;
+   QString oldFileDiff;
+   QVector<ChunkDiffInfo> chunks;
 };

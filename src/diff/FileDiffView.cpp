@@ -91,7 +91,7 @@ void FileDiffView::addNumberArea(LineNumberArea *numberArea)
    }
 }
 
-void FileDiffView::loadDiff(QString text, const QVector<DiffInfo::ChunkInfo> &fileDiffInfo)
+void FileDiffView::loadDiff(const QString &text, const QVector<ChunkDiffInfo::ChunkInfo> &fileDiffInfo)
 {
    QLog_Trace("UI",
               QString("FileDiffView::loadDiff - {%1} move scroll to pos {%2}")
@@ -169,10 +169,6 @@ int FileDiffView::lineNumberAreaWidth()
    return offset + (width * digits);
 }
 
-void FileDiffView::stageLine() { }
-
-void FileDiffView::stageChunk() { }
-
 void FileDiffView::updateLineNumberAreaWidth(int /* newBlockCount */)
 {
    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
@@ -242,7 +238,7 @@ void FileDiffView::showStagingMenu(const QPoint &cursorPos)
       if (row != -1)
       {
          const auto chunk
-             = std::find_if(mFileDiffInfo.cbegin(), mFileDiffInfo.cend(), [row](const DiffInfo::ChunkInfo &chunk) {
+             = std::find_if(mFileDiffInfo.cbegin(), mFileDiffInfo.cend(), [row](const ChunkDiffInfo::ChunkInfo &chunk) {
                   return chunk.startLine <= row && row <= chunk.endLine;
                });
 
@@ -261,3 +257,7 @@ void FileDiffView::showStagingMenu(const QPoint &cursorPos)
       }
    }
 }
+
+void FileDiffView::stageLine() { }
+
+void FileDiffView::stageChunk() { }

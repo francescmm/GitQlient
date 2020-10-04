@@ -16,7 +16,7 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
 {
    setObjectName("PrChangeListItem");
 
-   DiffHelper::processDiff(change.content, true, change.newData, change.oldData);
+   DiffHelper::processDiff(change.content, change.newData, change.oldData);
 
    const auto fileName = change.oldFileName == change.newFileName
        ? change.newFileName

@@ -133,7 +133,7 @@ private:
    FileDiffView *mOldFile = nullptr;
    QVector<int> mModifications;
    bool mFileVsFile = false;
-   QVector<DiffInfo::ChunkInfo> mChunks;
+   DiffInfo mChunks;
    int mCurrentChunkLine = 0;
    FileEditor *mFileEditor = nullptr;
    QStackedWidget *mViewStackedWidget = nullptr;

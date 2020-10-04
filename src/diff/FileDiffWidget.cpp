@@ -224,22 +224,27 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
 
    if (!text.isEmpty())
    {
-      QPair<QStringList, QVector<DiffInfo::ChunkInfo>> oldData;
-      QPair<QStringList, QVector<DiffInfo::ChunkInfo>> newData;
+      if (mFileVsFile)
+      {
+         QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> oldData;
+         QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> newData;
 
-      mChunks = DiffHelper::processDiff(text, mFileVsFile, newData, oldData);
+         mChunks = DiffHelper::processDiff(text, newData, oldData);
 
-      mOldFile->blockSignals(true);
-      mOldFile->loadDiff(oldData.first.join('\n'), oldData.second);
-      mOldFile->blockSignals(false);
+         mOldFile->blockSignals(true);
+         mOldFile->loadDiff(oldData.first.join('\n'), oldData.second);
+         mOldFile->blockSignals(false);
 
-      mNewFile->blockSignals(true);
-      mNewFile->loadDiff(newData.first.join('\n'), newData.second);
-      mNewFile->blockSignals(false);
-
-      GitQlientSettings settings;
-      mFileVsFile
-          = settings.localValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, false).toBool();
+         mNewFile->blockSignals(true);
+         mNewFile->loadDiff(newData.first.join('\n'), newData.second);
+         mNewFile->blockSignals(false);
+      }
+      else
+      {
+         mNewFile->blockSignals(true);
+         mNewFile->loadDiff(text, {});
+         mNewFile->blockSignals(false);
+      }
 
       if (editMode)
       {
@@ -325,11 +330,17 @@ void FileDiffWidget::hideBackButton() const
 
 void FileDiffWidget::moveChunkUp()
 {
-   for (auto i = mChunks.count() - 1; i >= 0; --i)
+   for (auto i = mChunks.chunks.count() - 1; i >= 0; --i)
    {
-      if (auto chunkStart = mChunks.at(i).startLine; chunkStart < mCurrentChunkLine)
+      auto &chunk = mChunks.chunks.at(i);
+
+      if (auto [chunkNewStart, chunkOldStart] = std::make_tuple(chunk.newFile.startLine, chunk.oldFile.startLine);
+          chunkNewStart < mCurrentChunkLine || chunkOldStart < mCurrentChunkLine)
       {
-         mCurrentChunkLine = chunkStart;
+         if (chunkNewStart < mCurrentChunkLine)
+            mCurrentChunkLine = chunkNewStart;
+         else if (chunkOldStart < mCurrentChunkLine)
+            mCurrentChunkLine = chunkOldStart;
 
          mNewFile->moveScrollBarToPos(mCurrentChunkLine - 1);
          mOldFile->moveScrollBarToPos(mCurrentChunkLine - 1);
@@ -341,17 +352,25 @@ void FileDiffWidget::moveChunkUp()
 
 void FileDiffWidget::moveChunkDown()
 {
-   const auto endIter = mChunks.constEnd();
-   auto iter = mChunks.constBegin();
+   const auto endIter = mChunks.chunks.constEnd();
+   auto iter = mChunks.chunks.constBegin();
 
    for (; iter != endIter; ++iter)
-      if (iter->startLine > mCurrentChunkLine)
+   {
+      if (iter->newFile.startLine > mCurrentChunkLine)
+      {
+         mCurrentChunkLine = iter->newFile.startLine;
          break;
+      }
+      else if (iter->oldFile.startLine > mCurrentChunkLine)
+      {
+         mCurrentChunkLine = iter->oldFile.startLine;
+         break;
+      }
+   }
 
    if (iter != endIter)
    {
-      mCurrentChunkLine = iter->startLine;
-
       mNewFile->moveScrollBarToPos(mCurrentChunkLine - 1);
       mOldFile->moveScrollBarToPos(mCurrentChunkLine - 1);
    }
