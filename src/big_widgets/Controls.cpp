@@ -387,7 +387,7 @@ void Controls::createGitPlatformButton(QHBoxLayout *layout)
    QIcon gitPlatformIcon;
    QString name;
    QString prName;
-   auto add = true;
+   auto add = false;
 
    if (remoteUrl.contains("github", Qt::CaseInsensitive))
    {

@@ -102,6 +102,7 @@ GitExecResult GitConfig::clone(const QString &url, const QString &fullPath)
 
    const auto asyncRun = new GitCloneProcess(mGitBase->getWorkingDir());
    connect(asyncRun, &GitCloneProcess::signalProgress, this, &GitConfig::signalCloningProgress, Qt::DirectConnection);
+   connect(asyncRun, &GitCloneProcess::signalCloningFailure, this, &GitConfig::signalCloningFailure, Qt::DirectConnection);
 
    mGitBase->setWorkingDir(fullPath);
 

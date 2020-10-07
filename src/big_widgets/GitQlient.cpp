@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QFile>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include <QLogger.h>
 
@@ -180,47 +181,59 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
 {
    if (!mCurrentRepos.contains(repoPath))
    {
-      const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "No repo";
-      const auto repo = new GitQlientRepo(repoPath);
+      QFileInfo info(QString("%1/.git").arg(repoPath));
 
-      const auto index = pinned ? mRepos->addPinnedTab(repo, repoName) : mRepos->addTab(repo, repoName);
-
-      connect(repo, &GitQlientRepo::signalEditFile, this, &GitQlient::signalEditDocument);
-      connect(repo, &GitQlientRepo::signalOpenSubmodule, this, &GitQlient::addRepoTab);
-      connect(repo, &GitQlientRepo::repoOpened, this, &GitQlient::onSuccessOpen);
-
-      repo->setRepository(repoName);
-
-      if (!repoPath.isEmpty())
+      if (info.isFile() || info.isDir())
       {
-         QProcess p;
-         p.setWorkingDirectory(repoPath);
-         p.start("git rev-parse", { "--show-superproject-working-tree" });
-         p.waitForFinished(5000);
+         const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "No repo";
+         const auto repo = new GitQlientRepo(repoPath);
 
-         const auto output = p.readAll().trimmed();
-         const auto isSubmodule = !output.isEmpty();
+         const auto index = pinned ? mRepos->addPinnedTab(repo, repoName) : mRepos->addTab(repo, repoName);
 
-         mRepos->setTabIcon(index, QIcon(isSubmodule ? QString(":/icons/submodules") : QString(":/icons/local")));
+         connect(repo, &GitQlientRepo::signalEditFile, this, &GitQlient::signalEditDocument);
+         connect(repo, &GitQlientRepo::signalOpenSubmodule, this, &GitQlient::addRepoTab);
+         connect(repo, &GitQlientRepo::repoOpened, this, &GitQlient::onSuccessOpen);
 
-         QLog_Info("UI", "Attaching repository to a new tab");
+         repo->setRepository(repoName);
 
-         if (isSubmodule)
+         if (!repoPath.isEmpty())
          {
-            const auto parentRepo = QString::fromUtf8(output.split('/').last());
+            QProcess p;
+            p.setWorkingDirectory(repoPath);
+            p.start("git rev-parse", { "--show-superproject-working-tree" });
+            p.waitForFinished(5000);
 
-            mRepos->setTabText(index, QString("%1 \u2192 %2").arg(parentRepo, repoName));
+            const auto output = p.readAll().trimmed();
+            const auto isSubmodule = !output.isEmpty();
 
-            QLog_Info("UI",
-                      QString("Opening the submodule {%1} from the repo {%2} on tab index {%3}")
-                          .arg(repoName, parentRepo)
-                          .arg(index));
+            mRepos->setTabIcon(index, QIcon(isSubmodule ? QString(":/icons/submodules") : QString(":/icons/local")));
+
+            QLog_Info("UI", "Attaching repository to a new tab");
+
+            if (isSubmodule)
+            {
+               const auto parentRepo = QString::fromUtf8(output.split('/').last());
+
+               mRepos->setTabText(index, QString("%1 \u2192 %2").arg(parentRepo, repoName));
+
+               QLog_Info("UI",
+                         QString("Opening the submodule {%1} from the repo {%2} on tab index {%3}")
+                             .arg(repoName, parentRepo)
+                             .arg(index));
+            }
          }
+
+         mRepos->setCurrentIndex(index);
+
+         mCurrentRepos.insert(repoPath);
       }
-
-      mRepos->setCurrentIndex(index);
-
-      mCurrentRepos.insert(repoPath);
+      else
+      {
+         QLog_Info("UI", "Trying to open a directory that is not a Git repository.");
+         QMessageBox::information(
+             this, tr("Not a Git repository"),
+             tr("The selected path is not a Git repository. Please make sure you opened the correct directory."));
+      }
    }
    else
       QLog_Warning("UI", QString("Repository at {%1} already opened. Skip adding it again.").arg(repoPath));

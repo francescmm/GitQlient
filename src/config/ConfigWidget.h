@@ -123,6 +123,13 @@ private:
    void updateProgressDialog(QString stepDescription, int value);
 
    /**
+    * @brief showError Shows an error ocurred during any configuration time.
+    * @param error The error code.
+    * @param description The error description.
+    */
+   void showError(int error, QString description);
+
+   /**
     * @brief showAbout Shows GitQlient about info.
     */
    void showAbout();
