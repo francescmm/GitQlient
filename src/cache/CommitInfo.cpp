@@ -3,6 +3,7 @@
 #include <QStringList>
 
 const QString CommitInfo::ZERO_SHA = QString("0000000000000000000000000000000000000000");
+const QString CommitInfo::INIT_SHA = QString("4b825dc642cb6eb9a060e54bf8d69288fbee4904");
 
 CommitInfo::CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
                        const QString &log, const QString &longLog)
@@ -79,6 +80,26 @@ QString CommitInfo::getFieldStr(CommitInfo::Field field) const
       default:
          return QString();
    }
+}
+
+int CommitInfo::parentsCount() const
+{
+   auto count = mParentsSha.count();
+
+   if (count > 0 && mParentsSha.contains(CommitInfo::INIT_SHA))
+      --count;
+
+   return count;
+}
+
+QString CommitInfo::parent(int idx) const
+{
+   return mParentsSha.count() > idx ? mParentsSha.at(idx) : QString();
+}
+
+QStringList CommitInfo::parents() const
+{
+   return mParentsSha;
 }
 
 bool CommitInfo::isValid() const

@@ -223,24 +223,19 @@ WipRevisionInfo GitRepoLoader::processWip()
 
    if (ret.success)
    {
-      auto parentSha = ret.output.toString().trimmed();
       QString diffIndex;
       QString diffIndexCached;
 
-      if (!parentSha.isEmpty())
-      {
-         const auto ret3 = mGitBase->run(QString("git diff-index %1").arg(parentSha));
-         diffIndex = ret3.success ? ret3.output.toString() : QString();
+      auto parentSha = ret.output.toString().trimmed();
 
-         const auto ret4 = mGitBase->run(QString("git diff-index --cached %1").arg(parentSha));
-         diffIndexCached = ret4.success ? ret4.output.toString() : QString();
-      }
-      else
-      {
-         parentSha = "-";
-         diffIndex = "-";
-         diffIndexCached = "-";
-      }
+      if (parentSha.isEmpty())
+         parentSha = CommitInfo::INIT_SHA;
+
+      const auto ret3 = mGitBase->run(QString("git diff-index %1").arg(parentSha));
+      diffIndex = ret3.success ? ret3.output.toString() : QString();
+
+      const auto ret4 = mGitBase->run(QString("git diff-index --cached %1").arg(parentSha));
+      diffIndexCached = ret4.success ? ret4.output.toString() : QString();
 
       return { parentSha, diffIndex, diffIndexCached };
    }

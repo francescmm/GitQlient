@@ -191,12 +191,6 @@ void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIn
 {
    auto newParentSha = parentSha;
 
-   if (parentSha == "-")
-   {
-      newParentSha = "";
-      QLog_Debug("Git", QString("Updating the WIP commit. There are no commits in the repo."));
-   }
-
    QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(newParentSha));
 
    const auto key = qMakePair(CommitInfo::ZERO_SHA, newParentSha);
@@ -340,17 +334,23 @@ RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl,
          }
          else
          {
-            const auto fileIsCached = !line.split(" ").at(3).startsWith("000000000");
-
             if (line.at(98) == '\t') // Faster parsing in normal case
             {
+               auto fields = line.split(" ");
+               const auto srcMode = fields.takeFirst();
+               const auto dstMode = fields.takeFirst();
+               const auto srcSha = fields.takeFirst();
+               const auto dstSha = fields.takeFirst();
+               const auto fileIsCached = !dstSha.startsWith(QStringLiteral("000000"));
+               const auto flag = fields.takeFirst().at(0);
+
                if (fl.rf != &rf)
                {
                   flushFileNames(fl);
                   fl.rf = &rf;
                }
                appendFileName(line.mid(99), fl);
-               const auto flag = line.at(97);
+
                rf.setStatus(flag, fileIsCached);
                rf.mergeParent.append(parNum);
             }

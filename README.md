@@ -3,6 +3,7 @@
 # GitQlient: Multi-platform Git client written with Qt
 [![Build status](https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient/branch/master)
 [![Build Status](https://travis-ci.org/francescmm/GitQlient.svg?branch=master)](https://travis-ci.org/francescmm/GitQlient)
+[![Copr build status](https://copr.fedorainfracloud.org/coprs/gitqlient/GitQlient/package/gitqlient/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/gitqlient/GitQlient/package/gitqlient/)
 
 GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git
 client originally forked from QGit. Nowadays it goes beyond of just a fork and
