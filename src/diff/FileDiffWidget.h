@@ -165,4 +165,6 @@ private:
     * @brief revertFile Revert all the changes to the file.
     */
    void revertFile();
+
+   void stageChunk(const QString &id);
 };

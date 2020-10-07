@@ -1,6 +1,7 @@
 #include "FileDiffWidget.h"
 
 #include <GitBase.h>
+#include <GitPatches.h>
 #include <GitHistory.h>
 #include <FileDiffView.h>
 #include <CommitInfo.h>
@@ -20,6 +21,8 @@
 #include <QDateTime>
 #include <QStackedWidget>
 #include <QMessageBox>
+#include <QDir>
+#include <QTemporaryFile>
 
 FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *parent)
    : IDiffWidget(git, cache, parent)
@@ -165,7 +168,9 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    }
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
+   connect(mNewFile, &FileDiffView::signalStageChunk, this, &FileDiffWidget::stageChunk);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
+   connect(mOldFile, &FileDiffView::signalStageChunk, this, &FileDiffWidget::stageChunk);
 
    setAttribute(Qt::WA_DeleteOnClose);
 }
@@ -431,6 +436,86 @@ void FileDiffWidget::revertFile()
       {
          emit fileReverted(mCurrentFile);
          emit exitRequested();
+      }
+   }
+}
+
+void FileDiffWidget::stageChunk(const QString &id)
+{
+   const auto iter = std::find_if(mChunks.chunks.cbegin(), mChunks.chunks.cend(),
+                                  [id](const ChunkDiffInfo &info) { return id == info.id; });
+
+   if (iter != mChunks.chunks.cend())
+   {
+      auto startingLine = 0;
+
+      if (iter->newFile.startLine != -1)
+      {
+         if (iter->oldFile.startLine == -1 || iter->newFile.startLine < iter->oldFile.startLine)
+            startingLine = iter->newFile.startLine;
+      }
+      else if (iter->oldFile.startLine == -1)
+         startingLine = iter->oldFile.startLine;
+
+      const auto buffer = 3;
+      QString text;
+      QString postLine = " \n";
+      auto fileCount = startingLine - 1 - buffer;
+
+      for (; fileCount < startingLine - 1 && fileCount < mChunks.oldFileDiff.count(); ++fileCount)
+         text.append(QString(" %1\n").arg(mChunks.oldFileDiff.at(fileCount)));
+
+      if (fileCount < mChunks.oldFileDiff.count())
+         postLine = QString(" %1\n").arg(mChunks.oldFileDiff.at(fileCount));
+
+      auto totalLinesOldFile = 0;
+
+      if (iter->oldFile.startLine != -1)
+      {
+         totalLinesOldFile
+             += iter->oldFile.startLine == iter->oldFile.endLine ? 1 : iter->oldFile.endLine - iter->oldFile.startLine;
+
+         for (auto i = iter->oldFile.startLine - 1;
+              i <= iter->oldFile.startLine - 1 + totalLinesOldFile && i < mChunks.oldFileDiff.count(); ++i)
+            text.append(QString("-%1\n").arg(mChunks.oldFileDiff.at(i)));
+      }
+
+      auto totalLinesNewFile = 0;
+
+      if (iter->newFile.startLine != -1)
+      {
+         const auto realStart = iter->newFile.startLine - 1;
+         totalLinesNewFile = iter->newFile.startLine == iter->newFile.endLine ? 1 : iter->newFile.endLine - realStart;
+
+         for (auto i = realStart; i < iter->newFile.endLine && i < mChunks.newFileDiff.count(); ++i)
+            text.append(QString("+%1\n").arg(mChunks.newFileDiff.at(i)));
+      }
+
+      text.append(postLine);
+
+      const auto filePath = QString(mCurrentFile).remove(mGit->getWorkingDir());
+      const auto patch
+          = QString("--- a%1\n"
+                    "+++ b%1\n"
+                    "@@ -%2,%3 +%2,%4 @@\n"
+                    "%5")
+                .arg(filePath, QString::number(startingLine - buffer), QString::number(buffer + totalLinesOldFile + 1),
+                     QString::number(buffer + totalLinesNewFile + 1), text);
+
+      QTemporaryFile f;
+
+      if (f.open())
+      {
+         f.write(patch.toUtf8());
+         f.close();
+
+         QScopedPointer<GitPatches> git(new GitPatches(mGit));
+
+         if (const auto ret = git->stagePatch(f.fileName()); ret.success)
+            QMessageBox::information(this, tr("Changes staged!"), tr("The chunk has been successfully staged."));
+         else
+            QMessageBox::information(this, tr("Stage failed"),
+                                     tr("The chunk couldn't be applied:\n%1").arg(ret.output.toString()));
       }
    }
 }
