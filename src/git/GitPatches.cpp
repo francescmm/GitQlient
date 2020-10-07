@@ -58,3 +58,10 @@ bool GitPatches::applyPatch(const QString &fileName, bool asCommit)
 
    return ret.success;
 }
+
+GitExecResult GitPatches::stagePatch(const QString &fileName) const
+{
+   QLog_Debug("Git", QString("Executing stagePatch: {%1}").arg(fileName));
+
+   return mGitBase->run(QString("git apply --cached %1").arg(fileName));
+}
