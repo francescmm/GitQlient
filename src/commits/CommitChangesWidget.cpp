@@ -207,7 +207,9 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
       const auto isConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
       const auto isPartiallyCached = files.statusCmp(i, RevisionFiles::PARTIALLY_CACHED);
       const auto untrackedFile = !isInIndex && isUnknown;
-      const auto staged = isInIndex && !isUnknown && !isConflict;
+      const auto isNew = files.statusCmp(i, RevisionFiles::NEW);
+      const auto isDeleted = files.statusCmp(i, RevisionFiles::DELETED);
+      const auto staged = (isInIndex && !isUnknown && !isConflict) || isNew || isDeleted;
       auto wip = QString("%1-%2").arg(fileName, QString::fromUtf8(ui->stagedFilesList->metaObject()->className()));
 
       if (staged || isPartiallyCached)

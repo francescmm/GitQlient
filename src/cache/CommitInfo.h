@@ -53,9 +53,9 @@ public:
 
    QString getFieldStr(CommitInfo::Field field) const;
    bool isBoundary() const { return mBoundaryInfo == '-'; }
-   int parentsCount() const { return mParentsSha.count(); }
-   QString parent(int idx) const { return mParentsSha.count() > idx ? mParentsSha.at(idx) : QString(); }
-   QStringList parents() const { return mParentsSha; }
+   int parentsCount() const;
+   QString parent(int idx) const;
+   QStringList parents() const;
 
    QString sha() const { return mSha; }
    QString committer() const { return mCommitter; }
@@ -86,6 +86,7 @@ public:
    void clearReferences() { mReferences.clear(); }
 
    static const QString ZERO_SHA;
+   static const QString INIT_SHA;
 
 private:
    QChar mBoundaryInfo;
