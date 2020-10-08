@@ -199,6 +199,9 @@ void CommitChangesWidget::clearCache()
 
 void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *fileList)
 {
+   for (auto &cachedItem : mInternalCache)
+      cachedItem.keep = false;
+
    for (auto i = 0; i < files.count(); ++i)
    {
       const auto fileName = files.getFile(i);
