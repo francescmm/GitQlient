@@ -365,7 +365,7 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
 
    QApplication::restoreOverrideCursor();
 
-   if (ret.output.toString().contains("merge failed", Qt::CaseInsensitive))
+   if (!ret.success)
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Merge failed"),
                          QString("There were problems during the merge. Please, see the detailed description for more "

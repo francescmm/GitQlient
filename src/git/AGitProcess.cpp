@@ -175,7 +175,10 @@ void AGitProcess::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
        || mCanceling || errorOutput.contains("error") || errorOutput.toLower().contains("could not read username");
 
    if (mRealError)
-      mRunOutput = mErrorOutput;
+   {
+      if (!mErrorOutput.isEmpty())
+         mRunOutput = !mErrorOutput.isEmpty();
+   }
    else
       mRunOutput.append(readAllStandardOutput() + mErrorOutput);
 }
