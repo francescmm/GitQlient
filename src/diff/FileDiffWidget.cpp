@@ -449,12 +449,10 @@ void FileDiffWidget::stageChunk(const QString &id)
    {
       auto startingLine = 0;
 
-      if (iter->newFile.startLine != -1)
-      {
-         if (iter->oldFile.startLine == -1 || iter->newFile.startLine < iter->oldFile.startLine)
-            startingLine = iter->newFile.startLine;
-      }
-      else if (iter->oldFile.startLine == -1)
+      if (iter->newFile.startLine != -1
+          && (iter->oldFile.startLine == -1 || iter->newFile.startLine < iter->oldFile.startLine))
+         startingLine = iter->newFile.startLine;
+      else
          startingLine = iter->oldFile.startLine;
 
       const auto buffer = 3;
@@ -472,12 +470,14 @@ void FileDiffWidget::stageChunk(const QString &id)
 
       if (iter->oldFile.startLine != -1)
       {
-         totalLinesOldFile
-             += iter->oldFile.startLine == iter->oldFile.endLine ? 1 : iter->oldFile.endLine - iter->oldFile.startLine;
+         const auto realStart = iter->oldFile.startLine - 1;
+         totalLinesOldFile = iter->oldFile.startLine == iter->oldFile.endLine ? 1 : iter->oldFile.endLine - realStart;
 
-         for (auto i = iter->oldFile.startLine - 1;
-              i <= iter->oldFile.startLine - 1 + totalLinesOldFile && i < mChunks.oldFileDiff.count(); ++i)
+         auto i = realStart;
+         for (; i < iter->oldFile.endLine && i < mChunks.oldFileDiff.count(); ++i)
             text.append(QString("-%1\n").arg(mChunks.oldFileDiff.at(i)));
+
+         postLine = QString(" %1\n").arg(mChunks.oldFileDiff.at(i));
       }
 
       auto totalLinesNewFile = 0;
@@ -514,8 +514,20 @@ void FileDiffWidget::stageChunk(const QString &id)
          if (const auto ret = git->stagePatch(f.fileName()); ret.success)
             QMessageBox::information(this, tr("Changes staged!"), tr("The chunk has been successfully staged."));
          else
+         {
+#ifdef DEBUG
+            QFile patch("aux.patch");
+
+            if (patch.open(QIODevice::WriteOnly) && f.open())
+            {
+               patch.write(f.readAll());
+               patch.close();
+               f.close();
+            }
+#endif
             QMessageBox::information(this, tr("Stage failed"),
                                      tr("The chunk couldn't be applied:\n%1").arg(ret.output.toString()));
+         }
       }
    }
 }
