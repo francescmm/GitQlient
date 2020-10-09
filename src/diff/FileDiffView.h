@@ -171,8 +171,6 @@ private:
     */
    int lineNumberAreaWidth();
 
-   void stageLine();
-
    QVector<ChunkDiffInfo::ChunkInfo> mFileDiffInfo;
    LineNumberArea *mLineNumberArea = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;

@@ -245,8 +245,10 @@ void FileDiffView::showStagingMenu(const QPoint &cursorPos)
          if (chunk != mFileDiffInfo.cend())
          {
             const auto menu = new QMenu(this);
+            /*
             const auto stageLine = menu->addAction(tr("Stage line"));
             connect(stageLine, &QAction::triggered, this, &FileDiffView::stageLine);
+            */
 
             const auto stageChunk = menu->addAction(tr("Stage chunk"));
             connect(stageChunk, &QAction::triggered, this,
@@ -258,5 +260,3 @@ void FileDiffView::showStagingMenu(const QPoint &cursorPos)
       }
    }
 }
-
-void FileDiffView::stageLine() { }
