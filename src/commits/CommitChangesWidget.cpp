@@ -68,6 +68,7 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitChangesWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitChangesWidget::commitChanges);
    connect(ui->pbCommit, &QPushButton::clicked, this, &CommitChangesWidget::commitChanges);
+   connect(ui->pbCancelAmend, &QPushButton::clicked, this, [this]() { emit signalCancelAmend(mCurrentSha); });
    connect(ui->untrackedFilesList, &QListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
    connect(ui->untrackedFilesList, &QListWidget::customContextMenuRequested, this,
