@@ -222,6 +222,7 @@ void GitRepoLoader::processRevision(QByteArray ba)
       auto preProcessedCommits = ba.split(splitter);
       QByteArray commit;
       QByteArray gpg;
+      QString gpgKey;
       auto processingCommit = false;
 
       for (auto line : preProcessedCommits)
@@ -230,6 +231,16 @@ void GitRepoLoader::processRevision(QByteArray ba)
          {
             processingCommit = false;
             gpg.append(line);
+
+            if (line.contains("using RSA key"))
+            {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+               gpgKey = QString::fromUtf8(line).split("using RSA key", Qt::SkipEmptyParts).last();
+#else
+               gpgKey = QString::fromUtf8(line).split("using RSA key", QString::SkipEmptyParts);
+#endif
+               gpgKey.append('\n');
+            }
          }
          else if (line.startsWith("log size"))
          {
@@ -241,7 +252,7 @@ void GitRepoLoader::processRevision(QByteArray ba)
             }
             processingCommit = true;
             const auto isSigned = !gpg.isEmpty() && gpg.contains("Good signature");
-            commit.append(isSigned ? "S\n" : "U\n");
+            commit.append(isSigned ? gpgKey.toUtf8() : "\n");
             gpg.clear();
          }
          else if (processingCommit)

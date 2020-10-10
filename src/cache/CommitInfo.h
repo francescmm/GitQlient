@@ -86,6 +86,7 @@ public:
    void clearReferences() { mReferences.clear(); }
 
    bool isSigned() const { return mSigned; }
+   QString getGpgKey() const { return mGpgKey; }
 
    static const QString ZERO_SHA;
 
@@ -103,4 +104,5 @@ private:
    References mReferences;
    QMap<QString, CommitInfo *> mChilds;
    bool mSigned = false;
+   QString mGpgKey;
 };
