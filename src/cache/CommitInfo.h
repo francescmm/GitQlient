@@ -85,6 +85,8 @@ public:
 
    void clearReferences() { mReferences.clear(); }
 
+   bool isSigned() const { return mSigned; }
+
    static const QString ZERO_SHA;
 
 private:
@@ -100,4 +102,5 @@ private:
    QVector<Lane> mLanes;
    References mReferences;
    QMap<QString, CommitInfo *> mChilds;
+   bool mSigned = false;
 };

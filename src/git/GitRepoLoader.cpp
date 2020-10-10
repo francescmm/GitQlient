@@ -179,7 +179,7 @@ void GitRepoLoader::requestRevisions()
    requestor->run(baseCmd);
 }
 
-void GitRepoLoader::processRevision(const QByteArray &ba)
+void GitRepoLoader::processRevision(QByteArray ba)
 {
    QLog_Info("Git", "Revisions received!");
 
@@ -196,7 +196,50 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    QLog_Debug("Git", "Processing revisions...");
 
-   const auto &commits = ba.split('\000');
+   auto showSignature = false;
+
+   if (const auto ret = gitConfig->getGitValue("log.showSignature"); ret.success)
+      showSignature = ret.output.toString().contains("true");
+
+   const auto splitter = showSignature ? '\n' : '\000';
+   QList<QByteArray> commits;
+
+   if (!showSignature)
+      commits = ba.split(splitter);
+   else
+   {
+      ba.replace('\000', '\n');
+
+      auto preProcessedCommits = ba.split(splitter);
+      QByteArray commit;
+      QByteArray gpg;
+      auto processingCommit = false;
+
+      for (auto line : preProcessedCommits)
+      {
+         if (line.startsWith("gpg: "))
+         {
+            processingCommit = false;
+            gpg.append(line);
+         }
+         else if (line.startsWith("log size"))
+         {
+            if (!commit.isEmpty())
+            {
+               commits.append(commit);
+               commit.clear();
+            }
+            processingCommit = true;
+            const auto isSigned = !gpg.isEmpty() && gpg.contains("Good signature");
+            commit.append(isSigned ? "S\n" : "U\n");
+            gpg.clear();
+         }
+         else if (processingCommit)
+         {
+            commit.append(line + '\n');
+         }
+      }
+   }
 
    emit signalLoadingStarted(commits.count());
 
