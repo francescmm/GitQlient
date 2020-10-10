@@ -61,6 +61,7 @@ public:
    ~GitCache();
 
    void setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits);
+   void setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits);
 
    int count() const;
 

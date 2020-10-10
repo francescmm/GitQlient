@@ -85,12 +85,24 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
          newOpt.rect.setWidth(newOpt.rect.width() - 5);
       }
-
-      if (index.column() == static_cast<int>(CommitHistoryColumns::Sha))
+      else if (index.column() == static_cast<int>(CommitHistoryColumns::Sha))
       {
          newOpt.font.setPointSize(8);
          newOpt.font.setFamily("DejaVu Sans Mono");
          text = text.left(8);
+      }
+      else if (index.column() == static_cast<int>(CommitHistoryColumns::Author) && commit.isSigned())
+      {
+         static const auto size = 15;
+         static const auto offset = 5;
+         QPixmap pic(":/icons/signed");
+         pic = pic.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+         const auto inc = (newOpt.rect.height() - size) / 2;
+
+         p->drawPixmap(QRect(newOpt.rect.x(), newOpt.rect.y() + inc, size, size), pic);
+
+         newOpt.rect.setX(newOpt.rect.x() + size + offset);
       }
 
       QFontMetrics fm(newOpt.font);

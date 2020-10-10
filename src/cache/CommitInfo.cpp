@@ -23,6 +23,11 @@ CommitInfo::CommitInfo(const QByteArray &b)
 
    if (fields.count() > 6)
    {
+      mSigned = !fields.first().isEmpty();
+
+      if (mSigned)
+         mGpgKey = fields.first();
+
       auto combinedShas = fields.at(1);
       auto sha = combinedShas.split('X').first();
       mBoundaryInfo = sha.at(0);

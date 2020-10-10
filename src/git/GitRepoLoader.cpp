@@ -179,7 +179,7 @@ void GitRepoLoader::requestRevisions()
    requestor->run(baseCmd);
 }
 
-void GitRepoLoader::processRevision(const QByteArray &ba)
+void GitRepoLoader::processRevision(QByteArray ba)
 {
    QLog_Info("Git", "Revisions received!");
 
@@ -196,13 +196,75 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    QLog_Debug("Git", "Processing revisions...");
 
-   const auto &commits = ba.split('\000');
+   auto showSignature = false;
 
-   emit signalLoadingStarted(commits.count());
+   if (const auto ret = gitConfig->getGitValue("log.showSignature"); ret.success)
+      showSignature = ret.output.toString().contains("true");
 
    const auto wipInfo = processWip();
 
-   mRevCache->setup(wipInfo, commits);
+   const auto splitter = showSignature ? '\n' : '\000';
+
+   if (!showSignature)
+   {
+      QList<QByteArray> commits;
+      commits = ba.split(splitter);
+
+      emit signalLoadingStarted(commits.count());
+
+      mRevCache->setup(wipInfo, commits);
+   }
+   else
+   {
+      QList<CommitInfo> commits;
+      ba.replace('\000', '\n');
+
+      auto preProcessedCommits = ba.split(splitter);
+      QByteArray commit;
+      QByteArray gpg;
+      QString gpgKey;
+      auto processingCommit = false;
+
+      for (auto line : preProcessedCommits)
+      {
+         if (line.startsWith("gpg: "))
+         {
+            processingCommit = false;
+            gpg.append(line);
+
+            if (line.contains("using RSA key"))
+            {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+               gpgKey = QString::fromUtf8(line).split("using RSA key", Qt::SkipEmptyParts).last();
+#else
+               gpgKey = QString::fromUtf8(line).split("using RSA key", QString::SkipEmptyParts);
+#endif
+               gpgKey.append('\n');
+            }
+         }
+         else if (line.startsWith("log size"))
+         {
+            if (!commit.isEmpty())
+            {
+               CommitInfo revision(commit);
+               commits.append(revision);
+               commit.clear();
+            }
+            processingCommit = true;
+            const auto isSigned = !gpg.isEmpty() && gpg.contains("Good signature");
+            commit.append(isSigned ? gpgKey.toUtf8() : "\n");
+            gpg.clear();
+         }
+         else if (processingCommit)
+         {
+            commit.append(line + '\n');
+         }
+      }
+
+      emit signalLoadingStarted(commits.count());
+
+      mRevCache->setup(wipInfo, commits);
+   }
 
    loadReferences();
 
