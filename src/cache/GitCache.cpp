@@ -75,6 +75,58 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &co
    }
 }
 
+void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits)
+{
+   QMutexLocker lock(&mMutex);
+
+   const auto totalCommits = commits.count() + 1;
+
+   QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
+
+   mConfigured = false;
+
+   mDirNames.clear();
+   mFileNames.clear();
+   mRevisionFilesMap.clear();
+   mLanes.clear();
+
+   for (auto reference : qAsConst(mReferences))
+      reference->clearReferences();
+
+   mReferences.clear();
+
+   if (mCommitsMap.isEmpty())
+      mCommitsMap.reserve(totalCommits);
+
+   if (mCommits.isEmpty() || totalCommits > mCommits.count())
+      mCommits.resize(totalCommits);
+   else if (totalCommits < mCommits.count())
+   {
+      const auto commitsToRemove = std::abs(totalCommits - mCommits.count());
+      for (auto i = 0, pos = 1; i < commitsToRemove; ++i, ++pos)
+      {
+         mCommits.remove(pos);
+      }
+   }
+
+   QLog_Debug("Git", QString("Adding WIP revision."));
+
+   insertWipRevision(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
+
+   auto count = 1;
+
+   QLog_Debug("Git", QString("Adding commited revisions."));
+
+   for (const auto &commit : commits)
+   {
+      if (commit.isValid())
+      {
+         insertCommitInfo(commit, count);
+         ++count;
+      }
+   }
+}
+
 CommitInfo GitCache::getCommitInfoByRow(int row)
 {
    QMutexLocker lock(&mMutex);

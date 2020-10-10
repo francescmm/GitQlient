@@ -201,13 +201,22 @@ void GitRepoLoader::processRevision(QByteArray ba)
    if (const auto ret = gitConfig->getGitValue("log.showSignature"); ret.success)
       showSignature = ret.output.toString().contains("true");
 
+   const auto wipInfo = processWip();
+
    const auto splitter = showSignature ? '\n' : '\000';
-   QList<QByteArray> commits;
 
    if (!showSignature)
+   {
+      QList<QByteArray> commits;
       commits = ba.split(splitter);
+
+      emit signalLoadingStarted(commits.count());
+
+      mRevCache->setup(wipInfo, commits);
+   }
    else
    {
+      QList<CommitInfo> commits;
       ba.replace('\000', '\n');
 
       auto preProcessedCommits = ba.split(splitter);
@@ -226,7 +235,8 @@ void GitRepoLoader::processRevision(QByteArray ba)
          {
             if (!commit.isEmpty())
             {
-               commits.append(commit);
+               CommitInfo revision(commit);
+               commits.append(revision);
                commit.clear();
             }
             processingCommit = true;
@@ -239,13 +249,11 @@ void GitRepoLoader::processRevision(QByteArray ba)
             commit.append(line + '\n');
          }
       }
+
+      emit signalLoadingStarted(commits.count());
+
+      mRevCache->setup(wipInfo, commits);
    }
-
-   emit signalLoadingStarted(commits.count());
-
-   const auto wipInfo = processWip();
-
-   mRevCache->setup(wipInfo, commits);
 
    loadReferences();
 
