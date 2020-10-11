@@ -172,6 +172,8 @@ void GitRepoLoader::requestRevisions()
                             .append(QString::fromUtf8(GIT_LOG_FORMAT))
                             .append(mShowAll ? QString("--all") : mGitBase->getCurrentBranch());
 
+   emit signalLoadingStarted(1);
+
    const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());
    connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevision);
    connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
