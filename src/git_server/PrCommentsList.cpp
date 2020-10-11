@@ -48,9 +48,6 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    delete mScroll;
    delete layout();
 
-   const auto descriptionFrame = new QFrame();
-   descriptionFrame->setObjectName("IssueDescription");
-
    mIssuesLayout = new QVBoxLayout();
    mIssuesLayout->setContentsMargins(QMargins());
    mIssuesLayout->setSpacing(30);
@@ -86,12 +83,16 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    mInputFrame->setLayout(inputLayout);
    mInputFrame->setVisible(false);
 
+   const auto descriptionFrame = new QFrame();
+   descriptionFrame->setObjectName("IssueDescription");
+
    const auto bodyLayout = new QVBoxLayout();
    bodyLayout->setContentsMargins(20, 20, 20, 20);
    bodyLayout->setAlignment(Qt::AlignTop);
    bodyLayout->setSpacing(30);
    bodyLayout->addWidget(descriptionFrame);
    bodyLayout->addLayout(mIssuesLayout);
+   bodyLayout->addStretch();
 
    mIssuesFrame = new QFrame();
    mIssuesFrame->setObjectName("IssuesViewFrame");
@@ -106,6 +107,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    aLayout->setSpacing(0);
    aLayout->addWidget(mScroll);
    aLayout->addWidget(mInputFrame);
+   // aLayout->addStretch();
 
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
@@ -132,6 +134,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
 
       creationLayout->addStretch();
    }
+   creationLayout->addWidget(new QLabel(tr("Unassigned")));
 
    for (auto &label : issue.labels)
    {
@@ -174,6 +177,8 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    body->setWordWrap(true);
 #endif
    layout->addWidget(body);
+
+   descriptionFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
    const auto separator = new QFrame();
    separator->setObjectName("orangeHSeparator");
