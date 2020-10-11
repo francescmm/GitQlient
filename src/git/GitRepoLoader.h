@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <GitExecResult.h>
+#include <CommitInfo.h>
 
 #include <QObject>
 #include <QSharedPointer>
@@ -62,4 +63,7 @@ private:
    void processRevision(QByteArray ba);
    WipRevisionInfo processWip();
    QVector<QString> getUntrackedFiles() const;
+   QList<CommitInfo> processUnsignedLog(QByteArray &log);
+   QList<CommitInfo> processSignedLog(QByteArray &log) const;
+   CommitInfo parseCommitData(QByteArray &commitData) const;
 };

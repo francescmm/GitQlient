@@ -45,13 +45,15 @@ public:
    };
 
    CommitInfo() = default;
-   explicit CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
-                       const QString &log, const QString &longLog = QString());
-   explicit CommitInfo(const QByteArray &b);
+   explicit CommitInfo(const QString sha, const QStringList &parents, const QChar &boundary, const QString &commiter,
+                       const QDateTime &commitDate, const QString &author, const QString &log,
+                       const QString &longLog = QString(), bool isSigned = false, const QString &gpgKey = QString());
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;
 
    QString getFieldStr(CommitInfo::Field field) const;
+
+   void setBoundary(QChar info) { mBoundaryInfo = std::move(info); }
    bool isBoundary() const { return mBoundaryInfo == '-'; }
    int parentsCount() const { return mParentsSha.count(); }
    QString parent(int idx) const { return mParentsSha.count() > idx ? mParentsSha.at(idx) : QString(); }

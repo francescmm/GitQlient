@@ -20,61 +20,6 @@ GitCache::~GitCache()
    mReferences.clear();
 }
 
-void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits)
-{
-   QMutexLocker lock(&mMutex);
-
-   const auto totalCommits = commits.count() + 1;
-
-   QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
-
-   mConfigured = false;
-
-   mDirNames.clear();
-   mFileNames.clear();
-   mRevisionFilesMap.clear();
-   mLanes.clear();
-
-   for (auto reference : qAsConst(mReferences))
-      reference->clearReferences();
-
-   mReferences.clear();
-
-   if (mCommitsMap.isEmpty())
-      mCommitsMap.reserve(totalCommits);
-
-   if (mCommits.isEmpty() || totalCommits > mCommits.count())
-      mCommits.resize(totalCommits);
-   else if (totalCommits < mCommits.count())
-   {
-      const auto commitsToRemove = std::abs(totalCommits - mCommits.count());
-      for (auto i = 0, pos = 1; i < commitsToRemove; ++i, ++pos)
-      {
-         mCommits.remove(pos);
-      }
-   }
-
-   QLog_Debug("Git", QString("Adding WIP revision."));
-
-   insertWipRevision(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
-
-   auto count = 1;
-
-   QLog_Debug("Git", QString("Adding commited revisions."));
-
-   for (const auto &commitInfo : commits)
-   {
-      CommitInfo revision(commitInfo);
-
-      if (revision.isValid())
-         insertCommitInfo(std::move(revision), count);
-      else
-         break;
-
-      ++count;
-   }
-}
-
 void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits)
 {
    QMutexLocker lock(&mMutex);
@@ -264,7 +209,8 @@ void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIn
    if (!newParentSha.isEmpty())
       parents.append(newParentSha);
 
-   CommitInfo c(CommitInfo::ZERO_SHA, parents, QString("-"), QDateTime::currentDateTime().toSecsSinceEpoch(), log);
+   CommitInfo c(CommitInfo::ZERO_SHA, parents, QChar(), QStringLiteral("-"), QDateTime::currentDateTime(),
+                QStringLiteral("-"), log);
 
    if (mLanes.isEmpty())
       mLanes.init(c.sha());
