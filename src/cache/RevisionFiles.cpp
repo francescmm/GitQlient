@@ -42,15 +42,21 @@ void RevisionFiles::setStatus(const QString &rowSt, bool isStaged)
       case 'U':
          mFileStatus.append(RevisionFiles::MODIFIED);
          mFileStatus[mFileStatus.count() - 1] |= RevisionFiles::CONFLICT;
+         if (isStaged)
+            mFileStatus[mFileStatus.count() - 1] |= RevisionFiles::IN_INDEX;
          mOnlyModified = false;
          break;
       case 'D':
          mFileStatus.append(RevisionFiles::DELETED);
          mOnlyModified = false;
+         if (isStaged)
+            mFileStatus[mFileStatus.count() - 1] |= RevisionFiles::IN_INDEX;
          break;
       case 'A':
          mFileStatus.append(RevisionFiles::NEW);
          mOnlyModified = false;
+         if (isStaged)
+            mFileStatus[mFileStatus.count() - 1] |= RevisionFiles::IN_INDEX;
          break;
       case '?':
          mFileStatus.append(RevisionFiles::UNKNOWN);

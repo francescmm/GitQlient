@@ -211,10 +211,8 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
       const auto isConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
       const auto isPartiallyCached = files.statusCmp(i, RevisionFiles::PARTIALLY_CACHED);
       const auto untrackedFile = !isInIndex && isUnknown;
-      const auto isNew = files.statusCmp(i, RevisionFiles::NEW);
-      const auto isDeleted = files.statusCmp(i, RevisionFiles::DELETED);
-      const auto staged = (isInIndex && !isUnknown && !isConflict) || isNew || isDeleted;
-      auto wip = QString("%1-%2").arg(fileName, QString::fromUtf8(ui->stagedFilesList->metaObject()->className()));
+      const auto staged = isInIndex && !isUnknown && !isConflict;
+      auto wip = QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName());
 
       if (staged || isPartiallyCached)
       {
@@ -233,7 +231,7 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
 
       const auto parent = untrackedFile ? ui->untrackedFilesList : fileList;
 
-      wip = QString("%1-%2").arg(fileName, QString::fromUtf8(parent->metaObject()->className()));
+      wip = QString("%1-%2").arg(fileName, parent->objectName());
 
       if (!staged)
       {
@@ -281,8 +279,7 @@ QPair<QListWidgetItem *, FileWidget *> CommitChangesWidget::fillFileItemInfo(con
    const auto fileWidget = new FileWidget(icon, modName);
    fileWidget->setTextColor(color);
 
-   mInternalCache.insert(QString("%1-%2").arg(file, QString::fromUtf8(parent->metaObject()->className())),
-                         { true, item });
+   mInternalCache.insert(QString("%1-%2").arg(file, parent->objectName()), { true, item });
 
    return qMakePair(item, fileWidget);
 }
@@ -321,10 +318,8 @@ void CommitChangesWidget::addFileToCommitList(QListWidgetItem *item)
    fileList->removeItemWidget(item);
    fileList->takeItem(row);
 
-   const auto wip
-       = mInternalCache.take(QString("%1-%2").arg(fileName, QString::fromUtf8(fileList->metaObject()->className())));
-   const auto newKey
-       = QString("%1-%2").arg(fileName, QString::fromUtf8(ui->stagedFilesList->metaObject()->className()));
+   const auto wip = mInternalCache.take(QString("%1-%2").arg(fileName, fileList->objectName()));
+   const auto newKey = QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName());
 
    if (!mInternalCache.contains(newKey))
    {
@@ -375,11 +370,8 @@ void CommitChangesWidget::removeFileFromCommitList(QListWidgetItem *item)
       const auto fileWidget = qobject_cast<FileWidget *>(ui->stagedFilesList->itemWidget(item));
       const auto fileName = fileWidget->text();
 
-      const auto wip = mInternalCache.take(
-          QString("%1-%2").arg(fileName, QString::fromUtf8(ui->stagedFilesList->metaObject()->className())));
-      mInternalCache.insert(
-          QString("%1-%2").arg(fileName, QString::fromUtf8(itemOriginalList->metaObject()->className())),
-          std::move(wip));
+      const auto wip = mInternalCache.take(QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName()));
+      mInternalCache.insert(QString("%1-%2").arg(fileName, itemOriginalList->objectName()), std::move(wip));
 
       const auto newFileWidget = new FileWidget(":/icons/add", fileName);
       newFileWidget->setTextColor(fileWidget->getTextColor());
