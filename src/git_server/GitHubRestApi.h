@@ -57,6 +57,7 @@ public:
    void requestComments(const Issue &issue) override;
    void requestReviews(const PullRequest &pr) override;
    void requestCommitsFromPR(const GitServer::PullRequest &pr) override;
+   void addIssueComment(const Issue &issue, const QString &text) override;
 
 private:
    QString mRepoEndpoint;

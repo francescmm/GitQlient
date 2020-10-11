@@ -44,9 +44,14 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    mConfig = config;
    mIssueNumber = issueNumber;
 
+   auto issue = config == Config::Issues ? mGitServerCache->getIssue(mIssueNumber)
+                                         : mGitServerCache->getPullRequest(mIssueNumber);
+
    delete mIssuesFrame;
    delete mScroll;
    delete layout();
+
+   mCommentsFrame = nullptr;
 
    mIssuesLayout = new QVBoxLayout();
    mIssuesLayout->setContentsMargins(QMargins());
@@ -63,7 +68,13 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
       mInputFrame->setVisible(false);
    });
 
-   connect(add, &QPushButton::clicked, this, []() {});
+   connect(add, &QPushButton::clicked, this, [issue, this]() {
+      connect(mGitServerCache.get(), &GitServerCache::issueUpdated, this, &PrCommentsList::processComments,
+              Qt::UniqueConnection);
+      mGitServerCache->getApi()->addIssueComment(issue, mInputTextEdit->toMarkdown());
+      mInputTextEdit->clear();
+      mInputFrame->setVisible(false);
+   });
 
    const auto btnsLayout = new QHBoxLayout();
    btnsLayout->setContentsMargins(QMargins());
@@ -112,9 +123,6 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
    creationLayout->setSpacing(5);
-
-   auto issue = config == Config::Issues ? mGitServerCache->getIssue(mIssueNumber)
-                                         : mGitServerCache->getPullRequest(mIssueNumber);
 
    if (!issue.assignees.isEmpty())
    {
@@ -229,13 +237,23 @@ void PrCommentsList::processComments(const Issue &issue)
    if (mIssueNumber != issue.number)
       return;
 
+   delete mCommentsFrame;
+
+   mCommentsFrame = new QFrame();
+
+   mIssuesLayout->addWidget(mCommentsFrame);
+
+   const auto commentsLayout = new QVBoxLayout(mCommentsFrame);
+   commentsLayout->setContentsMargins(QMargins());
+   commentsLayout->setSpacing(30);
+
    for (auto &comment : issue.comments)
    {
       const auto layout = createBubbleForComment(comment);
-      mIssuesLayout->addLayout(layout);
+      commentsLayout->addLayout(layout);
    }
 
-   mIssuesLayout->addStretch();
+   commentsLayout->addStretch();
 }
 
 QLabel *PrCommentsList::createHeadline(const QDateTime &dt, const QString &prefix)

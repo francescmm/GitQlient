@@ -79,6 +79,7 @@ public:
 private:
    QSharedPointer<GitServerCache> mGitServerCache;
    QNetworkAccessManager *mManager = nullptr;
+   QFrame *mCommentsFrame = nullptr;
    QVBoxLayout *mIssuesLayout = nullptr;
    QFrame *mIssuesFrame = nullptr;
    QFrame *mInputFrame = nullptr;

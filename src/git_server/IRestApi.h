@@ -188,6 +188,8 @@ public:
     */
    virtual void requestCommitsFromPR(const GitServer::PullRequest &pr) = 0;
 
+   virtual void addIssueComment(const Issue &, const QString &) { }
+
 protected:
    QNetworkAccessManager *mManager = nullptr;
    ServerAuthentication mAuth;
