@@ -42,6 +42,7 @@ class QVBoxLayout;
 class QNetworkAccessManager;
 class QHBoxLayout;
 class QScrollArea;
+class QTextEdit;
 
 class HighlightningFrame : public QFrame
 {
@@ -73,12 +74,15 @@ public:
 
    void loadData(Config config, int issueNumber);
    void highlightComment(int frameId);
+   void addGlobalComment();
 
 private:
    QSharedPointer<GitServerCache> mGitServerCache;
    QNetworkAccessManager *mManager = nullptr;
    QVBoxLayout *mIssuesLayout = nullptr;
    QFrame *mIssuesFrame = nullptr;
+   QFrame *mInputFrame = nullptr;
+   QTextEdit *mInputTextEdit = nullptr;
    Config mConfig;
    QScrollArea *mScroll = nullptr;
    bool mLoaded = false;

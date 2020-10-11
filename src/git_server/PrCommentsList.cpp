@@ -22,6 +22,7 @@
 #include <QSequentialAnimationGroup>
 #include <QPushButton>
 #include <QIcon>
+#include <QScrollBar>
 
 using namespace GitServer;
 
@@ -47,14 +48,54 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    delete mScroll;
    delete layout();
 
+   const auto descriptionFrame = new QFrame();
+   descriptionFrame->setObjectName("IssueDescription");
+
    mIssuesLayout = new QVBoxLayout();
-   mIssuesLayout->setContentsMargins(20, 20, 20, 20);
-   mIssuesLayout->setAlignment(Qt::AlignTop);
+   mIssuesLayout->setContentsMargins(QMargins());
    mIssuesLayout->setSpacing(30);
+
+   mInputTextEdit = new QTextEdit();
+   mInputTextEdit->setPlaceholderText(tr("Add your comment..."));
+   mInputTextEdit->setObjectName("AddReviewInput");
+
+   const auto cancel = new QPushButton(tr("Cancel"));
+   const auto add = new QPushButton(tr("Comment"));
+   connect(cancel, &QPushButton::clicked, this, [this]() {
+      mInputTextEdit->clear();
+      mInputFrame->setVisible(false);
+   });
+
+   connect(add, &QPushButton::clicked, this, []() {});
+
+   const auto btnsLayout = new QHBoxLayout();
+   btnsLayout->setContentsMargins(QMargins());
+   btnsLayout->setSpacing(0);
+   btnsLayout->addWidget(cancel);
+   btnsLayout->addStretch();
+   btnsLayout->addWidget(add);
+
+   const auto inputLayout = new QVBoxLayout();
+   inputLayout->setContentsMargins(20, 20, 20, 10);
+   inputLayout->setSpacing(10);
+   inputLayout->addWidget(mInputTextEdit);
+   inputLayout->addLayout(btnsLayout);
+
+   mInputFrame = new QFrame();
+   mInputFrame->setFixedHeight(200);
+   mInputFrame->setLayout(inputLayout);
+   mInputFrame->setVisible(false);
+
+   const auto bodyLayout = new QVBoxLayout();
+   bodyLayout->setContentsMargins(20, 20, 20, 20);
+   bodyLayout->setAlignment(Qt::AlignTop);
+   bodyLayout->setSpacing(30);
+   bodyLayout->addWidget(descriptionFrame);
+   bodyLayout->addLayout(mIssuesLayout);
 
    mIssuesFrame = new QFrame();
    mIssuesFrame->setObjectName("IssuesViewFrame");
-   mIssuesFrame->setLayout(mIssuesLayout);
+   mIssuesFrame->setLayout(bodyLayout);
 
    mScroll = new QScrollArea();
    mScroll->setWidgetResizable(true);
@@ -64,6 +105,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    aLayout->setContentsMargins(QMargins());
    aLayout->setSpacing(0);
    aLayout->addWidget(mScroll);
+   aLayout->addWidget(mInputFrame);
 
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
@@ -115,10 +157,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
 
    creationLayout->addStretch();
 
-   const auto frame = new QFrame();
-   frame->setObjectName("IssueDescription");
-
-   const auto layout = new QVBoxLayout(frame);
+   const auto layout = new QVBoxLayout(descriptionFrame);
    layout->setContentsMargins(QMargins());
    layout->setSpacing(10);
    layout->addLayout(creationLayout);
@@ -135,8 +174,6 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    body->setWordWrap(true);
 #endif
    layout->addWidget(body);
-
-   mIssuesLayout->addWidget(frame);
 
    const auto separator = new QFrame();
    separator->setObjectName("orangeHSeparator");
@@ -172,6 +209,12 @@ void PrCommentsList::highlightComment(int frameId)
    animationGoup->addAnimation(animation);
 
    animationGoup->start();
+}
+
+void PrCommentsList::addGlobalComment()
+{
+   mInputFrame->setVisible(true);
+   mInputTextEdit->setFocus();
 }
 
 void PrCommentsList::processComments(const Issue &issue)

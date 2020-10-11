@@ -122,6 +122,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    addComment->setChecked(false);
    addComment->setIcon(QIcon(":/icons/add_comment"));
    addComment->setToolTip(tr("Add new comment"));
+   connect(addComment, &QPushButton::clicked, mPrCommentsList, &PrCommentsList::addGlobalComment);
 
    const auto headLine = new QVBoxLayout();
    headLine->setContentsMargins(QMargins());
