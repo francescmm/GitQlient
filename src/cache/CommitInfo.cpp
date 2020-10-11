@@ -5,45 +5,20 @@
 const QString CommitInfo::ZERO_SHA = QString("0000000000000000000000000000000000000000");
 const QString CommitInfo::INIT_SHA = QString("4b825dc642cb6eb9a060e54bf8d69288fbee4904");
 
-CommitInfo::CommitInfo(const QString &sha, const QStringList &parents, const QString &author, long long secsSinceEpoch,
-                       const QString &log, const QString &longLog)
+CommitInfo::CommitInfo(const QString sha, const QStringList &parents, const QChar &boundary, const QString &commiter,
+                       const QDateTime &commitDate, const QString &author, const QString &log, const QString &longLog,
+                       bool isSigned, const QString &gpgKey)
 {
    mSha = sha;
    mParentsSha = parents;
-   mCommitter = author;
+   mBoundaryInfo = boundary;
+   mCommitter = commiter;
+   mCommitDate = commitDate;
    mAuthor = author;
-   mCommitDate = QDateTime::fromSecsSinceEpoch(secsSinceEpoch);
    mShortLog = log;
    mLongLog = longLog;
-}
-
-CommitInfo::CommitInfo(const QByteArray &b)
-{
-   const auto fields = QString::fromUtf8(b).split('\n');
-
-   if (fields.count() > 6)
-   {
-      auto combinedShas = fields.at(1);
-      auto sha = combinedShas.split('X').first();
-      mBoundaryInfo = sha.at(0);
-      sha.remove(0, 1);
-      mSha = sha;
-      combinedShas = combinedShas.remove(0, mSha.size() + 1 + 1);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-      mParentsSha = combinedShas.trimmed().split(' ', Qt::SkipEmptyParts);
-#else
-      mParentsSha = combinedShas.trimmed().split(' ', QString::SkipEmptyParts);
-#endif
-      mCommitter = fields.at(2);
-      mAuthor = fields.at(3);
-      mCommitDate = QDateTime::fromSecsSinceEpoch(fields.at(4).toInt());
-      mShortLog = fields.at(5);
-
-      for (auto i = 6; i < fields.count(); ++i)
-         mLongLog += fields.at(i) + '\n';
-
-      mLongLog = mLongLog.trimmed();
-   }
+   mSigned = isSigned;
+   mGpgKey = gpgKey;
 }
 
 bool CommitInfo::operator==(const CommitInfo &commit) const

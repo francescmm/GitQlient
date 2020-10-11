@@ -103,9 +103,10 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
 
    auto tooltip = sha == CommitInfo::ZERO_SHA
        ? QString()
-       : QString("<p>%1 - %2<p></p>%3</p>%4")
+       : QString("<p>%1 - %2</p><p>%3</p>%4%5")
              .arg(r.author().split("<").first(), d.toString(locale.dateTimeFormat(QLocale::ShortFormat)), sha,
-                  auxMessage);
+                  !auxMessage.isEmpty() ? QString("<p>%1</p>").arg(auxMessage) : "",
+                  r.isSigned() ? QString::fromUtf8("<p>Commit signed!</p><p> GPG key: %1</p>").arg(r.getGpgKey()) : "");
 
    if (mGitServerCache)
    {

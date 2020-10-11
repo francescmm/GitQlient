@@ -20,7 +20,7 @@ GitCache::~GitCache()
    mReferences.clear();
 }
 
-void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &commits)
+void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits)
 {
    QMutexLocker lock(&mMutex);
 
@@ -62,17 +62,14 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<QByteArray> &co
 
    QLog_Debug("Git", QString("Adding commited revisions."));
 
-   for (const auto &commitInfo : commits)
+   for (const auto &commit : commits)
    {
-      CommitInfo revision(commitInfo);
-
-      if (revision.isValid())
-         insertCommitInfo(std::move(revision), count);
-      else
-         break;
-
+      if (commit.isValid())
+      {
+         insertCommitInfo(commit, count);
       ++count;
    }
+}
 }
 
 CommitInfo GitCache::getCommitInfoByRow(int row)
@@ -206,7 +203,8 @@ void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIn
    if (!newParentSha.isEmpty())
       parents.append(newParentSha);
 
-   CommitInfo c(CommitInfo::ZERO_SHA, parents, QString("-"), QDateTime::currentDateTime().toSecsSinceEpoch(), log);
+   CommitInfo c(CommitInfo::ZERO_SHA, parents, QChar(), QStringLiteral("-"), QDateTime::currentDateTime(),
+                QStringLiteral("-"), log);
 
    if (mLanes.isEmpty())
       mLanes.init(c.sha());

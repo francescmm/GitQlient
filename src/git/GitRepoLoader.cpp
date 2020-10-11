@@ -172,6 +172,8 @@ void GitRepoLoader::requestRevisions()
                             .append(QString::fromUtf8(GIT_LOG_FORMAT))
                             .append(mShowAll ? QString("--all") : mGitBase->getCurrentBranch());
 
+   emit signalLoadingStarted(1);
+
    const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());
    connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevision);
    connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
@@ -179,7 +181,7 @@ void GitRepoLoader::requestRevisions()
    requestor->run(baseCmd);
 }
 
-void GitRepoLoader::processRevision(const QByteArray &ba)
+void GitRepoLoader::processRevision(QByteArray ba)
 {
    QLog_Info("Git", "Revisions received!");
 
@@ -196,12 +198,13 @@ void GitRepoLoader::processRevision(const QByteArray &ba)
 
    QLog_Debug("Git", "Processing revisions...");
 
-   const auto &commits = ba.split('\000');
+   emit signalLoadingStarted(1);
 
-   emit signalLoadingStarted(commits.count());
+   const auto ret = gitConfig->getGitValue("log.showSignature");
+   const auto showSignature = ret.success ? ret.output.toString().contains("true") : false;
+   const auto commits = showSignature ? processSignedLog(ba) : processUnsignedLog(ba);
 
    const auto wipInfo = processWip();
-
    mRevCache->setup(wipInfo, commits);
 
    loadReferences();
@@ -269,4 +272,102 @@ QVector<QString> GitRepoLoader::getUntrackedFiles() const
 #endif
 
    return ret;
+}
+
+QList<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log)
+{
+   QList<CommitInfo> commits;
+   auto commitsLog = log.split('\000');
+
+   for (auto &commitData : commitsLog)
+   {
+      if (auto commit = parseCommitData(commitData); commit.isValid())
+         commits.append(std::move(commit));
+   }
+
+   return commits;
+}
+
+QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
+{
+   auto preProcessedCommits = log.replace('\000', '\n').split('\n');
+   QList<CommitInfo> commits;
+   QByteArray commit;
+   QByteArray gpg;
+   QString gpgKey;
+   auto processingCommit = false;
+
+   for (auto line : preProcessedCommits)
+   {
+      if (line.startsWith("gpg: "))
+      {
+         processingCommit = false;
+         gpg.append(line);
+
+         if (line.contains("using RSA key"))
+         {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+            gpgKey = QString::fromUtf8(line).split("using RSA key", Qt::SkipEmptyParts).last();
+#else
+            gpgKey = QString::fromUtf8(line).split("using RSA key", QString::SkipEmptyParts);
+#endif
+            gpgKey.append('\n');
+         }
+      }
+      else if (line.startsWith("log size"))
+      {
+         if (!commit.isEmpty())
+         {
+            if (auto revision = parseCommitData(commit); revision.isValid())
+               commits.append(std::move(revision));
+
+            commit.clear();
+         }
+         processingCommit = true;
+         const auto isSigned = !gpg.isEmpty() && gpg.contains("Good signature");
+         commit.append(isSigned ? gpgKey.toUtf8() : "\n");
+         gpg.clear();
+      }
+      else if (processingCommit)
+      {
+         commit.append(line + '\n');
+      }
+   }
+
+   return commits;
+}
+
+CommitInfo GitRepoLoader::parseCommitData(QByteArray &commitData) const
+{
+   if (const auto fields = QString::fromUtf8(commitData).split('\n'); fields.count() > 6)
+   {
+      const auto firstField = fields.constFirst();
+      const auto isSigned = !fields.first().isEmpty() && !firstField.contains("log size") ? true : false;
+      auto combinedShas = fields.at(1);
+      auto commitSha = combinedShas.split('X').first();
+      const auto boundary = commitSha[0];
+      const auto sha = commitSha.remove(0, 1);
+      combinedShas = combinedShas.remove(0, sha.size() + 1 + 1).trimmed();
+      QStringList parentsSha;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+      parentsSha = combinedShas.split(' ', Qt::SkipEmptyParts);
+#else
+      parentsSha = combinedShas.split(' ', QString::SkipEmptyParts);
+#endif
+      const auto committer = fields.at(2);
+      const auto author = fields.at(3);
+      const auto commitDate = QDateTime::fromSecsSinceEpoch(fields.at(4).toInt());
+      const auto shortLog = fields.at(5);
+      QString longLog;
+
+      for (auto i = 6; i < fields.count(); ++i)
+         longLog += fields.at(i) + '\n';
+
+      longLog = longLog.trimmed();
+
+      return CommitInfo { sha,    parentsSha, boundary, committer, commitDate,
+                          author, shortLog,   longLog,  isSigned,  isSigned ? firstField : QString() };
+   }
+
+   return CommitInfo();
 }

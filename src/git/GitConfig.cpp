@@ -20,7 +20,6 @@ GitConfig::GitConfig(QSharedPointer<GitBase> gitBase, QObject *parent)
 
 GitUserInfo GitConfig::getGlobalUserInfo() const
 {
-
    GitUserInfo userInfo;
 
    QLog_Debug("Git", QString("Getting global user info"));
@@ -40,7 +39,6 @@ GitUserInfo GitConfig::getGlobalUserInfo() const
 
 void GitConfig::setGlobalUserInfo(const GitUserInfo &info)
 {
-
    QLog_Debug("Git", QString("Setting global user info"));
 
    mGitBase->run(QString("git config --global user.name \"%1\"").arg(info.mUserName));
@@ -49,7 +47,6 @@ void GitConfig::setGlobalUserInfo(const GitUserInfo &info)
 
 GitExecResult GitConfig::setGlobalData(const QString &key, const QString &value)
 {
-
    QLog_Debug("Git", QString("Configuring global key {%1} with value {%2}").arg(key, value));
 
    const auto ret = mGitBase->run(QString("git config --global %1 \"%2\"").arg(key, value));
@@ -59,7 +56,6 @@ GitExecResult GitConfig::setGlobalData(const QString &key, const QString &value)
 
 GitUserInfo GitConfig::getLocalUserInfo() const
 {
-
    QLog_Debug("Git", QString("Getting local user info"));
 
    GitUserInfo userInfo;
@@ -79,7 +75,6 @@ GitUserInfo GitConfig::getLocalUserInfo() const
 
 void GitConfig::setLocalUserInfo(const GitUserInfo &info)
 {
-
    QLog_Debug("Git", QString("Setting local user info"));
 
    mGitBase->run(QString("git config --local user.name \"%1\"").arg(info.mUserName));
@@ -88,7 +83,6 @@ void GitConfig::setLocalUserInfo(const GitUserInfo &info)
 
 GitExecResult GitConfig::setLocalData(const QString &key, const QString &value)
 {
-
    QLog_Debug("Git", QString("Configuring local key {%1} with value {%2}").arg(key, value));
 
    const auto ret = mGitBase->run(QString("git config --local %1 \"%2\"").arg(key, value));
@@ -102,7 +96,8 @@ GitExecResult GitConfig::clone(const QString &url, const QString &fullPath)
 
    const auto asyncRun = new GitCloneProcess(mGitBase->getWorkingDir());
    connect(asyncRun, &GitCloneProcess::signalProgress, this, &GitConfig::signalCloningProgress, Qt::DirectConnection);
-   connect(asyncRun, &GitCloneProcess::signalCloningFailure, this, &GitConfig::signalCloningFailure, Qt::DirectConnection);
+   connect(asyncRun, &GitCloneProcess::signalCloningFailure, this, &GitConfig::signalCloningFailure,
+           Qt::DirectConnection);
 
    mGitBase->setWorkingDir(fullPath);
 
@@ -111,7 +106,6 @@ GitExecResult GitConfig::clone(const QString &url, const QString &fullPath)
 
 GitExecResult GitConfig::initRepo(const QString &fullPath)
 {
-
    QLog_Debug("Git", QString("Initializing a new repository at {%1}").arg(fullPath));
 
    const auto ret = mGitBase->run(QString("git init %1").arg(fullPath));
@@ -124,7 +118,6 @@ GitExecResult GitConfig::initRepo(const QString &fullPath)
 
 GitExecResult GitConfig::getLocalConfig() const
 {
-
    QLog_Debug("Git", QString("Getting local config"));
 
    const auto ret = mGitBase->run("git config --local --list");
@@ -134,7 +127,6 @@ GitExecResult GitConfig::getLocalConfig() const
 
 GitExecResult GitConfig::getGlobalConfig() const
 {
-
    QLog_Debug("Git", QString("Getting global config"));
 
    const auto ret = mGitBase->run("git config --global --list");
@@ -144,7 +136,6 @@ GitExecResult GitConfig::getGlobalConfig() const
 
 GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
 {
-
    QLog_Debug("Git", QString("Getting remote for branch {%1}.").arg(branch));
 
    const auto config = getLocalConfig();
@@ -180,7 +171,6 @@ GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
 
 GitExecResult GitConfig::getGitValue(const QString &key) const
 {
-
    QLog_Debug("Git", QString("Getting value for config key {%1}").arg(key));
 
    const auto ret = mGitBase->run(QString("git config --get %1").arg(key));
