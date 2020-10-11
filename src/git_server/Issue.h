@@ -62,6 +62,7 @@ struct Issue
    QDateTime creation;
    int commentsCount = 0;
    QVector<Comment> comments;
+   bool isOpen = true;
 
    QJsonObject toJson() const
    {
@@ -82,6 +83,8 @@ struct Issue
       for (const auto &assignee : assignees)
          array.insert(count++, assignee.name);
       object.insert("assignees", array);
+
+      object.insert("state", isOpen ? "open" : "closed");
 
       QJsonArray labelsArray;
       count = 0;

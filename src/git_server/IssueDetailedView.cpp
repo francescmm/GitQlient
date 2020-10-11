@@ -4,11 +4,11 @@
 #include <CircularPixmap.h>
 #include <GitServerCache.h>
 #include <IRestApi.h>
-#include <Issue.h>
 #include <PrCommitsList.h>
 #include <PrChangesList.h>
 #include <PrCommentsList.h>
 
+#include <QMessageBox>
 #include <QLocale>
 #include <QPushButton>
 #include <QToolButton>
@@ -117,12 +117,21 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
       }
    });
 
-   const auto addComment = new QPushButton();
-   addComment->setCheckable(true);
-   addComment->setChecked(false);
-   addComment->setIcon(QIcon(":/icons/add_comment"));
-   addComment->setToolTip(tr("Add new comment"));
-   connect(addComment, &QPushButton::clicked, mPrCommentsList, &PrCommentsList::addGlobalComment);
+   mAddComment = new QPushButton();
+   mAddComment->setCheckable(true);
+   mAddComment->setChecked(false);
+   mAddComment->setIcon(QIcon(":/icons/add_comment"));
+   mAddComment->setToolTip(tr("Add new comment"));
+   mAddComment->setDisabled(true);
+   connect(mAddComment, &QPushButton::clicked, mPrCommentsList, &PrCommentsList::addGlobalComment);
+
+   mCloseIssue = new QPushButton();
+   mCloseIssue->setCheckable(true);
+   mCloseIssue->setChecked(false);
+   mCloseIssue->setIcon(QIcon(":/icons/close_issue"));
+   mCloseIssue->setToolTip(tr("Close"));
+   mCloseIssue->setDisabled(true);
+   connect(mCloseIssue, &QPushButton::clicked, this, &IssueDetailedView::closeIssue);
 
    const auto headLine = new QVBoxLayout();
    headLine->setContentsMargins(QMargins());
@@ -144,7 +153,8 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    headerLayout->addWidget(commits);
    headerLayout->addSpacing(20);
    headerLayout->addWidget(mReviewBtn);
-   headerLayout->addWidget(addComment);
+   headerLayout->addWidget(mAddComment);
+   headerLayout->addWidget(mCloseIssue);
 
    const auto footerFrame = new QFrame();
    footerFrame->setObjectName("IssuesFooterFrame");
@@ -180,28 +190,27 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum)
 {
    mIssueNumber = issueNum;
 
-   auto issue
-       = config == Config::Issues ? mGitServerCache->getIssue(issueNum) : mGitServerCache->getPullRequest(issueNum);
+   mIssue = config == Config::Issues ? mGitServerCache->getIssue(issueNum) : mGitServerCache->getPullRequest(issueNum);
 
-   const auto title = issue.title.count() >= 40 ? issue.title.left(40).append("...") : issue.title;
-   mTitleLabel->setText(QString("#%1 - %2").arg(issue.number).arg(title));
+   const auto title = mIssue.title.count() >= 40 ? mIssue.title.left(40).append("...") : mIssue.title;
+   mTitleLabel->setText(QString("#%1 - %2").arg(mIssue.number).arg(title));
 
-   const auto days = issue.creation.daysTo(QDateTime::currentDateTime());
+   const auto days = mIssue.creation.daysTo(QDateTime::currentDateTime());
    const auto whenText = days <= 30
        ? days != 0 ? QString::fromUtf8(" %1 days ago").arg(days) : QString::fromUtf8(" today")
-       : QString(" on %1").arg(issue.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+       : QString(" on %1").arg(mIssue.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
-   mCreationLabel->setText(QString("Created by <b>%1</b>%2").arg(issue.creator.name, whenText));
-   mCreationLabel->setToolTip(issue.creation.toString(QLocale().dateTimeFormat(QLocale::ShortFormat)));
+   mCreationLabel->setText(QString("Created by <b>%1</b>%2").arg(mIssue.creator.name, whenText));
+   mCreationLabel->setToolTip(mIssue.creation.toString(QLocale().dateTimeFormat(QLocale::ShortFormat)));
    mCreationLabel->setVisible(true);
 
    mPrCommentsList->loadData(static_cast<PrCommentsList::Config>(config), issueNum);
 
    if (config == Config::PullRequests)
    {
-      mPrCommitsList->loadData(issue.number);
+      mPrCommitsList->loadData(mIssue.number);
 
-      const auto pr = mGitServerCache->getPullRequest(issue.number);
+      const auto pr = mGitServerCache->getPullRequest(mIssue.number);
       mPrChangesList->loadData(pr.base, pr.head);
    }
 
@@ -209,6 +218,8 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum)
    mBtnGroup->button(static_cast<int>(Buttons::Changes))->setEnabled(config == Config::PullRequests);
    mBtnGroup->button(static_cast<int>(Buttons::Comments))->setEnabled(true);
    mReviewBtn->setEnabled(config == Config::PullRequests);
+   mCloseIssue->setEnabled(true);
+   mAddComment->setEnabled(true);
 }
 
 bool IssueDetailedView::eventFilter(QObject *obj, QEvent *event)
@@ -225,4 +236,14 @@ bool IssueDetailedView::eventFilter(QObject *obj, QEvent *event)
    }
 
    return false;
+}
+
+void IssueDetailedView::closeIssue()
+{
+   if (const auto ret = QMessageBox::question(this, tr("Close issue"), tr("Are you sure you want to close the issue?"));
+       ret == QMessageBox::Yes)
+   {
+      mIssue.isOpen = false;
+      mGitServerCache->getApi()->updateIssue(mIssue.number, mIssue);
+   }
 }

@@ -74,7 +74,6 @@ struct PullRequest : public Issue
 
    QString head;
    QString base;
-   bool isOpen = true;
    bool maintainerCanModify = true;
    bool draft = false;
    int id = 0;

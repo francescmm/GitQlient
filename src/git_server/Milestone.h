@@ -30,7 +30,7 @@ namespace GitServer
 
 struct Milestone
 {
-   int id;
+   int id = -1;
    int number;
    QString nodeId;
    QString title;

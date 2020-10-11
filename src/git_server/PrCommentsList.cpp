@@ -139,10 +139,11 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
          if (count++ < totalAssignees - 1)
             creationLayout->addWidget(new QLabel(", "));
       }
-
-      creationLayout->addStretch();
    }
-   creationLayout->addWidget(new QLabel(tr("Unassigned")));
+   else
+      creationLayout->addWidget(new QLabel(tr("Unassigned")));
+
+   creationLayout->addStretch();
 
    for (auto &label : issue.labels)
    {
@@ -165,8 +166,6 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
       milestone->setObjectName("IssueLabel");
       creationLayout->addWidget(milestone);
    }
-
-   creationLayout->addStretch();
 
    const auto layout = new QVBoxLayout(descriptionFrame);
    layout->setContentsMargins(QMargins());

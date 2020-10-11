@@ -37,6 +37,7 @@ class QStackedLayout;
 class GitBase;
 class PrChangesList;
 class QToolButton;
+class QPushButton;
 
 namespace GitServer
 {
@@ -79,6 +80,7 @@ private:
       RequestChanges
    };
 
+   GitServer::Issue mIssue;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitServerCache> mGitServerCache;
    int mIssueNumber = 0;
@@ -90,4 +92,8 @@ private:
    PrChangesList *mPrChangesList = nullptr;
    PrCommitsList *mPrCommitsList = nullptr;
    QToolButton *mReviewBtn = nullptr;
+   QPushButton *mAddComment = nullptr;
+   QPushButton *mCloseIssue = nullptr;
+
+   void closeIssue();
 };

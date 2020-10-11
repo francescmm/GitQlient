@@ -67,6 +67,7 @@ void GitHubRestApi::updateIssue(int issueNumber, const Issue &issue)
 
    auto request = createRequest(QString(mRepoEndpoint + "/issues/%1").arg(issueNumber));
    request.setRawHeader("Content-Length", QByteArray::number(data.size()));
+   request.setRawHeader("Accept", "application/vnd.github.v3+json");
    const auto reply = mManager->post(request, data);
 
    connect(reply, &QNetworkReply::finished, this, [this]() {
@@ -773,6 +774,7 @@ Issue GitHubRestApi::issueFromJson(const QJsonObject &json) const
    issue.url = json["html_url"].toString();
    issue.creation = json["created_at"].toVariant().toDateTime();
    issue.commentsCount = json["comments"].toInt();
+   issue.isOpen = json["state"].toString() == "open";
 
    issue.creator = { json["user"].toObject()["id"].toInt(), json["user"].toObject()["login"].toString(),
                      json["user"].toObject()["avatar_url"].toString(), json["user"].toObject()["html_url"].toString(),
@@ -800,14 +802,17 @@ Issue GitHubRestApi::issueFromJson(const QJsonObject &json) const
       issue.assignees.append(sAssignee);
    }
 
-   Milestone sMilestone { json["milestone"].toObject()[QStringLiteral("id")].toInt(),
-                          json["milestone"].toObject()[QStringLiteral("number")].toInt(),
-                          json["milestone"].toObject()[QStringLiteral("node_id")].toString(),
-                          json["milestone"].toObject()[QStringLiteral("title")].toString(),
-                          json["milestone"].toObject()[QStringLiteral("description")].toString(),
-                          json["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
+   if (const auto value = json["milestone"].toString(); !json["milestone"].toObject().isEmpty() && value != "NULL")
+   {
+      Milestone sMilestone { json["milestone"].toObject()[QStringLiteral("id")].toInt(),
+                             json["milestone"].toObject()[QStringLiteral("number")].toInt(),
+                             json["milestone"].toObject()[QStringLiteral("node_id")].toString(),
+                             json["milestone"].toObject()[QStringLiteral("title")].toString(),
+                             json["milestone"].toObject()[QStringLiteral("description")].toString(),
+                             json["milestone"].toObject()[QStringLiteral("state")].toString() == "open" };
 
-   issue.milestone = sMilestone;
+      issue.milestone = sMilestone;
+   }
 
    return issue;
 }
