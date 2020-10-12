@@ -177,7 +177,7 @@ void AGitProcess::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
    if (mRealError)
    {
       if (!mErrorOutput.isEmpty())
-         mRunOutput = !mErrorOutput.isEmpty();
+         mRunOutput = mErrorOutput;
    }
    else
       mRunOutput.append(readAllStandardOutput() + mErrorOutput);
