@@ -3,6 +3,7 @@ INCLUDEPATH += $$PWD
 FORMS += \
     $$PWD/BranchDlg.ui \
     $$PWD/CreateRepoDlg.ui \
+    $$PWD/InitialRepoConfig.ui \
     $$PWD/PullDlg.ui \
     $$PWD/RepoConfigDlg.ui
 
@@ -16,6 +17,7 @@ HEADERS += \
     $$PWD/CreateRepoDlg.h \
     $$PWD/GitQlientUpdater.h \
     $$PWD/Highlighter.h \
+    $$PWD/InitialRepoConfig.h \
     $$PWD/ProgressDlg.h \
     $$PWD/PullDlg.h \
     $$PWD/RepoConfigDlg.h \
@@ -31,6 +33,7 @@ SOURCES += \
     $$PWD/CreateRepoDlg.cpp \
     $$PWD/GitQlientUpdater.cpp \
     $$PWD/Highlighter.cpp \
+    $$PWD/InitialRepoConfig.cpp \
     $$PWD/ProgressDlg.cpp \
     $$PWD/PullDlg.cpp \
     $$PWD/RepoConfigDlg.cpp \

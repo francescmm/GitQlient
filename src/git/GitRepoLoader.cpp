@@ -168,9 +168,14 @@ void GitRepoLoader::requestRevisions()
 {
    QLog_Debug("Git", "Loading revisions.");
 
+   GitQlientSettings settings;
+   const auto maxCommits = settings.localValue(mGitBase->getGitQlientSettingsDir(), "MaxCommits", 0).toInt();
+   const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
+                                                  : mShowAll ? QString("--all") : mGitBase->getCurrentBranch();
+
    const auto baseCmd = QString("git log --date-order --no-color --log-size --parents --boundary -z --pretty=format:")
                             .append(QString::fromUtf8(GIT_LOG_FORMAT))
-                            .append(mShowAll ? QString("--all") : mGitBase->getCurrentBranch());
+                            .append(commitsToRetrieve);
 
    emit signalLoadingStarted(1);
 

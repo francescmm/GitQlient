@@ -4,6 +4,7 @@
 #include <GitQlientStyles.h>
 #include <GitQlientSettings.h>
 #include <QPinnableTabWidget.h>
+#include <InitialRepoConfig.h>
 
 #include <QProcess>
 #include <QTabBar>
@@ -13,6 +14,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <GitBase.h>
 
 #include <QLogger.h>
 
@@ -183,9 +185,10 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
 
       if (info.isFile() || info.isDir())
       {
+         conditionallyOpenPreConfigDlg(repoPath);
+
          const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "No repo";
          const auto repo = new GitQlientRepo(repoPath);
-
          const auto index = pinned ? mRepos->addPinnedTab(repo, repoName) : mRepos->addTab(repo, repoName);
 
          connect(repo, &GitQlientRepo::signalEditFile, this, &GitQlient::signalEditDocument);
@@ -263,4 +266,18 @@ void GitQlient::onSuccessOpen(const QString &fullPath)
    settings.setProjectOpened(fullPath);
 
    mConfigWidget->onRepoOpened();
+}
+
+void GitQlient::conditionallyOpenPreConfigDlg(const QString &repoPath)
+{
+   QSharedPointer<GitBase> git(new GitBase(repoPath));
+
+   GitQlientSettings settings;
+   auto maxCommits = settings.localValue(git->getGitQlientSettingsDir(), "MaxCommits", -1).toInt();
+
+   if (maxCommits == -1)
+   {
+      const auto preConfig = new InitialRepoConfig(git, this);
+      preConfig->exec();
+   }
 }

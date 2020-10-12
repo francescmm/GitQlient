@@ -48,10 +48,9 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
    else if (totalCommits < mCommits.count())
    {
       const auto commitsToRemove = std::abs(totalCommits - mCommits.count());
-      for (auto i = 0, pos = 1; i < commitsToRemove; ++i, ++pos)
-      {
-         mCommits.remove(pos);
-      }
+
+      for (auto i = 0; i < commitsToRemove; ++i)
+         mCommits.takeLast();
    }
 
    QLog_Debug("Git", QString("Adding WIP revision."));
@@ -67,9 +66,9 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
       if (commit.isValid())
       {
          insertCommitInfo(commit, count);
-      ++count;
+         ++count;
+      }
    }
-}
 }
 
 CommitInfo GitCache::getCommitInfoByRow(int row)
