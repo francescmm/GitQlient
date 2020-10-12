@@ -192,6 +192,9 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum)
 
    mIssue = config == Config::Issues ? mGitServerCache->getIssue(issueNum) : mGitServerCache->getPullRequest(issueNum);
 
+   mCloseIssue->setIcon(
+       QIcon(QString::fromUtf8(config == Config::Issues ? ":/icons/close_issue" : ":/icons/close_pr")));
+
    const auto title = mIssue.title.count() >= 40 ? mIssue.title.left(40).append("...") : mIssue.title;
    mTitleLabel->setText(QString("#%1 - %2").arg(mIssue.number).arg(title));
 
