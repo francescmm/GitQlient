@@ -66,7 +66,7 @@ inline QVector<DiffChange> splitDiff(const QString &diff)
    const auto flag = QString::SkipEmptyParts;
 #endif
 
-   const auto chunks = diff.split("diff --gti", flag);
+   const auto chunks = diff.split("diff --git", flag);
 
    for (const auto &chunk : chunks)
    {

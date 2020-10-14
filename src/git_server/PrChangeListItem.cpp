@@ -53,7 +53,7 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
       numberArea->setEditor(oldFile);
       oldFile->setStartingLine(change.oldFileStartLine - 1);
       oldFile->loadDiff(change.oldData.first.join("\n").trimmed(), change.oldData.second);
-      oldFile->setMinimumWidth(535);
+      oldFile->setMinimumWidth(590);
       oldFile->show();
       oldFile->setMinimumHeight(oldFile->getHeight());
 
@@ -64,7 +64,7 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
       mNewFileDiff->setStartingLine(change.newFileStartLine - 1);
       mNewFileDiff->loadDiff(change.newData.first.join("\n").trimmed(), change.newData.second);
       mNewFileDiff->addNumberArea(mNewNumberArea);
-      mNewFileDiff->setMinimumWidth(535);
+      mNewFileDiff->setMinimumWidth(590);
       mNewFileDiff->show();
       mNewFileDiff->setMinimumHeight(mNewFileDiff->getHeight());
 
