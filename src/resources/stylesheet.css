@@ -849,6 +849,12 @@ ButtonLink#IssueTitle
    background: #D89000;
 }
 
+#IssueIntroCommented
+{
+   border-radius: 10px;
+   background: #404142;
+}
+
 #CodeReviewComment
 {
    border-radius: 10px;

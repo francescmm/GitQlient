@@ -94,7 +94,7 @@ private:
 
    void processComments(const GitServer::Issue &issue);
    QLabel *createHeadline(const QDateTime &dt, const QString &prefix = QString());
-   void onReviewsReceived(GitServer::PullRequest pr);
+   void onReviewsReceived();
    QLayout *createBubbleForComment(const GitServer::Comment &comment);
    QLayout *createBubbleForReview(const GitServer::Review &review);
    QVector<QLayout *> createBubbleForCodeReview(int reviewId, QVector<GitServer::CodeReview> &comments);

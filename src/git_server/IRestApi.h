@@ -105,6 +105,34 @@ signals:
    void issueUpdated(const GitServer::Issue &issue);
 
    /**
+    * @brief commentsReceived Signal triggered when comments for an issue has been received.
+    * @param issueNumber The number of the issue.
+    * @param comments The list of comments.
+    */
+   void commentsReceived(int issueNumber, const QVector<GitServer::Comment> &comments);
+
+   /**
+    * @brief onCodeReviewsReceived Signal triggered when code reviews for a PR has been received.
+    * @param prNumber The number of the PR.
+    * @param codeReviews The code reviews.
+    */
+   void codeReviewsReceived(int prNumber, const QVector<GitServer::CodeReview> &codeReviews);
+
+   /**
+    * @brief onCommentReviewsReceived Signal triggered when the review comments for a PR has been received.
+    * @param prNumber The number of the PR.
+    * @param commentReviews The comment reviews.
+    */
+   void commentReviewsReceived(int prNumber, const QMap<int, GitServer::Review> &commentReviews);
+
+   /**
+    * @brief commitsReceived Signal triggered when the commits of a PR has been received.
+    * @param prNumber The number of the PR.
+    * @param commits The commits.
+    */
+   void commitsReceived(int prNumber, const QVector<GitServer::Commit> &commits);
+
+   /**
     * @brief pullRequestUpdated Signal triggered when a pull request has been updated.
     * @param pr The updated pull request.
     */
@@ -172,21 +200,21 @@ public:
    /**
     * @brief requestComments Requests all the comments of an issue. This doesn't get the reviews and coments on reviews
     * for a pull request.
-    * @param issue The issue number to query.
+    * @param issueNumber The issue number to query.
     */
-   virtual void requestComments(const Issue &issue) = 0;
+   virtual void requestComments(int issueNumber) = 0;
 
    /**
     * @brief requestReviews Requests all the reviews in a Pull Requests.
     * @param pr The Pull Request to query.
     */
-   virtual void requestReviews(const PullRequest &pr) = 0;
+   virtual void requestReviews(int prNumber) = 0;
 
    /**
     * @brief requestCommitsFromPR Requests all the commits from a PR.
     * @param prNumber The Pr number.
     */
-   virtual void requestCommitsFromPR(const GitServer::PullRequest &pr) = 0;
+   virtual void requestCommitsFromPR(int prNumber) = 0;
 
    virtual void addIssueComment(const Issue &, const QString &) { }
 

@@ -54,9 +54,9 @@ public:
    void requestIssues(int page = -1) override;
    void requestPullRequests(int page = -1) override;
    void mergePullRequest(int number, const QByteArray &data) override;
-   void requestComments(const Issue &issue) override;
-   void requestReviews(const PullRequest &pr) override;
-   void requestCommitsFromPR(const GitServer::PullRequest &pr) override;
+   void requestComments(int issueNumber) override;
+   void requestReviews(int prNumber) override;
+   void requestCommitsFromPR(int prNumber) override;
    void addIssueComment(const Issue &issue, const QString &text) override;
 
 private:
@@ -71,13 +71,13 @@ private:
    void onPullRequestReceived();
    void onPullRequestStatusReceived(PullRequest pr);
    void onIssuesReceived();
-   void onCommentsReceived(Issue issue);
+   void onCommentsReceived(int issueNumber);
    void onPullRequestDetailsReceived(PullRequest pr);
-   void onReviewsReceived(PullRequest pr);
+   void onReviewsReceived(int prNumber);
 
-   void requestReviewComments(const PullRequest &pr);
-   void onReviewCommentsReceived(PullRequest pr);
-   void onCommitsReceived(PullRequest pr);
+   void requestReviewComments(int prNumber);
+   void onReviewCommentsReceived(int prNumber);
+   void onCommitsReceived(int prNumber);
 
    Issue issueFromJson(const QJsonObject &json) const;
    PullRequest prFromJson(const QJsonObject &json) const;

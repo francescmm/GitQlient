@@ -50,6 +50,7 @@ signals:
    void issuesReceived();
    void prUpdated(GitServer::PullRequest pr);
    void prReceived();
+   void prReviewsReceived();
    void errorOccurred(const QString &error);
 
 public:
@@ -86,6 +87,10 @@ private:
    void onConnectionTested();
    void onIssueUpdated(const GitServer::Issue &issue);
    void onPRUpdated(const GitServer::PullRequest &pr);
+   void onCommentsReceived(int number, const QVector<GitServer::Comment> &comments);
+   void onCodeReviewsReceived(int number, const QVector<GitServer::CodeReview> &codeReviews);
+   void onCommentReviewsReceived(int number, const QMap<int, GitServer::Review> &commentReviews);
+   void onCommitsReceived(int number, const QVector<GitServer::Commit> &commits);
 
    void initLabels(const QVector<GitServer::Label> &labels);
    void initMilestones(const QVector<GitServer::Milestone> &milestones);

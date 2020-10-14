@@ -36,7 +36,7 @@ void PrCommitsList::loadData(int number)
 
    const auto pr = mGitServerCache->getPullRequest(number);
 
-   mGitServerCache->getApi()->requestCommitsFromPR(pr);
+   mGitServerCache->getApi()->requestCommitsFromPR(pr.number);
 }
 
 void PrCommitsList::onCommitsReceived(const GitServer::PullRequest &pr)

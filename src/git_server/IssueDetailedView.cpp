@@ -98,11 +98,11 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
       {
          case ReviewState::None:
             mReviewBtn->setIcon(QIcon(":/icons/review_comment"));
-            mReviewBtn->setToolTip(tr("Comment"));
+            mReviewBtn->setToolTip(tr("Comment review"));
             break;
          case ReviewState::Approved:
             mReviewBtn->setIcon(QIcon(":/icons/review_approve"));
-            mReviewBtn->setToolTip(tr("Approved"));
+            mReviewBtn->setToolTip(tr("Approve review"));
             break;
          case ReviewState::RequestChanges:
             mReviewBtn->setIcon(QIcon(":/icons/review_change"));

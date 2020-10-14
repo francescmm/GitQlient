@@ -38,7 +38,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
 {
    connect(mGitServerCache.get(), &GitServerCache::issueUpdated, this, &PrCommentsList::processComments,
            Qt::UniqueConnection);
-   connect(mGitServerCache.get(), &GitServerCache::prUpdated, this, &PrCommentsList::onReviewsReceived,
+   connect(mGitServerCache.get(), &GitServerCache::prReviewsReceived, this, &PrCommentsList::onReviewsReceived,
            Qt::UniqueConnection);
 
    mConfig = config;
@@ -95,7 +95,6 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    mInputFrame->setVisible(false);
 
    const auto descriptionFrame = new QFrame();
-   // descriptionFrame->setObjectName("IssueDescription");
 
    const auto bodyLayout = new QVBoxLayout();
    bodyLayout->setContentsMargins(20, 20, 20, 20);
@@ -118,7 +117,6 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    aLayout->setSpacing(0);
    aLayout->addWidget(mScroll);
    aLayout->addWidget(mInputFrame);
-   // aLayout->addStretch();
 
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
@@ -200,12 +198,9 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    mIssuesLayout->addWidget(separator);
 
    if (mConfig == Config::Issues)
-      mGitServerCache->getApi()->requestComments(issue);
+      mGitServerCache->getApi()->requestComments(issue.number);
    else
-   {
-      const auto pr = mGitServerCache->getPullRequest(mIssueNumber);
-      mGitServerCache->getApi()->requestReviews(static_cast<PullRequest>(pr));
-   }
+      mGitServerCache->getApi()->requestReviews(mIssueNumber);
 }
 
 void PrCommentsList::highlightComment(int frameId)
@@ -275,10 +270,9 @@ QLabel *PrCommentsList::createHeadline(const QDateTime &dt, const QString &prefi
    return label;
 }
 
-void PrCommentsList::onReviewsReceived(PullRequest pr)
+void PrCommentsList::onReviewsReceived()
 {
-   if (mIssueNumber != pr.number)
-      return;
+   auto pr = mGitServerCache->getPullRequest(mIssueNumber);
 
    mFrameLinks.clear();
    mComments.clear();
@@ -297,11 +291,8 @@ void PrCommentsList::onReviewsReceived(PullRequest pr)
    {
       const auto layouts = new QVBoxLayout();
 
-      if (review.state != QString::fromUtf8("COMMENTED"))
-      {
-         const auto reviewLayout = createBubbleForReview(review);
-         layouts->addLayout(reviewLayout);
-      }
+      const auto reviewLayout = createBubbleForReview(review);
+      layouts->addLayout(reviewLayout);
 
       auto codeReviewsLayouts = createBubbleForCodeReview(review.id, pr.reviewComment);
 
@@ -387,6 +378,13 @@ QLayout *PrCommentsList::createBubbleForReview(const Review &review)
       frame->setObjectName("IssueIntroApproved");
 
       header = QString("<b>%1</b> (%2) approved the PR ").arg(review.creator.name, review.association.toLower());
+   }
+   else if (review.state == QString::fromUtf8("COMMENTED"))
+   {
+      frame->setObjectName("IssueIntroCommented");
+
+      header = QString("<p><b>%1</b> (%2) made comments:</p><p>%3</p>")
+                   .arg(review.creator.name, review.association.toLower(), review.body);
    }
 
    const auto creationLayout = new QHBoxLayout();

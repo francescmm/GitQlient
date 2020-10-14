@@ -198,26 +198,26 @@ void GitHubRestApi::mergePullRequest(int number, const QByteArray &data)
    connect(reply, &QNetworkReply::finished, this, &GitHubRestApi::onPullRequestMerged);
 }
 
-void GitHubRestApi::requestComments(const Issue &issue)
+void GitHubRestApi::requestComments(int issueNumber)
 {
-   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/issues/%1/comments").arg(issue.number)));
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/issues/%1/comments").arg(issueNumber)));
 
-   connect(reply, &QNetworkReply::finished, this, [this, issue]() { onCommentsReceived(issue); });
+   connect(reply, &QNetworkReply::finished, this, [this, issueNumber]() { onCommentsReceived(issueNumber); });
 }
 
-void GitHubRestApi::requestReviews(const PullRequest &pr)
+void GitHubRestApi::requestReviews(int prNumber)
 {
-   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1/reviews").arg(pr.number)));
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1/reviews").arg(prNumber)));
 
-   connect(reply, &QNetworkReply::finished, this, [this, pr]() { onReviewsReceived(pr); });
+   connect(reply, &QNetworkReply::finished, this, [this, prNumber]() { onReviewsReceived(prNumber); });
 }
 
-void GitHubRestApi::requestCommitsFromPR(const GitServer::PullRequest &pr)
+void GitHubRestApi::requestCommitsFromPR(int prNumber)
 {
-   auto request = createRequest(mRepoEndpoint + QString("/pulls/%1/commits").arg(pr.number));
+   auto request = createRequest(mRepoEndpoint + QString("/pulls/%1/commits").arg(prNumber));
    const auto reply = mManager->get(request);
 
-   connect(reply, &QNetworkReply::finished, this, [this, pr]() { onCommitsReceived(pr); });
+   connect(reply, &QNetworkReply::finished, this, [this, prNumber]() { onCommitsReceived(prNumber); });
 }
 
 void GitHubRestApi::addIssueComment(const Issue &issue, const QString &text)
@@ -459,6 +459,9 @@ void GitHubRestApi::onPullRequestReceived()
              [](const PullRequest &p1, const PullRequest &p2) { return p1.creation > p2.creation; });
 
    emit pullRequestsReceived(pullRequests);
+
+   for (auto &pr : pullRequests)
+      QTimer::singleShot(200, this, [this, num = pr.number]() { requestComments(num); });
 }
 
 void GitHubRestApi::onPullRequestStatusReceived(PullRequest pr)
@@ -550,10 +553,10 @@ void GitHubRestApi::onIssuesReceived()
    emit issuesReceived(issues);
 
    for (auto &issue : issues)
-      QTimer::singleShot(200, this, [this, issue]() { requestComments(issue); });
+      QTimer::singleShot(200, this, [this, num = issue.number]() { requestComments(num); });
 }
 
-void GitHubRestApi::onCommentsReceived(Issue issue)
+void GitHubRestApi::onCommentsReceived(int issueNumber)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
@@ -583,9 +586,7 @@ void GitHubRestApi::onCommentsReceived(Issue issue)
          comments.append(std::move(c));
       }
 
-      issue.comments = comments;
-
-      emit issueUpdated(issue);
+      emit commentsReceived(issueNumber, comments);
    }
 }
 
@@ -614,7 +615,7 @@ void GitHubRestApi::onPullRequestDetailsReceived(PullRequest pr)
    }
 }
 
-void GitHubRestApi::onReviewsReceived(PullRequest pr)
+void GitHubRestApi::onReviewsReceived(int prNumber)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
@@ -647,20 +648,20 @@ void GitHubRestApi::onReviewsReceived(PullRequest pr)
          reviews.insert(id, std::move(r));
       }
 
-      pr.reviews = reviews;
+      emit commentReviewsReceived(prNumber, reviews);
 
-      QTimer::singleShot(200, this, [this, pr]() { requestReviewComments(pr); });
+      QTimer::singleShot(200, this, [this, prNumber]() { requestReviewComments(prNumber); });
    }
 }
 
-void GitHubRestApi::requestReviewComments(const PullRequest &pr)
+void GitHubRestApi::requestReviewComments(int prNumber)
 {
-   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1/comments").arg(pr.number)));
+   const auto reply = mManager->get(createRequest(mRepoEndpoint + QString("/pulls/%1/comments").arg(prNumber)));
 
-   connect(reply, &QNetworkReply::finished, this, [this, pr]() { onReviewCommentsReceived(pr); });
+   connect(reply, &QNetworkReply::finished, this, [this, prNumber]() { onReviewCommentsReceived(prNumber); });
 }
 
-void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
+void GitHubRestApi::onReviewCommentsReceived(int prNumber)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
@@ -711,13 +712,11 @@ void GitHubRestApi::onReviewCommentsReceived(PullRequest pr)
          comments.append(std::move(c));
       }
 
-      pr.reviewComment = std::move(comments);
-
-      emit pullRequestUpdated(pr);
+      emit codeReviewsReceived(prNumber, comments);
    }
 }
 
-void GitHubRestApi::onCommitsReceived(PullRequest pr)
+void GitHubRestApi::onCommitsReceived(int prNumber)
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    QString errorStr;
@@ -759,9 +758,7 @@ void GitHubRestApi::onCommitsReceived(PullRequest pr)
          commits.append(std::move(c));
       }
 
-      pr.commits = std::move(commits);
-
-      emit pullRequestUpdated(pr);
+      emit commitsReceived(prNumber, commits);
    }
 }
 

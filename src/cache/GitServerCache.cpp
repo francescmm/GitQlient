@@ -40,6 +40,10 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
    connect(getApi(), &IRestApi::milestonesReceived, this, &GitServerCache::initMilestones);
    connect(getApi(), &IRestApi::issuesReceived, this, &GitServerCache::initIssues);
    connect(getApi(), &IRestApi::pullRequestsReceived, this, &GitServerCache::initPullRequests);
+   connect(getApi(), &IRestApi::commentsReceived, this, &GitServerCache::onCommentsReceived);
+   connect(getApi(), &IRestApi::codeReviewsReceived, this, &GitServerCache::onCodeReviewsReceived);
+   connect(getApi(), &IRestApi::commentReviewsReceived, this, &GitServerCache::onCommentReviewsReceived);
+   connect(getApi(), &IRestApi::commitsReceived, this, &GitServerCache::onCommitsReceived);
    connect(getApi(), &IRestApi::issueUpdated, this, &GitServerCache::onIssueUpdated);
    connect(getApi(), &IRestApi::pullRequestUpdated, this, &GitServerCache::onPRUpdated);
    connect(getApi(), &IRestApi::errorOccurred, this, &GitServerCache::errorOccurred);
@@ -94,6 +98,36 @@ void GitServerCache::onPRUpdated(const PullRequest &pr)
    mPullRequests[pr.number] = pr;
 
    emit prUpdated(pr);
+}
+
+void GitServerCache::onCommentsReceived(int number, const QVector<Comment> &comments)
+{
+   if (mIssues.contains(number))
+      mIssues[number].comments = comments;
+   else if (mPullRequests.contains(number))
+      mPullRequests[number].comments = comments;
+}
+
+void GitServerCache::onCodeReviewsReceived(int number, const QVector<GitServer::CodeReview> &codeReviews)
+{
+   if (mPullRequests.contains(number))
+      mPullRequests[number].reviewComment = codeReviews;
+
+   emit prReviewsReceived();
+}
+
+void GitServerCache::onCommentReviewsReceived(int number, const QMap<int, GitServer::Review> &commentReviews)
+{
+   if (mPullRequests.contains(number))
+      mPullRequests[number].reviews = commentReviews;
+}
+
+void GitServerCache::onCommitsReceived(int number, const QVector<GitServer::Commit> &commits)
+{
+   if (mPullRequests.contains(number))
+      mPullRequests[number].commits = commits;
+
+   emit prUpdated(mPullRequests[number]);
 }
 
 PullRequest GitServerCache::getPullRequest(const QString &sha) const
