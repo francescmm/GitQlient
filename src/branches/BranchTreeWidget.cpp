@@ -103,6 +103,6 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 
 void BranchTreeWidget::selectCommit(QTreeWidgetItem *item)
 {
-   if (item)
-      emit signalSelectCommit(item->data(0, Qt::UserRole + 3).toString());
+   if (item && item->data(0, IsLeaf).toBool())
+      emit signalSelectCommit(item->data(0, ShaRole).toString());
 }
