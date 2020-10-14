@@ -179,6 +179,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
       mStackedLayout->setCurrentIndex(static_cast<int>(Buttons::Comments));
       mPrCommentsList->highlightComment(frameId);
    });
+   connect(mPrCommitsList, &PrCommitsList::openDiff, this, &IssueDetailedView::openDiff);
 }
 
 IssueDetailedView::~IssueDetailedView()

@@ -42,6 +42,7 @@ class GitServerWidget : public QFrame
    Q_OBJECT
 
 signals:
+   void openDiff(const QString &sha);
 
 public:
    explicit GitServerWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,

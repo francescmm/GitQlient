@@ -18,7 +18,6 @@
 #include <QNetworkReply>
 #include <QDir>
 #include <QFile>
-#include <QDesktopServices>
 
 PrCommitsList::PrCommitsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
@@ -96,7 +95,7 @@ QFrame *PrCommitsList::createBubbleForComment(const GitServer::Commit &commit)
       commitMsg = commitMsg.left(47).append("...");
 
    const auto link = new ButtonLink(QString("<b>%1</b>").arg(commitMsg));
-   connect(link, &ButtonLink::clicked, [url = commit.url]() { QDesktopServices::openUrl(url); });
+   connect(link, &ButtonLink::clicked, this, [this, sha = commit.sha]() { emit openDiff(sha); });
 
    const auto frame = new QFrame();
    frame->setObjectName("IssueIntro");

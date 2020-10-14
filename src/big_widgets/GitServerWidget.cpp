@@ -30,6 +30,7 @@ GitServerWidget::GitServerWidget(const QSharedPointer<GitCache> &cache, const QS
    , mGitServerCache(gitServerCache)
    , mDetailedView(new IssueDetailedView(mGit, mGitServerCache))
 {
+   connect(mDetailedView, &IssueDetailedView::openDiff, this, &GitServerWidget::openDiff);
 }
 
 bool GitServerWidget::configure(const GitServer::ConfigData &config)
