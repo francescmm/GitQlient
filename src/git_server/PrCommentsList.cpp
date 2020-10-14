@@ -95,7 +95,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    mInputFrame->setVisible(false);
 
    const auto descriptionFrame = new QFrame();
-   descriptionFrame->setObjectName("IssueDescription");
+   // descriptionFrame->setObjectName("IssueDescription");
 
    const auto bodyLayout = new QVBoxLayout();
    bodyLayout->setContentsMargins(20, 20, 20, 20);
@@ -173,6 +173,12 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    layout->addLayout(creationLayout);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+   const auto bodyDescFrame = new QFrame();
+   bodyDescFrame->setObjectName("IssueDescription");
+
+   const auto bodyDescLayout = new QVBoxLayout(bodyDescFrame);
+   bodyDescLayout->setContentsMargins(10, 10, 10, 10);
+
    const auto body = new QTextEdit();
    body->setMarkdown(QString::fromUtf8(issue.body));
    body->setReadOnly(true);
@@ -183,7 +189,8 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    const auto body = new QLabel(QString::fromUtf8((issue.body)));
    body->setWordWrap(true);
 #endif
-   layout->addWidget(body);
+   bodyDescLayout->addWidget(body);
+   layout->addWidget(bodyDescFrame);
 
    descriptionFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 

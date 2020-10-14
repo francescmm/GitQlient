@@ -820,10 +820,16 @@ ButtonLink#IssueTitle
    padding-left: 5px;
 }
 
-#IssuesViewFrame, #IssueDescription
+#IssuesViewFrame
 {
    background: #2E2F30;
 }
+
+ #IssueDescription
+ {
+   background: #404142;
+   border-radius: 5px;
+ }
 
 #IssueIntro
 {
