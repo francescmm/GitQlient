@@ -61,12 +61,6 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    commits->setDisabled(true);
    mBtnGroup->addButton(commits, static_cast<int>(Buttons::Commits));
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-   connect(mBtnGroup, &QButtonGroup::idClicked, mStackedLayout, &QStackedLayout::setCurrentIndex);
-#else
-   connect(mBtnGroup, SIGNAL(buttonClicked(int)), mStackedLayout, SLOT(setCurrentIndex(int)));
-#endif
-
    const auto actionGroup = new QActionGroup(this);
    const auto reviewMenu = new QMenu(mReviewBtn);
    reviewMenu->installEventFilter(this);
@@ -173,6 +167,12 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    issuesLayout->addLayout(mStackedLayout);
    issuesLayout->addWidget(footerFrame);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+   connect(mBtnGroup, &QButtonGroup::idClicked, this, &IssueDetailedView::onViewChange);
+#else
+   connect(mBtnGroup, SIGNAL(buttonClicked(int)), this, SLOT(onViewChange(int)));
+#endif
+
    connect(mPrCommentsList, &PrCommentsList::frameReviewLink, mPrChangesList, &PrChangesList::addLinks);
    connect(mPrChangesList, &PrChangesList::gotoReview, this, [this](int frameId) {
       mBtnGroup->button(static_cast<int>(Buttons::Comments))->setChecked(true);
@@ -240,6 +240,12 @@ bool IssueDetailedView::eventFilter(QObject *obj, QEvent *event)
    }
 
    return false;
+}
+
+void IssueDetailedView::onViewChange(int viewId)
+{
+   mAddComment->setEnabled(viewId == static_cast<int>(Buttons::Comments));
+   mStackedLayout->setCurrentIndex(viewId);
 }
 
 void IssueDetailedView::closeIssue()

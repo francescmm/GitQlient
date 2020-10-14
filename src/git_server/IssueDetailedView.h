@@ -96,5 +96,6 @@ private:
    QPushButton *mAddComment = nullptr;
    QPushButton *mCloseIssue = nullptr;
 
+   void onViewChange(int viewId);
    void closeIssue();
 };
