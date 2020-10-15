@@ -292,7 +292,9 @@ void PrCommentsList::onReviewsReceived()
       const auto layouts = new QVBoxLayout();
 
       const auto reviewLayout = createBubbleForReview(review);
-      layouts->addLayout(reviewLayout);
+
+      if (reviewLayout)
+         layouts->addLayout(reviewLayout);
 
       auto codeReviewsLayouts = createBubbleForCodeReview(review.id, pr.reviewComment);
 
@@ -331,13 +333,13 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    const auto body = new QTextEdit();
-   body->setMarkdown(comment.body);
+   body->setMarkdown(comment.body.trimmed());
    body->setReadOnly(true);
    body->show();
    const auto height = body->document()->size().height();
    body->setMaximumHeight(height);
 #else
-   const auto body = new QLabel(comment.body);
+   const auto body = new QLabel(comment.body.trimmed());
    body->setWordWrap(true);
 #endif
 
@@ -366,12 +368,14 @@ QLayout *PrCommentsList::createBubbleForReview(const Review &review)
 {
    const auto frame = new QFrame();
    QString header;
+   QLabel *label = nullptr;
 
    if (review.state == QString::fromUtf8("CHANGES_REQUESTED"))
    {
       frame->setObjectName("IssueIntroChangesRequested");
 
-      header = QString("<b>%1</b> (%2) requested changes ").arg(review.creator.name, review.association.toLower());
+      header = QString("<b>%1</b> (%2) requested changes to the PR ")
+                   .arg(review.creator.name, review.association.toLower());
    }
    else if (review.state == QString::fromUtf8("APPROVED"))
    {
@@ -381,16 +385,28 @@ QLayout *PrCommentsList::createBubbleForReview(const Review &review)
    }
    else if (review.state == QString::fromUtf8("COMMENTED"))
    {
+      if (review.body.isEmpty())
+      {
+         delete frame;
+         return nullptr;
+      }
+
       frame->setObjectName("IssueIntroCommented");
 
-      header = QString("<p><b>%1</b> (%2) made comments:</p><p>%3</p>")
-                   .arg(review.creator.name, review.association.toLower(), review.body);
+      header = QString("<b>%1</b> (%2) reviewed the PR and added some comments ")
+                   .arg(review.creator.name, review.association.toLower());
+
+      label = createHeadline(review.creation, header);
+      label->setText(label->text().append(" <p>%1</p>").arg(review.body));
    }
+
+   if (!label)
+      label = createHeadline(review.creation, header);
 
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
    creationLayout->setSpacing(0);
-   creationLayout->addWidget(createHeadline(review.creation, header));
+   creationLayout->addWidget(label);
    creationLayout->addStretch();
 
    const auto innerLayout = new QVBoxLayout(frame);
