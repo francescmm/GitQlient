@@ -37,6 +37,12 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    mTitleLabel->setText(tr("Detailed View"));
    mTitleLabel->setObjectName("HeaderTitle");
 
+   const auto refresh = new QPushButton();
+   refresh->setIcon(QIcon(":/icons/refresh"));
+   refresh->setObjectName("ViewBtnOption");
+   refresh->setToolTip(tr("Refresh"));
+   connect(refresh, &QPushButton::clicked, this, [this]() { loadData(mConfig, mIssueNumber, true); });
+
    const auto comments = new QToolButton();
    comments->setIcon(QIcon(":/icons/comments"));
    comments->setObjectName("ViewBtnOption");
@@ -124,6 +130,8 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
    headerLayout->setSpacing(10);
+   headerLayout->addWidget(refresh);
+   headerLayout->addSpacing(20);
    headerLayout->addLayout(headLine);
    headerLayout->addStretch();
    headerLayout->addWidget(comments);
@@ -171,14 +179,18 @@ IssueDetailedView::~IssueDetailedView()
    delete mBtnGroup;
 }
 
-void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum)
+void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum, bool force)
 {
+   if (mIssueNumber == issueNum && !force)
+      return;
+
+   mConfig = config;
    mIssueNumber = issueNum;
 
-   mIssue = config == Config::Issues ? mGitServerCache->getIssue(issueNum) : mGitServerCache->getPullRequest(issueNum);
+   mIssue = mConfig == Config::Issues ? mGitServerCache->getIssue(issueNum) : mGitServerCache->getPullRequest(issueNum);
 
    mCloseIssue->setIcon(
-       QIcon(QString::fromUtf8(config == Config::Issues ? ":/icons/close_issue" : ":/icons/close_pr")));
+       QIcon(QString::fromUtf8(mConfig == Config::Issues ? ":/icons/close_issue" : ":/icons/close_pr")));
 
    const auto title = mIssue.title.count() >= 40 ? mIssue.title.left(40).append("...") : mIssue.title;
    mTitleLabel->setText(QString("#%1 - %2").arg(mIssue.number).arg(title));
@@ -192,9 +204,9 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum)
    mCreationLabel->setToolTip(mIssue.creation.toString(QLocale().dateTimeFormat(QLocale::ShortFormat)));
    mCreationLabel->setVisible(true);
 
-   mPrCommentsList->loadData(static_cast<PrCommentsList::Config>(config), issueNum);
+   mPrCommentsList->loadData(static_cast<PrCommentsList::Config>(mConfig), issueNum);
 
-   if (config == Config::PullRequests)
+   if (mConfig == Config::PullRequests)
    {
       mPrCommitsList->loadData(mIssue.number);
 
@@ -202,10 +214,10 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum)
       mPrChangesList->loadData(pr.base, pr.head);
    }
 
-   mBtnGroup->button(static_cast<int>(Buttons::Commits))->setEnabled(config == Config::PullRequests);
-   mBtnGroup->button(static_cast<int>(Buttons::Changes))->setEnabled(config == Config::PullRequests);
+   mBtnGroup->button(static_cast<int>(Buttons::Commits))->setEnabled(mConfig == Config::PullRequests);
+   mBtnGroup->button(static_cast<int>(Buttons::Changes))->setEnabled(mConfig == Config::PullRequests);
    mBtnGroup->button(static_cast<int>(Buttons::Comments))->setEnabled(true);
-   mReviewBtn->setEnabled(config == Config::PullRequests);
+   mReviewBtn->setEnabled(mConfig == Config::PullRequests);
    mCloseIssue->setEnabled(true);
    mAddComment->setEnabled(true);
 }

@@ -61,7 +61,7 @@ public:
                               QWidget *parent = nullptr);
    ~IssueDetailedView();
 
-   void loadData(Config config, int issueNum);
+   void loadData(Config config, int issueNum, bool force = false);
 
 protected:
    bool eventFilter(QObject *obj, QEvent *event);
@@ -77,7 +77,8 @@ private:
    GitServer::Issue mIssue;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitServerCache> mGitServerCache;
-   int mIssueNumber = 0;
+   Config mConfig;
+   int mIssueNumber = -1;
    QButtonGroup *mBtnGroup = nullptr;
    QLabel *mTitleLabel = nullptr;
    QLabel *mCreationLabel = nullptr;

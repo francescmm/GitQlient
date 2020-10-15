@@ -504,9 +504,6 @@ void GitHubRestApi::onPullRequestReceived()
              [](const PullRequest &p1, const PullRequest &p2) { return p1.creation > p2.creation; });
 
    emit pullRequestsReceived(pullRequests);
-
-   for (auto &pr : pullRequests)
-      QTimer::singleShot(200, this, [this, num = pr.number]() { requestComments(num); });
 }
 
 void GitHubRestApi::onPullRequestStatusReceived(PullRequest pr)

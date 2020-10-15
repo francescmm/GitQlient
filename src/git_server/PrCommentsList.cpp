@@ -200,7 +200,10 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    if (mConfig == Config::Issues)
       mGitServerCache->getApi()->requestComments(issue.number);
    else
+   {
+      mGitServerCache->getApi()->requestComments(mIssueNumber);
       mGitServerCache->getApi()->requestReviews(mIssueNumber);
+   }
 }
 
 void PrCommentsList::highlightComment(int frameId)
