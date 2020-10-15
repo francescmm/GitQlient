@@ -74,13 +74,6 @@ private:
       Commits
    };
 
-   enum class ReviewState
-   {
-      None,
-      Approved,
-      RequestChanges
-   };
-
    GitServer::Issue mIssue;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitServerCache> mGitServerCache;
@@ -98,4 +91,6 @@ private:
 
    void onViewChange(int viewId);
    void closeIssue();
+   void openAddReviewDlg(QAction *sender);
+   void addReview();
 };

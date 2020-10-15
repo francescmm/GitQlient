@@ -946,3 +946,8 @@ SourceCodeReview QLabel
    border: none;
 }
 
+#teComment
+{
+    border-style: solid;
+    border-width: 1px;
+}

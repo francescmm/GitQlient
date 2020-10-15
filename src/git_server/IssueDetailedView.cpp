@@ -7,6 +7,7 @@
 #include <PrCommitsList.h>
 #include <PrChangesList.h>
 #include <PrCommentsList.h>
+#include <AddCodeReviewDialog.h>
 
 #include <QMessageBox>
 #include <QLocale>
@@ -75,41 +76,24 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    action->setToolTip(tr("Comment"));
    action->setCheckable(true);
    action->setChecked(true);
-   action->setData(static_cast<int>(ReviewState::None));
+   action->setData(static_cast<int>(ReviewMode::Comment));
    actionGroup->addAction(action);
    reviewMenu->addAction(action);
 
    action = new QAction(tr("Review: Approve"));
    action->setCheckable(true);
    action->setToolTip(tr("The comments will be part of a review"));
-   action->setData(static_cast<int>(ReviewState::Approved));
+   action->setData(static_cast<int>(ReviewMode::Approve));
    actionGroup->addAction(action);
    reviewMenu->addAction(action);
 
    action = new QAction(tr("Review: Request changes"));
    action->setCheckable(true);
    action->setToolTip(tr("The comments will be part of a review"));
-   action->setData(static_cast<int>(ReviewState::RequestChanges));
+   action->setData(static_cast<int>(ReviewMode::RequestChanges));
    actionGroup->addAction(action);
    reviewMenu->addAction(action);
-
-   connect(actionGroup, &QActionGroup::triggered, this, [this](QAction *sender) {
-      switch (static_cast<ReviewState>(sender->data().toInt()))
-      {
-         case ReviewState::None:
-            mReviewBtn->setIcon(QIcon(":/icons/review_comment"));
-            mReviewBtn->setToolTip(tr("Comment review"));
-            break;
-         case ReviewState::Approved:
-            mReviewBtn->setIcon(QIcon(":/icons/review_approve"));
-            mReviewBtn->setToolTip(tr("Approve review"));
-            break;
-         case ReviewState::RequestChanges:
-            mReviewBtn->setIcon(QIcon(":/icons/review_change"));
-            mReviewBtn->setToolTip(tr("Request changes"));
-            break;
-      }
-   });
+   connect(actionGroup, &QActionGroup::triggered, this, &IssueDetailedView::openAddReviewDlg);
 
    mAddComment = new QPushButton();
    mAddComment->setCheckable(true);
@@ -257,3 +241,30 @@ void IssueDetailedView::closeIssue()
       mGitServerCache->getApi()->updateIssue(mIssue.number, mIssue);
    }
 }
+
+void IssueDetailedView::openAddReviewDlg(QAction *sender)
+{
+   const auto mode = static_cast<ReviewMode>(sender->data().toInt());
+   switch (mode)
+   {
+      case ReviewMode::Comment:
+         mReviewBtn->setIcon(QIcon(":/icons/review_comment"));
+         mReviewBtn->setToolTip(tr("Comment review"));
+         break;
+      case ReviewMode::Approve:
+         mReviewBtn->setIcon(QIcon(":/icons/review_approve"));
+         mReviewBtn->setToolTip(tr("Approve review"));
+         break;
+      case ReviewMode::RequestChanges:
+         mReviewBtn->setIcon(QIcon(":/icons/review_change"));
+         mReviewBtn->setToolTip(tr("Request changes"));
+         break;
+   }
+
+   const auto dlg = new AddCodeReviewDialog(mode, this);
+   connect(dlg, &AddCodeReviewDialog::commentAdded, this, [this](const QString &) { addReview(); });
+
+   dlg->exec();
+}
+
+void IssueDetailedView::addReview() { }
