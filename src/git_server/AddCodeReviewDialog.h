@@ -27,6 +27,8 @@ public:
 
    void accept() override;
 
+   QString getText() const;
+
 private:
    Ui::AddCodeReviewDialog *ui;
    ReviewMode mMode;

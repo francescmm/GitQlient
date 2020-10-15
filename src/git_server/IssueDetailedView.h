@@ -94,4 +94,5 @@ private:
    void closeIssue();
    void openAddReviewDlg(QAction *sender);
    void addReview(const QString &body, const QString &mode);
+   void addCodeReview(int line, const QString &path, const QString &body);
 };

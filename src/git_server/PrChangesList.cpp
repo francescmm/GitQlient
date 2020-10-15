@@ -43,6 +43,7 @@ void PrChangesList::loadData(const QString &baseBranch, const QString &headBranc
          {
             const auto changeListItem = new PrChangeListItem(change);
             connect(changeListItem, &PrChangeListItem::gotoReview, this, &PrChangesList::gotoReview);
+            connect(changeListItem, &PrChangeListItem::addCodeReview, this, &PrChangesList::addCodeReview);
 
             mListItems.append(changeListItem);
 

@@ -3,6 +3,7 @@
 #include <DiffHelper.h>
 #include <FileDiffView.h>
 #include <LineNumberArea.h>
+#include <AddCodeReviewDialog.h>
 
 #include <QGridLayout>
 #include <QLabel>
@@ -12,6 +13,7 @@ using namespace DiffHelper;
 PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
    : QFrame(parent)
    , mNewFileStartingLine(change.newFileStartLine)
+   , mOldFileName(change.oldFileName)
    , mNewFileName(change.newFileName)
 {
    setObjectName("PrChangeListItem");
@@ -49,10 +51,12 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
       const auto oldFile = new FileDiffView();
       const auto numberArea = new LineNumberArea(oldFile, true);
       numberArea->setObjectName("LineNumberArea");
-      oldFile->addNumberArea(numberArea);
       numberArea->setEditor(oldFile);
+      connect(numberArea, &LineNumberArea::addComment, this, &PrChangeListItem::openReviewDialog);
+
       oldFile->setStartingLine(change.oldFileStartLine - 1);
       oldFile->loadDiff(change.oldData.first.join("\n").trimmed(), change.oldData.second);
+      oldFile->addNumberArea(numberArea);
       oldFile->setMinimumWidth(590);
       oldFile->show();
       oldFile->setMinimumHeight(oldFile->getHeight());
@@ -61,6 +65,8 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
       mNewNumberArea = new LineNumberArea(mNewFileDiff, true);
       mNewNumberArea->setObjectName("LineNumberArea");
       mNewNumberArea->setEditor(mNewFileDiff);
+      connect(mNewNumberArea, &LineNumberArea::addComment, this, &PrChangeListItem::openReviewDialog);
+
       mNewFileDiff->setStartingLine(change.newFileStartLine - 1);
       mNewFileDiff->loadDiff(change.newData.first.join("\n").trimmed(), change.newData.second);
       mNewFileDiff->addNumberArea(mNewNumberArea);
@@ -82,4 +88,23 @@ PrChangeListItem::PrChangeListItem(DiffChange change, QWidget *parent)
 void PrChangeListItem::setBookmarks(const QMap<int, int> &bookmarks)
 {
    mNewNumberArea->setCommentBookmarks(bookmarks);
+}
+
+void PrChangeListItem::openReviewDialog(int line)
+{
+   const auto path = qobject_cast<LineNumberArea *>(sender()) == mNewNumberArea ? mNewFileName : mOldFileName;
+
+   const auto dlg = new AddCodeReviewDialog(ReviewMode::Comment);
+   dlg->setWindowFlag(Qt::FramelessWindowHint);
+   dlg->setWindowFlag(Qt::Tool);
+   dlg->setWindowModality(Qt::ApplicationModal);
+   dlg->setModal(true);
+   auto pos = QCursor::pos();
+   pos.setY(pos.y() + mNewFileDiff->getLineHeigth());
+   dlg->move(pos);
+
+   connect(dlg, &AddCodeReviewDialog::accepted, this,
+           [this, line, path, dlg]() { emit addCodeReview(line, path, dlg->getText().trimmed()); });
+
+   dlg->exec();
 }

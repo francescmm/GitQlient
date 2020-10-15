@@ -734,7 +734,8 @@ JobContainer, #JenkinsJobPanel, #JobPanelTabWidget, JenkinsJobPanel#JenkinsJobPa
 
 #teComment
 {
-    background: #606162;
-    border-color: #202122;
+   color: white;
+   background: #606162;
+   border-color: #202122;
 }
 

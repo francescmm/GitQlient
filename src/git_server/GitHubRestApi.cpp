@@ -311,6 +311,72 @@ void GitHubRestApi::addPrReview(int prNumber, const QString &body, const QString
    });
 }
 
+void GitHubRestApi::addPrCodeReview(int prNumber, const QString &body, const QString &path, int pos, const QString &sha)
+{
+   QJsonObject object;
+   object.insert("body", body);
+   object.insert("path", path);
+   object.insert("line", pos);
+   object.insert("commit_id", sha);
+
+   QJsonDocument doc(object);
+   const auto data = doc.toJson(QJsonDocument::Compact);
+
+   auto request = createRequest(QString(mRepoEndpoint + "/pulls/%1/comments").arg(prNumber));
+   request.setRawHeader("Content-Length", QByteArray::number(data.size()));
+   request.setRawHeader("Accept", "application/vnd.github.v3+json");
+   const auto reply = mManager->post(request, data);
+
+   connect(reply, &QNetworkReply::finished, this, [this, prNumber]() {
+      const auto reply = qobject_cast<QNetworkReply *>(sender());
+      const auto statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+      QString errorStr;
+      const auto tmpDoc = validateData(reply, errorStr);
+
+      if (statusCode.isValid() && statusCode.toInt() == 201 && !tmpDoc.isEmpty())
+      {
+         const auto commentData = tmpDoc.object();
+         CodeReview c;
+         c.outdated = false;
+         c.id = commentData["id"].toInt();
+         c.body = commentData["body"].toString();
+         c.creation = commentData["created_at"].toVariant().toDateTime();
+         c.association = commentData["author_association"].toString();
+         c.diff.diff = commentData["diff_hunk"].toString();
+         c.diff.file = commentData["path"].toString();
+
+         if (commentData.contains("line"))
+            c.diff.line = commentData["line"].toInt();
+         else
+         {
+            if (commentData["position"].toInt() != 0)
+               c.diff.line = commentData["position"].toInt();
+            else
+               c.outdated = true;
+         }
+
+         if (commentData.contains("original_line"))
+            c.diff.originalLine = commentData["original_line"].toInt();
+         else
+            c.diff.originalLine = commentData["original_position"].toInt();
+
+         c.reviewId = commentData["pull_request_review_id"].toInt();
+         c.replyToId = commentData["in_reply_to_id"].toInt();
+
+         GitServer::User sAssignee;
+         sAssignee.id = commentData["user"].toObject()["id"].toInt();
+         sAssignee.url = commentData["user"].toObject()["html_url"].toString();
+         sAssignee.name = commentData["user"].toObject()["login"].toString();
+         sAssignee.avatar = commentData["user"].toObject()["avatar_url"].toString();
+         sAssignee.type = commentData["user"].toObject()["type"].toString();
+
+         c.creator = std::move(sAssignee);
+
+         emit codeReviewsReceived(prNumber, { c });
+      }
+   });
+}
+
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
@@ -799,6 +865,10 @@ void GitHubRestApi::onCommitsReceived(int prNumber)
 
          commits.append(std::move(c));
       }
+
+      std::sort(commits.begin(), commits.end(), [](const Commit &c1, const Commit &c2) {
+         return c1.authorCommittedTimestamp < c2.authorCommittedTimestamp;
+      });
 
       emit commitsReceived(prNumber, commits);
    }

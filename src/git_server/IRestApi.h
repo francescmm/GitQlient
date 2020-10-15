@@ -221,7 +221,12 @@ public:
     */
    virtual void addIssueComment(const Issue &, const QString &) { }
 
+   /**
+    * @brief addPrReview
+    */
    virtual void addPrReview(int, const QString &, const QString &) { }
+
+   virtual void addPrCodeReview(int, const QString &, const QString &, int, const QString &) { }
 
 protected:
    QNetworkAccessManager *mManager = nullptr;

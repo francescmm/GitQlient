@@ -41,6 +41,7 @@ class PrChangesList : public QFrame
 
 signals:
    void gotoReview(int linkId);
+   void addCodeReview(int line, const QString &path, const QString &body);
 
 public:
    explicit PrChangesList(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);

@@ -171,6 +171,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
       mStackedLayout->setCurrentIndex(static_cast<int>(Buttons::Comments));
       mPrCommentsList->highlightComment(frameId);
    });
+   connect(mPrChangesList, &PrChangesList::addCodeReview, this, &IssueDetailedView::addCodeReview);
    connect(mPrCommitsList, &PrCommitsList::openDiff, this, &IssueDetailedView::openDiff);
 }
 
@@ -287,4 +288,10 @@ void IssueDetailedView::openAddReviewDlg(QAction *sender)
 void IssueDetailedView::addReview(const QString &body, const QString &mode)
 {
    mGitServerCache->getApi()->addPrReview(mIssueNumber, body, mode);
+}
+
+void IssueDetailedView::addCodeReview(int line, const QString &path, const QString &body)
+{
+   const auto lastCommit = mGitServerCache->getPullRequest(mIssueNumber).commits.constFirst();
+   mGitServerCache->getApi()->addPrCodeReview(mIssueNumber, body, path, line, lastCommit.sha);
 }

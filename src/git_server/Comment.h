@@ -68,6 +68,7 @@ struct Review : public Comment
 struct CodeReview : public Comment
 {
    CodeReview() = default;
+   bool operator==(const CodeReview &c) const { return c.reviewId == reviewId; }
 
    Diff diff;
    int replyToId;

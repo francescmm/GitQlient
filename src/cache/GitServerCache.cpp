@@ -117,7 +117,13 @@ void GitServerCache::onCommentsReceived(int number, const QVector<Comment> &comm
 void GitServerCache::onCodeReviewsReceived(int number, const QVector<GitServer::CodeReview> &codeReviews)
 {
    if (mPullRequests.contains(number))
-      mPullRequests[number].reviewComment = codeReviews;
+   {
+      for (auto &cReview : codeReviews)
+      {
+         if (!mPullRequests[number].reviewComment.contains(cReview))
+            mPullRequests[number].reviewComment.append(cReview);
+      }
+   }
 
    emit prReviewsReceived();
 }

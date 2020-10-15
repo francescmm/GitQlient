@@ -127,6 +127,12 @@ public:
     */
    int getHeight() const;
 
+   /**
+    * @brief getLineHeigth Method that returns the height value of the rows.
+    * @return The height of a row.
+    */
+   int getLineHeigth() const;
+
 protected:
    /*!
     \brief Overloaded method to process the resize event. Used to set an updated geometry to the line number area.

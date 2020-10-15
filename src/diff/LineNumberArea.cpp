@@ -127,11 +127,12 @@ void LineNumberArea::mouseReleaseEvent(QMouseEvent *e)
       if (x >= 0 && x <= height)
       {
          const auto cursor = fileDiffWidget->cursorForPosition(helpPos);
-         const auto row = cursor.block().blockNumber() + fileDiffWidget->mStartingLine + 1;
+         const auto position = cursor.block().blockNumber() + 1;
+         const auto row = position + fileDiffWidget->mStartingLine;
          const auto linkId = mBookmarks.value(row, -1);
 
          if (linkId == -1)
-            emit addComment();
+            emit addComment(row);
          else
             emit gotoReview(linkId);
       }

@@ -16,6 +16,7 @@ class PrChangeListItem : public QFrame
 
 signals:
    void gotoReview(int linkId);
+   void addCodeReview(int line, const QString &path, const QString &body);
 
 public:
    explicit PrChangeListItem(DiffHelper::DiffChange change, QWidget *parent = nullptr);
@@ -28,7 +29,10 @@ public:
 private:
    int mNewFileStartingLine = 0;
    int mNewFileEndingLine = 0;
+   QString mOldFileName;
    QString mNewFileName;
    FileDiffView *mNewFileDiff = nullptr;
    LineNumberArea *mNewNumberArea = nullptr;
+
+   void openReviewDialog(int line);
 };

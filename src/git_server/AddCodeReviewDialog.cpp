@@ -1,6 +1,8 @@
 #include "AddCodeReviewDialog.h"
 #include "ui_AddCodeReviewDialog.h"
 
+#include <GitQlientStyles.h>
+
 #include <QMessageBox>
 
 AddCodeReviewDialog::AddCodeReviewDialog(ReviewMode mode, QWidget *parent)
@@ -9,6 +11,9 @@ AddCodeReviewDialog::AddCodeReviewDialog(ReviewMode mode, QWidget *parent)
    , mMode(mode)
 {
    ui->setupUi(this);
+
+   if (!parent)
+      setStyleSheet(GitQlientStyles::getInstance()->getStyles());
 
    switch (mode)
    {
@@ -42,4 +47,9 @@ void AddCodeReviewDialog::accept()
    else if (mMode != ReviewMode::Approve)
       QMessageBox::warning(this, tr("Empty comment!"),
                            tr("The body cannot be empty when adding a comment or requesting changes."));
+}
+
+QString AddCodeReviewDialog::getText() const
+{
+   return ui->teComment->toMarkdown();
 }
