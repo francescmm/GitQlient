@@ -263,6 +263,7 @@ void GitQlientRepo::createProgressDialog()
    if (!mWaitDlg)
    {
       mWaitDlg = new WaitingDlg(tr("Loading repository..."));
+      mWaitDlg->setWindowFlag(Qt::Tool);
       mWaitDlg->exec();
 
       QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
