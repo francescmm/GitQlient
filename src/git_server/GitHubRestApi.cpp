@@ -866,11 +866,50 @@ void GitHubRestApi::onCommitsReceived(int prNumber)
          commits.append(std::move(c));
       }
 
+      const auto link = reply->rawHeader("Link").split(',');
+
+      QString nextUrl;
+      QString lastUrl;
+      auto currentPage = 0;
+      auto lastPage = 0;
+
+      for (auto &pair : link)
+      {
+         const auto page = pair.split(';');
+         const auto rel = page.last().trimmed();
+
+         if (rel.contains("next"))
+         {
+            nextUrl = QString::fromUtf8(page.first().trimmed());
+            nextUrl.remove(0, 1);
+            nextUrl.remove(nextUrl.size() - 1, 1);
+
+            currentPage = nextUrl.split("page=").last().toInt();
+         }
+         else if (rel.contains("last"))
+         {
+            lastUrl = QString::fromUtf8(page.first().trimmed());
+            lastUrl.remove(0, 1);
+            lastUrl.remove(lastUrl.size() - 1, 1);
+
+            lastPage = lastUrl.split("page=").last().toInt();
+         }
+      }
+
+      if (currentPage <= lastPage)
+      {
+         auto request = createRequest(mRepoEndpoint + QString("/pulls/%1/commits").arg(prNumber));
+         request.setUrl(nextUrl);
+         const auto reply = mManager->get(request);
+
+         connect(reply, &QNetworkReply::finished, this, [this, prNumber]() { onCommitsReceived(prNumber); });
+      }
+
       std::sort(commits.begin(), commits.end(), [](const Commit &c1, const Commit &c2) {
          return c1.authorCommittedTimestamp < c2.authorCommittedTimestamp;
       });
 
-      emit commitsReceived(prNumber, commits);
+      emit commitsReceived(prNumber, commits, currentPage, lastPage);
    }
 }
 

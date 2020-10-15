@@ -141,12 +141,23 @@ void GitServerCache::onCommentReviewsReceived(int number, const QMap<int, GitSer
    }
 }
 
-void GitServerCache::onCommitsReceived(int number, const QVector<GitServer::Commit> &commits)
+void GitServerCache::onCommitsReceived(int number, const QVector<GitServer::Commit> &commits, int currentPage,
+                                       int lastPage)
 {
    if (mPullRequests.contains(number))
-      mPullRequests[number].commits = commits;
+   {
+      if (currentPage == 1)
+         mPullRequests[number].commits.clear();
 
-   emit prUpdated(mPullRequests[number]);
+      for (auto &commit : commits)
+      {
+         if (!mPullRequests[number].commits.contains(commit))
+            mPullRequests[number].commits.append(commit);
+      }
+   }
+
+   if (currentPage == lastPage)
+      emit prUpdated(mPullRequests[number]);
 }
 
 PullRequest GitServerCache::getPullRequest(const QString &sha) const

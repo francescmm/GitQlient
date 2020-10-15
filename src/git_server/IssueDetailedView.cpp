@@ -292,6 +292,6 @@ void IssueDetailedView::addReview(const QString &body, const QString &mode)
 
 void IssueDetailedView::addCodeReview(int line, const QString &path, const QString &body)
 {
-   const auto lastCommit = mGitServerCache->getPullRequest(mIssueNumber).commits.constFirst();
+   const auto lastCommit = mGitServerCache->getPullRequest(mIssueNumber).commits.constLast();
    mGitServerCache->getApi()->addPrCodeReview(mIssueNumber, body, path, line, lastCommit.sha);
 }

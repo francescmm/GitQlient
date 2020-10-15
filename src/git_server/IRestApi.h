@@ -130,7 +130,7 @@ signals:
     * @param prNumber The number of the PR.
     * @param commits The commits.
     */
-   void commitsReceived(int prNumber, const QVector<GitServer::Commit> &commits);
+   void commitsReceived(int prNumber, const QVector<GitServer::Commit> &commits, int currentPage, int lastPage);
 
    /**
     * @brief pullRequestUpdated Signal triggered when a pull request has been updated.

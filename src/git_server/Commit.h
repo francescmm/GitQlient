@@ -32,6 +32,7 @@ namespace GitServer
 
 struct Commit
 {
+   bool operator==(const Commit &c) const { return sha == c.sha; }
    QString sha;
    QString url;
    QString message;

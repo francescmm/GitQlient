@@ -90,7 +90,7 @@ private:
    void onCommentsReceived(int number, const QVector<GitServer::Comment> &comments);
    void onCodeReviewsReceived(int number, const QVector<GitServer::CodeReview> &codeReviews);
    void onCommentReviewsReceived(int number, const QMap<int, GitServer::Review> &commentReviews);
-   void onCommitsReceived(int number, const QVector<GitServer::Commit> &commits);
+   void onCommitsReceived(int number, const QVector<GitServer::Commit> &commits, int currentPage, int lastPage);
 
    void initLabels(const QVector<GitServer::Label> &labels);
    void initMilestones(const QVector<GitServer::Milestone> &milestones);
