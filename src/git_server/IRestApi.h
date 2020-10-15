@@ -216,7 +216,12 @@ public:
     */
    virtual void requestCommitsFromPR(int prNumber) = 0;
 
+   /**
+    * @brief addIssueComment Adds a comment to an issue or PR.
+    */
    virtual void addIssueComment(const Issue &, const QString &) { }
+
+   virtual void addPrReview(int, const QString &, const QString &) { }
 
 protected:
    QNetworkAccessManager *mManager = nullptr;

@@ -103,9 +103,15 @@ void GitServerCache::onPRUpdated(const PullRequest &pr)
 void GitServerCache::onCommentsReceived(int number, const QVector<Comment> &comments)
 {
    if (mIssues.contains(number))
+   {
       mIssues[number].comments = comments;
+      emit issueUpdated(mIssues[number]);
+   }
    else if (mPullRequests.contains(number))
+   {
       mPullRequests[number].comments = comments;
+      emit prReviewsReceived();
+   }
 }
 
 void GitServerCache::onCodeReviewsReceived(int number, const QVector<GitServer::CodeReview> &codeReviews)
@@ -119,7 +125,14 @@ void GitServerCache::onCodeReviewsReceived(int number, const QVector<GitServer::
 void GitServerCache::onCommentReviewsReceived(int number, const QMap<int, GitServer::Review> &commentReviews)
 {
    if (mPullRequests.contains(number))
-      mPullRequests[number].reviews = commentReviews;
+   {
+      const auto end = commentReviews.cend();
+
+      for (auto iter = commentReviews.cbegin(); iter != end; ++iter)
+         mPullRequests[number].reviews.insert(iter.key(), iter.value());
+
+      emit prReviewsReceived();
+   }
 }
 
 void GitServerCache::onCommitsReceived(int number, const QVector<GitServer::Commit> &commits)

@@ -245,26 +245,34 @@ void IssueDetailedView::closeIssue()
 void IssueDetailedView::openAddReviewDlg(QAction *sender)
 {
    const auto mode = static_cast<ReviewMode>(sender->data().toInt());
+   QString modeStr;
    switch (mode)
    {
       case ReviewMode::Comment:
          mReviewBtn->setIcon(QIcon(":/icons/review_comment"));
          mReviewBtn->setToolTip(tr("Comment review"));
+         modeStr = QString::fromUtf8("COMMENT");
          break;
       case ReviewMode::Approve:
          mReviewBtn->setIcon(QIcon(":/icons/review_approve"));
          mReviewBtn->setToolTip(tr("Approve review"));
+         modeStr = QString::fromUtf8("APPROVE");
          break;
       case ReviewMode::RequestChanges:
          mReviewBtn->setIcon(QIcon(":/icons/review_change"));
          mReviewBtn->setToolTip(tr("Request changes"));
+         modeStr = QString::fromUtf8("REQUEST_CHANGES");
          break;
    }
 
    const auto dlg = new AddCodeReviewDialog(mode, this);
-   connect(dlg, &AddCodeReviewDialog::commentAdded, this, [this](const QString &) { addReview(); });
+   connect(dlg, &AddCodeReviewDialog::commentAdded, this,
+           [this, modeStr](const QString &text) { addReview(text, modeStr); });
 
    dlg->exec();
 }
 
-void IssueDetailedView::addReview() { }
+void IssueDetailedView::addReview(const QString &body, const QString &mode)
+{
+   mGitServerCache->getApi()->addPrReview(mIssueNumber, body, mode);
+}

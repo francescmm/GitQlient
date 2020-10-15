@@ -92,5 +92,5 @@ private:
    void onViewChange(int viewId);
    void closeIssue();
    void openAddReviewDlg(QAction *sender);
-   void addReview();
+   void addReview(const QString &body, const QString &mode);
 };

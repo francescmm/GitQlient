@@ -58,6 +58,7 @@ public:
    void requestReviews(int prNumber) override;
    void requestCommitsFromPR(int prNumber) override;
    void addIssueComment(const Issue &issue, const QString &text) override;
+   void addPrReview(int prNumber, const QString &body, const QString &event) override;
 
 private:
    QString mRepoEndpoint;

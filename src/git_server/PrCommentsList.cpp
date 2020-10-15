@@ -304,16 +304,25 @@ void PrCommentsList::onReviewsReceived()
       bubblesMap.insert(review.creation, layouts);
    }
 
+   delete mCommentsFrame;
+   mCommentsFrame = new QFrame();
+
+   const auto reviewsLayout = new QVBoxLayout(mCommentsFrame);
+   reviewsLayout->setContentsMargins(QMargins());
+   reviewsLayout->setSpacing(30);
+
    for (auto layout : bubblesMap)
    {
       if (layout)
-         mIssuesLayout->addLayout(layout);
+         reviewsLayout->addLayout(layout);
    }
+
+   reviewsLayout->addStretch();
+   reviewsLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding));
 
    emit frameReviewLink(originalPr, mFrameLinks);
 
-   mIssuesLayout->addStretch();
-   mIssuesLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding));
+   mIssuesLayout->addWidget(mCommentsFrame);
 }
 
 QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)

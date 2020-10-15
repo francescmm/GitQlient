@@ -266,6 +266,51 @@ void GitHubRestApi::addIssueComment(const Issue &issue, const QString &text)
    });
 }
 
+void GitHubRestApi::addPrReview(int prNumber, const QString &body, const QString &event)
+{
+   QJsonObject object;
+   object.insert("body", body);
+   object.insert("pull_number", prNumber);
+   object.insert("event", event);
+
+   QJsonDocument doc(object);
+   const auto data = doc.toJson(QJsonDocument::Compact);
+
+   auto request = createRequest(QString(mRepoEndpoint + "/pulls/%1/reviews").arg(prNumber));
+   request.setRawHeader("Content-Length", QByteArray::number(data.size()));
+   request.setRawHeader("Accept", "application/vnd.github.v3+json");
+   const auto reply = mManager->post(request, data);
+
+   connect(reply, &QNetworkReply::finished, this, [this, prNumber]() {
+      const auto reply = qobject_cast<QNetworkReply *>(sender());
+      const auto statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+      QString errorStr;
+      const auto tmpDoc = validateData(reply, errorStr);
+
+      if (statusCode.isValid() && statusCode.toInt() == 201 && !tmpDoc.isEmpty())
+      {
+         const auto commentData = tmpDoc.object();
+         Review r;
+         r.id = commentData["id"].toInt();
+         r.body = commentData["body"].toString();
+         r.creation = commentData["submitted_at"].toVariant().toDateTime();
+         r.state = commentData["state"].toString();
+         r.association = commentData["author_association"].toString();
+
+         GitServer::User sAssignee;
+         sAssignee.id = commentData["user"].toObject()["id"].toInt();
+         sAssignee.url = commentData["user"].toObject()["html_url"].toString();
+         sAssignee.name = commentData["user"].toObject()["login"].toString();
+         sAssignee.avatar = commentData["user"].toObject()["avatar_url"].toString();
+         sAssignee.type = commentData["user"].toObject()["type"].toString();
+
+         r.creator = std::move(sAssignee);
+
+         emit commentReviewsReceived(prNumber, { { r.id, r } });
+      }
+   });
+}
+
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;

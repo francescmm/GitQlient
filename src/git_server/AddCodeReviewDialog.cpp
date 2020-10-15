@@ -35,7 +35,10 @@ AddCodeReviewDialog::~AddCodeReviewDialog()
 void AddCodeReviewDialog::accept()
 {
    if (const auto text = ui->teComment->toMarkdown(); !text.isEmpty())
+   {
       emit commentAdded(text);
+      QDialog::accept();
+   }
    else if (mMode != ReviewMode::Approve)
       QMessageBox::warning(this, tr("Empty comment!"),
                            tr("The body cannot be empty when adding a comment or requesting changes."));
