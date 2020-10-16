@@ -39,7 +39,11 @@ AddCodeReviewDialog::~AddCodeReviewDialog()
 
 void AddCodeReviewDialog::accept()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    if (const auto text = ui->teComment->toMarkdown(); !text.isEmpty())
+#else
+   if (const auto text = ui->teComment->toPlainText(); !text.isEmpty())
+#endif
    {
       emit commentAdded(text);
       QDialog::accept();
@@ -51,5 +55,9 @@ void AddCodeReviewDialog::accept()
 
 QString AddCodeReviewDialog::getText() const
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    return ui->teComment->toMarkdown();
+#else
+   return ui->teComment->toPlainText();
+#endif
 }

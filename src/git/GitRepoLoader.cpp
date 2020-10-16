@@ -314,7 +314,7 @@ QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
             gpgKey = QString::fromUtf8(line).split("using RSA key", Qt::SkipEmptyParts).last();
 #else
-            gpgKey = QString::fromUtf8(line).split("using RSA key", QString::SkipEmptyParts);
+            gpgKey = QString::fromUtf8(line).split("using RSA key", QString::SkipEmptyParts).last();
 #endif
             gpgKey.append('\n');
          }

@@ -71,7 +71,11 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    connect(add, &QPushButton::clicked, this, [issue, this]() {
       connect(mGitServerCache.get(), &GitServerCache::issueUpdated, this, &PrCommentsList::processComments,
               Qt::UniqueConnection);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
       mGitServerCache->getApi()->addIssueComment(issue, mInputTextEdit->toMarkdown());
+#else
+      mGitServerCache->getApi()->addIssueComment(issue, mInputTextEdit->toPlainText());
+#endif
       mInputTextEdit->clear();
       mInputFrame->setVisible(false);
    });
@@ -170,13 +174,13 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    layout->setSpacing(10);
    layout->addLayout(creationLayout);
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    const auto bodyDescFrame = new QFrame();
    bodyDescFrame->setObjectName("IssueDescription");
 
    const auto bodyDescLayout = new QVBoxLayout(bodyDescFrame);
    bodyDescLayout->setContentsMargins(10, 10, 10, 10);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    const auto body = new QTextEdit();
    body->setMarkdown(QString::fromUtf8(issue.body));
    body->setReadOnly(true);
@@ -187,6 +191,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    const auto body = new QLabel(QString::fromUtf8((issue.body)));
    body->setWordWrap(true);
 #endif
+
    bodyDescLayout->addWidget(body);
    layout->addWidget(bodyDescFrame);
 
@@ -553,7 +558,11 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
             codeReviewLayout->addWidget(inputFrame);
 
             connect(add, &QPushButton::clicked, this, [this, inputTextEdit, commentId = review.id]() {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
                addReplyToCodeReview(commentId, inputTextEdit->toMarkdown().trimmed());
+#else
+               addReplyToCodeReview(commentId, inputTextEdit->toPlainText().trimmed());
+#endif
             });
             connect(cancel, &QPushButton::clicked, this, [inputTextEdit, addComment]() {
                inputTextEdit->clear();
