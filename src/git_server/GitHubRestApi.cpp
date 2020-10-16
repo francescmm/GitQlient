@@ -28,6 +28,9 @@ GitHubRestApi::GitHubRestApi(QString repoOwner, QString repoName, const ServerAu
       repoName = repoName.left(repoName.size() - 1);
 
    mRepoEndpoint = QString("/repos") + repoOwner + repoName;
+
+   mAuthString = "Basic "
+       + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName, mAuth.userPass).toLocal8Bit()).toBase64();
 }
 
 void GitHubRestApi::testConnection()
@@ -377,18 +380,80 @@ void GitHubRestApi::addPrCodeReview(int prNumber, const QString &body, const QSt
    });
 }
 
+void GitHubRestApi::replyCodeReview(int prNumber, int commentId, const QString &msgBody)
+{
+   QJsonObject object;
+   object.insert("body", msgBody);
+
+   QJsonDocument doc(object);
+   const auto data = doc.toJson(QJsonDocument::Compact);
+
+   const auto url = QString("%1/pulls/%2/comments/%3/replies")
+                        .arg(mRepoEndpoint, QString::number(prNumber), QString::number(commentId));
+   auto request = createRequest(url);
+   request.setRawHeader("Content-Length", QByteArray::number(data.size()));
+   request.setRawHeader("Accept", "application/vnd.github.v3+json");
+   const auto reply = mManager->post(request, data);
+
+   connect(reply, &QNetworkReply::finished, this, [this, prNumber]() {
+      const auto reply = qobject_cast<QNetworkReply *>(sender());
+      const auto statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+      QString errorStr;
+      const auto tmpDoc = validateData(reply, errorStr);
+
+      if (statusCode.isValid() && statusCode.toInt() == 201 && !tmpDoc.isEmpty())
+      {
+         const auto commentData = tmpDoc.object();
+         CodeReview c;
+         c.outdated = false;
+         c.id = commentData["id"].toInt();
+         c.body = commentData["body"].toString();
+         c.creation = commentData["created_at"].toVariant().toDateTime();
+         c.association = commentData["author_association"].toString();
+         c.diff.diff = commentData["diff_hunk"].toString();
+         c.diff.file = commentData["path"].toString();
+
+         if (commentData.contains("line"))
+            c.diff.line = commentData["line"].toInt();
+         else
+         {
+            if (commentData["position"].toInt() != 0)
+               c.diff.line = commentData["position"].toInt();
+            else
+               c.outdated = true;
+         }
+
+         if (commentData.contains("original_line"))
+            c.diff.originalLine = commentData["original_line"].toInt();
+         else
+            c.diff.originalLine = commentData["original_position"].toInt();
+
+         c.reviewId = commentData["pull_request_review_id"].toInt();
+         c.replyToId = commentData["in_reply_to_id"].toInt();
+
+         GitServer::User sAssignee;
+         sAssignee.id = commentData["user"].toObject()["id"].toInt();
+         sAssignee.url = commentData["user"].toObject()["html_url"].toString();
+         sAssignee.name = commentData["user"].toObject()["login"].toString();
+         sAssignee.avatar = commentData["user"].toObject()["avatar_url"].toString();
+         sAssignee.type = commentData["user"].toObject()["type"].toString();
+
+         c.creator = std::move(sAssignee);
+
+         emit codeReviewsReceived(prNumber, { c });
+      }
+   });
+}
+
 QNetworkRequest GitHubRestApi::createRequest(const QString &page) const
 {
    QNetworkRequest request;
-   request.setUrl(QString(mAuth.endpointUrl + page));
+   request.setUrl(QUrl(QString("%1%2").arg(mAuth.endpointUrl, page)));
    request.setRawHeader("User-Agent", "GitQlient");
    request.setRawHeader("X-Custom-User-Agent", "GitQlient");
    request.setRawHeader("Content-Type", "application/json");
    request.setRawHeader("Accept", "application/vnd.github.v3+json");
-   request.setRawHeader(
-       QByteArray("Authorization"),
-       QByteArray("Basic ")
-           + QByteArray(QString(QStringLiteral("%1:%2")).arg(mAuth.userName, mAuth.userPass).toLocal8Bit()).toBase64());
+   request.setRawHeader("Authorization", mAuthString);
 
    return request;
 }

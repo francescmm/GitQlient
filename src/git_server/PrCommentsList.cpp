@@ -552,11 +552,13 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
 
             codeReviewLayout->addWidget(inputFrame);
 
+            connect(add, &QPushButton::clicked, this, [this, inputTextEdit, commentId = review.id]() {
+               addReplyToCodeReview(commentId, inputTextEdit->toMarkdown().trimmed());
+            });
             connect(cancel, &QPushButton::clicked, this, [inputTextEdit, addComment]() {
                inputTextEdit->clear();
                addComment->toggle();
             });
-            connect(add, &QPushButton::clicked, this, []() {});
             connect(addComment, &QPushButton::toggled, this, [inputFrame, inputTextEdit](bool checked) {
                inputFrame->setVisible(checked);
                inputTextEdit->setFocus();
@@ -580,6 +582,11 @@ QVector<QLayout *> PrCommentsList::createBubbleForCodeReview(int reviewId, QVect
    }
 
    return listOfCodeReviews;
+}
+
+void PrCommentsList::addReplyToCodeReview(int commentId, const QString &message)
+{
+   mGitServerCache->getApi()->replyCodeReview(mIssueNumber, commentId, message);
 }
 
 HighlightningFrame::HighlightningFrame(QWidget *parent)

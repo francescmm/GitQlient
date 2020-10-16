@@ -99,8 +99,10 @@ void PrChangeListItem::openReviewDialog(int line)
    dlg->setWindowFlag(Qt::Tool);
    dlg->setWindowModality(Qt::ApplicationModal);
    dlg->setModal(true);
+
    auto pos = QCursor::pos();
    pos.setY(pos.y() + mNewFileDiff->getLineHeigth());
+
    dlg->move(pos);
 
    connect(dlg, &AddCodeReviewDialog::accepted, this,

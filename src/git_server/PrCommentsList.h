@@ -98,4 +98,5 @@ private:
    QLayout *createBubbleForComment(const GitServer::Comment &comment);
    QLayout *createBubbleForReview(const GitServer::Review &review);
    QVector<QLayout *> createBubbleForCodeReview(int reviewId, QVector<GitServer::CodeReview> &comments);
+   void addReplyToCodeReview(int commentId, const QString &message);
 };
