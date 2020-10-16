@@ -134,8 +134,9 @@ void FullDiffWidget::processData(const QString &fileChunk)
       mPreviousDiffText = fileChunk;
 
       auto count = 0;
+      const auto chunks = fileChunk.split("\n");
 
-      for (const auto &chunk : fileChunk.split("\n"))
+      for (const auto &chunk : chunks)
       {
          if (chunk.startsWith("diff --"))
             mFilePositions.append(count);

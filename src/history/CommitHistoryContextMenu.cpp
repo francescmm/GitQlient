@@ -173,7 +173,6 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
             });
          }
 
-         const auto link = mGitServerCache->getPullRequest(mShas.first()).url;
          connect(gitServerMenu->addAction("Show PR detailed view"), &QAction::triggered, this,
                  [this, num = pr.number]() { emit showPrDetailedView(num); });
 

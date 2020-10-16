@@ -475,7 +475,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
    }
 
    const auto showMinimal = o.rect.width() <= MIN_VIEW_WIDTH_PX;
-   const int mark_spacing = 5; // Space between markers in pixels
+   const auto mark_spacing = 5; // Space between markers in pixels
    const auto mapEnd = markValues.constEnd();
 
    for (auto mapIt = markValues.constBegin(); mapIt != mapEnd; ++mapIt)

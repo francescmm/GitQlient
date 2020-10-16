@@ -302,7 +302,7 @@ QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
    QString gpgKey;
    auto processingCommit = false;
 
-   for (auto line : preProcessedCommits)
+   for (const auto &line : preProcessedCommits)
    {
       if (line.startsWith("gpg: "))
       {

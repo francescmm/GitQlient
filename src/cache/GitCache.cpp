@@ -334,12 +334,9 @@ RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl,
             if (line.at(98) == '\t') // Faster parsing in normal case
             {
                auto fields = line.split(" ");
-               const auto srcMode = fields.takeFirst();
-               const auto dstMode = fields.takeFirst();
-               const auto srcSha = fields.takeFirst();
-               const auto dstSha = fields.takeFirst();
+               const auto dstSha = fields.at(3);
                const auto fileIsCached = !dstSha.startsWith(QStringLiteral("000000"));
-               const auto flag = fields.takeFirst().at(0);
+               const auto flag = fields.at(4).at(0);
 
                if (fl.rf != &rf)
                {

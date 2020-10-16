@@ -137,7 +137,7 @@ void GeneralConfigDlg::importConfig()
 
    if (fileDialog->exec())
    {
-      const auto file = fileDialog->selectedFiles().first();
+      const auto file = fileDialog->selectedFiles().constFirst();
 
       QFile f(file);
 
