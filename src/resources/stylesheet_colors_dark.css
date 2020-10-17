@@ -739,3 +739,125 @@ JobContainer, #JenkinsJobPanel, #JobPanelTabWidget, JenkinsJobPanel#JenkinsJobPa
    border-color: #202122;
 }
 
+#IssuesViewFrame
+{
+   background: #2E2F30;
+}
+
+#IssueDescription
+{
+  background: #404142;
+}
+
+#IssueIntro
+{
+   background: #404142;
+}
+
+#IssueIntroApproved
+{
+   background: #729943;
+}
+
+#IssueIntroChangesRequested
+{
+   background: #D89000;
+}
+
+#IssueIntroCommented
+{
+   background: #404142;
+}
+
+#CodeReviewComment
+{
+   background-color: #505152;
+}
+
+IssueDetailedView QTextEdit
+{
+   background: transparent;
+   color: white;
+}
+
+PrChangesList FileDiffView
+{
+   background: #404142;
+}
+
+#PrChangeListItem
+{
+   background: transparent;
+}
+
+#ChangeHeaderFrame
+{
+   background: #202122;
+}
+
+SourceCodeReview QLabel
+{
+    background: #2E2F30;
+    border-bottom-color: #D89000;
+}
+
+#OutdatedLabel
+{
+    background: #C8C8C8;
+    color: white;
+}
+
+#LineNumberArea
+{
+   border-right: 1px solid white;
+}
+
+#AddReviewInput
+{
+   background: #505152;
+   border-color: #2E2F30;
+}
+
+#JobContainer
+{
+   background: #2E2F30;
+}
+
+#ButtonIssuesHeaderFrame
+{
+   background: #404142;
+   border-color: #D89000;
+}
+
+#ButtonIssuesHeaderFrame:hover
+{
+   background: #606162;
+}
+
+#IssueItem
+{
+   background-color: #2E2F30;
+   border-bottom: 1px solid #404142;
+}
+
+#IssuesFooterFrame, #IssuesFooterFramePagination
+{
+   border-bottom: 1px solid #404142;
+   background-color: #2E2F30;
+}
+
+QScrollArea, #TransparentScrollArea
+{
+   background: transparent;
+}
+
+#IssuesHeaderFrame, #IssuesHeaderFrameBig
+{
+   background-color: #202122;
+}
+
+#IssuesWidget
+{
+   background-color: #2E2F30;
+}
+

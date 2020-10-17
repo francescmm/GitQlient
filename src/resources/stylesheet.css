@@ -740,21 +740,6 @@ QDialog > QPushButton
 }
 
 /* GitServerWidget */
-QScrollArea, #TransparentScrollArea
-{
-   background: transparent;
-}
-
-#IssuesHeaderFrame, #IssuesHeaderFrameBig
-{
-   background-color: #202122;
-}
-
-#IssuesFooterFrame, #IssuesFooterFramePagination
-{
-   background-color: #2E2F30;
-}
-
 #IssuesHeaderFrame, #IssuesHeaderFrameBig
 {
    padding: 10px;
@@ -772,22 +757,12 @@ QScrollArea, #TransparentScrollArea
    max-height: 10px;
 }
 
-#IssuesFooterFrame, #IssuesFooterFramePagination
-{
-   border-bottom: 1px solid #404142;
-}
-
 #ButtonIssuesHeaderFrame
 {
-   background: #404142;
    max-height: 20px;
    min-height: 20px;
-   border: 1px solid #D89000;
-}
-
-#ButtonIssuesHeaderFrame:hover
-{
-   background: #606162;
+   border-style: solid;
+   border-width: 1px;
 }
 
 #HeaderTitle
@@ -798,11 +773,6 @@ QScrollArea, #TransparentScrollArea
 }
 
 /* IssueButton */
-#IssueItem
-{
-   background-color: #2E2F30;
-}
-
 ButtonLink#IssueTitle
 {
    padding: 0;
@@ -820,51 +790,38 @@ ButtonLink#IssueTitle
    padding-left: 5px;
 }
 
-#IssuesViewFrame
+#IssueDescription
 {
-   background: #2E2F30;
-}
-
- #IssueDescription
- {
-   background: #404142;
    border-radius: 5px;
- }
+}
 
 #IssueIntro
 {
    border-radius: 10px;
-   background: #404142;
 }
 
 #IssueIntroApproved
 {
    border-radius: 10px;
-   background: #729943;
 }
 
 #IssueIntroChangesRequested
 {
    border-radius: 10px;
-   background: #D89000;
 }
 
 #IssueIntroCommented
 {
    border-radius: 10px;
-   background: #404142;
 }
 
 #CodeReviewComment
 {
    border-radius: 10px;
-   background-color: #505152;
 }
 
 IssueDetailedView QTextEdit
 {
-   background: transparent;
-   color: white;
    border: none;
 }
 
@@ -877,12 +834,6 @@ QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
 PrChangesList FileDiffView
 {
    border: 0;
-   background: #404142;
-}
-
-#PrChangeListItem
-{
-   background: transparent;
 }
 
 #ChangeFileName
@@ -892,53 +843,38 @@ PrChangesList FileDiffView
 
 #ChangeHeaderFrame
 {
-    background: #202122;
    padding: 10px;
 }
 
 SourceCodeReview > FileDiffView, #PrChangeListItem > FileDiffView
 {
-    border: 0;
-    font-size: 8pt;
+   border: 0;
+   font-size: 8pt;
 }
 
 SourceCodeReview QLabel
 {
-    background: #2E2F30;
-    padding: 10px;
-    font-weight: bold;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    border-bottom-color: #D89000;
+   padding: 10px;
+   font-weight: bold;
+   border-bottom-style: solid;
+   border-bottom-width: 1px;
 }
 
 #OutdatedLabel
 {
-    background: #C8C8C8;
-    color: white;
-    border-radius: 7px;
-    padding: 5px;
-}
-
-#LineNumberArea
-{
-   border-right: 1px solid white;
+   border-radius: 7px;
+   padding: 5px;
 }
 
 #AddReviewInput
 {
-   background: #505152;
-   border: 1px solid #2E2F30;
+   border-style: solid;
+   border-width: 1px;
    border-radius: 10px;
    padding: 5px;
 }
 
 /* JENKINS */
-#JobContainer
-{
-   background: #2E2F30;
-}
-
 #JenkinsWidget, #JobButton, #JobContainerScrollArea
 {
    background: transparent;
@@ -948,6 +884,6 @@ SourceCodeReview QLabel
 
 #teComment
 {
-    border-style: solid;
-    border-width: 1px;
+   border-style: solid;
+   border-width: 1px;
 }

@@ -113,9 +113,6 @@ void AGitServerItemList::createContent(QVector<IssueItem *> items)
    mIssuesWidget = new QFrame();
    mIssuesWidget->setLayout(issuesLayout);
    mIssuesWidget->setObjectName("IssuesWidget");
-   mIssuesWidget->setStyleSheet("#IssuesWidget{"
-                                "background-color: #2E2F30;"
-                                "}");
 
    mScrollArea = new QScrollArea();
    mScrollArea->setWidget(mIssuesWidget);
