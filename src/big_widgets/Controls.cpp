@@ -434,6 +434,9 @@ void Controls::configBuildSystemButton()
    GitQlientSettings settings;
    const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
    mBuildSystem->setEnabled(isConfigured);
+
+   if (!isConfigured)
+      emit signalGoRepo();
 }
 
 bool Controls::eventFilter(QObject *obj, QEvent *event)
