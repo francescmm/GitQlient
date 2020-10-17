@@ -27,10 +27,7 @@ void ButtonLink::mouseReleaseEvent(QMouseEvent *event)
    Q_UNUSED(event);
 
    if (isEnabled() && mPressed)
-   {
       emit clicked();
-      // emit clicked (mCustomData);
-   }
 }
 
 void ButtonLink::enterEvent(QEvent *event)

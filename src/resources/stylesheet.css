@@ -560,7 +560,7 @@ QLabel#authorFirstOfItsName, QLabel#authorPrimusInterPares
     min-height: 21px;
 }
 
-ClickableFrame#firstOfItsName, ClickableFrame#primusInterPares
+ButtonLink#firstOfItsName, ButtonLink#primusInterPares
 {
     padding: 2px;
     border: 0;
@@ -568,7 +568,7 @@ ClickableFrame#firstOfItsName, ClickableFrame#primusInterPares
     min-height: 21px;
 }
 
-QLabel#authorFirstOfItsName, ClickableFrame#firstOfItsName
+QLabel#authorFirstOfItsName, ButtonLink#firstOfItsName
 {
     border-top-width: 1px;
     border-top-style: solid;

@@ -402,20 +402,10 @@ QLabel#numberLabel
     background-color: white;
 }
 
-QLabel#authorFirstOfItsName, ClickableFrame#firstOfItsName
+QLabel#authorFirstOfItsName, ButtonLink#firstOfItsName
 {
     border-top-color: #606162;
     background-color: #C6C6C7;
-}
-
-ClickableFrame#firstOfItsName::hover, ClickableFrame#primusInterPares::hover
-{
-    background-color: #EFEFEF;
-}
-
-ClickableFrame#firstOfItsName::pressed,  ClickableFrame#primusInterPares::pressed
-{
-    background-color: #EFEFEF;
 }
 
 QProgressDialog

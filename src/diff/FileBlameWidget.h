@@ -28,7 +28,7 @@
 
 class GitBase;
 class QScrollArea;
-class ClickableFrame;
+class ButtonLink;
 class QLabel;
 class GitCache;
 
@@ -151,9 +151,9 @@ private:
 
     \param sha The sha to show.
     \param isFirst Indicates if it's the first item in the blame.
-    \return ClickableFrame Returns a newly created ClickableFrame.
+    \return Returns a newly created ButtonLink.
    */
-   ClickableFrame *createMessageLabel(const QString &sha, bool isFirst);
+   ButtonLink *createMessageLabel(const QString &sha, bool isFirst);
    /*!
     \brief Factory method that creates a label with the number of line. Uses the \p annotation parameter to display a
     visual help about when the change was done.
