@@ -18,9 +18,9 @@
   <tr>
     <td><a href="https://travis-ci.org/francescmm/GitQlient" target="_blank"><img src="https://travis-ci.org/francescmm/GitQlient.svg?branch=master"/></a></td>
     <td><a href="https://ci.appveyor.com/project/francescmm/gitqlient/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master"/></a></td>
-    <td><a href="https://ci.appveyor.com/api/projects/status/niu2b6m5gehxnarg/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/niu2b6m5gehxnarg/branch/master"/></a></td>
-    <td><a href="https://ci.appveyor.com/api/projects/status/kxidc23f7mnqyjyi/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/kxidc23f7mnqyjyi/branch/master"/></a></td>
-    <td><a href="https://ci.appveyor.com/api/projects/status/oxt8t90vssooy9rm/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/oxt8t90vssooy9rm/branch/master"/></a></td>
+    <td><a href="https://ci.appveyor.com/project/francescmm/gitqlient-qt514/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/niu2b6m5gehxnarg/branch/master"/></a></td>
+    <td><a href="https://ci.appveyor.com/project/francescmm/gitqlient-qt513/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/kxidc23f7mnqyjyi/branch/master"/></a></td>
+    <td><a href="https://ci.appveyor.com/project/francescmm/gitqlient-qt512/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/oxt8t90vssooy9rm/branch/master"/></a></td>
     <td><a href="https://copr.fedorainfracloud.org/coprs/gitqlient/GitQlient/package/gitqlient/" target="_blank"><img src="https://copr.fedorainfracloud.org/coprs/gitqlient/GitQlient/package/gitqlient/status_image/last_build.png"/></a></td>
   </tr>
 </table>
