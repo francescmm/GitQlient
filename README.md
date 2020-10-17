@@ -1,9 +1,12 @@
 ![GitQlient logo](https://github.com/francescmm/GitQlient/blob/master/src/resources/icons/GitQlientLogo96.png "GitQlient")
 
 # GitQlient: Multi-platform Git client written with Qt
-[![Build status](https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient/branch/master)
 [![Build Status](https://travis-ci.org/francescmm/GitQlient.svg?branch=master)](https://travis-ci.org/francescmm/GitQlient)
 [![Copr build status](https://copr.fedorainfracloud.org/coprs/gitqlient/GitQlient/package/gitqlient/status_image/last_build.png)](https://copr.fedorainfracloud.org/coprs/gitqlient/GitQlient/package/gitqlient/)
+Qt 5.15: [![Build status for Qt 5.15](https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient/branch/master)
+Qt 5.14: [![Build status for Qt 5.14](https://ci.appveyor.com/api/projects/status/niu2b6m5gehxnarg/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient-qt514/branch/master)
+Qt 5.13: [![Build status for Qt 5.13](https://ci.appveyor.com/api/projects/status/kxidc23f7mnqyjyi/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient-qt513/branch/master)
+Qt 5.12: [![Build status for Qt 5.12](https://ci.appveyor.com/api/projects/status/oxt8t90vssooy9rm/branch/master?svg=true)](https://ci.appveyor.com/project/francescmm/gitqlient-qt512/branch/master)
 
 GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git
 client originally forked from QGit. Nowadays it goes beyond of just a fork and
