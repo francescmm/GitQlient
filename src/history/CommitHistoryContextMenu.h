@@ -140,6 +140,10 @@ private:
     \brief Checks out to the selected branch.
    */
    void checkoutBranch();
+   /**
+    * @brief createCheckoutBranch Creates and checks out a branch.
+    */
+   void createCheckoutBranch();
    /*!
     \brief Checks out to the selected commit.
    */

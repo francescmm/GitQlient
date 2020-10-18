@@ -59,10 +59,11 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
       if (sha == CommitInfo::ZERO_SHA)
       {
-         const auto stashAction = addAction("Push stash");
+         const auto stashMenu = addMenu(tr("Stash"));
+         const auto stashAction = stashMenu->addAction("Push");
          connect(stashAction, &QAction::triggered, this, &CommitHistoryContextMenu::stashPush);
 
-         const auto popAction = addAction("Pop stash");
+         const auto popAction = stashMenu->addAction("Pop");
          connect(popAction, &QAction::triggered, this, &CommitHistoryContextMenu::stashPop);
       }
 
@@ -71,10 +72,12 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
       if (sha != CommitInfo::ZERO_SHA)
       {
-         const auto createBranchAction = addAction("Create branch here");
+         const auto createMenu = addMenu(tr("Create"));
+
+         const auto createBranchAction = createMenu->addAction("Branch");
          connect(createBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::createBranch);
 
-         const auto createTagAction = addAction("Create tag here");
+         const auto createTagAction = createMenu->addAction("Tag");
          connect(createTagAction, &QAction::triggered, this, &CommitHistoryContextMenu::createTag);
 
          const auto exportAsPatchAction = addAction("Export as patch");
@@ -100,10 +103,12 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
                connect(amendCommitAction, &QAction::triggered, this,
                        [this]() { emit signalAmendCommit(mShas.first()); });
 
-               const auto applyPatchAction = addAction("Apply patch");
+               const auto applyMenu = addMenu(tr("Apply"));
+
+               const auto applyPatchAction = applyMenu->addAction("Patch");
                connect(applyPatchAction, &QAction::triggered, this, &CommitHistoryContextMenu::applyPatch);
 
-               const auto applyCommitAction = addAction("Apply commit");
+               const auto applyCommitAction = applyMenu->addAction("Commit");
                connect(applyCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::applyCommit);
 
                const auto pushAction = addAction("Push");
@@ -117,35 +122,39 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
             }
          }
 
-         const auto copyShaAction = addAction("Copy SHA");
+         const auto resetMenu = addMenu(tr("Reset"));
+
+         const auto resetSoftAction = resetMenu->addAction("Soft");
+         connect(resetSoftAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetSoft);
+
+         const auto resetMixedAction = resetMenu->addAction("Mixed");
+         connect(resetMixedAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetMixed);
+
+         const auto resetHardAction = resetMenu->addAction("Hard");
+         connect(resetHardAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetHard);
+
+         addSeparator();
+
+         const auto copyMenu = addMenu(tr("Copy"));
+
+         const auto copyShaAction = copyMenu->addAction("Commit SHA");
          connect(copyShaAction, &QAction::triggered, this,
                  [this]() { QApplication::clipboard()->setText(mShas.first()); });
 
-         const auto copyTitleAction = addAction("Copy commit title");
+         const auto copyTitleAction = copyMenu->addAction("Commit title");
          connect(copyTitleAction, &QAction::triggered, this, [this]() {
             const auto title = mCache->getCommitInfo(mShas.first()).shortLog();
             QApplication::clipboard()->setText(title);
          });
-
-         addSeparator();
-
-         const auto resetSoftAction = addAction("Reset - Soft");
-         connect(resetSoftAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetSoft);
-
-         const auto resetMixedAction = addAction("Reset - Mixed");
-         connect(resetMixedAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetMixed);
-
-         const auto resetHardAction = addAction("Reset - Hard");
-         connect(resetHardAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetHard);
       }
    }
 
    if (mGitServerCache)
    {
       const auto isGitHub = mGitServerCache->getPlatform() == GitServer::Platform::GitHub;
-      addSeparator();
-
       const auto gitServerMenu = new QMenu(QString::fromUtf8(isGitHub ? "GitHub" : "GitLab"), this);
+
+      addSeparator();
       addMenu(gitServerMenu);
 
       if (const auto pr = mGitServerCache->getPullRequest(mShas.first()); singleSelection && pr.isValid())
@@ -178,19 +187,6 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          gitServerMenu->addSeparator();
       }
-
-      connect(gitServerMenu->addAction("New Issue"), &QAction::triggered, this, [this]() {
-         const auto createIssue = new CreateIssueDlg(mGitServerCache, this);
-         createIssue->exec();
-      });
-      connect(gitServerMenu->addAction("New Pull Request"), &QAction::triggered, this, [this]() {
-         const auto prDlg
-             = new CreatePullRequestDlg(mCache, mGitServerCache, mGit->getWorkingDir(), mGit->getCurrentBranch(), this);
-         connect(prDlg, &CreatePullRequestDlg::signalRefreshPRsCache, this,
-                 &CommitHistoryContextMenu::signalRefreshPRsCache);
-
-         prDlg->exec();
-      });
    }
 }
 
@@ -324,6 +320,15 @@ void CommitHistoryContextMenu::checkoutBranch()
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
+}
+
+void CommitHistoryContextMenu::createCheckoutBranch()
+{
+   BranchDlg dlg({ mShas.constFirst(), BranchDlgMode::CREATE_FROM_COMMIT, mGit });
+   const auto ret = dlg.exec();
+
+   if (ret == QDialog::Accepted)
+      emit signalRepositoryUpdated();
 }
 
 void CommitHistoryContextMenu::checkoutCommit()
@@ -565,9 +570,14 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
       }
    }
 
+   const auto branchMenu = !branchesToCheckout.isEmpty() ? addMenu("Checkout branch") : this;
+   const auto newBranchAction
+       = branchMenu->addAction(QString::fromUtf8(!branchesToCheckout.isEmpty() ? "New Branch" : "Checkout new branch"));
+   connect(newBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::createCheckoutBranch);
+
    if (!branchesToCheckout.isEmpty())
    {
-      const auto branchMenu = addMenu("Checkout branch...");
+      branchMenu->addSeparator();
       branchMenu->addActions(branchesToCheckout);
    }
 
