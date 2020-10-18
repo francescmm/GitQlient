@@ -101,6 +101,9 @@ protected:
    virtual bool hasConflicts() final;
    virtual void resetFile(QListWidgetItem *item) final;
    virtual QColor getColorForFile(const RevisionFiles &files, int index) const final;
+   void onUntrackedHeaderClicked();
+   void onUnstagedHeaderClicked();
+   void onStagedHeaderClicked();
 
    static QString lastMsgBeforeError;
    static const int kMaxTitleChars;

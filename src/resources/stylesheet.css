@@ -165,7 +165,7 @@ QTreeWidget::item
     max-width: 400px;
 }
 
-#tagsFrame
+#tagsFrame, #untrackedFiles, #unstagedFiles, #stagedFiles
 {
     padding: 0;
 }

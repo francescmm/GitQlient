@@ -11,6 +11,8 @@
 #include <GitCache.h>
 #include <FileWidget.h>
 #include <UntrackedMenu.h>
+#include <ClickableFrame.h>
+#include <GitQlientSettings.h>
 
 #include <QDir>
 #include <QKeyEvent>
@@ -80,6 +82,9 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
            &CommitChangesWidget::showUnstagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
+   connect(ui->untrackedFiles, &ClickableFrame::clicked, this, &CommitChangesWidget::onUntrackedHeaderClicked);
+   connect(ui->unstagedFiles, &ClickableFrame::clicked, this, &CommitChangesWidget::onUnstagedHeaderClicked);
+   connect(ui->stagedFiles, &ClickableFrame::clicked, this, &CommitChangesWidget::onStagedHeaderClicked);
 
    ui->pbCancelAmend->setVisible(false);
    ui->pbCommit->setText(tr("Commit"));
@@ -176,6 +181,50 @@ QColor CommitChangesWidget::getColorForFile(const RevisionFiles &files, int inde
       myColor = GitQlientStyles::getTextColor();
 
    return myColor;
+}
+
+void CommitChangesWidget::onUntrackedHeaderClicked()
+{
+   if (!ui->unstagedFilesList->isVisible() && !ui->stagedFilesList->isVisible())
+      return;
+
+   const auto visible = ui->untrackedFilesList->isVisible();
+
+   const auto icon = QIcon(visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+   ui->untrackedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+   ui->untrackedFilesList->setVisible(!visible);
+
+   GitQlientSettings settings;
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UntrackedHeader", !visible);
+}
+
+void CommitChangesWidget::onUnstagedHeaderClicked()
+{
+   if (!ui->untrackedFilesList->isVisible() && !ui->stagedFilesList->isVisible())
+      return;
+
+   const auto visible = ui->unstagedFilesList->isVisible();
+
+   const auto icon = QIcon(visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+   ui->unstagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+   ui->unstagedFilesList->setVisible(!visible);
+
+   GitQlientSettings settings;
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UnstagedHeader", !visible);
+}
+
+void CommitChangesWidget::onStagedHeaderClicked()
+{
+   if (!ui->untrackedFilesList->isVisible() && !ui->unstagedFilesList->isVisible())
+      return;
+
+   const auto visible = ui->stagedFilesList->isVisible();
+   const auto icon = QIcon(visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+   ui->stagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+   ui->stagedFilesList->setVisible(!visible);
+
+   GitQlientSettings settings;
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "StagedHeader", !visible);
 }
 
 void CommitChangesWidget::prepareCache()
