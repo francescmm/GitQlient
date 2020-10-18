@@ -1,5 +1,5 @@
 Name:    {{{ git_name name="gitqlient" }}}
-Version: 1.2.0
+Version: 1.3.0
 Release: {{{ git_version }}}%{?dist}
 Summary: A multi-platform Git client
 

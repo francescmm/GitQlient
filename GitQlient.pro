@@ -57,7 +57,7 @@ INCLUDEPATH += QLogger
 OTHER_FILES += \
     $$PWD/LICENSE
 
-VERSION = 1.2.0
+VERSION = 1.3.0
 
 GQ_SHA = $$system(git rev-parse HEAD)
 
