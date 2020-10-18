@@ -104,9 +104,12 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    GitQlientSettings settings;
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "TagsHeader", true).toBool(); !visible)
    {
-      mTagsList->setVisible(!visible);
-      onTagsHeaderClicked();
+      const auto icon = QIcon(!visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+      mTagArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+      mTagsList->setVisible(visible);
    }
+   else
+      mTagArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
 
    const auto tagsIcon = new QLabel();
    tagsIcon->setPixmap(QIcon(":/icons/tags").pixmap(QSize(15, 15)));
@@ -116,7 +119,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    tagsHeaderLayout->addWidget(mTagsCount);
    tagsHeaderLayout->addStretch();
 
-   mTagArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
    tagsHeaderLayout->addWidget(mTagArrow);
 
    mTagsList->setMouseTracking(true);
@@ -138,9 +140,12 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool();
        !visible)
    {
-      mStashesList->setVisible(!visible);
-      onStashesHeaderClicked();
+      const auto icon = QIcon(!visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+      mStashesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+      mStashesList->setVisible(visible);
    }
+   else
+      mStashesArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
 
    const auto stashHeaderLayout = new QHBoxLayout(stashFrame);
    stashHeaderLayout->setContentsMargins(20, 9, 10, 9);
@@ -154,7 +159,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    stashHeaderLayout->addWidget(mStashesCount = new QLabel(tr("(0)")));
    stashHeaderLayout->addStretch();
 
-   mStashesArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
    stashHeaderLayout->addWidget(mStashesArrow);
 
    mStashesList->setMouseTracking(true);
@@ -174,9 +178,12 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool();
        !visible)
    {
-      mSubmodulesList->setVisible(!visible);
-      onSubmodulesHeaderClicked();
+      const auto icon = QIcon(!visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+      mSubmodulesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+      mSubmodulesList->setVisible(visible);
    }
+   else
+      mSubmodulesArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
 
    const auto submoduleHeaderLayout = new QHBoxLayout(submoduleFrame);
    submoduleHeaderLayout->setContentsMargins(20, 9, 10, 9);
@@ -189,8 +196,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    submoduleHeaderLayout->addWidget(new QLabel(tr("Submodules")));
    submoduleHeaderLayout->addWidget(mSubmodulesCount);
    submoduleHeaderLayout->addStretch();
-
-   mSubmodulesArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
 
    submoduleHeaderLayout->addWidget(mSubmodulesArrow);
 

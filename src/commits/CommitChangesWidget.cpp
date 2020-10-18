@@ -52,20 +52,36 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
    ui->setupUi(this);
    setAttribute(Qt::WA_DeleteOnClose);
 
+   GitQlientSettings settings;
+   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "UntrackedHeader", true).toBool();
+       !visible)
+   {
+      const auto icon = QIcon(":/icons/arrow_up");
+      ui->untrackedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+      ui->untrackedFilesList->setVisible(visible);
+   }
+
+   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "UnstagedHeader", true).toBool();
+       !visible)
+   {
+      const auto icon = QIcon(":/icons/arrow_up");
+      ui->unstagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+      ui->unstagedFilesList->setVisible(visible);
+   }
+
+   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "StagedHeader", true).toBool();
+       !visible)
+   {
+      const auto icon = QIcon(":/icons/arrow_up");
+      ui->stagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+      ui->stagedFilesList->setVisible(visible);
+   }
+
    ui->amendFrame->setVisible(false);
 
    ui->lCounter->setText(QString::number(kMaxTitleChars));
    ui->leCommitTitle->setMaxLength(kMaxTitleChars);
    ui->teDescription->setMaximumHeight(125);
-
-   QIcon stagedIcon(":/icons/staged");
-   ui->stagedFilesIcon->setPixmap(stagedIcon.pixmap(15, 15));
-
-   QIcon unstagedIcon(":/icons/unstaged");
-   ui->unstagedIcon->setPixmap(unstagedIcon.pixmap(15, 15));
-
-   QIcon untrackedIcon(":/icons/untracked");
-   ui->untrackedFilesIcon->setPixmap(untrackedIcon.pixmap(15, 15));
 
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitChangesWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitChangesWidget::commitChanges);
