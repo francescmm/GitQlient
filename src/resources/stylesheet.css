@@ -16,6 +16,32 @@ a
    min-width: 800px;
 }
 
+/* CONTROLS */
+
+
+/* BLAME WIDGET */
+
+
+/* HISTORY WIDGET */
+#wipInfoFrame
+{
+   padding: 10px;
+}
+
+#wipSeparator
+{
+   min-height: 2px;
+   max-height: 2px;
+}
+
+/* BRANCHES WIDGET */
+
+
+/* MERGE WIDGET */
+
+
+/* DIFF WIDGET */
+
 ButtonLink
 {
    padding: 2px;

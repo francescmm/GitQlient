@@ -22,6 +22,7 @@
 #include <CheckBox.h>
 #include <FileDiffWidget.h>
 #include <FullDiffWidget.h>
+#include <GitConfig.h>
 
 #include <QLogger.h>
 
@@ -31,6 +32,7 @@
 #include <QStackedWidget>
 #include <QMessageBox>
 #include <QApplication>
+#include <QLabel>
 #include <QMenu>
 
 using namespace QLogger;
@@ -42,18 +44,51 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    , mCache(cache)
    , mGitServerCache(gitServerCache)
    , mReturnFromFull(new QPushButton())
+   , mUserName(new QLabel())
+   , mUserEmail(new QLabel())
+   , mCurrentBranchLabel(new QLabel())
 {
-   mCommitInfoWidget = new CommitInfoWidget(mCache, git);
-   mWipWidget = new WipWidget(mCache, git);
-   mAmendWidget = new AmendWidget(mCache, git);
+   mCommitInfoWidget = new CommitInfoWidget(mCache, mGit);
+   mWipWidget = new WipWidget(mCache, mGit);
+   mAmendWidget = new AmendWidget(mCache, mGit);
    setAttribute(Qt::WA_DeleteOnClose);
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto localUserInfo = gitConfig->getLocalUserInfo();
+   const auto globalUserInfo = gitConfig->getGlobalUserInfo();
+
+   mUserName->setText(localUserInfo.mUserName.isEmpty() ? globalUserInfo.mUserName : localUserInfo.mUserName);
+   mUserEmail->setText(localUserInfo.mUserEmail.isEmpty() ? globalUserInfo.mUserEmail : localUserInfo.mUserEmail);
+   mCurrentBranchLabel->setText(QString("Working branch: <b>%1</b>").arg(mGit->getCurrentBranch()));
+
+   const auto wipSeparator = new QFrame();
+   wipSeparator->setObjectName("wipSeparator");
+
+   const auto wipInfoFrame = new QFrame();
+   wipInfoFrame->setObjectName("wipInfoFrame");
+   const auto wipInfoLayout = new QVBoxLayout(wipInfoFrame);
+   wipInfoLayout->setContentsMargins(QMargins());
+   wipInfoLayout->setSpacing(10);
+   wipInfoLayout->addWidget(mUserName);
+   wipInfoLayout->addWidget(mUserEmail);
+   wipInfoLayout->addWidget(wipSeparator);
+   wipInfoLayout->addWidget(mCurrentBranchLabel);
 
    mCommitStackedWidget = new QStackedWidget();
    mCommitStackedWidget->setCurrentIndex(0);
    mCommitStackedWidget->addWidget(mCommitInfoWidget);
    mCommitStackedWidget->addWidget(mWipWidget);
    mCommitStackedWidget->addWidget(mAmendWidget);
-   mCommitStackedWidget->setFixedWidth(300);
+
+   const auto wipLayout = new QVBoxLayout();
+   wipLayout->setContentsMargins(QMargins());
+   wipLayout->setSpacing(0);
+   wipLayout->addWidget(wipInfoFrame);
+   wipLayout->addWidget(mCommitStackedWidget);
+
+   const auto wipFrame = new QFrame();
+   wipFrame->setLayout(wipLayout);
+   wipFrame->setFixedWidth(300);
 
    connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mWipWidget, &WipWidget::signalChangesCommitted, this, &HistoryWidget::returnToView);
@@ -80,8 +115,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
-   mRepositoryModel = new CommitHistoryModel(mCache, git, mGitServerCache);
-   mRepositoryView = new CommitHistoryView(mCache, git, mGitServerCache);
+   mRepositoryModel = new CommitHistoryModel(mCache, mGit, mGitServerCache);
+   mRepositoryView = new CommitHistoryView(mCache, mGit, mGitServerCache);
 
    connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &HistoryWidget::signalViewUpdated);
    connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, [this](const QString &sha) {
@@ -106,10 +141,10 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mRepositoryView->setObjectName("historyGraphView");
    mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setItemDelegate(mItemDelegate
-                                    = new RepositoryViewDelegate(cache, git, mGitServerCache, mRepositoryView));
+                                    = new RepositoryViewDelegate(cache, mGit, mGitServerCache, mRepositoryView));
    mRepositoryView->setEnabled(true);
 
-   mBranchesWidget = new BranchesWidget(mCache, git);
+   mBranchesWidget = new BranchesWidget(mCache, mGit);
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &HistoryWidget::signalUpdateCache);
    connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::onBranchCheckout);
 
@@ -184,7 +219,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    const auto layout = new QHBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->setSpacing(10);
-   layout->addWidget(mCommitStackedWidget);
+   layout->addWidget(wipFrame);
    layout->addWidget(mCenterStackedWidget);
    layout->addWidget(mBranchesWidget);
 
@@ -256,6 +291,16 @@ void HistoryWidget::onNewRevisions(int totalCommits)
    mRepositoryView->selectionModel()->select(
        QItemSelection(mRepositoryModel->index(0, 0), mRepositoryModel->index(0, mRepositoryModel->columnCount() - 1)),
        QItemSelectionModel::Select);
+}
+
+void HistoryWidget::updateConfig()
+{
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   const auto localUserInfo = gitConfig->getLocalUserInfo();
+   const auto globalUserInfo = gitConfig->getGlobalUserInfo();
+
+   mUserName->setText(localUserInfo.mUserName.isEmpty() ? globalUserInfo.mUserName : localUserInfo.mUserName);
+   mUserEmail->setText(localUserInfo.mUserEmail.isEmpty() ? globalUserInfo.mUserEmail : localUserInfo.mUserEmail);
 }
 
 void HistoryWidget::keyPressEvent(QKeyEvent *event)
@@ -345,8 +390,11 @@ void HistoryWidget::onShowAllUpdated(bool showAll)
 
 void HistoryWidget::onBranchCheckout()
 {
+   const auto currentBranch = mGit->getCurrentBranch();
+   mCurrentBranchLabel->setText(QString("Working branch: <b>%1</b>").arg(currentBranch));
+
    QScopedPointer<GitBranches> gitBranches(new GitBranches(mGit));
-   const auto ret = gitBranches->getLastCommitOfBranch(mGit->getCurrentBranch());
+   const auto ret = gitBranches->getLastCommitOfBranch(currentBranch);
 
    if (mChShowAllBranches->isChecked())
       mRepositoryView->focusOnCommit(ret.output.toString());

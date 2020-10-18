@@ -4,6 +4,31 @@
     color: white;
 }
 
+/* CONTROLS */
+
+
+/* BLAME WIDGET */
+
+
+/* HISTORY WIDGET */
+#wipInfoFrame
+{
+   background: #303132;
+}
+
+#wipSeparator
+{
+   background: #404142;
+}
+
+/* BRANCHES WIDGET */
+
+
+/* MERGE WIDGET */
+
+
+/* DIFF WIDGET */
+
 QToolButton
 {
     background-color: #404142;

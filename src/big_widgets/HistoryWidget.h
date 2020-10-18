@@ -42,6 +42,8 @@ class FileDiffWidget;
 class BranchesWidgetMinimal;
 class QPushButton;
 class GitServerCache;
+class QLabel;
+
 /*!
  \brief The HistoryWidget is the responsible fro showing the history of the repository. It is the first widget shown
  when a repository is open and manages all the signals from its subwidgets to the GitQlientRepo class. It also creates
@@ -221,6 +223,11 @@ public:
    */
    void onNewRevisions(int totalCommits);
 
+   /**
+    * @brief updateConfig Updates the informative panel.
+    */
+   void updateConfig();
+
 protected:
    void keyPressEvent(QKeyEvent *event) override;
    void keyReleaseEvent(QKeyEvent *event) override;
@@ -251,6 +258,9 @@ private:
    FileDiffWidget *mFileDiff = nullptr;
    FullDiffWidget *mFullDiffWidget = nullptr;
    QPushButton *mReturnFromFull = nullptr;
+   QLabel *mUserName = nullptr;
+   QLabel *mUserEmail = nullptr;
+   QLabel *mCurrentBranchLabel = nullptr;
    bool mReverseSearch = false;
 
    /*!
