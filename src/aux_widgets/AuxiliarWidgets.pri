@@ -18,6 +18,7 @@ HEADERS += \
     $$PWD/GitQlientUpdater.h \
     $$PWD/Highlighter.h \
     $$PWD/InitialRepoConfig.h \
+    $$PWD/PomodoroButton.h \
     $$PWD/ProgressDlg.h \
     $$PWD/PullDlg.h \
     $$PWD/RepoConfigDlg.h \
@@ -34,6 +35,7 @@ SOURCES += \
     $$PWD/GitQlientUpdater.cpp \
     $$PWD/Highlighter.cpp \
     $$PWD/InitialRepoConfig.cpp \
+    $$PWD/PomodoroButton.cpp \
     $$PWD/ProgressDlg.cpp \
     $$PWD/PullDlg.cpp \
     $$PWD/RepoConfigDlg.cpp \

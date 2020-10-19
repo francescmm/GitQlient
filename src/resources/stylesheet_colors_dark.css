@@ -876,3 +876,30 @@ QScrollArea, #TransparentScrollArea
    background-color: #2E2F30;
 }
 
+PomodoroButton
+{
+   background: #404142;
+}
+
+PomodoroButton:hover
+{
+   background: #606162;
+}
+
+PomodoroButton > QToolButton, PomodoroButton > QToolButton:hover
+{
+   background: transparent;
+}
+
+PomodoroButton > QToolButton#Arrow
+{
+   padding: 0;
+}
+
+PomodoroButton > QLabel
+{
+   qproperty-alignment: AlignCenter;
+   font-size: 7pt;
+   font-family: DejaVu Sans Mono;
+}
+

@@ -35,6 +35,7 @@ class QProgressBar;
 class GitQlientUpdater;
 class QButtonGroup;
 class QHBoxLayout;
+class PomodoroButton;
 
 /*!
  \brief Enum used to configure the different views handled by the Controls widget.
@@ -180,7 +181,7 @@ private:
    QToolButton *mConfigBtn = nullptr;
    QToolButton *mGitPlatform = nullptr;
    QToolButton *mBuildSystem = nullptr;
-   QToolButton *mPomodoro = nullptr;
+   PomodoroButton *mPomodoro = nullptr;
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;

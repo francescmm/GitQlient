@@ -12,6 +12,7 @@
 #include <CreatePullRequestDlg.h>
 #include <GitQlientUpdater.h>
 #include <GitQlientSettings.h>
+#include <PomodoroButton.h>
 #include <QLogger.h>
 
 #include <QApplication>
@@ -41,7 +42,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    , mConfigBtn(new QToolButton())
    , mGitPlatform(new QToolButton())
    , mBuildSystem(new QToolButton())
-   , mPomodoro(new QToolButton())
+   , mPomodoro(new PomodoroButton())
    , mVersionCheck(new QToolButton())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
    , mUpdater(new GitQlientUpdater(this))
@@ -120,10 +121,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mConfigBtn->setToolTip(tr("Config"));
    mConfigBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-   mPomodoro->setIcon(QIcon(":/icons/pomodoro"));
-   mPomodoro->setIconSize(QSize(22, 22));
-   mPomodoro->setToolTip(tr("Refresh"));
-   mPomodoro->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mPomodoro->setText("25:00");
 
    const auto separator = new QFrame();
    separator->setObjectName("orangeSeparator");
