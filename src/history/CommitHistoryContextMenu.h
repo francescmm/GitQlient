@@ -27,6 +27,7 @@
 
 class GitCache;
 class GitBase;
+class GitTags;
 class GitServerCache;
 
 /*!
@@ -106,6 +107,7 @@ private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitServerCache> mGitServerCache;
+   QSharedPointer<GitTags> mGitTags;
    QStringList mShas;
 
    /*!

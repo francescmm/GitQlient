@@ -42,6 +42,7 @@ class GitServerWidget;
 class QTimer;
 class WaitingDlg;
 class GitServerCache;
+class GitTags;
 
 namespace Jenkins
 {
@@ -153,6 +154,7 @@ private:
    QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
    QSharedPointer<GitServer::IRestApi> mApi;
+   QSharedPointer<GitTags> mGitTags;
 
    bool mIsInit = false;
    QThread *m_loaderThread;
@@ -292,11 +294,6 @@ private:
 
    */
    void updateWip();
-
-   /**
-    * @brief updateTagsOnCache Updates the remote tags in the cache.
-    */
-   void updateTagsOnCache();
 
    /**
     * @brief focusHistoryOnBranch Opens the graph view and focuses on the SHA of the last commit of the given branch.

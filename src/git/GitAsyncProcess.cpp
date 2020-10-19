@@ -19,7 +19,7 @@ void GitAsyncProcess::onFinished(int code, QProcess::ExitStatus exitStatus)
    AGitProcess::onFinished(code, exitStatus);
 
    if (!mCanceling)
-      emit signalDataReady({ mRealError, mRunOutput });
+      emit signalDataReady({ !mRealError, mRunOutput });
 
    deleteLater();
 }

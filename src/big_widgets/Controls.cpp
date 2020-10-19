@@ -1,6 +1,7 @@
 #include "Controls.h"
 
 #include <GitBase.h>
+#include <GitTags.h>
 #include <GitStashes.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
@@ -29,6 +30,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
+   , mGitTags(new GitTags(mGit))
    , mHistory(new QToolButton())
    , mDiff(new QToolButton())
    , mBlame(new QToolButton())
@@ -46,6 +48,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
+   connect(mGitTags.data(), &GitTags::remoteTagsReceived, mCache.data(), &GitCache::updateTags);
    connect(mUpdater, &GitQlientUpdater::newVersionAvailable, this, [this]() { mVersionCheck->setVisible(true); });
 
    mHistory->setCheckable(true);
@@ -267,7 +270,7 @@ void Controls::fetchAll()
 
    if (ret)
    {
-      emit signalFetchPerformed();
+      mGitTags->getRemoteTags();
       emit signalRepositoryUpdated();
    }
 }

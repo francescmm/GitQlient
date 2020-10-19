@@ -39,8 +39,11 @@ CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<GitCache
    , mCache(cache)
    , mGit(git)
    , mGitServerCache(gitServerCache)
+   , mGitTags(new GitTags(mGit))
    , mShas(shas)
 {
+   connect(mGitTags.data(), &GitTags::remoteTagsReceived, mCache.data(), &GitCache::updateTags);
+
    setAttribute(Qt::WA_DeleteOnClose);
 
    if (shas.count() == 1)
@@ -473,10 +476,7 @@ void CommitHistoryContextMenu::fetch()
 
    if (git->fetch())
    {
-      QScopedPointer<GitTags> gitTags(new GitTags(mGit));
-      const auto remoteTags = gitTags->getRemoteTags();
-
-      mCache->updateTags(remoteTags);
+      mGitTags->getRemoteTags();
       emit signalRepositoryUpdated();
    }
 }

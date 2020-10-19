@@ -30,6 +30,7 @@ class QListWidget;
 class QListWidgetItem;
 class QLabel;
 class GitBase;
+class GitTags;
 class GitCache;
 class QPushButton;
 class BranchesWidgetMinimal;
@@ -124,6 +125,7 @@ public:
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitTags> mGitTags;
    BranchTreeWidget *mLocalBranchesTree = nullptr;
    BranchTreeWidget *mRemoteBranchesTree = nullptr;
    QListWidget *mTagsList = nullptr;
@@ -220,11 +222,6 @@ private:
     \param item The stash item from the stashes list.
    */
    void onStashClicked(QListWidgetItem *item);
-
-   /**
-    * @brief onFetchPerformed Updates the remote tags in the cache.
-    */
-   void onFetchPerformed();
 
    /**
     * @brief onStashSelected Gets the SHA for a given stash and notifies the UI that it should select it in the

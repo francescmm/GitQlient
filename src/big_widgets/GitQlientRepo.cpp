@@ -56,7 +56,10 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mJenkins(new JenkinsWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
+   , mGitTags(new GitTags(mGitBase))
 {
+   connect(mGitTags.data(), &GitTags::remoteTagsReceived, mGitQlientCache.data(), &GitCache::updateTags);
+
    setAttribute(Qt::WA_DeleteOnClose);
 
    QLog_Info("UI", QString("Initializing GitQlient"));
@@ -94,7 +97,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
    connect(mAutoFilesUpdate, &QTimer::timeout, this, &GitQlientRepo::updateUiFromWatcher);
 
-   connect(mControls, &Controls::signalFetchPerformed, this, &GitQlientRepo::updateTagsOnCache);
    connect(mControls, &Controls::signalGoRepo, this, &GitQlientRepo::showHistoryView);
    connect(mControls, &Controls::signalGoBlame, this, &GitQlientRepo::showBlameView);
    connect(mControls, &Controls::signalGoDiff, this, &GitQlientRepo::showDiffView);
@@ -275,7 +277,7 @@ void GitQlientRepo::onRepoLoadFinished()
 {
    if (!mIsInit)
    {
-      updateTagsOnCache();
+      mGitTags->getRemoteTags();
 
       mIsInit = true;
 
@@ -469,14 +471,6 @@ void GitQlientRepo::updateWip()
    mHistoryWidget->resetWip();
    mGitLoader.data()->updateWipRevision();
    mHistoryWidget->updateUiFromWatcher();
-}
-
-void GitQlientRepo::updateTagsOnCache()
-{
-   QScopedPointer<GitTags> gitTags(new GitTags(mGitBase));
-   const auto remoteTags = gitTags->getRemoteTags();
-
-   mGitQlientCache->updateTags(remoteTags);
 }
 
 void GitQlientRepo::focusHistoryOnBranch(const QString &branch)

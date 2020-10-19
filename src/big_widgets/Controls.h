@@ -28,6 +28,7 @@
 class QToolButton;
 class QPushButton;
 class GitBase;
+class GitTags;
 class GitCache;
 class QNetworkAccessManager;
 class QProgressBar;
@@ -101,11 +102,6 @@ signals:
    void signalPullConflict();
 
    /**
-    * @brief signalFetchPerformed Signal triggered when a deep fetch is performed.
-    */
-   void signalFetchPerformed();
-
-   /**
     * @brief signalRefreshPRsCache Signal that refreshes PRs cache.
     */
    void signalRefreshPRsCache();
@@ -173,6 +169,7 @@ private:
    QString mCurrentSha;
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitTags> mGitTags;
    QToolButton *mHistory = nullptr;
    QToolButton *mDiff = nullptr;
    QToolButton *mBlame = nullptr;

@@ -458,6 +458,8 @@ QMap<QString, QString> GitCache::getTags(References::Type tagType) const
 void GitCache::updateTags(const QMap<QString, QString> &remoteTags)
 {
    mRemoteTags = remoteTags;
+
+   emit signalCacheUpdated();
 }
 
 void GitCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)

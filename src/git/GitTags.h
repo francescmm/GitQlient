@@ -31,13 +31,17 @@
 
 class GitBase;
 
-class GitTags
+class GitTags : public QObject
 {
+   Q_OBJECT
+
+signals:
+   void remoteTagsReceived(const QMap<QString, QString> &tags);
+
 public:
    explicit GitTags(const QSharedPointer<GitBase> &gitBase);
 
-   QMap<QString, QString> getRemoteTags() const;
-   QVector<QString> getLocalTags() const;
+   bool getRemoteTags() const;
    GitExecResult addTag(const QString &tagName, const QString &tagMessage, const QString &sha);
    GitExecResult removeTag(const QString &tagName, bool remote);
    GitExecResult pushTag(const QString &tagName);
@@ -45,4 +49,6 @@ public:
 
 private:
    QSharedPointer<GitBase> mGitBase;
+
+   void onRemoteTagsRecieved(GitExecResult result);
 };
