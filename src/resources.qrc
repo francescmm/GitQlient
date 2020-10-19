@@ -103,6 +103,9 @@
         <file alias="signed">resources/icons/green_check.svg</file>
         <file alias="close_issue">resources/icons/close_issue.svg</file>
         <file alias="close_pr">resources/icons/close_pr.svg</file>
+        <file alias="pomodoro">resources/icons/pomodoro.svg</file>
+        <file alias="pomodoro_running">resources/icons/pomodoro_running.svg</file>
+        <file alias="pomodoro_timeout">resources/icons/pomodoro_timeout.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

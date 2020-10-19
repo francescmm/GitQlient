@@ -58,6 +58,26 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    ui->tabWidget->setCurrentIndex(0);
    connect(ui->pbClearCache, &ButtonLink::clicked, this, &RepoConfigDlg::clearCache);
 
+   /* POMODORO CONFIG STARTS */
+   connect(ui->pomodoroDur, &QSlider::valueChanged, this,
+           [this](int value) { ui->pomodoroDurLabel->setText(QString::number(value)); });
+   connect(ui->breakDur, &QSlider::valueChanged, this,
+           [this](int value) { ui->pomodoroBreakDurLabel->setText(QString::number(value)); });
+   connect(ui->longBreakDur, &QSlider::valueChanged, this,
+           [this](int value) { ui->pomodoroLongBreakLabel->setText(QString::number(value)); });
+
+   ui->cbPomodoroEnabled->setChecked(
+       settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", true).toBool());
+   ui->cbAlarmSound->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Alarm", true).toBool());
+   ui->pomodoroDur->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", 25).toInt());
+   ui->breakDur->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", 5).toInt());
+   ui->longBreakDur->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", 15).toInt());
+   ui->sbLongBreakCount->setValue(
+       settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", 4).toInt());
+
+   /* POMODORO CONFIG ENDS */
+
+   /* BUILD SYSTEM CONFIG STARTS */
    const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
    ui->chBoxBuildSystem->setChecked(isConfigured);
    connect(ui->chBoxBuildSystem, &QCheckBox::stateChanged, this, &RepoConfigDlg::toggleBsAccesInfo);
@@ -79,6 +99,8 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
       ui->leBsUser->setText(user);
       ui->leBsToken->setText(token);
    }
+
+   /* BUILD SYSTEM CONFIG ENDS */
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto localConfig = gitConfig->getLocalConfig();
@@ -123,6 +145,7 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    ui->tab_2->setStyleSheet(QString("background-color: %1;").arg(color));
    ui->tab_3->setStyleSheet(QString("background-color: %1;").arg(color));
    ui->tab_4->setStyleSheet(QString("background-color: %1;").arg(color));
+   ui->tab_5->setStyleSheet(QString("background-color: %1;").arg(color));
 
    style()->unpolish(this);
    setStyleSheet(GitQlientStyles::getStyles());
@@ -141,6 +164,16 @@ RepoConfigDlg::~RepoConfigDlg()
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "ClangFormatOnCommit", ui->clangFormat->isChecked());
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", ui->updateOnPull->isChecked());
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MaxCommits", ui->sbMaxCommits->value());
+
+   /* POMODORO CONFIG */
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", ui->cbPomodoroEnabled->isEnabled());
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Alarm", ui->cbAlarmSound->isEnabled());
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", ui->pomodoroDur->value());
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", ui->breakDur->value());
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", ui->longBreakDur->value());
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", ui->sbLongBreakCount->value());
+
+   /* BUILD SYSTEM CONFIG */
 
    const auto showBs = ui->chBoxBuildSystem->isChecked();
    const auto bsUser = ui->leBsUser->text();

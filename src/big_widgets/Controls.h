@@ -180,6 +180,7 @@ private:
    QToolButton *mConfigBtn = nullptr;
    QToolButton *mGitPlatform = nullptr;
    QToolButton *mBuildSystem = nullptr;
+   QToolButton *mPomodoro = nullptr;
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;
