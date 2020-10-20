@@ -49,6 +49,12 @@ protected:
     */
    void mouseReleaseEvent(QMouseEvent *e) override;
 
+   /**
+    * @brief eventFilter Event filter method to position the menu of the tool button in a custom position.
+    * @param obj The object to filter, in this case QMenu.
+    * @param event The event to filter, in this case QEvent::Show.
+    * @return Returns true if filtered.
+    */
    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
@@ -58,12 +64,15 @@ private:
       Running,
       InBreak,
       InBreakRunning,
+      InLongBreak,
+      InLongBreakRunning,
       Finished
    };
    QTime mDurationTime;
    QTime mBreakTime;
    QTime mLongBreakTime;
    bool mPressed = false;
+   int mBigBreakCount = 0;
    State mState = State::OnHold;
    QSharedPointer<GitBase> mGit;
    QToolButton *mButton = nullptr;
@@ -77,4 +86,7 @@ private:
 
    void onTimeout();
    void onClick();
+   void onRunningMode();
+   void onBreakingMode();
+   void onLongBreakingMode();
 };

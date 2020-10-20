@@ -59,6 +59,8 @@ PomodoroButton::PomodoroButton(const QSharedPointer<GitBase> &git, QWidget *pare
    const auto longBreakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", 15).toInt();
    mLongBreakTime = QTime(0, longBreakMins, 0);
 
+   mBigBreakCount = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", 4).toInt();
+
    mTimer->setInterval(1000);
    connect(mTimer, &QTimer::timeout, this, &PomodoroButton::onTimeout);
 
@@ -115,63 +117,11 @@ bool PomodoroButton::eventFilter(QObject *obj, QEvent *event)
 void PomodoroButton::onTimeout()
 {
    if (mState == State::Running)
-   {
-      mDurationTime = mDurationTime.addSecs(-1);
-      const auto timeStr = mDurationTime.toString("mm:ss");
-      mCounter->setText(timeStr);
-
-      if (mDurationTime == QTime(0, 0, 0))
-      {
-         mTimer->stop();
-
-         GitQlientSettings settings;
-         const auto durationMins
-             = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", 25).toInt();
-         mDurationTime = QTime(0, durationMins, 0);
-
-         mCounter->setText(mBreakTime.toString("mm:ss"));
-         mButton->setIcon(QIcon(":/icons/pomodoro_timeout"));
-         mState = State::InBreak;
-
-         const auto answer
-             = QMessageBox::question(this, tr("Time for a break!"), tr("It's time to do a break. Are you ready?"));
-
-         if (answer == QMessageBox::Yes)
-         {
-            mCounter->setText(mBreakTime.toString("mm:ss"));
-            mState = State::InBreakRunning;
-            mTimer->start();
-         }
-      }
-   }
+      onRunningMode();
    else if (mState == State::InBreakRunning)
-   {
-      mBreakTime = mBreakTime.addSecs(-1);
-      const auto timeStr = mBreakTime.toString("mm:ss");
-      mCounter->setText(timeStr);
-
-      if (mBreakTime == QTime(0, 0, 0))
-      {
-         mTimer->stop();
-
-         GitQlientSettings settings;
-         const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", 5).toInt();
-         mBreakTime = QTime(0, breakMins, 0);
-
-         mState = State::Finished;
-
-         const auto answer
-             = QMessageBox::question(this, tr("Time to work!"), tr("It's time to go back to work. Are you ready?"));
-
-         if (answer == QMessageBox::Yes)
-         {
-            mCounter->setText(mDurationTime.toString("mm:ss"));
-            mState = State::Running;
-            mTimer->start();
-            mButton->setIcon(QIcon(":/icons/pomodoro_running"));
-         }
-      }
-   }
+      onBreakingMode();
+   else if (mState == State::InLongBreakRunning)
+      onLongBreakingMode();
 }
 
 void PomodoroButton::onClick()
@@ -183,16 +133,125 @@ void PomodoroButton::onClick()
          mState = State::Running;
          mTimer->start();
          mButton->setIcon(QIcon(":/icons/pomodoro_running"));
+         --mBigBreakCount;
          break;
       case State::InBreak:
          mState = State::InBreakRunning;
          mTimer->start();
          break;
+      case State::InLongBreak:
+         mState = State::InBreakRunning;
+         mTimer->start();
+         break;
       case State::InBreakRunning:
+      case State::InLongBreakRunning:
       case State::Running:
          mState = State::OnHold;
          mTimer->stop();
          mButton->setIcon(QIcon(":/icons/pomodoro"));
+         ++mBigBreakCount;
          break;
+   }
+}
+
+void PomodoroButton::onRunningMode()
+{
+   mDurationTime = mDurationTime.addSecs(-1);
+   const auto timeStr = mDurationTime.toString("mm:ss");
+   mCounter->setText(timeStr);
+
+   if (mDurationTime == QTime(0, 0, 0))
+   {
+      mTimer->stop();
+
+      GitQlientSettings settings;
+      const auto durationMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", 25).toInt();
+      mDurationTime = QTime(0, durationMins, 0);
+
+      mButton->setIcon(QIcon(":/icons/pomodoro_timeout"));
+
+      if (mBigBreakCount == 0)
+      {
+         mBigBreakCount = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", 4).toInt();
+
+         mCounter->setText(mLongBreakTime.toString("mm:ss"));
+      }
+      else
+         mCounter->setText(mBreakTime.toString("mm:ss"));
+
+      if (QMessageBox::question(this, tr("Time for a break!"), tr("It's time to do a break. Are you ready?"))
+          == QMessageBox::Yes)
+      {
+         if (mBigBreakCount == 0)
+            mState = State::InLongBreakRunning;
+         else
+            mState = State::InBreakRunning;
+
+         mTimer->start();
+      }
+      else
+      {
+         if (mBigBreakCount == 0)
+            mState = State::InLongBreak;
+         else
+            mState = State::InBreak;
+      }
+   }
+}
+
+void PomodoroButton::onBreakingMode()
+{
+   mBreakTime = mBreakTime.addSecs(-1);
+   mCounter->setText(mBreakTime.toString("mm:ss"));
+
+   if (mBreakTime == QTime(0, 0, 0))
+   {
+      mTimer->stop();
+
+      GitQlientSettings settings;
+      const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", 5).toInt();
+      mBreakTime = QTime(0, breakMins, 0);
+
+      mState = State::Finished;
+
+      const auto answer
+          = QMessageBox::question(this, tr("Time to work!"), tr("It's time to go back to work. Are you ready?"));
+
+      if (answer == QMessageBox::Yes)
+      {
+         mCounter->setText(mDurationTime.toString("mm:ss"));
+         mState = State::Running;
+         mTimer->start();
+         mButton->setIcon(QIcon(":/icons/pomodoro_running"));
+         --mBigBreakCount;
+      }
+   }
+}
+
+void PomodoroButton::onLongBreakingMode()
+{
+   mLongBreakTime = mLongBreakTime.addSecs(-1);
+   mCounter->setText(mLongBreakTime.toString("mm:ss"));
+
+   if (mLongBreakTime == QTime(0, 0, 0))
+   {
+      mTimer->stop();
+
+      GitQlientSettings settings;
+      const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", 15).toInt();
+      mLongBreakTime = QTime(0, breakMins, 0);
+
+      mState = State::Finished;
+
+      const auto answer
+          = QMessageBox::question(this, tr("Time to work!"), tr("It's time to go back to work. Are you ready?"));
+
+      if (answer == QMessageBox::Yes)
+      {
+         mCounter->setText(mDurationTime.toString("mm:ss"));
+         mState = State::Running;
+         mTimer->start();
+         mButton->setIcon(QIcon(":/icons/pomodoro_running"));
+      }
    }
 }
