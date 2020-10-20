@@ -121,8 +121,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mConfigBtn->setToolTip(tr("Config"));
    mConfigBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-   mPomodoro->setText("25:00");
-
    const auto separator = new QFrame();
    separator->setObjectName("orangeSeparator");
    separator->setFixedHeight(20);

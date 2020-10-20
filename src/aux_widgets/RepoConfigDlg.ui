@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>596</width>
-    <height>382</height>
+    <height>389</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -327,6 +327,9 @@
           </item>
           <item>
            <widget class="QSlider" name="pomodoroDur">
+            <property name="minimum">
+             <number>1</number>
+            </property>
             <property name="maximum">
              <number>60</number>
             </property>
@@ -381,6 +384,9 @@
           </item>
           <item>
            <widget class="QSlider" name="breakDur">
+            <property name="minimum">
+             <number>1</number>
+            </property>
             <property name="maximum">
              <number>30</number>
             </property>
@@ -432,6 +438,9 @@
           </item>
           <item>
            <widget class="QSlider" name="longBreakDur">
+            <property name="minimum">
+             <number>1</number>
+            </property>
             <property name="maximum">
              <number>60</number>
             </property>

@@ -57,6 +57,7 @@ private:
       OnHold,
       Running,
       InBreak,
+      InBreakRunning,
       Finished
    };
    QTime mDurationTime;
@@ -74,5 +75,6 @@ private:
    QAction *mRestartAction = nullptr;
    QAction *mConfigAction = nullptr;
 
+   void onTimeout();
    void onClick();
 };
