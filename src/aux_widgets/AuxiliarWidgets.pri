@@ -4,6 +4,7 @@ FORMS += \
     $$PWD/BranchDlg.ui \
     $$PWD/CreateRepoDlg.ui \
     $$PWD/InitialRepoConfig.ui \
+    $$PWD/PomodoroConfigDlg.ui \
     $$PWD/PullDlg.ui \
     $$PWD/RepoConfigDlg.ui
 
@@ -19,6 +20,7 @@ HEADERS += \
     $$PWD/Highlighter.h \
     $$PWD/InitialRepoConfig.h \
     $$PWD/PomodoroButton.h \
+    $$PWD/PomodoroConfigDlg.h \
     $$PWD/ProgressDlg.h \
     $$PWD/PullDlg.h \
     $$PWD/RepoConfigDlg.h \
@@ -36,6 +38,7 @@ SOURCES += \
     $$PWD/Highlighter.cpp \
     $$PWD/InitialRepoConfig.cpp \
     $$PWD/PomodoroButton.cpp \
+    $$PWD/PomodoroConfigDlg.cpp \
     $$PWD/ProgressDlg.cpp \
     $$PWD/PullDlg.cpp \
     $$PWD/RepoConfigDlg.cpp \

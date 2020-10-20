@@ -2,6 +2,7 @@
 
 #include <GitQlientSettings.h>
 #include <GitBase.h>
+#include <PomodoroConfigDlg.h>
 
 #include <QTime>
 #include <QToolButton>
@@ -25,12 +26,8 @@ PomodoroButton::PomodoroButton(const QSharedPointer<GitBase> &git, QWidget *pare
 
    const auto menu = new QMenu(mButton);
    menu->installEventFilter(this);
-
-   mStartAction = menu->addAction(tr("Start"));
-   mStopAction = menu->addAction(tr("Stop"));
-   mRestartAction = menu->addAction(tr("Restart"));
-   menu->addSeparator();
-   mConfigAction = menu->addAction(tr("Configuration"));
+   mConfigAction = menu->addAction(tr("Options..."));
+   connect(mConfigAction, &QAction::triggered, this, &PomodoroButton::showConfig);
 
    mButton->setIcon(QIcon(":/icons/pomodoro"));
    mButton->setIconSize(QSize(22, 22));
@@ -60,6 +57,8 @@ PomodoroButton::PomodoroButton(const QSharedPointer<GitBase> &git, QWidget *pare
    mLongBreakTime = QTime(0, longBreakMins, 0);
 
    mBigBreakCount = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", 4).toInt();
+
+   mStopResets = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/StopResets", true).toBool();
 
    mTimer->setInterval(1000);
    connect(mTimer, &QTimer::timeout, this, &PomodoroButton::onTimeout);
@@ -97,6 +96,8 @@ void PomodoroButton::updateCounters()
 
    const auto longBreakTriggerCount
        = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", 4).toInt();
+
+   mStopResets = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/StopResets", true).toBool();
 
    if (longBreakTriggerCount < mBigBreakOriginalValue)
    {
@@ -182,6 +183,16 @@ void PomodoroButton::onClick()
          mState = State::OnHold;
          mTimer->stop();
          mButton->setIcon(QIcon(":/icons/pomodoro"));
+
+         if (mStopResets)
+         {
+            GitQlientSettings settings;
+            const auto durationMins
+                = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", 25).toInt();
+            mDurationTime = QTime(0, durationMins, 0);
+            mCounter->setText(mDurationTime.toString("mm:ss"));
+         }
+
          ++mBigBreakCount;
          break;
    }
@@ -190,8 +201,7 @@ void PomodoroButton::onClick()
 void PomodoroButton::onRunningMode()
 {
    mDurationTime = mDurationTime.addSecs(-1);
-   const auto timeStr = mDurationTime.toString("mm:ss");
-   mCounter->setText(timeStr);
+   mCounter->setText(mDurationTime.toString("mm:ss"));
 
    if (mDurationTime == QTime(0, 0, 0))
    {
@@ -287,4 +297,16 @@ void PomodoroButton::onLongBreakingMode()
          mButton->setIcon(QIcon(":/icons/pomodoro_running"));
       }
    }
+}
+
+void PomodoroButton::showConfig()
+{
+   const auto dlg = new PomodoroConfigDlg(mGit, this);
+
+   connect(dlg, &PomodoroConfigDlg::finished, this, [this](int result) {
+      if (result == QDialog::Accepted)
+         updateCounters();
+   });
+
+   dlg->open();
 }

@@ -383,7 +383,11 @@ void Controls::showConfigDlg()
    const auto configDlg = new RepoConfigDlg(mGit, this);
    configDlg->exec();
 
-   mPomodoro->updateCounters();
+   GitQlientSettings settings;
+   const auto pomodoroEnabled = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", true).toBool();
+
+   mPomodoro->setVisible(pomodoroEnabled);
+
    configBuildSystemButton();
 }
 
