@@ -1,10 +1,13 @@
 #pragma once
 
 #include <QFrame>
+#include <QTime>
 
 class QToolButton;
 class QLabel;
 class QAction;
+class QTimer;
+class GitBase;
 
 class PomodoroButton : public QFrame
 {
@@ -22,7 +25,7 @@ public:
     * @brief PomodoroButton Overloaded constructor.
     * @param parent The parent widget.
     */
-   explicit PomodoroButton(QWidget *parent = nullptr);
+   explicit PomodoroButton(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
 
    /**
     * @brief setText Sets the text to the button.
@@ -53,15 +56,23 @@ private:
    {
       OnHold,
       Running,
+      InBreak,
       Finished
    };
+   QTime mDurationTime;
+   QTime mBreakTime;
+   QTime mLongBreakTime;
    bool mPressed = false;
    State mState = State::OnHold;
+   QSharedPointer<GitBase> mGit;
    QToolButton *mButton = nullptr;
    QToolButton *mArrow = nullptr;
    QLabel *mCounter = nullptr;
+   QTimer *mTimer = nullptr;
    QAction *mStopAction = nullptr;
    QAction *mStartAction = nullptr;
    QAction *mRestartAction = nullptr;
    QAction *mConfigAction = nullptr;
+
+   void onClick();
 };

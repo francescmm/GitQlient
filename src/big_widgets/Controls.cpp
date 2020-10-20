@@ -42,7 +42,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    , mConfigBtn(new QToolButton())
    , mGitPlatform(new QToolButton())
    , mBuildSystem(new QToolButton())
-   , mPomodoro(new PomodoroButton())
+   , mPomodoro(new PomodoroButton(mGit))
    , mVersionCheck(new QToolButton())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
    , mUpdater(new GitQlientUpdater(this))

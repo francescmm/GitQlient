@@ -1,17 +1,23 @@
 #include "PomodoroButton.h"
 
+#include <GitQlientSettings.h>
+#include <GitBase.h>
+
+#include <QTime>
 #include <QToolButton>
 #include <QLabel>
 #include <QMenu>
 #include <QVBoxLayout>
 #include <QMouseEvent>
-#include <QStyle>
+#include <QTimer>
 
-PomodoroButton::PomodoroButton(QWidget *parent)
+PomodoroButton::PomodoroButton(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
+   , mGit(git)
    , mButton(new QToolButton())
    , mArrow(new QToolButton())
    , mCounter(new QLabel())
+   , mTimer(new QTimer())
 {
    setContentsMargins(0, 0, 0, 0);
    setToolTip(tr("Pomodoro"));
@@ -29,6 +35,7 @@ PomodoroButton::PomodoroButton(QWidget *parent)
    mButton->setIconSize(QSize(22, 22));
    mButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mButton->setObjectName("ToolButtonAboveMenu");
+   connect(mButton, &QToolButton::clicked, this, &PomodoroButton::onClick);
 
    mArrow->setObjectName("Arrow");
    mArrow->setIcon(QIcon(":/icons/arrow_down"));
@@ -39,6 +46,30 @@ PomodoroButton::PomodoroButton(QWidget *parent)
    mArrow->setMenu(menu);
    mArrow->setFixedWidth(10);
    mArrow->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+
+   GitQlientSettings settings;
+   const auto durationMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", 25).toInt();
+   mDurationTime = QTime(0, durationMins, 0);
+   mCounter->setText(mDurationTime.toString("mm:ss"));
+
+   const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", 5).toInt();
+   mBreakTime = QTime(0, breakMins, 0);
+
+   const auto longBreakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", 15).toInt();
+   mLongBreakTime = QTime(0, longBreakMins, 0);
+
+   mTimer->setInterval(1000);
+   connect(mTimer, &QTimer::timeout, this, [this]() {
+      mDurationTime = mDurationTime.addSecs(-1);
+      const auto timeStr = mDurationTime.toString("mm:ss");
+      mCounter->setText(timeStr);
+
+      if (mDurationTime == QTime())
+      {
+         mCounter->setText(mBreakTime.toString("mm:ss"));
+         mTimer->start();
+      }
+   });
 
    const auto layout = new QGridLayout(this);
    layout->setContentsMargins(QMargins());
@@ -65,6 +96,8 @@ void PomodoroButton::mouseReleaseEvent(QMouseEvent *e)
 {
    if (isEnabled() && mPressed)
    {
+      onClick();
+
       emit clicked();
    }
 
@@ -86,4 +119,23 @@ bool PomodoroButton::eventFilter(QObject *obj, QEvent *event)
    }
 
    return false;
+}
+
+void PomodoroButton::onClick()
+{
+   switch (mState)
+   {
+      case State::OnHold:
+      case State::Finished:
+         mState = State::Running;
+         mTimer->start();
+         mButton->setIcon(QIcon(":/icons/pomodoro_running"));
+         break;
+      case State::InBreak:
+      case State::Running:
+         mState = State::OnHold;
+         mTimer->stop();
+         mButton->setIcon(QIcon(":/icons/pomodoro"));
+         break;
+   }
 }
