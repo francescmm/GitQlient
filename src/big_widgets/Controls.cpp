@@ -383,6 +383,7 @@ void Controls::showConfigDlg()
    const auto configDlg = new RepoConfigDlg(mGit, this);
    configDlg->exec();
 
+   mPomodoro->updateCounters();
    configBuildSystemButton();
 }
 

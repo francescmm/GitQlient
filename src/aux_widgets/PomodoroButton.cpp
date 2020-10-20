@@ -18,7 +18,7 @@ PomodoroButton::PomodoroButton(const QSharedPointer<GitBase> &git, QWidget *pare
    , mButton(new QToolButton())
    , mArrow(new QToolButton())
    , mCounter(new QLabel())
-   , mTimer(new QTimer())
+   , mTimer(new QTimer(this))
 {
    setContentsMargins(0, 0, 0, 0);
    setToolTip(tr("Pomodoro"));
@@ -75,6 +75,39 @@ PomodoroButton::PomodoroButton(const QSharedPointer<GitBase> &git, QWidget *pare
 void PomodoroButton::setText(const QString &text)
 {
    mCounter->setText(text);
+}
+
+void PomodoroButton::updateCounters()
+{
+   mState = State::OnHold;
+   mTimer->stop();
+   mButton->setIcon(QIcon(":/icons/pomodoro"));
+
+   GitQlientSettings settings;
+
+   const auto durationMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", 25).toInt();
+   mDurationTime = QTime(0, durationMins, 0);
+   mCounter->setText(mDurationTime.toString("mm:ss"));
+
+   const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", 5).toInt();
+   mBreakTime = QTime(0, breakMins, 0);
+
+   const auto longBreakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", 15).toInt();
+   mLongBreakTime = QTime(0, longBreakMins, 0);
+
+   const auto longBreakTriggerCount
+       = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", 4).toInt();
+
+   if (longBreakTriggerCount < mBigBreakOriginalValue)
+   {
+      mBigBreakOriginalValue = longBreakTriggerCount;
+      mBigBreakCount = longBreakTriggerCount;
+   }
+   else
+   {
+      mBigBreakCount = longBreakTriggerCount - (mBigBreakOriginalValue - mBigBreakCount);
+      mBigBreakOriginalValue = longBreakTriggerCount;
+   }
 }
 
 void PomodoroButton::mousePressEvent(QMouseEvent *e)

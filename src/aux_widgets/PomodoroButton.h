@@ -33,6 +33,17 @@ public:
     */
    void setText(const QString &text);
 
+   /**
+    * @brief updateCounters Notify the widget to update the counters because the configuration changed. This resets all
+    * counters and puts the pomodoro back on hold if it was running.
+    *
+    * The number of pomodoros until the long break is
+    * reset but the class takes into account to discount them from the new value.
+    *
+    * If the new value is lower than the value stored, the counter will start again in a new cycle.
+    */
+   void updateCounters();
+
 protected:
    /**
     *
@@ -73,6 +84,7 @@ private:
    QTime mLongBreakTime;
    bool mPressed = false;
    int mBigBreakCount = 0;
+   int mBigBreakOriginalValue = 0;
    State mState = State::OnHold;
    QSharedPointer<GitBase> mGit;
    QToolButton *mButton = nullptr;
