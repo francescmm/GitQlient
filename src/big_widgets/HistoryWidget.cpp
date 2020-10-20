@@ -59,7 +59,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    mUserName->setText(localUserInfo.mUserName.isEmpty() ? globalUserInfo.mUserName : localUserInfo.mUserName);
    mUserEmail->setText(localUserInfo.mUserEmail.isEmpty() ? globalUserInfo.mUserEmail : localUserInfo.mUserEmail);
-   mCurrentBranchLabel->setText(QString("Working branch: <b>%1</b>").arg(mGit->getCurrentBranch()));
+   mCurrentBranchLabel->setText(QString(tr("Working branch: <b>%1</b>")).arg(mGit->getCurrentBranch()));
 
    const auto wipSeparator = new QFrame();
    wipSeparator->setObjectName("wipSeparator");
@@ -391,7 +391,7 @@ void HistoryWidget::onShowAllUpdated(bool showAll)
 void HistoryWidget::onBranchCheckout()
 {
    const auto currentBranch = mGit->getCurrentBranch();
-   mCurrentBranchLabel->setText(QString("Working branch: <b>%1</b>").arg(currentBranch));
+   mCurrentBranchLabel->setText(QString(tr("Working branch: <b>%1</b>")).arg(currentBranch));
 
    QScopedPointer<GitBranches> gitBranches(new GitBranches(mGit));
    const auto ret = gitBranches->getLastCommitOfBranch(currentBranch);
@@ -415,10 +415,11 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
 
    if (!ret.success)
    {
-      QMessageBox msgBox(QMessageBox::Critical, tr("Merge failed"),
-                         QString("There were problems during the merge. Please, see the detailed description for more "
-                                 "information.<br><br>GitQlient will show the merge helper tool."),
-                         QMessageBox::Ok, this);
+      QMessageBox msgBox(
+          QMessageBox::Critical, tr("Merge failed"),
+          QString(tr("There were problems during the merge. Please, see the detailed description for more "
+                     "information.<br><br>GitQlient will show the merge helper tool.")),
+          QMessageBox::Ok, this);
       msgBox.setDetailedText(ret.output.toString());
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
@@ -437,7 +438,7 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
 
             QMessageBox msgBox(
                 QMessageBox::Information, tr("Merge successful"),
-                QString("The merge was successfully done. See the detailed description for more information."),
+                tr("The merge was successfully done. See the detailed description for more information."),
                 QMessageBox::Ok, this);
             msgBox.setDetailedText(ret.output.toString());
             msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -447,8 +448,7 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
          {
             QMessageBox msgBox(
                 QMessageBox::Warning, tr("Merge status"),
-                QString(
-                    "There were problems during the merge. Please, see the detailed description for more information."),
+                tr("There were problems during the merge. Please, see the detailed description for more information."),
                 QMessageBox::Ok, this);
             msgBox.setDetailedText(ret.output.toString());
             msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -507,8 +507,8 @@ void HistoryWidget::cherryPickCommit()
          else
          {
             QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
-                               QString("There were problems during the cherry-pick operation. Please, see the detailed "
-                                       "description for more information."),
+                               tr("There were problems during the cherry-pick operation. Please, see the detailed "
+                                  "description for more information."),
                                QMessageBox::Ok, this);
             msgBox.setDetailedText(errorMsg);
             msgBox.setStyleSheet(GitQlientStyles::getStyles());

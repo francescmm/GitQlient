@@ -64,7 +64,7 @@ void GitServerWidget::createWidget()
 
    const auto newIssue = new QPushButton();
    newIssue->setIcon(QIcon(":/icons/new_issue"));
-   newIssue->setToolTip("Create a new issue");
+   newIssue->setToolTip(tr("Create a new issue"));
    connect(newIssue, &QPushButton::clicked, this, &GitServerWidget::createNewIssue);
 
    const auto newPr = new QPushButton();

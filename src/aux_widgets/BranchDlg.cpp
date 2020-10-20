@@ -25,27 +25,27 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
    switch (mConfig.mDialogMode)
    {
       case BranchDlgMode::CREATE:
-         setWindowTitle("Create branch");
+         setWindowTitle(tr("Create branch"));
          break;
       case BranchDlgMode::RENAME:
          ui->pbAccept->setText(tr("Rename"));
          setWindowTitle("Rename branch");
          break;
       case BranchDlgMode::CREATE_CHECKOUT:
-         setWindowTitle("Create and checkout branch");
+         setWindowTitle(tr("Create and checkout branch"));
          ui->leOldName->setHidden(true);
          break;
       case BranchDlgMode::CREATE_FROM_COMMIT:
-         setWindowTitle("Create branch at commit");
+         setWindowTitle(tr("Create branch at commit"));
          ui->leOldName->setHidden(true);
          break;
       case BranchDlgMode::STASH_BRANCH:
-         setWindowTitle("Stash branch");
+         setWindowTitle(tr("Stash branch"));
          break;
       case BranchDlgMode::PUSH_UPSTREAM:
          ui->chbCopyRemote->setVisible(true);
          connect(ui->chbCopyRemote, &CheckBox::clicked, this, &BranchDlg::copyBranchName);
-         setWindowTitle("Push upstream branch");
+         setWindowTitle(tr("Push upstream branch"));
          ui->pbAccept->setText(tr("Push"));
          break;
       default:
@@ -104,8 +104,8 @@ void BranchDlg::accept()
       {
          QMessageBox msgBox(
              QMessageBox::Critical, tr("Error on branch action!"),
-             QString("There were problems during the branch operation. Please, see the detailed description "
-                     "for more information."),
+             QString(tr("There were problems during the branch operation. Please, see the detailed description "
+                        "for more information.")),
              QMessageBox::Ok, this);
          msgBox.setDetailedText(ret.output.toString());
          msgBox.setStyleSheet(GitQlientStyles::getStyles());

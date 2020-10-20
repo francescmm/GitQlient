@@ -29,8 +29,8 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
    const auto checkText = ui->chbOpen->text().arg(operation);
    ui->chbOpen->setText(checkText);
 
-   setWindowTitle(
-       QString("%1 repository").arg(mType == CreateRepoDlgType::INIT ? QString("Initialize") : QString("Clone")));
+   setWindowTitle(QString(tr("%1 repository"))
+                      .arg(mType == CreateRepoDlgType::INIT ? QString(tr("Initialize")) : QString(tr("Clone"))));
 
    connect(ui->leURL, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
    connect(ui->leURL, &QLineEdit::textChanged, this, &CreateRepoDlg::addDefaultName);
@@ -113,7 +113,7 @@ void CreateRepoDlg::accept()
          }
          else
          {
-            const auto msg = QString("You need to provider a URL to clone a repository.");
+            const auto msg = QString(tr("You need to provider a URL to clone a repository."));
 
             QMessageBox::critical(this, tr("Nor URL provided"), msg);
 

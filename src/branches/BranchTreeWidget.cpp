@@ -90,8 +90,8 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
          else
          {
             QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
-                               QString("There were problems during the checkout operation. Please, see the detailed "
-                                       "description for more information."),
+                               tr("There were problems during the checkout operation. Please, see the detailed "
+                                  "description for more information."),
                                QMessageBox::Ok, this);
             msgBox.setDetailedText(output);
             msgBox.setStyleSheet(GitQlientStyles::getStyles());

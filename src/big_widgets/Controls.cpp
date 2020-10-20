@@ -56,14 +56,14 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mHistory->setCheckable(true);
    mHistory->setIcon(QIcon(":/icons/git_orange"));
    mHistory->setIconSize(QSize(22, 22));
-   mHistory->setToolTip("View");
+   mHistory->setToolTip(tr("View"));
    mHistory->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mBtnGroup->addButton(mHistory, static_cast<int>(ControlsMainViews::History));
 
    mDiff->setCheckable(true);
    mDiff->setIcon(QIcon(":/icons/diff"));
    mDiff->setIconSize(QSize(22, 22));
-   mDiff->setToolTip("Diff");
+   mDiff->setToolTip(tr("Diff"));
    mDiff->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mDiff->setEnabled(false);
    mBtnGroup->addButton(mDiff, static_cast<int>(ControlsMainViews::Diff));
@@ -71,7 +71,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mBlame->setCheckable(true);
    mBlame->setIcon(QIcon(":/icons/blame"));
    mBlame->setIconSize(QSize(22, 22));
-   mBlame->setToolTip("Blame");
+   mBlame->setToolTip(tr("Blame"));
    mBlame->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mBtnGroup->addButton(mBlame, static_cast<int>(ControlsMainViews::Blame));
 
@@ -254,8 +254,8 @@ void Controls::pullCurrentBranch()
       else
       {
          QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
-                            QString("There were problems during the pull operation. Please, see the detailed "
-                                    "description for more information."),
+                            QString(tr("There were problems during the pull operation. Please, see the detailed "
+                                       "description for more information.")),
                             QMessageBox::Ok, this);
          msgBox.setDetailedText(msg);
          msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -329,10 +329,11 @@ void Controls::pushCurrentBranch()
    }
    else
    {
-      QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
-                         QString("There were problems during the push operation. Please, see the detailed description "
-                                 "for more information."),
-                         QMessageBox::Ok, this);
+      QMessageBox msgBox(
+          QMessageBox::Critical, tr("Error while pushing"),
+          QString(tr("There were problems during the push operation. Please, see the detailed description "
+                     "for more information.")),
+          QMessageBox::Ok, this);
       msgBox.setDetailedText(ret.output.toString());
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
@@ -358,8 +359,8 @@ void Controls::popStashedWork()
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while poping a stash"),
-                         QString("There were problems during the stash pop operation. Please, see the detailed "
-                                 "description for more information."),
+                         tr("There were problems during the stash pop operation. Please, see the detailed "
+                            "description for more information."),
                          QMessageBox::Ok, this);
       msgBox.setDetailedText(ret.output.toString());
       msgBox.setStyleSheet(GitQlientStyles::getStyles());

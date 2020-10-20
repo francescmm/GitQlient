@@ -19,30 +19,31 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
 
    if (mConfig.isLocal)
    {
-      connect(addAction("Pull"), &QAction::triggered, this, &BranchContextMenu::pull);
-      connect(addAction("Fetch"), &QAction::triggered, this, &BranchContextMenu::fetch);
-      connect(addAction("Push"), &QAction::triggered, this, &BranchContextMenu::push);
+      connect(addAction(tr("Pull")), &QAction::triggered, this, &BranchContextMenu::pull);
+      connect(addAction(tr("Fetch")), &QAction::triggered, this, &BranchContextMenu::fetch);
+      connect(addAction(tr("Push")), &QAction::triggered, this, &BranchContextMenu::push);
    }
 
    if (mConfig.currentBranch == mConfig.branchSelected)
-      connect(addAction("Push force"), &QAction::triggered, this, &BranchContextMenu::pushForce);
+      connect(addAction(tr("Push force")), &QAction::triggered, this, &BranchContextMenu::pushForce);
 
    addSeparator();
 
-   connect(addAction("Create branch"), &QAction::triggered, this, &BranchContextMenu::createBranch);
-   connect(addAction("Create && checkout branch"), &QAction::triggered, this, &BranchContextMenu::createCheckoutBranch);
-   connect(addAction("Checkout branch"), &QAction::triggered, this, &BranchContextMenu::signalCheckoutBranch);
+   connect(addAction(tr("Create branch")), &QAction::triggered, this, &BranchContextMenu::createBranch);
+   connect(addAction(tr("Create && checkout branch")), &QAction::triggered, this,
+           &BranchContextMenu::createCheckoutBranch);
+   connect(addAction(tr("Checkout branch")), &QAction::triggered, this, &BranchContextMenu::signalCheckoutBranch);
 
    if (mConfig.currentBranch != mConfig.branchSelected)
    {
-      const auto actionName = QString("Merge %1 into %2").arg(mConfig.branchSelected, mConfig.currentBranch);
+      const auto actionName = tr("Merge %1 into %2").arg(mConfig.branchSelected, mConfig.currentBranch);
       connect(addAction(actionName), &QAction::triggered, this, &BranchContextMenu::merge);
    }
 
    addSeparator();
 
-   connect(addAction("Rename"), &QAction::triggered, this, &BranchContextMenu::rename);
-   connect(addAction("Delete"), &QAction::triggered, this, &BranchContextMenu::deleteBranch);
+   connect(addAction(tr("Rename")), &QAction::triggered, this, &BranchContextMenu::rename);
+   connect(addAction(tr("Delete")), &QAction::triggered, this, &BranchContextMenu::deleteBranch);
 }
 
 void BranchContextMenu::pull()
@@ -66,8 +67,8 @@ void BranchContextMenu::pull()
       else
       {
          QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
-                            QString("There were problems during the pull operation. Please, see the detailed "
-                                    "description for more information."),
+                            tr("There were problems during the pull operation. Please, see the detailed "
+                               "description for more information."),
                             QMessageBox::Ok, this);
          msgBox.setDetailedText(errorMsg);
          msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -113,8 +114,8 @@ void BranchContextMenu::push()
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
-                         QString("There were problems during the push operation. Please, see the detailed description "
-                                 "for more information."),
+                         tr("There were problems during the push operation. Please, see the detailed description "
+                            "for more information."),
                          QMessageBox::Ok, this);
       msgBox.setDetailedText(ret.output.toString());
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -137,8 +138,8 @@ void BranchContextMenu::pushForce()
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
-                         QString("There were problems during the pull operation. Please, see the detailed description "
-                                 "for more information."),
+                         tr("There were problems during the pull operation. Please, see the detailed description "
+                            "for more information."),
                          QMessageBox::Ok, this);
       msgBox.setDetailedText(ret.output.toString());
       msgBox.setStyleSheet(GitQlientStyles::getStyles());

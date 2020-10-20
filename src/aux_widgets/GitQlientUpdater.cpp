@@ -37,11 +37,12 @@ void GitQlientUpdater::checkNewGitQlientVersion()
 
 void GitQlientUpdater::showInfoMessage()
 {
-   QMessageBox msgBox(QMessageBox::Information, tr("New version of GitQlient!"),
-                      QString("There is a new version of GitQlient available. Your current vrsion is {%1} and the new "
-                              "one is {%2}. You can read more about the new changes in the detailed description.")
-                          .arg(VER, mLatestGitQlient),
-                      QMessageBox::Ok | QMessageBox::Close, qobject_cast<QWidget *>(parent()));
+   QMessageBox msgBox(
+       QMessageBox::Information, tr("New version of GitQlient!"),
+       QString(tr("There is a new version of GitQlient available. Your current vrsion is {%1} and the new "
+                  "one is {%2}. You can read more about the new changes in the detailed description."))
+           .arg(VER, mLatestGitQlient),
+       QMessageBox::Ok | QMessageBox::Close, qobject_cast<QWidget *>(parent()));
    msgBox.setButtonText(QMessageBox::Ok, tr("Download"));
    msgBox.setDetailedText(mChangeLog);
    msgBox.setStyleSheet(GitQlientStyles::getStyles());
