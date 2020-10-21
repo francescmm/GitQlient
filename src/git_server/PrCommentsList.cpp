@@ -268,9 +268,8 @@ void PrCommentsList::processComments(const Issue &issue)
 QLabel *PrCommentsList::createHeadline(const QDateTime &dt, const QString &prefix)
 {
    const auto days = dt.daysTo(QDateTime::currentDateTime());
-   const auto whenText = days <= 30
-       ? days != 0 ? QString::fromUtf8(" %1 days ago").arg(days) : QString::fromUtf8(" today")
-       : QString(" on %1").arg(dt.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+   const auto whenText = days <= 30 ? days != 0 ? tr(" %1 days ago").arg(days) : tr(" today")
+                                    : tr(" on %1").arg(dt.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    const auto label = prefix.isEmpty() ? new QLabel(whenText) : new QLabel(prefix + whenText);
    label->setToolTip(dt.toString(QLocale().dateFormat(QLocale::ShortFormat)));
@@ -391,14 +390,13 @@ QLayout *PrCommentsList::createBubbleForReview(const Review &review)
    {
       frame->setObjectName("IssueIntroChangesRequested");
 
-      header = QString("<b>%1</b> (%2) requested changes to the PR ")
-                   .arg(review.creator.name, review.association.toLower());
+      header = tr("<b>%1</b> (%2) requested changes to the PR ").arg(review.creator.name, review.association.toLower());
    }
    else if (review.state == QString::fromUtf8("APPROVED"))
    {
       frame->setObjectName("IssueIntroApproved");
 
-      header = QString("<b>%1</b> (%2) approved the PR ").arg(review.creator.name, review.association.toLower());
+      header = tr("<b>%1</b> (%2) approved the PR ").arg(review.creator.name, review.association.toLower());
    }
    else if (review.state == QString::fromUtf8("COMMENTED"))
    {
@@ -410,7 +408,7 @@ QLayout *PrCommentsList::createBubbleForReview(const Review &review)
 
       frame->setObjectName("IssueIntroCommented");
 
-      header = QString("<b>%1</b> (%2) reviewed the PR and added some comments ")
+      header = tr("<b>%1</b> (%2) reviewed the PR and added some comments ")
                    .arg(review.creator.name, review.association.toLower());
 
       label = createHeadline(review.creation, header);

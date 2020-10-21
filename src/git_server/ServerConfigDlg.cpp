@@ -156,7 +156,7 @@ void ServerConfigDlg::onServerChanged()
 
 void ServerConfigDlg::onTestSucceeded()
 {
-   ui->lTestResult->setText("Token confirmed!");
+   ui->lTestResult->setText(tr("Token confirmed!"));
    QTimer::singleShot(3000, ui->lTestResult, &QLabel::clear);
 }
 

@@ -77,7 +77,7 @@ void CreateIssueDlg::accept()
 
 void CreateIssueDlg::onMilestones(const QVector<Milestone> &milestones)
 {
-   ui->cbMilesone->addItem("Select milestone", -1);
+   ui->cbMilesone->addItem(tr("Select milestone"), -1);
 
    for (auto &milestone : milestones)
       ui->cbMilesone->addItem(milestone.title, milestone.number);

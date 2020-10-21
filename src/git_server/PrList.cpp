@@ -13,7 +13,7 @@ PrList::PrList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *pa
    : AGitServerItemList(gitServerCache, parent)
 {
    mHeaderIconLabel->setPixmap(QIcon(":/icons/pull_request").pixmap(QSize(15, 15)));
-   mHeaderTitle->setText("Pull Requests");
+   mHeaderTitle->setText(tr("Pull Requests"));
 
    connect(mGitServerCache.get(), &GitServerCache::prReceived, this,
            [this]() { onPullRequestsReceived(mGitServerCache->getPullRequests()); });

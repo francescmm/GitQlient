@@ -56,8 +56,8 @@ void IssueItem::fillWidget(const Issue &issueData)
 
    const auto days = issueData.creation.daysTo(QDateTime::currentDateTime());
    const auto whenText = days <= 30
-       ? QString::fromUtf8(" %1 days ago").arg(days)
-       : QString(" on %1").arg(issueData.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+       ? tr(" %1 days ago").arg(days)
+       : tr(" on %1").arg(issueData.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    const auto whenLabel = new QLabel(whenText);
    whenLabel->setToolTip(issueData.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));

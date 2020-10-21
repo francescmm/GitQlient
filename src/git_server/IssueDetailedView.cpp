@@ -198,10 +198,10 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum,
 
    const auto days = mIssue.creation.daysTo(QDateTime::currentDateTime());
    const auto whenText = days <= 30
-       ? days != 0 ? QString::fromUtf8(" %1 days ago").arg(days) : QString::fromUtf8(" today")
-       : QString(" on %1").arg(mIssue.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+       ? days != 0 ? tr(" %1 days ago").arg(days) : tr(" today")
+       : tr(" on %1").arg(mIssue.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
-   mCreationLabel->setText(QString("Created by <b>%1</b>%2").arg(mIssue.creator.name, whenText));
+   mCreationLabel->setText(tr("Created by <b>%1</b>%2").arg(mIssue.creator.name, whenText));
    mCreationLabel->setToolTip(mIssue.creation.toString(QLocale().dateTimeFormat(QLocale::ShortFormat)));
    mCreationLabel->setVisible(true);
 

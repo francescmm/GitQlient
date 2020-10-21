@@ -40,7 +40,7 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<GitCache> &cache, const QS
 
    auto initialLayout = new QGridLayout(mAnotation);
    initialLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, 0);
-   initialLayout->addWidget(new QLabel("Select a file to blame"), 1, 1);
+   initialLayout->addWidget(new QLabel(tr("Select a file to blame")), 1, 1);
    initialLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 2);
 
    mInfoFont.setPointSize(9);
@@ -232,21 +232,21 @@ QLabel *FileBlameWidget::createDateLabel(const Annotation &annotation, bool isFi
       const auto days = annotation.dateTime.daysTo(QDateTime::currentDateTime());
       const auto secs = annotation.dateTime.secsTo(QDateTime::currentDateTime());
       if (days > 365)
-         when.append("more than 1 year ago");
+         when.append(tr("more than 1 year ago"));
       else if (days > 1)
-         when.append(QString::number(days)).append(" days ago");
+         when.append(QString::number(days)).append(tr(" days ago"));
       else if (days == 1)
-         when.append("yesterday");
+         when.append(tr("yesterday"));
       else if (secs > 3600)
-         when.append(QString::number(secs / 3600)).append(" hours ago");
+         when.append(QString::number(secs / 3600)).append(tr(" hours ago"));
       else if (secs == 3600)
-         when.append("1 hour ago");
+         when.append(tr("1 hour ago"));
       else if (secs > 60)
-         when.append(QString::number(secs / 60)).append(" minutes ago");
+         when.append(QString::number(secs / 60)).append(tr(" minutes ago"));
       else if (secs == 60)
-         when.append("1 minute ago");
+         when.append(tr("1 minute ago"));
       else
-         when.append(QString::number(secs)).append(" secs ago");
+         when.append(QString::number(secs)).append(tr(" secs ago"));
    }
 
    const auto dateLabel = new QLabel(when);
@@ -271,7 +271,7 @@ QLabel *FileBlameWidget::createAuthorLabel(const QString &author, bool isFirst)
 ButtonLink *FileBlameWidget::createMessageLabel(const QString &sha, bool isFirst)
 {
    const auto revision = mCache->getCommitInfo(sha);
-   auto commitMsg = QString("Local changes");
+   auto commitMsg = tr("Local changes");
 
    if (!revision.sha().isEmpty())
    {

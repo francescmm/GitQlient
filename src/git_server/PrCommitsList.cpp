@@ -83,11 +83,10 @@ QFrame *PrCommitsList::createBubbleForComment(const GitServer::Commit &commit)
 {
    const auto days = commit.authorCommittedTimestamp.daysTo(QDateTime::currentDateTime());
    const auto whenText = days <= 30
-       ? days != 0 ? QString::fromUtf8(" %1 days ago").arg(days) : QString::fromUtf8(" today")
-       : QString(" on %1").arg(
-           commit.authorCommittedTimestamp.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+       ? days != 0 ? tr(" %1 days ago").arg(days) : tr(" today")
+       : tr(" on %1").arg(commit.authorCommittedTimestamp.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
-   const auto creator = new QLabel(QString("Committed by <b>%1</b> %2").arg(commit.author.name, whenText));
+   const auto creator = new QLabel(tr("Committed by <b>%1</b> %2").arg(commit.author.name, whenText));
 
    auto commitMsg = commit.message.split("\n\n").constFirst().trimmed();
 

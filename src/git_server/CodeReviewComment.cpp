@@ -55,9 +55,8 @@ CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidge
 QLabel *CodeReviewComment::createHeadline(const QDateTime &dt, const QString &prefix)
 {
    const auto days = dt.daysTo(QDateTime::currentDateTime());
-   const auto whenText = days <= 30
-       ? days != 0 ? QString::fromUtf8(" %1 days ago").arg(days) : QString::fromUtf8(" today")
-       : QString(" on %1").arg(dt.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+   const auto whenText = days <= 30 ? days != 0 ? tr(" %1 days ago").arg(days) : tr(" today")
+                                    : tr(" on %1").arg(dt.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    const auto label = prefix.isEmpty() ? new QLabel(whenText) : new QLabel(prefix + whenText);
    label->setToolTip(dt.toString(QLocale().dateTimeFormat(QLocale::ShortFormat)));
