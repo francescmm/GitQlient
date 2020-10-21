@@ -79,22 +79,22 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    const auto sha = r.sha();
 
    if (mGit->getCurrentBranch().isEmpty())
-      auxMessage.append("<p>Status: <b>detached</b></p>");
+      auxMessage.append(tr("<p>Status: <b>detached</b></p>"));
 
    const auto localBranches = r.getReferences(References::Type::LocalBranch);
 
    if (!localBranches.isEmpty())
-      auxMessage.append(QString("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
+      auxMessage.append(tr("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
 
    const auto remoteBranches = r.getReferences(References::Type::RemoteBranches);
 
    if (!remoteBranches.isEmpty())
-      auxMessage.append(QString("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
+      auxMessage.append(tr("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));
 
    const auto tags = r.getReferences(References::Type::LocalTag);
 
    if (!tags.isEmpty())
-      auxMessage.append(QString("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));
+      auxMessage.append(tr("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));
 
    QDateTime d;
    d.setSecsSinceEpoch(r.authorDate().toUInt());
@@ -106,12 +106,12 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
        : QString("<p>%1 - %2</p><p>%3</p>%4%5")
              .arg(r.author().split("<").first(), d.toString(locale.dateTimeFormat(QLocale::ShortFormat)), sha,
                   !auxMessage.isEmpty() ? QString("<p>%1</p>").arg(auxMessage) : "",
-                  r.isSigned() ? QString::fromUtf8("<p>Commit signed!</p><p> GPG key: %1</p>").arg(r.getGpgKey()) : "");
+                  r.isSigned() ? tr("<p>Commit signed!</p><p> GPG key: %1</p>").arg(r.getGpgKey()) : "");
 
    if (mGitServerCache)
    {
       if (const auto pr = mGitServerCache->getPullRequest(sha); pr.isValid())
-         tooltip.append(QString("<p><b>PR state: </b>%1.</p>").arg(pr.state.state));
+         tooltip.append(tr("<p><b>PR state: </b>%1.</p>").arg(pr.state.state));
    }
 
    return tooltip;

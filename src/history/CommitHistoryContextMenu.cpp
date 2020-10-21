@@ -63,32 +63,32 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
       if (sha == CommitInfo::ZERO_SHA)
       {
          const auto stashMenu = addMenu(tr("Stash"));
-         const auto stashAction = stashMenu->addAction("Push");
+         const auto stashAction = stashMenu->addAction(tr("Push"));
          connect(stashAction, &QAction::triggered, this, &CommitHistoryContextMenu::stashPush);
 
-         const auto popAction = stashMenu->addAction("Pop");
+         const auto popAction = stashMenu->addAction(tr("Pop"));
          connect(popAction, &QAction::triggered, this, &CommitHistoryContextMenu::stashPop);
       }
 
-      const auto commitAction = addAction("See diff");
+      const auto commitAction = addAction(tr("See diff"));
       connect(commitAction, &QAction::triggered, this, [this]() { emit signalOpenDiff(mShas.first()); });
 
       if (sha != CommitInfo::ZERO_SHA)
       {
          const auto createMenu = addMenu(tr("Create"));
 
-         const auto createBranchAction = createMenu->addAction("Branch");
+         const auto createBranchAction = createMenu->addAction(tr("Branch"));
          connect(createBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::createBranch);
 
-         const auto createTagAction = createMenu->addAction("Tag");
+         const auto createTagAction = createMenu->addAction(tr("Tag"));
          connect(createTagAction, &QAction::triggered, this, &CommitHistoryContextMenu::createTag);
 
-         const auto exportAsPatchAction = addAction("Export as patch");
+         const auto exportAsPatchAction = addAction(tr("Export as patch"));
          connect(exportAsPatchAction, &QAction::triggered, this, &CommitHistoryContextMenu::exportAsPatch);
 
          addSeparator();
 
-         const auto checkoutCommitAction = addAction("Checkout commit");
+         const auto checkoutCommitAction = addAction(tr("Checkout commit"));
          connect(checkoutCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::checkoutCommit);
 
          addBranchActions(sha);
@@ -102,49 +102,49 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
             if (lastShaStr == sha)
             {
-               const auto amendCommitAction = addAction("Amend");
+               const auto amendCommitAction = addAction(tr("Amend"));
                connect(amendCommitAction, &QAction::triggered, this,
                        [this]() { emit signalAmendCommit(mShas.first()); });
 
                const auto applyMenu = addMenu(tr("Apply"));
 
-               const auto applyPatchAction = applyMenu->addAction("Patch");
+               const auto applyPatchAction = applyMenu->addAction(tr("Patch"));
                connect(applyPatchAction, &QAction::triggered, this, &CommitHistoryContextMenu::applyPatch);
 
-               const auto applyCommitAction = applyMenu->addAction("Commit");
+               const auto applyCommitAction = applyMenu->addAction(tr("Commit"));
                connect(applyCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::applyCommit);
 
-               const auto pushAction = addAction("Push");
+               const auto pushAction = addAction(tr("Push"));
                connect(pushAction, &QAction::triggered, this, &CommitHistoryContextMenu::push);
 
-               const auto pullAction = addAction("Pull");
+               const auto pullAction = addAction(tr("Pull"));
                connect(pullAction, &QAction::triggered, this, &CommitHistoryContextMenu::pull);
 
-               const auto fetchAction = addAction("Fetch");
+               const auto fetchAction = addAction(tr("Fetch"));
                connect(fetchAction, &QAction::triggered, this, &CommitHistoryContextMenu::fetch);
             }
          }
 
          const auto resetMenu = addMenu(tr("Reset"));
 
-         const auto resetSoftAction = resetMenu->addAction("Soft");
+         const auto resetSoftAction = resetMenu->addAction(tr("Soft"));
          connect(resetSoftAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetSoft);
 
-         const auto resetMixedAction = resetMenu->addAction("Mixed");
+         const auto resetMixedAction = resetMenu->addAction(tr("Mixed"));
          connect(resetMixedAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetMixed);
 
-         const auto resetHardAction = resetMenu->addAction("Hard");
+         const auto resetHardAction = resetMenu->addAction(tr("Hard"));
          connect(resetHardAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetHard);
 
          addSeparator();
 
          const auto copyMenu = addMenu(tr("Copy"));
 
-         const auto copyShaAction = copyMenu->addAction("Commit SHA");
+         const auto copyShaAction = copyMenu->addAction(tr("Commit SHA"));
          connect(copyShaAction, &QAction::triggered, this,
                  [this]() { QApplication::clipboard()->setText(mShas.first()); });
 
-         const auto copyTitleAction = copyMenu->addAction("Commit title");
+         const auto copyTitleAction = copyMenu->addAction(tr("Commit title"));
          connect(copyTitleAction, &QAction::triggered, this, [this]() {
             const auto title = mCache->getCommitInfo(mShas.first()).shortLog();
             QApplication::clipboard()->setText(title);
@@ -176,7 +176,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          if (isGitHub)
          {
-            connect(gitServerMenu->addAction("Merge PR"), &QAction::triggered, this, [this, pr]() {
+            connect(gitServerMenu->addAction(tr("Merge PR")), &QAction::triggered, this, [this, pr]() {
                const auto mergeDlg = new MergePullRequestDlg(mGit, pr, mShas.first(), this);
                connect(mergeDlg, &MergePullRequestDlg::signalRepositoryUpdated, this,
                        &CommitHistoryContextMenu::signalRepositoryUpdated);
@@ -185,7 +185,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
             });
          }
 
-         connect(gitServerMenu->addAction("Show PR detailed view"), &QAction::triggered, this,
+         connect(gitServerMenu->addAction(tr("Show PR detailed view")), &QAction::triggered, this,
                  [this, num = pr.number]() { emit showPrDetailedView(num); });
 
          gitServerMenu->addSeparator();
@@ -197,16 +197,16 @@ void CommitHistoryContextMenu::createMultipleShasMenu()
 {
    if (mShas.count() == 2)
    {
-      const auto diffAction = addAction("See diff");
+      const auto diffAction = addAction(tr("See diff"));
       connect(diffAction, &QAction::triggered, this, [this]() { emit signalOpenCompareDiff(mShas); });
    }
 
    if (!mShas.contains(CommitInfo::ZERO_SHA))
    {
-      const auto exportAsPatchAction = addAction("Export as patch");
+      const auto exportAsPatchAction = addAction(tr("Export as patch"));
       connect(exportAsPatchAction, &QAction::triggered, this, &CommitHistoryContextMenu::exportAsPatch);
 
-      const auto copyShaAction = addAction("Copy all SHA");
+      const auto copyShaAction = addAction(tr("Copy all SHA"));
       connect(copyShaAction, &QAction::triggered, this,
               [this]() { QApplication::clipboard()->setText(mShas.join(',')); });
    }
@@ -316,8 +316,8 @@ void CommitHistoryContextMenu::checkoutBranch()
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
-                         QString("There were problems during the checkout operation. Please, see the detailed "
-                                 "description for more information."),
+                         tr("There were problems during the checkout operation. Please, see the detailed "
+                            "description for more information."),
                          QMessageBox::Ok, this);
       msgBox.setDetailedText(ret.output.toString());
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -347,8 +347,8 @@ void CommitHistoryContextMenu::checkoutCommit()
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
-                         QString("There were problems during the checkout operation. Please, see the detailed "
-                                 "description for more information."),
+                         tr("There were problems during the checkout operation. Please, see the detailed "
+                            "description for more information."),
                          QMessageBox::Ok, this);
       msgBox.setDetailedText(ret.output.toString());
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -375,8 +375,8 @@ void CommitHistoryContextMenu::cherryPickCommit()
       else
       {
          QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
-                            QString("There were problems during the cherry-pich operation. Please, see the detailed "
-                                    "description for more information."),
+                            tr("There were problems during the cherry-pich operation. Please, see the detailed "
+                               "description for more information."),
                             QMessageBox::Ok, this);
          msgBox.setDetailedText(errorMsg);
          msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -387,7 +387,7 @@ void CommitHistoryContextMenu::cherryPickCommit()
 
 void CommitHistoryContextMenu::applyPatch()
 {
-   const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
+   const QString fileName(QFileDialog::getOpenFileName(this, tr("Select a patch to apply")));
    QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
    if (!fileName.isEmpty() && git->applyPatch(fileName))
@@ -430,8 +430,8 @@ void CommitHistoryContextMenu::push()
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
-                         QString("There were problems during the push operation. Please, see the detailed description "
-                                 "for more information."),
+                         tr("There were problems during the push operation. Please, see the detailed description "
+                            "for more information."),
                          QMessageBox::Ok, this);
       msgBox.setDetailedText(ret.output.toString());
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -460,8 +460,8 @@ void CommitHistoryContextMenu::pull()
       else
       {
          QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
-                            QString("There were problems during the pull operation. Please, see the detailed "
-                                    "description for more information."),
+                            tr("There were problems during the pull operation. Please, see the detailed "
+                               "description for more information."),
                             QMessageBox::Ok, this);
          msgBox.setDetailedText(errorMsg);
          msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -570,9 +570,9 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
       }
    }
 
-   const auto branchMenu = !branchesToCheckout.isEmpty() ? addMenu("Checkout branch") : this;
-   const auto newBranchAction
-       = branchMenu->addAction(QString::fromUtf8(!branchesToCheckout.isEmpty() ? "New Branch" : "Checkout new branch"));
+   const auto branchMenu = !branchesToCheckout.isEmpty() ? addMenu(tr("Checkout branch")) : this;
+   const auto newBranchAction = branchMenu->addAction(
+       QString::fromUtf8(!branchesToCheckout.isEmpty() ? tr("New Branch") : tr("Checkout new branch")));
    connect(newBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::createCheckoutBranch);
 
    if (!branchesToCheckout.isEmpty())
