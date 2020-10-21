@@ -54,6 +54,14 @@ Please, if you have any doubts about how to use it or you just want to know all 
 
 It is planned to release for Linux, MacOs and Windows. However, take into account that the development environment is based on Linux and it will be the first platform released.
 
+## Translating GitQlient
+
+GitQlient is using the translation system of Qt. That means that for every new language two files are needed: .ts and .qm. The first one is the text translation and the second one is a compiled file that GitQlient will load.
+
+To add a new translation, please generate those files and add them to the resources.qrc.
+
+For more information on [Qt translation system](https://doc.qt.io/qt-5/linguist-manager.html).
+
 ## Development documentation
 
 I'm aware that developers may like to have some more information beyond the User Manual. Whether you want to collaborate in the development or just to know how GitQlient works I think it's nice to have some development documentation. In the [Wiki section](https://github.com/francescmm/GitQlient/wiki) I will release class diagramas, sequence diagrams as well as the Release Plan an features. Take a look!
