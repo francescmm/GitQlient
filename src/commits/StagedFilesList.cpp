@@ -22,9 +22,9 @@ void StagedFilesList::onContextMenu(const QPoint &pos)
          const auto itemOriginalList = qvariant_cast<QListWidget *>(mSelectedItem->data(GitQlientRole::U_ListRole));
 
          if (sender() == itemOriginalList)
-            connect(menu->addAction("Reset"), &QAction::triggered, this, &StagedFilesList::onResetFile);
+            connect(menu->addAction(tr("Reset")), &QAction::triggered, this, &StagedFilesList::onResetFile);
          else
-            connect(menu->addAction("See changes"), &QAction::triggered, this, &StagedFilesList::onShowDiff);
+            connect(menu->addAction(tr("See changes")), &QAction::triggered, this, &StagedFilesList::onShowDiff);
       }
 
       menu->popup(mapToGlobal(mapToParent(pos)));

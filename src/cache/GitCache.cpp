@@ -194,8 +194,7 @@ void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIn
 
    insertRevisionFile(CommitInfo::ZERO_SHA, newParentSha, fakeRevFile);
 
-   const auto log
-       = fakeRevFile.count() == mUntrackedfiles.count() ? QString("No local changes") : QString("Local changes");
+   const auto log = fakeRevFile.count() == mUntrackedfiles.count() ? tr("No local changes") : tr("Local changes");
 
    QStringList parents;
 

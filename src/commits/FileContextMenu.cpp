@@ -22,7 +22,7 @@ FileContextMenu::FileContextMenu(const QString &file, bool editionAllowed, QWidg
 
    if (editionAllowed)
    {
-      connect(addAction("Edit file"), &QAction::triggered, this, &FileContextMenu::signalEditFile);
+      connect(addAction(tr("Edit file")), &QAction::triggered, this, &FileContextMenu::signalEditFile);
 
       addSeparator();
    }

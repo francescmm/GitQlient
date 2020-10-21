@@ -370,7 +370,7 @@ void CommitChangesWidget::addFileToCommitList(QListWidgetItem *item)
    const auto fileList = qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole));
    const auto row = fileList->row(item);
    const auto fileWidget = qobject_cast<FileWidget *>(fileList->itemWidget(item));
-   const auto fileName = fileWidget->text().remove("(conflicts)").trimmed();
+   const auto fileName = fileWidget->text().remove(tr("(conflicts)")).trimmed();
 
    QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
    connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
@@ -448,7 +448,7 @@ void CommitChangesWidget::removeFileFromCommitList(QListWidgetItem *item)
 
       if (item->data(GitQlientRole::U_IsConflict).toBool())
       {
-         newFileWidget->setText(fileName + QString::fromUtf8(" (conflicts)"));
+         newFileWidget->setText(fileName + tr(" (conflicts)"));
       }
 
       delete fileWidget;

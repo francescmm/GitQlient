@@ -94,19 +94,19 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    const auto lineTitle2 = new QFrame();
    lineTitle2->setObjectName("orangeHSeparator");
 
-   const auto version = new ButtonLink(QString("About GitQlient..."));
+   const auto version = new ButtonLink(tr("About GitQlient..."));
    connect(version, &ButtonLink::clicked, this, &ConfigWidget::showAbout);
    version->setToolTip(QString("%1").arg(SHA_VER));
 
-   const auto goToRepo = new ButtonLink(QString("Source code"));
+   const auto goToRepo = new ButtonLink(tr("Source code"));
    connect(goToRepo, &ButtonLink::clicked, this,
            []() { QDesktopServices::openUrl(QUrl("https://www.github.com/francescmm/GitQlient")); });
-   goToRepo->setToolTip(QString("Get the source code in GitHub"));
+   goToRepo->setToolTip(tr("Get the source code in GitHub"));
 
-   const auto goToBlog = new ButtonLink(QString("Report an issue"));
+   const auto goToBlog = new ButtonLink(tr("Report an issue"));
    connect(goToBlog, &ButtonLink::clicked, this,
            []() { QDesktopServices::openUrl(QUrl("https://github.com/francescmm/GitQlient/issues/new/choose")); });
-   goToBlog->setToolTip(QString("Report an issue in GitHub"));
+   goToBlog->setToolTip(tr("Report an issue in GitHub"));
 
    const auto promoLayout = new QHBoxLayout();
    promoLayout->setContentsMargins(QMargins());
@@ -144,8 +144,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
 
    connect(mGit.data(), &GitConfig::signalCloningProgress, this, &ConfigWidget::updateProgressDialog,
            Qt::DirectConnection);
-   connect(mGit.data(), &GitConfig::signalCloningFailure, this, &ConfigWidget::showError,
-           Qt::DirectConnection);
+   connect(mGit.data(), &GitConfig::signalCloningFailure, this, &ConfigWidget::showError, Qt::DirectConnection);
 }
 
 ConfigWidget::~ConfigWidget()
@@ -210,7 +209,7 @@ QWidget *ConfigWidget::createRecentProjectsPage()
 
    innerLayout->addStretch();
 
-   const auto clear = new ButtonLink("Clear list");
+   const auto clear = new ButtonLink(tr("Clear list"));
    clear->setVisible(!projects.isEmpty());
    connect(clear, &ButtonLink::clicked, this, [this]() {
       mSettings->clearRecentProjects();
@@ -253,7 +252,7 @@ QWidget *ConfigWidget::createUsedProjectsPage()
 
    innerLayout->addStretch();
 
-   const auto clear = new ButtonLink("Clear list");
+   const auto clear = new ButtonLink(tr("Clear list"));
    clear->setVisible(!projects.isEmpty());
    connect(clear, &ButtonLink::clicked, this, [this]() {
       mSettings->clearMostUsedProjects();
@@ -291,26 +290,26 @@ void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
 
 void ConfigWidget::showError(int, QString description)
 {
-    if (mProgressDlg)
-        mProgressDlg->deleteLater();
+   if (mProgressDlg)
+      mProgressDlg->deleteLater();
 
-    QMessageBox::critical(this, tr("Error!"), description);
+   QMessageBox::critical(this, tr("Error!"), description);
 }
 
 void ConfigWidget::showAbout()
 {
-   const QString aboutMsg
-       = "GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client. "
-         "With GitQlient you will be able to add commits, branches and manage all the options Git provides. <br><br>"
-         "Once a fork of QGit, GitQlient has followed is own path and is currently develop and maintain by Francesc M. "
-         "You can download the code from <a href='https://github.com/francescmm/GitQlient'>GitHub</a>. If you find any "
-         "bug or problem, please report it in <a href='https://github.com/francescmm/GitQlient/issues'>the issues "
-         "page</a> so I can fix it as soon as possible.<br><br>"
-         "If you want to integrate GitQlient into QtCreator, there I also provide a plugin that you can download from "
-         "<a href='https://github.com/francescmm/GitQlient/releases'>here</a>. Just make sure you pick the right "
-         "version and follow the instructions in the main page of the repo.<br><br>"
-         "GitQlient can be compiled from Qt 5.12 on.<br><br>"
-         "Copyright &copy; 2019 - 2020 GitQlient (Francesc Martínez)";
+   const QString aboutMsg = tr(
+       "GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client. "
+       "With GitQlient you will be able to add commits, branches and manage all the options Git provides. <br><br>"
+       "Once a fork of QGit, GitQlient has followed is own path and is currently develop and maintain by Francesc M. "
+       "You can download the code from <a href='https://github.com/francescmm/GitQlient'>GitHub</a>. If you find any "
+       "bug or problem, please report it in <a href='https://github.com/francescmm/GitQlient/issues'>the issues "
+       "page</a> so I can fix it as soon as possible.<br><br>"
+       "If you want to integrate GitQlient into QtCreator, there I also provide a plugin that you can download from "
+       "<a href='https://github.com/francescmm/GitQlient/releases'>here</a>. Just make sure you pick the right "
+       "version and follow the instructions in the main page of the repo.<br><br>"
+       "GitQlient can be compiled from Qt 5.12 on.<br><br>"
+       "Copyright &copy; 2019 - 2020 GitQlient (Francesc Martínez)");
 
    QMessageBox::about(this, tr("About GitQlient v%1").arg(VER), aboutMsg);
 }

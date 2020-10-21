@@ -19,7 +19,7 @@ UntrackedMenu::UntrackedMenu(const QSharedPointer<GitBase> &git, const QString &
 
    const auto ignoreMenu = addMenu(tr("Ignore"));
 
-   connect(ignoreMenu->addAction("Ignore file"), &QAction::triggered, this, [this]() {
+   connect(ignoreMenu->addAction(tr("Ignore file")), &QAction::triggered, this, [this]() {
       const auto ret = QMessageBox::question(this, tr("Ignoring file"),
                                              tr("Are you sure you want to add the file to the black list?"));
 
@@ -32,7 +32,7 @@ UntrackedMenu::UntrackedMenu(const QSharedPointer<GitBase> &git, const QString &
       }
    });
 
-   connect(ignoreMenu->addAction("Ignore extension"), &QAction::triggered, this, [this]() {
+   connect(ignoreMenu->addAction(tr("Ignore extension")), &QAction::triggered, this, [this]() {
       const auto msgBoxRet = QMessageBox::question(
           this, tr("Ignoring file"), tr("Are you sure you want to add the file extension to the black list?"));
 
@@ -48,7 +48,7 @@ UntrackedMenu::UntrackedMenu(const QSharedPointer<GitBase> &git, const QString &
       }
    });
 
-   connect(ignoreMenu->addAction("Ignore containing folder"), &QAction::triggered, this, [this]() {
+   connect(ignoreMenu->addAction(tr("Ignore containing folder")), &QAction::triggered, this, [this]() {
       const auto msgBoxRet = QMessageBox::question(
           this, tr("Ignoring folder"), tr("Are you sure you want to add the containing folder to the black list?"));
 
