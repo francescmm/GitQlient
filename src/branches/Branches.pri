@@ -13,6 +13,7 @@ HEADERS += \
     $$PWD/BranchesWidgetMinimal.h \
     $$PWD/GitQlientBranchItemRole.h \
     $$PWD/StashesContextMenu.h \
+    $$PWD/SubmodulesContextMenu.h \
     $$PWD/TagDlg.h
 
 SOURCES += \
@@ -23,4 +24,5 @@ SOURCES += \
     $$PWD/BranchesWidget.cpp \
     $$PWD/BranchesWidgetMinimal.cpp \
     $$PWD/StashesContextMenu.cpp \
+    $$PWD/SubmodulesContextMenu.cpp \
     $$PWD/TagDlg.cpp

@@ -10,6 +10,7 @@
 #include <ClickableFrame.h>
 #include <AddSubmoduleDlg.h>
 #include <StashesContextMenu.h>
+#include <SubmodulesContextMenu.h>
 #include <GitCache.h>
 #include <GitQlientBranchItemRole.h>
 #include <GitQlientSettings.h>
@@ -670,44 +671,9 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
 {
    QLog_Info("UI", QString("Requesting context menu for submodules"));
 
-   const auto index = mSubmodulesList->indexAt(p);
-   const auto menu = new QMenu(this);
-
-   if (!index.isValid())
-   {
-      const auto addSubmoduleAction = menu->addAction(tr("Add submodule"));
-      connect(addSubmoduleAction, &QAction::triggered, this, [this] {
-         const auto git = QSharedPointer<GitSubmodules>::create(mGit);
-         AddSubmoduleDlg addDlg(git);
-         const auto ret = addDlg.exec();
-         if (ret == QDialog::Accepted)
-            emit signalBranchesUpdated();
-      });
-   }
-   else
-   {
-      const auto submoduleName = index.data().toString();
-      const auto updateSubmoduleAction = menu->addAction(tr("Update"));
-      connect(updateSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QScopedPointer<GitSubmodules> git(new GitSubmodules(mGit));
-         const auto ret = git->submoduleUpdate(submoduleName);
-         QApplication::restoreOverrideCursor();
-
-         if (ret)
-            emit signalBranchesUpdated();
-      });
-
-      const auto openSubmoduleAction = menu->addAction(tr("Open"));
-      connect(openSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
-         emit signalOpenSubmodule(mGit->getWorkingDir().append("/").append(submoduleName));
-      });
-
-      /*
-      const auto deleteSubmoduleAction = menu->addAction(tr("Delete"));
-      connect(deleteSubmoduleAction, &QAction::triggered, this, []() {});
-      */
-   }
+   const auto menu = new SubmodulesContextMenu(mGit, mSubmodulesList->indexAt(p), this);
+   connect(menu, &SubmodulesContextMenu::openSubmodule, this, &BranchesWidget::signalOpenSubmodule);
+   connect(menu, &SubmodulesContextMenu::infoUpdated, this, &BranchesWidget::signalBranchesUpdated);
 
    menu->exec(mSubmodulesList->viewport()->mapToGlobal(p));
 }
