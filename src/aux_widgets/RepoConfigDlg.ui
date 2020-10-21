@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>596</width>
-    <height>389</height>
+    <width>751</width>
+    <height>466</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -75,51 +75,14 @@
        <property name="spacing">
         <number>10</number>
        </property>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Prune when fetch</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="CheckBox" name="pruneOnFetch">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="CheckBox" name="clangFormat">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Max. commits to retrieve (0 for all)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
+       <item row="1" column="1">
         <widget class="QSpinBox" name="sbMaxCommits">
          <property name="suffix">
           <string> last commits</string>
@@ -135,51 +98,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Auto-Fetch interval</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="autoFetch">
-         <property name="suffix">
-          <string> minutes</string>
-         </property>
-         <property name="maximum">
-          <number>60</number>
-         </property>
-         <property name="value">
-          <number>5</number>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Cache spaced used:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="labelClangFormat">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run clang-format before commit&lt;br/&gt;(Requires clang-format)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="spacing">
           <number>10</number>
@@ -213,28 +132,88 @@
          </item>
         </layout>
        </item>
-       <item row="4" column="0">
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Max. commits to retrieve (0 for all)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
           <string>Update submodules when pull</string>
          </property>
         </widget>
        </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Auto-Fetch interval</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Prune when fetch</string>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="1">
-        <widget class="CheckBox" name="updateOnPull">
+        <widget class="CheckBox" name="pruneOnFetch">
          <property name="text">
           <string/>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
        <item row="8" column="0">
-        <widget class="QLabel" name="label_13">
+        <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Enable pomodoro</string>
+          <string>Cache spaced used:</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="2" column="1">
+        <widget class="QSpinBox" name="autoFetch">
+         <property name="suffix">
+          <string> minutes</string>
+         </property>
+         <property name="maximum">
+          <number>60</number>
+         </property>
+         <property name="value">
+          <number>5</number>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
         <widget class="CheckBox" name="cbPomodoroEnabled">
          <property name="text">
           <string/>
@@ -243,6 +222,37 @@
           <bool>true</bool>
          </property>
         </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="CheckBox" name="updateOnPull">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>Enable pomodoro</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="labelClangFormat">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run clang-format before commit&lt;br/&gt;(Requires clang-format)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Language</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="cbTranslations"/>
        </item>
       </layout>
      </widget>
@@ -352,14 +362,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header>CheckBox.h</header>
-  </customwidget>
-  <customwidget>
    <class>ButtonLink</class>
    <extends>QLabel</extends>
    <header>ButtonLink.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>CheckBox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

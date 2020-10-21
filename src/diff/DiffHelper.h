@@ -207,7 +207,7 @@ inline void findString(const QString &s, QPlainTextEdit *textEdit, QWidget *mana
          {
             textEdit->setTextCursor(cursorSaved);
 
-            QMessageBox::information(managerWidget, textEdit->tr("Text not found"), textEdit->tr("Text not found."));
+            QMessageBox::information(managerWidget, QObject::tr("Text not found"), QObject::tr("Text not found."));
          }
       }
    }

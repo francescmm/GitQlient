@@ -137,6 +137,8 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    setAttribute(Qt::WA_DeleteOnClose);
 
    calculateCacheSize();
+
+   createLanguageMenu();
 }
 
 RepoConfigDlg::~RepoConfigDlg()
@@ -250,4 +252,67 @@ void RepoConfigDlg::toggleBsAccesInfo()
    ui->leBsTokenLabel->setVisible(visible);
    ui->leBsUrl->setVisible(visible);
    ui->leBsUrlLabel->setVisible(visible);
+}
+
+void RepoConfigDlg::createLanguageMenu()
+{
+   connect(ui->cbTranslations, SIGNAL(currentIndexChanged(int)), this, SLOT(onLanguageChanged(int)));
+
+   // format systems language
+   QString defaultLocale = QLocale::system().name();
+   defaultLocale.truncate(defaultLocale.lastIndexOf('_'));
+
+   QDir dir(":/translations");
+   QStringList fileNames = dir.entryList(QStringList("gitqlient_*.qm"));
+   auto indexToFocus = 0;
+
+   for (int i = 0; i < fileNames.size(); ++i)
+   {
+      // get locale extracted by filename
+      QString locale;
+      locale = fileNames[i]; // "gitqlient_es.qm"
+      locale.truncate(locale.lastIndexOf('.')); // "gitqlient_es"
+      locale.remove(0, locale.lastIndexOf('_') + 1); // "es"
+
+      QString lang = QLocale::languageToString(QLocale(locale).language());
+
+      ui->cbTranslations->addItem(lang, locale);
+
+      // set default translators and language checked
+      if (defaultLocale == locale)
+         indexToFocus = i;
+   }
+
+   ui->cbTranslations->setCurrentIndex(indexToFocus);
+}
+
+void RepoConfigDlg::onLanguageChanged(int index)
+{
+   loadLanguage(ui->cbTranslations->itemData(index).toString());
+}
+
+void RepoConfigDlg::switchTranslator(QTranslator &translator, const QString &filename)
+{
+   // remove the old translator
+   qApp->removeTranslator(&translator);
+
+   // load the new translator
+   QString path = QApplication::applicationDirPath();
+   path.append("/languages/");
+   if (translator.load(
+           path
+           + filename)) // Here Path and Filename has to be entered because the system didn't find the QM Files else
+      qApp->installTranslator(&translator);
+}
+
+void RepoConfigDlg::loadLanguage(const QString &rLanguage)
+{
+   if (mCurrLang != rLanguage)
+   {
+      mCurrLang = rLanguage;
+      QLocale locale = QLocale(mCurrLang);
+      QLocale::setDefault(locale);
+      switchTranslator(mTranslator, QString("TranslationExample_%1.qm").arg(rLanguage));
+      switchTranslator(mTranslatorQt, QString("qt_%1.qm").arg(rLanguage));
+   }
 }

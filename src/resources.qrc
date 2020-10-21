@@ -115,4 +115,8 @@
         <file alias="DejaVuSans">resources/DejaVuSans.ttf</file>
         <file alias="DejaVuSansMono">resources/DejaVuSansMono.ttf</file>
     </qresource>
+    <qresource prefix="/translations">
+        <file alias="gitqlient_en.qm">resources/translations/gitqlient_en.qm</file>
+        <file alias="gitqlient_en.ts">resources/translations/gitqlient_en.ts</file>
+    </qresource>
 </RCC>

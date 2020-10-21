@@ -571,8 +571,8 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
    }
 
    const auto branchMenu = !branchesToCheckout.isEmpty() ? addMenu(tr("Checkout branch")) : this;
-   const auto newBranchAction = branchMenu->addAction(
-       QString::fromUtf8(!branchesToCheckout.isEmpty() ? tr("New Branch") : tr("Checkout new branch")));
+   const auto newBranchAction
+       = branchMenu->addAction(!branchesToCheckout.isEmpty() ? tr("New Branch") : tr("Checkout new branch"));
    connect(newBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::createCheckoutBranch);
 
    if (!branchesToCheckout.isEmpty())

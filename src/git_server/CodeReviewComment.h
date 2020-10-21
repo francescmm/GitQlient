@@ -34,6 +34,8 @@ struct CodeReview;
 
 class CodeReviewComment : public QFrame
 {
+   Q_OBJECT
+
 public:
    explicit CodeReviewComment(const GitServer::CodeReview &review, QWidget *parent = nullptr);
 
