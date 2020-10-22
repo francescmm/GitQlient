@@ -47,7 +47,13 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    ui->labelClangFormat->setVisible(false);
    ui->clangFormat->setVisible(false);
 
+   ui->cbLogOrder->addItem("Topo order");
+   ui->cbLogOrder->addItem("Date order");
+   ui->cbLogOrder->addItem("Author date order");
+
    GitQlientSettings settings;
+   mOriginalRepoOrder = settings.localValue(mGit->getGitQlientSettingsDir(), "GraphSortingOrder", 0).toInt();
+   ui->cbLogOrder->setCurrentIndex(mOriginalRepoOrder);
    ui->autoFetch->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "AutoFetch", 5).toInt());
    ui->pruneOnFetch->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "PruneOnFetch", true).toBool());
    ui->clangFormat->setChecked(
@@ -143,12 +149,16 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
 
 RepoConfigDlg::~RepoConfigDlg()
 {
+   if (mOriginalRepoOrder != ui->cbLogOrder->currentIndex())
+      emit reloadView();
+
    GitQlientSettings settings;
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "AutoFetch", ui->autoFetch->value());
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "PruneOnFetch", ui->pruneOnFetch->isChecked());
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "ClangFormatOnCommit", ui->clangFormat->isChecked());
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", ui->updateOnPull->isChecked());
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MaxCommits", ui->sbMaxCommits->value());
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "GraphSortingOrder", ui->cbLogOrder->currentIndex());
 
    /* POMODORO CONFIG */
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", ui->cbPomodoroEnabled->isChecked());

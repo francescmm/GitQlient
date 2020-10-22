@@ -175,9 +175,26 @@ void GitRepoLoader::requestRevisions()
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
                                                   : mShowAll ? QString("--all") : mGitBase->getCurrentBranch();
 
-   const auto baseCmd = QString("git log --date-order --no-color --log-size --parents --boundary -z --pretty=format:")
-                            .append(QString::fromUtf8(GIT_LOG_FORMAT))
-                            .append(commitsToRetrieve);
+   QString order;
+
+   switch (settings.localValue(mGitBase->getGitQlientSettingsDir(), "GraphSortingOrder", 0).toInt())
+   {
+      case 0:
+         order = "--topo-order";
+         break;
+      case 1:
+         order = "--date-order";
+         break;
+      case 2:
+         order = "--author-date-order";
+         break;
+      default:
+         order = "--topo-order";
+         break;
+   }
+
+   const auto baseCmd = QString("git log %1 --no-color --log-size --parents --boundary -z --pretty=format:%2 %3")
+                            .arg(order, QString::fromUtf8(GIT_LOG_FORMAT), commitsToRetrieve);
 
    emit signalLoadingStarted(1);
 

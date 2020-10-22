@@ -382,7 +382,8 @@ void Controls::pruneBranches()
 void Controls::showConfigDlg()
 {
    const auto configDlg = new RepoConfigDlg(mGit, this);
-   configDlg->exec();
+   connect(configDlg, &RepoConfigDlg::reloadView, this, &Controls::signalRepositoryUpdated);
+   configDlg->open();
 
    GitQlientSettings settings;
    const auto pomodoroEnabled = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", true).toBool();

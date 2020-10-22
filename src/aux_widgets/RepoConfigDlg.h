@@ -18,6 +18,9 @@ class RepoConfigDlg : public QDialog
 {
    Q_OBJECT
 
+signals:
+   void reloadView();
+
 public:
    explicit RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    ~RepoConfigDlg();
@@ -30,6 +33,7 @@ private:
    QTranslator mTranslatorQt; // contains the translations for qt
    QString mCurrLang; // contains the currently loaded language
    QString mLangPath; // Path of language files. This is always fixed to /languages.
+   int mOriginalRepoOrder = 0;
 
    void addUserConfig(const QStringList &elements, QGridLayout *layout);
    void setConfig();
