@@ -233,5 +233,5 @@ private:
     */
    void onStashSelected(const QString &stashId);
 
-   void onSearcBranch();
+   void onSearchBranch();
 };

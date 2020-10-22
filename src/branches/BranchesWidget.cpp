@@ -218,7 +218,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    const auto searchBranch = new QLineEdit();
    searchBranch->setPlaceholderText(tr("Prese ENTER to search a branch..."));
    searchBranch->setObjectName("SearchInput");
-   connect(searchBranch, &QLineEdit::returnPressed, this, &BranchesWidget::onSearcBranch);
+   connect(searchBranch, &QLineEdit::returnPressed, this, &BranchesWidget::onSearchBranch);
 
    const auto vLayout = new QVBoxLayout();
    vLayout->setContentsMargins(0, 0, 10, 0);
@@ -737,7 +737,7 @@ void BranchesWidget::onStashSelected(const QString &stashId)
    emit signalSelectCommit(sha);
 }
 
-void BranchesWidget::onSearcBranch()
+void BranchesWidget::onSearchBranch()
 {
    const auto lineEdit = qobject_cast<QLineEdit *>(sender());
 
