@@ -140,6 +140,9 @@ private:
    QPushButton *mMinimize = nullptr;
    QFrame *mFullBranchFrame = nullptr;
    BranchesWidgetMinimal *mMinimal = nullptr;
+   QString mLastSearch;
+   int mLastIndex;
+   BranchTreeWidget *mLastTreeSearched = nullptr;
 
    /*!
     \brief Method that for a given \p branch process all the informatio and creates the item that will be stored in the
@@ -229,4 +232,6 @@ private:
     * @param stash The stash name.
     */
    void onStashSelected(const QString &stashId);
+
+   void onSearcBranch();
 };

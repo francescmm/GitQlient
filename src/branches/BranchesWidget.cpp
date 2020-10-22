@@ -17,6 +17,7 @@
 #include <BranchesWidgetMinimal.h>
 
 #include <QApplication>
+#include <QLineEdit>
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QListWidget>
@@ -214,9 +215,16 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
 
    /* SUBMODULES END */
 
+   const auto searchBranch = new QLineEdit();
+   searchBranch->setPlaceholderText(tr("Prese ENTER to search a branch..."));
+   searchBranch->setObjectName("SearchInput");
+   connect(searchBranch, &QLineEdit::returnPressed, this, &BranchesWidget::onSearcBranch);
+
    const auto vLayout = new QVBoxLayout();
    vLayout->setContentsMargins(0, 0, 10, 0);
    vLayout->setSpacing(0);
+   vLayout->addWidget(searchBranch);
+   vLayout->addSpacing(5);
    vLayout->addWidget(mLocalBranchesTree);
    vLayout->addWidget(mRemoteBranchesTree);
    vLayout->addLayout(tagLayout);
@@ -727,4 +735,52 @@ void BranchesWidget::onStashSelected(const QString &stashId)
    const auto sha = git->getTagCommit(stashId).output.toString();
 
    emit signalSelectCommit(sha);
+}
+
+void BranchesWidget::onSearcBranch()
+{
+   const auto lineEdit = qobject_cast<QLineEdit *>(sender());
+
+   const auto text = lineEdit->text();
+
+   if (mLastSearch != text)
+   {
+      mLastSearch = text;
+      mLastIndex = mLocalBranchesTree->focusOnBranch(text);
+      mLastTreeSearched = mLocalBranchesTree;
+
+      if (mLastIndex == -1)
+      {
+         mLastIndex = mRemoteBranchesTree->focusOnBranch(mLastSearch);
+         mLastTreeSearched = mRemoteBranchesTree;
+
+         if (mLastIndex == -1)
+            mLastTreeSearched = mLocalBranchesTree;
+      }
+   }
+   else
+   {
+      if (mLastTreeSearched == mLocalBranchesTree)
+      {
+         if (mLastIndex != -1)
+         {
+            mLastIndex = mLocalBranchesTree->focusOnBranch(mLastSearch, mLastIndex);
+            mLastTreeSearched = mLocalBranchesTree;
+         }
+
+         if (mLastIndex == -1)
+         {
+            mLastIndex = mRemoteBranchesTree->focusOnBranch(mLastSearch);
+            mLastTreeSearched = mRemoteBranchesTree;
+         }
+      }
+      else if (mLastIndex != -1)
+      {
+         mLastIndex = mRemoteBranchesTree->focusOnBranch(mLastSearch, mLastIndex);
+         mLastTreeSearched = mRemoteBranchesTree;
+
+         if (mLastIndex == -1)
+            mLastTreeSearched = mLocalBranchesTree;
+      }
+   }
 }

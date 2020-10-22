@@ -89,6 +89,8 @@ public:
    */
    void setLocalRepo(const bool isLocal) { mLocal = isLocal; }
 
+   int focusOnBranch(const QString &branch, int lastPos = -1);
+
 private:
    bool mLocal = false;
    QSharedPointer<GitBase> mGit;
@@ -111,4 +113,9 @@ private:
     \param item The item that contains the data of the branch selected to extract the commit SHA.
    */
    void selectCommit(QTreeWidgetItem *item);
+
+   /**
+    * @brief onSelectionChanged Process when a selection has changed.
+    */
+   void onSelectionChanged();
 };

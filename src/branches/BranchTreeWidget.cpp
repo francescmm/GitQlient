@@ -21,7 +21,32 @@ BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitBase> &git, QWidget *
 
    connect(this, &BranchTreeWidget::customContextMenuRequested, this, &BranchTreeWidget::showBranchesContextMenu);
    connect(this, &BranchTreeWidget::itemClicked, this, &BranchTreeWidget::selectCommit);
+   connect(this, &BranchTreeWidget::itemSelectionChanged, this, &BranchTreeWidget::onSelectionChanged);
    connect(this, &BranchTreeWidget::itemDoubleClicked, this, &BranchTreeWidget::checkoutBranch);
+}
+
+int BranchTreeWidget::focusOnBranch(const QString &branch, int lastPos)
+{
+   const auto items = findItems(branch, Qt::MatchContains | Qt::MatchRecursive);
+
+   if (lastPos + 1 >= items.count())
+      return -1;
+
+   ++lastPos;
+
+   auto itemToExpand = items.at(lastPos);
+
+   itemToExpand->setSelected(true);
+
+   while (itemToExpand->parent())
+   {
+      itemToExpand->setExpanded(true);
+      itemToExpand = itemToExpand->parent();
+   }
+
+   itemToExpand->setExpanded(true);
+
+   return lastPos;
 }
 
 void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
@@ -105,4 +130,12 @@ void BranchTreeWidget::selectCommit(QTreeWidgetItem *item)
 {
    if (item && item->data(0, IsLeaf).toBool())
       emit signalSelectCommit(item->data(0, ShaRole).toString());
+}
+
+void BranchTreeWidget::onSelectionChanged()
+{
+   const auto selection = selectedItems();
+
+   if (!selection.isEmpty())
+      selectCommit(selection.constFirst());
 }
