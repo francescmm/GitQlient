@@ -47,10 +47,16 @@ SubmodulesContextMenu::SubmodulesContextMenu(const QSharedPointer<GitBase> &git,
       connect(openSubmoduleAction, &QAction::triggered, this,
               [this, submoduleName]() { emit openSubmodule(mGit->getWorkingDir().append("/").append(submoduleName)); });
 
-      /*
-      const auto deleteSubmoduleAction = menu->addAction(tr("Delete"));
-      connect(deleteSubmoduleAction, &QAction::triggered, this, []() {});
-      */
+      const auto deleteSubmoduleAction = addAction(tr("Delete"));
+      connect(deleteSubmoduleAction, &QAction::triggered, this, [this, submoduleName]() {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+         QScopedPointer<GitSubmodules> git(new GitSubmodules(mGit));
+         const auto ret = git->submoduleRemove(submoduleName);
+         QApplication::restoreOverrideCursor();
+
+         if (ret)
+            emit infoUpdated();
+      });
    }
 }
 

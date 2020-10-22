@@ -1,8 +1,11 @@
 #include "GitSubmodules.h"
 
 #include <GitBase.h>
-
 #include <QLogger.h>
+
+#include <QFile>
+#include <QTextStream>
+#include <QTemporaryFile>
 
 using namespace QLogger;
 
@@ -46,7 +49,44 @@ bool GitSubmodules::submoduleUpdate(const QString &)
    return ret;
 }
 
-bool GitSubmodules::submoduleRemove(const QString &)
+bool GitSubmodules::submoduleRemove(const QString &submodule)
 {
-   return false;
+   auto ret = mGitBase->run(QString("git submodule deinit -f %1").arg(submodule));
+   ret = mGitBase->run(QString("git rm -f --cached %1").arg(submodule));
+
+   ret = mGitBase->run(QString("rm -rf %1/.git/modules/%2").arg(mGitBase->getWorkingDir(), submodule));
+
+   QFile gitmodules(QString("%1/.gitmodules").arg(mGitBase->getWorkingDir()));
+   QTemporaryFile gitTmp;
+
+   if (gitmodules.open(QIODevice::ReadOnly) && gitTmp.open())
+   {
+      QTextStream out(&gitmodules);
+      QTextStream in(&gitTmp);
+      auto removed = false;
+
+      while (!out.atEnd())
+      {
+         auto line = out.readLine();
+
+         if (line.contains(QString("[submodule \"%1\"]").arg(submodule)))
+         {
+            out.readLine();
+            out.readLine();
+            removed = true;
+         }
+         else
+            in << line.append('\n');
+      }
+      gitmodules.close();
+      gitTmp.close();
+
+      if (removed)
+      {
+         gitmodules.remove();
+         gitTmp.copy(QString("%1/.gitmodules").arg(mGitBase->getWorkingDir()));
+      }
+   }
+
+   return ret.success;
 }
