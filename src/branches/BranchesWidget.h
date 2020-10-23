@@ -233,5 +233,8 @@ private:
     */
    void onStashSelected(const QString &stashId);
 
+   /**
+    * @brief onSearchBranch Searches for a branch in the children BranchTreeWidget.
+    */
    void onSearchBranch();
 };

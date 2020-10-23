@@ -25,6 +25,7 @@
 #include <QMenu>
 #include <QHeaderView>
 #include <QPushButton>
+#include <QToolButton>
 
 #include <QLogger.h>
 
@@ -220,10 +221,22 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    searchBranch->setObjectName("SearchInput");
    connect(searchBranch, &QLineEdit::returnPressed, this, &BranchesWidget::onSearchBranch);
 
+   // mMinimize->setObjectName("MinimizeBtn");
+   mMinimize->setIcon(QIcon(":/icons/ahead"));
+   mMinimize->setToolTip(tr("Show minimalist view"));
+   mMinimize->setObjectName("BranchesWidgetOptionsButton");
+   connect(mMinimize, &QPushButton::clicked, this, &BranchesWidget::minimalView);
+
+   const auto mainControlsLayout = new QHBoxLayout();
+   mainControlsLayout->setContentsMargins(QMargins());
+   mainControlsLayout->setSpacing(5);
+   mainControlsLayout->addWidget(mMinimize);
+   mainControlsLayout->addWidget(searchBranch);
+
    const auto vLayout = new QVBoxLayout();
    vLayout->setContentsMargins(0, 0, 10, 0);
    vLayout->setSpacing(0);
-   vLayout->addWidget(searchBranch);
+   vLayout->addLayout(mainControlsLayout);
    vLayout->addSpacing(5);
    vLayout->addWidget(mLocalBranchesTree);
    vLayout->addWidget(mRemoteBranchesTree);
@@ -231,17 +244,12 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    vLayout->addLayout(stashLayout);
    vLayout->addLayout(submoduleLayout);
 
-   mMinimize->setObjectName("MinimizeBtn");
-   mMinimize->setIcon(QIcon(":/icons/arrow_right"));
-   mMinimize->setToolTip(tr("Show minimalist view"));
-   connect(mMinimize, &QPushButton::clicked, this, &BranchesWidget::minimalView);
-
    mFullBranchFrame = new QFrame();
    mFullBranchFrame->setObjectName("FullBranchesWidget");
    const auto mainBranchLayout = new QHBoxLayout(mFullBranchFrame);
    mainBranchLayout->setContentsMargins(QMargins());
    mainBranchLayout->setSpacing(0);
-   mainBranchLayout->addWidget(mMinimize);
+   // mainBranchLayout->addWidget(mMinimize);
    mainBranchLayout->addLayout(vLayout);
 
    const auto mainLayout = new QGridLayout(this);

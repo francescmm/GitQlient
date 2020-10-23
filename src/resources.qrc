@@ -106,6 +106,7 @@
         <file alias="pomodoro">resources/icons/pomodoro.svg</file>
         <file alias="pomodoro_running">resources/icons/pomodoro_running.svg</file>
         <file alias="pomodoro_timeout">resources/icons/pomodoro_timeout.svg</file>
+        <file alias="ahead">resources/icons/ahead.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>
