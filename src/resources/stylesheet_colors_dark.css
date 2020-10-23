@@ -14,6 +14,8 @@
 #wipInfoFrame
 {
    background: #303132;
+   border: 1px solid #202122;
+   border-bottom: 0;
 }
 
 #wipSeparator
