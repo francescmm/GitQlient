@@ -285,10 +285,6 @@
   <tabstop>sbLongBreakCount</tabstop>
   <tabstop>cbAlarmSound</tabstop>
   <tabstop>cbStopResets</tabstop>
-  <tabstop>cbAlarmSound</tabstop>
-  <tabstop>sbLongBreakCount</tabstop>
-  <tabstop>cbAlarmSound_2</tabstop>
-  <tabstop>sbLongBreakCount_2</tabstop>
  </tabstops>
  <resources>
   <include location="../resources.qrc"/>
