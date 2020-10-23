@@ -14,7 +14,7 @@ using namespace QLogger;
 
 CommitInfoWidget::CommitInfoWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                    QWidget *parent)
-   : QWidget(parent)
+   : QFrame(parent)
    , mCache(cache)
    , mGit(git)
    , mInfoPanel(new CommitInfoPanel())

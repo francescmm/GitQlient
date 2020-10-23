@@ -26,6 +26,7 @@ a
 #wipInfoFrame
 {
    padding: 10px;
+   padding-bottom: 0;
 }
 
 #wipSeparator
@@ -191,9 +192,16 @@ QTreeWidget::item
     max-width: 350px;
 }
 
-#tagsFrame, #untrackedFiles, #unstagedFiles, #stagedFiles
+#tagsFrame, #unstagedFiles, #stagedFiles
 {
     padding: 0;
+}
+
+#unstagedFiles, #stagedFiles
+{
+    border-style: solid;
+    border-left-width: 1px;
+    border-right-width: 1px;
 }
 
 QListWidget::item:focus, BlameWidget > QTreeView::item:focus
@@ -213,10 +221,23 @@ CommitChangesWidget > #pbCancelAmend
     padding-right: 10px;
 }
 
-CommitInfoWidget, CommitChangesWidget
+CommitChangesWidget
 {
     max-width: 300px;
     min-width: 300px;
+}
+
+CommitInfoWidget > FileListWidget
+{
+    border: 0;
+}
+
+CommitInfoWidget
+{
+    max-width: 298px;
+    min-width: 298px;
+    border: 1px solid #202122;
+    border-top: 0;
 }
 
 CommitChangesWidget > QListWidget, MergeWidget > QListWidget
@@ -281,6 +302,7 @@ FullDiffWidget > QPlainTextEdit, #leCommitTitle, #teDescription, #leAuthorName, 
 #leAuthorEmail
 {
     border-top: 0;
+    border-bottom:0;
     max-height: 30px;
     min-height: 30px;
     padding-left: 10px;
@@ -297,7 +319,12 @@ QLabel#lCounter
     qproperty-alignment: AlignCenter;
 }
 
-CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles, #JobContainerHeader
+#stagedFilesList, #unstagedFilesList
+{
+    border-top-width: 0;
+}
+
+CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, #JobContainerHeader
 {
     max-height: 30px;
     min-height: 30px;

@@ -23,7 +23,7 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QWidget>
+#include <QFrame>
 
 class GitCache;
 class GitBase;
@@ -31,7 +31,7 @@ class QLabel;
 class FileListWidget;
 class CommitInfoPanel;
 
-class CommitInfoWidget : public QWidget
+class CommitInfoWidget : public QFrame
 {
    Q_OBJECT
 

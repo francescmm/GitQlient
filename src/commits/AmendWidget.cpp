@@ -53,7 +53,6 @@ void AmendWidget::configure(const QString &sha)
 
       blockSignals(true);
       mInternalCache.clear();
-      ui->untrackedFilesList->clear();
       ui->unstagedFilesList->clear();
       ui->stagedFilesList->clear();
       blockSignals(false);

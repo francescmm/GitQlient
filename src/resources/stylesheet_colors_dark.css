@@ -98,7 +98,7 @@ QLineEdit
 #labelSha
 {
     color: #D89000;
-    background-color: #202122;
+    background-color: #2E2F30;
 }
 
 QListView
@@ -212,7 +212,12 @@ QLabel#lCounter
     color: #A3A3A4;
 }
 
-CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles,
+CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles
+{
+    background: #2E2F30;
+    border-color: #202122;
+}
+
 #JobContainerHeader
 {
     background: #202122;

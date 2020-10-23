@@ -35,7 +35,7 @@ signals:
    void signalShowDiff(const QString &fileName);
    void signalCommitAll();
    void signalRevertAll();
-   void signalCheckedOut(bool success);
+   void signalCheckedOut();
    void signalShowFileHistory(const QString &fileName);
    void signalEditFile();
    void signalConflictsResolved();
@@ -50,4 +50,5 @@ private:
    QString mFileName;
 
    bool addEntryToGitIgnore(const QString &entry);
+   void onDeleteFile();
 };

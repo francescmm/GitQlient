@@ -10,7 +10,6 @@
 #include <UnstagedMenu.h>
 #include <GitCache.h>
 #include <FileWidget.h>
-#include <UntrackedMenu.h>
 #include <ClickableFrame.h>
 #include <GitQlientSettings.h>
 
@@ -52,31 +51,6 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
    ui->setupUi(this);
    setAttribute(Qt::WA_DeleteOnClose);
 
-   GitQlientSettings settings;
-   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "UntrackedHeader", true).toBool();
-       !visible)
-   {
-      const auto icon = QIcon(":/icons/arrow_up");
-      ui->untrackedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-      ui->untrackedFilesList->setVisible(visible);
-   }
-
-   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "UnstagedHeader", true).toBool();
-       !visible)
-   {
-      const auto icon = QIcon(":/icons/arrow_up");
-      ui->unstagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-      ui->unstagedFilesList->setVisible(visible);
-   }
-
-   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "StagedHeader", true).toBool();
-       !visible)
-   {
-      const auto icon = QIcon(":/icons/arrow_up");
-      ui->stagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-      ui->stagedFilesList->setVisible(visible);
-   }
-
    ui->amendFrame->setVisible(false);
 
    ui->lCounter->setText(QString::number(kMaxTitleChars));
@@ -87,10 +61,6 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitChangesWidget::commitChanges);
    connect(ui->pbCommit, &QPushButton::clicked, this, &CommitChangesWidget::commitChanges);
    connect(ui->pbCancelAmend, &QPushButton::clicked, this, [this]() { emit signalCancelAmend(mCurrentSha); });
-   connect(ui->untrackedFilesList, &QListWidget::itemDoubleClicked, this,
-           [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
-   connect(ui->untrackedFilesList, &QListWidget::customContextMenuRequested, this,
-           &CommitChangesWidget::showUntrackedMenu);
    connect(ui->stagedFilesList, &StagedFilesList::signalResetFile, this, &CommitChangesWidget::resetFile);
    connect(ui->stagedFilesList, &StagedFilesList::signalShowDiff, this,
            [this](const QString &fileName) { requestDiff(mGit->getWorkingDir() + "/" + fileName); });
@@ -98,9 +68,6 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
            &CommitChangesWidget::showUnstagedMenu);
    connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
-   connect(ui->untrackedFiles, &ClickableFrame::clicked, this, &CommitChangesWidget::onUntrackedHeaderClicked);
-   connect(ui->unstagedFiles, &ClickableFrame::clicked, this, &CommitChangesWidget::onUnstagedHeaderClicked);
-   connect(ui->stagedFiles, &ClickableFrame::clicked, this, &CommitChangesWidget::onStagedHeaderClicked);
 
    ui->pbCancelAmend->setVisible(false);
    ui->pbCommit->setText(tr("Commit"));
@@ -153,16 +120,16 @@ void CommitChangesWidget::resetFile(QListWidgetItem *item)
          }
          else if (untrackedFile)
          {
-            item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(ui->untrackedFilesList));
+            item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(ui->unstagedFilesList));
 
             ui->stagedFilesList->takeItem(row);
-            ui->untrackedFilesList->addItem(item);
+            ui->unstagedFilesList->addItem(item);
 
             const auto newFileWidget = new FileWidget(iconPath, item->toolTip());
             newFileWidget->setTextColor(fileWidget->getTextColor());
 
             connect(newFileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
-            ui->untrackedFilesList->setItemWidget(item, newFileWidget);
+            ui->unstagedFilesList->setItemWidget(item, newFileWidget);
 
             delete newFileWidget;
          }
@@ -199,50 +166,6 @@ QColor CommitChangesWidget::getColorForFile(const RevisionFiles &files, int inde
    return myColor;
 }
 
-void CommitChangesWidget::onUntrackedHeaderClicked()
-{
-   if (!ui->unstagedFilesList->isVisible() && !ui->stagedFilesList->isVisible())
-      return;
-
-   const auto visible = ui->untrackedFilesList->isVisible();
-
-   const auto icon = QIcon(visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
-   ui->untrackedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-   ui->untrackedFilesList->setVisible(!visible);
-
-   GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UntrackedHeader", !visible);
-}
-
-void CommitChangesWidget::onUnstagedHeaderClicked()
-{
-   if (!ui->untrackedFilesList->isVisible() && !ui->stagedFilesList->isVisible())
-      return;
-
-   const auto visible = ui->unstagedFilesList->isVisible();
-
-   const auto icon = QIcon(visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
-   ui->unstagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-   ui->unstagedFilesList->setVisible(!visible);
-
-   GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UnstagedHeader", !visible);
-}
-
-void CommitChangesWidget::onStagedHeaderClicked()
-{
-   if (!ui->untrackedFilesList->isVisible() && !ui->unstagedFilesList->isVisible())
-      return;
-
-   const auto visible = ui->stagedFilesList->isVisible();
-   const auto icon = QIcon(visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
-   ui->stagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-   ui->stagedFilesList->setVisible(!visible);
-
-   GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "StagedHeader", !visible);
-}
-
 void CommitChangesWidget::prepareCache()
 {
    for (auto it = mInternalCache.begin(); it != mInternalCache.end(); ++it)
@@ -275,7 +198,6 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
       const auto isInIndex = files.statusCmp(i, RevisionFiles::IN_INDEX);
       const auto isConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
       const auto isPartiallyCached = files.statusCmp(i, RevisionFiles::PARTIALLY_CACHED);
-      const auto untrackedFile = !isInIndex && isUnknown;
       const auto staged = isInIndex && !isUnknown && !isConflict;
       auto wip = QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName());
 
@@ -294,12 +216,9 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
             mInternalCache[wip].keep = true;
       }
 
-      const auto parent = untrackedFile ? ui->untrackedFilesList : fileList;
-
-      wip = QString("%1-%2").arg(fileName, parent->objectName());
-
       if (!staged)
       {
+         wip = QString("%1-%2").arg(fileName, fileList->objectName());
          if (!mInternalCache.contains(wip))
          {
             // Item configuration
@@ -310,12 +229,12 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
             if (!files.statusCmp(i, RevisionFiles::NEW) && color == GitQlientStyles::getGreen())
                color = GitQlientStyles::getTextColor();
 
-            const auto itemPair = fillFileItemInfo(fileName, isConflict, QString(":/icons/add"), color, parent);
+            const auto itemPair = fillFileItemInfo(fileName, isConflict, QString(":/icons/add"), color, fileList);
 
             connect(itemPair.second, &FileWidget::clicked, this,
                     [this, item = itemPair.first]() { addFileToCommitList(item); });
 
-            parent->setItemWidget(itemPair.first, itemPair.second);
+            fileList->setItemWidget(itemPair.first, itemPair.second);
             itemPair.first->setSizeHint(itemPair.second->sizeHint());
          }
          else
@@ -406,7 +325,6 @@ void CommitChangesWidget::addFileToCommitList(QListWidgetItem *item)
 
    delete fileWidget;
 
-   ui->lUntrackedCount->setText(QString("(%1)").arg(ui->untrackedFilesList->count()));
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->pbCommit->setEnabled(true);
@@ -528,7 +446,6 @@ bool CommitChangesWidget::hasConflicts()
 
 void CommitChangesWidget::clear()
 {
-   ui->untrackedFilesList->clear();
    ui->unstagedFilesList->clear();
    ui->stagedFilesList->clear();
    mInternalCache.clear();
@@ -537,22 +454,4 @@ void CommitChangesWidget::clear()
    ui->pbCommit->setEnabled(false);
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-   ui->lUntrackedCount->setText(QString("(%1)").arg(ui->untrackedFilesList->count()));
-}
-
-void CommitChangesWidget::showUntrackedMenu(const QPoint &pos)
-{
-   const auto item = ui->untrackedFilesList->itemAt(pos);
-
-   if (item)
-   {
-      const auto fileName = item->toolTip();
-      const auto contextMenu = new UntrackedMenu(mGit, fileName, this);
-      connect(contextMenu, &UntrackedMenu::signalStageFile, this, [this, item]() { addFileToCommitList(item); });
-      connect(contextMenu, &UntrackedMenu::signalCheckoutPerformed, this,
-              &CommitChangesWidget::signalCheckoutPerformed);
-
-      const auto parentPos = ui->untrackedFilesList->mapToParent(pos);
-      contextMenu->popup(mapToGlobal(parentPos));
-   }
 }
