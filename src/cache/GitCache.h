@@ -51,8 +51,6 @@ signals:
 public:
    struct LocalBranchDistances
    {
-      int aheadMaster = 0;
-      int behindMaster = 0;
       int aheadOrigin = 0;
       int behindOrigin = 0;
    };

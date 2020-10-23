@@ -134,18 +134,7 @@ void GitRepoLoader::loadReferences()
                const auto git = new GitBranches(mGitBase);
                GitCache::LocalBranchDistances distances;
 
-               const auto distToMaster = git->getDistanceBetweenBranches(true, name);
-               auto toMaster = distToMaster.output.toString();
-
-               if (!toMaster.contains("fatal"))
-               {
-                  toMaster.replace('\n', "");
-                  const auto values = toMaster.split('\t');
-                  distances.behindMaster = values.first().toUInt();
-                  distances.aheadMaster = values.last().toUInt();
-               }
-
-               const auto distToOrigin = git->getDistanceBetweenBranches(false, name);
+               const auto distToOrigin = git->getDistanceBetweenBranches(name);
                auto toOrigin = distToOrigin.output.toString();
 
                if (!toOrigin.contains("fatal"))
@@ -157,7 +146,6 @@ void GitRepoLoader::loadReferences()
                }
 
                mRevCache->insertLocalBranchDistances(name, distances);
-               //*/
             }
          }
 

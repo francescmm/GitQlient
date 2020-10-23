@@ -187,8 +187,8 @@ QTreeWidget::item
 
 #FullBranchesWidget
 {
-    min-width: 400px;
-    max-width: 400px;
+    min-width: 350px;
+    max-width: 350px;
 }
 
 #tagsFrame, #untrackedFiles, #unstagedFiles, #stagedFiles
@@ -898,6 +898,16 @@ SourceCodeReview QLabel
    border-width: 1px;
    border-radius: 10px;
    padding: 5px;
+}
+
+#BranchesWidgetOptionsButton
+{
+    border-width: 1px;
+    border-style: solid;
+    max-width: 15px;
+    min-width: 15px;
+    max-height: 15px;
+    min-height: 15px;
 }
 
 /* JENKINS */
