@@ -270,6 +270,12 @@ QHeaderView:section
     background: #202122;
 }
 
+BranchTreeWidget QHeaderView:section
+{
+    border-right-color: #202122;
+    background: #202122;
+}
+
 #tagsFrame, #fileTitleFrame
 {
     background-color: #202122;

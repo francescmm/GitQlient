@@ -60,7 +60,10 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       return;
 
    if (index.column() == static_cast<int>(CommitHistoryColumns::Graph))
+   {
+      newOpt.rect.setX(newOpt.rect.x() + 10);
       paintGraph(p, newOpt, commit);
+   }
    else if (index.column() == static_cast<int>(CommitHistoryColumns::Log))
       paintLog(p, newOpt, commit, index.data().toString());
    else
