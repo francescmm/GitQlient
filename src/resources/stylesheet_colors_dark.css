@@ -14,8 +14,7 @@
 #wipInfoFrame
 {
    background: #303132;
-   border: 1px solid #202122;
-   border-bottom: 0;
+   border-color: #202122;
 }
 
 #wipSeparator
@@ -84,6 +83,45 @@ QLineEdit
     color: white;
 }
 
+/* CommitChangesWidget start */
+CommitChangesWidget > QListWidget, MergeWidget > QListWidget
+{
+    border-color: #202122;
+    background-color: #2E2F30;
+    color: white;
+}
+
+
+#leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail, #lCounter
+{
+    background-color: #2E2F30;
+    color: white;
+    border-color: #202122;
+}
+
+#leCommitTitle
+{
+    border-bottom-color: #404142;
+}
+
+#leAuthorName
+{
+    border-bottom-color: #404142;
+}
+
+#lCounter
+{
+    border-bottom-color: #404141;
+    font-size: 9pt;
+}
+
+#stagedFiles, #unstagedFiles
+{
+    background: #2E2F30;
+}
+
+/* CommitChangesWidget end */
+
 #labelTitle, #commitInfoFrame, #labelDescription,
 #labelAuthor, #labelDateTime
 {
@@ -143,17 +181,17 @@ QListWidget::item:disabled, QListView::item:disabled
     color: #606162;
 }
 
-CommitHistoryView, FullDiffWidget > QPlainTextEdit, CommitChangesWidget > QListWidget, FileListWidget, QTreeWidget, MergeWidget > QListWidget
+CommitHistoryView, FullDiffWidget > QPlainTextEdit, FileListWidget, QTreeWidget, MergeWidget > QListWidget
 {
     background-color: #2E2F30;
 }
 
-CommitHistoryView, FullDiffWidget > QPlainTextEdit, CommitChangesWidget > QListWidget, QTreeWidget, MergeWidget > QListWidget
+CommitHistoryView, FullDiffWidget > QPlainTextEdit, QTreeWidget, MergeWidget > QListWidget
 {
     color: white;
 }
 
-CommitChangesWidget > QListWidget, MergeWidget > QListWidget
+MergeWidget > QListWidget
 {
     border-color: #202122;
 }
@@ -188,34 +226,9 @@ QMenu::separator
    background: #3f4043;
 }
 
-FullDiffWidget > QPlainTextEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget > QPlainTextEdit
 {
     border-color: #202122
-}
-
-#leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
-{
-    background-color: #606162;
-    color: white;
-}
-
-#leAuthorName
-{
-    border-bottom-color: #404142;
-}
-
-QLabel#lCounter
-{
-    background-color: #606162;
-    border-color: #202122;
-    border-bottom-color: #404141;
-    color: #A3A3A4;
-}
-
-CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles
-{
-    background: #2E2F30;
-    border-color: #202122;
 }
 
 #JobContainerHeader
@@ -245,10 +258,6 @@ FileDiffWidget > QPushButton:checked, FileDiffWidget > QToolButton:checked
    background-color: #202122;
 }
 
-#leCommitTitle
-{
-    border-bottom-color: #404142;
-}
 
 QHeaderView
 {

@@ -26,7 +26,8 @@ a
 #wipInfoFrame
 {
    padding: 10px;
-   padding-bottom: 0;
+   border-width: 1px;
+   border-style: solid;
 }
 
 #wipSeparator
@@ -117,6 +118,59 @@ QPushButton:hover
     border: 0;
 }
 
+CommitDiffWidget
+{
+   max-height: 350px;
+   min-height: 350px;
+}
+
+BranchesWidget > QListWidget, BlameWidget > QTreeView, MergeWidget > QListWidget
+{
+   border: 0;
+   outline: 0;
+ }
+
+QListWidget::item, BlameWidget > QTreeView::item
+{
+   padding-left: 7px;
+   padding-right: 7px;
+   border-left: 0;
+   border-bottom: 0;
+   margin: 0;
+   min-height: 25px;
+   max-height: 25px;
+}
+
+MergeWidget > QListWidget::item
+{
+   padding: 0;
+}
+
+QTreeWidget::item
+{
+    min-height: 25px;
+    max-height: 25px;
+}
+
+#FullBranchesWidget
+{
+    min-width: 350px;
+    max-width: 350px;
+}
+
+#tagsFrame
+{
+    padding: 0;
+}
+
+MergeWidget > QListWidget
+{
+    border-width: 1px;
+    border-style: solid;
+}
+
+/* CommitInfoWidget start */
+
 #labelTitle, #commitInfoFrame, #labelDescription
 {
     padding: 10px;
@@ -147,86 +201,6 @@ QPushButton:hover
     font-size: 8pt;
 }
 
-CommitDiffWidget
-{
-   max-height: 350px;
-   min-height: 350px;
-}
-
-CommitChangesWidget > QListWidget, BranchesWidget > QListWidget, BlameWidget > QTreeView, MergeWidget > QListWidget
-{
-   border: 0;
-   outline: 0;
- }
-
-QListWidget::item, BlameWidget > QTreeView::item
-{
-   padding-left: 7px;
-   padding-right: 7px;
-   border-left: 0;
-   border-bottom: 0;
-   margin: 0;
-   min-height: 25px;
-   max-height: 25px;
-}
-
-CommitChangesWidget > QListWidget::item, MergeWidget > QListWidget::item
-{
-   padding: 0;
-}
-
-#amendFrame
-{
-    border: none;
-}
-
-QTreeWidget::item
-{
-    min-height: 25px;
-    max-height: 25px;
-}
-
-#FullBranchesWidget
-{
-    min-width: 350px;
-    max-width: 350px;
-}
-
-#tagsFrame, #unstagedFiles, #stagedFiles
-{
-    padding: 0;
-}
-
-#unstagedFiles, #stagedFiles
-{
-    border-style: solid;
-    border-left-width: 1px;
-    border-right-width: 1px;
-}
-
-QListWidget::item:focus, BlameWidget > QTreeView::item:focus
-{
-   border: 0;
-}
-
-CommitChangesWidget > #pbCommit, CommitChangesWidget > #pbCancelAmend
-{
-    max-height: 30px;
-    min-height: 30px;
-}
-
-CommitChangesWidget > #pbCancelAmend
-{
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-CommitChangesWidget
-{
-    max-width: 300px;
-    min-width: 300px;
-}
-
 CommitInfoWidget > FileListWidget
 {
     border: 0;
@@ -237,13 +211,112 @@ CommitInfoWidget
     max-width: 298px;
     min-width: 298px;
     border: 1px solid #202122;
-    border-top: 0;
 }
 
-CommitChangesWidget > QListWidget, MergeWidget > QListWidget
+/* CommitInfoWidget end */
+
+/* CommitChangesWidget start */
+#stagedFiles, #unstagedFiles
+{
+   padding: 0;
+   border: 1px solid #202122;
+}
+
+#stagedFiles
+{
+   border-top: 0;
+}
+
+#stagedFilesList, #unstagedFilesList
+{
+   padding: 0;
+   border: 0;
+   outline: 0;
+}
+
+#unstagedFilesList::item, #stagedFilesList::item
+{
+   padding-left: 0;
+}
+
+CommitChangesWidget > #pbCommit, CommitChangesWidget > #pbCancelAmend
+{
+   max-height: 30px;
+   min-height: 30px;
+}
+
+CommitChangesWidget > #pbCancelAmend
+{
+   padding-left: 10px;
+   padding-right: 10px;
+}
+
+CommitChangesWidget
+{
+   max-width: 300px;
+   min-width: 300px;
+}
+
+#amendFrame
+{
+    border: none;
+}
+
+#leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
 {
     border-width: 1px;
     border-style: solid;
+}
+
+#leAuthorName
+{
+    max-height: 30px;
+    min-height: 30px;
+    padding-left: 10px;
+}
+
+#leAuthorEmail
+{
+    border-top: 0;
+    border-bottom: 0;
+    max-height: 30px;
+    min-height: 30px;
+    padding-left: 10px;
+}
+
+#lCounter
+{
+    border-width: 1px;
+    border-style: solid;
+    border-left-width: 0;
+    font-family: "DejaVu Sans Mono";
+    max-width: 29px;
+    min-width: 29px;
+    qproperty-alignment: AlignCenter;
+}
+
+#leCommitTitle
+{
+    border-right: 0;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    max-height: 30px;
+    min-height: 30px;
+    padding-left: 10px;
+}
+
+#teDescription
+{
+    border-top: none;
+    border-bottom: none;
+    padding-left: 8px;
+}
+
+/* CommitChangesWidget end */
+
+QListWidget::item:focus, BlameWidget > QTreeView::item:focus
+{
+   border: 0;
 }
 
 /** START RepositoryContextMenu **/
@@ -286,45 +359,13 @@ FullDiffWidget
     border: none;
 }
 
-FullDiffWidget > QPlainTextEdit, #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
+FullDiffWidget > QPlainTextEdit
 {
     border-width: 1px;
     border-style: solid;
 }
 
-#leAuthorName
-{
-    max-height: 30px;
-    min-height: 30px;
-    padding-left: 10px;
-}
-
-#leAuthorEmail
-{
-    border-top: 0;
-    border-bottom:0;
-    max-height: 30px;
-    min-height: 30px;
-    padding-left: 10px;
-}
-
-QLabel#lCounter
-{
-    border-width: 1px;
-    border-style: solid;
-    border-left-width: 0;
-    font-family: "DejaVu Sans Mono";
-    max-width: 29px;
-    min-width: 29px;
-    qproperty-alignment: AlignCenter;
-}
-
-#stagedFilesList, #unstagedFilesList
-{
-    border-top-width: 0;
-}
-
-CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, #JobContainerHeader
+#JobContainerHeader
 {
     max-height: 30px;
     min-height: 30px;
@@ -336,21 +377,7 @@ FileDiffView
     font-size: 8pt;
 }
 
-#leCommitTitle
-{
-    border-right: 0;
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    max-height: 30px;
-    min-height: 30px;
-    padding-left: 10px;
-}
 
-#teDescription, #outputTerminal
-{
-    border-top: none;
-    padding-left: 8px;
-}
 
 /** START QHeaderView **/
 
@@ -560,7 +587,6 @@ QScrollBar::sub-line:vertical
     border-width: 1px;
     border-style: solid;
     border-right: 0;
-    border-top: 0;
     height: 15px;
     width: 15px;
     image: url(:/icons/up-arrow);

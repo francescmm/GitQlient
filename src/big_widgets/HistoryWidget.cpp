@@ -64,9 +64,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    const auto wipSeparator = new QFrame();
    wipSeparator->setObjectName("wipSeparator");
 
-   const auto wipSeparator2 = new QFrame();
-   wipSeparator2->setObjectName("wipSeparator");
-
    const auto wipInfoFrame = new QFrame();
    wipInfoFrame->setObjectName("wipInfoFrame");
    const auto wipInfoLayout = new QVBoxLayout(wipInfoFrame);
@@ -76,7 +73,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    wipInfoLayout->addWidget(mUserEmail);
    wipInfoLayout->addWidget(wipSeparator);
    wipInfoLayout->addWidget(mCurrentBranchLabel);
-   wipInfoLayout->addWidget(wipSeparator2);
 
    mCommitStackedWidget = new QStackedWidget();
    mCommitStackedWidget->setCurrentIndex(0);
@@ -86,7 +82,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    const auto wipLayout = new QVBoxLayout();
    wipLayout->setContentsMargins(QMargins());
-   wipLayout->setSpacing(0);
+   wipLayout->setSpacing(10);
    wipLayout->addWidget(wipInfoFrame);
    wipLayout->addWidget(mCommitStackedWidget);
 
