@@ -41,19 +41,22 @@ void BranchesViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &o, con
    else
       p->fillRect(newOpt.rect, GitQlientStyles::getBackgroundColor());
 
+   static const auto iconSize = 20;
+   static const auto offset = 5;
+
    if (i.column() == 0)
    {
       if (i.data(IsLeaf).toBool())
       {
          const auto width = newOpt.rect.x();
-         QRect rectIcon(width - 20, newOpt.rect.y(), 20, newOpt.rect.height());
+         QRect rectIcon(width - offset, newOpt.rect.y(), iconSize, newOpt.rect.height());
          QIcon icon(":/icons/repo_indicator");
          icon.paint(p, rectIcon);
       }
       else
       {
          const auto width = newOpt.rect.x();
-         QRect rectIcon(width - 20, newOpt.rect.y(), 20, newOpt.rect.height());
+         QRect rectIcon(width - offset, newOpt.rect.y(), iconSize, newOpt.rect.height());
          QIcon icon(":/icons/folder_indicator");
          icon.paint(p, rectIcon);
       }
@@ -71,6 +74,11 @@ void BranchesViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &o, con
    p->setFont(newOpt.font);
 
    const auto elidedText = fm.elidedText(i.data().toString(), Qt::ElideRight, newOpt.rect.width());
+
+   if (i.column() == 0)
+      newOpt.rect.setX(newOpt.rect.x() + iconSize + offset);
+   else
+      newOpt.rect.setX(newOpt.rect.x() + iconSize - offset);
 
    p->drawText(newOpt.rect, elidedText, QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
 }

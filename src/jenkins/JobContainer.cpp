@@ -187,7 +187,7 @@ QIcon JobContainer::getIconForJob(JenkinsJobInfo job) const
 void JobContainer::createHeader(const QString &name, QListWidget *listWidget)
 {
    const auto headerFrame = new ClickableFrame();
-   headerFrame->setObjectName("tagsFrame");
+   headerFrame->setObjectName("sectionFrame");
 
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(20, 9, 10, 9);

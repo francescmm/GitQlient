@@ -81,51 +81,55 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    mLocalBranchesTree->setColumnCount(2);
 
    const auto localHeader = mLocalBranchesTree->headerItem();
-   localHeader->setText(0, QString("   %1").arg(tr("Local")));
-   localHeader->setIcon(0, QIcon(":/icons/local"));
-   localHeader->setText(1, tr("Origin"));
+   localHeader->setText(0, tr("Local"));
+   localHeader->setText(1, tr("To origin"));
 
    mRemoteBranchesTree->setColumnCount(1);
    mRemoteBranchesTree->setMouseTracking(true);
    mRemoteBranchesTree->setItemDelegate(new BranchesViewDelegate());
 
    const auto remoteHeader = mRemoteBranchesTree->headerItem();
-   remoteHeader->setText(0, QString("   %1").arg(tr("Remote")));
-   remoteHeader->setIcon(0, QIcon(":/icons/server"));
+   remoteHeader->setText(0, tr("Remote"));
 
    /* TAGS */
 
-   const auto tagsFrame = new ClickableFrame();
-   tagsFrame->setObjectName("tagsFrame");
-   const auto tagsHeaderLayout = new QHBoxLayout(tagsFrame);
-   tagsHeaderLayout->setContentsMargins(20, 9, 10, 9);
-   tagsHeaderLayout->setSpacing(10);
+   auto wipSeparator = new QFrame();
+   wipSeparator->setObjectName("wipSeparator");
 
-   const auto tagLayout = new QVBoxLayout();
-   tagLayout->setContentsMargins(QMargins());
-   tagLayout->setSpacing(0);
-   tagLayout->addWidget(tagsFrame);
-   tagLayout->addWidget(mTagsList);
+   auto wipFrame = new QFrame();
+   auto wipLayout = new QHBoxLayout(wipFrame);
+   wipLayout->setContentsMargins(10, 10, 10, 5);
+   wipLayout->addWidget(wipSeparator);
 
    GitQlientSettings settings;
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "TagsHeader", true).toBool(); !visible)
    {
-      const auto icon = QIcon(!visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+      const auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
       mTagArrow->setPixmap(icon.pixmap(QSize(15, 15)));
       mTagsList->setVisible(visible);
    }
    else
-      mTagArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
+      mTagArrow->setPixmap(QIcon(":/icons/remove").pixmap(QSize(15, 15)));
 
-   const auto tagsIcon = new QLabel();
-   tagsIcon->setPixmap(QIcon(":/icons/tags").pixmap(QSize(15, 15)));
-
-   tagsHeaderLayout->addWidget(tagsIcon);
+   const auto tagsHeaderFrame = new ClickableFrame();
+   const auto tagsHeaderLayout = new QHBoxLayout(tagsHeaderFrame);
+   tagsHeaderLayout->setContentsMargins(10, 0, 0, 0);
+   tagsHeaderLayout->setSpacing(10);
    tagsHeaderLayout->addWidget(new QLabel(tr("Tags")));
    tagsHeaderLayout->addWidget(mTagsCount);
    tagsHeaderLayout->addStretch();
-
    tagsHeaderLayout->addWidget(mTagArrow);
+
+   const auto tagLayout = new QVBoxLayout();
+   tagLayout->setContentsMargins(QMargins());
+   tagLayout->setSpacing(0);
+   tagLayout->addWidget(wipFrame);
+   tagLayout->addWidget(tagsHeaderFrame);
+   tagLayout->addWidget(mTagsList);
+
+   const auto tagsFrame = new QFrame();
+   tagsFrame->setObjectName("sectionFrame");
+   tagsFrame->setLayout(tagLayout);
 
    mTagsList->setMouseTracking(true);
    mTagsList->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -134,75 +138,74 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
 
    /* STASHES */
 
-   const auto stashFrame = new ClickableFrame();
-   stashFrame->setObjectName("tagsFrame");
+   wipSeparator = new QFrame();
+   wipSeparator->setObjectName("wipSeparator");
 
-   const auto stashLayout = new QVBoxLayout();
-   stashLayout->setContentsMargins(QMargins());
-   stashLayout->setSpacing(0);
-   stashLayout->addWidget(stashFrame);
-   stashLayout->addWidget(mStashesList);
+   wipFrame = new QFrame();
+   wipLayout = new QHBoxLayout(wipFrame);
+   wipLayout->setContentsMargins(10, 10, 10, 5);
+   wipLayout->addWidget(wipSeparator);
 
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool();
        !visible)
    {
-      const auto icon = QIcon(!visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+      const auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
       mStashesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
       mStashesList->setVisible(visible);
    }
    else
-      mStashesArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
+      mStashesArrow->setPixmap(QIcon(":/icons/remove").pixmap(QSize(15, 15)));
 
-   const auto stashHeaderLayout = new QHBoxLayout(stashFrame);
-   stashHeaderLayout->setContentsMargins(20, 9, 10, 9);
+   const auto stashHeaderFrame = new ClickableFrame();
+   const auto stashHeaderLayout = new QHBoxLayout(stashHeaderFrame);
+   stashHeaderLayout->setContentsMargins(10, 0, 0, 0);
    stashHeaderLayout->setSpacing(10);
-
-   const auto stashIconLabel = new QLabel();
-   stashIconLabel->setPixmap(QIcon(":/icons/stashes").pixmap(QSize(15, 15)));
-
-   stashHeaderLayout->addWidget(stashIconLabel);
    stashHeaderLayout->addWidget(new QLabel(tr("Stashes")));
    stashHeaderLayout->addWidget(mStashesCount = new QLabel(tr("(0)")));
    stashHeaderLayout->addStretch();
-
    stashHeaderLayout->addWidget(mStashesArrow);
 
    mStashesList->setMouseTracking(true);
    mStashesList->setContextMenuPolicy(Qt::CustomContextMenu);
 
+   const auto stashLayout = new QVBoxLayout();
+   stashLayout->setContentsMargins(QMargins());
+   stashLayout->setSpacing(0);
+   stashLayout->addWidget(wipFrame);
+   stashLayout->addWidget(stashHeaderFrame);
+   stashLayout->addWidget(mStashesList);
+
+   const auto stashFrame = new QFrame();
+   stashFrame->setObjectName("sectionFrame");
+   stashFrame->setLayout(stashLayout);
+
    /* STASHES END */
 
-   const auto submoduleFrame = new ClickableFrame();
-   submoduleFrame->setObjectName("tagsFrame");
+   wipSeparator = new QFrame();
+   wipSeparator->setObjectName("wipSeparator");
 
-   const auto submoduleLayout = new QVBoxLayout();
-   submoduleLayout->setContentsMargins(QMargins());
-   submoduleLayout->setSpacing(0);
-   submoduleLayout->addWidget(submoduleFrame);
-   submoduleLayout->addWidget(mSubmodulesList);
+   wipFrame = new QFrame();
+   wipLayout = new QHBoxLayout(wipFrame);
+   wipLayout->setContentsMargins(10, 10, 10, 5);
+   wipLayout->addWidget(wipSeparator);
 
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool();
        !visible)
    {
-      const auto icon = QIcon(!visible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+      const auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
       mSubmodulesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
       mSubmodulesList->setVisible(visible);
    }
    else
-      mSubmodulesArrow->setPixmap(QIcon(":/icons/arrow_down").pixmap(QSize(15, 15)));
+      mSubmodulesArrow->setPixmap(QIcon(":/icons/remove").pixmap(QSize(15, 15)));
 
-   const auto submoduleHeaderLayout = new QHBoxLayout(submoduleFrame);
-   submoduleHeaderLayout->setContentsMargins(20, 9, 10, 9);
+   const auto submoduleHeaderFrame = new ClickableFrame();
+   const auto submoduleHeaderLayout = new QHBoxLayout(submoduleHeaderFrame);
+   submoduleHeaderLayout->setContentsMargins(10, 0, 0, 0);
    submoduleHeaderLayout->setSpacing(10);
-
-   const auto submoduleIconLabel = new QLabel();
-   submoduleIconLabel->setPixmap(QIcon(":/icons/submodules").pixmap(QSize(15, 15)));
-
-   submoduleHeaderLayout->addWidget(submoduleIconLabel);
    submoduleHeaderLayout->addWidget(new QLabel(tr("Submodules")));
    submoduleHeaderLayout->addWidget(mSubmodulesCount);
    submoduleHeaderLayout->addStretch();
-
    submoduleHeaderLayout->addWidget(mSubmodulesArrow);
 
    mSubmodulesList->setMouseTracking(true);
@@ -210,6 +213,17 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    connect(mSubmodulesList, &QListWidget::itemDoubleClicked, this, [this](QListWidgetItem *item) {
       emit signalOpenSubmodule(mGit->getWorkingDir().append("/").append(item->text()));
    });
+
+   const auto submoduleLayout = new QVBoxLayout();
+   submoduleLayout->setContentsMargins(QMargins());
+   submoduleLayout->setSpacing(0);
+   submoduleLayout->addWidget(wipFrame);
+   submoduleLayout->addWidget(submoduleHeaderFrame);
+   submoduleLayout->addWidget(mSubmodulesList);
+
+   const auto submoduleFrame = new QFrame();
+   submoduleFrame->setObjectName("sectionFrame");
+   submoduleFrame->setLayout(submoduleLayout);
 
    /* SUBMODULES START */
 
@@ -232,28 +246,46 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    mainControlsLayout->addWidget(mMinimize);
    mainControlsLayout->addWidget(searchBranch);
 
+   const auto panelsLayout = new QVBoxLayout();
+   panelsLayout->setContentsMargins(QMargins());
+   panelsLayout->setSpacing(0);
+   panelsLayout->addWidget(mLocalBranchesTree);
+
+   wipSeparator = new QFrame();
+   wipSeparator->setObjectName("wipSeparator");
+
+   wipFrame = new QFrame();
+   wipLayout = new QHBoxLayout(wipFrame);
+   wipLayout->setContentsMargins(10, 10, 10, 5);
+   wipLayout->addWidget(wipSeparator);
+   panelsLayout->addWidget(wipFrame);
+
+   panelsLayout->addWidget(mRemoteBranchesTree);
+   panelsLayout->addWidget(tagsFrame);
+   panelsLayout->addWidget(stashFrame);
+   panelsLayout->addWidget(submoduleFrame);
+
+   const auto panelsFrame = new QFrame();
+   panelsFrame->setObjectName("panelsFrame");
+   panelsFrame->setLayout(panelsLayout);
+
    const auto vLayout = new QVBoxLayout();
    vLayout->setContentsMargins(0, 0, 10, 0);
    vLayout->setSpacing(0);
    vLayout->addLayout(mainControlsLayout);
    vLayout->addSpacing(5);
-   vLayout->addWidget(mLocalBranchesTree);
-   vLayout->addWidget(mRemoteBranchesTree);
-   vLayout->addLayout(tagLayout);
-   vLayout->addLayout(stashLayout);
-   vLayout->addLayout(submoduleLayout);
+   vLayout->addWidget(panelsFrame);
 
    mFullBranchFrame = new QFrame();
    mFullBranchFrame->setObjectName("FullBranchesWidget");
    const auto mainBranchLayout = new QHBoxLayout(mFullBranchFrame);
    mainBranchLayout->setContentsMargins(QMargins());
    mainBranchLayout->setSpacing(0);
-   // mainBranchLayout->addWidget(mMinimize);
    mainBranchLayout->addLayout(vLayout);
 
    const auto mainLayout = new QGridLayout(this);
    mainLayout->setContentsMargins(QMargins());
-   mainLayout->setSpacing(10);
+   mainLayout->setSpacing(0);
    mainLayout->addWidget(mFullBranchFrame, 0, 0, 3, 1);
    mainLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding), 0, 1);
    mainLayout->addWidget(mMinimal, 1, 1);
@@ -294,9 +326,9 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    connect(mStashesList, &QListWidget::itemClicked, this, &BranchesWidget::onStashClicked);
    connect(mStashesList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showStashesContextMenu);
    connect(mSubmodulesList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showSubmodulesContextMenu);
-   connect(tagsFrame, &ClickableFrame::clicked, this, &BranchesWidget::onTagsHeaderClicked);
-   connect(stashFrame, &ClickableFrame::clicked, this, &BranchesWidget::onStashesHeaderClicked);
-   connect(submoduleFrame, &ClickableFrame::clicked, this, &BranchesWidget::onSubmodulesHeaderClicked);
+   connect(tagsHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onTagsHeaderClicked);
+   connect(stashHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onStashesHeaderClicked);
+   connect(submoduleHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onSubmodulesHeaderClicked);
 }
 
 void BranchesWidget::showBranches()
@@ -695,7 +727,7 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
 void BranchesWidget::onTagsHeaderClicked()
 {
    const auto tagsAreVisible = mTagsList->isVisible();
-   const auto icon = QIcon(tagsAreVisible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+   const auto icon = QIcon(tagsAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
    mTagArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mTagsList->setVisible(!tagsAreVisible);
 
@@ -706,7 +738,7 @@ void BranchesWidget::onTagsHeaderClicked()
 void BranchesWidget::onStashesHeaderClicked()
 {
    const auto stashesAreVisible = mStashesList->isVisible();
-   const auto icon = QIcon(stashesAreVisible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+   const auto icon = QIcon(stashesAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
    mStashesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mStashesList->setVisible(!stashesAreVisible);
 
@@ -717,7 +749,7 @@ void BranchesWidget::onStashesHeaderClicked()
 void BranchesWidget::onSubmodulesHeaderClicked()
 {
    const auto submodulesAreVisible = mSubmodulesList->isVisible();
-   const auto icon = QIcon(submodulesAreVisible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+   const auto icon = QIcon(submodulesAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
    mSubmodulesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mSubmodulesList->setVisible(!submodulesAreVisible);
 

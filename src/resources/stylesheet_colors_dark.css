@@ -122,6 +122,8 @@ CommitChangesWidget > QListWidget, MergeWidget > QListWidget
 
 /* CommitChangesWidget end */
 
+/* commitInfoPanel start */
+
 #labelTitle, #commitInfoFrame, #labelDescription,
 #labelAuthor, #labelDateTime
 {
@@ -138,6 +140,8 @@ CommitChangesWidget > QListWidget, MergeWidget > QListWidget
     color: #D89000;
     background-color: #2E2F30;
 }
+
+/* commitInfoPanel end */
 
 QListView
 {
@@ -258,7 +262,6 @@ FileDiffWidget > QPushButton:checked, FileDiffWidget > QToolButton:checked
    background-color: #202122;
 }
 
-
 QHeaderView
 {
     color:#ffffff;
@@ -270,13 +273,32 @@ QHeaderView:section
     background: #202122;
 }
 
-BranchTreeWidget QHeaderView:section
+/* BranchesWidget start */
+#panelsFrame
 {
-    border-right-color: #202122;
-    background: #202122;
+   border-color: #202122;
+   background: #2E2F30;
 }
 
-#tagsFrame, #fileTitleFrame
+BranchTreeWidget QHeaderView:section
+{
+    border-right-color: #2E2F30;
+    background: #2E2F30;
+}
+
+#sectionFrame
+{
+    background-color: #2E2F30;
+    color: white;
+    border-color: #202122;
+}
+
+BranchesWidget ClickableFrame:hover
+{
+   background: #2E2F30;
+}
+
+#fileTitleFrame
 {
     background-color: #202122;
     color: white;
@@ -294,6 +316,8 @@ BranchDlg
     background-color: #2E2F30;
     color: white;
 }
+
+/* BranchesWidget end */
 
 GitQlient
 {

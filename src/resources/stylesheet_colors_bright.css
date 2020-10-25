@@ -225,7 +225,13 @@ QHeaderView:section
     background: #404142;
 }
 
-#tagsFrame, #fileTitleFrame, #tagsFrame > QLabel, #fileTitleFrame > QLabel
+#sectionFrame, #sectionFrame > QLabel, #fileTitleFrame > QLabel
+{
+    background-color: #2E2F30;
+    color: white;
+}
+
+#fileTitleFrame
 {
     background-color: #404142;
     color: white;

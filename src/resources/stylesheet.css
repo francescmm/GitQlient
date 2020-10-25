@@ -124,13 +124,21 @@ CommitDiffWidget
    min-height: 350px;
 }
 
-BranchesWidget > QListWidget, BlameWidget > QTreeView, MergeWidget > QListWidget
+MergeWidget > QListWidget
+{
+    border-width: 1px;
+    border-style: solid;
+    border: 0;
+    outline: 0;
+}
+
+BlameWidget > QTreeView
 {
    border: 0;
    outline: 0;
- }
+}
 
-QListWidget::item, BlameWidget > QTreeView::item
+BlameWidget > QTreeView::item
 {
    padding-left: 7px;
    padding-right: 7px;
@@ -146,28 +154,67 @@ MergeWidget > QListWidget::item
    padding: 0;
 }
 
+QListWidget::item
+{
+   padding-left: 7px;
+   padding-right: 7px;
+   border-left: 0;
+   border-bottom: 0;
+   margin: 0;
+   min-height: 25px;
+   max-height: 25px;
+}
+
 QTreeWidget::item
 {
-    min-height: 25px;
-    max-height: 25px;
+   min-height: 25px;
+   max-height: 25px;
+}
+
+/* BranchesWidget start */
+BranchesWidget QListWidget, BranchesWidget QTreeWidget
+{
+   border: 0;
+   outline: 0;
+}
+
+BranchesWidget QListWidget::item
+{
+   padding-left: 15px;
+   padding-right: 7px;
+   border-left: 0;
+   border-bottom: 0;
+   margin: 0;
+   min-height: 25px;
+   max-height: 25px;
+}
+
+BranchesWidget QTreeWidget::item
+{
+   min-height: 25px;
+   max-height: 25px;
+   padding-left: 15px;
 }
 
 #FullBranchesWidget
 {
-    min-width: 350px;
-    max-width: 350px;
+   min-width: 350px;
+   max-width: 350px;
 }
 
-#tagsFrame
+#panelsFrame
 {
-    padding: 0;
+   border-width: 1px;
+   border-style: solid;
 }
 
-MergeWidget > QListWidget
+#sectionFrame
 {
-    border-width: 1px;
-    border-style: solid;
+   border-width: 0;
+   border-style: solid;
 }
+
+/* BranchesWidget start */
 
 /* CommitInfoWidget start */
 
@@ -561,7 +608,6 @@ QScrollBar::add-line:vertical
     border-width: 1px;
     border-style: solid;
     border-right: 0;
-    border-bottom: 0;
     height: 15px;
     width: 15px;
     image: url(:/icons/down-arrow);
