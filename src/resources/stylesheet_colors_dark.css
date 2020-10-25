@@ -124,15 +124,15 @@ CommitChangesWidget > QListWidget, MergeWidget > QListWidget
 
 /* commitInfoPanel start */
 
+CommitInfoWidget, CommitInfoPanel
+{
+   background: #2E2F30;
+}
+
 #labelTitle, #commitInfoFrame, #labelDescription,
 #labelAuthor, #labelDateTime
 {
-    background-color: #606162;
-}
-
-#labelAuthor
-{
-   border-color: #404142;
+    background-color: #2E2F30;
 }
 
 #labelSha

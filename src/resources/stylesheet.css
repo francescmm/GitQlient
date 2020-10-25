@@ -118,12 +118,6 @@ QPushButton:hover
     border: 0;
 }
 
-CommitDiffWidget
-{
-   max-height: 350px;
-   min-height: 350px;
-}
-
 MergeWidget > QListWidget
 {
     border-width: 1px;
@@ -229,8 +223,6 @@ BranchesWidget QTreeWidget::item
    padding: 10px;
    padding-bottom: 1px;
    border: none;
-   border-style: solid;
-   border-top-width: 1px;
 }
 
 #labelDateTime
@@ -248,7 +240,7 @@ BranchesWidget QTreeWidget::item
     font-size: 8pt;
 }
 
-CommitInfoWidget > FileListWidget
+CommitInfoWidget FileListWidget
 {
     border: 0;
 }
@@ -721,10 +713,22 @@ DiffButton
    min-height: 30px;
 }
 
-DiffWidget > QScrollArea
+DiffWidget FileListWidget
 {
-   min-width: 375px;
-   max-width: 375px;
+    border: 0;
+}
+
+#InfoPanel
+{
+   border-style: solid;
+   border-width: 1px;
+   border-color: #202122;
+   background: #2E2F30;
+}
+
+#InfoPanelBase
+{
+   border-bottom: 0;
 }
 
 #mergeFrame
