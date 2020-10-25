@@ -269,8 +269,18 @@ QHeaderView
 
 QHeaderView:section
 {
-    border-right-color: #606162;
-    background: #202122;
+   background: #2E2F30;
+}
+
+CommitHistoryView QHeaderView:section
+{
+   border-right-color: #606162;
+   border-bottom-color: #606162;
+}
+
+BlameWidget QHeaderView:section
+{
+    border-right-color: #2E2F30;
 }
 
 /* BranchesWidget start */
