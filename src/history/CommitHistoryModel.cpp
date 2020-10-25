@@ -17,9 +17,9 @@ CommitHistoryModel::CommitHistoryModel(const QSharedPointer<GitCache> &cache, co
    , mGitServerCache(gitServerCache)
 {
    mColumns.insert(CommitHistoryColumns::TreeViewIcon, "");
-   mColumns.insert(CommitHistoryColumns::Graph, "Graph");
+   mColumns.insert(CommitHistoryColumns::Graph, "");
    mColumns.insert(CommitHistoryColumns::Sha, "Sha");
-   mColumns.insert(CommitHistoryColumns::Log, "Log");
+   mColumns.insert(CommitHistoryColumns::Log, "History");
    mColumns.insert(CommitHistoryColumns::Author, "Author");
    mColumns.insert(CommitHistoryColumns::Date, "Date");
 }

@@ -430,11 +430,11 @@ QHeaderView:section
 
 CommitHistoryView QHeaderView:section
 {
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
+   border-bottom-width: 1px;
+   border-bottom-style: solid;
 }
 
-CommitHistoryView QHeaderView:section::last
+CommitHistoryView QHeaderView:section::last, CommitHistoryView QHeaderView:section::first
 {
    border-right-width: 0;
 }
@@ -443,11 +443,11 @@ CommitHistoryView QHeaderView:section::last
 
 BranchDlg > QLineEdit, HistoryWidget > QLineEdit
 {
-    border-width: 1px;
-    border-style: solid;
-    max-height: 25px;
-    min-height: 25px;
-    padding-left: 10px;
+   border-width: 1px;
+   border-style: solid;
+   max-height: 25px;
+   min-height: 25px;
+   padding-left: 10px;
 }
 
 /** QPinnableTabWidget **/
