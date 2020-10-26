@@ -118,4 +118,6 @@ private:
     * @brief onSelectionChanged Process when a selection has changed.
     */
    void onSelectionChanged();
+
+   QList<QTreeWidgetItem *> findChildItem(const QString &text);
 };
