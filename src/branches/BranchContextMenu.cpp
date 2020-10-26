@@ -8,6 +8,8 @@
 
 #include <QApplication>
 #include <QMessageBox>
+#include <QApplication>
+#include <QClipboard>
 
 #include <utility>
 
@@ -16,6 +18,11 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
    , mConfig(std::move(config))
 {
    setAttribute(Qt::WA_DeleteOnClose);
+
+   connect(addAction(tr("Copy name")), &QAction::triggered, this,
+           [this] { QApplication::clipboard()->setText(mConfig.branchSelected); });
+
+   addSeparator();
 
    if (mConfig.isLocal)
    {
