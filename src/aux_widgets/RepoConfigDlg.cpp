@@ -47,8 +47,8 @@ RepoConfigDlg::RepoConfigDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    ui->labelClangFormat->setVisible(false);
    ui->clangFormat->setVisible(false);
 
-   ui->cbLogOrder->addItem("Topo order");
    ui->cbLogOrder->addItem("Date order");
+   ui->cbLogOrder->addItem("Topo order");
    ui->cbLogOrder->addItem("Author date order");
 
    GitQlientSettings settings;

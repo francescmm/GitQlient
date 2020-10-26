@@ -168,10 +168,10 @@ void GitRepoLoader::requestRevisions()
    switch (settings.localValue(mGitBase->getGitQlientSettingsDir(), "GraphSortingOrder", 0).toInt())
    {
       case 0:
-         order = "--topo-order";
+         order = "--date-order";
          break;
       case 1:
-         order = "--date-order";
+         order = "--topo-order";
          break;
       case 2:
          order = "--author-date-order";
