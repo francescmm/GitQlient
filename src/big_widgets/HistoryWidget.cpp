@@ -59,7 +59,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    mUserName->setText(localUserInfo.mUserName.isEmpty() ? globalUserInfo.mUserName : localUserInfo.mUserName);
    mUserEmail->setText(localUserInfo.mUserEmail.isEmpty() ? globalUserInfo.mUserEmail : localUserInfo.mUserEmail);
-   mCurrentBranchLabel->setText(QString(tr("Working branch: <b>%1</b>")).arg(mGit->getCurrentBranch()));
+   mCurrentBranchLabel->setText(QString(tr("<b>%1</b>")).arg(mGit->getCurrentBranch()));
 
    const auto wipSeparator = new QFrame();
    wipSeparator->setObjectName("wipSeparator");
@@ -391,7 +391,7 @@ void HistoryWidget::onShowAllUpdated(bool showAll)
 void HistoryWidget::onBranchCheckout()
 {
    const auto currentBranch = mGit->getCurrentBranch();
-   mCurrentBranchLabel->setText(QString(tr("Working branch: <b>%1</b>")).arg(currentBranch));
+   mCurrentBranchLabel->setText(QString(tr("<b>%1</b>")).arg(currentBranch));
 
    QScopedPointer<GitBranches> gitBranches(new GitBranches(mGit));
    const auto ret = gitBranches->getLastCommitOfBranch(currentBranch);

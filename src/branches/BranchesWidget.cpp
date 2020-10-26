@@ -125,6 +125,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    tagLayout->setSpacing(0);
    tagLayout->addWidget(wipFrame);
    tagLayout->addWidget(tagsHeaderFrame);
+   tagLayout->addSpacing(5);
    tagLayout->addWidget(mTagsList);
 
    const auto tagsFrame = new QFrame();
@@ -173,6 +174,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    stashLayout->setSpacing(0);
    stashLayout->addWidget(wipFrame);
    stashLayout->addWidget(stashHeaderFrame);
+   stashLayout->addSpacing(5);
    stashLayout->addWidget(mStashesList);
 
    const auto stashFrame = new QFrame();
@@ -219,6 +221,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    submoduleLayout->setSpacing(0);
    submoduleLayout->addWidget(wipFrame);
    submoduleLayout->addWidget(submoduleHeaderFrame);
+   submoduleLayout->addSpacing(5);
    submoduleLayout->addWidget(mSubmodulesList);
 
    const auto submoduleFrame = new QFrame();
