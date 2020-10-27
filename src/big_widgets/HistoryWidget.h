@@ -260,7 +260,6 @@ private:
    QPushButton *mReturnFromFull = nullptr;
    QLabel *mUserName = nullptr;
    QLabel *mUserEmail = nullptr;
-   QLabel *mCurrentBranchLabel = nullptr;
    bool mReverseSearch = false;
 
    /*!
