@@ -240,7 +240,7 @@ QComboBox
 {
    outline: none;
    color: white;
-   border-color: #202122;
+   border-color: #D89000;
    background-color: #2E2F30;
 }
 
@@ -260,6 +260,13 @@ QComboBox QAbstractItemView
 {
    outline: none;
    background-color: #404142;
+   border-color: #D89000;
+   selection-background-color: #606162;
+}
+
+QComboBox::drop-down:hover
+{
+   background: #606162;
 }
 
 CheckBox

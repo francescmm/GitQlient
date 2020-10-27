@@ -70,8 +70,28 @@ QComboBox, QLineEdit
 
 QComboBox::drop-down
 {
-     min-width: 20px;
-     max-width: 20px;
+   width: 16px;
+   padding-left: 2px;
+   padding-right: 2px;
+   border: 0;
+}
+
+QComboBox::drop-down:hover
+{
+   width: 16px;
+}
+
+QComboBox::down-arrow
+{
+   image: url(:/icons/arrow_down);
+   min-width: 14px;
+   max-width: 14px;
+}
+
+QComboBox QAbstractItemView
+{
+   border-width: 1px;
+   border-style: solid;
 }
 
 QPushButton, QToolButton
@@ -352,28 +372,28 @@ QSpinBox
 
 QSpinBox::up-button
 {
-   width: 16px;
+   width: 20px;
    border: 0px;
 }
 
 QSpinBox::up-arrow
 {
    image: url(:/icons/arrow_up);
-   width: 14px;
-   height: 7px;
+   width: 20px;
+   height: 10px;
 }
 
 QSpinBox::down-button
 {
-   width: 16px;
+   width: 20px;
    border: 0px;
 }
 
 QSpinBox::down-arrow
 {
    image: url(:/icons/arrow_down);
-   width: 14px;
-   height: 7px;
+   width: 20px;
+   height: 10px;
 }
 
 /* QWidgets end */
