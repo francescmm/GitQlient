@@ -79,6 +79,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    mLocalBranchesTree->setMouseTracking(true);
    mLocalBranchesTree->setItemDelegate(new BranchesViewDelegate());
    mLocalBranchesTree->setColumnCount(2);
+   mLocalBranchesTree->setObjectName("LocalBranches");
 
    const auto localHeader = mLocalBranchesTree->headerItem();
    localHeader->setText(0, tr("Local"));
@@ -92,15 +93,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    remoteHeader->setText(0, tr("Remote"));
 
    /* TAGS */
-
-   auto wipSeparator = new QFrame();
-   wipSeparator->setObjectName("wipSeparator");
-
-   auto wipFrame = new QFrame();
-   auto wipLayout = new QHBoxLayout(wipFrame);
-   wipLayout->setContentsMargins(10, 10, 10, 5);
-   wipLayout->addWidget(wipSeparator);
-
    GitQlientSettings settings;
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "TagsHeader", true).toBool(); !visible)
    {
@@ -123,7 +115,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    const auto tagLayout = new QVBoxLayout();
    tagLayout->setContentsMargins(QMargins());
    tagLayout->setSpacing(0);
-   tagLayout->addWidget(wipFrame);
    tagLayout->addWidget(tagsHeaderFrame);
    tagLayout->addSpacing(5);
    tagLayout->addWidget(mTagsList);
@@ -138,15 +129,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    /* TAGS END */
 
    /* STASHES */
-
-   wipSeparator = new QFrame();
-   wipSeparator->setObjectName("wipSeparator");
-
-   wipFrame = new QFrame();
-   wipLayout = new QHBoxLayout(wipFrame);
-   wipLayout->setContentsMargins(10, 10, 10, 5);
-   wipLayout->addWidget(wipSeparator);
-
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool();
        !visible)
    {
@@ -172,7 +154,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    const auto stashLayout = new QVBoxLayout();
    stashLayout->setContentsMargins(QMargins());
    stashLayout->setSpacing(0);
-   stashLayout->addWidget(wipFrame);
    stashLayout->addWidget(stashHeaderFrame);
    stashLayout->addSpacing(5);
    stashLayout->addWidget(mStashesList);
@@ -182,15 +163,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    stashFrame->setLayout(stashLayout);
 
    /* STASHES END */
-
-   wipSeparator = new QFrame();
-   wipSeparator->setObjectName("wipSeparator");
-
-   wipFrame = new QFrame();
-   wipLayout = new QHBoxLayout(wipFrame);
-   wipLayout->setContentsMargins(10, 10, 10, 5);
-   wipLayout->addWidget(wipSeparator);
-
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool();
        !visible)
    {
@@ -219,7 +191,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    const auto submoduleLayout = new QVBoxLayout();
    submoduleLayout->setContentsMargins(QMargins());
    submoduleLayout->setSpacing(0);
-   submoduleLayout->addWidget(wipFrame);
    submoduleLayout->addWidget(submoduleHeaderFrame);
    submoduleLayout->addSpacing(5);
    submoduleLayout->addWidget(mSubmodulesList);
@@ -253,16 +224,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    panelsLayout->setContentsMargins(QMargins());
    panelsLayout->setSpacing(0);
    panelsLayout->addWidget(mLocalBranchesTree);
-
-   wipSeparator = new QFrame();
-   wipSeparator->setObjectName("wipSeparator");
-
-   wipFrame = new QFrame();
-   wipLayout = new QHBoxLayout(wipFrame);
-   wipLayout->setContentsMargins(10, 10, 10, 5);
-   wipLayout->addWidget(wipSeparator);
-   panelsLayout->addWidget(wipFrame);
-
    panelsLayout->addWidget(mRemoteBranchesTree);
    panelsLayout->addWidget(tagsFrame);
    panelsLayout->addWidget(stashFrame);

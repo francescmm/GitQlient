@@ -350,7 +350,7 @@ FileDiffWidget > QPushButton:checked, FileDiffWidget > QToolButton:checked
 {
     background-color: #2E2F30;
     color: white;
-    border-color: #202122;
+    border-color: #606162;
 }
 
 BranchesWidget ClickableFrame:hover
@@ -358,7 +358,7 @@ BranchesWidget ClickableFrame:hover
    background: #2E2F30;
 }
 
-BranchesWidget QListWidget
+BranchesWidget QHeaderView, BranchesWidget QListWidget
 {
     border-top-color: #606162;
 }

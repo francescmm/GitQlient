@@ -468,6 +468,24 @@ MergeWidget > QListWidget::item
 }
 
 /* BranchesWidget start */
+#sectionFrame
+{
+   border-width: 0;
+   border-top-width: 1px;
+   border-style: solid;
+}
+
+BranchesWidget QHeaderView, BranchesWidget QListWidget
+{
+    border-top-style: solid;
+    border-top-width: 1px;
+}
+
+#LocalBranches QHeaderView
+{
+    border-top: 0;
+}
+
 BranchesWidget QListWidget::item
 {
    padding-left: 15px;
@@ -495,12 +513,6 @@ BranchesWidget QTreeWidget::item
 #panelsFrame
 {
    border-width: 1px;
-   border-style: solid;
-}
-
-#sectionFrame
-{
-   border-width: 0;
    border-style: solid;
 }
 
