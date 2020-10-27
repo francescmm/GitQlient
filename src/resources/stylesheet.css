@@ -423,13 +423,13 @@ Controls > QToolButton
 }
 
 /* GitQlient styles */
-CommitHistoryView
+HistoryWidget CommitHistoryView
 {
    border-width: 1px;
    border-style: solid;
 }
 
-CommitHistoryView QHeaderView:section:first
+HistoryWidget CommitHistoryView QHeaderView:section:first
 {
    border-right-width: 1px;
    border-right-style: solid;
