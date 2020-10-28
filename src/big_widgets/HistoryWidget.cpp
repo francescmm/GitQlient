@@ -151,7 +151,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    const auto cherryPickBtn = new QPushButton(tr("Cherry-pick"));
    cherryPickBtn->setEnabled(false);
-   cherryPickBtn->setObjectName("pbCherryPick");
+   cherryPickBtn->setObjectName("applyActionBtn");
    connect(cherryPickBtn, &QPushButton::clicked, this, &HistoryWidget::cherryPickCommit);
    connect(mSearchInput, &QLineEdit::textChanged, this,
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });

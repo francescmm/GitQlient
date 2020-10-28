@@ -1,7 +1,6 @@
 INCLUDEPATH += $$PWD
 
 HEADERS += \
-    $$PWD/DiffButton.h \
     $$PWD/DiffHelper.h \
     $$PWD/DiffInfo.h \
     $$PWD/FileBlameWidget.h \
@@ -15,7 +14,6 @@ HEADERS += \
     $$PWD/LineNumberArea.h
 
 SOURCES += \
-    $$PWD/DiffButton.cpp \
     $$PWD/FileBlameWidget.cpp \
     $$PWD/FileDiffEditor.cpp \
     $$PWD/FileDiffHighlighter.cpp \

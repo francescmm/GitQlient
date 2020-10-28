@@ -17,7 +17,7 @@ using namespace QLogger;
 AmendWidget::AmendWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : CommitChangesWidget(cache, git, parent)
 {
-   ui->pbCommit->setText(tr("Amend"));
+   ui->applyActionBtn->setText(tr("Amend"));
 }
 
 void AmendWidget::configure(const QString &sha)
@@ -25,7 +25,7 @@ void AmendWidget::configure(const QString &sha)
    const auto commit = mCache->getCommitInfo(sha);
 
    ui->amendFrame->setVisible(true);
-   ui->pbCancelAmend->setVisible(true);
+   ui->warningButton->setVisible(true);
 
    if (commit.parentsCount() <= 0)
       return;
@@ -76,7 +76,7 @@ void AmendWidget::configure(const QString &sha)
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
 
-   ui->pbCommit->setEnabled(ui->stagedFilesList->count());
+   ui->applyActionBtn->setEnabled(ui->stagedFilesList->count());
 }
 
 bool AmendWidget::commitChanges()

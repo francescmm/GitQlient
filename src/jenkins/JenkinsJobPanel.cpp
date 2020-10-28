@@ -69,7 +69,7 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    mTabWidget->setContextMenuPolicy(QPinnableTabWidget::ContextMenuPolicy::ShowNever);
 
    mBuild->setVisible(false);
-   mBuild->setObjectName("pbCommit");
+   mBuild->setObjectName("applyActionBtn");
 
    const auto linkLayout = new QHBoxLayout();
    linkLayout->setContentsMargins(QMargins());
@@ -391,7 +391,7 @@ void JenkinsJobPanel::createBuildConfigPanel()
 
    const auto btn = new QPushButton(tr("Build"));
    btn->setFixedSize(100, 30);
-   btn->setObjectName("pbCommit");
+   btn->setObjectName("applyActionBtn");
    connect(btn, &QPushButton::clicked, this, &JenkinsJobPanel::triggerBuild);
 
    btnsLayout->addWidget(btn);

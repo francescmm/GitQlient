@@ -405,12 +405,6 @@ QFrame#separator
    max-height: 1px;
 }
 
-QFrame#separator2px
-{
-   min-height: 2px;
-   max-height: 2px;
-}
-
 #orangeHSeparator
 {
    min-height: 1px;
@@ -586,7 +580,8 @@ CommitInfoWidget
 #stagedFiles, #unstagedFiles
 {
    padding: 0;
-   border: 1px solid #202122;
+   border-width: 1px;
+   border-style: solid;
 }
 
 #stagedFiles
@@ -598,6 +593,8 @@ CommitInfoWidget
 {
    padding: 0;
    border: 0;
+   border-top-width: 1px;
+   border-top-style: solid;
    outline: 0;
 }
 
@@ -606,13 +603,13 @@ CommitInfoWidget
    padding-left: 0;
 }
 
-CommitChangesWidget > #pbCommit, CommitChangesWidget > #pbCancelAmend
+CommitChangesWidget > #applyActionBtn, CommitChangesWidget > #warningButton
 {
    max-height: 30px;
    min-height: 30px;
 }
 
-CommitChangesWidget > #pbCancelAmend
+CommitChangesWidget > #warningButton
 {
    padding-left: 10px;
    padding-right: 10px;
@@ -805,12 +802,6 @@ QLabel#authorFirstOfItsName, ButtonLink#firstOfItsName
     border-top-style: solid;
 }
 
-DiffButton
-{
-   max-height: 30px;
-   min-height: 30px;
-}
-
 DiffWidget FileListWidget
 {
     border: 0;
@@ -820,8 +811,6 @@ DiffWidget FileListWidget
 {
    border-style: solid;
    border-width: 1px;
-   border-color: #202122;
-   background: #2E2F30;
 }
 
 #InfoPanelBase
@@ -835,7 +824,7 @@ DiffWidget FileListWidget
    min-width: 450px;
 }
 
-#MergeWarningButton, QPushButton#warnButton, QPushButton#Abort, QPushButton#Merge
+#WarningButton, QPushButton#warnButton, QPushButton#Abort, QPushButton#Merge
 {
    border-width: 1px;
 }
@@ -873,7 +862,7 @@ GeneralConfigPage > QLabel#configLabel
     qproperty-alignment: AlignCenter;
 }
 
-#pbCherryPick
+HistoryWidget > #applyActionBtn
 {
    max-height: 20px;
    min-height: 20px;

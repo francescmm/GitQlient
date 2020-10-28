@@ -59,8 +59,8 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
 
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitChangesWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitChangesWidget::commitChanges);
-   connect(ui->pbCommit, &QPushButton::clicked, this, &CommitChangesWidget::commitChanges);
-   connect(ui->pbCancelAmend, &QPushButton::clicked, this, [this]() { emit signalCancelAmend(mCurrentSha); });
+   connect(ui->applyActionBtn, &QPushButton::clicked, this, &CommitChangesWidget::commitChanges);
+   connect(ui->warningButton, &QPushButton::clicked, this, [this]() { emit signalCancelAmend(mCurrentSha); });
    connect(ui->stagedFilesList, &StagedFilesList::signalResetFile, this, &CommitChangesWidget::resetFile);
    connect(ui->stagedFilesList, &StagedFilesList::signalShowDiff, this,
            [this](const QString &fileName) { requestDiff(mGit->getWorkingDir() + "/" + fileName); });
@@ -69,8 +69,8 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
    connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
 
-   ui->pbCancelAmend->setVisible(false);
-   ui->pbCommit->setText(tr("Commit"));
+   ui->warningButton->setVisible(false);
+   ui->applyActionBtn->setText(tr("Commit"));
 }
 
 CommitChangesWidget::~CommitChangesWidget()
@@ -275,7 +275,7 @@ void CommitChangesWidget::addAllFilesToCommitList()
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-   ui->pbCommit->setEnabled(ui->stagedFilesList->count() > 0);
+   ui->applyActionBtn->setEnabled(ui->stagedFilesList->count() > 0);
 }
 
 void CommitChangesWidget::requestDiff(const QString &fileName)
@@ -327,7 +327,7 @@ void CommitChangesWidget::addFileToCommitList(QListWidgetItem *item)
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-   ui->pbCommit->setEnabled(true);
+   ui->applyActionBtn->setEnabled(true);
 }
 
 void CommitChangesWidget::revertAllChanges()
@@ -379,7 +379,7 @@ void CommitChangesWidget::removeFileFromCommitList(QListWidgetItem *item)
 
       ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
       ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-      ui->pbCommit->setDisabled(ui->stagedFilesList->count() == 0);
+      ui->applyActionBtn->setDisabled(ui->stagedFilesList->count() == 0);
    }
 }
 
@@ -451,7 +451,7 @@ void CommitChangesWidget::clear()
    mInternalCache.clear();
    ui->leCommitTitle->clear();
    ui->teDescription->clear();
-   ui->pbCommit->setEnabled(false);
+   ui->applyActionBtn->setEnabled(false);
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
 }

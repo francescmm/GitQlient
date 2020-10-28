@@ -39,14 +39,14 @@
       <number>10</number>
      </property>
      <item>
-      <widget class="QPushButton" name="pbCancelAmend">
+      <widget class="QPushButton" name="warningButton">
        <property name="text">
         <string>Cancel</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pbCommit">
+      <widget class="QPushButton" name="applyActionBtn">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -364,8 +364,8 @@
   <tabstop>teDescription</tabstop>
   <tabstop>leAuthorName</tabstop>
   <tabstop>leAuthorEmail</tabstop>
-  <tabstop>pbCommit</tabstop>
-  <tabstop>pbCancelAmend</tabstop>
+  <tabstop>applyActionBtn</tabstop>
+  <tabstop>warningButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>

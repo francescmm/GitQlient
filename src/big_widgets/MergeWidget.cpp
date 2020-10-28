@@ -46,8 +46,8 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
    mDescription->setReadOnly(false);
    mDescription->setAcceptRichText(false);
 
-   mAbortBtn->setObjectName("Abort");
-   mMergeBtn->setObjectName("Merge");
+   mAbortBtn->setObjectName("warningButton");
+   mMergeBtn->setObjectName("applyActionBtn");
 
    const auto mergeBtnLayout = new QHBoxLayout();
    mergeBtnLayout->setContentsMargins(QMargins());
