@@ -95,40 +95,40 @@ QTabWidget::tab-bar
 QTabWidget > QTabBar::tab
 {
    background: #202122;
-   color: white;
+   color: black;
 }
 
 QTabWidget > QTabBar::tab:selected
 {
-   background: #404142;
+   background: white;
 }
 
 QTabWidget > QTabBar::tab:!selected
 {
-    border-right-color: #2E2F30;
+   background: #C6C6C7;
 }
 
 QTabWidget > QTabBar::tab:!selected:hover
 {
-    background: #606162;
+   background: #606162;
 }
 
 QTabWidget > QTabBar::tab:disabled
 {
-    color: #606162;
+   color: #606162;
 }
 
 QToolTip
 {
-    border-color: #2E2F30;
-    background: white;
-    color: black;
+   border-color: #2E2F30;
+   background: white;
+   color: black;
 }
 
 QMenu::item
 {
-    background: white;
-    color: black;
+   background: white;
+   color: black;
 }
 
 QMenu::item:selected
@@ -414,17 +414,17 @@ GitQlient
 
 #GitQlientTab > QTabBar::tab:first
 {
-   background: #2E2F30;
+   background: #C6C6C7;
 }
 
 #GitQlientTab > QTabBar::tab:first:selected
 {
-   background: #404142;
+   background: #606162;
 }
 
 ConfigWidget
 {
-    background: #404142;
+    background: #C6C6C7;
 }
 
 /*********************************************/
@@ -463,9 +463,20 @@ CommitHistoryView
    border-color: #202122;
 }
 
+DiffWidget > QPinnableTabWidget > QTabBar::tab:!selected
+{
+   background: #E6E6E7;
+}
+
 DiffWidget > QPinnableTabWidget > QTabBar::tab:selected
 {
-   background: #2E2F30;
+   background: #C6C6C7;
+   border-right: 1px solid #2E2F30;
+}
+
+DiffWidget > QPinnableTabWidget > QTabBar::tab:last
+{
+   border-right: none;
 }
 
 #InfoPanel
@@ -569,8 +580,8 @@ FileDiffView
 
 FileDiffWidget
 {
-    background: white;
-    border-color: #2E2F30;
+    background: #C6C6C7;
+    border-color: #C6C6C7;
 }
 
 FileDiffWidget > QPushButton, FileDiffWidget > QToolButton
@@ -585,8 +596,8 @@ FileDiffWidget > QPushButton:checked, FileDiffWidget > QToolButton:checked
 
 FullDiffWidget
 {
-    background: white;
-    border-color: #2E2F30;
+    background: #C6C6C7;
+    border-color: #C6C6C7;
 }
 
 FullDiffWidget > QPlainTextEdit
@@ -695,10 +706,26 @@ BlameWidget > QTreeView
     border-color: #2E2F30;
 }
 
-BlameWidget > QTabWidget, BlameWidget > QTabWidget:pane, BlameWidget > QTabWidget > QTabBar::tab:selected
+BlameWidget > QTabWidget, BlameWidget > QTabWidget:pane
 {
-    background: white;
+    background: #C6C6C7;
     border: 0;
+}
+
+BlameWidget > QTabWidget > QTabBar::tab:!selected
+{
+   background: #E6E6E7;
+}
+
+BlameWidget > QTabWidget > QTabBar::tab:selected
+{
+   background: #C6C6C7;
+   border-right: 1px solid #2E2F30;
+}
+
+BlameWidget > QTabWidget > QTabBar::tab:last
+{
+   border-right: none;
 }
 
 BlameWidget > QTabWidget, BlameWidget > QTabWidget:pane
@@ -709,22 +736,29 @@ BlameWidget > QTabWidget, BlameWidget > QTabWidget:pane
 
 FileBlameWidget
 {
+    background: #C6C6C7;
+}
+
+#normalLabel
+{
     background: white;
 }
 
 #AnnotationFrame
 {
-    background: white;
+   background: #C6C6C7;
 }
 
 QLabel#numberLabel
 {
     border-right-color: #202122;
+    background: #C6C6C7;
 }
 
 QLabel#authorFirstOfItsName, ButtonLink#firstOfItsName
 {
     border-top-color: #606162;
+    background: #C6C6C7;
 }
 
 /*********************************************/
