@@ -25,18 +25,13 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<GitCache> &cache, const 
    fileListWidget->setObjectName("fileListWidget");
 
    const auto wipSeparator = new QFrame();
-   wipSeparator->setObjectName("wipSeparator");
-
-   const auto wipFrame = new QFrame();
-   const auto wipLayout = new QHBoxLayout(wipFrame);
-   wipLayout->setContentsMargins(10, 0, 10, 0);
-   wipLayout->addWidget(wipSeparator);
+   wipSeparator->setObjectName("separator");
 
    const auto verticalLayout = new QVBoxLayout(this);
    verticalLayout->setSpacing(0);
    verticalLayout->setContentsMargins(0, 0, 0, 0);
    verticalLayout->addWidget(mInfoPanel);
-   verticalLayout->addWidget(wipFrame);
+   verticalLayout->addWidget(wipSeparator);
    verticalLayout->addSpacing(5);
    verticalLayout->addWidget(fileListWidget);
 

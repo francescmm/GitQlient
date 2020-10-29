@@ -35,12 +35,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<GitCach
    connect(mCenterStackedWidget, &QTabWidget::tabCloseRequested, this, &DiffWidget::onTabClosed);
 
    const auto wipSeparator = new QFrame();
-   wipSeparator->setObjectName("wipSeparator");
-
-   const auto wipFrame = new QFrame();
-   const auto wipLayout = new QHBoxLayout(wipFrame);
-   wipLayout->setContentsMargins(10, 0, 10, 0);
-   wipLayout->addWidget(wipSeparator);
+   wipSeparator->setObjectName("separator");
 
    const auto infoPanel = new QFrame();
    infoPanel->setFixedWidth(350);
@@ -49,7 +44,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<GitCach
    diffsLayout->setContentsMargins(QMargins());
    diffsLayout->setSpacing(0);
    diffsLayout->addWidget(mInfoPanelBase);
-   diffsLayout->addWidget(wipFrame);
+   diffsLayout->addWidget(wipSeparator);
    diffsLayout->addSpacing(5);
    diffsLayout->addWidget(fileListWidget);
 
