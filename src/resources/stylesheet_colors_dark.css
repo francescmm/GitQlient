@@ -344,6 +344,16 @@ PomodoroButton:hover
    background: #606162;
 }
 
+PomodoroButton[checked=true], PomodoroButton[checked=true]:hover, PomodoroButton[checked=false]:hover
+{
+   background: #202122;
+}
+
+PomodoroButton[checked=false]
+{
+   background: #404142;
+}
+
 PomodoroButton > QToolButton, PomodoroButton > QToolButton:hover
 {
    background: transparent;
@@ -352,6 +362,17 @@ PomodoroButton > QToolButton, PomodoroButton > QToolButton:hover
 PomodoroButton > QToolButton#Arrow
 {
    padding: 0;
+   background: #404142;
+}
+
+PomodoroButton > QToolButton#Arrow:pressed
+{
+   background: #202122;
+}
+
+PomodoroButton > QToolButton#Arrow:hover
+{
+   background: #606162;
 }
 
 PomodoroButton > QLabel
