@@ -150,7 +150,7 @@ QMenu::separator
 
 QSpinBox
 {
-    color: white;
+    color: black;
     border-color: #D89000;
     background: transparent;
 }
@@ -205,13 +205,23 @@ QScrollArea
 
 QDialog
 {
-    background: #404142;
+    background: #E6E6E7;
+}
+
+QDialog QPushButton:hover
+{
+   background: #A6A6A7;
+}
+
+QDialog QPushButton:pressed
+{
+   background: #C6C6C7;
 }
 
 QMessageBox
 {
-    background: #606162;
-    color: white;
+    background: #E6E6E7;
+    color: black;
 }
 
 QScrollBar:vertical
