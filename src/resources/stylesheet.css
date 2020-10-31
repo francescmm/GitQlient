@@ -1,3 +1,7 @@
+/*********************************************/
+/*               QWidgets START              */
+/*********************************************/
+
 *
 {
    outline: none;
@@ -15,33 +19,6 @@ QWidget
    outline: 0;
 }
 
-#InitWidget
-{
-   max-width: 800px;
-   min-width: 800px;
-}
-
-/* CONTROLS */
-
-
-/* BLAME WIDGET */
-
-
-/* HISTORY WIDGET */
-#wipInfoFrame
-{
-   padding: 10px;
-   border-width: 1px;
-   border-style: solid;
-}
-
-#wipSeparator
-{
-   min-height: 2px;
-   max-height: 2px;
-}
-
-/* QWidgets start */
 CheckBox::indicator
 {
     width: 13px;
@@ -396,10 +373,34 @@ QSpinBox::down-arrow
    height: 10px;
 }
 
-/* QWidgets end */
+/*********************************************/
+/*                QWidgets END               */
+/*********************************************/
 
-/* Custom widgets */
-QFrame#separator
+/*********************************************/
+/*            Custom Widgets START           */
+/*********************************************/
+
+#InitWidget
+{
+   max-width: 800px;
+   min-width: 800px;
+}
+
+#wipInfoFrame
+{
+   padding: 10px;
+   border-width: 1px;
+   border-style: solid;
+}
+
+#wipSeparator
+{
+   min-height: 2px;
+   max-height: 2px;
+}
+
+#separator
 {
    min-height: 1px;
    max-height: 1px;
@@ -428,6 +429,57 @@ ClickableFrame
     padding: 5px;
 }
 
+#WarningButton, QPushButton#warnButton, QPushButton#Abort, QPushButton#Merge
+{
+   border-width: 1px;
+}
+
+QPushButton#Abort, QPushButton#Merge
+{
+   max-height: 30px;
+   min-height: 30px;
+   max-width: 125px;
+   min-width: 125px;
+}
+
+PullDlg
+{
+   max-height: 150px;
+   min-height: 150px;
+   max-width: 500px;
+   min-width: 500px;
+}
+
+GeneralConfigPage > QLabel#configLabel
+{
+    qproperty-alignment: AlignCenter;
+}
+
+/*********************************************/
+/*             Custom Widgets END            */
+/*********************************************/
+
+/*********************************************/
+/*            GitQlient class START          */
+/*********************************************/
+
+#openNewRepo
+{
+   max-height: 25px; /** 25px for the button + 1px to compensate the border of the tabs in the QPinnableTabWidget **/
+   min-height: 25px;
+   max-width: 31px;
+   min-width: 31px;
+   padding-left: 10px;
+}
+
+/*********************************************/
+/*            GitQlient class END            */
+/*********************************************/
+
+/*********************************************/
+/*               Controls START              */
+/*********************************************/
+
 Controls > QToolButton
 {
    max-width: 35px;
@@ -435,6 +487,41 @@ Controls > QToolButton
    max-height: 35px;
    min-height: 35px;
 }
+
+Controls > QToolButton:menu-indicator, Controls > QToolButton:menu-button,
+#ToolButtonWithMenu:menu-button, #ToolButtonWithMenu:menu-indicator
+{
+    image: none;
+    height: 0px;
+    width: 0px;
+}
+
+#ToolButtonWithMenu
+{
+   max-width: 45px;
+   min-width: 45px;
+   max-height: 10px;
+   min-height: 10px;
+   padding: 0;
+}
+
+#ToolButtonAboveMenu
+{
+   max-width: 35px;
+   min-width: 35px;
+   max-height: 25px;
+   min-height: 25px;
+   padding-bottom: 0;
+   padding-top: 10px;
+}
+
+/*********************************************/
+/*                Controls END               */
+/*********************************************/
+
+/*********************************************/
+/*             HistoryWidget START           */
+/*********************************************/
 
 /* GitQlient styles */
 HistoryWidget CommitHistoryView
@@ -449,134 +536,65 @@ HistoryWidget CommitHistoryView QHeaderView:section:first
    border-right-style: solid;
 }
 
-Controls > QToolButton:menu-indicator, BranchesWidgetMinimal > QToolButton:menu-indicator,
-Controls > QToolButton:menu-button, #ToolButtonWithMenu:menu-button, #ToolButtonWithMenu:menu-indicator
+DiffWidget FileListWidget
 {
-    image: none;
-    height: 0px;
-    width: 0px;
-}
-
-MergeWidget > QListWidget
-{
-    border-width: 1px;
-    border-style: solid;
     border: 0;
-    outline: 0;
 }
 
-BlameWidget > QTreeView::item
+#InfoPanel
 {
-   padding-left: 7px;
-   padding-right: 7px;
-   border-left: 0;
-   border-bottom: 0;
-   margin: 0;
-   min-height: 25px;
-   max-height: 25px;
-}
-
-MergeWidget > QListWidget::item
-{
-   padding: 0;
-}
-
-/* BranchesWidget start */
-#sectionFrame
-{
-   border-width: 0;
-   border-top-width: 1px;
    border-style: solid;
+   border-width: 1px;
 }
 
-BranchesWidget QHeaderView, BranchesWidget QListWidget
+#InfoPanelBase
 {
-    border-top-style: solid;
-    border-top-width: 1px;
-}
-
-#LocalBranches QHeaderView
-{
-    border-top: 0;
-}
-
-BranchesWidget QListWidget::item
-{
-   padding-left: 15px;
-   padding-right: 7px;
-   border-left: 0;
    border-bottom: 0;
-   margin: 0;
-   min-height: 25px;
-   max-height: 25px;
 }
 
-BranchesWidget QTreeWidget::item
-{
-   min-height: 25px;
-   max-height: 25px;
-   padding-left: 15px;
-}
-
-#FullBranchesWidget
-{
-   min-width: 350px;
-   max-width: 350px;
-}
-
-#panelsFrame
+HistoryWidget > QLineEdit
 {
    border-width: 1px;
    border-style: solid;
+   max-height: 25px;
+   min-height: 25px;
+   padding-left: 10px;
 }
 
-/* BranchesWidget start */
-
-/* CommitInfoWidget start */
-
-#labelTitle, #commitInfoFrame, #labelDescription
+HistoryWidget > #applyActionBtn
 {
-    padding: 10px;
+   max-height: 20px;
+   min-height: 20px;
+   padding: 2px 5px;
 }
 
-#labelAuthor
+
+/*********************************************/
+/*              HistoryWidget END            */
+/*********************************************/
+
+/*********************************************/
+/*          CommitChangesWidget START        */
+/*********************************************/
+
+CommitChangesWidget
 {
-   font-size: 12pt;
-   padding: 10px;
-   padding-bottom: 1px;
-   border: none;
+   max-width: 300px;
+   min-width: 300px;
 }
 
-#labelDateTime
+CommitChangesWidget > #applyActionBtn, CommitChangesWidget > #warningButton
 {
-   font-size: 9pt;
-   padding: 10px;
-   padding-top: 1px;
+   max-height: 30px;
+   min-height: 30px;
 }
 
-#labelSha
+CommitChangesWidget > #warningButton
 {
-    padding: 8px 10px;
-    font-weight: bold;
-    font-family: "DejaVu Sans Mono";
-    font-size: 8pt;
+   padding-left: 10px;
+   padding-right: 10px;
 }
 
-CommitInfoWidget FileListWidget
-{
-    border: 0;
-}
-
-CommitInfoWidget
-{
-    max-width: 298px;
-    min-width: 298px;
-    border: 1px solid #202122;
-}
-
-/* CommitInfoWidget end */
-
-/* CommitChangesWidget start */
 #stagedFiles, #unstagedFiles
 {
    padding: 0;
@@ -601,24 +619,6 @@ CommitInfoWidget
 #unstagedFilesList::item, #stagedFilesList::item
 {
    padding-left: 0;
-}
-
-CommitChangesWidget > #applyActionBtn, CommitChangesWidget > #warningButton
-{
-   max-height: 30px;
-   min-height: 30px;
-}
-
-CommitChangesWidget > #warningButton
-{
-   padding-left: 10px;
-   padding-right: 10px;
-}
-
-CommitChangesWidget
-{
-   max-width: 300px;
-   min-width: 300px;
 }
 
 #amendFrame
@@ -676,16 +676,80 @@ CommitChangesWidget
     padding-left: 8px;
 }
 
-/* CommitChangesWidget end */
-BlameWidget > QTreeView
+/*********************************************/
+/*           CommitChangesWidget END         */
+/*********************************************/
+
+/*********************************************/
+/*            CommitInfoPanel START          */
+/*********************************************/
+
+#labelSha
 {
-    border-width: 1px;
-    border-style: solid;
+    padding: 8px 10px;
+    font-weight: bold;
+    font-family: "DejaVu Sans Mono";
+    font-size: 8pt;
 }
 
-BlameWidget > QTreeView::item:focus
+#labelTitle, #labelDescription
 {
-   border: 0;
+    padding: 10px;
+}
+
+#labelAuthor
+{
+   font-size: 12pt;
+   padding: 10px;
+   padding-bottom: 1px;
+   border: none;
+}
+
+#labelDateTime
+{
+   font-size: 9pt;
+   padding: 10px;
+   padding-top: 1px;
+}
+
+/*********************************************/
+/*             CommitInfoPanel END           */
+/*********************************************/
+
+/*********************************************/
+/*           CommitInfoWidget START          */
+/*********************************************/
+
+CommitInfoWidget
+{
+    max-width: 298px;
+    min-width: 298px;
+    border: 1px solid #202122;
+}
+
+CommitInfoWidget FileListWidget
+{
+    border: 0;
+}
+
+/*********************************************/
+/*             CommitInfoWidget END          */
+/*********************************************/
+
+/*********************************************/
+/*              IDiffWidget START            */
+/*********************************************/
+
+FileDiffView
+{
+    font-family: "DejaVu Sans Mono";
+    font-size: 8pt;
+}
+
+#LineNumberArea
+{
+    border-right-width: 1px;
+    border-right-style: solid;
 }
 
 FileDiffWidget, FullDiffWidget
@@ -700,19 +764,63 @@ FullDiffWidget > QPlainTextEdit
     border-style: solid;
 }
 
-#JobContainerHeader
+/*********************************************/
+/*               IDiffWidget END             */
+/*********************************************/
+
+/*********************************************/
+/*             BranchesWidget START          */
+/*********************************************/
+
+BranchesWidget QHeaderView, BranchesWidget QListWidget
 {
-    max-height: 30px;
-    min-height: 30px;
+    border-top-style: solid;
+    border-top-width: 1px;
 }
 
-FileDiffView
+#LocalBranches QHeaderView
 {
-    font-family: "DejaVu Sans Mono";
-    font-size: 8pt;
+    border-top: 0;
 }
 
-BranchDlg > QLineEdit, HistoryWidget > QLineEdit
+BranchesWidget QListWidget::item
+{
+   padding-left: 15px;
+   padding-right: 7px;
+   border-left: 0;
+   border-bottom: 0;
+   margin: 0;
+   min-height: 25px;
+   max-height: 25px;
+}
+
+BranchesWidget QTreeWidget::item
+{
+   min-height: 25px;
+   max-height: 25px;
+   padding-left: 15px;
+}
+
+#FullBranchesWidget
+{
+   min-width: 350px;
+   max-width: 350px;
+}
+
+#panelsFrame
+{
+   border-width: 1px;
+   border-style: solid;
+}
+
+#sectionFrame
+{
+   border-width: 0;
+   border-top-width: 1px;
+   border-style: solid;
+}
+
+BranchDlg > QLineEdit
 {
    border-width: 1px;
    border-style: solid;
@@ -721,45 +829,62 @@ BranchDlg > QLineEdit, HistoryWidget > QLineEdit
    padding-left: 10px;
 }
 
-/** QPinnableTabWidget **/
-#openNewRepo
+#BranchesWidgetOptionsButton
 {
-   max-height: 25px; /** 25px for the button + 1px to compensate the border of the tabs in the QPinnableTabWidget **/
+    border-width: 1px;
+    border-style: solid;
+    max-width: 15px;
+    min-width: 15px;
+    max-height: 15px;
+    min-height: 15px;
+}
+
+/*********************************************/
+/*              BranchesWidget END           */
+/*********************************************/
+
+/*********************************************/
+/*         BranchesWidgetMinimal START       */
+/*********************************************/
+
+BranchesWidgetMinimal > QToolButton:menu-indicator
+{
+    image: none;
+    height: 0px;
+    width: 0px;
+}
+
+/*********************************************/
+/*          BranchesWidgetMinimal END        */
+/*********************************************/
+
+/*********************************************/
+/*              BlameWidget START            */
+/*********************************************/
+
+BlameWidget > QTreeView
+{
+    border-width: 1px;
+    border-style: solid;
+}
+
+BlameWidget > QTreeView::item:focus
+{
+   border: 0;
+}
+
+BlameWidget > QTreeView::item
+{
+   padding-left: 7px;
+   padding-right: 7px;
+   border-left: 0;
+   border-bottom: 0;
+   margin: 0;
    min-height: 25px;
-   max-width: 31px;
-   min-width: 31px;
-   padding-left: 10px;
+   max-height: 25px;
 }
 
-QLabel#subtitle
-{
-    font-size: 16pt;
-}
-
-QLabel#title
-{
-    font-size: 24pt;
-}
-
-QPushButton#bigButton
-{
-    max-height: 30px;
-    min-height: 30px;
-    max-width: 200px;
-    min-width: 200px;
-    border-width: 0;
-}
-
-QFrame#tabWidget > QPushButton, QFrame#tabWidget > QPushButton[selected=false]
-{
-    max-width: 125px;
-    min-width: 125px;
-    max-height: 30px;
-    min-height: 30px;
-    border-right: 0;
-}
-
-QLabel#normalLabel
+#normalLabel
 {
     padding: 2px;
     padding-left: 5px;
@@ -802,39 +927,31 @@ QLabel#authorFirstOfItsName, ButtonLink#firstOfItsName
     border-top-style: solid;
 }
 
-DiffWidget FileListWidget
+/*********************************************/
+/*               BlameWidget END             */
+/*********************************************/
+
+/*********************************************/
+/*              MergeWidget START            */
+/*********************************************/
+
+MergeWidget > QListWidget
 {
+    border-width: 1px;
+    border-style: solid;
     border: 0;
+    outline: 0;
 }
 
-#InfoPanel
+MergeWidget > QListWidget::item
 {
-   border-style: solid;
-   border-width: 1px;
-}
-
-#InfoPanelBase
-{
-   border-bottom: 0;
+   padding: 0;
 }
 
 #mergeFrame
 {
    max-width: 450px;
    min-width: 450px;
-}
-
-#WarningButton, QPushButton#warnButton, QPushButton#Abort, QPushButton#Merge
-{
-   border-width: 1px;
-}
-
-QPushButton#Abort, QPushButton#Merge
-{
-   max-height: 30px;
-   min-height: 30px;
-   max-width: 125px;
-   min-width: 125px;
 }
 
 #FilesListTitle
@@ -849,46 +966,49 @@ MergeWidget > #leCommitTitle
    border-right: 1px;
 }
 
-PullDlg
+#JobContainerHeader
 {
-   max-height: 150px;
-   min-height: 150px;
-   max-width: 500px;
-   min-width: 500px;
+    max-height: 30px;
+    min-height: 30px;
 }
 
-GeneralConfigPage > QLabel#configLabel
+/*********************************************/
+/*               MergeWidget END             */
+/*********************************************/
+
+/*********************************************/
+/*             ConfigWidget START            */
+/*********************************************/
+
+QLabel#title
 {
-    qproperty-alignment: AlignCenter;
+    font-size: 24pt;
 }
 
-HistoryWidget > #applyActionBtn
+QPushButton#bigButton
 {
-   max-height: 20px;
-   min-height: 20px;
-   padding: 2px 5px;
+    max-height: 30px;
+    min-height: 30px;
+    max-width: 200px;
+    min-width: 200px;
+    border-width: 0;
 }
 
-#ToolButtonWithMenu
+QFrame#tabWidget > QPushButton, QFrame#tabWidget > QPushButton[selected=false]
 {
-   max-width: 45px;
-   min-width: 45px;
-   max-height: 10px;
-   min-height: 10px;
-   padding: 0;
+    max-width: 125px;
+    min-width: 125px;
+    max-height: 30px;
+    min-height: 30px;
+    border-right: 0;
 }
 
-#ToolButtonAboveMenu
-{
-   max-width: 35px;
-   min-width: 35px;
-   max-height: 25px;
-   min-height: 25px;
-   padding-bottom: 0;
-   padding-top: 10px;
-}
+/*********************************************/
+/*             ConfigWidget END              */
+/*********************************************/
 
-/* GitServerWidget */
+/* GitServer and BuildSystem */
+
 #IssuesHeaderFrame, #IssuesHeaderFrameBig
 {
    padding: 10px;
@@ -1021,22 +1141,6 @@ SourceCodeReview QLabel
    border-width: 1px;
    border-radius: 10px;
    padding: 5px;
-}
-
-#BranchesWidgetOptionsButton
-{
-    border-width: 1px;
-    border-style: solid;
-    max-width: 15px;
-    min-width: 15px;
-    max-height: 15px;
-    min-height: 15px;
-}
-
-#LineNumberArea
-{
-    border-right-width: 1px;
-    border-right-style: solid;
 }
 
 /* JENKINS */
