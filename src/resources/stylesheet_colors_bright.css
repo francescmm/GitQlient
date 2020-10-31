@@ -46,6 +46,7 @@ QLabel
 QLineEdit
 {
     color: black;
+    background: transparent;
 }
 
 QListWidget, QListView, QTreeWidget, QTreeView
@@ -680,12 +681,6 @@ BranchesWidget QHeaderView, BranchesWidget QListWidget
     background: #C6C6C7;
     color: black;
     border-color: #2E2F30;
-}
-
-BranchDlg
-{
-    background: #404142;
-    color: white;
 }
 
 #BranchesWidgetOptionsButton
