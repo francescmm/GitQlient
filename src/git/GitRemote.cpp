@@ -46,7 +46,7 @@ GitExecResult GitRemote::pull()
 
    QLog_Debug("Git", QString("Executing pull"));
 
-   auto ret = mGitBase->run("git pull");
+   auto ret = mGitBase->run("git pull --ff-only");
 
    GitQlientSettings settings;
    const auto updateOnPull = settings.localValue(mGitBase->getGitQlientSettingsDir(), "UpdateOnPull", true).toBool();
