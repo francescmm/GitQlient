@@ -46,6 +46,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    addTab->setToolTip(tr("Open new repository"));
    connect(addTab, &QPushButton::clicked, this, &GitQlient::openRepo);
 
+   mRepos->setObjectName("GitQlientTab");
    mRepos->setStyleSheet(GitQlientStyles::getStyles());
    mRepos->setCornerWidget(addTab, Qt::TopRightCorner);
    connect(mRepos, &QTabWidget::tabCloseRequested, this, &GitQlient::closeTab);

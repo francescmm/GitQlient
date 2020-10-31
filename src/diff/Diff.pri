@@ -1,8 +1,6 @@
 INCLUDEPATH += $$PWD
 
 HEADERS += \
-    $$PWD/CommitDiffWidget.h \
-    $$PWD/DiffButton.h \
     $$PWD/DiffHelper.h \
     $$PWD/DiffInfo.h \
     $$PWD/FileBlameWidget.h \
@@ -16,8 +14,6 @@ HEADERS += \
     $$PWD/LineNumberArea.h
 
 SOURCES += \
-    $$PWD/CommitDiffWidget.cpp \
-    $$PWD/DiffButton.cpp \
     $$PWD/FileBlameWidget.cpp \
     $$PWD/FileDiffEditor.cpp \
     $$PWD/FileDiffHighlighter.cpp \

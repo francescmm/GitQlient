@@ -31,12 +31,16 @@ CommitInfoPanel::CommitInfoPanel(QWidget *parent)
 
    mLabelDateTime->setObjectName("labelDateTime");
 
+   const auto wipSeparator = new QFrame();
+   wipSeparator->setObjectName("separator");
+
    const auto descriptionLayout = new QVBoxLayout(this);
    descriptionLayout->setContentsMargins(0, 0, 0, 0);
    descriptionLayout->setSpacing(0);
    descriptionLayout->addWidget(mLabelSha);
    descriptionLayout->addWidget(mLabelTitle);
    descriptionLayout->addWidget(mLabelDescription);
+   descriptionLayout->addWidget(wipSeparator);
    descriptionLayout->addWidget(mLabelAuthor);
    descriptionLayout->addWidget(mLabelDateTime);
 }

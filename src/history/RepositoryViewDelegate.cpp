@@ -60,7 +60,10 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       return;
 
    if (index.column() == static_cast<int>(CommitHistoryColumns::Graph))
+   {
+      newOpt.rect.setX(newOpt.rect.x() + 10);
       paintGraph(p, newOpt, commit);
+   }
    else if (index.column() == static_cast<int>(CommitHistoryColumns::Log))
       paintLog(p, newOpt, commit, index.data().toString());
    else
@@ -89,7 +92,8 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       {
          newOpt.font.setPointSize(8);
          newOpt.font.setFamily("DejaVu Sans Mono");
-         text = text.left(8);
+
+         text = commit.sha() != CommitInfo::ZERO_SHA ? text.left(8) : "";
       }
       else if (index.column() == static_cast<int>(CommitHistoryColumns::Author) && commit.isSigned())
       {
@@ -139,9 +143,10 @@ bool RepositoryViewDelegate::editorEvent(QEvent *event, QAbstractItemModel *mode
    }
    else if (event->type() == QEvent::MouseButtonRelease && cursorColumn == index.column() && mColumnPressed != -1)
    {
-      if (cursorColumn == static_cast<int>(CommitHistoryColumns::Sha))
+      const auto text = index.data().toString();
+      if (cursorColumn == static_cast<int>(CommitHistoryColumns::Sha) && text != CommitInfo::ZERO_SHA)
       {
-         QApplication::clipboard()->setText(index.data().toString());
+         QApplication::clipboard()->setText(text);
          QToolTip::showText(QCursor::pos(), tr("Copied!"), mView);
       }
 

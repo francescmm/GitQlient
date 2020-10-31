@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QtGlobal>
 #include <QDesktopServices>
+#include <GitQlientStyles.h>
 
 #include <QLogger.h>
 
@@ -32,6 +33,8 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    , mSettings(new GitQlientSettings())
 {
    setAttribute(Qt::WA_DeleteOnClose);
+
+   setStyleSheet(GitQlientStyles::getStyles());
 
    mOpenRepo->setObjectName("bigButton");
    mCloneRepo->setObjectName("bigButton");

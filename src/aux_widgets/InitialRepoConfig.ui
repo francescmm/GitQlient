@@ -33,10 +33,13 @@
    <item row="1" column="0" colspan="2">
     <widget class="QFrame" name="orangeHSeparator">
      <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
      </property>
     </widget>
    </item>

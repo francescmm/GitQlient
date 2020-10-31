@@ -1,7 +1,6 @@
 #include "FileBlameWidget.h"
 
 #include <GitCache.h>
-#include <FileDiffView.h>
 #include <GitHistory.h>
 #include <CommitInfo.h>
 #include <ButtonLink.hpp>
@@ -71,7 +70,7 @@ FileBlameWidget::FileBlameWidget(const QSharedPointer<GitCache> &cache, const QS
 
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(10, 10, 10, 0);
-   layout->setSpacing(10);
+   layout->setSpacing(0);
    layout->addLayout(shasLayout);
    layout->addWidget(mScrollArea);
 }

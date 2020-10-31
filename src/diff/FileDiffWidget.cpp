@@ -97,7 +97,6 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mViewStackedWidget->addWidget(diffFrame);
    mViewStackedWidget->addWidget(mFileEditor);
 
-   mTitleFrame->setObjectName("fileTitleFrame");
    mTitleFrame->setVisible(false);
 
    const auto titleLayout = new QHBoxLayout(mTitleFrame);

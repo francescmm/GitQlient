@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>647</width>
-    <height>531</height>
+    <height>551</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,166 +33,20 @@
    <property name="spacing">
     <number>0</number>
    </property>
-   <item row="2" column="1" colspan="2">
-    <widget class="ClickableFrame" name="unstagedFiles">
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>15</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="unstagedIcon">
-        <property name="minimumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources.qrc">:/icons/unstaged</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_6">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>10</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Unstaged files </string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lUnstagedCount">
-        <property name="text">
-         <string>(0)</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="unstagedArrow">
-        <property name="minimumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources.qrc">:/icons/arrow_down</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_11">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>10</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="12" column="1" colspan="2">
+   <item row="15" column="1" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <property name="spacing">
       <number>10</number>
      </property>
      <item>
-      <widget class="QPushButton" name="pbCancelAmend">
+      <widget class="QPushButton" name="warningButton">
        <property name="text">
         <string>Cancel</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pbCommit">
+      <widget class="QPushButton" name="applyActionBtn">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -212,33 +66,21 @@
      </item>
     </layout>
    </item>
-   <item row="5" column="1" colspan="2">
-    <widget class="StagedFilesList" name="stagedFilesList">
-     <property name="contextMenuPolicy">
-      <enum>Qt::CustomContextMenu</enum>
-     </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAsNeeded</enum>
+   <item row="6" column="1">
+    <widget class="QLineEdit" name="leCommitTitle">
+     <property name="placeholderText">
+      <string>Summary</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="2">
-    <widget class="ClickableFrame" name="untrackedFiles">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="spacing">
-       <number>0</number>
-      </property>
+   <item row="9" column="1" colspan="2">
+    <widget class="ClickableFrame" name="stagedFiles">
+     <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>5</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
@@ -246,79 +88,8 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <spacer name="horizontalSpacer_7">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>15</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="untrackedFilesIcon">
-        <property name="minimumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources.qrc">:/icons/untracked</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_8">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>10</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Untracked files </string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lUntrackedCount">
-        <property name="text">
-         <string>(0)</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_9">
+      <item row="1" column="3">
+       <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -330,33 +101,21 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <widget class="QLabel" name="untrackedArrow">
-        <property name="minimumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
+      <item row="0" column="0" colspan="4">
+       <widget class="QFrame" name="separator">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
         </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources.qrc">:/icons/arrow_down</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
+        <property name="lineWidth">
+         <number>0</number>
         </property>
        </widget>
       </item>
-      <item>
-       <spacer name="horizontalSpacer_10">
+      <item row="1" column="0">
+       <spacer name="horizontalSpacer_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -371,10 +130,50 @@
         </property>
        </spacer>
       </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="lStagedCount">
+        <property name="text">
+         <string>(0)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="4">
+       <widget class="StagedFilesList" name="stagedFilesList">
+        <property name="contextMenuPolicy">
+         <enum>Qt::CustomContextMenu</enum>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Staged files </string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="9" column="1">
+   <item row="7" column="1" colspan="2">
+    <widget class="QTextEdit" name="teDescription">
+     <property name="lineWrapMode">
+      <enum>QTextEdit::WidgetWidth</enum>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+     <property name="acceptRichText">
+      <bool>false</bool>
+     </property>
+     <property name="placeholderText">
+      <string>Description</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
     <spacer name="verticalSpacer_4">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -390,14 +189,23 @@
      </property>
     </spacer>
    </item>
-   <item row="7" column="1">
-    <widget class="QLineEdit" name="leCommitTitle">
-     <property name="placeholderText">
-      <string>Summary</string>
+   <item row="4" column="1">
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-    </widget>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
    </item>
-   <item row="10" column="1" colspan="2">
+   <item row="5" column="1" colspan="2">
     <widget class="QFrame" name="amendFrame">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -435,53 +243,24 @@
         </property>
        </widget>
       </item>
-      <item>
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>10</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
     </widget>
    </item>
-   <item row="7" column="2">
+   <item row="6" column="2">
     <widget class="QLabel" name="lCounter">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="2">
-    <widget class="QListWidget" name="untrackedFilesList">
-     <property name="contextMenuPolicy">
-      <enum>Qt::CustomContextMenu</enum>
-     </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAsNeeded</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1" colspan="2">
-    <widget class="ClickableFrame" name="stagedFiles">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>0</number>
-      </property>
+   <item row="0" column="1" colspan="2">
+    <widget class="ClickableFrame" name="unstagedFiles">
+     <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
        <number>0</number>
       </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>5</number>
       </property>
       <property name="rightMargin">
        <number>0</number>
@@ -489,49 +268,8 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
-       <spacer name="horizontalSpacer_4">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>15</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="stagedFilesIcon">
-        <property name="minimumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources.qrc">:/icons/staged</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_5">
+      <item row="0" column="0">
+       <spacer name="horizontalSpacer_3">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -546,22 +284,22 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Staged files </string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lStagedCount">
+      <item row="0" column="2">
+       <widget class="QLabel" name="lUnstagedCount">
         <property name="text">
          <string>(0)</string>
         </property>
        </widget>
       </item>
-      <item>
-       <spacer name="horizontalSpacer">
+      <item row="0" column="1">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Unstaged files </string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -573,90 +311,17 @@
         </property>
        </spacer>
       </item>
-      <item>
-       <widget class="QLabel" name="stagedArrow">
-        <property name="minimumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
+      <item row="1" column="0" colspan="4">
+       <widget class="QListWidget" name="unstagedFilesList">
+        <property name="contextMenuPolicy">
+         <enum>Qt::CustomContextMenu</enum>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>15</width>
-          <height>15</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="pixmap">
-         <pixmap resource="../resources.qrc">:/icons/arrow_down</pixmap>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
         </property>
        </widget>
       </item>
-      <item>
-       <spacer name="horizontalSpacer_12">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>10</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>10</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="8" column="1" colspan="2">
-    <widget class="QTextEdit" name="teDescription">
-     <property name="lineWrapMode">
-      <enum>QTextEdit::WidgetWidth</enum>
-     </property>
-     <property name="readOnly">
-      <bool>false</bool>
-     </property>
-     <property name="acceptRichText">
-      <bool>false</bool>
-     </property>
-     <property name="placeholderText">
-      <string>Description</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1" colspan="2">
-    <widget class="QListWidget" name="unstagedFilesList">
-     <property name="contextMenuPolicy">
-      <enum>Qt::CustomContextMenu</enum>
-     </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAsNeeded</enum>
-     </property>
     </widget>
    </item>
   </layout>
@@ -676,18 +341,13 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>untrackedFilesList</tabstop>
-  <tabstop>unstagedFilesList</tabstop>
-  <tabstop>stagedFilesList</tabstop>
   <tabstop>leCommitTitle</tabstop>
   <tabstop>teDescription</tabstop>
   <tabstop>leAuthorName</tabstop>
   <tabstop>leAuthorEmail</tabstop>
-  <tabstop>pbCommit</tabstop>
-  <tabstop>pbCancelAmend</tabstop>
+  <tabstop>applyActionBtn</tabstop>
+  <tabstop>warningButton</tabstop>
  </tabstops>
- <resources>
-  <include location="../resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

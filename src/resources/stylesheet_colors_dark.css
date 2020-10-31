@@ -1,35 +1,6 @@
-#mainWindow
-{
-    background-color: #404142;
-    color: white;
-}
-
-/* CONTROLS */
-
-
-/* BLAME WIDGET */
-
-
-/* HISTORY WIDGET */
-#wipInfoFrame
-{
-   background: #303132;
-   border: 1px solid #202122;
-   border-bottom: 0;
-}
-
-#wipSeparator
-{
-   background: #404142;
-}
-
-/* BRANCHES WIDGET */
-
-
-/* MERGE WIDGET */
-
-
-/* DIFF WIDGET */
+/*********************************************/
+/*               QWidgets START              */
+/*********************************************/
 
 QToolButton
 {
@@ -84,30 +55,7 @@ QLineEdit
     color: white;
 }
 
-#labelTitle, #commitInfoFrame, #labelDescription,
-#labelAuthor, #labelDateTime
-{
-    background-color: #606162;
-}
-
-#labelAuthor
-{
-   border-color: #404142;
-}
-
-#labelSha
-{
-    color: #D89000;
-    background-color: #202122;
-}
-
-QListView
-{
-   background-color: #606162;
-   color: white;
-}
-
-QListWidget, BlameWidget > QTreeView
+QListWidget, QListView, QTreeWidget, QTreeView
 {
    color: white;
    background-color: #2E2F30;
@@ -118,7 +66,7 @@ QListView::item
    background-color: #606162;
 }
 
-QListWidget::item, BlameWidget > QTreeView::item
+QListWidget::item, QTreeView::item
 {
     background-color: #2E2F30;
 }
@@ -143,151 +91,12 @@ QListWidget::item:disabled, QListView::item:disabled
     color: #606162;
 }
 
-CommitHistoryView, FullDiffWidget > QPlainTextEdit, CommitChangesWidget > QListWidget, FileListWidget, QTreeWidget, MergeWidget > QListWidget
-{
-    background-color: #2E2F30;
-}
-
-CommitHistoryView, FullDiffWidget > QPlainTextEdit, CommitChangesWidget > QListWidget, QTreeWidget, MergeWidget > QListWidget
-{
-    color: white;
-}
-
-CommitChangesWidget > QListWidget, MergeWidget > QListWidget
-{
-    border-color: #202122;
-}
-
-QMenu, QToolTip
-{
-    border-color: #000000;
-    background-color: #000000;
-    color:#ffffff;
-}
-
-QMenu::item
-{
-    background-color: #2E2F30;
-    color: #ffffff;
-}
-
-QMenu::item:selected
-{
-   background-color: #404142;
-   color: #d89000;
-}
-
-QMenu::item:disabled
-{
-   background-color: #242425;
-   color: #656668;
-}
-
-QMenu::separator
-{
-   background: #3f4043;
-}
-
-FullDiffWidget > QPlainTextEdit,  #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
-{
-    border-color: #202122
-}
-
-#leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail
-{
-    background-color: #606162;
-    color: white;
-}
-
-#leAuthorName
-{
-    border-bottom-color: #404142;
-}
-
-QLabel#lCounter
-{
-    background-color: #606162;
-    border-color: #202122;
-    border-bottom-color: #404141;
-    color: #A3A3A4;
-}
-
-CommitChangesWidget > QFrame#stagedFiles, CommitChangesWidget > QFrame#unstagedFiles, CommitChangesWidget > QFrame#untrackedFiles,
-#JobContainerHeader
-{
-    background: #202122;
-    border: none;
-}
-
-FileDiffView
-{
-    background-color: #2E2F30;
-    color: white;
-}
-
-FileDiffWidget, FullDiffWidget
-{
-    background-color: #2E2F30;
-}
-
-FileDiffWidget > QPushButton,FileDiffWidget > QToolButton
-{
-    background-color: transparent;
-}
-
-FileDiffWidget > QPushButton:checked, FileDiffWidget > QToolButton:checked
-{
-   background-color: #202122;
-}
-
-#leCommitTitle
-{
-    border-bottom-color: #404142;
-}
-
-QHeaderView
-{
-    color:#ffffff;
-}
-
 QHeaderView:section
 {
-    border-right-color: #606162;
-    background: #202122;
-}
-
-#tagsFrame, #fileTitleFrame
-{
-    background-color: #202122;
-    color: white;
-}
-
-BranchDlg
-{
-    background-color: #404142;
-    color: white;
-}
-
-#SearchInput
-{
-    border-color: #202122;
-    background-color: #2E2F30;
-    color: white;
-}
-
-GitQlient
-{
+   color:#ffffff;
    background: #2E2F30;
-}
-
-#openNewRepo
-{
-   background-color: #202122;
-}
-
-#openNewRepo:hover, #openGitAdmin:hover
-{
-   background-color: #606162;
+   border-right-color: #606162;
+   border-bottom-color: #606162;
 }
 
 QTabWidget::tab-bar
@@ -321,35 +130,89 @@ QTabWidget > QTabBar::tab:disabled
     color: #606162;
 }
 
-DiffWidget > QPinnableTabWidget::tab-bar
+QMenu
+{
+    border-color: #000000;
+    background-color: #000000;
+    color:#ffffff;
+}
+
+QMenu::item
+{
+    background-color: #2E2F30;
+    color: #ffffff;
+}
+
+QMenu::item:selected
 {
    background-color: #404142;
+   color: #d89000;
 }
 
-DiffWidget > QPinnableTabWidget > QTabBar::tab
+QMenu::item:disabled
 {
-   background-color: #202122;
+   background-color: #242425;
+   color: #656668;
+}
+
+QMenu::separator
+{
+   background: #3f4043;
+}
+
+QSpinBox
+{
+    color: white;
+    border-color: #D89000;
+    background-color: transparent;
+}
+
+QSpinBox::up-button:hover, QSpinBox::down-button:hover
+{
+    background: #606162;
+}
+
+QSpinBox::up-button, QSpinBox::down-button
+{
+    border-color: #D89000;
+}
+
+QComboBox
+{
+   outline: none;
    color: white;
+   border-color: #D89000;
+   background: transparent;
 }
 
-DiffWidget > QPinnableTabWidget > QTabBar::tab:selected
-{
+QComboBox:disabled {
+   color: #E0E0E1;
+}
+
+QComboBox:editable {
+   background: #ffffff;
+}
+
+QComboBox:on {
    background-color: #2E2F30;
 }
 
-DiffWidget > QPinnableTabWidget > QTabBar::tab:!selected
+QComboBox QAbstractItemView
 {
-    border-right-color: #404142;
+   outline: none;
+   background-color: #404142;
+   border-color: #D89000;
+   selection-background-color: #606162;
 }
 
-DiffWidget > QPinnableTabWidget > QTabBar::tab:!selected:hover
+QComboBox::drop-down:hover
 {
-    background-color: #606162;
+   background: #606162;
 }
 
-DiffWidget > QPinnableTabWidget > QTabBar::tab:disabled
+QScrollArea
 {
-    color: #606162;
+   background: transparent;
 }
 
 QToolTip
@@ -357,31 +220,6 @@ QToolTip
     border-color: #606162;
     background-color: #202122;
     color: white;
-}
-
-ConfigWidget
-{
-    background-color: #404142;
-}
-
-QFrame#separator, QFrame#separator2px
-{
-    background-color: #202122;
-}
-
-#orangeSeparator, #orangeHSeparator
-{
-    background-color: #D89000;
-}
-
-QFrame#tabWidget > QPushButton[selected=true], QFrame#tabWidget > QPushButton[selected=true]:hover
-{
-    background-color: #606162;
-}
-
-GeneralConfigPage, #recentProjects
-{
-    background-color: #606162;
 }
 
 QDialog
@@ -434,21 +272,6 @@ QScrollBar::add-page, QScrollBar::sub-page
     background-color: #606162;
 }
 
-#AnnotationFrame
-{
-    background-color: #2E2F30;
-}
-
-QLabel#numberLabel
-{
-    border-right-color: #202122;
-}
-
-QLabel#authorFirstOfItsName, ButtonLink#firstOfItsName
-{
-    border-top-color: #606162;
-}
-
 QProgressDialog
 {
     background-color: #404142;
@@ -466,6 +289,41 @@ QProgressBar::chunk
     background-color: #D89000;
 }
 
+/*********************************************/
+/*                QWidgets END               */
+/*********************************************/
+
+
+/*********************************************/
+/*            Custom Widgets START           */
+/*********************************************/
+
+CheckBox
+{
+   color: white
+}
+
+#wipInfoFrame
+{
+   background: #2E2F30;
+   border-color: #202122;
+}
+
+#wipSeparator
+{
+   background: #404142;
+}
+
+#separator
+{
+    background-color: #606162;
+}
+
+#orangeSeparator, #orangeHSeparator
+{
+    background-color: #D89000;
+}
+
 ClickableFrame::hover
 {
     background-color: #404142;
@@ -476,162 +334,38 @@ ClickableFrame::pressed
     background-color: #202122;
 }
 
-FileBlameWidget
+PomodoroButton
 {
+   background: #404142;
+}
+
+PomodoroButton:hover
+{
+   background: #606162;
+}
+
+PomodoroButton > QToolButton, PomodoroButton > QToolButton:hover
+{
+   background: transparent;
+}
+
+PomodoroButton > QToolButton#Arrow
+{
+   padding: 0;
+}
+
+PomodoroButton > QLabel
+{
+   qproperty-alignment: AlignCenter;
+   font-size: 7pt;
+   font-family: DejaVu Sans Mono;
+}
+
+#SearchInput
+{
+    border-color: #202122;
     background-color: #2E2F30;
-}
-
-BlameWidget > QTabWidget, QTabWidget#HistoryTab:pane
-{
-    background-color: #2E2F30;
-    border: 0;
-}
-
-QTabWidget#HistoryTab > QTabBar::tab:selected
-{
-    background-color: #2E2F30;
-}
-
-QTabWidget#HistoryTab > QTabBar::tab:selected:hover
-{
-    background-color: #2E2F30;
-}
-
-QTabWidget#HistoryTab > QTabBar::tab:!selected
-{
-    background-color: #505152;
-}
-
-QTabWidget#HistoryTab > QTabBar::tab:!selected:hover
-{
-    background-color: #202122;
-}
-
-DiffButton
-{
-   background-color: #2F2E30;
-}
-
-DiffButton > QLabel
-{
-   background-color: transparent;
-}
-
-DiffButton:hover
-{
-   background-color: #606162;
-}
-
-DiffButton[pressed="true"]
-{
-   background-color: #202122;
-}
-
-#DiffButtonClose:pressed
-{
-   background-color: #606162;
-}
-
-#DiffButtonClose:hover
-{
-   background-color: #202122;
-}
-
-#DiffButtonsFrame
-{
-   background-color: #404142;
-}
-
-#MergeWarningButton, QPushButton#warnButton, QPushButton#Abort, QPushButton#pbCancelAmend
-{
-   border-style: solid;
-   border-color: #FF5555;
-   background-color: rgba(255, 85, 85, 0.45);
-}
-
-#MergeWarningButton:hover, QPushButton#warnButton:hover, QPushButton#Abort:hover, QPushButton#pbCancelAmend:hover
-{
-   background-color: rgba(255, 85, 85, 0.65);
-}
-
-#MergeWarningButton:pressed, QPushButton#warnButton:pressed, QPushButton#Abort:pressed, QPushButton#pbCancelAmend:pressed
-{
-   background-color: rgba(255, 85, 85, 0.55);
-}
-
-QPushButton#Merge, QPushButton#pbCommit, QPushButton#pbCherryPick
-{
-   border-style: solid;
-   border-color: #8DC944;
-   background-color: rgba(141, 201, 68, 0.45);
-}
-
-QPushButton#Merge:hover, QPushButton#pbCommit:hover, QPushButton#pbCherryPick:hover
-{
-   background-color: rgba(141, 201, 68, 0.65);
-}
-
-QPushButton#Merge:pressed, QPushButton#pbCommit:pressed, QPushButton#pbCherryPick:pressed
-{
-   background-color: rgba(141, 201, 68, 0.55);
-}
-
-#FilesListTitle
-{
     color: white;
-    background-color: #202122;
-}
-
-#FileBtn:pressed, #FileBtn:checked
-{
-   background-color: #606162;
-}
-
-#FileBtn:hover
-{
-   background-color: #202122;
-}
-
-QComboBox
-{
-   outline: none;
-   color: white;
-   border-color: #202122;
-   background-color: #2E2F30;
-}
-
-QComboBox:disabled {
-   color: #E0E0E1;
-}
-
-QComboBox:editable {
-   background: #ffffff;
-}
-
-QComboBox:on {
-   background-color: #2E2F30;
-}
-
-QComboBox QAbstractItemView
-{
-   outline: none;
-   background-color: #404142;
-}
-
-CheckBox
-{
-   color: white
-}
-
-CheckBox::indicator
-{
-    width: 13px;
-    height: 13px;
-}
-
-RepoConfigDlg
-{
-   background-color: #2E2F30;
 }
 
 PullDlg QLabel#lQuestion
@@ -639,6 +373,306 @@ PullDlg QLabel#lQuestion
    color: white;
    font-weight: bold;
 }
+
+#warningButton
+{
+   border-style: solid;
+   border-color: #FF5555;
+   background-color: rgba(255, 85, 85, 0.45);
+}
+
+#warningButton, #warningButton:hover, #warningButton:pressed
+{
+   background-color: rgba(255, 85, 85, 0.65);
+}
+
+#applyActionBtn
+{
+   border-style: solid;
+   border-color: #8DC944;
+   background-color: rgba(141, 201, 68, 0.45);
+}
+
+#applyActionBtn:hover, #applyActionBtn:pressed
+{
+   background-color: rgba(141, 201, 68, 0.65);
+}
+
+RepoConfigDlg
+{
+   background-color: #2E2F30;
+}
+
+QFrame#tabWidget > QPushButton[selected=true], QFrame#tabWidget > QPushButton[selected=true]:hover
+{
+    background-color: #606162;
+}
+
+/*********************************************/
+/*             Custom Widgets END            */
+/*********************************************/
+
+/*********************************************/
+/*            GitQlient class START          */
+/*********************************************/
+
+GitQlient
+{
+   background: #2E2F30;
+}
+
+#openNewRepo
+{
+   background-color: #2E2F30;
+}
+
+#openNewRepo:hover, #openGitAdmin:hover
+{
+   background-color: #606162;
+}
+
+#GitQlientTab > QTabBar::tab:first
+{
+   background-color: #2E2F30;
+}
+
+#GitQlientTab > QTabBar::tab:first:selected
+{
+   background-color: #404142;
+}
+
+ConfigWidget
+{
+    background-color: #404142;
+}
+
+/*********************************************/
+/*            GitQlient class END            */
+/*********************************************/
+
+/*********************************************/
+/*             GitQlientRepo START           */
+/*********************************************/
+
+#mainWindow
+{
+    background-color: #404142;
+    color: white;
+}
+
+/*********************************************/
+/*              GitQlientRepo END            */
+/*********************************************/
+
+/*********************************************/
+/*               Controls START              */
+/*********************************************/
+
+
+/*********************************************/
+/*                Controls END               */
+/*********************************************/
+
+/*********************************************/
+/*             HistoryWidget START           */
+/*********************************************/
+
+CommitHistoryView
+{
+   border-color: #202122;
+}
+
+DiffWidget > QPinnableTabWidget > QTabBar::tab:selected
+{
+   background-color: #2E2F30;
+}
+
+#InfoPanel
+{
+   border-color: #202122;
+   background: #2E2F30;
+}
+
+/*********************************************/
+/*              HistoryWidget END            */
+/*********************************************/
+
+/*********************************************/
+/*          CommitChangesWidget START        */
+/*********************************************/
+
+#leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail, #lCounter
+{
+    background-color: #2E2F30;
+    color: white;
+    border-color: #202122;
+}
+
+#leCommitTitle
+{
+    border-bottom-color: #404142;
+}
+
+#leAuthorName
+{
+    border-bottom-color: #404142;
+}
+
+#lCounter
+{
+    border-bottom-color: #404141;
+    font-size: 9pt;
+}
+
+#stagedFiles, #unstagedFiles
+{
+    background: #2E2F30;
+    border-color: #202122;
+}
+
+#stagedFilesList, #unstagedFilesList
+{
+   border-color: #606162;
+}
+
+/*********************************************/
+/*           CommitChangesWidget END         */
+/*********************************************/
+
+/*********************************************/
+/*            CommitInfoPanel START          */
+/*********************************************/
+
+CommitInfoPanel
+{
+   background: #2E2F30;
+}
+
+#labelSha
+{
+    color: #D89000;
+}
+
+/*********************************************/
+/*             CommitInfoPanel END           */
+/*********************************************/
+
+/*********************************************/
+/*           CommitInfoWidget START          */
+/*********************************************/
+
+CommitInfoWidget
+{
+   background: #2E2F30;
+}
+
+/*********************************************/
+/*             CommitInfoWidget END          */
+/*********************************************/
+
+/*********************************************/
+/*              IDiffWidget START            */
+/*********************************************/
+
+FileDiffView
+{
+    background-color: #2E2F30;
+    color: white;
+}
+
+#LineNumberArea
+{
+   border-right-color: white;
+}
+
+FileDiffWidget
+{
+    background-color: #2E2F30;
+    border-color: #202122;
+}
+
+FileDiffWidget > QPushButton, FileDiffWidget > QToolButton
+{
+    background-color: transparent;
+}
+
+FileDiffWidget > QPushButton:checked, FileDiffWidget > QToolButton:checked
+{
+   background-color: #202122;
+}
+
+FullDiffWidget
+{
+    background-color: #2E2F30;
+    border-color: #202122;
+}
+
+FullDiffWidget > QPlainTextEdit
+{
+    background-color: #2E2F30;
+    color: white;
+}
+
+FullDiffWidget > QPlainTextEdit
+{
+    border-color: #202122
+}
+
+/*********************************************/
+/*               IDiffWidget END             */
+/*********************************************/
+
+/*********************************************/
+/*             BranchesWidget START          */
+/*********************************************/
+
+BranchesWidget ClickableFrame:hover
+{
+   background: #2E2F30;
+}
+
+BranchesWidget QHeaderView, BranchesWidget QListWidget
+{
+    border-top-color: #606162;
+}
+
+#panelsFrame
+{
+   border-color: #202122;
+   background: #2E2F30;
+}
+
+#sectionFrame
+{
+    background-color: #2E2F30;
+    color: white;
+    border-color: #606162;
+}
+
+BranchDlg
+{
+    background-color: #404142;
+    color: white;
+}
+
+#BranchesWidgetOptionsButton
+{
+    background: #2E2F30;
+    border-color: #202122;
+}
+
+#BranchesWidgetOptionsButton:hover
+{
+    background: #606162;
+}
+
+/*********************************************/
+/*              BranchesWidget END           */
+/*********************************************/
+
+/*********************************************/
+/*         BranchesWidgetMinimal START       */
+/*********************************************/
 
 BranchesWidgetMinimal
 {
@@ -655,37 +689,81 @@ BranchesWidgetMinimal > DiffButton
     background-color: #202122;
 }
 
-#MinimizeBtn
+/*********************************************/
+/*          BranchesWidgetMinimal END        */
+/*********************************************/
+
+/*********************************************/
+/*              BlameWidget START            */
+/*********************************************/
+
+BlameWidget > QTreeView
 {
-    background-color: #202122;
+    background-color: #2E2F30;
+    border-color: #202122;
 }
 
-#MinimizeBtn:hover
+BlameWidget > QTabWidget, BlameWidget > QTabWidget:pane, BlameWidget > QTabWidget > QTabBar::tab:selected
 {
-    background-color: #606162;
+    background-color: #2E2F30;
+    border: 0;
 }
 
-QSpinBox
+BlameWidget > QTabWidget, BlameWidget > QTabWidget:pane
 {
-    color: white;
-    border-color: #D89000;
-    background-color: transparent;
+    background-color: #2E2F30;
+    border: 0;
 }
 
-QSpinBox::up-button:hover, QSpinBox::down-button:hover
+FileBlameWidget
 {
-    background: #606162;
+    background-color: #2E2F30;
 }
 
-QSpinBox::up-button, QSpinBox::down-button
+#AnnotationFrame
 {
-    border-color: #D89000;
+    background-color: #2E2F30;
 }
+
+QLabel#numberLabel
+{
+    border-right-color: #202122;
+}
+
+QLabel#authorFirstOfItsName, ButtonLink#firstOfItsName
+{
+    border-top-color: #606162;
+}
+
+/*********************************************/
+/*               BlameWidget END             */
+/*********************************************/
+
+/*********************************************/
+/*              MergeWidget START            */
+/*********************************************/
 
 MergeWidget > QPinnableTabWidget
 {
     background: #404142;
 }
+
+#DiffButtonsFrame
+{
+   background-color: #404142;
+}
+
+#FilesListTitle
+{
+    color: white;
+    background-color: #202122;
+}
+
+/*********************************************/
+/*               MergeWidget END             */
+/*********************************************/
+
+/* GitServer and BuildSystem */
 
 QToolButton#ViewBtnOption
 {
@@ -702,6 +780,12 @@ QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
 QToolButton#ViewBtnOption:!checked:hover
 {
    background-color: #606162;
+}
+
+#JobContainerHeader
+{
+    background: #202122;
+    border: none;
 }
 
 #JobButton:hover
@@ -824,11 +908,6 @@ SourceCodeReview QLabel
     color: white;
 }
 
-#LineNumberArea
-{
-   border-right: 1px solid white;
-}
-
 #AddReviewInput
 {
    background: #505152;
@@ -863,7 +942,7 @@ SourceCodeReview QLabel
    background-color: #2E2F30;
 }
 
-QScrollArea, #TransparentScrollArea
+#TransparentScrollArea
 {
    background: transparent;
 }
@@ -876,43 +955,5 @@ QScrollArea, #TransparentScrollArea
 #IssuesWidget
 {
    background-color: #2E2F30;
-}
-
-PomodoroButton
-{
-   background: #404142;
-}
-
-PomodoroButton:hover
-{
-   background: #606162;
-}
-
-PomodoroButton > QToolButton, PomodoroButton > QToolButton:hover
-{
-   background: transparent;
-}
-
-PomodoroButton > QToolButton#Arrow
-{
-   padding: 0;
-}
-
-PomodoroButton > QLabel
-{
-   qproperty-alignment: AlignCenter;
-   font-size: 7pt;
-   font-family: DejaVu Sans Mono;
-}
-
-#BranchesWidgetOptionsButton
-{
-    background: #2E2F30;
-    border-color: #202122;
-}
-
-#BranchesWidgetOptionsButton:hover
-{
-    background: #606162;
 }
 

@@ -83,7 +83,6 @@ protected:
 
    virtual bool commitChanges() = 0;
    virtual void showUnstagedMenu(const QPoint &pos) = 0;
-   void showUntrackedMenu(const QPoint &pos);
 
    virtual void insertFiles(const RevisionFiles &files, QListWidget *fileList) final;
    QPair<QListWidgetItem *, FileWidget *> fillFileItemInfo(const QString &file, bool isConflict, const QString &icon,
@@ -101,9 +100,6 @@ protected:
    virtual bool hasConflicts() final;
    virtual void resetFile(QListWidgetItem *item) final;
    virtual QColor getColorForFile(const RevisionFiles &files, int index) const final;
-   void onUntrackedHeaderClicked();
-   void onUnstagedHeaderClicked();
-   void onStagedHeaderClicked();
 
    static QString lastMsgBeforeError;
    static const int kMaxTitleChars;

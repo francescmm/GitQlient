@@ -31,7 +31,7 @@ class GitBase;
 class QPinnableTabWidget;
 class IDiffWidget;
 class QVBoxLayout;
-class CommitDiffWidget;
+class FileListWidget;
 class GitCache;
 
 /*!
@@ -115,7 +115,9 @@ private:
    CommitInfoPanel *mInfoPanelParent = nullptr;
    QPinnableTabWidget *mCenterStackedWidget = nullptr;
    QMap<QString, IDiffWidget *> mDiffWidgets;
-   CommitDiffWidget *mCommitDiffWidget = nullptr;
+   FileListWidget *fileListWidget = nullptr;
+   QString mCurrentSha;
+   QString mParentSha;
 
    /*!
     \brief When the user selectes a different diff from a different tab, it changes the information in the commit info

@@ -44,7 +44,7 @@ void WipWidget::configure(const QString &sha)
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-   ui->pbCommit->setEnabled(ui->stagedFilesList->count());
+   ui->applyActionBtn->setEnabled(ui->stagedFilesList->count());
 }
 
 bool WipWidget::commitChanges()

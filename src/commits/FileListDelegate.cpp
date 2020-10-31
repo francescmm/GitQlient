@@ -4,7 +4,7 @@
 
 #include <QPainter>
 
-constexpr auto Offset = 5;
+constexpr auto Offset = 10;
 constexpr auto DefaultHeight = 25.0;
 constexpr auto HeightIncrement = 15.0;
 

@@ -177,7 +177,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    hLayout->addWidget(mVersionCheck);
    hLayout->addStretch();
 
-   mMergeWarning->setObjectName("MergeWarningButton");
+   mMergeWarning->setObjectName("WarningButton");
    mMergeWarning->setVisible(false);
    mBtnGroup->addButton(mMergeWarning, static_cast<int>(ControlsMainViews::Merge));
 

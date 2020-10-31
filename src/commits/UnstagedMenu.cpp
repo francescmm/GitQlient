@@ -4,10 +4,13 @@
 #include <GitSyncProcess.h>
 #include <GitLocal.h>
 #include <GitQlientSettings.h>
+#include <QLogger.h>
 
 #include <QFile>
 #include <QDir>
 #include <QMessageBox>
+
+using namespace QLogger;
 
 UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, bool hasConflicts,
                            QWidget *parent)
@@ -48,7 +51,8 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
          QScopedPointer<GitLocal> git(new GitLocal(mGit));
          const auto ret = git->checkoutFile(mFileName);
 
-         emit signalCheckedOut(ret);
+         if (ret)
+            emit signalCheckedOut();
       }
    });
 
@@ -65,9 +69,11 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
          const auto gitRet = addEntryToGitIgnore(mFileName);
 
          if (gitRet)
-            emit signalCheckedOut(gitRet);
+            emit signalCheckedOut();
       }
    });
+
+   connect(addAction(tr("Delete file")), &QAction::triggered, this, &UnstagedMenu::onDeleteFile);
 
    connect(ignoreMenu->addAction(tr("Ignore extension")), &QAction::triggered, this, [this]() {
       const auto msgBoxRet = QMessageBox::question(
@@ -81,7 +87,7 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
          const auto ret = addEntryToGitIgnore(extension);
 
          if (ret)
-            emit signalCheckedOut(ret);
+            emit signalCheckedOut();
       }
    });
 
@@ -97,7 +103,7 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
          const auto ret = addEntryToGitIgnore(extension);
 
          if (ret)
-            emit signalCheckedOut(ret);
+            emit signalCheckedOut();
       }
    });
 
@@ -143,4 +149,18 @@ bool UnstagedMenu::addEntryToGitIgnore(const QString &entry)
    }
 
    return entryAdded;
+}
+
+void UnstagedMenu::onDeleteFile()
+{
+   const auto path = QString("%1").arg(mFileName);
+
+   QLog_Info("UI", "Removing paht: " + path);
+
+   QProcess p;
+   p.setWorkingDirectory(mGit->getWorkingDir());
+   p.start("rm", { "-rf", path });
+
+   if (p.waitForFinished())
+      emit signalCheckedOut();
 }

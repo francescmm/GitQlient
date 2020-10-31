@@ -14,7 +14,7 @@ using namespace QLogger;
 
 CommitInfoWidget::CommitInfoWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                    QWidget *parent)
-   : QWidget(parent)
+   : QFrame(parent)
    , mCache(cache)
    , mGit(git)
    , mInfoPanel(new CommitInfoPanel())
@@ -24,10 +24,15 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<GitCache> &cache, const 
 
    fileListWidget->setObjectName("fileListWidget");
 
+   const auto wipSeparator = new QFrame();
+   wipSeparator->setObjectName("separator");
+
    const auto verticalLayout = new QVBoxLayout(this);
    verticalLayout->setSpacing(0);
    verticalLayout->setContentsMargins(0, 0, 0, 0);
    verticalLayout->addWidget(mInfoPanel);
+   verticalLayout->addWidget(wipSeparator);
+   verticalLayout->addSpacing(5);
    verticalLayout->addWidget(fileListWidget);
 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,

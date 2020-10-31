@@ -46,7 +46,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    , mReturnFromFull(new QPushButton())
    , mUserName(new QLabel())
    , mUserEmail(new QLabel())
-   , mCurrentBranchLabel(new QLabel())
 {
    mCommitInfoWidget = new CommitInfoWidget(mCache, mGit);
    mWipWidget = new WipWidget(mCache, mGit);
@@ -59,10 +58,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    mUserName->setText(localUserInfo.mUserName.isEmpty() ? globalUserInfo.mUserName : localUserInfo.mUserName);
    mUserEmail->setText(localUserInfo.mUserEmail.isEmpty() ? globalUserInfo.mUserEmail : localUserInfo.mUserEmail);
-   mCurrentBranchLabel->setText(QString(tr("Working branch: <b>%1</b>")).arg(mGit->getCurrentBranch()));
-
-   const auto wipSeparator = new QFrame();
-   wipSeparator->setObjectName("wipSeparator");
 
    const auto wipInfoFrame = new QFrame();
    wipInfoFrame->setObjectName("wipInfoFrame");
@@ -71,8 +66,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    wipInfoLayout->setSpacing(10);
    wipInfoLayout->addWidget(mUserName);
    wipInfoLayout->addWidget(mUserEmail);
-   wipInfoLayout->addWidget(wipSeparator);
-   wipInfoLayout->addWidget(mCurrentBranchLabel);
 
    mCommitStackedWidget = new QStackedWidget();
    mCommitStackedWidget->setCurrentIndex(0);
@@ -82,7 +75,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    const auto wipLayout = new QVBoxLayout();
    wipLayout->setContentsMargins(QMargins());
-   wipLayout->setSpacing(0);
+   wipLayout->setSpacing(10);
    wipLayout->addWidget(wipInfoFrame);
    wipLayout->addWidget(mCommitStackedWidget);
 
@@ -158,7 +151,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    const auto cherryPickBtn = new QPushButton(tr("Cherry-pick"));
    cherryPickBtn->setEnabled(false);
-   cherryPickBtn->setObjectName("pbCherryPick");
+   cherryPickBtn->setObjectName("applyActionBtn");
    connect(cherryPickBtn, &QPushButton::clicked, this, &HistoryWidget::cherryPickCommit);
    connect(mSearchInput, &QLineEdit::textChanged, this,
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });
@@ -390,11 +383,8 @@ void HistoryWidget::onShowAllUpdated(bool showAll)
 
 void HistoryWidget::onBranchCheckout()
 {
-   const auto currentBranch = mGit->getCurrentBranch();
-   mCurrentBranchLabel->setText(QString(tr("Working branch: <b>%1</b>")).arg(currentBranch));
-
    QScopedPointer<GitBranches> gitBranches(new GitBranches(mGit));
-   const auto ret = gitBranches->getLastCommitOfBranch(currentBranch);
+   const auto ret = gitBranches->getLastCommitOfBranch(mGit->getCurrentBranch());
 
    if (mChShowAllBranches->isChecked())
       mRepositoryView->focusOnCommit(ret.output.toString());

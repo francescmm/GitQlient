@@ -161,23 +161,24 @@ void GitRepoLoader::requestRevisions()
    GitQlientSettings settings;
    const auto maxCommits = settings.localValue(mGitBase->getGitQlientSettingsDir(), "MaxCommits", 0).toInt();
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
-                                                  : mShowAll ? QString("--all") : mGitBase->getCurrentBranch();
+       : mShowAll                                 ? QString("--all")
+                                                  : mGitBase->getCurrentBranch();
 
    QString order;
 
    switch (settings.localValue(mGitBase->getGitQlientSettingsDir(), "GraphSortingOrder", 0).toInt())
    {
       case 0:
-         order = "--date-order";
-         break;
-      case 1:
-         order = "--topo-order";
-         break;
-      case 2:
          order = "--author-date-order";
          break;
-      default:
+      case 1:
+         order = "--date-order";
+         break;
+      case 2:
          order = "--topo-order";
+         break;
+      default:
+         order = "--author-date-order";
          break;
    }
 
