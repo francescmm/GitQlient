@@ -112,6 +112,17 @@ void PomodoroButton::updateCounters()
    }
 }
 
+void PomodoroButton::setRunningMode()
+{
+   style()->unpolish(this);
+   setProperty("checked", true);
+   style()->polish(this);
+   mState = State::Running;
+   mTimer->start();
+   mButton->setIcon(QIcon(":/icons/pomodoro_running"));
+   --mBigBreakCount;
+}
+
 void PomodoroButton::mousePressEvent(QMouseEvent *e)
 {
    if (isEnabled())
@@ -165,13 +176,7 @@ void PomodoroButton::onClick()
    {
       case State::OnHold:
       case State::Finished:
-         style()->unpolish(this);
-         setProperty("checked", true);
-         style()->polish(this);
-         mState = State::Running;
-         mTimer->start();
-         mButton->setIcon(QIcon(":/icons/pomodoro_running"));
-         --mBigBreakCount;
+         setRunningMode();
          break;
       case State::InBreak:
          style()->unpolish(this);
@@ -184,11 +189,13 @@ void PomodoroButton::onClick()
          style()->unpolish(this);
          setProperty("checked", true);
          style()->polish(this);
-         mState = State::InBreakRunning;
+         mState = State::InLongBreakRunning;
          mTimer->start();
          break;
       case State::InBreakRunning:
       case State::InLongBreakRunning:
+         setRunningMode();
+         break;
       case State::Running:
          style()->unpolish(this);
          setProperty("checked", false);
@@ -226,7 +233,13 @@ void PomodoroButton::onRunningMode()
 
       mButton->setIcon(QIcon(":/icons/pomodoro_timeout"));
 
-      if (mBigBreakCount == 0)
+      const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", 5).toInt();
+      mBreakTime = QTime(0, breakMins, 0);
+
+      const auto longBreakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", 15).toInt();
+      mLongBreakTime = QTime(0, longBreakMins, 0);
+
+      if (mBigBreakCount <= 0)
       {
          mBigBreakCount = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", 4).toInt();
 
@@ -279,14 +292,8 @@ void PomodoroButton::onBreakingMode()
 
       if (answer == QMessageBox::Yes)
       {
-         style()->unpolish(this);
-         setProperty("checked", true);
-         style()->polish(this);
          mCounter->setText(mDurationTime.toString("mm:ss"));
-         mState = State::Running;
-         mTimer->start();
-         mButton->setIcon(QIcon(":/icons/pomodoro_running"));
-         --mBigBreakCount;
+         setRunningMode();
       }
       else
       {
@@ -317,13 +324,8 @@ void PomodoroButton::onLongBreakingMode()
 
       if (answer == QMessageBox::Yes)
       {
-         style()->unpolish(this);
-         setProperty("checked", true);
-         style()->polish(this);
          mCounter->setText(mDurationTime.toString("mm:ss"));
-         mState = State::Running;
-         mTimer->start();
-         mButton->setIcon(QIcon(":/icons/pomodoro_running"));
+         setRunningMode();
       }
       else
       {

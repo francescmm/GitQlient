@@ -99,4 +99,5 @@ private:
     * If the new value is lower than the value stored, the counter will start again in a new cycle.
     */
    void updateCounters();
+   void setRunningMode();
 };
