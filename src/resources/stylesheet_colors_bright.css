@@ -47,6 +47,7 @@ QLineEdit
 {
     color: black;
     background: transparent;
+    border-color: #D89000;
 }
 
 QListWidget, QListView, QTreeWidget, QTreeView
