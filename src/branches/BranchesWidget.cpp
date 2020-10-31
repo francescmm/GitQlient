@@ -208,7 +208,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    searchBranch->setObjectName("SearchInput");
    connect(searchBranch, &QLineEdit::returnPressed, this, &BranchesWidget::onSearchBranch);
 
-   // mMinimize->setObjectName("MinimizeBtn");
    mMinimize->setIcon(QIcon(":/icons/ahead"));
    mMinimize->setToolTip(tr("Show minimalist view"));
    mMinimize->setObjectName("BranchesWidgetOptionsButton");

@@ -465,7 +465,12 @@ CommitHistoryView
 
 DiffWidget > QPinnableTabWidget > QTabBar::tab:!selected
 {
-   background: #E6E6E7;
+   background: #606162;
+}
+
+DiffWidget > QPinnableTabWidget > QTabBar::tab:!selected:hover
+{
+   background: #808182;
 }
 
 DiffWidget > QPinnableTabWidget > QTabBar::tab:selected
@@ -584,14 +589,16 @@ FileDiffWidget
     border-color: #C6C6C7;
 }
 
+FullDiffWidget > QPushButton, FullDiffWidget > QToolButton,
 FileDiffWidget > QPushButton, FileDiffWidget > QToolButton
 {
-    background: transparent;
+   background: transparent;
 }
 
+FullDiffWidget > QPushButton:checked, FullDiffWidget > QToolButton:checked,
 FileDiffWidget > QPushButton:checked, FileDiffWidget > QToolButton:checked
 {
-   background: #202122;
+   background: #404142;
 }
 
 FullDiffWidget
@@ -669,27 +676,17 @@ BranchDlg
 
 BranchesWidgetMinimal
 {
-    background: #202122;
+    background: #C6C6C7;
 }
 
 BranchesWidgetMinimal > QPushButton, BranchesWidgetMinimal > QToolButton
 {
-    background: #202122;
+    background: #C6C6C7;
 }
 
 BranchesWidgetMinimal > DiffButton
 {
-    background: #202122;
-}
-
-#MinimizeBtn
-{
-    background: #202122;
-}
-
-#MinimizeBtn:hover
-{
-    background: #606162;
+    background: #C6C6C7;
 }
 
 /*********************************************/
@@ -714,7 +711,12 @@ BlameWidget > QTabWidget, BlameWidget > QTabWidget:pane
 
 BlameWidget > QTabWidget > QTabBar::tab:!selected
 {
-   background: #E6E6E7;
+   background: #606162;
+}
+
+BlameWidget > QTabWidget > QTabBar::tab:!selected:hover
+{
+   background: #808182;
 }
 
 BlameWidget > QTabWidget > QTabBar::tab:selected
