@@ -379,18 +379,41 @@ PullDlg QLabel#lQuestion
    background: rgba(141, 201, 68, 0.85);
 }
 
+/*********************************************/
+/*             Custom Widgets END            */
+/*********************************************/
+
+/*********************************************/
+/*            RepoConfigDlg START            */
+/*********************************************/
+
 RepoConfigDlg
+{
+   background: #E6E6E7;
+}
+
+RepoConfigDlg > QTabWidget > QTabBar::tab:!selected
+{
+   background: #A6A6A7;
+}
+
+RepoConfigDlg > QTabWidget > QTabBar::tab:!selected:hover
 {
    background: #C6C6C7;
 }
 
-QFrame#tabWidget > QPushButton[selected=true], QFrame#tabWidget > QPushButton[selected=true]:hover
+RepoConfigDlg QPushButton:hover
 {
-    background: #606162;
+   background: #A6A6A7;
+}
+
+RepoConfigDlg QPushButton:pressed
+{
+   background: #C6C6C7;
 }
 
 /*********************************************/
-/*             Custom Widgets END            */
+/*             RepoConfigDlg END             */
 /*********************************************/
 
 /*********************************************/
