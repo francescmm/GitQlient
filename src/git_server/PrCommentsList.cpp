@@ -132,7 +132,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
        : tr(" on %1").arg(issue.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    const auto creationLabel = new QLabel();
-   creationLabel->setText(tr("Created by <b>%1</b>%2 - ").arg(issue.creator.name, whenText));
+   creationLabel->setText(tr("<i>Created by <b>%1</b>%2</i> - ").arg(issue.creator.name, whenText));
    creationLabel->setToolTip(issue.creation.toString(QLocale().dateTimeFormat(QLocale::ShortFormat)));
 
    creationLayout->addWidget(creationLabel);
@@ -143,13 +143,13 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
       assignedLayout->setContentsMargins(QMargins());
       assignedLayout->setSpacing(0);
 
-      assignedLayout->addWidget(new QLabel(tr("Assigned to ")));
+      assignedLayout->addWidget(new QLabel(tr("<i>Assigned to </i>")));
 
       auto count = 0;
       const auto totalAssignees = issue.assignees.count();
       for (auto &assignee : issue.assignees)
       {
-         const auto assigneLabel = new QLabel(QString("<b>%1</b>").arg(assignee.name));
+         const auto assigneLabel = new QLabel(QString("<i><b>%1</b></i>").arg(assignee.name));
          assigneLabel->setObjectName("CreatorLink");
          assignedLayout->addWidget(assigneLabel);
 
@@ -160,7 +160,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
       creationLayout->addLayout(assignedLayout);
    }
    else
-      creationLayout->addWidget(new QLabel(tr("Unassigned")));
+      creationLayout->addWidget(new QLabel(tr("<i>Unassigned</i>")));
 
    creationLayout->addStretch();
 

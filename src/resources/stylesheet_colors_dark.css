@@ -869,22 +869,47 @@ IssueItem
 /*            PrCommentsList END             */
 /*********************************************/
 
-QToolButton#ViewBtnOption
+/*********************************************/
+/*          IssueDetailedView START          */
+/*********************************************/
+
+IssueDetailedView
+{
+   border-color: #202122;
+}
+
+IssueDetailedView QTextEdit
+{
+   background: transparent;
+   color: white;
+}
+
+#IssuesFooterFrame
+{
+   border-bottom: 1px solid #404142;
+   background-color: #2E2F30;
+}
+
+QToolButton#ViewBtnOption, QPushButton#ViewBtnOption
 {
     background-color: #404142;
     color: white;
 }
-
 QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
 {
    background-color: #202122;
    border-color: #404142;
 }
 
+QPushButton#ViewBtnOption:hover,
 QToolButton#ViewBtnOption:!checked:hover
 {
    background-color: #606162;
 }
+
+/*********************************************/
+/*           IssueDetailedView END           */
+/*********************************************/
 
 #JobContainerHeader
 {
@@ -949,12 +974,6 @@ JobContainer, #JenkinsJobPanel, #JobPanelTabWidget, JenkinsJobPanel#JenkinsJobPa
    background: #2E2F30;
 }
 
-IssueDetailedView QTextEdit
-{
-   background: transparent;
-   color: white;
-}
-
 PrChangesList FileDiffView
 {
    background: #404142;
@@ -991,13 +1010,6 @@ SourceCodeReview QLabel
 #JobContainer
 {
    background: #2E2F30;
-}
-
-
-#IssuesFooterFrame, #IssuesFooterFramePagination
-{
-   border-bottom: 1px solid #404142;
-   background-color: #2E2F30;
 }
 
 #TransparentScrollArea

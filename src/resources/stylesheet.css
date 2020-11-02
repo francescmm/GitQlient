@@ -1080,12 +1080,6 @@ ButtonLink#IssueTitle
 /*               IssueItem END               */
 /*********************************************/
 
-#IssuesFooterFrame
-{
-   min-height: 10px;
-   max-height: 10px;
-}
-
 /*********************************************/
 /*           PrCommentsList START            */
 /*********************************************/
@@ -1124,10 +1118,30 @@ ButtonLink#IssueTitle
 /*            PrCommentsList END             */
 /*********************************************/
 
+/*********************************************/
+/*          IssueDetailedView START          */
+/*********************************************/
+
+IssueDetailedView
+{
+   border-style: solid;
+   border-width: 1px;
+}
+
 IssueDetailedView QTextEdit
 {
    border: none;
 }
+
+#IssuesFooterFrame
+{
+   min-height: 10px;
+   max-height: 10px;
+}
+
+/*********************************************/
+/*           IssueDetailedView END           */
+/*********************************************/
 
 QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
 {

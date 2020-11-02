@@ -36,12 +36,6 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    mTitleLabel->setText(tr("Detailed View"));
    mTitleLabel->setObjectName("HeaderTitle");
 
-   const auto refresh = new QPushButton();
-   refresh->setIcon(QIcon(":/icons/refresh"));
-   refresh->setObjectName("ViewBtnOption");
-   refresh->setToolTip(tr("Refresh"));
-   connect(refresh, &QPushButton::clicked, this, [this]() { loadData(mConfig, mIssueNumber, true); });
-
    const auto comments = new QToolButton();
    comments->setIcon(QIcon(":/icons/comments"));
    comments->setObjectName("ViewBtnOption");
@@ -106,6 +100,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    mAddComment->setIcon(QIcon(":/icons/add_comment"));
    mAddComment->setToolTip(tr("Add new comment"));
    mAddComment->setDisabled(true);
+   mAddComment->setObjectName("ViewBtnOption");
    connect(mAddComment, &QPushButton::clicked, mPrCommentsList, &PrCommentsList::addGlobalComment);
 
    mCloseIssue = new QPushButton();
@@ -114,15 +109,20 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    mCloseIssue->setIcon(QIcon(":/icons/close_issue"));
    mCloseIssue->setToolTip(tr("Close"));
    mCloseIssue->setDisabled(true);
+   mCloseIssue->setObjectName("ViewBtnOption");
    connect(mCloseIssue, &QPushButton::clicked, this, &IssueDetailedView::closeIssue);
+
+   const auto refresh = new QPushButton();
+   refresh->setIcon(QIcon(":/icons/refresh"));
+   refresh->setObjectName("ViewBtnOption");
+   refresh->setToolTip(tr("Refresh"));
+   connect(refresh, &QPushButton::clicked, this, [this]() { loadData(mConfig, mIssueNumber, true); });
 
    const auto headerFrame = new QFrame();
    headerFrame->setObjectName("IssuesHeaderFrameBig");
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
    headerLayout->setSpacing(10);
-   headerLayout->addWidget(refresh);
-   headerLayout->addSpacing(20);
    headerLayout->addWidget(mTitleLabel);
    headerLayout->addStretch();
    headerLayout->addWidget(comments);
@@ -132,6 +132,8 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    headerLayout->addWidget(mReviewBtn);
    headerLayout->addWidget(mAddComment);
    headerLayout->addWidget(mCloseIssue);
+   headerLayout->addSpacing(20);
+   headerLayout->addWidget(refresh);
 
    const auto footerFrame = new QFrame();
    footerFrame->setObjectName("IssuesFooterFrame");
