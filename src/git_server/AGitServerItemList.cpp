@@ -33,7 +33,7 @@ AGitServerItemList::AGitServerItemList(const QSharedPointer<GitServerCache> &git
    headerFrame->setObjectName("IssuesHeaderFrame");
    connect(headerFrame, &ClickableFrame::clicked, this, &AGitServerItemList::onHeaderClicked);
 
-   mArrow->setPixmap(QIcon(":/icons/arrow_up").pixmap(QSize(15, 15)));
+   mArrow->setPixmap(QIcon(":/icons/remove").pixmap(QSize(15, 15)));
 
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
@@ -120,7 +120,7 @@ void AGitServerItemList::createContent(QVector<IssueItem *> items)
 
    mIssuesLayout->addWidget(mScrollArea);
 
-   const auto icon = QIcon(mScrollArea->isVisible() ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+   const auto icon = QIcon(mScrollArea->isVisible() ? QString(":/icons/add") : QString(":/icons/remove"));
    mArrow->setPixmap(icon.pixmap(QSize(15, 15)));
 
    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
@@ -134,7 +134,7 @@ void AGitServerItemList::onHeaderClicked()
 
       mScrollArea->setWidgetResizable(issuesVisible);
 
-      const auto icon = QIcon(issuesVisible ? QString(":/icons/arrow_up") : QString(":/icons/arrow_down"));
+      const auto icon = QIcon(issuesVisible ? QString(":/icons/add") : QString(":/icons/remove"));
       mArrow->setPixmap(icon.pixmap(QSize(15, 15)));
       mScrollArea->setVisible(!issuesVisible);
 
