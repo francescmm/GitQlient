@@ -970,7 +970,8 @@ SourceCodeReview QLabel
 
 #IssuesHeaderFrame, #IssuesHeaderFrameBig
 {
-   background-color: #202122;
+   background-color: #2E2F30;
+   border-bottom-color: #606162;
 }
 
 #IssuesWidget

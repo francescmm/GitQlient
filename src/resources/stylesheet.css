@@ -1007,17 +1007,25 @@ QFrame#tabWidget > QPushButton, QFrame#tabWidget > QPushButton[selected=false]
 /*             ConfigWidget END              */
 /*********************************************/
 
+/*********************************************/
+/*          IssueDetailedView START          */
+/*********************************************/
+
+/*********************************************/
+/*           IssueDetailedView END           */
+/*********************************************/
+
 /* GitServer and BuildSystem */
 
 #IssuesHeaderFrame, #IssuesHeaderFrameBig
 {
    padding: 10px;
+   border-bottom-width: 1px;
+   border-bottom-style: solid;
 }
 
 #IssuesHeaderFrameBig
 {
-    max-height: 40px;
-    min-height: 40px;
 }
 
 #IssuesFooterFrame

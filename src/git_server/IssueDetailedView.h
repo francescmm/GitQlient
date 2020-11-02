@@ -81,7 +81,6 @@ private:
    int mIssueNumber = -1;
    QButtonGroup *mBtnGroup = nullptr;
    QLabel *mTitleLabel = nullptr;
-   QLabel *mCreationLabel = nullptr;
    QStackedLayout *mStackedLayout = nullptr;
    PrCommentsList *mPrCommentsList = nullptr;
    PrChangesList *mPrChangesList = nullptr;

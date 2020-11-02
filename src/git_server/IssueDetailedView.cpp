@@ -27,7 +27,6 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    , mGitServerCache(gitServerCache)
    , mBtnGroup(new QButtonGroup())
    , mTitleLabel(new QLabel())
-   , mCreationLabel(new QLabel())
    , mStackedLayout(new QStackedLayout())
    , mPrCommentsList(new PrCommentsList(mGitServerCache))
    , mPrChangesList(new PrChangesList(mGit))
@@ -117,14 +116,6 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    mCloseIssue->setDisabled(true);
    connect(mCloseIssue, &QPushButton::clicked, this, &IssueDetailedView::closeIssue);
 
-   const auto headLine = new QVBoxLayout();
-   headLine->setContentsMargins(QMargins());
-   headLine->setSpacing(5);
-   headLine->addWidget(mTitleLabel);
-   headLine->addWidget(mCreationLabel);
-
-   mCreationLabel->setVisible(false);
-
    const auto headerFrame = new QFrame();
    headerFrame->setObjectName("IssuesHeaderFrameBig");
    const auto headerLayout = new QHBoxLayout(headerFrame);
@@ -132,7 +123,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    headerLayout->setSpacing(10);
    headerLayout->addWidget(refresh);
    headerLayout->addSpacing(20);
-   headerLayout->addLayout(headLine);
+   headerLayout->addWidget(mTitleLabel);
    headerLayout->addStretch();
    headerLayout->addWidget(comments);
    headerLayout->addWidget(changes);
@@ -195,15 +186,6 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum,
 
    const auto title = mIssue.title.count() >= 40 ? mIssue.title.left(40).append("...") : mIssue.title;
    mTitleLabel->setText(QString("#%1 - %2").arg(mIssue.number).arg(title));
-
-   const auto days = mIssue.creation.daysTo(QDateTime::currentDateTime());
-   const auto whenText = days <= 30
-       ? days != 0 ? tr(" %1 days ago").arg(days) : tr(" today")
-       : tr(" on %1").arg(mIssue.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
-
-   mCreationLabel->setText(tr("Created by <b>%1</b>%2").arg(mIssue.creator.name, whenText));
-   mCreationLabel->setToolTip(mIssue.creation.toString(QLocale().dateTimeFormat(QLocale::ShortFormat)));
-   mCreationLabel->setVisible(true);
 
    mPrCommentsList->loadData(static_cast<PrCommentsList::Config>(mConfig), issueNum);
 
