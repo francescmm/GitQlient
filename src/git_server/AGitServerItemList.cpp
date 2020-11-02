@@ -18,15 +18,9 @@ using namespace GitServer;
 AGitServerItemList::AGitServerItemList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
    , mGitServerCache(gitServerCache)
-   , mHeaderIconLabel(new QLabel())
    , mHeaderTitle(new QLabel())
    , mArrow(new QLabel())
 {
-   const auto pagesSpinBox = new QSpinBox(this);
-   connect(pagesSpinBox, SIGNAL(valueChanged(int)), this, SLOT(loadPage(int)));
-
-   const auto pagesLabel = new QLabel(tr("Page: "));
-
    mHeaderTitle->setObjectName("HeaderTitle");
 
    const auto headerFrame = new ClickableFrame();
@@ -38,24 +32,11 @@ AGitServerItemList::AGitServerItemList(const QSharedPointer<GitServerCache> &git
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
    headerLayout->setSpacing(0);
-   headerLayout->addWidget(mHeaderIconLabel);
-   headerLayout->addSpacing(10);
    headerLayout->addWidget(mHeaderTitle);
    headerLayout->addStretch();
    headerLayout->addWidget(mArrow);
 
    mIssuesLayout = new QVBoxLayout();
-
-   const auto footerFrame = new QFrame();
-   footerFrame->setObjectName("IssuesFooterFramePagination");
-
-   pagesSpinBox->setVisible(false);
-
-   const auto footerLayout = new QHBoxLayout(footerFrame);
-   footerLayout->setContentsMargins(5, 5, 5, 5);
-   footerLayout->addWidget(pagesLabel);
-   footerLayout->addWidget(pagesSpinBox);
-   footerLayout->addStretch();
 
    const auto issuesLayout = new QVBoxLayout(this);
    issuesLayout->setContentsMargins(QMargins());
@@ -63,25 +44,10 @@ AGitServerItemList::AGitServerItemList(const QSharedPointer<GitServerCache> &git
    issuesLayout->setAlignment(Qt::AlignTop);
    issuesLayout->addWidget(headerFrame);
    issuesLayout->addLayout(mIssuesLayout);
-   issuesLayout->addWidget(footerFrame);
 
    const auto timer = new QTimer();
    connect(timer, &QTimer::timeout, this, &AGitServerItemList::loadData);
    timer->start(900000);
-
-   /*
-   connect(mApi, &IRestApi::paginationPresent, this, [pagesSpinBox, pagesLabel](int current, int, int total) {
-      if (total != 0)
-      {
-         pagesSpinBox->blockSignals(true);
-         pagesSpinBox->setRange(1, total);
-         pagesSpinBox->setValue(current);
-         pagesSpinBox->setVisible(true);
-         pagesLabel->setVisible(true);
-         pagesSpinBox->blockSignals(false);
-      }
-   });
-*/
 }
 
 void AGitServerItemList::loadData()
@@ -99,13 +65,21 @@ void AGitServerItemList::createContent(QVector<IssueItem *> items)
    issuesLayout->setContentsMargins(QMargins());
    issuesLayout->setSpacing(0);
 
+   const auto last = items.count() - 1;
+   auto count = 0;
+
    for (auto item : items)
    {
       issuesLayout->addWidget(item);
 
-      const auto separator = new QFrame();
-      separator->setObjectName("orangeHSeparator");
-      issuesLayout->addWidget(separator);
+      if (count < last)
+      {
+         const auto separator = new QFrame();
+         separator->setObjectName("separator");
+         issuesLayout->addWidget(separator);
+      }
+
+      ++count;
    }
 
    issuesLayout->addStretch();
@@ -117,6 +91,7 @@ void AGitServerItemList::createContent(QVector<IssueItem *> items)
    mScrollArea = new QScrollArea();
    mScrollArea->setWidget(mIssuesWidget);
    mScrollArea->setWidgetResizable(true);
+   mScrollArea->setObjectName("IssuesScroll");
 
    mIssuesLayout->addWidget(mScrollArea);
 

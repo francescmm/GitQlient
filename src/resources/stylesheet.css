@@ -1008,53 +1008,62 @@ QFrame#tabWidget > QPushButton, QFrame#tabWidget > QPushButton[selected=false]
 /*********************************************/
 
 /*********************************************/
-/*          IssueDetailedView START          */
+/*          AGitServerItemList START         */
 /*********************************************/
 
-/*********************************************/
-/*           IssueDetailedView END           */
-/*********************************************/
-
-/* GitServer and BuildSystem */
-
-#IssuesHeaderFrame, #IssuesHeaderFrameBig
+AGitServerItemList
 {
-   padding: 10px;
+   border-style: solid;
+   border-width: 1px;
+}
+
+#IssuesHeaderFrame
+{
+   padding: 0px 10px;
+}
+
+#IssuesHeaderFrameBig
+{
+   padding: 10px 10px;
+}
+
+#IssuesHeaderFrameBig
+{
    border-bottom-width: 1px;
    border-bottom-style: solid;
+}
+
+#IssuesHeaderFrame
+{
+   max-height: 31px;
+   min-height: 31px;
 }
 
 #IssuesHeaderFrameBig
 {
 }
 
-#IssuesFooterFrame
-{
-   min-height: 10px;
-   max-height: 10px;
-}
-
-#ButtonIssuesHeaderFrame
-{
-   max-height: 20px;
-   min-height: 20px;
-   border-style: solid;
-   border-width: 1px;
-}
-
 #HeaderTitle
 {
-   font-variant: small-caps;
-   font-size: 12pt;
-   font-weight: bold;
 }
 
-/* IssueButton */
+#IssuesScroll
+{
+   border-top-width: 1px;
+   border-top-style: solid;
+}
+
+/*********************************************/
+/*           AGitServerItemList END          */
+/*********************************************/
+
+/*********************************************/
+/*              IssueItem START              */
+/*********************************************/
+
 ButtonLink#IssueTitle
 {
    padding: 0;
-   font-size: 11pt;
-   font-weight: bold;
 }
 
 #CreatorLink
@@ -1066,6 +1075,20 @@ ButtonLink#IssueTitle
 {
    padding-left: 5px;
 }
+
+/*********************************************/
+/*               IssueItem END               */
+/*********************************************/
+
+#IssuesFooterFrame
+{
+   min-height: 10px;
+   max-height: 10px;
+}
+
+/*********************************************/
+/*           PrCommentsList START            */
+/*********************************************/
 
 #IssueDescription
 {
@@ -1096,6 +1119,10 @@ ButtonLink#IssueTitle
 {
    border-radius: 10px;
 }
+
+/*********************************************/
+/*            PrCommentsList END             */
+/*********************************************/
 
 IssueDetailedView QTextEdit
 {

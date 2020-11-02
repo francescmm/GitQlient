@@ -32,8 +32,6 @@ IssueItem::IssueItem(const PullRequest &issueData, QWidget *parent)
 
 void IssueItem::fillWidget(const Issue &issueData)
 {
-   setObjectName("IssueItem");
-
    const auto title = new ButtonLink(QString("#%1 - %2").arg(issueData.number).arg(issueData.title));
    title->setWordWrap(true);
    title->setObjectName("IssueTitle");
@@ -47,8 +45,8 @@ void IssueItem::fillWidget(const Issue &issueData)
    const auto creationLayout = new QHBoxLayout();
    creationLayout->setContentsMargins(QMargins());
    creationLayout->setSpacing(0);
-   creationLayout->addWidget(new QLabel(tr("Created by ")));
-   const auto creator = new ButtonLink(QString("<b>%1</b>").arg(issueData.creator.name));
+   creationLayout->addWidget(new QLabel(tr("<i>Created by </i>")));
+   const auto creator = new ButtonLink(QString("<i><b>%1</b></i>").arg(issueData.creator.name));
    creator->setObjectName("CreatorLink");
    connect(creator, &ButtonLink::clicked, [url = issueData.url]() { QDesktopServices::openUrl(url); });
 
@@ -56,40 +54,14 @@ void IssueItem::fillWidget(const Issue &issueData)
 
    const auto days = issueData.creation.daysTo(QDateTime::currentDateTime());
    const auto whenText = days <= 30
-       ? tr(" %1 days ago").arg(days)
-       : tr(" on %1").arg(issueData.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
+       ? tr("<i> %1 days ago</i>").arg(days)
+       : tr("<i> on %1</i>").arg(issueData.creation.date().toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    const auto whenLabel = new QLabel(whenText);
    whenLabel->setToolTip(issueData.creation.toString(QLocale().dateFormat(QLocale::ShortFormat)));
 
    creationLayout->addWidget(whenLabel);
    creationLayout->addStretch();
-
-   const auto labelsLayout = new QHBoxLayout();
-   labelsLayout->setContentsMargins(QMargins());
-   labelsLayout->setSpacing(10);
-
-   QStringList labelsList;
-
-   for (auto &label : issueData.labels)
-   {
-      auto labelWidget = new QLabel();
-      labelWidget->setStyleSheet(QString("QLabel {"
-                                         "background-color: #%1;"
-                                         "border-radius: 7px;"
-                                         "min-height: 15px;"
-                                         "max-height: 15px;"
-                                         "min-width: 15px;"
-                                         "max-width: 15px;}")
-                                     .arg(label.colorHex));
-      labelWidget->setToolTip(label.name);
-      labelsLayout->addWidget(labelWidget);
-   }
-
-   const auto milestone = new QLabel(QString("%1").arg(issueData.milestone.title));
-   milestone->setObjectName("IssueLabel");
-   labelsLayout->addWidget(milestone);
-   labelsLayout->addStretch();
 
    const auto layout = new QVBoxLayout();
    layout->setContentsMargins(QMargins());
@@ -121,7 +93,35 @@ void IssueItem::fillWidget(const Issue &issueData)
       layout->addLayout(assigneeLayout);
    }
 
-   layout->addLayout(labelsLayout);
+   if (!issueData.labels.isEmpty())
+   {
+      const auto labelsLayout = new QHBoxLayout();
+      labelsLayout->setContentsMargins(QMargins());
+      labelsLayout->setSpacing(10);
+
+      QStringList labelsList;
+
+      for (auto &label : issueData.labels)
+      {
+         auto labelWidget = new QLabel();
+         labelWidget->setStyleSheet(QString("QLabel {"
+                                            "background-color: #%1;"
+                                            "border-radius: 7px;"
+                                            "min-height: 15px;"
+                                            "max-height: 15px;"
+                                            "min-width: 15px;"
+                                            "max-width: 15px;}")
+                                        .arg(label.colorHex));
+         labelWidget->setToolTip(label.name);
+         labelsLayout->addWidget(labelWidget);
+      }
+
+      const auto milestone = new QLabel(QString("%1").arg(issueData.milestone.title));
+      milestone->setObjectName("IssueLabel");
+      labelsLayout->addWidget(milestone);
+      labelsLayout->addStretch();
+      layout->addLayout(labelsLayout);
+   }
 
    QPixmap pic(":/icons/comment");
    pic = pic.scaled(15, 15, Qt::KeepAspectRatio, Qt::SmoothTransformation);

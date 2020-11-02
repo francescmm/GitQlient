@@ -784,7 +784,90 @@ MergeWidget > QPinnableTabWidget
 /*               MergeWidget END             */
 /*********************************************/
 
-/* GitServer and BuildSystem */
+/*********************************************/
+/*          AGitServerItemList START         */
+/*********************************************/
+
+AGitServerItemList
+{
+   border-color: #202122;
+}
+
+#IssuesHeaderFrame, #IssuesHeaderFrameBig
+{
+   background-color: #2E2F30;
+}
+
+#IssuesHeaderFrameBig
+{
+   border-bottom-color: #606162;
+}
+
+#IssuesScroll, #IssuesWidget
+{
+   background-color: #2E2F30;
+   border-top-color: #606162;
+}
+
+#IssuesScroll
+{
+   border-top-color: #606162;
+}
+
+/*********************************************/
+/*           AGitServerItemList END          */
+/*********************************************/
+
+/*********************************************/
+/*              IssueItem START              */
+/*********************************************/
+
+IssueItem
+{
+   background-color: #2E2F30;
+}
+
+/*********************************************/
+/*               IssueItem END               */
+/*********************************************/
+
+/*********************************************/
+/*           PrCommentsList START            */
+/*********************************************/
+
+#IssueDescription
+{
+  background: #404142;
+}
+
+#IssueIntro
+{
+   background: #404142;
+}
+
+#IssueIntroApproved
+{
+   background: #729943;
+}
+
+#IssueIntroChangesRequested
+{
+   background: #D89000;
+}
+
+#IssueIntroCommented
+{
+   background: #404142;
+}
+
+#CodeReviewComment
+{
+   background-color: #505152;
+}
+
+/*********************************************/
+/*            PrCommentsList END             */
+/*********************************************/
 
 QToolButton#ViewBtnOption
 {
@@ -866,36 +949,6 @@ JobContainer, #JenkinsJobPanel, #JobPanelTabWidget, JenkinsJobPanel#JenkinsJobPa
    background: #2E2F30;
 }
 
-#IssueDescription
-{
-  background: #404142;
-}
-
-#IssueIntro
-{
-   background: #404142;
-}
-
-#IssueIntroApproved
-{
-   background: #729943;
-}
-
-#IssueIntroChangesRequested
-{
-   background: #D89000;
-}
-
-#IssueIntroCommented
-{
-   background: #404142;
-}
-
-#CodeReviewComment
-{
-   background-color: #505152;
-}
-
 IssueDetailedView QTextEdit
 {
    background: transparent;
@@ -940,22 +993,6 @@ SourceCodeReview QLabel
    background: #2E2F30;
 }
 
-#ButtonIssuesHeaderFrame
-{
-   background: #404142;
-   border-color: #D89000;
-}
-
-#ButtonIssuesHeaderFrame:hover
-{
-   background: #606162;
-}
-
-#IssueItem
-{
-   background-color: #2E2F30;
-   border-bottom: 1px solid #404142;
-}
 
 #IssuesFooterFrame, #IssuesFooterFramePagination
 {
@@ -968,14 +1005,4 @@ SourceCodeReview QLabel
    background: transparent;
 }
 
-#IssuesHeaderFrame, #IssuesHeaderFrameBig
-{
-   background-color: #2E2F30;
-   border-bottom-color: #606162;
-}
-
-#IssuesWidget
-{
-   background-color: #2E2F30;
-}
 

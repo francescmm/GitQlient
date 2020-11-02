@@ -53,7 +53,6 @@ public:
 
 protected:
    QSharedPointer<GitServerCache> mGitServerCache;
-   QLabel *mHeaderIconLabel = nullptr;
    QLabel *mHeaderTitle = nullptr;
 
    void createContent(QVector<IssueItem *> items);

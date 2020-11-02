@@ -841,7 +841,43 @@ MergeWidget > QPinnableTabWidget
 /*               MergeWidget END             */
 /*********************************************/
 
-/* GitServer and BuildSystem */
+/*********************************************/
+/*          AGitServerItemList START         */
+/*********************************************/
+
+AGitServerItemList
+{
+   border-color: #202122;
+}
+
+#IssuesHeaderFrame, #IssuesHeaderFrameBig
+{
+   background-color: #2E2F30;
+}
+
+#IssuesHeaderFrameBig
+{
+   border-bottom-color: #606162;
+}
+
+#IssuesWidget
+{
+   background: #2E2F30;
+}
+
+#IssuesScroll
+{
+   border-top-color: green;
+}
+
+IssueItem
+{
+   background: #2E2F30;
+}
+
+/*********************************************/
+/*           AGitServerItemList END          */
+/*********************************************/
 
 QToolButton#ViewBtnOption
 {
@@ -997,23 +1033,6 @@ SourceCodeReview QLabel
    background: #2E2F30;
 }
 
-#ButtonIssuesHeaderFrame
-{
-   background: #404142;
-   border-color: #D89000;
-}
-
-#ButtonIssuesHeaderFrame:hover
-{
-   background: #606162;
-}
-
-#IssueItem
-{
-   background: #2E2F30;
-   border-bottom: 1px solid #404142;
-}
-
 #IssuesFooterFrame, #IssuesFooterFramePagination
 {
    border-bottom: 1px solid #404142;
@@ -1028,10 +1047,5 @@ SourceCodeReview QLabel
 #IssuesHeaderFrame, #IssuesHeaderFrameBig
 {
    background: #202122;
-}
-
-#IssuesWidget
-{
-   background: #2E2F30;
 }
 
