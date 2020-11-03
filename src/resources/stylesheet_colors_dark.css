@@ -865,6 +865,24 @@ IssueItem
    background-color: #505152;
 }
 
+#OutdatedLabel
+{
+    background: #C8C8C8;
+    color: white;
+}
+
+#AddReviewInput
+{
+   background: #505152;
+   border-color: #2E2F30;
+}
+
+SourceCodeReview QLabel
+{
+    background: #2E2F30;
+    border-bottom-color: #D89000;
+}
+
 /*********************************************/
 /*            PrCommentsList END             */
 /*********************************************/
@@ -910,6 +928,46 @@ QToolButton#ViewBtnOption:!checked:hover
 /*********************************************/
 /*           IssueDetailedView END           */
 /*********************************************/
+
+/*********************************************/
+/*            PrChangesList START            */
+/*********************************************/
+
+#IssuesViewFrame
+{
+   background: #2E2F30;
+}
+
+PrChangesList FileDiffView
+{
+   background: #404142;
+}
+
+#PrChangeListItem
+{
+   background: transparent;
+}
+
+#ChangeHeaderFrame
+{
+   background: #202122;
+}
+
+#teComment
+{
+   color: white;
+   background: #606162;
+   border-color: #202122;
+}
+
+/*********************************************/
+/*             PrChangesList END             */
+/*********************************************/
+
+#JobContainer
+{
+   background: #2E2F30;
+}
 
 #JobContainerHeader
 {
@@ -962,59 +1020,8 @@ JobContainer, #JenkinsJobPanel, #JobPanelTabWidget, JenkinsJobPanel#JenkinsJobPa
     color: white;
 }
 
-#teComment
-{
-   color: white;
-   background: #606162;
-   border-color: #202122;
-}
-
-#IssuesViewFrame
-{
-   background: #2E2F30;
-}
-
-PrChangesList FileDiffView
-{
-   background: #404142;
-}
-
-#PrChangeListItem
-{
-   background: transparent;
-}
-
-#ChangeHeaderFrame
-{
-   background: #202122;
-}
-
-SourceCodeReview QLabel
-{
-    background: #2E2F30;
-    border-bottom-color: #D89000;
-}
-
-#OutdatedLabel
-{
-    background: #C8C8C8;
-    color: white;
-}
-
-#AddReviewInput
-{
-   background: #505152;
-   border-color: #2E2F30;
-}
-
-#JobContainer
-{
-   background: #2E2F30;
-}
-
 #TransparentScrollArea
 {
    background: transparent;
 }
-
 

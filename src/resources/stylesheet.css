@@ -1139,15 +1139,33 @@ IssueDetailedView QTextEdit
    max-height: 10px;
 }
 
-/*********************************************/
-/*           IssueDetailedView END           */
-/*********************************************/
-
 QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
 {
    border-width: 1px;
    border-style: solid;
 }
+
+#OutdatedLabel
+{
+   border-radius: 7px;
+   padding: 5px;
+}
+
+#AddReviewInput
+{
+   border-style: solid;
+   border-width: 1px;
+   border-radius: 10px;
+   padding: 5px;
+}
+
+/*********************************************/
+/*           IssueDetailedView END           */
+/*********************************************/
+
+/*********************************************/
+/*            PrChangesList START            */
+/*********************************************/
 
 PrChangesList FileDiffView
 {
@@ -1178,21 +1196,10 @@ SourceCodeReview QLabel
    border-bottom-width: 1px;
 }
 
-#OutdatedLabel
-{
-   border-radius: 7px;
-   padding: 5px;
-}
+/*********************************************/
+/*             PrChangesList END             */
+/*********************************************/
 
-#AddReviewInput
-{
-   border-style: solid;
-   border-width: 1px;
-   border-radius: 10px;
-   padding: 5px;
-}
-
-/* JENKINS */
 #JenkinsWidget, #JobButton, #JobContainerScrollArea
 {
    background: transparent;

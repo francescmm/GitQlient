@@ -860,40 +860,170 @@ AGitServerItemList
    border-bottom-color: #606162;
 }
 
-#IssuesWidget
+#IssuesScroll, #IssuesWidget
 {
-   background: #2E2F30;
+   background-color: #2E2F30;
+   border-top-color: #606162;
 }
 
 #IssuesScroll
 {
-   border-top-color: green;
-}
-
-IssueItem
-{
-   background: #2E2F30;
+   border-top-color: #606162;
 }
 
 /*********************************************/
 /*           AGitServerItemList END          */
 /*********************************************/
 
-QToolButton#ViewBtnOption
+/*********************************************/
+/*              IssueItem START              */
+/*********************************************/
+
+IssueItem
 {
-    background: #404142;
+   background-color: #2E2F30;
+}
+
+/*********************************************/
+/*               IssueItem END               */
+/*********************************************/
+
+/*********************************************/
+/*           PrCommentsList START            */
+/*********************************************/
+
+#IssueDescription
+{
+  background: #404142;
+}
+
+#IssueIntro
+{
+   background: #404142;
+}
+
+#IssueIntroApproved
+{
+   background: #729943;
+}
+
+#IssueIntroChangesRequested
+{
+   background: #D89000;
+}
+
+#IssueIntroCommented
+{
+   background: #404142;
+}
+
+#CodeReviewComment
+{
+   background-color: #505152;
+}
+
+#OutdatedLabel
+{
+    background: #C8C8C8;
     color: white;
 }
 
+#AddReviewInput
+{
+   background: #505152;
+   border-color: #2E2F30;
+}
+
+SourceCodeReview QLabel
+{
+    background: #2E2F30;
+    border-bottom-color: #D89000;
+}
+
+/*********************************************/
+/*            PrCommentsList END             */
+/*********************************************/
+
+/*********************************************/
+/*          IssueDetailedView START          */
+/*********************************************/
+
+IssueDetailedView
+{
+   border-color: #202122;
+}
+
+IssueDetailedView QTextEdit
+{
+   background: transparent;
+   color: white;
+}
+
+#IssuesFooterFrame
+{
+   border-bottom: 1px solid #404142;
+   background-color: #2E2F30;
+}
+
+QToolButton#ViewBtnOption, QPushButton#ViewBtnOption
+{
+    background-color: #404142;
+    color: white;
+}
 QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
 {
-   background: #202122;
+   background-color: #202122;
    border-color: #404142;
 }
 
+QPushButton#ViewBtnOption:hover,
 QToolButton#ViewBtnOption:!checked:hover
 {
+   background-color: #606162;
+}
+
+/*********************************************/
+/*           IssueDetailedView END           */
+/*********************************************/
+
+/*********************************************/
+/*            PrChangesList START            */
+/*********************************************/
+
+#IssuesViewFrame
+{
+   background: #2E2F30;
+}
+
+PrChangesList FileDiffView
+{
+   background: #404142;
+}
+
+#PrChangeListItem
+{
+   background: transparent;
+}
+
+#ChangeHeaderFrame
+{
+   background: #202122;
+}
+
+#teComment
+{
+   color: white;
    background: #606162;
+   border-color: #202122;
+}
+
+/*********************************************/
+/*             PrChangesList END             */
+/*********************************************/
+
+#JobContainer
+{
+   background: #2E2F30;
 }
 
 #JobContainerHeader
@@ -947,105 +1077,8 @@ JobContainer, #JenkinsJobPanel, #JobPanelTabWidget, JenkinsJobPanel#JenkinsJobPa
     color: white;
 }
 
-#teComment
-{
-   color: white;
-   background: #606162;
-   border-color: #202122;
-}
-
-#IssuesViewFrame
-{
-   background: #2E2F30;
-}
-
-#IssueDescription
-{
-  background: #404142;
-}
-
-#IssueIntro
-{
-   background: #404142;
-}
-
-#IssueIntroApproved
-{
-   background: #729943;
-}
-
-#IssueIntroChangesRequested
-{
-   background: #D89000;
-}
-
-#IssueIntroCommented
-{
-   background: #404142;
-}
-
-#CodeReviewComment
-{
-   background: #505152;
-}
-
-IssueDetailedView QTextEdit
-{
-   background: transparent;
-   color: white;
-}
-
-PrChangesList FileDiffView
-{
-   background: #404142;
-}
-
-#PrChangeListItem
-{
-   background: transparent;
-}
-
-#ChangeHeaderFrame
-{
-   background: #202122;
-}
-
-SourceCodeReview QLabel
-{
-    background: #2E2F30;
-    border-bottom-color: #D89000;
-}
-
-#OutdatedLabel
-{
-    background: #C8C8C8;
-    color: white;
-}
-
-#AddReviewInput
-{
-   background: #505152;
-   border-color: #2E2F30;
-}
-
-#JobContainer
-{
-   background: #2E2F30;
-}
-
-#IssuesFooterFrame, #IssuesFooterFramePagination
-{
-   border-bottom: 1px solid #404142;
-   background: #2E2F30;
-}
-
 #TransparentScrollArea
 {
    background: transparent;
-}
-
-#IssuesHeaderFrame, #IssuesHeaderFrameBig
-{
-   background: #202122;
 }
 
