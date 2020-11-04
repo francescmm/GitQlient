@@ -45,7 +45,6 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<GitCach
    diffsLayout->setSpacing(0);
    diffsLayout->addWidget(mInfoPanelBase);
    diffsLayout->addWidget(wipSeparator);
-   diffsLayout->addSpacing(5);
    diffsLayout->addWidget(fileListWidget);
 
    const auto panelLayout = new QVBoxLayout();

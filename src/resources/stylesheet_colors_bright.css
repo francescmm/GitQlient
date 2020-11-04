@@ -554,6 +554,11 @@ DiffWidget > QPinnableTabWidget > QTabBar::tab:last
 /*          CommitChangesWidget START        */
 /*********************************************/
 
+CommitChangesWidget, WipWidget, AmendWidget
+{
+   background: white;
+}
+
 #leCommitTitle, #teDescription, #leAuthorName, #leAuthorEmail, #lCounter
 {
     background: white;

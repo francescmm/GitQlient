@@ -32,7 +32,6 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<GitCache> &cache, const 
    verticalLayout->setContentsMargins(0, 0, 0, 0);
    verticalLayout->addWidget(mInfoPanel);
    verticalLayout->addWidget(wipSeparator);
-   verticalLayout->addSpacing(5);
    verticalLayout->addWidget(fileListWidget);
 
    connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
