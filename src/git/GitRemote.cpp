@@ -16,7 +16,6 @@ GitRemote::GitRemote(const QSharedPointer<GitBase> &gitBase)
 
 GitExecResult GitRemote::pushBranch(const QString &branchName, bool force)
 {
-
    QLog_Debug("Git", QString("Executing push"));
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
@@ -33,7 +32,6 @@ GitExecResult GitRemote::pushBranch(const QString &branchName, bool force)
 
 GitExecResult GitRemote::push(bool force)
 {
-
    QLog_Debug("Git", QString("Executing push"));
 
    const auto ret = mGitBase->run(QString("git push ").append(force ? QString("--force") : QString()));
@@ -43,7 +41,6 @@ GitExecResult GitRemote::push(bool force)
 
 GitExecResult GitRemote::pull()
 {
-
    QLog_Debug("Git", QString("Executing pull"));
 
    auto ret = mGitBase->run("git pull --ff-only");
@@ -69,7 +66,6 @@ GitExecResult GitRemote::pull()
 
 bool GitRemote::fetch()
 {
-
    QLog_Debug("Git", QString("Executing fetch with prune"));
 
    GitQlientSettings settings;
@@ -84,10 +80,23 @@ bool GitRemote::fetch()
 
 GitExecResult GitRemote::prune()
 {
-
    QLog_Debug("Git", QString("Executing prune"));
 
    const auto ret = mGitBase->run("git remote prune origin");
+
+   return ret;
+}
+
+GitExecResult GitRemote::addRemote(const QString &remoteRepo, const QString &remoteName)
+{
+   QLog_Debug("Git", QString("Adding a remote repository"));
+
+   const auto ret = mGitBase->run(QString("git remote add %1 %2").arg(remoteName, remoteRepo));
+
+   if (ret.success)
+   {
+      const auto ret2 = mGitBase->run(QString("git fetch %1").arg(remoteName));
+   }
 
    return ret;
 }

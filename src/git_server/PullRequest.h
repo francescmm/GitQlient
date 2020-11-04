@@ -73,7 +73,10 @@ struct PullRequest : public Issue
    };
 
    QString head;
+   QString headRepo;
+   QString headUrl;
    QString base;
+   QString baseRepo;
    bool maintainerCanModify = true;
    bool draft = false;
    int id = 0;

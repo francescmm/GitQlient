@@ -5,12 +5,16 @@
 #include <FileDiffView.h>
 #include <PrChangeListItem.h>
 #include <PullRequest.h>
+#include <GitRemote.h>
+#include <GitConfig.h>
+#include <QLogger.h>
 
 #include <QGridLayout>
 #include <QLabel>
 #include <QScrollArea>
 
 using namespace GitServer;
+using namespace QLogger;
 
 PrChangesList::PrChangesList(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
@@ -18,13 +22,47 @@ PrChangesList::PrChangesList(const QSharedPointer<GitBase> &git, QWidget *parent
 {
 }
 
-void PrChangesList::loadData(const QString &baseBranch, const QString &headBranch)
+void PrChangesList::loadData(const GitServer::PullRequest &prInfo)
 {
-   Q_UNUSED(headBranch);
-   Q_UNUSED(baseBranch);
+   GitExecResult ret;
+   bool showDiff = true;
+
+   if (prInfo.headRepo != prInfo.baseRepo)
+   {
+      QScopedPointer<GitConfig> git(new GitConfig(mGit));
+      const auto ret = git->getGitValue(QString("remote.%1.url").arg(prInfo.headRepo.split("/").constFirst()));
+
+      if (ret.output.toString().isEmpty())
+      {
+         const auto response = QMessageBox::question(
+             this, tr("Getting remote branch"),
+             tr("The head branch of the Pull Request is not in the same repository. In order to show "
+                "the changes the remote must be added. <b>Do you want to get the remote branch?</b>"));
+
+         if (response == QMessageBox::Yes)
+         {
+            QScopedPointer<GitRemote> git(new GitRemote(mGit));
+            const auto remoteAdded = git->addRemote(prInfo.headUrl, prInfo.headRepo.split("/").constFirst());
+
+            showDiff = remoteAdded.success;
+
+            if (!showDiff)
+               QLog_Warning("UI", QString("Problems adding a remote: {%1}").arg(remoteAdded.output.toString()));
+         }
+         else
+            showDiff = false;
+
+         if (!showDiff)
+            return;
+      }
+   }
+
+   const auto head = prInfo.headRepo == prInfo.baseRepo
+       ? prInfo.head
+       : QString("%1/%2").arg(prInfo.headRepo.split("/").constFirst(), prInfo.head);
 
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
-   const auto ret = git->getBranchesDiff(baseBranch, headBranch);
+   ret = git->getBranchesDiff(prInfo.base, head);
 
    if (ret.success)
    {

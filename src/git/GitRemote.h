@@ -39,6 +39,7 @@ public:
    GitExecResult pull();
    bool fetch();
    GitExecResult prune();
+   GitExecResult addRemote(const QString &remoteRepo, const QString &remoteName);
 
 private:
    QSharedPointer<GitBase> mGitBase;

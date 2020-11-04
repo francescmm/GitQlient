@@ -197,7 +197,7 @@ void IssueDetailedView::loadData(IssueDetailedView::Config config, int issueNum,
       mPrCommitsList->loadData(mIssue.number);
 
       const auto pr = mGitServerCache->getPullRequest(mIssue.number);
-      mPrChangesList->loadData(pr.base, pr.head);
+      mPrChangesList->loadData(pr);
    }
 
    mBtnGroup->button(static_cast<int>(Buttons::Commits))->setEnabled(mConfig == Config::PullRequests);

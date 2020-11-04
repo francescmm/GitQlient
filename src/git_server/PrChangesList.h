@@ -46,7 +46,7 @@ signals:
 public:
    explicit PrChangesList(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
 
-   void loadData(const QString &baseBranch, const QString &headBranch);
+   void loadData(const GitServer::PullRequest &prInfo);
 
    void onReviewsReceived(GitServer::PullRequest pr);
    void addLinks(GitServer::PullRequest pr, const QMap<int, int> &reviewLinkToComments);

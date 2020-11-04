@@ -649,10 +649,9 @@ void GitHubRestApi::onPullRequestStatusReceived(PullRequest pr)
 
       pr.state.state = obj["state"].toString();
 
-      pr.state.eState = pr.state.state == "success"
-          ? PullRequest::HeadState::State::Success
-          : pr.state.state == "failure" ? PullRequest::HeadState::State::Failure
-                                        : PullRequest::HeadState::State::Pending;
+      pr.state.eState = pr.state.state == "success" ? PullRequest::HeadState::State::Success
+          : pr.state.state == "failure"             ? PullRequest::HeadState::State::Failure
+                                                    : PullRequest::HeadState::State::Pending;
 
       const auto statuses = obj["statuses"].toArray();
 
@@ -1038,8 +1037,11 @@ PullRequest GitHubRestApi::prFromJson(const QJsonObject &json) const
    pr.body = json["body"].toString().toUtf8();
    pr.url = json["html_url"].toString();
    pr.head = json["head"].toObject()["ref"].toString();
+   pr.headRepo = json["head"].toObject()["repo"].toObject()["full_name"].toString();
+   pr.headUrl = json["head"].toObject()["repo"].toObject()["clone_url"].toString();
    pr.state.sha = json["head"].toObject()["sha"].toString();
    pr.base = json["base"].toObject()["ref"].toString();
+   pr.baseRepo = json["base"].toObject()["repo"].toObject()["full_name"].toString();
    pr.isOpen = json["state"].toString() == "open";
    pr.draft = json["draft"].toBool();
    pr.creation = json["created_at"].toVariant().toDateTime();
