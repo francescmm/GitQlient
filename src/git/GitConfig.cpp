@@ -160,10 +160,7 @@ GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
       }
 
       if (!configValue.isEmpty())
-      {
-
          return { true, configValue };
-      }
    }
 
    return GitExecResult();

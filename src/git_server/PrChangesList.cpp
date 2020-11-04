@@ -26,6 +26,7 @@ void PrChangesList::loadData(const GitServer::PullRequest &prInfo)
 {
    GitExecResult ret;
    bool showDiff = true;
+   QString head;
 
    if (prInfo.headRepo != prInfo.baseRepo)
    {
@@ -55,14 +56,22 @@ void PrChangesList::loadData(const GitServer::PullRequest &prInfo)
          if (!showDiff)
             return;
       }
+
+      head = QString("%1/%2").arg(prInfo.headRepo.split("/").constFirst(), prInfo.head);
+   }
+   else
+   {
+      QScopedPointer<GitConfig> git(new GitConfig(mGit));
+      auto retBase = git->getRemoteForBranch(prInfo.head);
+      head = QString("%1/%2").arg(retBase.success ? retBase.output.toString() : "origin", prInfo.head);
    }
 
-   const auto head = prInfo.headRepo == prInfo.baseRepo
-       ? prInfo.head
-       : QString("%1/%2").arg(prInfo.headRepo.split("/").constFirst(), prInfo.head);
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   auto retBase = gitConfig->getRemoteForBranch(prInfo.head);
+   const auto base = QString("%1/%2").arg(retBase.success ? retBase.output.toString() : "origin", prInfo.base);
 
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
-   ret = git->getBranchesDiff(prInfo.base, head);
+   ret = git->getBranchesDiff(base, head);
 
    if (ret.success)
    {
