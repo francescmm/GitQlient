@@ -98,7 +98,21 @@ void LineNumberArea::mouseMoveEvent(QMouseEvent *e)
          if (x >= 0 && x <= height)
          {
             QTextCursor cursor = fileDiffWidget->cursorForPosition(helpPos);
-            fileDiffWidget->mRow = cursor.block().blockNumber() + fileDiffWidget->mStartingLine + 1;
+            const auto textRow = cursor.block().blockNumber();
+            auto found = false;
+
+            for (const auto &diff : fileDiffWidget->mFileDiffInfo)
+            {
+               if (textRow + 1 >= diff.startLine && textRow + 1 <= diff.endLine)
+               {
+                  fileDiffWidget->mRow = textRow + fileDiffWidget->mStartingLine + 1;
+                  found = true;
+                  break;
+               }
+            }
+
+            if (!found)
+               fileDiffWidget->mRow = -1;
 
             repaint();
          }

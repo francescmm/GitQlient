@@ -215,7 +215,21 @@ bool FileDiffView::eventFilter(QObject *obj, QEvent *event)
       if (x >= 0 && x <= height)
       {
          QTextCursor cursor = cursorForPosition(helpPos);
-         mRow = cursor.block().blockNumber() + mStartingLine + 1;
+         const auto textRow = cursor.block().blockNumber();
+         auto found = false;
+
+         for (const auto &diff : mFileDiffInfo)
+         {
+            if (textRow + 1 >= diff.startLine && textRow + 1 <= diff.endLine)
+            {
+               mRow = textRow + mStartingLine + 1;
+               found = true;
+               break;
+            }
+         }
+
+         if (!found)
+            mRow = -1;
 
          repaint();
       }
