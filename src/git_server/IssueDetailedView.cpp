@@ -68,6 +68,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    mReviewBtn->setPopupMode(QToolButton::InstantPopup);
    mReviewBtn->setIcon(QIcon(":/icons/review_comment"));
    mReviewBtn->setToolTip(tr("Start review"));
+   mReviewBtn->setObjectName("ViewBtnOption");
    mReviewBtn->setDisabled(true);
    mReviewBtn->setMenu(reviewMenu);
 

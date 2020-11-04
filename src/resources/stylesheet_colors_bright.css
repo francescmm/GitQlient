@@ -847,28 +847,28 @@ MergeWidget > QPinnableTabWidget
 
 AGitServerItemList
 {
-   border-color: #202122;
+   border-color: #2E2F30;
 }
 
 #IssuesHeaderFrame, #IssuesHeaderFrameBig
 {
-   background-color: #2E2F30;
+   background-color: #C6C6C7;
 }
 
 #IssuesHeaderFrameBig
 {
-   border-bottom-color: #606162;
+   border-bottom-color: #2E2F30;
 }
 
 #IssuesScroll, #IssuesWidget
 {
-   background-color: #2E2F30;
-   border-top-color: #606162;
+   background-color: white;
+   border-top-color: #2E2F30;
 }
 
 #IssuesScroll
 {
-   border-top-color: #606162;
+   border-top-color: #2E2F30;
 }
 
 /*********************************************/
@@ -881,7 +881,7 @@ AGitServerItemList
 
 IssueItem
 {
-   background-color: #2E2F30;
+   background-color: white;
 }
 
 /*********************************************/
@@ -892,14 +892,24 @@ IssueItem
 /*           PrCommentsList START            */
 /*********************************************/
 
+PrCommentsList, PrCommentsList QScrollArea
+{
+   background: white;
+}
+
+#IssuesViewFrame
+{
+   background: white;
+}
+
 #IssueDescription
 {
-  background: #404142;
+   background: #C6C6C7;
 }
 
 #IssueIntro
 {
-   background: #404142;
+   background: #C6C6C7;
 }
 
 #IssueIntroApproved
@@ -914,30 +924,30 @@ IssueItem
 
 #IssueIntroCommented
 {
-   background: #404142;
+   background: #606162;
 }
 
 #CodeReviewComment
 {
-   background-color: #505152;
+   background-color: white;
 }
 
 #OutdatedLabel
 {
-    background: #C8C8C8;
-    color: white;
+   background: white;
+   color: black;
 }
 
 #AddReviewInput
 {
-   background: #505152;
+   background: white;
    border-color: #2E2F30;
 }
 
 SourceCodeReview QLabel
 {
-    background: #2E2F30;
-    border-bottom-color: #D89000;
+   background: white;
+   border-bottom-color: #D89000;
 }
 
 /*********************************************/
@@ -950,34 +960,35 @@ SourceCodeReview QLabel
 
 IssueDetailedView
 {
-   border-color: #202122;
+   border-color: #2E2F30;
 }
 
 IssueDetailedView QTextEdit
 {
    background: transparent;
-   color: white;
+   color: black;
 }
 
 #IssuesFooterFrame
 {
-   border-bottom: 1px solid #404142;
-   background-color: #2E2F30;
+   border-bottom: 0;
+   background-color: white;
 }
 
-QToolButton#ViewBtnOption, QPushButton#ViewBtnOption
+QToolButton#ViewBtnOption, QPushButton#ViewBtnOption, QToolButton#ViewBtnOption::menu-button
 {
     background-color: #404142;
     color: white;
 }
 QToolButton#ViewBtnOption:checked, QToolButton#ViewBtnOption:checked:hover
 {
-   background-color: #202122;
-   border-color: #404142;
+   background-color: white;
+   border-color: #2E2F30;
 }
 
 QPushButton#ViewBtnOption:hover,
-QToolButton#ViewBtnOption:!checked:hover
+QToolButton#ViewBtnOption:!checked:hover,
+QToolButton#ViewBtnOption::menu-button:hover
 {
    background-color: #606162;
 }
@@ -990,14 +1001,9 @@ QToolButton#ViewBtnOption:!checked:hover
 /*            PrChangesList START            */
 /*********************************************/
 
-#IssuesViewFrame
-{
-   background: #2E2F30;
-}
-
 PrChangesList FileDiffView
 {
-   background: #404142;
+   background: #C6C6C7;
 }
 
 #PrChangeListItem
