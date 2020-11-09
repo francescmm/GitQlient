@@ -457,6 +457,11 @@ GitQlient
    background-color: #2E2F30;
 }
 
+#GitQlientTab > QTabBar::tab:first:hover
+{
+   background-color: #606162;
+}
+
 #GitQlientTab > QTabBar::tab:first:selected
 {
    background-color: #404142;
