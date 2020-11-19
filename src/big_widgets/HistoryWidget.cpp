@@ -490,7 +490,7 @@ void HistoryWidget::cherryPickCommit()
          const auto errorMsg = ret.output.toString();
 
          if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
-             && errorMsg.contains("causing a conflict", Qt::CaseInsensitive))
+             && errorMsg.contains(" conflict", Qt::CaseInsensitive))
          {
             emit signalCherryPickConflict();
          }
