@@ -21,6 +21,7 @@
 #include <GitBase.h>
 #include <GitHistory.h>
 #include <GitHubRestApi.h>
+#include <GitSubmodules.h>
 #include <GitServerWidget.h>
 #include <GitServerCache.h>
 #include <ConfigData.h>
@@ -227,13 +228,26 @@ void GitQlientRepo::setWatcher()
 
    mGitWatcher->addPath(mCurrentDir);
 
-   QDirIterator it(mCurrentDir, QDirIterator::Subdirectories);
+   QScopedPointer<GitSubmodules> git(new GitSubmodules(mGitBase));
+   const auto submodules = git->getSubmodules();
+
+   QDirIterator it(mCurrentDir);
    while (it.hasNext())
    {
       const auto dir = it.next();
 
-      if (it.fileInfo().isDir() && !dir.endsWith(".") && !dir.endsWith(".."))
-         mGitWatcher->addPath(dir);
+      if (it.fileInfo().isDir() && !dir.endsWith(".") && !dir.endsWith("..") && !containsSubmodule(dir, submodules))
+      {
+         QDirIterator subdirIt(dir, QDirIterator::Subdirectories);
+
+         while (subdirIt.hasNext())
+         {
+            const auto dir = subdirIt.next();
+
+            if (subdirIt.fileInfo().isDir() && !dir.endsWith(".") && !dir.endsWith(".."))
+               mGitWatcher->addPath(dir);
+         }
+      }
    }
 }
 
@@ -501,6 +515,17 @@ void GitQlientRepo::focusHistoryOnPr(int prNumber)
 
    mHistoryWidget->focusOnCommit(pr.state.sha);
    showHistoryView();
+}
+
+bool GitQlientRepo::containsSubmodule(const QString &path, const QVector<QString> &submodules)
+{
+   for (const auto &submodule : submodules)
+   {
+      if (auto hasPath = path.contains(submodule); hasPath)
+         return hasPath;
+   }
+
+   return false;
 }
 
 void GitQlientRepo::openCommitDiff(const QString currentSha)

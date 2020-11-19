@@ -306,4 +306,12 @@ private:
     * @param prNumber The PR to put the focus on.
     */
    void focusHistoryOnPr(int prNumber);
+
+   /**
+    * @brief containsSubmodule Analyzes a path to see if the path is one of the submodules.
+    * @param path The full path to check if submodule.
+    * @param submodules The list of submodules.
+    * @return True if the path is in a submodule.
+    */
+   bool containsSubmodule(const QString &path, const QVector<QString> &submodules);
 };

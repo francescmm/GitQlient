@@ -166,13 +166,15 @@ bool AGitProcess::execute(const QString &command)
 
 void AGitProcess::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
+   Q_UNUSED(exitCode)
+
    QLog_Debug("Git", QString("Process {%1} finished.").arg(mCommand));
 
    const auto errorOutput = readAllStandardError();
 
    mErrorOutput = QString::fromUtf8(errorOutput);
-   mRealError = exitStatus != QProcess::NormalExit || (exitStatus == QProcess::NormalExit && exitCode != 0)
-       || mCanceling || errorOutput.contains("error") || errorOutput.toLower().contains("could not read username");
+   mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error")
+       || errorOutput.toLower().contains("could not read username");
 
    if (mRealError)
    {
