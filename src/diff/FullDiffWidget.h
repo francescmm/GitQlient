@@ -59,7 +59,7 @@ public:
     \brief Loads a diff for a specific commit SHA respect another commit SHA.
 
     \param sha The base commit SHA.
-    \param diffToSha The commit SHA to comapre to.
+    \param diffToSha The commit SHA to compare to.
     \param diffData The diff data returned by the git command.
     \return True if there is a diff to load, otherwise false.
    */

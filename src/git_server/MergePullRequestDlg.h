@@ -56,7 +56,7 @@ signals:
 
 public:
    /**
-    * @brief MergePullRequestDlg Defail constructor.
+    * @brief MergePullRequestDlg Detail constructor.
     * @param git The git object to perform Git operations.
     * @param pr The pull request to be merged.
     * @param sha The sha of the current commit to check that is the current sha in the server.
@@ -77,7 +77,7 @@ private:
    GitServer::IRestApi *mApi;
 
    /**
-    * @brief accept Checks the data introduced by the user and triggers the connection agains the server.
+    * @brief accept Checks the data introduced by the user and triggers the connection against the server.
     */
    void accept() override;
    /**

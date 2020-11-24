@@ -155,7 +155,7 @@ void UnstagedMenu::onDeleteFile()
 {
    const auto path = QString("%1").arg(mFileName);
 
-   QLog_Info("UI", "Removing paht: " + path);
+   QLog_Info("UI", "Removing path: " + path);
 
    QProcess p;
    p.setWorkingDirectory(mGit->getWorkingDir());

@@ -108,7 +108,7 @@ public:
    static QColor getOrange();
 
    /**
-    * @brief getGitQlientOrange Gets the GitQlient oficial orange color.
+    * @brief getGitQlientOrange Gets the GitQlient official orange color.
     * @return QColor
     */
    static QColor getGitQlientOrange();

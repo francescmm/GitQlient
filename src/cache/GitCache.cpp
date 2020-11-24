@@ -59,7 +59,7 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
 
    auto count = 1;
 
-   QLog_Debug("Git", QString("Adding commited revisions."));
+   QLog_Debug("Git", QString("Adding committed revisions."));
 
    for (const auto &commit : commits)
    {

@@ -33,7 +33,7 @@ class GitServerCache;
 enum class CommitHistoryColumns;
 
 /**
- * @brief The CommitHistoryModel contains the data model (is the Model in the MVC pattern) that will be diplayed by the
+ * @brief The CommitHistoryModel contains the data model (is the Model in the MVC pattern) that will be displayed by the
  * view.
  *
  * @class CommitHistoryModel CommitHistoryModel.h "CommitHistoryModel.h"
@@ -58,7 +58,7 @@ public:
    void clear();
    /**
     * @brief Method used to retrieve the sha of a specific row. The view access this method instead of the internal
-    * cache becuase the row could change when a pxoxy filter is used between the View and the Model data.
+    * cache because the row could change when a proxy filter is used between the View and the Model data.
     *
     * @param row The row to get the SHA from.
     * @return QString The SHA.
@@ -69,7 +69,7 @@ public:
     * @brief Returns the data stored under the given \p role for the item referred to by the \p index
     *
     * @param index The index to get the data from.
-    * @param role The role from where to extrat the data.
+    * @param role The role from where to extract the data.
     * @return QVariant The data value.
     */
    QVariant data(const QModelIndex &index, int role) const override;
@@ -147,7 +147,7 @@ private:
    /**
     * @brief Returns the data that will be display for every \p column.
     *
-    * @param rev The commit infor to retrieve the data that will be displayed.
+    * @param rev The commit info to retrieve the data that will be displayed.
     * @param column The column where the data will be shown.
     * @return QVariant The data to be shown.
     */

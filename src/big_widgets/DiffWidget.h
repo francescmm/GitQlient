@@ -44,7 +44,7 @@ class DiffWidget : public QFrame
 
 signals:
    /*!
-    \brief Signal triggered when the user whants to see the history and blame of a given file.
+    \brief Signal triggered when the user wants to see the history and blame of a given file.
 
     \param fileName The full file name.
    */
@@ -120,7 +120,7 @@ private:
    QString mParentSha;
 
    /*!
-    \brief When the user selectes a different diff from a different tab, it changes the information in the commit info
+    \brief When the user selects a different diff from a different tab, it changes the information in the commit info
     panel.
 
     \param index The new selected index.

@@ -44,10 +44,10 @@ public:
    bool containsFile(const QString &fileName) { return mFiles.contains(fileName); }
 
 private:
-   // Status information is splitted in a flags vector and in a string
+   // Status information is split in a flags vector and in a string
    // vector in 'status' are stored flags according to the info returned
    // by 'git diff-tree' without -C option.
-   // In case of a working directory file an IN_INDEX flag is or-ed togheter in
+   // In case of a working directory file an IN_INDEX flag is or-ed together in
    // case file is present in git index.
    // If file is renamed or copied an entry in 'extStatus' stores the
    // value returned by 'git diff-tree -C' plus source and destination

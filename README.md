@@ -64,7 +64,7 @@ For more information on [Qt translation system](https://doc.qt.io/qt-5/linguist-
 
 ## Development documentation
 
-I'm aware that developers may like to have some more information beyond the User Manual. Whether you want to collaborate in the development or just to know how GitQlient works I think it's nice to have some development documentation. In the [Wiki section](https://github.com/francescmm/GitQlient/wiki) I will release class diagramas, sequence diagrams as well as the Release Plan an features. Take a look!
+I'm aware that developers may like to have some more information beyond the User Manual. Whether you want to collaborate in the development or just to know how GitQlient works I think it's nice to have some development documentation. In the [Wiki section](https://github.com/francescmm/GitQlient/wiki) I will release class diagrams, sequence diagrams as well as the Release Plan an features. Take a look!
 
 ## Licenses
 

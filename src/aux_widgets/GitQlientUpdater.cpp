@@ -39,7 +39,7 @@ void GitQlientUpdater::showInfoMessage()
 {
    QMessageBox msgBox(
        QMessageBox::Information, tr("New version of GitQlient!"),
-       QString(tr("There is a new version of GitQlient available. Your current vrsion is {%1} and the new "
+       QString(tr("There is a new version of GitQlient available. Your current version is {%1} and the new "
                   "one is {%2}. You can read more about the new changes in the detailed description."))
            .arg(VER, mLatestGitQlient),
        QMessageBox::Ok | QMessageBox::Close, qobject_cast<QWidget *>(parent()));
@@ -93,7 +93,7 @@ void GitQlientUpdater::processUpdateFile()
          QMessageBox::information(
              qobject_cast<QWidget *>(parent()), tr("New version available!"),
              tr("There is a new version of GitQlient available but your OS doesn't have a binary built. If you want to "
-                "get the latest version, pleas <a href='https://github.com/francescmm/GitQlient/releases/tag/v%1'>get "
+                "get the latest version, please <a href='https://github.com/francescmm/GitQlient/releases/tag/v%1'>get "
                 "the source code from GitHub</a>.")
                  .arg(mLatestGitQlient));
       }

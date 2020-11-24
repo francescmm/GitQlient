@@ -91,7 +91,7 @@ private:
    void onServerChanged();
 
    /**
-    * @brief onTestSucceeded Notifies the user through the UI that the connection test succceeded.
+    * @brief onTestSucceeded Notifies the user through the UI that the connection test succeeded.
     */
    void onTestSucceeded();
 

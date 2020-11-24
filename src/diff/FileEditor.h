@@ -47,7 +47,7 @@ public:
 
    /**
     * @brief finishEdition Tells the widget to finish the edition. If there are changes the widget asks the user if they
-    * wnat to save them.
+    * want to save them.
     */
    void finishEdition();
 

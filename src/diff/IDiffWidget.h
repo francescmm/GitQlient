@@ -27,7 +27,7 @@ public:
        */
    QString getCurrentSha() const { return mCurrentSha; }
    /*!
-    \brief Gets the SHA agains the diff is comparing to.
+    \brief Gets the SHA against the diff is comparing to.
 
    \return QString The SHA that the diff is compared to.
        */

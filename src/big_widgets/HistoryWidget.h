@@ -45,15 +45,15 @@ class GitServerCache;
 class QLabel;
 
 /*!
- \brief The HistoryWidget is the responsible fro showing the history of the repository. It is the first widget shown
+ \brief The HistoryWidget is responsible for showing the history of the repository. It is the first widget shown
  when a repository is open and manages all the signals from its subwidgets to the GitQlientRepo class. It also creates
- the layout and acts as a bridget to transfer the signals from one subwidget to the other.
+ the layout and acts as a bridge to transfer the signals from one subwidget to the other.
 
  The layout is formed by four important widgets:
  - In the left side two different widgets are shown depending on the conditions. If the user selects the Work In
  Progress (WIP) commit, the WorkInProgressWidget will be shown. In case it's any another commit, the CommitWidgetInfo
  will be shown.
- - In the center is located the repositorry view with the graph tree and the commits information.
+ - In the center is located the repository view with the graph tree and the commits information.
  - In the right side the BranchWidget is shown where the user has control of everything related with branches, tags,
  stashes and submodules.
 
@@ -87,13 +87,13 @@ signals:
    */
    void signalOpenCompareDiff(const QStringList &sha);
    /*!
-    \brief Signal triggered when the internal cache for the current repository needs to be udpated.
+    \brief Signal triggered when the internal cache for the current repository needs to be updated.
 
    */
    void signalUpdateCache();
    /*!
     \brief Signal triggered when the user opens a new submodule. It is necessary to propagate this signal since is the
-    GitQlient class the reponsible of opening a new tab for the submodule.
+    GitQlient class the responsible of opening a new tab for the submodule.
 
     \param submodule The submodule to be opened.
    */
@@ -116,7 +116,7 @@ signals:
    void signalEditFile(const QString &fileName, int line, int column);
 
    /*!
-    \brief Signal triggered when changes are commited.
+    \brief Signal triggered when changes are committed.
 
     \param commited True if there was no error, false otherwise.
    */
@@ -146,7 +146,7 @@ signals:
     */
    void signalPullConflict();
    /*!
-    \brief Signal triggered  when the WIP needs to be updated.
+    \brief Signal triggered when the WIP needs to be updated.
    */
    void signalUpdateWip();
    /**

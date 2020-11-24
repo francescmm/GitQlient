@@ -57,7 +57,7 @@ class CreateRepoDlg : public QDialog
 
 signals:
    /**
-    * @brief Signal emited when the user accepts the configuration to notify other widgets that that the user wants to
+    * @brief Signal emitted when the user accepts the configuration to notify other widgets that that the user wants to
     * open the repo after init or clone it.
     *
     * @param path The path to the new repository.
