@@ -108,7 +108,7 @@ private:
    QMap<QString, QLoggerWriter *> mModuleDest;
 
    /**
-    * @brief Defines the queue of messages when no writters have been set yet.
+    * @brief Defines the queue of messages when no writers have been set yet.
     */
    QMultiMap<QString, QVector<QVariant>> mNonWriterQueue;
 

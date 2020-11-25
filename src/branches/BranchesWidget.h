@@ -145,14 +145,14 @@ private:
    BranchTreeWidget *mLastTreeSearched = nullptr;
 
    /*!
-    \brief Method that for a given \p branch process all the informatio and creates the item that will be stored in the
+    \brief Method that for a given \p branch process all the information and creates the item that will be stored in the
     local branches BranchTreeWidget.
 
     \param branch The branch to be added in the tree widget.
    */
    void processLocalBranch(const QString &sha, QString branch);
    /*!
-    \brief Method that for a given \p branch process al the information and creates the item that will be sotred in the
+    \brief Method that for a given \p branch process all the information and creates the item that will be stored in the
     remote branches BranchTreeWidget.
 
     \param branch The remote branch to be added in the tree widget.

@@ -156,7 +156,7 @@ GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &
       return updIdx;
    }
 
-   QLog_Debug("Git", QString("Commiting files"));
+   QLog_Debug("Git", QString("Committing files"));
 
    const auto ret = mGitBase->run(QString("git commit -m \"%1\"").arg(msg));
 

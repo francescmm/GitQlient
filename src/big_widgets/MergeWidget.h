@@ -54,7 +54,7 @@ class MergeWidget : public QFrame
 
 signals:
    /**
-    * @brief Signal triggered when the merge ends. It can be by aborting it or by commiting it.
+    * @brief Signal triggered when the merge ends. It can be by aborting it or by committing it.
     *
     */
    void signalMergeFinished();
@@ -122,12 +122,12 @@ private:
     */
    void abort();
    /**
-    * @brief Commits the curreent merge.
+    * @brief Commits the current merge.
     *
     */
    void commit();
    /**
-    * @brief This method removes all the handmade componentes before closing the merge view.
+    * @brief This method removes all the handmade components before closing the merge view.
     *
     */
    void removeMergeComponents();

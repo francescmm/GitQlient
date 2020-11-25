@@ -327,7 +327,7 @@ void CommitHistoryContextMenu::checkoutBranch()
 
 void CommitHistoryContextMenu::createCheckoutBranch()
 {
-   BranchDlg dlg({ mShas.constFirst(), BranchDlgMode::CREATE_FROM_COMMIT, mGit });
+   BranchDlg dlg({ mShas.constFirst(), BranchDlgMode::CREATE_CHECKOUT_FROM_COMMIT, mGit });
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)

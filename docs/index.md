@@ -50,7 +50,7 @@ There is another view but is not accessible always: it is the [*Merge View*](#th
 
 GitQlient can be executed from command line with additional params. Please take a look to the following table:
 
-| Command  | Desciption  |
+| Command  | Description  |
 |---|---|
 | -noLog  | Disables the log system for the current execution  |
 | -logLevel | Sets the log level for GitQlient. It expects a numeric: 0 (Trace), 1 (Debug), 2 (Info), 3 (Warning), 4 (Error) and 5 (Fatal). |
@@ -163,7 +163,7 @@ The repository configuration dialog shows the configuration of your .gitconfig f
 
 The tree view is divided in three different sections:
 * In the center you can find the graphic representation of the repository tree.
-* In the right side, GitQlient displayes information about the local &amp; remote branches, tags, stashes and submodules.
+* In the right side, GitQlient displays information about the local &amp; remote branches, tags, stashes and submodules.
 * In the left side, GitQlient shows the information about the commit you select in the tree view. It will vary depending on if you select the work in progress or a commit.
 
 1. [The repository graph tree](#graph-view)
@@ -204,7 +204,7 @@ Over the selection you can perform different actions:
 
 ## <a name="wip-view"></a>WIP view
 
-When you select the first entry in the graphic tree view when the text says *Local changes*, it will show the information of your local uncommited changes in a widget on the left side of the graphic view:
+When you select the first entry in the graphic tree view when the text says *Local changes*, it will show the information of your local uncommitted changes in a widget on the left side of the graphic view:
 
 ![GitQlient - WIP view](/GitQlient/assets/3_wip_view.png "GitQlient - WIP view")
 
@@ -290,7 +290,7 @@ You can perform the following actions:
 * Single click a branch to position the selection of the tree view on the commit of that branch.
 * Right click on a branch to show the context menu.
 
-The context menu will vary in case you select your current branch or not. If the current branch is **not** selected, it will show the *Merge* action. In the case that display the conext menu of your current branch, the *push* and *push force* options will be displayed.
+The context menu will vary in case you select your current branch or not. If the current branch is **not** selected, it will show the *Merge* action. In the case that display the context menu of your current branch, the *push* and *push force* options will be displayed.
 
 The branches are grouped by their path as if it was a file system path. That means that every word followed by a slash will be treated as folder:
 
@@ -316,7 +316,7 @@ The next view is the stashes. As the branches, it has the same click behaviour. 
 Finally, the last view is the submoules view. Since a submodule is basically a link to another repository the click behaviour changes a bit.
 
 * Add a submodule: To add a submodule, right click on the background of the list. This will show the *Add* option. After selecting it, GitQlient will show a dialog where you can add the URL and the name of the submodule.
-* Open a submodule: If you want to open a submodule in a new GitQlient view, you can double click over it or choos *Open* in the context menu.
+* Open a submodule: If you want to open a submodule in a new GitQlient view, you can double click over it or choose *Open* in the context menu.
 * Update a submodule: To update a submodule, please select *Update* in the context menu.
 
 ### Fold behaviour
@@ -364,7 +364,7 @@ Finally, both in the commit and file diff the text have different colors.
 - The blue color is used to show the file name and the commit SHAs.
 - The orange color is used to emphasize the line where the changes start.
 
-In the lower part ther eis the commit diff list. It shows all the files that were modified between the two selected commits, or the WIP and the last commit. The SHAs are shown in the top of the list and they pop up a tooltip with the basic commit metadata (author, date and short log message).
+In the lower part there is the commit diff list. It shows all the files that were modified between the two selected commits, or the WIP and the last commit. The SHAs are shown in the top of the list and they pop up a tooltip with the basic commit metadata (author, date and short log message).
 
 # <a name="the-blame-history-view"></a>The Blame &amp; History View
 
@@ -398,11 +398,11 @@ By using the context menu, you can open the diff of this file between the curren
 
 This is the central part and the one that give more information. In the blame view we have as many tabs as files we've opened and the commit history will change when we change the blame view.
 
-In the top part of the Blame view we find the two commits that are being compared. That will change if you select a different commit in the commit history. Under that, you will see the blame of the file where the modifications are grouped by date. In the right part, between the commit metadata and the file blame, you will find a small *decoration* in blue. This can be gradualy painted and this indicates how recent or old a specific line is.
+In the top part of the Blame view we find the two commits that are being compared. That will change if you select a different commit in the commit history. Under that, you will see the blame of the file where the modifications are grouped by date. In the right part, between the commit metadata and the file blame, you will find a small *decoration* in blue. This can be gradually painted and this indicates how recent or old a specific line is.
 
 ![GitQlient - The Blame View](/GitQlient/assets/5_file_blame_view.png "GitQlient - The Blame View")
 
-The ligh blue color indicates the oldest lines whereas the darkes blue tells that those lines where more recently modified.
+The light blue color indicates the oldest lines whereas the darkes blue tells that those lines where more recently modified.
 
 The log message is clickable and when you clicking on it will focus the commit in the history view. This tries to be a little help to locate the commit and make it easier to compare.
 
@@ -437,7 +437,7 @@ The merge manager is divided in three sub-sections. In the top left you can see 
 
 To show a file, you need to click over the file name (red ellipse). Once clicked, the diff view will change to show that file.
 
-**Important note:** GitQlient in the current version (1.1.1) doens't allow to edit the files inside. To fix a file you need to edit it in a separated editor. To do that, press the file icon (orange ellipse).
+**Important note:** GitQlient in the current version (1.1.1) doesn't allow to edit the files inside. To fix a file you need to edit it in a separated editor. To do that, press the file icon (orange ellipse).
 
 Once you fix all the conflicts in the file, you can mark it as solved by clicking the check button (green ellipse). That will add the file to the list below (Merged files).
 
@@ -554,7 +554,7 @@ I don't mind that you have your own style when coding: it's easier to do it with
 ## <a name="code-guidelines">Code guidelines
 Some time ago, [Bjarne Stroustrup](http://www.stroustrup.com) and [Herb Sutter](http://herbsutter.com/) started an amazing project called [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines). I know that is a large document and I don't expect that anybody reads the whole thing or memorizes it. I won't.
 
-But in case of doubt, is the place where we should look on how to do things or why some things are done in the way they are. Having this kind of guidelines is the best way to avoid gut feelings regarding code.
+But in case of doubt, it's the place where we should look on how to do things or why some things are done in the way they are. Having these kind of guidelines is the best way to avoid gut-feelings regarding code.
 
 # <a name="appendix-d-recognition"></a>Appendix D: Recognition
 GitQlient started as a fork from QGit. Despite it has changed a lot, there is some of the original code still, mainly the Git core functionality.

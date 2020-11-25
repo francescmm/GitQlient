@@ -175,7 +175,7 @@ private:
    */
    void openCommitDiff(const QString currentSha);
    /*!
-    \brief Opens the diff view witht the selected SHAs to compare between them.
+    \brief Opens the diff view with the selected SHAs to compare between them.
 
     \param shas The list of shas to compare between.
    */
@@ -183,7 +183,7 @@ private:
    /*!
     \brief Method called when changes are commites through the WIP widget.
 
-    \param ok True if the changes are commited, otherwise false.
+    \param ok True if the changes are committed, otherwise false.
    */
    void changesCommitted(bool ok);
    /*!
@@ -210,12 +210,12 @@ private:
    void showFileHistory(const QString &fileName);
 
    /*!
-    \brief Updates the progess dialog when loading a really huge repository.
+    \brief Updates the progress dialog when loading a really huge repository.
    */
    void createProgressDialog();
 
    /*!
-    \brief When the loading finishes this method closes and destroyes the dialog.
+    \brief When the loading finishes this method closes and destroys the dialog.
 
    */
    void onRepoLoadFinished();

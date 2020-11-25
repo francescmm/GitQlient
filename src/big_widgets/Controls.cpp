@@ -44,7 +44,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    , mBuildSystem(new QToolButton())
    , mPomodoro(new PomodoroButton(mGit))
    , mVersionCheck(new QToolButton())
-   , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be commited! Click here to solve it.")))
+   , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be committed! Click here to solve it.")))
    , mUpdater(new GitQlientUpdater(this))
    , mBtnGroup(new QButtonGroup())
 {
@@ -358,7 +358,7 @@ void Controls::popStashedWork()
       emit signalRepositoryUpdated();
    else
    {
-      QMessageBox msgBox(QMessageBox::Critical, tr("Error while poping a stash"),
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while popping a stash"),
                          tr("There were problems during the stash pop operation. Please, see the detailed "
                             "description for more information."),
                          QMessageBox::Ok, this);

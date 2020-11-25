@@ -28,7 +28,7 @@
 class QLabel;
 
 /**
- * @brief The ClickableFrame class is simple widget to make QLabel clickable and at the same time give the hability to
+ * @brief The ClickableFrame class is simple widget to make QLabel clickable and at the same time give the ability to
  * customize its look & feel. The behaviour is so simplified that only has a @p clicked() signal to notify the user that
  * the object was clicked.
  *
@@ -43,7 +43,7 @@ class ClickableFrame : public QFrame
 
 signals:
    /**
-    * @brief Signal emited when the user clicks the object.
+    * @brief Signal emitted when the user clicks the object.
     */
    void clicked();
 
@@ -55,7 +55,7 @@ public:
     */
    explicit ClickableFrame(QWidget *parent = nullptr);
    /**
-    * @brief Creates a ClickableFrame with a QLabel inside filld with the given @p text and in the given @p alignment
+    * @brief Creates a ClickableFrame with a QLabel inside filled with the given @p text and in the given @p alignment
     *
     * @param text The text that the widget will display
     * @param alignment The alignment of the text in the widget

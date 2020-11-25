@@ -52,7 +52,7 @@ signals:
    */
    void signalOpenDiff(const QString &sha);
    /*!
-    \brief Signal triggered when the user whants to diff the shas in the list. This signal is only emited if the user
+    \brief Signal triggered when the user wants to diff the shas in the list. This signal is only emitted if the user
     selected two SHAs.
 
     \param sha The shas to diff between.
@@ -135,7 +135,7 @@ private:
    */
    void createTag();
    /*!
-    \brief Export the selected commit/s as patches. If multiple commits are selected they are enumerated sequentialy.
+    \brief Export the selected commit/s as patches. If multiple commits are selected they are enumerated sequentially.
    */
    void exportAsPatch();
    /*!

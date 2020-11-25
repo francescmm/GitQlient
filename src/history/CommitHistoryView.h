@@ -138,7 +138,7 @@ public:
     */
    void clear();
    /**
-    * @brief Puts the focus (and selectes) the given SHA.
+    * @brief Puts the focus (and selects) the given SHA.
     *
     * @param goToSha The SHA to select.
     */
@@ -150,7 +150,7 @@ public:
     */
    QString getCurrentSha() const { return mCurrentSha; }
    /**
-    * @brief Overrided function to make it public. Useful to retrieve the indexes when a search is done.
+    * @brief Overridden function to make it public. Useful to retrieve the indexes when a search is done.
     *
     * @return QModelIndexList The list of selected indexes.
     */
@@ -190,7 +190,7 @@ private:
    void refreshView();
    /**
     * @brief onHeaderContextMenu Shows the context menu for the header of the tree view.
-    * @param pos The position of the cursos that will be used to show the menu.
+    * @param pos The position of the cursor that will be used to show the menu.
     */
    void onHeaderContextMenu(const QPoint &pos);
 };

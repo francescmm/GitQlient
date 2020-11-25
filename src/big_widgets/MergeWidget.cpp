@@ -69,7 +69,7 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
    const auto conflictsLabel = new QLabel(tr("Conflicts"));
    conflictsLabel->setObjectName("FilesListTitle");
 
-   const auto automergeLabel = new QLabel(tr("Changes to be commited"));
+   const auto automergeLabel = new QLabel(tr("Changes to be committed"));
    automergeLabel->setObjectName("FilesListTitle");
 
    const auto mergeLayout = new QVBoxLayout(mergeFrame);

@@ -57,7 +57,7 @@ public:
    void setLogLevel(LogLevel level) { mLevel = level; }
 
    /**
-    * @brief enqueue Enqueues a message to be written in the destiantion.
+    * @brief enqueue Enqueues a message to be written in the destination.
     * @param date The date and time of the log message.
     * @param threadId The thread where the message comes from.
     * @param module The module that writes the message.

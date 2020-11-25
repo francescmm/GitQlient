@@ -39,6 +39,10 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
          setWindowTitle(tr("Create branch at commit"));
          ui->leOldName->setHidden(true);
          break;
+      case BranchDlgMode::CREATE_CHECKOUT_FROM_COMMIT:
+         setWindowTitle(tr("Create and checkout branch"));
+         ui->leOldName->setHidden(true);
+         break;
       case BranchDlgMode::STASH_BRANCH:
          setWindowTitle(tr("Stash branch"));
          break;
@@ -88,6 +92,8 @@ void BranchDlg::accept()
          ret = git->renameBranch(ui->leOldName->text(), ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::CREATE_FROM_COMMIT)
          ret = git->createBranchAtCommit(ui->leOldName->text(), ui->leNewName->text());
+      else if (mConfig.mDialogMode == BranchDlgMode::CREATE_CHECKOUT_FROM_COMMIT)
+         ret = git->checkoutBranchFromCommit(ui->leOldName->text(), ui->leNewName->text());
       else if (mConfig.mDialogMode == BranchDlgMode::STASH_BRANCH)
       {
          QScopedPointer<GitStashes> git(new GitStashes(mConfig.mGit));

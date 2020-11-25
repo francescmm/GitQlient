@@ -42,7 +42,7 @@ signals:
    */
    void openSubmodule(const QString &path);
    /*!
-    \brief Signal triggered when the main GitQlient UI needs to be udpated because of a change in the stashes.
+    \brief Signal triggered when the main GitQlient UI needs to be updated because of a change in the stashes.
 
    */
    void infoUpdated();

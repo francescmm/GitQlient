@@ -69,7 +69,7 @@ class FileDiffView : public QPlainTextEdit
 
 signals:
    /**
-    * @brief signalScrollChanged Signal emited when the scrollbar changes its position.
+    * @brief signalScrollChanged Signal emitted when the scrollbar changes its position.
     * @param value The new scrollbar position.
     */
    void signalScrollChanged(int value);
@@ -151,7 +151,7 @@ protected:
 
    /**
     * @brief showStagingMenu Shows the context menu to stage lines or chunks.
-    * @param cursorPos The curren position of the mouse cursor.
+    * @param cursorPos The current position of the mouse cursor.
     */
    void showStagingMenu(const QPoint &cursorPos);
 

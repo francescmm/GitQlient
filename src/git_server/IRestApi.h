@@ -57,7 +57,7 @@ signals:
    void connectionTested();
    /**
     * @brief labelsReceived Signal triggered after the labels are received and processed.
-    * @param labels The processed lables.
+    * @param labels The processed labels.
     */
    void labelsReceived(const QVector<GitServer::Label> &labels);
    /**
@@ -147,7 +147,7 @@ public:
    static QJsonDocument validateData(QNetworkReply *reply, QString &errorString);
 
    /**
-    * @brief testConnection Tests the connection agains the server.
+    * @brief testConnection Tests the connection against the server.
     */
    virtual void testConnection() = 0;
    /**
@@ -198,7 +198,7 @@ public:
    virtual void mergePullRequest(int number, const QByteArray &data) = 0;
 
    /**
-    * @brief requestComments Requests all the comments of an issue. This doesn't get the reviews and coments on reviews
+    * @brief requestComments Requests all the comments of an issue. This doesn't get the reviews and comments on reviews
     * for a pull request.
     * @param issueNumber The issue number to query.
     */

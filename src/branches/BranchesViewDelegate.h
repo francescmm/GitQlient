@@ -42,7 +42,7 @@ public:
    explicit BranchesViewDelegate(QObject *parent = nullptr);
 
    /*!
-    \brief Overrided paint method used to display different colors when mouse actions happen.
+    \brief Overridden paint method used to display different colors when mouse actions happen.
 
     \param p The painter device.
     \param o The style options of the item.
@@ -50,7 +50,7 @@ public:
    */
    void paint(QPainter *p, const QStyleOptionViewItem &o, const QModelIndex &i) const override;
    /*!
-    \brief Overrided method that returns the size of the row, both height and width.
+    \brief Overridden method that returns the size of the row, both height and width.
 
     \return QSize The width and height of the row.
    */

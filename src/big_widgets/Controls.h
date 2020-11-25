@@ -62,7 +62,7 @@ class Controls : public QFrame
 
 signals:
    /*!
-    \brief Signal triggered when the user whants to go to the main repository view.
+    \brief Signal triggered when the user wants to go to the main repository view.
 
    */
    void signalGoRepo();

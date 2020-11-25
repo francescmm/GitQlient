@@ -86,7 +86,7 @@ private:
    QWidget *mMostUsedInnerWidget = nullptr;
 
    /*!
-    \brief Opens a alredy cloned repository.
+    \brief Opens an already cloned repository.
 
    */
    void openRepo();
@@ -123,7 +123,7 @@ private:
    void updateProgressDialog(QString stepDescription, int value);
 
    /**
-    * @brief showError Shows an error ocurred during any configuration time.
+    * @brief showError Shows an error occurred during any configuration time.
     * @param error The error code.
     * @param description The error description.
     */

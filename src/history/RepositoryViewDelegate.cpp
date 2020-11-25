@@ -452,66 +452,87 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewItem o, int &startPoint,
                                             const QString &sha) const
 {
-   QMap<QString, QColor> markValues;
+   QVector<QString> marks;
+   QVector<QColor> colors;
    const auto currentBranch = mGit->getCurrentBranch();
    const auto commit = mCache->getCommitInfo(sha);
 
    if ((currentBranch.isEmpty() || currentBranch == "HEAD"))
    {
       if (const auto ret = mGit->getLastCommit(); ret.success && commit.sha() == ret.output.toString().trimmed())
-         markValues.insert("detached", GitQlientStyles::getDetachedColor());
+      {
+         marks.append("detached");
+         colors.append(GitQlientStyles::getDetachedColor());
+      }
    }
 
    if (commit.hasReferences())
    {
       const auto localBranches = commit.getReferences(References::Type::LocalBranch);
       for (const auto &branch : localBranches)
-         markValues.insert(branch,
-                           branch == currentBranch ? GitQlientStyles::getCurrentBranchColor()
-                                                   : GitQlientStyles::getLocalBranchColor());
-
-      const auto remoteBranches = commit.getReferences(References::Type::RemoteBranches);
-      for (const auto &branch : remoteBranches)
-         markValues.insert(branch, QColor("#011f4b"));
+      {
+         if (branch == currentBranch)
+         {
+            marks.prepend(branch);
+            colors.prepend(GitQlientStyles::getCurrentBranchColor());
+         }
+         else
+         {
+            marks.append(branch);
+            colors.append(GitQlientStyles::getLocalBranchColor());
+         }
+      }
 
       const auto tags = commit.getReferences(References::Type::LocalTag);
       for (const auto &tag : tags)
-         markValues.insert(tag, GitQlientStyles::getTagColor());
-   }
+      {
+         marks.append(tag);
+         colors.append(GitQlientStyles::getTagColor());
+      }
 
-   const auto showMinimal = o.rect.width() <= MIN_VIEW_WIDTH_PX;
-   const auto mark_spacing = 5; // Space between markers in pixels
-   const auto mapEnd = markValues.constEnd();
+      const auto remoteBranches = commit.getReferences(References::Type::RemoteBranches);
+      for (const auto &branch : remoteBranches)
+      {
+         marks.append(branch);
+         colors.append(QColor("#011f4b"));
+      }
 
-   for (auto mapIt = markValues.constBegin(); mapIt != mapEnd; ++mapIt)
-   {
-      const auto isCurrentSpot = mapIt.key() == "detached" || mapIt.key() == currentBranch;
-      o.font.setBold(isCurrentSpot);
+      const auto showMinimal = o.rect.width() <= MIN_VIEW_WIDTH_PX;
+      const auto mark_spacing = 5; // Space between markers in pixels
+      const auto mapEnd = marks.constEnd();
 
-      const auto nameToDisplay = showMinimal ? QString(". . .") : mapIt.key();
-      QFontMetrics fm(o.font);
-      const auto textBoundingRect = fm.boundingRect(nameToDisplay);
-      const int textPadding = 3;
-      const auto rectWidth = textBoundingRect.width() + 2 * textPadding;
+      auto mapIt = marks.constBegin();
+      auto colorIter = colors.constBegin();
+      for (; mapIt != mapEnd; ++mapIt, ++colorIter)
+      {
+         const auto isCurrentSpot = *mapIt == "detached" || *mapIt == currentBranch;
+         o.font.setBold(isCurrentSpot);
 
-      painter->save();
-      painter->setRenderHint(QPainter::Antialiasing);
-      painter->setPen(QPen(mapIt.value(), 2));
-      QPainterPath path;
-      path.addRoundedRect(QRectF(o.rect.x() + startPoint, o.rect.y() + 4, rectWidth, ROW_HEIGHT - 8), 1, 1);
-      painter->fillPath(path, mapIt.value());
-      painter->drawPath(path);
+         const auto nameToDisplay = showMinimal ? QString(". . .") : *mapIt;
+         QFontMetrics fm(o.font);
+         const auto textBoundingRect = fm.boundingRect(nameToDisplay);
+         const int textPadding = 3;
+         const auto rectWidth = textBoundingRect.width() + 2 * textPadding;
 
-      // TODO: Fix this with a nicer way
-      painter->setPen(QColor(mapIt.value() == QColor("#dec3c3") ? QString("#000000") : QString("#FFFFFF")));
+         painter->save();
+         painter->setRenderHint(QPainter::Antialiasing);
+         painter->setPen(QPen(*colorIter, 2));
+         QPainterPath path;
+         path.addRoundedRect(QRectF(o.rect.x() + startPoint, o.rect.y() + 4, rectWidth, ROW_HEIGHT - 8), 1, 1);
+         painter->fillPath(path, *colorIter);
+         painter->drawPath(path);
 
-      const auto fontRect = textBoundingRect.height();
-      const auto y = o.rect.y() + ROW_HEIGHT - (ROW_HEIGHT - fontRect) + 2;
-      painter->setFont(o.font);
-      painter->drawText(o.rect.x() + startPoint + textPadding, y, nameToDisplay);
-      painter->restore();
+         // TODO: Fix this with a nicer way
+         painter->setPen(QColor(*colorIter == QColor("#dec3c3") ? QString("#000000") : QString("#FFFFFF")));
 
-      startPoint += rectWidth + mark_spacing;
+         const auto fontRect = textBoundingRect.height();
+         const auto y = o.rect.y() + ROW_HEIGHT - (ROW_HEIGHT - fontRect) + 2;
+         painter->setFont(o.font);
+         painter->drawText(o.rect.x() + startPoint + textPadding, y, nameToDisplay);
+         painter->restore();
+
+         startPoint += rectWidth + mark_spacing;
+      }
    }
 }
 

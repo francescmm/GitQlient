@@ -36,7 +36,7 @@ void StashesContextMenu::drop()
       emit signalUpdateView();
    else
    {
-      QMessageBox msgBox(QMessageBox::Critical, tr("Error while droping stash"),
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while dropping stash"),
                          tr("There were problems during the stash drop operation. Please, see the detailed "
                             "description for more information."),
                          QMessageBox::Ok, this);

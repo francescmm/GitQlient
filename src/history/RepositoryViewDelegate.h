@@ -63,7 +63,7 @@ public:
                           const QSharedPointer<GitServerCache> &gitServerCache, CommitHistoryView *view);
 
    /**
-    * @brief Overrided method to paint the different columns and rows in the view.
+    * @brief Overridden method to paint the different columns and rows in the view.
     *
     * @param p The painter device.
     * @param o The style options of the item.

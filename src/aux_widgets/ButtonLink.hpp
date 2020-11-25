@@ -2,7 +2,7 @@
  ** Copyright (C) 2016-2020  Francesc Martinez <es.linkedin.com/in/cescmm/en>
  **
  ** This file is part of DietPlanner.
- ** DietPlanner is an application to creat, edit and manage diets, food and patients.
+ ** DietPlanner is an application to create, edit and manage diets, food and patients.
  **
  ** This application is free software; you can redistribute it and/or
  ** modify it under the terms of the GNU Lesser General Public

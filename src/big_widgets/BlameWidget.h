@@ -144,7 +144,7 @@ private:
     */
    void reloadBlame(const QModelIndex &index);
    /**
-    * @brief When the user changes the blame view, the history view is notified to reload its history to accomodate the
+    * @brief When the user changes the blame view, the history view is notified to reload its history to accommodate the
     * new information from the new selected file.
     *
     * @param tabIndex The new tab index selected.
