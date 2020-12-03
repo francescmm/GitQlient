@@ -422,23 +422,26 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
 
       if (!outputStr.isEmpty())
       {
-         if (ret.success)
+         if (outputStr.contains("error: could not apply", Qt::CaseInsensitive)
+             || outputStr.contains(" conflict", Qt::CaseInsensitive))
+         {
+            QMessageBox msgBox(
+                QMessageBox::Warning, tr("Merge status"),
+                tr("There were problems during the merge. Please, see the detailed description for more information."),
+                QMessageBox::Ok, this);
+            msgBox.setDetailedText(ret.output.toString());
+            msgBox.setStyleSheet(GitQlientStyles::getStyles());
+            msgBox.exec();
+
+            emit signalMergeConflicts();
+         }
+         else
          {
             emit signalUpdateCache();
 
             QMessageBox msgBox(
                 QMessageBox::Information, tr("Merge successful"),
                 tr("The merge was successfully done. See the detailed description for more information."),
-                QMessageBox::Ok, this);
-            msgBox.setDetailedText(ret.output.toString());
-            msgBox.setStyleSheet(GitQlientStyles::getStyles());
-            msgBox.exec();
-         }
-         else
-         {
-            QMessageBox msgBox(
-                QMessageBox::Warning, tr("Merge status"),
-                tr("There were problems during the merge. Please, see the detailed description for more information."),
                 QMessageBox::Ok, this);
             msgBox.setDetailedText(ret.output.toString());
             msgBox.setStyleSheet(GitQlientStyles::getStyles());
@@ -490,7 +493,7 @@ void HistoryWidget::cherryPickCommit()
          const auto errorMsg = ret.output.toString();
 
          if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
-             && errorMsg.contains(" conflict", Qt::CaseInsensitive))
+             || errorMsg.contains(" conflict", Qt::CaseInsensitive))
          {
             emit signalCherryPickConflict();
          }
