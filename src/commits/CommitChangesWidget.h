@@ -80,7 +80,6 @@ protected:
    QSharedPointer<GitBase> mGit;
    QString mCurrentSha;
    QMap<QString, WipCacheItem> mInternalCache;
-   bool mOnUpdate = false;
 
    virtual bool commitChanges() = 0;
    virtual void showUnstagedMenu(const QPoint &pos) = 0;

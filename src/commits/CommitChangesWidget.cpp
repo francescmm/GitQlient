@@ -103,35 +103,24 @@ void CommitChangesWidget::resetFile(QListWidgetItem *item)
          const auto iconPath = QString(":/icons/add");
          const auto fileWidget = qobject_cast<FileWidget *>(ui->stagedFilesList->itemWidget(item));
 
-         if (isInIndex)
+         QFontMetrics metrix(item->font());
+         const auto clippedText = metrix.elidedText(item->toolTip(), Qt::ElideMiddle, width() - 10);
+
+         if (isInIndex || untrackedFile)
          {
             item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(ui->unstagedFilesList));
 
             ui->stagedFilesList->takeItem(row);
             ui->unstagedFilesList->addItem(item);
 
-            const auto newFileWidget = new FileWidget(iconPath, item->toolTip());
+            const auto newFileWidget = new FileWidget(iconPath, clippedText);
             newFileWidget->setTextColor(fileWidget->getTextColor());
+            newFileWidget->setToolTip(fileName);
 
             connect(newFileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
             ui->unstagedFilesList->setItemWidget(item, newFileWidget);
 
             delete fileWidget;
-         }
-         else if (untrackedFile)
-         {
-            item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(ui->unstagedFilesList));
-
-            ui->stagedFilesList->takeItem(row);
-            ui->unstagedFilesList->addItem(item);
-
-            const auto newFileWidget = new FileWidget(iconPath, item->toolTip());
-            newFileWidget->setTextColor(fileWidget->getTextColor());
-
-            connect(newFileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
-            ui->unstagedFilesList->setItemWidget(item, newFileWidget);
-
-            delete newFileWidget;
          }
       }
    }
@@ -151,9 +140,7 @@ QColor CommitChangesWidget::getColorForFile(const RevisionFiles &files, int inde
    const auto isDeleted = files.statusCmp(index, RevisionFiles::DELETED);
 
    if (isConflict)
-   {
       myColor = GitQlientStyles::getBlue();
-   }
    else if (isDeleted)
       myColor = GitQlientStyles::getRed();
    else if (untrackedFile)
@@ -188,9 +175,6 @@ void CommitChangesWidget::clearCache()
 
 void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *fileList)
 {
-   if (mOnUpdate)
-      return;
-
    for (auto &cachedItem : mInternalCache)
       cachedItem.keep = false;
 
@@ -263,8 +247,12 @@ QPair<QListWidgetItem *, FileWidget *> CommitChangesWidget::fillFileItemInfo(con
    item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(parent));
    item->setToolTip(modName);
 
-   const auto fileWidget = new FileWidget(icon, modName);
+   QFontMetrics metrix(item->font());
+   const auto clippedText = metrix.elidedText(modName, Qt::ElideMiddle, width() - 10);
+
+   const auto fileWidget = new FileWidget(icon, clippedText);
    fileWidget->setTextColor(color);
+   fileWidget->setToolTip(modName);
 
    mInternalCache.insert(QString("%1-%2").arg(file, parent->objectName()), { true, item });
 
@@ -282,13 +270,9 @@ void CommitChangesWidget::addAllFilesToCommitList()
    connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
       QScopedPointer<GitRepoLoader> loader(new GitRepoLoader(mGit, mCache));
       loader->updateWipRevision();
-
-      mOnUpdate = false;
    });
 
    git->markFilesAsResolved(files);
-
-   mOnUpdate = true;
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
@@ -306,7 +290,7 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
    const auto fileList = qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole));
    const auto row = fileList->row(item);
    const auto fileWidget = qobject_cast<FileWidget *>(fileList->itemWidget(item));
-   const auto fileName = fileWidget->text().remove(tr("(conflicts)")).trimmed();
+   const auto fileName = fileWidget->toolTip().remove(tr("(conflicts)")).trimmed();
 
    if (updateGit)
    {
@@ -314,8 +298,6 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
       connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
          QScopedPointer<GitRepoLoader> loader(new GitRepoLoader(mGit, mCache));
          loader->updateWipRevision();
-
-         mOnUpdate = false;
       });
 
       git->markFileAsResolved(fileName);
@@ -331,8 +313,12 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
    {
       mInternalCache.insert(newKey, std::move(wip));
 
-      const auto newFileWidget = new FileWidget(":/icons/remove", fileName);
+      QFontMetrics metrix(item->font());
+      const auto clippedText = metrix.elidedText(fileName, Qt::ElideMiddle, width() - 10);
+
+      const auto newFileWidget = new FileWidget(":/icons/remove", clippedText);
       newFileWidget->setTextColor(fileWidget->getTextColor());
+      newFileWidget->setToolTip(fileName);
 
       connect(newFileWidget, &FileWidget::clicked, this, [this, item]() { removeFileFromCommitList(item); });
 
@@ -375,13 +361,17 @@ void CommitChangesWidget::removeFileFromCommitList(QListWidgetItem *item)
       const auto itemOriginalList = qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole));
       const auto row = ui->stagedFilesList->row(item);
       const auto fileWidget = qobject_cast<FileWidget *>(ui->stagedFilesList->itemWidget(item));
-      const auto fileName = fileWidget->text();
+      const auto fileName = fileWidget->toolTip();
 
       const auto wip = mInternalCache.take(QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName()));
       mInternalCache.insert(QString("%1-%2").arg(fileName, itemOriginalList->objectName()), std::move(wip));
 
-      const auto newFileWidget = new FileWidget(":/icons/add", fileName);
+      QFontMetrics metrix(item->font());
+      const auto clippedText = metrix.elidedText(fileName, Qt::ElideMiddle, width() - 10);
+
+      const auto newFileWidget = new FileWidget(":/icons/add", clippedText);
       newFileWidget->setTextColor(fileWidget->getTextColor());
+      newFileWidget->setToolTip(fileName);
 
       connect(newFileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
 
@@ -415,7 +405,7 @@ QStringList CommitChangesWidget::getFiles()
    for (auto i = 0; i < totalItems; ++i)
    {
       const auto fileWidget = static_cast<FileWidget *>(ui->stagedFilesList->itemWidget(ui->stagedFilesList->item(i)));
-      selFiles.append(fileWidget->text());
+      selFiles.append(fileWidget->toolTip());
    }
 
    return selFiles;
