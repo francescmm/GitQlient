@@ -83,6 +83,15 @@ GitExecResult GitLocal::markFileAsResolved(const QString &fileName)
    return ret;
 }
 
+GitExecResult GitLocal::markFilesAsResolved(const QStringList &files)
+{
+   QLog_Debug("Git", QString("Executing markFilesAsResolved for {%1} files").arg(files.count()));
+
+   const auto ret = mGitBase->run(QString("git add %1").arg(files.join(" ")));
+
+   return ret;
+}
+
 bool GitLocal::checkoutFile(const QString &fileName) const
 {
    if (fileName.isEmpty())

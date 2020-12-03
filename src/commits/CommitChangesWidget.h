@@ -80,6 +80,7 @@ protected:
    QSharedPointer<GitBase> mGit;
    QString mCurrentSha;
    QMap<QString, WipCacheItem> mInternalCache;
+   bool mOnUpdate = false;
 
    virtual bool commitChanges() = 0;
    virtual void showUnstagedMenu(const QPoint &pos) = 0;
@@ -91,7 +92,7 @@ protected:
    virtual void clearCache() final;
    virtual void addAllFilesToCommitList() final;
    virtual void requestDiff(const QString &fileName) final;
-   virtual void addFileToCommitList(QListWidgetItem *item) final;
+   virtual QString addFileToCommitList(QListWidgetItem *item, bool updateGit = true) final;
    virtual void revertAllChanges() final;
    virtual void removeFileFromCommitList(QListWidgetItem *item) final;
    virtual QStringList getFiles() final;

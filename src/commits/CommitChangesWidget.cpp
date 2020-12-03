@@ -188,6 +188,9 @@ void CommitChangesWidget::clearCache()
 
 void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *fileList)
 {
+   if (mOnUpdate)
+      return;
+
    for (auto &cachedItem : mInternalCache)
       cachedItem.keep = false;
 
@@ -270,8 +273,22 @@ QPair<QListWidgetItem *, FileWidget *> CommitChangesWidget::fillFileItemInfo(con
 
 void CommitChangesWidget::addAllFilesToCommitList()
 {
+   QStringList files;
+
    for (auto i = ui->unstagedFilesList->count() - 1; i >= 0; --i)
-      addFileToCommitList(ui->unstagedFilesList->item(i));
+      files += addFileToCommitList(ui->unstagedFilesList->item(i), false);
+
+   QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
+   connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
+      QScopedPointer<GitRepoLoader> loader(new GitRepoLoader(mGit, mCache));
+      loader->updateWipRevision();
+
+      mOnUpdate = false;
+   });
+
+   git->markFilesAsResolved(files);
+
+   mOnUpdate = true;
 
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
@@ -284,20 +301,25 @@ void CommitChangesWidget::requestDiff(const QString &fileName)
    emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName, isCached);
 }
 
-void CommitChangesWidget::addFileToCommitList(QListWidgetItem *item)
+QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool updateGit)
 {
    const auto fileList = qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole));
    const auto row = fileList->row(item);
    const auto fileWidget = qobject_cast<FileWidget *>(fileList->itemWidget(item));
    const auto fileName = fileWidget->text().remove(tr("(conflicts)")).trimmed();
 
-   QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
-   connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
-      QScopedPointer<GitRepoLoader> loader(new GitRepoLoader(mGit, mCache));
-      loader->updateWipRevision();
-   });
+   if (updateGit)
+   {
+      QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
+      connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
+         QScopedPointer<GitRepoLoader> loader(new GitRepoLoader(mGit, mCache));
+         loader->updateWipRevision();
 
-   git->markFileAsResolved(fileName);
+         mOnUpdate = false;
+      });
+
+      git->markFileAsResolved(fileName);
+   }
 
    fileList->removeItemWidget(item);
    fileList->takeItem(row);
@@ -328,6 +350,8 @@ void CommitChangesWidget::addFileToCommitList(QListWidgetItem *item)
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->applyActionBtn->setEnabled(true);
+
+   return fileName;
 }
 
 void CommitChangesWidget::revertAllChanges()
