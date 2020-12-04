@@ -722,8 +722,8 @@ CommitChangesWidget > #warningButton
 
 CommitInfoWidget
 {
-    max-width: 248px;
-    min-width: 248px;
+    max-width: 348px;
+    min-width: 348px;
     border: 1px solid #202122;
 }
 
