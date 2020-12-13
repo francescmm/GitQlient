@@ -6,6 +6,8 @@
 #include <BranchContextMenu.h>
 #include <PullDlg.h>
 #include <GitQlientBranchItemRole.h>
+#include <AddRemoteDlg.h>
+#include <GitRemote.h>
 
 #include <QApplication>
 #include <QMessageBox>
@@ -76,6 +78,32 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 
          menu->exec(viewport()->mapToGlobal(pos));
       }
+      else if (item->data(0, IsRoot).toBool())
+      {
+         const auto menu = new QMenu(this);
+         const auto addRemote = menu->addAction(tr("Remove remote"));
+         connect(addRemote, &QAction::triggered, this, [this, item]() {
+            QScopedPointer<GitRemote> git(new GitRemote(mGit));
+            if (const auto ret = git->removeRemote(item->text(0)); ret.success)
+               emit signalBranchesUpdated();
+         });
+
+         menu->exec(viewport()->mapToGlobal(pos));
+      }
+   }
+   else if (!mLocal)
+   {
+      const auto menu = new QMenu(this);
+      const auto addRemote = menu->addAction(tr("Add remote"));
+      connect(addRemote, &QAction::triggered, this, [this]() {
+         const auto addRemote = new AddRemoteDlg(mGit);
+         const auto ret = addRemote->exec();
+
+         if (ret == QDialog::Accepted)
+            emit signalBranchesUpdated();
+      });
+
+      menu->exec(viewport()->mapToGlobal(pos));
    }
 }
 

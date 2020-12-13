@@ -100,3 +100,10 @@ GitExecResult GitRemote::addRemote(const QString &remoteRepo, const QString &rem
 
    return ret;
 }
+
+GitExecResult GitRemote::removeRemote(const QString &remoteName)
+{
+   QLog_Debug("Git", QString("Removing a remote repository"));
+
+   return mGitBase->run(QString("git remote rm %1").arg(remoteName));
+}

@@ -520,7 +520,10 @@ void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
          item->setText(0, folder);
 
          if (!parent)
+         {
+            item->setData(0, GitQlient::IsRoot, true);
             mRemoteBranchesTree->addTopLevelItem(item);
+         }
 
          parent = item;
       }

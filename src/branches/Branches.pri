@@ -5,6 +5,7 @@ FORMS += \
     $$PWD/TagDlg.ui
 
 HEADERS += \
+    $$PWD/AddRemoteDlg.h \
     $$PWD/AddSubmoduleDlg.h \
     $$PWD/BranchContextMenu.h \
     $$PWD/BranchTreeWidget.h \
@@ -17,6 +18,7 @@ HEADERS += \
     $$PWD/TagDlg.h
 
 SOURCES += \
+    $$PWD/AddRemoteDlg.cpp \
     $$PWD/AddSubmoduleDlg.cpp \
     $$PWD/BranchContextMenu.cpp \
     $$PWD/BranchTreeWidget.cpp \
