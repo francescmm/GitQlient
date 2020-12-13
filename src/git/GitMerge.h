@@ -35,6 +35,7 @@ class GitMerge
 public:
    explicit GitMerge(const QSharedPointer<GitBase> &gitBase, QSharedPointer<GitCache> cache);
 
+   bool isInMerge() const;
    GitExecResult merge(const QString &into, QStringList sources);
    GitExecResult abortMerge() const;
    GitExecResult applyMerge() const;

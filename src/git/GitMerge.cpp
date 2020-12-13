@@ -5,12 +5,21 @@
 
 #include <QLogger.h>
 
+#include <QFile>
+
 using namespace QLogger;
 
 GitMerge::GitMerge(const QSharedPointer<GitBase> &gitBase, QSharedPointer<GitCache> cache)
    : mGitBase(gitBase)
    , mCache(cache)
 {
+}
+
+bool GitMerge::isInMerge() const
+{
+   QFile mergeHead(mGitBase->getWorkingDir().append("/.git/MERGE_HEAD"));
+
+   return mergeHead.exists();
 }
 
 GitExecResult GitMerge::merge(const QString &into, QStringList sources)

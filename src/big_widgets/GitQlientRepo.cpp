@@ -21,6 +21,7 @@
 #include <GitBase.h>
 #include <GitHistory.h>
 #include <GitHubRestApi.h>
+#include <GitMerge.h>
 #include <GitSubmodules.h>
 #include <GitServerWidget.h>
 #include <GitServerCache.h>
@@ -333,6 +334,17 @@ void GitQlientRepo::onRepoLoadFinished()
 
    if (mWaitDlg)
       mWaitDlg->close();
+
+   QScopedPointer<GitMerge> gitMerge(new GitMerge(mGitBase, mGitQlientCache));
+
+   if (gitMerge->isInMerge())
+   {
+      QMessageBox::warning(this, tr("Merge in progress"),
+                           tr("There is a merge conflict in progress. Solve the merge before moving on."));
+
+      mControls->activateMergeWarning();
+      showWarningMerge();
+   }
 }
 
 void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file,
