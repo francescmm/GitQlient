@@ -38,6 +38,7 @@ class GitCache;
 class FileEditor;
 class QListWidget;
 class QListWidgetItem;
+class QStackedWidget;
 
 /**
  * @brief The MergeWidget class creates the layout for when a merge happens. The layout is composed by two lists of
@@ -102,6 +103,7 @@ private:
    QPushButton *mMergeBtn = nullptr;
    QPushButton *mAbortBtn = nullptr;
    ConflictReason mReason = ConflictReason::Merge;
+   QStackedWidget *mStacked = nullptr;
    FileDiffWidget *mFileDiff = nullptr;
 
    /**

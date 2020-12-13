@@ -785,6 +785,11 @@ MergeWidget > QPinnableTabWidget
     background-color: #202122;
 }
 
+MergeWidget > QStackedWidget
+{
+   background: #2E2F30;
+}
+
 /*********************************************/
 /*               MergeWidget END             */
 /*********************************************/

@@ -205,6 +205,9 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
          text = ret.output.toString();
    }
 
+   if (text.startsWith("* "))
+      return false;
+
    mFileNameLabel->setText(file);
 
    const auto isWip = currentSha == CommitInfo::ZERO_SHA;

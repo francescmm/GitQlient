@@ -20,6 +20,7 @@
 #include <QLabel>
 #include <QFile>
 #include <QMessageBox>
+#include <QStackedWidget>
 
 MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const QSharedPointer<GitBase> &git,
                          QWidget *parent)
@@ -32,6 +33,7 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
    , mDescription(new QTextEdit())
    , mMergeBtn(new QPushButton(tr("Merge && Commit")))
    , mAbortBtn(new QPushButton(tr("Abort merge")))
+   , mStacked(new QStackedWidget())
    , mFileDiff(new FileDiffWidget(mGit, mGitQlientCache))
 {
    const auto autoMergedBtnFrame = new QFrame();
@@ -85,11 +87,24 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
 
    mFileDiff->hideBackButton();
 
+   const auto noFileFrame = new QFrame();
+   const auto noFileLayout = new QGridLayout();
+   noFileLayout->setContentsMargins(0, 0, 0, 0);
+   noFileLayout->setSpacing(0);
+   noFileLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, 0);
+   noFileLayout->addWidget(new QLabel(tr("Select a file from the list to show its contents.")), 1, 1);
+   noFileLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 2);
+   noFileFrame->setLayout(noFileLayout);
+
+   mStacked->insertWidget(0, noFileFrame);
+   mStacked->insertWidget(1, mFileDiff);
+
    const auto layout = new QHBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->addWidget(mergeFrame);
-   layout->addWidget(mFileDiff);
+   layout->addWidget(mStacked);
 
+   connect(mFileDiff, &FileDiffWidget::exitRequested, this, [this]() { mStacked->setCurrentIndex(0); });
    connect(mFileDiff, &FileDiffWidget::fileStaged, this, &MergeWidget::onConflictResolved);
 
    connect(mConflictFiles, &QListWidget::itemClicked, this, &MergeWidget::changeDiffView);
@@ -131,18 +146,7 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
       const auto item = new QListWidgetItem(fileName);
       item->setData(Qt::UserRole, fileInConflict);
 
-      if (fileInConflict)
-      {
-         mConflictFiles->addItem(item);
-
-         if (mConflictFiles->count() == 1)
-         {
-            mConflictFiles->setCurrentItem(item);
-            changeDiffView(item);
-         }
-      }
-      else
-         mMergedFiles->addItem(item);
+      fileInConflict ? mConflictFiles->addItem(item) : mMergedFiles->addItem(item);
    }
 }
 
@@ -151,7 +155,13 @@ void MergeWidget::changeDiffView(QListWidgetItem *item)
    const auto file = item->text();
    const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   mFileDiff->configure(CommitInfo::ZERO_SHA, wip.parent(0), mGit->getWorkingDir() + "/" + file, false);
+   const auto configured
+       = mFileDiff->configure(CommitInfo::ZERO_SHA, wip.parent(0), mGit->getWorkingDir() + "/" + file, false);
+
+   mStacked->setCurrentIndex(configured);
+
+   if (!configured)
+      QMessageBox::warning(this, tr("No diff to show"), tr("There is not diff information to be shown."));
 }
 
 void MergeWidget::abort()
@@ -246,8 +256,19 @@ void MergeWidget::onConflictResolved(const QString &)
 {
    const auto currentRow = mConflictFiles->currentRow();
    const auto currentConflict = mConflictFiles->takeItem(currentRow);
-   const auto fileName = currentConflict->text();
-   delete currentConflict;
 
-   mMergedFiles->addItem(fileName);
+   if (currentConflict)
+   {
+      const auto fileName = currentConflict->text();
+      delete currentConflict;
+
+      mMergedFiles->addItem(fileName);
+   }
+
+   mConflictFiles->clearSelection();
+   mConflictFiles->selectionModel()->clearSelection();
+   mConflictFiles->selectionModel()->clearCurrentIndex();
+
+   mFileDiff->clear();
+   mStacked->setCurrentIndex(0);
 }
