@@ -75,7 +75,7 @@ inline QLabel *createAvatar(const QString &userName, const QString &avatarUrl, c
       const auto manager = new QNetworkAccessManager();
       QNetworkRequest request;
       request.setUrl(avatarUrl);
-      request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+      request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, true);
       const auto reply = manager->get(request);
       QObject::connect(reply, &QNetworkReply::finished,
                        [manager, reply, avatar, userName]() { storeCreatorAvatar(manager, reply, avatar, userName); });
