@@ -29,7 +29,7 @@ void GitQlientUpdater::checkNewGitQlientVersion()
    request.setRawHeader("X-Custom-User-Agent", "GitQlient");
    request.setRawHeader("Content-Type", "application/json");
    request.setUrl(QUrl("https://github.com/francescmm/ci-utils/releases/download/gq_update/updates.json"));
-   request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+   request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, true);
 
    const auto reply = mManager->get(request);
    connect(reply, &QNetworkReply::finished, this, &GitQlientUpdater::processUpdateFile);
@@ -107,7 +107,7 @@ void GitQlientUpdater::processUpdateFile()
             request.setRawHeader("User-Agent", "GitQlient");
             request.setRawHeader("X-Custom-User-Agent", "GitQlient");
             request.setRawHeader("Content-Type", "application/json");
-            request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+            request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, true);
             request.setUrl(QUrl(changeLogUrl));
 
             const auto reply = mManager->get(request);
@@ -130,7 +130,7 @@ void GitQlientUpdater::downloadFile()
    request.setRawHeader("User-Agent", "GitQlient");
    request.setRawHeader("X-Custom-User-Agent", "GitQlient");
    request.setRawHeader("Content-Type", "application/octet-stream");
-   request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+   request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, true);
    request.setUrl(QUrl(mGitQlientDownloadUrl));
 
    const auto fileName = mGitQlientDownloadUrl.split("/").last();
