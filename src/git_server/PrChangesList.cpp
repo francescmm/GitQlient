@@ -20,6 +20,8 @@ PrChangesList::PrChangesList(const QSharedPointer<GitBase> &git, QWidget *parent
    : QFrame(parent)
    , mGit(git)
 {
+   QScopedPointer<GitRemote> gitRemote(new GitRemote(mGit));
+   gitRemote->fetch();
 }
 
 void PrChangesList::loadData(const GitServer::PullRequest &prInfo)
