@@ -241,7 +241,7 @@ void GitCache::insertReference(const QString &sha, References::Type type, const 
    QMutexLocker lock(&mMutex);
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-   if (mCommitsMap.contains(sha) && !mReferences.contains(sha))
+   if (mCommitsMap.contains(sha))
    {
       auto &ref = mReferences[sha];
       ref.addReference(type, reference);
