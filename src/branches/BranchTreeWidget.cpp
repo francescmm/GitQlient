@@ -32,6 +32,7 @@ void BranchTreeWidget::reloadCurrentBranchLink() const
    const auto items = findChildItem(mGit->getCurrentBranch());
 
    items.at(0)->setData(0, GitQlient::ShaRole, mGit->getLastCommit().output.toString().trimmed());
+   items.at(0)->setData(0, GitQlient::IsCurrentBranchRole, true);
 }
 
 int BranchTreeWidget::focusOnBranch(const QString &branch, int lastPos)
@@ -122,6 +123,7 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 
       if (!branchName.isEmpty())
       {
+         const auto oldItem = findChildItem(mGit->getCurrentBranch());
          const auto isLocal = item->data(0, LocalBranchRole).toBool();
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          QScopedPointer<GitBranches> git(new GitBranches(mGit));
@@ -152,7 +154,10 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
             }
 
             if (!uiUpdateRequested)
+            {
+               oldItem.at(0)->setData(0, GitQlient::IsCurrentBranchRole, false);
                emit signalBranchCheckedOut();
+            }
          }
          else
          {
