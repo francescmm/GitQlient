@@ -91,12 +91,6 @@ signals:
     * @brief signalGoBuildSystem Signal triggered when the user selected the Build System view.
     */
    void signalGoBuildSystem();
-
-   /*!
-    \brief Signal triggered when the user manually forces a refresh of the repository data.
-
-   */
-   void signalRepositoryUpdated();
    /*!
     * \brief Signal triggered when trying to pull and a conflict happens.
     */
@@ -106,6 +100,12 @@ signals:
     * @brief signalRefreshPRsCache Signal that refreshes PRs cache.
     */
    void signalRefreshPRsCache();
+
+   /**
+    * @brief requestReload Signal triggered when the user forces a refresh of the repository data.
+    * @param full True if the refresh includes commits and references, otherwise it refreshes only commits.
+    */
+   void requestReload(bool full);
 
 public:
    /*!

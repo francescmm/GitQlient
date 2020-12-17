@@ -40,13 +40,16 @@ class GitRepoLoader : public QObject
 
 signals:
    void signalLoadingStarted(int total);
-   void signalLoadingFinished();
+   void signalLoadingFinished(bool full);
    void cancelAllProcesses(QPrivateSignal);
    void signalRefreshPRsCache(const QString repoName, const QString &repoOwner, const QString &serverUrl);
 
+public slots:
+   bool load();
+   bool load(bool refreshReferences);
+
 public:
    explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache, QObject *parent = nullptr);
-   bool loadRepository();
    void updateWipRevision();
    void cancelAll();
    void setShowAll(bool showAll = true) { mShowAll = showAll; }
@@ -54,6 +57,7 @@ public:
 private:
    bool mShowAll = true;
    bool mLocked = false;
+   bool mRefreshReferences = true;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitCache> mRevCache;
 

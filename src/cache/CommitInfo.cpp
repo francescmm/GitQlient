@@ -98,8 +98,3 @@ int CommitInfo::getActiveLane() const
 
    return -1;
 }
-
-void CommitInfo::addReference(References::Type type, const QString &reference)
-{
-   mReferences.addReference(type, reference);
-}

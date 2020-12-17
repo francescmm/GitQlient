@@ -41,6 +41,8 @@ public:
 
    QStringList getReferences(Type type) const;
 
+   int removeReference(Type type, const QString &value);
+
    bool isEmpty() const { return mReferences.isEmpty(); }
 
    void clear() { mReferences.clear(); }

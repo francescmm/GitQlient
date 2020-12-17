@@ -111,7 +111,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mRepositoryModel = new CommitHistoryModel(mCache, mGit, mGitServerCache);
    mRepositoryView = new CommitHistoryView(mCache, mGit, mGitServerCache);
 
-   connect(mRepositoryView, &CommitHistoryView::signalViewUpdated, this, &HistoryWidget::signalViewUpdated);
+   connect(mRepositoryView, &CommitHistoryView::requestReload, this, &HistoryWidget::requestReload);
    connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, [this](const QString &sha) {
       if (sha == CommitInfo::ZERO_SHA)
          showFullDiff();
@@ -486,7 +486,7 @@ void HistoryWidget::cherryPickCommit()
       if (ret.success)
       {
          mSearchInput->clear();
-         emit signalViewUpdated();
+         emit requestReload(false);
       }
       else
       {

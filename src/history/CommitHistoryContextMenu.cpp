@@ -179,7 +179,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
             connect(gitServerMenu->addAction(tr("Merge PR")), &QAction::triggered, this, [this, pr]() {
                const auto mergeDlg = new MergePullRequestDlg(mGit, pr, mShas.first(), this);
                connect(mergeDlg, &MergePullRequestDlg::signalRepositoryUpdated, this,
-                       &CommitHistoryContextMenu::signalRepositoryUpdated);
+                       [this]() { emit requestReload(true); });
 
                mergeDlg->exec();
             });
@@ -220,7 +220,7 @@ void CommitHistoryContextMenu::stashPush()
    const auto ret = git->stash();
 
    if (ret.success)
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
 }
 
 void CommitHistoryContextMenu::stashPop()
@@ -229,7 +229,7 @@ void CommitHistoryContextMenu::stashPop()
    const auto ret = git->pop();
 
    if (ret.success)
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
 }
 
 void CommitHistoryContextMenu::createBranch()
@@ -238,7 +238,7 @@ void CommitHistoryContextMenu::createBranch()
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
-      emit signalRepositoryUpdated();
+      emit requestReload(true); // TODO: Optimize
 }
 
 void CommitHistoryContextMenu::createTag()
@@ -247,7 +247,7 @@ void CommitHistoryContextMenu::createTag()
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
-      emit signalRepositoryUpdated();
+      emit requestReload(true); // TODO: Optimize
 }
 
 void CommitHistoryContextMenu::exportAsPatch()
@@ -307,11 +307,11 @@ void CommitHistoryContextMenu::checkoutBranch()
 
          PullDlg pull(mGit, output.split('\n').first());
 
-         connect(&pull, &PullDlg::signalRepositoryUpdated, this, &CommitHistoryContextMenu::signalRepositoryUpdated);
+         connect(&pull, &PullDlg::signalRepositoryUpdated, this, [this]() { emit requestReload(true); });
          connect(&pull, &PullDlg::signalPullConflict, this, &CommitHistoryContextMenu::signalPullConflict);
       }
 
-      emit signalRepositoryUpdated();
+      emit requestReload(!isLocal);
    }
    else
    {
@@ -331,7 +331,7 @@ void CommitHistoryContextMenu::createCheckoutBranch()
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
-      emit signalRepositoryUpdated();
+      emit requestReload(true); // TODO: Optimize
 }
 
 void CommitHistoryContextMenu::checkoutCommit()
@@ -343,7 +343,7 @@ void CommitHistoryContextMenu::checkoutCommit()
    const auto ret = git->checkoutCommit(sha);
 
    if (ret.success)
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
@@ -362,7 +362,7 @@ void CommitHistoryContextMenu::cherryPickCommit()
    const auto ret = git->cherryPickCommit(mShas.first());
 
    if (ret.success)
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
    else
    {
       const auto errorMsg = ret.output.toString();
@@ -391,7 +391,7 @@ void CommitHistoryContextMenu::applyPatch()
    QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
    if (!fileName.isEmpty() && git->applyPatch(fileName))
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
 }
 
 void CommitHistoryContextMenu::applyCommit()
@@ -400,7 +400,7 @@ void CommitHistoryContextMenu::applyCommit()
    QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
    if (!fileName.isEmpty() && git->applyPatch(fileName, true))
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
 }
 
 void CommitHistoryContextMenu::push()
@@ -419,13 +419,13 @@ void CommitHistoryContextMenu::push()
       if (ret == QDialog::Accepted)
       {
          emit signalRefreshPRsCache();
-         emit signalRepositoryUpdated();
+         emit requestReload(false);
       }
    }
    else if (ret.success)
    {
       emit signalRefreshPRsCache();
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
    }
    else
    {
@@ -447,7 +447,7 @@ void CommitHistoryContextMenu::pull()
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
-      emit signalRepositoryUpdated();
+      emit requestReload(true);
    else
    {
       const auto errorMsg = ret.output.toString();
@@ -477,7 +477,7 @@ void CommitHistoryContextMenu::fetch()
    if (git->fetch())
    {
       mGitTags->getRemoteTags();
-      emit signalRepositoryUpdated();
+      emit requestReload(true);
    }
 }
 
@@ -486,7 +486,7 @@ void CommitHistoryContextMenu::resetSoft()
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
 
    if (git->resetCommit(mShas.first(), GitLocal::CommitResetType::SOFT))
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
 }
 
 void CommitHistoryContextMenu::resetMixed()
@@ -494,7 +494,7 @@ void CommitHistoryContextMenu::resetMixed()
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
 
    if (git->resetCommit(mShas.first(), GitLocal::CommitResetType::MIXED))
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
 }
 
 void CommitHistoryContextMenu::resetHard()
@@ -508,7 +508,7 @@ void CommitHistoryContextMenu::resetHard()
       QScopedPointer<GitLocal> git(new GitLocal(mGit));
 
       if (git->resetCommit(mShas.first(), GitLocal::CommitResetType::HARD))
-         emit signalRepositoryUpdated();
+         emit requestReload(false);
    }
 }
 
@@ -522,9 +522,8 @@ void CommitHistoryContextMenu::merge(const QString &branchFrom)
 
 void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 {
-   const auto commitInfo = mCache->getCommitInfo(sha);
-   auto remoteBranches = commitInfo.getReferences(References::Type::RemoteBranches);
-   const auto localBranches = commitInfo.getReferences(References::Type::LocalBranch);
+   auto remoteBranches = mCache->getReferences(sha, References::Type::RemoteBranches);
+   const auto localBranches = mCache->getReferences(sha, References::Type::LocalBranch);
 
    QMap<QString, bool> branchTracking;
 

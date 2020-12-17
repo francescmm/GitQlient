@@ -76,16 +76,9 @@ public:
    int getLanesCount() const { return mLanes.count(); }
    int getActiveLane() const;
 
-   void addReference(References::Type type, const QString &reference);
-   void addReferences(const References &refs) { mReferences = refs; }
-   QStringList getReferences(References::Type type) const { return mReferences.getReferences(type); }
-   bool hasReferences() const { return !mReferences.isEmpty(); }
-
    void addChildReference(CommitInfo *commit) { mChilds.insert(commit->sha(), commit); }
    QList<CommitInfo *> getChilds() const { return mChilds.values(); }
    bool hasChilds() const { return !mChilds.empty(); }
-
-   void clearReferences() { mReferences.clear(); }
 
    bool isSigned() const { return mSigned; }
    QString getGpgKey() const { return mGpgKey; }
@@ -104,7 +97,6 @@ private:
    QString mLongLog;
    QString mDiff;
    QVector<Lane> mLanes;
-   References mReferences;
    QMap<QString, CommitInfo *> mChilds;
    bool mSigned = false;
    QString mGpgKey;

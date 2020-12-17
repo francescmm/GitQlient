@@ -68,10 +68,15 @@ public:
    CommitInfo getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint, bool reverse);
    RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
 
+   void clearReferences();
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    void insertReference(const QString &sha, References::Type type, const QString &reference);
    void insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances);
+   bool hasReferences(const QString &sha) const;
+   QStringList getReferences(const QString &sha, References::Type type) const;
    LocalBranchDistances getLocalBranchDistances(const QString &name) { return mLocalBranchDistances.value(name); }
+   void reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha);
+
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
 
    bool containsRevisionFile(const QString &sha1, const QString &sha2) const;
@@ -95,12 +100,12 @@ private:
    QHash<QString, CommitInfo> mCommitsMap;
    QMultiMap<QString, CommitInfo *> mTmpChildsStorage;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
-   QVector<CommitInfo *> mReferences;
    QMap<QString, LocalBranchDistances> mLocalBranchDistances;
    Lanes mLanes;
    QVector<QString> mDirNames;
    QVector<QString> mFileNames;
    QVector<QString> mUntrackedfiles;
+   QMap<QString, References> mReferences;
    QMap<QString, QString> mRemoteTags;
 
    struct FileNamesLoader

@@ -35,11 +35,6 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
    mRevisionFilesMap.clear();
    mLanes.clear();
 
-   for (auto reference : qAsConst(mReferences))
-      reference->clearReferences();
-
-   mReferences.clear();
-
    if (mCommitsMap.isEmpty())
       mCommitsMap.reserve(totalCommits);
 
@@ -153,6 +148,11 @@ RevisionFiles GitCache::getRevisionFile(const QString &sha1, const QString &sha2
    return mRevisionFilesMap.value(qMakePair(sha1, sha2));
 }
 
+void GitCache::clearReferences()
+{
+   mReferences.clear();
+}
+
 void GitCache::insertCommitInfo(CommitInfo rev, int orderIdx)
 {
    if (!mConfigured)
@@ -241,20 +241,43 @@ void GitCache::insertReference(const QString &sha, References::Type type, const 
    QMutexLocker lock(&mMutex);
    QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
-   if (mCommitsMap.contains(sha))
+   if (mCommitsMap.contains(sha) && !mReferences.contains(sha))
    {
-      auto &commit = mCommitsMap[sha];
-
-      commit.addReference(type, reference);
-
-      if (!mReferences.contains(&mCommitsMap[sha]))
-         mReferences.append(&mCommitsMap[sha]);
+      auto &ref = mReferences[sha];
+      ref.addReference(type, reference);
    }
 }
 
 void GitCache::insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances)
 {
    mLocalBranchDistances[name] = distances;
+}
+
+bool GitCache::hasReferences(const QString &sha) const
+{
+   return mReferences.contains(sha) && !mReferences.value(sha).isEmpty();
+}
+
+QStringList GitCache::getReferences(const QString &sha, References::Type type) const
+{
+   return mReferences.value(sha).getReferences(type);
+}
+
+void GitCache::reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha)
+{
+   for (auto &ref : mReferences.toStdMap())
+   {
+      if (ref.second.getReferences(References::Type::LocalBranch).contains(currentBranch))
+      {
+         ref.second.removeReference(References::Type::LocalBranch, currentBranch);
+
+         mReferences.remove(ref.first);
+
+         break;
+      }
+   }
+
+   mReferences[currentSha].addReference(References::Type::LocalBranch, currentBranch);
 }
 
 void GitCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
@@ -430,8 +453,8 @@ QVector<QPair<QString, QStringList>> GitCache::getBranches(References::Type type
    QMutexLocker lock(&mMutex);
    QVector<QPair<QString, QStringList>> branches;
 
-   for (auto commit : qAsConst(mReferences))
-      branches.append(QPair<QString, QStringList>(commit->sha(), commit->getReferences(type)));
+   for (const auto &ref : mReferences.toStdMap())
+      branches.append(QPair<QString, QStringList>(ref.first, ref.second.getReferences(type)));
 
    return branches;
 }
@@ -442,13 +465,12 @@ QMap<QString, QString> GitCache::getTags(References::Type tagType) const
 
    if (tagType == References::Type::LocalTag)
    {
-      for (auto commit : mReferences)
+      for (auto reference : mReferences.toStdMap())
       {
-         const auto sha = commit->sha();
-         const auto tagNames = commit->getReferences(tagType);
+         const auto tagNames = reference.second.getReferences(tagType);
 
          for (const auto &tag : tagNames)
-            tags[tag] = sha;
+            tags[tag] = reference.first;
       }
    }
    else

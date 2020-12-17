@@ -23,12 +23,19 @@ GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<Git
 {
 }
 
-bool GitRepoLoader::loadRepository()
+bool GitRepoLoader::load()
+{
+   return load(true);
+}
+
+bool GitRepoLoader::load(bool refreshReferences)
 {
    if (mLocked)
       QLog_Warning("Git", "Git is currently loading data.");
    else
    {
+      mRefreshReferences = refreshReferences;
+
       if (mGitBase->getWorkingDir().isEmpty())
          QLog_Error("Git", "No working directory set.");
       else
@@ -220,13 +227,21 @@ void GitRepoLoader::processRevision(QByteArray ba)
    const auto wipInfo = processWip();
    mRevCache->setup(wipInfo, commits);
 
-   loadReferences();
+   if (mRefreshReferences)
+   {
+      mRevCache->clearReferences();
+      loadReferences();
+   }
+   else
+      mRevCache->reloadCurrentBranchInfo(mGitBase->getCurrentBranch(),
+                                         mGitBase->getLastCommit().output.toString().trimmed());
 
    mRevCache->setConfigurationDone();
 
-   mLocked = false;
+   emit signalLoadingFinished(mRefreshReferences);
 
-   emit signalLoadingFinished();
+   mLocked = false;
+   mRefreshReferences = false;
 }
 
 WipRevisionInfo GitRepoLoader::processWip()

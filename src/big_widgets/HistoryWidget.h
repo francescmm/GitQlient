@@ -63,12 +63,12 @@ class HistoryWidget : public QFrame
    Q_OBJECT
 
 signals:
-   /*!
-    \brief Signal triggered when the view has been updated. It notifies GitQlientRepo needs to update the UI for the
-    current repo.
+   /**
+    * @brief requestReload Signal triggered when the user forces a refresh of the repository data.
+    * @param full True if the refresh includes commits and references, otherwise it refreshes only commits.
+    */
+   void requestReload(bool full);
 
-   */
-   void signalViewUpdated();
    /*!
     \brief Signal triggered when GitQlientRepo needs to update the UI for the current repo.
 

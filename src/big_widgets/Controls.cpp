@@ -192,7 +192,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
    connect(mPullBtn, &QToolButton::clicked, this, &Controls::pullCurrentBranch);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
-   connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::signalRepositoryUpdated);
+   connect(mRefreshBtn, &QToolButton::clicked, this, [this]() { emit requestReload(true); });
    connect(mConfigBtn, &QToolButton::clicked, this, &Controls::showConfigDlg);
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
    connect(mVersionCheck, &QToolButton::clicked, mUpdater, &GitQlientUpdater::showInfoMessage);
@@ -242,7 +242,7 @@ void Controls::pullCurrentBranch()
       if (msg.contains("merge conflict", Qt::CaseInsensitive))
          emit signalPullConflict();
       else
-         emit signalRepositoryUpdated();
+         emit requestReload(true);
    }
    else
    {
@@ -274,7 +274,7 @@ void Controls::fetchAll()
    if (ret)
    {
       mGitTags->getRemoteTags();
-      emit signalRepositoryUpdated();
+      emit requestReload(true);
    }
 }
 
@@ -319,13 +319,13 @@ void Controls::pushCurrentBranch()
       if (dlgRet == QDialog::Accepted)
       {
          emit signalRefreshPRsCache();
-         emit signalRepositoryUpdated();
+         emit requestReload(true);
       }
    }
    else if (ret.success)
    {
       emit signalRefreshPRsCache();
-      emit signalRepositoryUpdated();
+      emit requestReload(true);
    }
    else
    {
@@ -346,7 +346,7 @@ void Controls::stashCurrentWork()
    const auto ret = git->stash();
 
    if (ret.success)
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
 }
 
 void Controls::popStashedWork()
@@ -355,7 +355,7 @@ void Controls::popStashedWork()
    const auto ret = git->pop();
 
    if (ret.success)
-      emit signalRepositoryUpdated();
+      emit requestReload(false);
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while popping a stash"),
@@ -376,13 +376,13 @@ void Controls::pruneBranches()
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
-      emit signalRepositoryUpdated();
+      emit requestReload(true);
 }
 
 void Controls::showConfigDlg()
 {
    const auto configDlg = new RepoConfigDlg(mGit, this);
-   connect(configDlg, &RepoConfigDlg::reloadView, this, &Controls::signalRepositoryUpdated);
+   connect(configDlg, &RepoConfigDlg::reloadView, this, [this]() { emit requestReload(false); });
    configDlg->open();
 
    GitQlientSettings settings;

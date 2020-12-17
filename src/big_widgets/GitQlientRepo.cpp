@@ -105,17 +105,17 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mControls, &Controls::signalGoMerge, this, &GitQlientRepo::showMergeView);
    connect(mControls, &Controls::signalGoServer, this, &GitQlientRepo::showGitServerView);
    connect(mControls, &Controls::signalGoBuildSystem, this, &GitQlientRepo::showBuildSystemView);
-   connect(mControls, &Controls::signalRepositoryUpdated, this, &GitQlientRepo::updateCache);
+   connect(mControls, &Controls::requestReload, this, &GitQlientRepo::updateCache);
    connect(mControls, &Controls::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
-   connect(mControls, &Controls::signalRepositoryUpdated, mHistoryWidget, &HistoryWidget::updateConfig);
+   connect(mControls, &Controls::requestReload, mHistoryWidget, [this](bool) { mHistoryWidget->updateConfig(); });
 
    connect(mHistoryWidget, &HistoryWidget::signalEditFile, this, &GitQlientRepo::signalEditFile);
    connect(mHistoryWidget, &HistoryWidget::signalAllBranchesActive, mGitLoader.data(), &GitRepoLoader::setShowAll);
    connect(mHistoryWidget, &HistoryWidget::signalAllBranchesActive, this, &GitQlientRepo::updateCache);
-   connect(mHistoryWidget, &HistoryWidget::signalUpdateCache, this, &GitQlientRepo::updateCache);
+   connect(mHistoryWidget, &HistoryWidget::signalUpdateCache, this, [this]() { updateCache(false); });
    connect(mHistoryWidget, &HistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
-   connect(mHistoryWidget, &HistoryWidget::signalViewUpdated, this, &GitQlientRepo::updateCache);
+   connect(mHistoryWidget, &HistoryWidget::requestReload, this, &GitQlientRepo::updateCache);
    connect(mHistoryWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
    connect(mHistoryWidget, &HistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
    connect(mHistoryWidget, &HistoryWidget::signalShowDiff, this, &GitQlientRepo::loadFileDiff);
@@ -140,7 +140,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mBlameWidget, &BlameWidget::signalOpenDiff, this, &GitQlientRepo::openCommitCompareDiff);
 
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, &GitQlientRepo::showHistoryView);
-   connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, &GitQlientRepo::updateCache);
+   connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, [this]() { updateCache(true); });
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, mControls, &Controls::disableMergeWarning);
    connect(mMergeWidget, &MergeWidget::signalEditFile, this, &GitQlientRepo::signalEditFile);
 
@@ -154,7 +154,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    m_loaderThread = new QThread();
    mGitLoader->moveToThread(m_loaderThread);
-   connect(this, &GitQlientRepo::signalLoadRepo, mGitLoader.data(), &GitRepoLoader::loadRepository);
+   connect(this, SIGNAL(signalLoadRepo(bool)), mGitLoader.data(), SLOT(load(bool)));
    m_loaderThread->start();
 
    mGitLoader->setShowAll(settings.localValue(mGitBase->getGitQlientSettingsDir(), "ShowAllBranches", true).toBool());
@@ -170,13 +170,13 @@ GitQlientRepo::~GitQlientRepo()
    m_loaderThread->deleteLater();
 }
 
-void GitQlientRepo::updateCache()
+void GitQlientRepo::updateCache(bool full)
 {
    if (!mCurrentDir.isEmpty())
    {
       QLog_Debug("UI", QString("Updating the GitQlient UI"));
 
-      emit signalLoadRepo();
+      emit signalLoadRepo(full);
 
       mDiffWidget->reload();
    }
@@ -201,7 +201,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
       mGitLoader->cancelAll();
 
-      emit signalLoadRepo();
+      emit signalLoadRepo(true);
 
       mCurrentDir = newDir;
       clearWindow();
@@ -288,7 +288,7 @@ void GitQlientRepo::createProgressDialog()
    }
 }
 
-void GitQlientRepo::onRepoLoadFinished()
+void GitQlientRepo::onRepoLoadFinished(bool fullReload)
 {
    if (!mIsInit)
    {
@@ -328,7 +328,9 @@ void GitQlientRepo::onRepoLoadFinished()
 
    const auto totalCommits = mGitQlientCache->count();
 
-   mHistoryWidget->loadBranches();
+   if (fullReload)
+      mHistoryWidget->loadBranches();
+
    mHistoryWidget->onNewRevisions(totalCommits);
    mBlameWidget->onNewRevisions(totalCommits);
 
@@ -569,7 +571,7 @@ void GitQlientRepo::changesCommitted(bool ok)
 {
    if (ok)
    {
-      updateCache();
+      updateCache(false);
       showHistoryView();
    }
    else

@@ -430,7 +430,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
       }
    }
 
-   if (commit.hasReferences() && !mView->hasActiveFilter())
+   if (mCache->hasReferences(commit.sha()) && !mView->hasActiveFilter())
    {
       if (offset == 0)
          offset = 5;
@@ -455,20 +455,19 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
    QVector<QString> marks;
    QVector<QColor> colors;
    const auto currentBranch = mGit->getCurrentBranch();
-   const auto commit = mCache->getCommitInfo(sha);
 
    if ((currentBranch.isEmpty() || currentBranch == "HEAD"))
    {
-      if (const auto ret = mGit->getLastCommit(); ret.success && commit.sha() == ret.output.toString().trimmed())
+      if (const auto ret = mGit->getLastCommit(); ret.success && sha == ret.output.toString().trimmed())
       {
          marks.append("detached");
          colors.append(GitQlientStyles::getDetachedColor());
       }
    }
 
-   if (commit.hasReferences())
+   if (mCache->hasReferences(sha))
    {
-      const auto localBranches = commit.getReferences(References::Type::LocalBranch);
+      const auto localBranches = mCache->getReferences(sha, References::Type::LocalBranch);
       for (const auto &branch : localBranches)
       {
          if (branch == currentBranch)
@@ -483,14 +482,14 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
          }
       }
 
-      const auto tags = commit.getReferences(References::Type::LocalTag);
+      const auto tags = mCache->getReferences(sha, References::Type::LocalTag);
       for (const auto &tag : tags)
       {
          marks.append(tag);
          colors.append(GitQlientStyles::getTagColor());
       }
 
-      const auto remoteBranches = commit.getReferences(References::Type::RemoteBranches);
+      const auto remoteBranches = mCache->getReferences(sha, References::Type::RemoteBranches);
       for (const auto &branch : remoteBranches)
       {
          marks.append(branch);

@@ -214,7 +214,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
       {
          const auto menu = new CommitHistoryContextMenu(mCache, mGit, mGitServerCache, shas, this);
          // connect(menu, &CommitHistoryContextMenu::signalRefreshPRsCache, mCache.get(), &GitCache::refreshPRsCache);
-         connect(menu, &CommitHistoryContextMenu::signalRepositoryUpdated, this, &CommitHistoryView::signalViewUpdated);
+         connect(menu, &CommitHistoryContextMenu::requestReload, this, &CommitHistoryView::requestReload);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,
                  &CommitHistoryView::signalOpenCompareDiff);

@@ -88,8 +88,9 @@ signals:
 
    /**
     * @brief signalLoadRepo Signal used to trigger the data update in a different thread.
+    * @param full Requests a full repository refresh: includes commits and references.
     */
-   void signalLoadRepo();
+   void signalLoadRepo(bool full);
 
    /**
     * @brief repoOpened Signal triggered when the repo was successfully opened.
@@ -163,7 +164,7 @@ private:
     \brief Updates the UI cache and refreshes the subwidgets.
 
    */
-   void updateCache();
+   void updateCache(bool full);
    /*!
     \brief Performs a light UI update triggered by the QFileSystemWatcher.
 
@@ -214,11 +215,11 @@ private:
    */
    void createProgressDialog();
 
-   /*!
-    \brief When the loading finishes this method closes and destroys the dialog.
-
-   */
-   void onRepoLoadFinished();
+   /**
+    * @brief When the loading finishes this method closes and destroys the dialog.
+    * @param fullReload Indicates that the load finished in the full mode (commits + references).
+    */
+   void onRepoLoadFinished(bool fullReload);
    /*!
     \brief Loads the view to show the diff of a specific file.
 
