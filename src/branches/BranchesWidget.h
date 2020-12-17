@@ -96,6 +96,11 @@ public:
 
    */
    void showBranches();
+
+   /**
+    * @brief refreshCurrentBranchLink Reloads the current branch link
+    */
+   void refreshCurrentBranchLink();
    /*!
     \brief Clears all widget's information.
 

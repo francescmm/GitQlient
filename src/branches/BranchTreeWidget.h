@@ -89,6 +89,11 @@ public:
    */
    void setLocalRepo(const bool isLocal) { mLocal = isLocal; }
 
+   /**
+    * @brief reloadCurrentBranchLink Reloads the link to the current branch.
+    */
+   void reloadCurrentBranchLink() const;
+
    int focusOnBranch(const QString &branch, int lastPos = -1);
 
 private:
@@ -119,5 +124,5 @@ private:
     */
    void onSelectionChanged();
 
-   QList<QTreeWidgetItem *> findChildItem(const QString &text);
+   QList<QTreeWidgetItem *> findChildItem(const QString &text) const;
 };

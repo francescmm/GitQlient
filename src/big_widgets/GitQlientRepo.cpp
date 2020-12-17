@@ -328,8 +328,7 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
 
    const auto totalCommits = mGitQlientCache->count();
 
-   if (fullReload)
-      mHistoryWidget->loadBranches();
+   mHistoryWidget->loadBranches(fullReload);
 
    mHistoryWidget->onNewRevisions(totalCommits);
    mBlameWidget->onNewRevisions(totalCommits);

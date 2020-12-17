@@ -243,9 +243,12 @@ void HistoryWidget::resetWip()
    mWipWidget->clear();
 }
 
-void HistoryWidget::loadBranches()
+void HistoryWidget::loadBranches(bool fullReload)
 {
-   mBranchesWidget->showBranches();
+   if (fullReload)
+      mBranchesWidget->showBranches();
+   else
+      mBranchesWidget->refreshCurrentBranchLink();
 }
 
 void HistoryWidget::updateUiFromWatcher()

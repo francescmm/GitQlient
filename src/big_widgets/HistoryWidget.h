@@ -183,8 +183,10 @@ public:
 
    /**
     * @brief loadBranches Loads the information on the branches widget: branches, tags, stashes and submodules.
+    * @brief fullReload Indicates that the information on the panel should be fully reloaded, otherwise only refreshes
+    * the link to the current branch.
     */
-   void loadBranches();
+   void loadBranches(bool fullReload);
 
    /*!
     \brief If the current view is the WIP widget, updates it.

@@ -356,6 +356,11 @@ void BranchesWidget::showBranches()
    adjustBranchesTree(mLocalBranchesTree);
 }
 
+void BranchesWidget::refreshCurrentBranchLink()
+{
+   mLocalBranchesTree->reloadCurrentBranchLink();
+}
+
 void BranchesWidget::clear()
 {
    blockSignals(true);

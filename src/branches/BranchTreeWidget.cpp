@@ -27,6 +27,13 @@ BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitBase> &git, QWidget *
    connect(this, &BranchTreeWidget::itemDoubleClicked, this, &BranchTreeWidget::checkoutBranch);
 }
 
+void BranchTreeWidget::reloadCurrentBranchLink() const
+{
+   const auto items = findChildItem(mGit->getCurrentBranch());
+
+   items.at(0)->setData(0, GitQlient::ShaRole, mGit->getLastCommit().output.toString().trimmed());
+}
+
 int BranchTreeWidget::focusOnBranch(const QString &branch, int lastPos)
 {
    const auto items = findChildItem(branch);
@@ -175,7 +182,7 @@ void BranchTreeWidget::onSelectionChanged()
       selectCommit(selection.constFirst());
 }
 
-QList<QTreeWidgetItem *> BranchTreeWidget::findChildItem(const QString &text)
+QList<QTreeWidgetItem *> BranchTreeWidget::findChildItem(const QString &text) const
 {
    QModelIndexList indexes = model()->match(model()->index(0, 0, QModelIndex()), GitQlient::FullNameRole, text, -1,
                                             Qt::MatchContains | Qt::MatchRecursive);
