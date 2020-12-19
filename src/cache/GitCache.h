@@ -107,6 +107,7 @@ private:
    QVector<QString> mUntrackedfiles;
    QMap<QString, References> mReferences;
    QMap<QString, QString> mRemoteTags;
+   QStringList mSubTrees;
 
    struct FileNamesLoader
    {
