@@ -17,6 +17,7 @@ HEADERS += \
     $$PWD/GitRequestorProcess.h \
     $$PWD/GitStashes.h \
     $$PWD/GitSubmodules.h \
+    $$PWD/GitSubtree.h \
     $$PWD/GitSyncProcess.h \
     $$PWD/GitTags.h
 
@@ -37,5 +38,6 @@ SOURCES += \
     $$PWD/GitRequestorProcess.cpp \
     $$PWD/GitStashes.cpp \
     $$PWD/GitSubmodules.cpp \
+    $$PWD/GitSubtree.cpp \
     $$PWD/GitSyncProcess.cpp \
     $$PWD/GitTags.cpp

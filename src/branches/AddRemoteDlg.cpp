@@ -16,7 +16,6 @@ AddRemoteDlg::AddRemoteDlg(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->setupUi(this);
 
    setWindowTitle("Add remote repository");
-   setAttribute(Qt::WA_DeleteOnClose);
 
    connect(ui->lePath, &QLineEdit::returnPressed, this, &AddRemoteDlg::accept);
    connect(ui->leUrl, &QLineEdit::returnPressed, this, &AddRemoteDlg::accept);

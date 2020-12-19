@@ -4,11 +4,12 @@
 #include <GitBase.h>
 #include <GitSubmodules.h>
 #include <GitStashes.h>
+#include <GitSubtree.h>
 #include <GitTags.h>
 #include <GitConfig.h>
 #include <BranchesViewDelegate.h>
 #include <ClickableFrame.h>
-#include <AddSubmoduleDlg.h>
+#include <AddSubtreeDlg.h>
 #include <StashesContextMenu.h>
 #include <SubmodulesContextMenu.h>
 #include <GitCache.h>
@@ -751,7 +752,11 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
 
    if (index.isValid())
    {
-      menu->addAction(tr("Pull"));
+      connect(menu->addAction(tr("Pull")), &QAction::triggered, this, [this]() {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+         QScopedPointer<GitSubtree> git(new GitSubtree(mGit));
+         QApplication::restoreOverrideCursor();
+      });
       menu->addAction(tr("Merge"));
       menu->addAction(tr("Push"));
       menu->addAction(tr("Split"));
@@ -759,9 +764,11 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
    else
    {
       const auto addSubtree = menu->addAction(tr("Add subtree"));
-      connect(addSubtree, &QAction::triggered, this, []() {
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QApplication::restoreOverrideCursor();
+      connect(addSubtree, &QAction::triggered, this, [this]() {
+         AddSubtreeDlg addDlg(mGit);
+         const auto ret = addDlg.exec();
+         if (ret == QDialog::Accepted)
+            emit signalBranchesUpdated();
       });
    }
 
