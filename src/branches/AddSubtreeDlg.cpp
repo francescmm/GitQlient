@@ -1,5 +1,5 @@
 #include "AddSubtreeDlg.h"
-#include "ui_AddSubmoduleDlg.h"
+#include "ui_AddSubtreeDlg.h"
 
 #include <GitSubtree.h>
 #include <GitQlientStyles.h>
@@ -11,14 +11,12 @@ using namespace QLogger;
 
 AddSubtreeDlg::AddSubtreeDlg(const QSharedPointer<GitBase> &git, QWidget *parent)
    : QDialog(parent)
-   , ui(new Ui::AddSubmoduleDlg)
+   , ui(new Ui::AddSubtreeDlg)
    , mGit(git)
 {
    setStyleSheet(GitQlientStyles::getStyles());
 
    ui->setupUi(this);
-
-   setWindowTitle("Add subtree");
 
    connect(ui->lePath, &QLineEdit::returnPressed, this, &AddSubtreeDlg::accept);
    connect(ui->leUrl, &QLineEdit::returnPressed, this, &AddSubtreeDlg::accept);
@@ -34,12 +32,13 @@ AddSubtreeDlg::~AddSubtreeDlg()
 
 void AddSubtreeDlg::accept()
 {
-   const auto remoteName = ui->lePath->text();
-   const auto remoteUrl = ui->leUrl->text();
+   const auto subtreeName = ui->lePath->text();
+   const auto subtreeUrl = ui->leUrl->text();
+   const auto subtreeRef = ui->leReference->text();
 
    QScopedPointer<GitSubtree> git(new GitSubtree(mGit));
 
-   if (remoteName.isEmpty() || remoteUrl.isEmpty())
+   if (subtreeName.isEmpty() || subtreeUrl.isEmpty() || subtreeRef.isEmpty())
    {
       QMessageBox::warning(
           this, tr("Invalid fields"),
@@ -47,7 +46,7 @@ void AddSubtreeDlg::accept()
    }
    else
    {
-      const auto ret = git->add(remoteUrl, remoteName);
+      const auto ret = git->add(subtreeUrl, subtreeRef, subtreeName, ui->chSquash->isChecked());
 
       if (ret.success)
          QDialog::accept();

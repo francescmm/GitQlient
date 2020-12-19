@@ -34,7 +34,7 @@ class GitSubtree : public QObject
 public:
    explicit GitSubtree(const QSharedPointer<GitBase> &gitBase);
 
-   GitExecResult add(const QString &url, const QString &name);
+   GitExecResult add(const QString &url, const QString &ref, const QString &name, bool squash);
    GitExecResult pull() const;
    GitExecResult push() const;
    GitExecResult merge(const QString &sha) const;

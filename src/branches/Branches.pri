@@ -2,6 +2,7 @@ INCLUDEPATH += $$PWD
 
 FORMS += \
     $$PWD/AddSubmoduleDlg.ui \
+    $$PWD/AddSubtreeDlg.ui \
     $$PWD/TagDlg.ui
 
 HEADERS += \

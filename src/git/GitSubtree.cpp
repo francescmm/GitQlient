@@ -10,11 +10,16 @@ GitSubtree::GitSubtree(const QSharedPointer<GitBase> &gitBase)
 {
 }
 
-GitExecResult GitSubtree::add(const QString &url, const QString &name)
+GitExecResult GitSubtree::add(const QString &url, const QString &ref, const QString &name, bool squash)
 {
    QLog_Debug("UI", "Adding a subtree");
 
-   return mGitBase->run(QString("git subtree add --prefix=%1 %2").arg(name, url));
+   auto cmd = QString("git subtree add --prefix=%1 %2 %3").arg(name, url, ref);
+
+   if (squash)
+      cmd.append(" --squash");
+
+   return mGitBase->run(cmd);
 }
 
 GitExecResult GitSubtree::pull() const

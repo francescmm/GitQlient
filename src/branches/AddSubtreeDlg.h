@@ -27,7 +27,7 @@
 
 namespace Ui
 {
-class AddSubmoduleDlg;
+class AddSubtreeDlg;
 }
 
 class GitBase;
@@ -62,7 +62,7 @@ public:
    void accept() override;
 
 private:
-   Ui::AddSubmoduleDlg *ui;
+   Ui::AddSubtreeDlg *ui;
    QSharedPointer<GitBase> mGit;
 
    void proposeName();
