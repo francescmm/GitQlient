@@ -316,7 +316,7 @@ QVector<Lane> GitCache::calculateLanes(const CommitInfo &c)
    return lanes;
 }
 
-RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl, bool)
+RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl, bool cached)
 {
    RevisionFiles rf;
    auto parNum = 1;
@@ -340,7 +340,7 @@ RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl,
              * be RM or MR). For visualization purposes we could consider
              * the file as modified
              */
-            if (fl.rf != &rf)
+            if (fl.rf != &rf && !cached)
             {
                flushFileNames(fl);
                fl.rf = &rf;
@@ -361,7 +361,7 @@ RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl,
                if (flag == 'D')
                   fileIsCached = !fileIsCached;
 
-               if (fl.rf != &rf)
+               if (fl.rf != &rf && !cached)
                {
                   flushFileNames(fl);
                   fl.rf = &rf;

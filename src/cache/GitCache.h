@@ -110,12 +110,7 @@ private:
 
    struct FileNamesLoader
    {
-      FileNamesLoader()
-         : rf(nullptr)
-      {
-      }
-
-      RevisionFiles *rf;
+      RevisionFiles *rf = nullptr;
       QVector<int> rfDirs;
       QVector<int> rfNames;
       QVector<QString> files;
