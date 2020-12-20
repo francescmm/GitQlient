@@ -30,6 +30,7 @@ class GitCache;
 class GitBase;
 class GitServerCache;
 class IssueDetailedView;
+class QPushButton;
 
 namespace GitServer
 {
@@ -47,6 +48,8 @@ signals:
 public:
    explicit GitServerWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                             const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+
+   ~GitServerWidget();
 
    /**
     * @brief configure Configures the widget by showing the config dialog or the full content if it was already
@@ -72,6 +75,9 @@ private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitServerCache> mGitServerCache;
    IssueDetailedView *mDetailedView = nullptr;
+   QPushButton *mOldIssue = nullptr;
+   QPushButton *mOldPr = nullptr;
+   QPushButton *mRefresh = nullptr;
    bool mConfigured = false;
 
    /**

@@ -34,6 +34,11 @@ PrCommentsList::PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCa
    setObjectName("IssuesViewFrame");
 }
 
+PrCommentsList::~PrCommentsList()
+{
+   delete mManager;
+}
+
 void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
 {
    connect(mGitServerCache.get(), &GitServerCache::issueUpdated, this, &PrCommentsList::processComments,

@@ -200,6 +200,11 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    enableButtons(false);
 }
 
+Controls::~Controls()
+{
+   delete mBtnGroup;
+}
+
 void Controls::toggleButton(ControlsMainViews view)
 {
    mBtnGroup->button(static_cast<int>(view))->setChecked(true);
@@ -428,11 +433,6 @@ void Controls::createGitPlatformButton(QHBoxLayout *layout)
       mGitPlatform->setToolButtonStyle(Qt::ToolButtonIconOnly);
       mGitPlatform->setPopupMode(QToolButton::InstantPopup);
       mBtnGroup->addButton(mGitPlatform, static_cast<int>(ControlsMainViews::GitServer));
-
-      const auto gitLayout = new QVBoxLayout();
-      gitLayout->setContentsMargins(QMargins());
-      gitLayout->setSpacing(0);
-      gitLayout->addWidget(mGitPlatform);
 
       layout->addWidget(mGitPlatform);
 

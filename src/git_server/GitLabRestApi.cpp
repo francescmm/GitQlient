@@ -309,7 +309,7 @@ void GitLabRestApi::onLabelsReceived()
                         labelMap.value("name").toString(),
                         labelMap.value("description").toString(),
                         labelMap.value("color").toString(),
-                        "" };
+                        false };
 
          labels.append(std::move(sLabel));
       }

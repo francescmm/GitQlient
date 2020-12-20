@@ -72,7 +72,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    mReviewBtn->setDisabled(true);
    mReviewBtn->setMenu(reviewMenu);
 
-   auto action = new QAction(tr("Only comments"));
+   auto action = new QAction(tr("Only comments"), reviewMenu);
    action->setToolTip(tr("Comment"));
    action->setCheckable(true);
    action->setChecked(true);
@@ -80,14 +80,14 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    actionGroup->addAction(action);
    reviewMenu->addAction(action);
 
-   action = new QAction(tr("Review: Approve"));
+   action = new QAction(tr("Review: Approve"), reviewMenu);
    action->setCheckable(true);
    action->setToolTip(tr("The comments will be part of a review"));
    action->setData(static_cast<int>(ReviewMode::Approve));
    actionGroup->addAction(action);
    reviewMenu->addAction(action);
 
-   action = new QAction(tr("Review: Request changes"));
+   action = new QAction(tr("Review: Request changes"), reviewMenu);
    action->setCheckable(true);
    action->setToolTip(tr("The comments will be part of a review"));
    action->setData(static_cast<int>(ReviewMode::RequestChanges));
@@ -95,7 +95,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    reviewMenu->addAction(action);
    connect(actionGroup, &QActionGroup::triggered, this, &IssueDetailedView::openAddReviewDlg);
 
-   mAddComment = new QPushButton();
+   mAddComment = new QPushButton(this);
    mAddComment->setCheckable(true);
    mAddComment->setChecked(false);
    mAddComment->setIcon(QIcon(":/icons/add_comment"));
@@ -104,7 +104,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    mAddComment->setObjectName("ViewBtnOption");
    connect(mAddComment, &QPushButton::clicked, mPrCommentsList, &PrCommentsList::addGlobalComment);
 
-   mCloseIssue = new QPushButton();
+   mCloseIssue = new QPushButton(this);
    mCloseIssue->setCheckable(true);
    mCloseIssue->setChecked(false);
    mCloseIssue->setIcon(QIcon(":/icons/close_issue"));
@@ -113,13 +113,13 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    mCloseIssue->setObjectName("ViewBtnOption");
    connect(mCloseIssue, &QPushButton::clicked, this, &IssueDetailedView::closeIssue);
 
-   const auto refresh = new QPushButton();
+   const auto refresh = new QPushButton(this);
    refresh->setIcon(QIcon(":/icons/refresh"));
    refresh->setObjectName("ViewBtnOption");
    refresh->setToolTip(tr("Refresh"));
    connect(refresh, &QPushButton::clicked, this, [this]() { loadData(mConfig, mIssueNumber, true); });
 
-   const auto headerFrame = new QFrame();
+   const auto headerFrame = new QFrame(this);
    headerFrame->setObjectName("IssuesHeaderFrameBig");
    const auto headerLayout = new QHBoxLayout(headerFrame);
    headerLayout->setContentsMargins(QMargins());
@@ -136,7 +136,7 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
    headerLayout->addSpacing(20);
    headerLayout->addWidget(refresh);
 
-   const auto footerFrame = new QFrame();
+   const auto footerFrame = new QFrame(this);
    footerFrame->setObjectName("IssuesFooterFrame");
 
    mPrCommitsList->setVisible(false);

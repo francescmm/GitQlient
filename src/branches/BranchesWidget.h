@@ -34,6 +34,7 @@ class GitTags;
 class GitCache;
 class QPushButton;
 class BranchesWidgetMinimal;
+class BranchesViewDelegate;
 
 /*!
  \brief BranchesWidget is the widget that creates the layout that contains all the widgets related with the display of
@@ -90,6 +91,12 @@ public:
    */
    explicit BranchesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                            QWidget *parent = nullptr);
+
+   /**
+    * @brief Destructor;
+    */
+   ~BranchesWidget();
+
    /*!
     \brief This method configures the widget gathering all the information regarding branches, tags, stashes and
     submodules.
@@ -132,7 +139,9 @@ private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitTags> mGitTags;
    BranchTreeWidget *mLocalBranchesTree = nullptr;
+   BranchesViewDelegate *mLocalDelegate = nullptr;
    BranchTreeWidget *mRemoteBranchesTree = nullptr;
+   BranchesViewDelegate *mRemotesDelegate = nullptr;
    QListWidget *mTagsList = nullptr;
    QListWidget *mStashesList = nullptr;
    QListWidget *mSubmodulesList = nullptr;

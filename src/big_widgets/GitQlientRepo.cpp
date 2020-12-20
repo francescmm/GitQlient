@@ -167,7 +167,8 @@ GitQlientRepo::~GitQlientRepo()
    delete mGitWatcher;
 
    m_loaderThread->exit();
-   m_loaderThread->deleteLater();
+   m_loaderThread->wait();
+   delete m_loaderThread;
 }
 
 void GitQlientRepo::updateCache(bool full)

@@ -116,6 +116,11 @@ public:
    */
    explicit Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                      QWidget *parent = nullptr);
+
+   /**
+    * @brief Destructor.
+    */
+   ~Controls();
    /*!
     \brief Process the toggled button and triggers its corresponding action.
 

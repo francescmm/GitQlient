@@ -63,6 +63,10 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
    mTimer->setInterval(15 * 60 * 1000); // 15 mins
 }
 
+JenkinsWidget::~JenkinsWidget() {
+   delete mBtnGroup;
+}
+
 void JenkinsWidget::reload() const
 {
    mTimer->stop();

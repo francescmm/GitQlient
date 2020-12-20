@@ -66,24 +66,24 @@ struct PullRequest : public Issue
          QString name;
       };
 
-      QString sha;
-      QString state;
-      State eState;
-      QVector<Check> checks;
+      QString sha {};
+      QString state {};
+      State eState {};
+      QVector<Check> checks {};
    };
 
-   QString head;
-   QString headRepo;
-   QString headUrl;
-   QString base;
-   QString baseRepo;
+   QString head {};
+   QString headRepo {};
+   QString headUrl {};
+   QString base {};
+   QString baseRepo {};
    bool maintainerCanModify = true;
    bool draft = false;
    int id = 0;
-   QString url;
-   HeadState state;
-   QMap<int, Review> reviews;
-   QVector<CodeReview> reviewComment;
+   QString url {};
+   HeadState state {};
+   QMap<int, Review> reviews {};
+   QVector<CodeReview> reviewComment {};
    int reviewCommentsCount = 0;
    int commitCount = 0;
    int additions = 0;
@@ -92,8 +92,8 @@ struct PullRequest : public Issue
    bool merged = false;
    bool mergeable = false;
    bool rebaseable = false;
-   QString mergeableState;
-   QVector<Commit> commits;
+   QString mergeableState {};
+   QVector<Commit> commits {};
 
    QJsonObject toJson() const
    {

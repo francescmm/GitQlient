@@ -29,7 +29,7 @@ signals:
 
 public:
    JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
-   ~JenkinsWidget() override = default;
+   ~JenkinsWidget() override;
 
    void reload() const;
 

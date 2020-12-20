@@ -13,6 +13,7 @@ signals:
 
 public:
    explicit GitQlientUpdater(QObject *parent = nullptr);
+   ~GitQlientUpdater();
 
    void checkNewGitQlientVersion();
    void showInfoMessage();

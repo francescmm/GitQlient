@@ -107,7 +107,7 @@ bool BranchesWidgetMinimal::eventFilter(QObject *obj, QEvent *event)
 
 void BranchesWidgetMinimal::addActionToMenu(const QString &sha, const QString &name, QMenu *menu)
 {
-   const auto action = new QAction(name);
+   const auto action = new QAction(name, menu);
    action->setData(sha);
    connect(action, &QAction::triggered, this, [this, sha] { emit commitSelected(sha); });
 

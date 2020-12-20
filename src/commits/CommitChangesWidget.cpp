@@ -113,7 +113,7 @@ void CommitChangesWidget::resetFile(QListWidgetItem *item)
             ui->stagedFilesList->takeItem(row);
             ui->unstagedFilesList->addItem(item);
 
-            const auto newFileWidget = new FileWidget(iconPath, clippedText);
+            const auto newFileWidget = new FileWidget(iconPath, clippedText, this);
             newFileWidget->setTextColor(fileWidget->getTextColor());
             newFileWidget->setToolTip(fileName);
 
@@ -250,7 +250,7 @@ QPair<QListWidgetItem *, FileWidget *> CommitChangesWidget::fillFileItemInfo(con
    QFontMetrics metrix(item->font());
    const auto clippedText = metrix.elidedText(modName, Qt::ElideMiddle, width() - 10);
 
-   const auto fileWidget = new FileWidget(icon, clippedText);
+   const auto fileWidget = new FileWidget(icon, clippedText, this);
    fileWidget->setTextColor(color);
    fileWidget->setToolTip(modName);
 
@@ -306,17 +306,17 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
    fileList->removeItemWidget(item);
    fileList->takeItem(row);
 
-   const auto wip = mInternalCache.take(QString("%1-%2").arg(fileName, fileList->objectName()));
    const auto newKey = QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName());
 
    if (!mInternalCache.contains(newKey))
    {
-      mInternalCache.insert(newKey, std::move(wip));
+      const auto wip = mInternalCache.take(QString("%1-%2").arg(fileName, fileList->objectName()));
+      mInternalCache.insert(newKey, wip);
 
       QFontMetrics metrix(item->font());
       const auto clippedText = metrix.elidedText(fileName, Qt::ElideMiddle, width() - 10);
 
-      const auto newFileWidget = new FileWidget(":/icons/remove", clippedText);
+      const auto newFileWidget = new FileWidget(":/icons/remove", clippedText, this);
       newFileWidget->setTextColor(fileWidget->getTextColor());
       newFileWidget->setToolTip(fileName);
 
@@ -364,12 +364,12 @@ void CommitChangesWidget::removeFileFromCommitList(QListWidgetItem *item)
       const auto fileName = fileWidget->toolTip();
 
       const auto wip = mInternalCache.take(QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName()));
-      mInternalCache.insert(QString("%1-%2").arg(fileName, itemOriginalList->objectName()), std::move(wip));
+      mInternalCache.insert(QString("%1-%2").arg(fileName, itemOriginalList->objectName()), wip);
 
       QFontMetrics metrix(item->font());
       const auto clippedText = metrix.elidedText(fileName, Qt::ElideMiddle, width() - 10);
 
-      const auto newFileWidget = new FileWidget(":/icons/add", clippedText);
+      const auto newFileWidget = new FileWidget(":/icons/add", clippedText, this);
       newFileWidget->setTextColor(fileWidget->getTextColor());
       newFileWidget->setToolTip(fileName);
 

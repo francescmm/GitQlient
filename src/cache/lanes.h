@@ -27,7 +27,7 @@
 class Lanes
 {
 public:
-   Lanes() { } // init() will setup us later, when data is available
+   Lanes() = default;
    bool isEmpty() { return typeVec.empty(); }
    void init(const QString &expectedSha);
    void clear();

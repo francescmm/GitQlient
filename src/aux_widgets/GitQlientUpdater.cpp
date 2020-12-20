@@ -22,6 +22,11 @@ GitQlientUpdater::GitQlientUpdater(QObject *parent)
 {
 }
 
+GitQlientUpdater::~GitQlientUpdater()
+{
+   delete mManager;
+}
+
 void GitQlientUpdater::checkNewGitQlientVersion()
 {
    QNetworkRequest request;

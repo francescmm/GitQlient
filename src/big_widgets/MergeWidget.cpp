@@ -36,9 +36,6 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
    , mStacked(new QStackedWidget())
    , mFileDiff(new FileDiffWidget(mGit, mGitQlientCache))
 {
-   const auto autoMergedBtnFrame = new QFrame();
-   autoMergedBtnFrame->setObjectName("DiffButtonsFrame");
-
    mCommitTitle->setObjectName("leCommitTitle");
 
    mDescription->setMaximumHeight(125);

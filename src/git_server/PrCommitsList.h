@@ -46,6 +46,7 @@ signals:
 
 public:
    explicit PrCommitsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+   ~PrCommitsList();
 
    void loadData(int number);
 

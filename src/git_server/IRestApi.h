@@ -140,7 +140,7 @@ signals:
 
 public:
    explicit IRestApi(const ServerAuthentication &auth, QObject *parent = nullptr);
-   virtual ~IRestApi() = default;
+   virtual ~IRestApi();
 
    virtual QString getUserName() const { return mAuth.userName; }
 

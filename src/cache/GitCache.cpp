@@ -268,8 +268,10 @@ void GitCache::reloadCurrentBranchInfo(const QString &currentBranch, const QStri
       {
          ref.value().removeReference(References::Type::LocalBranch, currentBranch);
 
-         if (mReferences.value(ref.key()).isEmpty())
-            mReferences.remove(ref.key());
+         const auto key = ref.key();
+
+         if (mReferences.value(key).isEmpty())
+            mReferences.remove(key);
 
          break;
       }

@@ -18,6 +18,11 @@ IRestApi::IRestApi(const ServerAuthentication &auth, QObject *parent)
 {
 }
 
+IRestApi::~IRestApi()
+{
+   delete mManager;
+}
+
 QJsonDocument IRestApi::validateData(QNetworkReply *reply, QString &errorString)
 {
    const auto data = reply->readAll();

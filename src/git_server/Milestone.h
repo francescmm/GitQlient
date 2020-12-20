@@ -31,11 +31,11 @@ namespace GitServer
 struct Milestone
 {
    int id = -1;
-   int number;
+   int number = -1;
    QString nodeId;
    QString title;
    QString description;
-   bool isOpen;
+   bool isOpen = false;
 };
 
 }

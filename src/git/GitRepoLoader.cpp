@@ -137,8 +137,7 @@ void GitRepoLoader::loadReferences()
 
             if (localBranches)
             {
-               ///*
-               const auto git = new GitBranches(mGitBase);
+               QScopedPointer<GitBranches> git(new GitBranches(mGitBase));
                GitCache::LocalBranchDistances distances;
 
                const auto distToOrigin = git->getDistanceBetweenBranches(name);

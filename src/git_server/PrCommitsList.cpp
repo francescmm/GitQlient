@@ -27,6 +27,11 @@ PrCommitsList::PrCommitsList(const QSharedPointer<GitServerCache> &gitServerCach
    setObjectName("IssuesViewFrame");
 }
 
+PrCommitsList::~PrCommitsList()
+{
+   delete mManager;
+}
+
 void PrCommitsList::loadData(int number)
 {
    connect(mGitServerCache.get(), &GitServerCache::prUpdated, this, &PrCommitsList::onCommitsReceived,

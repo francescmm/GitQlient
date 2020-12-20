@@ -35,7 +35,7 @@ GitExecResult GitBranches::getDistanceBetweenBranches(const QString &right)
    else
    {
       const auto remote = ret.success ? ret.output.toString().append("/") : QString();
-      const auto gitBase = new GitBase(mGitBase->getWorkingDir());
+      QScopedPointer<GitBase> gitBase(new GitBase(mGitBase->getWorkingDir()));
       const auto gitCmd = QString("git rev-list --left-right --count %1%2...%2").arg(remote, right);
 
       result = gitBase->run(gitCmd);

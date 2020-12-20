@@ -33,6 +33,14 @@ GitServerWidget::GitServerWidget(const QSharedPointer<GitCache> &cache, const QS
    connect(mDetailedView, &IssueDetailedView::openDiff, this, &GitServerWidget::openDiff);
 }
 
+GitServerWidget::~GitServerWidget()
+{
+   delete mDetailedView;
+   delete mOldIssue;
+   delete mOldPr;
+   delete mRefresh;
+}
+
 bool GitServerWidget::configure(const GitServer::ConfigData &config)
 {
    if (mConfigured)
@@ -120,6 +128,15 @@ void GitServerWidget::createWidget()
 
    issues->loadData();
    pullRequests->loadData();
+
+   delete mOldIssue;
+   mOldIssue = newIssue;
+
+   delete mOldPr;
+   mOldPr = newPr;
+
+   delete mRefresh;
+   mRefresh = refresh;
 
    delete layout();
    setLayout(centralLayout);

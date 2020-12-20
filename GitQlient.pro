@@ -10,9 +10,6 @@ QT += widgets core network svg
 DEFINES += QT_DEPRECATED_WARNINGS
 QMAKE_LFLAGS += -no-pie
 
-TRANSLATIONS = \
-    src/resources/translations/gitqlient_en.ts
-
 unix {
    isEmpty(PREFIX) {
       PREFIX = /usr/local

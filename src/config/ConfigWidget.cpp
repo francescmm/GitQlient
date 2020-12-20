@@ -40,9 +40,6 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    mCloneRepo->setObjectName("bigButton");
    mInitRepo->setObjectName("bigButton");
 
-   const auto line = new QFrame();
-   line->setObjectName("separator");
-
    // Adding buttons to open or init repos
    const auto repoOptionsFrame = new QFrame();
    const auto repoOptionsLayout = new QHBoxLayout(repoOptionsFrame);
@@ -205,7 +202,7 @@ QWidget *ConfigWidget::createRecentProjectsPage()
    {
       const auto projectName = project.mid(project.lastIndexOf("/") + 1);
       const auto labelText = QString("%1<br><em>%2</em>").arg(projectName, project);
-      const auto clickableFrame = new ButtonLink(labelText);
+      const auto clickableFrame = new ButtonLink(labelText, this);
       connect(clickableFrame, &ButtonLink::clicked, this, [this, project]() { emit signalOpenRepo(project); });
       innerLayout->addWidget(clickableFrame);
    }

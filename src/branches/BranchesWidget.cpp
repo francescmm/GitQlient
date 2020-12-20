@@ -77,7 +77,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
 
    mLocalBranchesTree->setLocalRepo(true);
    mLocalBranchesTree->setMouseTracking(true);
-   mLocalBranchesTree->setItemDelegate(new BranchesViewDelegate());
+   mLocalBranchesTree->setItemDelegate(mLocalDelegate = new BranchesViewDelegate());
    mLocalBranchesTree->setColumnCount(2);
    mLocalBranchesTree->setObjectName("LocalBranches");
 
@@ -87,7 +87,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
 
    mRemoteBranchesTree->setColumnCount(1);
    mRemoteBranchesTree->setMouseTracking(true);
-   mRemoteBranchesTree->setItemDelegate(new BranchesViewDelegate());
+   mRemoteBranchesTree->setItemDelegate(mRemotesDelegate = new BranchesViewDelegate());
 
    const auto remoteHeader = mRemoteBranchesTree->headerItem();
    remoteHeader->setText(0, tr("Remote"));
@@ -292,6 +292,12 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    connect(tagsHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onTagsHeaderClicked);
    connect(stashHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onStashesHeaderClicked);
    connect(submoduleHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onSubmodulesHeaderClicked);
+}
+
+BranchesWidget::~BranchesWidget()
+{
+   delete mLocalDelegate;
+   delete mRemotesDelegate;
 }
 
 void BranchesWidget::showBranches()
@@ -560,7 +566,7 @@ void BranchesWidget::processTags()
    for (const auto &tag : localTags.toStdMap())
    {
       auto tagName = tag.first;
-      const auto item = new QListWidgetItem();
+      const auto item = new QListWidgetItem(mTagsList);
       item->setData(Qt::UserRole, tagName);
       item->setData(Qt::UserRole + 1, true);
       item->setData(Qt::UserRole + 2, tag.second);

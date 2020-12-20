@@ -45,8 +45,6 @@ public:
    GitExecResult removeLocalBranch(const QString &branchName);
    GitExecResult removeRemoteBranch(const QString &branchName);
    GitExecResult getLastCommitOfBranch(const QString &branch);
-   GitExecResult prune();
-   QString getCurrentBranch() const;
    GitExecResult pushUpstream(const QString &branchName);
    QMap<QString, QStringList> getTrackingBranches() const;
 

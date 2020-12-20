@@ -71,25 +71,26 @@ public:
    };
 
    explicit PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+   ~PrCommentsList();
 
    void loadData(Config config, int issueNumber);
    void highlightComment(int frameId);
    void addGlobalComment();
 
 private:
-   QSharedPointer<GitServerCache> mGitServerCache;
+   QSharedPointer<GitServerCache> mGitServerCache = nullptr;
    QNetworkAccessManager *mManager = nullptr;
    QFrame *mCommentsFrame = nullptr;
    QVBoxLayout *mIssuesLayout = nullptr;
    QFrame *mIssuesFrame = nullptr;
    QFrame *mInputFrame = nullptr;
    QTextEdit *mInputTextEdit = nullptr;
-   Config mConfig;
+   Config mConfig {};
    QScrollArea *mScroll = nullptr;
    bool mLoaded = false;
    int mIssueNumber = -1;
-   QMap<int, QFrame *> mComments;
-   QMap<int, int> mFrameLinks;
+   QMap<int, QFrame *> mComments {};
+   QMap<int, int> mFrameLinks {};
    inline static int mCommentId = 0;
 
    void processComments(const GitServer::Issue &issue);

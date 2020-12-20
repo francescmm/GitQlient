@@ -51,15 +51,15 @@ struct Issue
    {
    }
 
-   int number;
-   QString title;
-   QByteArray body;
-   Milestone milestone;
-   QVector<Label> labels;
-   User creator;
-   QVector<User> assignees;
-   QString url;
-   QDateTime creation;
+   int number {};
+   QString title {};
+   QByteArray body {};
+   Milestone milestone {};
+   QVector<Label> labels {};
+   User creator {};
+   QVector<User> assignees {};
+   QString url {};
+   QDateTime creation {};
    int commentsCount = 0;
    QVector<Comment> comments;
    bool isOpen = true;
