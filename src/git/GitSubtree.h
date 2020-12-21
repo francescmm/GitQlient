@@ -35,8 +35,8 @@ public:
    explicit GitSubtree(const QSharedPointer<GitBase> &gitBase);
 
    GitExecResult add(const QString &url, const QString &ref, const QString &name, bool squash);
-   GitExecResult pull() const;
-   GitExecResult push() const;
+   GitExecResult pull(const QString &url, const QString &ref, const QString &name) const;
+   GitExecResult push(const QString &url, const QString &ref, const QString &name) const;
    GitExecResult merge(const QString &sha) const;
    GitExecResult list() const;
 

@@ -48,6 +48,14 @@ public:
     * @param parent The parent widget if needed.
     */
    explicit AddSubtreeDlg(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+
+   /**
+    * @brief AddSubtreeDlg Overloaded constructor used to configure an existing subtree.
+    * @param prefix The existing prefix.
+    * @param git The git object to execute Git commands.
+    * @param parent The parent widget if needed.
+    */
+   explicit AddSubtreeDlg(const QString &prefix, const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    /**
     * @brief Destructor.
     *

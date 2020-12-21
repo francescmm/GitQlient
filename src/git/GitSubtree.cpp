@@ -1,5 +1,7 @@
 #include <GitSubtree.h>
 #include <GitBase.h>
+#include <GitQlientSettings.h>
+
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -14,33 +16,76 @@ GitExecResult GitSubtree::add(const QString &url, const QString &ref, const QStr
 {
    QLog_Debug("UI", "Adding a subtree");
 
-   auto cmd = QString("git subtree add --prefix=%1 %2 %3").arg(name, url, ref);
+   GitQlientSettings settings;
 
-   if (squash)
-      cmd.append(" --squash");
+   for (auto i = 0;; ++i)
+   {
+      const auto repo = settings.localValue(mGitBase->getGitQlientSettingsDir(), QString("Subtrees/&%1.prefix").arg(i));
 
-   return mGitBase->run(cmd);
+      if (repo.toString() == name)
+      {
+         settings.setLocalValue(mGitBase->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i), url);
+         settings.setLocalValue(mGitBase->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i), ref);
+
+         auto cmd = QString("git subtree add --prefix=%1 %2 %3").arg(name, url, ref);
+
+         if (squash)
+            cmd.append(" --squash");
+
+         auto ret = mGitBase->run(cmd);
+
+         if (ret.output.toString().contains("Cannot"))
+            ret.success = false;
+
+         return ret;
+      }
+      else if (repo.toString().isEmpty())
+      {
+         settings.setLocalValue(mGitBase->getGitQlientSettingsDir(), QString("Subtrees/%1.prefix").arg(i), name);
+         settings.setLocalValue(mGitBase->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i), url);
+         settings.setLocalValue(mGitBase->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i), ref);
+
+         return { true, "" };
+      }
+   }
+
+   return { false, "" };
 }
 
-GitExecResult GitSubtree::pull() const
+GitExecResult GitSubtree::pull(const QString &url, const QString &ref, const QString &prefix) const
 {
    QLog_Debug("UI", "Pulling a subtree");
 
-   return mGitBase->run(QString("git subtree pull"));
+   auto ret = mGitBase->run(QString("git subtree pull --prefix=%1 %2 %3").arg(prefix, url, ref));
+
+   if (ret.output.toString().contains("Cannot"))
+      ret.success = false;
+
+   return ret;
 }
 
-GitExecResult GitSubtree::push() const
+GitExecResult GitSubtree::push(const QString &url, const QString &ref, const QString &prefix) const
 {
    QLog_Debug("UI", "Pushing changes in a subtree");
 
-   return mGitBase->run(QString("git subtree push"));
+   auto ret = mGitBase->run(QString("git subtree push --prefix=%1 %2 %3").arg(prefix, url, ref));
+
+   if (ret.output.toString().contains("Cannot"))
+      ret.success = false;
+
+   return ret;
 }
 
 GitExecResult GitSubtree::merge(const QString &sha) const
 {
    QLog_Debug("UI", "Merging changes from the remote of a subtree");
 
-   return mGitBase->run(QString("git subtree merge %1").arg(sha));
+   auto ret = mGitBase->run(QString("git subtree merge %1").arg(sha));
+
+   if (ret.output.toString().contains("Cannot"))
+      ret.success = false;
+
+   return ret;
 }
 
 GitExecResult GitSubtree::list() const

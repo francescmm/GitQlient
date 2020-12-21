@@ -27,6 +27,7 @@
 #include <QHeaderView>
 #include <QPushButton>
 #include <QToolButton>
+#include <QMessageBox>
 
 #include <QLogger.h>
 
@@ -785,14 +786,51 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
 
    if (index.isValid())
    {
-      connect(menu->addAction(tr("Pull")), &QAction::triggered, this, [this]() {
+      connect(menu->addAction(tr("Pull")), &QAction::triggered, this, [this, index]() {
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+         const auto prefix = index.data().toString();
+         const auto subtreeData = getSubtreeData(prefix);
+
          QScopedPointer<GitSubtree> git(new GitSubtree(mGit));
+         const auto ret = git->pull(subtreeData.first, subtreeData.second, prefix);
          QApplication::restoreOverrideCursor();
+
+         if (ret.success)
+            emit signalBranchesUpdated();
+         else
+            QMessageBox::warning(this, tr("Error when pulling"), ret.output.toString());
       });
-      menu->addAction(tr("Merge"));
-      menu->addAction(tr("Push"));
-      menu->addAction(tr("Split"));
+      /*
+      connect(menu->addAction(tr("Merge")), &QAction::triggered, this, [this, index]() {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+         const auto subtreeData = getSubtreeData(index.data().toString());
+
+         QScopedPointer<GitSubtree> git(new GitSubtree(mGit));
+         const auto ret = git->pull(subtreeData.first, subtreeData.second);
+         QApplication::restoreOverrideCursor();
+
+         if (ret.success)
+            emit signalBranchesUpdated();
+      });
+*/
+      connect(menu->addAction(tr("Push")), &QAction::triggered, this, [this, index]() {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+         const auto prefix = index.data().toString();
+         const auto subtreeData = getSubtreeData(prefix);
+
+         QScopedPointer<GitSubtree> git(new GitSubtree(mGit));
+         const auto ret = git->push(subtreeData.first, subtreeData.second, prefix);
+         QApplication::restoreOverrideCursor();
+
+         if (ret.success)
+            emit signalBranchesUpdated();
+         else
+            QMessageBox::warning(this, tr("Error when pushing"), ret.output.toString());
+      });
+      // menu->addAction(tr("Split"));
    }
    else
    {
@@ -913,4 +951,102 @@ void BranchesWidget::onSearchBranch()
             mLastTreeSearched = mLocalBranchesTree;
       }
    }
+}
+
+QPair<QString, QString> BranchesWidget::getSubtreeData(const QString &prefix)
+{
+   GitQlientSettings settings;
+   bool end = false;
+   QString url;
+   QString ref;
+
+   for (auto i = 0; !end; ++i)
+   {
+      const auto repo = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.prefix").arg(i), "");
+
+      if (repo.toString() == prefix)
+      {
+         auto tmpUrl
+             = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i)).toString();
+         auto tmpRef
+             = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i)).toString();
+
+         if (tmpUrl.isEmpty() || tmpRef.isEmpty())
+         {
+            const auto resp
+                = QMessageBox::question(this, tr("Subtree configuration not found!"),
+                                        tr("The subtree configuration was not found. It could be that it was created "
+                                           "outside GitQlient.<br>To operate with this subtree, it needs to be "
+                                           "configured.<br><br><b>Do you want to configure it now?<b>"));
+
+            if (resp == QMessageBox::Yes)
+            {
+               AddSubtreeDlg stDlg(prefix, mGit, this);
+               const auto ret = stDlg.exec();
+
+               if (ret == QDialog::Accepted)
+               {
+                  tmpUrl = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i))
+                               .toString();
+                  tmpRef = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i))
+                               .toString();
+
+                  if (tmpUrl.isEmpty() || tmpRef.isEmpty())
+                     QMessageBox::critical(this, tr("Unexpected error!"),
+                                           tr("An unidentified error happened while using subtrees. Please contact the "
+                                              "creator of GitQlient for support."));
+                  else
+                  {
+                     url = tmpUrl;
+                     ref = tmpRef;
+                  }
+               }
+            }
+
+            end = true;
+         }
+         else
+         {
+            url = tmpUrl;
+            ref = tmpRef;
+            end = true;
+         }
+      }
+      else if (repo.toString().isEmpty())
+      {
+         const auto resp
+             = QMessageBox::question(this, tr("Subtree configuration not found!"),
+                                     tr("The subtree configuration was not found. It could be that it was created "
+                                        "outside GitQlient.<br>To operate with this subtree, it needs to be "
+                                        "configured.<br><br><b>Do you want to configure it now?<b>"));
+
+         if (resp == QMessageBox::Yes)
+         {
+            AddSubtreeDlg stDlg(prefix, mGit, this);
+            const auto ret = stDlg.exec();
+
+            if (ret == QDialog::Accepted)
+            {
+               const auto tmpUrl
+                   = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i)).toString();
+               const auto tmpRef
+                   = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i)).toString();
+
+               if (tmpUrl.isEmpty() || tmpRef.isEmpty())
+                  QMessageBox::critical(this, tr("Unexpected error!"),
+                                        tr("An unidentified error happened while using subtrees. Please contact the "
+                                           "creator of GitQlient for support."));
+               else
+               {
+                  url = tmpUrl;
+                  ref = tmpRef;
+               }
+            }
+         }
+
+         end = true;
+      }
+   }
+
+   return qMakePair(url, ref);
 }

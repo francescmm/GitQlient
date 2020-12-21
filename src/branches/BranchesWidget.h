@@ -261,4 +261,6 @@ private:
     * @brief onSearchBranch Searches for a branch in the children BranchTreeWidget.
     */
    void onSearchBranch();
+
+   QPair<QString, QString> getSubtreeData(const QString &prefix);
 };

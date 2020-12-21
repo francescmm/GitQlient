@@ -25,6 +25,14 @@ AddSubtreeDlg::AddSubtreeDlg(const QSharedPointer<GitBase> &git, QWidget *parent
    connect(ui->pbCancel, &QPushButton::clicked, this, &QDialog::reject);
 }
 
+AddSubtreeDlg::AddSubtreeDlg(const QString &prefix, const QSharedPointer<GitBase> &git, QWidget *parent)
+   : AddSubtreeDlg(git, parent)
+{
+   ui->lePath->setText(prefix);
+   ui->lePath->setReadOnly(true);
+   ui->chSquash->setVisible(false);
+}
+
 AddSubtreeDlg::~AddSubtreeDlg()
 {
    delete ui;
