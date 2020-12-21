@@ -67,7 +67,7 @@ private:
    void processRevision(QByteArray ba);
    WipRevisionInfo processWip();
    QVector<QString> getUntrackedFiles() const;
-   QList<CommitInfo> processUnsignedLog(QByteArray &log);
-   QList<CommitInfo> processSignedLog(QByteArray &log) const;
-   CommitInfo parseCommitData(QByteArray &commitData) const;
+   QList<CommitInfo> processUnsignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees);
+   QList<CommitInfo> processSignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees) const;
+   CommitInfo parseCommitData(QByteArray &commitData, bool &isSubtree) const;
 };

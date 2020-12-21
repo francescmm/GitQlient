@@ -463,7 +463,7 @@ QMap<QString, QString> GitCache::getTags(References::Type tagType) const
 
    if (tagType == References::Type::LocalTag)
    {
-      for (auto reference : mReferences.toStdMap())
+      for (auto &reference : mReferences.toStdMap())
       {
          const auto tagNames = reference.second.getReferences(tagType);
 
@@ -482,6 +482,22 @@ void GitCache::updateTags(const QMap<QString, QString> &remoteTags)
    mRemoteTags = remoteTags;
 
    emit signalCacheUpdated();
+}
+
+void GitCache::addSubtrees(const QList<QPair<QString, QString>> &subtrees)
+{
+   for (auto &tree : subtrees)
+      mSubtrees.append({ tree.first, tree.second });
+}
+
+QStringList GitCache::getSubtrees() const
+{
+   QStringList subtrees;
+
+   for (auto &tree : mSubtrees)
+      subtrees.append(tree.name);
+
+   return subtrees;
 }
 
 void GitCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl)

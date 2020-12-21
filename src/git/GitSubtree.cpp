@@ -42,3 +42,10 @@ GitExecResult GitSubtree::merge(const QString &sha) const
 
    return mGitBase->run(QString("git subtree merge %1").arg(sha));
 }
+
+GitExecResult GitSubtree::list() const
+{
+   QLog_Debug("UI", "Listing all subtrees");
+
+   return mGitBase->run(QString("git log --pretty=format:%b --grep=git-subtree-dir"));
+}

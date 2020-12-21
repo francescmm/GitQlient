@@ -395,6 +395,7 @@ void BranchesWidget::showBranches()
    processTags();
    processStashes();
    processSubmodules();
+   processSubtrees();
 
    QApplication::restoreOverrideCursor();
 
@@ -665,7 +666,39 @@ void BranchesWidget::processSubmodules()
    mSubmodulesCount->setText('(' + QString::number(submodules.count()) + ')');
 }
 
-void BranchesWidget::processSubtrees() { }
+void BranchesWidget::processSubtrees()
+{
+   mSubtreeList->clear();
+
+   QScopedPointer<GitSubtree> git(new GitSubtree(mGit));
+
+   const auto ret = git->list();
+
+   if (ret.success)
+   {
+      const auto rawData = ret.output.toString();
+      const auto commits = rawData.split("\n\n");
+
+      for (auto subtreeRawData : commits)
+      {
+         QString name;
+         QString sha;
+         auto fields = subtreeRawData.split("\n");
+
+         for (auto &field : fields)
+         {
+            if (field.contains("git-subtree-dir:"))
+               name = field.remove("git-subtree-dir:").trimmed();
+            else if (field.contains("git-subtree-split"))
+               sha = field.remove("git-subtree-split:").trimmed();
+         }
+
+         mSubtreeList->addItem(name);
+      }
+
+      mSubtreeCount->setText('(' + QString::number(commits.count()) + ')');
+   }
+}
 
 void BranchesWidget::adjustBranchesTree(BranchTreeWidget *treeWidget)
 {

@@ -65,7 +65,8 @@ public:
    CommitInfo getCommitInfo(const QString &sha);
    CommitInfo getCommitInfoByRow(int row);
    int getCommitPos(const QString &sha);
-   CommitInfo getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint, bool reverse);
+   CommitInfo getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint = 0,
+                                   bool reverse = false);
    RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
 
    void clearReferences();
@@ -90,6 +91,8 @@ public:
    QMap<QString, QString> getTags(References::Type tagType) const;
 
    void updateTags(const QMap<QString, QString> &remoteTags);
+   void addSubtrees(const QList<QPair<QString, QString>> &subtrees);
+   QStringList getSubtrees() const;
 
 private:
    friend class GitRepoLoader;
@@ -107,7 +110,14 @@ private:
    QVector<QString> mUntrackedfiles;
    QMap<QString, References> mReferences;
    QMap<QString, QString> mRemoteTags;
-   QStringList mSubTrees;
+
+   struct Subtree
+   {
+      QString name;
+      QString commit;
+   };
+
+   QList<Subtree> mSubtrees;
 
    struct FileNamesLoader
    {

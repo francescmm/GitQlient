@@ -38,6 +38,7 @@ public:
    GitExecResult pull() const;
    GitExecResult push() const;
    GitExecResult merge(const QString &sha) const;
+   GitExecResult list() const;
 
 private:
    QSharedPointer<GitBase> mGitBase;
