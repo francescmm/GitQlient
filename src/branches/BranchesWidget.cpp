@@ -679,25 +679,30 @@ void BranchesWidget::processSubtrees()
    {
       const auto rawData = ret.output.toString();
       const auto commits = rawData.split("\n\n");
+      auto count = 0;
 
-      for (auto subtreeRawData : commits)
+      for (auto &subtreeRawData : commits)
       {
-         QString name;
-         QString sha;
-         auto fields = subtreeRawData.split("\n");
-
-         for (auto &field : fields)
+         if (!subtreeRawData.isEmpty())
          {
-            if (field.contains("git-subtree-dir:"))
-               name = field.remove("git-subtree-dir:").trimmed();
-            else if (field.contains("git-subtree-split"))
-               sha = field.remove("git-subtree-split:").trimmed();
-         }
+            QString name;
+            QString sha;
+            auto fields = subtreeRawData.split("\n");
 
-         mSubtreeList->addItem(name);
+            for (auto &field : fields)
+            {
+               if (field.contains("git-subtree-dir:"))
+                  name = field.remove("git-subtree-dir:").trimmed();
+               else if (field.contains("git-subtree-split"))
+                  sha = field.remove("git-subtree-split:").trimmed();
+            }
+
+            mSubtreeList->addItem(name);
+            ++count;
+         }
       }
 
-      mSubtreeCount->setText('(' + QString::number(commits.count()) + ')');
+      mSubtreeCount->setText('(' + QString::number(count) + ')');
    }
 }
 
