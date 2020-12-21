@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>363</width>
-    <height>132</height>
+    <height>160</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,7 +63,7 @@
     </widget>
    </item>
    <item row="3" column="0" colspan="3">
-    <widget class="QCheckBox" name="chSquash">
+    <widget class="CheckBox" name="chSquash">
      <property name="text">
       <string>Squash commits</string>
      </property>
@@ -71,6 +71,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header>CheckBox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>leUrl</tabstop>
   <tabstop>leReference</tabstop>
