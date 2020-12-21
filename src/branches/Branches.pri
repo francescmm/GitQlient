@@ -2,11 +2,13 @@ INCLUDEPATH += $$PWD
 
 FORMS += \
     $$PWD/AddSubmoduleDlg.ui \
+    $$PWD/AddSubtreeDlg.ui \
     $$PWD/TagDlg.ui
 
 HEADERS += \
     $$PWD/AddRemoteDlg.h \
     $$PWD/AddSubmoduleDlg.h \
+    $$PWD/AddSubtreeDlg.h \
     $$PWD/BranchContextMenu.h \
     $$PWD/BranchTreeWidget.h \
     $$PWD/BranchesViewDelegate.h \
@@ -20,6 +22,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/AddRemoteDlg.cpp \
     $$PWD/AddSubmoduleDlg.cpp \
+    $$PWD/AddSubtreeDlg.cpp \
     $$PWD/BranchContextMenu.cpp \
     $$PWD/BranchTreeWidget.cpp \
     $$PWD/BranchesViewDelegate.cpp \

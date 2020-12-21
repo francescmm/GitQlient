@@ -219,12 +219,16 @@ void GitRepoLoader::processRevision(QByteArray ba)
 
    emit signalLoadingStarted(1);
 
+   QList<QPair<QString, QString>> subtrees;
    const auto ret = gitConfig->getGitValue("log.showSignature");
    const auto showSignature = ret.success ? ret.output.toString().contains("true") : false;
-   const auto commits = showSignature ? processSignedLog(ba) : processUnsignedLog(ba);
+   const auto commits = showSignature ? processSignedLog(ba, subtrees) : processUnsignedLog(ba, subtrees);
 
    const auto wipInfo = processWip();
    mRevCache->setup(wipInfo, commits);
+
+   if (!subtrees.isEmpty())
+      mRevCache->addSubtrees(subtrees);
 
    if (mRefreshReferences)
    {
@@ -301,21 +305,31 @@ QVector<QString> GitRepoLoader::getUntrackedFiles() const
    return ret;
 }
 
-QList<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log)
+QList<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees)
 {
    QList<CommitInfo> commits;
    auto commitsLog = log.split('\000');
 
    for (auto &commitData : commitsLog)
    {
-      if (auto commit = parseCommitData(commitData); commit.isValid())
+      bool subtree = false;
+      if (auto commit = parseCommitData(commitData, subtree); commit.isValid())
+      {
          commits.append(std::move(commit));
+
+         if (subtree)
+         {
+            auto fields = commit.longLog().trimmed().split("\n");
+            subtrees.append(qMakePair(fields.first().remove("git-subtree-dir:").trimmed(),
+                                      fields.last().remove("git-subtree-split:").trimmed()));
+         }
+      }
    }
 
    return commits;
 }
 
-QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
+QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees) const
 {
    auto preProcessedCommits = log.replace('\000', '\n').split('\n');
    QList<CommitInfo> commits;
@@ -345,8 +359,18 @@ QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
       {
          if (!commit.isEmpty())
          {
-            if (auto revision = parseCommitData(commit); revision.isValid())
+            bool subtree = false;
+            if (auto revision = parseCommitData(commit, subtree); revision.isValid())
+            {
                commits.append(std::move(revision));
+
+               if (subtree)
+               {
+                  auto fields = revision.longLog().trimmed().split("\n");
+                  subtrees.append(qMakePair(fields.first().remove("git-subtree-dir:").trimmed(),
+                                            fields.last().remove("git-subtree-split:").trimmed()));
+               }
+            }
 
             commit.clear();
          }
@@ -364,7 +388,7 @@ QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
    return commits;
 }
 
-CommitInfo GitRepoLoader::parseCommitData(QByteArray &commitData) const
+CommitInfo GitRepoLoader::parseCommitData(QByteArray &commitData, bool &isSubtree) const
 {
    if (const auto fields = QString::fromUtf8(commitData).split('\n'); fields.count() > 6)
    {
@@ -391,6 +415,9 @@ CommitInfo GitRepoLoader::parseCommitData(QByteArray &commitData) const
          longLog += fields.at(i) + '\n';
 
       longLog = longLog.trimmed();
+
+      if (longLog.contains("git-subtree-dir") || shortLog.contains("git-subtree-dir"))
+         isSubtree = true;
 
       return CommitInfo { sha,    parentsSha, boundary, committer, commitDate,
                           author, shortLog,   longLog,  isSigned,  isSigned ? firstField : QString() };

@@ -4,11 +4,12 @@
 #include <GitBase.h>
 #include <GitSubmodules.h>
 #include <GitStashes.h>
+#include <GitSubtree.h>
 #include <GitTags.h>
 #include <GitConfig.h>
 #include <BranchesViewDelegate.h>
 #include <ClickableFrame.h>
-#include <AddSubmoduleDlg.h>
+#include <AddSubtreeDlg.h>
 #include <StashesContextMenu.h>
 #include <SubmodulesContextMenu.h>
 #include <GitCache.h>
@@ -26,6 +27,7 @@
 #include <QHeaderView>
 #include <QPushButton>
 #include <QToolButton>
+#include <QMessageBox>
 
 #include <QLogger.h>
 
@@ -60,13 +62,17 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    , mLocalBranchesTree(new BranchTreeWidget(mGit))
    , mRemoteBranchesTree(new BranchTreeWidget(mGit))
    , mTagsList(new QListWidget())
-   , mStashesList(new QListWidget())
-   , mSubmodulesList(new QListWidget())
    , mTagsCount(new QLabel("(0)"))
    , mTagArrow(new QLabel())
+   , mStashesList(new QListWidget())
+   , mStashesCount(new QLabel(tr("(0)")))
    , mStashesArrow(new QLabel())
    , mSubmodulesCount(new QLabel("(0)"))
    , mSubmodulesArrow(new QLabel())
+   , mSubmodulesList(new QListWidget())
+   , mSubtreeCount(new QLabel("(0)"))
+   , mSubtreeArrow(new QLabel())
+   , mSubtreeList(new QListWidget())
    , mMinimize(new QPushButton())
    , mMinimal(new BranchesWidgetMinimal(mCache, mGit))
 {
@@ -92,7 +98,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    const auto remoteHeader = mRemoteBranchesTree->headerItem();
    remoteHeader->setText(0, tr("Remote"));
 
-   /* TAGS */
+   /* TAGS START */
    GitQlientSettings settings;
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "TagsHeader", true).toBool(); !visible)
    {
@@ -128,7 +134,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
 
    /* TAGS END */
 
-   /* STASHES */
+   /* STASHES START */
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool();
        !visible)
    {
@@ -144,7 +150,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    stashHeaderLayout->setContentsMargins(10, 0, 0, 0);
    stashHeaderLayout->setSpacing(10);
    stashHeaderLayout->addWidget(new QLabel(tr("Stashes")));
-   stashHeaderLayout->addWidget(mStashesCount = new QLabel(tr("(0)")));
+   stashHeaderLayout->addWidget(mStashesCount);
    stashHeaderLayout->addStretch();
    stashHeaderLayout->addWidget(mStashesArrow);
 
@@ -163,6 +169,8 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    stashFrame->setLayout(stashLayout);
 
    /* STASHES END */
+
+   /* SUBMODULES START */
    if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool();
        !visible)
    {
@@ -199,9 +207,43 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    submoduleFrame->setObjectName("sectionFrame");
    submoduleFrame->setLayout(submoduleLayout);
 
-   /* SUBMODULES START */
-
    /* SUBMODULES END */
+
+   /* SUBTREE START */
+   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubtreeHeader", true).toBool();
+       !visible)
+   {
+      const auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
+      mSubtreeArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+      mSubtreeList->setVisible(visible);
+   }
+   else
+      mSubtreeArrow->setPixmap(QIcon(":/icons/remove").pixmap(QSize(15, 15)));
+
+   const auto subtreeHeaderFrame = new ClickableFrame();
+   const auto subtreeHeaderLayout = new QHBoxLayout(subtreeHeaderFrame);
+   subtreeHeaderLayout->setContentsMargins(10, 0, 0, 0);
+   subtreeHeaderLayout->setSpacing(10);
+   subtreeHeaderLayout->addWidget(new QLabel(tr("Subtrees")));
+   subtreeHeaderLayout->addWidget(mSubtreeCount = new QLabel(tr("(0)")));
+   subtreeHeaderLayout->addStretch();
+   subtreeHeaderLayout->addWidget(mSubtreeArrow);
+
+   mSubtreeList->setMouseTracking(true);
+   mSubtreeList->setContextMenuPolicy(Qt::CustomContextMenu);
+
+   const auto subtreeLayout = new QVBoxLayout();
+   subtreeLayout->setContentsMargins(QMargins());
+   subtreeLayout->setSpacing(0);
+   subtreeLayout->addWidget(subtreeHeaderFrame);
+   subtreeLayout->addSpacing(5);
+   subtreeLayout->addWidget(mSubtreeList);
+
+   const auto subtreeFrame = new QFrame();
+   subtreeFrame->setObjectName("sectionFrame");
+   subtreeFrame->setLayout(subtreeLayout);
+
+   /* SUBTREE END */
 
    const auto searchBranch = new QLineEdit();
    searchBranch->setPlaceholderText(tr("Prese ENTER to search a branch..."));
@@ -227,6 +269,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    panelsLayout->addWidget(tagsFrame);
    panelsLayout->addWidget(stashFrame);
    panelsLayout->addWidget(submoduleFrame);
+   panelsLayout->addWidget(subtreeFrame);
 
    const auto panelsFrame = new QFrame();
    panelsFrame->setObjectName("panelsFrame");
@@ -283,15 +326,18 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalBranchCheckedOut, this,
            &BranchesWidget::signalBranchCheckedOut);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
+
    connect(mTagsList, &QListWidget::itemClicked, this, &BranchesWidget::onTagClicked);
    connect(mTagsList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showTagsContextMenu);
    connect(mTagsList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showTagsContextMenu);
    connect(mStashesList, &QListWidget::itemClicked, this, &BranchesWidget::onStashClicked);
    connect(mStashesList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showStashesContextMenu);
    connect(mSubmodulesList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showSubmodulesContextMenu);
+   connect(mSubtreeList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showSubtreesContextMenu);
    connect(tagsHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onTagsHeaderClicked);
    connect(stashHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onStashesHeaderClicked);
    connect(submoduleHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onSubmodulesHeaderClicked);
+   connect(subtreeHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onSubtreesHeaderClicked);
 }
 
 BranchesWidget::~BranchesWidget()
@@ -356,6 +402,7 @@ void BranchesWidget::showBranches()
    processTags();
    processStashes();
    processSubmodules();
+   processSubtrees();
 
    QApplication::restoreOverrideCursor();
 
@@ -626,6 +673,45 @@ void BranchesWidget::processSubmodules()
    mSubmodulesCount->setText('(' + QString::number(submodules.count()) + ')');
 }
 
+void BranchesWidget::processSubtrees()
+{
+   mSubtreeList->clear();
+
+   QScopedPointer<GitSubtree> git(new GitSubtree(mGit));
+
+   const auto ret = git->list();
+
+   if (ret.success)
+   {
+      const auto rawData = ret.output.toString();
+      const auto commits = rawData.split("\n\n");
+      auto count = 0;
+
+      for (auto &subtreeRawData : commits)
+      {
+         if (!subtreeRawData.isEmpty())
+         {
+            QString name;
+            QString sha;
+            auto fields = subtreeRawData.split("\n");
+
+            for (auto &field : fields)
+            {
+               if (field.contains("git-subtree-dir:"))
+                  name = field.remove("git-subtree-dir:").trimmed();
+               else if (field.contains("git-subtree-split"))
+                  sha = field.remove("git-subtree-split:").trimmed();
+            }
+
+            mSubtreeList->addItem(name);
+            ++count;
+         }
+      }
+
+      mSubtreeCount->setText('(' + QString::number(count) + ')');
+   }
+}
+
 void BranchesWidget::adjustBranchesTree(BranchTreeWidget *treeWidget)
 {
    for (auto i = 1; i < treeWidget->columnCount(); ++i)
@@ -701,6 +787,86 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
    menu->exec(mSubmodulesList->viewport()->mapToGlobal(p));
 }
 
+void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
+{
+   QLog_Info("UI", QString("Requesting context menu for subtrees"));
+
+   QModelIndex index = mSubtreeList->indexAt(p);
+
+   const auto menu = new QMenu(this);
+
+   if (index.isValid())
+   {
+      connect(menu->addAction(tr("Pull")), &QAction::triggered, this, [this, index]() {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+         const auto prefix = index.data().toString();
+         const auto subtreeData = getSubtreeData(prefix);
+
+         QScopedPointer<GitSubtree> git(new GitSubtree(mGit));
+         const auto ret = git->pull(subtreeData.first, subtreeData.second, prefix);
+         QApplication::restoreOverrideCursor();
+
+         if (ret.success)
+            emit signalBranchesUpdated();
+         else
+            QMessageBox::warning(this, tr("Error when pulling"), ret.output.toString());
+      });
+      /*
+      connect(menu->addAction(tr("Merge")), &QAction::triggered, this, [this, index]() {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+         const auto subtreeData = getSubtreeData(index.data().toString());
+
+         QScopedPointer<GitSubtree> git(new GitSubtree(mGit));
+         const auto ret = git->pull(subtreeData.first, subtreeData.second);
+         QApplication::restoreOverrideCursor();
+
+         if (ret.success)
+            emit signalBranchesUpdated();
+      });
+*/
+      connect(menu->addAction(tr("Push")), &QAction::triggered, this, [this, index]() {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+         const auto prefix = index.data().toString();
+         const auto subtreeData = getSubtreeData(prefix);
+
+         QScopedPointer<GitSubtree> git(new GitSubtree(mGit));
+         const auto ret = git->push(subtreeData.first, subtreeData.second, prefix);
+         QApplication::restoreOverrideCursor();
+
+         if (ret.success)
+            emit signalBranchesUpdated();
+         else
+            QMessageBox::warning(this, tr("Error when pushing"), ret.output.toString());
+      });
+
+      const auto addSubtree = menu->addAction(tr("Configure"));
+      connect(addSubtree, &QAction::triggered, this, [this, index]() {
+         const auto prefix = index.data().toString();
+         const auto subtreeData = getSubtreeData(prefix);
+         AddSubtreeDlg addDlg(prefix, subtreeData.first, subtreeData.second, mGit);
+         const auto ret = addDlg.exec();
+         if (ret == QDialog::Accepted)
+            emit signalBranchesUpdated();
+      });
+      // menu->addAction(tr("Split"));
+   }
+   else
+   {
+      const auto addSubtree = menu->addAction(tr("Add subtree"));
+      connect(addSubtree, &QAction::triggered, this, [this]() {
+         AddSubtreeDlg addDlg(mGit);
+         const auto ret = addDlg.exec();
+         if (ret == QDialog::Accepted)
+            emit signalBranchesUpdated();
+      });
+   }
+
+   menu->exec(mSubtreeList->viewport()->mapToGlobal(p));
+}
+
 void BranchesWidget::onTagsHeaderClicked()
 {
    const auto tagsAreVisible = mTagsList->isVisible();
@@ -732,6 +898,14 @@ void BranchesWidget::onSubmodulesHeaderClicked()
 
    GitQlientSettings settings;
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", !submodulesAreVisible);
+}
+
+void BranchesWidget::onSubtreesHeaderClicked()
+{
+   const auto subtreesAreVisible = mSubtreeList->isVisible();
+   const auto icon = QIcon(subtreesAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
+   mSubtreeArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+   mSubtreeList->setVisible(!subtreesAreVisible);
 }
 
 void BranchesWidget::onTagClicked(QListWidgetItem *item)
@@ -798,4 +972,102 @@ void BranchesWidget::onSearchBranch()
             mLastTreeSearched = mLocalBranchesTree;
       }
    }
+}
+
+QPair<QString, QString> BranchesWidget::getSubtreeData(const QString &prefix)
+{
+   GitQlientSettings settings;
+   bool end = false;
+   QString url;
+   QString ref;
+
+   for (auto i = 0; !end; ++i)
+   {
+      const auto repo = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.prefix").arg(i), "");
+
+      if (repo.toString() == prefix)
+      {
+         auto tmpUrl
+             = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i)).toString();
+         auto tmpRef
+             = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i)).toString();
+
+         if (tmpUrl.isEmpty() || tmpRef.isEmpty())
+         {
+            const auto resp
+                = QMessageBox::question(this, tr("Subtree configuration not found!"),
+                                        tr("The subtree configuration was not found. It could be that it was created "
+                                           "outside GitQlient.<br>To operate with this subtree, it needs to be "
+                                           "configured.<br><br><b>Do you want to configure it now?<b>"));
+
+            if (resp == QMessageBox::Yes)
+            {
+               AddSubtreeDlg stDlg(prefix, mGit, this);
+               const auto ret = stDlg.exec();
+
+               if (ret == QDialog::Accepted)
+               {
+                  tmpUrl = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i))
+                               .toString();
+                  tmpRef = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i))
+                               .toString();
+
+                  if (tmpUrl.isEmpty() || tmpRef.isEmpty())
+                     QMessageBox::critical(this, tr("Unexpected error!"),
+                                           tr("An unidentified error happened while using subtrees. Please contact the "
+                                              "creator of GitQlient for support."));
+                  else
+                  {
+                     url = tmpUrl;
+                     ref = tmpRef;
+                  }
+               }
+            }
+
+            end = true;
+         }
+         else
+         {
+            url = tmpUrl;
+            ref = tmpRef;
+            end = true;
+         }
+      }
+      else if (repo.toString().isEmpty())
+      {
+         const auto resp
+             = QMessageBox::question(this, tr("Subtree configuration not found!"),
+                                     tr("The subtree configuration was not found. It could be that it was created "
+                                        "outside GitQlient.<br>To operate with this subtree, it needs to be "
+                                        "configured.<br><br><b>Do you want to configure it now?<b>"));
+
+         if (resp == QMessageBox::Yes)
+         {
+            AddSubtreeDlg stDlg(prefix, mGit, this);
+            const auto ret = stDlg.exec();
+
+            if (ret == QDialog::Accepted)
+            {
+               const auto tmpUrl
+                   = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i)).toString();
+               const auto tmpRef
+                   = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i)).toString();
+
+               if (tmpUrl.isEmpty() || tmpRef.isEmpty())
+                  QMessageBox::critical(this, tr("Unexpected error!"),
+                                        tr("An unidentified error happened while using subtrees. Please contact the "
+                                           "creator of GitQlient for support."));
+               else
+               {
+                  url = tmpUrl;
+                  ref = tmpRef;
+               }
+            }
+         }
+
+         end = true;
+      }
+   }
+
+   return qMakePair(url, ref);
 }

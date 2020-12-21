@@ -143,14 +143,17 @@ private:
    BranchTreeWidget *mRemoteBranchesTree = nullptr;
    BranchesViewDelegate *mRemotesDelegate = nullptr;
    QListWidget *mTagsList = nullptr;
-   QListWidget *mStashesList = nullptr;
-   QListWidget *mSubmodulesList = nullptr;
    QLabel *mTagsCount = nullptr;
    QLabel *mTagArrow = nullptr;
+   QListWidget *mStashesList = nullptr;
    QLabel *mStashesCount = nullptr;
    QLabel *mStashesArrow = nullptr;
    QLabel *mSubmodulesCount = nullptr;
    QLabel *mSubmodulesArrow = nullptr;
+   QListWidget *mSubmodulesList = nullptr;
+   QLabel *mSubtreeCount = nullptr;
+   QLabel *mSubtreeArrow = nullptr;
+   QListWidget *mSubtreeList = nullptr;
    QPushButton *mMinimize = nullptr;
    QFrame *mFullBranchFrame = nullptr;
    BranchesWidgetMinimal *mMinimal = nullptr;
@@ -187,6 +190,11 @@ private:
 
    */
    void processSubmodules();
+
+   /**
+    * @brief processSubtrees Process all the subtrees and adds them into the QListWidget.
+    */
+   void processSubtrees();
    /*!
     \brief Once all the items have been added to the conrresponding BranchTreeWidget, the columns are adjusted to show
     the data correctly from a UI point of view.
@@ -197,21 +205,27 @@ private:
    /*!
     \brief Shows the tags context menu.
 
-    \param p The position where the menu will be display.
+    \param p The position where the menu will be displayed.
    */
    void showTagsContextMenu(const QPoint &p);
    /*!
     \brief Shows the stashes context menu.
 
-    \param p The position where the menu will be display.
+    \param p The position where the menu will be displayed.
    */
    void showStashesContextMenu(const QPoint &p);
    /*!
     \brief Shows the submodules context menu.
 
-    \param p The position where the menu will be display.
+    \param p The position where the menu will be displayed.
    */
    void showSubmodulesContextMenu(const QPoint &p);
+
+   /**
+    * @brief showSubtreesContextMenu Shows the subtrees context menu.
+    * @param p The position where the menu will be displayed.
+    */
+   void showSubtreesContextMenu(const QPoint &p);
    /*!
     \brief Expands or contracts the tags list widget.
 
@@ -227,6 +241,11 @@ private:
 
    */
    void onSubmodulesHeaderClicked();
+
+   /**
+    * @brief onSubtreesHeaderClicked Expands or contracts the subtrees list widget.
+    */
+   void onSubtreesHeaderClicked();
    /*!
     \brief Gets the SHA for a given tag and notifies the UI that it should select it in the repository view.
 
@@ -251,4 +270,6 @@ private:
     * @brief onSearchBranch Searches for a branch in the children BranchTreeWidget.
     */
    void onSearchBranch();
+
+   QPair<QString, QString> getSubtreeData(const QString &prefix);
 };

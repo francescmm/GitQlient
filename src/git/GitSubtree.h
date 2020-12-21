@@ -24,50 +24,22 @@
  ***************************************************************************************/
 
 #include <GitExecResult.h>
-#include <CommitInfo.h>
 
-#include <QObject>
 #include <QSharedPointer>
-#include <QVector>
 
 class GitBase;
-class GitCache;
-struct WipRevisionInfo;
 
-class GitRepoLoader : public QObject
+class GitSubtree : public QObject
 {
-   Q_OBJECT
-
-signals:
-   void signalLoadingStarted(int total);
-   void signalLoadingFinished(bool full);
-   void cancelAllProcesses(QPrivateSignal);
-   void signalRefreshPRsCache(const QString repoName, const QString &repoOwner, const QString &serverUrl);
-
-public slots:
-   bool load();
-   bool load(bool refreshReferences);
-
 public:
-   explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache, QObject *parent = nullptr);
-   void updateWipRevision();
-   void cancelAll();
-   void setShowAll(bool showAll = true) { mShowAll = showAll; }
+   explicit GitSubtree(const QSharedPointer<GitBase> &gitBase);
+
+   GitExecResult add(const QString &url, const QString &ref, const QString &name, bool squash);
+   GitExecResult pull(const QString &url, const QString &ref, const QString &name) const;
+   GitExecResult push(const QString &url, const QString &ref, const QString &name) const;
+   GitExecResult merge(const QString &sha) const;
+   GitExecResult list() const;
 
 private:
-   bool mShowAll = true;
-   bool mLocked = false;
-   bool mRefreshReferences = true;
    QSharedPointer<GitBase> mGitBase;
-   QSharedPointer<GitCache> mRevCache;
-
-   bool configureRepoDirectory();
-   void loadReferences();
-   void requestRevisions();
-   void processRevision(QByteArray ba);
-   WipRevisionInfo processWip();
-   QVector<QString> getUntrackedFiles() const;
-   QList<CommitInfo> processUnsignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees);
-   QList<CommitInfo> processSignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees) const;
-   CommitInfo parseCommitData(QByteArray &commitData, bool &isSubtree) const;
 };
