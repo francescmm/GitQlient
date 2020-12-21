@@ -20,7 +20,7 @@ GitExecResult GitSubtree::add(const QString &url, const QString &ref, const QStr
 
    for (auto i = 0;; ++i)
    {
-      const auto repo = settings.localValue(mGitBase->getGitQlientSettingsDir(), QString("Subtrees/&%1.prefix").arg(i));
+      const auto repo = settings.localValue(mGitBase->getGitQlientSettingsDir(), QString("Subtrees/%1.prefix").arg(i));
 
       if (repo.toString() == name)
       {

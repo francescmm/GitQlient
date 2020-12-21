@@ -28,9 +28,23 @@ AddSubtreeDlg::AddSubtreeDlg(const QSharedPointer<GitBase> &git, QWidget *parent
 AddSubtreeDlg::AddSubtreeDlg(const QString &prefix, const QSharedPointer<GitBase> &git, QWidget *parent)
    : AddSubtreeDlg(git, parent)
 {
+   disconnect(ui->leUrl, &QLineEdit::editingFinished, this, &AddSubtreeDlg::proposeName);
+
    ui->lePath->setText(prefix);
    ui->lePath->setReadOnly(true);
    ui->chSquash->setVisible(false);
+
+   setWindowTitle(tr("Configure subtree"));
+}
+
+AddSubtreeDlg::AddSubtreeDlg(const QString &prefix, const QString &url, const QString &reference,
+                             const QSharedPointer<GitBase> &git, QWidget *parent)
+   : AddSubtreeDlg(prefix, git, parent)
+{
+   disconnect(ui->leUrl, &QLineEdit::editingFinished, this, &AddSubtreeDlg::proposeName);
+
+   ui->leReference->setText(reference);
+   ui->leUrl->setText(url);
 }
 
 AddSubtreeDlg::~AddSubtreeDlg()

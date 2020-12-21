@@ -835,6 +835,16 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
          else
             QMessageBox::warning(this, tr("Error when pushing"), ret.output.toString());
       });
+
+      const auto addSubtree = menu->addAction(tr("Configure"));
+      connect(addSubtree, &QAction::triggered, this, [this, index]() {
+         const auto prefix = index.data().toString();
+         const auto subtreeData = getSubtreeData(prefix);
+         AddSubtreeDlg addDlg(prefix, subtreeData.first, subtreeData.second, mGit);
+         const auto ret = addDlg.exec();
+         if (ret == QDialog::Accepted)
+            emit signalBranchesUpdated();
+      });
       // menu->addAction(tr("Split"));
    }
    else
