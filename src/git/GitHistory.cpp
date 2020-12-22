@@ -18,7 +18,11 @@ GitExecResult GitHistory::blame(const QString &file, const QString &commitFrom)
 {
    QLog_Debug("Git", QString("Executing blame: {%1} from {%2}").arg(file, commitFrom));
 
-   const auto ret = mGitBase->run(QString("git annotate %1 %2").arg(file, commitFrom));
+   const auto cmd = QString("git annotate %1 %2").arg(file, commitFrom);
+
+   QLog_Trace("Git", QString("Executing blame: {%1}").arg(cmd));
+
+   const auto ret = mGitBase->run(cmd);
 
    return ret;
 }
@@ -27,7 +31,11 @@ GitExecResult GitHistory::history(const QString &file)
 {
    QLog_Debug("Git", QString("Executing history: {%1}").arg(file));
 
-   auto ret = mGitBase->run(QString("git log --follow --pretty=%H %1").arg(file));
+   const auto cmd = QString("git log --follow --pretty=%H %1").arg(file);
+
+   QLog_Trace("Git", QString("Executing history: {%1}").arg(cmd));
+
+   auto ret = mGitBase->run(cmd);
 
    if (ret.success && ret.output.toString().isEmpty())
       ret.success = false;
@@ -37,6 +45,8 @@ GitExecResult GitHistory::history(const QString &file)
 
 GitExecResult GitHistory::getBranchesDiff(const QString &base, const QString &head)
 {
+   QLog_Debug("Git", QString("Getting diff between branches: {%1} and {%2}").arg(base, head));
+
    QScopedPointer<GitConfig> git(new GitConfig(mGitBase));
 
    QString fullBase = base;
@@ -51,14 +61,18 @@ GitExecResult GitHistory::getBranchesDiff(const QString &base, const QString &he
    if (retHead.success)
       fullHead.prepend(retHead.output.toString() + QStringLiteral("/"));
 
-   return mGitBase->run(QString("git diff %1...%2").arg(fullBase, fullHead));
+   const auto cmd = QString("git diff %1...%2").arg(fullBase, fullHead);
+
+   QLog_Trace("Git", QString("Getting diff between branches: {%1}").arg(cmd));
+
+   return mGitBase->run(cmd);
 }
 
 GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffToSha)
 {
    if (!sha.isEmpty())
    {
-      QLog_Debug("Git", QString("Executing getCommitDiff: {%1} to {%2}").arg(sha, diffToSha));
+      QLog_Debug("Git", QString("Executing diff for commit: {%1} to {%2}").arg(sha, diffToSha));
 
       QString runCmd = QString("git diff-tree --no-color -r --patch-with-stat -m");
 
@@ -74,6 +88,8 @@ GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffT
       else
          runCmd = "git diff HEAD ";
 
+      QLog_Trace("Git", QString("Executing diff for commit: {%1}").arg(runCmd));
+
       return mGitBase->run(runCmd);
    }
    else
@@ -85,7 +101,7 @@ GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffT
 QString GitHistory::getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file,
                                 bool isCached)
 {
-   QLog_Debug("Git", QString("Executing getFileDiff: {%1} between {%2} and {%3}").arg(file, currentSha, previousSha));
+   QLog_Debug("Git", QString("Getting diff for a file: {%1} between {%2} and {%3}").arg(file, currentSha, previousSha));
 
    auto cmd = QString("git diff %1 -w -U15000 ").arg(QString::fromUtf8(isCached ? "--cached" : ""));
 
@@ -93,6 +109,8 @@ QString GitHistory::getFileDiff(const QString &currentSha, const QString &previo
       cmd.append(file);
    else
       cmd.append(QString("%1 %2 %3").arg(previousSha, currentSha, file));
+
+   QLog_Trace("Git", QString("Getting diff for a file: {%1}").arg(cmd));
 
    if (const auto ret = mGitBase->run(cmd); ret.success)
       return ret.output.toString();
@@ -102,7 +120,7 @@ QString GitHistory::getFileDiff(const QString &currentSha, const QString &previo
 
 GitExecResult GitHistory::getDiffFiles(const QString &sha, const QString &diffToSha)
 {
-   QLog_Debug("Git", QString("Executing getDiffFiles: {%1} to {%2}").arg(sha, diffToSha));
+   QLog_Debug("Git", QString("Getting modified files between SHAs: {%1} to {%2}").arg(sha, diffToSha));
 
    auto runCmd = QString("git diff-tree -C --no-color -r -m ");
 
@@ -111,20 +129,28 @@ GitExecResult GitHistory::getDiffFiles(const QString &sha, const QString &diffTo
    else
       runCmd.append("4b825dc642cb6eb9a060e54bf8d69288fbee4904 " + sha);
 
+   QLog_Trace("Git", QString("Getting modified files between SHAs: {%1}").arg(runCmd));
+
    return mGitBase->run(runCmd);
 }
 
 GitExecResult GitHistory::getUntrackedFileDiff(const QString &file) const
 {
-   QLog_Debug("Git", QString("Executing getUntrackedFileDiff for file {%1}").arg(file));
+   QLog_Debug("Git", QString("Getting diff for untracked file {%1}").arg(file));
 
    auto cmd = QString("git add --intent-to-add %1").arg(file);
+
+   QLog_Trace("Git", QString("Simulating we stage the file: {%1}").arg(cmd));
 
    if (auto ret = mGitBase->run(cmd); ret.success)
    {
       cmd = QString("git diff %1").arg(file);
 
+      QLog_Trace("Git", QString("Getting diff for untracked file: {%1}").arg(cmd));
+
       const auto retDiff = mGitBase->run(cmd);
+
+      QLog_Trace("Git", QString("Resetting the file to its previous state: {%1}").arg(cmd));
 
       cmd = QString("git reset %1").arg(file);
 

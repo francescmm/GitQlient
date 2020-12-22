@@ -7,7 +7,6 @@ GitAsyncProcess::GitAsyncProcess(const QString &workingDir)
 
 GitExecResult GitAsyncProcess::run(const QString &command)
 {
-
    const auto ret = execute(command);
 
    return { ret, "" };
@@ -15,7 +14,6 @@ GitExecResult GitAsyncProcess::run(const QString &command)
 
 void GitAsyncProcess::onFinished(int code, QProcess::ExitStatus exitStatus)
 {
-
    AGitProcess::onFinished(code, exitStatus);
 
    if (!mCanceling)

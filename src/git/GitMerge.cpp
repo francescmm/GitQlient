@@ -24,18 +24,22 @@ bool GitMerge::isInMerge() const
 
 GitExecResult GitMerge::merge(const QString &into, QStringList sources)
 {
-
    QLog_Debug("Git", QString("Executing merge: {%1} into {%2}").arg(sources.join(","), into));
 
-   const auto retCheckout = mGitBase->run(QString("git checkout -q %1").arg(into));
+   const auto cmd = QString("git checkout -q %1").arg(into);
+
+   QLog_Trace("Git", QString("Checking out the current branch: {%1}").arg(cmd));
+
+   const auto retCheckout = mGitBase->run(cmd);
 
    if (!retCheckout.success)
-   {
-
       return retCheckout;
-   }
 
-   const auto retMerge = mGitBase->run(QString("git merge -Xignore-all-space ") + sources.join(" "));
+   const auto cmd2 = QString("git merge -Xignore-all-space ").append(sources.join(" "));
+
+   QLog_Trace("Git", QString("Merging ignoreing spaces: {%1}").arg(cmd2));
+
+   const auto retMerge = mGitBase->run(cmd);
 
    if (retMerge.success)
    {
@@ -48,20 +52,26 @@ GitExecResult GitMerge::merge(const QString &into, QStringList sources)
 
 GitExecResult GitMerge::abortMerge() const
 {
+   QLog_Debug("Git", QString("Aborting merge"));
 
-   QLog_Debug("Git", QString("Merge aborted"));
+   const auto cmd = QString("git merge --abort");
 
-   const auto ret = mGitBase->run("git merge --abort");
+   QLog_Trace("Git", QString("Aborting merge: {%1}").arg(cmd));
+
+   const auto ret = mGitBase->run(cmd);
 
    return ret;
 }
 
 GitExecResult GitMerge::applyMerge() const
 {
+   QLog_Debug("Git", QString("Commiting merge"));
 
-   QLog_Debug("Git", QString("Merge commit"));
+   const auto cmd = QString("git commit --no-edit");
 
-   const auto ret = mGitBase->run("git commit --no-edit");
+   QLog_Trace("Git", QString("Commiting merge: {%1}").arg(cmd));
+
+   const auto ret = mGitBase->run(cmd);
 
    return ret;
 }

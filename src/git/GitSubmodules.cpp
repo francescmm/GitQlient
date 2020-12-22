@@ -16,16 +16,23 @@ GitSubmodules::GitSubmodules(const QSharedPointer<GitBase> &gitBase)
 
 QVector<QString> GitSubmodules::getSubmodules()
 {
-   QLog_Debug("Git", QString("Executing getSubmodules"));
+   QLog_Debug("Git", QString("Getting submodules"));
+
+   const auto cmd = QString("git config --file .gitmodules --name-only --get-regexp path");
+
+   QLog_Trace("Git", QString("Getting submodules: {%1}").arg(cmd));
 
    QVector<QString> submodulesList;
-   const auto ret = mGitBase->run("git config --file .gitmodules --name-only --get-regexp path");
-   if (ret.success)
+
+   if (const auto ret = mGitBase->run(cmd); ret.success)
    {
       const auto submodules = ret.output.toString().split('\n');
+
       for (const auto &submodule : submodules)
+      {
          if (!submodule.isEmpty() && submodule != "\n")
             submodulesList.append(submodule.split('.').at(1));
+      }
    }
 
    return submodulesList;
@@ -33,28 +40,57 @@ QVector<QString> GitSubmodules::getSubmodules()
 
 bool GitSubmodules::submoduleAdd(const QString &url, const QString &name)
 {
-   QLog_Debug("Git", QString("Executing submoduleAdd: {%1} {%2}").arg(url, name));
+   QLog_Debug("Git", QString("Adding a submodule: {%1} {%2}").arg(url, name));
 
-   const auto ret = mGitBase->run(QString("git submodule add %1 %2").arg(url, name)).success;
+   const auto cmd = QString("git submodule add %1 %2").arg(url, name);
+
+   QLog_Trace("Git", QString("Adding a submodule: {%1}").arg(cmd));
+
+   const auto ret = mGitBase->run(cmd).success;
 
    return ret;
 }
 
-bool GitSubmodules::submoduleUpdate(const QString &)
+bool GitSubmodules::submoduleUpdate(const QString &submodule)
 {
-   QLog_Debug("Git", QString("Executing submoduleUpdate"));
+   if (submodule.isEmpty())
+      QLog_Debug("Git", QString("Updating all submodules"));
+   else
+      QLog_Debug("Git", QString("Updating submodule: {%1}").arg(submodule));
 
-   const auto ret = mGitBase->run("git submodule update --init --recursive").success;
+   auto cmd = QString("git submodule update --init --recursive");
+
+   if (!submodule.isEmpty())
+      cmd.append(QString(" %1").arg(submodule));
+
+   QLog_Trace("Git", QString("Updating submodules: {%1}").arg(cmd));
+
+   const auto ret = mGitBase->run(cmd).success;
 
    return ret;
 }
 
 bool GitSubmodules::submoduleRemove(const QString &submodule)
 {
-   auto ret = mGitBase->run(QString("git submodule deinit -f %1").arg(submodule));
-   ret = mGitBase->run(QString("git rm -f --cached %1").arg(submodule));
+   QLog_Debug("Git", QString("Removing a submodule: {%1}").arg(submodule));
 
-   ret = mGitBase->run(QString("rm -rf %1/.git/modules/%2").arg(mGitBase->getWorkingDir(), submodule));
+   auto cmd = QString("git submodule deinit -f %1").arg(submodule);
+
+   QLog_Trace("Git", QString("Deinitializing the submodule: {%1}").arg(cmd));
+
+   auto ret = mGitBase->run(cmd);
+
+   cmd = QString("git rm -f --cached %1").arg(submodule);
+
+   QLog_Trace("Git", QString("Removing cache: {%1}").arg(cmd));
+
+   ret = mGitBase->run(cmd);
+
+   cmd = QString("rm -rf %1/.git/modules/%2").arg(mGitBase->getWorkingDir(), submodule);
+
+   QLog_Trace("Git", QString("Removing the submodule: {%1}").arg(cmd));
+
+   ret = mGitBase->run(cmd);
 
    QFile gitmodules(QString("%1/.gitmodules").arg(mGitBase->getWorkingDir()));
    QTemporaryFile gitTmp;

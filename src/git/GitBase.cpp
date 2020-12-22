@@ -47,22 +47,15 @@ QString GitBase::getGitQlientSettingsDir() const
 
 GitExecResult GitBase::run(const QString &cmd) const
 {
-
    GitSyncProcess p(mWorkingDirectory);
    connect(this, &GitBase::cancelAllProcesses, &p, &AGitProcess::onCancel);
 
    const auto ret = p.run(cmd);
    const auto runOutput = ret.output.toString();
 
-   if (ret.success)
-   {
-
-      if (runOutput.contains("fatal:"))
-         QLog_Info("Git", QString("Git command {%1} reported issues:\n%2").arg(cmd, runOutput));
-      else
-         QLog_Trace("Git", QString("Git command {%1} executed successfully.").arg(cmd));
-   }
-   else
+   if (ret.success && runOutput.contains("fatal:"))
+      QLog_Info("Git", QString("Git command {%1} reported issues:\n%2").arg(cmd, runOutput));
+   else if (!ret.success)
       QLog_Warning("Git", QString("Git command {%1} has errors:\n%2").arg(cmd, runOutput));
 
    return ret;
@@ -70,7 +63,6 @@ GitExecResult GitBase::run(const QString &cmd) const
 
 bool GitBase::runAsync(const QString &cmd) const
 {
-
    const auto p = new GitAsyncProcess(mWorkingDirectory);
    connect(this, &GitBase::cancelAllProcesses, p, &AGitProcess::onCancel);
    connect(p, &GitAsyncProcess::signalDataReady, this, &GitBase::signalResultReady);
@@ -82,18 +74,19 @@ bool GitBase::runAsync(const QString &cmd) const
 
 void GitBase::updateCurrentBranch()
 {
+   QLog_Trace("Git", "Updating the cached current branch");
 
-   QLog_Trace("Git", "Updating the current branch");
+   const auto cmd = QString("git rev-parse --abbrev-ref HEAD");
 
-   const auto ret = run("git rev-parse --abbrev-ref HEAD");
+   QLog_Trace("Git", QString("Updating the cached current branch: {%1}").arg(cmd));
+
+   const auto ret = run(cmd);
 
    mCurrentBranch = ret.success ? ret.output.toString().trimmed().remove("heads/") : QString();
 }
 
 QString GitBase::getCurrentBranch()
 {
-   QLog_Trace("Git", "Executing getCurrentBranch");
-
    if (mCurrentBranch.isEmpty())
       updateCurrentBranch();
 
@@ -102,10 +95,13 @@ QString GitBase::getCurrentBranch()
 
 GitExecResult GitBase::getLastCommit() const
 {
+   QLog_Trace("Git", "Getting last commit");
 
-   QLog_Trace("Git", "Executing getLastCommit");
+   const auto cmd = QString("git rev-parse HEAD");
 
-   const auto ret = run("git rev-parse HEAD");
+   QLog_Trace("Git", QString("Getting last commit: {%1}").arg(cmd));
+
+   const auto ret = run(cmd);
 
    return ret;
 }

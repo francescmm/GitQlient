@@ -14,7 +14,6 @@ GitPatches::GitPatches(const QSharedPointer<GitBase> &gitBase)
 
 GitExecResult GitPatches::exportPatch(const QStringList &shaList)
 {
-
    QLog_Debug("Git", QString("Executing exportPatch: {%1}").arg(shaList.join(",")));
 
    auto val = 1;
@@ -22,7 +21,11 @@ GitExecResult GitPatches::exportPatch(const QStringList &shaList)
 
    for (const auto &sha : shaList)
    {
-      const auto ret = mGitBase->run(QString("git format-patch -1 %1").arg(sha));
+      const auto cmd = QString("git format-patch -1 %1").arg(sha);
+
+      QLog_Trace("Git", QString("Exporting patch: {%1}").arg(cmd));
+
+      const auto ret = mGitBase->run(cmd);
 
       if (!ret.success)
          break;
@@ -49,19 +52,26 @@ GitExecResult GitPatches::exportPatch(const QStringList &shaList)
 
 bool GitPatches::applyPatch(const QString &fileName, bool asCommit)
 {
+   QLog_Debug("Git", QString("Applying patch: {%1} %2").arg(fileName, asCommit ? QString("as commit.") : QString()));
 
-   QLog_Debug("Git",
-              QString("Executing applyPatch: {%1} %2").arg(fileName, asCommit ? QString("as commit.") : QString()));
+   auto cmd = asCommit ? QString("git am --signof ") : QString("git apply ");
 
-   const auto cmd = asCommit ? QString("git am --signof") : QString("git apply");
-   const auto ret = mGitBase->run(QString("%1 %2").arg(cmd, fileName));
+   cmd.append(fileName);
+
+   QLog_Trace("Git", QString("Applaying patch: {%1}").arg(cmd));
+
+   const auto ret = mGitBase->run(cmd);
 
    return ret.success;
 }
 
 GitExecResult GitPatches::stagePatch(const QString &fileName) const
 {
-   QLog_Debug("Git", QString("Executing stagePatch: {%1}").arg(fileName));
+   QLog_Debug("Git", QString("Staging patch: {%1}").arg(fileName));
 
-   return mGitBase->run(QString("git apply --cached %1").arg(fileName));
+   const auto cmd = QString("git apply --cached %1").arg(fileName);
+
+   QLog_Trace("Git", QString("Staging patch: {%1}").arg(cmd));
+
+   return mGitBase->run(cmd);
 }

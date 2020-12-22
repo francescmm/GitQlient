@@ -46,7 +46,6 @@ public:
    GitExecResult removeRemoteBranch(const QString &branchName);
    GitExecResult getLastCommitOfBranch(const QString &branch);
    GitExecResult pushUpstream(const QString &branchName);
-   QMap<QString, QStringList> getTrackingBranches() const;
 
 private:
    QSharedPointer<GitBase> mGitBase;

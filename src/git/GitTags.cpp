@@ -1,5 +1,4 @@
-#include "GitTags.h"
-
+#include <GitTags.h>
 #include <GitBase.h>
 
 #include <QLogger.h>
@@ -14,49 +13,77 @@ GitTags::GitTags(const QSharedPointer<GitBase> &gitBase)
 
 bool GitTags::getRemoteTags() const
 {
-   QLog_Debug("Git", QString("Executing getRemoteTags"));
+   QLog_Debug("Git", QString("Getting remote tags"));
 
-   return mGitBase->runAsync("git ls-remote --tags");
+   const auto cmd = QString("git ls-remote --tags");
+
+   QLog_Trace("Git", QString("Getting remote tags: {%1}").arg(cmd));
+
+   return mGitBase->runAsync(cmd);
 }
 
 GitExecResult GitTags::addTag(const QString &tagName, const QString &tagMessage, const QString &sha)
 {
-   QLog_Debug("Git", QString("Executing addTag: {%1}").arg(tagName));
+   QLog_Debug("Git", QString("Adding a tag: {%1}").arg(tagName));
 
-   const auto ret = mGitBase->run(QString("git tag -a %1 %2 -m \"%3\"").arg(tagName, sha, tagMessage));
+   const auto cmd = QString("git tag -a %1 %2 -m \"%3\"").arg(tagName, sha, tagMessage);
+
+   QLog_Trace("Git", QString("Adding a tag: {%1}").arg(cmd));
+
+   const auto ret = mGitBase->run(cmd);
 
    return ret;
 }
 
 GitExecResult GitTags::removeTag(const QString &tagName, bool remote)
 {
-   QLog_Debug("Git", QString("Executing removeTag: {%1}").arg(tagName));
+   QLog_Debug("Git", QString("Removing tag: {%1}").arg(tagName));
 
    GitExecResult ret;
 
    if (remote)
-      ret = mGitBase->run(QString("git push origin --delete %1").arg(tagName));
+   {
+      const auto cmd = QString("git push origin --delete %1").arg(tagName);
+
+      QLog_Trace("Git", QString("Removing tag: {%1}").arg(cmd));
+
+      ret = mGitBase->run(cmd);
+   }
 
    if (!remote || (remote && ret.success))
-      ret = mGitBase->run(QString("git tag -d %1").arg(tagName));
+   {
+      const auto cmd = QString("git tag -d %1").arg(tagName);
+
+      QLog_Trace("Git", QString("Removing the tag locally: {%1}").arg(cmd));
+
+      ret = mGitBase->run(cmd);
+   }
 
    return ret;
 }
 
 GitExecResult GitTags::pushTag(const QString &tagName)
 {
-   QLog_Debug("Git", QString("Executing pushTag: {%1}").arg(tagName));
+   QLog_Debug("Git", QString("Pushing a tag: {%1}").arg(tagName));
 
-   const auto ret = mGitBase->run(QString("git push origin %1").arg(tagName));
+   const auto cmd = QString("git push origin %1").arg(tagName);
+
+   QLog_Trace("Git", QString("Pushing a tag: {%1}").arg(cmd));
+
+   const auto ret = mGitBase->run(cmd);
 
    return ret;
 }
 
 GitExecResult GitTags::getTagCommit(const QString &tagName)
 {
-   QLog_Debug("Git", QString("Executing getTagCommit: {%1}").arg(tagName));
+   QLog_Debug("Git", QString("Getting the commit of a tag: {%1}").arg(tagName));
 
-   const auto ret = mGitBase->run(QString("git rev-list -n 1 %1").arg(tagName));
+   const auto cmd = QString("git rev-list -n 1 %1").arg(tagName);
+
+   QLog_Trace("Git", QString("Getting the commit of a tag: {%1}").arg(cmd));
+
+   const auto ret = mGitBase->run(cmd);
    const auto output = ret.output.toString().trimmed();
 
    return qMakePair(ret.success, output);
