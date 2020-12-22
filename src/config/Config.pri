@@ -4,11 +4,11 @@ FORMS += \
     $$PWD/GitConfigDlg.ui
 
 HEADERS += \
-    $$PWD/ConfigWidget.h \
     $$PWD/GeneralConfigDlg.h \
-    $$PWD/GitConfigDlg.h
+    $$PWD/GitConfigDlg.h \
+    $$PWD/InitScreen.h
 
 SOURCES += \
-    $$PWD/ConfigWidget.cpp \
     $$PWD/GeneralConfigDlg.cpp \
-    $$PWD/GitConfigDlg.cpp
+    $$PWD/GitConfigDlg.cpp \
+    $$PWD/InitScreen.cpp

@@ -977,7 +977,7 @@ MergeWidget > #leCommitTitle
 /*********************************************/
 
 /*********************************************/
-/*             ConfigWidget START            */
+/*             InitScreen START            */
 /*********************************************/
 
 QLabel#title
@@ -1004,7 +1004,7 @@ QFrame#tabWidget > QPushButton, QFrame#tabWidget > QPushButton[selected=false]
 }
 
 /*********************************************/
-/*             ConfigWidget END              */
+/*             InitScreen END              */
 /*********************************************/
 
 /*********************************************/

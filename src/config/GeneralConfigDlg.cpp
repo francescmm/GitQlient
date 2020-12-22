@@ -44,8 +44,9 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
    mLevelCombo->addItems({ "Trace", "Debug", "Info", "Warning", "Error", "Fatal" });
    mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
 
-   const auto currentStyle = settings.globalValue("colorSchema", "dark").toString();
    mStylesSchema->addItems({ "dark", "bright" });
+
+   const auto currentStyle = settings.globalValue("colorSchema", "dark").toString();
    mStylesSchema->setCurrentText(currentStyle);
    connect(mStylesSchema, &QComboBox::currentTextChanged, this, [this, currentStyle](const QString &newText) {
       if (newText != currentStyle)

@@ -1,4 +1,4 @@
-﻿#include "ConfigWidget.h"
+﻿#include "InitScreen.h"
 
 #include <GeneralConfigDlg.h>
 #include <CreateRepoDlg.h>
@@ -25,7 +25,7 @@
 
 using namespace QLogger;
 
-ConfigWidget::ConfigWidget(QWidget *parent)
+InitScreen::InitScreen(QWidget *parent)
    : QFrame(parent)
    , mOpenRepo(new QPushButton(tr("OPEN")))
    , mCloneRepo(new QPushButton(tr("CLONE")))
@@ -77,7 +77,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
 
    const auto configBtn = new QPushButton();
    configBtn->setIcon(QIcon(":/icons/config"));
-   connect(configBtn, &QPushButton::clicked, this, &ConfigWidget::openConfigDlg);
+   connect(configBtn, &QPushButton::clicked, this, &InitScreen::openConfigDlg);
 
    const auto titleLayout = new QHBoxLayout();
    titleLayout->setContentsMargins(QMargins());
@@ -95,7 +95,7 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    lineTitle2->setObjectName("orangeHSeparator");
 
    const auto version = new ButtonLink(tr("About GitQlient..."));
-   connect(version, &ButtonLink::clicked, this, &ConfigWidget::showAbout);
+   connect(version, &ButtonLink::clicked, this, &InitScreen::showAbout);
    version->setToolTip(QString("%1").arg(SHA_VER));
 
    const auto goToRepo = new ButtonLink(tr("Source code"));
@@ -135,24 +135,24 @@ ConfigWidget::ConfigWidget(QWidget *parent)
    layout->addWidget(centerFrame, 1, 1);
    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 2);
 
-   connect(mOpenRepo, &QPushButton::clicked, this, &ConfigWidget::openRepo);
-   connect(mCloneRepo, &QPushButton::clicked, this, &ConfigWidget::cloneRepo);
-   connect(mInitRepo, &QPushButton::clicked, this, &ConfigWidget::initRepo);
+   connect(mOpenRepo, &QPushButton::clicked, this, &InitScreen::openRepo);
+   connect(mCloneRepo, &QPushButton::clicked, this, &InitScreen::cloneRepo);
+   connect(mInitRepo, &QPushButton::clicked, this, &InitScreen::initRepo);
 
    const auto gitBase(QSharedPointer<GitBase>::create(""));
    mGit = QSharedPointer<GitConfig>::create(gitBase);
 
-   connect(mGit.data(), &GitConfig::signalCloningProgress, this, &ConfigWidget::updateProgressDialog,
+   connect(mGit.data(), &GitConfig::signalCloningProgress, this, &InitScreen::updateProgressDialog,
            Qt::DirectConnection);
-   connect(mGit.data(), &GitConfig::signalCloningFailure, this, &ConfigWidget::showError, Qt::DirectConnection);
+   connect(mGit.data(), &GitConfig::signalCloningFailure, this, &InitScreen::showError, Qt::DirectConnection);
 }
 
-ConfigWidget::~ConfigWidget()
+InitScreen::~InitScreen()
 {
    delete mSettings;
 }
 
-void ConfigWidget::openRepo()
+void InitScreen::openRepo()
 {
    const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
 
@@ -163,7 +163,7 @@ void ConfigWidget::openRepo()
    }
 }
 
-void ConfigWidget::cloneRepo()
+void InitScreen::cloneRepo()
 {
    CreateRepoDlg cloneDlg(CreateRepoDlgType::CLONE, mGit);
    connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, [this](const QString &path) { mPathToOpen = path; });
@@ -176,14 +176,14 @@ void ConfigWidget::cloneRepo()
    }
 }
 
-void ConfigWidget::initRepo()
+void InitScreen::initRepo()
 {
    CreateRepoDlg cloneDlg(CreateRepoDlgType::INIT, mGit);
-   connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, &ConfigWidget::signalOpenRepo);
+   connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, &InitScreen::signalOpenRepo);
    cloneDlg.exec();
 }
 
-QWidget *ConfigWidget::createRecentProjectsPage()
+QWidget *InitScreen::createRecentProjectsPage()
 {
    delete mInnerWidget;
    mInnerWidget = new QFrame();
@@ -226,7 +226,7 @@ QWidget *ConfigWidget::createRecentProjectsPage()
    return mInnerWidget;
 }
 
-QWidget *ConfigWidget::createUsedProjectsPage()
+QWidget *InitScreen::createUsedProjectsPage()
 {
    delete mMostUsedInnerWidget;
    mMostUsedInnerWidget = new QFrame();
@@ -269,7 +269,7 @@ QWidget *ConfigWidget::createUsedProjectsPage()
    return mMostUsedInnerWidget;
 }
 
-void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
+void InitScreen::updateProgressDialog(QString stepDescription, int value)
 {
    if (value >= 0)
    {
@@ -288,7 +288,7 @@ void ConfigWidget::updateProgressDialog(QString stepDescription, int value)
    mProgressDlg->repaint();
 }
 
-void ConfigWidget::showError(int, QString description)
+void InitScreen::showError(int, QString description)
 {
    if (mProgressDlg)
       mProgressDlg->deleteLater();
@@ -296,7 +296,7 @@ void ConfigWidget::showError(int, QString description)
    QMessageBox::critical(this, tr("Error!"), description);
 }
 
-void ConfigWidget::showAbout()
+void InitScreen::showAbout()
 {
    const QString aboutMsg = tr(
        "GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client. "
@@ -314,13 +314,13 @@ void ConfigWidget::showAbout()
    QMessageBox::about(this, tr("About GitQlient v%1").arg(VER), aboutMsg);
 }
 
-void ConfigWidget::openConfigDlg()
+void InitScreen::openConfigDlg()
 {
    GeneralConfigDlg dlg;
    dlg.exec();
 }
 
-void ConfigWidget::onRepoOpened()
+void InitScreen::onRepoOpened()
 {
    mRecentProjectsLayout->addWidget(createRecentProjectsPage());
    mUsedProjectsLayout->addWidget(createUsedProjectsPage());

@@ -39,7 +39,7 @@ class QVBoxLayout;
 The widget also shows the list of most open repositories.
 
 */
-class ConfigWidget : public QFrame
+class InitScreen : public QFrame
 {
    Q_OBJECT
 
@@ -57,12 +57,12 @@ public:
 
     \param parent The parent widget if needed.
    */
-   explicit ConfigWidget(QWidget *parent = nullptr);
+   explicit InitScreen(QWidget *parent = nullptr);
    /*!
     \brief Destructor.
 
    */
-   ~ConfigWidget() override;
+   ~InitScreen() override;
 
    /*!
     * \brief onRepoOpened Increments the uses of the repo in the settings to update the lists.

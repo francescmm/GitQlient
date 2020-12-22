@@ -27,7 +27,7 @@
 #include <QSet>
 
 class QPinnableTabWidget;
-class ConfigWidget;
+class InitScreen;
 
 /*!
  \brief The GitQlient class is the MainWindow of the GitQlient application. Is the widget that stores all the tabs about
@@ -82,7 +82,7 @@ public:
 
 private:
    QPinnableTabWidget *mRepos = nullptr;
-   ConfigWidget *mConfigWidget = nullptr;
+   InitScreen *mConfigWidget = nullptr;
    QSet<QString> mCurrentRepos;
 
    /*!

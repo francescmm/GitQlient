@@ -1,6 +1,6 @@
 #include "GitQlient.h"
 
-#include <ConfigWidget.h>
+#include <InitScreen.h>
 #include <GitQlientStyles.h>
 #include <GitQlientSettings.h>
 #include <QPinnableTabWidget.h>
@@ -28,7 +28,7 @@ GitQlient::GitQlient(QWidget *parent)
 GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    : QWidget(parent)
    , mRepos(new QPinnableTabWidget())
-   , mConfigWidget(new ConfigWidget())
+   , mConfigWidget(new InitScreen())
 {
 
    auto repos = parseArguments(arguments);
@@ -58,7 +58,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
    mConfigWidget->onRepoOpened();
 
-   connect(mConfigWidget, &ConfigWidget::signalOpenRepo, this, &GitQlient::addRepoTab);
+   connect(mConfigWidget, &InitScreen::signalOpenRepo, this, &GitQlient::addRepoTab);
 
    setRepositories(repos);
 
