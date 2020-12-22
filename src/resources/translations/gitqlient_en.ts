@@ -2501,7 +2501,7 @@
     </message>
     <message>
         <location filename="../../aux_widgets/RepoConfigDlg.ui" line="199"/>
-        <source>Cache spaced used:</source>
+        <source>Cache space used:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
