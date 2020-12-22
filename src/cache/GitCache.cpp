@@ -26,7 +26,7 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
 
    const auto totalCommits = commits.count() + 1;
 
-   QLog_Debug("Git", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
+   QLog_Debug("Cache", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
 
    mConfigured = false;
 
@@ -48,13 +48,13 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
          mCommits.takeLast();
    }
 
-   QLog_Debug("Git", QString("Adding WIP revision."));
+   QLog_Debug("Cache", QString("Adding WIP revision."));
 
    insertWipRevision(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
 
    auto count = 1;
 
-   QLog_Debug("Git", QString("Adding committed revisions."));
+   QLog_Debug("Cache", QString("Adding committed revisions."));
 
    for (const auto &commit : commits)
    {
@@ -187,7 +187,7 @@ void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIn
 {
    auto newParentSha = parentSha;
 
-   QLog_Debug("Git", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(newParentSha));
+   QLog_Debug("Cache", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(newParentSha));
 
    const auto key = qMakePair(CommitInfo::ZERO_SHA, newParentSha);
    const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
@@ -226,7 +226,7 @@ bool GitCache::insertRevisionFile(const QString &sha1, const QString &sha2, cons
 
    if ((emptyShas || isWip) && mRevisionFilesMap.value(key) != file)
    {
-      QLog_Debug("Git", QString("Adding the revisions files between {%1} and {%2}.").arg(sha1, sha2));
+      QLog_Debug("Cache", QString("Adding the revisions files between {%1} and {%2}.").arg(sha1, sha2));
 
       mRevisionFilesMap.insert(key, file);
 
@@ -239,7 +239,7 @@ bool GitCache::insertRevisionFile(const QString &sha1, const QString &sha2, cons
 void GitCache::insertReference(const QString &sha, References::Type type, const QString &reference)
 {
    QMutexLocker lock(&mMutex);
-   QLog_Debug("Git", QString("Adding a new reference with SHA {%1}.").arg(sha));
+   QLog_Debug("Cache", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
    mReferences[sha].addReference(type, reference);
 }
@@ -295,7 +295,7 @@ QVector<Lane> GitCache::calculateLanes(const CommitInfo &c)
 {
    const auto sha = c.sha();
 
-   QLog_Trace("Git", QString("Updating the lanes for SHA {%1}.").arg(sha));
+   QLog_Trace("Cache", QString("Updating the lanes for SHA {%1}.").arg(sha));
 
    bool isDiscontinuity;
    bool isFork = mLanes.isFork(sha, isDiscontinuity);

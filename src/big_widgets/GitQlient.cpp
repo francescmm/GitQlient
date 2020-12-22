@@ -168,7 +168,7 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
    }
 
    const auto manager = QLoggerManager::getInstance();
-   manager->addDestination("GitQlient.log", { "UI", "Git" }, logLevel);
+   manager->addDestination("GitQlient.log", { "UI", "Git", "Cache" }, logLevel);
 
    return repos;
 }
