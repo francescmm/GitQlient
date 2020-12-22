@@ -171,7 +171,7 @@
        <item row="9" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>Cache spaced used:</string>
+          <string>Cache space used:</string>
          </property>
         </widget>
        </item>
