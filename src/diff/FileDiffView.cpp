@@ -218,7 +218,7 @@ bool FileDiffView::eventFilter(QObject *obj, QEvent *event)
          const auto textRow = cursor.block().blockNumber();
          auto found = false;
 
-         for (const auto &diff : mFileDiffInfo)
+         for (const auto &diff : qAsConst(mFileDiffInfo))
          {
             if (textRow + 1 >= diff.startLine && textRow + 1 <= diff.endLine)
             {

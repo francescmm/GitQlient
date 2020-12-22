@@ -106,12 +106,6 @@ public:
     \return QColor
    */
    static QColor getOrange();
-
-   /**
-    * @brief getGitQlientOrange Gets the GitQlient official orange color.
-    * @return QColor
-    */
-   static QColor getGitQlientOrange();
    /*!
     \brief Gets the total count of branch colors.
 
@@ -131,42 +125,6 @@ public:
     \return QColor Returns the color.
    */
    static QColor getBranchColorAt(int index);
-   /*!
-    \brief Gets the current branch color.
-
-    \return QColor The color.
-   */
-   static QColor getCurrentBranchColor();
-   /*!
-    \brief Gets the local branch color.
-
-    \return QColor The color.
-   */
-   static QColor getLocalBranchColor();
-   /*!
-    \brief Gets the remote branch color.
-
-    \return QColor The color.
-   */
-   static QColor getRemoteBranchColor();
-   /*!
-    \brief Gets the color when the status is detached.
-
-    \return QColor The color.
-   */
-   static QColor getDetachedColor();
-   /*!
-    \brief Gets the tag color.
-
-    \return QColor
-   */
-   static QColor getTagColor();
-   /*!
-    \brief Gets the references color.
-
-    \return QColor The color
-   */
-   static QColor getRefsColor();
 
 private:
    static GitQlientStyles *INSTANCE;

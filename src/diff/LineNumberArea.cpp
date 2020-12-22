@@ -2,6 +2,7 @@
 
 #include <FileDiffView.h>
 #include <GitQlientStyles.h>
+#include <Colors.h>
 
 #include <QPainter>
 #include <QTextBlock>
@@ -62,14 +63,14 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
                painter.drawPixmap(6, static_cast<int>(top), height, height,
                                   QIcon(":/icons/comments").pixmap(height, height));
 
-               painter.setPen(QColor("#D89000"));
+               painter.setPen(gitQlientOrange);
             }
             else if (fileDiffWidget->mRow == number)
             {
                painter.drawPixmap(width() - height - fontWidth, static_cast<int>(top), height, height,
                                   QIcon(":/icons/add_comment").pixmap(height, height));
 
-               painter.setPen(QColor("#D89000"));
+               painter.setPen(gitQlientOrange);
             }
 
             painter.drawText(0, static_cast<int>(top), width() - offset, height, Qt::AlignRight,
@@ -101,7 +102,7 @@ void LineNumberArea::mouseMoveEvent(QMouseEvent *e)
             const auto textRow = cursor.block().blockNumber();
             auto found = false;
 
-            for (const auto &diff : fileDiffWidget->mFileDiffInfo)
+            for (const auto &diff : qAsConst(fileDiffWidget->mFileDiffInfo))
             {
                if (textRow + 1 >= diff.startLine && textRow + 1 <= diff.endLine)
                {

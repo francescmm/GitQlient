@@ -98,7 +98,9 @@ void JobDetailsFetcher::retrieveBuildConfig(const QJsonArray &propertyArray)
             {
                jobConfig.fieldType = JobConfigFieldType::Choice;
 
-               for (const auto &choiceValue : config[QStringLiteral("choices")].toArray())
+               const auto choices = config[QStringLiteral("choices")].toArray();
+
+               for (const auto &choiceValue : choices)
                   jobConfig.choicesValues.append(choiceValue.toString());
             }
 

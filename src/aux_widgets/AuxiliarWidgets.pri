@@ -13,6 +13,7 @@ HEADERS += \
     $$PWD/ButtonLink.hpp \
     $$PWD/CheckBox.h \
     $$PWD/ClickableFrame.h \
+    $$PWD/Colors.h \
     $$PWD/CommitInfoPanel.h \
     $$PWD/ConflictButton.h \
     $$PWD/CreateRepoDlg.h \

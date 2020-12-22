@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Colors.h>
+
 #include <QDateTime>
 #include <QString>
 #include <QMap>
@@ -14,17 +16,15 @@ namespace Jenkins
 inline QColor resultColor(const QString &result)
 {
    if (result == "SUCCESS")
-      return QColor("#00AF18");
+      return jenkinsResultSuccess;
    else if (result == "UNSTABLE")
-      return QColor("#D89000");
+      return gitQlientOrange;
    else if (result == "FAILURE" || result == "FAILED")
-      return QColor("#C12020");
+      return jenkinsResultFailure;
    else if (result == "ABORTED")
-      return QColor("#5B5B5B");
-   else if (result == "NOT_BUILT")
-      return QColor("#C8C8C8");
-
-   return QColor("#C8C8C8");
+      return jenkinsResultAborted;
+   else
+      return jenkinsResultNotBuilt;
 }
 
 struct JenkinsStageInfo

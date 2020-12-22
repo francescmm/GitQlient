@@ -8,6 +8,7 @@
 #include <AvatarHelper.h>
 #include <CodeReviewComment.h>
 #include <ButtonLink.hpp>
+#include <Colors.h>
 
 #include <QNetworkAccessManager>
 #include <QVBoxLayout>
@@ -242,14 +243,14 @@ void PrCommentsList::highlightComment(int frameId)
    const auto animationGoup = new QSequentialAnimationGroup();
    auto animation = new QPropertyAnimation(daFrame, "color");
    animation->setDuration(500);
-   animation->setStartValue(QColor("#404142"));
-   animation->setEndValue(QColor("#606162"));
+   animation->setStartValue(highlightCommentStart);
+   animation->setEndValue(highlightCommentEnd);
    animationGoup->addAnimation(animation);
 
    animation = new QPropertyAnimation(daFrame, "color");
    animation->setDuration(500);
-   animation->setStartValue(QColor("#606162"));
-   animation->setEndValue(QColor("#404142"));
+   animation->setStartValue(highlightCommentEnd);
+   animation->setEndValue(highlightCommentStart);
    animationGoup->addAnimation(animation);
 
    animationGoup->start();

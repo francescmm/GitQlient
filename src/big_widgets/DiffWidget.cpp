@@ -62,8 +62,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<GitCach
 
    setLayout(layout);
 
-   connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
-           [this](QListWidgetItem *item) { emit loadFileDiff(mCurrentSha, mParentSha, item->text(), false); });
+   connect(fileListWidget, &FileListWidget::itemDoubleClicked, this, &DiffWidget::onDoubleClick);
    connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &DiffWidget::signalShowFileHistory);
 
    fileListWidget->setVisible(false);
@@ -212,4 +211,9 @@ void DiffWidget::onTabClosed(int index)
       const auto key = mDiffWidgets.key(widget);
       mDiffWidgets.remove(key);
    }
+}
+
+void DiffWidget::onDoubleClick(QListWidgetItem *item)
+{
+   loadFileDiff(mCurrentSha, mParentSha, item->text(), false);
 }

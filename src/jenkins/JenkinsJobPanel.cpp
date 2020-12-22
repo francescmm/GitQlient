@@ -341,7 +341,7 @@ void JenkinsJobPanel::createBuildConfigPanel()
 
    auto row = 0;
 
-   for (const auto &config : mRequestedJob.configFields)
+   for (const auto &config : qAsConst(mRequestedJob.configFields))
    {
       buildLayout->addWidget(new QLabel(config.name), row, 0);
 

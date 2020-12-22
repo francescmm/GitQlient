@@ -33,6 +33,7 @@ class IDiffWidget;
 class QVBoxLayout;
 class FileListWidget;
 class GitCache;
+class QListWidgetItem;
 
 /*!
  \brief The DiffWidget class creates the layout to display the dif information for both files and commits.
@@ -132,4 +133,6 @@ private:
     * @param index The index to be closed.
     */
    void onTabClosed(int index);
+
+   void onDoubleClick(QListWidgetItem *item);
 };

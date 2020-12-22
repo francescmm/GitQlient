@@ -12,6 +12,7 @@
 #include <GitCache.h>
 #include <GitBase.h>
 #include <PullRequest.h>
+#include <Colors.h>
 
 #include <QSortFilterProxyModel>
 #include <QPainter>
@@ -360,7 +361,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          QColor color = activeColor;
 
          if (mCache->pendingLocalChanges())
-            color = GitQlientStyles::getGitQlientOrange();
+            color = gitQlientOrange;
 
          paintGraphLane(p, LaneType::BRANCH, false, 0, LANE_WIDTH, color, activeColor, activeColor, true,
                         commit.parentsCount() != 0);
@@ -461,7 +462,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
       if (const auto ret = mGit->getLastCommit(); ret.success && sha == ret.output.toString().trimmed())
       {
          marks.append("detached");
-         colors.append(GitQlientStyles::getDetachedColor());
+         colors.append(graphDetached);
       }
    }
 
@@ -473,12 +474,12 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
          if (branch == currentBranch)
          {
             marks.prepend(branch);
-            colors.prepend(GitQlientStyles::getCurrentBranchColor());
+            colors.prepend(graphCurrentBranch);
          }
          else
          {
             marks.append(branch);
-            colors.append(GitQlientStyles::getLocalBranchColor());
+            colors.append(graphLocalBranch);
          }
       }
 
@@ -486,14 +487,14 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
       for (const auto &tag : tags)
       {
          marks.append(tag);
-         colors.append(GitQlientStyles::getTagColor());
+         colors.append(graphTag);
       }
 
       const auto remoteBranches = mCache->getReferences(sha, References::Type::RemoteBranches);
       for (const auto &branch : remoteBranches)
       {
          marks.append(branch);
-         colors.append(QColor("#011f4b"));
+         colors.append(graphRemoteBranch);
       }
 
       const auto showMinimal = o.rect.width() <= MIN_VIEW_WIDTH_PX;
@@ -522,7 +523,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
          painter->drawPath(path);
 
          // TODO: Fix this with a nicer way
-         painter->setPen(QColor(*colorIter == QColor("#dec3c3") ? QString("#000000") : QString("#FFFFFF")));
+         painter->setPen(QColor(*colorIter == graphTag ? textColorDark : textColorBright));
 
          const auto fontRect = textBoundingRect.height();
          const auto y = o.rect.y() + ROW_HEIGHT - (ROW_HEIGHT - fontRect) + 2;
