@@ -44,7 +44,7 @@ static const QColor graphPink(255, 121, 198); //#FF79C6
 static const QColor graphPastel(205, 144, 119); //#CD9077
 static const QColor graphCurrentBranch(0, 91, 150); //#005B96
 static const QColor graphLocalBranch(100, 151, 177); //#6497B1
-static const QColor graphRemoteBranch(1, 131, 75); //#011F4B
+static const QColor graphRemoteBranch(1, 31, 75); //#011F4B
 static const QColor graphDetached(133, 30, 62); //#851E3E
 static const QColor graphTag(222, 195, 195); //#DEC3C3
 static const QColor highlightCommentStart(64, 65, 66); //#404142

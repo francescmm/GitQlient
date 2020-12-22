@@ -523,7 +523,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
          painter->drawPath(path);
 
          // TODO: Fix this with a nicer way
-         painter->setPen(QColor(*colorIter == graphTag ? textColorDark : textColorBright));
+         painter->setPen(QColor(*colorIter == graphTag ? textColorBright : textColorDark));
 
          const auto fontRect = textBoundingRect.height();
          const auto y = o.rect.y() + ROW_HEIGHT - (ROW_HEIGHT - fontRect) + 2;
