@@ -1,3 +1,5 @@
+INCLUDEPATH += $$PWD
+
 SOURCES += \
     $$PWD/FakeCloseButton.cpp \
     $$PWD/RealCloseButton.cpp \
