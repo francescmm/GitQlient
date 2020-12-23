@@ -301,11 +301,11 @@ void InitScreen::showAbout()
    const QString aboutMsg = tr(
        "GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client. "
        "With GitQlient you will be able to add commits, branches and manage all the options Git provides. <br><br>"
-       "Once a fork of QGit, GitQlient has followed is own path and is currently develop and maintain by Francesc M. "
+       "Once a fork of QGit, GitQlient has followed is own path. "
        "You can download the code from <a href='https://github.com/francescmm/GitQlient'>GitHub</a>. If you find any "
        "bug or problem, please report it in <a href='https://github.com/francescmm/GitQlient/issues'>the issues "
        "page</a> so I can fix it as soon as possible.<br><br>"
-       "If you want to integrate GitQlient into QtCreator, there I also provide a plugin that you can download from "
+       "If you want to integrate GitQlient into QtCreator, I also provide a plugin that you can download from "
        "<a href='https://github.com/francescmm/GitQlient/releases'>here</a>. Just make sure you pick the right "
        "version and follow the instructions in the main page of the repo.<br><br>"
        "GitQlient can be compiled from Qt 5.12 on.<br><br>"
