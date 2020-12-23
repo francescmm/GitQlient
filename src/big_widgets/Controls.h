@@ -224,10 +224,6 @@ private:
 
    */
    void pruneBranches();
-   /*!
-    * \brief Shows the config dialog for both Local and Global user data.
-    */
-   void showConfigDlg();
 
    /**
     * @brief createGitPlatformButton Createst the git platform button if the user has enabled it.

@@ -7,7 +7,6 @@
 #include <GitRemote.h>
 #include <GitConfig.h>
 #include <BranchDlg.h>
-#include <RepoConfigDlg.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
 #include <GitQlientUpdater.h>
@@ -384,20 +383,6 @@ void Controls::pruneBranches()
 
    if (ret.success)
       emit requestReload(true);
-}
-
-void Controls::showConfigDlg()
-{
-   const auto configDlg = new RepoConfigDlg(mGit, this);
-   connect(configDlg, &RepoConfigDlg::reloadView, this, [this]() { emit requestReload(false); });
-   configDlg->open();
-
-   GitQlientSettings settings;
-   const auto pomodoroEnabled = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", true).toBool();
-
-   mPomodoro->setVisible(pomodoroEnabled);
-
-   configBuildSystemButton();
 }
 
 void Controls::createGitPlatformButton(QHBoxLayout *layout)
