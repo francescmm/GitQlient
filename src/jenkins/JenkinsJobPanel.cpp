@@ -66,7 +66,7 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
 
    mTabWidget = new QPinnableTabWidget();
    mTabWidget->addPinnedTab(scrollArea, "Previous builds");
-   mTabWidget->setContextMenuPolicy(QPinnableTabWidget::ContextMenuPolicy::ShowNever);
+   mTabWidget->setContextMenuPolicy(Qt::NoContextMenu);
 
    mBuild->setVisible(false);
    mBuild->setObjectName("applyActionBtn");
