@@ -48,7 +48,8 @@ enum class ControlsMainViews
    Blame,
    Merge,
    GitServer,
-   BuildSystem
+   BuildSystem,
+   Config
 };
 
 /*!
@@ -106,6 +107,11 @@ signals:
     * @param full True if the refresh includes commits and references, otherwise it refreshes only commits.
     */
    void requestReload(bool full);
+
+   /**
+    * @brief goConfig Signal triggered when the user seleced the config view.
+    */
+   void goConfig();
 
 public:
    /*!

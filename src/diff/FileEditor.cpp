@@ -7,11 +7,13 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 
-FileEditor::FileEditor(QWidget *parent)
+FileEditor::FileEditor(bool highlighter, QWidget *parent)
    : QFrame(parent)
    , mFileEditor(new FileDiffEditor())
-   , mHighlighter(new Highlighter(mFileEditor->document()))
 {
+   if (highlighter)
+      mHighlighter = new Highlighter(mFileEditor->document());
+
    const auto layout = new QVBoxLayout(this);
    layout->setContentsMargins(QMargins());
    layout->setSpacing(0);

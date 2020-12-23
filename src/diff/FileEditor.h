@@ -36,7 +36,7 @@ signals:
    void signalEditionClosed();
 
 public:
-   explicit FileEditor(QWidget *parent = nullptr);
+   explicit FileEditor(bool highlighter = true, QWidget *parent = nullptr);
 
    /**
     * @brief editFile Shows the file edition window with the content of

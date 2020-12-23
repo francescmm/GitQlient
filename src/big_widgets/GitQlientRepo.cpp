@@ -27,6 +27,7 @@
 #include <GitServerCache.h>
 #include <ConfigData.h>
 #include <JenkinsWidget.h>
+#include <ConfigWidget.h>
 
 #include <QTimer>
 #include <QDirIterator>
@@ -56,6 +57,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
    , mGitServerWidget(new GitServerWidget(mGitQlientCache, mGitBase, mGitServerCache))
    , mJenkins(new JenkinsWidget(mGitBase))
+   , mConfigWidget(new ConfigWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
    , mGitTags(new GitTags(mGitBase))
@@ -81,6 +83,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    mStackedLayout->addWidget(mMergeWidget);
    mStackedLayout->addWidget(mGitServerWidget);
    mStackedLayout->addWidget(mJenkins);
+   mStackedLayout->addWidget(mConfigWidget);
 
    const auto mainLayout = new QVBoxLayout(this);
    mainLayout->setSpacing(0);
@@ -105,6 +108,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mControls, &Controls::signalGoMerge, this, &GitQlientRepo::showMergeView);
    connect(mControls, &Controls::signalGoServer, this, &GitQlientRepo::showGitServerView);
    connect(mControls, &Controls::signalGoBuildSystem, this, &GitQlientRepo::showBuildSystemView);
+   connect(mControls, &Controls::goConfig, this, &GitQlientRepo::showConfig);
    connect(mControls, &Controls::requestReload, this, &GitQlientRepo::updateCache);
    connect(mControls, &Controls::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
@@ -486,6 +490,12 @@ void GitQlientRepo::showBuildSystemView()
    mJenkins->reload();
    mStackedLayout->setCurrentWidget(mJenkins);
    mControls->toggleButton(ControlsMainViews::BuildSystem);
+}
+
+void GitQlientRepo::showConfig()
+{
+   mStackedLayout->setCurrentWidget(mConfigWidget);
+   mControls->toggleButton(ControlsMainViews::Config);
 }
 
 void GitQlientRepo::showPreviousView()

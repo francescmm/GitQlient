@@ -35,7 +35,6 @@ class QTextEdit;
 class FileDiffWidget;
 class RevisionFiles;
 class GitCache;
-class FileEditor;
 class QListWidget;
 class QListWidgetItem;
 class QStackedWidget;

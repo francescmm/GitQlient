@@ -116,10 +116,12 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mRefreshBtn->setToolTip(tr("Refresh"));
    mRefreshBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
+   mConfigBtn->setCheckable(true);
    mConfigBtn->setIcon(QIcon(":/icons/config"));
    mConfigBtn->setIconSize(QSize(22, 22));
    mConfigBtn->setToolTip(tr("Config"));
    mConfigBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mBtnGroup->addButton(mConfigBtn, static_cast<int>(ControlsMainViews::Config));
 
    const auto separator = new QFrame();
    separator->setObjectName("orangeSeparator");
@@ -193,9 +195,9 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    connect(mPullBtn, &QToolButton::clicked, this, &Controls::pullCurrentBranch);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, [this]() { emit requestReload(true); });
-   connect(mConfigBtn, &QToolButton::clicked, this, &Controls::showConfigDlg);
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
    connect(mVersionCheck, &QToolButton::clicked, mUpdater, &GitQlientUpdater::showInfoMessage);
+   connect(mConfigBtn, &QToolButton::clicked, this, &Controls::goConfig);
 
    enableButtons(false);
 }
