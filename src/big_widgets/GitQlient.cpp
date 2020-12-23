@@ -54,7 +54,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
    vLayout->addWidget(mRepos);
-   mRepos->addPinnedTab(mConfigWidget, QIcon(":/icons/config"), QString());
+   mRepos->addPinnedTab(mConfigWidget, QIcon(":/icons/home"), QString());
 
    mConfigWidget->onRepoOpened();
 
