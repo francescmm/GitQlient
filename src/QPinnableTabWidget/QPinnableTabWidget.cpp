@@ -29,13 +29,17 @@ protected:
 
    void mouseMoveEvent(QMouseEvent *event) override
    {
-      const auto currentPinned = dynamic_cast<QPinnableTabWidget *>(parentWidget())->isPinned(mIndexToMove);
-      const auto newPosIsPinned
-          = dynamic_cast<QPinnableTabWidget *>(parentWidget())->isPinned(indexAtPos(event->pos()));
-      const auto lastPinnedTab = dynamic_cast<QPinnableTabWidget *>(parentWidget())->getLastPinnedTabIndex();
+      const auto pinnableWidget = dynamic_cast<QPinnableTabWidget *>(parentWidget());
 
-      if (!currentPinned && !newPosIsPinned && (event->pos().x() - mDistToStart) > tabRect(lastPinnedTab).right())
-         QTabBar::mouseMoveEvent(event);
+      if (pinnableWidget)
+      {
+         const auto currentPinned = pinnableWidget->isPinned(mIndexToMove);
+         const auto newPosIsPinned = pinnableWidget->isPinned(indexAtPos(event->pos()));
+         const auto lastPinnedTab = pinnableWidget->getLastPinnedTabIndex();
+
+         if (!currentPinned && !newPosIsPinned && (event->pos().x() - mDistToStart) > tabRect(lastPinnedTab).right())
+            QTabBar::mouseMoveEvent(event);
+      }
    }
 
    void mouseReleaseEvent(QMouseEvent *event) override
@@ -187,7 +191,7 @@ void QPinnableTabWidget::showContextMenu()
    else
       connect(actions->addAction("Pin"), &QAction::triggered, this, &QPinnableTabWidget::pintTab);
 
-   connect(actions->addAction("Close"), &QAction::triggered, this, [this]() { tabCloseRequested(mClickedTab); });
+   connect(actions->addAction("Close"), &QAction::triggered, this, [this]() { emit tabCloseRequested(mClickedTab); });
 
    actions->exec(QCursor::pos());
 }
