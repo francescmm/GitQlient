@@ -221,9 +221,10 @@ private:
     * @param messageOptions Specifies what elements are displayed in one line of log message.
     * @return the newly created QLoggerWriter instance.
     */
-   QLoggerWriter *initializeWriter(const QString &fileDest, LogLevel level, const QString &fileFolderDestination,
-                                   LogMode mode, LogFileDisplay fileSuffixIfFull,
-                                   LogMessageDisplays messageOptions) const;
+   QLoggerWriter *createWriter(const QString &fileDest, LogLevel level, const QString &fileFolderDestination,
+                               LogMode mode, LogFileDisplay fileSuffixIfFull, LogMessageDisplays messageOptions) const;
+
+   void startWriter(const QString &module, QLoggerWriter *log, LogMode mode, bool notify);
 
    /**
     * @brief Checks the queue and writes the messages if the writer is the correct one. The queue is emptied

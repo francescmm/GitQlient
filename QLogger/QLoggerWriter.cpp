@@ -209,11 +209,18 @@ void QLoggerWriter::enqueue(const QDateTime &date, const QString &threadId, cons
 
    messages.append({ threadId, text });
 
-   mQueueNotEmpty.wakeOne();
+   if (!mIsStop)
+      mQueueNotEmpty.wakeAll();
 }
 
 void QLoggerWriter::run()
 {
+   if (!mQuit)
+   {
+      QMutexLocker locker(&mutex);
+      mQueueNotEmpty.wait(&mutex);
+   }
+
    while (!mQuit)
    {
       decltype(messages) copy;
