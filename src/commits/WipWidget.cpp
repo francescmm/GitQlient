@@ -99,6 +99,7 @@ void WipWidget::showUnstagedMenu(const QPoint &pos)
       connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &WipWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &WipWidget::revertAllChanges);
       connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &WipWidget::signalCheckoutPerformed);
+      connect(contextMenu, &UnstagedMenu::changeReverted, this, &CommitChangesWidget::changeReverted);
       connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &WipWidget::signalShowFileHistory);
       connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
       connect(contextMenu, &UnstagedMenu::signalConflictsResolved, this, [this, item] {

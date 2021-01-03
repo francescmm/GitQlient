@@ -34,6 +34,7 @@ class UnstagedMenu : public QMenu
 signals:
    void signalShowDiff(const QString &fileName);
    void signalCommitAll();
+   void changeReverted(const QString &revertedFile);
    void signalRevertAll();
    void signalCheckedOut();
    void signalShowFileHistory(const QString &fileName);

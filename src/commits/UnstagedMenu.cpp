@@ -52,7 +52,7 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
          const auto ret = git->checkoutFile(mFileName);
 
          if (ret)
-            emit signalCheckedOut();
+            emit changeReverted(mFileName);
       }
    });
 

@@ -114,6 +114,12 @@ public:
     */
    void hideBackButton() const;
 
+   /**
+    * @brief getCurrentFile Gets the current loaded file.
+    * @return The current file name.
+    */
+   QString getCurrentFile() const { return mCurrentFile; }
+
 private:
    QString mCurrentFile;
    bool mIsCached = false;
