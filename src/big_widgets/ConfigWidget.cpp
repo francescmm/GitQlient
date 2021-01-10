@@ -87,6 +87,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    GitQlientSettings settings;
 
    ui->chDevMode->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "DevMode", false).toBool());
+   enableWidgets();
 
    // GitQlient configuration
    ui->chDisableLogs->setChecked(settings.globalValue("logsDisabled", true).toBool());

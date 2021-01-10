@@ -2,6 +2,11 @@
 /*               QWidgets START              */
 /*********************************************/
 
+QGroupBox
+{
+    color: #D89000;
+}
+
 QToolButton
 {
     background-color: #404142;
