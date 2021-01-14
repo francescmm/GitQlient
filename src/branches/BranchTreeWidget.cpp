@@ -31,8 +31,11 @@ void BranchTreeWidget::reloadCurrentBranchLink() const
 {
    const auto items = findChildItem(mGit->getCurrentBranch());
 
-   items.at(0)->setData(0, GitQlient::ShaRole, mGit->getLastCommit().output.toString().trimmed());
-   items.at(0)->setData(0, GitQlient::IsCurrentBranchRole, true);
+   if (!items.isEmpty())
+   {
+      items.at(0)->setData(0, GitQlient::ShaRole, mGit->getLastCommit().output.toString().trimmed());
+      items.at(0)->setData(0, GitQlient::IsCurrentBranchRole, true);
+   }
 }
 
 int BranchTreeWidget::focusOnBranch(const QString &branch, int lastPos)
