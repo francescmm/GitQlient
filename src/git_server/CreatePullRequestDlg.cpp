@@ -19,8 +19,7 @@
 using namespace GitServer;
 
 CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache,
-                                           const QSharedPointer<GitServerCache> &gitServerCache,
-                                           const QString &workingDir, const QString &currentBranch, QWidget *parent)
+                                           const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::CreatePullRequestDlg)
    , mCache(cache)
@@ -32,6 +31,8 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
 
    connect(mGitServerCache->getApi(), &IRestApi::pullRequestUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
    connect(mGitServerCache.get(), &GitServerCache::errorOccurred, this, &CreatePullRequestDlg::onGitServerError);
+   connect(ui->pbCreate, &QPushButton::clicked, this, &CreatePullRequestDlg::accept);
+   connect(ui->pbClose, &QPushButton::clicked, this, &CreatePullRequestDlg::reject);
 
    onMilestones(mGitServerCache->getMilestones());
    onLabels(mGitServerCache->getLabels());
@@ -43,12 +44,16 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
       ui->cbOrigin->addItems(value.second);
       ui->cbDestination->addItems(value.second);
    }
+}
 
+bool CreatePullRequestDlg::configure(const QString &workingDir, const QString &currentBranch)
+{
    const auto index = ui->cbOrigin->findText(currentBranch, Qt::MatchEndsWith);
-   ui->cbOrigin->setCurrentIndex(index);
 
-   connect(ui->pbCreate, &QPushButton::clicked, this, &CreatePullRequestDlg::accept);
-   connect(ui->pbClose, &QPushButton::clicked, this, &CreatePullRequestDlg::reject);
+   if (index == -1)
+      return false;
+
+   ui->cbOrigin->setCurrentIndex(index);
 
    QFile f(workingDir + "/.github/PULL_REQUEST_TEMPLATE.md");
 
@@ -57,6 +62,8 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
       ui->teDescription->setText(QString::fromUtf8(f.readAll()));
       f.close();
    }
+
+   return true;
 }
 
 CreatePullRequestDlg::~CreatePullRequestDlg()

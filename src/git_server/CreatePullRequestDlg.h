@@ -63,8 +63,10 @@ public:
     * @param parent The parent widget.
     */
    explicit CreatePullRequestDlg(const QSharedPointer<GitCache> &cache,
-                                 const QSharedPointer<GitServerCache> &gitServerCache, const QString &workingDir,
-                                 const QString &currentBranch, QWidget *parent = nullptr);
+                                 const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+
+   bool configure(const QString &workingDir, const QString &currentBranch);
+
    /**
     * Destructor
     */

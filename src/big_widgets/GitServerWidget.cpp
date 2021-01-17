@@ -19,6 +19,7 @@
 #include <QScrollArea>
 #include <QStackedLayout>
 #include <QLabel>
+#include <QMessageBox>
 
 using namespace GitServer;
 
@@ -150,7 +151,16 @@ void GitServerWidget::createNewIssue()
 
 void GitServerWidget::createNewPullRequest()
 {
-   const auto prDlg
-       = new CreatePullRequestDlg(mCache, mGitServerCache, mGit->getWorkingDir(), mGit->getCurrentBranch(), this);
-   prDlg->exec();
+   const auto prDlg = new CreatePullRequestDlg(mCache, mGitServerCache, this);
+   const auto done = prDlg->configure(mGit->getWorkingDir(), mGit->getCurrentBranch());
+
+   if (done)
+      prDlg->exec();
+   else
+   {
+      QMessageBox::warning(this, tr("Configuration problems"),
+                           tr("There were some problems configuring the dialog. One common cause is that the current "
+                              "branch hasn't been pushed to remote."));
+      prDlg->close();
+   }
 }
