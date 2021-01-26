@@ -158,7 +158,9 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 
             if (!uiUpdateRequested)
             {
-               oldItem.at(0)->setData(0, GitQlient::IsCurrentBranchRole, false);
+               if (!oldItem.empty())
+                  oldItem.at(0)->setData(0, GitQlient::IsCurrentBranchRole, false);
+
                emit signalBranchCheckedOut();
             }
          }
