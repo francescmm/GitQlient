@@ -6,14 +6,20 @@
 #include <GitServerCache.h>
 #include <Issue.h>
 
+#include <previewpage.h>
+
 #include <QMessageBox>
 #include <QStandardItemModel>
 #include <QStandardItem>
+#include <QFile>
+#include <QWebChannel>
+#include <QDirIterator>
 
 using namespace GitServer;
 
-CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
-   : QDialog(parent)
+CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCache, const QString &workingDir,
+                               QWidget *parent)
+   : QFrame(parent)
    , ui(new Ui::CreateIssueDlg)
    , mGitServerCache(gitServerCache)
 {
@@ -28,12 +34,120 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCa
    onLabels(mGitServerCache->getLabels());
 
    connect(ui->pbAccept, &QPushButton::clicked, this, &CreateIssueDlg::accept);
-   connect(ui->pbClose, &QPushButton::clicked, this, &CreateIssueDlg::reject);
+
+   connect(ui->teDescription, &QTextEdit::textChanged,
+           [this]() { m_content.setText(ui->teDescription->toPlainText()); });
+
+   if (QFile f(workingDir + "/.github/ISSUE_TEMPLATE.md"); f.exists())
+   {
+      ui->cbIssueType->setVisible(false);
+
+      if (f.open(QIODevice::ReadOnly))
+      {
+         const auto fileContent = f.readAll();
+         f.close();
+
+         PreviewPage *page = new PreviewPage(this);
+         ui->preview->setPage(page);
+         ui->teDescription->setText(QString::fromUtf8(fileContent));
+
+         QWebChannel *channel = new QWebChannel(this);
+         channel->registerObject(QStringLiteral("content"), &m_content);
+         page->setWebChannel(channel);
+
+         ui->preview->setUrl(QUrl("qrc:/resources/index.html"));
+      }
+   }
+   else
+   {
+      connect(ui->cbIssueType, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
+              [this](int newIndex) {
+                 const auto fileName = ui->cbIssueType->itemData(newIndex).toString();
+
+                 if (QFile f(fileName); f.exists())
+                 {
+                    if (f.open(QIODevice::ReadOnly))
+                    {
+                       const auto fileContent = f.readAll();
+                       f.close();
+
+                       PreviewPage *page = new PreviewPage(this);
+                       ui->preview->setPage(page);
+                       ui->teDescription->setText(QString::fromUtf8(fileContent));
+
+                       QWebChannel *channel = new QWebChannel(this);
+                       channel->registerObject(QStringLiteral("content"), &m_content);
+                       page->setWebChannel(channel);
+
+                       ui->preview->setUrl(QUrl("qrc:/resources/index.html"));
+                    }
+                 }
+              });
+
+      QDirIterator iter(workingDir + "/.github/ISSUE_TEMPLATE/", QDir::Files);
+
+      while (iter.hasNext())
+      {
+         const auto fileInfo = iter.next();
+
+         QFile file(fileInfo);
+
+         if (file.open(QIODevice::ReadOnly))
+         {
+            QByteArray line;
+            do
+            {
+               line = file.readLine();
+
+               if (line.contains("name:"))
+               {
+                  line = line.remove(0, 6).trimmed();
+                  ui->cbIssueType->addItem(QString::fromUtf8(line), fileInfo);
+                  break;
+               }
+            } while (!line.isNull());
+
+            file.close();
+         }
+      }
+
+      if (ui->cbIssueType->count() > 0)
+         ui->cbIssueType->setCurrentIndex(0);
+      else
+         ui->cbIssueType->setVisible(false);
+   }
 }
 
 CreateIssueDlg::~CreateIssueDlg()
 {
    delete ui;
+}
+
+bool CreateIssueDlg::configure(const QString &workingDir)
+{
+   QFile f(workingDir + "/.github/ISSUE_TEMPLATE.md");
+
+   if (f.open(QIODevice::ReadOnly))
+   {
+      const auto fileContent = f.readAll();
+      f.close();
+
+      PreviewPage *page = new PreviewPage(this);
+      ui->preview->setPage(page);
+
+      connect(ui->teDescription, &QTextEdit::textChanged,
+              [this]() { m_content.setText(ui->teDescription->toPlainText()); });
+
+      ui->teDescription->setText(QString::fromUtf8(fileContent));
+
+      QWebChannel *channel = new QWebChannel(this);
+      channel->registerObject(QStringLiteral("content"), &m_content);
+      page->setWebChannel(channel);
+
+      ui->preview->setUrl(QUrl("qrc:/resources/index.html"));
+   }
+
+   return true;
 }
 
 void CreateIssueDlg::accept()
@@ -104,7 +218,7 @@ void CreateIssueDlg::onIssueCreated(const GitServer::Issue &issue)
    QMessageBox::information(this, tr("Issue created"),
                             tr("The issue has been created. You can <a href=\"%1\">find it here</a>.").arg(issue.url));
 
-   QDialog::accept();
+   emit issueCreated();
 }
 
 void CreateIssueDlg::onGitServerError(const QString &error)

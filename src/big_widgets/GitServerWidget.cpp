@@ -20,6 +20,7 @@
 #include <QStackedLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QStackedLayout>
 
 using namespace GitServer;
 
@@ -29,9 +30,7 @@ GitServerWidget::GitServerWidget(const QSharedPointer<GitCache> &cache, const QS
    , mCache(cache)
    , mGit(git)
    , mGitServerCache(gitServerCache)
-   , mDetailedView(new IssueDetailedView(mGit, mGitServerCache))
 {
-   connect(mDetailedView, &IssueDetailedView::openDiff, this, &GitServerWidget::openDiff);
 }
 
 GitServerWidget::~GitServerWidget()
@@ -71,15 +70,17 @@ void GitServerWidget::createWidget()
    const auto prLabel = QString::fromUtf8(
        mGitServerCache->getPlatform() == GitServer::Platform::GitHub ? "pull request" : "merge request");
 
+   const auto home = new QPushButton();
+   home->setIcon(QIcon(":/icons/home"));
+   home->setToolTip(tr("General view"));
+
    const auto newIssue = new QPushButton();
    newIssue->setIcon(QIcon(":/icons/new_issue"));
    newIssue->setToolTip(tr("Create a new issue"));
-   connect(newIssue, &QPushButton::clicked, this, &GitServerWidget::createNewIssue);
 
    const auto newPr = new QPushButton();
    newPr->setIcon(QIcon(":/icons/new_pr"));
    newPr->setToolTip(tr("Create a new %1").arg(prLabel));
-   connect(newPr, &QPushButton::clicked, this, &GitServerWidget::createNewPullRequest);
 
    const auto refresh = new QPushButton();
    refresh->setIcon(QIcon(":/icons/refresh"));
@@ -88,10 +89,14 @@ void GitServerWidget::createWidget()
    const auto buttonsLayout = new QHBoxLayout();
    buttonsLayout->setContentsMargins(QMargins());
    buttonsLayout->setSpacing(10);
+   buttonsLayout->addWidget(home);
    buttonsLayout->addWidget(newIssue);
    buttonsLayout->addWidget(newPr);
    buttonsLayout->addWidget(refresh);
    buttonsLayout->addStretch();
+
+   mDetailedView = new IssueDetailedView(mGit, mGitServerCache);
+   connect(mDetailedView, &IssueDetailedView::openDiff, this, &GitServerWidget::openDiff);
 
    const auto issues = new IssuesList(mGitServerCache);
    connect(issues, &AGitServerItemList::selected, mDetailedView,
@@ -118,17 +123,40 @@ void GitServerWidget::createWidget()
    detailsLayout->setAlignment(Qt::AlignTop);
    detailsLayout->addWidget(mDetailedView);
 
-   const auto centralLayout = new QGridLayout();
+   const auto generalViewLayout = new QGridLayout();
+   generalViewLayout->setContentsMargins(10, 10, 10, 10);
+   generalViewLayout->setSpacing(10);
+   generalViewLayout->setColumnStretch(0, 1);
+   generalViewLayout->setColumnStretch(1, 3);
+   generalViewLayout->addLayout(issuesLayout, 2, 0);
+   generalViewLayout->addLayout(detailsLayout, 2, 1);
+
+   mGeneralView = new QFrame();
+   mGeneralView->setLayout(generalViewLayout);
+
+   mCreateIssueView = new CreateIssueDlg(mGitServerCache, mGit->getWorkingDir(), this);
+   mCreatePrView = new CreatePullRequestDlg(mCache, mGitServerCache, this);
+
+   mStackedLayout = new QStackedLayout();
+   mStackedLayout->addWidget(mGeneralView);
+   mStackedLayout->addWidget(mCreateIssueView);
+   mStackedLayout->addWidget(mCreatePrView);
+
+   const auto centralLayout = new QVBoxLayout();
    centralLayout->setContentsMargins(10, 10, 10, 10);
    centralLayout->setSpacing(10);
-   centralLayout->addLayout(buttonsLayout, 0, 0, 1, 2);
-   centralLayout->setColumnStretch(0, 1);
-   centralLayout->setColumnStretch(1, 3);
-   centralLayout->addLayout(issuesLayout, 2, 0);
-   centralLayout->addLayout(detailsLayout, 2, 1);
+   centralLayout->addLayout(buttonsLayout);
+   centralLayout->addLayout(mStackedLayout);
 
    issues->loadData();
    pullRequests->loadData();
+
+   connect(home, &QPushButton::clicked, this, [this]() { mStackedLayout->setCurrentIndex(0); });
+   connect(newIssue, &QPushButton::clicked, [this]() { mStackedLayout->setCurrentIndex(1); });
+   connect(newPr, &QPushButton::clicked, [this]() {
+      mStackedLayout->setCurrentIndex(2);
+      mCreatePrView->configure(mGit->getWorkingDir(), mGit->getCurrentBranch());
+   });
 
    delete mOldIssue;
    mOldIssue = newIssue;
@@ -141,26 +169,4 @@ void GitServerWidget::createWidget()
 
    delete layout();
    setLayout(centralLayout);
-}
-
-void GitServerWidget::createNewIssue()
-{
-   const auto createIssue = new CreateIssueDlg(mGitServerCache, this);
-   createIssue->exec();
-}
-
-void GitServerWidget::createNewPullRequest()
-{
-   const auto prDlg = new CreatePullRequestDlg(mCache, mGitServerCache, this);
-   const auto done = prDlg->configure(mGit->getWorkingDir(), mGit->getCurrentBranch());
-
-   if (done)
-      prDlg->exec();
-   else
-   {
-      QMessageBox::warning(this, tr("Configuration problems"),
-                           tr("There were some problems configuring the dialog. One common cause is that the current "
-                              "branch hasn't been pushed to remote."));
-      prDlg->close();
-   }
 }

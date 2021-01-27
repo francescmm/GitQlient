@@ -31,6 +31,9 @@ class GitBase;
 class GitServerCache;
 class IssueDetailedView;
 class QPushButton;
+class QStackedLayout;
+class CreateIssueDlg;
+class CreatePullRequestDlg;
 
 namespace GitServer
 {
@@ -74,7 +77,11 @@ private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitServerCache> mGitServerCache;
+   QStackedLayout *mStackedLayout = nullptr;
    IssueDetailedView *mDetailedView = nullptr;
+   QFrame *mGeneralView = nullptr;
+   CreateIssueDlg *mCreateIssueView = nullptr;
+   CreatePullRequestDlg *mCreatePrView = nullptr;
    QPushButton *mOldIssue = nullptr;
    QPushButton *mOldPr = nullptr;
    QPushButton *mRefresh = nullptr;
@@ -84,14 +91,4 @@ private:
     * @brief createWidget Creates all the contents of the GitServerWidget.
     */
    void createWidget();
-
-   /**
-    * @brief createNewIssue Shows the dialog to create a new issue on the server.
-    */
-   void createNewIssue();
-
-   /**
-    * @brief createNewPullRequest Shows the dialog to create a new pull request on the server.
-    */
-   void createNewPullRequest();
 };

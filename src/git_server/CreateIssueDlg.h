@@ -23,7 +23,9 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QDialog>
+#include <QFrame>
+
+#include <document.h>
 
 namespace Ui
 {
@@ -42,9 +44,12 @@ struct Issue;
 /**
  * @brief The CreateIssueDlg class presents the UI where the user can create issues in the remote Git server.
  */
-class CreateIssueDlg : public QDialog
+class CreateIssueDlg : public QFrame
 {
    Q_OBJECT
+
+signals:
+   void issueCreated();
 
 public:
    /**
@@ -52,20 +57,25 @@ public:
     * @param git The git object to perform Git operations.
     * @param parent The parent widget.
     */
-   explicit CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+   explicit CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCache, const QString &workingDir,
+                           QWidget *parent = nullptr);
+
    /**
     * Destructor.
     */
    ~CreateIssueDlg();
 
+   bool configure(const QString &workingDir);
+
 private:
    Ui::CreateIssueDlg *ui;
    QSharedPointer<GitServerCache> mGitServerCache;
+   Document m_content;
 
    /**
     * @brief accept Process the user input data and does a request to create an issue.
     */
-   void accept() override;
+   void accept();
    /**
     * @brief onMilestones Process the reply from the server when the milestones request is done.
     * @param milestones The list of milestones to process.

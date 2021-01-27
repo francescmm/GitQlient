@@ -23,7 +23,9 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QDialog>
+#include <QFrame>
+
+#include <document.h>
 
 namespace Ui
 {
@@ -45,7 +47,7 @@ class IRestApi;
  * @brief The CreatePullRequestDlg class configures the UI so the user can create pull requests in the git remote
  * server.
  */
-class CreatePullRequestDlg : public QDialog
+class CreatePullRequestDlg : public QFrame
 {
    Q_OBJECT
 
@@ -76,11 +78,12 @@ private:
    Ui::CreatePullRequestDlg *ui;
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitServerCache> mGitServerCache;
+   Document m_content;
 
    /**
     * @brief accept Checks the data introduced by the user and connects to the server to create a pull request.
     */
-   void accept() override;
+   void accept();
    /**
     * @brief onMilestones Process the reply from the server when the milestones request is done.
     * @param milestones The list of milestones to process.

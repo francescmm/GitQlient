@@ -11,16 +11,19 @@
 #include <Milestone.h>
 #include <Label.h>
 
+#include <previewpage.h>
+
 #include <QStandardItemModel>
 #include <QMessageBox>
 #include <QTimer>
 #include <QFile>
+#include <QWebChannel>
 
 using namespace GitServer;
 
 CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache,
                                            const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
-   : QDialog(parent)
+   : QFrame(parent)
    , ui(new Ui::CreatePullRequestDlg)
    , mCache(cache)
    , mGitServerCache(gitServerCache)
@@ -32,7 +35,7 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
    connect(mGitServerCache->getApi(), &IRestApi::pullRequestUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
    connect(mGitServerCache.get(), &GitServerCache::errorOccurred, this, &CreatePullRequestDlg::onGitServerError);
    connect(ui->pbCreate, &QPushButton::clicked, this, &CreatePullRequestDlg::accept);
-   connect(ui->pbClose, &QPushButton::clicked, this, &CreatePullRequestDlg::reject);
+   // connect(ui->pbClose, &QPushButton::clicked, this, &CreatePullRequestDlg::reject);
 
    onMilestones(mGitServerCache->getMilestones());
    onLabels(mGitServerCache->getLabels());
@@ -51,7 +54,10 @@ bool CreatePullRequestDlg::configure(const QString &workingDir, const QString &c
    const auto index = ui->cbOrigin->findText(currentBranch, Qt::MatchEndsWith);
 
    if (index == -1)
-      return false;
+   {
+      QMessageBox::warning(this, tr("Current branch not found!"),
+                           tr("The current branch was not found on remote. Please make sure that ou push upstream."));
+   }
 
    ui->cbOrigin->setCurrentIndex(index);
 
@@ -59,8 +65,22 @@ bool CreatePullRequestDlg::configure(const QString &workingDir, const QString &c
 
    if (f.open(QIODevice::ReadOnly))
    {
-      ui->teDescription->setText(QString::fromUtf8(f.readAll()));
+      const auto fileContent = f.readAll();
       f.close();
+
+      PreviewPage *page = new PreviewPage(this);
+      ui->preview->setPage(page);
+
+      connect(ui->teDescription, &QTextEdit::textChanged,
+              [this]() { m_content.setText(ui->teDescription->toPlainText()); });
+
+      ui->teDescription->setText(QString::fromUtf8(fileContent));
+
+      QWebChannel *channel = new QWebChannel(this);
+      channel->registerObject(QStringLiteral("content"), &m_content);
+      page->setWebChannel(channel);
+
+      ui->preview->setUrl(QUrl("qrc:/resources/index.html"));
    }
 
    return true;
@@ -161,8 +181,6 @@ void CreatePullRequestDlg::onPullRequestUpdated(const PullRequest &pr)
           tr("The Pull Request has been created. You can <a href=\"%1\">find it here</a>.").arg(pr.url));
 
       emit signalRefreshPRsCache();
-
-      QDialog::accept();
    });
 }
 

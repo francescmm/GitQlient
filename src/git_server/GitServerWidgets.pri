@@ -25,7 +25,9 @@ HEADERS += \
    $$PWD/PrCommitsList.h \
    $$PWD/PrList.h \
    $$PWD/ServerConfigDlg.h \ \
-   $$PWD/SourceCodeReview.h
+   $$PWD/SourceCodeReview.h \
+   $$PWD/document.h \
+   $$PWD/previewpage.h
 
 SOURCES += \
    $$PWD/AddCodeReviewDialog.cpp \
@@ -44,4 +46,6 @@ SOURCES += \
    $$PWD/PrCommitsList.cpp \
    $$PWD/PrList.cpp \
    $$PWD/ServerConfigDlg.cpp \
-   $$PWD/SourceCodeReview.cpp
+   $$PWD/SourceCodeReview.cpp \
+   $$PWD/document.cpp \
+   $$PWD/previewpage.cpp
