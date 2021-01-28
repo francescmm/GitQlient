@@ -97,4 +97,10 @@ private:
     * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
     */
    void onGitServerError(const QString &error);
+
+   void fillIssueTypeComboBox(const QString &workingDir);
+
+   void onIssueTemplateChange(int newIndex);
+
+   void updateMarkdown(const QByteArray &fileContent);
 };

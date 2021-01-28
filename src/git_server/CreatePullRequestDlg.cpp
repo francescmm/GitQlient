@@ -32,9 +32,10 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
 
    ui->setupUi(this);
 
-   connect(mGitServerCache->getApi(), &IRestApi::pullRequestUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
    connect(mGitServerCache.get(), &GitServerCache::errorOccurred, this, &CreatePullRequestDlg::onGitServerError);
    connect(ui->pbCreate, &QPushButton::clicked, this, &CreatePullRequestDlg::accept);
+   connect(ui->teDescription, &QTextEdit::textChanged,
+           [this]() { m_content.setText(ui->teDescription->toPlainText()); });
    // connect(ui->pbClose, &QPushButton::clicked, this, &CreatePullRequestDlg::reject);
 
    onMilestones(mGitServerCache->getMilestones());
@@ -70,10 +71,6 @@ bool CreatePullRequestDlg::configure(const QString &workingDir, const QString &c
 
       PreviewPage *page = new PreviewPage(this);
       ui->preview->setPage(page);
-
-      connect(ui->teDescription, &QTextEdit::textChanged,
-              [this]() { m_content.setText(ui->teDescription->toPlainText()); });
-
       ui->teDescription->setText(QString::fromUtf8(fileContent));
 
       QWebChannel *channel = new QWebChannel(this);
@@ -146,6 +143,8 @@ void CreatePullRequestDlg::accept()
 
    ui->pbCreate->setEnabled(false);
 
+   connect(mGitServerCache->getApi(), &IRestApi::pullRequestUpdated, this, &CreatePullRequestDlg::onPullRequestUpdated);
+
    mGitServerCache->getApi()->createPullRequest(pr);
 }
 
@@ -175,6 +174,9 @@ void CreatePullRequestDlg::onLabels(const QVector<Label> &labels)
 
 void CreatePullRequestDlg::onPullRequestUpdated(const PullRequest &pr)
 {
+   disconnect(mGitServerCache->getApi(), &IRestApi::pullRequestUpdated, this,
+              &CreatePullRequestDlg::onPullRequestUpdated);
+
    QTimer::singleShot(200, this, [this, pr]() {
       QMessageBox::information(
           this, tr("Pull Request created"),

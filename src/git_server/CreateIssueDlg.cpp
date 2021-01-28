@@ -41,80 +41,30 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCa
    if (QFile f(workingDir + "/.github/ISSUE_TEMPLATE.md"); f.exists())
    {
       ui->cbIssueType->setVisible(false);
+      ui->lIssueType->setVisible(false);
 
       if (f.open(QIODevice::ReadOnly))
       {
          const auto fileContent = f.readAll();
          f.close();
 
-         PreviewPage *page = new PreviewPage(this);
-         ui->preview->setPage(page);
-         ui->teDescription->setText(QString::fromUtf8(fileContent));
-
-         QWebChannel *channel = new QWebChannel(this);
-         channel->registerObject(QStringLiteral("content"), &m_content);
-         page->setWebChannel(channel);
-
-         ui->preview->setUrl(QUrl("qrc:/resources/index.html"));
+         updateMarkdown(fileContent);
       }
    }
    else
    {
       connect(ui->cbIssueType, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
-              [this](int newIndex) {
-                 const auto fileName = ui->cbIssueType->itemData(newIndex).toString();
+              &CreateIssueDlg::onIssueTemplateChange);
 
-                 if (QFile f(fileName); f.exists())
-                 {
-                    if (f.open(QIODevice::ReadOnly))
-                    {
-                       const auto fileContent = f.readAll();
-                       f.close();
-
-                       PreviewPage *page = new PreviewPage(this);
-                       ui->preview->setPage(page);
-                       ui->teDescription->setText(QString::fromUtf8(fileContent));
-
-                       QWebChannel *channel = new QWebChannel(this);
-                       channel->registerObject(QStringLiteral("content"), &m_content);
-                       page->setWebChannel(channel);
-
-                       ui->preview->setUrl(QUrl("qrc:/resources/index.html"));
-                    }
-                 }
-              });
-
-      QDirIterator iter(workingDir + "/.github/ISSUE_TEMPLATE/", QDir::Files);
-
-      while (iter.hasNext())
-      {
-         const auto fileInfo = iter.next();
-
-         QFile file(fileInfo);
-
-         if (file.open(QIODevice::ReadOnly))
-         {
-            QByteArray line;
-            do
-            {
-               line = file.readLine();
-
-               if (line.contains("name:"))
-               {
-                  line = line.remove(0, 6).trimmed();
-                  ui->cbIssueType->addItem(QString::fromUtf8(line), fileInfo);
-                  break;
-               }
-            } while (!line.isNull());
-
-            file.close();
-         }
-      }
+      fillIssueTypeComboBox(workingDir);
 
       if (ui->cbIssueType->count() > 0)
          ui->cbIssueType->setCurrentIndex(0);
       else
+      {
          ui->cbIssueType->setVisible(false);
+         ui->lIssueType->setVisible(false);
+      }
    }
 }
 
@@ -226,4 +176,63 @@ void CreateIssueDlg::onGitServerError(const QString &error)
    ui->pbAccept->setEnabled(true);
 
    QMessageBox::warning(this, tr("API access error!"), error);
+}
+
+void CreateIssueDlg::fillIssueTypeComboBox(const QString &workingDir)
+{
+   QDirIterator iter(workingDir + "/.github/ISSUE_TEMPLATE/", QDir::Files);
+
+   while (iter.hasNext())
+   {
+      const auto fileInfo = iter.next();
+
+      QFile file(fileInfo);
+
+      if (file.open(QIODevice::ReadOnly))
+      {
+         QByteArray line;
+         do
+         {
+            line = file.readLine();
+
+            if (line.contains("name:"))
+            {
+               line = line.remove(0, 6).trimmed();
+               ui->cbIssueType->addItem(QString::fromUtf8(line), fileInfo);
+               break;
+            }
+         } while (!line.isNull());
+
+         file.close();
+      }
+   }
+}
+
+void CreateIssueDlg::onIssueTemplateChange(int newIndex)
+{
+   const auto fileName = ui->cbIssueType->itemData(newIndex).toString();
+
+   if (QFile f(fileName); f.exists())
+   {
+      if (f.open(QIODevice::ReadOnly))
+      {
+         const auto fileContent = f.readAll();
+         f.close();
+
+         updateMarkdown(fileContent);
+      }
+   }
+}
+
+void CreateIssueDlg::updateMarkdown(const QByteArray &fileContent)
+{
+   PreviewPage *page = new PreviewPage(this);
+   ui->preview->setPage(page);
+   ui->teDescription->setText(QString::fromUtf8(fileContent));
+
+   QWebChannel *channel = new QWebChannel(this);
+   channel->registerObject(QStringLiteral("content"), &m_content);
+   page->setWebChannel(channel);
+
+   ui->preview->setUrl(QUrl("qrc:/resources/index.html"));
 }

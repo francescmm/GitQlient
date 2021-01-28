@@ -25,6 +25,12 @@
 #include <QIcon>
 #include <QScrollBar>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+#   include <previewpage.h>
+#   include <QWebChannel>
+#   include <QWebEngineView>
+#endif
+
 using namespace GitServer;
 
 PrCommentsList::PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
@@ -204,12 +210,21 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    bodyDescLayout->setContentsMargins(10, 10, 10, 10);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-   const auto body = new QTextEdit();
-   body->setMarkdown(QString::fromUtf8(issue.body));
-   body->setReadOnly(true);
-   body->show();
-   const auto height = body->document()->size().height();
-   body->setFixedHeight(height);
+   const auto body = new QWebEngineView();
+
+   PreviewPage *page = new PreviewPage(this);
+   body->setPage(page);
+
+   QWebChannel *channel = new QWebChannel(this);
+   channel->registerObject(QStringLiteral("content"), &m_content);
+   page->setWebChannel(channel);
+
+   body->setUrl(QUrl("qrc:/resources/index.html"));
+
+   connect(page, &PreviewPage::contentsSizeChanged, this,
+           [body](const QSizeF size) { body->setFixedHeight(size.height()); });
+
+   m_content.setText(QString::fromUtf8(issue.body));
 #else
    const auto body = new QLabel(QString::fromUtf8((issue.body)));
    body->setWordWrap(true);
@@ -371,12 +386,23 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
    creationLayout->addWidget(new QLabel(comment.association));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-   const auto body = new QTextEdit();
-   body->setMarkdown(comment.body.trimmed());
-   body->setReadOnly(true);
-   body->show();
-   const auto height = body->document()->size().height();
-   body->setMaximumHeight(height);
+   const auto doc = new Document(this);
+   m_commentContents.append(doc);
+
+   const auto body = new QWebEngineView();
+
+   PreviewPage *page = new PreviewPage(this);
+   body->setPage(page);
+
+   QWebChannel *channel = new QWebChannel(this);
+   channel->registerObject(QStringLiteral("content"), doc);
+   page->setWebChannel(channel);
+
+   body->setUrl(QUrl("qrc:/resources/index.html"));
+   doc->setText(comment.body.trimmed());
+
+   connect(page, &PreviewPage::contentsSizeChanged, this,
+           [body](const QSizeF size) { body->setFixedHeight(size.height()); });
 #else
    const auto body = new QLabel(comment.body.trimmed());
    body->setWordWrap(true);

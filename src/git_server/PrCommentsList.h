@@ -26,6 +26,10 @@
 #include <Issue.h>
 #include <GitServerCache.h>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+#   include <document.h>
+#endif
+
 #include <QFrame>
 
 namespace GitServer
@@ -92,6 +96,10 @@ private:
    QMap<int, QFrame *> mComments {};
    QMap<int, int> mFrameLinks {};
    inline static int mCommentId = 0;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+   Document m_content;
+   QVector<Document *> m_commentContents;
+#endif
 
    void processComments(const GitServer::Issue &issue);
    QLabel *createHeadline(const QDateTime &dt, const QString &prefix = QString());
