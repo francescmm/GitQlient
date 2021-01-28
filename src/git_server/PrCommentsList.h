@@ -31,6 +31,7 @@
 #endif
 
 #include <QFrame>
+#include <QMutex>
 
 namespace GitServer
 {
@@ -82,6 +83,7 @@ public:
    void addGlobalComment();
 
 private:
+   QMutex mMutex;
    QSharedPointer<GitServerCache> mGitServerCache = nullptr;
    QNetworkAccessManager *mManager = nullptr;
    QFrame *mCommentsFrame = nullptr;

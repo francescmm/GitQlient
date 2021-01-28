@@ -35,6 +35,7 @@ using namespace GitServer;
 
 PrCommentsList::PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
+   , mMutex(QMutex::Recursive)
    , mGitServerCache(gitServerCache)
    , mManager(new QNetworkAccessManager())
 {
@@ -48,6 +49,8 @@ PrCommentsList::~PrCommentsList()
 
 void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
 {
+   QMutexLocker lock(&mMutex);
+
    connect(mGitServerCache.get(), &GitServerCache::issueUpdated, this, &PrCommentsList::processComments,
            Qt::UniqueConnection);
    connect(mGitServerCache.get(), &GitServerCache::prReviewsReceived, this, &PrCommentsList::onReviewsReceived,
@@ -279,6 +282,8 @@ void PrCommentsList::addGlobalComment()
 
 void PrCommentsList::processComments(const Issue &issue)
 {
+   QMutexLocker lock(&mMutex);
+
    disconnect(mGitServerCache.get(), &GitServerCache::issueUpdated, this, &PrCommentsList::processComments);
 
    if (mIssueNumber != issue.number)
@@ -317,6 +322,8 @@ QLabel *PrCommentsList::createHeadline(const QDateTime &dt, const QString &prefi
 
 void PrCommentsList::onReviewsReceived()
 {
+   QMutexLocker lock(&mMutex);
+
    auto pr = mGitServerCache->getPullRequest(mIssueNumber);
 
    mFrameLinks.clear();
@@ -389,20 +396,22 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
    const auto doc = new Document(this);
    m_commentContents.append(doc);
 
-   const auto body = new QWebEngineView();
-
-   PreviewPage *page = new PreviewPage(this);
-   body->setPage(page);
-
-   QWebChannel *channel = new QWebChannel(this);
+   const auto channel = new QWebChannel(this);
    channel->registerObject(QStringLiteral("content"), doc);
+
+   const auto page = new PreviewPage(this);
    page->setWebChannel(channel);
 
-   body->setUrl(QUrl("qrc:/resources/index.html"));
-   doc->setText(comment.body.trimmed());
+   const auto body = new QWebEngineView();
 
    connect(page, &PreviewPage::contentsSizeChanged, this,
            [body](const QSizeF size) { body->setFixedHeight(size.height()); });
+
+   body->setPage(page);
+   body->setUrl(QUrl("qrc:/resources/index.html"));
+   body->setMinimumHeight(20);
+
+   doc->setText(comment.body.trimmed());
 #else
    const auto body = new QLabel(comment.body.trimmed());
    body->setWordWrap(true);

@@ -8,6 +8,12 @@
 #include <QLabel>
 #include <QLocale>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+#   include <QWebEngineView>
+#   include <QWebChannel>
+#   include <previewpage.h>
+#endif
+
 CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidget *parent)
    : QFrame(parent)
 {
@@ -25,12 +31,21 @@ CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidge
    avatarLayout->addStretch();
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-   const auto body = new QTextEdit();
-   body->setMarkdown(review.body);
-   body->setReadOnly(true);
-   body->show();
-   const auto height = body->document()->size().height();
-   body->setMaximumHeight(height);
+   const auto body = new QWebEngineView();
+
+   PreviewPage *page = new PreviewPage(this);
+   body->setPage(page);
+
+   QWebChannel *channel = new QWebChannel(this);
+   channel->registerObject(QStringLiteral("content"), &m_content);
+   page->setWebChannel(channel);
+
+   body->setUrl(QUrl("qrc:/resources/index.html"));
+
+   connect(page, &PreviewPage::contentsSizeChanged, this,
+           [body](const QSizeF size) { body->setFixedHeight(size.height()); });
+
+   m_content.setText(review.body);
 #else
    const auto body = new QLabel(review.body);
    body->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);

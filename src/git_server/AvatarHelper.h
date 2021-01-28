@@ -32,6 +32,7 @@
 #include <QNetworkRequest>
 #include <QFile>
 #include <QDir>
+#include <QPointer>
 
 inline void storeCreatorAvatar(QNetworkAccessManager *manager, QNetworkReply *reply, QLabel *avatar,
                                const QString &fileName)
@@ -63,11 +64,12 @@ inline void storeCreatorAvatar(QNetworkAccessManager *manager, QNetworkReply *re
    manager->deleteLater();
 }
 
-inline QLabel *createAvatar(const QString &userName, const QString &avatarUrl, const QSize &avatarSize = QSize(50, 50))
+inline QPointer<CircularPixmap> createAvatar(const QString &userName, const QString &avatarUrl,
+                                             const QSize &avatarSize = QSize(50, 50))
 {
    const auto fileName
        = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation), userName);
-   const auto avatar = new CircularPixmap(avatarSize);
+   QPointer<CircularPixmap> avatar = new CircularPixmap(avatarSize);
    avatar->setObjectName("Avatar");
 
    if (!QFile(fileName).exists())
@@ -77,8 +79,10 @@ inline QLabel *createAvatar(const QString &userName, const QString &avatarUrl, c
       request.setUrl(avatarUrl);
       request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, true);
       const auto reply = manager->get(request);
-      QObject::connect(reply, &QNetworkReply::finished,
-                       [manager, reply, avatar, userName]() { storeCreatorAvatar(manager, reply, avatar, userName); });
+      QObject::connect(reply, &QNetworkReply::finished, [manager, reply, avatar, userName]() {
+         if (avatar)
+            storeCreatorAvatar(manager, reply, avatar, userName);
+      });
    }
    else
    {
