@@ -116,6 +116,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    mInputFrame->setVisible(false);
 
    const auto descriptionFrame = new QFrame();
+   descriptionFrame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
    const auto bodyLayout = new QVBoxLayout();
    bodyLayout->setContentsMargins(20, 20, 20, 20);
@@ -219,7 +220,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
    const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
 
-   const auto body = new QWebEngineView();
+   QPointer<QWebEngineView> body = new QWebEngineView();
 
    PreviewPage *page = new PreviewPage(this);
    body->setPage(page);
@@ -229,9 +230,12 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    page->setWebChannel(channel);
 
    body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
+   body->setFixedHeight(20);
 
-   connect(page, &PreviewPage::contentsSizeChanged, this,
-           [body](const QSizeF size) { body->setFixedHeight(size.height()); });
+   connect(page, &PreviewPage::contentsSizeChanged, this, [body](const QSizeF size) {
+      if (body)
+         body->setFixedHeight(size.height());
+   });
 
    m_content.setText(QString::fromUtf8(issue.body));
 #else
@@ -412,14 +416,16 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
    const auto page = new PreviewPage(this);
    page->setWebChannel(channel);
 
-   const auto body = new QWebEngineView();
+   QPointer<QWebEngineView> body = new QWebEngineView();
 
-   connect(page, &PreviewPage::contentsSizeChanged, this,
-           [body](const QSizeF size) { body->setFixedHeight(size.height()); });
+   connect(page, &PreviewPage::contentsSizeChanged, this, [body](const QSizeF size) {
+      if (body)
+         body->setFixedHeight(size.height());
+   });
 
    body->setPage(page);
    body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
-   body->setMinimumHeight(20);
+   body->setFixedHeight(20);
 
    doc->setText(comment.body.trimmed());
 #else

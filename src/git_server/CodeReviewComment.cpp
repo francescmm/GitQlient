@@ -37,8 +37,7 @@ CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidge
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
    const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
 
-   const auto body = new QWebEngineView();
-
+   QPointer<QWebEngineView> body = new QWebEngineView();
    PreviewPage *page = new PreviewPage(this);
    body->setPage(page);
 
@@ -47,9 +46,12 @@ CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidge
    page->setWebChannel(channel);
 
    body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
+   body->setFixedHeight(20);
 
-   connect(page, &PreviewPage::contentsSizeChanged, this,
-           [body](const QSizeF size) { body->setFixedHeight(size.height()); });
+   connect(page, &PreviewPage::contentsSizeChanged, this, [body](const QSizeF size) {
+      if (body)
+         body->setFixedHeight(size.height());
+   });
 
    m_content.setText(review.body);
 #else

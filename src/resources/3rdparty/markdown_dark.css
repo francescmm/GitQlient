@@ -70,7 +70,7 @@ aside {
     width: 390px;
 }
 blockquote {
-    border-left:.5em solid #eee;
+    border-left:.5em solid #2E2F30;
     padding: 0 2em;
     margin-left:0;
     max-width: 476px;
@@ -78,15 +78,14 @@ blockquote {
 blockquote  cite {
     font-size:11pt;
     line-height:20px;
-    color:#bfbfbf;
+    font-style: italic;
 }
 blockquote cite:before {
     content: '\2014 \00A0';
 }
 
 blockquote p {
-    color: #666;
-    max-width: 460px;
+    color: #EEEEEE;
 }
 hr {
     width: 540px;
