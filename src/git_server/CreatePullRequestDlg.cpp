@@ -69,6 +69,10 @@ bool CreatePullRequestDlg::configure(const QString &workingDir, const QString &c
       const auto fileContent = f.readAll();
       f.close();
 
+      GitQlientSettings settings;
+      const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+      const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
+
       PreviewPage *page = new PreviewPage(this);
       ui->preview->setPage(page);
       ui->teDescription->setText(QString::fromUtf8(fileContent));
@@ -77,7 +81,7 @@ bool CreatePullRequestDlg::configure(const QString &workingDir, const QString &c
       channel->registerObject(QStringLiteral("content"), &m_content);
       page->setWebChannel(channel);
 
-      ui->preview->setUrl(QUrl("qrc:/resources/index.html"));
+      ui->preview->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
    }
 
    return true;

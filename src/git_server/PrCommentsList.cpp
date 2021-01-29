@@ -27,6 +27,8 @@
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
 #   include <previewpage.h>
+#   include <GitQlientSettings.h>
+
 #   include <QWebChannel>
 #   include <QWebEngineView>
 #endif
@@ -213,6 +215,10 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    bodyDescLayout->setContentsMargins(10, 10, 10, 10);
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+   GitQlientSettings settings;
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+   const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
+
    const auto body = new QWebEngineView();
 
    PreviewPage *page = new PreviewPage(this);
@@ -222,7 +228,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    channel->registerObject(QStringLiteral("content"), &m_content);
    page->setWebChannel(channel);
 
-   body->setUrl(QUrl("qrc:/resources/index.html"));
+   body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
 
    connect(page, &PreviewPage::contentsSizeChanged, this,
            [body](const QSizeF size) { body->setFixedHeight(size.height()); });
@@ -393,6 +399,10 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
    creationLayout->addWidget(new QLabel(comment.association));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+   GitQlientSettings settings;
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+   const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
+
    const auto doc = new Document(this);
    m_commentContents.append(doc);
 
@@ -408,7 +418,7 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
            [body](const QSizeF size) { body->setFixedHeight(size.height()); });
 
    body->setPage(page);
-   body->setUrl(QUrl("qrc:/resources/index.html"));
+   body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
    body->setMinimumHeight(20);
 
    doc->setText(comment.body.trimmed());

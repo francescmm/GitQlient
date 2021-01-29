@@ -115,10 +115,12 @@
         <file>resources.rc</file>
         <file alias="DejaVuSans">resources/DejaVuSans.ttf</file>
         <file alias="DejaVuSansMono">resources/DejaVuSansMono.ttf</file>
-        <file>resources/index.html</file>
-        <file>resources/3rdparty/markdown.css</file>
         <file>resources/3rdparty/marked.js</file>
         <file>resources/3rdparty/qt_attribution.json</file>
+        <file>resources/3rdparty/markdown_bright.css</file>
+        <file>resources/3rdparty/markdown_dark.css</file>
+        <file>resources/index_bright.html</file>
+        <file>resources/index_dark.html</file>
     </qresource>
     <qresource prefix="/translations">
         <file alias="gitqlient_en.qm">resources/translations/gitqlient_en.qm</file>

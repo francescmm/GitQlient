@@ -11,7 +11,9 @@
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
 #   include <QWebEngineView>
 #   include <QWebChannel>
+
 #   include <previewpage.h>
+#   include <GitQlientSettings.h>
 #endif
 
 CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidget *parent)
@@ -31,6 +33,10 @@ CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidge
    avatarLayout->addStretch();
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+   GitQlientSettings settings;
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+   const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
+
    const auto body = new QWebEngineView();
 
    PreviewPage *page = new PreviewPage(this);
@@ -40,7 +46,7 @@ CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidge
    channel->registerObject(QStringLiteral("content"), &m_content);
    page->setWebChannel(channel);
 
-   body->setUrl(QUrl("qrc:/resources/index.html"));
+   body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
 
    connect(page, &PreviewPage::contentsSizeChanged, this,
            [body](const QSizeF size) { body->setFixedHeight(size.height()); });

@@ -82,6 +82,10 @@ bool CreateIssueDlg::configure(const QString &workingDir)
       const auto fileContent = f.readAll();
       f.close();
 
+      GitQlientSettings settings;
+      const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+      const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
+
       PreviewPage *page = new PreviewPage(this);
       ui->preview->setPage(page);
 
@@ -94,7 +98,7 @@ bool CreateIssueDlg::configure(const QString &workingDir)
       channel->registerObject(QStringLiteral("content"), &m_content);
       page->setWebChannel(channel);
 
-      ui->preview->setUrl(QUrl("qrc:/resources/index.html"));
+      ui->preview->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
    }
 
    return true;
@@ -226,6 +230,10 @@ void CreateIssueDlg::onIssueTemplateChange(int newIndex)
 
 void CreateIssueDlg::updateMarkdown(const QByteArray &fileContent)
 {
+   GitQlientSettings settings;
+   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+   const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
+
    PreviewPage *page = new PreviewPage(this);
    ui->preview->setPage(page);
    ui->teDescription->setText(QString::fromUtf8(fileContent));
@@ -234,5 +242,5 @@ void CreateIssueDlg::updateMarkdown(const QByteArray &fileContent)
    channel->registerObject(QStringLiteral("content"), &m_content);
    page->setWebChannel(channel);
 
-   ui->preview->setUrl(QUrl("qrc:/resources/index.html"));
+   ui->preview->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
 }

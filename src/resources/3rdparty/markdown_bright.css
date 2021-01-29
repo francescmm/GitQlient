@@ -1,13 +1,13 @@
 body{
+    background: #C6C6C7;
     margin: 0 auto;
-    font-family: Georgia, Palatino, serif;
-    color: #444444;
+    font-family: "DejaVu Sans";
+    color: #000000;
     line-height: 1;
     max-width: 960px;
-    padding: 30px;
+    margin-left: 10px;
 }
 h1, h2, h3, h4 {
-    color: #111111;
     font-weight: 400;
 }
 h1, h2, h3, h4, h5, p {
@@ -15,35 +15,32 @@ h1, h2, h3, h4, h5, p {
     padding: 0;
 }
 h1 {
-    font-size: 48px;
+    font-size: 24pt;
 }
 h2 {
-    font-size: 36px;
+    font-size: 20pt;
     /* The bottom margin is small. It's designed to be used with gray meta text
      * below a post title. */
-    margin: 24px 0 6px;
 }
 h3 {
-    font-size: 24px;
+    font-size: 18pt;
 }
 h4 {
-    font-size: 21px;
+    font-size: 16pt;
 }
 h5 {
-    font-size: 18px;
+    font-size: 14pt;
+    font-weight: bold;
 }
 a {
-    color: #0099ff;
+    color: #D89000;
     margin: 0;
     padding: 0;
     vertical-align: baseline;
 }
 a:hover {
     text-decoration: none;
-    color: #ff6600;
-}
-a:visited {
-    color: purple;
+    color: #0099ff;
 }
 ul, ol {
     padding: 0;
@@ -52,13 +49,10 @@ ul, ol {
 li {
     line-height: 24px;
 }
-li ul, li ul {
-    margin-left: 24px;
-}
 p, ul, ol {
-    font-size: 16px;
+    font-size: 11pt;
     line-height: 24px;
-    max-width: 540px;
+    max-width: 960px;
 }
 pre {
     padding: 0px 24px;
@@ -66,9 +60,9 @@ pre {
     white-space: pre-wrap;
 }
 code {
-    font-family: Consolas, Monaco, Andale Mono, monospace;
+    font-family: "DejaVu Sans Mono";
     line-height: 1.5;
-    font-size: 13px;
+    font-size: 11pt;
 }
 aside {
     display: block;
@@ -82,7 +76,7 @@ blockquote {
     max-width: 476px;
 }
 blockquote  cite {
-    font-size:14px;
+    font-size:11pt;
     line-height:20px;
     color:#bfbfbf;
 }
@@ -150,8 +144,8 @@ label,
 input,
 select,
 textarea {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-family: "DejaVu Sans";
+  font-size: 11pt;
   font-weight: normal;
   line-height: normal;
   margin-bottom: 18px;
@@ -167,7 +161,7 @@ select {
   display: inline-block;
   width: 210px;
   padding: 4px;
-  font-size: 13px;
+  font-size: 11pt;
   font-weight: normal;
   line-height: 18px;
   height: 18px;
@@ -216,8 +210,8 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus {
 button {
   display: inline-block;
   padding: 4px 14px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 13px;
+  font-family: "DejaVu Sans";
+  font-size: 11pt;
   line-height: 18px;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;

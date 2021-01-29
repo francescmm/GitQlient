@@ -38,14 +38,15 @@ inline void storeCreatorAvatar(QNetworkAccessManager *manager, QNetworkReply *re
                                const QString &fileName)
 {
    const auto data = reply->readAll();
+   const auto cache = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+   QDir dir(cache);
 
-   QDir dir(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
    if (!dir.exists())
-      dir.mkpath(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+      dir.mkpath(cache);
 
-   QString path = dir.absolutePath() + "/" + fileName;
-   QFile file(path);
-   if (file.open(QIODevice::WriteOnly))
+   const auto path = QString("%1/%2").arg(dir.absolutePath(), fileName);
+
+   if (QFile file(path); file.open(QIODevice::WriteOnly))
    {
       file.write(data);
       file.close();

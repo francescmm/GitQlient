@@ -192,7 +192,7 @@ QComboBox QAbstractItemView
    outline: none;
    background: #404142;
    border-color: #D89000;
-   selection-background: #606162;
+   selection-background-color: #606162;
 }
 
 QComboBox::drop-down:hover
