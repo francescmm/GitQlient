@@ -36,5 +36,7 @@ void PrList::onPullRequestsReceived(const QVector<PullRequest> &pr)
       items.append(issueItem);
    }
 
+   mHeaderTitle->setText(tr("Pull Requests (%1)").arg(items.count()));
+
    createContent(items);
 }

@@ -36,5 +36,7 @@ void IssuesList::onIssuesReceived(const QVector<Issue> &issues)
       items.append(issueItem);
    }
 
+   mHeaderTitle->setText(tr("Issues (%1)").arg(items.count()));
+
    createContent(items);
 }

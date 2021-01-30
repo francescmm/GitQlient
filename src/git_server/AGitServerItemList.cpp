@@ -65,21 +65,13 @@ void AGitServerItemList::createContent(QVector<IssueItem *> items)
    issuesLayout->setContentsMargins(QMargins());
    issuesLayout->setSpacing(0);
 
-   const auto last = items.count() - 1;
-   auto count = 0;
-
    for (auto item : items)
    {
       issuesLayout->addWidget(item);
 
-      if (count < last)
-      {
-         const auto separator = new QFrame();
-         separator->setObjectName("separator");
-         issuesLayout->addWidget(separator);
-      }
-
-      ++count;
+      const auto separator = new QFrame();
+      separator->setObjectName("separator");
+      issuesLayout->addWidget(separator);
    }
 
    issuesLayout->addStretch();

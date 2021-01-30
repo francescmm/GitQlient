@@ -16,6 +16,8 @@ IssueItem::IssueItem(const Issue &issueData, QWidget *parent)
    : QFrame(parent)
    , mComments(new QLabel())
 {
+   setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
+
    fillWidget(issueData);
 
    mComments->setText(QString::number(issueData.commentsCount));

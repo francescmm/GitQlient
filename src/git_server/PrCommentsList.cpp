@@ -195,6 +195,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
                                      .arg(label.colorHex));
       labelWidget->setToolTip(label.name);
       creationLayout->addWidget(labelWidget);
+      creationLayout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
    }
 
    if (!issue.milestone.title.isEmpty())
