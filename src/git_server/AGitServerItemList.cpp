@@ -84,6 +84,7 @@ void AGitServerItemList::createContent(QVector<IssueItem *> items)
    mScrollArea->setWidget(mIssuesWidget);
    mScrollArea->setWidgetResizable(true);
    mScrollArea->setObjectName("IssuesScroll");
+   mScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
    mIssuesLayout->addWidget(mScrollArea);
 
