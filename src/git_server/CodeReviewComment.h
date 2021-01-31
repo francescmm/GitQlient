@@ -25,9 +25,7 @@
 
 #include <QFrame>
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-#   include <document.h>
-#endif
+#include <document.h>
 
 class QLabel;
 

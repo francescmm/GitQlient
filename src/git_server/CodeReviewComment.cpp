@@ -2,19 +2,15 @@
 
 #include <Comment.h>
 #include <AvatarHelper.h>
+#include <previewpage.h>
+#include <GitQlientSettings.h>
 
 #include <QVBoxLayout>
 #include <QTextEdit>
 #include <QLabel>
 #include <QLocale>
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-#   include <QWebEngineView>
-#   include <QWebChannel>
-
-#   include <previewpage.h>
-#   include <GitQlientSettings.h>
-#endif
+#include <QWebEngineView>
+#include <QWebChannel>
 
 CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidget *parent)
    : QFrame(parent)
@@ -32,7 +28,6 @@ CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidge
    avatarLayout->addWidget(creator);
    avatarLayout->addStretch();
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    GitQlientSettings settings;
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
    const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
@@ -54,11 +49,6 @@ CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidge
    });
 
    m_content.setText(review.body);
-#else
-   const auto body = new QLabel(review.body);
-   body->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-   body->setWordWrap(true);
-#endif
 
    const auto frame = new QFrame();
    frame->setObjectName("CodeReviewComment");

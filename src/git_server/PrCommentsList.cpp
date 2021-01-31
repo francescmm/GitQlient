@@ -9,6 +9,8 @@
 #include <CodeReviewComment.h>
 #include <ButtonLink.hpp>
 #include <Colors.h>
+#include <previewpage.h>
+#include <GitQlientSettings.h>
 
 #include <QNetworkAccessManager>
 #include <QVBoxLayout>
@@ -24,14 +26,8 @@
 #include <QPushButton>
 #include <QIcon>
 #include <QScrollBar>
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-#   include <previewpage.h>
-#   include <GitQlientSettings.h>
-
-#   include <QWebChannel>
-#   include <QWebEngineView>
-#endif
+#include <QWebChannel>
+#include <QWebEngineView>
 
 using namespace GitServer;
 
@@ -216,7 +212,6 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    const auto bodyDescLayout = new QVBoxLayout(bodyDescFrame);
    bodyDescLayout->setContentsMargins(10, 10, 10, 10);
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    GitQlientSettings settings;
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
    const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
@@ -239,10 +234,6 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    });
 
    m_content.setText(QString::fromUtf8(issue.body));
-#else
-   const auto body = new QLabel(QString::fromUtf8((issue.body)));
-   body->setWordWrap(true);
-#endif
 
    bodyDescLayout->addWidget(body);
    layout->addWidget(bodyDescFrame);
@@ -403,7 +394,6 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
    creationLayout->addStretch();
    creationLayout->addWidget(new QLabel(comment.association));
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    GitQlientSettings settings;
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
    const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
@@ -429,10 +419,6 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
    body->setFixedHeight(20);
 
    doc->setText(comment.body.trimmed());
-#else
-   const auto body = new QLabel(comment.body.trimmed());
-   body->setWordWrap(true);
-#endif
 
    const auto frame = new QFrame();
    frame->setObjectName("IssueIntro");
