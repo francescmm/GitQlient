@@ -43,13 +43,13 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    , mGit(git)
    , mCache(cache)
    , mGitServerCache(gitServerCache)
+   , mWipWidget(new WipWidget(mCache, mGit))
+   , mAmendWidget(new AmendWidget(mCache, mGit))
+   , mCommitInfoWidget(new CommitInfoWidget(mCache, mGit))
    , mReturnFromFull(new QPushButton())
    , mUserName(new QLabel())
    , mUserEmail(new QLabel())
 {
-   mCommitInfoWidget = new CommitInfoWidget(mCache, mGit);
-   mWipWidget = new WipWidget(mCache, mGit);
-   mAmendWidget = new AmendWidget(mCache, mGit);
    setAttribute(Qt::WA_DeleteOnClose);
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));

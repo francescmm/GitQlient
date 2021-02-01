@@ -18,26 +18,29 @@ CommitInfoWidget::CommitInfoWidget(const QSharedPointer<GitCache> &cache, const 
    , mCache(cache)
    , mGit(git)
    , mInfoPanel(new CommitInfoPanel())
-   , fileListWidget(new FileListWidget(mGit, mCache))
+   , mFileListWidget(new FileListWidget(mGit, mCache))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
-   fileListWidget->setObjectName("fileListWidget");
+   mFileListWidget->setObjectName("fileListWidget");
 
    const auto wipSeparator = new QFrame();
    wipSeparator->setObjectName("separator");
 
-   const auto verticalLayout = new QVBoxLayout(this);
-   verticalLayout->setSpacing(0);
-   verticalLayout->setContentsMargins(0, 0, 0, 0);
-   verticalLayout->addWidget(mInfoPanel);
-   verticalLayout->addWidget(wipSeparator);
-   verticalLayout->addWidget(fileListWidget);
+   const auto mainLayout = new QGridLayout(this);
+   mainLayout->setSpacing(0);
+   mainLayout->setContentsMargins(0, 0, 0, 0);
+   mainLayout->addWidget(mInfoPanel, 0, 0);
+   mainLayout->addWidget(wipSeparator, 1, 0);
+   mainLayout->addWidget(mFileListWidget, 2, 0);
+   mainLayout->setRowStretch(1, 0);
+   mainLayout->setRowStretch(2, 0);
+   mainLayout->setRowStretch(2, 1);
 
-   connect(fileListWidget, &FileListWidget::itemDoubleClicked, this,
+   connect(mFileListWidget, &FileListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { emit signalOpenFileCommit(mCurrentSha, mParentSha, item->text(), false); });
-   connect(fileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitInfoWidget::signalShowFileHistory);
-   connect(fileListWidget, &FileListWidget::signalEditFile, this, &CommitInfoWidget::signalEditFile);
+   connect(mFileListWidget, &FileListWidget::signalShowFileHistory, this, &CommitInfoWidget::signalShowFileHistory);
+   connect(mFileListWidget, &FileListWidget::signalEditFile, this, &CommitInfoWidget::signalEditFile);
 }
 
 void CommitInfoWidget::configure(const QString &sha)
@@ -62,7 +65,7 @@ void CommitInfoWidget::configure(const QString &sha)
 
          mInfoPanel->configure(commit);
 
-         fileListWidget->insertFiles(mCurrentSha, mParentSha);
+         mFileListWidget->insertFiles(mCurrentSha, mParentSha);
       }
    }
 }
@@ -77,5 +80,5 @@ void CommitInfoWidget::clear()
    mCurrentSha = QString();
    mParentSha = QString();
 
-   fileListWidget->clear();
+   mFileListWidget->clear();
 }

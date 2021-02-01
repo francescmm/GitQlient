@@ -31,6 +31,7 @@ CommitInfoPanel::CommitInfoPanel(QWidget *parent)
    mScrollArea = new QScrollArea();
    mScrollArea->setWidget(mLabelDescription);
    mScrollArea->setWidgetResizable(true);
+   mScrollArea->setFixedHeight(50);
 
    mLabelAuthor->setObjectName("labelAuthor");
 
@@ -63,6 +64,17 @@ void CommitInfoPanel::configure(const CommitInfo &commit)
 
    const auto description = commit.longLog();
    mLabelDescription->setText(description.isEmpty() ? "<No description provided>" : description);
+
+   QFontMetrics fm(mLabelDescription->font());
+   const auto neededsize = fm.boundingRect(QRect(0, 0, 300, 250), Qt::TextWordWrap, mLabelDescription->text());
+   auto height = neededsize.height();
+
+   if (height > 250)
+      height = 250;
+   else if (height < 50)
+      height = 50;
+
+   mScrollArea->setFixedHeight(height);
 
    auto f = mLabelDescription->font();
    f.setItalic(description.isEmpty());

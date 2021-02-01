@@ -62,5 +62,5 @@ private:
    QString mCurrentSha;
    QString mParentSha;
    CommitInfoPanel *mInfoPanel = nullptr;
-   FileListWidget *fileListWidget = nullptr;
+   FileListWidget *mFileListWidget = nullptr;
 };

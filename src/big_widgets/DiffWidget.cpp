@@ -28,6 +28,7 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<GitCach
    setAttribute(Qt::WA_DeleteOnClose);
 
    mInfoPanelParent->setObjectName("InfoPanel");
+   mInfoPanelParent->setFixedWidth(350);
 
    mCenterStackedWidget->setCurrentIndex(0);
    mCenterStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
