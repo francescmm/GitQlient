@@ -601,7 +601,7 @@ CommitChangesWidget, WipWidget, AmendWidget
 /*            CommitInfoPanel START          */
 /*********************************************/
 
-CommitInfoPanel
+CommitInfoPanel, CommitInfoPanel QScrollArea, #labelDescription
 {
    background: #C6C6C7;
 }

@@ -5,7 +5,7 @@
 #include <QPainter>
 
 constexpr auto Offset = 10;
-constexpr auto DefaultHeight = 25.0;
+constexpr auto DefaultHeight = 30.0;
 constexpr auto HeightIncrement = 15.0;
 
 FileListDelegate::FileListDelegate(QObject *parent)
@@ -34,10 +34,12 @@ void FileListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
 QSize FileListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+   auto rect = option.rect;
+   rect.setWidth(rect.width() - Offset);
+
+   const auto text = index.model()->data(index, Qt::DisplayRole).toString();
    QFontMetrics fm(option.font);
-   const QAbstractItemModel *model = index.model();
-   QString Text = model->data(index, Qt::DisplayRole).toString();
-   QRect neededsize = fm.boundingRect(option.rect, Qt::TextWordWrap, Text);
+   QRect neededsize = fm.boundingRect(rect, Qt::TextWordWrap, text);
 
    if (neededsize.height() < DefaultHeight)
       neededsize.setHeight(DefaultHeight);

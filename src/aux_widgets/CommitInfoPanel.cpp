@@ -3,6 +3,7 @@
 
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QScrollArea>
 
 CommitInfoPanel::CommitInfoPanel(QWidget *parent)
    : QFrame(parent)
@@ -27,6 +28,10 @@ CommitInfoPanel::CommitInfoPanel(QWidget *parent)
    mLabelDescription->setWordWrap(true);
    mLabelDescription->setObjectName("labelDescription");
 
+   mScrollArea = new QScrollArea();
+   mScrollArea->setWidget(mLabelDescription);
+   mScrollArea->setWidgetResizable(true);
+
    mLabelAuthor->setObjectName("labelAuthor");
 
    mLabelDateTime->setObjectName("labelDateTime");
@@ -39,7 +44,7 @@ CommitInfoPanel::CommitInfoPanel(QWidget *parent)
    descriptionLayout->setSpacing(0);
    descriptionLayout->addWidget(mLabelSha);
    descriptionLayout->addWidget(mLabelTitle);
-   descriptionLayout->addWidget(mLabelDescription);
+   descriptionLayout->addWidget(mScrollArea);
    descriptionLayout->addWidget(wipSeparator);
    descriptionLayout->addWidget(mLabelAuthor);
    descriptionLayout->addWidget(mLabelDateTime);

@@ -592,7 +592,7 @@ DiffWidget > QPinnableTabWidget > QTabBar::tab:selected
 /*            CommitInfoPanel START          */
 /*********************************************/
 
-CommitInfoPanel
+CommitInfoPanel, CommitInfoPanel QScrollArea, #labelDescription
 {
    background: #2E2F30;
 }
