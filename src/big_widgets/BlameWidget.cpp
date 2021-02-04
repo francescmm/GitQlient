@@ -105,15 +105,28 @@ void BlameWidget::showFileHistory(const QString &filePath)
    if (!mTabsMap.contains(filePath))
    {
       QScopedPointer<GitHistory> git(new GitHistory(mGit));
-      const auto ret = git->history(filePath);
+      auto ret = git->history(filePath);
 
       if (ret.success)
       {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-         const auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+         auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
 #else
-         const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+         auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
 #endif
+         for (auto i = 0; i < shaHistory.size();)
+         {
+            if (shaHistory.at(i).startsWith("gpg:"))
+            {
+               shaHistory.takeAt(i);
+
+               if (shaHistory.size() <= i)
+                  break;
+            }
+            else
+               ++i;
+         }
+
          mRepoView->blockSignals(true);
          mRepoView->filterBySha(shaHistory);
          mRepoView->blockSignals(false);
@@ -174,10 +187,23 @@ void BlameWidget::reloadHistory(int tabIndex)
       if (ret.success)
       {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-         const auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+         auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
 #else
-         const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+         auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
 #endif
+         for (auto i = 0; i < shaHistory.size();)
+         {
+            if (shaHistory.at(i).startsWith("gpg:"))
+            {
+               shaHistory.takeAt(i);
+
+               if (shaHistory.size() <= i)
+                  break;
+            }
+            else
+               ++i;
+         }
+
          mRepoView->blockSignals(true);
          mRepoView->filterBySha(shaHistory);
 
