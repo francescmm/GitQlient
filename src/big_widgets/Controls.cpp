@@ -144,6 +144,8 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    createGitPlatformButton(hLayout);
 
+   GitQlientSettings settings;
+   mBuildSystem->setVisible(settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEnabled", false).toBool());
    mBuildSystem->setCheckable(true);
    mBuildSystem->setIcon(QIcon(":/icons/build_system"));
    mBuildSystem->setIconSize(QSize(22, 22));

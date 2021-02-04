@@ -19,6 +19,7 @@ class ConfigWidget : public QWidget
 
 signals:
    void reloadView();
+   void buildSystemConfigured(bool configured);
 
 public:
    explicit ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);

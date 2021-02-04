@@ -257,9 +257,13 @@ void ConfigWidget::saveConfig()
       settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", bsUrl);
       settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", bsUser);
       settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", bsToken);
+      emit buildSystemConfigured(showBs);
    }
    else
+   {
       settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false);
+      emit buildSystemConfigured(false);
+   }
 
    mFeedbackTimer->singleShot(3000, ui->lFeedback, &QLabel::clear);
 }
