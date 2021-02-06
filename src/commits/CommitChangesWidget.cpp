@@ -275,8 +275,6 @@ void CommitChangesWidget::addAllFilesToCommitList()
 
    git->markFilesAsResolved(files);
 
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->applyActionBtn->setEnabled(ui->stagedFilesList->count() > 0);
 }
 
@@ -334,8 +332,6 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
 
    delete fileWidget;
 
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->applyActionBtn->setEnabled(true);
 
    return fileName;
@@ -392,8 +388,6 @@ void CommitChangesWidget::removeFileFromCommitList(QListWidgetItem *item)
       itemOriginalList->addItem(item);
       itemOriginalList->setItemWidget(item, newFileWidget);
 
-      ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-      ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
       ui->applyActionBtn->setDisabled(ui->stagedFilesList->count() == 0);
    }
 }
@@ -467,8 +461,6 @@ void CommitChangesWidget::clear()
    ui->leCommitTitle->clear();
    ui->teDescription->clear();
    ui->applyActionBtn->setEnabled(false);
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
 }
 
 void CommitChangesWidget::setCommitTitleMaxLength()

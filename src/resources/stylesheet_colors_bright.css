@@ -582,15 +582,14 @@ CommitChangesWidget, WipWidget, AmendWidget
    font-size: 9pt;
 }
 
-#stagedFiles, #unstagedFiles
-{
-   background: #C6C6C7;
-   border-color: #2E2F30;
-}
-
 #stagedFilesList, #unstagedFilesList
 {
    border-color: #2E2F30;
+}
+
+#stagedFilesList
+{
+   border-top-color: #C6C6C7;
 }
 
 /*********************************************/

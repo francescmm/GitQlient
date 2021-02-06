@@ -573,15 +573,16 @@ DiffWidget > QPinnableTabWidget > QTabBar::tab:selected
     font-size: 9pt;
 }
 
-#stagedFiles, #unstagedFiles
+CommitChangesWidget #wipSeparator
 {
-    background: #2E2F30;
-    border-color: #202122;
+   background: #404142;
+   border-left: 1px solid #202122;
+   border-right: 1px solid #202122;
 }
 
 #stagedFilesList, #unstagedFilesList
 {
-   border-color: #606162;
+   border-color: #202122;
 }
 
 /*********************************************/

@@ -581,25 +581,23 @@ CommitChangesWidget > #warningButton
    padding-right: 10px;
 }
 
-#stagedFiles, #unstagedFiles
+CommitChangesWidget #wipSeparator
 {
-   padding: 0;
-   border-width: 1px;
-   border-style: solid;
-}
-
-#stagedFiles
-{
-   border-top: 0;
+   max-height: 1px;
+   min-height: 1px;
 }
 
 #stagedFilesList, #unstagedFilesList
 {
    padding: 0;
-   border: 0;
-   border-top-width: 1px;
-   border-top-style: solid;
+   border-width: 1px;
+   border-style: solid;
    outline: 0;
+}
+
+#stagedFilesList
+{
+   border-top: 0;
 }
 
 #unstagedFilesList::item, #stagedFilesList::item

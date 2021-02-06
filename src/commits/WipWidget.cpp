@@ -42,8 +42,6 @@ void WipWidget::configure(const QString &sha)
 
    clearCache();
 
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->applyActionBtn->setEnabled(ui->stagedFilesList->count());
 }
 
