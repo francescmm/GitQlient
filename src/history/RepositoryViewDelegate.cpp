@@ -1,4 +1,4 @@
-﻿#include "RepositoryViewDelegate.h"
+#include "RepositoryViewDelegate.h"
 
 #include <GitServerCache.h>
 #include <GitQlientStyles.h>
@@ -117,9 +117,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
           newOpt.state & QStyle::State_MouseOver && cursorColumn == index.column()
           && cursorColumn == static_cast<int>(CommitHistoryColumns::Sha))
       {
-         QFont font = newOpt.font;
-         font.setUnderline(true);
-         p->setFont(font);
+         p->setPen(gitQlientOrange);
       }
 
       p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()), textalignment);
@@ -247,35 +245,46 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool 
       }
    }
 
-   // center symbol, e.g. rect or ellipse
+   // center symbol
    auto isCommit = false;
-   switch (lane.getType())
+
+   if (isWip)
    {
-      case LaneType::HEAD:
-      case LaneType::INITIAL:
-      case LaneType::BRANCH:
-      case LaneType::MERGE_FORK:
-      case LaneType::MERGE_FORK_R:
-         isCommit = true;
-         p->setPen(QPen(mergeColor, 2));
-         p->setBrush(col);
-         p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
+      isCommit = true;
+      p->setPen(QPen(col, 2));
+      p->setBrush(col);
+      p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
+   }
+   else
+   {
+      switch (lane.getType())
+      {
+         case LaneType::HEAD:
+         case LaneType::INITIAL:
+         case LaneType::BRANCH:
+         case LaneType::MERGE_FORK:
+         case LaneType::MERGE_FORK_R:
+            isCommit = true;
+            p->setPen(QPen(mergeColor, 2));
+            p->setBrush(col);
+            p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
+            break;
+         case LaneType::MERGE_FORK_L:
+            isCommit = true;
+            p->setPen(QPen(laneHeadPresent ? mergeColor : col, 2));
+            p->setBrush(col);
+            p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
+            break;
+         case LaneType::ACTIVE: {
+            isCommit = true;
+            p->setPen(QPen(col, 2));
+            p->setBrush(QColor(isWip ? col : GitQlientStyles::getBackgroundColor()));
+            p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
+         }
          break;
-      case LaneType::MERGE_FORK_L:
-         isCommit = true;
-         p->setPen(QPen(laneHeadPresent ? mergeColor : col, 2));
-         p->setBrush(col);
-         p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
-         break;
-      case LaneType::ACTIVE: {
-         isCommit = true;
-         p->setPen(QPen(col, 2));
-         p->setBrush(QColor(isWip ? col : GitQlientStyles::getBackgroundColor()));
-         p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
+         default:
+            break;
       }
-      break;
-      default:
-         break;
    }
 
    lanePen.setColor(mergeColor);
