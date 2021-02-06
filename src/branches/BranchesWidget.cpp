@@ -84,12 +84,11 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    mLocalBranchesTree->setLocalRepo(true);
    mLocalBranchesTree->setMouseTracking(true);
    mLocalBranchesTree->setItemDelegate(mLocalDelegate = new BranchesViewDelegate());
-   mLocalBranchesTree->setColumnCount(2);
+   mLocalBranchesTree->setColumnCount(1);
    mLocalBranchesTree->setObjectName("LocalBranches");
 
    const auto localHeader = mLocalBranchesTree->headerItem();
    localHeader->setText(0, tr("Local"));
-   localHeader->setText(1, tr("To origin"));
 
    mRemoteBranchesTree->setColumnCount(1);
    mRemoteBranchesTree->setMouseTracking(true);
@@ -533,15 +532,6 @@ void BranchesWidget::processLocalBranch(const QString &sha, QString branch)
          const auto indexToScroll = mLocalBranchesTree->currentIndex();
          mLocalBranchesTree->scrollTo(indexToScroll);
       }
-   }
-
-   QLog_Debug("UI", QString("Calculating distances..."));
-
-   if (fullBranchName != "detached")
-   {
-      const auto distances = mCache->getLocalBranchDistances(fullBranchName);
-
-      item->setText(1, QString("%1 \u2193 - %2 \u2191").arg(distances.behindOrigin).arg(distances.aheadOrigin));
    }
 
    mLocalBranchesTree->addTopLevelItem(item);

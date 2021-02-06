@@ -72,10 +72,8 @@ public:
    void clearReferences();
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    void insertReference(const QString &sha, References::Type type, const QString &reference);
-   void insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances);
    bool hasReferences(const QString &sha) const;
    QStringList getReferences(const QString &sha, References::Type type) const;
-   LocalBranchDistances getLocalBranchDistances(const QString &name) { return mLocalBranchDistances.value(name); }
    void reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha);
 
    void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
@@ -103,7 +101,6 @@ private:
    QHash<QString, CommitInfo> mCommitsMap;
    QMultiMap<QString, CommitInfo *> mTmpChildsStorage;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
-   QMap<QString, LocalBranchDistances> mLocalBranchDistances;
    Lanes mLanes;
    QVector<QString> mDirNames;
    QVector<QString> mFileNames;

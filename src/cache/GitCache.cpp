@@ -244,11 +244,6 @@ void GitCache::insertReference(const QString &sha, References::Type type, const 
    mReferences[sha].addReference(type, reference);
 }
 
-void GitCache::insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances)
-{
-   mLocalBranchDistances[name] = distances;
-}
-
 bool GitCache::hasReferences(const QString &sha) const
 {
    return mReferences.contains(sha) && !mReferences.value(sha).isEmpty();

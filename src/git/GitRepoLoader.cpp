@@ -109,7 +109,6 @@ void GitRepoLoader::loadReferences()
 
          if (!refName.startsWith("refs/tags/") || (refName.startsWith("refs/tags/") && refName.endsWith("^{}")))
          {
-            auto localBranches = false;
             References::Type type;
             QString name;
 
@@ -123,7 +122,6 @@ void GitRepoLoader::loadReferences()
             {
                type = References::Type::LocalBranch;
                name = refName.mid(11);
-               localBranches = true;
             }
             else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
             {
@@ -134,25 +132,6 @@ void GitRepoLoader::loadReferences()
                continue;
 
             mRevCache->insertReference(revSha, type, name);
-
-            if (localBranches)
-            {
-               QScopedPointer<GitBranches> git(new GitBranches(mGitBase));
-               GitCache::LocalBranchDistances distances;
-
-               const auto distToOrigin = git->getDistanceBetweenBranches(name);
-               auto toOrigin = distToOrigin.output.toString();
-
-               if (!toOrigin.contains("fatal"))
-               {
-                  toOrigin.replace('\n', "");
-                  const auto values = toOrigin.split('\t');
-                  distances.behindOrigin = values.first().toUInt();
-                  distances.aheadOrigin = values.last().toUInt();
-               }
-
-               mRevCache->insertLocalBranchDistances(name, distances);
-            }
          }
 
          prevRefSha = revSha;
