@@ -99,6 +99,11 @@ signals:
     */
    void repoOpened(const QString &repoPath);
 
+   /**
+    * @brief currentBranchChanged Signal triggered whenever the current branch changes.
+    */
+   void currentBranchChanged();
+
 public:
    /*!
     \brief Default constructor.
@@ -119,6 +124,13 @@ public:
     \return QString The current working dir.
    */
    QString currentDir() const { return mCurrentDir; }
+
+   /**
+    * @brief currentBranch Gets the current branch.
+    * @return QString The current branch.
+    */
+   QString currentBranch() const;
+
    /*!
     \brief Sets the repository once the widget is created.
 

@@ -132,4 +132,10 @@ private:
     * time.
     */
    void conditionallyOpenPreConfigDlg(const QString &repoPath);
+
+   /**
+    * @brief updateWindowTitle Updates the window title of GitQlient appending the branch of the current repository.
+    * @param currentTabIndex The current tab index used to retrieve the repository.
+    */
+   void updateWindowTitle();
 };

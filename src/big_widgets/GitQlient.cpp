@@ -50,6 +50,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    mRepos->setStyleSheet(GitQlientStyles::getStyles());
    mRepos->setCornerWidget(addTab, Qt::TopRightCorner);
    connect(mRepos, &QTabWidget::tabCloseRequested, this, &GitQlient::closeTab);
+   connect(mRepos, &QTabWidget::currentChanged, this, &GitQlient::updateWindowTitle);
 
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(QMargins());
@@ -195,6 +196,7 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
          connect(repo, &GitQlientRepo::signalEditFile, this, &GitQlient::signalEditDocument);
          connect(repo, &GitQlientRepo::signalOpenSubmodule, this, &GitQlient::addRepoTab);
          connect(repo, &GitQlientRepo::repoOpened, this, &GitQlient::onSuccessOpen);
+         connect(repo, &GitQlientRepo::currentBranchChanged, this, &GitQlient::updateWindowTitle);
 
          repo->setRepository(repoName);
 
@@ -280,5 +282,18 @@ void GitQlient::conditionallyOpenPreConfigDlg(const QString &repoPath)
    {
       const auto preConfig = new InitialRepoConfig(git, this);
       preConfig->exec();
+   }
+}
+
+void GitQlient::updateWindowTitle()
+{
+
+   if (const auto currentTab = dynamic_cast<GitQlientRepo *>(mRepos->currentWidget()))
+   {
+      const auto repoPath = currentTab->currentDir();
+      const auto currentName = repoPath.split("/").last();
+      const auto currentBranch = currentTab->currentBranch();
+
+      setWindowTitle(QString("GitQlient %1 - %2 (%3)").arg(VER, currentName, currentBranch));
    }
 }

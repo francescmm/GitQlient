@@ -175,6 +175,11 @@ GitQlientRepo::~GitQlientRepo()
    delete m_loaderThread;
 }
 
+QString GitQlientRepo::currentBranch() const
+{
+   return mGitBase->getCurrentBranch();
+}
+
 void GitQlientRepo::updateCache(bool full)
 {
    if (!mCurrentDir.isEmpty())
@@ -182,6 +187,9 @@ void GitQlientRepo::updateCache(bool full)
       QLog_Debug("UI", QString("Updating the GitQlient UI"));
 
       emit signalLoadRepo(full);
+
+      if (full)
+         emit currentBranchChanged();
 
       mDiffWidget->reload();
    }
