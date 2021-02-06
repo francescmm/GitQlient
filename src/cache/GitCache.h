@@ -65,8 +65,7 @@ public:
    CommitInfo getCommitInfo(const QString &sha);
    CommitInfo getCommitInfoByRow(int row);
    int getCommitPos(const QString &sha);
-   CommitInfo getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint = 0,
-                                   bool reverse = false);
+   CommitInfo searchCommitInfo(const QString &text, int startingPoint = 0, bool reverse = false);
    RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
 
    void clearReferences();
@@ -133,9 +132,7 @@ private:
    void appendFileName(const QString &name, FileNamesLoader &fl);
    void flushFileNames(FileNamesLoader &fl);
    void setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
-   QVector<CommitInfo *>::const_iterator searchCommit(CommitInfo::Field field, const QString &text,
-                                                      int startingPoint = 0) const;
-   QVector<CommitInfo *>::const_reverse_iterator reverseSearchCommit(CommitInfo::Field field, const QString &text,
-                                                                     int startingPoint = 0) const;
+   auto searchCommit(const QString &text, int startingPoint = 0) const;
+   auto reverseSearchCommit(const QString &text, int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);
 };

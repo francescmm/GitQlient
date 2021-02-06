@@ -88,27 +88,41 @@ int GitCache::getCommitPos(const QString &sha)
    return -1;
 }
 
-CommitInfo GitCache::getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint, bool reverse)
+auto GitCache::searchCommit(const QString &text, const int startingPoint) const
+{
+   return std::find_if(mCommits.constBegin() + startingPoint, mCommits.constEnd(),
+                       [text](CommitInfo *info) { return info->contains(text); });
+}
+
+auto GitCache::reverseSearchCommit(const QString &text, int startingPoint) const
+{
+   const auto startEndPos = startingPoint > 0 ? mCommits.count() - startingPoint + 1 : 0;
+
+   return std::find_if(mCommits.crbegin() + startEndPos, mCommits.crend(),
+                       [text](CommitInfo *info) { return info->contains(text); });
+}
+
+CommitInfo GitCache::searchCommitInfo(const QString &text, int startingPoint, bool reverse)
 {
    QMutexLocker lock(&mMutex);
    CommitInfo commit;
 
    if (!reverse)
    {
-      auto commitIter = searchCommit(field, text, startingPoint);
+      auto commitIter = searchCommit(text, startingPoint);
 
       if (commitIter == mCommits.constEnd())
-         commitIter = searchCommit(field, text);
+         commitIter = searchCommit(text);
 
       if (commitIter != mCommits.constEnd())
          commit = **commitIter;
    }
    else
    {
-      auto commitIter = reverseSearchCommit(field, text, startingPoint);
+      auto commitIter = reverseSearchCommit(text, startingPoint);
 
       if (commitIter == mCommits.crend())
-         commitIter = reverseSearchCommit(field, text);
+         commitIter = reverseSearchCommit(text);
 
       if (commitIter != mCommits.crend())
          commit = **commitIter;
@@ -548,22 +562,6 @@ void GitCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum,
       rf.appendExtStatus(extStatusInfo);
    }
    rf.setOnlyModified(false);
-}
-
-QVector<CommitInfo *>::const_iterator GitCache::searchCommit(CommitInfo::Field field, const QString &text,
-                                                             const int startingPoint) const
-{
-   return std::find_if(mCommits.constBegin() + startingPoint, mCommits.constEnd(),
-                       [field, text](CommitInfo *info) { return info->getFieldStr(field).contains(text); });
-}
-
-QVector<CommitInfo *>::const_reverse_iterator
-GitCache::reverseSearchCommit(CommitInfo::Field field, const QString &text, int startingPoint) const
-{
-   const auto startEndPos = startingPoint > 0 ? mCommits.count() - startingPoint + 1 : 0;
-
-   return std::find_if(mCommits.crbegin() + startEndPos, mCommits.crend(),
-                       [field, text](CommitInfo *info) { return info->getFieldStr(field).contains(text); });
 }
 
 void GitCache::resetLanes(const CommitInfo &c, bool isFork)

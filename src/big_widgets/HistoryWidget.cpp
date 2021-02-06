@@ -344,9 +344,7 @@ void HistoryWidget::onCommitTitleMaxLenghtChanged()
 
 void HistoryWidget::search()
 {
-   const auto text = mSearchInput->text();
-
-   if (!text.isEmpty())
+   if (const auto text = mSearchInput->text(); !text.isEmpty())
    {
       auto commitInfo = mCache->getCommitInfo(text);
 
@@ -364,7 +362,7 @@ void HistoryWidget::search()
             startingRow = selectedItems.constFirst().row();
          }
 
-         commitInfo = mCache->getCommitInfoByField(CommitInfo::Field::SHORT_LOG, text, startingRow + 1, mReverseSearch);
+         commitInfo = mCache->searchCommitInfo(text, startingRow + 1, mReverseSearch);
 
          if (commitInfo.isValid())
             goToSha(commitInfo.sha());

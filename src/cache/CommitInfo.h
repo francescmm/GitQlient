@@ -51,7 +51,7 @@ public:
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;
 
-   QString getFieldStr(CommitInfo::Field field) const;
+   bool contains(const QString &value);
 
    void setBoundary(QChar info) { mBoundaryInfo = std::move(info); }
    bool isBoundary() const { return mBoundaryInfo == '-'; }
