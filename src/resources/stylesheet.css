@@ -789,8 +789,8 @@ BranchesWidget QTreeWidget::item
 
 #FullBranchesWidget
 {
-   min-width: 350px;
-   max-width: 350px;
+   min-width: 250px;
+   max-width: 250px;
 }
 
 #panelsFrame
