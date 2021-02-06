@@ -230,6 +230,11 @@ public:
     */
    void updateConfig();
 
+   /**
+    * @brief onCommitTitleMaxLenghtChanged Changes the maximum length of the commit title.
+    */
+   void onCommitTitleMaxLenghtChanged();
+
 protected:
    void keyPressEvent(QKeyEvent *event) override;
    void keyReleaseEvent(QKeyEvent *event) override;

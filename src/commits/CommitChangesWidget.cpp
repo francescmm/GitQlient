@@ -31,8 +31,6 @@
 
 using namespace QLogger;
 
-const int CommitChangesWidget::kMaxTitleChars = 50;
-
 QString CommitChangesWidget::lastMsgBeforeError;
 
 enum GitQlientRole
@@ -53,8 +51,11 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
 
    ui->amendFrame->setVisible(false);
 
-   ui->lCounter->setText(QString::number(kMaxTitleChars));
-   ui->leCommitTitle->setMaxLength(kMaxTitleChars);
+   GitQlientSettings settings;
+   mTitleMaxLength = settings.globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
+
+   ui->lCounter->setText(QString::number(mTitleMaxLength));
+   ui->leCommitTitle->setMaxLength(mTitleMaxLength);
    ui->teDescription->setMaximumHeight(125);
 
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitChangesWidget::updateCounter);
@@ -445,7 +446,7 @@ bool CommitChangesWidget::checkMsg(QString &msg)
 
 void CommitChangesWidget::updateCounter(const QString &text)
 {
-   ui->lCounter->setText(QString::number(kMaxTitleChars - text.count()));
+   ui->lCounter->setText(QString::number(mTitleMaxLength - text.count()));
 }
 
 bool CommitChangesWidget::hasConflicts()
@@ -468,4 +469,14 @@ void CommitChangesWidget::clear()
    ui->applyActionBtn->setEnabled(false);
    ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+}
+
+void CommitChangesWidget::setCommitTitleMaxLength()
+{
+   GitQlientSettings settings;
+   mTitleMaxLength = settings.globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
+
+   ui->lCounter->setText(QString::number(mTitleMaxLength));
+   ui->leCommitTitle->setMaxLength(mTitleMaxLength);
+   updateCounter(ui->leCommitTitle->text());
 }

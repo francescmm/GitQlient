@@ -336,6 +336,12 @@ void HistoryWidget::showFullDiff()
       QMessageBox::warning(this, tr("No diff available!"), tr("There is no diff to show."));
 }
 
+void HistoryWidget::onCommitTitleMaxLenghtChanged()
+{
+   mWipWidget->setCommitTitleMaxLength();
+   mAmendWidget->setCommitTitleMaxLength();
+}
+
 void HistoryWidget::search()
 {
    const auto text = mSearchInput->text();
