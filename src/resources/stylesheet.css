@@ -60,7 +60,7 @@ QComboBox::drop-down:hover
 
 QComboBox::down-arrow
 {
-   image: url(:/icons/arrow_down);
+   image: url(:/icons/resources/icons/arrow_down.png);
    min-width: 14px;
    max-width: 14px;
 }
@@ -184,17 +184,17 @@ QTabWidget > QTabBar::tab:!selected
 
 QTabWidget > QTabBar::close-button
 {
-   image: url(:/icons/close);
+   image: url(:/icons/resources/icons/remove-symbol.png);
 }
 
 QTabWidget > QTabBar::close-button:hover
 {
-   image: url(:/icons/close_hover);
+   image: url(:/icons/resources/icons/remove-symbol_hover.png);
 }
 
 QTabWidget > QTabBar::close-button:pressed
 {
-   image: url(":/icons/close_press");
+   image: url(":/icons/resources/icons/remove-symbol_press");
 }
 
 QToolTip
@@ -263,50 +263,36 @@ QScrollBar::add-line:vertical
 {
    subcontrol-position: bottom center;
    subcontrol-origin: margin;
-   border-width: 1px;
-   border-style: solid;
-   border-right: 0;
-   height: 15px;
-   width: 15px;
-   image: url(:/icons/down-arrow);
+   border: 0;
+   height: 0;
+   width: 0;
 }
 
 QScrollBar::add-line:horizontal
 {
    subcontrol-position: right;
    subcontrol-origin: margin;
-   border-width: 1px;
-   border-style: solid;
-   border-right: 0;
-   border-bottom: 0;
-   height: 15px;
-   width: 15px;
-   image: url(:/icons/right-arrow);
+   border: 0;
+   height: 0;
+   width: 0;
 }
 
 QScrollBar::sub-line:vertical
 {
    subcontrol-position: top center;
    subcontrol-origin: margin;
-   border-width: 1px;
-   border-style: solid;
-   border-right: 0;
-   height: 15px;
-   width: 15px;
-   image: url(:/icons/up-arrow);
+   border: 0;
+   height: 0;
+   width: 0;
 }
 
 QScrollBar::sub-line:horizontal
 {
    subcontrol-position: left;
    subcontrol-origin: margin;
-   border-width: 1px;
-   border-style: solid;
-   border-left: 0;
-   border-bottom: 0;
-   height: 15px;
-   width: 15px;
-   image: url(:/icons/left-arrow);
+   border: 0;
+   height: 0;
+   width: 0;
 }
 
 QScrollArea
@@ -355,7 +341,7 @@ QSpinBox::up-button
 
 QSpinBox::up-arrow
 {
-   image: url(:/icons/arrow_up);
+   image: url(:/icons/resources/icons/arrow_up.png);
    width: 20px;
    height: 10px;
 }
@@ -368,7 +354,7 @@ QSpinBox::down-button
 
 QSpinBox::down-arrow
 {
-   image: url(:/icons/arrow_down);
+   image: url(:/icons/resources/icons/arrow_down.png);
    width: 20px;
    height: 10px;
 }

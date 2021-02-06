@@ -6,7 +6,7 @@ greaterThan(QT_MINOR_VERSION, 12) {
 }
 
 TARGET = gitqlient
-QT += widgets core network svg webenginewidgets webchannel
+QT += widgets core network webenginewidgets webchannel
 DEFINES += QT_DEPRECATED_WARNINGS
 QMAKE_LFLAGS += -no-pie
 
