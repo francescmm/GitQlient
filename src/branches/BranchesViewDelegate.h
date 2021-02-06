@@ -39,7 +39,7 @@ public:
 
     \param parent The parent widget if needed.
    */
-   explicit BranchesViewDelegate(QObject *parent = nullptr);
+   explicit BranchesViewDelegate(bool isTag = false, QObject *parent = nullptr);
 
    /*!
     \brief Overridden paint method used to display different colors when mouse actions happen.
@@ -55,4 +55,7 @@ public:
     \return QSize The width and height of the row.
    */
    QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override;
+
+private:
+   bool mIsTag = false;
 };

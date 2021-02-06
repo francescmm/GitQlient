@@ -35,6 +35,8 @@ class GitCache;
 class QPushButton;
 class BranchesWidgetMinimal;
 class BranchesViewDelegate;
+class QTreeWidget;
+class QTreeWidgetItem;
 
 /*!
  \brief BranchesWidget is the widget that creates the layout that contains all the widgets related with the display of
@@ -142,9 +144,8 @@ private:
    BranchesViewDelegate *mLocalDelegate = nullptr;
    BranchTreeWidget *mRemoteBranchesTree = nullptr;
    BranchesViewDelegate *mRemotesDelegate = nullptr;
-   QListWidget *mTagsList = nullptr;
-   QLabel *mTagsCount = nullptr;
-   QLabel *mTagArrow = nullptr;
+   BranchesViewDelegate *mTagsDelegate = nullptr;
+   QTreeWidget *mTagsTree = nullptr;
    QListWidget *mStashesList = nullptr;
    QLabel *mStashesCount = nullptr;
    QLabel *mStashesArrow = nullptr;
@@ -227,11 +228,6 @@ private:
     */
    void showSubtreesContextMenu(const QPoint &p);
    /*!
-    \brief Expands or contracts the tags list widget.
-
-   */
-   void onTagsHeaderClicked();
-   /*!
     \brief Expands or contracts the stashes list widget.
 
    */
@@ -251,7 +247,7 @@ private:
 
     \param item The tag item from the tags list.
    */
-   void onTagClicked(QListWidgetItem *item);
+   void onTagClicked(QTreeWidgetItem *item);
    /*!
     \brief Gets the SHA for a given stash and notifies the UI that it should select it in the repository view.
 
