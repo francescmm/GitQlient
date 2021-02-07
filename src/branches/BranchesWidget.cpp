@@ -232,11 +232,19 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    mainControlsLayout->addWidget(mMinimize);
    mainControlsLayout->addWidget(searchBranch);
 
+   const auto separator1 = new QFrame();
+   separator1->setObjectName("separator");
+
+   const auto separator2 = new QFrame();
+   separator2->setObjectName("separator");
+
    const auto panelsLayout = new QVBoxLayout();
    panelsLayout->setContentsMargins(QMargins());
    panelsLayout->setSpacing(0);
    panelsLayout->addWidget(mLocalBranchesTree);
+   panelsLayout->addWidget(separator1);
    panelsLayout->addWidget(mRemoteBranchesTree);
+   panelsLayout->addWidget(separator2);
    panelsLayout->addWidget(mTagsTree);
    panelsLayout->addWidget(stashFrame);
    panelsLayout->addWidget(submoduleFrame);

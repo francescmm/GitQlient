@@ -751,13 +751,13 @@ FullDiffWidget > QPlainTextEdit
 /*             BranchesWidget START          */
 /*********************************************/
 
-BranchesWidget QHeaderView, BranchesWidget QListWidget
+BranchesWidget QListWidget
 {
     border-top-style: solid;
     border-top-width: 1px;
 }
 
-#LocalBranches QHeaderView
+#LocalBranches QHeaderView, #LocalBranches
 {
     border-top: 0;
 }

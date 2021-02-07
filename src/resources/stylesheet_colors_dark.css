@@ -657,7 +657,7 @@ FullDiffWidget > QPlainTextEdit
 /*********************************************/
 
 /*********************************************/
-/*             BranchesWidget START          */
+/*              START          */
 /*********************************************/
 
 BranchesWidget ClickableFrame:hover
@@ -665,7 +665,7 @@ BranchesWidget ClickableFrame:hover
    background: #2E2F30;
 }
 
-BranchesWidget QHeaderView, BranchesWidget QListWidget
+BranchesWidget QListWidget
 {
     border-top-color: #606162;
 }

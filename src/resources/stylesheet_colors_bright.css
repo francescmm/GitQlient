@@ -675,7 +675,7 @@ BranchesWidget ClickableFrame:hover
    background: #C6C6C7;
 }
 
-BranchesWidget QHeaderView, BranchesWidget QListWidget
+BranchesWidget QListWidget
 {
     border-top-color: #606162;
 }
