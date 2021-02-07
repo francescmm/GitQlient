@@ -311,9 +311,19 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
 
       if (info.isFile() || info.isDir())
       {
+         const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "";
+
+         if (repoName.isEmpty())
+         {
+            QMessageBox::critical(
+                this, tr("Not a repository"),
+                tr("The selected folder is not a Git repository. Please make sure you open a Git repository."));
+            QLog_Error("UI", "The selected folder is not a Git repository");
+            return;
+         }
+
          conditionallyOpenPreConfigDlg(repoPath);
 
-         const auto repoName = repoPath.contains("/") ? repoPath.split("/").last() : "No repo";
          const auto repo = new GitQlientRepo(repoPath);
          const auto index = pinned ? mRepos->addPinnedTab(repo, repoName) : mRepos->addTab(repo, repoName);
 
@@ -380,7 +390,10 @@ void GitQlient::closeTab(int tabIndex)
    const auto totalTabs = mRepos->count() - 1;
 
    if (totalTabs == 0)
+   {
       mStackedLayout->setCurrentIndex(0);
+      setWindowTitle(QString("GitQlient %1").arg(VER));
+   }
 }
 
 void GitQlient::restorePinnedRepos()
@@ -419,10 +432,12 @@ void GitQlient::updateWindowTitle()
 
    if (const auto currentTab = dynamic_cast<GitQlientRepo *>(mRepos->currentWidget()))
    {
-      const auto repoPath = currentTab->currentDir();
-      const auto currentName = repoPath.split("/").last();
-      const auto currentBranch = currentTab->currentBranch();
+      if (const auto repoPath = currentTab->currentDir(); !repoPath.isEmpty())
+      {
+         const auto currentName = repoPath.split("/").last();
+         const auto currentBranch = currentTab->currentBranch();
 
-      setWindowTitle(QString("GitQlient %1 - %2 (%3)").arg(VER, currentName, currentBranch));
+         setWindowTitle(QString("GitQlient %1 - %2 (%3)").arg(VER, currentName, currentBranch));
+      }
    }
 }

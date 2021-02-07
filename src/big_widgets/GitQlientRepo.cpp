@@ -366,6 +366,8 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
       mControls->activateMergeWarning();
       showWarningMerge();
    }
+
+   emit currentBranchChanged();
 }
 
 void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file,
