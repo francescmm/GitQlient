@@ -76,14 +76,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    globalGitLayout->addWidget(globalGit);
    mEditors.insert(1, globalGit);
 
-   const auto gitQlientLayout = new QVBoxLayout(ui->gitQlientConfig);
-   gitQlientLayout->setContentsMargins(QMargins());
-
-   const auto gitQlientEditor = new FileEditor(false, this);
-   gitQlientEditor->editFile(mGit->getGitQlientSettingsDir().append("/GitQlientConfig.ini"));
-   gitQlientLayout->addWidget(gitQlientEditor);
-   mEditors.insert(2, gitQlientEditor);
-
    GitQlientSettings settings;
 
    ui->chDevMode->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "DevMode", false).toBool());
@@ -116,6 +108,10 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    ui->cbPomodoroEnabled->setChecked(
        settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", true).toBool());
+
+   ui->cbStash->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool());
+   ui->cbSubmodule->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool());
+   ui->cbSubtree->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "SubtreeHeader", true).toBool());
 
    // Build System configuration
    const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
@@ -155,6 +151,9 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->updateOnPull, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->clangFormat, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbPomodoroEnabled, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbStash, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbSubmodule, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbSubtree, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->leBsUrl, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->leBsUser, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->leBsToken, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
@@ -163,6 +162,15 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 ConfigWidget::~ConfigWidget()
 {
    delete ui;
+}
+
+void ConfigWidget::onPanelsVisibilityChanged()
+{
+   GitQlientSettings settings;
+
+   ui->cbStash->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool());
+   ui->cbSubmodule->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool());
+   ui->cbSubtree->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "SubtreeHeader", true).toBool());
 }
 
 void ConfigWidget::clearCache()
@@ -245,6 +253,12 @@ void ConfigWidget::saveConfig()
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "ClangFormatOnCommit", ui->clangFormat->isChecked());
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", ui->updateOnPull->isChecked());
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MaxCommits", ui->sbMaxCommits->value());
+
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "StashesHeader", ui->cbStash->isChecked());
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", ui->cbSubmodule->isChecked());
+   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "SubtreeHeader", ui->cbSubtree->isChecked());
+
+   emit panelsVisibilityChaned();
 
    /* POMODORO CONFIG */
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", ui->cbPomodoroEnabled->isChecked());

@@ -155,6 +155,12 @@ signals:
     */
    void showPrDetailedView(int pr);
 
+   /**
+    * @brief panelsVisibilityChanged Signal triggered whenever the visibility of the panels in the BranchesWidget
+    * changes.
+    */
+   void panelsVisibilityChanged();
+
 public:
    /*!
     \brief Default constructor.
@@ -234,6 +240,11 @@ public:
     * @brief onCommitTitleMaxLenghtChanged Changes the maximum length of the commit title.
     */
    void onCommitTitleMaxLenghtChanged();
+
+   /**
+    * @brief onPanelsVisibilityChaned Reloads the visibility configuration of the panels in the BranchesWidget.
+    */
+   void onPanelsVisibilityChanged();
 
 protected:
    void keyPressEvent(QKeyEvent *event) override;

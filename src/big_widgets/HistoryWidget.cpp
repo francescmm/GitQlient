@@ -152,6 +152,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &HistoryWidget::signalOpenSubmodule);
    connect(mBranchesWidget, &BranchesWidget::signalMergeRequired, this, &HistoryWidget::mergeBranch);
    connect(mBranchesWidget, &BranchesWidget::signalPullConflict, this, &HistoryWidget::signalPullConflict);
+   connect(mBranchesWidget, &BranchesWidget::panelsVisibilityChanged, this, &HistoryWidget::panelsVisibilityChanged);
 
    GitQlientSettings settings;
 
@@ -340,6 +341,11 @@ void HistoryWidget::onCommitTitleMaxLenghtChanged()
 {
    mWipWidget->setCommitTitleMaxLength();
    mAmendWidget->setCommitTitleMaxLength();
+}
+
+void HistoryWidget::onPanelsVisibilityChanged()
+{
+   mBranchesWidget->onPanelsVisibilityChaned();
 }
 
 void HistoryWidget::search()

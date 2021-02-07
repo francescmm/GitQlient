@@ -428,6 +428,26 @@ void BranchesWidget::forceMinimalView()
    mMinimal->setVisible(true);
 }
 
+void BranchesWidget::onPanelsVisibilityChaned()
+{
+   GitQlientSettings settings;
+
+   auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool();
+   auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
+   mStashesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+   mStashesList->setVisible(visible);
+
+   visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool();
+   icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
+   mSubmodulesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+   mSubmodulesList->setVisible(visible);
+
+   visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubtreeHeader", true).toBool();
+   icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
+   mSubtreeArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+   mSubtreeList->setVisible(visible);
+}
+
 void BranchesWidget::processLocalBranch(const QString &sha, QString branch)
 {
    QLog_Debug("UI", QString("Adding local branch {%1}").arg(branch));
@@ -868,6 +888,8 @@ void BranchesWidget::onStashesHeaderClicked()
 
    GitQlientSettings settings;
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "StashesHeader", !stashesAreVisible);
+
+   emit panelsVisibilityChanged();
 }
 
 void BranchesWidget::onSubmodulesHeaderClicked()
@@ -879,6 +901,8 @@ void BranchesWidget::onSubmodulesHeaderClicked()
 
    GitQlientSettings settings;
    settings.setLocalValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", !submodulesAreVisible);
+
+   emit panelsVisibilityChanged();
 }
 
 void BranchesWidget::onSubtreesHeaderClicked()
@@ -887,6 +911,8 @@ void BranchesWidget::onSubtreesHeaderClicked()
    const auto icon = QIcon(subtreesAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
    mSubtreeArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mSubtreeList->setVisible(!subtreesAreVisible);
+
+   emit panelsVisibilityChanged();
 }
 
 void BranchesWidget::onTagClicked(QTreeWidgetItem *item)

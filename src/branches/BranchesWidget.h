@@ -49,6 +49,13 @@ class BranchesWidget : public QFrame
    Q_OBJECT
 
 signals:
+
+   /**
+    * @brief panelsVisibilityChanged Signal triggered whenever the visibility of the panels in the BranchesWidget
+    * changes.
+    */
+   void panelsVisibilityChanged();
+
    /*!
     \brief Signal triggered when a branch has been updated and requires a GitQlient UI refresh.
 
@@ -135,6 +142,11 @@ public:
     * @brief forceMinimalView Forces the minimal view but temporarily: id doesn't save the state.
     */
    void forceMinimalView();
+
+   /**
+    * @brief onPanelsVisibilityChaned Reloads the visibility of the stash, submodules, and subtree panels.
+    */
+   void onPanelsVisibilityChaned();
 
 private:
    QSharedPointer<GitCache> mCache;

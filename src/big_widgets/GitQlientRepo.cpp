@@ -116,6 +116,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    connect(mHistoryWidget, &HistoryWidget::signalEditFile, this, &GitQlientRepo::signalEditFile);
    connect(mHistoryWidget, &HistoryWidget::signalAllBranchesActive, mGitLoader.data(), &GitRepoLoader::setShowAll);
+   connect(mHistoryWidget, &HistoryWidget::panelsVisibilityChanged, mConfigWidget,
+           &ConfigWidget::onPanelsVisibilityChanged);
    connect(mHistoryWidget, &HistoryWidget::signalAllBranchesActive, this, &GitQlientRepo::updateCache);
    connect(mHistoryWidget, &HistoryWidget::signalUpdateCache, this, [this]() { updateCache(true); });
    connect(mHistoryWidget, &HistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
@@ -150,6 +152,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    connect(mConfigWidget, &ConfigWidget::commitTitleMaxLenghtChanged, mHistoryWidget,
            &HistoryWidget::onCommitTitleMaxLenghtChanged);
+   connect(mConfigWidget, &ConfigWidget::panelsVisibilityChaned, mHistoryWidget,
+           &HistoryWidget::onPanelsVisibilityChanged);
 
    connect(mGitServerWidget, &GitServerWidget::openDiff, this, &GitQlientRepo::openCommitDiff);
 
