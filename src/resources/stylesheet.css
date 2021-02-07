@@ -223,63 +223,55 @@ QDialog > QLineEdit
 
 QScrollBar:vertical
 {
-   border: 0;
    width: 16px;
-   margin: 16px 0;
+   border: 0;
+   margin: 0;
    border-left-width: 1px;
    border-left-style: solid;
 }
 
-QScrollBar:horizontal
-{
-   border: 0;
-   border-top-width: 1px;
-   border-top-style: solid;
-   height: 16px;
-   margin: 0 16px;
-}
-
 QScrollBar::handle:vertical
 {
-   width: 14px;
-   min-height: 10px;
-   border-width: 1px;
-   border-style: solid;
-   border-right: 0;
-   border-left: 0;
+    width: 14px;
+    min-height: 10px;
 }
+
+QScrollBar::add-line:vertical
+{
+   border: 0;
+   background: none;
+   height: 0;
+   subcontrol-position: bottom;
+   subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+    border: 0;
+    background: none;
+    height: 0;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+
+QScrollBar:horizontal
+{
+   height: 16px;
+   border: 0;
+   margin: 0;
+   border-top-width: 1px;
+   border-top-style: solid;
+}
+
 
 QScrollBar::handle:horizontal
 {
    height: 14px;
    min-width: 10px;
-   border-width: 1px;
-   border-style: solid;
-   border-top: 0;
-   border-bottom: 0;
-}
-
-QScrollBar::add-line:vertical
-{
-   subcontrol-position: bottom center;
-   subcontrol-origin: margin;
-   border: 0;
-   height: 0;
-   width: 0;
 }
 
 QScrollBar::add-line:horizontal
 {
    subcontrol-position: right;
-   subcontrol-origin: margin;
-   border: 0;
-   height: 0;
-   width: 0;
-}
-
-QScrollBar::sub-line:vertical
-{
-   subcontrol-position: top center;
    subcontrol-origin: margin;
    border: 0;
    height: 0;
