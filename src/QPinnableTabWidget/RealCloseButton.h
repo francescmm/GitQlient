@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** QPinnableTabWidget is a library that overrides a QTabWidget to allow the user to pin tabs.
  **
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
