@@ -28,6 +28,9 @@
 
 class QPinnableTabWidget;
 class InitScreen;
+class ProgressDlg;
+class GitConfig;
+class QStackedLayout;
 
 /*!
  \brief The GitQlient class is the MainWindow of the GitQlient application. Is the widget that stores all the tabs about
@@ -80,10 +83,17 @@ public:
     */
    void restorePinnedRepos();
 
+protected:
+   bool eventFilter(QObject *obj, QEvent *event) override;
+
 private:
+   QStackedLayout *mStackedLayout = nullptr;
    QPinnableTabWidget *mRepos = nullptr;
    InitScreen *mConfigWidget = nullptr;
    QSet<QString> mCurrentRepos;
+   QSharedPointer<GitConfig> mGit;
+   ProgressDlg *mProgressDlg = nullptr;
+   QString mPathToOpen;
 
    /*!
     \brief This method parses all the arguments and configures GitQlient settings with them. Part of the arguments can
@@ -95,9 +105,40 @@ private:
    QStringList parseArguments(const QStringList &arguments);
    /*!
     \brief Opens a QFileDialog to select a repository in the local disk.
-
    */
    void openRepo();
+
+   /**
+    * @brief Opens a QFileDialog to select a repository in the local disk.
+    * @param path The path of the new repo.
+    */
+   void openRepoWithPath(const QString &path);
+
+   /*!
+    \brief Clones a new repository.
+   */
+   void cloneRepo();
+
+   /*!
+    \brief Initiates a new local repository.
+   */
+   void initRepo();
+
+   /**
+    * @brief Updates the progress dialog for cloning repos.
+    *
+    * @param stepDescription The description step.
+    * @param value The numeric value.
+    */
+   void updateProgressDialog(QString stepDescription, int value);
+
+   /**
+    * @brief showError Shows an error occurred during any configuration time.
+    * @param error The error code.
+    * @param description The error description.
+    */
+   void showError(int error, QString description);
+
    /*!
     \brief Creates a new GitQlientWidget instance or the repository defined in the \p repoPath value. After that, it
     adds a new tab in the current widget.

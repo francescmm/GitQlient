@@ -5,16 +5,23 @@
 #include <GitQlientSettings.h>
 #include <QPinnableTabWidget.h>
 #include <InitialRepoConfig.h>
+#include <GitBase.h>
+#include <CreateRepoDlg.h>
+#include <ProgressDlg.h>
+#include <GitConfig.h>
+#include <GitQlientRepo.h>
 
+#include <QMenu>
+#include <QEvent>
 #include <QProcess>
 #include <QTabBar>
-#include <GitQlientRepo.h>
-#include <QVBoxLayout>
-#include <QPushButton>
+#include <QStackedLayout>
+#include <QToolButton>
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <GitBase.h>
+#include <QTabBar>
+#include <QPushButton>
 
 #include <QLogger.h>
 
@@ -27,8 +34,10 @@ GitQlient::GitQlient(QWidget *parent)
 
 GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    : QWidget(parent)
+   , mStackedLayout(new QStackedLayout(this))
    , mRepos(new QPinnableTabWidget())
    , mConfigWidget(new InitScreen())
+
 {
 
    auto repos = parseArguments(arguments);
@@ -40,22 +49,65 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
    setStyleSheet(GitQlientStyles::getStyles());
 
-   const auto addTab = new QPushButton();
-   addTab->setObjectName("openNewRepo");
-   addTab->setIcon(QIcon(":/icons/open_repo"));
-   addTab->setToolTip(tr("Open new repository"));
-   connect(addTab, &QPushButton::clicked, this, &GitQlient::openRepo);
+   const auto homeMenu = new QPushButton();
+   const auto menu = new QMenu(homeMenu);
+
+   homeMenu->setIcon(QIcon(":/icons/burger_menu"));
+   homeMenu->setIconSize(QSize(17, 17));
+   homeMenu->setToolTip("Options");
+   homeMenu->setMenu(menu);
+   homeMenu->setObjectName("MainMenuBtn");
+
+   menu->installEventFilter(this);
+
+   const auto open = menu->addAction(tr("Open repo..."));
+   connect(open, &QAction::triggered, this, &GitQlient::openRepo);
+
+   const auto clone = menu->addAction(tr("Clone repo..."));
+   connect(clone, &QAction::triggered, this, &GitQlient::cloneRepo);
+
+   const auto init = menu->addAction(tr("New repo..."));
+   connect(init, &QAction::triggered, this, &GitQlient::initRepo);
+
+   menu->addSeparator();
+
+   GitQlientSettings settings;
+   const auto recent = new QMenu("Recent repos", menu);
+   const auto recentProjects = settings.getMostUsedProjects();
+
+   for (const auto &project : recentProjects)
+   {
+      const auto projectName = project.mid(project.lastIndexOf("/") + 1);
+      const auto action = recent->addAction(projectName);
+      action->setData(project);
+      connect(action, &QAction::triggered, this, [this, project]() { openRepoWithPath(project); });
+   }
+
+   menu->addMenu(recent);
+
+   const auto mostUsed = new QMenu("Most used repos", menu);
+   const auto projects = settings.getRecentProjects();
+
+   for (const auto &project : projects)
+   {
+      const auto projectName = project.mid(project.lastIndexOf("/") + 1);
+      const auto action = mostUsed->addAction(projectName);
+      action->setData(project);
+      connect(action, &QAction::triggered, this, [this, project]() { openRepoWithPath(project); });
+   }
+
+   menu->addMenu(mostUsed);
 
    mRepos->setObjectName("GitQlientTab");
    mRepos->setStyleSheet(GitQlientStyles::getStyles());
-   mRepos->setCornerWidget(addTab, Qt::TopRightCorner);
+   mRepos->setCornerWidget(homeMenu, Qt::TopLeftCorner);
    connect(mRepos, &QTabWidget::tabCloseRequested, this, &GitQlient::closeTab);
    connect(mRepos, &QTabWidget::currentChanged, this, &GitQlient::updateWindowTitle);
 
-   const auto vLayout = new QVBoxLayout(this);
-   vLayout->setContentsMargins(QMargins());
-   vLayout->addWidget(mRepos);
-   mRepos->addPinnedTab(mConfigWidget, QIcon(":/icons/home"), QString());
+   mStackedLayout->setContentsMargins(QMargins());
+   mStackedLayout->addWidget(mConfigWidget);
+   mStackedLayout->addWidget(mRepos);
+   mStackedLayout->setCurrentIndex(0);
 
    mConfigWidget->onRepoOpened();
 
@@ -63,11 +115,17 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
    setRepositories(repos);
 
-   GitQlientSettings settings;
    const auto geometry = settings.globalValue("GitQlientGeometry", saveGeometry()).toByteArray();
 
    if (!geometry.isNull())
       restoreGeometry(geometry);
+
+   const auto gitBase(QSharedPointer<GitBase>::create(""));
+   mGit = QSharedPointer<GitConfig>::create(gitBase);
+
+   connect(mGit.data(), &GitConfig::signalCloningProgress, this, &GitQlient::updateProgressDialog,
+           Qt::DirectConnection);
+   connect(mGit.data(), &GitConfig::signalCloningFailure, this, &GitQlient::showError, Qt::DirectConnection);
 }
 
 GitQlient::~GitQlient()
@@ -76,7 +134,7 @@ GitQlient::~GitQlient()
    QStringList pinnedRepos;
    const auto totalTabs = mRepos->count();
 
-   for (auto i = 1; i < totalTabs; ++i)
+   for (auto i = 0; i < totalTabs; ++i)
    {
       if (mRepos->isPinned(i))
       {
@@ -91,16 +149,82 @@ GitQlient::~GitQlient()
    QLog_Info("UI", "*            Closing GitQlient            *\n\n");
 }
 
+bool GitQlient::eventFilter(QObject *obj, QEvent *event)
+{
+
+   if (const auto menu = qobject_cast<QMenu *>(obj); menu && event->type() == QEvent::Show)
+   {
+      auto localPos = menu->parentWidget()->pos();
+      auto pos = mapToGlobal(localPos);
+      menu->show();
+      pos.setY(pos.y() + menu->parentWidget()->height());
+      menu->move(pos);
+      return true;
+   }
+
+   return false;
+}
+
 void GitQlient::openRepo()
 {
 
    const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
 
    if (!dirName.isEmpty())
+      openRepoWithPath(dirName);
+}
+
+void GitQlient::openRepoWithPath(const QString &path)
+{
+   QDir d(path);
+   addRepoTab(d.absolutePath());
+}
+
+void GitQlient::cloneRepo()
+{
+   CreateRepoDlg cloneDlg(CreateRepoDlgType::CLONE, mGit);
+   connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, [this](const QString &path) { mPathToOpen = path; });
+
+   if (cloneDlg.exec() == QDialog::Accepted)
    {
-      QDir d(dirName);
-      addRepoTab(d.absolutePath());
+      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 100, false);
+      connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
+      mProgressDlg->show();
    }
+}
+
+void GitQlient::initRepo()
+{
+   CreateRepoDlg cloneDlg(CreateRepoDlgType::INIT, mGit);
+   connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, &GitQlient::openRepoWithPath);
+   cloneDlg.exec();
+}
+
+void GitQlient::updateProgressDialog(QString stepDescription, int value)
+{
+   if (value >= 0)
+   {
+      mProgressDlg->setValue(value);
+
+      if (stepDescription.contains("done", Qt::CaseInsensitive))
+      {
+         mProgressDlg->close();
+         openRepoWithPath(mPathToOpen);
+
+         mPathToOpen = "";
+      }
+   }
+
+   mProgressDlg->setLabelText(stepDescription);
+   mProgressDlg->repaint();
+}
+
+void GitQlient::showError(int, QString description)
+{
+   if (mProgressDlg)
+      mProgressDlg->deleteLater();
+
+   QMessageBox::critical(this, tr("Error!"), description);
 }
 
 void GitQlient::setRepositories(const QStringList &repositories)
@@ -228,6 +352,7 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
          }
 
          mRepos->setCurrentIndex(index);
+         mStackedLayout->setCurrentIndex(1);
 
          mCurrentRepos.insert(repoPath);
       }
@@ -245,13 +370,17 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
 
 void GitQlient::closeTab(int tabIndex)
 {
-   auto repoToRemove = dynamic_cast<GitQlientRepo *>(mRepos->widget(tabIndex));
+   const auto repoToRemove = dynamic_cast<GitQlientRepo *>(mRepos->widget(tabIndex));
 
    QLog_Info("UI", QString("Removing repository {%1}").arg(repoToRemove->currentDir()));
 
    mCurrentRepos.remove(repoToRemove->currentDir());
-   // mRepos->removeTab(tabIndex);
    repoToRemove->close();
+
+   const auto totalTabs = mRepos->count() - 1;
+
+   if (totalTabs == 0)
+      mStackedLayout->setCurrentIndex(0);
 }
 
 void GitQlient::restorePinnedRepos()

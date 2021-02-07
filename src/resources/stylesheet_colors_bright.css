@@ -458,22 +458,12 @@ GitQlient
    background: #C6C6C7;
 }
 
-#openNewRepo
+#MainMenuBtn, #GitQlientTab > QTabBar::tab:first
 {
    background: #C6C6C7;
 }
 
-#openNewRepo:hover, #openGitAdmin:hover
-{
-   background: #606162;
-}
-
-#GitQlientTab > QTabBar::tab:first
-{
-   background: #C6C6C7;
-}
-
-#GitQlientTab > QTabBar::tab:first:selected
+#MainMenuBtn:hover, #GitQlientTab > QTabBar::tab:first:selected
 {
    background: #606162;
 }

@@ -447,29 +447,19 @@ GitQlient
    background: #2E2F30;
 }
 
-#openNewRepo
+#MainMenuBtn
 {
    background-color: #2E2F30;
 }
 
-#openNewRepo:hover, #openGitAdmin:hover
+#MainMenuBtn:hover, #GitQlientTab:hover
 {
    background-color: #606162;
 }
 
-#GitQlientTab > QTabBar::tab:first
+#GitQlientTab
 {
    background-color: #2E2F30;
-}
-
-#GitQlientTab > QTabBar::tab:first:hover
-{
-   background-color: #606162;
-}
-
-#GitQlientTab > QTabBar::tab:first:selected
-{
-   background-color: #404142;
 }
 
 InitScreen
