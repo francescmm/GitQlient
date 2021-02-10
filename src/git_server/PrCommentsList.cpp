@@ -212,7 +212,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    const auto bodyDescLayout = new QVBoxLayout(bodyDescFrame);
    bodyDescLayout->setContentsMargins(10, 10, 10, 10);
 
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
    const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
 
@@ -394,7 +394,7 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
    creationLayout->addStretch();
    creationLayout->addWidget(new QLabel(comment.association));
 
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
    const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
 

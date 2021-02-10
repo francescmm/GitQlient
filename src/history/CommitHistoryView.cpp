@@ -87,15 +87,14 @@ void CommitHistoryView::filterBySha(const QStringList &shaList)
 
 CommitHistoryView::~CommitHistoryView()
 {
-   GitQlientSettings s;
-   s.setLocalValue(mGit->getGitDir(), QString("%1").arg(objectName()), header()->saveState());
+   GitQlientSettings s(mGit->getGitDir());
+   s.setLocalValue(QString("%1").arg(objectName()), header()->saveState());
 }
 
 void CommitHistoryView::setupGeometry()
 {
-   GitQlientSettings s;
-   const auto previousState
-       = s.localValue(mGit->getGitDir(), QString("%1").arg(objectName()), QByteArray()).toByteArray();
+   GitQlientSettings s(mGit->getGitDir());
+   const auto previousState = s.localValue(QString("%1").arg(objectName()), QByteArray()).toByteArray();
 
    if (previousState.isEmpty())
    {

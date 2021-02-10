@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
    QFontDatabase::addApplicationFont(":/DejaVuSans");
    QFontDatabase::addApplicationFont(":/DejaVuSansMono");
 
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    settings.setGlobalValue("isGitQlient", true);
 
    GitQlient mainWin(arguments);

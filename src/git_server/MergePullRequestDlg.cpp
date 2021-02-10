@@ -24,7 +24,7 @@ MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, cons
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    const auto serverUrl = gitConfig->getServerUrl();
 
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
    const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
    const auto repoInfo = gitConfig->getCurrentRepoAndOwner();

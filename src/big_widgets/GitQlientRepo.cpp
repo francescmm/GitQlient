@@ -94,8 +94,8 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    showHistoryView();
 
-   GitQlientSettings settings;
-   const auto fetchInterval = settings.localValue(mGitBase->getGitDir(), "AutoFetch", 5).toInt();
+   GitQlientSettings settings(mGitBase->getGitDir());
+   const auto fetchInterval = settings.localValue("AutoFetch", 5).toInt();
 
    mAutoFetch->setInterval(fetchInterval * 60 * 1000);
    mAutoFilesUpdate->setInterval(15000);
@@ -169,7 +169,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(this, SIGNAL(signalLoadRepo(bool)), mGitLoader.data(), SLOT(load(bool)));
    m_loaderThread->start();
 
-   mGitLoader->setShowAll(settings.localValue(mGitBase->getGitDir(), "ShowAllBranches", true).toBool());
+   mGitLoader->setShowAll(settings.localValue("ShowAllBranches", true).toBool());
 }
 
 GitQlientRepo::~GitQlientRepo()
@@ -472,7 +472,7 @@ bool GitQlientRepo::configureGitServer() const
       const auto serverUrl = gitConfig->getServerUrl();
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
-      GitQlientSettings settings;
+      GitQlientSettings settings("");
       const auto user = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
       const auto token = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
 

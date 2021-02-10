@@ -38,7 +38,7 @@ public:
     \brief Default constructor.
 
    */
-   GitQlientSettings() = default;
+   GitQlientSettings(const QString &gitRepoPath);
 
    /*!
     \brief Sets a value for a given \p key.
@@ -61,7 +61,7 @@ public:
     * @param key The key.
     * @param value The new value for the key.
     */
-   void setLocalValue(const QString &repo, const QString &key, const QVariant &value);
+   void setLocalValue(const QString &key, const QVariant &value);
 
    /**
     * @brief getLocalValue Returns the value for a given @p repo and a given @p key.
@@ -69,7 +69,7 @@ public:
     * @param key The key
     * @param defaultValue (optional) A default value in case the key doesn't exist.
     */
-   QVariant localValue(const QString &repo, const QString &key, const QVariant &defaultValue = QVariant());
+   QVariant localValue(const QString &key, const QVariant &defaultValue = QVariant());
 
    /*!
     \brief Stores that a project is opened. This is used to recalculate which projects are the most used.
@@ -116,4 +116,5 @@ public:
 
 private:
    QSettings globalSettings;
+   QString mGitRepoPath;
 };

@@ -154,7 +154,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mBranchesWidget, &BranchesWidget::signalPullConflict, this, &HistoryWidget::signalPullConflict);
    connect(mBranchesWidget, &BranchesWidget::panelsVisibilityChanged, this, &HistoryWidget::panelsVisibilityChanged);
 
-   GitQlientSettings settings;
+   GitQlientSettings settings(mGit->getGitDir());
 
    const auto cherryPickBtn = new QPushButton(tr("Cherry-pick"));
    cherryPickBtn->setEnabled(false);
@@ -164,8 +164,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });
 
    mChShowAllBranches = new CheckBox(tr("Show all branches"));
-   mChShowAllBranches->setChecked(
-       settings.localValue(mGit->getGitDir(), "ShowAllBranches", true).toBool());
+   mChShowAllBranches->setChecked(settings.localValue("ShowAllBranches", true).toBool());
    connect(mChShowAllBranches, &CheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
 
    const auto graphOptionsLayout = new QHBoxLayout();
@@ -207,7 +206,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mFileDiff, &FileDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
    connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
 
-   if (GitQlientSettings settings; !settings.globalValue("isGitQlient", false).toBool())
+   if (GitQlientSettings settings(""); !settings.globalValue("isGitQlient", false).toBool())
       connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
    else
    {
@@ -394,8 +393,8 @@ void HistoryWidget::commitSelected(const QModelIndex &index)
 
 void HistoryWidget::onShowAllUpdated(bool showAll)
 {
-   GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitDir(), "ShowAllBranches", showAll);
+   GitQlientSettings settings(mGit->getGitDir());
+   settings.setLocalValue("ShowAllBranches", showAll);
 
    emit signalAllBranchesActive(showAll);
 }

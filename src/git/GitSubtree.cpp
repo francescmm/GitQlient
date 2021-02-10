@@ -16,16 +16,16 @@ GitExecResult GitSubtree::add(const QString &url, const QString &ref, const QStr
 {
    QLog_Debug("UI", "Adding a subtree");
 
-   GitQlientSettings settings;
+   GitQlientSettings settings(mGitBase->getGitDir());
 
    for (auto i = 0;; ++i)
    {
-      const auto repo = settings.localValue(mGitBase->getGitDir(), QString("Subtrees/%1.prefix").arg(i));
+      const auto repo = settings.localValue(QString("Subtrees/%1.prefix").arg(i));
 
       if (repo.toString() == name)
       {
-         settings.setLocalValue(mGitBase->getGitDir(), QString("Subtrees/%1.url").arg(i), url);
-         settings.setLocalValue(mGitBase->getGitDir(), QString("Subtrees/%1.ref").arg(i), ref);
+         settings.setLocalValue(QString("Subtrees/%1.url").arg(i), url);
+         settings.setLocalValue(QString("Subtrees/%1.ref").arg(i), ref);
 
          auto cmd = QString("git subtree add --prefix=%1 %2 %3").arg(name, url, ref);
 
@@ -43,9 +43,9 @@ GitExecResult GitSubtree::add(const QString &url, const QString &ref, const QStr
       }
       else if (repo.toString().isEmpty())
       {
-         settings.setLocalValue(mGitBase->getGitDir(), QString("Subtrees/%1.prefix").arg(i), name);
-         settings.setLocalValue(mGitBase->getGitDir(), QString("Subtrees/%1.url").arg(i), url);
-         settings.setLocalValue(mGitBase->getGitDir(), QString("Subtrees/%1.ref").arg(i), ref);
+         settings.setLocalValue(QString("Subtrees/%1.prefix").arg(i), name);
+         settings.setLocalValue(QString("Subtrees/%1.url").arg(i), url);
+         settings.setLocalValue(QString("Subtrees/%1.ref").arg(i), ref);
 
          QLog_Trace("Git", QString("Updating subtree info: {%1}").arg(name));
 

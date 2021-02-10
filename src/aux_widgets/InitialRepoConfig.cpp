@@ -13,21 +13,21 @@ InitialRepoConfig::InitialRepoConfig(const QSharedPointer<GitBase> &git, QWidget
 
    ui->setupUi(this);
 
-   GitQlientSettings settings;
+   GitQlientSettings settings(mGit->getGitDir());
 
-   ui->autoFetch->setValue(settings.localValue(mGit->getGitDir(), "AutoFetch", 5).toInt());
-   ui->pruneOnFetch->setChecked(settings.localValue(mGit->getGitDir(), "PruneOnFetch", true).toBool());
-   ui->updateOnPull->setChecked(settings.localValue(mGit->getGitDir(), "UpdateOnPull", false).toBool());
-   ui->sbMaxCommits->setValue(settings.localValue(mGit->getGitDir(), "MaxCommits", 0).toInt());
+   ui->autoFetch->setValue(settings.localValue("AutoFetch", 5).toInt());
+   ui->pruneOnFetch->setChecked(settings.localValue("PruneOnFetch", true).toBool());
+   ui->updateOnPull->setChecked(settings.localValue("UpdateOnPull", false).toBool());
+   ui->sbMaxCommits->setValue(settings.localValue("MaxCommits", 0).toInt());
 }
 
 InitialRepoConfig::~InitialRepoConfig()
 {
-   GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitDir(), "AutoFetch", ui->autoFetch->value());
-   settings.setLocalValue(mGit->getGitDir(), "PruneOnFetch", ui->pruneOnFetch->isChecked());
-   settings.setLocalValue(mGit->getGitDir(), "UpdateOnPull", ui->updateOnPull->isChecked());
-   settings.setLocalValue(mGit->getGitDir(), "MaxCommits", ui->sbMaxCommits->value());
+   GitQlientSettings settings(mGit->getGitDir());
+   settings.setLocalValue("AutoFetch", ui->autoFetch->value());
+   settings.setLocalValue("PruneOnFetch", ui->pruneOnFetch->isChecked());
+   settings.setLocalValue("UpdateOnPull", ui->updateOnPull->isChecked());
+   settings.setLocalValue("MaxCommits", ui->sbMaxCommits->value());
 
    delete ui;
 }

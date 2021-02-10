@@ -58,7 +58,7 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServer
 
    ui->leEndPoint->setHidden(true);
 
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    ui->leUserName->setText(mData.user);
    ui->leUserToken->setText(mData.token);
    ui->leEndPoint->setText(
@@ -110,7 +110,7 @@ void ServerConfigDlg::accept()
 {
    const auto endpoint = ui->cbServer->currentIndex() == GitHubEnterprise ? ui->leEndPoint->text()
                                                                           : ui->cbServer->currentData().toString();
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    settings.setGlobalValue(QString("%1/user").arg(mData.serverUrl), ui->leUserName->text());
    settings.setGlobalValue(QString("%1/token").arg(mData.serverUrl), ui->leUserToken->text());
    settings.setGlobalValue(QString("%1/endpoint").arg(mData.serverUrl), endpoint);

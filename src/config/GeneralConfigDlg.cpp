@@ -37,7 +37,7 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
    mReset->setMinimumWidth(75);
    mApply->setMinimumWidth(75);
 
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
 
    mDisableLogs->setChecked(settings.globalValue("logsDisabled", true).toBool());
 
@@ -99,7 +99,7 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
 
 void GeneralConfigDlg::resetChanges()
 {
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
    mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", 2).toInt());
    mStylesSchema->setCurrentText(settings.globalValue("colorSchema", "bright").toString());
@@ -108,7 +108,7 @@ void GeneralConfigDlg::resetChanges()
 
 void GeneralConfigDlg::accept()
 {
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    settings.setGlobalValue("logsDisabled", mDisableLogs->isChecked());
    settings.setGlobalValue("logsLevel", mLevelCombo->currentIndex());
    settings.setGlobalValue("colorSchema", mStylesSchema->currentText());

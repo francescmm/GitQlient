@@ -51,7 +51,7 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
 
    ui->amendFrame->setVisible(false);
 
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    mTitleMaxLength = settings.globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
 
    ui->lCounter->setText(QString::number(mTitleMaxLength));
@@ -465,7 +465,7 @@ void CommitChangesWidget::clear()
 
 void CommitChangesWidget::setCommitTitleMaxLength()
 {
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    mTitleMaxLength = settings.globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
 
    ui->lCounter->setText(QString::number(mTitleMaxLength));

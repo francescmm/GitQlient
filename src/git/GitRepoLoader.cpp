@@ -143,15 +143,15 @@ void GitRepoLoader::requestRevisions()
 {
    QLog_Debug("Git", "Loading revisions.");
 
-   GitQlientSettings settings;
-   const auto maxCommits = settings.localValue(mGitBase->getGitDir(), "MaxCommits", 0).toInt();
+   GitQlientSettings settings(mGitBase->getGitDir());
+   const auto maxCommits = settings.localValue("MaxCommits", 0).toInt();
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
        : mShowAll                                 ? QString("--all")
                                                   : mGitBase->getCurrentBranch();
 
    QString order;
 
-   switch (settings.localValue(mGitBase->getGitDir(), "GraphSortingOrder", 0).toInt())
+   switch (settings.localValue("GraphSortingOrder", 0).toInt())
    {
       case 0:
          order = "--author-date-order";

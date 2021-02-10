@@ -22,7 +22,7 @@ GitLabRestApi::GitLabRestApi(const QString &userName, const QString &repoName, c
    if (!userName.isEmpty() && !auth.userName.isEmpty() && !auth.userPass.isEmpty() && !auth.endpointUrl.isEmpty())
    {
       mPreRequisites = 0;
-      GitQlientSettings settings;
+      GitQlientSettings settings("");
       mUserId = settings.globalValue(QString("%1/%2-userId").arg(mSettingsKey, mRepoName), "").toString();
       mRepoId = settings.globalValue(QString("%1/%2-repoId").arg(mSettingsKey, mRepoName), "").toString();
 
@@ -235,7 +235,7 @@ void GitLabRestApi::onUserInfoReceived()
 
          mUserId = firstUser.value("id").toString();
 
-         GitQlientSettings settings;
+         GitQlientSettings settings("");
          settings.setGlobalValue(QString("%1/%2-userId").arg(mSettingsKey, mRepoName), mUserId);
 
          --mPreRequisites;
@@ -274,7 +274,7 @@ void GitLabRestApi::onProjectsReceived()
          {
             mRepoId = labelMap.value("id").toString();
 
-            GitQlientSettings settings;
+            GitQlientSettings settings("");
             settings.setGlobalValue(QString("%1/%2-repoId").arg(mSettingsKey, mRepoName), mRepoId);
             --mPreRequisites;
 

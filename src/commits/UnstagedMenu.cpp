@@ -3,7 +3,6 @@
 #include <GitBase.h>
 #include <GitSyncProcess.h>
 #include <GitLocal.h>
-#include <GitQlientSettings.h>
 #include <QLogger.h>
 
 #include <QFile>
@@ -22,9 +21,6 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
 
    connect(addAction(tr("See changes")), &QAction::triggered, this, [this]() { emit signalShowDiff(mFileName); });
    connect(addAction(tr("Blame")), &QAction::triggered, this, [this]() { emit signalShowFileHistory(mFileName); });
-
-   GitQlientSettings settings;
-
    connect(addAction(tr("Edit file")), &QAction::triggered, this, [this]() { emit signalEditFile(); });
 
    addSeparator();

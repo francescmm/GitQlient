@@ -5,6 +5,11 @@
 QString GitQlientSettings::PinnedRepos = "Config/PinnedRepos";
 QString GitQlientSettings::SplitFileDiffView = "SplitDiff";
 
+GitQlientSettings::GitQlientSettings(const QString &gitRepoPath)
+   : mGitRepoPath(gitRepoPath)
+{
+}
+
 void GitQlientSettings::setGlobalValue(const QString &key, const QVariant &value)
 {
    globalSettings.setValue(key, value);
@@ -16,16 +21,16 @@ QVariant GitQlientSettings::globalValue(const QString &key, const QVariant &defa
    return globalSettings.value(key, defaultValue);
 }
 
-void GitQlientSettings::setLocalValue(const QString &repo, const QString &key, const QVariant &value)
+void GitQlientSettings::setLocalValue(const QString &key, const QVariant &value)
 {
-   QSettings localSettings(repo + "/GitQlientConfig.ini", QSettings::IniFormat);
+   QSettings localSettings(mGitRepoPath + "/GitQlientConfig.ini", QSettings::IniFormat);
    localSettings.setValue(key, value);
    localSettings.sync();
 }
 
-QVariant GitQlientSettings::localValue(const QString &repo, const QString &key, const QVariant &defaultValue)
+QVariant GitQlientSettings::localValue(const QString &key, const QVariant &defaultValue)
 {
-   QSettings localSettings(repo + "/GitQlientConfig.ini", QSettings::IniFormat);
+   QSettings localSettings(mGitRepoPath + "/GitQlientConfig.ini", QSettings::IniFormat);
    return localSettings.value(key, defaultValue);
 }
 

@@ -30,7 +30,7 @@ InitScreen::InitScreen(QWidget *parent)
    , mOpenRepo(new QPushButton(tr("OPEN")))
    , mCloneRepo(new QPushButton(tr("CLONE")))
    , mInitRepo(new QPushButton(tr("NEW")))
-   , mSettings(new GitQlientSettings())
+   , mSettings(new GitQlientSettings(""))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
