@@ -46,7 +46,7 @@ GitExecResult GitRemote::pull()
    auto ret = mGitBase->run("git pull --ff-only");
 
    GitQlientSettings settings;
-   const auto updateOnPull = settings.localValue(mGitBase->getGitQlientSettingsDir(), "UpdateOnPull", true).toBool();
+   const auto updateOnPull = settings.localValue(mGitBase->getGitDir(), "UpdateOnPull", true).toBool();
 
    if (ret.success && updateOnPull)
    {
@@ -69,7 +69,7 @@ bool GitRemote::fetch()
    QLog_Debug("Git", QString("Executing fetch with prune"));
 
    GitQlientSettings settings;
-   const auto pruneOnFetch = settings.localValue(mGitBase->getGitQlientSettingsDir(), "PruneOnFetch", true).toBool();
+   const auto pruneOnFetch = settings.localValue(mGitBase->getGitDir(), "PruneOnFetch", true).toBool();
 
    const auto cmd
        = QString("git fetch --all --tags --force %1").arg(pruneOnFetch ? QString("--prune --prune-tags") : QString());

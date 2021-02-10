@@ -106,7 +106,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    GitQlientSettings settings;
 
    /* STASHES START */
-   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool();
+   if (const auto visible = settings.localValue(mGit->getGitDir(), "StashesHeader", true).toBool();
        !visible)
    {
       const auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
@@ -142,7 +142,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    /* STASHES END */
 
    /* SUBMODULES START */
-   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool();
+   if (const auto visible = settings.localValue(mGit->getGitDir(), "SubmodulesHeader", true).toBool();
        !visible)
    {
       const auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
@@ -181,7 +181,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    /* SUBMODULES END */
 
    /* SUBTREE START */
-   if (const auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubtreeHeader", true).toBool();
+   if (const auto visible = settings.localValue(mGit->getGitDir(), "SubtreeHeader", true).toBool();
        !visible)
    {
       const auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
@@ -277,7 +277,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    mainLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding), 2, 1);
 
    const auto isMinimalVisible
-       = settings.localValue(mGit->getGitQlientSettingsDir(), "MinimalBranchesView", false).toBool();
+       = settings.localValue(mGit->getGitDir(), "MinimalBranchesView", false).toBool();
    mFullBranchFrame->setVisible(!isMinimalVisible);
    mMinimal->setVisible(isMinimalVisible);
    connect(mMinimal, &BranchesWidgetMinimal::showFullBranchesView, this, &BranchesWidget::fullView);
@@ -407,13 +407,13 @@ void BranchesWidget::fullView()
    mMinimal->setVisible(false);
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MinimalBranchesView", mMinimal->isVisible());
+   settings.setLocalValue(mGit->getGitDir(), "MinimalBranchesView", mMinimal->isVisible());
 }
 
 void BranchesWidget::returnToSavedView()
 {
    GitQlientSettings settings;
-   const auto savedState = settings.localValue(mGit->getGitQlientSettingsDir(), "MinimalBranchesView", false).toBool();
+   const auto savedState = settings.localValue(mGit->getGitDir(), "MinimalBranchesView", false).toBool();
 
    if (savedState != mMinimal->isVisible())
    {
@@ -427,7 +427,7 @@ void BranchesWidget::minimalView()
    forceMinimalView();
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MinimalBranchesView", mMinimal->isVisible());
+   settings.setLocalValue(mGit->getGitDir(), "MinimalBranchesView", mMinimal->isVisible());
 }
 
 void BranchesWidget::forceMinimalView()
@@ -440,17 +440,17 @@ void BranchesWidget::onPanelsVisibilityChaned()
 {
    GitQlientSettings settings;
 
-   auto visible = settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool();
+   auto visible = settings.localValue(mGit->getGitDir(), "StashesHeader", true).toBool();
    auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
    mStashesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mStashesList->setVisible(visible);
 
-   visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool();
+   visible = settings.localValue(mGit->getGitDir(), "SubmodulesHeader", true).toBool();
    icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
    mSubmodulesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mSubmodulesList->setVisible(visible);
 
-   visible = settings.localValue(mGit->getGitQlientSettingsDir(), "SubtreeHeader", true).toBool();
+   visible = settings.localValue(mGit->getGitDir(), "SubtreeHeader", true).toBool();
    icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
    mSubtreeArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mSubtreeList->setVisible(visible);
@@ -895,7 +895,7 @@ void BranchesWidget::onStashesHeaderClicked()
    mStashesList->setVisible(!stashesAreVisible);
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "StashesHeader", !stashesAreVisible);
+   settings.setLocalValue(mGit->getGitDir(), "StashesHeader", !stashesAreVisible);
 
    emit panelsVisibilityChanged();
 }
@@ -908,7 +908,7 @@ void BranchesWidget::onSubmodulesHeaderClicked()
    mSubmodulesList->setVisible(!submodulesAreVisible);
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", !submodulesAreVisible);
+   settings.setLocalValue(mGit->getGitDir(), "SubmodulesHeader", !submodulesAreVisible);
 
    emit panelsVisibilityChanged();
 }
@@ -998,14 +998,14 @@ QPair<QString, QString> BranchesWidget::getSubtreeData(const QString &prefix)
 
    for (auto i = 0; !end; ++i)
    {
-      const auto repo = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.prefix").arg(i), "");
+      const auto repo = settings.localValue(mGit->getGitDir(), QString("Subtrees/%1.prefix").arg(i), "");
 
       if (repo.toString() == prefix)
       {
          auto tmpUrl
-             = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i)).toString();
+             = settings.localValue(mGit->getGitDir(), QString("Subtrees/%1.url").arg(i)).toString();
          auto tmpRef
-             = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i)).toString();
+             = settings.localValue(mGit->getGitDir(), QString("Subtrees/%1.ref").arg(i)).toString();
 
          if (tmpUrl.isEmpty() || tmpRef.isEmpty())
          {
@@ -1022,9 +1022,9 @@ QPair<QString, QString> BranchesWidget::getSubtreeData(const QString &prefix)
 
                if (ret == QDialog::Accepted)
                {
-                  tmpUrl = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i))
+                  tmpUrl = settings.localValue(mGit->getGitDir(), QString("Subtrees/%1.url").arg(i))
                                .toString();
-                  tmpRef = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i))
+                  tmpRef = settings.localValue(mGit->getGitDir(), QString("Subtrees/%1.ref").arg(i))
                                .toString();
 
                   if (tmpUrl.isEmpty() || tmpRef.isEmpty())
@@ -1064,9 +1064,9 @@ QPair<QString, QString> BranchesWidget::getSubtreeData(const QString &prefix)
             if (ret == QDialog::Accepted)
             {
                const auto tmpUrl
-                   = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.url").arg(i)).toString();
+                   = settings.localValue(mGit->getGitDir(), QString("Subtrees/%1.url").arg(i)).toString();
                const auto tmpRef
-                   = settings.localValue(mGit->getGitQlientSettingsDir(), QString("Subtrees/%1.ref").arg(i)).toString();
+                   = settings.localValue(mGit->getGitDir(), QString("Subtrees/%1.ref").arg(i)).toString();
 
                if (tmpUrl.isEmpty() || tmpRef.isEmpty())
                   QMessageBox::critical(this, tr("Unexpected error!"),

@@ -40,7 +40,7 @@ void GitBase::setWorkingDir(const QString &workingDir)
    mWorkingDirectory = workingDir;
 }
 
-QString GitBase::getGitQlientSettingsDir() const
+QString GitBase::getGitDir() const
 {
    return mGitDirectory;
 }

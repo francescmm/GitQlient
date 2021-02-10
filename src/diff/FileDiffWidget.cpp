@@ -115,7 +115,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
 
    GitQlientSettings settings;
    mFileVsFile
-       = settings.localValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, false).toBool();
+       = settings.localValue(mGit->getGitDir(), GitQlientSettings::SplitFileDiffView, false).toBool();
 
    mBack->setIcon(QIcon(":/icons/back"));
    mBack->setToolTip(tr("Return to the view"));
@@ -280,7 +280,7 @@ void FileDiffWidget::setSplitViewEnabled(bool enable)
    mSearchOld->setVisible(mFileVsFile);
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
+   settings.setLocalValue(mGit->getGitDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
 
    configure(mCurrentSha, mPreviousSha, mCurrentFile, mIsCached);
 
@@ -309,7 +309,7 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
    mSearchOld->setVisible(mFileVsFile);
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
+   settings.setLocalValue(mGit->getGitDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
 
    configure(mCurrentSha, mPreviousSha, mCurrentFile, mIsCached);
 

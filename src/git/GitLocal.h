@@ -47,6 +47,7 @@ public:
 
    explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
    GitExecResult stageFile(const QString &fileName) const;
+   bool isInCherryPickMerge() const;
    GitExecResult cherryPickCommit(const QString &sha) const;
    GitExecResult cherryPickAbort() const;
    GitExecResult cherryPickContinue() const;

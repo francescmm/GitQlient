@@ -86,7 +86,7 @@ bool GitSubmodules::submoduleRemove(const QString &submodule)
 
    ret = mGitBase->run(cmd);
 
-   cmd = QString("rm -rf %1/.git/modules/%2").arg(mGitBase->getWorkingDir(), submodule);
+   cmd = QString("rm -rf %1/.git/modules/%2").arg(mGitBase->getGitDir(), submodule);
 
    QLog_Trace("Git", QString("Removing the submodule: {%1}").arg(cmd));
 

@@ -63,7 +63,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    localGitLayout->setContentsMargins(QMargins());
 
    const auto localGit = new FileEditor(false, this);
-   localGit->editFile(mGit->getGitQlientSettingsDir().append("/config"));
+   localGit->editFile(mGit->getGitDir().append("/config"));
    localGitLayout->addWidget(localGit);
    mEditors.insert(0, localGit);
 
@@ -78,7 +78,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    GitQlientSettings settings;
 
-   ui->chDevMode->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "DevMode", false).toBool());
+   ui->chDevMode->setChecked(settings.localValue(mGit->getGitDir(), "DevMode", false).toBool());
    enableWidgets();
 
    // GitQlient configuration
@@ -94,27 +94,27 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    });
 
    // Repository configuration
-   mOriginalRepoOrder = settings.localValue(mGit->getGitQlientSettingsDir(), "GraphSortingOrder", 0).toInt();
+   mOriginalRepoOrder = settings.localValue(mGit->getGitDir(), "GraphSortingOrder", 0).toInt();
    ui->cbLogOrder->setCurrentIndex(mOriginalRepoOrder);
-   ui->autoFetch->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "AutoFetch", 5).toInt());
-   ui->pruneOnFetch->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "PruneOnFetch", true).toBool());
+   ui->autoFetch->setValue(settings.localValue(mGit->getGitDir(), "AutoFetch", 5).toInt());
+   ui->pruneOnFetch->setChecked(settings.localValue(mGit->getGitDir(), "PruneOnFetch", true).toBool());
    ui->clangFormat->setChecked(
-       settings.localValue(mGit->getGitQlientSettingsDir(), "ClangFormatOnCommit", false).toBool());
-   ui->updateOnPull->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", false).toBool());
-   ui->sbMaxCommits->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "MaxCommits", 0).toInt());
+       settings.localValue(mGit->getGitDir(), "ClangFormatOnCommit", false).toBool());
+   ui->updateOnPull->setChecked(settings.localValue(mGit->getGitDir(), "UpdateOnPull", false).toBool());
+   ui->sbMaxCommits->setValue(settings.localValue(mGit->getGitDir(), "MaxCommits", 0).toInt());
 
    ui->tabWidget->setCurrentIndex(0);
    connect(ui->pbClearCache, &ButtonLink::clicked, this, &ConfigWidget::clearCache);
 
    ui->cbPomodoroEnabled->setChecked(
-       settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", true).toBool());
+       settings.localValue(mGit->getGitDir(), "Pomodoro/Enabled", true).toBool());
 
-   ui->cbStash->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool());
-   ui->cbSubmodule->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool());
-   ui->cbSubtree->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "SubtreeHeader", true).toBool());
+   ui->cbStash->setChecked(settings.localValue(mGit->getGitDir(), "StashesHeader", true).toBool());
+   ui->cbSubmodule->setChecked(settings.localValue(mGit->getGitDir(), "SubmodulesHeader", true).toBool());
+   ui->cbSubtree->setChecked(settings.localValue(mGit->getGitDir(), "SubtreeHeader", true).toBool());
 
    // Build System configuration
-   const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
+   const auto isConfigured = settings.localValue(mGit->getGitDir(), "BuildSystemEanbled", false).toBool();
    ui->chBoxBuildSystem->setChecked(isConfigured);
    connect(ui->chBoxBuildSystem, &QCheckBox::stateChanged, this, &ConfigWidget::toggleBsAccesInfo);
 
@@ -127,9 +127,9 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    if (isConfigured)
    {
-      const auto url = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", "").toString();
-      const auto user = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", "").toString();
-      const auto token = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", "").toString();
+      const auto url = settings.localValue(mGit->getGitDir(), "BuildSystemUrl", "").toString();
+      const auto user = settings.localValue(mGit->getGitDir(), "BuildSystemUser", "").toString();
+      const auto token = settings.localValue(mGit->getGitDir(), "BuildSystemToken", "").toString();
 
       ui->leBsUrl->setText(url);
       ui->leBsUser->setText(user);
@@ -168,9 +168,9 @@ void ConfigWidget::onPanelsVisibilityChanged()
 {
    GitQlientSettings settings;
 
-   ui->cbStash->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "StashesHeader", true).toBool());
-   ui->cbSubmodule->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", true).toBool());
-   ui->cbSubtree->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "SubtreeHeader", true).toBool());
+   ui->cbStash->setChecked(settings.localValue(mGit->getGitDir(), "StashesHeader", true).toBool());
+   ui->cbSubmodule->setChecked(settings.localValue(mGit->getGitDir(), "SubmodulesHeader", true).toBool());
+   ui->cbSubtree->setChecked(settings.localValue(mGit->getGitDir(), "SubtreeHeader", true).toBool());
 }
 
 void ConfigWidget::clearCache()
@@ -244,24 +244,24 @@ void ConfigWidget::saveConfig()
 
    if (mOriginalRepoOrder != ui->cbLogOrder->currentIndex())
    {
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "GraphSortingOrder", ui->cbLogOrder->currentIndex());
+      settings.setLocalValue(mGit->getGitDir(), "GraphSortingOrder", ui->cbLogOrder->currentIndex());
       emit reloadView();
    }
 
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "AutoFetch", ui->autoFetch->value());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "PruneOnFetch", ui->pruneOnFetch->isChecked());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "ClangFormatOnCommit", ui->clangFormat->isChecked());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", ui->updateOnPull->isChecked());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MaxCommits", ui->sbMaxCommits->value());
+   settings.setLocalValue(mGit->getGitDir(), "AutoFetch", ui->autoFetch->value());
+   settings.setLocalValue(mGit->getGitDir(), "PruneOnFetch", ui->pruneOnFetch->isChecked());
+   settings.setLocalValue(mGit->getGitDir(), "ClangFormatOnCommit", ui->clangFormat->isChecked());
+   settings.setLocalValue(mGit->getGitDir(), "UpdateOnPull", ui->updateOnPull->isChecked());
+   settings.setLocalValue(mGit->getGitDir(), "MaxCommits", ui->sbMaxCommits->value());
 
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "StashesHeader", ui->cbStash->isChecked());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "SubmodulesHeader", ui->cbSubmodule->isChecked());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "SubtreeHeader", ui->cbSubtree->isChecked());
+   settings.setLocalValue(mGit->getGitDir(), "StashesHeader", ui->cbStash->isChecked());
+   settings.setLocalValue(mGit->getGitDir(), "SubmodulesHeader", ui->cbSubmodule->isChecked());
+   settings.setLocalValue(mGit->getGitDir(), "SubtreeHeader", ui->cbSubtree->isChecked());
 
    emit panelsVisibilityChaned();
 
    /* POMODORO CONFIG */
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", ui->cbPomodoroEnabled->isChecked());
+   settings.setLocalValue(mGit->getGitDir(), "Pomodoro/Enabled", ui->cbPomodoroEnabled->isChecked());
 
    /* BUILD SYSTEM CONFIG */
 
@@ -272,15 +272,15 @@ void ConfigWidget::saveConfig()
 
    if (showBs && !bsUser.isEmpty() && !bsToken.isEmpty() && !bsUrl.isEmpty())
    {
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", showBs);
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", bsUrl);
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", bsUser);
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", bsToken);
+      settings.setLocalValue(mGit->getGitDir(), "BuildSystemEanbled", showBs);
+      settings.setLocalValue(mGit->getGitDir(), "BuildSystemUrl", bsUrl);
+      settings.setLocalValue(mGit->getGitDir(), "BuildSystemUser", bsUser);
+      settings.setLocalValue(mGit->getGitDir(), "BuildSystemToken", bsToken);
       emit buildSystemConfigured(showBs);
    }
    else
    {
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false);
+      settings.setLocalValue(mGit->getGitDir(), "BuildSystemEanbled", false);
       emit buildSystemConfigured(false);
    }
 
@@ -292,7 +292,7 @@ void ConfigWidget::enableWidgets()
    const auto enable = ui->chDevMode->isChecked();
 
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "DevMode", enable);
+   settings.setLocalValue(mGit->getGitDir(), "DevMode", enable);
 
    ui->tabWidget->setEnabled(enable);
 }

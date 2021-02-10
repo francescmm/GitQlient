@@ -27,9 +27,9 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
    setObjectName("JenkinsWidget");
 
    GitQlientSettings settings;
-   const auto url = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", "").toString();
-   const auto user = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", "").toString();
-   const auto token = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", "").toString();
+   const auto url = settings.localValue(mGit->getGitDir(), "BuildSystemUrl", "").toString();
+   const auto user = settings.localValue(mGit->getGitDir(), "BuildSystemUser", "").toString();
+   const auto token = settings.localValue(mGit->getGitDir(), "BuildSystemToken", "").toString();
 
    mConfig = IFetcher::Config { user, token, nullptr };
    mConfig.accessManager.reset(new QNetworkAccessManager());

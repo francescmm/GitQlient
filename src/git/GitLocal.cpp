@@ -5,6 +5,7 @@
 
 #include <QLogger.h>
 
+#include <QFile>
 #include <QProcess>
 
 using namespace QLogger;
@@ -36,6 +37,13 @@ GitExecResult GitLocal::stageFile(const QString &fileName) const
    const auto ret = mGitBase->run(cmd);
 
    return ret;
+}
+
+bool GitLocal::isInCherryPickMerge() const
+{
+   QFile cherrypickHead(QString("%1/CHERRY_PICK_HEAD").arg(mGitBase->getGitDir()));
+
+   return cherrypickHead.exists();
 }
 
 GitExecResult GitLocal::cherryPickCommit(const QString &sha) const

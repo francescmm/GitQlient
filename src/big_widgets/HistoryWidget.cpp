@@ -165,7 +165,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    mChShowAllBranches = new CheckBox(tr("Show all branches"));
    mChShowAllBranches->setChecked(
-       settings.localValue(mGit->getGitQlientSettingsDir(), "ShowAllBranches", true).toBool());
+       settings.localValue(mGit->getGitDir(), "ShowAllBranches", true).toBool());
    connect(mChShowAllBranches, &CheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
 
    const auto graphOptionsLayout = new QHBoxLayout();
@@ -395,7 +395,7 @@ void HistoryWidget::commitSelected(const QModelIndex &index)
 void HistoryWidget::onShowAllUpdated(bool showAll)
 {
    GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "ShowAllBranches", showAll);
+   settings.setLocalValue(mGit->getGitDir(), "ShowAllBranches", showAll);
 
    emit signalAllBranchesActive(showAll);
 }

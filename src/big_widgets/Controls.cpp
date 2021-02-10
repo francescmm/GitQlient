@@ -145,7 +145,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    createGitPlatformButton(hLayout);
 
    GitQlientSettings settings;
-   mBuildSystem->setVisible(settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEnabled", false).toBool());
+   mBuildSystem->setVisible(settings.localValue(mGit->getGitDir(), "BuildSystemEnabled", false).toBool());
    mBuildSystem->setCheckable(true);
    mBuildSystem->setIcon(QIcon(":/icons/build_system"));
    mBuildSystem->setIconSize(QSize(22, 22));
@@ -228,7 +228,7 @@ void Controls::enableButtons(bool enabled)
    {
       GitQlientSettings settings;
       const auto isConfigured
-          = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
+          = settings.localValue(mGit->getGitDir(), "BuildSystemEanbled", false).toBool();
 
       mBuildSystem->setEnabled(isConfigured);
    }
@@ -434,7 +434,7 @@ void Controls::createGitPlatformButton(QHBoxLayout *layout)
 void Controls::configBuildSystemButton()
 {
    GitQlientSettings settings;
-   const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
+   const auto isConfigured = settings.localValue(mGit->getGitDir(), "BuildSystemEanbled", false).toBool();
    mBuildSystem->setEnabled(isConfigured);
 
    if (!isConfigured)

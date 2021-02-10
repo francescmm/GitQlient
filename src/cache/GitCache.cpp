@@ -372,7 +372,7 @@ RevisionFiles GitCache::parseDiffFormat(const QString &buf, FileNamesLoader &fl,
                if (flag == 'D')
                   fileIsCached = !fileIsCached;
 
-               if (fl.rf != &rf && !cached)
+               if (fl.rf != &rf && (!cached || flag == 'U'))
                {
                   flushFileNames(fl);
                   fl.rf = &rf;

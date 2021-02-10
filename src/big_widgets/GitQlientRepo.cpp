@@ -21,6 +21,7 @@
 #include <GitBase.h>
 #include <GitHistory.h>
 #include <GitHubRestApi.h>
+#include <GitLocal.h>
 #include <GitMerge.h>
 #include <GitSubmodules.h>
 #include <GitServerWidget.h>
@@ -94,7 +95,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    showHistoryView();
 
    GitQlientSettings settings;
-   const auto fetchInterval = settings.localValue(mGitBase->getGitQlientSettingsDir(), "AutoFetch", 5).toInt();
+   const auto fetchInterval = settings.localValue(mGitBase->getGitDir(), "AutoFetch", 5).toInt();
 
    mAutoFetch->setInterval(fetchInterval * 60 * 1000);
    mAutoFilesUpdate->setInterval(15000);
@@ -168,7 +169,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(this, SIGNAL(signalLoadRepo(bool)), mGitLoader.data(), SLOT(load(bool)));
    m_loaderThread->start();
 
-   mGitLoader->setShowAll(settings.localValue(mGitBase->getGitQlientSettingsDir(), "ShowAllBranches", true).toBool());
+   mGitLoader->setShowAll(settings.localValue(mGitBase->getGitDir(), "ShowAllBranches", true).toBool());
 }
 
 GitQlientRepo::~GitQlientRepo()
@@ -356,15 +357,22 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
    if (mWaitDlg)
       mWaitDlg->close();
 
-   QScopedPointer<GitMerge> gitMerge(new GitMerge(mGitBase, mGitQlientCache));
-
-   if (gitMerge->isInMerge())
+   if (QScopedPointer<GitMerge> gitMerge(new GitMerge(mGitBase, mGitQlientCache)); gitMerge->isInMerge())
    {
-      QMessageBox::warning(this, tr("Merge in progress"),
-                           tr("There is a merge conflict in progress. Solve the merge before moving on."));
-
       mControls->activateMergeWarning();
       showWarningMerge();
+
+      QMessageBox::warning(this, tr("Merge in progress"),
+                           tr("There is a merge conflict in progress. Solve the merge before moving on."));
+   }
+   else if (QScopedPointer<GitLocal> gitMerge(new GitLocal(mGitBase)); gitMerge->isInCherryPickMerge())
+   {
+      mControls->activateMergeWarning();
+      showCherryPickConflict();
+
+      QMessageBox::warning(
+          this, tr("Cherry-pick in progress"),
+          tr("There is a cherry-pick in progress that contains with conflicts. Solve them before moving on."));
    }
 
    emit currentBranchChanged();

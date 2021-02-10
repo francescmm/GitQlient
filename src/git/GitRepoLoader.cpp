@@ -144,14 +144,14 @@ void GitRepoLoader::requestRevisions()
    QLog_Debug("Git", "Loading revisions.");
 
    GitQlientSettings settings;
-   const auto maxCommits = settings.localValue(mGitBase->getGitQlientSettingsDir(), "MaxCommits", 0).toInt();
+   const auto maxCommits = settings.localValue(mGitBase->getGitDir(), "MaxCommits", 0).toInt();
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
        : mShowAll                                 ? QString("--all")
                                                   : mGitBase->getCurrentBranch();
 
    QString order;
 
-   switch (settings.localValue(mGitBase->getGitQlientSettingsDir(), "GraphSortingOrder", 0).toInt())
+   switch (settings.localValue(mGitBase->getGitDir(), "GraphSortingOrder", 0).toInt())
    {
       case 0:
          order = "--author-date-order";
@@ -267,11 +267,11 @@ QVector<QString> GitRepoLoader::getUntrackedFiles() const
    QLog_Debug("Git", QString("Executing getUntrackedFiles."));
 
    auto runCmd = QString("git ls-files --others");
-   const auto exFile = QString(".git/info/exclude");
-   const auto path = QString("%1/%2").arg(mGitBase->getWorkingDir(), exFile);
+   const auto exFile = QString("info/exclude");
+   const auto path = QString("%1/%2").arg(mGitBase->getGitDir(), exFile);
 
    if (QFile::exists(path))
-      runCmd.append(QString(" --exclude-from=$%1$").arg(exFile));
+      runCmd.append(QString(" --exclude-from=$%1$").arg(path));
 
    runCmd.append(QString(" --exclude-per-directory=$%1$").arg(".gitignore"));
 

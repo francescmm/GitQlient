@@ -418,7 +418,7 @@ void GitQlient::conditionallyOpenPreConfigDlg(const QString &repoPath)
    QSharedPointer<GitBase> git(new GitBase(repoPath));
 
    GitQlientSettings settings;
-   auto maxCommits = settings.localValue(git->getGitQlientSettingsDir(), "MaxCommits", -1).toInt();
+   auto maxCommits = settings.localValue(git->getGitDir(), "MaxCommits", -1).toInt();
 
    if (maxCommits == -1)
    {

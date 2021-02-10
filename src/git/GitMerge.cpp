@@ -17,7 +17,7 @@ GitMerge::GitMerge(const QSharedPointer<GitBase> &gitBase, QSharedPointer<GitCac
 
 bool GitMerge::isInMerge() const
 {
-   QFile mergeHead(mGitBase->getWorkingDir().append("/.git/MERGE_HEAD"));
+   QFile mergeHead(QString("%1/MERGE_HEAD").arg(mGitBase->getGitDir()));
 
    return mergeHead.exists();
 }
