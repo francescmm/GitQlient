@@ -2,6 +2,7 @@
 #include "ui_InitialRepoConfig.h"
 
 #include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
 #include <GitBase.h>
 
 InitialRepoConfig::InitialRepoConfig(const QSharedPointer<GitBase> &git, QWidget *parent)
@@ -14,6 +15,8 @@ InitialRepoConfig::InitialRepoConfig(const QSharedPointer<GitBase> &git, QWidget
    ui->setupUi(this);
 
    GitQlientSettings settings(mGit->getGitDir());
+
+   setStyleSheet(GitQlientStyles::getInstance()->getStyles());
 
    ui->autoFetch->setValue(settings.localValue("AutoFetch", 5).toInt());
    ui->pruneOnFetch->setChecked(settings.localValue("PruneOnFetch", true).toBool());
