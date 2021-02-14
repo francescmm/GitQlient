@@ -172,7 +172,7 @@ QComboBox
    outline: none;
    color: black;
    border-color: #D89000;
-   background: transparent;
+   background: #FFFFFF;
 }
 
 QComboBox:disabled {
@@ -190,9 +190,7 @@ QComboBox:on {
 QComboBox QAbstractItemView
 {
    outline: none;
-   background: #404142;
    border-color: #D89000;
-   selection-background-color: #606162;
 }
 
 QComboBox::drop-down:hover

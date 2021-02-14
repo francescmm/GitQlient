@@ -86,12 +86,13 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->cbLogLevel->setCurrentIndex(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
    ui->spCommitTitleLength->setValue(settings.globalValue("commitTitleMaxLength", 50).toInt());
 
-   const auto currentStyle = settings.globalValue("colorSchema", "dark").toString();
-   ui->cbStyle->setCurrentText(currentStyle);
-   connect(ui->cbStyle, &QComboBox::currentTextChanged, this, [this, currentStyle](const QString &newText) {
-      if (newText != currentStyle)
-         mShowResetMsg = true;
-   });
+   const auto originalStyles = settings.globalValue("colorSchema", "dark").toString();
+   ui->cbStyle->setCurrentText(originalStyles);
+   connect(ui->cbStyle, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged), this,
+           [this, originalStyles]() {
+              mShowResetMsg = ui->cbStyle->currentText() != originalStyles;
+              saveConfig();
+           });
 
    // Repository configuration
    mOriginalRepoOrder = settings.localValue("GraphSortingOrder", 0).toInt();
@@ -138,7 +139,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->chDevMode, &CheckBox::stateChanged, this, &ConfigWidget::enableWidgets);
    connect(ui->chDisableLogs, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbLogLevel, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
-   connect(ui->cbStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->leGitPath, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->spCommitTitleLength, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbTranslations, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
