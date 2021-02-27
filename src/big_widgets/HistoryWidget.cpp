@@ -38,11 +38,13 @@
 using namespace QLogger;
 
 HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
-                             const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
+                             const QSharedPointer<GitServerCache> &gitServerCache,
+                             const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)
    , mGitServerCache(gitServerCache)
+   , mSettings(settings)
    , mWipWidget(new WipWidget(mCache, mGit))
    , mAmendWidget(new AmendWidget(mCache, mGit))
    , mCommitInfoWidget(new CommitInfoWidget(mCache, mGit))
@@ -96,7 +98,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
       emit signalUpdateUi();
    });
 
-   connect(mAmendWidget, &AmendWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
    connect(mAmendWidget, &AmendWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mAmendWidget, &AmendWidget::signalChangesCommitted, this, &HistoryWidget::returnToView);
    connect(mAmendWidget, &AmendWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
@@ -114,7 +115,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
    mRepositoryModel = new CommitHistoryModel(mCache, mGit, mGitServerCache);
-   mRepositoryView = new CommitHistoryView(mCache, mGit, mGitServerCache);
+   mRepositoryView = new CommitHistoryView(mCache, mGit, mSettings, mGitServerCache);
 
    connect(mRepositoryView, &CommitHistoryView::requestReload, this, &HistoryWidget::requestReload);
    connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, [this](const QString &sha) {
@@ -153,8 +154,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mBranchesWidget, &BranchesWidget::signalPullConflict, this, &HistoryWidget::signalPullConflict);
    connect(mBranchesWidget, &BranchesWidget::panelsVisibilityChanged, this, &HistoryWidget::panelsVisibilityChanged);
 
-   GitQlientSettings settings(mGit->getGitDir());
-
    const auto cherryPickBtn = new QPushButton(tr("Cherry-pick"));
    cherryPickBtn->setEnabled(false);
    cherryPickBtn->setObjectName("applyActionBtn");
@@ -163,7 +162,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });
 
    mChShowAllBranches = new CheckBox(tr("Show all branches"));
-   mChShowAllBranches->setChecked(settings.localValue("ShowAllBranches", true).toBool());
+   mChShowAllBranches->setChecked(mSettings->localValue("ShowAllBranches", true).toBool());
    connect(mChShowAllBranches, &CheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
 
    const auto graphOptionsLayout = new QHBoxLayout();
@@ -205,14 +204,9 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mFileDiff, &FileDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
    connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
 
-   if (GitQlientSettings settings(""); !settings.globalValue("isGitQlient", false).toBool())
-      connect(mWipWidget, &WipWidget::signalEditFile, this, &HistoryWidget::signalEditFile);
-   else
-   {
-      connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName, int, int) {
-         showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
-      });
-   }
+   connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName, int, int) {
+      showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+   });
 
    const auto layout = new QHBoxLayout(this);
    layout->setContentsMargins(QMargins());
@@ -415,8 +409,11 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
    QScopedPointer<GitMerge> git(new GitMerge(mGit, mCache));
    const auto ret = git->merge(current, { branchToMerge });
 
-   QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
-   gitLoader->updateWipRevision();
+   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+   mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+      mCache->updateWipCommit(wipInfo);
 
    QApplication::restoreOverrideCursor();
 

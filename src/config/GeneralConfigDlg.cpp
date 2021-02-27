@@ -22,6 +22,7 @@ using namespace QLogger;
 
 GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
    : QDialog(parent)
+   , mSettings(new GitQlientSettings())
    , mDisableLogs(new CheckBox())
    , mLevelCombo(new QComboBox())
    , mStylesSchema(new QComboBox())
@@ -37,16 +38,14 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
    mReset->setMinimumWidth(75);
    mApply->setMinimumWidth(75);
 
-   GitQlientSettings settings("");
-
-   mDisableLogs->setChecked(settings.globalValue("logsDisabled", true).toBool());
+   mDisableLogs->setChecked(mSettings->globalValue("logsDisabled", true).toBool());
 
    mLevelCombo->addItems({ "Trace", "Debug", "Info", "Warning", "Error", "Fatal" });
-   mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
+   mLevelCombo->setCurrentIndex(mSettings->globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
 
    mStylesSchema->addItems({ "dark", "bright" });
 
-   const auto currentStyle = settings.globalValue("colorSchema", "dark").toString();
+   const auto currentStyle = mSettings->globalValue("colorSchema", "dark").toString();
    mStylesSchema->setCurrentText(currentStyle);
    connect(mStylesSchema, &QComboBox::currentTextChanged, this, [this, currentStyle](const QString &newText) {
       if (newText != currentStyle)
@@ -99,20 +98,18 @@ GeneralConfigDlg::GeneralConfigDlg(QWidget *parent)
 
 void GeneralConfigDlg::resetChanges()
 {
-   GitQlientSettings settings("");
-   mDisableLogs->setChecked(settings.globalValue("logsDisabled", false).toBool());
-   mLevelCombo->setCurrentIndex(settings.globalValue("logsLevel", 2).toInt());
-   mStylesSchema->setCurrentText(settings.globalValue("colorSchema", "bright").toString());
-   mGitLocation->setText(settings.globalValue("gitLocation", "").toString());
+   mDisableLogs->setChecked(mSettings->globalValue("logsDisabled", false).toBool());
+   mLevelCombo->setCurrentIndex(mSettings->globalValue("logsLevel", 2).toInt());
+   mStylesSchema->setCurrentText(mSettings->globalValue("colorSchema", "bright").toString());
+   mGitLocation->setText(mSettings->globalValue("gitLocation", "").toString());
 }
 
 void GeneralConfigDlg::accept()
 {
-   GitQlientSettings settings("");
-   settings.setGlobalValue("logsDisabled", mDisableLogs->isChecked());
-   settings.setGlobalValue("logsLevel", mLevelCombo->currentIndex());
-   settings.setGlobalValue("colorSchema", mStylesSchema->currentText());
-   settings.setGlobalValue("gitLocation", mGitLocation->text());
+   mSettings->setGlobalValue("logsDisabled", mDisableLogs->isChecked());
+   mSettings->setGlobalValue("logsLevel", mLevelCombo->currentIndex());
+   mSettings->setGlobalValue("colorSchema", mStylesSchema->currentText());
+   mSettings->setGlobalValue("gitLocation", mGitLocation->text());
 
    if (mShowResetMsg)
       QMessageBox::information(this, tr("Reset needed!"),

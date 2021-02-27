@@ -28,6 +28,7 @@
 #include <QPointer>
 
 class GitBase;
+class GitQlientSettings;
 class GitCache;
 class GitRepoLoader;
 class QCloseEvent;
@@ -79,13 +80,6 @@ signals:
     \param submoduleName The submodule name.
    */
    void signalOpenSubmodule(const QString &submoduleName);
-   /**
-    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
-    * @param fileName The file name
-    * @param line The line
-    * @param column The column
-    */
-   void signalEditFile(const QString &fileName, int line, int column);
 
    /**
     * @brief signalLoadRepo Signal used to trigger the data update in a different thread.
@@ -111,7 +105,8 @@ public:
     \param repoPath The path in disk where the repository is located.
     \param parent The parent widget if needed.
    */
-   explicit GitQlientRepo(const QString &repoPath, QWidget *parent = nullptr);
+   explicit GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPointer<GitQlientSettings> &settings,
+                          QWidget *parent = nullptr);
    /*!
     \brief Destructor.
 
@@ -151,6 +146,7 @@ private:
    QSharedPointer<GitCache> mGitQlientCache;
    QSharedPointer<GitServerCache> mGitServerCache;
    QSharedPointer<GitBase> mGitBase;
+   QSharedPointer<GitQlientSettings> mSettings;
    QSharedPointer<GitRepoLoader> mGitLoader;
    HistoryWidget *mHistoryWidget = nullptr;
    QStackedLayout *mStackedLayout = nullptr;

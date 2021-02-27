@@ -20,9 +20,9 @@ GitExecResult GitSubtree::add(const QString &url, const QString &ref, const QStr
 
    for (auto i = 0;; ++i)
    {
-      const auto repo = settings.localValue(QString("Subtrees/%1.prefix").arg(i));
+      const auto repo = settings.localValue(QString("Subtrees/%1.prefix").arg(i)).toString();
 
-      if (repo.toString() == name)
+      if (repo == name)
       {
          settings.setLocalValue(QString("Subtrees/%1.url").arg(i), url);
          settings.setLocalValue(QString("Subtrees/%1.ref").arg(i), ref);
@@ -41,7 +41,7 @@ GitExecResult GitSubtree::add(const QString &url, const QString &ref, const QStr
 
          return ret;
       }
-      else if (repo.toString().isEmpty())
+      else if (repo.isEmpty())
       {
          settings.setLocalValue(QString("Subtrees/%1.prefix").arg(i), name);
          settings.setLocalValue(QString("Subtrees/%1.url").arg(i), url);

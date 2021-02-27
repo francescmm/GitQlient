@@ -25,8 +25,11 @@
 
 #include <QString>
 #include <QColor>
+#include <QScopedPointer>
 
 #include <array>
+
+class GitQlientSettings;
 
 /*!
  \brief GitQlientStyles contains the information shared between all the instances of GitQlientWidget. This is a general
@@ -127,6 +130,7 @@ public:
    static QColor getBranchColorAt(int index);
 
 private:
+   static QScopedPointer<GitQlientSettings> mSettings;
    static GitQlientStyles *INSTANCE;
 
    /*!

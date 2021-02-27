@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <GitExecResult.h>
+#include <WipRevisionInfo.h>
 
 #include <QSharedPointer>
 
@@ -61,6 +62,8 @@ public:
    GitExecResult commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg) const;
    GitExecResult ammendCommit(const QStringList &selFiles, const RevisionFiles &allCommitFiles, const QString &msg,
                               const QString &author = QString()) const;
+   QVector<QString> getUntrackedFiles() const;
+   WipRevisionInfo getWipDiff() const;
 
 private:
    QSharedPointer<GitBase> mGitBase;

@@ -1,7 +1,7 @@
 #include "GitCache.h"
-#include <GitQlientSettings.h>
-#include <GitHubRestApi.h>
 
+#include <GitHubRestApi.h>
+#include <WipRevisionInfo.h>
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -50,7 +50,7 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
 
    QLog_Debug("Cache", QString("Adding WIP revision."));
 
-   insertWipRevision(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
+   insertWipRevision(wipInfo);
 
    auto count = 1;
 
@@ -197,14 +197,14 @@ void GitCache::insertCommitInfo(CommitInfo rev, int orderIdx)
    }
 }
 
-void GitCache::insertWipRevision(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
+void GitCache::insertWipRevision(const WipRevisionInfo &wipInfo)
 {
-   auto newParentSha = parentSha;
+   auto newParentSha = wipInfo.parentSha;
 
    QLog_Debug("Cache", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(newParentSha));
 
    const auto key = qMakePair(CommitInfo::ZERO_SHA, newParentSha);
-   const auto fakeRevFile = fakeWorkDirRevFile(diffIndex, diffIndexCache);
+   const auto fakeRevFile = fakeWorkDirRevFile(wipInfo.diffIndex, wipInfo.diffIndexCached);
 
    insertRevisionFile(CommitInfo::ZERO_SHA, newParentSha, fakeRevFile);
 
@@ -289,10 +289,10 @@ void GitCache::reloadCurrentBranchInfo(const QString &currentBranch, const QStri
    mReferences[currentSha].addReference(References::Type::LocalBranch, currentBranch);
 }
 
-void GitCache::updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache)
+void GitCache::updateWipCommit(const WipRevisionInfo &wipInfo)
 {
    if (mConfigured)
-      insertWipRevision(parentSha, diffIndex, diffIndexCache);
+      insertWipRevision(wipInfo);
 }
 
 bool GitCache::containsRevisionFile(const QString &sha1, const QString &sha2) const

@@ -51,8 +51,7 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
 
    ui->amendFrame->setVisible(false);
 
-   GitQlientSettings settings("");
-   mTitleMaxLength = settings.globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
+   mTitleMaxLength = GitQlientSettings().globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
 
    ui->lCounter->setText(QString::number(mTitleMaxLength));
    ui->leCommitTitle->setMaxLength(mTitleMaxLength);
@@ -267,10 +266,14 @@ void CommitChangesWidget::addAllFilesToCommitList()
    for (auto i = ui->unstagedFilesList->count() - 1; i >= 0; --i)
       files += addFileToCommitList(ui->unstagedFilesList->item(i), false);
 
+   // TODO: Probably not getting the signal since this goes out of scope
    QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
    connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
-      QScopedPointer<GitRepoLoader> loader(new GitRepoLoader(mGit, mCache));
-      loader->updateWipRevision();
+      QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+      mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+      if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+         mCache->updateWipCommit(wipInfo);
    });
 
    git->markFilesAsResolved(files);
@@ -293,10 +296,14 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
 
    if (updateGit)
    {
+      // TODO: Probably not getting the signal since this goes out of scope
       QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
       connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
-         QScopedPointer<GitRepoLoader> loader(new GitRepoLoader(mGit, mCache));
-         loader->updateWipRevision();
+         QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+         mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+         if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+            mCache->updateWipCommit(wipInfo);
       });
 
       git->markFileAsResolved(fileName);
@@ -465,8 +472,7 @@ void CommitChangesWidget::clear()
 
 void CommitChangesWidget::setCommitTitleMaxLength()
 {
-   GitQlientSettings settings("");
-   mTitleMaxLength = settings.globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
+   mTitleMaxLength = GitQlientSettings().globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
 
    ui->lCounter->setText(QString::number(mTitleMaxLength));
    ui->leCommitTitle->setMaxLength(mTitleMaxLength);

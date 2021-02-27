@@ -36,6 +36,7 @@ class CommitHistoryView;
 class QTabWidget;
 class QModelIndex;
 class RepositoryViewDelegate;
+class GitQlientSettings;
 
 /**
  * @brief The BlameWidget class creates the layout that contains all the widgets that are part of the blame and history
@@ -79,7 +80,7 @@ public:
     * @param parent The parent widget if needed.
     */
    explicit BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                        QWidget *parent = nullptr);
+                        const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
    /**
     * @brief Destructor.
     *
@@ -110,6 +111,7 @@ public:
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitQlientSettings> mSettings;
    QFileSystemModel *fileSystemModel = nullptr;
    CommitHistoryModel *mRepoModel = nullptr;
    CommitHistoryView *mRepoView = nullptr;

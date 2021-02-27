@@ -2,8 +2,6 @@
 
 #include <StageFetcher.h>
 
-#include <GitQlientSettings.h>
-
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>

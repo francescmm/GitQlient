@@ -7,6 +7,7 @@
 #include <GitBranches.h>
 #include <GitQlientSettings.h>
 #include <GitHubRestApi.h>
+#include <GitLocal.h>
 
 #include <QLogger.h>
 
@@ -16,10 +17,12 @@ using namespace QLogger;
 
 static const char *GIT_LOG_FORMAT("%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ");
 
-GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache, QObject *parent)
+GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache,
+                             const QSharedPointer<GitQlientSettings> &settings, QObject *parent)
    : QObject(parent)
    , mGitBase(gitBase)
    , mRevCache(std::move(cache))
+   , mSettings(settings)
 {
 }
 
@@ -143,15 +146,14 @@ void GitRepoLoader::requestRevisions()
 {
    QLog_Debug("Git", "Loading revisions.");
 
-   GitQlientSettings settings(mGitBase->getGitDir());
-   const auto maxCommits = settings.localValue("MaxCommits", 0).toInt();
+   const auto maxCommits = mSettings->localValue("MaxCommits", 0).toInt();
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
        : mShowAll                                 ? QString("--all")
                                                   : mGitBase->getCurrentBranch();
 
    QString order;
 
-   switch (settings.localValue("GraphSortingOrder", 0).toInt())
+   switch (mSettings->localValue("GraphSortingOrder", 0).toInt())
    {
       case 0:
          order = "--author-date-order";
@@ -203,8 +205,9 @@ void GitRepoLoader::processRevision(QByteArray ba)
    const auto showSignature = ret.success ? ret.output.toString().contains("true") : false;
    const auto commits = showSignature ? processSignedLog(ba, subtrees) : processUnsignedLog(ba, subtrees);
 
-   const auto wipInfo = processWip();
-   mRevCache->setup(wipInfo, commits);
+   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
+   mRevCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+   mRevCache->setup(gitLocal->getWipDiff(), commits);
 
    if (!subtrees.isEmpty())
       mRevCache->addSubtrees(subtrees);
@@ -224,64 +227,6 @@ void GitRepoLoader::processRevision(QByteArray ba)
 
    mLocked = false;
    mRefreshReferences = false;
-}
-
-WipRevisionInfo GitRepoLoader::processWip()
-{
-   QLog_Debug("Git", QString("Executing processWip."));
-
-   mRevCache->setUntrackedFilesList(getUntrackedFiles());
-
-   const auto ret = mGitBase->run("git rev-parse --revs-only HEAD");
-
-   if (ret.success)
-   {
-      QString diffIndex;
-      QString diffIndexCached;
-
-      auto parentSha = ret.output.toString().trimmed();
-
-      if (parentSha.isEmpty())
-         parentSha = CommitInfo::INIT_SHA;
-
-      const auto ret3 = mGitBase->run(QString("git diff-index %1").arg(parentSha));
-      diffIndex = ret3.success ? ret3.output.toString() : QString();
-
-      const auto ret4 = mGitBase->run(QString("git diff-index --cached %1").arg(parentSha));
-      diffIndexCached = ret4.success ? ret4.output.toString() : QString();
-
-      return { parentSha, diffIndex, diffIndexCached };
-   }
-
-   return {};
-}
-
-void GitRepoLoader::updateWipRevision()
-{
-   if (const auto wipInfo = processWip(); wipInfo.isValid())
-      mRevCache->updateWipCommit(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
-}
-
-QVector<QString> GitRepoLoader::getUntrackedFiles() const
-{
-   QLog_Debug("Git", QString("Executing getUntrackedFiles."));
-
-   auto runCmd = QString("git ls-files --others");
-   const auto exFile = QString("info/exclude");
-   const auto path = QString("%1/%2").arg(mGitBase->getGitDir(), exFile);
-
-   if (QFile::exists(path))
-      runCmd.append(QString(" --exclude-from=$%1$").arg(path));
-
-   runCmd.append(QString(" --exclude-per-directory=$%1$").arg(".gitignore"));
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-   const auto ret = mGitBase->run(runCmd).output.toString().split('\n', Qt::SkipEmptyParts).toVector();
-#else
-   const auto ret = mGitBase->run(runCmd).output.toString().split('\n', QString::SkipEmptyParts).toVector();
-#endif
-
-   return ret;
 }
 
 QList<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees)

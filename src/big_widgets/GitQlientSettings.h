@@ -38,7 +38,9 @@ public:
     \brief Default constructor.
 
    */
+   GitQlientSettings() = default;
    GitQlientSettings(const QString &gitRepoPath);
+   ~GitQlientSettings() { }
 
    /*!
     \brief Sets a value for a given \p key.

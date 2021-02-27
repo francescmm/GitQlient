@@ -17,7 +17,6 @@
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
 #include <GitHubRestApi.h>
-#include <GitQlientSettings.h>
 #include <MergePullRequestDlg.h>
 
 #include <QMessageBox>

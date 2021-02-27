@@ -4,8 +4,6 @@
 #include <QTimer>
 
 #include <GitQlient.h>
-#include <GitQlientSettings.h>
-
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -29,9 +27,6 @@ int main(int argc, char *argv[])
 
    QFontDatabase::addApplicationFont(":/DejaVuSans");
    QFontDatabase::addApplicationFont(":/DejaVuSansMono");
-
-   GitQlientSettings settings("");
-   settings.setGlobalValue("isGitQlient", true);
 
    GitQlient mainWin(arguments);
 

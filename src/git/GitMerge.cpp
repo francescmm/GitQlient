@@ -2,7 +2,7 @@
 
 #include <GitBase.h>
 #include <GitRepoLoader.h>
-
+#include <GitLocal.h>
 #include <QLogger.h>
 
 #include <QFile>
@@ -45,8 +45,11 @@ GitExecResult GitMerge::merge(const QString &into, QStringList sources)
 
    if (retMerge.success)
    {
-      QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGitBase, mCache));
-      gitLoader->updateWipRevision();
+      QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
+      mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+      if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+         mCache->updateWipCommit(wipInfo);
    }
 
    return retMerge;

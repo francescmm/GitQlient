@@ -9,7 +9,6 @@
 #include <CommitInfo.h>
 #include <RevisionFiles.h>
 #include <FileEditor.h>
-#include <GitQlientSettings.h>
 #include <QPinnableTabWidget.h>
 
 #include <QListWidget>

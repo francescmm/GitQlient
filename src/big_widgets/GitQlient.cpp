@@ -71,7 +71,7 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
    menu->addSeparator();
 
-   GitQlientSettings settings("");
+   GitQlientSettings settings;
    const auto recent = new QMenu("Recent repos", menu);
    const auto recentProjects = settings.getMostUsedProjects();
 
@@ -130,7 +130,6 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
 
 GitQlient::~GitQlient()
 {
-   GitQlientSettings settings("");
    QStringList pinnedRepos;
    const auto totalTabs = mRepos->count();
 
@@ -143,6 +142,7 @@ GitQlient::~GitQlient()
       }
    }
 
+   GitQlientSettings settings;
    settings.setGlobalValue(GitQlientSettings::PinnedRepos, pinnedRepos);
    settings.setGlobalValue("GitQlientGeometry", saveGeometry());
 
@@ -248,7 +248,7 @@ QStringList GitQlient::parseArguments(const QStringList &arguments)
 {
 
    LogLevel logLevel;
-   GitQlientSettings settings("");
+   GitQlientSettings settings;
 
 #ifdef DEBUG
    logLevel = LogLevel::Trace;
@@ -322,12 +322,14 @@ void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
             return;
          }
 
-         conditionallyOpenPreConfigDlg(repoPath);
+         QSharedPointer<GitBase> git(new GitBase(repoPath));
+         QSharedPointer<GitQlientSettings> settings(new GitQlientSettings(git->getGitDir()));
 
-         const auto repo = new GitQlientRepo(repoPath);
+         conditionallyOpenPreConfigDlg(settings);
+
+         const auto repo = new GitQlientRepo(git, settings);
          const auto index = pinned ? mRepos->addPinnedTab(repo, repoName) : mRepos->addTab(repo, repoName);
 
-         connect(repo, &GitQlientRepo::signalEditFile, this, &GitQlient::signalEditDocument);
          connect(repo, &GitQlientRepo::signalOpenSubmodule, this, &GitQlient::addRepoTab);
          connect(repo, &GitQlientRepo::repoOpened, this, &GitQlient::onSuccessOpen);
          connect(repo, &GitQlientRepo::currentBranchChanged, this, &GitQlient::updateWindowTitle);
@@ -398,8 +400,8 @@ void GitQlient::closeTab(int tabIndex)
 
 void GitQlient::restorePinnedRepos()
 {
-   GitQlientSettings settings("");
-   const auto pinnedRepos = settings.globalValue(GitQlientSettings::PinnedRepos, QStringList()).toStringList();
+   const auto pinnedRepos
+       = GitQlientSettings().globalValue(GitQlientSettings::PinnedRepos, QStringList()).toStringList();
 
    for (auto &repo : pinnedRepos)
       addNewRepoTab(repo, true);
@@ -407,22 +409,18 @@ void GitQlient::restorePinnedRepos()
 
 void GitQlient::onSuccessOpen(const QString &fullPath)
 {
-   GitQlientSettings settings("");
-   settings.setProjectOpened(fullPath);
+   GitQlientSettings().setProjectOpened(fullPath);
 
    mConfigWidget->onRepoOpened();
 }
 
-void GitQlient::conditionallyOpenPreConfigDlg(const QString &repoPath)
+void GitQlient::conditionallyOpenPreConfigDlg(const QSharedPointer<GitQlientSettings> &settings)
 {
-   QSharedPointer<GitBase> git(new GitBase(repoPath));
-
-   GitQlientSettings settings(git->getGitDir());
-   auto maxCommits = settings.localValue("MaxCommits", -1).toInt();
+   auto maxCommits = settings->localValue("MaxCommits", -1).toInt();
 
    if (maxCommits == -1)
    {
-      const auto preConfig = new InitialRepoConfig(git, this);
+      const auto preConfig = new InitialRepoConfig(settings, this);
       preConfig->exec();
    }
 }

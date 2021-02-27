@@ -17,10 +17,12 @@
 using namespace QLogger;
 
 CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                                     const QSharedPointer<GitQlientSettings> &settings,
                                      const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QTreeView(parent)
    , mCache(cache)
    , mGit(git)
+   , mSettings(settings)
    , mGitServerCache(gitServerCache)
 {
    setEnabled(false);
@@ -87,14 +89,12 @@ void CommitHistoryView::filterBySha(const QStringList &shaList)
 
 CommitHistoryView::~CommitHistoryView()
 {
-   GitQlientSettings s(mGit->getGitDir());
-   s.setLocalValue(QString("%1").arg(objectName()), header()->saveState());
+   mSettings->setLocalValue(QString("%1").arg(objectName()), header()->saveState());
 }
 
 void CommitHistoryView::setupGeometry()
 {
-   GitQlientSettings s(mGit->getGitDir());
-   const auto previousState = s.localValue(QString("%1").arg(objectName()), QByteArray()).toByteArray();
+   const auto previousState = mSettings->localValue(QString("%1").arg(objectName()), QByteArray()).toByteArray();
 
    if (previousState.isEmpty())
    {

@@ -32,14 +32,7 @@
 #include <QHash>
 #include <QMutex>
 
-struct WipRevisionInfo
-{
-   QString parentSha;
-   QString diffIndex;
-   QString diffIndexCached;
-
-   bool isValid() const { return !parentSha.isEmpty() || !diffIndex.isEmpty() || !diffIndexCached.isEmpty(); }
-};
+struct WipRevisionInfo;
 
 class GitCache : public QObject
 {
@@ -75,7 +68,7 @@ public:
    QStringList getReferences(const QString &sha, References::Type type) const;
    void reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha);
 
-   void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
+   void updateWipCommit(const WipRevisionInfo &wipInfo);
 
    bool containsRevisionFile(const QString &sha1, const QString &sha2) const;
 
@@ -125,7 +118,7 @@ private:
 
    void setConfigurationDone() { mConfigured = true; }
    void insertCommitInfo(CommitInfo rev, int orderIdx);
-   void insertWipRevision(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
+   void insertWipRevision(const WipRevisionInfo &wipInfo);
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
    QVector<Lane> calculateLanes(const CommitInfo &c);
    RevisionFiles parseDiffFormat(const QString &buf, FileNamesLoader &fl, bool cached = false);

@@ -21,7 +21,7 @@ bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString
 {
    mInit = true;
 
-   GitQlientSettings settings("");
+   GitQlientSettings settings;
    const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
    const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
    const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();

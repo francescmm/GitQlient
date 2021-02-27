@@ -43,6 +43,7 @@ class BranchesWidgetMinimal;
 class QPushButton;
 class GitServerCache;
 class QLabel;
+class GitQlientSettings;
 
 /*!
  \brief The HistoryWidget is responsible for showing the history of the repository. It is the first widget shown
@@ -107,14 +108,6 @@ signals:
    */
    void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
 
-   /**
-    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
-    * @param fileName The file name
-    * @param line The line
-    * @param column The column
-    */
-   void signalEditFile(const QString &fileName, int line, int column);
-
    /*!
     \brief Signal triggered when changes are committed.
 
@@ -170,7 +163,8 @@ public:
     \param parent The parent widget if needed.
    */
    explicit HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
-                          const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+                          const QSharedPointer<GitServerCache> &gitServerCache,
+                          const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
    /*!
     \brief Destructor.
 
@@ -261,6 +255,7 @@ private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitServerCache> mGitServerCache;
+   QSharedPointer<GitQlientSettings> mSettings;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;

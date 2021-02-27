@@ -6,6 +6,7 @@
 #include <QFile>
 
 GitQlientStyles *GitQlientStyles::INSTANCE = nullptr;
+QScopedPointer<GitQlientSettings> GitQlientStyles::mSettings(new GitQlientSettings());
 
 GitQlientStyles *GitQlientStyles::getInstance()
 {
@@ -22,8 +23,7 @@ QString GitQlientStyles::getStyles()
 
    if (stylesFile.open(QIODevice::ReadOnly))
    {
-      GitQlientSettings settings("");
-      const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+      const auto colorSchema = mSettings->globalValue("colorSchema", "dark").toString();
       QFile colorsFile(QString(":/colors_%1").arg(colorSchema));
       QString colorsCss;
 
@@ -43,48 +43,42 @@ QString GitQlientStyles::getStyles()
 
 QColor GitQlientStyles::getTextColor()
 {
-   GitQlientSettings settings("");
-   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = mSettings->globalValue("colorSchema", "dark").toString();
 
    return colorSchema == "bright" ? textColorBright : textColorDark;
 }
 
 QColor GitQlientStyles::getGraphSelectionColor()
 {
-   GitQlientSettings settings("");
-   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = mSettings->globalValue("colorSchema", "dark").toString();
 
    return colorSchema == "dark" ? graphSelectionColorDark : graphSelectionColorBright;
 }
 
 QColor GitQlientStyles::getGraphHoverColor()
 {
-   GitQlientSettings settings("");
-   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = mSettings->globalValue("colorSchema", "dark").toString();
 
    return colorSchema == "dark" ? graphHoverColorDark : graphHoverColorBright;
 }
 
 QColor GitQlientStyles::getBackgroundColor()
 {
-   GitQlientSettings settings("");
-   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = mSettings->globalValue("colorSchema", "dark").toString();
 
    return colorSchema == "dark" ? graphBackgroundColorDark : graphBackgroundColorBright;
 }
 
 QColor GitQlientStyles::getTabColor()
 {
-   GitQlientSettings settings("");
-   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = mSettings->globalValue("colorSchema", "dark").toString();
 
    return colorSchema == "dark" ? graphHoverColorDark : graphBackgroundColorBright;
 }
 
 QColor GitQlientStyles::getBlue()
 {
-   GitQlientSettings settings("");
-   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = mSettings->globalValue("colorSchema", "dark").toString();
 
    return colorSchema == "dark" ? graphBlueDark : graphBlueBright;
 }

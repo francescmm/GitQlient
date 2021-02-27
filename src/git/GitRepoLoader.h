@@ -33,6 +33,7 @@
 class GitBase;
 class GitCache;
 struct WipRevisionInfo;
+class GitQlientSettings;
 
 class GitRepoLoader : public QObject
 {
@@ -49,8 +50,8 @@ public slots:
    bool load(bool refreshReferences);
 
 public:
-   explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache, QObject *parent = nullptr);
-   void updateWipRevision();
+   explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache,
+                          const QSharedPointer<GitQlientSettings> &settings, QObject *parent = nullptr);
    void cancelAll();
    void setShowAll(bool showAll = true) { mShowAll = showAll; }
 
@@ -60,13 +61,12 @@ private:
    bool mRefreshReferences = true;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitCache> mRevCache;
+   QSharedPointer<GitQlientSettings> mSettings;
 
    bool configureRepoDirectory();
    void loadReferences();
    void requestRevisions();
    void processRevision(QByteArray ba);
-   WipRevisionInfo processWip();
-   QVector<QString> getUntrackedFiles() const;
    QList<CommitInfo> processUnsignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees);
    QList<CommitInfo> processSignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees) const;
    CommitInfo parseCommitData(QByteArray &commitData, bool &isSubtree) const;

@@ -28,8 +28,11 @@ void WipWidget::configure(const QString &sha)
 
    if (!mCache->containsRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0)))
    {
-      QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));
-      git->updateWipRevision();
+      QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+      mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+      if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+         mCache->updateWipCommit(wipInfo);
    }
 
    const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
@@ -59,8 +62,13 @@ bool WipWidget::commitChanges()
       else if (checkMsg(msg))
       {
          const auto revInfo = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
-         QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
-         gitLoader->updateWipRevision();
+
+         QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+         mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+         if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+            mCache->updateWipCommit(wipInfo);
+
          const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));

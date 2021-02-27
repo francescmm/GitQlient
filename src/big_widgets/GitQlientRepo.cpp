@@ -44,17 +44,19 @@ using namespace QLogger;
 using namespace GitServer;
 using namespace Jenkins;
 
-GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
+GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPointer<GitQlientSettings> &settings,
+                             QWidget *parent)
    : QFrame(parent)
    , mGitQlientCache(new GitCache())
    , mGitServerCache(new GitServerCache())
-   , mGitBase(new GitBase(repoPath))
-   , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache))
-   , mHistoryWidget(new HistoryWidget(mGitQlientCache, mGitBase, mGitServerCache))
+   , mGitBase(git)
+   , mSettings(settings)
+   , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache, mSettings))
+   , mHistoryWidget(new HistoryWidget(mGitQlientCache, mGitBase, mGitServerCache, mSettings))
    , mStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGitQlientCache, mGitBase))
    , mDiffWidget(new DiffWidget(mGitBase, mGitQlientCache))
-   , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase))
+   , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase, mSettings))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
    , mGitServerWidget(new GitServerWidget(mGitQlientCache, mGitBase, mGitServerCache))
    , mJenkins(new JenkinsWidget(mGitBase))
@@ -94,8 +96,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
 
    showHistoryView();
 
-   GitQlientSettings settings(mGitBase->getGitDir());
-   const auto fetchInterval = settings.localValue("AutoFetch", 5).toInt();
+   const auto fetchInterval = mSettings->localValue("AutoFetch", 5).toInt();
 
    mAutoFetch->setInterval(fetchInterval * 60 * 1000);
    mAutoFilesUpdate->setInterval(15000);
@@ -115,7 +116,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
    connect(mControls, &Controls::requestReload, mHistoryWidget, [this](bool) { mHistoryWidget->updateConfig(); });
 
-   connect(mHistoryWidget, &HistoryWidget::signalEditFile, this, &GitQlientRepo::signalEditFile);
    connect(mHistoryWidget, &HistoryWidget::signalAllBranchesActive, mGitLoader.data(), &GitRepoLoader::setShowAll);
    connect(mHistoryWidget, &HistoryWidget::panelsVisibilityChanged, mConfigWidget,
            &ConfigWidget::onPanelsVisibilityChanged);
@@ -141,7 +141,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mDiffWidget, &DiffWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mDiffWidget, &DiffWidget::signalDiffEmpty, mControls, &Controls::disableDiff);
    connect(mDiffWidget, &DiffWidget::signalDiffEmpty, this, &GitQlientRepo::showPreviousView);
-   connect(mDiffWidget, &DiffWidget::signalEditFile, this, &GitQlientRepo::signalEditFile);
 
    connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::loadFileDiff);
    connect(mBlameWidget, &BlameWidget::signalOpenDiff, this, &GitQlientRepo::openCommitCompareDiff);
@@ -149,7 +148,6 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, &GitQlientRepo::showHistoryView);
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, [this]() { updateCache(true); });
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, mControls, &Controls::disableMergeWarning);
-   connect(mMergeWidget, &MergeWidget::signalEditFile, this, &GitQlientRepo::signalEditFile);
 
    connect(mConfigWidget, &ConfigWidget::commitTitleMaxLenghtChanged, mHistoryWidget,
            &HistoryWidget::onCommitTitleMaxLenghtChanged);
@@ -169,7 +167,7 @@ GitQlientRepo::GitQlientRepo(const QString &repoPath, QWidget *parent)
    connect(this, SIGNAL(signalLoadRepo(bool)), mGitLoader.data(), SLOT(load(bool)));
    m_loaderThread->start();
 
-   mGitLoader->setShowAll(settings.localValue("ShowAllBranches", true).toBool());
+   mGitLoader->setShowAll(mSettings->localValue("ShowAllBranches", true).toBool());
 }
 
 GitQlientRepo::~GitQlientRepo()
@@ -207,7 +205,11 @@ void GitQlientRepo::updateUiFromWatcher()
 {
    QLog_Info("UI", QString("Updating the GitQlient UI from watcher"));
 
-   mGitLoader->updateWipRevision();
+   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
+   mGitQlientCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+      mGitQlientCache->updateWipCommit(wipInfo);
 
    mHistoryWidget->updateUiFromWatcher();
 
@@ -414,42 +416,54 @@ void GitQlientRepo::showDiffView()
    mControls->toggleButton(ControlsMainViews::Diff);
 }
 
+// TODO: Optimize
 void GitQlientRepo::showWarningMerge()
 {
    showMergeView();
 
    const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGitBase, mGitQlientCache));
-   git->updateWipRevision();
+   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
+   mGitQlientCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+      mGitQlientCache->updateWipCommit(wipInfo);
 
    const auto file = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
    mMergeWidget->configure(file, MergeWidget::ConflictReason::Merge);
 }
 
+// TODO: Optimize
 void GitQlientRepo::showCherryPickConflict()
 {
    showMergeView();
 
    const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGitBase, mGitQlientCache));
-   git->updateWipRevision();
+   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
+   mGitQlientCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+      mGitQlientCache->updateWipCommit(wipInfo);
 
    const auto files = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
    mMergeWidget->configure(files, MergeWidget::ConflictReason::CherryPick);
 }
 
+// TODO: Optimize
 void GitQlientRepo::showPullConflict()
 {
    showMergeView();
 
    const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGitBase, mGitQlientCache));
-   git->updateWipRevision();
+   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
+   mGitQlientCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+      mGitQlientCache->updateWipCommit(wipInfo);
 
    const auto files = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
@@ -532,7 +546,14 @@ void GitQlientRepo::showPreviousView()
 void GitQlientRepo::updateWip()
 {
    mHistoryWidget->resetWip();
-   mGitLoader.data()->updateWipRevision();
+
+   // TODO: Optimize
+   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
+   mGitQlientCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
+
+   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
+      mGitQlientCache->updateWipCommit(wipInfo);
+
    mHistoryWidget->updateUiFromWatcher();
 }
 

@@ -18,13 +18,15 @@
 #include <QClipboard>
 #include <QTabWidget>
 
-BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
+BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                         const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
+   , mSettings(settings)
    , fileSystemModel(new QFileSystemModel())
    , mRepoModel(new CommitHistoryModel(mCache, mGit, nullptr))
-   , mRepoView(new CommitHistoryView(mCache, mGit, nullptr))
+   , mRepoView(new CommitHistoryView(mCache, mGit, mSettings, nullptr))
    , fileSystemView(new QTreeView())
    , mTabWidget(new QTabWidget())
 {
