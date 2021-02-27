@@ -89,7 +89,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mWipWidget, &WipWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
    connect(mWipWidget, &WipWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
    connect(mWipWidget, &WipWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
-   connect(mWipWidget, &WipWidget::signalCancelAmend, this, &HistoryWidget::onCommitSelected);
    connect(mWipWidget, &WipWidget::changeReverted, this, [this](const QString &revertedFile) {
       if (mFileDiff->getCurrentFile().contains(revertedFile))
          returnToView();
@@ -477,7 +476,7 @@ void HistoryWidget::onCommitSelected(const QString &goToSha)
    QLog_Info("UI", QString("Selected commit {%1}").arg(goToSha));
 
    if (isWip)
-      mWipWidget->configure(goToSha);
+      mWipWidget->configure(CommitInfo::ZERO_SHA);
    else
       mCommitInfoWidget->configure(goToSha);
 }

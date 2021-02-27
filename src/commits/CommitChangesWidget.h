@@ -85,7 +85,7 @@ protected:
    int mTitleMaxLength = 50;
 
    virtual bool commitChanges() = 0;
-   virtual void showUnstagedMenu(const QPoint &pos) = 0;
+   virtual void showUnstagedMenu(const QPoint &pos) final;
 
    virtual void insertFiles(const RevisionFiles &files, QListWidget *fileList) final;
    QPair<QListWidgetItem *, FileWidget *> fillFileItemInfo(const QString &file, bool isConflict, const QString &icon,

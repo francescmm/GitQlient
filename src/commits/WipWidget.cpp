@@ -34,7 +34,7 @@ void WipWidget::configure(const QString &sha)
 
    const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
 
-   QLog_Info("UI", QString("Updating files for SHA {%1}").arg(mCurrentSha));
+   QLog_Info("UI", QString("Configuring WIP widget"));
 
    prepareCache();
 
@@ -80,33 +80,4 @@ bool WipWidget::commitChanges()
    }
 
    return done;
-}
-
-void WipWidget::showUnstagedMenu(const QPoint &pos)
-{
-   const auto item = ui->unstagedFilesList->itemAt(pos);
-
-   if (item)
-   {
-      const auto fileName = item->toolTip();
-      const auto unsolvedConflicts = item->data(GitQlientRole::U_IsConflict).toBool();
-      const auto contextMenu = new UnstagedMenu(mGit, fileName, unsolvedConflicts, this);
-      connect(contextMenu, &UnstagedMenu::signalEditFile, this,
-              [this, fileName]() { emit signalEditFile(mGit->getWorkingDir() + "/" + fileName, 0, 0); });
-      connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &WipWidget::requestDiff);
-      connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &WipWidget::addAllFilesToCommitList);
-      connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &WipWidget::revertAllChanges);
-      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &WipWidget::signalCheckoutPerformed);
-      connect(contextMenu, &UnstagedMenu::changeReverted, this, &CommitChangesWidget::changeReverted);
-      connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &WipWidget::signalShowFileHistory);
-      connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
-      connect(contextMenu, &UnstagedMenu::signalConflictsResolved, this, [this, item] {
-         item->setData(GitQlientRole::U_IsConflict, false);
-         item->setForeground(GitQlientStyles::getGreen());
-         addFileToCommitList(item);
-      });
-
-      const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
-      contextMenu->popup(mapToGlobal(parentPos));
-   }
 }

@@ -44,7 +44,6 @@ public:
 
 private:
    bool commitChanges() override;
-   void showUnstagedMenu(const QPoint &pos) override;
 
    static QString lastMsgBeforeError;
    static const int kMaxTitleChars;

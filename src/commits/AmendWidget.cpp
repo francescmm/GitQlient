@@ -110,27 +110,3 @@ bool AmendWidget::commitChanges()
 
    return done;
 }
-
-void AmendWidget::showUnstagedMenu(const QPoint &pos)
-{
-   const auto item = ui->unstagedFilesList->itemAt(pos);
-
-   if (item)
-   {
-      const auto fileName = item->toolTip();
-      const auto unsolvedConflicts = item->data(GitQlientRole::U_IsConflict).toBool();
-      const auto contextMenu = new UnstagedMenu(mGit, fileName, unsolvedConflicts, this);
-      connect(contextMenu, &UnstagedMenu::signalEditFile, this,
-              [this, fileName]() { emit signalEditFile(mGit->getWorkingDir() + "/" + fileName, 0, 0); });
-      connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &AmendWidget::requestDiff);
-      connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &AmendWidget::addAllFilesToCommitList);
-      connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &AmendWidget::revertAllChanges);
-      connect(contextMenu, &UnstagedMenu::changeReverted, this, &CommitChangesWidget::changeReverted);
-      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &AmendWidget::signalCheckoutPerformed);
-      connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &AmendWidget::signalShowFileHistory);
-      connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
-
-      const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
-      contextMenu->popup(mapToGlobal(parentPos));
-   }
-}

@@ -11,7 +11,7 @@
 
 using namespace QLogger;
 
-UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, bool hasConflicts,
+UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName,
                            QWidget *parent)
    : QMenu(parent)
    , mGit(git)
@@ -24,17 +24,6 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
    connect(addAction(tr("Edit file")), &QAction::triggered, this, [this]() { emit signalEditFile(); });
 
    addSeparator();
-
-   if (hasConflicts)
-   {
-      connect(addAction(tr("Mark as resolved")), &QAction::triggered, this, [this] {
-         QScopedPointer<GitLocal> git(new GitLocal(mGit));
-         const auto ret = git->markFileAsResolved(mFileName);
-
-         if (ret.success)
-            emit signalConflictsResolved();
-      });
-   }
 
    connect(addAction(tr("Stage file")), &QAction::triggered, this, &UnstagedMenu::signalStageFile);
 

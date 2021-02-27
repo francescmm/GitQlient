@@ -39,11 +39,10 @@ signals:
    void signalCheckedOut();
    void signalShowFileHistory(const QString &fileName);
    void signalEditFile();
-   void signalConflictsResolved();
    void signalStageFile();
 
 public:
-   explicit UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, bool hasConflicts,
+   explicit UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName,
                          QWidget *parent = nullptr);
 
 private:

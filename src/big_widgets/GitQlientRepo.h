@@ -155,7 +155,6 @@ private:
    HistoryWidget *mHistoryWidget = nullptr;
    QStackedLayout *mStackedLayout = nullptr;
    Controls *mControls = nullptr;
-   HistoryWidget *mRepoWidget = nullptr;
    DiffWidget *mDiffWidget = nullptr;
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;

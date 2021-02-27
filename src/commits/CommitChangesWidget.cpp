@@ -472,3 +472,26 @@ void CommitChangesWidget::setCommitTitleMaxLength()
    ui->leCommitTitle->setMaxLength(mTitleMaxLength);
    updateCounter(ui->leCommitTitle->text());
 }
+
+void CommitChangesWidget::showUnstagedMenu(const QPoint &pos)
+{
+   const auto item = ui->unstagedFilesList->itemAt(pos);
+
+   if (item)
+   {
+      const auto fileName = item->toolTip();
+      const auto contextMenu = new UnstagedMenu(mGit, fileName, this);
+      connect(contextMenu, &UnstagedMenu::signalEditFile, this,
+              [this, fileName]() { emit signalEditFile(mGit->getWorkingDir() + "/" + fileName, 0, 0); });
+      connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &CommitChangesWidget::requestDiff);
+      connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &CommitChangesWidget::addAllFilesToCommitList);
+      connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &CommitChangesWidget::revertAllChanges);
+      connect(contextMenu, &UnstagedMenu::changeReverted, this, &CommitChangesWidget::changeReverted);
+      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &CommitChangesWidget::signalCheckoutPerformed);
+      connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &CommitChangesWidget::signalShowFileHistory);
+      connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
+
+      const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
+      contextMenu->popup(mapToGlobal(parentPos));
+   }
+}

@@ -50,5 +50,4 @@ public:
 
 private:
    bool commitChanges() override;
-   void showUnstagedMenu(const QPoint &pos) override;
 };
