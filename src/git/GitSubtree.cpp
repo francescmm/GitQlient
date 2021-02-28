@@ -1,14 +1,13 @@
-#include <GitSubtree.h>
 #include <GitBase.h>
 #include <GitQlientSettings.h>
+#include <GitSubtree.h>
 
 #include <QLogger.h>
 
 using namespace QLogger;
 
 GitSubtree::GitSubtree(const QSharedPointer<GitBase> &gitBase)
-   : QObject()
-   , mGitBase(gitBase)
+   : mGitBase(gitBase)
 {
 }
 

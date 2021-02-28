@@ -29,7 +29,7 @@
 
 class GitBase;
 
-class GitSubtree : public QObject
+class GitSubtree
 {
 public:
    explicit GitSubtree(const QSharedPointer<GitBase> &gitBase);

@@ -1,7 +1,7 @@
 #include "GitWip.h"
 
-#include <GitCache.h>
 #include <GitBase.h>
+#include <GitCache.h>
 
 #include <QLogger.h>
 
@@ -9,9 +9,8 @@
 
 using namespace QLogger;
 
-GitWip::GitWip(const QSharedPointer<GitBase> &git, const QSharedPointer<GitCache> &cache, QObject *parent)
-   : QObject(parent)
-   , mGit(git)
+GitWip::GitWip(const QSharedPointer<GitBase> &git, const QSharedPointer<GitCache> &cache)
+   : mGit(git)
    , mCache(cache)
 {
 }

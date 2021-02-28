@@ -20,8 +20,7 @@ static QString quote(const QStringList &sl)
 }
 
 GitLocal::GitLocal(const QSharedPointer<GitBase> &gitBase)
-   : QObject()
-   , mGitBase(gitBase)
+   : mGitBase(gitBase)
 {
 }
 

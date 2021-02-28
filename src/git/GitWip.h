@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QObject>
 #include <QSharedPointer>
 
 #include <WipRevisionInfo.h>
@@ -8,12 +7,10 @@
 class GitBase;
 class GitCache;
 
-class GitWip : public QObject
+class GitWip
 {
-   Q_OBJECT
 public:
-   explicit GitWip(const QSharedPointer<GitBase> &git, const QSharedPointer<GitCache> &cache,
-                   QObject *parent = nullptr);
+   explicit GitWip(const QSharedPointer<GitBase> &git, const QSharedPointer<GitCache> &cache);
 
    void updateUntrackedFiles() const;
    bool updateWip() const;

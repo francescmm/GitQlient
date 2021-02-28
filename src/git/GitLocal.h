@@ -30,10 +30,8 @@
 class GitBase;
 class RevisionFiles;
 
-class GitLocal : public QObject
+class GitLocal
 {
-   Q_OBJECT
-
 public:
    enum class CommitResetType
    {

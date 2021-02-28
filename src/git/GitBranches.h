@@ -29,7 +29,7 @@
 
 class GitBase;
 
-class GitBranches : public QObject
+class GitBranches
 {
 public:
    GitBranches(const QSharedPointer<GitBase> &gitBase);
