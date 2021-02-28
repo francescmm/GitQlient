@@ -34,9 +34,6 @@ class GitLocal : public QObject
 {
    Q_OBJECT
 
-signals:
-   void signalWipUpdated();
-
 public:
    enum class CommitResetType
    {

@@ -1,32 +1,32 @@
 #include <CommitChangesWidget.h>
 #include <ui_CommitChangesWidget.h>
 
-#include <GitRepoLoader.h>
-#include <GitBase.h>
-#include <GitLocal.h>
-#include <GitWip.h>
-#include <GitQlientStyles.h>
+#include <ClickableFrame.h>
 #include <CommitInfo.h>
+#include <FileWidget.h>
+#include <GitBase.h>
+#include <GitCache.h>
+#include <GitLocal.h>
+#include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
+#include <GitRepoLoader.h>
+#include <GitWip.h>
 #include <RevisionFiles.h>
 #include <UnstagedMenu.h>
-#include <GitCache.h>
-#include <FileWidget.h>
-#include <ClickableFrame.h>
-#include <GitQlientSettings.h>
 
 #include <QDir>
+#include <QItemDelegate>
 #include <QKeyEvent>
+#include <QListWidgetItem>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPainter>
+#include <QProcess>
 #include <QRegExp>
 #include <QScrollBar>
 #include <QTextCodec>
-#include <QToolTip>
-#include <QListWidgetItem>
 #include <QTextStream>
-#include <QProcess>
-#include <QItemDelegate>
-#include <QPainter>
+#include <QToolTip>
 
 #include <QLogger.h>
 
@@ -267,14 +267,13 @@ void CommitChangesWidget::addAllFilesToCommitList()
    for (auto i = ui->unstagedFilesList->count() - 1; i >= 0; --i)
       files += addFileToCommitList(ui->unstagedFilesList->item(i), false);
 
-   // TODO: Probably not getting the signal since this goes out of scope
-   QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
-   connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
+   const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
+
+   if (const auto ret = git->markFilesAsResolved(files); ret.success)
+   {
       QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
       git->updateWip();
-   });
-
-   git->markFilesAsResolved(files);
+   }
 
    ui->applyActionBtn->setEnabled(ui->stagedFilesList->count() > 0);
 }
@@ -288,22 +287,21 @@ void CommitChangesWidget::requestDiff(const QString &fileName)
 QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool updateGit)
 {
    const auto fileList = qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole));
-   const auto row = fileList->row(item);
    const auto fileWidget = qobject_cast<FileWidget *>(fileList->itemWidget(item));
    const auto fileName = fileWidget->toolTip().remove(tr("(conflicts)")).trimmed();
 
    if (updateGit)
    {
-      // TODO: Probably not getting the signal since this goes out of scope
-      QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
-      connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
+      const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
+
+      if (const auto ret = git->markFileAsResolved(fileName); ret.success)
+      {
          QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
          git->updateWip();
-      });
-
-      git->markFileAsResolved(fileName);
+      }
    }
 
+   const auto row = fileList->row(item);
    fileList->removeItemWidget(item);
    fileList->takeItem(row);
 

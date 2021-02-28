@@ -1,6 +1,7 @@
 #include "GitLocal.h"
 
 #include <GitBase.h>
+#include <GitWip.h>
 #include <QLogger.h>
 
 #include <QFile>
@@ -101,12 +102,7 @@ GitExecResult GitLocal::checkoutCommit(const QString &sha) const
 
 GitExecResult GitLocal::markFileAsResolved(const QString &fileName)
 {
-   const auto ret = stageFile(fileName);
-
-   if (ret.success)
-      emit signalWipUpdated();
-
-   return ret;
+   return stageFile(fileName);
 }
 
 GitExecResult GitLocal::markFilesAsResolved(const QStringList &files)
@@ -179,9 +175,6 @@ bool GitLocal::resetCommit(const QString &sha, CommitResetType type)
    QLog_Trace("Git", QString("Reseting commit: {%1}").arg(cmd));
 
    const auto ret = mGitBase->run(cmd);
-
-   if (ret.success)
-      emit signalWipUpdated();
 
    return ret.success;
 }
