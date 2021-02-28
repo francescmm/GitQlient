@@ -1,45 +1,43 @@
 #include "GitQlientRepo.h"
 
-#include <GitQlientSettings.h>
-#include <GitTags.h>
-#include <Controls.h>
+#include <BlameWidget.h>
 #include <BranchesWidget.h>
 #include <CommitHistoryColumns.h>
-#include <HistoryWidget.h>
-#include <QLogger.h>
-#include <BlameWidget.h>
 #include <CommitInfo.h>
-#include <WaitingDlg.h>
-#include <GitConfigDlg.h>
+#include <ConfigData.h>
+#include <ConfigWidget.h>
 #include <Controls.h>
-#include <HistoryWidget.h>
 #include <DiffWidget.h>
-#include <MergeWidget.h>
-#include <GitCache.h>
-#include <GitRepoLoader.h>
-#include <GitConfig.h>
 #include <GitBase.h>
-#include <GitWip.h>
+#include <GitCache.h>
+#include <GitConfig.h>
+#include <GitConfigDlg.h>
 #include <GitHistory.h>
 #include <GitHubRestApi.h>
 #include <GitLocal.h>
 #include <GitMerge.h>
-#include <GitSubmodules.h>
-#include <GitServerWidget.h>
+#include <GitQlientSettings.h>
+#include <GitRepoLoader.h>
 #include <GitServerCache.h>
-#include <ConfigData.h>
+#include <GitServerWidget.h>
+#include <GitSubmodules.h>
+#include <GitTags.h>
+#include <GitWip.h>
+#include <HistoryWidget.h>
 #include <JenkinsWidget.h>
-#include <ConfigWidget.h>
+#include <MergeWidget.h>
+#include <QLogger.h>
+#include <WaitingDlg.h>
 
-#include <QTimer>
-#include <QDirIterator>
-#include <QFileSystemWatcher>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QStackedWidget>
-#include <QGridLayout>
 #include <QApplication>
+#include <QDirIterator>
+#include <QFileDialog>
+#include <QFileSystemWatcher>
+#include <QGridLayout>
+#include <QMessageBox>
 #include <QStackedLayout>
+#include <QStackedWidget>
+#include <QTimer>
 
 using namespace QLogger;
 using namespace GitServer;
@@ -626,9 +624,4 @@ void GitQlientRepo::closeEvent(QCloseEvent *ce)
    mGitLoader->cancelAll();
 
    QWidget::closeEvent(ce);
-}
-
-void GitRepoLoader::cancelAll()
-{
-   emit cancelAllProcesses(QPrivateSignal());
 }

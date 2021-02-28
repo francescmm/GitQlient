@@ -99,11 +99,6 @@ GitExecResult GitLocal::checkoutCommit(const QString &sha) const
    return ret;
 }
 
-GitExecResult GitLocal::markFileAsResolved(const QString &fileName)
-{
-   return stageFile(fileName);
-}
-
 GitExecResult GitLocal::markFilesAsResolved(const QStringList &files)
 {
    QLog_Debug("Git", QString("Marking {%1} files as resolved").arg(files.count()));

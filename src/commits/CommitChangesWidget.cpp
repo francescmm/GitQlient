@@ -294,7 +294,7 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
    {
       const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
 
-      if (const auto ret = git->markFileAsResolved(fileName); ret.success)
+      if (const auto ret = git->stageFile(fileName); ret.success)
       {
          QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
          git->updateWip();

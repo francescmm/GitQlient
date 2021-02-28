@@ -1,27 +1,27 @@
 #include "FileDiffWidget.h"
 
-#include <GitBase.h>
-#include <GitPatches.h>
-#include <GitHistory.h>
-#include <FileDiffView.h>
-#include <CommitInfo.h>
-#include <GitCache.h>
-#include <GitQlientSettings.h>
 #include <CheckBox.h>
-#include <FileEditor.h>
-#include <GitLocal.h>
+#include <CommitInfo.h>
 #include <DiffHelper.h>
+#include <FileDiffView.h>
+#include <FileEditor.h>
+#include <GitBase.h>
+#include <GitCache.h>
+#include <GitHistory.h>
+#include <GitLocal.h>
+#include <GitPatches.h>
+#include <GitQlientSettings.h>
 #include <LineNumberArea.h>
 
-#include <QLineEdit>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QLabel>
-#include <QScrollBar>
 #include <QDateTime>
-#include <QStackedWidget>
-#include <QMessageBox>
 #include <QDir>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QScrollBar>
+#include <QStackedWidget>
 #include <QTemporaryFile>
 
 FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *parent)
@@ -412,7 +412,7 @@ void FileDiffWidget::endEditFile()
 void FileDiffWidget::stageFile()
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
-   const auto ret = git->markFileAsResolved(mCurrentFile);
+   const auto ret = git->stageFile(mCurrentFile);
 
    if (ret.success)
    {

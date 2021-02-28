@@ -23,8 +23,8 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <GitExecResult.h>
 #include <CommitInfo.h>
+#include <GitExecResult.h>
 
 #include <QObject>
 #include <QSharedPointer>
@@ -40,13 +40,11 @@ class GitRepoLoader : public QObject
    Q_OBJECT
 
 signals:
-   void signalLoadingStarted(int total);
+   void signalLoadingStarted();
    void signalLoadingFinished(bool full);
    void cancelAllProcesses(QPrivateSignal);
-   void signalRefreshPRsCache(const QString repoName, const QString &repoOwner, const QString &serverUrl);
 
 public slots:
-   bool load();
    bool load(bool refreshReferences);
 
 public:
@@ -54,6 +52,7 @@ public:
                           const QSharedPointer<GitQlientSettings> &settings, QObject *parent = nullptr);
    void cancelAll();
    void setShowAll(bool showAll = true) { mShowAll = showAll; }
+   bool load();
 
 private:
    bool mShowAll = true;

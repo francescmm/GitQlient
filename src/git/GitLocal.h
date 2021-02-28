@@ -41,13 +41,12 @@ public:
    };
 
    explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
-   GitExecResult stageFile(const QString &fileName) const;
    bool isInCherryPickMerge() const;
    GitExecResult cherryPickCommit(const QString &sha) const;
    GitExecResult cherryPickAbort() const;
    GitExecResult cherryPickContinue() const;
    GitExecResult checkoutCommit(const QString &sha) const;
-   GitExecResult markFileAsResolved(const QString &fileName);
+   GitExecResult stageFile(const QString &fileName) const;
    GitExecResult markFilesAsResolved(const QStringList &files);
    bool checkoutFile(const QString &fileName) const;
 

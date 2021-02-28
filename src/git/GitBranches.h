@@ -33,8 +33,6 @@ class GitBranches
 {
 public:
    GitBranches(const QSharedPointer<GitBase> &gitBase);
-   GitExecResult getBranches();
-   GitExecResult getDistanceBetweenBranches(const QString &right);
    GitExecResult createBranchFromAnotherBranch(const QString &oldName, const QString &newName);
    GitExecResult createBranchAtCommit(const QString &commitSha, const QString &branchName);
    GitExecResult checkoutBranchFromCommit(const QString &commitSha, const QString &branchName);

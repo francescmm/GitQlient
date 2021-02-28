@@ -1,13 +1,13 @@
 #include "GitRepoLoader.h"
 
 #include <GitBase.h>
-#include <GitConfig.h>
-#include <GitCache.h>
-#include <GitRequestorProcess.h>
 #include <GitBranches.h>
-#include <GitQlientSettings.h>
+#include <GitCache.h>
+#include <GitConfig.h>
 #include <GitHubRestApi.h>
 #include <GitLocal.h>
+#include <GitQlientSettings.h>
+#include <GitRequestorProcess.h>
 #include <GitWip.h>
 
 #include <QLogger.h>
@@ -25,6 +25,11 @@ GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<Git
    , mRevCache(std::move(cache))
    , mSettings(settings)
 {
+}
+
+void GitRepoLoader::cancelAll()
+{
+   emit cancelAllProcesses(QPrivateSignal());
 }
 
 bool GitRepoLoader::load()
@@ -172,7 +177,7 @@ void GitRepoLoader::requestRevisions()
    const auto baseCmd = QString("git log %1 --no-color --log-size --parents --boundary -z --pretty=format:%2 %3")
                             .arg(order, QString::fromUtf8(GIT_LOG_FORMAT), commitsToRetrieve);
 
-   emit signalLoadingStarted(1);
+   emit signalLoadingStarted();
 
    const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());
    connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevision);
@@ -189,16 +194,11 @@ void GitRepoLoader::processRevision(QByteArray ba)
    const auto serverUrl = gitConfig->getServerUrl();
 
    if (serverUrl.contains("github"))
-   {
       QLog_Info("Git", "Requesting PR status!");
-      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-
-      emit signalRefreshPRsCache(repoInfo.first, repoInfo.second, serverUrl);
-   }
 
    QLog_Debug("Git", "Processing revisions...");
 
-   emit signalLoadingStarted(1);
+   emit signalLoadingStarted();
 
    QList<QPair<QString, QString>> subtrees;
    const auto ret = gitConfig->getGitValue("log.showSignature");
