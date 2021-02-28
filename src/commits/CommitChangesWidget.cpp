@@ -136,6 +136,7 @@ QColor CommitChangesWidget::getColorForFile(const RevisionFiles &files, int inde
    const auto isInIndex = files.statusCmp(index, RevisionFiles::IN_INDEX);
    const auto isConflict = files.statusCmp(index, RevisionFiles::CONFLICT);
    const auto untrackedFile = !isInIndex && isUnknown;
+   const auto isPartiallyCached = files.statusCmp(index, RevisionFiles::PARTIALLY_CACHED);
 
    QColor myColor;
    const auto isDeleted = files.statusCmp(index, RevisionFiles::DELETED);
@@ -146,7 +147,7 @@ QColor CommitChangesWidget::getColorForFile(const RevisionFiles &files, int inde
       myColor = GitQlientStyles::getRed();
    else if (untrackedFile)
       myColor = GitQlientStyles::getOrange();
-   else if (files.statusCmp(index, RevisionFiles::NEW) || isUnknown || isInIndex)
+   else if (files.statusCmp(index, RevisionFiles::NEW) || isUnknown || isInIndex || isPartiallyCached)
       myColor = GitQlientStyles::getGreen();
    else
       myColor = GitQlientStyles::getTextColor();
@@ -193,8 +194,9 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
       {
          if (!mInternalCache.contains(wip))
          {
-            const auto itemPair = fillFileItemInfo(fileName, isConflict, QString(":/icons/remove"),
-                                                   GitQlientStyles::getGreen(), ui->stagedFilesList);
+            const auto color = getColorForFile(files, i);
+            const auto itemPair
+                = fillFileItemInfo(fileName, isConflict, QString(":/icons/remove"), color, ui->stagedFilesList);
             connect(itemPair.second, &FileWidget::clicked, this, [this, item = itemPair.first]() { resetFile(item); });
 
             ui->stagedFilesList->setItemWidget(itemPair.first, itemPair.second);

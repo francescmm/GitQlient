@@ -23,14 +23,14 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <CommitInfo.h>
 #include <RevisionFiles.h>
 #include <lanes.h>
-#include <CommitInfo.h>
 
-#include <QSharedPointer>
-#include <QObject>
 #include <QHash>
 #include <QMutex>
+#include <QObject>
+#include <QSharedPointer>
 
 struct WipRevisionInfo;
 
@@ -72,8 +72,6 @@ public:
 
    bool containsRevisionFile(const QString &sha1, const QString &sha2) const;
 
-   RevisionFiles parseDiff(const QString &logDiff);
-
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
    bool pendingLocalChanges();
 
@@ -83,6 +81,8 @@ public:
    void updateTags(const QMap<QString, QString> &remoteTags);
    void addSubtrees(const QList<QPair<QString, QString>> &subtrees);
    QStringList getSubtrees() const;
+
+   RevisionFiles parseDiff(const QString &buf, bool cached = false);
 
 private:
    friend class GitRepoLoader;
@@ -108,23 +108,12 @@ private:
 
    QList<Subtree> mSubtrees;
 
-   struct FileNamesLoader
-   {
-      RevisionFiles *rf = nullptr;
-      QVector<int> rfDirs;
-      QVector<int> rfNames;
-      QVector<QString> files;
-   };
-
    void setConfigurationDone() { mConfigured = true; }
    void insertCommitInfo(CommitInfo rev, int orderIdx);
    void insertWipRevision(const WipRevisionInfo &wipInfo);
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
    QVector<Lane> calculateLanes(const CommitInfo &c);
-   RevisionFiles parseDiffFormat(const QString &buf, FileNamesLoader &fl, bool cached = false);
-   void appendFileName(const QString &name, FileNamesLoader &fl);
-   void flushFileNames(FileNamesLoader &fl);
-   void setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
+   void setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum);
    auto searchCommit(const QString &text, int startingPoint = 0) const;
    auto reverseSearchCommit(const QString &text, int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);
