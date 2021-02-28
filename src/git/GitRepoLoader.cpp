@@ -4,7 +4,6 @@
 #include <GitBranches.h>
 #include <GitCache.h>
 #include <GitConfig.h>
-#include <GitHubRestApi.h>
 #include <GitLocal.h>
 #include <GitQlientSettings.h>
 #include <GitRequestorProcess.h>

@@ -1,8 +1,6 @@
 #include "Controls.h"
 
 #include <BranchDlg.h>
-#include <CreateIssueDlg.h>
-#include <CreatePullRequestDlg.h>
 #include <GitBase.h>
 #include <GitCache.h>
 #include <GitConfig.h>
