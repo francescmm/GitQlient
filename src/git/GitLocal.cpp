@@ -3,6 +3,7 @@
 #include <GitBase.h>
 #include <GitWip.h>
 #include <QLogger.h>
+#include <RevisionFiles.h>
 
 #include <QFile>
 #include <QProcess>

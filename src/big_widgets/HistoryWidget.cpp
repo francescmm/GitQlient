@@ -1,40 +1,40 @@
 #include "HistoryWidget.h"
 
+#include <AmendWidget.h>
+#include <BranchesWidget.h>
+#include <CheckBox.h>
 #include <CommitHistoryModel.h>
 #include <CommitHistoryView.h>
-#include <RepositoryViewDelegate.h>
-#include <BranchesWidget.h>
-#include <WipWidget.h>
-#include <AmendWidget.h>
-#include <CommitInfoWidget.h>
 #include <CommitInfo.h>
-#include <GitQlientSettings.h>
+#include <CommitInfoWidget.h>
+#include <FileDiffWidget.h>
+#include <FileEditor.h>
+#include <FullDiffWidget.h>
 #include <GitBase.h>
 #include <GitBranches.h>
+#include <GitCache.h>
+#include <GitConfig.h>
 #include <GitHistory.h>
-#include <GitRepoLoader.h>
-#include <GitRemote.h>
-#include <GitMerge.h>
 #include <GitLocal.h>
-#include <GitWip.h>
-#include <FileEditor.h>
+#include <GitMerge.h>
 #include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
-#include <CheckBox.h>
-#include <FileDiffWidget.h>
-#include <FullDiffWidget.h>
-#include <GitConfig.h>
+#include <GitRemote.h>
+#include <GitRepoLoader.h>
+#include <GitWip.h>
+#include <RepositoryViewDelegate.h>
+#include <WipWidget.h>
 
 #include <QLogger.h>
 
-#include <QPushButton>
-#include <QGridLayout>
-#include <QLineEdit>
-#include <QStackedWidget>
-#include <QMessageBox>
 #include <QApplication>
+#include <QGridLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMenu>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QStackedWidget>
 
 using namespace QLogger;
 
@@ -205,7 +205,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mFileDiff, &FileDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
    connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
 
-   connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName, int, int) {
+   connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName) {
       showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
    });
 

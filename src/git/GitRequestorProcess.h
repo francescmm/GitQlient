@@ -29,8 +29,6 @@ class QTemporaryFile;
 
 class GitRequestorProcess : public AGitProcess
 {
-   Q_OBJECT
-
 public:
    explicit GitRequestorProcess(const QString &workingDir);
    GitExecResult run(const QString &command) override;

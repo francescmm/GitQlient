@@ -1,28 +1,29 @@
 #include "Controls.h"
 
-#include <GitBase.h>
-#include <GitTags.h>
-#include <GitStashes.h>
-#include <GitQlientStyles.h>
-#include <GitRemote.h>
-#include <GitConfig.h>
 #include <BranchDlg.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
-#include <GitQlientUpdater.h>
+#include <GitBase.h>
+#include <GitCache.h>
+#include <GitConfig.h>
 #include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
+#include <GitQlientUpdater.h>
+#include <GitRemote.h>
+#include <GitStashes.h>
+#include <GitTags.h>
 #include <PomodoroButton.h>
 #include <QLogger.h>
 
 #include <QApplication>
-#include <QToolButton>
+#include <QButtonGroup>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QTimer>
-#include <QProgressBar>
-#include <QButtonGroup>
+#include <QToolButton>
 
 using namespace QLogger;
 

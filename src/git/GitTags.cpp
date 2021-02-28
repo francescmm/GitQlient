@@ -1,6 +1,6 @@
-#include <GitTags.h>
+#include <GitAsyncProcess.h>
 #include <GitBase.h>
-
+#include <GitTags.h>
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -8,7 +8,6 @@ using namespace QLogger;
 GitTags::GitTags(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
 {
-   connect(mGitBase.get(), &GitBase::signalResultReady, this, &GitTags::onRemoteTagsRecieved);
 }
 
 bool GitTags::getRemoteTags() const
@@ -19,7 +18,12 @@ bool GitTags::getRemoteTags() const
 
    QLog_Trace("Git", QString("Getting remote tags: {%1}").arg(cmd));
 
-   return mGitBase->runAsync(cmd);
+   const auto p = new GitAsyncProcess(mGitBase->getWorkingDir());
+   connect(p, &GitAsyncProcess::signalDataReady, this, &GitTags::onRemoteTagsRecieved);
+
+   const auto ret = p->run(cmd);
+
+   return ret.success;
 }
 
 GitExecResult GitTags::addTag(const QString &tagName, const QString &tagMessage, const QString &sha)

@@ -24,25 +24,13 @@
  ***************************************************************************************/
 
 #include <GitExecResult.h>
-#include <GitCache.h>
 
-#include <QObject>
-#include <QSharedPointer>
-
-class GitBase final : public QObject
+class GitBase final
 {
-   Q_OBJECT
-
-signals:
-   void cancelAllProcesses(QPrivateSignal);
-   void signalResultReady(GitExecResult result);
-
 public:
-   explicit GitBase(const QString &workingDirectory, QObject *parent = nullptr);
+   explicit GitBase(const QString &workingDirectory);
 
    GitExecResult run(const QString &cmd) const;
-
-   bool runAsync(const QString &cmd) const;
 
    QString getWorkingDir() const;
 

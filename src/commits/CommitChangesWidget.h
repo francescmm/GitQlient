@@ -23,8 +23,8 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QWidget>
 #include <QMap>
+#include <QWidget>
 
 class QListWidget;
 class QListWidgetItem;
@@ -57,7 +57,7 @@ signals:
     * @param line The line
     * @param column The column
     */
-   void signalEditFile(const QString &fileName, int line, int column);
+   void signalEditFile(const QString &fileName);
 
 public:
    explicit CommitChangesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,

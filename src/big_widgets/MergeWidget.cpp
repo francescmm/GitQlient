@@ -1,25 +1,26 @@
 #include "MergeWidget.h"
 
-#include <GitQlientStyles.h>
-#include <GitBase.h>
-#include <GitMerge.h>
-#include <GitRemote.h>
-#include <GitLocal.h>
-#include <FileDiffWidget.h>
 #include <CommitInfo.h>
-#include <RevisionFiles.h>
+#include <FileDiffWidget.h>
 #include <FileEditor.h>
+#include <GitBase.h>
+#include <GitCache.h>
+#include <GitLocal.h>
+#include <GitMerge.h>
+#include <GitQlientStyles.h>
+#include <GitRemote.h>
 #include <QPinnableTabWidget.h>
+#include <RevisionFiles.h>
 
-#include <QListWidget>
-#include <QPushButton>
+#include <QFile>
+#include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QStackedWidget>
 #include <QTextEdit>
 #include <QVBoxLayout>
-#include <QLabel>
-#include <QFile>
-#include <QMessageBox>
-#include <QStackedWidget>
 
 MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const QSharedPointer<GitBase> &git,
                          QWidget *parent)

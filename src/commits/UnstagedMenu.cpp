@@ -1,18 +1,17 @@
 #include "UnstagedMenu.h"
 
 #include <GitBase.h>
-#include <GitSyncProcess.h>
 #include <GitLocal.h>
+#include <GitSyncProcess.h>
 #include <QLogger.h>
 
-#include <QFile>
 #include <QDir>
+#include <QFile>
 #include <QMessageBox>
 
 using namespace QLogger;
 
-UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName,
-                           QWidget *parent)
+UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, QWidget *parent)
    : QMenu(parent)
    , mGit(git)
    , mFileName(fileName)
@@ -21,7 +20,8 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
 
    connect(addAction(tr("See changes")), &QAction::triggered, this, [this]() { emit signalShowDiff(mFileName); });
    connect(addAction(tr("Blame")), &QAction::triggered, this, [this]() { emit signalShowFileHistory(mFileName); });
-   connect(addAction(tr("Edit file")), &QAction::triggered, this, [this]() { emit signalEditFile(); });
+   connect(addAction(tr("Edit file")), &QAction::triggered, this,
+           [this]() { emit signalEditFile(mGit->getWorkingDir() + "/" + mFileName); });
 
    addSeparator();
 

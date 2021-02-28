@@ -38,12 +38,11 @@ signals:
    void signalRevertAll();
    void signalCheckedOut();
    void signalShowFileHistory(const QString &fileName);
-   void signalEditFile();
+   void signalEditFile(const QString &fullFilePath);
    void signalStageFile();
 
 public:
-   explicit UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName,
-                         QWidget *parent = nullptr);
+   explicit UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, QWidget *parent = nullptr);
 
 private:
    QSharedPointer<GitBase> mGit;

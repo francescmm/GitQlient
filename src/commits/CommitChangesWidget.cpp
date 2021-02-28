@@ -480,8 +480,7 @@ void CommitChangesWidget::showUnstagedMenu(const QPoint &pos)
    {
       const auto fileName = item->toolTip();
       const auto contextMenu = new UnstagedMenu(mGit, fileName, this);
-      connect(contextMenu, &UnstagedMenu::signalEditFile, this,
-              [this, fileName]() { emit signalEditFile(mGit->getWorkingDir() + "/" + fileName, 0, 0); });
+      connect(contextMenu, &UnstagedMenu::signalEditFile, this, &CommitChangesWidget::signalEditFile);
       connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &CommitChangesWidget::requestDiff);
       connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &CommitChangesWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &CommitChangesWidget::revertAllChanges);
