@@ -16,6 +16,7 @@
 #include <GitRemote.h>
 #include <GitMerge.h>
 #include <GitLocal.h>
+#include <GitWip.h>
 #include <FileEditor.h>
 #include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
@@ -409,11 +410,8 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
    QScopedPointer<GitMerge> git(new GitMerge(mGit, mCache));
    const auto ret = git->merge(current, { branchToMerge });
 
-   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
-   mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-      mCache->updateWipCommit(wipInfo);
+   QScopedPointer<GitWip> gitWip(new GitWip(mGit, mCache));
+   gitWip->updateWip();
 
    QApplication::restoreOverrideCursor();
 

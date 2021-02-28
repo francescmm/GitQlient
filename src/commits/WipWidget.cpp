@@ -4,6 +4,7 @@
 #include <GitQlientRole.h>
 #include <GitCache.h>
 #include <GitRepoLoader.h>
+#include <GitWip.h>
 #include <GitLocal.h>
 #include <UnstagedMenu.h>
 #include <GitBase.h>
@@ -28,11 +29,8 @@ void WipWidget::configure(const QString &sha)
 
    if (!mCache->containsRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0)))
    {
-      QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
-      mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-      if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-         mCache->updateWipCommit(wipInfo);
+      QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+      git->updateWip();
    }
 
    const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
@@ -63,17 +61,14 @@ bool WipWidget::commitChanges()
       {
          const auto revInfo = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-         QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
-         mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-         if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-            mCache->updateWipCommit(wipInfo);
+         QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+         git->updateWip();
 
          const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QScopedPointer<GitLocal> git(new GitLocal(mGit));
-         const auto ret = git->commitFiles(selFiles, files, msg);
+         QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+         const auto ret = gitLocal->commitFiles(selFiles, files, msg);
          QApplication::restoreOverrideCursor();
 
          lastMsgBeforeError = (ret.success ? "" : msg);

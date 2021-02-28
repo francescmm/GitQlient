@@ -1,9 +1,8 @@
 #include <AmendWidget.h>
 #include <ui_CommitChangesWidget.h>
 
+#include <GitWip.h>
 #include <GitCache.h>
-#include <GitRepoLoader.h>
-#include <GitBase.h>
 #include <GitLocal.h>
 #include <GitQlientRole.h>
 #include <UnstagedMenu.h>
@@ -32,11 +31,8 @@ void AmendWidget::configure(const QString &sha)
 
    if (!mCache->containsRevisionFile(CommitInfo::ZERO_SHA, sha))
    {
-      QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
-      mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-      if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-         mCache->updateWipCommit(wipInfo);
+      QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+      git->updateWip();
    }
 
    const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, sha);
@@ -95,17 +91,16 @@ bool AmendWidget::commitChanges()
       }
       else if (checkMsg(msg))
       {
-         QScopedPointer<GitLocal> git(new GitLocal(mGit));
-         mCache->setUntrackedFilesList(git->getUntrackedFiles());
-
-         if (const auto wipInfo = git->getWipDiff(); wipInfo.isValid())
-            mCache->updateWipCommit(wipInfo);
+         QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+         git->updateWip();
 
          const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, mCurrentSha);
          const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         const auto ret = git->ammendCommit(selFiles, files, msg, author);
+
+         QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+         const auto ret = gitLocal->ammendCommit(selFiles, files, msg, author);
          QApplication::restoreOverrideCursor();
 
          emit signalChangesCommitted(ret.success);

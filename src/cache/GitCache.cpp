@@ -289,10 +289,15 @@ void GitCache::reloadCurrentBranchInfo(const QString &currentBranch, const QStri
    mReferences[currentSha].addReference(References::Type::LocalBranch, currentBranch);
 }
 
-void GitCache::updateWipCommit(const WipRevisionInfo &wipInfo)
+bool GitCache::updateWipCommit(const WipRevisionInfo &wipInfo)
 {
    if (mConfigured)
+   {
       insertWipRevision(wipInfo);
+      return true;
+   }
+
+   return false;
 }
 
 bool GitCache::containsRevisionFile(const QString &sha1, const QString &sha2) const

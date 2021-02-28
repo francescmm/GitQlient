@@ -8,6 +8,7 @@
 #include <GitQlientSettings.h>
 #include <GitHubRestApi.h>
 #include <GitLocal.h>
+#include <GitWip.h>
 
 #include <QLogger.h>
 
@@ -148,8 +149,7 @@ void GitRepoLoader::requestRevisions()
 
    const auto maxCommits = mSettings->localValue("MaxCommits", 0).toInt();
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
-       : mShowAll                                 ? QString("--all")
-                                                  : mGitBase->getCurrentBranch();
+                                                  : mShowAll ? QString("--all") : mGitBase->getCurrentBranch();
 
    QString order;
 
@@ -205,9 +205,10 @@ void GitRepoLoader::processRevision(QByteArray ba)
    const auto showSignature = ret.success ? ret.output.toString().contains("true") : false;
    const auto commits = showSignature ? processSignedLog(ba, subtrees) : processUnsignedLog(ba, subtrees);
 
-   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
-   mRevCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-   mRevCache->setup(gitLocal->getWipDiff(), commits);
+   QScopedPointer<GitWip> git(new GitWip(mGitBase, mRevCache));
+   git->updateUntrackedFiles();
+
+   mRevCache->setup(git->getWipInfo(), commits);
 
    if (!subtrees.isEmpty())
       mRevCache->addSubtrees(subtrees);

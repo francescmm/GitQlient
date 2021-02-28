@@ -68,7 +68,7 @@ public:
    QStringList getReferences(const QString &sha, References::Type type) const;
    void reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha);
 
-   void updateWipCommit(const WipRevisionInfo &wipInfo);
+   bool updateWipCommit(const WipRevisionInfo &wipInfo);
 
    bool containsRevisionFile(const QString &sha1, const QString &sha2) const;
 

@@ -19,7 +19,8 @@ HEADERS += \
     $$PWD/GitSubmodules.h \
     $$PWD/GitSubtree.h \
     $$PWD/GitSyncProcess.h \
-    $$PWD/GitTags.h
+    $$PWD/GitTags.h \
+    $$PWD/GitWip.h
 
 SOURCES += \
     $$PWD/AGitProcess.cpp \
@@ -40,4 +41,5 @@ SOURCES += \
     $$PWD/GitSubmodules.cpp \
     $$PWD/GitSubtree.cpp \
     $$PWD/GitSyncProcess.cpp \
-    $$PWD/GitTags.cpp
+    $$PWD/GitTags.cpp \
+    $$PWD/GitWip.cpp

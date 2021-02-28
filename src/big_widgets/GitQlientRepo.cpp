@@ -19,6 +19,7 @@
 #include <GitRepoLoader.h>
 #include <GitConfig.h>
 #include <GitBase.h>
+#include <GitWip.h>
 #include <GitHistory.h>
 #include <GitHubRestApi.h>
 #include <GitLocal.h>
@@ -205,11 +206,8 @@ void GitQlientRepo::updateUiFromWatcher()
 {
    QLog_Info("UI", QString("Updating the GitQlient UI from watcher"));
 
-   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
-   mGitQlientCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-      mGitQlientCache->updateWipCommit(wipInfo);
+   QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
+   git->updateWip();
 
    mHistoryWidget->updateUiFromWatcher();
 
@@ -423,11 +421,8 @@ void GitQlientRepo::showWarningMerge()
 
    const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
-   mGitQlientCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-      mGitQlientCache->updateWipCommit(wipInfo);
+   QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
+   git->updateWip();
 
    const auto file = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
@@ -441,11 +436,8 @@ void GitQlientRepo::showCherryPickConflict()
 
    const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
-   mGitQlientCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-      mGitQlientCache->updateWipCommit(wipInfo);
+   QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
+   git->updateWip();
 
    const auto files = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
@@ -459,11 +451,8 @@ void GitQlientRepo::showPullConflict()
 
    const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
 
-   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
-   mGitQlientCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-      mGitQlientCache->updateWipCommit(wipInfo);
+   QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
+   git->updateWip();
 
    const auto files = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
@@ -547,12 +536,8 @@ void GitQlientRepo::updateWip()
 {
    mHistoryWidget->resetWip();
 
-   // TODO: Optimize
-   QScopedPointer<GitLocal> gitLocal(new GitLocal(mGitBase));
-   mGitQlientCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-   if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-      mGitQlientCache->updateWipCommit(wipInfo);
+   QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
+   git->updateWip();
 
    mHistoryWidget->updateUiFromWatcher();
 }

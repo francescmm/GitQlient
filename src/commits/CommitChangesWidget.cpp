@@ -4,6 +4,7 @@
 #include <GitRepoLoader.h>
 #include <GitBase.h>
 #include <GitLocal.h>
+#include <GitWip.h>
 #include <GitQlientStyles.h>
 #include <CommitInfo.h>
 #include <RevisionFiles.h>
@@ -269,11 +270,8 @@ void CommitChangesWidget::addAllFilesToCommitList()
    // TODO: Probably not getting the signal since this goes out of scope
    QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
    connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
-      QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
-      mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-      if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-         mCache->updateWipCommit(wipInfo);
+      QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+      git->updateWip();
    });
 
    git->markFilesAsResolved(files);
@@ -299,11 +297,8 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
       // TODO: Probably not getting the signal since this goes out of scope
       QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
       connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
-         QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
-         mCache->setUntrackedFilesList(gitLocal->getUntrackedFiles());
-
-         if (const auto wipInfo = gitLocal->getWipDiff(); wipInfo.isValid())
-            mCache->updateWipCommit(wipInfo);
+         QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+         git->updateWip();
       });
 
       git->markFileAsResolved(fileName);

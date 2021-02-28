@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
    QFontDatabase::addApplicationFont(":/DejaVuSansMono");
 
    GitQlient mainWin(arguments);
-
+   mainWin.setFixedSize(1920, 1080);
    mainWin.show();
 
    QTimer::singleShot(500, &mainWin, &GitQlient::restorePinnedRepos);
