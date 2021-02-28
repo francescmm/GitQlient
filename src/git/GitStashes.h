@@ -26,6 +26,7 @@
 #include <GitExecResult.h>
 
 #include <QSharedPointer>
+#include <QVector>
 
 class GitBase;
 
