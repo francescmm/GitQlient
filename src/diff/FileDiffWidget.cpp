@@ -461,6 +461,9 @@ void FileDiffWidget::stageChunk(const QString &id)
       QString postLine = " \n";
       auto fileCount = startingLine - 1 - buffer;
 
+      if (fileCount < 0)
+         fileCount = 0;
+
       for (; fileCount < startingLine - 1 && fileCount < mChunks.oldFileDiff.count(); ++fileCount)
          text.append(QString(" %1\n").arg(mChunks.oldFileDiff.at(fileCount)));
 
