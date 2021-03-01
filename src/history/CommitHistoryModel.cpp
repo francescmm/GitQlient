@@ -26,7 +26,7 @@ CommitHistoryModel::CommitHistoryModel(const QSharedPointer<GitCache> &cache, co
 
 int CommitHistoryModel::rowCount(const QModelIndex &parent) const
 {
-   return !parent.isValid() ? mCache->count() : 0;
+   return !parent.isValid() ? mCache->commitCount() : 0;
 }
 
 bool CommitHistoryModel::hasChildren(const QModelIndex &parent) const
@@ -65,7 +65,7 @@ QVariant CommitHistoryModel::headerData(int section, Qt::Orientation orientation
 
 QModelIndex CommitHistoryModel::index(int row, int column, const QModelIndex &) const
 {
-   return row >= 0 && row < mCache->count() ? createIndex(row, column, nullptr) : QModelIndex();
+   return row >= 0 && row < mCache->commitCount() ? createIndex(row, column, nullptr) : QModelIndex();
 }
 
 QModelIndex CommitHistoryModel::parent(const QModelIndex &) const
@@ -144,7 +144,7 @@ QVariant CommitHistoryModel::data(const QModelIndex &index, int role) const
    if (!index.isValid() || (role != Qt::DisplayRole && role != Qt::ToolTipRole))
       return QVariant();
 
-   const auto r = mCache->getCommitInfoByRow(index.row());
+   const auto r = mCache->commitInfo(index.row());
 
    if (role == Qt::ToolTipRole)
       return getToolTipData(r);

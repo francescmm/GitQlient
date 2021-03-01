@@ -110,6 +110,8 @@ void GitRepoLoader::loadReferences()
       const auto referencesList = ret3.output.toString().split('\n', QString::SkipEmptyParts);
 #endif
 
+      mRevCache->clearReferences();
+
       for (const auto &reference : referencesList)
       {
          const auto revSha = reference.left(40);
@@ -153,7 +155,8 @@ void GitRepoLoader::requestRevisions()
 
    const auto maxCommits = mSettings->localValue("MaxCommits", 0).toInt();
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
-                                                  : mShowAll ? QString("--all") : mGitBase->getCurrentBranch();
+       : mShowAll                                 ? QString("--all")
+                                                  : mGitBase->getCurrentBranch();
 
    QString order;
 
@@ -213,10 +216,7 @@ void GitRepoLoader::processRevision(QByteArray ba)
       mRevCache->addSubtrees(subtrees);
 
    if (mRefreshReferences)
-   {
-      mRevCache->clearReferences();
       loadReferences();
-   }
    else
       mRevCache->reloadCurrentBranchInfo(mGitBase->getCurrentBranch(),
                                          mGitBase->getLastCommit().output.toString().trimmed());

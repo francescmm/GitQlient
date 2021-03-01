@@ -28,8 +28,6 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
 
    mConfigured = false;
 
-   mDirNames.clear();
-   mFileNames.clear();
    mRevisionFilesMap.clear();
    mLanes.clear();
 
@@ -54,17 +52,40 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
 
    QLog_Debug("Cache", QString("Adding committed revisions."));
 
-   for (const auto &commit : commits)
+   for (auto commit : commits)
    {
       if (commit.isValid())
       {
-         insertCommitInfo(commit, count);
+         commit.setLanes(calculateLanes(commit));
+
+         const auto sha = commit.sha();
+
+         if (sha == mCommitsMap.value(CommitInfo::ZERO_SHA).parent(0))
+            commit.addChildReference(&mCommitsMap[CommitInfo::ZERO_SHA]);
+
+         mCommitsMap[sha] = std::move(commit);
+
+         mCommits.replace(count, &mCommitsMap[sha]);
+
+         if (mTmpChildsStorage.contains(sha))
+         {
+            for (auto &child : mTmpChildsStorage.values(sha))
+               mCommitsMap[sha].addChildReference(child);
+
+            mTmpChildsStorage.remove(sha);
+         }
+
+         const auto parents = mCommitsMap.value(sha).parents();
+
+         for (const auto &parent : parents)
+            mTmpChildsStorage.insert(parent, &mCommitsMap[sha]);
+
          ++count;
       }
    }
 }
 
-CommitInfo GitCache::getCommitInfoByRow(int row)
+CommitInfo GitCache::commitInfo(int row)
 {
    QMutexLocker lock(&mMutex);
 
@@ -73,7 +94,7 @@ CommitInfo GitCache::getCommitInfoByRow(int row)
    return commit ? *commit : CommitInfo();
 }
 
-int GitCache::getCommitPos(const QString &sha)
+int GitCache::commitPos(const QString &sha)
 {
    QMutexLocker lock(&mMutex);
 
@@ -129,7 +150,7 @@ CommitInfo GitCache::searchCommitInfo(const QString &text, int startingPoint, bo
    return commit;
 }
 
-CommitInfo GitCache::getCommitInfo(const QString &sha)
+CommitInfo GitCache::commitInfo(const QString &sha)
 {
    QMutexLocker lock(&mMutex);
 
@@ -155,44 +176,17 @@ CommitInfo GitCache::getCommitInfo(const QString &sha)
    return CommitInfo();
 }
 
-RevisionFiles GitCache::getRevisionFile(const QString &sha1, const QString &sha2) const
+RevisionFiles GitCache::revisionFile(const QString &sha1, const QString &sha2) const
 {
-   return mRevisionFilesMap.value(qMakePair(sha1, sha2));
+   const auto iter = mRevisionFilesMap.constFind(qMakePair(sha1, sha2));
+
+   return iter != mRevisionFilesMap.cend() ? *iter : RevisionFiles();
 }
 
 void GitCache::clearReferences()
 {
+   QMutexLocker lock(&mMutex);
    mReferences.clear();
-}
-
-void GitCache::insertCommitInfo(CommitInfo rev, int orderIdx)
-{
-   if (!mConfigured)
-   {
-      rev.setLanes(calculateLanes(rev));
-
-      const auto sha = rev.sha();
-
-      if (sha == mCommitsMap.value(CommitInfo::ZERO_SHA).parent(0))
-         rev.addChildReference(&mCommitsMap[CommitInfo::ZERO_SHA]);
-
-      mCommitsMap[sha] = rev;
-
-      mCommits.replace(orderIdx, &mCommitsMap[sha]);
-
-      if (mTmpChildsStorage.contains(sha))
-      {
-         for (auto &child : mTmpChildsStorage.values(sha))
-            mCommitsMap[sha].addChildReference(child);
-
-         mTmpChildsStorage.remove(sha);
-      }
-
-      const auto parents = mCommitsMap.value(sha).parents();
-
-      for (const auto &parent : parents)
-         mTmpChildsStorage.insert(parent, &mCommitsMap[sha]);
-   }
 }
 
 void GitCache::insertWipRevision(const WipRevisionInfo &wipInfo)
@@ -251,6 +245,7 @@ bool GitCache::insertRevisionFile(const QString &sha1, const QString &sha2, cons
 void GitCache::insertReference(const QString &sha, References::Type type, const QString &reference)
 {
    QMutexLocker lock(&mMutex);
+
    QLog_Debug("Cache", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
    mReferences[sha].addReference(type, reference);
@@ -298,11 +293,6 @@ bool GitCache::updateWipCommit(const WipRevisionInfo &wipInfo)
    return false;
 }
 
-bool GitCache::containsRevisionFile(const QString &sha1, const QString &sha2) const
-{
-   return mRevisionFilesMap.contains(qMakePair(sha1, sha2));
-}
-
 QVector<Lane> GitCache::calculateLanes(const CommitInfo &c)
 {
    const auto sha = c.sha();
@@ -330,51 +320,6 @@ QVector<Lane> GitCache::calculateLanes(const CommitInfo &c)
    return lanes;
 }
 
-RevisionFiles GitCache::parseDiff(const QString &buf, bool cached)
-{
-   RevisionFiles rf;
-   auto parNum = 1;
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-   const auto lines = buf.split("\n", Qt::SkipEmptyParts);
-#else
-   const auto lines = buf.split("\n", QString::SkipEmptyParts);
-#endif
-
-   for (auto line : lines)
-   {
-      if (line[0] == ':') // avoid sha's in merges output
-      {
-         if (line[1] == ':')
-         {
-            rf.mFiles.append(line.section('\t', -1));
-            rf.setStatus("M");
-            rf.mergeParent.append(parNum);
-         }
-         else
-         {
-            if (line.at(98) == '\t') // Faster parsing in normal case
-            {
-               auto fields = line.split(" ");
-               const auto dstSha = fields.at(3);
-               auto fileIsCached = !dstSha.startsWith(QStringLiteral("000000"));
-               const auto flag = fields.at(4).at(0);
-
-               rf.mFiles.append(line.mid(99));
-               rf.setStatus(flag, cached ? cached : fileIsCached);
-               rf.mergeParent.append(parNum);
-            }
-            else // It's a rename or a copy, we are not in fast path now!
-               setExtStatus(rf, line.mid(97), parNum);
-         }
-      }
-      else
-         ++parNum;
-   }
-
-   return rf;
-}
-
 bool GitCache::pendingLocalChanges()
 {
    QMutexLocker lock(&mMutex);
@@ -384,7 +329,7 @@ bool GitCache::pendingLocalChanges()
 
    if (commit.isValid())
    {
-      const auto rf = getRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
+      const auto rf = revisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
       localChanges = rf.count() - mUntrackedfiles.count() > 0;
    }
 
@@ -445,40 +390,6 @@ QStringList GitCache::getSubtrees() const
    return subtrees;
 }
 
-void GitCache::setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum)
-{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-   const QStringList sl(rowSt.split('\t', Qt::SkipEmptyParts));
-#else
-   const QStringList sl(rowSt.split('\t', QString::SkipEmptyParts));
-#endif
-   if (sl.count() != 3)
-      return;
-
-   // we want store extra info with format "orig --> dest (Rxx%)"
-   // but git give us something like "Rxx\t<orig>\t<dest>"
-   QString type = sl[0];
-   type.remove(0, 1);
-   const QString &orig = sl[1];
-   const QString &dest = sl[2];
-   const QString extStatusInfo(orig + " --> " + dest + " (" + QString::number(type.toInt()) + "%)");
-
-   rf.mFiles.append(dest);
-   rf.mergeParent.append(parNum);
-   rf.setStatus(RevisionFiles::NEW);
-   rf.appendExtStatus(extStatusInfo);
-
-   // simulate deleted orig file only in case of rename
-   if (type.at(0) == 'R')
-   {
-      rf.mFiles.append(orig);
-      rf.mergeParent.append(parNum);
-      rf.setStatus(RevisionFiles::DELETED);
-      rf.appendExtStatus(extStatusInfo);
-   }
-   rf.setOnlyModified(false);
-}
-
 void GitCache::resetLanes(const CommitInfo &c, bool isFork)
 {
    const auto nextSha = c.parentsCount() == 0 ? QString() : c.parent(0);
@@ -493,14 +404,14 @@ void GitCache::resetLanes(const CommitInfo &c, bool isFork)
       mLanes.afterBranch();
 }
 
-int GitCache::count() const
+int GitCache::commitCount() const
 {
    return mCommits.count();
 }
 
 RevisionFiles GitCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
 {
-   auto rf = parseDiff(diffIndex);
+   RevisionFiles rf(diffIndex);
    rf.setOnlyModified(false);
 
    for (const auto &it : qAsConst(mUntrackedfiles))
@@ -510,7 +421,7 @@ RevisionFiles GitCache::fakeWorkDirRevFile(const QString &diffIndex, const QStri
       rf.mergeParent.append(1);
    }
 
-   RevisionFiles cachedFiles = parseDiff(diffIndexCache, true);
+   RevisionFiles cachedFiles(diffIndexCache, true);
 
    for (auto i = 0; i < rf.count(); i++)
    {

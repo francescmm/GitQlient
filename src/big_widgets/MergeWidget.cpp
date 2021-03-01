@@ -150,7 +150,7 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
 void MergeWidget::changeDiffView(QListWidgetItem *item)
 {
    const auto file = item->text();
-   const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
+   const auto wip = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
 
    const auto configured
        = mFileDiff->configure(CommitInfo::ZERO_SHA, wip.parent(0), mGit->getWorkingDir() + "/" + file, false);

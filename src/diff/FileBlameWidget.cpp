@@ -122,7 +122,7 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
       auto start = 0;
       auto indexOfTab = line.indexOf('\t');
       const auto shortSha = line.mid(start, indexOfTab);
-      const auto revision = mCache->getCommitInfo(shortSha);
+      const auto revision = mCache->commitInfo(shortSha);
 
       start = indexOfTab + 1;
       indexOfTab = line.indexOf('\t', start);
@@ -269,7 +269,7 @@ QLabel *FileBlameWidget::createAuthorLabel(const QString &author, bool isFirst)
 
 ButtonLink *FileBlameWidget::createMessageLabel(const QString &sha, bool isFirst)
 {
-   const auto revision = mCache->getCommitInfo(sha);
+   const auto revision = mCache->commitInfo(sha);
    auto commitMsg = tr("Local changes");
 
    if (!revision.sha().isEmpty())

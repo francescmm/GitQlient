@@ -142,7 +142,7 @@ void CommitHistoryView::refreshView()
       topLeft = mCommitHistoryModel->index(0, 0);
       bottomRight
           = mCommitHistoryModel->index(mCommitHistoryModel->rowCount() - 1, mCommitHistoryModel->columnCount() - 1);
-      mCommitHistoryModel->onNewRevisions(mCache->count());
+      mCommitHistoryModel->onNewRevisions(mCache->commitCount());
    }
 
    const auto auxTL = visualRect(topLeft);
@@ -182,7 +182,7 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
 
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 
-   auto row = mCache->getCommitPos(mCurrentSha);
+   auto row = mCache->commitPos(mCurrentSha);
 
    if (mIsFiltering)
    {

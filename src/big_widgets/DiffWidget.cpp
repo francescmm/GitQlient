@@ -109,8 +109,8 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
 
       if (fileWithModifications)
       {
-         mInfoPanelBase->configure(mCache->getCommitInfo(currentSha));
-         mInfoPanelParent->configure(mCache->getCommitInfo(previousSha));
+         mInfoPanelBase->configure(mCache->commitInfo(currentSha));
+         mInfoPanelParent->configure(mCache->commitInfo(previousSha));
 
          mDiffWidgets.insert(id, fileDiffWidget);
 
@@ -159,8 +159,8 @@ bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
          const auto fullDiffWidget = new FullDiffWidget(mGit, mCache);
          fullDiffWidget->loadDiff(sha, parentSha, ret.output.toString());
 
-         mInfoPanelBase->configure(mCache->getCommitInfo(sha));
-         mInfoPanelParent->configure(mCache->getCommitInfo(parentSha));
+         mInfoPanelBase->configure(mCache->commitInfo(sha));
+         mInfoPanelParent->configure(mCache->commitInfo(parentSha));
 
          mDiffWidgets.insert(id, fullDiffWidget);
 
@@ -196,8 +196,8 @@ void DiffWidget::changeSelection(int index)
 
    if (widget)
    {
-      mInfoPanelBase->configure(mCache->getCommitInfo(widget->getCurrentSha()));
-      mInfoPanelParent->configure(mCache->getCommitInfo(widget->getPreviousSha()));
+      mInfoPanelBase->configure(mCache->commitInfo(widget->getCurrentSha()));
+      mInfoPanelParent->configure(mCache->commitInfo(widget->getPreviousSha()));
    }
    else
       emit signalDiffEmpty();

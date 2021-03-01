@@ -206,7 +206,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
 
    connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName) {
-      showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+      showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
    });
 
    const auto layout = new QHBoxLayout(this);
@@ -317,7 +317,7 @@ void HistoryWidget::keyReleaseEvent(QKeyEvent *event)
 
 void HistoryWidget::showFullDiff()
 {
-   const auto commit = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
+   const auto commit = mCache->commitInfo(CommitInfo::ZERO_SHA);
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
    const auto ret = git->getCommitDiff(CommitInfo::ZERO_SHA, commit.parent(0));
 
@@ -345,7 +345,7 @@ void HistoryWidget::search()
 {
    if (const auto text = mSearchInput->text(); !text.isEmpty())
    {
-      auto commitInfo = mCache->getCommitInfo(text);
+      auto commitInfo = mCache->commitInfo(text);
 
       if (commitInfo.isValid())
          goToSha(text);
@@ -490,7 +490,7 @@ void HistoryWidget::returnToView()
 
 void HistoryWidget::cherryPickCommit()
 {
-   if (const auto commit = mCache->getCommitInfo(mSearchInput->text()); commit.isValid())
+   if (const auto commit = mCache->commitInfo(mSearchInput->text()); commit.isValid())
    {
       const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
       const auto ret = git->cherryPickCommit(commit.sha());

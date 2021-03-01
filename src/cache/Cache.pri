@@ -3,6 +3,7 @@ INCLUDEPATH += $$PWD
 HEADERS += \
     $$PWD/CommitInfo.h \
     $$PWD/GitCache.h \
+    $$PWD/GitCachePrivate.h \
     $$PWD/GitServerCache.h \
     $$PWD/Lane.h \
     $$PWD/LaneType.h \
@@ -14,6 +15,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/CommitInfo.cpp \
     $$PWD/GitCache.cpp \
+    $$PWD/GitCachePrivate.cpp \
     $$PWD/GitServerCache.cpp \
     $$PWD/Lane.cpp \
     $$PWD/References.cpp \

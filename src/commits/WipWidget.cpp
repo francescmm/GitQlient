@@ -1,15 +1,15 @@
 #include <WipWidget.h>
 #include <ui_CommitChangesWidget.h>
 
-#include <GitQlientRole.h>
+#include <FileWidget.h>
+#include <GitBase.h>
 #include <GitCache.h>
+#include <GitLocal.h>
+#include <GitQlientRole.h>
+#include <GitQlientStyles.h>
 #include <GitRepoLoader.h>
 #include <GitWip.h>
-#include <GitLocal.h>
 #include <UnstagedMenu.h>
-#include <GitBase.h>
-#include <FileWidget.h>
-#include <GitQlientStyles.h>
 
 #include <QMessageBox>
 
@@ -25,15 +25,12 @@ WipWidget::WipWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer
 
 void WipWidget::configure(const QString &sha)
 {
-   const auto commit = mCache->getCommitInfo(sha);
+   const auto commit = mCache->commitInfo(sha);
 
-   if (!mCache->containsRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0)))
-   {
-      QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
-      git->updateWip();
-   }
+   QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+   git->updateWip();
 
-   const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
+   const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
 
    QLog_Info("UI", QString("Configuring WIP widget"));
 
@@ -59,12 +56,12 @@ bool WipWidget::commitChanges()
                               tr("There are files with conflicts. Please, resolve the conflicts first."));
       else if (checkMsg(msg))
       {
-         const auto revInfo = mCache->getCommitInfo(CommitInfo::ZERO_SHA);
+         const auto revInfo = mCache->commitInfo(CommitInfo::ZERO_SHA);
 
          QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
          git->updateWip();
 
-         const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
+         const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));

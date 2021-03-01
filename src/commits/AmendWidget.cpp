@@ -1,10 +1,10 @@
 #include <AmendWidget.h>
 #include <ui_CommitChangesWidget.h>
 
-#include <GitWip.h>
 #include <GitCache.h>
 #include <GitLocal.h>
 #include <GitQlientRole.h>
+#include <GitWip.h>
 #include <UnstagedMenu.h>
 
 #include <QMessageBox>
@@ -21,7 +21,7 @@ AmendWidget::AmendWidget(const QSharedPointer<GitCache> &cache, const QSharedPoi
 
 void AmendWidget::configure(const QString &sha)
 {
-   const auto commit = mCache->getCommitInfo(sha);
+   const auto commit = mCache->commitInfo(sha);
 
    ui->amendFrame->setVisible(true);
    ui->warningButton->setVisible(true);
@@ -29,14 +29,11 @@ void AmendWidget::configure(const QString &sha)
    if (commit.parentsCount() <= 0)
       return;
 
-   if (!mCache->containsRevisionFile(CommitInfo::ZERO_SHA, sha))
-   {
-      QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
-      git->updateWip();
-   }
+   QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+   git->updateWip();
 
-   const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, sha);
-   const auto amendFiles = mCache->getRevisionFile(sha, commit.parent(0));
+   const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, sha);
+   const auto amendFiles = mCache->revisionFile(sha, commit.parent(0));
 
    if (mCurrentSha != sha)
    {
@@ -94,7 +91,7 @@ bool AmendWidget::commitChanges()
          QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
          git->updateWip();
 
-         const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, mCurrentSha);
+         const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, mCurrentSha);
          const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));

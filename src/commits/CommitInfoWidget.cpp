@@ -55,7 +55,7 @@ void CommitInfoWidget::configure(const QString &sha)
 
    if (sha != CommitInfo::ZERO_SHA && !sha.isEmpty())
    {
-      const auto commit = mCache->getCommitInfo(sha);
+      const auto commit = mCache->commitInfo(sha);
 
       if (!commit.sha().isEmpty())
       {

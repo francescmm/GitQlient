@@ -145,7 +145,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          const auto copyTitleAction = copyMenu->addAction(tr("Commit title"));
          connect(copyTitleAction, &QAction::triggered, this, [this]() {
-            const auto title = mCache->getCommitInfo(mShas.first()).shortLog();
+            const auto title = mCache->commitInfo(mShas.first()).shortLog();
             QApplication::clipboard()->setText(title);
          });
       }

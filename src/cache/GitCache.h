@@ -51,26 +51,25 @@ public:
    explicit GitCache(QObject *parent = nullptr);
    ~GitCache();
 
-   void setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits);
+   int commitCount() const;
 
-   int count() const;
+   CommitInfo commitInfo(const QString &sha);
+   CommitInfo commitInfo(int row);
+   int commitPos(const QString &sha);
 
-   CommitInfo getCommitInfo(const QString &sha);
-   CommitInfo getCommitInfoByRow(int row);
-   int getCommitPos(const QString &sha);
    CommitInfo searchCommitInfo(const QString &text, int startingPoint = 0, bool reverse = false);
-   RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
+
+   bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
+   RevisionFiles revisionFile(const QString &sha1, const QString &sha2) const;
 
    void clearReferences();
-   bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    void insertReference(const QString &sha, References::Type type, const QString &reference);
    bool hasReferences(const QString &sha) const;
    QStringList getReferences(const QString &sha, References::Type type) const;
+
    void reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha);
 
    bool updateWipCommit(const WipRevisionInfo &wipInfo);
-
-   bool containsRevisionFile(const QString &sha1, const QString &sha2) const;
 
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
    bool pendingLocalChanges();
@@ -82,8 +81,6 @@ public:
    void addSubtrees(const QList<QPair<QString, QString>> &subtrees);
    QStringList getSubtrees() const;
 
-   RevisionFiles parseDiff(const QString &buf, bool cached = false);
-
 private:
    friend class GitRepoLoader;
 
@@ -94,8 +91,6 @@ private:
    QMultiMap<QString, CommitInfo *> mTmpChildsStorage;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
    Lanes mLanes;
-   QVector<QString> mDirNames;
-   QVector<QString> mFileNames;
    QVector<QString> mUntrackedfiles;
    QMap<QString, References> mReferences;
    QMap<QString, QString> mRemoteTags;
@@ -108,12 +103,12 @@ private:
 
    QList<Subtree> mSubtrees;
 
+   void setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits);
    void setConfigurationDone() { mConfigured = true; }
-   void insertCommitInfo(CommitInfo rev, int orderIdx);
+
    void insertWipRevision(const WipRevisionInfo &wipInfo);
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
    QVector<Lane> calculateLanes(const CommitInfo &c);
-   void setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum);
    auto searchCommit(const QString &text, int startingPoint = 0) const;
    auto reverseSearchCommit(const QString &text, int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);

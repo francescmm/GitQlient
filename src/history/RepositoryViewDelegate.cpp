@@ -1,28 +1,28 @@
 #include "RepositoryViewDelegate.h"
 
-#include <GitServerCache.h>
-#include <GitQlientStyles.h>
+#include <Colors.h>
+#include <CommitHistoryColumns.h>
+#include <CommitHistoryModel.h>
+#include <CommitHistoryView.h>
+#include <CommitInfo.h>
+#include <GitBase.h>
+#include <GitCache.h>
 #include <GitLocal.h>
+#include <GitQlientStyles.h>
+#include <GitServerCache.h>
 #include <Lane.h>
 #include <LaneType.h>
-#include <CommitInfo.h>
-#include <CommitHistoryColumns.h>
-#include <CommitHistoryView.h>
-#include <CommitHistoryModel.h>
-#include <GitCache.h>
-#include <GitBase.h>
 #include <PullRequest.h>
-#include <Colors.h>
 
-#include <QSortFilterProxyModel>
-#include <QPainter>
-#include <QPainterPath>
-#include <QEvent>
-#include <QDesktopServices>
-#include <QUrl>
-#include <QToolTip>
 #include <QApplication>
 #include <QClipboard>
+#include <QDesktopServices>
+#include <QEvent>
+#include <QPainter>
+#include <QPainterPath>
+#include <QSortFilterProxyModel>
+#include <QToolTip>
+#include <QUrl>
 
 using namespace GitServer;
 
@@ -55,7 +55,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
 
-   const auto commit = mCache->getCommitInfoByRow(row);
+   const auto commit = mCache->commitInfo(row);
 
    if (commit.sha().isEmpty())
       return;
@@ -440,13 +440,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
       }
    }
 
-   if (mCache->hasReferences(commit.sha()) && !mView->hasActiveFilter())
-   {
-      if (offset == 0)
-         offset = 5;
-
-      paintTagBranch(p, opt, offset, sha);
-   }
+   paintTagBranch(p, opt, offset, sha);
 
    auto newOpt = opt;
    newOpt.rect.setX(opt.rect.x() + offset + 5);
@@ -462,21 +456,24 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewItem o, int &startPoint,
                                             const QString &sha) const
 {
-   QVector<QString> marks;
-   QVector<QColor> colors;
-   const auto currentBranch = mGit->getCurrentBranch();
-
-   if ((currentBranch.isEmpty() || currentBranch == "HEAD"))
+   if (mCache->hasReferences(sha) && !mView->hasActiveFilter())
    {
-      if (const auto ret = mGit->getLastCommit(); ret.success && sha == ret.output.toString().trimmed())
+      QVector<QString> marks;
+      QVector<QColor> colors;
+      const auto currentBranch = mGit->getCurrentBranch();
+
+      if (startPoint == 0)
+         startPoint = 5;
+
+      if ((currentBranch.isEmpty() || currentBranch == "HEAD"))
       {
-         marks.append("detached");
-         colors.append(graphDetached);
+         if (const auto ret = mGit->getLastCommit(); ret.success && sha == ret.output.toString().trimmed())
+         {
+            marks.append("detached");
+            colors.append(graphDetached);
+         }
       }
-   }
 
-   if (mCache->hasReferences(sha))
-   {
       const auto localBranches = mCache->getReferences(sha, References::Type::LocalBranch);
       for (const auto &branch : localBranches)
       {

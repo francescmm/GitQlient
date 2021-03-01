@@ -345,7 +345,7 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
       QLog_Info("UI", "... repository loaded successfully");
    }
 
-   const auto totalCommits = mGitQlientCache->count();
+   const auto totalCommits = mGitQlientCache->commitCount();
 
    mHistoryWidget->loadBranches(fullReload);
 
@@ -417,12 +417,12 @@ void GitQlientRepo::showWarningMerge()
 {
    showMergeView();
 
-   const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
+   const auto wipCommit = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
 
    QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
    git->updateWip();
 
-   const auto file = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+   const auto file = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
    mMergeWidget->configure(file, MergeWidget::ConflictReason::Merge);
 }
@@ -432,12 +432,12 @@ void GitQlientRepo::showCherryPickConflict()
 {
    showMergeView();
 
-   const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
+   const auto wipCommit = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
 
    QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
    git->updateWip();
 
-   const auto files = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+   const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
    mMergeWidget->configure(files, MergeWidget::ConflictReason::CherryPick);
 }
@@ -447,12 +447,12 @@ void GitQlientRepo::showPullConflict()
 {
    showMergeView();
 
-   const auto wipCommit = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
+   const auto wipCommit = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
 
    QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
    git->updateWip();
 
-   const auto files = mGitQlientCache->getRevisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+   const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
    mMergeWidget->configure(files, MergeWidget::ConflictReason::Pull);
 }
@@ -583,7 +583,7 @@ bool GitQlientRepo::containsSubmodule(const QString &path, const QVector<QString
 
 void GitQlientRepo::openCommitDiff(const QString currentSha)
 {
-   const auto rev = mGitQlientCache->getCommitInfo(currentSha);
+   const auto rev = mGitQlientCache->commitInfo(currentSha);
    const auto loaded = mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
 
    if (loaded)
