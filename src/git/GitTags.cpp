@@ -1,5 +1,6 @@
 #include <GitAsyncProcess.h>
 #include <GitBase.h>
+#include <GitCache.h>
 #include <GitTags.h>
 #include <QLogger.h>
 
@@ -10,8 +11,20 @@ GitTags::GitTags(const QSharedPointer<GitBase> &gitBase)
 {
 }
 
+GitTags::GitTags(const QSharedPointer<GitBase> &gitBase, const QSharedPointer<GitCache> &cache)
+   : mGitBase(gitBase)
+   , mCache(cache)
+{
+}
+
 bool GitTags::getRemoteTags() const
 {
+   if (!mCache.get())
+   {
+      QLog_Fatal("Git", QString("Getting remote tages without cache."));
+      assert(mCache.get());
+   }
+
    QLog_Debug("Git", QString("Getting remote tags"));
 
    const auto cmd = QString("git ls-remote --tags");
@@ -113,5 +126,5 @@ void GitTags::onRemoteTagsRecieved(GitExecResult result)
       }
    }
 
-   emit remoteTagsReceived(tags);
+   mCache->updateTags(tags);
 }

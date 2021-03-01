@@ -62,10 +62,8 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    , mConfigWidget(new ConfigWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
-   , mGitTags(new GitTags(mGitBase))
+   , mGitTags(new GitTags(mGitBase, mGitQlientCache))
 {
-   connect(mGitTags.data(), &GitTags::remoteTagsReceived, mGitQlientCache.data(), &GitCache::updateTags);
-
    setAttribute(Qt::WA_DeleteOnClose);
 
    QLog_Info("UI", QString("Initializing GitQlient"));

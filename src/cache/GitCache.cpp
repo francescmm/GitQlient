@@ -374,22 +374,6 @@ void GitCache::updateTags(const QMap<QString, QString> &remoteTags)
    emit signalCacheUpdated();
 }
 
-void GitCache::addSubtrees(const QList<QPair<QString, QString>> &subtrees)
-{
-   for (auto &tree : subtrees)
-      mSubtrees.append({ tree.first, tree.second });
-}
-
-QStringList GitCache::getSubtrees() const
-{
-   QStringList subtrees;
-
-   for (auto &tree : mSubtrees)
-      subtrees.append(tree.name);
-
-   return subtrees;
-}
-
 void GitCache::resetLanes(const CommitInfo &c, bool isFork)
 {
    const auto nextSha = c.parentsCount() == 0 ? QString() : c.parent(0);

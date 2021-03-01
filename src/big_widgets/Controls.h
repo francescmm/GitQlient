@@ -179,7 +179,6 @@ public:
 
 private:
    QString mCurrentSha;
-   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitTags> mGitTags;
    QToolButton *mHistory = nullptr;

@@ -1,33 +1,32 @@
 ﻿#include "BranchesWidget.h"
 
-#include <BranchTreeWidget.h>
-#include <GitBase.h>
-#include <GitSubmodules.h>
-#include <GitStashes.h>
-#include <GitSubtree.h>
-#include <GitTags.h>
-#include <GitConfig.h>
-#include <BranchesViewDelegate.h>
-#include <ClickableFrame.h>
 #include <AddSubtreeDlg.h>
-#include <StashesContextMenu.h>
-#include <SubmodulesContextMenu.h>
+#include <BranchTreeWidget.h>
+#include <BranchesViewDelegate.h>
+#include <BranchesWidgetMinimal.h>
+#include <ClickableFrame.h>
+#include <GitBase.h>
 #include <GitCache.h>
+#include <GitConfig.h>
 #include <GitQlientBranchItemRole.h>
 #include <GitQlientSettings.h>
-#include <BranchesWidgetMinimal.h>
+#include <GitStashes.h>
+#include <GitSubmodules.h>
+#include <GitSubtree.h>
+#include <GitTags.h>
+#include <StashesContextMenu.h>
+#include <SubmodulesContextMenu.h>
 
 #include <QApplication>
-#include <QLineEdit>
-#include <QVBoxLayout>
 #include <QHeaderView>
-#include <QListWidget>
 #include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
 #include <QMenu>
-#include <QHeaderView>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QToolButton>
-#include <QMessageBox>
+#include <QVBoxLayout>
 
 #include <QLogger.h>
 
@@ -58,7 +57,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
-   , mGitTags(new GitTags(mGit))
+   , mGitTags(new GitTags(mGit, mCache))
    , mLocalBranchesTree(new BranchTreeWidget(mGit))
    , mRemoteBranchesTree(new BranchTreeWidget(mGit))
    , mTagsTree(new QTreeWidget())
@@ -74,9 +73,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    , mMinimize(new QPushButton())
    , mMinimal(new BranchesWidgetMinimal(mCache, mGit))
 {
-   connect(mGitTags.data(), &GitTags::remoteTagsReceived, mCache.data(), &GitCache::updateTags);
-   connect(mCache.get(), &GitCache::signalCacheUpdated, this, &BranchesWidget::processTags);
-
    setAttribute(Qt::WA_DeleteOnClose);
 
    mLocalBranchesTree->setLocalRepo(true);

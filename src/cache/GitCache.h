@@ -78,8 +78,6 @@ public:
    QMap<QString, QString> getTags(References::Type tagType) const;
 
    void updateTags(const QMap<QString, QString> &remoteTags);
-   void addSubtrees(const QList<QPair<QString, QString>> &subtrees);
-   QStringList getSubtrees() const;
 
 private:
    friend class GitRepoLoader;
@@ -94,14 +92,6 @@ private:
    QVector<QString> mUntrackedfiles;
    QMap<QString, References> mReferences;
    QMap<QString, QString> mRemoteTags;
-
-   struct Subtree
-   {
-      QString name;
-      QString commit;
-   };
-
-   QList<Subtree> mSubtrees;
 
    void setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits);
    void setConfigurationDone() { mConfigured = true; }

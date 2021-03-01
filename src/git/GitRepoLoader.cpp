@@ -155,8 +155,7 @@ void GitRepoLoader::requestRevisions()
 
    const auto maxCommits = mSettings->localValue("MaxCommits", 0).toInt();
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
-       : mShowAll                                 ? QString("--all")
-                                                  : mGitBase->getCurrentBranch();
+                                                  : mShowAll ? QString("--all") : mGitBase->getCurrentBranch();
 
    QString order;
 
@@ -211,9 +210,6 @@ void GitRepoLoader::processRevision(QByteArray ba)
    git->updateUntrackedFiles();
 
    mRevCache->setup(git->getWipInfo(), commits);
-
-   if (!subtrees.isEmpty())
-      mRevCache->addSubtrees(subtrees);
 
    if (mRefreshReferences)
       loadReferences();

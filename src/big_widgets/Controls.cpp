@@ -27,9 +27,8 @@ using namespace QLogger;
 
 Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
-   , mCache(cache)
    , mGit(git)
-   , mGitTags(new GitTags(mGit))
+   , mGitTags(new GitTags(mGit, cache))
    , mHistory(new QToolButton())
    , mDiff(new QToolButton())
    , mBlame(new QToolButton())
@@ -48,7 +47,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
-   connect(mGitTags.data(), &GitTags::remoteTagsReceived, mCache.data(), &GitCache::updateTags);
    connect(mUpdater, &GitQlientUpdater::newVersionAvailable, this, [this]() { mVersionCheck->setVisible(true); });
 
    mHistory->setCheckable(true);
