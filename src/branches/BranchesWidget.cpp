@@ -927,7 +927,8 @@ void BranchesWidget::onSubtreesHeaderClicked()
 
 void BranchesWidget::onTagClicked(QTreeWidgetItem *item)
 {
-   emit signalSelectCommit(item->data(0, Qt::UserRole + 2).toString());
+   if (item && item->data(0, IsLeaf).toBool())
+      emit signalSelectCommit(item->data(0, ShaRole).toString());
 }
 
 void BranchesWidget::onStashClicked(QListWidgetItem *item)
