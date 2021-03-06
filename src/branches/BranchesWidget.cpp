@@ -73,6 +73,8 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    , mMinimize(new QPushButton())
    , mMinimal(new BranchesWidgetMinimal(mCache, mGit))
 {
+   connect(mCache.get(), &GitCache::signalCacheUpdated, this, &BranchesWidget::processTags);
+
    setAttribute(Qt::WA_DeleteOnClose);
 
    mLocalBranchesTree->setLocalRepo(true);
@@ -369,7 +371,6 @@ void BranchesWidget::showBranches()
       QLog_Info("UI", QString("... remote branches processed"));
    }
 
-   processTags();
    processStashes();
    processSubmodules();
    processSubtrees();
@@ -389,7 +390,6 @@ void BranchesWidget::clear()
    blockSignals(true);
    mLocalBranchesTree->clear();
    mRemoteBranchesTree->clear();
-   mTagsTree->clear();
    blockSignals(false);
 }
 
@@ -585,21 +585,26 @@ void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
 
 void BranchesWidget::processTags()
 {
+   mTagsTree->clear();
+
    const auto localTags = mCache->getTags(References::Type::LocalTag);
    const auto remoteTags = mCache->getTags(References::Type::RemoteTag);
 
    for (const auto &localTag : localTags.toStdMap())
    {
       QTreeWidgetItem *parent = nullptr;
-      auto tagName = localTag.first;
-      auto folders = tagName.split("/");
+      auto fullTagName = localTag.first;
+      auto folders = fullTagName.split("/");
+      auto tagName = folders.takeLast();
 
       for (const auto &folder : qAsConst(folders))
       {
          QTreeWidgetItem *child = nullptr;
 
          if (parent)
+         {
             child = getChild(parent, folder);
+         }
          else
          {
             for (auto i = 0; i < mTagsTree->topLevelItemCount(); ++i)
@@ -624,25 +629,26 @@ void BranchesWidget::processTags()
       }
 
       const auto item = new QTreeWidgetItem(parent);
-      item->setData(0, Qt::UserRole, tagName);
-      item->setData(0, Qt::UserRole + 2, localTag.second);
 
       if (!remoteTags.contains(tagName))
       {
          tagName += " (local)";
-         item->setData(0, Qt::UserRole + 1, false);
+         item->setData(0, LocalBranchRole, false);
       }
       else
-         item->setData(0, Qt::UserRole + 1, true);
+         item->setData(0, LocalBranchRole, true);
 
+      QLog_Debug("UI", QString("Adding tag {%1}").arg(tagName));
+
+      item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
       item->setText(0, tagName);
+      item->setData(0, GitQlient::FullNameRole, fullTagName);
+      item->setData(0, GitQlient::ShaRole, localTag.second);
+      item->setData(0, Qt::ToolTipRole, fullTagName);
+      item->setData(0, GitQlient::IsLeaf, true);
 
       mTagsTree->addTopLevelItem(item);
-
-      mMinimal->configureTagsMenu(localTag.second, tagName);
    }
-
-   // mTagsList->clear();
 }
 
 void BranchesWidget::processStashes()
@@ -739,38 +745,42 @@ void BranchesWidget::adjustBranchesTree(BranchTreeWidget *treeWidget)
 
 void BranchesWidget::showTagsContextMenu(const QPoint &p)
 {
-   QModelIndex index = mTagsTree->indexAt(p);
+   const auto item = mTagsTree->itemAt(p);
 
-   if (!index.isValid())
+   if (!item)
       return;
 
-   const auto tagName = index.data(Qt::UserRole).toString();
-   const auto isRemote = index.data(Qt::UserRole + 1).toBool();
-   const auto menu = new QMenu(this);
-   const auto removeTagAction = menu->addAction(tr("Remove tag"));
-   connect(removeTagAction, &QAction::triggered, this, [this, tagName, isRemote]() {
-      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      QScopedPointer<GitTags> git(new GitTags(mGit));
-      const auto ret = git->removeTag(tagName, isRemote);
-      QApplication::restoreOverrideCursor();
+   const auto tagName = item->data(0, GitQlient::FullNameRole).toString();
 
-      if (ret.success)
-         emit signalBranchesUpdated();
-   });
+   if (!tagName.isEmpty())
+   {
+      const auto isRemote = item->data(0, LocalBranchRole).toBool();
+      const auto menu = new QMenu(this);
+      const auto removeTagAction = menu->addAction(tr("Remove tag"));
+      connect(removeTagAction, &QAction::triggered, this, [this, tagName, isRemote]() {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+         QScopedPointer<GitTags> git(new GitTags(mGit));
+         const auto ret = git->removeTag(tagName, isRemote);
+         QApplication::restoreOverrideCursor();
 
-   const auto pushTagAction = menu->addAction(tr("Push tag"));
-   pushTagAction->setEnabled(!isRemote);
-   connect(pushTagAction, &QAction::triggered, this, [this, tagName]() {
-      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      QScopedPointer<GitTags> git(new GitTags(mGit));
-      const auto ret = git->pushTag(tagName);
-      QApplication::restoreOverrideCursor();
+         if (ret.success)
+            emit signalBranchesUpdated();
+      });
 
-      if (ret.success)
-         emit signalBranchesUpdated();
-   });
+      const auto pushTagAction = menu->addAction(tr("Push tag"));
+      pushTagAction->setEnabled(!isRemote);
+      connect(pushTagAction, &QAction::triggered, this, [this, tagName]() {
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+         QScopedPointer<GitTags> git(new GitTags(mGit));
+         const auto ret = git->pushTag(tagName);
+         QApplication::restoreOverrideCursor();
 
-   menu->exec(mTagsTree->viewport()->mapToGlobal(p));
+         if (ret.success)
+            emit signalBranchesUpdated();
+      });
+
+      menu->exec(mTagsTree->viewport()->mapToGlobal(p));
+   }
 }
 
 void BranchesWidget::showStashesContextMenu(const QPoint &p)

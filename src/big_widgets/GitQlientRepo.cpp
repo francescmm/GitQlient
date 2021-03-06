@@ -307,10 +307,10 @@ void GitQlientRepo::createProgressDialog()
 
 void GitQlientRepo::onRepoLoadFinished(bool fullReload)
 {
+   mGitTags->getRemoteTags();
+
    if (!mIsInit)
    {
-      mGitTags->getRemoteTags();
-
       mIsInit = true;
 
       mCurrentDir = mGitBase->getWorkingDir();
