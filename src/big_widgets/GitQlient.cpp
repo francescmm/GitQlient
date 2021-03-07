@@ -231,7 +231,7 @@ bool GitQlient::setArgumentsPostInit(const QStringList &arguments)
    QLog_Info("UI", QString("External call with the params {%1}").arg(arguments.join(",")));
 
    QStringList repos;
-   bool ret = parseArguments(arguments, &repos);
+   const auto ret = parseArguments(arguments, &repos);
    if (ret)
       setRepositories(repos);
    return ret;
