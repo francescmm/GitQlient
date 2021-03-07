@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
    QApplication::setOrganizationName("CescSoftware");
    QApplication::setOrganizationDomain("francescmm.com");
    QApplication::setApplicationName("GitQlient");
+   QApplication::setApplicationVersion(VER);
    QApplication::setWindowIcon(QIcon(":/icons/GitQlientLogoIco"));
 
    QFontDatabase::addApplicationFont(":/DejaVuSans");
@@ -33,13 +34,16 @@ int main(int argc, char *argv[])
    GitQlientSettings settings;
    settings.setGlobalValue("isGitQlient", true);
 
-   GitQlient mainWin(arguments);
+   QStringList repos;
+   if (GitQlient::parseArguments(arguments, &repos))
+   {
+      GitQlient mainWin;
+      mainWin.setRepositories(repos);
+      mainWin.show();
 
-   mainWin.show();
+      QTimer::singleShot(500, &mainWin, &GitQlient::restorePinnedRepos);
 
-   QTimer::singleShot(500, &mainWin, &GitQlient::restorePinnedRepos);
-
-   const auto ret = app.exec();
-
-   return ret;
+      return app.exec();
+   } else
+      return 0;
 }
