@@ -46,20 +46,20 @@ PomodoroButton::PomodoroButton(const QSharedPointer<GitBase> &git, QWidget *pare
    mArrow->setFixedWidth(10);
    mArrow->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
-   GitQlientSettings settings;
-   const auto durationMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", 25).toInt();
+   GitQlientSettings settings(mGit->getGitDir());
+   const auto durationMins = settings.localValue("Pomodoro/Duration", 25).toInt();
    mDurationTime = QTime(0, durationMins, 0);
    mCounter->setText(mDurationTime.toString("mm:ss"));
 
-   const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", 5).toInt();
+   const auto breakMins = settings.localValue("Pomodoro/Break", 5).toInt();
    mBreakTime = QTime(0, breakMins, 0);
 
-   const auto longBreakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", 15).toInt();
+   const auto longBreakMins = settings.localValue("Pomodoro/LongBreak", 15).toInt();
    mLongBreakTime = QTime(0, longBreakMins, 0);
 
-   mBigBreakCount = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", 4).toInt();
+   mBigBreakCount = settings.localValue("Pomodoro/LongBreakTrigger", 4).toInt();
 
-   mStopResets = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/StopResets", true).toBool();
+   mStopResets = settings.localValue("Pomodoro/StopResets", true).toBool();
 
    mTimer->setInterval(1000);
    connect(mTimer, &QTimer::timeout, this, &PomodoroButton::onTimeout);
@@ -83,22 +83,21 @@ void PomodoroButton::updateCounters()
    mTimer->stop();
    mButton->setIcon(QIcon(":/icons/pomodoro"));
 
-   GitQlientSettings settings;
+   GitQlientSettings settings(mGit->getGitDir());
 
-   const auto durationMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", 25).toInt();
+   const auto durationMins = settings.localValue("Pomodoro/Duration", 25).toInt();
    mDurationTime = QTime(0, durationMins, 0);
    mCounter->setText(mDurationTime.toString("mm:ss"));
 
-   const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", 5).toInt();
+   const auto breakMins = settings.localValue("Pomodoro/Break", 5).toInt();
    mBreakTime = QTime(0, breakMins, 0);
 
-   const auto longBreakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", 15).toInt();
+   const auto longBreakMins = settings.localValue("Pomodoro/LongBreak", 15).toInt();
    mLongBreakTime = QTime(0, longBreakMins, 0);
 
-   const auto longBreakTriggerCount
-       = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", 4).toInt();
+   const auto longBreakTriggerCount = settings.localValue("Pomodoro/LongBreakTrigger", 4).toInt();
 
-   mStopResets = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/StopResets", true).toBool();
+   mStopResets = settings.localValue("Pomodoro/StopResets", true).toBool();
 
    if (longBreakTriggerCount < mBigBreakOriginalValue)
    {
@@ -206,9 +205,8 @@ void PomodoroButton::onClick()
 
          if (mStopResets)
          {
-            GitQlientSettings settings;
-            const auto durationMins
-                = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", 25).toInt();
+            GitQlientSettings settings(mGit->getGitDir());
+            const auto durationMins = settings.localValue("Pomodoro/Duration", 25).toInt();
             mDurationTime = QTime(0, durationMins, 0);
             mCounter->setText(mDurationTime.toString("mm:ss"));
          }
@@ -227,21 +225,21 @@ void PomodoroButton::onRunningMode()
    {
       mTimer->stop();
 
-      GitQlientSettings settings;
-      const auto durationMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Duration", 25).toInt();
+      GitQlientSettings settings(mGit->getGitDir());
+      const auto durationMins = settings.localValue("Pomodoro/Duration", 25).toInt();
       mDurationTime = QTime(0, durationMins, 0);
 
       mButton->setIcon(QIcon(":/icons/pomodoro_timeout"));
 
-      const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", 5).toInt();
+      const auto breakMins = settings.localValue("Pomodoro/Break", 5).toInt();
       mBreakTime = QTime(0, breakMins, 0);
 
-      const auto longBreakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", 15).toInt();
+      const auto longBreakMins = settings.localValue("Pomodoro/LongBreak", 15).toInt();
       mLongBreakTime = QTime(0, longBreakMins, 0);
 
       if (mBigBreakCount <= 0)
       {
-         mBigBreakCount = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreakTrigger", 4).toInt();
+         mBigBreakCount = settings.localValue("Pomodoro/LongBreakTrigger", 4).toInt();
 
          mCounter->setText(mLongBreakTime.toString("mm:ss"));
       }
@@ -281,8 +279,8 @@ void PomodoroButton::onBreakingMode()
    {
       mTimer->stop();
 
-      GitQlientSettings settings;
-      const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Break", 5).toInt();
+      GitQlientSettings settings(mGit->getGitDir());
+      const auto breakMins = settings.localValue("Pomodoro/Break", 5).toInt();
       mBreakTime = QTime(0, breakMins, 0);
 
       mState = State::Finished;
@@ -313,8 +311,8 @@ void PomodoroButton::onLongBreakingMode()
    {
       mTimer->stop();
 
-      GitQlientSettings settings;
-      const auto breakMins = settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/LongBreak", 15).toInt();
+      GitQlientSettings settings(mGit->getGitDir());
+      const auto breakMins = settings.localValue("Pomodoro/LongBreak", 15).toInt();
       mLongBreakTime = QTime(0, breakMins, 0);
 
       mState = State::Finished;

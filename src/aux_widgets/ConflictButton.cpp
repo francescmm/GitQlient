@@ -4,9 +4,9 @@
 #include <GitLocal.h>
 #include <QLogger.h>
 
-#include <QPushButton>
 #include <QHBoxLayout>
 #include <QProcess>
+#include <QPushButton>
 
 using namespace QLogger;
 
@@ -66,7 +66,7 @@ void ConflictButton::setInConflict(bool inConflict)
 void ConflictButton::resolveConflict()
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
-   const auto ret = git->markFileAsResolved(mFileName);
+   const auto ret = git->stageFile(mFileName);
 
    if (ret.success)
    {

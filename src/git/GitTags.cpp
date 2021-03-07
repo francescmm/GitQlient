@@ -1,6 +1,7 @@
-#include <GitTags.h>
+#include <GitAsyncProcess.h>
 #include <GitBase.h>
-
+#include <GitCache.h>
+#include <GitTags.h>
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -8,18 +9,34 @@ using namespace QLogger;
 GitTags::GitTags(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
 {
-   connect(mGitBase.get(), &GitBase::signalResultReady, this, &GitTags::onRemoteTagsRecieved);
+}
+
+GitTags::GitTags(const QSharedPointer<GitBase> &gitBase, const QSharedPointer<GitCache> &cache)
+   : mGitBase(gitBase)
+   , mCache(cache)
+{
 }
 
 bool GitTags::getRemoteTags() const
 {
+   if (!mCache.get())
+   {
+      QLog_Fatal("Git", QString("Getting remote tages without cache."));
+      assert(mCache.get());
+   }
+
    QLog_Debug("Git", QString("Getting remote tags"));
 
    const auto cmd = QString("git ls-remote --tags");
 
    QLog_Trace("Git", QString("Getting remote tags: {%1}").arg(cmd));
 
-   return mGitBase->runAsync(cmd);
+   const auto p = new GitAsyncProcess(mGitBase->getWorkingDir());
+   connect(p, &GitAsyncProcess::signalDataReady, this, &GitTags::onRemoteTagsRecieved);
+
+   const auto ret = p->run(cmd);
+
+   return ret.success;
 }
 
 GitExecResult GitTags::addTag(const QString &tagName, const QString &tagMessage, const QString &sha)
@@ -109,5 +126,5 @@ void GitTags::onRemoteTagsRecieved(GitExecResult result)
       }
    }
 
-   emit remoteTagsReceived(tags);
+   mCache->updateTags(tags);
 }

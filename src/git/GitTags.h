@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -25,21 +25,20 @@
 
 #include <GitExecResult.h>
 
-#include <QVector>
-#include <QString>
 #include <QSharedPointer>
+#include <QString>
+#include <QVector>
 
 class GitBase;
+class GitCache;
 
 class GitTags : public QObject
 {
    Q_OBJECT
 
-signals:
-   void remoteTagsReceived(const QMap<QString, QString> &tags);
-
 public:
    explicit GitTags(const QSharedPointer<GitBase> &gitBase);
+   explicit GitTags(const QSharedPointer<GitBase> &gitBase, const QSharedPointer<GitCache> &cache);
 
    bool getRemoteTags() const;
    GitExecResult addTag(const QString &tagName, const QString &tagMessage, const QString &sha);
@@ -49,6 +48,7 @@ public:
 
 private:
    QSharedPointer<GitBase> mGitBase;
+   QSharedPointer<GitCache> mCache;
 
    void onRemoteTagsRecieved(GitExecResult result);
 };

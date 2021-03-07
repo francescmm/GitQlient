@@ -34,27 +34,10 @@ bool CommitInfo::operator!=(const CommitInfo &commit) const
    return !(*this == commit);
 }
 
-QString CommitInfo::getFieldStr(CommitInfo::Field field) const
+bool CommitInfo::contains(const QString &value)
 {
-   switch (field)
-   {
-      case CommitInfo::Field::SHA:
-         return sha();
-      case CommitInfo::Field::PARENTS_SHA:
-         return parents().join(",");
-      case CommitInfo::Field::COMMITER:
-         return committer();
-      case CommitInfo::Field::AUTHOR:
-         return author();
-      case CommitInfo::Field::DATE:
-         return authorDate();
-      case CommitInfo::Field::SHORT_LOG:
-         return shortLog();
-      case CommitInfo::Field::LONG_LOG:
-         return longLog();
-      default:
-         return QString();
-   }
+   return mSha.startsWith(value, Qt::CaseInsensitive) || mShortLog.contains(value, Qt::CaseInsensitive)
+       || mCommitter.contains(value, Qt::CaseInsensitive) || mAuthor.contains(value, Qt::CaseInsensitive);
 }
 
 int CommitInfo::parentsCount() const

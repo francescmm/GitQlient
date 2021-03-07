@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -51,7 +51,7 @@ public:
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;
 
-   QString getFieldStr(CommitInfo::Field field) const;
+   bool contains(const QString &value);
 
    void setBoundary(QChar info) { mBoundaryInfo = std::move(info); }
    bool isBoundary() const { return mBoundaryInfo == '-'; }

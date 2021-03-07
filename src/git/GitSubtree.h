@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -29,7 +29,7 @@
 
 class GitBase;
 
-class GitSubtree : public QObject
+class GitSubtree
 {
 public:
    explicit GitSubtree(const QSharedPointer<GitBase> &gitBase);

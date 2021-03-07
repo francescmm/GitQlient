@@ -1,31 +1,30 @@
 #include "CommitHistoryContextMenu.h"
 
-#include <GitServerCache.h>
-#include <GitQlientStyles.h>
-#include <GitLocal.h>
-#include <GitTags.h>
-#include <GitPatches.h>
-#include <GitBase.h>
-#include <GitStashes.h>
-#include <GitBranches.h>
-#include <GitRemote.h>
 #include <BranchDlg.h>
-#include <TagDlg.h>
 #include <CommitInfo.h>
-#include <GitCache.h>
-#include <PullDlg.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
+#include <GitBase.h>
+#include <GitBranches.h>
+#include <GitCache.h>
 #include <GitHubRestApi.h>
-#include <GitQlientSettings.h>
+#include <GitLocal.h>
+#include <GitPatches.h>
+#include <GitQlientStyles.h>
+#include <GitRemote.h>
+#include <GitServerCache.h>
+#include <GitStashes.h>
+#include <GitTags.h>
 #include <MergePullRequestDlg.h>
+#include <PullDlg.h>
+#include <TagDlg.h>
 
-#include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
-#include <QFileDialog>
-#include <QProcess>
 #include <QDesktopServices>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QProcess>
 
 #include <QLogger.h>
 
@@ -39,11 +38,9 @@ CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<GitCache
    , mCache(cache)
    , mGit(git)
    , mGitServerCache(gitServerCache)
-   , mGitTags(new GitTags(mGit))
+   , mGitTags(new GitTags(mGit, mCache))
    , mShas(shas)
 {
-   connect(mGitTags.data(), &GitTags::remoteTagsReceived, mCache.data(), &GitCache::updateTags);
-
    setAttribute(Qt::WA_DeleteOnClose);
 
    if (shas.count() == 1)
@@ -146,7 +143,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          const auto copyTitleAction = copyMenu->addAction(tr("Commit title"));
          connect(copyTitleAction, &QAction::triggered, this, [this]() {
-            const auto title = mCache->getCommitInfo(mShas.first()).shortLog();
+            const auto title = mCache->commitInfo(mShas.first()).shortLog();
             QApplication::clipboard()->setText(title);
          });
       }

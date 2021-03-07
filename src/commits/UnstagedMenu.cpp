@@ -1,19 +1,17 @@
 #include "UnstagedMenu.h"
 
 #include <GitBase.h>
-#include <GitSyncProcess.h>
 #include <GitLocal.h>
-#include <GitQlientSettings.h>
+#include <GitSyncProcess.h>
 #include <QLogger.h>
 
-#include <QFile>
 #include <QDir>
+#include <QFile>
 #include <QMessageBox>
 
 using namespace QLogger;
 
-UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, bool hasConflicts,
-                           QWidget *parent)
+UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, QWidget *parent)
    : QMenu(parent)
    , mGit(git)
    , mFileName(fileName)
@@ -22,23 +20,10 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
 
    connect(addAction(tr("See changes")), &QAction::triggered, this, [this]() { emit signalShowDiff(mFileName); });
    connect(addAction(tr("Blame")), &QAction::triggered, this, [this]() { emit signalShowFileHistory(mFileName); });
-
-   GitQlientSettings settings;
-
-   connect(addAction(tr("Edit file")), &QAction::triggered, this, [this]() { emit signalEditFile(); });
+   connect(addAction(tr("Edit file")), &QAction::triggered, this,
+           [this]() { emit signalEditFile(mGit->getWorkingDir() + "/" + mFileName); });
 
    addSeparator();
-
-   if (hasConflicts)
-   {
-      connect(addAction(tr("Mark as resolved")), &QAction::triggered, this, [this] {
-         QScopedPointer<GitLocal> git(new GitLocal(mGit));
-         const auto ret = git->markFileAsResolved(mFileName);
-
-         if (ret.success)
-            emit signalConflictsResolved();
-      });
-   }
 
    connect(addAction(tr("Stage file")), &QAction::triggered, this, &UnstagedMenu::signalStageFile);
 

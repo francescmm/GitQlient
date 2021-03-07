@@ -26,10 +26,10 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
 {
    setObjectName("JenkinsWidget");
 
-   GitQlientSettings settings;
-   const auto url = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", "").toString();
-   const auto user = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", "").toString();
-   const auto token = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", "").toString();
+   GitQlientSettings settings(mGit->getGitDir());
+   const auto url = settings.localValue("BuildSystemUrl", "").toString();
+   const auto user = settings.localValue("BuildSystemUser", "").toString();
+   const auto token = settings.localValue("BuildSystemToken", "").toString();
 
    mConfig = IFetcher::Config { user, token, nullptr };
    mConfig.accessManager.reset(new QNetworkAccessManager());
@@ -63,7 +63,8 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
    mTimer->setInterval(15 * 60 * 1000); // 15 mins
 }
 
-JenkinsWidget::~JenkinsWidget() {
+JenkinsWidget::~JenkinsWidget()
+{
    delete mBtnGroup;
 }
 

@@ -19,10 +19,15 @@ class ConfigWidget : public QWidget
 
 signals:
    void reloadView();
+   void buildSystemConfigured(bool configured);
+   void commitTitleMaxLenghtChanged();
+   void panelsVisibilityChaned();
 
 public:
    explicit ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    ~ConfigWidget();
+
+   void onPanelsVisibilityChanged();
 
 private:
    Ui::ConfigWidget *ui;

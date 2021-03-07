@@ -187,7 +187,7 @@ QComboBox
    outline: none;
    color: white;
    border-color: #D89000;
-   background: transparent;
+   background: #404142;
 }
 
 QComboBox:disabled {
@@ -205,9 +205,7 @@ QComboBox:on {
 QComboBox QAbstractItemView
 {
    outline: none;
-   background-color: #404142;
    border-color: #D89000;
-   selection-background-color: #606162;
 }
 
 QComboBox::drop-down:hover
@@ -250,24 +248,18 @@ QScrollBar:horizontal
     background-color: transparent;
 }
 
-QScrollBar::handle:vertical, QScrollBar::handle:horizontal,
-QScrollBar::add-line:vertical, QScrollBar::add-line:horizontal,
-QScrollBar::sub-line:vertical, QScrollBar::sub-line:horizontal
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal
 {
     border-color: #202122;
     background-color: #2E2F30;
 }
 
-QScrollBar::add-line:vertical:hover, QScrollBar::sub-line:vertical:hover,
-QScrollBar::handle:vertical:hover, QScrollBar::add-line:horizontal:hover,
-QScrollBar::sub-line:horizontal:hover, QScrollBar::handle:horizontal:hover
+QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover
 {
     background-color: #404142;
 }
 
-QScrollBar::add-line:vertical:pressed, QScrollBar::sub-line:vertical:pressed,
-QScrollBar::handle:vertical:pressed, QScrollBar::add-line:horizontal:pressed,
-QScrollBar::sub-line:horizontal:pressed, QScrollBar::handle:horizontal:pressed
+QScrollBar::handle:vertical:pressed, QScrollBar::handle:horizontal:pressed
 {
     background-color: #303132;
 }
@@ -407,7 +399,7 @@ PullDlg QLabel#lQuestion
    background-color: rgba(255, 85, 85, 0.45);
 }
 
-#warningButton, #warningButton:hover, #warningButton:pressed
+#warningButton:hover, #warningButton:pressed
 {
    background-color: rgba(255, 85, 85, 0.65);
 }
@@ -447,29 +439,19 @@ GitQlient
    background: #2E2F30;
 }
 
-#openNewRepo
+#MainMenuBtn
 {
    background-color: #2E2F30;
 }
 
-#openNewRepo:hover, #openGitAdmin:hover
+#MainMenuBtn:hover, #GitQlientTab:hover
 {
    background-color: #606162;
 }
 
-#GitQlientTab > QTabBar::tab:first
+#GitQlientTab
 {
    background-color: #2E2F30;
-}
-
-#GitQlientTab > QTabBar::tab:first:hover
-{
-   background-color: #606162;
-}
-
-#GitQlientTab > QTabBar::tab:first:selected
-{
-   background-color: #404142;
 }
 
 InitScreen
@@ -573,15 +555,16 @@ DiffWidget > QPinnableTabWidget > QTabBar::tab:selected
     font-size: 9pt;
 }
 
-#stagedFiles, #unstagedFiles
+CommitChangesWidget #wipSeparator
 {
-    background: #2E2F30;
-    border-color: #202122;
+   background: #404142;
+   border-left: 1px solid #202122;
+   border-right: 1px solid #202122;
 }
 
 #stagedFilesList, #unstagedFilesList
 {
-   border-color: #606162;
+   border-color: #202122;
 }
 
 /*********************************************/
@@ -672,7 +655,7 @@ FullDiffWidget > QPlainTextEdit
 /*********************************************/
 
 /*********************************************/
-/*             BranchesWidget START          */
+/*              START          */
 /*********************************************/
 
 BranchesWidget ClickableFrame:hover
@@ -680,7 +663,7 @@ BranchesWidget ClickableFrame:hover
    background: #2E2F30;
 }
 
-BranchesWidget QHeaderView, BranchesWidget QListWidget
+BranchesWidget QListWidget
 {
     border-top-color: #606162;
 }

@@ -1,12 +1,13 @@
 #include "GitRepoLoader.h"
 
 #include <GitBase.h>
-#include <GitConfig.h>
-#include <GitCache.h>
-#include <GitRequestorProcess.h>
 #include <GitBranches.h>
+#include <GitCache.h>
+#include <GitConfig.h>
+#include <GitLocal.h>
 #include <GitQlientSettings.h>
-#include <GitHubRestApi.h>
+#include <GitRequestorProcess.h>
+#include <GitWip.h>
 
 #include <QLogger.h>
 
@@ -16,11 +17,18 @@ using namespace QLogger;
 
 static const char *GIT_LOG_FORMAT("%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ");
 
-GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache, QObject *parent)
+GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache,
+                             const QSharedPointer<GitQlientSettings> &settings, QObject *parent)
    : QObject(parent)
    , mGitBase(gitBase)
    , mRevCache(std::move(cache))
+   , mSettings(settings)
 {
+}
+
+void GitRepoLoader::cancelAll()
+{
+   emit cancelAllProcesses(QPrivateSignal());
 }
 
 bool GitRepoLoader::load()
@@ -102,6 +110,8 @@ void GitRepoLoader::loadReferences()
       const auto referencesList = ret3.output.toString().split('\n', QString::SkipEmptyParts);
 #endif
 
+      mRevCache->clearReferences();
+
       for (const auto &reference : referencesList)
       {
          const auto revSha = reference.left(40);
@@ -109,7 +119,6 @@ void GitRepoLoader::loadReferences()
 
          if (!refName.startsWith("refs/tags/") || (refName.startsWith("refs/tags/") && refName.endsWith("^{}")))
          {
-            auto localBranches = false;
             References::Type type;
             QString name;
 
@@ -123,7 +132,6 @@ void GitRepoLoader::loadReferences()
             {
                type = References::Type::LocalBranch;
                name = refName.mid(11);
-               localBranches = true;
             }
             else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
             {
@@ -134,25 +142,6 @@ void GitRepoLoader::loadReferences()
                continue;
 
             mRevCache->insertReference(revSha, type, name);
-
-            if (localBranches)
-            {
-               QScopedPointer<GitBranches> git(new GitBranches(mGitBase));
-               GitCache::LocalBranchDistances distances;
-
-               const auto distToOrigin = git->getDistanceBetweenBranches(name);
-               auto toOrigin = distToOrigin.output.toString();
-
-               if (!toOrigin.contains("fatal"))
-               {
-                  toOrigin.replace('\n', "");
-                  const auto values = toOrigin.split('\t');
-                  distances.behindOrigin = values.first().toUInt();
-                  distances.aheadOrigin = values.last().toUInt();
-               }
-
-               mRevCache->insertLocalBranchDistances(name, distances);
-            }
          }
 
          prevRefSha = revSha;
@@ -164,15 +153,13 @@ void GitRepoLoader::requestRevisions()
 {
    QLog_Debug("Git", "Loading revisions.");
 
-   GitQlientSettings settings;
-   const auto maxCommits = settings.localValue(mGitBase->getGitQlientSettingsDir(), "MaxCommits", 0).toInt();
+   const auto maxCommits = mSettings->localValue("MaxCommits", 0).toInt();
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
-       : mShowAll                                 ? QString("--all")
-                                                  : mGitBase->getCurrentBranch();
+                                                  : mShowAll ? QString("--all") : mGitBase->getCurrentBranch();
 
    QString order;
 
-   switch (settings.localValue(mGitBase->getGitQlientSettingsDir(), "GraphSortingOrder", 0).toInt())
+   switch (mSettings->localValue("GraphSortingOrder", 0).toInt())
    {
       case 0:
          order = "--author-date-order";
@@ -191,7 +178,7 @@ void GitRepoLoader::requestRevisions()
    const auto baseCmd = QString("git log %1 --no-color --log-size --parents --boundary -z --pretty=format:%2 %3")
                             .arg(order, QString::fromUtf8(GIT_LOG_FORMAT), commitsToRetrieve);
 
-   emit signalLoadingStarted(1);
+   emit signalLoadingStarted();
 
    const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());
    connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevision);
@@ -208,33 +195,24 @@ void GitRepoLoader::processRevision(QByteArray ba)
    const auto serverUrl = gitConfig->getServerUrl();
 
    if (serverUrl.contains("github"))
-   {
       QLog_Info("Git", "Requesting PR status!");
-      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-
-      emit signalRefreshPRsCache(repoInfo.first, repoInfo.second, serverUrl);
-   }
 
    QLog_Debug("Git", "Processing revisions...");
 
-   emit signalLoadingStarted(1);
+   emit signalLoadingStarted();
 
    QList<QPair<QString, QString>> subtrees;
    const auto ret = gitConfig->getGitValue("log.showSignature");
    const auto showSignature = ret.success ? ret.output.toString().contains("true") : false;
    const auto commits = showSignature ? processSignedLog(ba, subtrees) : processUnsignedLog(ba, subtrees);
 
-   const auto wipInfo = processWip();
-   mRevCache->setup(wipInfo, commits);
+   QScopedPointer<GitWip> git(new GitWip(mGitBase, mRevCache));
+   git->updateUntrackedFiles();
 
-   if (!subtrees.isEmpty())
-      mRevCache->addSubtrees(subtrees);
+   mRevCache->setup(git->getWipInfo(), commits);
 
    if (mRefreshReferences)
-   {
-      mRevCache->clearReferences();
       loadReferences();
-   }
    else
       mRevCache->reloadCurrentBranchInfo(mGitBase->getCurrentBranch(),
                                          mGitBase->getLastCommit().output.toString().trimmed());
@@ -245,64 +223,6 @@ void GitRepoLoader::processRevision(QByteArray ba)
 
    mLocked = false;
    mRefreshReferences = false;
-}
-
-WipRevisionInfo GitRepoLoader::processWip()
-{
-   QLog_Debug("Git", QString("Executing processWip."));
-
-   mRevCache->setUntrackedFilesList(getUntrackedFiles());
-
-   const auto ret = mGitBase->run("git rev-parse --revs-only HEAD");
-
-   if (ret.success)
-   {
-      QString diffIndex;
-      QString diffIndexCached;
-
-      auto parentSha = ret.output.toString().trimmed();
-
-      if (parentSha.isEmpty())
-         parentSha = CommitInfo::INIT_SHA;
-
-      const auto ret3 = mGitBase->run(QString("git diff-index %1").arg(parentSha));
-      diffIndex = ret3.success ? ret3.output.toString() : QString();
-
-      const auto ret4 = mGitBase->run(QString("git diff-index --cached %1").arg(parentSha));
-      diffIndexCached = ret4.success ? ret4.output.toString() : QString();
-
-      return { parentSha, diffIndex, diffIndexCached };
-   }
-
-   return {};
-}
-
-void GitRepoLoader::updateWipRevision()
-{
-   if (const auto wipInfo = processWip(); wipInfo.isValid())
-      mRevCache->updateWipCommit(wipInfo.parentSha, wipInfo.diffIndex, wipInfo.diffIndexCached);
-}
-
-QVector<QString> GitRepoLoader::getUntrackedFiles() const
-{
-   QLog_Debug("Git", QString("Executing getUntrackedFiles."));
-
-   auto runCmd = QString("git ls-files --others");
-   const auto exFile = QString(".git/info/exclude");
-   const auto path = QString("%1/%2").arg(mGitBase->getWorkingDir(), exFile);
-
-   if (QFile::exists(path))
-      runCmd.append(QString(" --exclude-from=$%1$").arg(exFile));
-
-   runCmd.append(QString(" --exclude-per-directory=$%1$").arg(".gitignore"));
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-   const auto ret = mGitBase->run(runCmd).output.toString().split('\n', Qt::SkipEmptyParts).toVector();
-#else
-   const auto ret = mGitBase->run(runCmd).output.toString().split('\n', QString::SkipEmptyParts).toVector();
-#endif
-
-   return ret;
 }
 
 QList<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees)

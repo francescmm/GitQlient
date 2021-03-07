@@ -1,7 +1,7 @@
 #include "GitBase.h"
 
-#include <GitSyncProcess.h>
 #include <GitAsyncProcess.h>
+#include <GitSyncProcess.h>
 
 #include <QLogger.h>
 
@@ -10,9 +10,8 @@ using namespace QLogger;
 #include <QDir>
 #include <QFileInfo>
 
-GitBase::GitBase(const QString &workingDirectory, QObject *parent)
-   : QObject(parent)
-   , mWorkingDirectory(workingDirectory)
+GitBase::GitBase(const QString &workingDirectory)
+   : mWorkingDirectory(workingDirectory)
    , mGitDirectory(mWorkingDirectory + "/.git")
 {
    QFileInfo fileInfo(mGitDirectory);
@@ -40,7 +39,7 @@ void GitBase::setWorkingDir(const QString &workingDir)
    mWorkingDirectory = workingDir;
 }
 
-QString GitBase::getGitQlientSettingsDir() const
+QString GitBase::getGitDir() const
 {
    return mGitDirectory;
 }
@@ -48,7 +47,6 @@ QString GitBase::getGitQlientSettingsDir() const
 GitExecResult GitBase::run(const QString &cmd) const
 {
    GitSyncProcess p(mWorkingDirectory);
-   connect(this, &GitBase::cancelAllProcesses, &p, &AGitProcess::onCancel);
 
    const auto ret = p.run(cmd);
    const auto runOutput = ret.output.toString();
@@ -59,17 +57,6 @@ GitExecResult GitBase::run(const QString &cmd) const
       QLog_Warning("Git", QString("Git command {%1} has errors:\n%2").arg(cmd, runOutput));
 
    return ret;
-}
-
-bool GitBase::runAsync(const QString &cmd) const
-{
-   const auto p = new GitAsyncProcess(mWorkingDirectory);
-   connect(this, &GitBase::cancelAllProcesses, p, &AGitProcess::onCancel);
-   connect(p, &GitAsyncProcess::signalDataReady, this, &GitBase::signalResultReady);
-
-   const auto ret = p->run(cmd);
-
-   return ret.success;
 }
 
 void GitBase::updateCurrentBranch()

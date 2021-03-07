@@ -69,7 +69,7 @@ bool CreatePullRequestDlg::configure(const QString &workingDir, const QString &c
       const auto fileContent = f.readAll();
       f.close();
 
-      GitQlientSettings settings;
+      GitQlientSettings settings("");
       const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
       const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
 

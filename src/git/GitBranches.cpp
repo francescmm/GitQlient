@@ -12,44 +12,6 @@ GitBranches::GitBranches(const QSharedPointer<GitBase> &gitBase)
 {
 }
 
-GitExecResult GitBranches::getBranches()
-{
-   QLog_Debug("Git", "Getting branches");
-
-   const auto cmd = QString("git branch -a");
-
-   QLog_Trace("Git", QString("Getting branches: {%1}").arg(cmd));
-
-   const auto ret = mGitBase->run(cmd);
-
-   return ret;
-}
-
-GitExecResult GitBranches::getDistanceBetweenBranches(const QString &right)
-{
-   QLog_Debug("Git", QString("Executing getDistanceBetweenBranches: {origin/%1} and {%1}").arg(right));
-
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
-
-   const auto ret = gitConfig->getRemoteForBranch(right);
-   GitExecResult result;
-
-   if (right == "master")
-      result = GitExecResult { false, "Same branch" };
-   else
-   {
-      const auto remote = ret.success ? ret.output.toString().append("/") : QString();
-      QScopedPointer<GitBase> gitBase(new GitBase(mGitBase->getWorkingDir()));
-      const auto gitCmd = QString("git rev-list --left-right --count %1%2...%2").arg(remote, right);
-
-      QLog_Trace("Git", QString("Getting distance between branches: {%1}").arg(gitCmd));
-
-      result = gitBase->run(gitCmd);
-   }
-
-   return result;
-}
-
 GitExecResult GitBranches::createBranchFromAnotherBranch(const QString &oldName, const QString &newName)
 {
    QLog_Debug("Git", QString("Creating branch from another branch: {%1} and {%2}").arg(oldName, newName));

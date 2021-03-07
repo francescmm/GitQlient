@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -28,6 +28,10 @@
 
 class QPinnableTabWidget;
 class InitScreen;
+class ProgressDlg;
+class GitConfig;
+class QStackedLayout;
+class GitQlientSettings;
 
 /*!
  \brief The GitQlient class is the MainWindow of the GitQlient application. Is the widget that stores all the tabs about
@@ -38,8 +42,6 @@ class InitScreen;
 class GitQlient : public QWidget
 {
    Q_OBJECT
-signals:
-   void signalEditDocument(const QString &fileName, int line, int column);
 
 public:
    /*!
@@ -74,7 +76,7 @@ public:
     * @param pinnedRepos The list of repos to restore
     */
    void restorePinnedRepos();
-
+   
    /*!
     \brief This method parses all the arguments and configures GitQlient settings with them. Part of the arguments can
     be a list of repositories to be opened. In that case, the method returns the list of repositories to open in the repos out parameter.
@@ -85,16 +87,54 @@ public:
    */
    static bool parseArguments(const QStringList &arguments, QStringList *repos);
 
+protected:
+   bool eventFilter(QObject *obj, QEvent *event) override;
+
 private:
+   QStackedLayout *mStackedLayout = nullptr;
    QPinnableTabWidget *mRepos = nullptr;
    InitScreen *mConfigWidget = nullptr;
    QSet<QString> mCurrentRepos;
+   QSharedPointer<GitConfig> mGit;
+   ProgressDlg *mProgressDlg = nullptr;
+   QString mPathToOpen;
 
    /*!
     \brief Opens a QFileDialog to select a repository in the local disk.
-
    */
    void openRepo();
+
+   /**
+    * @brief Opens a QFileDialog to select a repository in the local disk.
+    * @param path The path of the new repo.
+    */
+   void openRepoWithPath(const QString &path);
+
+   /*!
+    \brief Clones a new repository.
+   */
+   void cloneRepo();
+
+   /*!
+    \brief Initiates a new local repository.
+   */
+   void initRepo();
+
+   /**
+    * @brief Updates the progress dialog for cloning repos.
+    *
+    * @param stepDescription The description step.
+    * @param value The numeric value.
+    */
+   void updateProgressDialog(QString stepDescription, int value);
+
+   /**
+    * @brief showError Shows an error occurred during any configuration time.
+    * @param error The error code.
+    * @param description The error description.
+    */
+   void showError(int error, QString description);
+
    /*!
     \brief Creates a new GitQlientWidget instance or the repository defined in the \p repoPath value. After that, it
     adds a new tab in the current widget.
@@ -127,6 +167,13 @@ private:
    /**
     * @brief conditionallyOpenPreConfigDlg Opens the pre-config dialog in case that the repo is open for the very first
     * time.
+    * @param settings The settings object to store the new values.
     */
-   void conditionallyOpenPreConfigDlg(const QString &repoPath);
+   void conditionallyOpenPreConfigDlg(const QSharedPointer<GitQlientSettings> &settings);
+
+   /**
+    * @brief updateWindowTitle Updates the window title of GitQlient appending the branch of the current repository.
+    * @param currentTabIndex The current tab index used to retrieve the repository.
+    */
+   void updateWindowTitle();
 };

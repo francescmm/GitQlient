@@ -1,37 +1,36 @@
 #include <CommitChangesWidget.h>
 #include <ui_CommitChangesWidget.h>
 
-#include <GitRepoLoader.h>
-#include <GitBase.h>
-#include <GitLocal.h>
-#include <GitQlientStyles.h>
+#include <ClickableFrame.h>
 #include <CommitInfo.h>
+#include <FileWidget.h>
+#include <GitBase.h>
+#include <GitCache.h>
+#include <GitLocal.h>
+#include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
+#include <GitRepoLoader.h>
+#include <GitWip.h>
 #include <RevisionFiles.h>
 #include <UnstagedMenu.h>
-#include <GitCache.h>
-#include <FileWidget.h>
-#include <ClickableFrame.h>
-#include <GitQlientSettings.h>
 
 #include <QDir>
+#include <QItemDelegate>
 #include <QKeyEvent>
+#include <QListWidgetItem>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPainter>
+#include <QProcess>
 #include <QRegExp>
 #include <QScrollBar>
 #include <QTextCodec>
-#include <QToolTip>
-#include <QListWidgetItem>
 #include <QTextStream>
-#include <QProcess>
-#include <QItemDelegate>
-#include <QPainter>
+#include <QToolTip>
 
 #include <QLogger.h>
 
 using namespace QLogger;
-
-const int CommitChangesWidget::kMaxTitleChars = 50;
 
 QString CommitChangesWidget::lastMsgBeforeError;
 
@@ -53,8 +52,10 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
 
    ui->amendFrame->setVisible(false);
 
-   ui->lCounter->setText(QString::number(kMaxTitleChars));
-   ui->leCommitTitle->setMaxLength(kMaxTitleChars);
+   mTitleMaxLength = GitQlientSettings().globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
+
+   ui->lCounter->setText(QString::number(mTitleMaxLength));
+   ui->leCommitTitle->setMaxLength(mTitleMaxLength);
    ui->teDescription->setMaximumHeight(125);
 
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitChangesWidget::updateCounter);
@@ -87,8 +88,8 @@ void CommitChangesWidget::resetFile(QListWidgetItem *item)
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
    const auto ret = git->resetFile(item->toolTip());
-   const auto revInfo = mCache->getCommitInfo(mCurrentSha);
-   const auto files = mCache->getRevisionFile(mCurrentSha, revInfo.parent(0));
+   const auto revInfo = mCache->commitInfo(mCurrentSha);
+   const auto files = mCache->revisionFile(mCurrentSha, revInfo.parent(0));
 
    for (auto i = 0; i < files.count(); ++i)
    {
@@ -135,6 +136,7 @@ QColor CommitChangesWidget::getColorForFile(const RevisionFiles &files, int inde
    const auto isInIndex = files.statusCmp(index, RevisionFiles::IN_INDEX);
    const auto isConflict = files.statusCmp(index, RevisionFiles::CONFLICT);
    const auto untrackedFile = !isInIndex && isUnknown;
+   const auto isPartiallyCached = files.statusCmp(index, RevisionFiles::PARTIALLY_CACHED);
 
    QColor myColor;
    const auto isDeleted = files.statusCmp(index, RevisionFiles::DELETED);
@@ -145,7 +147,7 @@ QColor CommitChangesWidget::getColorForFile(const RevisionFiles &files, int inde
       myColor = GitQlientStyles::getRed();
    else if (untrackedFile)
       myColor = GitQlientStyles::getOrange();
-   else if (files.statusCmp(index, RevisionFiles::NEW) || isUnknown || isInIndex)
+   else if (files.statusCmp(index, RevisionFiles::NEW) || isUnknown || isInIndex || isPartiallyCached)
       myColor = GitQlientStyles::getGreen();
    else
       myColor = GitQlientStyles::getTextColor();
@@ -192,8 +194,9 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
       {
          if (!mInternalCache.contains(wip))
          {
-            const auto itemPair = fillFileItemInfo(fileName, isConflict, QString(":/icons/remove"),
-                                                   GitQlientStyles::getGreen(), ui->stagedFilesList);
+            const auto color = getColorForFile(files, i);
+            const auto itemPair
+                = fillFileItemInfo(fileName, isConflict, QString(":/icons/remove"), color, ui->stagedFilesList);
             connect(itemPair.second, &FileWidget::clicked, this, [this, item = itemPair.first]() { resetFile(item); });
 
             ui->stagedFilesList->setItemWidget(itemPair.first, itemPair.second);
@@ -266,43 +269,41 @@ void CommitChangesWidget::addAllFilesToCommitList()
    for (auto i = ui->unstagedFilesList->count() - 1; i >= 0; --i)
       files += addFileToCommitList(ui->unstagedFilesList->item(i), false);
 
-   QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
-   connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
-      QScopedPointer<GitRepoLoader> loader(new GitRepoLoader(mGit, mCache));
-      loader->updateWipRevision();
-   });
+   const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
 
-   git->markFilesAsResolved(files);
+   if (const auto ret = git->markFilesAsResolved(files); ret.success)
+   {
+      QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+      git->updateWip();
+   }
 
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->applyActionBtn->setEnabled(ui->stagedFilesList->count() > 0);
 }
 
 void CommitChangesWidget::requestDiff(const QString &fileName)
 {
    const auto isCached = qobject_cast<StagedFilesList *>(sender()) == ui->stagedFilesList;
-   emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->getCommitInfo(CommitInfo::ZERO_SHA).parent(0), fileName, isCached);
+   emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).parent(0), fileName, isCached);
 }
 
 QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool updateGit)
 {
    const auto fileList = qvariant_cast<QListWidget *>(item->data(GitQlientRole::U_ListRole));
-   const auto row = fileList->row(item);
    const auto fileWidget = qobject_cast<FileWidget *>(fileList->itemWidget(item));
    const auto fileName = fileWidget->toolTip().remove(tr("(conflicts)")).trimmed();
 
    if (updateGit)
    {
-      QScopedPointer<GitLocal> git = QScopedPointer<GitLocal>(new GitLocal(mGit));
-      connect(git.data(), &GitLocal::signalWipUpdated, this, [this]() {
-         QScopedPointer<GitRepoLoader> loader(new GitRepoLoader(mGit, mCache));
-         loader->updateWipRevision();
-      });
+      const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
 
-      git->markFileAsResolved(fileName);
+      if (const auto ret = git->stageFile(fileName); ret.success)
+      {
+         QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+         git->updateWip();
+      }
    }
 
+   const auto row = fileList->row(item);
    fileList->removeItemWidget(item);
    fileList->takeItem(row);
 
@@ -333,8 +334,6 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
 
    delete fileWidget;
 
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
    ui->applyActionBtn->setEnabled(true);
 
    return fileName;
@@ -391,8 +390,6 @@ void CommitChangesWidget::removeFileFromCommitList(QListWidgetItem *item)
       itemOriginalList->addItem(item);
       itemOriginalList->setItemWidget(item, newFileWidget);
 
-      ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-      ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
       ui->applyActionBtn->setDisabled(ui->stagedFilesList->count() == 0);
    }
 }
@@ -445,7 +442,7 @@ bool CommitChangesWidget::checkMsg(QString &msg)
 
 void CommitChangesWidget::updateCounter(const QString &text)
 {
-   ui->lCounter->setText(QString::number(kMaxTitleChars - text.count()));
+   ui->lCounter->setText(QString::number(mTitleMaxLength - text.count()));
 }
 
 bool CommitChangesWidget::hasConflicts()
@@ -466,6 +463,35 @@ void CommitChangesWidget::clear()
    ui->leCommitTitle->clear();
    ui->teDescription->clear();
    ui->applyActionBtn->setEnabled(false);
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
+}
+
+void CommitChangesWidget::setCommitTitleMaxLength()
+{
+   mTitleMaxLength = GitQlientSettings().globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
+
+   ui->lCounter->setText(QString::number(mTitleMaxLength));
+   ui->leCommitTitle->setMaxLength(mTitleMaxLength);
+   updateCounter(ui->leCommitTitle->text());
+}
+
+void CommitChangesWidget::showUnstagedMenu(const QPoint &pos)
+{
+   const auto item = ui->unstagedFilesList->itemAt(pos);
+
+   if (item)
+   {
+      const auto fileName = item->toolTip();
+      const auto contextMenu = new UnstagedMenu(mGit, fileName, this);
+      connect(contextMenu, &UnstagedMenu::signalEditFile, this, &CommitChangesWidget::signalEditFile);
+      connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &CommitChangesWidget::requestDiff);
+      connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &CommitChangesWidget::addAllFilesToCommitList);
+      connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &CommitChangesWidget::revertAllChanges);
+      connect(contextMenu, &UnstagedMenu::changeReverted, this, &CommitChangesWidget::changeReverted);
+      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &CommitChangesWidget::signalCheckoutPerformed);
+      connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &CommitChangesWidget::signalShowFileHistory);
+      connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
+
+      const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
+      contextMenu->popup(mapToGlobal(parentPos));
+   }
 }

@@ -1,26 +1,26 @@
 #include "MergeWidget.h"
 
-#include <GitQlientStyles.h>
-#include <GitBase.h>
-#include <GitMerge.h>
-#include <GitRemote.h>
-#include <GitLocal.h>
-#include <FileDiffWidget.h>
 #include <CommitInfo.h>
-#include <RevisionFiles.h>
+#include <FileDiffWidget.h>
 #include <FileEditor.h>
-#include <GitQlientSettings.h>
+#include <GitBase.h>
+#include <GitCache.h>
+#include <GitLocal.h>
+#include <GitMerge.h>
+#include <GitQlientStyles.h>
+#include <GitRemote.h>
 #include <QPinnableTabWidget.h>
+#include <RevisionFiles.h>
 
-#include <QListWidget>
-#include <QPushButton>
+#include <QFile>
+#include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QStackedWidget>
 #include <QTextEdit>
 #include <QVBoxLayout>
-#include <QLabel>
-#include <QFile>
-#include <QMessageBox>
-#include <QStackedWidget>
 
 MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const QSharedPointer<GitBase> &git,
                          QWidget *parent)
@@ -120,7 +120,7 @@ void MergeWidget::configure(const RevisionFiles &files, ConflictReason reason)
    mMergedFiles->clear();
    mFileDiff->clear();
 
-   QFile mergeMsg(QString(mGit->getGitQlientSettingsDir() + QString::fromUtf8("/MERGE_MSG")));
+   QFile mergeMsg(QString(mGit->getGitDir() + QString::fromUtf8("/MERGE_MSG")));
 
    if (mergeMsg.open(QIODevice::ReadOnly))
    {
@@ -150,7 +150,7 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
 void MergeWidget::changeDiffView(QListWidgetItem *item)
 {
    const auto file = item->text();
-   const auto wip = mGitQlientCache->getCommitInfo(CommitInfo::ZERO_SHA);
+   const auto wip = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
 
    const auto configured
        = mFileDiff->configure(CommitInfo::ZERO_SHA, wip.parent(0), mGit->getWorkingDir() + "/" + file, false);

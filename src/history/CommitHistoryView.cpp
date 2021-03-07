@@ -17,10 +17,12 @@
 using namespace QLogger;
 
 CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                                     const QSharedPointer<GitQlientSettings> &settings,
                                      const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QTreeView(parent)
    , mCache(cache)
    , mGit(git)
+   , mSettings(settings)
    , mGitServerCache(gitServerCache)
 {
    setEnabled(false);
@@ -87,15 +89,12 @@ void CommitHistoryView::filterBySha(const QStringList &shaList)
 
 CommitHistoryView::~CommitHistoryView()
 {
-   GitQlientSettings s;
-   s.setLocalValue(mGit->getGitQlientSettingsDir(), QString("%1").arg(objectName()), header()->saveState());
+   mSettings->setLocalValue(QString("%1").arg(objectName()), header()->saveState());
 }
 
 void CommitHistoryView::setupGeometry()
 {
-   GitQlientSettings s;
-   const auto previousState
-       = s.localValue(mGit->getGitQlientSettingsDir(), QString("%1").arg(objectName()), QByteArray()).toByteArray();
+   const auto previousState = mSettings->localValue(QString("%1").arg(objectName()), QByteArray()).toByteArray();
 
    if (previousState.isEmpty())
    {
@@ -143,7 +142,7 @@ void CommitHistoryView::refreshView()
       topLeft = mCommitHistoryModel->index(0, 0);
       bottomRight
           = mCommitHistoryModel->index(mCommitHistoryModel->rowCount() - 1, mCommitHistoryModel->columnCount() - 1);
-      mCommitHistoryModel->onNewRevisions(mCache->count());
+      mCommitHistoryModel->onNewRevisions(mCache->commitCount());
    }
 
    const auto auxTL = visualRect(topLeft);
@@ -183,7 +182,7 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
 
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 
-   auto row = mCache->getCommitPos(mCurrentSha);
+   auto row = mCache->commitPos(mCurrentSha);
 
    if (mIsFiltering)
    {

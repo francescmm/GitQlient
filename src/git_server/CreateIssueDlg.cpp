@@ -82,7 +82,7 @@ bool CreateIssueDlg::configure(const QString &workingDir)
       const auto fileContent = f.readAll();
       f.close();
 
-      GitQlientSettings settings;
+      GitQlientSettings settings("");
       const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
       const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
 
@@ -230,7 +230,7 @@ void CreateIssueDlg::onIssueTemplateChange(int newIndex)
 
 void CreateIssueDlg::updateMarkdown(const QByteArray &fileContent)
 {
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
    const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
 

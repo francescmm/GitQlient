@@ -1,14 +1,15 @@
 #include "BranchesViewDelegate.h"
 
-#include <GitQlientStyles.h>
 #include <GitQlientBranchItemRole.h>
+#include <GitQlientStyles.h>
 
 #include <QPainter>
 
 using namespace GitQlient;
 
-BranchesViewDelegate::BranchesViewDelegate(QObject *parent)
+BranchesViewDelegate::BranchesViewDelegate(bool isTag, QObject *parent)
    : QStyledItemDelegate(parent)
+   , mIsTag(isTag)
 {
 }
 
@@ -50,14 +51,14 @@ void BranchesViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &o, con
       {
          const auto width = newOpt.rect.x();
          QRect rectIcon(width - offset, newOpt.rect.y(), iconSize, newOpt.rect.height());
-         QIcon icon(":/icons/repo_indicator");
+         QIcon icon(QString::fromUtf8(mIsTag ? ":/icons/tag_indicator" : ":/icons/repo_indicator"));
          icon.paint(p, rectIcon);
       }
       else
       {
          const auto width = newOpt.rect.x();
          QRect rectIcon(width - offset, newOpt.rect.y(), iconSize, newOpt.rect.height());
-         QIcon icon(":/icons/folder_indicator");
+         QIcon icon(QString::fromUtf8(":/icons/folder_indicator"));
          icon.paint(p, rectIcon);
       }
    }

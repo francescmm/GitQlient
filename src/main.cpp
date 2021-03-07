@@ -4,8 +4,6 @@
 #include <QTimer>
 
 #include <GitQlient.h>
-#include <GitQlientSettings.h>
-
 #include <QLogger.h>
 
 using namespace QLogger;
@@ -31,9 +29,6 @@ int main(int argc, char *argv[])
    QFontDatabase::addApplicationFont(":/DejaVuSans");
    QFontDatabase::addApplicationFont(":/DejaVuSansMono");
 
-   GitQlientSettings settings;
-   settings.setGlobalValue("isGitQlient", true);
-
    QStringList repos;
    if (GitQlient::parseArguments(arguments, &repos))
    {
@@ -44,6 +39,7 @@ int main(int argc, char *argv[])
       QTimer::singleShot(500, &mainWin, &GitQlient::restorePinnedRepos);
 
       return app.exec();
-   } else
-      return 0;
+   }
+
+   return 0;
 }

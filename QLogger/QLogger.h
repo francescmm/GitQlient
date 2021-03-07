@@ -2,7 +2,7 @@
 
 /****************************************************************************************
  ** QLogger is a library to register and print logs into a file.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com

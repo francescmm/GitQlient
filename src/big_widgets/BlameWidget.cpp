@@ -18,13 +18,15 @@
 #include <QClipboard>
 #include <QTabWidget>
 
-BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
+BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                         const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
+   , mSettings(settings)
    , fileSystemModel(new QFileSystemModel())
    , mRepoModel(new CommitHistoryModel(mCache, mGit, nullptr))
-   , mRepoView(new CommitHistoryView(mCache, mGit, nullptr))
+   , mRepoView(new CommitHistoryView(mCache, mGit, mSettings, nullptr))
    , fileSystemView(new QTreeView())
    , mTabWidget(new QTabWidget())
 {
@@ -105,15 +107,28 @@ void BlameWidget::showFileHistory(const QString &filePath)
    if (!mTabsMap.contains(filePath))
    {
       QScopedPointer<GitHistory> git(new GitHistory(mGit));
-      const auto ret = git->history(filePath);
+      auto ret = git->history(filePath);
 
       if (ret.success)
       {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-         const auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+         auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
 #else
-         const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+         auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
 #endif
+         for (auto i = 0; i < shaHistory.size();)
+         {
+            if (shaHistory.at(i).startsWith("gpg:"))
+            {
+               shaHistory.takeAt(i);
+
+               if (shaHistory.size() <= i)
+                  break;
+            }
+            else
+               ++i;
+         }
+
          mRepoView->blockSignals(true);
          mRepoView->filterBySha(shaHistory);
          mRepoView->blockSignals(false);
@@ -174,10 +189,23 @@ void BlameWidget::reloadHistory(int tabIndex)
       if (ret.success)
       {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-         const auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+         auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
 #else
-         const auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+         auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
 #endif
+         for (auto i = 0; i < shaHistory.size();)
+         {
+            if (shaHistory.at(i).startsWith("gpg:"))
+            {
+               shaHistory.takeAt(i);
+
+               if (shaHistory.size() <= i)
+                  break;
+            }
+            else
+               ++i;
+         }
+
          mRepoView->blockSignals(true);
          mRepoView->filterBySha(shaHistory);
 

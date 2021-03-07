@@ -63,7 +63,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    localGitLayout->setContentsMargins(QMargins());
 
    const auto localGit = new FileEditor(false, this);
-   localGit->editFile(mGit->getGitQlientSettingsDir().append("/config"));
+   localGit->editFile(mGit->getGitDir().append("/config"));
    localGitLayout->addWidget(localGit);
    mEditors.insert(0, localGit);
 
@@ -76,48 +76,44 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    globalGitLayout->addWidget(globalGit);
    mEditors.insert(1, globalGit);
 
-   const auto gitQlientLayout = new QVBoxLayout(ui->gitQlientConfig);
-   gitQlientLayout->setContentsMargins(QMargins());
+   GitQlientSettings settings(mGit->getGitDir());
 
-   const auto gitQlientEditor = new FileEditor(false, this);
-   gitQlientEditor->editFile(mGit->getGitQlientSettingsDir().append("/GitQlientConfig.ini"));
-   gitQlientLayout->addWidget(gitQlientEditor);
-   mEditors.insert(2, gitQlientEditor);
-
-   GitQlientSettings settings;
-
-   ui->chDevMode->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "DevMode", false).toBool());
+   ui->chDevMode->setChecked(settings.localValue("DevMode", false).toBool());
    enableWidgets();
 
    // GitQlient configuration
    ui->chDisableLogs->setChecked(settings.globalValue("logsDisabled", true).toBool());
    ui->cbLogLevel->setCurrentIndex(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
+   ui->spCommitTitleLength->setValue(settings.globalValue("commitTitleMaxLength", 50).toInt());
 
-   const auto currentStyle = settings.globalValue("colorSchema", "dark").toString();
-   ui->cbStyle->setCurrentText(currentStyle);
-   connect(ui->cbStyle, &QComboBox::currentTextChanged, this, [this, currentStyle](const QString &newText) {
-      if (newText != currentStyle)
-         mShowResetMsg = true;
-   });
+   const auto originalStyles = settings.globalValue("colorSchema", "dark").toString();
+   ui->cbStyle->setCurrentText(originalStyles);
+   connect(ui->cbStyle, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged), this,
+           [this, originalStyles]() {
+              mShowResetMsg = ui->cbStyle->currentText() != originalStyles;
+              saveConfig();
+           });
 
    // Repository configuration
-   mOriginalRepoOrder = settings.localValue(mGit->getGitQlientSettingsDir(), "GraphSortingOrder", 0).toInt();
+   mOriginalRepoOrder = settings.localValue("GraphSortingOrder", 0).toInt();
    ui->cbLogOrder->setCurrentIndex(mOriginalRepoOrder);
-   ui->autoFetch->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "AutoFetch", 5).toInt());
-   ui->pruneOnFetch->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "PruneOnFetch", true).toBool());
-   ui->clangFormat->setChecked(
-       settings.localValue(mGit->getGitQlientSettingsDir(), "ClangFormatOnCommit", false).toBool());
-   ui->updateOnPull->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", false).toBool());
-   ui->sbMaxCommits->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "MaxCommits", 0).toInt());
+   ui->autoFetch->setValue(settings.localValue("AutoFetch", 5).toInt());
+   ui->pruneOnFetch->setChecked(settings.localValue("PruneOnFetch", true).toBool());
+   ui->clangFormat->setChecked(settings.localValue("ClangFormatOnCommit", false).toBool());
+   ui->updateOnPull->setChecked(settings.localValue("UpdateOnPull", false).toBool());
+   ui->sbMaxCommits->setValue(settings.localValue("MaxCommits", 0).toInt());
 
    ui->tabWidget->setCurrentIndex(0);
    connect(ui->pbClearCache, &ButtonLink::clicked, this, &ConfigWidget::clearCache);
 
-   ui->cbPomodoroEnabled->setChecked(
-       settings.localValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", true).toBool());
+   ui->cbPomodoroEnabled->setChecked(settings.localValue("Pomodoro/Enabled", true).toBool());
+
+   ui->cbStash->setChecked(settings.localValue("StashesHeader", true).toBool());
+   ui->cbSubmodule->setChecked(settings.localValue("SubmodulesHeader", true).toBool());
+   ui->cbSubtree->setChecked(settings.localValue("SubtreeHeader", true).toBool());
 
    // Build System configuration
-   const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
+   const auto isConfigured = settings.localValue("BuildSystemEanbled", false).toBool();
    ui->chBoxBuildSystem->setChecked(isConfigured);
    connect(ui->chBoxBuildSystem, &QCheckBox::stateChanged, this, &ConfigWidget::toggleBsAccesInfo);
 
@@ -130,9 +126,9 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    if (isConfigured)
    {
-      const auto url = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", "").toString();
-      const auto user = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", "").toString();
-      const auto token = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", "").toString();
+      const auto url = settings.localValue("BuildSystemUrl", "").toString();
+      const auto user = settings.localValue("BuildSystemUser", "").toString();
+      const auto token = settings.localValue("BuildSystemToken", "").toString();
 
       ui->leBsUrl->setText(url);
       ui->leBsUser->setText(user);
@@ -143,8 +139,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->chDevMode, &CheckBox::stateChanged, this, &ConfigWidget::enableWidgets);
    connect(ui->chDisableLogs, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbLogLevel, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
-   connect(ui->cbStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->leGitPath, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
+   connect(ui->spCommitTitleLength, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbTranslations, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->sbMaxCommits, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbLogOrder, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
@@ -153,6 +149,9 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->updateOnPull, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->clangFormat, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbPomodoroEnabled, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbStash, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbSubmodule, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbSubtree, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->leBsUrl, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->leBsUser, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->leBsToken, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
@@ -161,6 +160,15 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 ConfigWidget::~ConfigWidget()
 {
    delete ui;
+}
+
+void ConfigWidget::onPanelsVisibilityChanged()
+{
+   GitQlientSettings settings(mGit->getGitDir());
+
+   ui->cbStash->setChecked(settings.localValue("StashesHeader", true).toBool());
+   ui->cbSubmodule->setChecked(settings.localValue("SubmodulesHeader", true).toBool());
+   ui->cbSubtree->setChecked(settings.localValue("SubtreeHeader", true).toBool());
 }
 
 void ConfigWidget::clearCache()
@@ -208,12 +216,15 @@ void ConfigWidget::saveConfig()
 
    ui->lFeedback->setText(tr("Changes saved"));
 
-   GitQlientSettings settings;
+   GitQlientSettings settings(mGit->getGitDir());
 
    settings.setGlobalValue("logsDisabled", ui->chDisableLogs->isChecked());
    settings.setGlobalValue("logsLevel", ui->cbLogLevel->currentIndex());
+   settings.setGlobalValue("commitTitleMaxLength", ui->spCommitTitleLength->value());
    settings.setGlobalValue("colorSchema", ui->cbStyle->currentText());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
+
+   emit commitTitleMaxLenghtChanged();
 
    if (mShowResetMsg)
    {
@@ -231,18 +242,24 @@ void ConfigWidget::saveConfig()
 
    if (mOriginalRepoOrder != ui->cbLogOrder->currentIndex())
    {
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "GraphSortingOrder", ui->cbLogOrder->currentIndex());
+      settings.setLocalValue("GraphSortingOrder", ui->cbLogOrder->currentIndex());
       emit reloadView();
    }
 
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "AutoFetch", ui->autoFetch->value());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "PruneOnFetch", ui->pruneOnFetch->isChecked());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "ClangFormatOnCommit", ui->clangFormat->isChecked());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", ui->updateOnPull->isChecked());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MaxCommits", ui->sbMaxCommits->value());
+   settings.setLocalValue("AutoFetch", ui->autoFetch->value());
+   settings.setLocalValue("PruneOnFetch", ui->pruneOnFetch->isChecked());
+   settings.setLocalValue("ClangFormatOnCommit", ui->clangFormat->isChecked());
+   settings.setLocalValue("UpdateOnPull", ui->updateOnPull->isChecked());
+   settings.setLocalValue("MaxCommits", ui->sbMaxCommits->value());
+
+   settings.setLocalValue("StashesHeader", ui->cbStash->isChecked());
+   settings.setLocalValue("SubmodulesHeader", ui->cbSubmodule->isChecked());
+   settings.setLocalValue("SubtreeHeader", ui->cbSubtree->isChecked());
+
+   emit panelsVisibilityChaned();
 
    /* POMODORO CONFIG */
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "Pomodoro/Enabled", ui->cbPomodoroEnabled->isChecked());
+   settings.setLocalValue("Pomodoro/Enabled", ui->cbPomodoroEnabled->isChecked());
 
    /* BUILD SYSTEM CONFIG */
 
@@ -253,13 +270,17 @@ void ConfigWidget::saveConfig()
 
    if (showBs && !bsUser.isEmpty() && !bsToken.isEmpty() && !bsUrl.isEmpty())
    {
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", showBs);
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUrl", bsUrl);
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemUser", bsUser);
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemToken", bsToken);
+      settings.setLocalValue("BuildSystemEanbled", showBs);
+      settings.setLocalValue("BuildSystemUrl", bsUrl);
+      settings.setLocalValue("BuildSystemUser", bsUser);
+      settings.setLocalValue("BuildSystemToken", bsToken);
+      emit buildSystemConfigured(showBs);
    }
    else
-      settings.setLocalValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false);
+   {
+      settings.setLocalValue("BuildSystemEanbled", false);
+      emit buildSystemConfigured(false);
+   }
 
    mFeedbackTimer->singleShot(3000, ui->lFeedback, &QLabel::clear);
 }
@@ -268,8 +289,8 @@ void ConfigWidget::enableWidgets()
 {
    const auto enable = ui->chDevMode->isChecked();
 
-   GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "DevMode", enable);
+   GitQlientSettings settings(mGit->getGitDir());
+   settings.setLocalValue("DevMode", enable);
 
    ui->tabWidget->setEnabled(enable);
 }

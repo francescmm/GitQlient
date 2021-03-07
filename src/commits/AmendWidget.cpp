@@ -2,10 +2,9 @@
 #include <ui_CommitChangesWidget.h>
 
 #include <GitCache.h>
-#include <GitRepoLoader.h>
-#include <GitBase.h>
 #include <GitLocal.h>
 #include <GitQlientRole.h>
+#include <GitWip.h>
 #include <UnstagedMenu.h>
 
 #include <QMessageBox>
@@ -22,7 +21,7 @@ AmendWidget::AmendWidget(const QSharedPointer<GitCache> &cache, const QSharedPoi
 
 void AmendWidget::configure(const QString &sha)
 {
-   const auto commit = mCache->getCommitInfo(sha);
+   const auto commit = mCache->commitInfo(sha);
 
    ui->amendFrame->setVisible(true);
    ui->warningButton->setVisible(true);
@@ -30,14 +29,11 @@ void AmendWidget::configure(const QString &sha)
    if (commit.parentsCount() <= 0)
       return;
 
-   if (!mCache->containsRevisionFile(CommitInfo::ZERO_SHA, sha))
-   {
-      QScopedPointer<GitRepoLoader> git(new GitRepoLoader(mGit, mCache));
-      git->updateWipRevision();
-   }
+   QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+   git->updateWip();
 
-   const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, sha);
-   const auto amendFiles = mCache->getRevisionFile(sha, commit.parent(0));
+   const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, sha);
+   const auto amendFiles = mCache->revisionFile(sha, commit.parent(0));
 
    if (mCurrentSha != sha)
    {
@@ -73,9 +69,6 @@ void AmendWidget::configure(const QString &sha)
       insertFiles(amendFiles, ui->stagedFilesList);
    }
 
-   ui->lUnstagedCount->setText(QString("(%1)").arg(ui->unstagedFilesList->count()));
-   ui->lStagedCount->setText(QString("(%1)").arg(ui->stagedFilesList->count()));
-
    ui->applyActionBtn->setEnabled(ui->stagedFilesList->count());
 }
 
@@ -95,14 +88,16 @@ bool AmendWidget::commitChanges()
       }
       else if (checkMsg(msg))
       {
-         QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGit, mCache));
-         gitLoader->updateWipRevision();
-         const auto files = mCache->getRevisionFile(CommitInfo::ZERO_SHA, mCurrentSha);
+         QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
+         git->updateWip();
+
+         const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, mCurrentSha);
          const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QScopedPointer<GitLocal> git(new GitLocal(mGit));
-         const auto ret = git->ammendCommit(selFiles, files, msg, author);
+
+         QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+         const auto ret = gitLocal->ammendCommit(selFiles, files, msg, author);
          QApplication::restoreOverrideCursor();
 
          emit signalChangesCommitted(ret.success);
@@ -112,28 +107,4 @@ bool AmendWidget::commitChanges()
    }
 
    return done;
-}
-
-void AmendWidget::showUnstagedMenu(const QPoint &pos)
-{
-   const auto item = ui->unstagedFilesList->itemAt(pos);
-
-   if (item)
-   {
-      const auto fileName = item->toolTip();
-      const auto unsolvedConflicts = item->data(GitQlientRole::U_IsConflict).toBool();
-      const auto contextMenu = new UnstagedMenu(mGit, fileName, unsolvedConflicts, this);
-      connect(contextMenu, &UnstagedMenu::signalEditFile, this,
-              [this, fileName]() { emit signalEditFile(mGit->getWorkingDir() + "/" + fileName, 0, 0); });
-      connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &AmendWidget::requestDiff);
-      connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &AmendWidget::addAllFilesToCommitList);
-      connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &AmendWidget::revertAllChanges);
-      connect(contextMenu, &UnstagedMenu::changeReverted, this, &CommitChangesWidget::changeReverted);
-      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &AmendWidget::signalCheckoutPerformed);
-      connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &AmendWidget::signalShowFileHistory);
-      connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
-
-      const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
-      contextMenu->popup(mapToGlobal(parentPos));
-   }
 }

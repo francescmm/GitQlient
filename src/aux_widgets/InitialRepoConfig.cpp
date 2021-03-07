@@ -2,32 +2,31 @@
 #include "ui_InitialRepoConfig.h"
 
 #include <GitQlientSettings.h>
-#include <GitBase.h>
+#include <GitQlientStyles.h>
 
-InitialRepoConfig::InitialRepoConfig(const QSharedPointer<GitBase> &git, QWidget *parent)
+InitialRepoConfig::InitialRepoConfig(const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::InitialRepoConfig)
-   , mGit(git)
+   , mSettings(settings)
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
    ui->setupUi(this);
 
-   GitQlientSettings settings;
+   setStyleSheet(GitQlientStyles::getInstance()->getStyles());
 
-   ui->autoFetch->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "AutoFetch", 5).toInt());
-   ui->pruneOnFetch->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "PruneOnFetch", true).toBool());
-   ui->updateOnPull->setChecked(settings.localValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", false).toBool());
-   ui->sbMaxCommits->setValue(settings.localValue(mGit->getGitQlientSettingsDir(), "MaxCommits", 0).toInt());
+   ui->autoFetch->setValue(mSettings->localValue("AutoFetch", 5).toInt());
+   ui->pruneOnFetch->setChecked(settings->localValue("PruneOnFetch", true).toBool());
+   ui->updateOnPull->setChecked(settings->localValue("UpdateOnPull", false).toBool());
+   ui->sbMaxCommits->setValue(settings->localValue("MaxCommits", 0).toInt());
 }
 
 InitialRepoConfig::~InitialRepoConfig()
 {
-   GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "AutoFetch", ui->autoFetch->value());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "PruneOnFetch", ui->pruneOnFetch->isChecked());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "UpdateOnPull", ui->updateOnPull->isChecked());
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), "MaxCommits", ui->sbMaxCommits->value());
+   mSettings->setLocalValue("AutoFetch", ui->autoFetch->value());
+   mSettings->setLocalValue("PruneOnFetch", ui->pruneOnFetch->isChecked());
+   mSettings->setLocalValue("UpdateOnPull", ui->updateOnPull->isChecked());
+   mSettings->setLocalValue("MaxCommits", ui->sbMaxCommits->value());
 
    delete ui;
 }

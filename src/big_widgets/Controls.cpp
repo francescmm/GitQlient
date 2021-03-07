@@ -1,36 +1,34 @@
 #include "Controls.h"
 
-#include <GitBase.h>
-#include <GitTags.h>
-#include <GitStashes.h>
-#include <GitQlientStyles.h>
-#include <GitRemote.h>
-#include <GitConfig.h>
 #include <BranchDlg.h>
-#include <CreateIssueDlg.h>
-#include <CreatePullRequestDlg.h>
-#include <GitQlientUpdater.h>
+#include <GitBase.h>
+#include <GitCache.h>
+#include <GitConfig.h>
 #include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
+#include <GitQlientUpdater.h>
+#include <GitRemote.h>
+#include <GitStashes.h>
+#include <GitTags.h>
 #include <PomodoroButton.h>
 #include <QLogger.h>
 
 #include <QApplication>
-#include <QToolButton>
+#include <QButtonGroup>
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QMessageBox>
+#include <QProgressBar>
 #include <QPushButton>
 #include <QTimer>
-#include <QProgressBar>
-#include <QButtonGroup>
+#include <QToolButton>
 
 using namespace QLogger;
 
 Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
-   , mCache(cache)
    , mGit(git)
-   , mGitTags(new GitTags(mGit))
+   , mGitTags(new GitTags(mGit, cache))
    , mHistory(new QToolButton())
    , mDiff(new QToolButton())
    , mBlame(new QToolButton())
@@ -49,7 +47,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
-   connect(mGitTags.data(), &GitTags::remoteTagsReceived, mCache.data(), &GitCache::updateTags);
    connect(mUpdater, &GitQlientUpdater::newVersionAvailable, this, [this]() { mVersionCheck->setVisible(true); });
 
    mHistory->setCheckable(true);
@@ -144,6 +141,8 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    createGitPlatformButton(hLayout);
 
+   GitQlientSettings settings(mGit->getGitDir());
+   mBuildSystem->setVisible(settings.localValue("BuildSystemEnabled", false).toBool());
    mBuildSystem->setCheckable(true);
    mBuildSystem->setIcon(QIcon(":/icons/build_system"));
    mBuildSystem->setIconSize(QSize(22, 22));
@@ -224,9 +223,8 @@ void Controls::enableButtons(bool enabled)
 
    if (enabled)
    {
-      GitQlientSettings settings;
-      const auto isConfigured
-          = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
+      GitQlientSettings settings(mGit->getGitDir());
+      const auto isConfigured = settings.localValue("BuildSystemEanbled", false).toBool();
 
       mBuildSystem->setEnabled(isConfigured);
    }
@@ -431,8 +429,8 @@ void Controls::createGitPlatformButton(QHBoxLayout *layout)
 
 void Controls::configBuildSystemButton()
 {
-   GitQlientSettings settings;
-   const auto isConfigured = settings.localValue(mGit->getGitQlientSettingsDir(), "BuildSystemEanbled", false).toBool();
+   GitQlientSettings settings(mGit->getGitDir());
+   const auto isConfigured = settings.localValue("BuildSystemEanbled", false).toBool();
    mBuildSystem->setEnabled(isConfigured);
 
    if (!isConfigured)

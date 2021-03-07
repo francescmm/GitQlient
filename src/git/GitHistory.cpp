@@ -1,5 +1,6 @@
 #include "GitHistory.h"
 
+#include <CommitInfo.h>
 #include <GitBase.h>
 #include <GitConfig.h>
 

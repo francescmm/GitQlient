@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -35,6 +35,8 @@ class GitCache;
 class QPushButton;
 class BranchesWidgetMinimal;
 class BranchesViewDelegate;
+class QTreeWidget;
+class QTreeWidgetItem;
 
 /*!
  \brief BranchesWidget is the widget that creates the layout that contains all the widgets related with the display of
@@ -47,6 +49,13 @@ class BranchesWidget : public QFrame
    Q_OBJECT
 
 signals:
+
+   /**
+    * @brief panelsVisibilityChanged Signal triggered whenever the visibility of the panels in the BranchesWidget
+    * changes.
+    */
+   void panelsVisibilityChanged();
+
    /*!
     \brief Signal triggered when a branch has been updated and requires a GitQlient UI refresh.
 
@@ -134,6 +143,11 @@ public:
     */
    void forceMinimalView();
 
+   /**
+    * @brief onPanelsVisibilityChaned Reloads the visibility of the stash, submodules, and subtree panels.
+    */
+   void onPanelsVisibilityChaned();
+
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
@@ -142,9 +156,8 @@ private:
    BranchesViewDelegate *mLocalDelegate = nullptr;
    BranchTreeWidget *mRemoteBranchesTree = nullptr;
    BranchesViewDelegate *mRemotesDelegate = nullptr;
-   QListWidget *mTagsList = nullptr;
-   QLabel *mTagsCount = nullptr;
-   QLabel *mTagArrow = nullptr;
+   BranchesViewDelegate *mTagsDelegate = nullptr;
+   QTreeWidget *mTagsTree = nullptr;
    QListWidget *mStashesList = nullptr;
    QLabel *mStashesCount = nullptr;
    QLabel *mStashesArrow = nullptr;
@@ -227,11 +240,6 @@ private:
     */
    void showSubtreesContextMenu(const QPoint &p);
    /*!
-    \brief Expands or contracts the tags list widget.
-
-   */
-   void onTagsHeaderClicked();
-   /*!
     \brief Expands or contracts the stashes list widget.
 
    */
@@ -251,7 +259,7 @@ private:
 
     \param item The tag item from the tags list.
    */
-   void onTagClicked(QListWidgetItem *item);
+   void onTagClicked(QTreeWidgetItem *item);
    /*!
     \brief Gets the SHA for a given stash and notifies the UI that it should select it in the repository view.
 

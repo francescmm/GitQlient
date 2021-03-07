@@ -60,7 +60,7 @@ QComboBox::drop-down:hover
 
 QComboBox::down-arrow
 {
-   image: url(:/icons/arrow_down);
+   image: url(:/icons/resources/icons/arrow_down.png);
    min-width: 14px;
    max-width: 14px;
 }
@@ -184,17 +184,17 @@ QTabWidget > QTabBar::tab:!selected
 
 QTabWidget > QTabBar::close-button
 {
-   image: url(:/icons/close);
+   image: url(:/icons/resources/icons/remove-symbol.png);
 }
 
 QTabWidget > QTabBar::close-button:hover
 {
-   image: url(:/icons/close_hover);
+   image: url(:/icons/resources/icons/remove-symbol_hover.png);
 }
 
 QTabWidget > QTabBar::close-button:pressed
 {
-   image: url(":/icons/close_press");
+   image: url(":/icons/resources/icons/remove-symbol_press");
 }
 
 QToolTip
@@ -223,90 +223,68 @@ QDialog > QLineEdit
 
 QScrollBar:vertical
 {
-   border: 0;
    width: 16px;
-   margin: 16px 0;
+   border: 0;
+   margin: 0;
    border-left-width: 1px;
    border-left-style: solid;
 }
 
-QScrollBar:horizontal
-{
-   border: 0;
-   border-top-width: 1px;
-   border-top-style: solid;
-   height: 16px;
-   margin: 0 16px;
-}
-
 QScrollBar::handle:vertical
 {
-   width: 14px;
-   min-height: 10px;
-   border-width: 1px;
-   border-style: solid;
-   border-right: 0;
-   border-left: 0;
+    width: 14px;
+    min-height: 10px;
 }
+
+QScrollBar::add-line:vertical
+{
+   border: 0;
+   background: none;
+   height: 0;
+   subcontrol-position: bottom;
+   subcontrol-origin: margin;
+}
+
+QScrollBar::sub-line:vertical {
+    border: 0;
+    background: none;
+    height: 0;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+}
+
+QScrollBar:horizontal
+{
+   height: 16px;
+   border: 0;
+   margin: 0;
+   border-top-width: 1px;
+   border-top-style: solid;
+}
+
 
 QScrollBar::handle:horizontal
 {
    height: 14px;
    min-width: 10px;
-   border-width: 1px;
-   border-style: solid;
-   border-top: 0;
-   border-bottom: 0;
-}
-
-QScrollBar::add-line:vertical
-{
-   subcontrol-position: bottom center;
-   subcontrol-origin: margin;
-   border-width: 1px;
-   border-style: solid;
-   border-right: 0;
-   height: 15px;
-   width: 15px;
-   image: url(:/icons/down-arrow);
 }
 
 QScrollBar::add-line:horizontal
 {
    subcontrol-position: right;
    subcontrol-origin: margin;
-   border-width: 1px;
-   border-style: solid;
-   border-right: 0;
-   border-bottom: 0;
-   height: 15px;
-   width: 15px;
-   image: url(:/icons/right-arrow);
-}
-
-QScrollBar::sub-line:vertical
-{
-   subcontrol-position: top center;
-   subcontrol-origin: margin;
-   border-width: 1px;
-   border-style: solid;
-   border-right: 0;
-   height: 15px;
-   width: 15px;
-   image: url(:/icons/up-arrow);
+   border: 0;
+   height: 0;
+   width: 0;
 }
 
 QScrollBar::sub-line:horizontal
 {
    subcontrol-position: left;
    subcontrol-origin: margin;
-   border-width: 1px;
-   border-style: solid;
-   border-left: 0;
-   border-bottom: 0;
-   height: 15px;
-   width: 15px;
-   image: url(:/icons/left-arrow);
+   border: 0;
+   height: 0;
+   width: 0;
 }
 
 QScrollArea
@@ -355,7 +333,7 @@ QSpinBox::up-button
 
 QSpinBox::up-arrow
 {
-   image: url(:/icons/arrow_up);
+   image: url(:/icons/resources/icons/arrow_up.png);
    width: 20px;
    height: 10px;
 }
@@ -368,7 +346,7 @@ QSpinBox::down-button
 
 QSpinBox::down-arrow
 {
-   image: url(:/icons/arrow_down);
+   image: url(:/icons/resources/icons/arrow_down.png);
    width: 20px;
    height: 10px;
 }
@@ -463,13 +441,16 @@ GeneralConfigPage > QLabel#configLabel
 /*            GitQlient class START          */
 /*********************************************/
 
-#openNewRepo
+#MainMenuBtn
 {
-   max-height: 25px; /** 25px for the button + 1px to compensate the border of the tabs in the QPinnableTabWidget **/
+   max-height: 25px;
    min-height: 25px;
-   max-width: 31px;
-   min-width: 31px;
-   padding-left: 10px;
+   max-width: 33px;
+   min-width: 33px;
+}
+
+#MainMenuBtn::menu-indicator {
+    image: url();
 }
 
 /*********************************************/
@@ -595,25 +576,23 @@ CommitChangesWidget > #warningButton
    padding-right: 10px;
 }
 
-#stagedFiles, #unstagedFiles
+CommitChangesWidget #wipSeparator
 {
-   padding: 0;
-   border-width: 1px;
-   border-style: solid;
-}
-
-#stagedFiles
-{
-   border-top: 0;
+   max-height: 1px;
+   min-height: 1px;
 }
 
 #stagedFilesList, #unstagedFilesList
 {
    padding: 0;
-   border: 0;
-   border-top-width: 1px;
-   border-top-style: solid;
+   border-width: 1px;
+   border-style: solid;
    outline: 0;
+}
+
+#stagedFilesList
+{
+   border-top: 0;
 }
 
 #unstagedFilesList::item, #stagedFilesList::item
@@ -772,13 +751,13 @@ FullDiffWidget > QPlainTextEdit
 /*             BranchesWidget START          */
 /*********************************************/
 
-BranchesWidget QHeaderView, BranchesWidget QListWidget
+BranchesWidget QListWidget
 {
     border-top-style: solid;
     border-top-width: 1px;
 }
 
-#LocalBranches QHeaderView
+#LocalBranches QHeaderView, #LocalBranches
 {
     border-top: 0;
 }
@@ -803,8 +782,8 @@ BranchesWidget QTreeWidget::item
 
 #FullBranchesWidget
 {
-   min-width: 350px;
-   max-width: 350px;
+   min-width: 250px;
+   max-width: 250px;
 }
 
 #panelsFrame

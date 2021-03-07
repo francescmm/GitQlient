@@ -30,7 +30,6 @@ InitScreen::InitScreen(QWidget *parent)
    , mOpenRepo(new QPushButton(tr("OPEN")))
    , mCloneRepo(new QPushButton(tr("CLONE")))
    , mInitRepo(new QPushButton(tr("NEW")))
-   , mSettings(new GitQlientSettings())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -147,11 +146,6 @@ InitScreen::InitScreen(QWidget *parent)
    connect(mGit.data(), &GitConfig::signalCloningFailure, this, &InitScreen::showError, Qt::DirectConnection);
 }
 
-InitScreen::~InitScreen()
-{
-   delete mSettings;
-}
-
 void InitScreen::openRepo()
 {
    const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
@@ -196,7 +190,7 @@ QWidget *InitScreen::createRecentProjectsPage()
    innerLayout->setSpacing(10);
    innerLayout->addWidget(title);
 
-   const auto projects = mSettings->getRecentProjects();
+   const auto projects = GitQlientSettings().getRecentProjects();
 
    for (auto project : projects)
    {
@@ -212,7 +206,7 @@ QWidget *InitScreen::createRecentProjectsPage()
    const auto clear = new ButtonLink(tr("Clear list"));
    clear->setVisible(!projects.isEmpty());
    connect(clear, &ButtonLink::clicked, this, [this]() {
-      mSettings->clearRecentProjects();
+      GitQlientSettings().clearRecentProjects();
 
       mRecentProjectsLayout->addWidget(createRecentProjectsPage());
    });
@@ -239,7 +233,7 @@ QWidget *InitScreen::createUsedProjectsPage()
    innerLayout->setSpacing(10);
    innerLayout->addWidget(title);
 
-   const auto projects = mSettings->getMostUsedProjects();
+   const auto projects = GitQlientSettings().getMostUsedProjects();
 
    for (auto project : projects)
    {
@@ -255,7 +249,7 @@ QWidget *InitScreen::createUsedProjectsPage()
    const auto clear = new ButtonLink(tr("Clear list"));
    clear->setVisible(!projects.isEmpty());
    connect(clear, &ButtonLink::clicked, this, [this]() {
-      mSettings->clearMostUsedProjects();
+      GitQlientSettings().clearMostUsedProjects();
 
       mUsedProjectsLayout->addWidget(createUsedProjectsPage());
    });

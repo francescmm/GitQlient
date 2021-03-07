@@ -8,6 +8,7 @@ HEADERS += \
     $$PWD/LaneType.h \
     $$PWD/References.h \
     $$PWD/RevisionFiles.h \
+    $$PWD/WipRevisionInfo.h \
     $$PWD/lanes.h
 
 SOURCES += \

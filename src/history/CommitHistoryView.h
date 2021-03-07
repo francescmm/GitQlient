@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -30,6 +30,7 @@ class GitBase;
 class CommitHistoryModel;
 class ShaFilterProxyModel;
 class GitServerCache;
+class GitQlientSettings;
 
 /**
  * @brief The CommitHistoryView is the class that represents the View in a MVC pattern. It shows the data provided by
@@ -98,6 +99,7 @@ public:
     * @param parent The parent widget if needed.
     */
    explicit CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                              const QSharedPointer<GitQlientSettings> &settings,
                               const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
    /**
     * @brief Destructor.
@@ -161,6 +163,7 @@ public:
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitQlientSettings> mSettings;
    QSharedPointer<GitServerCache> mGitServerCache;
    CommitHistoryModel *mCommitHistoryModel = nullptr;
    ShaFilterProxyModel *mProxyModel = nullptr;

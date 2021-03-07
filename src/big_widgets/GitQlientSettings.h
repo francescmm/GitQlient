@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -39,6 +39,8 @@ public:
 
    */
    GitQlientSettings() = default;
+   GitQlientSettings(const QString &gitRepoPath);
+   ~GitQlientSettings() { }
 
    /*!
     \brief Sets a value for a given \p key.
@@ -61,7 +63,7 @@ public:
     * @param key The key.
     * @param value The new value for the key.
     */
-   void setLocalValue(const QString &repo, const QString &key, const QVariant &value);
+   void setLocalValue(const QString &key, const QVariant &value);
 
    /**
     * @brief getLocalValue Returns the value for a given @p repo and a given @p key.
@@ -69,7 +71,7 @@ public:
     * @param key The key
     * @param defaultValue (optional) A default value in case the key doesn't exist.
     */
-   QVariant localValue(const QString &repo, const QString &key, const QVariant &defaultValue = QVariant());
+   QVariant localValue(const QString &key, const QVariant &defaultValue = QVariant());
 
    /*!
     \brief Stores that a project is opened. This is used to recalculate which projects are the most used.
@@ -116,4 +118,5 @@ public:
 
 private:
    QSettings globalSettings;
+   QString mGitRepoPath;
 };

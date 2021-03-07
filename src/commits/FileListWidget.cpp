@@ -1,21 +1,21 @@
 #include "FileListWidget.h"
 
 #include <FileContextMenu.h>
-#include <RevisionFiles.h>
 #include <FileListDelegate.h>
+#include <GitBase.h>
+#include <GitCache.h>
 #include <GitHistory.h>
 #include <GitQlientStyles.h>
-#include <GitCache.h>
-#include <GitBase.h>
+#include <RevisionFiles.h>
 
 #include <QApplication>
 #include <QDrag>
+#include <QItemDelegate>
+#include <QMenu>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPalette>
-#include <QMenu>
-#include <QItemDelegate>
 
 FileListWidget::FileListWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *p)
    : QListWidget(p)
@@ -67,16 +67,14 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 
    mCurrentSha = currentSha;
 
-   if (mCache->containsRevisionFile(mCurrentSha, compareToSha))
-      files = mCache->getRevisionFile(mCurrentSha, compareToSha);
-   else
+   if (files = mCache->revisionFile(mCurrentSha, compareToSha); !files.isValid())
    {
       QScopedPointer<GitHistory> git(new GitHistory(mGit));
       const auto ret = git->getDiffFiles(mCurrentSha, compareToSha);
 
       if (ret.success)
       {
-         files = mCache->parseDiff(ret.output.toString());
+         files = RevisionFiles(ret.output.toString());
          mCache->insertRevisionFile(mCurrentSha, compareToSha, files);
       }
    }

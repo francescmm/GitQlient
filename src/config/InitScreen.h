@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -58,11 +58,6 @@ public:
     \param parent The parent widget if needed.
    */
    explicit InitScreen(QWidget *parent = nullptr);
-   /*!
-    \brief Destructor.
-
-   */
-   ~InitScreen() override;
 
    /*!
     * \brief onRepoOpened Increments the uses of the repo in the settings to update the lists.
@@ -79,7 +74,6 @@ private:
    QButtonGroup *mBtnGroup = nullptr;
    ProgressDlg *mProgressDlg = nullptr;
    QString mPathToOpen;
-   GitQlientSettings *mSettings = nullptr;
    QVBoxLayout *mRecentProjectsLayout = nullptr;
    QVBoxLayout *mUsedProjectsLayout = nullptr;
    QWidget *mInnerWidget = nullptr;

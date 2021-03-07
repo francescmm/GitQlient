@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -43,6 +43,7 @@ class BranchesWidgetMinimal;
 class QPushButton;
 class GitServerCache;
 class QLabel;
+class GitQlientSettings;
 
 /*!
  \brief The HistoryWidget is responsible for showing the history of the repository. It is the first widget shown
@@ -107,14 +108,6 @@ signals:
    */
    void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
 
-   /**
-    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
-    * @param fileName The file name
-    * @param line The line
-    * @param column The column
-    */
-   void signalEditFile(const QString &fileName, int line, int column);
-
    /*!
     \brief Signal triggered when changes are committed.
 
@@ -155,6 +148,12 @@ signals:
     */
    void showPrDetailedView(int pr);
 
+   /**
+    * @brief panelsVisibilityChanged Signal triggered whenever the visibility of the panels in the BranchesWidget
+    * changes.
+    */
+   void panelsVisibilityChanged();
+
 public:
    /*!
     \brief Default constructor.
@@ -164,7 +163,8 @@ public:
     \param parent The parent widget if needed.
    */
    explicit HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
-                          const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+                          const QSharedPointer<GitServerCache> &gitServerCache,
+                          const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
    /*!
     \brief Destructor.
 
@@ -230,6 +230,16 @@ public:
     */
    void updateConfig();
 
+   /**
+    * @brief onCommitTitleMaxLenghtChanged Changes the maximum length of the commit title.
+    */
+   void onCommitTitleMaxLenghtChanged();
+
+   /**
+    * @brief onPanelsVisibilityChaned Reloads the visibility configuration of the panels in the BranchesWidget.
+    */
+   void onPanelsVisibilityChanged();
+
 protected:
    void keyPressEvent(QKeyEvent *event) override;
    void keyReleaseEvent(QKeyEvent *event) override;
@@ -245,6 +255,7 @@ private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitServerCache> mGitServerCache;
+   QSharedPointer<GitQlientSettings> mSettings;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;
    BranchesWidget *mBranchesWidget = nullptr;

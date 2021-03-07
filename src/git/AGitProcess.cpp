@@ -145,8 +145,7 @@ bool AGitProcess::execute(const QString &command)
       env << "GIT_TRACE=0"; // avoid choking on debug traces
       env << "GIT_FLUSH=0"; // skip the fflush() in 'git log'
 
-      GitQlientSettings settings;
-      const auto gitAlternative = settings.globalValue("gitLocation", "").toString();
+      const auto gitAlternative = GitQlientSettings().globalValue("gitLocation", "").toString();
 
       setEnvironment(env);
       setProgram(gitAlternative.isEmpty() ? arguments.takeFirst() : gitAlternative);

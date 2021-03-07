@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -39,7 +39,7 @@ public:
 
     \param parent The parent widget if needed.
    */
-   explicit BranchesViewDelegate(QObject *parent = nullptr);
+   explicit BranchesViewDelegate(bool isTag = false, QObject *parent = nullptr);
 
    /*!
     \brief Overridden paint method used to display different colors when mouse actions happen.
@@ -55,4 +55,7 @@ public:
     \return QSize The width and height of the row.
    */
    QSize sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const override;
+
+private:
+   bool mIsTag = false;
 };

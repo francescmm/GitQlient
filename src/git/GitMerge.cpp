@@ -2,7 +2,7 @@
 
 #include <GitBase.h>
 #include <GitRepoLoader.h>
-
+#include <GitWip.h>
 #include <QLogger.h>
 
 #include <QFile>
@@ -17,7 +17,7 @@ GitMerge::GitMerge(const QSharedPointer<GitBase> &gitBase, QSharedPointer<GitCac
 
 bool GitMerge::isInMerge() const
 {
-   QFile mergeHead(mGitBase->getWorkingDir().append("/.git/MERGE_HEAD"));
+   QFile mergeHead(QString("%1/MERGE_HEAD").arg(mGitBase->getGitDir()));
 
    return mergeHead.exists();
 }
@@ -45,8 +45,8 @@ GitExecResult GitMerge::merge(const QString &into, QStringList sources)
 
    if (retMerge.success)
    {
-      QScopedPointer<GitRepoLoader> gitLoader(new GitRepoLoader(mGitBase, mCache));
-      gitLoader->updateWipRevision();
+      QScopedPointer<GitWip> git(new GitWip(mGitBase, mCache));
+      git->updateWip();
    }
 
    return retMerge;

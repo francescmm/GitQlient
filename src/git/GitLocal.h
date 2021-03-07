@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -30,13 +30,8 @@
 class GitBase;
 class RevisionFiles;
 
-class GitLocal : public QObject
+class GitLocal
 {
-   Q_OBJECT
-
-signals:
-   void signalWipUpdated();
-
 public:
    enum class CommitResetType
    {
@@ -46,12 +41,12 @@ public:
    };
 
    explicit GitLocal(const QSharedPointer<GitBase> &gitBase);
-   GitExecResult stageFile(const QString &fileName) const;
+   bool isInCherryPickMerge() const;
    GitExecResult cherryPickCommit(const QString &sha) const;
    GitExecResult cherryPickAbort() const;
    GitExecResult cherryPickContinue() const;
    GitExecResult checkoutCommit(const QString &sha) const;
-   GitExecResult markFileAsResolved(const QString &fileName);
+   GitExecResult stageFile(const QString &fileName) const;
    GitExecResult markFilesAsResolved(const QStringList &files);
    bool checkoutFile(const QString &fileName) const;
 

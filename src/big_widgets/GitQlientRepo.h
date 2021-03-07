@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -28,6 +28,7 @@
 #include <QPointer>
 
 class GitBase;
+class GitQlientSettings;
 class GitCache;
 class GitRepoLoader;
 class QCloseEvent;
@@ -79,13 +80,6 @@ signals:
     \param submoduleName The submodule name.
    */
    void signalOpenSubmodule(const QString &submoduleName);
-   /**
-    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
-    * @param fileName The file name
-    * @param line The line
-    * @param column The column
-    */
-   void signalEditFile(const QString &fileName, int line, int column);
 
    /**
     * @brief signalLoadRepo Signal used to trigger the data update in a different thread.
@@ -99,6 +93,11 @@ signals:
     */
    void repoOpened(const QString &repoPath);
 
+   /**
+    * @brief currentBranchChanged Signal triggered whenever the current branch changes.
+    */
+   void currentBranchChanged();
+
 public:
    /*!
     \brief Default constructor.
@@ -106,7 +105,8 @@ public:
     \param repoPath The path in disk where the repository is located.
     \param parent The parent widget if needed.
    */
-   explicit GitQlientRepo(const QString &repoPath, QWidget *parent = nullptr);
+   explicit GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPointer<GitQlientSettings> &settings,
+                          QWidget *parent = nullptr);
    /*!
     \brief Destructor.
 
@@ -119,6 +119,13 @@ public:
     \return QString The current working dir.
    */
    QString currentDir() const { return mCurrentDir; }
+
+   /**
+    * @brief currentBranch Gets the current branch.
+    * @return QString The current branch.
+    */
+   QString currentBranch() const;
+
    /*!
     \brief Sets the repository once the widget is created.
 
@@ -139,11 +146,11 @@ private:
    QSharedPointer<GitCache> mGitQlientCache;
    QSharedPointer<GitServerCache> mGitServerCache;
    QSharedPointer<GitBase> mGitBase;
+   QSharedPointer<GitQlientSettings> mSettings;
    QSharedPointer<GitRepoLoader> mGitLoader;
    HistoryWidget *mHistoryWidget = nullptr;
    QStackedLayout *mStackedLayout = nullptr;
    Controls *mControls = nullptr;
-   HistoryWidget *mRepoWidget = nullptr;
    DiffWidget *mDiffWidget = nullptr;
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;

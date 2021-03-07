@@ -11,7 +11,6 @@
 #include <IssueDetailedView.h>
 #include <Platform.h>
 #include <GitBase.h>
-#include <GitQlientSettings.h>
 
 #include <QPushButton>
 #include <QToolButton>

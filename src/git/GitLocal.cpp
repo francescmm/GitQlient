@@ -1,10 +1,11 @@
 #include "GitLocal.h"
 
 #include <GitBase.h>
-#include <GitQlientSettings.h>
-
+#include <GitWip.h>
 #include <QLogger.h>
+#include <RevisionFiles.h>
 
+#include <QFile>
 #include <QProcess>
 
 using namespace QLogger;
@@ -20,8 +21,7 @@ static QString quote(const QStringList &sl)
 }
 
 GitLocal::GitLocal(const QSharedPointer<GitBase> &gitBase)
-   : QObject()
-   , mGitBase(gitBase)
+   : mGitBase(gitBase)
 {
 }
 
@@ -36,6 +36,13 @@ GitExecResult GitLocal::stageFile(const QString &fileName) const
    const auto ret = mGitBase->run(cmd);
 
    return ret;
+}
+
+bool GitLocal::isInCherryPickMerge() const
+{
+   QFile cherrypickHead(QString("%1/CHERRY_PICK_HEAD").arg(mGitBase->getGitDir()));
+
+   return cherrypickHead.exists();
 }
 
 GitExecResult GitLocal::cherryPickCommit(const QString &sha) const
@@ -89,16 +96,6 @@ GitExecResult GitLocal::checkoutCommit(const QString &sha) const
 
    if (ret.success)
       mGitBase->updateCurrentBranch();
-
-   return ret;
-}
-
-GitExecResult GitLocal::markFileAsResolved(const QString &fileName)
-{
-   const auto ret = stageFile(fileName);
-
-   if (ret.success)
-      emit signalWipUpdated();
 
    return ret;
 }
@@ -173,9 +170,6 @@ bool GitLocal::resetCommit(const QString &sha, CommitResetType type)
    QLog_Trace("Git", QString("Reseting commit: {%1}").arg(cmd));
 
    const auto ret = mGitBase->run(cmd);
-
-   if (ret.success)
-      emit signalWipUpdated();
 
    return ret.success;
 }

@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -23,23 +23,16 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <CommitInfo.h>
 #include <RevisionFiles.h>
 #include <lanes.h>
-#include <CommitInfo.h>
 
-#include <QSharedPointer>
-#include <QObject>
 #include <QHash>
 #include <QMutex>
+#include <QObject>
+#include <QSharedPointer>
 
-struct WipRevisionInfo
-{
-   QString parentSha;
-   QString diffIndex;
-   QString diffIndexCached;
-
-   bool isValid() const { return !parentSha.isEmpty() || !diffIndex.isEmpty() || !diffIndexCached.isEmpty(); }
-};
+struct WipRevisionInfo;
 
 class GitCache : public QObject
 {
@@ -58,31 +51,25 @@ public:
    explicit GitCache(QObject *parent = nullptr);
    ~GitCache();
 
-   void setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits);
+   int commitCount() const;
 
-   int count() const;
+   CommitInfo commitInfo(const QString &sha);
+   CommitInfo commitInfo(int row);
+   int commitPos(const QString &sha);
 
-   CommitInfo getCommitInfo(const QString &sha);
-   CommitInfo getCommitInfoByRow(int row);
-   int getCommitPos(const QString &sha);
-   CommitInfo getCommitInfoByField(CommitInfo::Field field, const QString &text, int startingPoint = 0,
-                                   bool reverse = false);
-   RevisionFiles getRevisionFile(const QString &sha1, const QString &sha2) const;
+   CommitInfo searchCommitInfo(const QString &text, int startingPoint = 0, bool reverse = false);
+
+   bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
+   RevisionFiles revisionFile(const QString &sha1, const QString &sha2) const;
 
    void clearReferences();
-   bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    void insertReference(const QString &sha, References::Type type, const QString &reference);
-   void insertLocalBranchDistances(const QString &name, const LocalBranchDistances &distances);
    bool hasReferences(const QString &sha) const;
    QStringList getReferences(const QString &sha, References::Type type) const;
-   LocalBranchDistances getLocalBranchDistances(const QString &name) { return mLocalBranchDistances.value(name); }
+
    void reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha);
 
-   void updateWipCommit(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
-
-   bool containsRevisionFile(const QString &sha1, const QString &sha2) const;
-
-   RevisionFiles parseDiff(const QString &logDiff);
+   bool updateWipCommit(const WipRevisionInfo &wipInfo);
 
    void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
    bool pendingLocalChanges();
@@ -91,8 +78,6 @@ public:
    QMap<QString, QString> getTags(References::Type tagType) const;
 
    void updateTags(const QMap<QString, QString> &remoteTags);
-   void addSubtrees(const QList<QPair<QString, QString>> &subtrees);
-   QStringList getSubtrees() const;
 
 private:
    friend class GitRepoLoader;
@@ -103,42 +88,18 @@ private:
    QHash<QString, CommitInfo> mCommitsMap;
    QMultiMap<QString, CommitInfo *> mTmpChildsStorage;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
-   QMap<QString, LocalBranchDistances> mLocalBranchDistances;
    Lanes mLanes;
-   QVector<QString> mDirNames;
-   QVector<QString> mFileNames;
    QVector<QString> mUntrackedfiles;
    QMap<QString, References> mReferences;
    QMap<QString, QString> mRemoteTags;
 
-   struct Subtree
-   {
-      QString name;
-      QString commit;
-   };
-
-   QList<Subtree> mSubtrees;
-
-   struct FileNamesLoader
-   {
-      RevisionFiles *rf = nullptr;
-      QVector<int> rfDirs;
-      QVector<int> rfNames;
-      QVector<QString> files;
-   };
-
+   void setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits);
    void setConfigurationDone() { mConfigured = true; }
-   void insertCommitInfo(CommitInfo rev, int orderIdx);
-   void insertWipRevision(const QString &parentSha, const QString &diffIndex, const QString &diffIndexCache);
+
+   void insertWipRevision(const WipRevisionInfo &wipInfo);
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
    QVector<Lane> calculateLanes(const CommitInfo &c);
-   RevisionFiles parseDiffFormat(const QString &buf, FileNamesLoader &fl, bool cached = false);
-   void appendFileName(const QString &name, FileNamesLoader &fl);
-   void flushFileNames(FileNamesLoader &fl);
-   void setExtStatus(RevisionFiles &rf, const QString &rowSt, int parNum, FileNamesLoader &fl);
-   QVector<CommitInfo *>::const_iterator searchCommit(CommitInfo::Field field, const QString &text,
-                                                      int startingPoint = 0) const;
-   QVector<CommitInfo *>::const_reverse_iterator reverseSearchCommit(CommitInfo::Field field, const QString &text,
-                                                                     int startingPoint = 0) const;
+   auto searchCommit(const QString &text, int startingPoint = 0) const;
+   auto reverseSearchCommit(const QString &text, int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);
 };

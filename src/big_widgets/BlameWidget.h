@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -36,6 +36,7 @@ class CommitHistoryView;
 class QTabWidget;
 class QModelIndex;
 class RepositoryViewDelegate;
+class GitQlientSettings;
 
 /**
  * @brief The BlameWidget class creates the layout that contains all the widgets that are part of the blame and history
@@ -79,7 +80,7 @@ public:
     * @param parent The parent widget if needed.
     */
    explicit BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                        QWidget *parent = nullptr);
+                        const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
    /**
     * @brief Destructor.
     *
@@ -110,6 +111,7 @@ public:
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QSharedPointer<GitQlientSettings> mSettings;
    QFileSystemModel *fileSystemModel = nullptr;
    CommitHistoryModel *mRepoModel = nullptr;
    CommitHistoryView *mRepoView = nullptr;

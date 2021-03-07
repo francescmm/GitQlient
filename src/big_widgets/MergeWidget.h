@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2020  Francesc Martinez
+ ** Copyright (C) 2021  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -58,14 +58,6 @@ signals:
     *
     */
    void signalMergeFinished();
-
-   /**
-    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
-    * @param fileName The file name
-    * @param line The line
-    * @param column The column
-    */
-   void signalEditFile(const QString &fileName, int line, int column);
 
 public:
    enum class ConflictReason

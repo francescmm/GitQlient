@@ -1,27 +1,27 @@
 #include "FileDiffWidget.h"
 
-#include <GitBase.h>
-#include <GitPatches.h>
-#include <GitHistory.h>
-#include <FileDiffView.h>
-#include <CommitInfo.h>
-#include <GitCache.h>
-#include <GitQlientSettings.h>
 #include <CheckBox.h>
-#include <FileEditor.h>
-#include <GitLocal.h>
+#include <CommitInfo.h>
 #include <DiffHelper.h>
+#include <FileDiffView.h>
+#include <FileEditor.h>
+#include <GitBase.h>
+#include <GitCache.h>
+#include <GitHistory.h>
+#include <GitLocal.h>
+#include <GitPatches.h>
+#include <GitQlientSettings.h>
 #include <LineNumberArea.h>
 
-#include <QLineEdit>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QLabel>
-#include <QScrollBar>
 #include <QDateTime>
-#include <QStackedWidget>
-#include <QMessageBox>
 #include <QDir>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QScrollBar>
+#include <QStackedWidget>
 #include <QTemporaryFile>
 
 FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *parent)
@@ -113,9 +113,8 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    vLayout->addLayout(optionsLayout);
    vLayout->addWidget(mViewStackedWidget);
 
-   GitQlientSettings settings;
-   mFileVsFile
-       = settings.localValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, false).toBool();
+   GitQlientSettings settings(mGit->getGitDir());
+   mFileVsFile = settings.localValue(GitQlientSettings::SplitFileDiffView, false).toBool();
 
    mBack->setIcon(QIcon(":/icons/back"));
    mBack->setToolTip(tr("Return to the view"));
@@ -279,8 +278,8 @@ void FileDiffWidget::setSplitViewEnabled(bool enable)
    mOldFile->setVisible(mFileVsFile);
    mSearchOld->setVisible(mFileVsFile);
 
-   GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
+   GitQlientSettings settings(mGit->getGitDir());
+   settings.setLocalValue(GitQlientSettings::SplitFileDiffView, mFileVsFile);
 
    configure(mCurrentSha, mPreviousSha, mCurrentFile, mIsCached);
 
@@ -308,8 +307,8 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
    mOldFile->setVisible(mFileVsFile);
    mSearchOld->setVisible(mFileVsFile);
 
-   GitQlientSettings settings;
-   settings.setLocalValue(mGit->getGitQlientSettingsDir(), GitQlientSettings::SplitFileDiffView, mFileVsFile);
+   GitQlientSettings settings(mGit->getGitDir());
+   settings.setLocalValue(GitQlientSettings::SplitFileDiffView, mFileVsFile);
 
    configure(mCurrentSha, mPreviousSha, mCurrentFile, mIsCached);
 
@@ -413,7 +412,7 @@ void FileDiffWidget::endEditFile()
 void FileDiffWidget::stageFile()
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
-   const auto ret = git->markFileAsResolved(mCurrentFile);
+   const auto ret = git->stageFile(mCurrentFile);
 
    if (ret.success)
    {
@@ -461,6 +460,9 @@ void FileDiffWidget::stageChunk(const QString &id)
       QString text;
       QString postLine = " \n";
       auto fileCount = startingLine - 1 - buffer;
+
+      if (fileCount < 0)
+         fileCount = 0;
 
       for (; fileCount < startingLine - 1 && fileCount < mChunks.oldFileDiff.count(); ++fileCount)
          text.append(QString(" %1\n").arg(mChunks.oldFileDiff.at(fileCount)));

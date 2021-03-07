@@ -1,8 +1,8 @@
 #pragma once
 
 #include <QByteArray>
-#include <QVector>
 #include <QStringList>
+#include <QVector>
 
 class RevisionFiles
 {
@@ -21,6 +21,9 @@ public:
    };
 
    RevisionFiles() = default;
+   RevisionFiles(const QString &diff, bool cached = false);
+
+   bool isValid() const;
    bool operator==(const RevisionFiles &revFiles) const;
    bool operator!=(const RevisionFiles &revFiles) const;
 
@@ -57,4 +60,6 @@ private:
    bool mOnlyModified = true;
    QVector<int> mFileStatus;
    QVector<QString> mRenamedFiles;
+
+   void setExtStatus(const QString &rowSt, int parNum);
 };

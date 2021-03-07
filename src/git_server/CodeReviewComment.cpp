@@ -28,7 +28,7 @@ CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidge
    avatarLayout->addWidget(creator);
    avatarLayout->addStretch();
 
-   GitQlientSettings settings;
+   GitQlientSettings settings("");
    const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
    const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
 

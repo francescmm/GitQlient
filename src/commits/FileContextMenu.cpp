@@ -1,7 +1,5 @@
 #include "FileContextMenu.h"
 
-#include <GitQlientSettings.h>
-
 #include <QApplication>
 #include <QClipboard>
 
