@@ -4,8 +4,9 @@
 #include <QLogger.h>
 
 #include <QFile>
-#include <QTextStream>
 #include <QTemporaryFile>
+#include <QTextStream>
+#include <QVector>
 
 using namespace QLogger;
 
