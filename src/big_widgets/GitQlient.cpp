@@ -178,8 +178,10 @@ void GitQlient::addRepoTab(const QString &repoPath)
    addNewRepoTab(repoPath, false);
 }
 
-void GitQlient::addNewRepoTab(const QString &repoPath, bool pinned)
+void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
 {
+   const QString repoPath = QFileInfo(repoPathArg).canonicalFilePath();
+
    if (!mCurrentRepos.contains(repoPath))
    {
       QFileInfo info(QString("%1/.git").arg(repoPath));
