@@ -1,27 +1,26 @@
 #include "GitQlient.h"
 
-#include <InitScreen.h>
-#include <GitQlientStyles.h>
-#include <GitQlientSettings.h>
-#include <QPinnableTabWidget.h>
-#include <InitialRepoConfig.h>
-#include <GitBase.h>
 #include <CreateRepoDlg.h>
-#include <ProgressDlg.h>
+#include <GitBase.h>
 #include <GitConfig.h>
 #include <GitQlientRepo.h>
+#include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
+#include <InitScreen.h>
+#include <InitialRepoConfig.h>
+#include <ProgressDlg.h>
+#include <QPinnableTabWidget.h>
 
-#include <QMenu>
 #include <QEvent>
-#include <QProcess>
-#include <QTabBar>
-#include <QStackedLayout>
-#include <QToolButton>
 #include <QFile>
 #include <QFileDialog>
+#include <QMenu>
 #include <QMessageBox>
-#include <QTabBar>
+#include <QProcess>
 #include <QPushButton>
+#include <QStackedLayout>
+#include <QTabBar>
+#include <QToolButton>
 
 #include <QLogger.h>
 
@@ -305,7 +304,7 @@ void GitQlient::addRepoTab(const QString &repoPath)
 
 void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
 {
-   const QString repoPath = QFileInfo(repoPathArg).canonicalFilePath();
+   const auto repoPath = QFileInfo(repoPathArg).canonicalFilePath();
 
    if (!mCurrentRepos.contains(repoPath))
    {
