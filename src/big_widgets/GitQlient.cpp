@@ -106,7 +106,6 @@ GitQlient::GitQlient(QWidget *parent)
 
    connect(mConfigWidget, &InitScreen::signalOpenRepo, this, &GitQlient::addRepoTab);
 
-   GitQlientSettings settings;
    const auto geometry = settings.globalValue("GitQlientGeometry", saveGeometry()).toByteArray();
 
    if (!geometry.isNull())
@@ -233,9 +232,8 @@ bool GitQlient::setArgumentsPostInit(const QStringList &arguments)
 
    QStringList repos;
    bool ret = parseArguments(arguments, &repos);
-   if (ret) {
+   if (ret)
       setRepositories(repos);
-   }
    return ret;
 }
 
@@ -244,14 +242,14 @@ bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
    bool ret = true;
    GitQlientSettings settings;
 #ifdef DEBUG
-   LogLevel logLevel = LogLevel::Trace;
+   auto logLevel = LogLevel::Trace;
 #else
-   LogLevel logLevel = static_cast<LogLevel>(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
+   auto logLevel = static_cast<LogLevel>(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
 #endif
    bool areLogsDisabled = settings.globalValue("logsDisabled", true).toBool();
 
    QCommandLineParser parser;
-   parser.setApplicationDescription(tr("Graphical Git client"));
+   parser.setApplicationDescription(tr("Multi-platform Git client written with Qt"));
    parser.addPositionalArgument("repos", tr("Git repositories to open"), tr("[repos...]"));
 
    const QCommandLineOption helpOption = parser.addHelpOption();
@@ -275,7 +273,7 @@ bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
    {
       if (parser.isSet(logLevelOption))
       {
-         LogLevel level = static_cast<LogLevel>(parser.value(logLevelOption).toInt());
+         const auto level = static_cast<LogLevel>(parser.value(logLevelOption).toInt());
          if (level >= QLogger::LogLevel::Trace && level <= QLogger::LogLevel::Fatal)
          {
             logLevel = level;
