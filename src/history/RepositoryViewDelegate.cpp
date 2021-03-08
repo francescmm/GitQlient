@@ -515,26 +515,25 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
          o.font.setBold(isCurrentSpot);
 
          const auto nameToDisplay = showMinimal ? QString(". . .") : *mapIt;
-         QFontMetrics fm(o.font);
+         const QFontMetrics fm(o.font);
          const auto textBoundingRect = fm.boundingRect(nameToDisplay);
          const int textPadding = 3;
          const auto rectWidth = textBoundingRect.width() + 2 * textPadding;
+         const QRectF markerRect(o.rect.x() + startPoint, o.rect.y() + 2, rectWidth, ROW_HEIGHT - 4);
 
          painter->save();
          painter->setRenderHint(QPainter::Antialiasing);
          painter->setPen(QPen(*colorIter, 2));
          QPainterPath path;
-         path.addRoundedRect(QRectF(o.rect.x() + startPoint, o.rect.y() + 4, rectWidth, ROW_HEIGHT - 8), 1, 1);
+         path.addRoundedRect(markerRect, 1, 1);
          painter->fillPath(path, *colorIter);
          painter->drawPath(path);
 
          // TODO: Fix this with a nicer way
          painter->setPen(QColor(*colorIter == graphTag ? textColorBright : textColorDark));
 
-         const auto fontRect = textBoundingRect.height();
-         const auto y = o.rect.y() + ROW_HEIGHT - (ROW_HEIGHT - fontRect) + 2;
          painter->setFont(o.font);
-         painter->drawText(o.rect.x() + startPoint + textPadding, y, nameToDisplay);
+         painter->drawText(markerRect, Qt::AlignCenter, nameToDisplay);
          painter->restore();
 
          startPoint += rectWidth + mark_spacing;
