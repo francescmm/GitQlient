@@ -12,6 +12,7 @@
 #include <QPinnableTabWidget.h>
 
 #include <QEvent>
+#include <QCommandLineParser>
 #include <QFile>
 #include <QFileDialog>
 #include <QMenu>
@@ -20,6 +21,7 @@
 #include <QPushButton>
 #include <QStackedLayout>
 #include <QTabBar>
+#include <QTextStream>
 #include <QToolButton>
 
 #include <QLogger.h>
@@ -27,20 +29,12 @@
 using namespace QLogger;
 
 GitQlient::GitQlient(QWidget *parent)
-   : GitQlient(QStringList(), parent)
-{
-}
-
-GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    : QWidget(parent)
    , mStackedLayout(new QStackedLayout(this))
    , mRepos(new QPinnableTabWidget())
    , mConfigWidget(new InitScreen())
 
 {
-
-   auto repos = parseArguments(arguments);
-
    QLog_Info("UI", "*******************************************");
    QLog_Info("UI", "*          GitQlient has started          *");
    QLog_Info("UI", QString("*                  %1                  *").arg(VER));
@@ -111,8 +105,6 @@ GitQlient::GitQlient(const QStringList &arguments, QWidget *parent)
    mConfigWidget->onRepoOpened();
 
    connect(mConfigWidget, &InitScreen::signalOpenRepo, this, &GitQlient::addRepoTab);
-
-   setRepositories(repos);
 
    const auto geometry = settings.globalValue("GitQlientGeometry", saveGeometry()).toByteArray();
 
@@ -234,67 +226,81 @@ void GitQlient::setRepositories(const QStringList &repositories)
       addRepoTab(repo);
 }
 
-void GitQlient::setArgumentsPostInit(const QStringList &arguments)
+bool GitQlient::setArgumentsPostInit(const QStringList &arguments)
 {
    QLog_Info("UI", QString("External call with the params {%1}").arg(arguments.join(",")));
 
-   const auto repos = parseArguments(arguments);
-
-   setRepositories(repos);
+   QStringList repos;
+   const auto ret = parseArguments(arguments, &repos);
+   if (ret)
+      setRepositories(repos);
+   return ret;
 }
 
-QStringList GitQlient::parseArguments(const QStringList &arguments)
+bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
 {
-
-   LogLevel logLevel;
+   bool ret = true;
    GitQlientSettings settings;
-
 #ifdef DEBUG
-   logLevel = LogLevel::Trace;
+   auto logLevel = LogLevel::Trace;
 #else
-   logLevel = static_cast<LogLevel>(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
+   auto logLevel = static_cast<LogLevel>(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
 #endif
+   bool areLogsDisabled = settings.globalValue("logsDisabled", true).toBool();
 
-   if (arguments.contains("-noLog") || settings.globalValue("logsDisabled", true).toBool())
-      QLoggerManager::getInstance()->pause();
-   else
-      QLoggerManager::getInstance()->overwriteLogLevel(logLevel);
+   QCommandLineParser parser;
+   parser.setApplicationDescription(tr("Multi-platform Git client written with Qt"));
+   parser.addPositionalArgument("repos", tr("Git repositories to open"), tr("[repos...]"));
 
-   QLog_Info("UI", QString("Getting arguments {%1}").arg(arguments.join(", ")));
+   const QCommandLineOption helpOption = parser.addHelpOption();
+   // We don't use parser.addVersionOption() because then it is handled by Qt and we want to show Git SHA also
+   const QCommandLineOption versionOption(QStringList() << "v" << "version", tr("Displays version information."));
+   parser.addOption(versionOption);
 
-   QStringList repos;
-   const auto argSize = arguments.count();
+   const QCommandLineOption noLogOption("no-log", tr("Disables logs."));
+   parser.addOption(noLogOption);
 
-   for (auto i = 0; i < argSize;)
+   const QCommandLineOption logLevelOption("log-level", tr("Sets log level."), tr("level"));
+   parser.addOption(logLevelOption);
+
+   parser.process(arguments);
+
+   *repos = parser.positionalArguments();
+   if (parser.isSet(noLogOption))
+      areLogsDisabled = true;
+
+   if (!areLogsDisabled)
    {
-      if (arguments.at(i) == "-repos")
+      if (parser.isSet(logLevelOption))
       {
-         while (++i < argSize && !arguments.at(i).startsWith("-"))
-            repos.append(arguments.at(i));
-      }
-      else
-      {
-         if (arguments.at(i) == "-logLevel")
+         const auto level = static_cast<LogLevel>(parser.value(logLevelOption).toInt());
+         if (level >= QLogger::LogLevel::Trace && level <= QLogger::LogLevel::Fatal)
          {
-            logLevel = static_cast<LogLevel>(arguments.at(++i).toInt());
-
-            if (logLevel >= QLogger::LogLevel::Trace && logLevel <= QLogger::LogLevel::Fatal)
-            {
-               const auto logger = QLoggerManager::getInstance();
-               logger->overwriteLogLevel(logLevel);
-
-               settings.setGlobalValue("logsLevel", static_cast<int>(logLevel));
-            }
+            logLevel = level;
+            settings.setGlobalValue("logsLevel", static_cast<int>(level));
          }
-
-         ++i;
       }
+
+      QLoggerManager::getInstance()->overwriteLogLevel(logLevel);
+      QLog_Info("UI", QString("Getting arguments {%1}").arg(arguments.join(", ")));
    }
+   else
+      QLoggerManager::getInstance()->pause();
+
+   if (parser.isSet(versionOption))
+   {
+      QTextStream out(stdout);
+      out << QCoreApplication::applicationName() << ' ' << tr("version") << ' ' << QCoreApplication::applicationVersion()
+          << " (" << tr("Git SHA ") << SHA_VER << ")\n";
+      ret = false;
+   }
+   if (parser.isSet(helpOption))
+      ret = false;
 
    const auto manager = QLoggerManager::getInstance();
    manager->addDestination("GitQlient.log", { "UI", "Git", "Cache" }, logLevel);
 
-   return repos;
+   return ret;
 }
 
 void GitQlient::addRepoTab(const QString &repoPath)

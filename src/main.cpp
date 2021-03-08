@@ -13,28 +13,27 @@ int main(int argc, char *argv[])
    qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "1");
 
    QApplication app(argc, argv);
-   QStringList arguments;
-
-   auto argNum = argc;
-
-   while (argNum--)
-      arguments.prepend(QString::fromUtf8(argv[argNum]));
 
    QApplication::setOrganizationName("CescSoftware");
    QApplication::setOrganizationDomain("francescmm.com");
    QApplication::setApplicationName("GitQlient");
+   QApplication::setApplicationVersion(VER);
    QApplication::setWindowIcon(QIcon(":/icons/GitQlientLogoIco"));
 
    QFontDatabase::addApplicationFont(":/DejaVuSans");
    QFontDatabase::addApplicationFont(":/DejaVuSansMono");
 
-   GitQlient mainWin(arguments);
-   mainWin.setFixedSize(1920, 1080);
-   mainWin.show();
+   QStringList repos;
+   if (GitQlient::parseArguments(app.arguments(), &repos))
+   {
+      GitQlient mainWin;
+      mainWin.setRepositories(repos);
+      mainWin.show();
 
-   QTimer::singleShot(500, &mainWin, &GitQlient::restorePinnedRepos);
+      QTimer::singleShot(500, &mainWin, &GitQlient::restorePinnedRepos);
 
-   const auto ret = app.exec();
+      return app.exec();
+   }
 
-   return ret;
+   return 0;
 }

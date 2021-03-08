@@ -50,13 +50,7 @@ public:
     \param parent The parent widget if needed.
    */
    explicit GitQlient(QWidget *parent = nullptr);
-   /*!
-    \brief Overloaded constructor. Takes a list of arguments and after parsing them, starts the GitQlient instance.
 
-    \param arguments Command prompt arguments.
-    \param parent The parent wiget if needed.
-   */
-   explicit GitQlient(const QStringList &arguments, QWidget *parent = nullptr);
    /*!
     \brief Destructor.
 
@@ -73,14 +67,25 @@ public:
     \brief In case that the GitQlient instance it's already initialize, the user can add arguments to be processed.
 
     \param arguments The list of arguments.
+    \return Returns true if application should continue or false if it should quit.
    */
-   void setArgumentsPostInit(const QStringList &arguments);
+   bool setArgumentsPostInit(const QStringList &arguments);
 
    /**
     * @brief restorePinnedRepos This method restores the pinned repos from the last session
     * @param pinnedRepos The list of repos to restore
     */
    void restorePinnedRepos();
+   
+   /*!
+    \brief This method parses all the arguments and configures GitQlient settings with them. Part of the arguments can
+    be a list of repositories to be opened. In that case, the method returns the list of repositories to open in the repos out parameter.
+
+    \param arguments Arguments from the command prompt.
+    \param repos Output paramter, repositories to open.
+    \return Returns true if application should continue or false if it should quit.
+   */
+   static bool parseArguments(const QStringList &arguments, QStringList *repos);
 
 protected:
    bool eventFilter(QObject *obj, QEvent *event) override;
@@ -94,14 +99,6 @@ private:
    ProgressDlg *mProgressDlg = nullptr;
    QString mPathToOpen;
 
-   /*!
-    \brief This method parses all the arguments and configures GitQlient settings with them. Part of the arguments can
-    be a list of repositories to be opened. In that case, the method returns the list of repositories to open.
-
-    \param arguments Arguments from the command prompt.
-    \return QStringList Returns the list of repositories to be opened. Empty if none is passed.
-   */
-   QStringList parseArguments(const QStringList &arguments);
    /*!
     \brief Opens a QFileDialog to select a repository in the local disk.
    */
