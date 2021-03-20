@@ -85,7 +85,7 @@ macos{
    dmg.commands += create-dmg \
          --volname $${TARGET} \
          --background $${PWD}/src/resources/dmg_bg.png \
-         --icon $${BUNDLE_FILENAME} 150 218 \
+         --icon $${PWD}/src/resources/icons/GitQlientLogo128.png 150 218 \
          --window-pos 200 120 \
          --window-size 600 450 \
          --icon-size 100 \
