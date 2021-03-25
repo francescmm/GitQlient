@@ -36,6 +36,7 @@ public:
 
    GitExecResult pushBranch(const QString &branchName, bool force = false);
    GitExecResult push(bool force = false);
+   GitExecResult pushCommit(const QString &sha, const QString &remoteBranch);
    GitExecResult pull();
    bool fetch();
    GitExecResult prune();

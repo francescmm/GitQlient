@@ -59,6 +59,8 @@ public:
 
    CommitInfo searchCommitInfo(const QString &text, int startingPoint = 0, bool reverse = false);
 
+   bool isCommitInCurrentGeneologyTree(const QString &sha) const;
+
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    RevisionFiles revisionFile(const QString &sha1, const QString &sha2) const;
 
@@ -102,4 +104,5 @@ private:
    auto searchCommit(const QString &text, int startingPoint = 0) const;
    auto reverseSearchCommit(const QString &text, int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);
+   bool checkSha(const QString &originalSha, const QString &currentSha) const;
 };

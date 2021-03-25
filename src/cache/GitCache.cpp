@@ -150,6 +150,11 @@ CommitInfo GitCache::searchCommitInfo(const QString &text, int startingPoint, bo
    return commit;
 }
 
+bool GitCache::isCommitInCurrentGeneologyTree(const QString &sha) const
+{
+   return checkSha(sha, CommitInfo::ZERO_SHA);
+}
+
 CommitInfo GitCache::commitInfo(const QString &sha)
 {
    QMutexLocker lock(&mMutex);
@@ -386,6 +391,19 @@ void GitCache::resetLanes(const CommitInfo &c, bool isFork)
       mLanes.afterFork();
    if (mLanes.isBranch())
       mLanes.afterBranch();
+}
+
+bool GitCache::checkSha(const QString &originalSha, const QString &currentSha) const
+{
+   if (originalSha == currentSha)
+      return true;
+   else
+   {
+      if (const auto iter = mCommitsMap.find(currentSha); iter != mCommitsMap.cend())
+         return checkSha(originalSha, iter->parent(0));
+
+      return false;
+   }
 }
 
 int GitCache::commitCount() const

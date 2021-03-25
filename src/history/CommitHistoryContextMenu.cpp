@@ -120,6 +120,11 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
                const auto fetchAction = addAction(tr("Fetch"));
                connect(fetchAction, &QAction::triggered, this, &CommitHistoryContextMenu::fetch);
             }
+            else if (mCache->isCommitInCurrentGeneologyTree(mShas.first()))
+            {
+               const auto pushAction = addAction(tr("Push"));
+               connect(pushAction, &QAction::triggered, this, &CommitHistoryContextMenu::push);
+            }
          }
 
          const auto resetMenu = addMenu(tr("Reset"));
@@ -404,7 +409,7 @@ void CommitHistoryContextMenu::push()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
-   const auto ret = git->push();
+   const auto ret = git->pushCommit(mShas.first(), mGit->getCurrentBranch());
    QApplication::restoreOverrideCursor();
 
    if (ret.output.toString().contains("has no upstream branch"))

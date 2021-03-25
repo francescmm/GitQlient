@@ -2,8 +2,8 @@
 
 #include <GitBase.h>
 #include <GitConfig.h>
-#include <GitSubmodules.h>
 #include <GitQlientSettings.h>
+#include <GitSubmodules.h>
 
 #include <QLogger.h>
 
@@ -37,6 +37,17 @@ GitExecResult GitRemote::push(bool force)
    const auto ret = mGitBase->run(QString("git push ").append(force ? QString("--force") : QString()));
 
    return ret;
+}
+
+GitExecResult GitRemote::pushCommit(const QString &sha, const QString &remoteBranch)
+{
+   QLog_Debug("Git", QString("Executing pushCommit"));
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+   const auto remote = gitConfig->getRemoteForBranch(remoteBranch);
+
+   return mGitBase->run(QString("git push %1 %2:refs/heads/%3")
+                            .arg(remote.success ? remote.output.toString() : QString("origin"), sha, remoteBranch));
 }
 
 GitExecResult GitRemote::pull()
