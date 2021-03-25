@@ -11,8 +11,8 @@
 #include <ProgressDlg.h>
 #include <QPinnableTabWidget.h>
 
-#include <QEvent>
 #include <QCommandLineParser>
+#include <QEvent>
 #include <QFile>
 #include <QFileDialog>
 #include <QMenu>
@@ -66,9 +66,9 @@ GitQlient::GitQlient(QWidget *parent)
 
    GitQlientSettings settings;
    const auto recent = new QMenu("Recent repos", menu);
-   const auto recentProjects = settings.getMostUsedProjects();
+   const auto projects = settings.getRecentProjects();
 
-   for (const auto &project : recentProjects)
+   for (const auto &project : projects)
    {
       const auto projectName = project.mid(project.lastIndexOf("/") + 1);
       const auto action = recent->addAction(projectName);
@@ -79,9 +79,9 @@ GitQlient::GitQlient(QWidget *parent)
    menu->addMenu(recent);
 
    const auto mostUsed = new QMenu("Most used repos", menu);
-   const auto projects = settings.getRecentProjects();
+   const auto recentProjects = settings.getMostUsedProjects();
 
-   for (const auto &project : projects)
+   for (const auto &project : recentProjects)
    {
       const auto projectName = project.mid(project.lastIndexOf("/") + 1);
       const auto action = mostUsed->addAction(projectName);
@@ -244,7 +244,8 @@ bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
 #ifdef DEBUG
    auto logLevel = LogLevel::Trace;
 #else
-   auto logLevel = static_cast<LogLevel>(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
+   auto logLevel
+       = static_cast<LogLevel>(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
 #endif
    bool areLogsDisabled = settings.globalValue("logsDisabled", true).toBool();
 
@@ -254,7 +255,9 @@ bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
 
    const QCommandLineOption helpOption = parser.addHelpOption();
    // We don't use parser.addVersionOption() because then it is handled by Qt and we want to show Git SHA also
-   const QCommandLineOption versionOption(QStringList() << "v" << "version", tr("Displays version information."));
+   const QCommandLineOption versionOption(QStringList() << "v"
+                                                        << "version",
+                                          tr("Displays version information."));
    parser.addOption(versionOption);
 
    const QCommandLineOption noLogOption("no-log", tr("Disables logs."));
@@ -290,8 +293,8 @@ bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
    if (parser.isSet(versionOption))
    {
       QTextStream out(stdout);
-      out << QCoreApplication::applicationName() << ' ' << tr("version") << ' ' << QCoreApplication::applicationVersion()
-          << " (" << tr("Git SHA ") << SHA_VER << ")\n";
+      out << QCoreApplication::applicationName() << ' ' << tr("version") << ' '
+          << QCoreApplication::applicationVersion() << " (" << tr("Git SHA ") << SHA_VER << ")\n";
       ret = false;
    }
    if (parser.isSet(helpOption))
