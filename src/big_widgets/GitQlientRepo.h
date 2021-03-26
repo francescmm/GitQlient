@@ -24,8 +24,8 @@
  ***************************************************************************************/
 
 #include <QFrame>
-#include <QThread>
 #include <QPointer>
+#include <QThread>
 
 class GitBase;
 class GitQlientSettings;
@@ -262,7 +262,7 @@ private:
     * \brief Configures the merge widget when a conflict happens and is due to a cherry-pick. The conflicts are shown in
     * the merge view.
     */
-   void showCherryPickConflict();
+   void showCherryPickConflict(const QStringList &shas = QStringList());
    /*!
     * \brief Configures the merge widget when a conflict happens and is due to a pull. The conflicts are shown in the
     * merge view.

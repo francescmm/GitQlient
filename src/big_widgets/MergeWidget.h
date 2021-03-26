@@ -84,6 +84,13 @@ public:
     */
    void configure(const RevisionFiles &files, ConflictReason reason);
 
+   /**
+    * @brief Configures the merge widget by giving the current revisions files that are part of the merge.
+    *
+    * @param files The RevisionFiles data.
+    */
+   void configureForCherryPick(const RevisionFiles &files, const QStringList &pendingShas = QStringList());
+
 private:
    QSharedPointer<GitCache> mGitQlientCache;
    QSharedPointer<GitBase> mGit;
@@ -96,6 +103,7 @@ private:
    ConflictReason mReason = ConflictReason::Merge;
    QStackedWidget *mStacked = nullptr;
    FileDiffWidget *mFileDiff = nullptr;
+   QStringList mPendingShas;
 
    /**
     * @brief Fills both lists of ConflictButton.
@@ -130,4 +138,6 @@ private:
     * @param fileName The file name of the file whose conflict is resolved.
     */
    void onConflictResolved(const QString &fileName);
+
+   void cherryPickCommit();
 };

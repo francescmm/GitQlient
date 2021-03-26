@@ -211,6 +211,17 @@ void CommitHistoryContextMenu::createMultipleShasMenu()
       const auto copyShaAction = addAction(tr("Copy all SHA"));
       connect(copyShaAction, &QAction::triggered, this,
               [this]() { QApplication::clipboard()->setText(mShas.join(',')); });
+
+      auto allShaNotInCurrentBranch = true;
+
+      for (const auto &sha : qAsConst(mShas))
+         allShaNotInCurrentBranch &= mCache->isCommitInCurrentGeneologyTree(sha);
+
+      if (allShaNotInCurrentBranch)
+      {
+         const auto cherryPickAction = addAction(tr("Cherry pick ALL commits"));
+         connect(cherryPickAction, &QAction::triggered, this, &CommitHistoryContextMenu::cherryPickCommit);
+      }
    }
    else
       QLog_Warning("UI", "WIP selected as part of a series of SHAs");
@@ -360,29 +371,35 @@ void CommitHistoryContextMenu::checkoutCommit()
 
 void CommitHistoryContextMenu::cherryPickCommit()
 {
-   QScopedPointer<GitLocal> git(new GitLocal(mGit));
-   const auto ret = git->cherryPickCommit(mShas.first());
-
-   if (ret.success)
-      emit requestReload(false);
-   else
+   auto shas = mShas;
+   for (const auto &sha : qAsConst(mShas))
    {
-      const auto errorMsg = ret.output.toString();
+      QScopedPointer<GitLocal> git(new GitLocal(mGit));
+      const auto ret = git->cherryPickCommit(sha);
 
-      if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
-          && errorMsg.contains("after resolving the conflicts", Qt::CaseInsensitive))
+      shas.takeFirst();
+
+      if (ret.success && shas.isEmpty())
+         emit requestReload(false);
+      else if (!ret.success)
       {
-         emit signalCherryPickConflict();
-      }
-      else
-      {
-         QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
-                            tr("There were problems during the cherry-pich operation. Please, see the detailed "
-                               "description for more information."),
-                            QMessageBox::Ok, this);
-         msgBox.setDetailedText(errorMsg);
-         msgBox.setStyleSheet(GitQlientStyles::getStyles());
-         msgBox.exec();
+         const auto errorMsg = ret.output.toString();
+
+         if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
+             && errorMsg.contains("after resolving the conflicts", Qt::CaseInsensitive))
+         {
+            emit signalCherryPickConflict(shas);
+         }
+         else
+         {
+            QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
+                               tr("There were problems during the cherry-pich operation. Please, see the detailed "
+                                  "description for more information."),
+                               QMessageBox::Ok, this);
+            msgBox.setDetailedText(errorMsg);
+            msgBox.setStyleSheet(GitQlientStyles::getStyles());
+            msgBox.exec();
+         }
       }
    }
 }
@@ -554,13 +571,10 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
    }
 
    QList<QAction *> branchesToCheckout;
-   auto isCommitInCurrentBranch = false;
    const auto currentBranch = mGit->getCurrentBranch();
 
    for (const auto &pair : branchTracking.toStdMap())
    {
-      isCommitInCurrentBranch |= pair.first == currentBranch;
-
       if (!branchTracking.isEmpty() && pair.first != currentBranch
           && pair.first != QString("origin/%1").arg(currentBranch))
       {
@@ -582,7 +596,7 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
       branchMenu->addActions(branchesToCheckout);
    }
 
-   if (!isCommitInCurrentBranch)
+   if (!mCache->isCommitInCurrentGeneologyTree(sha))
    {
       for (const auto &pair : branchTracking.toStdMap())
       {
@@ -594,13 +608,12 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
             connect(mergeBranchAction, &QAction::triggered, this, [this, pair]() { merge(pair.first); });
          }
       }
-   }
 
-   addSeparator();
+      addSeparator();
 
-   if (!isCommitInCurrentBranch)
-   {
       const auto cherryPickAction = addAction(tr("Cherry pick commit"));
       connect(cherryPickAction, &QAction::triggered, this, &CommitHistoryContextMenu::cherryPickCommit);
    }
+   else
+      addSeparator();
 }

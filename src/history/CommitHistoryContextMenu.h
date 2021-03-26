@@ -77,7 +77,7 @@ signals:
    /*!
     * \brief signalConflict Signal triggered when trying to cherry-pick and a conflict happens.
     */
-   void signalCherryPickConflict();
+   void signalCherryPickConflict(const QStringList &pendingShas = QStringList());
    /*!
     * \brief signalPullConflict Signal triggered when trying to pull and a conflict happens.
     */

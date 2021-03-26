@@ -426,7 +426,7 @@ void GitQlientRepo::showWarningMerge()
 }
 
 // TODO: Optimize
-void GitQlientRepo::showCherryPickConflict()
+void GitQlientRepo::showCherryPickConflict(const QStringList &shas)
 {
    showMergeView();
 
@@ -437,7 +437,7 @@ void GitQlientRepo::showCherryPickConflict()
 
    const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
 
-   mMergeWidget->configure(files, MergeWidget::ConflictReason::CherryPick);
+   mMergeWidget->configureForCherryPick(files, shas);
 }
 
 // TODO: Optimize

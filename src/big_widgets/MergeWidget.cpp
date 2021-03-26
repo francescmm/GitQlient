@@ -9,6 +9,7 @@
 #include <GitMerge.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
+#include <GitWip.h>
 #include <QPinnableTabWidget.h>
 #include <RevisionFiles.h>
 
@@ -134,6 +135,29 @@ void MergeWidget::configure(const RevisionFiles &files, ConflictReason reason)
    fillButtonFileList(files);
 }
 
+void MergeWidget::configureForCherryPick(const RevisionFiles &files, const QStringList &pendingShas)
+{
+   mReason = ConflictReason::CherryPick;
+   mPendingShas = pendingShas;
+
+   mConflictFiles->clear();
+   mMergedFiles->clear();
+   mFileDiff->clear();
+
+   QFile mergeMsg(QString(mGit->getGitDir() + QString::fromUtf8("/MERGE_MSG")));
+
+   if (mergeMsg.open(QIODevice::ReadOnly))
+   {
+      const auto summary = QString::fromUtf8(mergeMsg.readLine()).trimmed();
+      const auto description = QString::fromUtf8(mergeMsg.readAll()).trimmed();
+      mCommitTitle->setText(summary);
+      mDescription->setText(description);
+      mergeMsg.close();
+   }
+
+   fillButtonFileList(files);
+}
+
 void MergeWidget::fillButtonFileList(const RevisionFiles &files)
 {
    for (auto i = 0; i < files.count(); ++i)
@@ -194,6 +218,7 @@ void MergeWidget::abort()
    }
    else
    {
+      mPendingShas.clear();
       removeMergeComponents();
 
       emit signalMergeFinished();
@@ -235,6 +260,8 @@ void MergeWidget::commit()
    {
       removeMergeComponents();
 
+      if (!mPendingShas.isEmpty()) { }
+
       emit signalMergeFinished();
    }
 }
@@ -268,4 +295,50 @@ void MergeWidget::onConflictResolved(const QString &)
 
    mFileDiff->clear();
    mStacked->setCurrentIndex(0);
+}
+
+void MergeWidget::cherryPickCommit()
+{
+   auto shas = mPendingShas;
+   for (const auto &sha : qAsConst(mPendingShas))
+   {
+      QScopedPointer<GitLocal> git(new GitLocal(mGit));
+      const auto ret = git->cherryPickCommit(sha);
+
+      shas.takeFirst();
+
+      if (ret.success && shas.isEmpty())
+         emit signalMergeFinished();
+      else if (!ret.success)
+      {
+         const auto errorMsg = ret.output.toString();
+
+         if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
+             && errorMsg.contains("after resolving the conflicts", Qt::CaseInsensitive))
+         {
+            const auto wipCommit = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
+
+            QScopedPointer<GitWip> git(new GitWip(mGit, mGitQlientCache));
+            git->updateWip();
+
+            const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+
+            configureForCherryPick(files, shas);
+         }
+         else
+         {
+            QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
+                               tr("There were problems during the cherry-pich operation. Please, see the detailed "
+                                  "description for more information."),
+                               QMessageBox::Ok, this);
+            msgBox.setDetailedText(errorMsg);
+            msgBox.setStyleSheet(GitQlientStyles::getStyles());
+            msgBox.exec();
+
+            mPendingShas.clear();
+
+            emit signalMergeFinished();
+         }
+      }
+   }
 }

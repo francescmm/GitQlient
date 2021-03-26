@@ -133,7 +133,7 @@ signals:
    /*!
     * \brief signalConflict Signal triggered when trying to cherry-pick or pull and a conflict happens.
     */
-   void signalCherryPickConflict();
+   void signalCherryPickConflict(const QStringList &pendingShas);
    /*!
     * \brief signalPullConflict Signal triggered when trying to pull and a conflict happens.
     */

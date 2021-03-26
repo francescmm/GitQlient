@@ -507,7 +507,7 @@ void HistoryWidget::cherryPickCommit()
          if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
              || errorMsg.contains(" conflict", Qt::CaseInsensitive))
          {
-            emit signalCherryPickConflict();
+            emit signalCherryPickConflict(QStringList());
          }
          else
          {
