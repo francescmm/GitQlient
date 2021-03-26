@@ -60,6 +60,8 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
 
    connect(addAction(tr("Delete file")), &QAction::triggered, this, &UnstagedMenu::onDeleteFile);
 
+   connect(addAction(tr("Delete ALL untracked files")), &QAction::triggered, this, &UnstagedMenu::deleteUntracked);
+
    connect(ignoreMenu->addAction(tr("Ignore extension")), &QAction::triggered, this, [this]() {
       const auto msgBoxRet = QMessageBox::question(
           this, tr("Ignoring extension"), tr("Are you sure you want to add the file extension to the black list?"));

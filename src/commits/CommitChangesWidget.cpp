@@ -38,6 +38,8 @@ enum GitQlientRole
 {
    U_ListRole = Qt::UserRole,
    U_IsConflict,
+   U_IsUntracked,
+   U_FullPath
 };
 
 CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
@@ -155,6 +157,29 @@ QColor CommitChangesWidget::getColorForFile(const RevisionFiles &files, int inde
    return myColor;
 }
 
+void CommitChangesWidget::deleteUntrackedFiles()
+{
+   for (auto i = 0; i < ui->unstagedFilesList->count(); ++i)
+   {
+      const auto item = ui->unstagedFilesList->item(i);
+
+      if (item->data(GitQlientRole::U_IsUntracked).toBool())
+      {
+         const auto path = QString("%1").arg(item->data(GitQlientRole::U_FullPath).toString());
+
+         QLog_Info("UI", "Removing path: " + path);
+
+         QProcess p;
+         p.setWorkingDirectory(mGit->getWorkingDir());
+         p.start("rm", { "-rf", path });
+
+         p.waitForFinished();
+      }
+   }
+
+   emit signalCheckoutPerformed();
+}
+
 void CommitChangesWidget::prepareCache()
 {
    for (auto it = mInternalCache.begin(); it != mInternalCache.end(); ++it)
@@ -188,6 +213,7 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
       const auto isConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
       const auto isPartiallyCached = files.statusCmp(i, RevisionFiles::PARTIALLY_CACHED);
       const auto staged = isInIndex && !isUnknown && !isConflict;
+      const auto untrackedFile = !isInIndex && isUnknown;
       auto wip = QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName());
 
       if (staged || isPartiallyCached)
@@ -195,8 +221,8 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
          if (!mInternalCache.contains(wip))
          {
             const auto color = getColorForFile(files, i);
-            const auto itemPair
-                = fillFileItemInfo(fileName, isConflict, QString(":/icons/remove"), color, ui->stagedFilesList);
+            const auto itemPair = fillFileItemInfo(fileName, isConflict, untrackedFile, QString(":/icons/remove"),
+                                                   color, ui->stagedFilesList);
             connect(itemPair.second, &FileWidget::clicked, this, [this, item = itemPair.first]() { resetFile(item); });
 
             ui->stagedFilesList->setItemWidget(itemPair.first, itemPair.second);
@@ -219,7 +245,8 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
             if (!files.statusCmp(i, RevisionFiles::NEW) && color == GitQlientStyles::getGreen())
                color = GitQlientStyles::getTextColor();
 
-            const auto itemPair = fillFileItemInfo(fileName, isConflict, QString(":/icons/add"), color, fileList);
+            const auto itemPair
+                = fillFileItemInfo(fileName, isConflict, untrackedFile, QString(":/icons/add"), color, fileList);
 
             connect(itemPair.second, &FileWidget::clicked, this,
                     [this, item = itemPair.first]() { addFileToCommitList(item); });
@@ -234,11 +261,13 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
 }
 
 QPair<QListWidgetItem *, FileWidget *> CommitChangesWidget::fillFileItemInfo(const QString &file, bool isConflict,
-                                                                             const QString &icon, const QColor &color,
-                                                                             QListWidget *parent)
+                                                                             bool isUntracked, const QString &icon,
+                                                                             const QColor &color, QListWidget *parent)
 {
    auto modName = file;
    auto item = new QListWidgetItem(parent);
+
+   item->setData(GitQlientRole::U_FullPath, file);
 
    if (isConflict)
    {
@@ -248,6 +277,7 @@ QPair<QListWidgetItem *, FileWidget *> CommitChangesWidget::fillFileItemInfo(con
    }
 
    item->setData(GitQlientRole::U_ListRole, QVariant::fromValue(parent));
+   item->setData(GitQlientRole::U_IsUntracked, isUntracked);
    item->setToolTip(modName);
 
    QFontMetrics metrix(item->font());
@@ -490,6 +520,7 @@ void CommitChangesWidget::showUnstagedMenu(const QPoint &pos)
       connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &CommitChangesWidget::signalCheckoutPerformed);
       connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &CommitChangesWidget::signalShowFileHistory);
       connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
+      connect(contextMenu, &UnstagedMenu::deleteUntracked, this, &CommitChangesWidget::deleteUntrackedFiles);
 
       const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
       contextMenu->popup(mapToGlobal(parentPos));

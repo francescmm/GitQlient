@@ -40,6 +40,7 @@ signals:
    void signalShowFileHistory(const QString &fileName);
    void signalEditFile(const QString &fullFilePath);
    void signalStageFile();
+   void deleteUntracked();
 
 public:
    explicit UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, QWidget *parent = nullptr);
