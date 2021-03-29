@@ -223,9 +223,14 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    rearrangeSplittrer(minimalActive);
 
-   mSplitter->setSizes({ 250, QApplication::primaryScreen()->geometry().width() - 500, branchesWidth });
-
    connect(mBranchesWidget, &BranchesWidget::minimalViewStateChanged, this, &HistoryWidget::rearrangeSplittrer);
+
+   const auto splitterSate = mSettings->localValue("HistoryWidgetState", QByteArray()).toByteArray();
+
+   if (splitterSate.isEmpty())
+      mSplitter->setSizes({ 250, QApplication::primaryScreen()->geometry().width() - 500, branchesWidth });
+   else
+      mSplitter->restoreState(splitterSate);
 
    const auto layout = new QHBoxLayout(this);
    layout->addWidget(mSplitter);
@@ -244,6 +249,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
 HistoryWidget::~HistoryWidget()
 {
+   mSettings->setLocalValue("HistoryWidgetState", mSplitter->saveState());
+
    delete mItemDelegate;
    delete mRepositoryModel;
 }
