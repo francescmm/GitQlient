@@ -44,6 +44,7 @@ class QPushButton;
 class GitServerCache;
 class QLabel;
 class GitQlientSettings;
+class QSplitter;
 
 /*!
  \brief The HistoryWidget is responsible for showing the history of the repository. It is the first widget shown
@@ -274,6 +275,7 @@ private:
    QLabel *mUserName = nullptr;
    QLabel *mUserEmail = nullptr;
    bool mReverseSearch = false;
+   QSplitter *mSplitter = nullptr;
 
    /*!
     \brief Performs a search based on the input of the search QLineEdit with the users input.
@@ -346,4 +348,6 @@ private:
     * @param parentSha The commit SHA to compare with.
     */
    void showFullDiff();
+
+   void rearrangeSplittrer(bool minimalActive);
 };

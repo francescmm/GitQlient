@@ -258,6 +258,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
 
    mFullBranchFrame = new QFrame();
    mFullBranchFrame->setObjectName("FullBranchesWidget");
+
    const auto mainBranchLayout = new QHBoxLayout(mFullBranchFrame);
    mainBranchLayout->setContentsMargins(QMargins());
    mainBranchLayout->setSpacing(0);
@@ -316,6 +317,12 @@ BranchesWidget::~BranchesWidget()
    delete mLocalDelegate;
    delete mRemotesDelegate;
    delete mTagsDelegate;
+}
+
+bool BranchesWidget::isMinimalViewActive() const
+{
+   GitQlientSettings settings(mGit->getGitDir());
+   return settings.localValue("MinimalBranchesView", false).toBool();
 }
 
 void BranchesWidget::showBranches()
@@ -398,6 +405,8 @@ void BranchesWidget::fullView()
    mFullBranchFrame->setVisible(true);
    mMinimal->setVisible(false);
 
+   emit minimalViewStateChanged(false);
+
    GitQlientSettings settings(mGit->getGitDir());
    settings.setLocalValue("MinimalBranchesView", mMinimal->isVisible());
 }
@@ -411,6 +420,8 @@ void BranchesWidget::returnToSavedView()
    {
       mFullBranchFrame->setVisible(!savedState);
       mMinimal->setVisible(savedState);
+
+      emit minimalViewStateChanged(savedState);
    }
 }
 
@@ -426,6 +437,8 @@ void BranchesWidget::forceMinimalView()
 {
    mFullBranchFrame->setVisible(false);
    mMinimal->setVisible(true);
+
+   emit minimalViewStateChanged(true);
 }
 
 void BranchesWidget::onPanelsVisibilityChaned()

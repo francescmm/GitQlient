@@ -34,6 +34,8 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QScreen>
+#include <QSplitter>
 #include <QStackedWidget>
 
 using namespace QLogger;
@@ -52,6 +54,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    , mReturnFromFull(new QPushButton())
    , mUserName(new QLabel())
    , mUserEmail(new QLabel())
+   , mSplitter(new QSplitter())
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -84,7 +87,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    const auto wipFrame = new QFrame();
    wipFrame->setLayout(wipLayout);
-   wipFrame->setFixedWidth(250);
+   wipFrame->setMinimumWidth(250);
+   wipFrame->setMaximumWidth(500);
 
    connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mWipWidget, &WipWidget::signalChangesCommitted, this, &HistoryWidget::returnToView);
@@ -145,9 +149,9 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mRepositoryView->setEnabled(true);
 
    mBranchesWidget = new BranchesWidget(mCache, mGit);
+
    connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &HistoryWidget::signalUpdateCache);
    connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::onBranchCheckout);
-
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &HistoryWidget::goToSha);
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &HistoryWidget::signalOpenSubmodule);
@@ -209,12 +213,29 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
       showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
    });
 
+   mSplitter->insertWidget(0, wipFrame);
+   mSplitter->insertWidget(1, mCenterStackedWidget);
+   mSplitter->setCollapsible(1, false);
+   mSplitter->insertWidget(2, mBranchesWidget);
+
+   const auto minimalActive = mBranchesWidget->isMinimalViewActive();
+   const auto branchesWidth = minimalActive ? 50 : 250;
+
+   rearrangeSplittrer(minimalActive);
+
+   mSplitter->setSizes({ 250, QApplication::primaryScreen()->geometry().width() - 500, branchesWidth });
+
+   connect(mBranchesWidget, &BranchesWidget::minimalViewStateChanged, this, &HistoryWidget::rearrangeSplittrer);
+
    const auto layout = new QHBoxLayout(this);
+   layout->addWidget(mSplitter);
+   /*
    layout->setContentsMargins(QMargins());
    layout->setSpacing(10);
    layout->addWidget(wipFrame);
    layout->addWidget(mCenterStackedWidget);
    layout->addWidget(mBranchesWidget);
+   */
 
    mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
    mCenterStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -328,6 +349,21 @@ void HistoryWidget::showFullDiff()
    }
    else
       QMessageBox::warning(this, tr("No diff available!"), tr("There is no diff to show."));
+}
+
+void HistoryWidget::rearrangeSplittrer(bool minimalActive)
+{
+   if (minimalActive)
+   {
+      mBranchesWidget->setFixedWidth(50);
+      mSplitter->setCollapsible(2, false);
+   }
+   else
+   {
+      mBranchesWidget->setMinimumWidth(250);
+      mBranchesWidget->setMaximumWidth(500);
+      mSplitter->setCollapsible(2, true);
+   }
 }
 
 void HistoryWidget::onCommitTitleMaxLenghtChanged()

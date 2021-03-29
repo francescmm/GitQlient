@@ -560,7 +560,7 @@ HistoryWidget > #applyActionBtn
 
 CommitChangesWidget
 {
-   max-width: 250px;
+   max-width: 500px;
    min-width: 250px;
 }
 
@@ -778,12 +778,6 @@ BranchesWidget QTreeWidget::item
    min-height: 25px;
    max-height: 25px;
    padding-left: 15px;
-}
-
-#FullBranchesWidget
-{
-   min-width: 250px;
-   max-width: 250px;
 }
 
 #panelsFrame

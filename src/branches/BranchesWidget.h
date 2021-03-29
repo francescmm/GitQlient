@@ -90,6 +90,10 @@ signals:
     * \brief signalPullConflict Signal triggered when trying to pull and a conflict happens.
     */
    void signalPullConflict();
+   /**
+    * @brief minimalViewStateChanged Signal triggered when the minimal view is active.
+    */
+   void minimalViewStateChanged(bool isActive);
 
 public:
    /*!
@@ -105,6 +109,12 @@ public:
     * @brief Destructor;
     */
    ~BranchesWidget();
+
+   /**
+    * @brief isMinimalViewActive Checks if the minimal view is active.
+    * @return True if active, otherwise false.
+    */
+   bool isMinimalViewActive() const;
 
    /*!
     \brief This method configures the widget gathering all the information regarding branches, tags, stashes and
@@ -122,21 +132,12 @@ public:
 
    */
    void clear();
-   /**
-    * @brief fullView Shows the full branches view.
-    */
-   void fullView();
 
    /**
     * @brief returnToSavedView Returns to the view mode previously saved. This methods bypasses the forceMinimalView.
     * method.
     */
    void returnToSavedView();
-
-   /**
-    * @brief minimalView Shows the minimalistic branches view.
-    */
-   void minimalView();
 
    /**
     * @brief forceMinimalView Forces the minimal view but temporarily: id doesn't save the state.
@@ -173,6 +174,16 @@ private:
    QString mLastSearch;
    int mLastIndex;
    BranchTreeWidget *mLastTreeSearched = nullptr;
+
+   /**
+    * @brief fullView Shows the full branches view.
+    */
+   void fullView();
+
+   /**
+    * @brief minimalView Shows the minimalistic branches view.
+    */
+   void minimalView();
 
    /*!
     \brief Method that for a given \p branch process all the information and creates the item that will be stored in the
