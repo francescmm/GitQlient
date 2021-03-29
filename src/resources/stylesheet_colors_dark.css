@@ -372,13 +372,6 @@ PomodoroButton > QToolButton#Arrow:hover
    background: #606162;
 }
 
-PomodoroButton > QLabel
-{
-   qproperty-alignment: AlignCenter;
-   font-size: 7pt;
-   font-family: DejaVu Sans Mono;
-}
-
 #SearchInput
 {
     border-color: #202122;
@@ -552,7 +545,6 @@ DiffWidget > QPinnableTabWidget > QTabBar::tab:selected
 #lCounter
 {
     border-bottom-color: #404141;
-    font-size: 9pt;
 }
 
 CommitChangesWidget #wipSeparator

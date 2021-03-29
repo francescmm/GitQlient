@@ -433,6 +433,13 @@ GeneralConfigPage > QLabel#configLabel
     qproperty-alignment: AlignCenter;
 }
 
+PomodoroButton > QLabel
+{
+   qproperty-alignment: AlignCenter;
+   font-size: 7pt;
+   font-family: DejaVu Sans Mono;
+}
+
 /*********************************************/
 /*             Custom Widgets END            */
 /*********************************************/
@@ -629,13 +636,14 @@ CommitChangesWidget #wipSeparator
 
 #lCounter
 {
-    border-width: 1px;
-    border-style: solid;
-    border-left-width: 0;
-    font-family: "DejaVu Sans Mono";
-    max-width: 29px;
-    min-width: 29px;
-    qproperty-alignment: AlignCenter;
+   font-size: 9pt;
+   border-width: 1px;
+   border-style: solid;
+   border-left-width: 0;
+   font-family: "DejaVu Sans Mono";
+   max-width: 29px;
+   min-width: 29px;
+   qproperty-alignment: AlignCenter;
 }
 
 #leCommitTitle

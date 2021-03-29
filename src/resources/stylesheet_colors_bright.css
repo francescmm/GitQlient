@@ -360,13 +360,6 @@ PomodoroButton > QToolButton#Arrow:hover
    background: #EFEFEF;
 }
 
-PomodoroButton > QLabel
-{
-   qproperty-alignment: AlignCenter;
-   font-size: 7pt;
-   font-family: DejaVu Sans Mono;
-}
-
 #SearchInput
 {
    border-color: #2E2F30;
@@ -561,7 +554,6 @@ CommitChangesWidget, WipWidget, AmendWidget
 #lCounter
 {
    border-bottom-color: #C6C6C7;
-   font-size: 9pt;
 }
 
 #stagedFilesList, #unstagedFilesList
