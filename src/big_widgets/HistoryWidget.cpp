@@ -84,7 +84,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    const auto wipFrame = new QFrame();
    wipFrame->setLayout(wipLayout);
-   wipFrame->setFixedWidth(350);
+   wipFrame->setFixedWidth(250);
 
    connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mWipWidget, &WipWidget::signalChangesCommitted, this, &HistoryWidget::returnToView);

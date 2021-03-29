@@ -560,8 +560,8 @@ HistoryWidget > #applyActionBtn
 
 CommitChangesWidget
 {
-   max-width: 350px;
-   min-width: 350px;
+   max-width: 250px;
+   min-width: 250px;
 }
 
 CommitChangesWidget > #applyActionBtn, CommitChangesWidget > #warningButton
@@ -701,8 +701,8 @@ CommitChangesWidget #wipSeparator
 
 CommitInfoWidget
 {
-    max-width: 348px;
-    min-width: 348px;
+    max-width: 248px;
+    min-width: 248px;
     border: 1px solid #202122;
 }
 
