@@ -243,11 +243,12 @@ bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
    GitQlientSettings settings;
 #ifdef DEBUG
    auto logLevel = LogLevel::Trace;
+   bool areLogsDisabled = false;
 #else
    auto logLevel
        = static_cast<LogLevel>(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
-#endif
    bool areLogsDisabled = settings.globalValue("logsDisabled", true).toBool();
+#endif
 
    QCommandLineParser parser;
    parser.setApplicationDescription(tr("Multi-platform Git client written with Qt"));
