@@ -130,7 +130,7 @@ void CreateRepoDlg::accept()
       if (ret.success)
       {
          if (ui->cbGitUser->isChecked())
-            mGit->setLocalUserInfo({ ui->leGitName->text(), ui->leGitEmail->text() });
+            mGit->setLocalUserInfo({ ui->leGitName->text().trimmed(), ui->leGitEmail->text().trimmed() });
 
          if (ui->chbOpen->isChecked())
             emit signalOpenWhenFinish(fullPath);
