@@ -549,11 +549,11 @@ HistoryWidget > QLineEdit
    padding-left: 10px;
 }
 
-HistoryWidget > #applyActionBtn
+#cherryPickBtn
 {
-   max-height: 20px;
-   min-height: 20px;
-   padding: 2px 5px;
+   max-height: 27px;
+   min-height: 27px;
+   padding: 0px 5px;
 }
 
 

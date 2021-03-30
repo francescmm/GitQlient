@@ -397,14 +397,14 @@ PullDlg QLabel#lQuestion
    background-color: rgba(255, 85, 85, 0.65);
 }
 
-#applyActionBtn
+#applyActionBtn, #cherryPickBtn
 {
    border-style: solid;
    border-color: #8DC944;
    background-color: rgba(141, 201, 68, 0.45);
 }
 
-#applyActionBtn:hover, #applyActionBtn:pressed
+#applyActionBtn:hover, #applyActionBtn:pressed, #cherryPickBtn:hover, #cherryPickBtn:pressed
 {
    background-color: rgba(141, 201, 68, 0.65);
 }
