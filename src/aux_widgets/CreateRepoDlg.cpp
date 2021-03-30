@@ -6,8 +6,8 @@
 #include <GitQlientStyles.h>
 
 #include <QFileDialog>
-#include <QMessageBox>
 #include <QLogger.h>
+#include <QMessageBox>
 
 using namespace QLogger;
 
@@ -82,8 +82,8 @@ void CreateRepoDlg::showGitControls()
 
 void CreateRepoDlg::accept()
 {
-   auto path = ui->lePath->text();
-   auto repoName = ui->leRepoName->text();
+   auto path = ui->lePath->text().trimmed();
+   auto repoName = ui->leRepoName->text().trimmed();
 
    if (!path.isEmpty() && !repoName.isEmpty())
    {
@@ -97,7 +97,7 @@ void CreateRepoDlg::accept()
 
       if (mType == CreateRepoDlgType::CLONE)
       {
-         const auto url = ui->leURL->text();
+         const auto url = ui->leURL->text().trimmed();
 
          if (!url.isEmpty())
          {
