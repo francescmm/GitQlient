@@ -58,7 +58,7 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
 
    ui->lCounter->setText(QString::number(mTitleMaxLength));
    ui->leCommitTitle->setMaxLength(mTitleMaxLength);
-   ui->teDescription->setMaximumHeight(125);
+   ui->teDescription->setMaximumHeight(100);
 
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitChangesWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitChangesWidget::commitChanges);

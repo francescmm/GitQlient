@@ -182,7 +182,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mBtnGroup->addButton(mMergeWarning, static_cast<int>(ControlsMainViews::Merge));
 
    const auto vLayout = new QVBoxLayout(this);
-   vLayout->setContentsMargins(0, 10, 0, 10);
+   vLayout->setContentsMargins(0, 5, 0, 0);
    vLayout->setSpacing(10);
    vLayout->addLayout(hLayout);
    vLayout->addWidget(mMergeWarning);

@@ -250,14 +250,13 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    panelsFrame->setLayout(panelsLayout);
 
    const auto vLayout = new QVBoxLayout();
-   vLayout->setContentsMargins(0, 0, 10, 0);
+   vLayout->setContentsMargins(0, 0, 0, 0);
    vLayout->setSpacing(0);
    vLayout->addLayout(mainControlsLayout);
    vLayout->addSpacing(5);
    vLayout->addWidget(panelsFrame);
 
    mFullBranchFrame = new QFrame();
-   mFullBranchFrame->setObjectName("FullBranchesWidget");
 
    const auto mainBranchLayout = new QHBoxLayout(mFullBranchFrame);
    mainBranchLayout->setContentsMargins(QMargins());

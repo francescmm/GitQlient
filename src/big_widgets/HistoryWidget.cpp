@@ -81,7 +81,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    const auto wipLayout = new QVBoxLayout();
    wipLayout->setContentsMargins(QMargins());
-   wipLayout->setSpacing(10);
+   wipLayout->setSpacing(5);
    wipLayout->addWidget(wipInfoFrame);
    wipLayout->addWidget(mCommitStackedWidget);
 
@@ -201,6 +201,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    fullLayout->addWidget(mFullDiffWidget, 1, 0, 1, 2);
 
    mCenterStackedWidget = new QStackedWidget();
+   mCenterStackedWidget->setMinimumWidth(800);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mFileDiff);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FullDiff), fullFrame);
@@ -233,14 +234,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
       mSplitter->restoreState(splitterSate);
 
    const auto layout = new QHBoxLayout(this);
-   layout->addWidget(mSplitter);
-   /*
    layout->setContentsMargins(QMargins());
-   layout->setSpacing(10);
-   layout->addWidget(wipFrame);
-   layout->addWidget(mCenterStackedWidget);
-   layout->addWidget(mBranchesWidget);
-   */
+   layout->addWidget(mSplitter);
 
    mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
    mCenterStackedWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

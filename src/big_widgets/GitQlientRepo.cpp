@@ -77,6 +77,14 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
 
    mGitServerCache->init(serverUrl, repoInfo);
 
+   mHistoryWidget->setContentsMargins(QMargins(5, 5, 5, 5));
+   mDiffWidget->setContentsMargins(QMargins(5, 5, 5, 5));
+   mBlameWidget->setContentsMargins(QMargins(5, 5, 5, 5));
+   mMergeWidget->setContentsMargins(QMargins(5, 5, 5, 5));
+   mGitServerWidget->setContentsMargins(QMargins(5, 5, 5, 5));
+   mJenkins->setContentsMargins(QMargins(5, 5, 5, 5));
+   mConfigWidget->setContentsMargins(QMargins(5, 5, 5, 5));
+
    mStackedLayout->addWidget(mHistoryWidget);
    mStackedLayout->addWidget(mDiffWidget);
    mStackedLayout->addWidget(mBlameWidget);
@@ -85,11 +93,13 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    mStackedLayout->addWidget(mJenkins);
    mStackedLayout->addWidget(mConfigWidget);
 
-   const auto mainLayout = new QVBoxLayout(this);
+   const auto mainLayout = new QVBoxLayout();
    mainLayout->setSpacing(0);
-   mainLayout->setContentsMargins(10, 0, 0, 10);
+   mainLayout->setContentsMargins(QMargins());
    mainLayout->addWidget(mControls);
    mainLayout->addLayout(mStackedLayout);
+
+   setLayout(mainLayout);
 
    showHistoryView();
 
