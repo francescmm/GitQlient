@@ -66,6 +66,10 @@ For more information on [Qt translation system](https://doc.qt.io/qt-5/linguist-
 
 I'm aware that developers may like to have some more information beyond the User Manual. Whether you want to collaborate in the development or just to know how GitQlient works I think it's nice to have some development documentation. In the [Wiki section](https://github.com/francescmm/GitQlient/wiki) I will release class diagrams, sequence diagrams as well as the Release Plan an features. Take a look!
 
+### Hot to build GitQlient
+
+In the [User Manual](https://francescmm.github.io/GitQlient/#appendix-b-build) you can find a whole section about building GitQlient and what dependencies you need.
+
 ## Licenses
 
 Most of the icons on GitQlient are from Font Awesome. [The license states is GPL friendly](https://fontawesome.com/license/free). Those icons that are not from Font Awesome are custom made icons.
