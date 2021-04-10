@@ -202,7 +202,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    fullLayout->addWidget(mFullDiffWidget, 1, 0, 1, 2);
 
    mCenterStackedWidget = new QStackedWidget();
-   mCenterStackedWidget->setMinimumWidth(800);
+   mCenterStackedWidget->setMinimumWidth(600);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mFileDiff);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FullDiff), fullFrame);
@@ -230,7 +230,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    const auto splitterSate = mSettings->localValue("HistoryWidgetState", QByteArray()).toByteArray();
 
    if (splitterSate.isEmpty())
-      mSplitter->setSizes({ 200, 600, branchesWidth });
+      mSplitter->setSizes({ 200, 500, branchesWidth });
    else
       mSplitter->restoreState(splitterSate);
 
