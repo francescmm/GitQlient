@@ -1,17 +1,17 @@
 #include "ConfigWidget.h"
 #include "ui_ConfigWidget.h"
 
-#include <GitQlientSettings.h>
-#include <GitBase.h>
 #include <FileEditor.h>
+#include <GitBase.h>
+#include <GitQlientSettings.h>
 #include <QLogger.h>
 
-#include <QProcess>
-#include <QPushButton>
-#include <QStandardPaths>
 #include <QDir>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QProcess>
+#include <QPushButton>
+#include <QStandardPaths>
 #include <QTimer>
 
 using namespace QLogger;
@@ -57,7 +57,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->tabWidget->setCornerWidget(mSave);
 
    ui->mainLayout->setColumnStretch(0, 1);
-   ui->mainLayout->setColumnStretch(1, 2);
+   ui->mainLayout->setColumnStretch(1, 3);
 
    const auto localGitLayout = new QVBoxLayout(ui->localGit);
    localGitLayout->setContentsMargins(QMargins());
@@ -155,6 +155,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->leBsUrl, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->leBsUser, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->leBsToken, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
+
+   calculateCacheSize();
 }
 
 ConfigWidget::~ConfigWidget()
