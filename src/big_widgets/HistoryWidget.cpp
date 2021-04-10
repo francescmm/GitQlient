@@ -87,7 +87,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    const auto wipFrame = new QFrame();
    wipFrame->setLayout(wipLayout);
-   wipFrame->setMinimumWidth(250);
+   wipFrame->setMinimumWidth(200);
    wipFrame->setMaximumWidth(500);
 
    connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
@@ -221,7 +221,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mSplitter->insertWidget(2, mBranchesWidget);
 
    const auto minimalActive = mBranchesWidget->isMinimalViewActive();
-   const auto branchesWidth = minimalActive ? 50 : 250;
+   const auto branchesWidth = minimalActive ? 50 : 200;
 
    rearrangeSplittrer(minimalActive);
 
@@ -230,7 +230,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    const auto splitterSate = mSettings->localValue("HistoryWidgetState", QByteArray()).toByteArray();
 
    if (splitterSate.isEmpty())
-      mSplitter->setSizes({ 250, QApplication::primaryScreen()->geometry().width() - 500, branchesWidth });
+      mSplitter->setSizes({ 200, 600, branchesWidth });
    else
       mSplitter->restoreState(splitterSate);
 
