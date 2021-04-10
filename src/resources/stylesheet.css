@@ -709,8 +709,6 @@ CommitChangesWidget #wipSeparator
 
 CommitInfoWidget
 {
-    max-width: 248px;
-    min-width: 248px;
     border: 1px solid #202122;
 }
 
