@@ -23,9 +23,9 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QString>
 #include <QColor>
 #include <QScopedPointer>
+#include <QString>
 
 #include <array>
 
@@ -130,7 +130,6 @@ public:
    static QColor getBranchColorAt(int index);
 
 private:
-   static QScopedPointer<GitQlientSettings> mSettings;
    static GitQlientStyles *INSTANCE;
 
    /*!
