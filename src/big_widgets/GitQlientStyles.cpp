@@ -22,7 +22,7 @@ QString GitQlientStyles::getStyles()
 
    if (stylesFile.open(QIODevice::ReadOnly))
    {
-      const auto colorSchema = GitQlientSettings().globalValue("colorSchema").toString();
+      const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
       QFile colorsFile(QString(":/colors_%1").arg(colorSchema));
       QString colorsCss;
 
