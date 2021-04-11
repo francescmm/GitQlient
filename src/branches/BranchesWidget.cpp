@@ -661,6 +661,8 @@ void BranchesWidget::processTags()
 
       mTagsTree->addTopLevelItem(item);
    }
+
+   mTagsTree->update();
 }
 
 void BranchesWidget::processStashes()
