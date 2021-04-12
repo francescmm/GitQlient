@@ -191,7 +191,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    subtreeHeaderLayout->setContentsMargins(10, 0, 0, 0);
    subtreeHeaderLayout->setSpacing(10);
    subtreeHeaderLayout->addWidget(new QLabel(tr("Subtrees")));
-   subtreeHeaderLayout->addWidget(mSubtreeCount = new QLabel(tr("(0)")));
+   subtreeHeaderLayout->addWidget(mSubtreeCount);
    subtreeHeaderLayout->addStretch();
    subtreeHeaderLayout->addWidget(mSubtreeArrow);
 
