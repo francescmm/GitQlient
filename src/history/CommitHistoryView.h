@@ -76,6 +76,16 @@ signals:
     \param destination The branch to merge into.
    */
    void signalMergeRequired(const QString &origin, const QString &destination);
+
+   /**
+    * @brief Signal triggered when a merge with squash behavior has been requested. Since it involves a lot of changes
+    * at UI level this action is not performed here.
+    *
+    * @param origin The branch to merge from.
+    * @param destination The branch to merge into.
+    */
+   void mergeSqushRequested(const QString &origin, const QString &destination);
+
    /*!
     * \brief signalConflict Signal triggered when trying to cherry-pick or pull and a conflict happens.
     */

@@ -137,6 +137,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    });
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &HistoryWidget::onAmendCommit);
    connect(mRepositoryView, &CommitHistoryView::signalMergeRequired, this, &HistoryWidget::mergeBranch);
+   connect(mRepositoryView, &CommitHistoryView::mergeSqushRequested, this, &HistoryWidget::mergeSquashBranch);
    connect(mRepositoryView, &CommitHistoryView::signalCherryPickConflict, this,
            &HistoryWidget::signalCherryPickConflict);
    connect(mRepositoryView, &CommitHistoryView::signalPullConflict, this, &HistoryWidget::signalPullConflict);
@@ -156,6 +157,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &HistoryWidget::goToSha);
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &HistoryWidget::signalOpenSubmodule);
    connect(mBranchesWidget, &BranchesWidget::signalMergeRequired, this, &HistoryWidget::mergeBranch);
+   // connect(mRepositoryView, &BranchesWidget::mergeSqushRequested, this, &HistoryWidget::mergeSquashBranch);
    connect(mBranchesWidget, &BranchesWidget::signalPullConflict, this, &HistoryWidget::signalPullConflict);
    connect(mBranchesWidget, &BranchesWidget::panelsVisibilityChanged, this, &HistoryWidget::panelsVisibilityChanged);
 
@@ -454,6 +456,25 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
 
    QApplication::restoreOverrideCursor();
 
+   processMergeResponse(ret);
+}
+
+void HistoryWidget::mergeSquashBranch(const QString &current, const QString &branchToMerge)
+{
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   QScopedPointer<GitMerge> git(new GitMerge(mGit, mCache));
+   const auto ret = git->squashMerge(current, { branchToMerge });
+
+   QScopedPointer<GitWip> gitWip(new GitWip(mGit, mCache));
+   gitWip->updateWip();
+
+   QApplication::restoreOverrideCursor();
+
+   processMergeResponse(ret);
+}
+
+void HistoryWidget::processMergeResponse(const GitExecResult &ret)
+{
    if (!ret.success)
    {
       QMessageBox msgBox(

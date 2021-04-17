@@ -45,6 +45,7 @@ class GitServerCache;
 class QLabel;
 class GitQlientSettings;
 class QSplitter;
+struct GitExecResult;
 
 /*!
  \brief The HistoryWidget is responsible for showing the history of the repository. It is the first widget shown
@@ -315,6 +316,16 @@ private:
     \param branchToMerge The branch to merge from.
    */
    void mergeBranch(const QString &current, const QString &branchToMerge);
+
+   /**
+    * @brief mergeSquashBranch Tries to perform the git merge operation squashing all commits from \p branchToMerge into
+    the \p current. If there are conflicts the GitQlientRepo class is notified to take actions.
+    * @param current The current branch
+    * @param branchToMerge The branch to merge from
+    */
+   void mergeSquashBranch(const QString &current, const QString &branchToMerge);
+
+   void processMergeResponse(const GitExecResult &ret);
 
    /**
     * @brief endEditFile Closes the file diff view.

@@ -1,17 +1,17 @@
 #include "CommitHistoryView.h"
 
-#include <CommitHistoryModel.h>
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryContextMenu.h>
-#include <ShaFilterProxyModel.h>
+#include <CommitHistoryModel.h>
 #include <CommitInfo.h>
+#include <GitBase.h>
 #include <GitCache.h>
 #include <GitConfig.h>
 #include <GitQlientSettings.h>
-#include <GitBase.h>
+#include <ShaFilterProxyModel.h>
 
-#include <QHeaderView>
 #include <QDateTime>
+#include <QHeaderView>
 
 #include <QLogger.h>
 using namespace QLogger;
@@ -219,6 +219,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
                  &CommitHistoryView::signalOpenCompareDiff);
          connect(menu, &CommitHistoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
          connect(menu, &CommitHistoryContextMenu::signalMergeRequired, this, &CommitHistoryView::signalMergeRequired);
+         connect(menu, &CommitHistoryContextMenu::mergeSqushRequested, this, &CommitHistoryView::mergeSqushRequested);
          connect(menu, &CommitHistoryContextMenu::signalCherryPickConflict, this,
                  &CommitHistoryView::signalCherryPickConflict);
          connect(menu, &CommitHistoryContextMenu::signalPullConflict, this, &CommitHistoryView::signalPullConflict);

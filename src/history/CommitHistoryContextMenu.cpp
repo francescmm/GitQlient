@@ -527,12 +527,26 @@ void CommitHistoryContextMenu::resetHard()
    }
 }
 
-void CommitHistoryContextMenu::merge(const QString &branchFrom)
+void CommitHistoryContextMenu::merge()
 {
+   const auto action = qobject_cast<QAction *>(sender());
+   const auto fromBranch = action->data().toString();
+
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
    const auto currentBranch = mGit->getCurrentBranch();
 
-   emit signalMergeRequired(currentBranch, branchFrom);
+   emit signalMergeRequired(currentBranch, fromBranch);
+}
+
+void CommitHistoryContextMenu::mergeSquash()
+{
+   const auto action = qobject_cast<QAction *>(sender());
+   const auto fromBranch = action->data().toString();
+
+   QScopedPointer<GitRemote> git(new GitRemote(mGit));
+   const auto currentBranch = mGit->getCurrentBranch();
+
+   emit mergeSqushRequested(currentBranch, fromBranch);
 }
 
 void CommitHistoryContextMenu::addBranchActions(const QString &sha)
@@ -601,7 +615,12 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
          {
             // If is the last commit of a branch
             const auto mergeBranchAction = addAction(QString(tr("Merge %1")).arg(pair.first));
-            connect(mergeBranchAction, &QAction::triggered, this, [this, pair]() { merge(pair.first); });
+            mergeBranchAction->setData(pair.first);
+            connect(mergeBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::merge);
+
+            const auto mergeSquashBranchAction = addAction(QString(tr("Merge squash %1")).arg(pair.first));
+            mergeSquashBranchAction->setData(pair.first);
+            connect(mergeSquashBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::mergeSquash);
          }
       }
 
