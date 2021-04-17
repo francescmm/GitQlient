@@ -212,12 +212,21 @@ void CommitHistoryContextMenu::createMultipleShasMenu()
       connect(copyShaAction, &QAction::triggered, this,
               [this]() { QApplication::clipboard()->setText(mShas.join(',')); });
 
-      for (const auto &sha : qAsConst(mShas))
-         if (mCache->isCommitInCurrentGeneologyTree(sha))
-            return;
+      auto shasInCurrenTree = 0;
 
-      const auto cherryPickAction = addAction(tr("Cherry pick ALL commits"));
-      connect(cherryPickAction, &QAction::triggered, this, &CommitHistoryContextMenu::cherryPickCommit);
+      for (const auto &sha : qAsConst(mShas))
+         shasInCurrenTree += mCache->isCommitInCurrentGeneologyTree(sha);
+
+      if (shasInCurrenTree == 0)
+      {
+         const auto cherryPickAction = addAction(tr("Cherry pick ALL commits"));
+         connect(cherryPickAction, &QAction::triggered, this, &CommitHistoryContextMenu::cherryPickCommit);
+      }
+      else if (shasInCurrenTree == mShas.count())
+      {
+         const auto cherryPickAction = addAction(tr("Squash commits"));
+         connect(cherryPickAction, &QAction::triggered, this, &CommitHistoryContextMenu::showSquashDialog);
+      }
    }
    else
       QLog_Warning("UI", "WIP selected as part of a series of SHAs");
@@ -632,3 +641,5 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
    else
       addSeparator();
 }
+
+void CommitHistoryContextMenu::showSquashDialog() { }
