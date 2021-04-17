@@ -7,5 +7,8 @@ sudo apt-get -qq install libc6-i386 build-essential libgl1-mesa-dev mesa-common-
 sudo apt-get -qq install libxcb-*
 sudo apt-get -qq remove gcc g++
 sudo apt-get install gcc-9 g++-9
+sudo add-apt-repository -y ppa:beineri/opt-qt-5.12.8-xenial
+sudo apt-get -qq update
+sudo apt-get install -y -qq qt512base qt512webchannel qt512webengine fakeroot
 sudo ln -s /usr/bin/g++-9 /usr/bin/g++
 sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc

@@ -1,0 +1,10 @@
+Source: gitqlient
+Section: devel
+Priority: optional
+Build-Depends:
+Homepage: https://github.com/francescmm/GitQlient
+Package: gitqlient
+Architecture: amd64
+Maintainer: Francesc M. <francescmm@gmail.com>
+Pre-Depends: git (>= 2.0.0), libqt5core5a (>= 5.12.0), libqt5gui5 (>= 5.12.0), libqt5widgets5 (>= 5.12.0), libqt5network5 (>= 5.12.0), libqt5webchannel5 (>= 5.12.0), libqt5webenginewidgets5 (>= 5.12.0)
+Description: GitQlient: Multi-platform Git client written with Qt
