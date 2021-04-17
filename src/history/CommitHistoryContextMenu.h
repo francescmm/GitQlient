@@ -216,4 +216,6 @@ private:
     \param sha The SHA of the current commit.
    */
    void addBranchActions(const QString &sha);
+
+   void showSquashDialog();
 };

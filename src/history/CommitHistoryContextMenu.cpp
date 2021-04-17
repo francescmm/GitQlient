@@ -17,6 +17,7 @@
 #include <GitTags.h>
 #include <MergePullRequestDlg.h>
 #include <PullDlg.h>
+#include <SquashDlg.h>
 #include <TagDlg.h>
 
 #include <QApplication>
@@ -642,4 +643,8 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
       addSeparator();
 }
 
-void CommitHistoryContextMenu::showSquashDialog() { }
+void CommitHistoryContextMenu::showSquashDialog()
+{
+   const auto squash = new SquashDlg(mCache, mShas, this);
+   squash->exec();
+}
