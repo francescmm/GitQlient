@@ -1,13 +1,13 @@
 #include "BranchTreeWidget.h"
 
-#include <GitQlientStyles.h>
-#include <GitBranches.h>
-#include <GitBase.h>
-#include <BranchContextMenu.h>
-#include <PullDlg.h>
-#include <GitQlientBranchItemRole.h>
 #include <AddRemoteDlg.h>
+#include <BranchContextMenu.h>
+#include <GitBase.h>
+#include <GitBranches.h>
+#include <GitQlientBranchItemRole.h>
+#include <GitQlientStyles.h>
 #include <GitRemote.h>
+#include <PullDlg.h>
 
 #include <QApplication>
 #include <QMessageBox>
@@ -85,6 +85,7 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
          connect(menu, &BranchContextMenu::signalBranchesUpdated, this, &BranchTreeWidget::signalBranchesUpdated);
          connect(menu, &BranchContextMenu::signalCheckoutBranch, this, [this, item]() { checkoutBranch(item); });
          connect(menu, &BranchContextMenu::signalMergeRequired, this, &BranchTreeWidget::signalMergeRequired);
+         connect(menu, &BranchContextMenu::mergeSqushRequested, this, &BranchTreeWidget::mergeSqushRequested);
          connect(menu, &BranchContextMenu::signalPullConflict, this, &BranchTreeWidget::signalPullConflict);
 
          menu->exec(viewport()->mapToGlobal(pos));

@@ -1,15 +1,14 @@
 #include "BranchContextMenu.h"
 
-#include <GitQlientStyles.h>
 #include <BranchDlg.h>
-#include <GitBranches.h>
 #include <GitBase.h>
+#include <GitBranches.h>
+#include <GitQlientStyles.h>
 #include <GitRemote.h>
 
 #include <QApplication>
-#include <QMessageBox>
-#include <QApplication>
 #include <QClipboard>
+#include <QMessageBox>
 
 #include <utility>
 
@@ -45,6 +44,9 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
    {
       const auto actionName = tr("Merge %1 into %2").arg(mConfig.branchSelected, mConfig.currentBranch);
       connect(addAction(actionName), &QAction::triggered, this, &BranchContextMenu::merge);
+
+      const auto mergeSquashAction = tr("Merge squash %1 into %2").arg(mConfig.branchSelected, mConfig.currentBranch);
+      connect(addAction(mergeSquashAction), &QAction::triggered, this, &BranchContextMenu::mergeSquash);
    }
 
    addSeparator();
@@ -175,6 +177,11 @@ void BranchContextMenu::createCheckoutBranch()
 void BranchContextMenu::merge()
 {
    emit signalMergeRequired(mConfig.currentBranch, mConfig.branchSelected);
+}
+
+void BranchContextMenu::mergeSquash()
+{
+   emit mergeSqushRequested(mConfig.currentBranch, mConfig.branchSelected);
 }
 
 void BranchContextMenu::rename()

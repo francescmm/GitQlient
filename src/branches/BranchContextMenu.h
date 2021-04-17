@@ -83,6 +83,15 @@ signals:
     */
    void signalRefreshPRsCache();
 
+   /**
+    * @brief Signal triggered when a merge with squash behavior has been requested. Since it involves a lot of changes
+    * at UI level this action is not performed here.
+    *
+    * @param origin The branch to merge from.
+    * @param destination The branch to merge into.
+    */
+   void mergeSqushRequested(const QString &origin, const QString &destination);
+
 public:
    /*!
     \brief Default constructor.
@@ -131,6 +140,8 @@ private:
 
    */
    void merge();
+
+   void mergeSquash();
    /*!
     \brief Renames the selected branch.
 
