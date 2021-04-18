@@ -628,7 +628,7 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
             mergeBranchAction->setData(pair.first);
             connect(mergeBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::merge);
 
-            const auto mergeSquashBranchAction = addAction(QString(tr("Merge squash %1")).arg(pair.first));
+            const auto mergeSquashBranchAction = addAction(QString(tr("Squash-merge %1")).arg(pair.first));
             mergeSquashBranchAction->setData(pair.first);
             connect(mergeSquashBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::mergeSquash);
          }

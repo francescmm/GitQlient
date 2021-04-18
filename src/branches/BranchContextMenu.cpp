@@ -45,7 +45,7 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
       const auto actionName = tr("Merge %1 into %2").arg(mConfig.branchSelected, mConfig.currentBranch);
       connect(addAction(actionName), &QAction::triggered, this, &BranchContextMenu::merge);
 
-      const auto mergeSquashAction = tr("Merge squash %1 into %2").arg(mConfig.branchSelected, mConfig.currentBranch);
+      const auto mergeSquashAction = tr("Squash-merge %1 into %2").arg(mConfig.branchSelected, mConfig.currentBranch);
       connect(addAction(mergeSquashAction), &QAction::triggered, this, &BranchContextMenu::mergeSquash);
    }
 
