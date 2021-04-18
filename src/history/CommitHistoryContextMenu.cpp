@@ -645,6 +645,15 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 
 void CommitHistoryContextMenu::showSquashDialog()
 {
-   const auto squash = new SquashDlg(mCache, mShas, this);
-   squash->exec();
+   if (mCache->pendingLocalChanges())
+   {
+      QMessageBox::warning(this, tr("Squash not possible"),
+                           tr("Please, make sure there are no pending changes to be commited."));
+   }
+   else
+   {
+      const auto squash = new SquashDlg(mGit, mCache, mShas, this);
+      connect(squash, &SquashDlg::changesCommitted, this, [this]() { requestReload(true); });
+      squash->exec();
+   }
 }

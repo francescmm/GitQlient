@@ -195,3 +195,12 @@ GitExecResult GitBranches::pushUpstream(const QString &branchName)
 
    return ret;
 }
+
+GitExecResult GitBranches::rebaseOnto(const QString &currentBranch, const QString &startBranch,
+                                      const QString &fromBranch) const
+{
+   QLog_Debug("Git", QString("Git rebase {%1} into {%2}").arg(currentBranch, fromBranch));
+
+   const auto cmd = QString("git rebase --onto %1 %2 %3").arg(currentBranch, startBranch, fromBranch);
+   return mGitBase->run(cmd);
+}

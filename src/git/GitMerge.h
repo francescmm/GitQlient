@@ -39,7 +39,7 @@ public:
    GitExecResult merge(const QString &into, QStringList sources);
    GitExecResult abortMerge() const;
    GitExecResult applyMerge() const;
-   GitExecResult squashMerge(const QString &into, QStringList sources) const;
+   GitExecResult squashMerge(const QString &into, QStringList sources, const QString &msg = QString()) const;
 
 private:
    QSharedPointer<GitBase> mGitBase;

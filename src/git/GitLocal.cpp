@@ -174,6 +174,24 @@ bool GitLocal::resetCommit(const QString &sha, CommitResetType type)
    return ret.success;
 }
 
+GitExecResult GitLocal::commit(const QString &msg) const
+{
+   QLog_Debug("Git", QString("Commit changes"));
+
+   const auto cmd = QString("git commit -m \"%1\"").arg(msg);
+   const auto ret = mGitBase->run(cmd);
+
+   return ret;
+}
+
+GitExecResult GitLocal::ammend(const QString &msg) const
+{
+   QLog_Debug("Git", QString("Amend message"));
+
+   const auto cmd = QString("git commit --amend -m \"%1\"").arg(msg);
+   return mGitBase->run(cmd);
+}
+
 GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &allCommitFiles,
                                     const QString &msg) const
 {

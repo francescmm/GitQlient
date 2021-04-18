@@ -78,7 +78,7 @@ GitExecResult GitMerge::applyMerge() const
    return ret;
 }
 
-GitExecResult GitMerge::squashMerge(const QString &into, QStringList sources) const
+GitExecResult GitMerge::squashMerge(const QString &into, QStringList sources, const QString &msg) const
 {
    QLog_Debug("Git", QString("Executing squash merge: {%1} into {%2}").arg(sources.join(","), into));
 
@@ -99,8 +99,16 @@ GitExecResult GitMerge::squashMerge(const QString &into, QStringList sources) co
 
    if (retMerge.success)
    {
-      const auto commitCmd = QString("git commit --no-edit");
-      mGitBase->run(commitCmd);
+      if (msg.isEmpty())
+      {
+         const auto commitCmd = QString("git commit --no-edit");
+         mGitBase->run(commitCmd);
+      }
+      else
+      {
+         const auto cmd = QString("git commit -m \"%1\"").arg(msg);
+         mGitBase->run(cmd);
+      }
 
       QScopedPointer<GitWip> git(new GitWip(mGitBase, mCache));
       git->updateWip();
