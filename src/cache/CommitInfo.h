@@ -23,9 +23,9 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QVector>
-#include <QStringList>
 #include <QDateTime>
+#include <QStringList>
+#include <QVector>
 
 #include <Lane.h>
 #include <References.h>
@@ -83,6 +83,9 @@ public:
    bool isSigned() const { return mSigned; }
    QString getGpgKey() const { return mGpgKey; }
 
+   void setPos(uint pos) { mPos = pos; }
+   uint getPos() const { return mPos; }
+
    static const QString ZERO_SHA;
    static const QString INIT_SHA;
 
@@ -100,4 +103,5 @@ private:
    QMap<QString, CommitInfo *> mChilds;
    bool mSigned = false;
    QString mGpgKey;
+   uint mPos = 0;
 };

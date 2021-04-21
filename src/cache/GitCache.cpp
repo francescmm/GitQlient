@@ -101,10 +101,12 @@ int GitCache::commitPos(const QString &sha)
    const auto iter = std::find_if(mCommitsMap.begin(), mCommitsMap.end(),
                                   [sha](const CommitInfo &commit) { return commit.sha().startsWith(sha); });
 
-   if (iter != mCommitsMap.end())
-      return mCommits.indexOf(&iter.value());
+   auto pos = -1;
 
-   return -1;
+   if (iter != mCommitsMap.end())
+      pos = iter.value().getPos();
+
+   return pos;
 }
 
 auto GitCache::searchCommit(const QString &text, const int startingPoint) const

@@ -229,12 +229,14 @@ QList<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log, QList<QPair
 {
    QList<CommitInfo> commits;
    auto commitsLog = log.split('\000');
+   auto pos = 1;
 
    for (auto &commitData : commitsLog)
    {
       bool subtree = false;
       if (auto commit = parseCommitData(commitData, subtree); commit.isValid())
       {
+         commit.setPos(pos++);
          commits.append(std::move(commit));
 
          if (subtree)
@@ -257,6 +259,7 @@ QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log, QList<QPair<Q
    QByteArray gpg;
    QString gpgKey;
    auto processingCommit = false;
+   auto pos = 1;
 
    for (const auto &line : preProcessedCommits)
    {
@@ -282,6 +285,7 @@ QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log, QList<QPair<Q
             bool subtree = false;
             if (auto revision = parseCommitData(commit, subtree); revision.isValid())
             {
+               revision.setPos(pos++);
                commits.append(std::move(revision));
 
                if (subtree)
