@@ -182,7 +182,7 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
 
    QLog_Info("UI", QString("Setting the focus on the commit {%1}").arg(mCurrentSha));
 
-   auto row = mCache->commitPos(mCurrentSha);
+   auto row = mCache->commitInfo(mCurrentSha).getPos();
 
    if (mIsFiltering)
    {

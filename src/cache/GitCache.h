@@ -55,7 +55,6 @@ public:
 
    CommitInfo commitInfo(const QString &sha);
    CommitInfo commitInfo(int row);
-   int commitPos(const QString &sha);
 
    CommitInfo searchCommitInfo(const QString &text, int startingPoint = 0, bool reverse = false);
 

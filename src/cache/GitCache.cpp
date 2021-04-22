@@ -94,21 +94,6 @@ CommitInfo GitCache::commitInfo(int row)
    return commit ? *commit : CommitInfo();
 }
 
-int GitCache::commitPos(const QString &sha)
-{
-   QMutexLocker lock(&mMutex);
-
-   const auto iter = std::find_if(mCommitsMap.begin(), mCommitsMap.end(),
-                                  [sha](const CommitInfo &commit) { return commit.sha().startsWith(sha); });
-
-   auto pos = -1;
-
-   if (iter != mCommitsMap.end())
-      pos = iter.value().getPos();
-
-   return pos;
-}
-
 auto GitCache::searchCommit(const QString &text, const int startingPoint) const
 {
    return std::find_if(mCommits.constBegin() + startingPoint, mCommits.constEnd(),
@@ -399,13 +384,11 @@ bool GitCache::checkSha(const QString &originalSha, const QString &currentSha) c
 {
    if (originalSha == currentSha)
       return true;
-   else
-   {
-      if (const auto iter = mCommitsMap.find(currentSha); iter != mCommitsMap.cend())
-         return checkSha(originalSha, iter->parent(0));
 
-      return false;
-   }
+   if (const auto iter = mCommitsMap.find(currentSha); iter != mCommitsMap.cend())
+      return checkSha(originalSha, iter->parent(0));
+
+   return false;
 }
 
 int GitCache::commitCount() const
