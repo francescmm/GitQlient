@@ -255,28 +255,6 @@ void GitQlientRepo::setWatcher()
    QLog_Info("UI", QString("Setting the file watcher for dir {%1}").arg(mCurrentDir));
 
    mGitWatcher->addPath(mCurrentDir);
-
-   QScopedPointer<GitSubmodules> git(new GitSubmodules(mGitBase));
-   const auto submodules = git->getSubmodules();
-
-   QDirIterator it(mCurrentDir);
-   while (it.hasNext())
-   {
-      const auto dir = it.next();
-
-      if (it.fileInfo().isDir() && !dir.endsWith(".") && !dir.endsWith("..") && !containsSubmodule(dir, submodules))
-      {
-         QDirIterator subdirIt(dir, QDirIterator::Subdirectories);
-
-         while (subdirIt.hasNext())
-         {
-            const auto dir = subdirIt.next();
-
-            if (subdirIt.fileInfo().isDir() && !dir.endsWith(".") && !dir.endsWith(".."))
-               mGitWatcher->addPath(dir);
-         }
-      }
-   }
 }
 
 void GitQlientRepo::clearWindow()
