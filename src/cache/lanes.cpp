@@ -20,7 +20,9 @@ void Lanes::init(const QString &expectedSha)
 void Lanes::clear()
 {
    typeVec.clear();
+   typeVec.squeeze();
    nextShaVec.clear();
+   nextShaVec.squeeze();
 }
 
 bool Lanes::isFork(const QString &sha, bool &isDiscontinuity)

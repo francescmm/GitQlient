@@ -13,19 +13,7 @@ GitCache::GitCache(QObject *parent)
 
 GitCache::~GitCache()
 {
-   mCommits.clear();
-   mCommits.squeeze();
-   mCommitsMap.clear();
-   mCommitsMap.squeeze();
-   mReferences.clear();
-   mRevisionFilesMap.clear();
-   mRevisionFilesMap.squeeze();
-   mUntrackedfiles.clear();
-   mUntrackedfiles.squeeze();
-   mReferences.clear();
-   mReferences.squeeze();
-   mRemoteTags.clear();
-   mRemoteTags.squeeze();
+   clearInternalData();
 }
 
 void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits)
@@ -38,8 +26,7 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
 
    mConfigured = false;
 
-   mRevisionFilesMap.clear();
-   mLanes.clear();
+   clearInternalData();
 
    if (mCommitsMap.isEmpty())
       mCommitsMap.reserve(totalCommits);
@@ -95,6 +82,8 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
          ++count;
       }
    }
+
+   mCommitsMap.squeeze();
 
    tmpChildsStorage.clear();
 }
@@ -403,6 +392,24 @@ bool GitCache::checkSha(const QString &originalSha, const QString &currentSha) c
       return checkSha(originalSha, iter->parent(0));
 
    return false;
+}
+
+void GitCache::clearInternalData()
+{
+   mCommits.clear();
+   mCommits.squeeze();
+   mCommitsMap.clear();
+   mCommitsMap.squeeze();
+   mReferences.clear();
+   mRevisionFilesMap.clear();
+   mRevisionFilesMap.squeeze();
+   mUntrackedfiles.clear();
+   mUntrackedfiles.squeeze();
+   mReferences.clear();
+   mReferences.squeeze();
+   mRemoteTags.clear();
+   mRemoteTags.squeeze();
+   mLanes.clear();
 }
 
 int GitCache::commitCount() const

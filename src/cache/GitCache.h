@@ -103,4 +103,5 @@ private:
    auto reverseSearchCommit(const QString &text, int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);
    bool checkSha(const QString &originalSha, const QString &currentSha) const;
+   void clearInternalData();
 };
