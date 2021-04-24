@@ -76,9 +76,9 @@ public:
    bool pendingLocalChanges();
 
    QVector<QPair<QString, QStringList>> getBranches(References::Type type);
-   QMap<QString, QString> getTags(References::Type tagType) const;
+   QHash<QString, QString> getTags(References::Type tagType) const;
 
-   void updateTags(const QMap<QString, QString> &remoteTags);
+   void updateTags(const QHash<QString, QString> &remoteTags);
 
 private:
    friend class GitRepoLoader;
@@ -87,12 +87,11 @@ private:
    bool mConfigured = true;
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo> mCommitsMap;
-   QMultiMap<QString, CommitInfo *> mTmpChildsStorage;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
    Lanes mLanes;
    QVector<QString> mUntrackedfiles;
-   QMap<QString, References> mReferences;
-   QMap<QString, QString> mRemoteTags;
+   QHash<QString, References> mReferences;
+   QHash<QString, QString> mRemoteTags;
 
    void setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits);
    void setConfigurationDone() { mConfigured = true; }

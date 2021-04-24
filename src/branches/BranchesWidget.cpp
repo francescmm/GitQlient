@@ -604,10 +604,10 @@ void BranchesWidget::processTags()
    const auto localTags = mCache->getTags(References::Type::LocalTag);
    const auto remoteTags = mCache->getTags(References::Type::RemoteTag);
 
-   for (const auto &localTag : localTags.toStdMap())
+   for (auto iter = localTags.cbegin(); iter != localTags.cend(); ++iter)
    {
       QTreeWidgetItem *parent = nullptr;
-      auto fullTagName = localTag.first;
+      auto fullTagName = iter.key();
       auto folders = fullTagName.split("/");
       auto tagName = folders.takeLast();
 
@@ -657,7 +657,7 @@ void BranchesWidget::processTags()
       item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
       item->setText(0, tagName);
       item->setData(0, GitQlient::FullNameRole, fullTagName);
-      item->setData(0, GitQlient::ShaRole, localTag.second);
+      item->setData(0, GitQlient::ShaRole, iter.value());
       item->setData(0, Qt::ToolTipRole, fullTagName);
       item->setData(0, GitQlient::IsLeaf, true);
 

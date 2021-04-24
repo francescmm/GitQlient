@@ -14,8 +14,18 @@ GitCache::GitCache(QObject *parent)
 GitCache::~GitCache()
 {
    mCommits.clear();
+   mCommits.squeeze();
    mCommitsMap.clear();
+   mCommitsMap.squeeze();
    mReferences.clear();
+   mRevisionFilesMap.clear();
+   mRevisionFilesMap.squeeze();
+   mUntrackedfiles.clear();
+   mUntrackedfiles.squeeze();
+   mReferences.clear();
+   mReferences.squeeze();
+   mRemoteTags.clear();
+   mRemoteTags.squeeze();
 }
 
 void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits)
@@ -52,6 +62,8 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
 
    QLog_Debug("Cache", QString("Adding committed revisions."));
 
+   QMultiMap<QString, CommitInfo *> tmpChildsStorage;
+
    for (auto commit : commits)
    {
       if (commit.isValid())
@@ -67,22 +79,24 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
 
          mCommits.replace(count, &mCommitsMap[sha]);
 
-         if (mTmpChildsStorage.contains(sha))
+         if (tmpChildsStorage.contains(sha))
          {
-            for (auto &child : mTmpChildsStorage.values(sha))
+            for (auto &child : tmpChildsStorage.values(sha))
                mCommitsMap[sha].addChildReference(child);
 
-            mTmpChildsStorage.remove(sha);
+            tmpChildsStorage.remove(sha);
          }
 
          const auto parents = mCommitsMap.value(sha).parents();
 
          for (const auto &parent : parents)
-            mTmpChildsStorage.insert(parent, &mCommitsMap[sha]);
+            tmpChildsStorage.insert(parent, &mCommitsMap[sha]);
 
          ++count;
       }
    }
+
+   tmpChildsStorage.clear();
 }
 
 CommitInfo GitCache::commitInfo(int row)
@@ -333,24 +347,24 @@ QVector<QPair<QString, QStringList>> GitCache::getBranches(References::Type type
    QMutexLocker lock(&mMutex);
    QVector<QPair<QString, QStringList>> branches;
 
-   for (const auto &ref : mReferences.toStdMap())
-      branches.append(QPair<QString, QStringList>(ref.first, ref.second.getReferences(type)));
+   for (auto iter = mReferences.cbegin(); iter != mReferences.cend(); ++iter)
+      branches.append(QPair<QString, QStringList>(iter.key(), iter.value().getReferences(type)));
 
    return branches;
 }
 
-QMap<QString, QString> GitCache::getTags(References::Type tagType) const
+QHash<QString, QString> GitCache::getTags(References::Type tagType) const
 {
-   QMap<QString, QString> tags;
+   decltype(mRemoteTags) tags;
 
    if (tagType == References::Type::LocalTag)
    {
-      for (auto &reference : mReferences.toStdMap())
+      for (auto iter = mReferences.cbegin(); iter != mReferences.cend(); ++iter)
       {
-         const auto tagNames = reference.second.getReferences(tagType);
+         const auto tagNames = iter->getReferences(tagType);
 
          for (const auto &tag : tagNames)
-            tags[tag] = reference.first;
+            tags[tag] = iter.key();
       }
    }
    else
@@ -359,7 +373,7 @@ QMap<QString, QString> GitCache::getTags(References::Type tagType) const
    return tags;
 }
 
-void GitCache::updateTags(const QMap<QString, QString> &remoteTags)
+void GitCache::updateTags(const QHash<QString, QString> &remoteTags)
 {
    mRemoteTags = remoteTags;
 

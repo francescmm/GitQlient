@@ -108,7 +108,7 @@ GitExecResult GitTags::getTagCommit(const QString &tagName)
 
 void GitTags::onRemoteTagsRecieved(GitExecResult result)
 {
-   QMap<QString, QString> tags;
+   QHash<QString, QString> tags;
 
    if (result.success)
    {
