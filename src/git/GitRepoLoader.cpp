@@ -110,7 +110,8 @@ void GitRepoLoader::loadReferences()
       const auto referencesList = ret3.output.toString().split('\n', QString::SkipEmptyParts);
 #endif
 
-      mRevCache->clearReferences();
+      if (mRefreshReferences)
+         mRevCache->clearReferences();
 
       for (const auto &reference : referencesList)
       {

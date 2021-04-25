@@ -26,7 +26,13 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits
 
    mConfigured = false;
 
-   clearInternalData();
+   mCommits.clear();
+   mCommits.squeeze();
+   mCommitsMap.clear();
+   mCommitsMap.squeeze();
+   mUntrackedfiles.clear();
+   mUntrackedfiles.squeeze();
+   mLanes.clear();
 
    mCommitsMap.reserve(totalCommits);
    mCommits.resize(totalCommits);
@@ -173,6 +179,7 @@ void GitCache::clearReferences()
 {
    QMutexLocker lock(&mMutex);
    mReferences.clear();
+   mReferences.squeeze();
 }
 
 void GitCache::insertWipRevision(const WipRevisionInfo &wipInfo)
@@ -396,11 +403,11 @@ void GitCache::clearInternalData()
    mRevisionFilesMap.squeeze();
    mUntrackedfiles.clear();
    mUntrackedfiles.squeeze();
+   mLanes.clear();
    mReferences.clear();
    mReferences.squeeze();
    mRemoteTags.clear();
    mRemoteTags.squeeze();
-   mLanes.clear();
 }
 
 int GitCache::commitCount() const
