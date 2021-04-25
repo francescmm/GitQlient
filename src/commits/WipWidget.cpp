@@ -30,7 +30,7 @@ void WipWidget::configure(const QString &sha)
    QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
    git->updateWip();
 
-   const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
+   const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, commit.firstParent());
 
    QLog_Info("UI", QString("Configuring WIP widget"));
 
@@ -61,7 +61,7 @@ bool WipWidget::commitChanges()
          QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
          git->updateWip();
 
-         const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
+         const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, revInfo.firstParent());
 
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));

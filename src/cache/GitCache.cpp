@@ -48,7 +48,7 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits
 
       const auto sha = commit.sha;
 
-      if (sha == mCommitsMap.value(CommitInfo::ZERO_SHA).parent(0))
+      if (sha == mCommitsMap.value(CommitInfo::ZERO_SHA).firstParent())
          commit.appendChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
 
       mCommitsMap[sha] = std::move(commit);
@@ -309,7 +309,7 @@ bool GitCache::pendingLocalChanges()
 
    if (commit.isValid())
    {
-      const auto rf = revisionFile(CommitInfo::ZERO_SHA, commit.parent(0));
+      const auto rf = revisionFile(CommitInfo::ZERO_SHA, commit.firstParent());
       localChanges = rf.count() - mUntrackedfiles.count() > 0;
    }
 
@@ -356,7 +356,7 @@ void GitCache::updateTags(const QHash<QString, QString> &remoteTags)
 
 void GitCache::resetLanes(const CommitInfo &c, bool isFork)
 {
-   const auto nextSha = c.parentsCount() == 0 ? QString() : c.parent(0);
+   const auto nextSha = c.parentsCount() == 0 ? QString() : c.firstParent();
 
    mLanes.nextParent(nextSha);
 
@@ -374,7 +374,7 @@ bool GitCache::checkSha(const QString &originalSha, const QString &currentSha) c
       return true;
 
    if (const auto iter = mCommitsMap.find(currentSha); iter != mCommitsMap.cend())
-      return checkSha(originalSha, iter->parent(0));
+      return checkSha(originalSha, iter->firstParent());
 
    return false;
 }

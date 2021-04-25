@@ -62,9 +62,9 @@ int CommitInfo::parentsCount() const
    return count;
 }
 
-QString CommitInfo::parent(int idx) const
+QString CommitInfo::firstParent() const
 {
-   return mParentsSha.count() > idx ? mParentsSha.at(idx) : QString();
+   return !mParentsSha.isEmpty() ? mParentsSha.at(0) : QString();
 }
 
 QStringList CommitInfo::parents() const

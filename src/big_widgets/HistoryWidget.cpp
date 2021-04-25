@@ -214,7 +214,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
 
    connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName) {
-      showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).parent(0), fileName);
+      showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent(), fileName);
    });
 
    mSplitter->insertWidget(0, wipFrame);
@@ -345,11 +345,11 @@ void HistoryWidget::showFullDiff()
 {
    const auto commit = mCache->commitInfo(CommitInfo::ZERO_SHA);
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
-   const auto ret = git->getCommitDiff(CommitInfo::ZERO_SHA, commit.parent(0));
+   const auto ret = git->getCommitDiff(CommitInfo::ZERO_SHA, commit.firstParent());
 
    if (ret.success && !ret.output.toString().isEmpty())
    {
-      mFullDiffWidget->loadDiff(CommitInfo::ZERO_SHA, commit.parent(0), ret.output.toString());
+      mFullDiffWidget->loadDiff(CommitInfo::ZERO_SHA, commit.firstParent(), ret.output.toString());
       mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FullDiff));
    }
    else

@@ -61,7 +61,7 @@ void CommitInfoWidget::configure(const QString &sha)
       {
          QLog_Info("UI", QString("Loading information of the commit {%1}").arg(sha));
          mCurrentSha = commit.sha;
-         mParentSha = commit.parent(0);
+         mParentSha = commit.firstParent();
 
          mInfoPanel->configure(commit);
 

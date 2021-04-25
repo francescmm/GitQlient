@@ -91,7 +91,7 @@ void CommitChangesWidget::resetFile(QListWidgetItem *item)
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
    const auto ret = git->resetFile(item->toolTip());
    const auto revInfo = mCache->commitInfo(mCurrentSha);
-   const auto files = mCache->revisionFile(mCurrentSha, revInfo.parent(0));
+   const auto files = mCache->revisionFile(mCurrentSha, revInfo.firstParent());
 
    for (auto i = 0; i < files.count(); ++i)
    {
@@ -313,7 +313,7 @@ void CommitChangesWidget::addAllFilesToCommitList()
 void CommitChangesWidget::requestDiff(const QString &fileName)
 {
    const auto isCached = qobject_cast<StagedFilesList *>(sender()) == ui->stagedFilesList;
-   emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).parent(0), fileName, isCached);
+   emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent(), fileName, isCached);
 }
 
 QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool updateGit)

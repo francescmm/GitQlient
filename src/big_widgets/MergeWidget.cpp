@@ -177,7 +177,7 @@ void MergeWidget::changeDiffView(QListWidgetItem *item)
    const auto wip = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
 
    const auto configured
-       = mFileDiff->configure(CommitInfo::ZERO_SHA, wip.parent(0), mGit->getWorkingDir() + "/" + file, false);
+       = mFileDiff->configure(CommitInfo::ZERO_SHA, wip.firstParent(), mGit->getWorkingDir() + "/" + file, false);
 
    mStacked->setCurrentIndex(configured);
 
@@ -321,7 +321,7 @@ void MergeWidget::cherryPickCommit()
             QScopedPointer<GitWip> git(new GitWip(mGit, mGitQlientCache));
             git->updateWip();
 
-            const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+            const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
 
             configureForCherryPick(files, shas);
          }

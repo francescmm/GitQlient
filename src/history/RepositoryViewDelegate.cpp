@@ -335,7 +335,7 @@ QColor RepositoryViewDelegate::getMergeColor(const Lane &currentLane, const Comm
       case LaneType::JOIN_L:
          for (auto laneCount = 0; laneCount < currentLaneIndex; ++laneCount)
          {
-            if (commit.getLane(laneCount).equals(LaneType::JOIN_L))
+            if (commit.laneAt(laneCount).equals(LaneType::JOIN_L))
             {
                mergeColor = GitQlientStyles::getBranchColorAt(laneCount % GitQlientStyles::getTotalBranchColors());
                isSet = true;
@@ -390,11 +390,11 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          {
             x1 = x2 - LANE_WIDTH;
 
-            auto currentLane = commit.getLane(i);
+            auto currentLane = commit.laneAt(i);
 
             if (!laneHeadPresent && i < laneNum - 1)
             {
-               auto prevLane = commit.getLane(i + 1);
+               auto prevLane = commit.laneAt(i + 1);
                laneHeadPresent
                    = prevLane.isHead() || prevLane.equals(LaneType::JOIN_R) || prevLane.equals(LaneType::JOIN_L);
             }

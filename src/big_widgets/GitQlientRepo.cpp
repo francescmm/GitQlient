@@ -408,7 +408,7 @@ void GitQlientRepo::showWarningMerge()
    QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
    git->updateWip();
 
-   const auto file = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+   const auto file = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
 
    mMergeWidget->configure(file, MergeWidget::ConflictReason::Merge);
 }
@@ -423,7 +423,7 @@ void GitQlientRepo::showCherryPickConflict(const QStringList &shas)
    QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
    git->updateWip();
 
-   const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+   const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
 
    mMergeWidget->configureForCherryPick(files, shas);
 }
@@ -438,7 +438,7 @@ void GitQlientRepo::showPullConflict()
    QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
    git->updateWip();
 
-   const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.parent(0));
+   const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
 
    mMergeWidget->configure(files, MergeWidget::ConflictReason::Pull);
 }
@@ -570,7 +570,7 @@ bool GitQlientRepo::containsSubmodule(const QString &path, const QVector<QString
 void GitQlientRepo::openCommitDiff(const QString currentSha)
 {
    const auto rev = mGitQlientCache->commitInfo(currentSha);
-   const auto loaded = mDiffWidget->loadCommitDiff(currentSha, rev.parent(0));
+   const auto loaded = mDiffWidget->loadCommitDiff(currentSha, rev.firstParent());
 
    if (loaded)
    {

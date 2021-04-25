@@ -77,53 +77,55 @@ void SquashDlg::accept()
       git->updateWip();
 
       const auto lastChild = mCache->commitInfo(mShas.last());
-      const auto oneChild = lastChild.getChildsCount() == 1;
 
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-      if (lastChild.isInWorkingBranch() && oneChild)
+      if (lastChild.getChildsCount() == 1)
       {
-         // Reset soft to the first commit to squash
-         QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
-         gitLocal->resetCommit(mShas.constFirst(), GitLocal::CommitResetType::SOFT);
-         gitLocal->ammend(msg);
-      }
-      else if (oneChild)
-      {
-         QScopedPointer<GitBranches> gitBranches(new GitBranches(mGit));
+         if (lastChild.isInWorkingBranch())
+         {
+            // Reset soft to the first commit to squash
+            QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+            gitLocal->resetCommit(mShas.constFirst(), GitLocal::CommitResetType::SOFT);
+            gitLocal->ammend(msg);
+         }
+         else
+         {
+            QScopedPointer<GitBranches> gitBranches(new GitBranches(mGit));
 
-         // Create auxiliar branch for rebase
-         const auto auxBranch1 = QUuid::createUuid().toString();
-         const auto commitOfAuxBranch1 = lastChild.getFirstChildSha();
-         gitBranches->createBranchAtCommit(commitOfAuxBranch1, auxBranch1);
+            // Create auxiliar branch for rebase
+            const auto auxBranch1 = QUuid::createUuid().toString();
+            const auto commitOfAuxBranch1 = lastChild.getFirstChildSha();
+            gitBranches->createBranchAtCommit(commitOfAuxBranch1, auxBranch1);
 
-         // Create auxiliar branch for merge squash
-         const auto auxBranch2 = QUuid::createUuid().toString();
-         gitBranches->createBranchAtCommit(mShas.last(), auxBranch2);
+            // Create auxiliar branch for merge squash
+            const auto auxBranch2 = QUuid::createUuid().toString();
+            gitBranches->createBranchAtCommit(mShas.last(), auxBranch2);
 
-         // Create auxiliar branch for final rebase
-         const auto auxBranch3 = QUuid::createUuid().toString();
-         const auto lastCommit = mCache->commitInfo(CommitInfo::ZERO_SHA).parent(0);
-         gitBranches->createBranchAtCommit(lastCommit, auxBranch3);
+            // Create auxiliar branch for final rebase
+            const auto auxBranch3 = QUuid::createUuid().toString();
+            const auto lastCommit = mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent();
+            gitBranches->createBranchAtCommit(lastCommit, auxBranch3);
 
-         // Reset hard to the first commit to squash
-         QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
-         gitLocal->resetCommit(mShas.constFirst(), GitLocal::CommitResetType::HARD);
+            // Reset hard to the first commit to squash
+            QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+            gitLocal->resetCommit(mShas.constFirst(), GitLocal::CommitResetType::HARD);
 
-         // Merge squash auxiliar branch 2
-         QScopedPointer<GitMerge> gitMerge(new GitMerge(mGit, mCache));
-         const auto ret = gitMerge->squashMerge(mGit->getCurrentBranch(), { auxBranch2 }, msg);
+            // Merge squash auxiliar branch 2
+            QScopedPointer<GitMerge> gitMerge(new GitMerge(mGit, mCache));
+            const auto ret = gitMerge->squashMerge(mGit->getCurrentBranch(), { auxBranch2 }, msg);
 
-         gitBranches->removeLocalBranch(auxBranch2);
+            gitBranches->removeLocalBranch(auxBranch2);
 
-         // Rebase auxiliar branch 1
-         const auto destBranch = mGit->getCurrentBranch();
-         gitLocal->cherryPickCommit(commitOfAuxBranch1);
-         gitBranches->rebaseOnto(destBranch, auxBranch1, auxBranch3);
-         gitBranches->removeLocalBranch(auxBranch1);
-         gitBranches->checkoutLocalBranch(destBranch);
-         gitMerge->merge(destBranch, { auxBranch3 });
-         gitBranches->removeLocalBranch(auxBranch3);
+            // Rebase auxiliar branch 1
+            const auto destBranch = mGit->getCurrentBranch();
+            gitLocal->cherryPickCommit(commitOfAuxBranch1);
+            gitBranches->rebaseOnto(destBranch, auxBranch1, auxBranch3);
+            gitBranches->removeLocalBranch(auxBranch1);
+            gitBranches->checkoutLocalBranch(destBranch);
+            gitMerge->merge(destBranch, { auxBranch3 });
+            gitBranches->removeLocalBranch(auxBranch3);
+         }
       }
 
       QApplication::restoreOverrideCursor();

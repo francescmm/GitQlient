@@ -33,7 +33,7 @@ void AmendWidget::configure(const QString &sha)
    git->updateWip();
 
    const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, sha);
-   const auto amendFiles = mCache->revisionFile(sha, commit.parent(0));
+   const auto amendFiles = mCache->revisionFile(sha, commit.firstParent());
 
    if (mCurrentSha != sha)
    {

@@ -56,18 +56,15 @@ public:
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;
 
+   bool isValid() const;
    bool contains(const QString &value);
 
    int parentsCount() const;
-   QString parent(int idx) const;
+   QString firstParent() const;
    QStringList parents() const;
    bool isInWorkingBranch() const;
 
-   QString fullLog() const { return QString("%1\n\n%2").arg(shortLog, longLog.trimmed()); }
-
-   bool isValid() const;
-
-   Lane getLane(int i) const { return lanes.at(i); }
+   Lane laneAt(int i) const { return lanes.at(i); }
    int getActiveLane() const;
 
    void appendChild(CommitInfo *commit) { mChilds.append(commit); }
