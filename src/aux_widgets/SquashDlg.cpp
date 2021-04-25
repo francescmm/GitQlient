@@ -42,7 +42,7 @@ SquashDlg::SquashDlg(const QSharedPointer<GitBase> git, const QSharedPointer<Git
    for (const auto &sha : shas)
    {
       const auto shortSha = sha.left(8);
-      const auto commitTitle = mCache->commitInfo(sha).shortLog();
+      const auto commitTitle = mCache->commitInfo(sha).shortLog;
       description.append(QString("Commit %1: %2 - %3\n\n").arg(row + 1).arg(shortSha, commitTitle));
 
       commitsLayout->addWidget(new QLabel(QString("<strong>(%1)</strong>").arg(shortSha)), row, 0);

@@ -27,6 +27,8 @@
 #include <QStringList>
 #include <QVector>
 
+#include <chrono>
+
 #include <Lane.h>
 #include <References.h>
 
@@ -46,9 +48,10 @@ public:
 
    CommitInfo() = default;
    ~CommitInfo();
-   explicit CommitInfo(const QString sha, const QStringList &parents, const QDateTime &commitDate, const QString &log);
+   explicit CommitInfo(const QString sha, const QStringList &parents, std::chrono::seconds commitDate,
+                       const QString &log);
    explicit CommitInfo(const QString sha, const QStringList &parents, const QString &commiter,
-                       const QDateTime &commitDate, const QString &author, const QString &log,
+                       std::chrono::seconds commitDate, const QString &author, const QString &log,
                        const QString &longLog = QString(), bool isSigned = false, const QString &gpgKey = QString());
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;
@@ -60,51 +63,33 @@ public:
    QStringList parents() const;
    bool isInWorkingBranch() const;
 
-   QString sha() const { return mSha; }
-   QString committer() const { return mCommitter; }
-   QString author() const { return mAuthor; }
-   QString authorDate() const { return QString::number(mCommitDate.toSecsSinceEpoch()); }
-   QString shortLog() const { return mShortLog; }
-   QString longLog() const { return mLongLog; }
-   QString fullLog() const { return QString("%1\n\n%2").arg(mShortLog, mLongLog.trimmed()); }
+   QString fullLog() const { return QString("%1\n\n%2").arg(shortLog, longLog.trimmed()); }
 
    bool isValid() const;
-   bool isWip() const { return mSha == ZERO_SHA; }
 
-   void setLanes(const QVector<Lane> &lanes) { mLanes = lanes; }
-   QVector<Lane> getLanes() const { return mLanes; }
-   Lane getLane(int i) const { return mLanes.at(i); }
-   int getLanesCount() const { return mLanes.count(); }
+   Lane getLane(int i) const { return lanes.at(i); }
    int getActiveLane() const;
 
-   void addChildReference(CommitInfo *commit) { mChilds.append(commit); }
+   void appendChild(CommitInfo *commit) { mChilds.append(commit); }
    bool hasChilds() const { return !mChilds.empty(); }
    QString getFirstChildSha() const;
    int getChildsCount() const { return mChilds.count(); }
 
-   bool isSigned() const { return mSigned; }
-   QString getGpgKey() const { return mGpgKey; }
-
-   void setPos(uint pos) { mPos = pos; }
-   uint getPos() const { return mPos; }
-
    static const QString ZERO_SHA;
    static const QString INIT_SHA;
 
-private:
-   QString mSha;
-   QStringList mParentsSha;
-   QString mCommitter;
-   QString mAuthor;
-   QString mShortLog;
-   QString mLongLog;
-   QString mDiff;
-   QDateTime mCommitDate;
-   QVector<Lane> mLanes;
-   QVector<CommitInfo *> mChilds;
-   bool mSigned = false;
-   QString mGpgKey;
-   uint mPos = 0;
+   uint pos = 0;
+   QString sha;
+   QString committer;
+   QString author;
+   std::chrono::seconds dateSinceEpoch;
+   QString shortLog;
+   QString longLog;
+   QVector<Lane> lanes;
+   QString gpgKey;
+   bool isSigned = false;
 
-   friend class GitCache;
+private:
+   QStringList mParentsSha;
+   QVector<CommitInfo *> mChilds;
 };

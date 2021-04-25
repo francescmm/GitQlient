@@ -1,12 +1,12 @@
-#include <CommitInfoWidget.h>
-#include <CommitInfoPanel.h>
-#include <GitCache.h>
 #include <CommitInfo.h>
+#include <CommitInfoPanel.h>
+#include <CommitInfoWidget.h>
 #include <FileListWidget.h>
+#include <GitCache.h>
 
+#include <QDateTime>
 #include <QLabel>
 #include <QVBoxLayout>
-#include <QDateTime>
 
 #include <QLogger.h>
 
@@ -57,10 +57,10 @@ void CommitInfoWidget::configure(const QString &sha)
    {
       const auto commit = mCache->commitInfo(sha);
 
-      if (!commit.sha().isEmpty())
+      if (!commit.sha.isEmpty())
       {
          QLog_Info("UI", QString("Loading information of the commit {%1}").arg(sha));
-         mCurrentSha = commit.sha();
+         mCurrentSha = commit.sha;
          mParentSha = commit.parent(0);
 
          mInfoPanel->configure(commit);

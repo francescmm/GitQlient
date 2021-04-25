@@ -6,39 +6,39 @@ const QString CommitInfo::ZERO_SHA = QString("0000000000000000000000000000000000
 const QString CommitInfo::INIT_SHA = QString("4b825dc642cb6eb9a060e54bf8d69288fbee4904");
 
 CommitInfo::CommitInfo(const QString sha, const QStringList &parents, const QString &commiter,
-                       const QDateTime &commitDate, const QString &author, const QString &log, const QString &longLog,
-                       bool isSigned, const QString &gpgKey)
+                       std::chrono::seconds commitDate, const QString &author, const QString &log,
+                       const QString &longLog, bool isSigned, const QString &gpgKey)
    : CommitInfo(sha, parents, commitDate, log)
 {
-   mCommitter = commiter;
-   mAuthor = author;
-   mLongLog = longLog;
-   mSigned = isSigned;
-   mGpgKey = gpgKey;
+   committer = commiter;
+   this->author = author;
+   this->longLog = longLog;
+   this->isSigned = isSigned;
+   this->gpgKey = gpgKey;
 }
 
 CommitInfo::~CommitInfo()
 {
-   mLanes.clear();
-   mLanes.squeeze();
+   lanes.clear();
+   lanes.squeeze();
    mChilds.clear();
    mChilds.squeeze();
 }
 
-CommitInfo::CommitInfo(const QString sha, const QStringList &parents, const QDateTime &commitDate, const QString &log)
-   : mSha(sha)
+CommitInfo::CommitInfo(const QString sha, const QStringList &parents, std::chrono::seconds commitDate,
+                       const QString &log)
+   : sha(sha)
+   , dateSinceEpoch(commitDate)
+   , shortLog(log)
    , mParentsSha(parents)
-   , mShortLog(log)
-   , mCommitDate(commitDate)
 {
 }
 
 bool CommitInfo::operator==(const CommitInfo &commit) const
 {
-   return (mSha == commit.mSha || mSha.startsWith(commit.sha()) || commit.sha().startsWith(mSha))
-       && mParentsSha == commit.mParentsSha && mCommitter == commit.mCommitter && mAuthor == commit.mAuthor
-       && mCommitDate == commit.mCommitDate && mShortLog == commit.mShortLog && mLongLog == commit.mLongLog
-       && mLanes == commit.mLanes;
+   return sha.startsWith(commit.sha) && mParentsSha == commit.mParentsSha && committer == commit.committer
+       && author == commit.author && dateSinceEpoch == commit.dateSinceEpoch && shortLog == commit.shortLog
+       && longLog == commit.longLog && lanes == commit.lanes;
 }
 
 bool CommitInfo::operator!=(const CommitInfo &commit) const
@@ -48,8 +48,8 @@ bool CommitInfo::operator!=(const CommitInfo &commit) const
 
 bool CommitInfo::contains(const QString &value)
 {
-   return mSha.startsWith(value, Qt::CaseInsensitive) || mShortLog.contains(value, Qt::CaseInsensitive)
-       || mCommitter.contains(value, Qt::CaseInsensitive) || mAuthor.contains(value, Qt::CaseInsensitive);
+   return sha.startsWith(value, Qt::CaseInsensitive) || shortLog.contains(value, Qt::CaseInsensitive)
+       || committer.contains(value, Qt::CaseInsensitive) || author.contains(value, Qt::CaseInsensitive);
 }
 
 int CommitInfo::parentsCount() const
@@ -76,7 +76,7 @@ bool CommitInfo::isInWorkingBranch() const
 {
    for (const auto &child : mChilds)
    {
-      if (child->mSha == CommitInfo::ZERO_SHA)
+      if (child->sha == CommitInfo::ZERO_SHA)
       {
          return true;
          break;
@@ -90,14 +90,14 @@ bool CommitInfo::isValid() const
 {
    static QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
 
-   return !mSha.isEmpty() && hexMatcher.exactMatch(mSha);
+   return !sha.isEmpty() && hexMatcher.exactMatch(sha);
 }
 
 int CommitInfo::getActiveLane() const
 {
    auto i = 0;
 
-   for (auto lane : mLanes)
+   for (auto lane : lanes)
    {
       if (lane.isActive())
          return i;

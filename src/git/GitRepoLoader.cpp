@@ -236,7 +236,7 @@ QVector<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
    {
       if (auto commit = parseCommitData(commitData); commit.isValid())
       {
-         commit.setPos(pos++);
+         commit.pos = pos++;
          commits.append(std::move(commit));
       }
    }
@@ -279,7 +279,7 @@ QVector<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
          {
             if (auto revision = parseCommitData(commit); revision.isValid())
             {
-               revision.setPos(pos++);
+               revision.pos = pos++;
                commits.append(std::move(revision));
             }
 
@@ -315,7 +315,7 @@ CommitInfo GitRepoLoader::parseCommitData(QByteArray &commitData) const
 #endif
       const auto committer = fields.at(2);
       const auto author = fields.at(3);
-      const auto commitDate = QDateTime::fromSecsSinceEpoch(fields.at(4).toInt());
+      const auto commitDate = std::chrono::seconds(fields.at(4).toInt());
       const auto shortLog = fields.at(5);
       QString longLog;
 

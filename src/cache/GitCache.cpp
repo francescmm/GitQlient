@@ -46,10 +46,10 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits
 
       calculateLanes(commit);
 
-      const auto sha = commit.sha();
+      const auto sha = commit.sha;
 
       if (sha == mCommitsMap.value(CommitInfo::ZERO_SHA).parent(0))
-         commit.addChildReference(&mCommitsMap[CommitInfo::ZERO_SHA]);
+         commit.appendChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
 
       mCommitsMap[sha] = std::move(commit);
 
@@ -58,7 +58,7 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits
       if (tmpChildsStorage.contains(sha))
       {
          for (auto &child : tmpChildsStorage.values(sha))
-            mCommitsMap[sha].addChildReference(child);
+            mCommitsMap[sha].appendChild(child);
 
          tmpChildsStorage.remove(sha);
       }
@@ -194,11 +194,11 @@ void GitCache::insertWipRevision(const WipRevisionInfo &wipInfo)
       mLanes.init(CommitInfo::ZERO_SHA);
 
    const auto log = fakeRevFile.count() == mUntrackedfiles.count() ? tr("No local changes") : tr("Local changes");
-   CommitInfo c(CommitInfo::ZERO_SHA, parents, QDateTime::currentDateTime(), log);
+   CommitInfo c(CommitInfo::ZERO_SHA, parents, std::chrono::seconds(QDateTime::currentSecsSinceEpoch()), log);
    calculateLanes(c);
 
    if (mCommits[0])
-      c.setLanes(mCommits[0]->getLanes());
+      c.lanes = mCommits[0]->lanes;
 
    mCommitsMap.insert(CommitInfo::ZERO_SHA, std::move(c));
    mCommits[0] = &mCommitsMap[CommitInfo::ZERO_SHA];
@@ -275,7 +275,7 @@ bool GitCache::updateWipCommit(const WipRevisionInfo &wipInfo)
 
 void GitCache::calculateLanes(CommitInfo &c)
 {
-   const auto sha = c.sha();
+   const auto sha = c.sha;
 
    QLog_Trace("Cache", QString("Updating the lanes for SHA {%1}.").arg(sha));
 
@@ -297,7 +297,7 @@ void GitCache::calculateLanes(CommitInfo &c)
 
    resetLanes(c, isFork);
 
-   c.mLanes = lanes;
+   c.lanes = lanes;
 }
 
 bool GitCache::pendingLocalChanges()

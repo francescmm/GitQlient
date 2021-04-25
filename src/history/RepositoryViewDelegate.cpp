@@ -57,7 +57,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
    const auto commit = mCache->commitInfo(row);
 
-   if (commit.sha().isEmpty())
+   if (commit.sha.isEmpty())
       return;
 
    if (index.column() == static_cast<int>(CommitHistoryColumns::Graph))
@@ -94,9 +94,9 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
          newOpt.font.setPointSize(8);
          newOpt.font.setFamily("DejaVu Sans Mono");
 
-         text = commit.sha() != CommitInfo::ZERO_SHA ? text.left(8) : "";
+         text = commit.sha != CommitInfo::ZERO_SHA ? text.left(8) : "";
       }
-      else if (index.column() == static_cast<int>(CommitHistoryColumns::Author) && commit.isSigned())
+      else if (index.column() == static_cast<int>(CommitHistoryColumns::Author) && commit.isSigned)
       {
          static const auto size = 15;
          static const auto offset = 5;
@@ -364,7 +364,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    }
    else
    {
-      if (commit.sha() == CommitInfo::ZERO_SHA)
+      if (commit.sha == CommitInfo::ZERO_SHA)
       {
          const auto activeColor = GitQlientStyles::getBranchColorAt(0);
          QColor color = activeColor;
@@ -377,7 +377,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       }
       else
       {
-         const auto laneNum = commit.getLanesCount();
+         const auto laneNum = commit.lanes.count();
          const auto activeLane = commit.getActiveLane();
          const auto activeColor
              = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
@@ -424,7 +424,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const CommitInfo &commit,
                                       const QString &text) const
 {
-   const auto sha = commit.sha();
+   const auto sha = commit.sha;
 
    if (sha.isEmpty())
       return;
@@ -433,7 +433,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    if (mGitServerCache)
    {
-      if (const auto pr = mGitServerCache->getPullRequest(commit.sha()); pr.isValid())
+      if (const auto pr = mGitServerCache->getPullRequest(commit.sha); pr.isValid())
       {
          offset = 5;
          paintPrStatus(p, opt, offset, pr);

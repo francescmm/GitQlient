@@ -405,7 +405,7 @@ void HistoryWidget::search()
          commitInfo = mCache->searchCommitInfo(text, startingRow + 1, mReverseSearch);
 
          if (commitInfo.isValid())
-            goToSha(commitInfo.sha());
+            goToSha(commitInfo.sha);
          else
             QMessageBox::information(this, tr("Not found!"), tr("No commits where found based on the search text."));
       }
@@ -553,7 +553,7 @@ void HistoryWidget::cherryPickCommit()
    if (const auto commit = mCache->commitInfo(mSearchInput->text()); commit.isValid())
    {
       const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
-      const auto ret = git->cherryPickCommit(commit.sha());
+      const auto ret = git->cherryPickCommit(commit.sha);
 
       if (ret.success)
       {

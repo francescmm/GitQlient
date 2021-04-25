@@ -1,9 +1,9 @@
-#include <CommitInfoPanel.h>
 #include <CommitInfo.h>
+#include <CommitInfoPanel.h>
 
-#include <QVBoxLayout>
 #include <QLabel>
 #include <QScrollArea>
+#include <QVBoxLayout>
 
 CommitInfoPanel::CommitInfoPanel(QWidget *parent)
    : QFrame(parent)
@@ -53,16 +53,16 @@ CommitInfoPanel::CommitInfoPanel(QWidget *parent)
 
 void CommitInfoPanel::configure(const CommitInfo &commit)
 {
-   mLabelSha->setText(commit.sha());
+   mLabelSha->setText(commit.sha);
 
-   const auto authorName = commit.committer().split("<").first();
-   mLabelTitle->setText(commit.shortLog());
+   const auto authorName = commit.committer.split("<").first();
+   mLabelTitle->setText(commit.shortLog);
    mLabelAuthor->setText(authorName);
 
-   QDateTime commitDate = QDateTime::fromSecsSinceEpoch(commit.authorDate().toInt());
+   QDateTime commitDate = QDateTime::fromSecsSinceEpoch(commit.dateSinceEpoch.count());
    mLabelDateTime->setText(commitDate.toString("dd/MM/yyyy hh:mm"));
 
-   const auto description = commit.longLog();
+   const auto description = commit.longLog;
    mLabelDescription->setText(description.isEmpty() ? "<No description provided>" : description);
 
    QFontMetrics fm(mLabelDescription->font());

@@ -2,9 +2,9 @@
 
 #include <CommitHistoryColumns.h>
 #include <CommitInfo.h>
+#include <GitBase.h>
 #include <GitCache.h>
 #include <GitServerCache.h>
-#include <GitBase.h>
 
 #include <QDateTime>
 #include <QLocale>
@@ -76,7 +76,7 @@ QModelIndex CommitHistoryModel::parent(const QModelIndex &) const
 QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
 {
    QString auxMessage;
-   const auto sha = r.sha();
+   const auto sha = r.sha;
 
    if (mGit->getCurrentBranch().isEmpty())
       auxMessage.append(tr("<p>Status: <b>detached</b></p>"));
@@ -97,16 +97,16 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
       auxMessage.append(tr("<p><b>Tags: </b>%1</p>").arg(tags.join(",")));
 
    QDateTime d;
-   d.setSecsSinceEpoch(r.authorDate().toUInt());
+   d.setSecsSinceEpoch(r.dateSinceEpoch.count());
 
    QLocale locale;
 
    auto tooltip = sha == CommitInfo::ZERO_SHA
        ? QString()
        : QString("<p>%1 - %2</p><p>%3</p>%4%5")
-             .arg(r.author().split("<").first(), d.toString(locale.dateTimeFormat(QLocale::ShortFormat)), sha,
+             .arg(r.author.split("<").first(), d.toString(locale.dateTimeFormat(QLocale::ShortFormat)), sha,
                   !auxMessage.isEmpty() ? QString("<p>%1</p>").arg(auxMessage) : "",
-                  r.isSigned() ? tr("<p>Commit signed!</p><p> GPG key: %1</p>").arg(r.getGpgKey()) : "");
+                  r.isSigned ? tr("<p>Commit signed!</p><p> GPG key: %1</p>").arg(r.gpgKey) : "");
 
    if (mGitServerCache)
    {
@@ -122,17 +122,17 @@ QVariant CommitHistoryModel::getDisplayData(const CommitInfo &rev, int column) c
    switch (static_cast<CommitHistoryColumns>(column))
    {
       case CommitHistoryColumns::Sha: {
-         const auto sha = rev.sha();
+         const auto sha = rev.sha;
          return sha;
       }
       case CommitHistoryColumns::Log:
-         return rev.shortLog();
+         return rev.shortLog;
       case CommitHistoryColumns::Author: {
-         const auto author = rev.author().split("<").first();
+         const auto author = rev.author.split("<").first();
          return author;
       }
       case CommitHistoryColumns::Date: {
-         return QDateTime::fromSecsSinceEpoch(rev.authorDate().toUInt()).toString("dd MMM yyyy hh:mm");
+         return QDateTime::fromSecsSinceEpoch(rev.dateSinceEpoch.count()).toString("dd MMM yyyy hh:mm");
       }
       default:
          return QVariant();
