@@ -8,9 +8,10 @@ greaterThan(QT_MINOR_VERSION, 12) {
 TARGET = gitqlient
 QT += widgets core network webenginewidgets webchannel
 DEFINES += QT_DEPRECATED_WARNINGS
-QMAKE_LFLAGS += -no-pie
 
 unix {
+   QMAKE_LFLAGS += -no-pie
+
    isEmpty(PREFIX) {
       PREFIX = /usr/local
    }
