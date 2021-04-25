@@ -105,4 +105,6 @@ private:
    bool mSigned = false;
    QString mGpgKey;
    uint mPos = 0;
+
+   friend class GitCache;
 };

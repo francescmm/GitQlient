@@ -98,7 +98,7 @@ private:
 
    void insertWipRevision(const WipRevisionInfo &wipInfo);
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
-   QVector<Lane> calculateLanes(const CommitInfo &c);
+   void calculateLanes(CommitInfo &c);
    auto searchCommit(const QString &text, int startingPoint = 0) const;
    auto reverseSearchCommit(const QString &text, int startingPoint = 0) const;
    void resetLanes(const CommitInfo &c, bool isFork);

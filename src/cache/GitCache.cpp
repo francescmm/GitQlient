@@ -44,7 +44,7 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits
    {
       auto commit = commits.takeFirst();
 
-      commit.setLanes(calculateLanes(commit));
+      calculateLanes(commit);
 
       const auto sha = commit.sha();
 
@@ -195,7 +195,7 @@ void GitCache::insertWipRevision(const WipRevisionInfo &wipInfo)
 
    const auto log = fakeRevFile.count() == mUntrackedfiles.count() ? tr("No local changes") : tr("Local changes");
    CommitInfo c(CommitInfo::ZERO_SHA, parents, QDateTime::currentDateTime(), log);
-   c.setLanes(calculateLanes(c));
+   calculateLanes(c);
 
    if (mCommits[0])
       c.setLanes(mCommits[0]->getLanes());
@@ -273,7 +273,7 @@ bool GitCache::updateWipCommit(const WipRevisionInfo &wipInfo)
    return false;
 }
 
-QVector<Lane> GitCache::calculateLanes(const CommitInfo &c)
+void GitCache::calculateLanes(CommitInfo &c)
 {
    const auto sha = c.sha();
 
@@ -284,7 +284,7 @@ QVector<Lane> GitCache::calculateLanes(const CommitInfo &c)
    bool isMerge = c.parentsCount() > 1;
 
    if (isDiscontinuity)
-      mLanes.changeActiveLane(sha); // uses previous isBoundary state
+      mLanes.changeActiveLane(sha);
 
    if (isFork)
       mLanes.setFork(sha);
@@ -297,7 +297,7 @@ QVector<Lane> GitCache::calculateLanes(const CommitInfo &c)
 
    resetLanes(c, isFork);
 
-   return lanes;
+   c.mLanes = lanes;
 }
 
 bool GitCache::pendingLocalChanges()
