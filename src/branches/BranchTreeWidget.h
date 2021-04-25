@@ -133,5 +133,5 @@ private:
     */
    void onSelectionChanged();
 
-   QList<QTreeWidgetItem *> findChildItem(const QString &text) const;
+   QVector<QTreeWidgetItem *> findChildItem(const QString &text) const;
 };

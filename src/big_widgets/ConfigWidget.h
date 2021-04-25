@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QWidget>
 #include <QMap>
+#include <QWidget>
 
 class GitBase;
 class QTimer;
@@ -36,7 +36,8 @@ private:
    bool mShowResetMsg = false;
    QTimer *mFeedbackTimer = nullptr;
    QPushButton *mSave = nullptr;
-   QMap<int, FileEditor *> mEditors;
+   FileEditor *mLocalGit = nullptr;
+   FileEditor *mGlobalGit = nullptr;
 
    void clearCache();
    void calculateCacheSize();

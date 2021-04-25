@@ -48,7 +48,6 @@ void AmendWidget::configure(const QString &sha)
       ui->leCommitTitle->setText(commit.shortLog);
 
       blockSignals(true);
-      mInternalCache.clear();
       ui->unstagedFilesList->clear();
       ui->stagedFilesList->clear();
       blockSignals(false);

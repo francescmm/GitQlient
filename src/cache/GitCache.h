@@ -72,13 +72,13 @@ public:
 
    bool updateWipCommit(const WipRevisionInfo &wipInfo);
 
-   void setUntrackedFilesList(const QVector<QString> &untrackedFiles);
+   void setUntrackedFilesList(QVector<QString> untrackedFiles);
    bool pendingLocalChanges();
 
    QVector<QPair<QString, QStringList>> getBranches(References::Type type);
    QHash<QString, QString> getTags(References::Type tagType) const;
 
-   void updateTags(const QHash<QString, QString> &remoteTags);
+   void updateTags(QHash<QString, QString> remoteTags);
 
 private:
    friend class GitRepoLoader;

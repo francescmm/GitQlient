@@ -653,7 +653,7 @@ void CommitHistoryContextMenu::showSquashDialog()
    else
    {
       const auto squash = new SquashDlg(mGit, mCache, mShas, this);
-      connect(squash, &SquashDlg::changesCommitted, this, [this]() { requestReload(true); });
+      connect(squash, &SquashDlg::changesCommitted, this, [this]() { emit requestReload(true); });
       squash->exec();
    }
 }

@@ -62,19 +62,17 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    const auto localGitLayout = new QVBoxLayout(ui->localGit);
    localGitLayout->setContentsMargins(QMargins());
 
-   const auto localGit = new FileEditor(false, this);
-   localGit->editFile(mGit->getGitDir().append("/config"));
-   localGitLayout->addWidget(localGit);
-   mEditors.insert(0, localGit);
+   mLocalGit = new FileEditor(false, this);
+   mLocalGit->editFile(mGit->getGitDir().append("/config"));
+   localGitLayout->addWidget(mLocalGit);
 
    const auto globalGitLayout = new QVBoxLayout(ui->globalGit);
    globalGitLayout->setContentsMargins(QMargins());
 
-   const auto globalGit = new FileEditor(false, this);
-   globalGit->editFile(
+   mGlobalGit = new FileEditor(false, this);
+   mGlobalGit->editFile(
        QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::HomeLocation), ".gitconfig"));
-   globalGitLayout->addWidget(globalGit);
-   mEditors.insert(1, globalGit);
+   globalGitLayout->addWidget(mGlobalGit);
 
    GitQlientSettings settings(mGit->getGitDir());
 
@@ -300,5 +298,9 @@ void ConfigWidget::enableWidgets()
 void ConfigWidget::saveFile()
 {
    const auto id = ui->tabWidget->currentIndex();
-   mEditors.value(id)->saveFile();
+
+   if (id == 0)
+      mLocalGit->saveFile();
+   else
+      mGlobalGit->saveFile();
 }

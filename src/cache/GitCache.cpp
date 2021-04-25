@@ -264,6 +264,8 @@ void GitCache::reloadCurrentBranchInfo(const QString &currentBranch, const QStri
 
 bool GitCache::updateWipCommit(const WipRevisionInfo &wipInfo)
 {
+   QMutexLocker lock(&mMutex);
+
    if (mConfigured)
    {
       insertWipRevision(wipInfo);
@@ -347,9 +349,13 @@ QHash<QString, QString> GitCache::getTags(References::Type tagType) const
    return tags;
 }
 
-void GitCache::updateTags(const QHash<QString, QString> &remoteTags)
+void GitCache::updateTags(QHash<QString, QString> remoteTags)
 {
-   mRemoteTags = remoteTags;
+   QMutexLocker lock(&mMutex);
+
+   mRemoteTags.clear();
+   mRemoteTags.squeeze();
+   mRemoteTags = std::move(remoteTags);
 
    emit signalCacheUpdated();
 }
@@ -433,7 +439,11 @@ RevisionFiles GitCache::fakeWorkDirRevFile(const QString &diffIndex, const QStri
    return rf;
 }
 
-void GitCache::setUntrackedFilesList(const QVector<QString> &untrackedFiles)
+void GitCache::setUntrackedFilesList(QVector<QString> untrackedFiles)
 {
-   mUntrackedfiles = untrackedFiles;
+   QMutexLocker lock(&mMutex);
+
+   mUntrackedfiles.clear();
+   mUntrackedfiles.squeeze();
+   mUntrackedfiles = std::move(untrackedFiles);
 }

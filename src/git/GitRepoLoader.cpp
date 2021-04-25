@@ -204,10 +204,10 @@ void GitRepoLoader::processRevision(QByteArray ba)
    const auto ret = gitConfig->getGitValue("log.showSignature");
    const auto showSignature = ret.success ? ret.output.toString().contains("true") : false;
    auto commits = showSignature ? processSignedLog(ba) : processUnsignedLog(ba);
-
    QScopedPointer<GitWip> git(new GitWip(mGitBase, mRevCache));
-   git->updateUntrackedFiles();
+   const auto files = git->getUntrackedFiles();
 
+   mRevCache->setUntrackedFilesList(std::move(files));
    mRevCache->setup(git->getWipInfo(), std::move(commits));
 
    if (mRefreshReferences)

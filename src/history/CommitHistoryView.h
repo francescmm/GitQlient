@@ -125,9 +125,9 @@ public:
    /**
     * @brief Returns the list of SHAs that the user has selected in the view.
     *
-    * @return QList<QString> Gets the selected SHA list.
+    * @return QStringList Gets the selected SHA list.
     */
-   QList<QString> getSelectedShaList() const;
+   QStringList getSelectedShaList() const;
    /**
     * @brief If the view has a filter active this method tells the filter which SHAs are going to be shown.
     *

@@ -126,5 +126,5 @@ void GitTags::onRemoteTagsRecieved(GitExecResult result)
       }
    }
 
-   mCache->updateTags(tags);
+   mCache->updateTags(std::move(tags));
 }

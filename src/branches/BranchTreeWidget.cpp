@@ -193,11 +193,11 @@ void BranchTreeWidget::onSelectionChanged()
       selectCommit(selection.constFirst());
 }
 
-QList<QTreeWidgetItem *> BranchTreeWidget::findChildItem(const QString &text) const
+QVector<QTreeWidgetItem *> BranchTreeWidget::findChildItem(const QString &text) const
 {
    QModelIndexList indexes = model()->match(model()->index(0, 0, QModelIndex()), GitQlient::FullNameRole, text, -1,
                                             Qt::MatchContains | Qt::MatchRecursive);
-   QList<QTreeWidgetItem *> items;
+   QVector<QTreeWidgetItem *> items;
    const int indexesSize = indexes.size();
    items.reserve(indexesSize);
    for (int i = 0; i < indexesSize; ++i)

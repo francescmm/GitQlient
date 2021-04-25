@@ -230,19 +230,25 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
    }
 }
 
-QList<QString> CommitHistoryView::getSelectedShaList() const
+QStringList CommitHistoryView::getSelectedShaList() const
 {
    const auto indexes = selectedIndexes();
-   QMap<QDateTime, QString> shas;
 
-   for (auto index : indexes)
+   if (indexes.count() > 0)
    {
-      const auto sha = mCommitHistoryModel->sha(index.row());
-      const auto dtStr
-          = mCommitHistoryModel->index(index.row(), static_cast<int>(CommitHistoryColumns::Date)).data().toString();
+      QMap<QDateTime, QString> shas;
 
-      shas.insert(QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm"), sha);
+      for (auto index : indexes)
+      {
+         const auto sha = mCommitHistoryModel->sha(index.row());
+         const auto dtStr
+             = mCommitHistoryModel->index(index.row(), static_cast<int>(CommitHistoryColumns::Date)).data().toString();
+
+         shas.insert(QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm"), sha);
+
+         return shas.values();
+      }
    }
 
-   return shas.count() >= 1 ? shas.values() : QList<QString>();
+   return QStringList();
 }
