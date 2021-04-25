@@ -170,19 +170,23 @@ void QLoggerManager::enqueueMessage(const QString &module, LogLevel level, const
                                     const QString &function, const QString &file, int line)
 {
    QMutexLocker lock(&mMutex);
-   const auto threadId = QString("%1").arg((quintptr)QThread::currentThread(), QT_POINTER_SIZE * 2, 16, QChar('0'));
-   const auto fileName = file.mid(file.lastIndexOf('/') + 1);
    const auto logWriter = mModuleDest.value(module, Q_NULLPTR);
    const auto isLogEnabled = logWriter && logWriter->getMode() != LogMode::Disabled && !logWriter->isStop();
 
    if (isLogEnabled && logWriter->getLevel() <= level)
    {
+      const auto threadId = QString("%1").arg((quintptr)QThread::currentThread(), QT_POINTER_SIZE * 2, 16, QChar('0'));
+      const auto fileName = file.mid(file.lastIndexOf('/') + 1);
+
       writeAndDequeueMessages(module);
 
       logWriter->enqueue(QDateTime::currentDateTime(), threadId, module, level, function, fileName, line, message);
    }
    else if (!logWriter && mNonWriterQueue.count(module) < QUEUE_LIMIT)
    {
+      const auto threadId = QString("%1").arg((quintptr)QThread::currentThread(), QT_POINTER_SIZE * 2, 16, QChar('0'));
+      const auto fileName = file.mid(file.lastIndexOf('/') + 1);
+
       mNonWriterQueue.insert(module,
                              { QDateTime::currentDateTime(), threadId, QVariant::fromValue<LogLevel>(level), function,
                                fileName, line, message });

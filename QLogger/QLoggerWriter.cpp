@@ -171,9 +171,10 @@ void QLoggerWriter::enqueue(const QDateTime &date, const QString &threadId, cons
    QString text;
    if (mMessageOptions.testFlag(LogMessageDisplay::Default))
    {
-      text
-          = QString("[%1][%2][%3][%4]%5 %6")
-                .arg(levelToText(level), module, date.toString("dd-MM-yyyy hh:mm:ss.zzz"), threadId, fileLine, message);
+      text = QString("[%1][%2][%3][%4]%5 %6")
+                 .arg(levelToText(level), module)
+                 .arg(date.toSecsSinceEpoch())
+                 .arg(threadId, fileLine, message);
    }
    else
    {
@@ -184,7 +185,7 @@ void QLoggerWriter::enqueue(const QDateTime &date, const QString &threadId, cons
          text.append(QString("[%1]").arg(module));
 
       if (mMessageOptions.testFlag(LogMessageDisplay::DateTime))
-         text.append(QString("[%1]").arg(date.toString("dd-MM-yyyy hh:mm:ss.zzz")));
+         text.append(QString("[%1]").arg(date.toSecsSinceEpoch()));
 
       if (mMessageOptions.testFlag(LogMessageDisplay::ThreadId))
          text.append(QString("[%1]").arg(threadId));
