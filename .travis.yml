@@ -12,7 +12,7 @@ script:
 jobs:
   include:
   - os: osx
-    osx_image: xcode10.1
+    osx_image: xcode12.2
   - os: linux
     compiler: gcc
     env:
