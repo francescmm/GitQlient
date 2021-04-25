@@ -42,6 +42,18 @@ RevisionFiles::RevisionFiles(const QString &diff, bool cached)
    }
 }
 
+RevisionFiles::~RevisionFiles()
+{
+   mFileStatus.clear();
+   mFileStatus.squeeze();
+   mRenamedFiles.clear();
+   mRenamedFiles.squeeze();
+   mergeParent.clear();
+   mergeParent.squeeze();
+   mFiles.clear();
+   mFiles.squeeze();
+}
+
 bool RevisionFiles::isValid() const
 {
    return !(mFiles.empty() && mFileStatus.empty() && mRenamedFiles.empty());

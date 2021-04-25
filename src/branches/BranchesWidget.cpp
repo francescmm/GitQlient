@@ -342,7 +342,7 @@ void BranchesWidget::showBranches()
       QLog_Info("UI", QString("Fetched {%1} local branches").arg(branches.count()));
       QLog_Info("UI", QString("Processing local branches..."));
 
-      for (const auto &pair : branches)
+      for (const auto &pair : qAsConst(branches))
       {
          for (const auto &branch : pair.second)
          {
@@ -357,6 +357,8 @@ void BranchesWidget::showBranches()
       QLog_Info("UI", QString("... local branches processed"));
    }
 
+   branches.clear();
+   branches.squeeze();
    branches = mCache->getBranches(References::Type::RemoteBranches);
 
    if (!branches.empty())
@@ -375,6 +377,9 @@ void BranchesWidget::showBranches()
             }
          }
       }
+
+      branches.clear();
+      branches.squeeze();
 
       QLog_Info("UI", QString("... remote branches processed"));
    }

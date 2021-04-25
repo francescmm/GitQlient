@@ -1,22 +1,22 @@
 #include "CreatePullRequestDlg.h"
 #include "ui_CreatePullRequestDlg.h"
 
+#include <GitCache.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
 #include <GitQlientSettings.h>
 #include <GitServerCache.h>
-#include <PullRequest.h>
-#include <GitCache.h>
 #include <Issue.h>
-#include <Milestone.h>
 #include <Label.h>
+#include <Milestone.h>
+#include <PullRequest.h>
 
 #include <previewpage.h>
 
-#include <QStandardItemModel>
-#include <QMessageBox>
-#include <QTimer>
 #include <QFile>
+#include <QMessageBox>
+#include <QStandardItemModel>
+#include <QTimer>
 #include <QWebChannel>
 
 using namespace GitServer;
@@ -41,13 +41,16 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
    onMilestones(mGitServerCache->getMilestones());
    onLabels(mGitServerCache->getLabels());
 
-   const auto branches = mCache->getBranches(References::Type::RemoteBranches);
+   auto branches = mCache->getBranches(References::Type::RemoteBranches);
 
-   for (auto &value : branches)
+   for (const auto &value : qAsConst(branches))
    {
       ui->cbOrigin->addItems(value.second);
       ui->cbDestination->addItems(value.second);
    }
+
+   branches.clear();
+   branches.squeeze();
 }
 
 bool CreatePullRequestDlg::configure(const QString &workingDir, const QString &currentBranch)

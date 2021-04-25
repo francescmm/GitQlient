@@ -21,6 +21,7 @@ public:
    };
 
    RevisionFiles() = default;
+   ~RevisionFiles();
    RevisionFiles(const QString &diff, bool cached = false);
 
    bool isValid() const;
