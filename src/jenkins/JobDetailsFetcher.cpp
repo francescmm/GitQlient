@@ -1,8 +1,8 @@
 #include "JobDetailsFetcher.h"
 
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
 
 namespace Jenkins
 {
@@ -35,7 +35,7 @@ void JobDetailsFetcher::readHealthReportsPartFor(QJsonObject &jsonObject)
 {
    if (jsonObject.contains(QStringLiteral("healthReport")))
    {
-      QJsonArray healthArray = jsonObject[QStringLiteral("healthReport")].toArray();
+      const auto healthArray = jsonObject[QStringLiteral("healthReport")].toArray();
       for (const auto &item : healthArray)
       {
          JenkinsJobInfo::HealthStatus status;
