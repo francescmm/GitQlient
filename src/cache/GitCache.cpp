@@ -198,7 +198,7 @@ void GitCache::insertWipRevision(const WipRevisionInfo &wipInfo)
    calculateLanes(c);
 
    if (mCommits[0])
-      c.lanes = mCommits[0]->lanes;
+      c.setLanes(mCommits[0]->lanes());
 
    mCommitsMap.insert(CommitInfo::ZERO_SHA, std::move(c));
    mCommits[0] = &mCommitsMap[CommitInfo::ZERO_SHA];
@@ -299,7 +299,7 @@ void GitCache::calculateLanes(CommitInfo &c)
 
    resetLanes(c, isFork);
 
-   c.lanes = lanes;
+   c.setLanes(std::move(lanes));
 }
 
 bool GitCache::pendingLocalChanges()

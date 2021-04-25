@@ -127,7 +127,6 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 
       if (!branchName.isEmpty())
       {
-         const auto oldItem = findChildItem(mGit->getCurrentBranch());
          const auto isLocal = item->data(0, LocalBranchRole).toBool();
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          QScopedPointer<GitBranches> git(new GitBranches(mGit));
@@ -146,9 +145,6 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 
             if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
             {
-               const auto commits = value.at(1).toUInt();
-               (void)commits;
-
                PullDlg pull(mGit, output.split('\n').first());
                connect(&pull, &PullDlg::signalRepositoryUpdated, this, &BranchTreeWidget::signalBranchCheckedOut);
                connect(&pull, &PullDlg::signalPullConflict, this, &BranchTreeWidget::signalPullConflict);
@@ -159,8 +155,12 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 
             if (!uiUpdateRequested)
             {
-               if (!oldItem.empty())
+               if (auto oldItem = findChildItem(mGit->getCurrentBranch()); !oldItem.empty())
+               {
                   oldItem.at(0)->setData(0, GitQlient::IsCurrentBranchRole, false);
+                  oldItem.clear();
+                  oldItem.squeeze();
+               }
 
                emit signalBranchCheckedOut();
             }

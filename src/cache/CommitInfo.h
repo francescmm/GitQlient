@@ -64,7 +64,10 @@ public:
    QStringList parents() const;
    bool isInWorkingBranch() const;
 
-   Lane laneAt(int i) const { return lanes.at(i); }
+   void setLanes(QVector<Lane> lanes);
+   QVector<Lane> lanes() const { return mLanes; }
+   int lanesCount() const { return mLanes.count(); }
+   Lane laneAt(int i) const { return mLanes.at(i); }
    int getActiveLane() const;
 
    void appendChild(CommitInfo *commit) { mChilds.append(commit); }
@@ -82,11 +85,11 @@ public:
    std::chrono::seconds dateSinceEpoch;
    QString shortLog;
    QString longLog;
-   QVector<Lane> lanes;
    QString gpgKey;
    bool isSigned = false;
 
 private:
+   QVector<Lane> mLanes;
    QStringList mParentsSha;
    QVector<CommitInfo *> mChilds;
 };

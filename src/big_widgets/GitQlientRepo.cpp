@@ -556,17 +556,6 @@ void GitQlientRepo::focusHistoryOnPr(int prNumber)
    showHistoryView();
 }
 
-bool GitQlientRepo::containsSubmodule(const QString &path, const QVector<QString> &submodules)
-{
-   for (const auto &submodule : submodules)
-   {
-      if (auto hasPath = path.contains(submodule); hasPath)
-         return hasPath;
-   }
-
-   return false;
-}
-
 void GitQlientRepo::openCommitDiff(const QString currentSha)
 {
    const auto rev = mGitQlientCache->commitInfo(currentSha);

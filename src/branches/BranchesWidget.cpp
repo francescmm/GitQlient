@@ -540,6 +540,9 @@ void BranchesWidget::processLocalBranch(const QString &sha, QString branch)
       }
    }
 
+   parents.clear();
+   parents.squeeze();
+
    mLocalBranchesTree->addTopLevelItem(item);
 
    QLog_Debug("UI", QString("Finish gathering local branch information"));

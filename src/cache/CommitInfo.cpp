@@ -19,8 +19,8 @@ CommitInfo::CommitInfo(const QString sha, const QStringList &parents, const QStr
 
 CommitInfo::~CommitInfo()
 {
-   lanes.clear();
-   lanes.squeeze();
+   mLanes.clear();
+   mLanes.squeeze();
    mChilds.clear();
    mChilds.squeeze();
 }
@@ -38,7 +38,7 @@ bool CommitInfo::operator==(const CommitInfo &commit) const
 {
    return sha.startsWith(commit.sha) && mParentsSha == commit.mParentsSha && committer == commit.committer
        && author == commit.author && dateSinceEpoch == commit.dateSinceEpoch && shortLog == commit.shortLog
-       && longLog == commit.longLog && lanes == commit.lanes;
+       && longLog == commit.longLog && mLanes == commit.mLanes;
 }
 
 bool CommitInfo::operator!=(const CommitInfo &commit) const
@@ -86,6 +86,13 @@ bool CommitInfo::isInWorkingBranch() const
    return false;
 }
 
+void CommitInfo::setLanes(QVector<Lane> lanes)
+{
+   this->mLanes.clear();
+   this->mLanes.squeeze();
+   this->mLanes = std::move(lanes);
+}
+
 bool CommitInfo::isValid() const
 {
    static QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
@@ -97,7 +104,7 @@ int CommitInfo::getActiveLane() const
 {
    auto i = 0;
 
-   for (auto lane : lanes)
+   for (auto lane : mLanes)
    {
       if (lane.isActive())
          return i;

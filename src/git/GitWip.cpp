@@ -15,11 +15,6 @@ GitWip::GitWip(const QSharedPointer<GitBase> &git, const QSharedPointer<GitCache
 {
 }
 
-void GitWip::updateUntrackedFiles() const
-{
-   mCache->setUntrackedFilesList(getUntrackedFiles());
-}
-
 QVector<QString> GitWip::getUntrackedFiles() const
 {
    QLog_Debug("Git", QString("Executing getUntrackedFiles."));
@@ -72,7 +67,8 @@ WipRevisionInfo GitWip::getWipInfo() const
 
 bool GitWip::updateWip() const
 {
-   updateUntrackedFiles();
+   const auto files = getUntrackedFiles();
+   mCache->setUntrackedFilesList(std::move(files));
 
    if (const auto wipInfo = getWipInfo(); wipInfo.isValid())
       return mCache->updateWipCommit(wipInfo);

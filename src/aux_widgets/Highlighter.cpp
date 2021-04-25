@@ -54,97 +54,111 @@
 
 #include "Highlighter.h"
 
-Highlighter::Highlighter(QTextDocument *parent)
-   : QSyntaxHighlighter(parent)
+namespace
 {
-   HighlightingRule rule;
 
-   QTextCharFormat format;
-   format.setForeground(QColor(255, 184, 108));
-   rule.pattern = QRegularExpression(QStringLiteral("::[A-Za-z0-9_]+"));
-   rule.format = format;
-   highlightingRules.append(rule);
-
-   format.setForeground(QColor(219, 219, 168));
-   rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
-   rule.format = format;
-   highlightingRules.append(rule);
-
-   format.setForeground(QColor(80, 200, 175));
-   rule.pattern = QRegularExpression(QStringLiteral("new \\b[A-Za-z0-9_]+(?=\\()"));
-   rule.format = format;
-   highlightingRules.append(rule);
-
-   format.setForeground(QColor(87, 155, 213));
-   const QString keywordPatterns[]
-       = { QStringLiteral("\\bchar\\b"),     QStringLiteral("\\bclass\\b"),     QStringLiteral("\\bconst\\b"),
-           QStringLiteral("\\bdouble\\b"),   QStringLiteral("\\benum\\b"),      QStringLiteral("\\bexplicit\\b"),
-           QStringLiteral("\\bfriend\\b"),   QStringLiteral("\\binline\\b"),    QStringLiteral("\\bint\\b"),
-           QStringLiteral("\\blong\\b"),     QStringLiteral("\\bnamespace\\b"), QStringLiteral("\\boperator\\b"),
-           QStringLiteral("\\bprivate\\b"),  QStringLiteral("\\bprotected\\b"), QStringLiteral("\\bpublic\\b"),
-           QStringLiteral("\\bshort\\b"),    QStringLiteral("\\bsignals\\b"),   QStringLiteral("\\bsigned\\b"),
-           QStringLiteral("\\bslots\\b"),    QStringLiteral("\\bstatic\\b"),    QStringLiteral("\\bstruct\\b"),
-           QStringLiteral("\\btemplate\\b"), QStringLiteral("\\btypedef\\b"),   QStringLiteral("\\btypename\\b"),
-           QStringLiteral("\\bunion\\b"),    QStringLiteral("\\bunsigned\\b"),  QStringLiteral("\\bvirtual\\b"),
-           QStringLiteral("\\bauto\\b"),     QStringLiteral("\\bexplicit\\b"),  QStringLiteral("\\bfinal\\b"),
-           QStringLiteral("\\bnullptr\\b"),  QStringLiteral("\\boverride\\b"),  QStringLiteral("\\busing\\b"),
-           QStringLiteral("\\bvoid\\b"),     QStringLiteral("\\bvolatile\\b"),  QStringLiteral("\\bbool\\b"),
-           QStringLiteral("\\btrue\\b"),     QStringLiteral("\\bfalse\\b"),     QStringLiteral("\\bdelete\\b"),
-           QStringLiteral("\\bnew\\b"),      QStringLiteral("\\bthis\\b") };
-
-   for (const QString &pattern : keywordPatterns)
+void createHighlightningRules(QVector<Highlighter::HighlightingRule> &highlightingRules)
+{
+   if (highlightingRules.empty())
    {
-      rule.pattern = QRegularExpression(pattern);
+      Highlighter::HighlightingRule rule;
+
+      QTextCharFormat format;
+      format.setForeground(QColor(255, 184, 108));
+      rule.pattern = QRegularExpression(QStringLiteral("::[A-Za-z0-9_]+"));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(QColor(219, 219, 168));
+      rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(QColor(80, 200, 175));
+      rule.pattern = QRegularExpression(QStringLiteral("new \\b[A-Za-z0-9_]+(?=\\()"));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(QColor(87, 155, 213));
+      const QString keywordPatterns[]
+          = { QStringLiteral("\\bchar\\b"),     QStringLiteral("\\bclass\\b"),     QStringLiteral("\\bconst\\b"),
+              QStringLiteral("\\bdouble\\b"),   QStringLiteral("\\benum\\b"),      QStringLiteral("\\bexplicit\\b"),
+              QStringLiteral("\\bfriend\\b"),   QStringLiteral("\\binline\\b"),    QStringLiteral("\\bint\\b"),
+              QStringLiteral("\\blong\\b"),     QStringLiteral("\\bnamespace\\b"), QStringLiteral("\\boperator\\b"),
+              QStringLiteral("\\bprivate\\b"),  QStringLiteral("\\bprotected\\b"), QStringLiteral("\\bpublic\\b"),
+              QStringLiteral("\\bshort\\b"),    QStringLiteral("\\bsignals\\b"),   QStringLiteral("\\bsigned\\b"),
+              QStringLiteral("\\bslots\\b"),    QStringLiteral("\\bstatic\\b"),    QStringLiteral("\\bstruct\\b"),
+              QStringLiteral("\\btemplate\\b"), QStringLiteral("\\btypedef\\b"),   QStringLiteral("\\btypename\\b"),
+              QStringLiteral("\\bunion\\b"),    QStringLiteral("\\bunsigned\\b"),  QStringLiteral("\\bvirtual\\b"),
+              QStringLiteral("\\bauto\\b"),     QStringLiteral("\\bexplicit\\b"),  QStringLiteral("\\bfinal\\b"),
+              QStringLiteral("\\bnullptr\\b"),  QStringLiteral("\\boverride\\b"),  QStringLiteral("\\busing\\b"),
+              QStringLiteral("\\bvoid\\b"),     QStringLiteral("\\bvolatile\\b"),  QStringLiteral("\\bbool\\b"),
+              QStringLiteral("\\btrue\\b"),     QStringLiteral("\\bfalse\\b"),     QStringLiteral("\\bdelete\\b"),
+              QStringLiteral("\\bnew\\b"),      QStringLiteral("\\bthis\\b") };
+
+      for (const QString &pattern : keywordPatterns)
+      {
+         rule.pattern = QRegularExpression(pattern);
+         rule.format = format;
+         highlightingRules.append(rule);
+      }
+
+      format.setForeground(QColor(80, 200, 175));
+      rule.pattern = QRegularExpression(QStringLiteral("\\bQ[A-Za-z]+\\b"));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(QColor(98, 114, 164));
+      rule.pattern = QRegularExpression(QStringLiteral("//[^\n]*"));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(QColor(205, 144, 119));
+      rule.pattern = QRegularExpression(QStringLiteral("\".*\""));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(QColor(219, 219, 168));
+      rule.pattern = QRegularExpression(QStringLiteral("\\&[A-Za-z0-9_]+::[A-Za-z0-9_]+"));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(QColor(80, 200, 175));
+      rule.pattern = QRegularExpression(QStringLiteral("\\&?\\b[A-Za-z0-9_]+::"));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(QColor(205, 144, 119));
+      rule.pattern = QRegularExpression(QStringLiteral("<[A-Za-z0-9_\\.]+>"));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(QColor(80, 200, 175));
+      rule.pattern = QRegularExpression(QStringLiteral("[A-Za-z0-9_\\.]+<[A-Za-z0-9_\\.]+>"));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(QColor(195, 133, 191));
+      rule.pattern = QRegularExpression(QStringLiteral("#include"));
+      rule.format = format;
+      highlightingRules.append(rule);
+
+      format.setForeground(Qt::white);
+      rule.pattern = QRegularExpression(QStringLiteral("::"));
       rule.format = format;
       highlightingRules.append(rule);
    }
+}
 
-   format.setForeground(QColor(80, 200, 175));
-   rule.pattern = QRegularExpression(QStringLiteral("\\bQ[A-Za-z]+\\b"));
-   rule.format = format;
-   highlightingRules.append(rule);
+}
 
+QVector<Highlighter::HighlightingRule> Highlighter::highlightingRules;
+
+Highlighter::Highlighter(QTextDocument *parent)
+   : QSyntaxHighlighter(parent)
+{
+   createHighlightningRules(highlightingRules);
    multiLineCommentFormat.setForeground(QColor(98, 114, 164));
-   format.setForeground(QColor(98, 114, 164));
-   rule.pattern = QRegularExpression(QStringLiteral("//[^\n]*"));
-   rule.format = format;
-   highlightingRules.append(rule);
-
-   format.setForeground(QColor(205, 144, 119));
-   rule.pattern = QRegularExpression(QStringLiteral("\".*\""));
-   rule.format = format;
-   highlightingRules.append(rule);
-
-   format.setForeground(QColor(219, 219, 168));
-   rule.pattern = QRegularExpression(QStringLiteral("\\&[A-Za-z0-9_]+::[A-Za-z0-9_]+"));
-   rule.format = format;
-   highlightingRules.append(rule);
-
-   format.setForeground(QColor(80, 200, 175));
-   rule.pattern = QRegularExpression(QStringLiteral("\\&?\\b[A-Za-z0-9_]+::"));
-   rule.format = format;
-   highlightingRules.append(rule);
-
-   format.setForeground(QColor(205, 144, 119));
-   rule.pattern = QRegularExpression(QStringLiteral("<[A-Za-z0-9_\\.]+>"));
-   rule.format = format;
-   highlightingRules.append(rule);
-
-   format.setForeground(QColor(80, 200, 175));
-   rule.pattern = QRegularExpression(QStringLiteral("[A-Za-z0-9_\\.]+<[A-Za-z0-9_\\.]+>"));
-   rule.format = format;
-   highlightingRules.append(rule);
-
-   format.setForeground(QColor(195, 133, 191));
-   rule.pattern = QRegularExpression(QStringLiteral("#include"));
-   rule.format = format;
-   highlightingRules.append(rule);
-
-   format.setForeground(Qt::white);
-   rule.pattern = QRegularExpression(QStringLiteral("::"));
-   rule.format = format;
-   highlightingRules.append(rule);
-
    commentStartExpression = QRegularExpression(QStringLiteral("/\\*"));
    commentEndExpression = QRegularExpression(QStringLiteral("\\*/"));
 }

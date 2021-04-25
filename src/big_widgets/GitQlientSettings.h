@@ -82,7 +82,7 @@ public:
    /*!
     * \brief Gets all the recent used projects.
     *
-    * \return QVector<QString> Projects list.
+    * \return QStringList Projects list.
     */
    QStringList getRecentProjects() const;
    /*!

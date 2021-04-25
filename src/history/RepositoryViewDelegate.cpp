@@ -377,7 +377,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       }
       else
       {
-         const auto laneNum = commit.lanes.count();
+         const auto laneNum = commit.lanesCount();
          const auto activeLane = commit.getActiveLane();
          const auto activeColor
              = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
