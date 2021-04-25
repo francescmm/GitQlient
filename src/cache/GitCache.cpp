@@ -16,7 +16,7 @@ GitCache::~GitCache()
    clearInternalData();
 }
 
-void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits)
+void GitCache::setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits)
 {
    QMutexLocker lock(&mMutex);
 
@@ -28,62 +28,53 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &co
 
    clearInternalData();
 
-   if (mCommitsMap.isEmpty())
-      mCommitsMap.reserve(totalCommits);
-
-   if (mCommits.isEmpty() || totalCommits > mCommits.count())
-      mCommits.resize(totalCommits);
-   else if (totalCommits < mCommits.count())
-   {
-      const auto commitsToRemove = std::abs(totalCommits - mCommits.count());
-
-      for (auto i = 0; i < commitsToRemove; ++i)
-         mCommits.takeLast();
-   }
+   mCommitsMap.reserve(totalCommits);
+   mCommits.resize(totalCommits);
 
    QLog_Debug("Cache", QString("Adding WIP revision."));
 
    insertWipRevision(wipInfo);
 
-   auto count = 1;
-
    QLog_Debug("Cache", QString("Adding committed revisions."));
 
    QMultiMap<QString, CommitInfo *> tmpChildsStorage;
+   auto count = 1;
 
-   for (auto commit : commits)
+   while (!commits.isEmpty())
    {
-      if (commit.isValid())
+      auto commit = commits.takeFirst();
+
+      commit.setLanes(calculateLanes(commit));
+
+      const auto sha = commit.sha();
+
+      if (sha == mCommitsMap.value(CommitInfo::ZERO_SHA).parent(0))
+         commit.addChildReference(&mCommitsMap[CommitInfo::ZERO_SHA]);
+
+      mCommitsMap[sha] = std::move(commit);
+
+      mCommits.replace(count, &mCommitsMap[sha]);
+
+      if (tmpChildsStorage.contains(sha))
       {
-         commit.setLanes(calculateLanes(commit));
+         for (auto &child : tmpChildsStorage.values(sha))
+            mCommitsMap[sha].addChildReference(child);
 
-         const auto sha = commit.sha();
-
-         if (sha == mCommitsMap.value(CommitInfo::ZERO_SHA).parent(0))
-            commit.addChildReference(&mCommitsMap[CommitInfo::ZERO_SHA]);
-
-         mCommitsMap[sha] = std::move(commit);
-
-         mCommits.replace(count, &mCommitsMap[sha]);
-
-         if (tmpChildsStorage.contains(sha))
-         {
-            for (auto &child : tmpChildsStorage.values(sha))
-               mCommitsMap[sha].addChildReference(child);
-
-            tmpChildsStorage.remove(sha);
-         }
-
-         const auto parents = mCommitsMap.value(sha).parents();
-
-         for (const auto &parent : parents)
-            tmpChildsStorage.insert(parent, &mCommitsMap[sha]);
-
-         ++count;
+         tmpChildsStorage.remove(sha);
       }
+
+      const auto parents = mCommitsMap.value(sha).parents();
+
+      for (const auto &parent : parents)
+         tmpChildsStorage.insert(parent, &mCommitsMap[sha]);
+
+      ++count;
    }
 
+   commits.clear();
+   commits.squeeze();
    mCommitsMap.squeeze();
+   mCommits.squeeze();
 
    tmpChildsStorage.clear();
 }
@@ -190,33 +181,27 @@ void GitCache::insertWipRevision(const WipRevisionInfo &wipInfo)
 
    QLog_Debug("Cache", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(newParentSha));
 
-   const auto key = qMakePair(CommitInfo::ZERO_SHA, newParentSha);
    const auto fakeRevFile = fakeWorkDirRevFile(wipInfo.diffIndex, wipInfo.diffIndexCached);
 
    insertRevisionFile(CommitInfo::ZERO_SHA, newParentSha, fakeRevFile);
-
-   const auto log = fakeRevFile.count() == mUntrackedfiles.count() ? tr("No local changes") : tr("Local changes");
 
    QStringList parents;
 
    if (!newParentSha.isEmpty())
       parents.append(newParentSha);
 
-   CommitInfo c(CommitInfo::ZERO_SHA, parents, QChar(), QStringLiteral("-"), QDateTime::currentDateTime(),
-                QStringLiteral("-"), log);
-
    if (mLanes.isEmpty())
-      mLanes.init(c.sha());
+      mLanes.init(CommitInfo::ZERO_SHA);
 
+   const auto log = fakeRevFile.count() == mUntrackedfiles.count() ? tr("No local changes") : tr("Local changes");
+   CommitInfo c(CommitInfo::ZERO_SHA, parents, QDateTime::currentDateTime(), log);
    c.setLanes(calculateLanes(c));
 
    if (mCommits[0])
       c.setLanes(mCommits[0]->getLanes());
 
-   const auto sha = c.sha();
-
-   mCommitsMap.insert(sha, std::move(c));
-   mCommits[0] = &mCommitsMap[sha];
+   mCommitsMap.insert(CommitInfo::ZERO_SHA, std::move(c));
+   mCommits[0] = &mCommitsMap[CommitInfo::ZERO_SHA];
 }
 
 bool GitCache::insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file)

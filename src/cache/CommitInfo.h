@@ -45,7 +45,9 @@ public:
    };
 
    CommitInfo() = default;
-   explicit CommitInfo(const QString sha, const QStringList &parents, const QChar &boundary, const QString &commiter,
+   ~CommitInfo();
+   explicit CommitInfo(const QString sha, const QStringList &parents, const QDateTime &commitDate, const QString &log);
+   explicit CommitInfo(const QString sha, const QStringList &parents, const QString &commiter,
                        const QDateTime &commitDate, const QString &author, const QString &log,
                        const QString &longLog = QString(), bool isSigned = false, const QString &gpgKey = QString());
    bool operator==(const CommitInfo &commit) const;
@@ -53,11 +55,10 @@ public:
 
    bool contains(const QString &value);
 
-   void setBoundary(QChar info) { mBoundaryInfo = std::move(info); }
-   bool isBoundary() const { return mBoundaryInfo == '-'; }
    int parentsCount() const;
    QString parent(int idx) const;
    QStringList parents() const;
+   bool isInWorkingBranch() const;
 
    QString sha() const { return mSha; }
    QString committer() const { return mCommitter; }
@@ -76,9 +77,10 @@ public:
    int getLanesCount() const { return mLanes.count(); }
    int getActiveLane() const;
 
-   void addChildReference(CommitInfo *commit) { mChilds.insert(commit->sha(), commit); }
-   QList<CommitInfo *> getChilds() const { return mChilds.values(); }
+   void addChildReference(CommitInfo *commit) { mChilds.append(commit); }
    bool hasChilds() const { return !mChilds.empty(); }
+   QString getFirstChildSha() const;
+   int getChildsCount() const { return mChilds.count(); }
 
    bool isSigned() const { return mSigned; }
    QString getGpgKey() const { return mGpgKey; }
@@ -90,17 +92,16 @@ public:
    static const QString INIT_SHA;
 
 private:
-   QChar mBoundaryInfo;
    QString mSha;
    QStringList mParentsSha;
    QString mCommitter;
    QString mAuthor;
-   QDateTime mCommitDate;
    QString mShortLog;
    QString mLongLog;
    QString mDiff;
+   QDateTime mCommitDate;
    QVector<Lane> mLanes;
-   QMap<QString, CommitInfo *> mChilds;
+   QVector<CommitInfo *> mChilds;
    bool mSigned = false;
    QString mGpgKey;
    uint mPos = 0;

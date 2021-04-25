@@ -40,8 +40,8 @@ public:
    bool isMerge() const;
    bool isActive() const;
    bool equals(LaneType type) const { return mType == type; }
-   LaneType getType() const { return mType; }
 
+   LaneType getType() const { return mType; }
    void setType(LaneType type) { mType = type; }
 
 private:

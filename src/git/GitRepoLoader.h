@@ -66,7 +66,7 @@ private:
    void loadReferences();
    void requestRevisions();
    void processRevision(QByteArray ba);
-   QList<CommitInfo> processUnsignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees);
-   QList<CommitInfo> processSignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees) const;
-   CommitInfo parseCommitData(QByteArray &commitData, bool &isSubtree) const;
+   QVector<CommitInfo> processUnsignedLog(QByteArray &log) const;
+   QVector<CommitInfo> processSignedLog(QByteArray &log) const;
+   CommitInfo parseCommitData(QByteArray &commitData) const;
 };

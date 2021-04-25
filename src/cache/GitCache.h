@@ -93,7 +93,7 @@ private:
    QHash<QString, References> mReferences;
    QHash<QString, QString> mRemoteTags;
 
-   void setup(const WipRevisionInfo &wipInfo, const QList<CommitInfo> &commits);
+   void setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits);
    void setConfigurationDone() { mConfigured = true; }
 
    void insertWipRevision(const WipRevisionInfo &wipInfo);

@@ -76,35 +76,25 @@ void SquashDlg::accept()
       QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
       git->updateWip();
 
-      const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, revInfo.parent(0));
-      const auto childs = mCache->commitInfo(mShas.last()).getChilds();
-      auto lastChildIsWip = false;
-
-      for (const auto child : childs)
-      {
-         if (child->sha() == CommitInfo::ZERO_SHA)
-         {
-            lastChildIsWip = true;
-            break;
-         }
-      }
+      const auto lastChild = mCache->commitInfo(mShas.last());
+      const auto oneChild = lastChild.getChildsCount() == 1;
 
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-      if (lastChildIsWip && childs.count() == 1)
+      if (lastChild.isInWorkingBranch() && oneChild)
       {
          // Reset soft to the first commit to squash
          QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
          gitLocal->resetCommit(mShas.constFirst(), GitLocal::CommitResetType::SOFT);
          gitLocal->ammend(msg);
       }
-      else if (childs.count() == 1)
+      else if (oneChild)
       {
          QScopedPointer<GitBranches> gitBranches(new GitBranches(mGit));
 
          // Create auxiliar branch for rebase
          const auto auxBranch1 = QUuid::createUuid().toString();
-         const auto commitOfAuxBranch1 = childs.constFirst()->sha();
+         const auto commitOfAuxBranch1 = lastChild.getFirstChildSha();
          gitBranches->createBranchAtCommit(commitOfAuxBranch1, auxBranch1);
 
          // Create auxiliar branch for merge squash

@@ -201,15 +201,14 @@ void GitRepoLoader::processRevision(QByteArray ba)
 
    emit signalLoadingStarted();
 
-   QList<QPair<QString, QString>> subtrees;
    const auto ret = gitConfig->getGitValue("log.showSignature");
    const auto showSignature = ret.success ? ret.output.toString().contains("true") : false;
-   const auto commits = showSignature ? processSignedLog(ba, subtrees) : processUnsignedLog(ba, subtrees);
+   auto commits = showSignature ? processSignedLog(ba) : processUnsignedLog(ba);
 
    QScopedPointer<GitWip> git(new GitWip(mGitBase, mRevCache));
    git->updateUntrackedFiles();
 
-   mRevCache->setup(git->getWipInfo(), commits);
+   mRevCache->setup(git->getWipInfo(), std::move(commits));
 
    if (mRefreshReferences)
       loadReferences();
@@ -225,36 +224,32 @@ void GitRepoLoader::processRevision(QByteArray ba)
    mRefreshReferences = false;
 }
 
-QList<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees)
+QVector<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
 {
-   QList<CommitInfo> commits;
    auto commitsLog = log.split('\000');
+   QVector<CommitInfo> commits;
+   commits.reserve(commitsLog.count());
+
    auto pos = 1;
 
    for (auto &commitData : commitsLog)
    {
-      bool subtree = false;
-      if (auto commit = parseCommitData(commitData, subtree); commit.isValid())
+      if (auto commit = parseCommitData(commitData); commit.isValid())
       {
          commit.setPos(pos++);
          commits.append(std::move(commit));
-
-         if (subtree)
-         {
-            auto fields = commit.longLog().trimmed().split("\n");
-            subtrees.append(qMakePair(fields.first().remove("git-subtree-dir:").trimmed(),
-                                      fields.last().remove("git-subtree-split:").trimmed()));
-         }
       }
    }
 
    return commits;
 }
 
-QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log, QList<QPair<QString, QString>> &subtrees) const
+QVector<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
 {
    auto preProcessedCommits = log.replace('\000', '\n').split('\n');
-   QList<CommitInfo> commits;
+   QVector<CommitInfo> commits;
+   commits.reserve(preProcessedCommits.count());
+
    QByteArray commit;
    QByteArray gpg;
    QString gpgKey;
@@ -282,18 +277,10 @@ QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log, QList<QPair<Q
       {
          if (!commit.isEmpty())
          {
-            bool subtree = false;
-            if (auto revision = parseCommitData(commit, subtree); revision.isValid())
+            if (auto revision = parseCommitData(commit); revision.isValid())
             {
                revision.setPos(pos++);
                commits.append(std::move(revision));
-
-               if (subtree)
-               {
-                  auto fields = revision.longLog().trimmed().split("\n");
-                  subtrees.append(qMakePair(fields.first().remove("git-subtree-dir:").trimmed(),
-                                            fields.last().remove("git-subtree-split:").trimmed()));
-               }
             }
 
             commit.clear();
@@ -304,15 +291,13 @@ QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log, QList<QPair<Q
          gpg.clear();
       }
       else if (processingCommit)
-      {
          commit.append(line + '\n');
-      }
    }
 
    return commits;
 }
 
-CommitInfo GitRepoLoader::parseCommitData(QByteArray &commitData, bool &isSubtree) const
+CommitInfo GitRepoLoader::parseCommitData(QByteArray &commitData) const
 {
    if (const auto fields = QString::fromUtf8(commitData).split('\n'); fields.count() > 6)
    {
@@ -320,7 +305,6 @@ CommitInfo GitRepoLoader::parseCommitData(QByteArray &commitData, bool &isSubtre
       const auto isSigned = !fields.first().isEmpty() && !firstField.contains("log size") ? true : false;
       auto combinedShas = fields.at(1);
       auto commitSha = combinedShas.split('X').first();
-      const auto boundary = commitSha[0];
       const auto sha = commitSha.remove(0, 1);
       combinedShas = combinedShas.remove(0, sha.size() + 1 + 1).trimmed();
       QStringList parentsSha;
@@ -340,11 +324,9 @@ CommitInfo GitRepoLoader::parseCommitData(QByteArray &commitData, bool &isSubtre
 
       longLog = longLog.trimmed();
 
-      if (longLog.contains("git-subtree-dir") || shortLog.contains("git-subtree-dir"))
-         isSubtree = true;
-
-      return CommitInfo { sha,    parentsSha, boundary, committer, commitDate,
-                          author, shortLog,   longLog,  isSigned,  isSigned ? firstField : QString() };
+      return CommitInfo { sha,        parentsSha, committer,
+                          commitDate, author,     shortLog,
+                          longLog,    isSigned,   isSigned ? firstField : QString() };
    }
 
    return CommitInfo();

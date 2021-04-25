@@ -5,20 +5,32 @@
 const QString CommitInfo::ZERO_SHA = QString("0000000000000000000000000000000000000000");
 const QString CommitInfo::INIT_SHA = QString("4b825dc642cb6eb9a060e54bf8d69288fbee4904");
 
-CommitInfo::CommitInfo(const QString sha, const QStringList &parents, const QChar &boundary, const QString &commiter,
+CommitInfo::CommitInfo(const QString sha, const QStringList &parents, const QString &commiter,
                        const QDateTime &commitDate, const QString &author, const QString &log, const QString &longLog,
                        bool isSigned, const QString &gpgKey)
+   : CommitInfo(sha, parents, commitDate, log)
 {
-   mSha = sha;
-   mParentsSha = parents;
-   mBoundaryInfo = boundary;
    mCommitter = commiter;
-   mCommitDate = commitDate;
    mAuthor = author;
-   mShortLog = log;
    mLongLog = longLog;
    mSigned = isSigned;
    mGpgKey = gpgKey;
+}
+
+CommitInfo::~CommitInfo()
+{
+   mLanes.clear();
+   mLanes.squeeze();
+   mChilds.clear();
+   mChilds.squeeze();
+}
+
+CommitInfo::CommitInfo(const QString sha, const QStringList &parents, const QDateTime &commitDate, const QString &log)
+   : mSha(sha)
+   , mParentsSha(parents)
+   , mShortLog(log)
+   , mCommitDate(commitDate)
+{
 }
 
 bool CommitInfo::operator==(const CommitInfo &commit) const
@@ -60,6 +72,20 @@ QStringList CommitInfo::parents() const
    return mParentsSha;
 }
 
+bool CommitInfo::isInWorkingBranch() const
+{
+   for (const auto &child : mChilds)
+   {
+      if (child->mSha == CommitInfo::ZERO_SHA)
+      {
+         return true;
+         break;
+      }
+   }
+
+   return false;
+}
+
 bool CommitInfo::isValid() const
 {
    static QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
@@ -80,4 +106,11 @@ int CommitInfo::getActiveLane() const
    }
 
    return -1;
+}
+
+QString CommitInfo::getFirstChildSha() const
+{
+   if (!mChilds.isEmpty())
+      mChilds.constFirst();
+   return QString();
 }
