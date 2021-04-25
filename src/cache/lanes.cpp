@@ -217,7 +217,10 @@ void Lanes::afterFork()
 
 bool Lanes::isBranch()
 {
-   return typeVec[activeLane].equals(LaneType::BRANCH);
+   if (typeVec.count() > activeLane)
+      return typeVec.at(activeLane).equals(LaneType::BRANCH);
+
+   return false;
 }
 
 void Lanes::afterBranch()

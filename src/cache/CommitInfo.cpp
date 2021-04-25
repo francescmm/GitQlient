@@ -17,14 +17,6 @@ CommitInfo::CommitInfo(const QString sha, const QStringList &parents, const QStr
    this->gpgKey = gpgKey;
 }
 
-CommitInfo::~CommitInfo()
-{
-   mLanes.clear();
-   mLanes.squeeze();
-   mChilds.clear();
-   mChilds.squeeze();
-}
-
 CommitInfo::CommitInfo(const QString sha, const QStringList &parents, std::chrono::seconds commitDate,
                        const QString &log)
    : sha(sha)

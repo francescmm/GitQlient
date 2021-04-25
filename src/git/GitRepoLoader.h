@@ -68,5 +68,5 @@ private:
    void processRevision(QByteArray ba);
    QVector<CommitInfo> processUnsignedLog(QByteArray &log) const;
    QVector<CommitInfo> processSignedLog(QByteArray &log) const;
-   CommitInfo parseCommitData(QByteArray &commitData) const;
+   CommitInfo parseCommitData(const QByteArray &commitData) const;
 };

@@ -47,7 +47,7 @@ public:
    };
 
    CommitInfo() = default;
-   ~CommitInfo();
+   ~CommitInfo() = default;
    explicit CommitInfo(const QString sha, const QStringList &parents, std::chrono::seconds commitDate,
                        const QString &log);
    explicit CommitInfo(const QString sha, const QStringList &parents, const QString &commiter,

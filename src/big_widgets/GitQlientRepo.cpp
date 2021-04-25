@@ -70,6 +70,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
 
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
+   setAttribute(Qt::WA_DeleteOnClose);
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
    const auto serverUrl = gitConfig->getServerUrl();
@@ -287,7 +288,7 @@ void GitQlientRepo::createProgressDialog()
    {
       mWaitDlg = new WaitingDlg(tr("Loading repository..."));
       mWaitDlg->setWindowFlag(Qt::Tool);
-      mWaitDlg->exec();
+      mWaitDlg->open();
 
       QApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
    }
