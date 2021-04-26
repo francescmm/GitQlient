@@ -46,10 +46,8 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits
    QMultiMap<QString, CommitInfo *> tmpChildsStorage;
    auto count = 1;
 
-   while (!commits.isEmpty())
+   for (auto commit : qAsConst(commits))
    {
-      auto commit = commits.takeFirst();
-
       calculateLanes(commit);
 
       const auto sha = commit.sha;

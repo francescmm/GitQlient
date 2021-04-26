@@ -233,9 +233,9 @@ QVector<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
 
    auto pos = 1;
 
-   while (!commitsLog.isEmpty())
+   for (const auto &commitLine : qAsConst(commitsLog))
    {
-      if (auto commit = parseCommitData(commitsLog.takeFirst()); commit.isValid())
+      if (auto commit = parseCommitData(commitLine); commit.isValid())
       {
          commit.pos = pos++;
          commits.append(std::move(commit));
