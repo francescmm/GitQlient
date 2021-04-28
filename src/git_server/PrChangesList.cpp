@@ -35,7 +35,7 @@ void PrChangesList::loadData(const GitServer::PullRequest &prInfo)
       QScopedPointer<GitConfig> git(new GitConfig(mGit));
       const auto ret = git->getGitValue(QString("remote.%1.url").arg(prInfo.headRepo.split("/").constFirst()));
 
-      if (ret.output.toString().isEmpty())
+      if (ret.output.isEmpty())
       {
          const auto response = QMessageBox::question(
              this, tr("Getting remote branch"),
@@ -50,7 +50,7 @@ void PrChangesList::loadData(const GitServer::PullRequest &prInfo)
             showDiff = remoteAdded.success;
 
             if (!showDiff)
-               QLog_Warning("UI", QString("Problems adding a remote: {%1}").arg(remoteAdded.output.toString()));
+               QLog_Warning("UI", QString("Problems adding a remote: {%1}").arg(remoteAdded.output));
          }
          else
             showDiff = false;
@@ -65,19 +65,19 @@ void PrChangesList::loadData(const GitServer::PullRequest &prInfo)
    {
       QScopedPointer<GitConfig> git(new GitConfig(mGit));
       auto retBase = git->getRemoteForBranch(prInfo.head);
-      head = QString("%1/%2").arg(retBase.success ? retBase.output.toString() : "origin", prInfo.head);
+      head = QString("%1/%2").arg(retBase.success ? retBase.output : "origin", prInfo.head);
    }
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
    auto retBase = gitConfig->getRemoteForBranch(prInfo.head);
-   const auto base = QString("%1/%2").arg(retBase.success ? retBase.output.toString() : "origin", prInfo.base);
+   const auto base = QString("%1/%2").arg(retBase.success ? retBase.output : "origin", prInfo.base);
 
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
    ret = git->getBranchesDiff(base, head);
 
    if (ret.success)
    {
-      auto diff = ret.output.toString();
+      auto diff = ret.output;
       auto changes = DiffHelper::splitDiff(diff);
 
       if (!changes.isEmpty())

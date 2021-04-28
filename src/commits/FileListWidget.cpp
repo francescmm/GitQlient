@@ -63,45 +63,45 @@ void FileListWidget::insertFiles(const QString &currentSha, const QString &compa
 {
    clear();
 
-   RevisionFiles files;
-
    mCurrentSha = currentSha;
 
-   if (files = mCache->revisionFile(mCurrentSha, compareToSha); !files.isValid())
+   auto files = mCache->revisionFile(mCurrentSha, compareToSha);
+
+   if (!files)
    {
       QScopedPointer<GitHistory> git(new GitHistory(mGit));
       const auto ret = git->getDiffFiles(mCurrentSha, compareToSha);
 
       if (ret.success)
       {
-         files = RevisionFiles(ret.output.toString());
-         mCache->insertRevisionFile(mCurrentSha, compareToSha, files);
+         files = RevisionFiles(ret.output);
+         mCache->insertRevisionFiles(mCurrentSha, compareToSha, files.value());
       }
    }
 
-   if (files.count() != 0)
+   if (files->count() != 0)
    {
       setUpdatesEnabled(false);
 
-      for (auto i = 0; i < files.count(); ++i)
+      for (auto i = 0; i < files->count(); ++i)
       {
-         if (!files.statusCmp(i, RevisionFiles::UNKNOWN))
+         if (!files->statusCmp(i, RevisionFiles::UNKNOWN))
          {
             QColor clr;
             QString fileName;
 
-            if (files.statusCmp(i, RevisionFiles::NEW))
+            if (files->statusCmp(i, RevisionFiles::NEW))
             {
-               const auto fileRename = files.extendedStatus(i);
+               const auto fileRename = files->extendedStatus(i);
 
                clr = fileRename.isEmpty() ? GitQlientStyles::getGreen() : GitQlientStyles::getBlue();
-               fileName = fileRename.isEmpty() ? files.getFile(i) : fileRename;
+               fileName = fileRename.isEmpty() ? files->getFile(i) : fileRename;
             }
             else
             {
-               clr = files.statusCmp(i, RevisionFiles::DELETED) ? GitQlientStyles::getRed()
-                                                                : GitQlientStyles::getTextColor();
-               fileName = files.getFile(i);
+               clr = files->statusCmp(i, RevisionFiles::DELETED) ? GitQlientStyles::getRed()
+                                                                 : GitQlientStyles::getTextColor();
+               fileName = files->getFile(i);
             }
 
             addItem(fileName, clr);

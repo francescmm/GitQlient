@@ -27,7 +27,7 @@ QVector<QString> GitSubmodules::getSubmodules()
 
    if (const auto ret = mGitBase->run(cmd); ret.success)
    {
-      const auto submodules = ret.output.toString().split('\n');
+      const auto submodules = ret.output.split('\n');
 
       for (const auto &submodule : submodules)
       {

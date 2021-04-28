@@ -36,7 +36,8 @@ void WipWidget::configure(const QString &sha)
 
    prepareCache();
 
-   insertFiles(files, ui->unstagedFilesList);
+   if (files)
+      insertFiles(files.value(), ui->unstagedFilesList);
 
    clearCache();
 
@@ -61,21 +62,21 @@ bool WipWidget::commitChanges()
          QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
          git->updateWip();
 
-         const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, revInfo.firstParent());
+         if (const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, revInfo.firstParent()); files)
+         {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+            const auto ret = gitLocal->commitFiles(selFiles, files.value(), msg);
+            QApplication::restoreOverrideCursor();
+            lastMsgBeforeError = (ret.success ? "" : msg);
 
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
-         const auto ret = gitLocal->commitFiles(selFiles, files, msg);
-         QApplication::restoreOverrideCursor();
+            emit signalChangesCommitted(ret.success);
 
-         lastMsgBeforeError = (ret.success ? "" : msg);
+            done = true;
 
-         emit signalChangesCommitted(ret.success);
-
-         done = true;
-
-         ui->leCommitTitle->clear();
-         ui->teDescription->clear();
+            ui->leCommitTitle->clear();
+            ui->teDescription->clear();
+         }
       }
    }
 

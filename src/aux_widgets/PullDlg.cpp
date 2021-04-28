@@ -41,10 +41,8 @@ void PullDlg::accept()
    }
    else
    {
-      const auto errorMsg = ret.output.toString();
-
-      if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
-          && errorMsg.contains("causing a conflict", Qt::CaseInsensitive))
+      if (ret.output.contains("error: could not apply", Qt::CaseInsensitive)
+          && ret.output.contains("causing a conflict", Qt::CaseInsensitive))
       {
          emit signalPullConflict();
       }
@@ -54,7 +52,7 @@ void PullDlg::accept()
                             QString(tr("There were problems during the pull operation. Please, see the detailed "
                                        "description for more information.")),
                             QMessageBox::Ok, this);
-         msgBox.setDetailedText(errorMsg);
+         msgBox.setDetailedText(ret.output);
          msgBox.setStyleSheet(GitQlientStyles::getStyles());
          msgBox.exec();
       }

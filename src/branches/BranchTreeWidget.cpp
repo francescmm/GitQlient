@@ -33,7 +33,7 @@ void BranchTreeWidget::reloadCurrentBranchLink() const
 
    if (!items.isEmpty())
    {
-      items.at(0)->setData(0, GitQlient::ShaRole, mGit->getLastCommit().output.toString().trimmed());
+      items.at(0)->setData(0, GitQlient::ShaRole, mGit->getLastCommit().output.trimmed());
       items.at(0)->setData(0, GitQlient::IsCurrentBranchRole, true);
    }
 }
@@ -134,7 +134,7 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
              = isLocal ? git->checkoutLocalBranch(branchName.remove("origin/")) : git->checkoutRemoteBranch(branchName);
          QApplication::restoreOverrideCursor();
 
-         const auto output = ret.output.toString();
+         const auto output = ret.output;
 
          if (ret.success)
          {

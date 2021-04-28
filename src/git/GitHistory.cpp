@@ -38,7 +38,7 @@ GitExecResult GitHistory::history(const QString &file)
 
    auto ret = mGitBase->run(cmd);
 
-   if (ret.success && ret.output.toString().isEmpty())
+   if (ret.success && ret.output.isEmpty())
       ret.success = false;
 
    return ret;
@@ -54,13 +54,13 @@ GitExecResult GitHistory::getBranchesDiff(const QString &base, const QString &he
    auto retBase = git->getRemoteForBranch(base);
 
    if (retBase.success)
-      fullBase.prepend(retBase.output.toString() + QStringLiteral("/"));
+      fullBase.prepend(retBase.output + QStringLiteral("/"));
 
    QString fullHead = head;
    auto retHead = git->getRemoteForBranch(head);
 
    if (retHead.success)
-      fullHead.prepend(retHead.output.toString() + QStringLiteral("/"));
+      fullHead.prepend(retHead.output + QStringLiteral("/"));
 
    const auto cmd = QString("git diff %1...%2").arg(fullBase, fullHead);
 
@@ -99,8 +99,8 @@ GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffT
    return qMakePair(false, QString());
 }
 
-QString GitHistory::getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file,
-                                bool isCached)
+GitExecResult GitHistory::getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file,
+                                      bool isCached)
 {
    QLog_Debug("Git", QString("Getting diff for a file: {%1} between {%2} and {%3}").arg(file, currentSha, previousSha));
 
@@ -113,10 +113,7 @@ QString GitHistory::getFileDiff(const QString &currentSha, const QString &previo
 
    QLog_Trace("Git", QString("Getting diff for a file: {%1}").arg(cmd));
 
-   if (const auto ret = mGitBase->run(cmd); ret.success)
-      return ret.output.toString();
-
-   return QString();
+   return mGitBase->run(cmd);
 }
 
 GitExecResult GitHistory::getDiffFiles(const QString &sha, const QString &diffToSha)

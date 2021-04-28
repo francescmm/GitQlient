@@ -92,11 +92,10 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          addBranchActions(sha);
 
          QScopedPointer<GitBranches> git(new GitBranches(mGit));
-         const auto ret = git->getLastCommitOfBranch(mGit->getCurrentBranch());
 
-         if (ret.success)
+         if (auto ret = git->getLastCommitOfBranch(mGit->getCurrentBranch()); ret.success)
          {
-            const auto lastShaStr = ret.output.toString().remove('\n');
+            const auto lastShaStr = ret.output.remove('\n');
 
             if (lastShaStr == sha)
             {
@@ -276,14 +275,13 @@ void CommitHistoryContextMenu::exportAsPatch()
 
    if (ret.success)
    {
-      const auto action = QMessageBox::information(
-          this, tr("Patch generated"),
-          tr("<p>The patch has been generated!</p>"
-             "<p><b>Commit:</b></p><p>%1</p>"
-             "<p><b>Destination:</b> %2</p>"
-             "<p><b>File names:</b></p><p>%3</p>")
-              .arg(mShas.join("<br>"), mGit->getWorkingDir(), ret.output.toStringList().join("<br>")),
-          QMessageBox::Ok, QMessageBox::Open);
+      const auto action = QMessageBox::information(this, tr("Patch generated"),
+                                                   tr("<p>The patch has been generated!</p>"
+                                                      "<p><b>Commit:</b></p><p>%1</p>"
+                                                      "<p><b>Destination:</b> %2</p>"
+                                                      "<p><b>File names:</b></p><p>%3</p>")
+                                                       .arg(mShas.join("<br>"), mGit->getWorkingDir(), ret.output),
+                                                   QMessageBox::Ok, QMessageBox::Open);
 
       if (action == QMessageBox::Open)
       {
@@ -311,12 +309,12 @@ void CommitHistoryContextMenu::checkoutBranch()
 
    QScopedPointer<GitBranches> git(new GitBranches(mGit));
    const auto ret = isLocal ? git->checkoutLocalBranch(branchName) : git->checkoutRemoteBranch(branchName);
-   const auto output = ret.output.toString();
+   const auto output = ret.output;
 
    if (ret.success)
    {
       QRegExp rx("by \\d+ commits");
-      rx.indexIn(ret.output.toString());
+      rx.indexIn(ret.output);
       auto value = rx.capturedTexts().constFirst().split(" ");
 
       if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
@@ -338,7 +336,7 @@ void CommitHistoryContextMenu::checkoutBranch()
                          tr("There were problems during the checkout operation. Please, see the detailed "
                             "description for more information."),
                          QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
@@ -369,7 +367,7 @@ void CommitHistoryContextMenu::checkoutCommit()
                          tr("There were problems during the checkout operation. Please, see the detailed "
                             "description for more information."),
                          QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
@@ -389,7 +387,7 @@ void CommitHistoryContextMenu::cherryPickCommit()
          emit requestReload(false);
       else if (!ret.success)
       {
-         const auto errorMsg = ret.output.toString();
+         const auto errorMsg = ret.output;
 
          if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
              && errorMsg.contains("after resolving the conflicts", Qt::CaseInsensitive))
@@ -435,7 +433,7 @@ void CommitHistoryContextMenu::push()
    const auto ret = git->pushCommit(mShas.first(), mGit->getCurrentBranch());
    QApplication::restoreOverrideCursor();
 
-   if (ret.output.toString().contains("has no upstream branch"))
+   if (ret.output.contains("has no upstream branch"))
    {
       const auto currentBranch = mGit->getCurrentBranch();
       BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mGit });
@@ -458,7 +456,7 @@ void CommitHistoryContextMenu::push()
                          tr("There were problems during the push operation. Please, see the detailed description "
                             "for more information."),
                          QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
@@ -475,7 +473,7 @@ void CommitHistoryContextMenu::pull()
       emit requestReload(true);
    else
    {
-      const auto errorMsg = ret.output.toString();
+      const auto errorMsg = ret.output;
 
       if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
           && errorMsg.contains("causing a conflict", Qt::CaseInsensitive))

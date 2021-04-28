@@ -2,8 +2,8 @@
 #include "ui_BranchDlg.h"
 
 #include <GitBranches.h>
-#include <GitStashes.h>
 #include <GitQlientStyles.h>
+#include <GitStashes.h>
 
 #include <QFile>
 #include <QMessageBox>
@@ -113,7 +113,7 @@ void BranchDlg::accept()
              QString(tr("There were problems during the branch operation. Please, see the detailed description "
                         "for more information.")),
              QMessageBox::Ok, this);
-         msgBox.setDetailedText(ret.output.toString());
+         msgBox.setDetailedText(ret.output);
          msgBox.setStyleSheet(GitQlientStyles::getStyles());
          msgBox.exec();
       }

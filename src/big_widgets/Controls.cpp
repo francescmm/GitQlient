@@ -239,19 +239,17 @@ void Controls::pullCurrentBranch()
    const auto ret = git->pull();
    QApplication::restoreOverrideCursor();
 
-   const auto msg = ret.output.toString();
-
    if (ret.success)
    {
-      if (msg.contains("merge conflict", Qt::CaseInsensitive))
+      if (ret.output.contains("merge conflict", Qt::CaseInsensitive))
          emit signalPullConflict();
       else
          emit requestReload(true);
    }
    else
    {
-      if (msg.contains("error: could not apply", Qt::CaseInsensitive)
-          && msg.contains("causing a conflict", Qt::CaseInsensitive))
+      if (ret.output.contains("error: could not apply", Qt::CaseInsensitive)
+          && ret.output.contains("causing a conflict", Qt::CaseInsensitive))
       {
          emit signalPullConflict();
       }
@@ -261,7 +259,7 @@ void Controls::pullCurrentBranch()
                             QString(tr("There were problems during the pull operation. Please, see the detailed "
                                        "description for more information.")),
                             QMessageBox::Ok, this);
-         msgBox.setDetailedText(msg);
+         msgBox.setDetailedText(ret.output);
          msgBox.setStyleSheet(GitQlientStyles::getStyles());
          msgBox.exec();
       }
@@ -314,7 +312,7 @@ void Controls::pushCurrentBranch()
    const auto ret = git->push();
    QApplication::restoreOverrideCursor();
 
-   if (ret.output.toString().contains("has no upstream branch"))
+   if (ret.output.contains("has no upstream branch"))
    {
       const auto currentBranch = mGit->getCurrentBranch();
       BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mGit });
@@ -338,7 +336,7 @@ void Controls::pushCurrentBranch()
           QString(tr("There were problems during the push operation. Please, see the detailed description "
                      "for more information.")),
           QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
@@ -366,7 +364,7 @@ void Controls::popStashedWork()
                          tr("There were problems during the stash pop operation. Please, see the detailed "
                             "description for more information."),
                          QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }

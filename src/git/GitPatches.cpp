@@ -31,7 +31,7 @@ GitExecResult GitPatches::exportPatch(const QStringList &shaList)
          break;
       else
       {
-         auto filename = ret.output.toString();
+         auto filename = ret.output;
          filename = filename.remove("\n");
          const auto text = filename.mid(filename.indexOf("-") + 1);
          const auto number = QString("%1").arg(val, 4, 10, QChar('0'));
@@ -47,7 +47,7 @@ GitExecResult GitPatches::exportPatch(const QStringList &shaList)
    if (val != shaList.count())
       QLog_Error("Git", QString("Problem generating patches. Stop after {%1} iterations").arg(val));
 
-   return qMakePair(true, QVariant(files));
+   return qMakePair(true, files.join("<br>"));
 }
 
 bool GitPatches::applyPatch(const QString &fileName, bool asCommit)

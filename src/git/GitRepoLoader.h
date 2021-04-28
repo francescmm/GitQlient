@@ -66,7 +66,6 @@ private:
    void loadReferences();
    void requestRevisions();
    void processRevision(QByteArray ba);
-   QVector<CommitInfo> processUnsignedLog(QByteArray &log) const;
-   QVector<CommitInfo> processSignedLog(QByteArray &log) const;
-   CommitInfo parseCommitData(const QByteArray &commitData) const;
+   QList<CommitInfo> processUnsignedLog(QByteArray &log) const;
+   QList<CommitInfo> processSignedLog(QByteArray &log) const;
 };

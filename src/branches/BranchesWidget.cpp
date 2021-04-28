@@ -725,7 +725,7 @@ void BranchesWidget::processSubtrees()
 
    if (ret.success)
    {
-      const auto rawData = ret.output.toString();
+      const auto rawData = ret.output;
       const auto commits = rawData.split("\n\n");
       auto count = 0;
 
@@ -856,7 +856,7 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
          if (ret.success)
             emit signalBranchesUpdated();
          else
-            QMessageBox::warning(this, tr("Error when pulling"), ret.output.toString());
+            QMessageBox::warning(this, tr("Error when pulling"), ret.output);
       });
       /*
       connect(menu->addAction(tr("Merge")), &QAction::triggered, this, [this, index]() {
@@ -885,7 +885,7 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
          if (ret.success)
             emit signalBranchesUpdated();
          else
-            QMessageBox::warning(this, tr("Error when pushing"), ret.output.toString());
+            QMessageBox::warning(this, tr("Error when pushing"), ret.output);
       });
 
       const auto addSubtree = menu->addAction(tr("Configure"));
@@ -963,7 +963,7 @@ void BranchesWidget::onStashClicked(QListWidgetItem *item)
 void BranchesWidget::onStashSelected(const QString &stashId)
 {
    QScopedPointer<GitTags> git(new GitTags(mGit));
-   const auto sha = git->getTagCommit(stashId).output.toString();
+   const auto sha = git->getTagCommit(stashId).output;
 
    emit signalSelectCommit(sha);
 }

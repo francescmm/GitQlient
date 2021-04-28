@@ -194,18 +194,24 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    if (destFile.contains("-->"))
       destFile = destFile.split("--> ").last().split("(").first().trimmed();
 
+   QString text;
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
-   auto text
+
+   if (const auto ret
        = git->getFileDiff(currentSha == CommitInfo::ZERO_SHA ? QString() : currentSha, previousSha, destFile, isCached);
-
-   if (text.isEmpty())
+       ret.success)
    {
-      if (const auto ret = git->getUntrackedFileDiff(destFile); ret.success)
-         text = ret.output.toString();
-   }
+      text = ret.output;
 
-   if (text.startsWith("* "))
-      return false;
+      if (text.isEmpty())
+      {
+         if (const auto ret = git->getUntrackedFileDiff(destFile); ret.success)
+            text = ret.output;
+      }
+
+      if (text.startsWith("* "))
+         return false;
+   }
 
    mFileNameLabel->setText(file);
 
@@ -530,7 +536,7 @@ void FileDiffWidget::stageChunk(const QString &id)
             }
 #endif
             QMessageBox::information(this, tr("Stage failed"),
-                                     tr("The chunk couldn't be applied:\n%1").arg(ret.output.toString()));
+                                     tr("The chunk couldn't be applied:\n%1").arg(ret.output));
          }
       }
    }

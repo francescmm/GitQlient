@@ -49,7 +49,7 @@ GitExecResult GitBase::run(const QString &cmd) const
    GitSyncProcess p(mWorkingDirectory);
 
    const auto ret = p.run(cmd);
-   const auto runOutput = ret.output.toString();
+   const auto runOutput = ret.output;
 
    if (ret.success && runOutput.contains("fatal:"))
       QLog_Info("Git", QString("Git command {%1} reported issues:\n%2").arg(cmd, runOutput));
@@ -69,7 +69,7 @@ void GitBase::updateCurrentBranch()
 
    const auto ret = run(cmd);
 
-   mCurrentBranch = ret.success ? ret.output.toString().trimmed().remove("heads/") : QString();
+   mCurrentBranch = ret.success ? ret.output.trimmed().remove("heads/") : QString();
 }
 
 QString GitBase::getCurrentBranch()

@@ -32,6 +32,8 @@
 #include <QObject>
 #include <QSharedPointer>
 
+#include <optional>
+
 struct WipRevisionInfo;
 
 class GitCache : public QObject
@@ -55,22 +57,18 @@ public:
 
    CommitInfo commitInfo(const QString &sha);
    CommitInfo commitInfo(int row);
-
    CommitInfo searchCommitInfo(const QString &text, int startingPoint = 0, bool reverse = false);
+   bool isCommitInCurrentGeneologyTree(const QString &sha);
+   bool updateWipCommit(const WipRevisionInfo &wipInfo);
 
-   bool isCommitInCurrentGeneologyTree(const QString &sha) const;
-
-   bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
-   RevisionFiles revisionFile(const QString &sha1, const QString &sha2) const;
+   bool insertRevisionFiles(const QString &sha1, const QString &sha2, const RevisionFiles &file);
+   std::optional<RevisionFiles> revisionFile(const QString &sha1, const QString &sha2) const;
 
    void clearReferences();
    void insertReference(const QString &sha, References::Type type, const QString &reference);
-   bool hasReferences(const QString &sha) const;
-   QStringList getReferences(const QString &sha, References::Type type) const;
-
+   bool hasReferences(const QString &sha);
+   QStringList getReferences(const QString &sha, References::Type type);
    void reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha);
-
-   bool updateWipCommit(const WipRevisionInfo &wipInfo);
 
    void setUntrackedFilesList(QVector<QString> untrackedFiles);
    bool pendingLocalChanges();
@@ -83,19 +81,27 @@ public:
 private:
    friend class GitRepoLoader;
 
-   QMutex mMutex;
    bool mConfigured = true;
+   Lanes mLanes;
+   QVector<QString> mUntrackedFiles;
+
+   mutable QMutex mCommitsMutex;
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo> mCommitsMap;
+
+   mutable QMutex mRevisionsMutex;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
-   Lanes mLanes;
-   QVector<QString> mUntrackedfiles;
+
+   mutable QMutex mReferencesMutex;
    QHash<QString, References> mReferences;
+
+   mutable QMutex mTagsMutex;
    QHash<QString, QString> mRemoteTags;
 
-   void setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits);
+   void setup(const WipRevisionInfo &wipInfo, QList<CommitInfo> commits);
    void setConfigurationDone() { mConfigured = true; }
 
+   bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    void insertWipRevision(const WipRevisionInfo &wipInfo);
    RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
    void calculateLanes(CommitInfo &c);

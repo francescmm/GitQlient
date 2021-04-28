@@ -27,12 +27,12 @@ GitUserInfo GitConfig::getGlobalUserInfo() const
    const auto nameRequest = mGitBase->run("git config --get --global user.name");
 
    if (nameRequest.success)
-      userInfo.mUserName = nameRequest.output.toString().trimmed();
+      userInfo.mUserName = nameRequest.output.trimmed();
 
    const auto emailRequest = mGitBase->run("git config --get --global user.email");
 
    if (emailRequest.success)
-      userInfo.mUserEmail = emailRequest.output.toString().trimmed();
+      userInfo.mUserEmail = emailRequest.output.trimmed();
 
    return userInfo;
 }
@@ -63,12 +63,12 @@ GitUserInfo GitConfig::getLocalUserInfo() const
    const auto nameRequest = mGitBase->run("git config --get --local user.name");
 
    if (nameRequest.success)
-      userInfo.mUserName = nameRequest.output.toString().trimmed();
+      userInfo.mUserName = nameRequest.output.trimmed();
 
    const auto emailRequest = mGitBase->run("git config --get --local user.email");
 
    if (emailRequest.success)
-      userInfo.mUserEmail = emailRequest.output.toString().trimmed();
+      userInfo.mUserEmail = emailRequest.output.trimmed();
 
    return userInfo;
 }
@@ -143,9 +143,9 @@ GitExecResult GitConfig::getRemoteForBranch(const QString &branch)
    if (config.success)
    {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-      const auto values = config.output.toString().split('\n', Qt::SkipEmptyParts);
+      const auto values = config.output.split('\n', Qt::SkipEmptyParts);
 #else
-      const auto values = config.output.toString().split('\n', QString::SkipEmptyParts);
+      const auto values = config.output.split('\n', QString::SkipEmptyParts);
 #endif
       const auto configKey = QString("branch.%1.remote=").arg(branch);
       QString configValue;
@@ -177,7 +177,7 @@ GitExecResult GitConfig::getGitValue(const QString &key) const
 
 QString GitConfig::getServerUrl() const
 {
-   auto serverUrl = getGitValue("remote.origin.url").output.toString().trimmed();
+   auto serverUrl = getGitValue("remote.origin.url").output.trimmed();
 
    if (serverUrl.startsWith("git@"))
    {
@@ -196,7 +196,7 @@ QString GitConfig::getServerUrl() const
 
 QPair<QString, QString> GitConfig::getCurrentRepoAndOwner() const
 {
-   auto serverUrl = getGitValue("remote.origin.url").output.toString().trimmed();
+   auto serverUrl = getGitValue("remote.origin.url").output.trimmed();
    QString repo;
 
    if (serverUrl.startsWith("git@"))

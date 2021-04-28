@@ -1,14 +1,8 @@
 #include "GitExecResult.h"
 
-GitExecResult::GitExecResult(bool ret, QVariant v)
+GitExecResult::GitExecResult(bool ret, QString v)
    : success(ret)
    , output(std::move(v))
-{
-}
-
-GitExecResult::GitExecResult(const QPair<bool, QVariant> &result)
-   : success(result.first)
-   , output(result.second)
 {
 }
 

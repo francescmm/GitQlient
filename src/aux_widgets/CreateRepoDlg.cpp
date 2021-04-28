@@ -139,11 +139,9 @@ void CreateRepoDlg::accept()
       }
       else
       {
-         const auto msg = ret.output.toString();
+         QMessageBox::critical(this, tr("Error when %1").arg(actionApplied), ret.output);
 
-         QMessageBox::critical(this, tr("Error when %1").arg(actionApplied), msg);
-
-         QLog_Error("UI", msg);
+         QLog_Error("UI", ret.output);
       }
    }
 }

@@ -1,8 +1,8 @@
 #include "AddSubtreeDlg.h"
 #include "ui_AddSubtreeDlg.h"
 
-#include <GitSubtree.h>
 #include <GitQlientStyles.h>
+#include <GitSubtree.h>
 #include <QLogger.h>
 
 #include <QMessageBox>
@@ -73,7 +73,7 @@ void AddSubtreeDlg::accept()
       if (ret.success)
          QDialog::accept();
       else
-         QMessageBox::warning(this, tr("Error when adding a subtree."), ret.output.toString());
+         QMessageBox::warning(this, tr("Error when adding a subtree."), ret.output);
    }
 }
 

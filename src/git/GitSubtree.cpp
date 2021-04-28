@@ -35,7 +35,7 @@ GitExecResult GitSubtree::add(const QString &url, const QString &ref, const QStr
 
          auto ret = mGitBase->run(cmd);
 
-         if (ret.output.toString().contains("Cannot"))
+         if (ret.output.contains("Cannot"))
             ret.success = false;
 
          return ret;
@@ -65,7 +65,7 @@ GitExecResult GitSubtree::pull(const QString &url, const QString &ref, const QSt
 
    auto ret = mGitBase->run(cmd);
 
-   if (ret.output.toString().contains("Cannot"))
+   if (ret.output.contains("Cannot"))
       ret.success = false;
 
    return ret;
@@ -81,7 +81,7 @@ GitExecResult GitSubtree::push(const QString &url, const QString &ref, const QSt
 
    auto ret = mGitBase->run(cmd);
 
-   if (ret.output.toString().contains("Cannot"))
+   if (ret.output.contains("Cannot"))
       ret.success = false;
 
    return ret;
@@ -97,7 +97,7 @@ GitExecResult GitSubtree::merge(const QString &sha) const
 
    auto ret = mGitBase->run(cmd);
 
-   if (ret.output.toString().contains("Cannot"))
+   if (ret.output.contains("Cannot"))
       ret.success = false;
 
    return ret;

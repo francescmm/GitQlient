@@ -93,14 +93,14 @@ void CommitChangesWidget::resetFile(QListWidgetItem *item)
    const auto revInfo = mCache->commitInfo(mCurrentSha);
    const auto files = mCache->revisionFile(mCurrentSha, revInfo.firstParent());
 
-   for (auto i = 0; i < files.count(); ++i)
+   for (auto i = 0; i < files->count(); ++i)
    {
-      auto fileName = files.getFile(i);
+      auto fileName = files->getFile(i);
 
       if (fileName == item->toolTip())
       {
-         const auto isUnknown = files.statusCmp(i, RevisionFiles::UNKNOWN);
-         const auto isInIndex = files.statusCmp(i, RevisionFiles::IN_INDEX);
+         const auto isUnknown = files->statusCmp(i, RevisionFiles::UNKNOWN);
+         const auto isInIndex = files->statusCmp(i, RevisionFiles::IN_INDEX);
          const auto untrackedFile = !isInIndex && isUnknown;
          const auto row = ui->stagedFilesList->row(item);
          const auto iconPath = QString(":/icons/add");
@@ -192,7 +192,9 @@ void CommitChangesWidget::clearCache()
    {
       if (!it.value().keep)
       {
-         delete it.value().item;
+         if (it.value().item)
+            delete it.value().item;
+
          it = mInternalCache.erase(it);
       }
       else
@@ -313,7 +315,8 @@ void CommitChangesWidget::addAllFilesToCommitList()
 void CommitChangesWidget::requestDiff(const QString &fileName)
 {
    const auto isCached = qobject_cast<StagedFilesList *>(sender()) == ui->stagedFilesList;
-   emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent(), fileName, isCached);
+   emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent(), fileName,
+                       isCached);
 }
 
 QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool updateGit)

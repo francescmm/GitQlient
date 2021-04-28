@@ -467,7 +467,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
       if ((currentBranch.isEmpty() || currentBranch == "HEAD"))
       {
-         if (const auto ret = mGit->getLastCommit(); ret.success && sha == ret.output.toString().trimmed())
+         if (const auto ret = mGit->getLastCommit(); ret.success && sha == ret.output.trimmed())
          {
             marks.append("detached");
             colors.append(graphDetached);

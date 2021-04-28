@@ -1,17 +1,17 @@
 #include "FullDiffWidget.h"
 
 #include <CommitInfo.h>
-#include <GitHistory.h>
-#include <GitCache.h>
-#include <GitQlientStyles.h>
 #include <DiffHelper.h>
+#include <GitCache.h>
+#include <GitHistory.h>
+#include <GitQlientStyles.h>
 
+#include <QLineEdit>
+#include <QPushButton>
 #include <QScrollBar>
 #include <QTextCharFormat>
 #include <QTextCodec>
 #include <QVBoxLayout>
-#include <QLineEdit>
-#include <QPushButton>
 
 FullDiffWidget::DiffHighlighter::DiffHighlighter(QTextDocument *document)
    : QSyntaxHighlighter(document)
@@ -117,9 +117,9 @@ bool FullDiffWidget::reload()
       QScopedPointer<GitHistory> git(new GitHistory(mGit));
       const auto ret = git->getCommitDiff(mCurrentSha, mPreviousSha);
 
-      if (ret.success && !ret.output.toString().isEmpty())
+      if (ret.success && !ret.output.isEmpty())
       {
-         loadDiff(mCurrentSha, mPreviousSha, ret.output.toString());
+         loadDiff(mCurrentSha, mPreviousSha, ret.output);
          return true;
       }
    }

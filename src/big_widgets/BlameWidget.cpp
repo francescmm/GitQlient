@@ -1,22 +1,22 @@
 #include "BlameWidget.h"
 
-#include <GitHistory.h>
-#include <FileBlameWidget.h>
 #include <BranchesViewDelegate.h>
-#include <RepositoryViewDelegate.h>
+#include <CommitHistoryColumns.h>
 #include <CommitHistoryModel.h>
 #include <CommitHistoryView.h>
-#include <CommitHistoryColumns.h>
 #include <CommitInfo.h>
+#include <FileBlameWidget.h>
+#include <GitHistory.h>
+#include <RepositoryViewDelegate.h>
 
+#include <QApplication>
+#include <QClipboard>
 #include <QFileSystemModel>
-#include <QTreeView>
 #include <QGridLayout>
 #include <QHeaderView>
 #include <QMenu>
-#include <QApplication>
-#include <QClipboard>
 #include <QTabWidget>
+#include <QTreeView>
 
 BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                          const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
@@ -112,9 +112,9 @@ void BlameWidget::showFileHistory(const QString &filePath)
       if (ret.success)
       {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-         auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+         auto shaHistory = ret.output.split("\n", Qt::SkipEmptyParts);
 #else
-         auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+         auto shaHistory = ret.output.split("\n", QString::SkipEmptyParts);
 #endif
          for (auto i = 0; i < shaHistory.size();)
          {
@@ -189,9 +189,9 @@ void BlameWidget::reloadHistory(int tabIndex)
       if (ret.success)
       {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-         auto shaHistory = ret.output.toString().split("\n", Qt::SkipEmptyParts);
+         auto shaHistory = ret.output.split("\n", Qt::SkipEmptyParts);
 #else
-         auto shaHistory = ret.output.toString().split("\n", QString::SkipEmptyParts);
+         auto shaHistory = ret.output.split("\n", QString::SkipEmptyParts);
 #endif
          for (auto i = 0; i < shaHistory.size();)
          {

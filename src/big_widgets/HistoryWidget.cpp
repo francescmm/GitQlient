@@ -347,9 +347,9 @@ void HistoryWidget::showFullDiff()
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
    const auto ret = git->getCommitDiff(CommitInfo::ZERO_SHA, commit.firstParent());
 
-   if (ret.success && !ret.output.toString().isEmpty())
+   if (ret.success && !ret.output.isEmpty())
    {
-      mFullDiffWidget->loadDiff(CommitInfo::ZERO_SHA, commit.firstParent(), ret.output.toString());
+      mFullDiffWidget->loadDiff(CommitInfo::ZERO_SHA, commit.firstParent(), ret.output);
       mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FullDiff));
    }
    else
@@ -440,7 +440,7 @@ void HistoryWidget::onBranchCheckout()
    const auto ret = gitBranches->getLastCommitOfBranch(mGit->getCurrentBranch());
 
    if (mChShowAllBranches->isChecked())
-      mRepositoryView->focusOnCommit(ret.output.toString());
+      mRepositoryView->focusOnCommit(ret.output);
 
    emit signalUpdateCache();
 }
@@ -482,7 +482,7 @@ void HistoryWidget::processMergeResponse(const GitExecResult &ret)
           QString(tr("There were problems during the merge. Please, see the detailed description for more "
                      "information.<br><br>GitQlient will show the merge helper tool.")),
           QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
 
@@ -490,18 +490,16 @@ void HistoryWidget::processMergeResponse(const GitExecResult &ret)
    }
    else
    {
-      const auto outputStr = ret.output.toString();
-
-      if (!outputStr.isEmpty())
+      if (!ret.output.isEmpty())
       {
-         if (outputStr.contains("error: could not apply", Qt::CaseInsensitive)
-             || outputStr.contains(" conflict", Qt::CaseInsensitive))
+         if (ret.output.contains("error: could not apply", Qt::CaseInsensitive)
+             || ret.output.contains(" conflict", Qt::CaseInsensitive))
          {
             QMessageBox msgBox(
                 QMessageBox::Warning, tr("Merge status"),
                 tr("There were problems during the merge. Please, see the detailed description for more information."),
                 QMessageBox::Ok, this);
-            msgBox.setDetailedText(ret.output.toString());
+            msgBox.setDetailedText(ret.output);
             msgBox.setStyleSheet(GitQlientStyles::getStyles());
             msgBox.exec();
 
@@ -515,7 +513,7 @@ void HistoryWidget::processMergeResponse(const GitExecResult &ret)
                 QMessageBox::Information, tr("Merge successful"),
                 tr("The merge was successfully done. See the detailed description for more information."),
                 QMessageBox::Ok, this);
-            msgBox.setDetailedText(ret.output.toString());
+            msgBox.setDetailedText(ret.output);
             msgBox.setStyleSheet(GitQlientStyles::getStyles());
             msgBox.exec();
          }
@@ -562,10 +560,8 @@ void HistoryWidget::cherryPickCommit()
       }
       else
       {
-         const auto errorMsg = ret.output.toString();
-
-         if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
-             || errorMsg.contains(" conflict", Qt::CaseInsensitive))
+         if (ret.output.contains("error: could not apply", Qt::CaseInsensitive)
+             || ret.output.contains(" conflict", Qt::CaseInsensitive))
          {
             emit signalCherryPickConflict(QStringList());
          }
@@ -575,7 +571,7 @@ void HistoryWidget::cherryPickCommit()
                                tr("There were problems during the cherry-pick operation. Please, see the detailed "
                                   "description for more information."),
                                QMessageBox::Ok, this);
-            msgBox.setDetailedText(errorMsg);
+            msgBox.setDetailedText(ret.output);
             msgBox.setStyleSheet(GitQlientStyles::getStyles());
             msgBox.exec();
          }

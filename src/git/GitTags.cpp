@@ -101,7 +101,7 @@ GitExecResult GitTags::getTagCommit(const QString &tagName)
    QLog_Trace("Git", QString("Getting the commit of a tag: {%1}").arg(cmd));
 
    const auto ret = mGitBase->run(cmd);
-   const auto output = ret.output.toString().trimmed();
+   const auto output = ret.output.trimmed();
 
    return qMakePair(ret.success, output);
 }
@@ -112,7 +112,7 @@ void GitTags::onRemoteTagsRecieved(GitExecResult result)
 
    if (result.success)
    {
-      const auto tagsTmp = result.output.toString().split("\n");
+      const auto tagsTmp = result.output.split("\n");
 
       for (const auto &tag : tagsTmp)
       {

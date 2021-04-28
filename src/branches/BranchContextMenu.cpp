@@ -66,7 +66,7 @@ void BranchContextMenu::pull()
       emit signalBranchesUpdated();
    else
    {
-      const auto errorMsg = ret.output.toString();
+      const auto errorMsg = ret.output;
 
       if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
           && errorMsg.contains("causing a conflict", Qt::CaseInsensitive))
@@ -110,7 +110,7 @@ void BranchContextMenu::push()
        = mConfig.currentBranch == mConfig.branchSelected ? git->push() : git->pushBranch(mConfig.branchSelected);
    QApplication::restoreOverrideCursor();
 
-   if (ret.output.toString().contains("has no upstream branch"))
+   if (ret.output.contains("has no upstream branch"))
    {
       BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::PUSH_UPSTREAM, mConfig.mGit });
       const auto ret = dlg.exec();
@@ -126,7 +126,7 @@ void BranchContextMenu::push()
                          tr("There were problems during the push operation. Please, see the detailed description "
                             "for more information."),
                          QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
@@ -150,7 +150,7 @@ void BranchContextMenu::pushForce()
                          tr("There were problems during the pull operation. Please, see the detailed description "
                             "for more information."),
                          QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
@@ -216,7 +216,7 @@ void BranchContextMenu::deleteBranch()
          else
             QMessageBox::critical(
                 this, tr("Delete a branch failed"),
-                tr("There were some problems while deleting the branch:<br><br> %1").arg(ret2.output.toString()));
+                tr("There were some problems while deleting the branch:<br><br> %1").arg(ret2.output));
       }
    }
 }

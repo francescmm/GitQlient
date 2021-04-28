@@ -81,7 +81,7 @@ void FileBlameWidget::setup(const QString &fileName, const QString &currentSha, 
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
    const auto ret = git->blame(mCurrentFile, currentSha);
 
-   if (ret.success && !ret.output.toString().startsWith("fatal:"))
+   if (ret.success && !ret.output.startsWith("fatal:"))
    {
       delete mAnotation;
       mAnotation = nullptr;
@@ -89,7 +89,7 @@ void FileBlameWidget::setup(const QString &fileName, const QString &currentSha, 
       mCurrentSha->setText(currentSha);
       mPreviousSha->setText(previousSha);
 
-      const auto annotations = processBlame(ret.output.toString());
+      const auto annotations = processBlame(ret.output);
       formatAnnotatedFile(annotations);
    }
    else

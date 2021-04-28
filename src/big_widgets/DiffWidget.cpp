@@ -1,18 +1,18 @@
 #include "DiffWidget.h"
 
-#include <GitCache.h>
 #include <CommitInfoPanel.h>
 #include <FileDiffWidget.h>
-#include <FullDiffWidget.h>
-#include <GitQlientSettings.h>
-#include <GitHistory.h>
 #include <FileListWidget.h>
+#include <FullDiffWidget.h>
+#include <GitCache.h>
+#include <GitHistory.h>
+#include <GitQlientSettings.h>
 
-#include <QPinnableTabWidget.h>
 #include <QLogger.h>
+#include <QPinnableTabWidget.h>
 
-#include <QMessageBox>
 #include <QHBoxLayout>
+#include <QMessageBox>
 
 using namespace QLogger;
 
@@ -154,10 +154,10 @@ bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
       QScopedPointer<GitHistory> git(new GitHistory(mGit));
       const auto ret = git->getCommitDiff(sha, parentSha);
 
-      if (ret.success && !ret.output.toString().isEmpty())
+      if (ret.success && !ret.output.isEmpty())
       {
          const auto fullDiffWidget = new FullDiffWidget(mGit, mCache);
-         fullDiffWidget->loadDiff(sha, parentSha, ret.output.toString());
+         fullDiffWidget->loadDiff(sha, parentSha, ret.output);
 
          mInfoPanelBase->configure(mCache->commitInfo(sha));
          mInfoPanelParent->configure(mCache->commitInfo(parentSha));

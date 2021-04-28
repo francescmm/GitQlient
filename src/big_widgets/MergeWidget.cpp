@@ -212,7 +212,7 @@ void MergeWidget::abort()
                          tr("There were problems during the aborting the merge. Please, see the detailed "
                             "description for more information."),
                          QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
@@ -252,7 +252,7 @@ void MergeWidget::commit()
                          tr("There were problems during the merge operation. Please, see the detailed description "
                             "for more information."),
                          QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output.toString());
+      msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
@@ -311,7 +311,7 @@ void MergeWidget::cherryPickCommit()
          emit signalMergeFinished();
       else if (!ret.success)
       {
-         const auto errorMsg = ret.output.toString();
+         const auto errorMsg = ret.output;
 
          if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
              && errorMsg.contains("after resolving the conflicts", Qt::CaseInsensitive))
@@ -323,7 +323,8 @@ void MergeWidget::cherryPickCommit()
 
             const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
 
-            configureForCherryPick(files, shas);
+            if (files)
+               configureForCherryPick(files.value(), shas);
          }
          else
          {

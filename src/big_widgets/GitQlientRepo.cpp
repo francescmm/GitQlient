@@ -411,7 +411,8 @@ void GitQlientRepo::showWarningMerge()
 
    const auto file = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
 
-   mMergeWidget->configure(file, MergeWidget::ConflictReason::Merge);
+   if (file)
+      mMergeWidget->configure(file.value(), MergeWidget::ConflictReason::Merge);
 }
 
 // TODO: Optimize
@@ -426,7 +427,8 @@ void GitQlientRepo::showCherryPickConflict(const QStringList &shas)
 
    const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
 
-   mMergeWidget->configureForCherryPick(files, shas);
+   if (files)
+      mMergeWidget->configureForCherryPick(files.value(), shas);
 }
 
 // TODO: Optimize
@@ -441,7 +443,8 @@ void GitQlientRepo::showPullConflict()
 
    const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
 
-   mMergeWidget->configure(files, MergeWidget::ConflictReason::Pull);
+   if (files)
+      mMergeWidget->configure(files.value(), MergeWidget::ConflictReason::Pull);
 }
 
 void GitQlientRepo::showMergeView()

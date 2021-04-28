@@ -48,11 +48,9 @@ public:
 
    CommitInfo() = default;
    ~CommitInfo() = default;
+   CommitInfo(QByteArray commitData, bool isSigned = false);
    explicit CommitInfo(const QString sha, const QStringList &parents, std::chrono::seconds commitDate,
                        const QString &log);
-   explicit CommitInfo(const QString sha, const QStringList &parents, const QString &commiter,
-                       std::chrono::seconds commitDate, const QString &author, const QString &log,
-                       const QString &longLog = QString(), bool isSigned = false, const QString &gpgKey = QString());
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;
 
@@ -92,4 +90,6 @@ private:
    QVector<Lane> mLanes;
    QStringList mParentsSha;
    QVector<CommitInfo *> mChilds;
+
+   friend class GitCache;
 };
