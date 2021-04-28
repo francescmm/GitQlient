@@ -23,6 +23,8 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QList<CommitInfo> commits)
 {
    QMutexLocker lock(&mCommitsMutex);
 
+   mInitialized = true;
+
    const auto totalCommits = commits.count() + 1;
 
    QLog_Debug("Cache", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
@@ -75,8 +77,6 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QList<CommitInfo> commits)
          tmpChildsStorage[parent].append(&mCommitsMap[sha]);
    }
 
-   commits.clear();
-   // commits.squeeze();
    mCommitsMap.squeeze();
    mCommits.squeeze();
 

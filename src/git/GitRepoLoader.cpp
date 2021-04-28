@@ -179,7 +179,8 @@ void GitRepoLoader::requestRevisions()
    const auto baseCmd = QString("git log %1 --no-color --log-size --parents --boundary -z --pretty=format:%2 %3")
                             .arg(order, QString::fromUtf8(GIT_LOG_FORMAT), commitsToRetrieve);
 
-   emit signalLoadingStarted();
+   if (!mRevCache->isInitialized())
+      emit signalLoadingStarted();
 
    const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());
    connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevision);
@@ -200,7 +201,10 @@ void GitRepoLoader::processRevision(QByteArray ba)
 
    QLog_Debug("Git", "Processing revisions...");
 
-   emit signalLoadingStarted();
+   const auto initialized = mRevCache->isInitialized();
+
+   if (!initialized)
+      emit signalLoadingStarted();
 
    const auto ret = gitConfig->getGitValue("log.showSignature");
    const auto showSignature = ret.success ? ret.output.contains("true") : false;

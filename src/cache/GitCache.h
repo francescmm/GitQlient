@@ -78,9 +78,12 @@ public:
 
    void updateTags(QHash<QString, QString> remoteTags);
 
+   bool isInitialized() const { return mInitialized; }
+
 private:
    friend class GitRepoLoader;
 
+   bool mInitialized = false;
    bool mConfigured = true;
    Lanes mLanes;
    QVector<QString> mUntrackedFiles;
