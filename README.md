@@ -63,6 +63,16 @@ I'm aware that developers may like to have some more information beyond the User
 
 In the [User Manual](https://francescmm.github.io/GitQlient/#appendix-b-build) you can find a whole section about building GitQlient and what dependencies you need.
 
+### Packaging status
+
+#### Fedora
+
+Package [available](https://src.fedoraproject.org/rpms/gitqlient) in official Fedora repos.
+
+```
+sudo dnf install gitqlient
+```
+
 ## Licenses
 
 Most of the icons on GitQlient are from Font Awesome. [The license states is GPL friendly](https://fontawesome.com/license/free). Those icons that are not from Font Awesome are custom made icons.
