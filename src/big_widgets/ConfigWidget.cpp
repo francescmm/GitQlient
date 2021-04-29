@@ -111,7 +111,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->cbSubtree->setChecked(settings.localValue("SubtreeHeader", true).toBool());
 
    // Build System configuration
-   const auto isConfigured = settings.localValue("BuildSystemEanbled", false).toBool();
+   const auto isConfigured = settings.localValue("BuildSystemEnabled", false).toBool();
    ui->chBoxBuildSystem->setChecked(isConfigured);
    connect(ui->chBoxBuildSystem, &QCheckBox::stateChanged, this, &ConfigWidget::toggleBsAccesInfo);
 
@@ -270,7 +270,7 @@ void ConfigWidget::saveConfig()
 
    if (showBs && !bsUser.isEmpty() && !bsToken.isEmpty() && !bsUrl.isEmpty())
    {
-      settings.setLocalValue("BuildSystemEanbled", showBs);
+      settings.setLocalValue("BuildSystemEnabled", showBs);
       settings.setLocalValue("BuildSystemUrl", bsUrl);
       settings.setLocalValue("BuildSystemUser", bsUser);
       settings.setLocalValue("BuildSystemToken", bsToken);
@@ -278,7 +278,7 @@ void ConfigWidget::saveConfig()
    }
    else
    {
-      settings.setLocalValue("BuildSystemEanbled", false);
+      settings.setLocalValue("BuildSystemEnabled", false);
       emit buildSystemConfigured(false);
    }
 

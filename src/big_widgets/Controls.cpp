@@ -224,7 +224,7 @@ void Controls::enableButtons(bool enabled)
    if (enabled)
    {
       GitQlientSettings settings(mGit->getGitDir());
-      const auto isConfigured = settings.localValue("BuildSystemEanbled", false).toBool();
+      const auto isConfigured = settings.localValue("BuildSystemEnabled", false).toBool();
 
       mBuildSystem->setEnabled(isConfigured);
    }
@@ -428,7 +428,7 @@ void Controls::createGitPlatformButton(QHBoxLayout *layout)
 void Controls::configBuildSystemButton()
 {
    GitQlientSettings settings(mGit->getGitDir());
-   const auto isConfigured = settings.localValue("BuildSystemEanbled", false).toBool();
+   const auto isConfigured = settings.localValue("BuildSystemEnabled", false).toBool();
    mBuildSystem->setEnabled(isConfigured);
 
    if (!isConfigured)
