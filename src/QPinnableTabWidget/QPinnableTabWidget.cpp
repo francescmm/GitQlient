@@ -189,14 +189,14 @@ void QPinnableTabWidget::showContextMenu()
    if (mTabState.value(mClickedTab))
       connect(actions->addAction("Unpin"), &QAction::triggered, this, &QPinnableTabWidget::unpinTab);
    else
-      connect(actions->addAction("Pin"), &QAction::triggered, this, &QPinnableTabWidget::pintTab);
+      connect(actions->addAction("Pin"), &QAction::triggered, this, &QPinnableTabWidget::pinTab);
 
    connect(actions->addAction("Close"), &QAction::triggered, this, [this]() { emit tabCloseRequested(mClickedTab); });
 
    actions->exec(QCursor::pos());
 }
 
-void QPinnableTabWidget::pintTab()
+void QPinnableTabWidget::pinTab()
 {
    tabBar()->setTabButton(
        mClickedTab,

@@ -23,8 +23,8 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QTabWidget>
 #include <QMap>
+#include <QTabWidget>
 
 class QPinnableTabWidget : public QTabWidget
 {
@@ -65,7 +65,7 @@ private:
 
    void clickRequested(int index);
    void showContextMenu();
-   void pintTab();
+   void pinTab();
    void unpinTab();
    QTabBar *tabBar() const { return QTabWidget::tabBar(); }
    void setTabsClosable(bool closeable) { QTabWidget::setTabsClosable(closeable); }
