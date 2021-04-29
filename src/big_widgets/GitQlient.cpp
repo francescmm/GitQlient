@@ -281,7 +281,6 @@ bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
       }
 
       QLoggerManager::getInstance()->overwriteLogLevel(logLevel);
-      QLog_Info("UI", QString("Getting arguments {%1}").arg(arguments.join(", ")));
    }
    else
       QLoggerManager::getInstance()->pause();

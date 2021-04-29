@@ -246,7 +246,7 @@ void GitCache::insertReference(const QString &sha, References::Type type, const 
 {
    QMutexLocker lock(&mReferencesMutex);
 
-   QLog_Debug("Cache", QString("Adding a new reference with SHA {%1}.").arg(sha));
+   QLog_Trace("Cache", QString("Adding a new reference with SHA {%1}.").arg(sha));
 
    mReferences[sha].addReference(type, reference);
 }

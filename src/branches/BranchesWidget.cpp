@@ -593,7 +593,7 @@ void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
          parent = child;
    }
 
-   QLog_Debug("UI", QString("Adding remote branch {%1}").arg(branch));
+   QLog_Trace("UI", QString("Adding remote branch {%1}").arg(branch));
 
    const auto item = new QTreeWidgetItem(parent);
    item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
@@ -660,7 +660,7 @@ void BranchesWidget::processTags()
       else
          item->setData(0, LocalBranchRole, true);
 
-      QLog_Debug("UI", QString("Adding tag {%1}").arg(tagName));
+      QLog_Trace("UI", QString("Adding tag {%1}").arg(tagName));
 
       item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
       item->setText(0, tagName);

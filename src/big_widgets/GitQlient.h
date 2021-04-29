@@ -23,8 +23,8 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QWidget>
 #include <QSet>
+#include <QWidget>
 
 class QPinnableTabWidget;
 class InitScreen;
@@ -76,10 +76,11 @@ public:
     * @param pinnedRepos The list of repos to restore
     */
    void restorePinnedRepos();
-   
+
    /*!
     \brief This method parses all the arguments and configures GitQlient settings with them. Part of the arguments can
-    be a list of repositories to be opened. In that case, the method returns the list of repositories to open in the repos out parameter.
+    be a list of repositories to be opened. In that case, the method returns the list of repositories to open in the
+    repos out parameter.
 
     \param arguments Arguments from the command prompt.
     \param repos Output paramter, repositories to open.
