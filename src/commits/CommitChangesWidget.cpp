@@ -466,9 +466,8 @@ bool CommitChangesWidget::checkMsg(QString &msg)
       return false;
    }
 
-   QString subj(msg.section('\n', 0, 0, QString::SectionIncludeTrailingSep));
-   QString body(msg.section('\n', 1).trimmed());
-   msg = subj + '\n' + body + '\n';
+   msg = QString("%1\n%2\n")
+             .arg(msg.section('\n', 0, 0, QString::SectionIncludeTrailingSep), msg.section('\n', 1).trimmed());
 
    return true;
 }
@@ -480,9 +479,8 @@ void CommitChangesWidget::updateCounter(const QString &text)
 
 bool CommitChangesWidget::hasConflicts()
 {
-   const auto end = mInternalCache.cend();
-   for (auto iter = mInternalCache.cbegin(); iter != end; ++iter)
-      if (iter.value().item->data(GitQlientRole::U_IsConflict).toBool())
+   for (const auto &iter : mInternalCache)
+      if (iter.item->data(GitQlientRole::U_IsConflict).toBool())
          return true;
 
    return false;
