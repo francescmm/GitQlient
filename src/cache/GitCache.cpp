@@ -19,7 +19,7 @@ GitCache::~GitCache()
    clearInternalData();
 }
 
-void GitCache::setup(const WipRevisionInfo &wipInfo, QList<CommitInfo> commits)
+void GitCache::setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits)
 {
    QMutexLocker lock(&mCommitsMutex);
 
@@ -51,10 +51,8 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QList<CommitInfo> commits)
    QHash<QString, QVector<CommitInfo *>> tmpChildsStorage;
    auto count = 0;
 
-   while (!commits.isEmpty())
+   for (auto &commit : commits)
    {
-      auto commit = commits.takeFirst();
-
       calculateLanes(commit);
 
       const auto sha = commit.sha;
@@ -62,7 +60,7 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QList<CommitInfo> commits)
       if (sha == mCommitsMap.value(CommitInfo::ZERO_SHA).firstParent())
          commit.appendChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
 
-      mCommitsMap[sha] = std::move(commit);
+      mCommitsMap[sha] = commit;
       mCommits[++count] = &mCommitsMap[sha];
 
       if (tmpChildsStorage.contains(sha))

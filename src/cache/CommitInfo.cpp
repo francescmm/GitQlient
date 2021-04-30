@@ -16,14 +16,12 @@ CommitInfo::CommitInfo(QByteArray commitData, bool)
          gpgKey = fields.constFirst();
 
       auto combinedShas = fields.at(1);
-      auto commitSha = combinedShas.split('X').first();
-      sha = commitSha.remove(0, 1);
-      combinedShas = combinedShas.remove(0, sha.size() + 1 + 1).trimmed();
-      QStringList parentsSha;
+      auto shas = combinedShas.split('X');
+      sha = shas.takeFirst().remove(0, 1);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-      mParentsSha = combinedShas.split(' ', Qt::SkipEmptyParts);
+      mParentsSha = shas.takeFirst().split(' ', Qt::SkipEmptyParts);
 #else
-      parents = combinedShas.split(' ', QString::SkipEmptyParts);
+      mParentsSha = shas.takeFirst().split(' ', QString::SkipEmptyParts);
 #endif
       committer = fields.at(2);
       author = fields.at(3);

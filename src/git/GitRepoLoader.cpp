@@ -228,20 +228,16 @@ void GitRepoLoader::processRevision(QByteArray ba)
    mRefreshReferences = false;
 }
 
-QList<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
+QVector<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
 {
-   QList<CommitInfo> commits;
+   auto lines = log.split('\000');
+   QVector<CommitInfo> commits;
+   commits.reserve(lines.count());
 
    auto pos = 0;
-   auto start = 0;
-   int end;
-
-   while ((end = log.indexOf('\000', start)) != -1)
+   while (!lines.isEmpty())
    {
-      QByteArray commitLine(log.mid(start, end - start));
-      start = end + 1;
-
-      if (auto commit = CommitInfo { std::move(commitLine) }; commit.isValid())
+      if (auto commit = CommitInfo { lines.takeFirst() }; commit.isValid())
       {
          commit.pos = ++pos;
          commits.append(std::move(commit));
@@ -251,11 +247,11 @@ QList<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
    return commits;
 }
 
-QList<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
+QVector<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
 {
    log.replace('\000', '\n');
 
-   QList<CommitInfo> commits;
+   QVector<CommitInfo> commits;
 
    QByteArray commit;
    QByteArray gpg;

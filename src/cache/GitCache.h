@@ -101,7 +101,7 @@ private:
    mutable QMutex mTagsMutex;
    QHash<QString, QString> mRemoteTags;
 
-   void setup(const WipRevisionInfo &wipInfo, QList<CommitInfo> commits);
+   void setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits);
    void setConfigurationDone() { mConfigured = true; }
 
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
