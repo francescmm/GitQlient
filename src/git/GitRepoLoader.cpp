@@ -260,6 +260,7 @@ QVector<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
    auto pos = 1;
    auto start = 0;
    int end;
+   bool goodSignature = false;
 
    while ((end = log.indexOf('\n', start)) != -1)
    {
@@ -285,18 +286,26 @@ QVector<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
       {
          if (!commit.isEmpty())
          {
-            if (auto revision = CommitInfo { commit }; revision.isValid())
+            if (auto revision = CommitInfo { commit, gpgKey, goodSignature }; revision.isValid())
             {
                revision.pos = pos++;
                commits.append(std::move(revision));
+
+               gpgKey.clear();
+               goodSignature = false;
             }
 
             commit.clear();
          }
          processingCommit = true;
-         const auto isSigned = !gpg.isEmpty() && gpg.contains("Good signature");
-         commit.append(isSigned ? gpgKey.toUtf8() : "\n");
-         gpg.clear();
+
+         if (!gpg.isEmpty())
+         {
+            goodSignature = gpg.contains("Good signature");
+            gpg.clear();
+         }
+         else
+            goodSignature = false;
       }
       else if (processingCommit)
          commit.append(line + '\n');

@@ -48,7 +48,7 @@ public:
 
    CommitInfo() = default;
    ~CommitInfo() = default;
-   CommitInfo(QByteArray commitData, bool isSigned = false);
+   CommitInfo(QByteArray commitData, const QString &gpg = QString(), bool goodSignature = false);
    explicit CommitInfo(const QString sha, const QStringList &parents, std::chrono::seconds commitDate,
                        const QString &log);
    bool operator==(const CommitInfo &commit) const;
@@ -73,6 +73,9 @@ public:
    QString getFirstChildSha() const;
    int getChildsCount() const { return mChilds.count(); }
 
+   bool isSigned() const { return !gpgKey.isEmpty(); }
+   bool verifiedSignature() const { return mGoodSignature && !gpgKey.isEmpty(); }
+
    static const QString ZERO_SHA;
    static const QString INIT_SHA;
 
@@ -84,9 +87,9 @@ public:
    QString shortLog;
    QString longLog;
    QString gpgKey;
-   bool isSigned = false;
 
 private:
+   bool mGoodSignature = false;
    QVector<Lane> mLanes;
    QStringList mParentsSha;
    QVector<CommitInfo *> mChilds;

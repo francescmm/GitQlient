@@ -106,7 +106,10 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
        : QString("<p>%1 - %2</p><p>%3</p>%4%5")
              .arg(r.author.split("<").first(), d.toString(locale.dateTimeFormat(QLocale::ShortFormat)), sha,
                   !auxMessage.isEmpty() ? QString("<p>%1</p>").arg(auxMessage) : "",
-                  r.isSigned ? tr("<p>Commit signed!</p><p> GPG key: %1</p>").arg(r.gpgKey) : "");
+                  r.isSigned()
+                      ? tr("<p> GPG key (%1): %2</p>")
+                            .arg(QString::fromUtf8(r.verifiedSignature() ? "verified" : "not verified"), r.gpgKey)
+                      : "");
 
    if (mGitServerCache)
    {

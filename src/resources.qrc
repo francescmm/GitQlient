@@ -114,6 +114,7 @@
         <file>resources/icons/remove-symbol_press.png</file>
         <file alias="tag_indicator">resources/icons/tag_indicator.svg</file>
         <file alias="burger_menu">resources/icons/burger_menu.svg</file>
+        <file alias="unsigned">resources/icons/unsigned.svg</file>
     </qresource>
     <qresource prefix="/">
         <file alias="stylesheet">resources/stylesheet.css</file>

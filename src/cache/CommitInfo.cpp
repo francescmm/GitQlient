@@ -5,28 +5,29 @@
 const QString CommitInfo::ZERO_SHA = QString("0000000000000000000000000000000000000000");
 const QString CommitInfo::INIT_SHA = QString("4b825dc642cb6eb9a060e54bf8d69288fbee4904");
 
-CommitInfo::CommitInfo(QByteArray commitData, bool)
+CommitInfo::CommitInfo(QByteArray commitData, const QString &gpg, bool goodSignature)
+   : gpgKey(gpg)
+   , mGoodSignature(goodSignature)
 {
-   if (const auto fields = QString::fromUtf8(commitData).split('\n'); fields.count() > 6)
+   if (const auto fields = QString::fromUtf8(commitData).split('\n'); fields.count() > 5)
    {
       const auto firstField = fields.constFirst();
-      isSigned = !fields.first().isEmpty() && !firstField.contains("log size") ? true : false;
-
-      if (isSigned)
-         gpgKey = fields.constFirst();
-
-      auto combinedShas = fields.at(1);
+      auto combinedShas = fields.at(0);
       auto shas = combinedShas.split('X');
       sha = shas.takeFirst().remove(0, 1);
+
+      if (!shas.isEmpty())
+      {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-      mParentsSha = shas.takeFirst().split(' ', Qt::SkipEmptyParts);
+         mParentsSha = shas.takeFirst().split(' ', Qt::SkipEmptyParts);
 #else
-      mParentsSha = shas.takeFirst().split(' ', QString::SkipEmptyParts);
+         mParentsSha = shas.takeFirst().split(' ', QString::SkipEmptyParts);
 #endif
-      committer = fields.at(2);
-      author = fields.at(3);
-      dateSinceEpoch = std::chrono::seconds(fields.at(4).toInt());
-      shortLog = fields.at(5);
+      }
+      committer = fields.at(1);
+      author = fields.at(2);
+      dateSinceEpoch = std::chrono::seconds(fields.at(3).toInt());
+      shortLog = fields.at(4);
 
       for (auto i = 6; i < fields.count(); ++i)
          longLog += fields.at(i) + '\n';

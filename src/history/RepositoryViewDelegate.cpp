@@ -96,11 +96,11 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
          text = commit.sha != CommitInfo::ZERO_SHA ? text.left(8) : "";
       }
-      else if (index.column() == static_cast<int>(CommitHistoryColumns::Author) && commit.isSigned)
+      else if (index.column() == static_cast<int>(CommitHistoryColumns::Author) && commit.isSigned())
       {
          static const auto size = 15;
          static const auto offset = 5;
-         QPixmap pic(":/icons/signed");
+         QPixmap pic(QString::fromUtf8(commit.verifiedSignature() ? ":/icons/signed" : ":/icons/unsigned"));
          pic = pic.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
          const auto inc = (newOpt.rect.height() - size) / 2;
