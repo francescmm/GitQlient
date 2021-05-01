@@ -31,45 +31,92 @@ void GitRepoLoader::cancelAll()
    emit cancelAllProcesses(QPrivateSignal());
 }
 
-bool GitRepoLoader::load()
-{
-   return load(true);
-}
-
-bool GitRepoLoader::load(bool refreshReferences)
+void GitRepoLoader::loadLogHistory()
 {
    if (mLocked)
       QLog_Warning("Git", "Git is currently loading data.");
    else
    {
-      mRefreshReferences = refreshReferences;
-
       if (mGitBase->getWorkingDir().isEmpty())
          QLog_Error("Git", "No working directory set.");
       else
       {
-         QLog_Info("Git", "Initializing Git...");
-
+         mRefreshReferences = true;
          mLocked = true;
 
          if (configureRepoDirectory())
          {
             mGitBase->updateCurrentBranch();
 
-            QLog_Info("Git", "... Git initialization finished.");
+            QLog_Info("Git", "Requesting references...");
 
-            QLog_Info("Git", "Requesting revisions...");
+            mSteps = 1;
 
             requestRevisions();
-
-            return true;
          }
          else
             QLog_Error("Git", "The working directory is not a Git repository.");
       }
    }
+}
 
-   return false;
+void GitRepoLoader::loadReferences()
+{
+   if (mLocked)
+      QLog_Warning("Git", "Git is currently loading data.");
+   else
+   {
+      if (mGitBase->getWorkingDir().isEmpty())
+         QLog_Error("Git", "No working directory set.");
+      else
+      {
+         mRefreshReferences = true;
+         mLocked = true;
+
+         if (configureRepoDirectory())
+         {
+            mGitBase->updateCurrentBranch();
+
+            QLog_Info("Git", "Requesting references...");
+
+            mSteps = 1;
+
+            requestReferences();
+         }
+         else
+            QLog_Error("Git", "The working directory is not a Git repository.");
+      }
+   }
+}
+
+void GitRepoLoader::loadAll()
+{
+   if (mLocked)
+      QLog_Warning("Git", "Git is currently loading data.");
+   else
+   {
+      if (mGitBase->getWorkingDir().isEmpty())
+         QLog_Error("Git", "No working directory set.");
+      else
+      {
+         mRefreshReferences = true;
+         mLocked = true;
+
+         if (configureRepoDirectory())
+         {
+            mGitBase->updateCurrentBranch();
+
+            QLog_Info("Git", "Requesting revisions and referencecs...");
+
+            mSteps = 2;
+
+            requestRevisions();
+            requestReferences();
+         }
+         else
+            QLog_Error("Git", "The working directory is not a Git repository.");
+      }
+   }
 }
 
 bool GitRepoLoader::configureRepoDirectory()
@@ -89,33 +136,30 @@ bool GitRepoLoader::configureRepoDirectory()
    return false;
 }
 
-void GitRepoLoader::loadReferences()
+void GitRepoLoader::requestReferences()
 {
-   QLog_Debug("Git", "Loading references.");
+   QLog_Debug("Git", "Loading references...");
 
-   const auto ret3 = mGitBase->run("git show-ref -d");
+   const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());
+   connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processReferences);
+   connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
 
-   if (ret3.success)
+   requestor->run("git show-ref -d");
+}
+
+void GitRepoLoader::processReferences(QByteArray ba)
+{
+   if (mRefreshReferences)
+      mRevCache->clearReferences();
+
+   QString prevRefSha;
+   const auto referencesList = ba.split('\n');
+
+   for (const auto &reference : referencesList)
    {
-      auto ret = mGitBase->getLastCommit();
-
-      if (ret.success)
-         ret.output = ret.output.trimmed();
-
-      QString prevRefSha;
-
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-      const auto referencesList = ret3.output.split('\n', Qt::SkipEmptyParts);
-#else
-      const auto referencesList = ret3.output.split('\n', QString::SkipEmptyParts);
-#endif
-
-      if (mRefreshReferences)
-         mRevCache->clearReferences();
-
-      for (const auto &reference : referencesList)
+      if (!reference.isEmpty())
       {
-         const auto revSha = reference.left(40);
+         auto revSha = QString::fromUtf8(reference.left(40));
          const auto refName = reference.mid(41);
 
          if (!refName.startsWith("refs/tags/") || (refName.startsWith("refs/tags/") && refName.endsWith("^{}")))
@@ -126,33 +170,46 @@ void GitRepoLoader::loadReferences()
             if (refName.startsWith("refs/tags/"))
             {
                type = References::Type::LocalTag;
-               name = refName.mid(10, reference.length());
+               name = QString::fromUtf8(refName.mid(10, reference.length()));
                name.remove("^{}");
             }
             else if (refName.startsWith("refs/heads/"))
             {
                type = References::Type::LocalBranch;
-               name = refName.mid(11);
+               name = QString::fromUtf8(refName.mid(11));
             }
             else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
             {
                type = References::Type::RemoteBranches;
-               name = refName.mid(13);
+               name = QString::fromUtf8(refName.mid(13));
             }
             else
                continue;
 
             mRevCache->insertReference(revSha, type, name);
          }
-
          prevRefSha = revSha;
       }
+   }
+
+   mRevCache->reloadCurrentBranchInfo(mGitBase->getCurrentBranch(), mGitBase->getLastCommit().output.trimmed());
+
+   --mSteps;
+
+   if (mSteps == 0)
+   {
+      mRevCache->setConfigurationDone();
+
+      emit signalLoadingFinished(mRefreshReferences);
+
+      mLocked = false;
+      mRefreshReferences = false;
    }
 }
 
 void GitRepoLoader::requestRevisions()
 {
-   QLog_Debug("Git", "Loading revisions.");
+   QLog_Debug("Git", "Loading revisions...");
 
    const auto maxCommits = mSettings->localValue("MaxCommits", 0).toInt();
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
@@ -183,13 +240,13 @@ void GitRepoLoader::requestRevisions()
       emit signalLoadingStarted();
 
    const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());
-   connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevision);
+   connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevisions);
    connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
 
    requestor->run(baseCmd);
 }
 
-void GitRepoLoader::processRevision(QByteArray ba)
+void GitRepoLoader::processRevisions(QByteArray ba)
 {
    QLog_Info("Git", "Revisions received!");
 
@@ -215,17 +272,17 @@ void GitRepoLoader::processRevision(QByteArray ba)
    mRevCache->setUntrackedFilesList(std::move(files));
    mRevCache->setup(git->getWipInfo(), std::move(commits));
 
-   if (mRefreshReferences)
-      loadReferences();
-   else
-      mRevCache->reloadCurrentBranchInfo(mGitBase->getCurrentBranch(), mGitBase->getLastCommit().output.trimmed());
+   --mSteps;
 
-   mRevCache->setConfigurationDone();
+   if (mSteps == 0)
+   {
+      mRevCache->setConfigurationDone();
 
-   emit signalLoadingFinished(mRefreshReferences);
+      emit signalLoadingFinished(mRefreshReferences);
 
-   mLocked = false;
-   mRefreshReferences = false;
+      mLocked = false;
+      mRefreshReferences = false;
+   }
 }
 
 QVector<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
@@ -292,7 +349,6 @@ QVector<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
                commits.append(std::move(revision));
 
                gpgKey.clear();
-               goodSignature = false;
             }
 
             commit.clear();

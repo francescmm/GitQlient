@@ -45,27 +45,30 @@ signals:
    void cancelAllProcesses(QPrivateSignal);
 
 public slots:
-   bool load(bool refreshReferences);
+   void loadLogHistory();
+   void loadReferences();
+   void loadAll();
 
 public:
    explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache,
                           const QSharedPointer<GitQlientSettings> &settings, QObject *parent = nullptr);
    void cancelAll();
    void setShowAll(bool showAll = true) { mShowAll = showAll; }
-   bool load();
 
 private:
    bool mShowAll = true;
    bool mLocked = false;
    bool mRefreshReferences = true;
+   int mSteps = 0;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitCache> mRevCache;
    QSharedPointer<GitQlientSettings> mSettings;
 
    bool configureRepoDirectory();
-   void loadReferences();
+   void requestReferences();
+   void processReferences(QByteArray ba);
    void requestRevisions();
-   void processRevision(QByteArray ba);
+   void processRevisions(QByteArray ba);
    QVector<CommitInfo> processUnsignedLog(QByteArray &log) const;
    QVector<CommitInfo> processSignedLog(QByteArray &log) const;
 };

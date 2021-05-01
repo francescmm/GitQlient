@@ -173,7 +173,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    m_loaderThread = new QThread();
    mGitLoader->moveToThread(m_loaderThread);
    mGitQlientCache->moveToThread(m_loaderThread);
-   connect(this, SIGNAL(signalLoadRepo(bool)), mGitLoader.data(), SLOT(load(bool)));
+   connect(this, &GitQlientRepo::signalLoadRepo, mGitLoader.data(), &GitRepoLoader::loadAll);
    m_loaderThread->start();
 
    mGitLoader->setShowAll(mSettings->localValue("ShowAllBranches", true).toBool());
