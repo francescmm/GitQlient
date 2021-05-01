@@ -116,7 +116,17 @@ void BranchContextMenu::push()
       BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::PUSH_UPSTREAM, mConfig.mCache, mConfig.mGit });
       dlg.exec();
    }
-   else if (!ret.success)
+   else if (ret.success)
+   {
+      if (ret.success)
+      {
+         const auto sha = mConfig.mCache->getShaOfReference(mConfig.branchSelected, References::Type::LocalBranch);
+
+         mConfig.mCache->insertReference(sha, References::Type::RemoteBranches, mConfig.branchSelected);
+         emit mConfig.mCache->signalCacheUpdated();
+      }
+   }
+   else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
                          tr("There were problems during the push operation. Please, see the detailed description "
