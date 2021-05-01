@@ -328,7 +328,12 @@ void Controls::pushCurrentBranch()
    else if (ret.success)
    {
       emit signalRefreshPRsCache();
-      emit requestFullReload();
+
+      const auto currentBranch = mGit->getCurrentBranch();
+      const auto sha = mCache->getShaOfReference(currentBranch, References::Type::LocalBranch);
+
+      mCache->insertReference(sha, References::Type::RemoteBranches, currentBranch);
+      emit mCache->signalCacheUpdated();
    }
    else
    {
