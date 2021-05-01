@@ -28,6 +28,7 @@
 class QToolButton;
 class QPushButton;
 class GitBase;
+class GitCache;
 class GitTags;
 class GitCache;
 class QNetworkAccessManager;
@@ -183,6 +184,7 @@ public:
 
 private:
    QString mCurrentSha;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitTags> mGitTags;
    QToolButton *mHistory = nullptr;

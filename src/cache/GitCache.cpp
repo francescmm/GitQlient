@@ -249,6 +249,13 @@ void GitCache::insertReference(const QString &sha, References::Type type, const 
    mReferences[sha].addReference(type, reference);
 }
 
+void GitCache::deleteReference(const QString &sha, References::Type type, const QString &reference)
+{
+   QMutexLocker lock(&mReferencesMutex);
+
+   mReferences[sha].removeReference(type, reference);
+}
+
 bool GitCache::hasReferences(const QString &sha)
 {
    QMutexLocker lock(&mReferencesMutex);
@@ -261,6 +268,22 @@ QStringList GitCache::getReferences(const QString &sha, References::Type type)
    QMutexLocker lock(&mReferencesMutex);
 
    return mReferences.value(sha).getReferences(type);
+}
+
+QString GitCache::getShaOfReference(const QString &referenceName, References::Type type) const
+{
+   QMutexLocker lock(&mReferencesMutex);
+
+   for (auto iter = mReferences.cbegin(); iter != mReferences.cend(); ++iter)
+   {
+      const auto references = iter.value().getReferences(type);
+
+      for (const auto &reference : references)
+         if (reference == referenceName)
+            return iter.key();
+   }
+
+   return QString();
 }
 
 void GitCache::reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha)

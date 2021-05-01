@@ -66,8 +66,10 @@ public:
 
    void clearReferences();
    void insertReference(const QString &sha, References::Type type, const QString &reference);
+   void deleteReference(const QString &sha, References::Type type, const QString &reference);
    bool hasReferences(const QString &sha);
    QStringList getReferences(const QString &sha, References::Type type);
+   QString getShaOfReference(const QString &referenceName, References::Type type) const;
    void reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha);
 
    void setUntrackedFilesList(QVector<QString> untrackedFiles);

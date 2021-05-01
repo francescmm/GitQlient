@@ -3,6 +3,7 @@
 #include <BranchDlg.h>
 #include <GitBase.h>
 #include <GitBranches.h>
+#include <GitCache.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
 
@@ -63,7 +64,7 @@ void BranchContextMenu::pull()
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
-      emit signalBranchesUpdated();
+      emit fullReload();
    else
    {
       const auto errorMsg = ret.output;
@@ -96,7 +97,7 @@ void BranchContextMenu::fetch()
    if (ret)
    {
       emit signalFetchPerformed();
-      emit signalBranchesUpdated();
+      emit fullReload();
    }
    else
       QMessageBox::critical(this, tr("Fetch failed"), tr("There were some problems while fetching. Please try again."));
@@ -112,15 +113,10 @@ void BranchContextMenu::push()
 
    if (ret.output.contains("has no upstream branch"))
    {
-      BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::PUSH_UPSTREAM, mConfig.mGit });
-      const auto ret = dlg.exec();
-
-      if (ret == QDialog::Accepted)
-         emit signalBranchesUpdated();
+      BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::PUSH_UPSTREAM, mConfig.mCache, mConfig.mGit });
+      dlg.exec();
    }
-   else if (ret.success)
-      emit signalBranchesUpdated();
-   else
+   else if (!ret.success)
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
                          tr("There were problems during the push operation. Please, see the detailed description "
@@ -142,7 +138,7 @@ void BranchContextMenu::pushForce()
    if (ret.success)
    {
       emit signalRefreshPRsCache();
-      emit signalBranchesUpdated();
+      emit fullReload();
    }
    else
    {
@@ -158,20 +154,14 @@ void BranchContextMenu::pushForce()
 
 void BranchContextMenu::createBranch()
 {
-   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::CREATE, mConfig.mGit });
-   const auto ret = dlg.exec();
-
-   if (ret == QDialog::Accepted)
-      emit signalBranchesUpdated();
+   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::CREATE, mConfig.mCache, mConfig.mGit });
+   dlg.exec();
 }
 
 void BranchContextMenu::createCheckoutBranch()
 {
-   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::CREATE_CHECKOUT, mConfig.mGit });
-   const auto ret = dlg.exec();
-
-   if (ret == QDialog::Accepted)
-      emit signalBranchesUpdated();
+   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::CREATE_CHECKOUT, mConfig.mCache, mConfig.mGit });
+   dlg.exec();
 }
 
 void BranchContextMenu::merge()
@@ -186,11 +176,8 @@ void BranchContextMenu::mergeSquash()
 
 void BranchContextMenu::rename()
 {
-   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::RENAME, mConfig.mGit });
-   const auto ret = dlg.exec();
-
-   if (ret == QDialog::Accepted)
-      emit signalBranchesUpdated();
+   BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::RENAME, mConfig.mCache, mConfig.mGit });
+   dlg.exec();
 }
 
 void BranchContextMenu::deleteBranch()
@@ -205,6 +192,8 @@ void BranchContextMenu::deleteBranch()
 
       if (ret == QMessageBox::Ok)
       {
+         const auto type = mConfig.isLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
+         const auto sha = mConfig.mCache->getShaOfReference(mConfig.branchSelected, type);
          QScopedPointer<GitBranches> git(new GitBranches(mConfig.mGit));
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
          const auto ret2 = mConfig.isLocal ? git->removeLocalBranch(mConfig.branchSelected)
@@ -212,7 +201,10 @@ void BranchContextMenu::deleteBranch()
          QApplication::restoreOverrideCursor();
 
          if (ret2.success)
-            emit signalBranchesUpdated();
+         {
+            mConfig.mCache->deleteReference(sha, type, mConfig.branchSelected);
+            emit mConfig.mCache->signalCacheUpdated();
+         }
          else
             QMessageBox::critical(
                 this, tr("Delete a branch failed"),

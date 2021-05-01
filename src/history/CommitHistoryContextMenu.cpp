@@ -252,11 +252,8 @@ void CommitHistoryContextMenu::stashPop()
 
 void CommitHistoryContextMenu::createBranch()
 {
-   BranchDlg dlg({ mShas.first(), BranchDlgMode::CREATE_FROM_COMMIT, mGit });
-   const auto ret = dlg.exec();
-
-   if (ret == QDialog::Accepted)
-      emit referencesReload(); // TODO: Optimize
+   BranchDlg dlg({ mShas.first(), BranchDlgMode::CREATE_FROM_COMMIT, mCache, mGit });
+   dlg.open();
 }
 
 void CommitHistoryContextMenu::createTag()
@@ -343,11 +340,8 @@ void CommitHistoryContextMenu::checkoutBranch()
 
 void CommitHistoryContextMenu::createCheckoutBranch()
 {
-   BranchDlg dlg({ mShas.constFirst(), BranchDlgMode::CREATE_CHECKOUT_FROM_COMMIT, mGit });
-   const auto ret = dlg.exec();
-
-   if (ret == QDialog::Accepted)
-      emit logReload();
+   BranchDlg dlg({ mShas.constFirst(), BranchDlgMode::CREATE_CHECKOUT_FROM_COMMIT, mCache, mGit });
+   dlg.open();
 }
 
 void CommitHistoryContextMenu::checkoutCommit()
@@ -435,20 +429,14 @@ void CommitHistoryContextMenu::push()
    if (ret.output.contains("has no upstream branch"))
    {
       const auto currentBranch = mGit->getCurrentBranch();
-      BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mGit });
+      BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mCache, mGit });
       const auto ret = dlg.exec();
 
       if (ret == QDialog::Accepted)
-      {
          emit signalRefreshPRsCache();
-         emit fullReload();
-      }
    }
    else if (ret.success)
-   {
       emit signalRefreshPRsCache();
-      emit fullReload();
-   }
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),

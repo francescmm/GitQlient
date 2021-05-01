@@ -50,9 +50,6 @@ class BranchesWidget : public QFrame
 
 signals:
    void fullReload();
-
-   void referencesReload();
-
    void logReload();
 
    /**
@@ -60,17 +57,6 @@ signals:
     * changes.
     */
    void panelsVisibilityChanged();
-
-   /*!
-    \brief Signal triggered when a branch has been updated and requires a GitQlient UI refresh.
-
-   */
-   void signalBranchesUpdated();
-   /*!
-    \brief Signal triggered when a branch is checked out and requires a GitQlient UI refresh.
-
-   */
-   void signalBranchCheckedOut();
    /*!
     \brief Signal triggered when the user selects a commit via branch or tag selection.
 

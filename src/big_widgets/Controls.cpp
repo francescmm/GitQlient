@@ -27,8 +27,9 @@ using namespace QLogger;
 
 Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : QFrame(parent)
+   , mCache(cache)
    , mGit(git)
-   , mGitTags(new GitTags(mGit, cache))
+   , mGitTags(new GitTags(mGit, mCache))
    , mHistory(new QToolButton())
    , mDiff(new QToolButton())
    , mBlame(new QToolButton())
@@ -315,7 +316,7 @@ void Controls::pushCurrentBranch()
    if (ret.output.contains("has no upstream branch"))
    {
       const auto currentBranch = mGit->getCurrentBranch();
-      BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mGit });
+      BranchDlg dlg({ currentBranch, BranchDlgMode::PUSH_UPSTREAM, mCache, mGit });
       const auto dlgRet = dlg.exec();
 
       if (dlgRet == QDialog::Accepted)

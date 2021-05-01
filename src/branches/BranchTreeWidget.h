@@ -26,6 +26,7 @@
 #include <QTreeWidget>
 
 class GitBase;
+class GitCache;
 
 /*!
  \brief The BranchTreeWidget class shows all the information regarding the branches and its position respect master and
@@ -37,11 +38,8 @@ class BranchTreeWidget : public QTreeWidget
    Q_OBJECT
 
 signals:
-   /*!
-    \brief Signal triggered when a branch has been updated and requires a GitQlient UI refresh.
+   void fullReload();
 
-   */
-   void signalBranchesUpdated();
    /*!
     \brief Signal triggered when a branch is checked out and requires a GitQlient UI refresh.
 
@@ -90,7 +88,8 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit BranchTreeWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit BranchTreeWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                             QWidget *parent = nullptr);
    /*!
     \brief Configures the widget to be the local branches widget.
 
@@ -107,6 +106,7 @@ public:
 
 private:
    bool mLocal = false;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
 
    /*!

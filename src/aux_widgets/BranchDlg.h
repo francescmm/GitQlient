@@ -30,6 +30,7 @@ namespace Ui
 class BranchDlg;
 }
 
+class GitCache;
 class GitBase;
 
 /**
@@ -64,6 +65,7 @@ struct BranchDlgConfig
     * @brief mDialogMode The dialog mode configuration.
     */
    BranchDlgMode mDialogMode;
+   QSharedPointer<GitCache> mCache;
    /**
     * @brief mGit The GitBase object to perform the git branch operations.
     */

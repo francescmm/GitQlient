@@ -26,6 +26,7 @@
 #include <QMenu>
 
 class GitBase;
+class GitCache;
 
 /*!
  \brief The BranchContextMenuConfig contains the necessary information to initialize the BranchContextMenu. It includes
@@ -37,6 +38,7 @@ struct BranchContextMenuConfig
    QString currentBranch;
    QString branchSelected;
    bool isLocal;
+   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
 };
 
@@ -51,11 +53,8 @@ class BranchContextMenu : public QMenu
    Q_OBJECT
 
 signals:
-   /*!
-    \brief Signal triggered when the branches have been updated and the GitQlient UI needs a refresh.
+   void fullReload();
 
-   */
-   void signalBranchesUpdated();
    /*!
     \brief Signal triggered when a branch has been checked out.
 

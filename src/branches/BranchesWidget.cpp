@@ -58,8 +58,8 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    , mCache(cache)
    , mGit(git)
    , mGitTags(new GitTags(mGit, mCache))
-   , mLocalBranchesTree(new BranchTreeWidget(mGit))
-   , mRemoteBranchesTree(new BranchTreeWidget(mGit))
+   , mLocalBranchesTree(new BranchTreeWidget(mCache, mGit))
+   , mRemoteBranchesTree(new BranchTreeWidget(mCache, mGit))
    , mTagsTree(new QTreeWidget())
    , mStashesList(new QListWidget())
    , mStashesCount(new QLabel(tr("(0)")))
@@ -73,6 +73,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    , mMinimize(new QPushButton())
    , mMinimal(new BranchesWidgetMinimal(mCache, mGit))
 {
+   connect(mCache.get(), &GitCache::signalCacheUpdated, this, &BranchesWidget::showBranches);
    connect(mCache.get(), &GitCache::signalCacheUpdated, this, &BranchesWidget::processTags);
 
    setAttribute(Qt::WA_DeleteOnClose);
@@ -286,19 +287,16 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, mRemoteBranchesTree,
            &BranchTreeWidget::clearSelection);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalFetchPerformed, mGitTags.data(), &GitTags::getRemoteTags);
-   connect(mLocalBranchesTree, &BranchTreeWidget::signalBranchesUpdated, this, &BranchesWidget::signalBranchesUpdated);
-   connect(mLocalBranchesTree, &BranchTreeWidget::signalBranchCheckedOut, this,
-           &BranchesWidget::signalBranchCheckedOut);
+   connect(mLocalBranchesTree, &BranchTreeWidget::fullReload, this, &BranchesWidget::fullReload);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
    connect(mLocalBranchesTree, &BranchTreeWidget::mergeSqushRequested, this, &BranchesWidget::mergeSqushRequested);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalPullConflict, this, &BranchesWidget::signalPullConflict);
+
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, mLocalBranchesTree,
            &BranchTreeWidget::clearSelection);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalFetchPerformed, mGitTags.data(), &GitTags::getRemoteTags);
-   connect(mRemoteBranchesTree, &BranchTreeWidget::signalBranchesUpdated, this, &BranchesWidget::signalBranchesUpdated);
-   connect(mRemoteBranchesTree, &BranchTreeWidget::signalBranchCheckedOut, this,
-           &BranchesWidget::signalBranchCheckedOut);
+   connect(mRemoteBranchesTree, &BranchTreeWidget::fullReload, this, &BranchesWidget::fullReload);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
    connect(mRemoteBranchesTree, &BranchTreeWidget::mergeSqushRequested, this, &BranchesWidget::mergeSqushRequested);
 
@@ -788,7 +786,7 @@ void BranchesWidget::showTagsContextMenu(const QPoint &p)
          QApplication::restoreOverrideCursor();
 
          if (ret.success)
-            emit signalBranchesUpdated();
+            mGitTags->getRemoteTags();
       });
 
       const auto pushTagAction = menu->addAction(tr("Push tag"));
@@ -800,7 +798,7 @@ void BranchesWidget::showTagsContextMenu(const QPoint &p)
          QApplication::restoreOverrideCursor();
 
          if (ret.success)
-            emit signalBranchesUpdated();
+            mGitTags->getRemoteTags();
       });
 
       menu->exec(mTagsTree->viewport()->mapToGlobal(p));
@@ -816,8 +814,8 @@ void BranchesWidget::showStashesContextMenu(const QPoint &p)
    if (index.isValid())
    {
       const auto menu = new StashesContextMenu(mGit, index.data(Qt::UserRole).toString(), this);
-      connect(menu, &StashesContextMenu::signalUpdateView, this, &BranchesWidget::signalBranchesUpdated);
-      connect(menu, &StashesContextMenu::signalContentRemoved, this, &BranchesWidget::signalBranchesUpdated);
+      connect(menu, &StashesContextMenu::signalUpdateView, this, &BranchesWidget::fullReload);
+      connect(menu, &StashesContextMenu::signalContentRemoved, this, &BranchesWidget::fullReload);
       menu->exec(mStashesList->viewport()->mapToGlobal(p));
    }
 }
@@ -828,7 +826,7 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
 
    const auto menu = new SubmodulesContextMenu(mGit, mSubmodulesList->indexAt(p), this);
    connect(menu, &SubmodulesContextMenu::openSubmodule, this, &BranchesWidget::signalOpenSubmodule);
-   connect(menu, &SubmodulesContextMenu::infoUpdated, this, &BranchesWidget::signalBranchesUpdated);
+   connect(menu, &SubmodulesContextMenu::infoUpdated, this, &BranchesWidget::fullReload);
 
    menu->exec(mSubmodulesList->viewport()->mapToGlobal(p));
 }
@@ -854,7 +852,7 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
          QApplication::restoreOverrideCursor();
 
          if (ret.success)
-            emit signalBranchesUpdated();
+            emit fullReload();
          else
             QMessageBox::warning(this, tr("Error when pulling"), ret.output);
       });
@@ -883,7 +881,7 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
          QApplication::restoreOverrideCursor();
 
          if (ret.success)
-            emit signalBranchesUpdated();
+            emit fullReload();
          else
             QMessageBox::warning(this, tr("Error when pushing"), ret.output);
       });
@@ -895,7 +893,7 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
          AddSubtreeDlg addDlg(prefix, subtreeData.first, subtreeData.second, mGit);
          const auto ret = addDlg.exec();
          if (ret == QDialog::Accepted)
-            emit signalBranchesUpdated();
+            emit fullReload();
       });
       // menu->addAction(tr("Split"));
    }
@@ -906,7 +904,7 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
          AddSubtreeDlg addDlg(mGit);
          const auto ret = addDlg.exec();
          if (ret == QDialog::Accepted)
-            emit signalBranchesUpdated();
+            emit fullReload();
       });
    }
 

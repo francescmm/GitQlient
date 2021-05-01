@@ -155,10 +155,9 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mBranchesWidget = new BranchesWidget(mCache, mGit);
 
    connect(mBranchesWidget, &BranchesWidget::fullReload, this, &HistoryWidget::fullReload);
-   connect(mBranchesWidget, &BranchesWidget::referencesReload, this, &HistoryWidget::referencesReload);
    connect(mBranchesWidget, &BranchesWidget::logReload, this, &HistoryWidget::logReload);
 
-   connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::onBranchCheckout);
+   // connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::onBranchCheckout);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &HistoryWidget::goToSha);
    connect(mBranchesWidget, &BranchesWidget::signalOpenSubmodule, this, &HistoryWidget::signalOpenSubmodule);

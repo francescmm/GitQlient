@@ -14,8 +14,10 @@
 
 using namespace GitQlient;
 
-BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
+BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                                   QWidget *parent)
    : QTreeWidget(parent)
+   , mCache(cache)
    , mGit(git)
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
@@ -79,10 +81,10 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
       {
          auto currentBranch = mGit->getCurrentBranch();
 
-         const auto menu = new BranchContextMenu({ currentBranch, selectedBranch, mLocal, mGit }, this);
+         const auto menu = new BranchContextMenu({ currentBranch, selectedBranch, mLocal, mCache, mGit }, this);
          connect(menu, &BranchContextMenu::signalRefreshPRsCache, this, &BranchTreeWidget::signalRefreshPRsCache);
          connect(menu, &BranchContextMenu::signalFetchPerformed, this, &BranchTreeWidget::signalFetchPerformed);
-         connect(menu, &BranchContextMenu::signalBranchesUpdated, this, &BranchTreeWidget::signalBranchesUpdated);
+         connect(menu, &BranchContextMenu::fullReload, this, &BranchTreeWidget::fullReload);
          connect(menu, &BranchContextMenu::signalCheckoutBranch, this, [this, item]() { checkoutBranch(item); });
          connect(menu, &BranchContextMenu::signalMergeRequired, this, &BranchTreeWidget::signalMergeRequired);
          connect(menu, &BranchContextMenu::mergeSqushRequested, this, &BranchTreeWidget::mergeSqushRequested);
@@ -97,7 +99,7 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
          connect(addRemote, &QAction::triggered, this, [this, item]() {
             QScopedPointer<GitRemote> git(new GitRemote(mGit));
             if (const auto ret = git->removeRemote(item->text(0)); ret.success)
-               emit signalBranchesUpdated();
+               emit fullReload();
          });
 
          menu->exec(viewport()->mapToGlobal(pos));
@@ -112,7 +114,7 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
          const auto ret = addRemote->exec();
 
          if (ret == QDialog::Accepted)
-            emit signalBranchesUpdated();
+            emit fullReload();
       });
 
       menu->exec(viewport()->mapToGlobal(pos));

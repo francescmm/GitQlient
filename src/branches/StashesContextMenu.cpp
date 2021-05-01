@@ -20,7 +20,7 @@ StashesContextMenu::StashesContextMenu(const QSharedPointer<GitBase> &git, const
 
 void StashesContextMenu::branch()
 {
-   BranchDlg dlg({ mStashId, BranchDlgMode::STASH_BRANCH, mGit });
+   BranchDlg dlg({ mStashId, BranchDlgMode::STASH_BRANCH, nullptr, mGit });
    const auto ret = dlg.exec();
 
    if (ret == QDialog::Accepted)
