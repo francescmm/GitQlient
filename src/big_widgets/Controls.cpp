@@ -322,7 +322,11 @@ void Controls::pushCurrentBranch()
       if (dlgRet == QDialog::Accepted)
       {
          emit signalRefreshPRsCache();
-         emit requestFullReload();
+
+         const auto sha = mCache->getShaOfReference(currentBranch, References::Type::LocalBranch);
+
+         mCache->insertReference(sha, References::Type::RemoteBranches, currentBranch);
+         emit mCache->signalCacheUpdated();
       }
    }
    else if (ret.success)
