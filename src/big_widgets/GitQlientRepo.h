@@ -85,7 +85,11 @@ signals:
     * @brief signalLoadRepo Signal used to trigger the data update in a different thread.
     * @param full Requests a full repository refresh: includes commits and references.
     */
-   void signalLoadRepo(bool full);
+   void fullReload(bool full);
+
+   void referencesReload();
+
+   void logReload();
 
    /**
     * @brief repoOpened Signal triggered when the repo was successfully opened.

@@ -192,7 +192,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
    connect(mPullBtn, &QToolButton::clicked, this, &Controls::pullCurrentBranch);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
-   connect(mRefreshBtn, &QToolButton::clicked, this, [this]() { emit requestReload(true); });
+   connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::requestFullReload);
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
    connect(mVersionCheck, &QToolButton::clicked, mUpdater, &GitQlientUpdater::showInfoMessage);
    connect(mConfigBtn, &QToolButton::clicked, this, &Controls::goConfig);
@@ -244,7 +244,7 @@ void Controls::pullCurrentBranch()
       if (ret.output.contains("merge conflict", Qt::CaseInsensitive))
          emit signalPullConflict();
       else
-         emit requestReload(true);
+         emit requestFullReload();
    }
    else
    {
@@ -276,7 +276,7 @@ void Controls::fetchAll()
    if (ret)
    {
       mGitTags->getRemoteTags();
-      emit requestReload(true);
+      emit requestFullReload();
    }
 }
 
@@ -321,13 +321,13 @@ void Controls::pushCurrentBranch()
       if (dlgRet == QDialog::Accepted)
       {
          emit signalRefreshPRsCache();
-         emit requestReload(true);
+         emit requestFullReload();
       }
    }
    else if (ret.success)
    {
       emit signalRefreshPRsCache();
-      emit requestReload(true);
+      emit requestFullReload();
    }
    else
    {
@@ -342,34 +342,6 @@ void Controls::pushCurrentBranch()
    }
 }
 
-void Controls::stashCurrentWork()
-{
-   QScopedPointer<GitStashes> git(new GitStashes(mGit));
-   const auto ret = git->stash();
-
-   if (ret.success)
-      emit requestReload(false);
-}
-
-void Controls::popStashedWork()
-{
-   QScopedPointer<GitStashes> git(new GitStashes(mGit));
-   const auto ret = git->pop();
-
-   if (ret.success)
-      emit requestReload(false);
-   else
-   {
-      QMessageBox msgBox(QMessageBox::Critical, tr("Error while popping a stash"),
-                         tr("There were problems during the stash pop operation. Please, see the detailed "
-                            "description for more information."),
-                         QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output);
-      msgBox.setStyleSheet(GitQlientStyles::getStyles());
-      msgBox.exec();
-   }
-}
-
 void Controls::pruneBranches()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -378,7 +350,7 @@ void Controls::pruneBranches()
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
-      emit requestReload(true);
+      emit requestReferencesReload();
 }
 
 void Controls::createGitPlatformButton(QHBoxLayout *layout)

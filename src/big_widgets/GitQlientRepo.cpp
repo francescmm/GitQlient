@@ -112,6 +112,9 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
    connect(mAutoFilesUpdate, &QTimer::timeout, this, &GitQlientRepo::updateUiFromWatcher);
 
+   connect(mControls, &Controls::requestFullReload, mGitLoader.data(), &GitRepoLoader::loadAll);
+   connect(mControls, &Controls::requestReferencesReload, mGitLoader.data(), &GitRepoLoader::loadReferences);
+
    connect(mControls, &Controls::signalGoRepo, this, &GitQlientRepo::showHistoryView);
    connect(mControls, &Controls::signalGoBlame, this, &GitQlientRepo::showBlameView);
    connect(mControls, &Controls::signalGoDiff, this, &GitQlientRepo::showDiffView);
@@ -119,10 +122,8 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mControls, &Controls::signalGoServer, this, &GitQlientRepo::showGitServerView);
    connect(mControls, &Controls::signalGoBuildSystem, this, &GitQlientRepo::showBuildSystemView);
    connect(mControls, &Controls::goConfig, this, &GitQlientRepo::showConfig);
-   connect(mControls, &Controls::requestReload, this, &GitQlientRepo::updateCache);
    connect(mControls, &Controls::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
-   connect(mControls, &Controls::requestReload, mHistoryWidget, [this](bool) { mHistoryWidget->updateConfig(); });
 
    connect(mHistoryWidget, &HistoryWidget::signalAllBranchesActive, mGitLoader.data(), &GitRepoLoader::setShowAll);
    connect(mHistoryWidget, &HistoryWidget::panelsVisibilityChanged, mConfigWidget,
@@ -173,7 +174,9 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    m_loaderThread = new QThread();
    mGitLoader->moveToThread(m_loaderThread);
    mGitQlientCache->moveToThread(m_loaderThread);
-   connect(this, &GitQlientRepo::signalLoadRepo, mGitLoader.data(), &GitRepoLoader::loadAll);
+   connect(this, &GitQlientRepo::fullReload, mGitLoader.data(), &GitRepoLoader::loadAll);
+   connect(this, &GitQlientRepo::referencesReload, mGitLoader.data(), &GitRepoLoader::loadReferences);
+   connect(this, &GitQlientRepo::logReload, mGitLoader.data(), &GitRepoLoader::loadLogHistory);
    m_loaderThread->start();
 
    mGitLoader->setShowAll(mSettings->localValue("ShowAllBranches", true).toBool());
@@ -201,7 +204,7 @@ void GitQlientRepo::updateCache(bool full)
    {
       QLog_Debug("UI", QString("Updating the GitQlient UI"));
 
-      emit signalLoadRepo(full);
+      emit fullReload(full);
 
       if (full)
          emit currentBranchChanged();
@@ -230,7 +233,7 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
       mGitLoader->cancelAll();
 
-      emit signalLoadRepo(true);
+      emit fullReload(true);
 
       mCurrentDir = newDir;
       clearWindow();
