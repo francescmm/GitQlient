@@ -77,7 +77,7 @@ sudo dnf install gitqlient
 
 For now there is no GitQlient in the official repos of Ubuntu or Debian. However, to install it via .deb package, go the the releases page and download the package. Once you download it, you can install it using apt-get command as root.
 
-**Note: **This option is available only from GitQlient 1.3.3.
+**Note:** This option is available only from GitQlient 1.3.3.
 
 ### Windows
 
