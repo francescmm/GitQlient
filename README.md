@@ -63,15 +63,29 @@ I'm aware that developers may like to have some more information beyond the User
 
 In the [User Manual](https://francescmm.github.io/GitQlient/#appendix-b-build) you can find a whole section about building GitQlient and what dependencies you need.
 
-### Packaging status
+## How to install GitQlient
 
-#### Fedora
+### Fedora
 
-Package [available](https://src.fedoraproject.org/rpms/gitqlient) in official Fedora repos.
+Package [available](https://src.fedoraproject.org/rpms/gitqlient) in official Fedora repos. To install, type the following command in the terminal:
 
 ```
 sudo dnf install gitqlient
 ```
+
+### Ubuntu
+
+For now there is no GitQlient in the official repos of Ubuntu or Debian. However, to install it via .deb package, go the the releases page and download the package. Once you download it, you can install it using apt-get command as root.
+
+**Note: **This option is available only from GitQlient 1.3.3.
+
+### Windows
+
+For Windows 10 there is a package provided on every release. It installs all the dependencies and creates an shortcut in the Desktop.
+
+### MacOS
+
+For MacOS there is also a DMG package you can install as usual.
 
 ## Licenses
 
