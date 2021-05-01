@@ -145,12 +145,6 @@ public:
    void closeDestination();
 
 private:
-   struct EnqueuedMessage
-   {
-      QString threadId;
-      QString message;
-   };
-
    bool mQuit = false;
    bool mIsStop = false;
    QWaitCondition mQueueNotEmpty;
@@ -161,7 +155,7 @@ private:
    LogLevel mLevel;
    int mMaxFileSize = 1024 * 1024; //! @note 1Mio
    LogMessageDisplays mMessageOptions;
-   QVector<EnqueuedMessage> messages;
+   QVector<QString> mMessages;
    QMutex mutex;
 
    /**
@@ -189,7 +183,7 @@ private:
     *
     * @param message Pair of values consistent on the date and the message to be log.
     */
-   void write(const EnqueuedMessage &message);
+   void write(QVector<QString> messages);
 };
 
 }

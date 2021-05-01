@@ -85,7 +85,7 @@ signals:
     * @brief signalLoadRepo Signal used to trigger the data update in a different thread.
     * @param full Requests a full repository refresh: includes commits and references.
     */
-   void fullReload(bool full);
+   void fullReload();
 
    void referencesReload();
 
@@ -173,11 +173,6 @@ private:
    bool mIsInit = false;
    QThread *m_loaderThread;
 
-   /*!
-    \brief Updates the UI cache and refreshes the subwidgets.
-
-   */
-   void updateCache(bool full);
    /*!
     \brief Performs a light UI update triggered by the QFileSystemWatcher.
 

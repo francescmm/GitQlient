@@ -121,14 +121,16 @@ QString QLoggerWriter::generateDuplicateFilename(const QString &fileDestination,
    return path;
 }
 
-void QLoggerWriter::write(const EnqueuedMessage &message)
+void QLoggerWriter::write(QVector<QString> messages)
 {
    // Write data to console
-   if (mMode == LogMode::OnlyConsole || mMode == LogMode::Full)
-      qInfo() << message.message;
-
    if (mMode == LogMode::OnlyConsole)
+   {
+      for (const auto &message : messages)
+         qInfo() << message;
+
       return;
+   }
 
    // Write data to file
    QFile file(mFileDestination);
@@ -140,9 +142,15 @@ void QLoggerWriter::write(const EnqueuedMessage &message)
       QTextStream out(&file);
 
       if (!prevFilename.isEmpty())
-         out << QString("%1 - Previous log %2\n").arg(message.threadId, prevFilename);
+         out << QString("Previous log %1\n").arg(prevFilename);
 
-      out << message.message;
+      for (const auto &message : messages)
+      {
+         out << message;
+
+         if (mMode == LogMode::Full)
+            qInfo() << message;
+      }
 
       file.close();
    }
@@ -208,7 +216,7 @@ void QLoggerWriter::enqueue(const QDateTime &date, const QString &threadId, cons
 
    text.append(QString::fromLatin1("\n"));
 
-   messages.append({ threadId, text });
+   mMessages.append({ threadId, text });
 
    if (!mIsStop)
       mQueueNotEmpty.wakeAll();
@@ -224,17 +232,14 @@ void QLoggerWriter::run()
 
    while (!mQuit)
    {
-      decltype(messages) copy;
+      decltype(mMessages) copy;
 
       {
          QMutexLocker locker(&mutex);
-         std::swap(copy, messages);
+         std::swap(copy, mMessages);
       }
 
-      for (const auto &msg : qAsConst(copy))
-         write(msg);
-
-      copy.clear();
+      write(std::move(copy));
 
       if (!mQuit)
       {

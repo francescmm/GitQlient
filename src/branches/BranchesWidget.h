@@ -49,6 +49,11 @@ class BranchesWidget : public QFrame
    Q_OBJECT
 
 signals:
+   void fullReload();
+
+   void referencesReload();
+
+   void logReload();
 
    /**
     * @brief panelsVisibilityChanged Signal triggered whenever the visibility of the panels in the BranchesWidget

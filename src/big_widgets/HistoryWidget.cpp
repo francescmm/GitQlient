@@ -122,7 +122,10 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mRepositoryModel = new CommitHistoryModel(mCache, mGit, mGitServerCache);
    mRepositoryView = new CommitHistoryView(mCache, mGit, mSettings, mGitServerCache);
 
-   connect(mRepositoryView, &CommitHistoryView::requestReload, this, &HistoryWidget::requestReload);
+   connect(mRepositoryView, &CommitHistoryView::fullReload, this, &HistoryWidget::fullReload);
+   connect(mRepositoryView, &CommitHistoryView::referencesReload, this, &HistoryWidget::referencesReload);
+   connect(mRepositoryView, &CommitHistoryView::logReload, this, &HistoryWidget::logReload);
+
    connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, [this](const QString &sha) {
       if (sha == CommitInfo::ZERO_SHA)
          showFullDiff();
@@ -151,7 +154,10 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    mBranchesWidget = new BranchesWidget(mCache, mGit);
 
-   connect(mBranchesWidget, &BranchesWidget::signalBranchesUpdated, this, &HistoryWidget::signalUpdateCache);
+   connect(mBranchesWidget, &BranchesWidget::fullReload, this, &HistoryWidget::fullReload);
+   connect(mBranchesWidget, &BranchesWidget::referencesReload, this, &HistoryWidget::referencesReload);
+   connect(mBranchesWidget, &BranchesWidget::logReload, this, &HistoryWidget::logReload);
+
    connect(mBranchesWidget, &BranchesWidget::signalBranchCheckedOut, this, &HistoryWidget::onBranchCheckout);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, mRepositoryView, &CommitHistoryView::focusOnCommit);
    connect(mBranchesWidget, &BranchesWidget::signalSelectCommit, this, &HistoryWidget::goToSha);
@@ -432,6 +438,7 @@ void HistoryWidget::onShowAllUpdated(bool showAll)
    settings.setLocalValue("ShowAllBranches", showAll);
 
    emit signalAllBranchesActive(showAll);
+   emit logReload();
 }
 
 void HistoryWidget::onBranchCheckout()
@@ -442,7 +449,7 @@ void HistoryWidget::onBranchCheckout()
    if (mChShowAllBranches->isChecked())
       mRepositoryView->focusOnCommit(ret.output);
 
-   emit signalUpdateCache();
+   emit logReload();
 }
 
 void HistoryWidget::mergeBranch(const QString &current, const QString &branchToMerge)
@@ -507,7 +514,7 @@ void HistoryWidget::processMergeResponse(const GitExecResult &ret)
          }
          else
          {
-            emit signalUpdateCache();
+            emit fullReload();
 
             QMessageBox msgBox(
                 QMessageBox::Information, tr("Merge successful"),
@@ -556,7 +563,7 @@ void HistoryWidget::cherryPickCommit()
       if (ret.success)
       {
          mSearchInput->clear();
-         emit requestReload(false);
+         emit fullReload();
       }
       else
       {

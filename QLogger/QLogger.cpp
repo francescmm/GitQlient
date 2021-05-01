@@ -139,7 +139,7 @@ void QLoggerManager::writeAndDequeueMessages(const QString &module)
 {
    QMutexLocker lock(&mMutex);
 
-   const auto logWriter = mModuleDest.value(module, Q_NULLPTR);
+   const auto logWriter = mModuleDest.value(module, nullptr);
 
    if (logWriter && !logWriter->isStop())
    {
@@ -170,7 +170,7 @@ void QLoggerManager::enqueueMessage(const QString &module, LogLevel level, const
                                     const QString &function, const QString &file, int line)
 {
    QMutexLocker lock(&mMutex);
-   const auto logWriter = mModuleDest.value(module, Q_NULLPTR);
+   const auto logWriter = mModuleDest.value(module, nullptr);
    const auto isLogEnabled = logWriter && logWriter->getMode() != LogMode::Disabled && !logWriter->isStop();
 
    if (isLogEnabled && logWriter->getLevel() <= level)

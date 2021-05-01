@@ -212,7 +212,9 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
       if (!shas.isEmpty())
       {
          const auto menu = new CommitHistoryContextMenu(mCache, mGit, mGitServerCache, shas, this);
-         connect(menu, &CommitHistoryContextMenu::requestReload, this, &CommitHistoryView::requestReload);
+         connect(menu, &CommitHistoryContextMenu::fullReload, this, &CommitHistoryView::fullReload);
+         connect(menu, &CommitHistoryContextMenu::referencesReload, this, &CommitHistoryView::referencesReload);
+         connect(menu, &CommitHistoryContextMenu::logReload, this, &CommitHistoryView::logReload);
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalOpenCompareDiff, this,
                  &CommitHistoryView::signalOpenCompareDiff);

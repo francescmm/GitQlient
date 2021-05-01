@@ -66,11 +66,11 @@ class HistoryWidget : public QFrame
    Q_OBJECT
 
 signals:
-   /**
-    * @brief requestReload Signal triggered when the user forces a refresh of the repository data.
-    * @param full True if the refresh includes commits and references, otherwise it refreshes only commits.
-    */
-   void requestReload(bool full);
+   void fullReload();
+
+   void referencesReload();
+
+   void logReload();
 
    /*!
     \brief Signal triggered when GitQlientRepo needs to update the UI for the current repo.
@@ -89,11 +89,6 @@ signals:
     \param sha The list of SHAs to compare.
    */
    void signalOpenCompareDiff(const QStringList &sha);
-   /*!
-    \brief Signal triggered when the internal cache for the current repository needs to be updated.
-
-   */
-   void signalUpdateCache();
    /*!
     \brief Signal triggered when the user opens a new submodule. It is necessary to propagate this signal since is the
     GitQlient class the responsible of opening a new tab for the submodule.

@@ -43,11 +43,9 @@ class CommitHistoryView : public QTreeView
    Q_OBJECT
 
 signals:
-   /**
-    * @brief requestReload Signal triggered when the user forces a refresh of the repository data.
-    * @param full True if the refresh includes commits and references, otherwise it refreshes only commits.
-    */
-   void requestReload(bool full);
+   void fullReload();
+   void referencesReload();
+   void logReload();
 
    /*!
     \brief Signal triggered when the user wants to open the diff of a commit compared to its parent.
