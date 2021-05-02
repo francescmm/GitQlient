@@ -330,16 +330,19 @@ void GitCache::insertCommit(CommitInfo commit)
    const auto sha = commit.sha;
    const auto parentSha = commit.firstParent();
    commit.setLanes(mCommitsMap[parentSha].lanes());
+   commit.pos = 1;
+
    mCommitsMap[sha] = std::move(commit);
    mCommitsMap[sha].appendChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
 
    mCommitsMap[parentSha].removeChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
    mCommitsMap[parentSha].appendChild(&mCommitsMap[sha]);
-   mCommits.insert(1, &mCommitsMap[sha]);
 
    const auto total = mCommits.count();
-   for (auto i = 2; i < total; ++i)
+   for (auto i = 1; i < total; ++i)
       ++mCommits[i]->pos;
+
+   mCommits.insert(1, &mCommitsMap[sha]);
 }
 
 void GitCache::calculateLanes(CommitInfo &c)

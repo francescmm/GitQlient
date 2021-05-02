@@ -583,6 +583,7 @@ void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
 void GitQlientRepo::onChangesCommitted()
 {
    mHistoryWidget->onCommitSelected(CommitInfo::ZERO_SHA);
+   mHistoryWidget->loadBranches(false);
    showHistoryView();
 }
 
