@@ -323,6 +323,21 @@ bool GitCache::updateWipCommit(const WipRevisionInfo &wipInfo)
    return false;
 }
 
+void GitCache::insertCommit(CommitInfo commit)
+{
+   QMutexLocker lock2(&mCommitsMutex);
+
+   const auto sha = commit.sha;
+   const auto parentSha = commit.firstParent();
+   commit.setLanes(mCommitsMap[parentSha].lanes());
+   mCommitsMap[sha] = std::move(commit);
+   mCommitsMap[sha].appendChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
+
+   mCommitsMap[parentSha].removeChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
+   mCommitsMap[parentSha].appendChild(&mCommitsMap[sha]);
+   mCommits.insert(1, &mCommitsMap[sha]);
+}
+
 void GitCache::calculateLanes(CommitInfo &c)
 {
    const auto sha = c.sha;

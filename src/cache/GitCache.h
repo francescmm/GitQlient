@@ -60,6 +60,7 @@ public:
    CommitInfo searchCommitInfo(const QString &text, int startingPoint = 0, bool reverse = false);
    bool isCommitInCurrentGeneologyTree(const QString &sha);
    bool updateWipCommit(const WipRevisionInfo &wipInfo);
+   void insertCommit(CommitInfo commit);
 
    bool insertRevisionFiles(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    std::optional<RevisionFiles> revisionFile(const QString &sha1, const QString &sha2) const;
