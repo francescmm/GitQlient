@@ -508,17 +508,29 @@ void CommitHistoryContextMenu::fetch()
 void CommitHistoryContextMenu::resetSoft()
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
+   const auto previousSha = mGit->getLastCommit().output.trimmed();
 
    if (git->resetCommit(mShas.first(), GitLocal::CommitResetType::SOFT))
+   {
+      mCache->deleteReference(previousSha, References::Type::LocalBranch, mGit->getCurrentBranch());
+      mCache->insertReference(mShas.first(), References::Type::LocalBranch, mGit->getCurrentBranch());
+
       emit logReload();
+   }
 }
 
 void CommitHistoryContextMenu::resetMixed()
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
+   const auto previousSha = mGit->getLastCommit().output.trimmed();
 
    if (git->resetCommit(mShas.first(), GitLocal::CommitResetType::MIXED))
+   {
+      mCache->deleteReference(previousSha, References::Type::LocalBranch, mGit->getCurrentBranch());
+      mCache->insertReference(mShas.first(), References::Type::LocalBranch, mGit->getCurrentBranch());
+
       emit logReload();
+   }
 }
 
 void CommitHistoryContextMenu::resetHard()
@@ -529,10 +541,16 @@ void CommitHistoryContextMenu::resetHard()
 
    if (retMsg == QMessageBox::Ok)
    {
+      const auto previousSha = mGit->getLastCommit().output.trimmed();
       QScopedPointer<GitLocal> git(new GitLocal(mGit));
 
       if (git->resetCommit(mShas.first(), GitLocal::CommitResetType::HARD))
+      {
+         mCache->deleteReference(previousSha, References::Type::LocalBranch, mGit->getCurrentBranch());
+         mCache->insertReference(mShas.first(), References::Type::LocalBranch, mGit->getCurrentBranch());
+
          emit logReload();
+      }
    }
 }
 
