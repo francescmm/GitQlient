@@ -124,7 +124,11 @@ void BranchContextMenu::push()
 
       if (remote.success)
       {
+         const auto oldSha = mConfig.mCache->getShaOfReference(
+             QString("%1/%2").arg(remote.output, mConfig.branchSelected), References::Type::RemoteBranches);
          const auto sha = mConfig.mCache->getShaOfReference(mConfig.branchSelected, References::Type::LocalBranch);
+         mConfig.mCache->deleteReference(oldSha, References::Type::RemoteBranches,
+                                         QString("%1/%2").arg(remote.output, mConfig.branchSelected));
          mConfig.mCache->insertReference(sha, References::Type::RemoteBranches,
                                          QString("%1/%2").arg(remote.output, mConfig.branchSelected));
          emit mConfig.mCache->signalCacheUpdated();
