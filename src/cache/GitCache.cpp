@@ -336,6 +336,10 @@ void GitCache::insertCommit(CommitInfo commit)
    mCommitsMap[parentSha].removeChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
    mCommitsMap[parentSha].appendChild(&mCommitsMap[sha]);
    mCommits.insert(1, &mCommitsMap[sha]);
+
+   const auto total = mCommits.count();
+   for (auto i = 2; i < total; ++i)
+      ++mCommits[i]->pos;
 }
 
 void GitCache::calculateLanes(CommitInfo &c)
