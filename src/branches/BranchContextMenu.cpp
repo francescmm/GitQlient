@@ -4,6 +4,7 @@
 #include <GitBase.h>
 #include <GitBranches.h>
 #include <GitCache.h>
+#include <GitConfig.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
 
@@ -118,11 +119,14 @@ void BranchContextMenu::push()
    }
    else if (ret.success)
    {
-      if (ret.success)
+      QScopedPointer<GitConfig> git(new GitConfig(mConfig.mGit));
+      const auto remote = git->getRemoteForBranch(mConfig.branchSelected);
+
+      if (remote.success)
       {
          const auto sha = mConfig.mCache->getShaOfReference(mConfig.branchSelected, References::Type::LocalBranch);
-
-         mConfig.mCache->insertReference(sha, References::Type::RemoteBranches, mConfig.branchSelected);
+         mConfig.mCache->insertReference(sha, References::Type::RemoteBranches,
+                                         QString("%1/%2").arg(remote.output, mConfig.branchSelected));
          emit mConfig.mCache->signalCacheUpdated();
       }
    }

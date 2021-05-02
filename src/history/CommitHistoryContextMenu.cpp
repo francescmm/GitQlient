@@ -7,6 +7,7 @@
 #include <GitBase.h>
 #include <GitBranches.h>
 #include <GitCache.h>
+#include <GitConfig.h>
 #include <GitHubRestApi.h>
 #include <GitLocal.h>
 #include <GitPatches.h>
@@ -436,7 +437,20 @@ void CommitHistoryContextMenu::push()
          emit signalRefreshPRsCache();
    }
    else if (ret.success)
-      emit signalRefreshPRsCache();
+   {
+      const auto currentBranch = mGit->getCurrentBranch();
+      QScopedPointer<GitConfig> git(new GitConfig(mGit));
+      const auto remote = git->getRemoteForBranch(currentBranch);
+
+      if (remote.success)
+      {
+         const auto sha = mCache->getShaOfReference(currentBranch, References::Type::LocalBranch);
+         mCache->insertReference(sha, References::Type::RemoteBranches,
+                                 QString("%1/%2").arg(remote.output, currentBranch));
+         emit mCache->signalCacheUpdated();
+         emit signalRefreshPRsCache();
+      }
+   }
    else
    {
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),

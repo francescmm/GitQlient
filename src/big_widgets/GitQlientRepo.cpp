@@ -586,7 +586,7 @@ void GitQlientRepo::changesCommitted(bool ok)
    {
       mHistoryWidget->onCommitSelected(CommitInfo::ZERO_SHA);
       showHistoryView();
-      emit fullReload();
+      emit fullReload(); // TODO: optimize
    }
    else
       QMessageBox::critical(this, tr("Commit error"), tr("Failed to commit changes"));

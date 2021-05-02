@@ -323,21 +323,34 @@ void Controls::pushCurrentBranch()
       {
          emit signalRefreshPRsCache();
 
-         const auto sha = mCache->getShaOfReference(currentBranch, References::Type::LocalBranch);
+         QScopedPointer<GitConfig> git(new GitConfig(mGit));
+         const auto remote = git->getRemoteForBranch(currentBranch);
 
-         mCache->insertReference(sha, References::Type::RemoteBranches, currentBranch);
-         emit mCache->signalCacheUpdated();
+         if (remote.success)
+         {
+            const auto sha = mCache->getShaOfReference(currentBranch, References::Type::LocalBranch);
+
+            mCache->insertReference(sha, References::Type::RemoteBranches,
+                                    QString("%1/%2").arg(remote.output, currentBranch));
+            emit mCache->signalCacheUpdated();
+         }
       }
    }
    else if (ret.success)
    {
-      emit signalRefreshPRsCache();
-
       const auto currentBranch = mGit->getCurrentBranch();
-      const auto sha = mCache->getShaOfReference(currentBranch, References::Type::LocalBranch);
+      QScopedPointer<GitConfig> git(new GitConfig(mGit));
+      const auto remote = git->getRemoteForBranch(currentBranch);
 
-      mCache->insertReference(sha, References::Type::RemoteBranches, currentBranch);
-      emit mCache->signalCacheUpdated();
+      if (remote.success)
+      {
+         const auto sha = mCache->getShaOfReference(currentBranch, References::Type::LocalBranch);
+
+         mCache->insertReference(sha, References::Type::RemoteBranches,
+                                 QString("%1/%2").arg(remote.output, currentBranch));
+         emit mCache->signalCacheUpdated();
+         emit signalRefreshPRsCache();
+      }
    }
    else
    {
