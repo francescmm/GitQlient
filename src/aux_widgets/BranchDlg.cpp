@@ -4,6 +4,7 @@
 #include <GitBase.h>
 #include <GitBranches.h>
 #include <GitCache.h>
+#include <GitConfig.h>
 #include <GitQlientStyles.h>
 #include <GitStashes.h>
 
@@ -166,10 +167,16 @@ void BranchDlg::accept()
 
          if (ret.success)
          {
-            const auto sha = mConfig.mCache->getShaOfReference(ui->leOldName->text(), References::Type::LocalBranch);
+            QScopedPointer<GitConfig> git(new GitConfig(mConfig.mGit));
+            const auto remote = git->getRemoteForBranch(ui->leNewName->text());
 
-            mConfig.mCache->insertReference(sha, References::Type::RemoteBranches, ui->leNewName->text());
-            emit mConfig.mCache->signalCacheUpdated();
+            if (remote.success)
+            {
+               const auto sha = mConfig.mCache->getShaOfReference(ui->leOldName->text(), References::Type::LocalBranch);
+               mConfig.mCache->insertReference(sha, References::Type::RemoteBranches,
+                                               QString("%1/%2").arg(remote.output, ui->leNewName->text()));
+               emit mConfig.mCache->signalCacheUpdated();
+            }
          }
       }
 

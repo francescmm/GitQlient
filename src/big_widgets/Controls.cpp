@@ -320,21 +320,7 @@ void Controls::pushCurrentBranch()
       const auto dlgRet = dlg.exec();
 
       if (dlgRet == QDialog::Accepted)
-      {
          emit signalRefreshPRsCache();
-
-         QScopedPointer<GitConfig> git(new GitConfig(mGit));
-         const auto remote = git->getRemoteForBranch(currentBranch);
-
-         if (remote.success)
-         {
-            const auto sha = mCache->getShaOfReference(currentBranch, References::Type::LocalBranch);
-
-            mCache->insertReference(sha, References::Type::RemoteBranches,
-                                    QString("%1/%2").arg(remote.output, currentBranch));
-            emit mCache->signalCacheUpdated();
-         }
-      }
    }
    else if (ret.success)
    {
