@@ -288,6 +288,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
            &BranchTreeWidget::clearSelection);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalFetchPerformed, mGitTags.data(), &GitTags::getRemoteTags);
    connect(mLocalBranchesTree, &BranchTreeWidget::fullReload, this, &BranchesWidget::fullReload);
+   connect(mLocalBranchesTree, &BranchTreeWidget::logReload, this, &BranchesWidget::logReload);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
    connect(mLocalBranchesTree, &BranchTreeWidget::mergeSqushRequested, this, &BranchesWidget::mergeSqushRequested);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalPullConflict, this, &BranchesWidget::signalPullConflict);
@@ -297,6 +298,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
            &BranchTreeWidget::clearSelection);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalFetchPerformed, mGitTags.data(), &GitTags::getRemoteTags);
    connect(mRemoteBranchesTree, &BranchTreeWidget::fullReload, this, &BranchesWidget::fullReload);
+   connect(mRemoteBranchesTree, &BranchTreeWidget::logReload, this, &BranchesWidget::logReload);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
    connect(mRemoteBranchesTree, &BranchTreeWidget::mergeSqushRequested, this, &BranchesWidget::mergeSqushRequested);
 

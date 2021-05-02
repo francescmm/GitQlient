@@ -39,12 +39,8 @@ class BranchTreeWidget : public QTreeWidget
 
 signals:
    void fullReload();
+   void logReload();
 
-   /*!
-    \brief Signal triggered when a branch is checked out and requires a GitQlient UI refresh.
-
-   */
-   void signalBranchCheckedOut();
    /*!
     \brief Signal triggered when the user selects a commit via branch or tag selection.
 

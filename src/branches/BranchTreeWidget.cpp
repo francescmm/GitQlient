@@ -148,7 +148,7 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
             if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
             {
                PullDlg pull(mGit, output.split('\n').first());
-               connect(&pull, &PullDlg::signalRepositoryUpdated, this, &BranchTreeWidget::signalBranchCheckedOut);
+               connect(&pull, &PullDlg::signalRepositoryUpdated, this, &BranchTreeWidget::fullReload);
                connect(&pull, &PullDlg::signalPullConflict, this, &BranchTreeWidget::signalPullConflict);
 
                if (pull.exec() == QDialog::Accepted)
@@ -164,7 +164,7 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
                   oldItem.squeeze();
                }
 
-               emit signalBranchCheckedOut();
+               emit logReload();
             }
          }
          else
