@@ -45,7 +45,7 @@ class CommitChangesWidget : public QWidget
 signals:
    void changeReverted(const QString &revertedFile);
    void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
-   void signalChangesCommitted(bool commited);
+   void changesCommitted();
    void signalCheckoutPerformed();
    void signalShowFileHistory(const QString &fileName);
    void signalUpdateWip();
@@ -84,7 +84,7 @@ protected:
    QMap<QString, WipCacheItem> mInternalCache;
    int mTitleMaxLength = 50;
 
-   virtual bool commitChanges() = 0;
+   virtual void commitChanges() = 0;
    virtual void showUnstagedMenu(const QPoint &pos) final;
 
    virtual void insertFiles(const RevisionFiles &files, QListWidget *fileList) final;

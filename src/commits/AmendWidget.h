@@ -43,7 +43,7 @@ public:
    void configure(const QString &sha) override;
 
 private:
-   bool commitChanges() override;
+   void commitChanges() override;
 
    static QString lastMsgBeforeError;
    static const int kMaxTitleChars;

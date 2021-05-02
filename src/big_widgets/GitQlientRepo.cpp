@@ -136,7 +136,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mHistoryWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
    connect(mHistoryWidget, &HistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
    connect(mHistoryWidget, &HistoryWidget::signalShowDiff, this, &GitQlientRepo::loadFileDiff);
-   connect(mHistoryWidget, &HistoryWidget::signalChangesCommitted, this, &GitQlientRepo::changesCommitted);
+   connect(mHistoryWidget, &HistoryWidget::changesCommitted, this, &GitQlientRepo::onChangesCommitted);
    connect(mHistoryWidget, &HistoryWidget::signalUpdateUi, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mHistoryWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, mControls, &Controls::activateMergeWarning);
@@ -580,16 +580,10 @@ void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
    }
 }
 
-void GitQlientRepo::changesCommitted(bool ok)
+void GitQlientRepo::onChangesCommitted()
 {
-   if (ok)
-   {
-      mHistoryWidget->onCommitSelected(CommitInfo::ZERO_SHA);
-      showHistoryView();
-      emit fullReload(); // TODO: optimize
-   }
-   else
-      QMessageBox::critical(this, tr("Commit error"), tr("Failed to commit changes"));
+   mHistoryWidget->onCommitSelected(CommitInfo::ZERO_SHA);
+   showHistoryView();
 }
 
 void GitQlientRepo::closeEvent(QCloseEvent *ce)

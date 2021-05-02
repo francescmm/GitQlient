@@ -194,7 +194,7 @@ private:
 
     \param ok True if the changes are committed, otherwise false.
    */
-   void changesCommitted(bool ok);
+   void onChangesCommitted();
    /*!
     \brief Method that sets the watcher for the files in the system.
 

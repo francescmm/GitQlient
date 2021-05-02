@@ -110,7 +110,7 @@ signals:
 
     \param commited True if there was no error, false otherwise.
    */
-   void signalChangesCommitted(bool commited);
+   void changesCommitted();
    /*!
     \brief Signal triggered when the user wants to see the History & Blame for a specific file.
 

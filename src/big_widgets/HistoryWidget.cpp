@@ -91,8 +91,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    wipFrame->setMaximumWidth(500);
 
    connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
-   connect(mWipWidget, &WipWidget::signalChangesCommitted, this, &HistoryWidget::returnToView);
-   connect(mWipWidget, &WipWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
+   connect(mWipWidget, &WipWidget::changesCommitted, this, &HistoryWidget::returnToView);
+   connect(mWipWidget, &WipWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
    connect(mWipWidget, &WipWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
    connect(mWipWidget, &WipWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
    connect(mWipWidget, &WipWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
@@ -104,8 +104,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    });
 
    connect(mAmendWidget, &AmendWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
-   connect(mAmendWidget, &AmendWidget::signalChangesCommitted, this, &HistoryWidget::returnToView);
-   connect(mAmendWidget, &AmendWidget::signalChangesCommitted, this, &HistoryWidget::signalChangesCommitted);
+   connect(mAmendWidget, &AmendWidget::changesCommitted, this, &HistoryWidget::returnToView);
+   connect(mAmendWidget, &AmendWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
    connect(mAmendWidget, &AmendWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
    connect(mAmendWidget, &AmendWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
    connect(mAmendWidget, &AmendWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);

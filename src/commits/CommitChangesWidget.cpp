@@ -479,7 +479,7 @@ void CommitChangesWidget::updateCounter(const QString &text)
 
 bool CommitChangesWidget::hasConflicts()
 {
-   for (const auto &iter : mInternalCache)
+   for (const auto &iter : qAsConst(mInternalCache))
       if (iter.item->data(GitQlientRole::U_IsConflict).toBool())
          return true;
 

@@ -90,10 +90,9 @@ void AmendWidget::configure(const QString &sha)
    ui->applyActionBtn->setEnabled(ui->stagedFilesList->count());
 }
 
-bool AmendWidget::commitChanges()
+void AmendWidget::commitChanges()
 {
    QStringList selFiles = getFiles();
-   auto done = false;
 
    if (!selFiles.isEmpty())
    {
@@ -120,8 +119,6 @@ bool AmendWidget::commitChanges()
             const auto ret = gitLocal->ammendCommit(selFiles, files.value(), msg, author);
             QApplication::restoreOverrideCursor();
 
-            emit signalChangesCommitted(ret.success);
-
             {
                const auto commit = mCache->commitInfo(mCurrentSha);
                QScopedPointer<GitHistory> git(new GitHistory(mGit));
@@ -130,10 +127,8 @@ bool AmendWidget::commitChanges()
                mCache->insertRevisionFiles(mCurrentSha, commit.firstParent(), RevisionFiles(ret.output));
             }
 
-            done = true;
+            emit changesCommitted();
          }
       }
    }
-
-   return done;
 }
