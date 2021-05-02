@@ -36,7 +36,7 @@ CommitInfo::CommitInfo(QByteArray commitData, const QString &gpg, bool goodSigna
    }
 }
 
-CommitInfo::CommitInfo(const QString sha, const QStringList &parents, std::chrono::seconds commitDate,
+CommitInfo::CommitInfo(const QString &sha, const QStringList &parents, std::chrono::seconds commitDate,
                        const QString &log)
    : sha(sha)
    , dateSinceEpoch(commitDate)
@@ -124,6 +124,12 @@ int CommitInfo::getActiveLane() const
    }
 
    return -1;
+}
+
+void CommitInfo::removeChild(CommitInfo *commit)
+{
+   if (mChilds.contains(commit))
+      mChilds.removeAll(commit);
 }
 
 QString CommitInfo::getFirstChildSha() const

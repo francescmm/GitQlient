@@ -69,6 +69,7 @@ public:
    int getActiveLane() const;
 
    void appendChild(CommitInfo *commit) { mChilds.append(commit); }
+   void removeChild(CommitInfo *commit);
    bool hasChilds() const { return !mChilds.empty(); }
    QString getFirstChildSha() const;
    int getChildsCount() const { return mChilds.count(); }
