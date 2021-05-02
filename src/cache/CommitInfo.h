@@ -49,7 +49,7 @@ public:
    CommitInfo() = default;
    ~CommitInfo() = default;
    CommitInfo(QByteArray commitData, const QString &gpg = QString(), bool goodSignature = false);
-   explicit CommitInfo(const QString sha, const QStringList &parents, std::chrono::seconds commitDate,
+   explicit CommitInfo(const QString &sha, const QStringList &parents, std::chrono::seconds commitDate,
                        const QString &log);
    bool operator==(const CommitInfo &commit) const;
    bool operator!=(const CommitInfo &commit) const;
