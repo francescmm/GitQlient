@@ -254,7 +254,7 @@ void CommitHistoryContextMenu::stashPop()
 void CommitHistoryContextMenu::createBranch()
 {
    BranchDlg dlg({ mShas.first(), BranchDlgMode::CREATE_FROM_COMMIT, mCache, mGit });
-   dlg.open();
+   dlg.exec();
 }
 
 void CommitHistoryContextMenu::createTag()
@@ -342,7 +342,7 @@ void CommitHistoryContextMenu::checkoutBranch()
 void CommitHistoryContextMenu::createCheckoutBranch()
 {
    BranchDlg dlg({ mShas.constFirst(), BranchDlgMode::CREATE_CHECKOUT_FROM_COMMIT, mCache, mGit });
-   dlg.open();
+   dlg.exec();
 }
 
 void CommitHistoryContextMenu::checkoutCommit()
