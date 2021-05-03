@@ -116,7 +116,7 @@ void BranchDlg::accept()
          if (ret.success)
          {
             mConfig.mCache->insertReference(mConfig.mGit->getLastCommit().output.trimmed(),
-                                            References::Type::LocalBranch, ui->leOldName->text());
+                                            References::Type::LocalBranch, ui->leNewName->text());
             emit mConfig.mCache->signalCacheUpdated();
          }
       }
