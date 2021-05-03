@@ -48,7 +48,8 @@ public:
 
    CommitInfo() = default;
    ~CommitInfo() = default;
-   CommitInfo(QByteArray commitData, const QString &gpg = QString(), bool goodSignature = false);
+   CommitInfo(QByteArray commitData);
+   CommitInfo(QByteArray commitData, const QString &gpg, bool goodSignature);
    explicit CommitInfo(const QString &sha, const QStringList &parents, std::chrono::seconds commitDate,
                        const QString &log);
    bool operator==(const CommitInfo &commit) const;
@@ -96,4 +97,6 @@ private:
    QVector<CommitInfo *> mChilds;
 
    friend class GitCache;
+
+   void parseDiff(QByteArray &data, int startingField);
 };
