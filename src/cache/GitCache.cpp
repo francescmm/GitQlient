@@ -329,7 +329,8 @@ void GitCache::insertCommit(CommitInfo commit)
 
    const auto sha = commit.sha;
    const auto parentSha = commit.firstParent();
-   commit.setLanes(mCommitsMap[parentSha].lanes());
+
+   commit.setLanes({ LaneType::ACTIVE });
    commit.pos = 1;
 
    mCommitsMap[sha] = std::move(commit);
