@@ -49,6 +49,9 @@ GitExecResult GitBranches::checkoutBranchFromCommit(const QString &commitSha, co
 
    const auto ret = mGitBase->run(cmd);
 
+   if (ret.success)
+      mGitBase->updateCurrentBranch();
+
    return ret;
 }
 

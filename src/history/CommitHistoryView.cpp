@@ -247,9 +247,9 @@ QStringList CommitHistoryView::getSelectedShaList() const
              = mCommitHistoryModel->index(index.row(), static_cast<int>(CommitHistoryColumns::Date)).data().toString();
 
          shas.insert(QDateTime::fromString(dtStr, "dd MMM yyyy hh:mm"), sha);
-
-         return shas.values();
       }
+
+      return shas.values();
    }
 
    return QStringList();
