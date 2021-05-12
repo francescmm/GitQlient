@@ -3,6 +3,7 @@
 
 #include <GitBase.h>
 #include <GitConfig.h>
+#include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 
 #include <QFileDialog>
@@ -27,6 +28,12 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
    const auto operation = mType == CreateRepoDlgType::INIT ? QString("init") : QString("clone");
    const auto checkText = ui->chbOpen->text().arg(operation);
    ui->chbOpen->setText(checkText);
+
+   GitQlientSettings settings;
+   const auto defaultLocation = settings.globalValue("DefaultCloneLocation", QString()).toString();
+
+   if (!defaultLocation.isEmpty())
+      ui->lePath->setText(defaultLocation);
 
    setWindowTitle(QString(tr("%1 repository"))
                       .arg(mType == CreateRepoDlgType::INIT ? QString(tr("Initialize")) : QString(tr("Clone"))));
@@ -129,6 +136,12 @@ void CreateRepoDlg::accept()
 
       if (ret.success)
       {
+         if (ui->chbDefaultDir->isChecked())
+         {
+            GitQlientSettings settings;
+            settings.setGlobalValue("DefaultCloneLocation", ui->lePath->text());
+         }
+
          if (ui->cbGitUser->isChecked())
             mGit->setLocalUserInfo({ ui->leGitName->text().trimmed(), ui->leGitEmail->text().trimmed() });
 
