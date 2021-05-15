@@ -368,7 +368,7 @@ void Controls::pruneBranches()
 void Controls::createGitPlatformButton(QHBoxLayout *layout)
 {
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto remoteUrl = gitConfig->getServerUrl();
+   const auto remoteUrl = gitConfig->getServerHost();
    QIcon gitPlatformIcon;
    QString name;
    QString prName;

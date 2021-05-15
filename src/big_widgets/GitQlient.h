@@ -32,6 +32,7 @@ class ProgressDlg;
 class GitConfig;
 class QStackedLayout;
 class GitQlientSettings;
+class GitBase;
 
 /*!
  \brief The GitQlient class is the MainWindow of the GitQlient application. Is the widget that stores all the tabs about
@@ -168,9 +169,11 @@ private:
    /**
     * @brief conditionallyOpenPreConfigDlg Opens the pre-config dialog in case that the repo is open for the very first
     * time.
+    * @param git The git object to perform Git operations.
     * @param settings The settings object to store the new values.
     */
-   void conditionallyOpenPreConfigDlg(const QSharedPointer<GitQlientSettings> &settings);
+   void conditionallyOpenPreConfigDlg(const QSharedPointer<GitBase> &git,
+                                      const QSharedPointer<GitQlientSettings> &settings);
 
    /**
     * @brief updateWindowTitle Updates the window title of GitQlient appending the branch of the current repository.

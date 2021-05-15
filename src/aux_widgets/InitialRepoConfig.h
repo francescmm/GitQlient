@@ -8,13 +8,15 @@ class InitialRepoConfig;
 }
 
 class GitQlientSettings;
+class GitBase;
 
 class InitialRepoConfig : public QDialog
 {
    Q_OBJECT
 
 public:
-   explicit InitialRepoConfig(const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
+   explicit InitialRepoConfig(const QSharedPointer<GitBase> &git, const QSharedPointer<GitQlientSettings> &settings,
+                              QWidget *parent = nullptr);
    ~InitialRepoConfig();
 
 private:

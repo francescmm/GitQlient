@@ -330,7 +330,7 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
          QSharedPointer<GitBase> git(new GitBase(repoPath));
          QSharedPointer<GitQlientSettings> settings(new GitQlientSettings(git->getGitDir()));
 
-         conditionallyOpenPreConfigDlg(settings);
+         conditionallyOpenPreConfigDlg(git, settings);
 
          const auto repo = new GitQlientRepo(git, settings);
          const auto index = pinned ? mRepos->addPinnedTab(repo, repoName) : mRepos->addTab(repo, repoName);
@@ -419,13 +419,14 @@ void GitQlient::onSuccessOpen(const QString &fullPath)
    mConfigWidget->onRepoOpened();
 }
 
-void GitQlient::conditionallyOpenPreConfigDlg(const QSharedPointer<GitQlientSettings> &settings)
+void GitQlient::conditionallyOpenPreConfigDlg(const QSharedPointer<GitBase> &git,
+                                              const QSharedPointer<GitQlientSettings> &settings)
 {
    auto maxCommits = settings->localValue("MaxCommits", -1).toInt();
 
    if (maxCommits == -1)
    {
-      const auto preConfig = new InitialRepoConfig(settings, this);
+      const auto preConfig = new InitialRepoConfig(git, settings, this);
       preConfig->exec();
    }
 }

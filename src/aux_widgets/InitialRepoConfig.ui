@@ -7,50 +7,31 @@
     <x>0</x>
     <y>0</y>
     <width>591</width>
-    <height>419</height>
+    <height>434</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Repo config</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="1">
-    <widget class="QSpinBox" name="sbMaxCommits">
-     <property name="suffix">
-      <string> last commits</string>
+   <item row="0" column="0" colspan="2">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this new version, GitQlient includes some new parameters to help you to configure the repository. Please, take a moment to change them if you'd like.&lt;/p&gt;&lt;p&gt;If you already have configured some of them, they will show the already set value.&lt;/p&gt;&lt;p&gt;You can modify these values at any moment using the &lt;span style=&quot; font-style:italic;&quot;&gt;Config &lt;/span&gt;button in the top icons list of GitQlient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
-     <property name="maximum">
-      <number>999999999</number>
-     </property>
-     <property name="singleStep">
-      <number>10</number>
-     </property>
-     <property name="value">
-      <number>0</number>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QFrame" name="orangeHSeparator">
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Plain</enum>
-     </property>
-     <property name="lineWidth">
-      <number>0</number>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
+   <item row="8" column="1">
     <widget class="CheckBox" name="updateOnPull">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
-   <item row="8" column="0" colspan="2">
+   <item row="9" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -74,71 +55,7 @@
      </item>
     </layout>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_7">
-     <property name="text">
-      <string>Max. commits to retrieve (0 for all)</string>
-     </property>
-    </widget>
-   </item>
    <item row="7" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Update submodules when pull</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QSpinBox" name="autoFetch">
-     <property name="suffix">
-      <string> minutes</string>
-     </property>
-     <property name="maximum">
-      <number>60</number>
-     </property>
-     <property name="value">
-      <number>5</number>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Auto-Fetch interval</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this new version, GitQlient includes some new parameters to help you to configure the repository. Please take a moment to change them if you'd like.&lt;/p&gt;&lt;p&gt;If you already have configured some of them, they will show the already set value.&lt;/p&gt;&lt;p&gt;You can modify these values at any moment using the &lt;span style=&quot; font-style:italic;&quot;&gt;Config &lt;/span&gt;button in the top icons list of GitQlient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="CheckBox" name="pruneOnFetch">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Prune when fetch</string>
@@ -160,6 +77,140 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="4" column="1">
+    <widget class="QSpinBox" name="sbMaxCommits">
+     <property name="suffix">
+      <string> last commits</string>
+     </property>
+     <property name="maximum">
+      <number>999999999</number>
+     </property>
+     <property name="singleStep">
+      <number>10</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Max. commits to retrieve (0 for all)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="CheckBox" name="pruneOnFetch">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Auto-Fetch interval</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QFrame" name="orangeHSeparator">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QSpinBox" name="autoFetch">
+     <property name="suffix">
+      <string> minutes</string>
+     </property>
+     <property name="maximum">
+      <number>60</number>
+     </property>
+     <property name="value">
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Update submodules when pull</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QGroupBox" name="credentialsFrames">
+     <property name="title">
+      <string>Credentials configuration</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <item row="1" column="0">
+       <widget class="QRadioButton" name="rbCache">
+        <property name="text">
+         <string>Cache for current session</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QRadioButton" name="rbStorage">
+        <property name="text">
+         <string>Storage</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="CheckBox" name="chbCredentials">
+        <property name="text">
+         <string>Store credentials using GitQlient (Current session or in Storage)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>

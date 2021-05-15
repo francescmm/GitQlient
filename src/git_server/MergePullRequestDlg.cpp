@@ -22,7 +22,7 @@ MergePullRequestDlg::MergePullRequestDlg(const QSharedPointer<GitBase> git, cons
    ui->setupUi(this);
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto serverUrl = gitConfig->getServerUrl();
+   const auto serverUrl = gitConfig->getServerHost();
 
    GitQlientSettings settings("");
    const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();

@@ -1,10 +1,13 @@
 #include "InitialRepoConfig.h"
 #include "ui_InitialRepoConfig.h"
 
+#include <GitBase.h>
+#include <GitConfig.h>
 #include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 
-InitialRepoConfig::InitialRepoConfig(const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
+InitialRepoConfig::InitialRepoConfig(const QSharedPointer<GitBase> &git,
+                                     const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::InitialRepoConfig)
    , mSettings(settings)
@@ -19,6 +22,11 @@ InitialRepoConfig::InitialRepoConfig(const QSharedPointer<GitQlientSettings> &se
    ui->pruneOnFetch->setChecked(settings->localValue("PruneOnFetch", true).toBool());
    ui->updateOnPull->setChecked(settings->localValue("UpdateOnPull", false).toBool());
    ui->sbMaxCommits->setValue(settings->localValue("MaxCommits", 0).toInt());
+
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(git));
+
+   const auto url = gitConfig->getServerUrl();
+   ui->credentialsFrames->setVisible(url.startsWith("https"));
 }
 
 InitialRepoConfig::~InitialRepoConfig()

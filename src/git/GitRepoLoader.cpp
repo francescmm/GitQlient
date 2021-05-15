@@ -251,7 +251,7 @@ void GitRepoLoader::processRevisions(QByteArray ba)
    QLog_Info("Git", "Revisions received!");
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
-   const auto serverUrl = gitConfig->getServerUrl();
+   const auto serverUrl = gitConfig->getServerHost();
 
    if (serverUrl.contains("github"))
       QLog_Info("Git", "Requesting PR status!");

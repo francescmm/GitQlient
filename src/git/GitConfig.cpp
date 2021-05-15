@@ -184,6 +184,21 @@ QString GitConfig::getServerUrl() const
       serverUrl.remove("git@");
       serverUrl.replace(":", "/");
    }
+
+   serverUrl = serverUrl.mid(0, serverUrl.lastIndexOf("."));
+
+   return serverUrl;
+}
+
+QString GitConfig::getServerHost() const
+{
+   auto serverUrl = getGitValue("remote.origin.url").output.trimmed();
+
+   if (serverUrl.startsWith("git@"))
+   {
+      serverUrl.remove("git@");
+      serverUrl.replace(":", "/");
+   }
    else if (serverUrl.startsWith("https://"))
    {
       serverUrl.remove("https://");

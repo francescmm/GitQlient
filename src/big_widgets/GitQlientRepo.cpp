@@ -73,7 +73,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    setAttribute(Qt::WA_DeleteOnClose);
 
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
-   const auto serverUrl = gitConfig->getServerUrl();
+   const auto serverUrl = gitConfig->getServerHost();
    const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
    mGitServerCache->init(serverUrl, repoInfo);
@@ -452,7 +452,7 @@ bool GitQlientRepo::configureGitServer() const
    if (!mGitServerWidget->isConfigured())
    {
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
-      const auto serverUrl = gitConfig->getServerUrl();
+      const auto serverUrl = gitConfig->getServerHost();
       const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
       GitQlientSettings settings("");
