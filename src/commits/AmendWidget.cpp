@@ -119,15 +119,16 @@ void AmendWidget::commitChanges()
             const auto ret = gitLocal->ammendCommit(selFiles, files.value(), msg, author);
             QApplication::restoreOverrideCursor();
 
+            if (ret.success)
             {
                const auto commit = mCache->commitInfo(mCurrentSha);
                QScopedPointer<GitHistory> git(new GitHistory(mGit));
                const auto ret = git->getDiffFiles(mCurrentSha, commit.firstParent());
 
                mCache->insertRevisionFiles(mCurrentSha, commit.firstParent(), RevisionFiles(ret.output));
-            }
 
-            emit changesCommitted();
+               emit changesCommitted();
+            }
          }
       }
    }
