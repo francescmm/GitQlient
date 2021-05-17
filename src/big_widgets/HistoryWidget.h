@@ -356,4 +356,6 @@ private:
    void showFullDiff();
 
    void rearrangeSplittrer(bool minimalActive);
+
+   void cleanCommitPanels();
 };

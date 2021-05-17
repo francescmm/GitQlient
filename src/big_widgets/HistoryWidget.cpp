@@ -93,6 +93,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mWipWidget, &WipWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mWipWidget, &WipWidget::changesCommitted, this, &HistoryWidget::returnToView);
    connect(mWipWidget, &WipWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
+   connect(mWipWidget, &WipWidget::changesCommitted, this, &HistoryWidget::cleanCommitPanels);
    connect(mWipWidget, &WipWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
    connect(mWipWidget, &WipWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
    connect(mWipWidget, &WipWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
@@ -106,6 +107,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mAmendWidget, &AmendWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mAmendWidget, &AmendWidget::changesCommitted, this, &HistoryWidget::returnToView);
    connect(mAmendWidget, &AmendWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
+   connect(mAmendWidget, &AmendWidget::changesCommitted, this, &HistoryWidget::cleanCommitPanels);
    connect(mAmendWidget, &AmendWidget::signalCheckoutPerformed, this, &HistoryWidget::signalUpdateUi);
    connect(mAmendWidget, &AmendWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
    connect(mAmendWidget, &AmendWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
@@ -374,6 +376,12 @@ void HistoryWidget::rearrangeSplittrer(bool minimalActive)
       mBranchesWidget->setMaximumWidth(500);
       mSplitter->setCollapsible(2, true);
    }
+}
+
+void HistoryWidget::cleanCommitPanels()
+{
+   mWipWidget->clearStaged();
+   mAmendWidget->clearStaged();
 }
 
 void HistoryWidget::onCommitTitleMaxLenghtChanged()

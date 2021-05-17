@@ -68,6 +68,7 @@ public:
    virtual void configure(const QString &sha) = 0;
    virtual void reload() final;
    virtual void clear() final;
+   virtual void clearStaged() final;
    virtual void setCommitTitleMaxLength() final;
 
 protected:

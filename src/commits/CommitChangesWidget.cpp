@@ -496,6 +496,12 @@ void CommitChangesWidget::clear()
    ui->applyActionBtn->setEnabled(false);
 }
 
+void CommitChangesWidget::clearStaged()
+{
+   ui->stagedFilesList->clear();
+   ui->applyActionBtn->setEnabled(false);
+}
+
 void CommitChangesWidget::setCommitTitleMaxLength()
 {
    mTitleMaxLength = GitQlientSettings().globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
