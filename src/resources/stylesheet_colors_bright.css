@@ -283,7 +283,7 @@ QProgressBar::chunk
 /*            Custom Widgets START           */
 /*********************************************/
 
-CheckBox
+CheckBox, QRadioButton
 {
    color: black;
 }

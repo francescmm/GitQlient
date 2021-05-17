@@ -6,6 +6,9 @@
 #include <GitQlientSettings.h>
 #include <QLogger.h>
 
+#include <CredentialsDlg.h>
+#include <GitConfig.h>
+#include <GitCredentials.h>
 #include <QDir>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -133,6 +136,15 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
       ui->leBsToken->setText(token);
    }
 
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(git));
+
+   const auto url = gitConfig->getServerUrl();
+   ui->credentialsFrames->setVisible(url.startsWith("https"));
+
+   connect(ui->buttonGroup, SIGNAL(buttonClicked(QAbstractButton *)), this,
+           SLOT(onCredentialsOptionChanged(QAbstractButton *)));
+   connect(ui->pbAddCredentials, &QPushButton::clicked, this, &ConfigWidget::showCredentialsDlg);
+
    // Connects for automatic save
    connect(ui->chDevMode, &CheckBox::stateChanged, this, &ConfigWidget::enableWidgets);
    connect(ui->chDisableLogs, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
@@ -169,6 +181,11 @@ void ConfigWidget::onPanelsVisibilityChanged()
    ui->cbStash->setChecked(settings.localValue("StashesHeader", true).toBool());
    ui->cbSubmodule->setChecked(settings.localValue("SubmodulesHeader", true).toBool());
    ui->cbSubtree->setChecked(settings.localValue("SubtreeHeader", true).toBool());
+}
+
+void ConfigWidget::onCredentialsOptionChanged(QAbstractButton *button)
+{
+   ui->sbTimeout->setEnabled(button == ui->rbCache);
 }
 
 void ConfigWidget::clearCache()
@@ -303,4 +320,19 @@ void ConfigWidget::saveFile()
       mLocalGit->saveFile();
    else
       mGlobalGit->saveFile();
+}
+
+void ConfigWidget::showCredentialsDlg()
+{
+   // Store credentials if allowed and the user checked the box
+   if (ui->credentialsFrames->isVisible() && ui->chbCredentials->isChecked())
+   {
+      if (ui->rbCache->isChecked())
+         GitCredentials::configureCache(ui->sbTimeout->value(), mGit);
+      else
+      {
+         CredentialsDlg dlg(mGit, this);
+         dlg.exec();
+      }
+   }
 }

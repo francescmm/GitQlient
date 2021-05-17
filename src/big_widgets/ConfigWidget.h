@@ -7,6 +7,7 @@ class GitBase;
 class QTimer;
 class FileEditor;
 class QPushButton;
+class QAbstractButton;
 
 namespace Ui
 {
@@ -44,7 +45,9 @@ private:
    void toggleBsAccesInfo();
    void enableWidgets();
    void saveFile();
+   void showCredentialsDlg();
 
 private slots:
    void saveConfig();
+   void onCredentialsOptionChanged(QAbstractButton *button);
 };

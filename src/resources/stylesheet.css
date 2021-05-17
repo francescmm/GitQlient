@@ -19,7 +19,7 @@ QWidget
    outline: 0;
 }
 
-CheckBox::indicator
+CheckBox::indicator, QRadioButton::indicator
 {
     width: 13px;
     height: 13px;

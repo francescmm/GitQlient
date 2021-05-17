@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>781</width>
-    <height>732</height>
+    <height>733</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -78,7 +78,7 @@
    <item row="1" column="0" rowspan="2">
     <widget class="QTabWidget" name="tabWidget_2">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_3">
       <property name="autoFillBackground">
@@ -262,7 +262,7 @@
             <x>0</x>
             <y>0</y>
             <width>565</width>
-            <height>653</height>
+            <height>654</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -567,13 +567,6 @@
                  <property name="spacing">
                   <number>10</number>
                  </property>
-                 <item row="1" column="1">
-                  <widget class="QRadioButton" name="rbStorage">
-                   <property name="text">
-                    <string>Storage</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="0" column="0" colspan="2">
                   <widget class="QCheckBox" name="chbCredentials">
                    <property name="text">
@@ -584,6 +577,16 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="1" column="1">
+                  <widget class="QRadioButton" name="rbStorage">
+                   <property name="text">
+                    <string>Storage</string>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">buttonGroup</string>
+                   </attribute>
+                  </widget>
+                 </item>
                  <item row="1" column="0">
                   <widget class="QRadioButton" name="rbCache">
                    <property name="text">
@@ -591,6 +594,52 @@
                    </property>
                    <property name="checked">
                     <bool>true</bool>
+                   </property>
+                   <attribute name="buttonGroup">
+                    <string notr="true">buttonGroup</string>
+                   </attribute>
+                  </widget>
+                 </item>
+                 <item row="2" column="0">
+                  <layout class="QHBoxLayout" name="horizontalLayout_3">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="label_19">
+                     <property name="text">
+                      <string>TextLabel</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QSpinBox" name="sbTimeout">
+                     <property name="suffix">
+                      <string> mins.</string>
+                     </property>
+                     <property name="maximum">
+                      <number>480</number>
+                     </property>
+                     <property name="singleStep">
+                      <number>5</number>
+                     </property>
+                     <property name="value">
+                      <number>15</number>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QPushButton" name="pbAddCredentials">
+                   <property name="text">
+                    <string>Add credentials</string>
                    </property>
                   </widget>
                  </item>
@@ -743,9 +792,13 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>tabWidget_2</tabstop>
   <tabstop>chDisableLogs</tabstop>
+  <tabstop>spCommitTitleLength</tabstop>
   <tabstop>cbLogLevel</tabstop>
+  <tabstop>cbStyle</tabstop>
   <tabstop>leGitPath</tabstop>
+  <tabstop>scrollArea</tabstop>
   <tabstop>cbTranslations</tabstop>
   <tabstop>sbMaxCommits</tabstop>
   <tabstop>cbLogOrder</tabstop>
@@ -754,14 +807,26 @@
   <tabstop>updateOnPull</tabstop>
   <tabstop>clangFormat</tabstop>
   <tabstop>cbPomodoroEnabled</tabstop>
+  <tabstop>cbStash</tabstop>
+  <tabstop>cbSubmodule</tabstop>
+  <tabstop>cbSubtree</tabstop>
+  <tabstop>chbCredentials</tabstop>
+  <tabstop>rbCache</tabstop>
+  <tabstop>rbStorage</tabstop>
+  <tabstop>sbTimeout</tabstop>
   <tabstop>chBoxBuildSystem</tabstop>
   <tabstop>leBsUrl</tabstop>
   <tabstop>leBsUser</tabstop>
   <tabstop>leBsToken</tabstop>
+  <tabstop>chDevMode</tabstop>
+  <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources/>
  <connections/>
  <slots>
   <slot>saveConfig()</slot>
  </slots>
+ <buttongroups>
+  <buttongroup name="buttonGroup"/>
+ </buttongroups>
 </ui>
