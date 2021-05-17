@@ -215,7 +215,10 @@ GitExecResult GitLocal::commitFiles(QStringList &selFiles, const RevisionFiles &
 
    QLog_Trace("Git", QString("Committing files: {%1}").arg(cmd));
 
-   const auto ret = mGitBase->run(cmd);
+   auto ret = mGitBase->run(cmd);
+
+   if (ret.output.startsWith("On branch"))
+      ret.output = false;
 
    return ret;
 }
