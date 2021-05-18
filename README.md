@@ -5,22 +5,15 @@
 <table>
   <tr>
     <th colspan="2">Qt 5.15</td>
-    <th colspan="3">Retrocompatibility</td>
     <th rowspan="2">RPM build</td>
   </tr>
   <tr>
     <td>Linux & OSX</td>
     <td>Windows</td>
-    <td>Qt 5.14</td>
-    <td>Qt 5.13</td>
-    <td>Qt 5.12</td>
   </tr>
   <tr>
     <td><a href="https://travis-ci.org/francescmm/GitQlient" target="_blank"><img src="https://travis-ci.org/francescmm/GitQlient.svg?branch=master"/></a></td>
     <td><a href="https://ci.appveyor.com/project/francescmm/gitqlient/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master"/></a></td>
-    <td><a href="https://ci.appveyor.com/project/francescmm/gitqlient-qt514/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/niu2b6m5gehxnarg/branch/master"/></a></td>
-    <td><a href="https://ci.appveyor.com/project/francescmm/gitqlient-qt513/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/kxidc23f7mnqyjyi/branch/master"/></a></td>
-    <td><a href="https://ci.appveyor.com/project/francescmm/gitqlient-qt512/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/oxt8t90vssooy9rm/branch/master"/></a></td>
     <td><a href="https://copr.fedorainfracloud.org/coprs/gitqlient/GitQlient/package/gitqlient/" target="_blank"><img src="https://copr.fedorainfracloud.org/coprs/gitqlient/GitQlient/package/gitqlient/status_image/last_build.png"/></a></td>
   </tr>
 </table>
@@ -69,6 +62,30 @@ I'm aware that developers may like to have some more information beyond the User
 ### Hot to build GitQlient
 
 In the [User Manual](https://francescmm.github.io/GitQlient/#appendix-b-build) you can find a whole section about building GitQlient and what dependencies you need.
+
+## How to install GitQlient
+
+### Fedora
+
+Package [available](https://src.fedoraproject.org/rpms/gitqlient) in official Fedora repos. To install, type the following command in the terminal:
+
+```
+sudo dnf install gitqlient
+```
+
+### Ubuntu
+
+For now there is no GitQlient in the official repos of Ubuntu or Debian. However, to install it via .deb package, go the the [releases page](https://github.com/francescmm/GitQlient/releases) and download the package. Once you download it, you can install it using apt-get command as root.
+
+**Note:** This option is available only from GitQlient 1.3.3.
+
+### Windows
+
+For Windows 10 there is a package provided on every release. It installs all the dependencies and creates an shortcut in the Desktop.
+
+### MacOS
+
+For MacOS there is also a DMG package you can install as usual.
 
 ## Licenses
 
