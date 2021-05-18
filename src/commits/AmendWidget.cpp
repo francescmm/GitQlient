@@ -5,6 +5,7 @@
 #include <GitHistory.h>
 #include <GitLocal.h>
 #include <GitQlientRole.h>
+#include <GitQlientStyles.h>
 #include <GitWip.h>
 #include <UnstagedMenu.h>
 
@@ -128,6 +129,17 @@ void AmendWidget::commitChanges()
                mCache->insertRevisionFiles(mCurrentSha, commit.firstParent(), RevisionFiles(ret.output));
 
                emit changesCommitted();
+            }
+            else
+            {
+               QMessageBox msgBox(QMessageBox::Critical, tr("Error when amending"),
+                                  tr("There were problems during the commit "
+                                     "operation. Please, see the detailed "
+                                     "description for more information."),
+                                  QMessageBox::Ok, this);
+               msgBox.setDetailedText(ret.output);
+               msgBox.setStyleSheet(GitQlientStyles::getStyles());
+               msgBox.exec();
             }
          }
       }

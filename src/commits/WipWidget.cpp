@@ -55,7 +55,8 @@ void WipWidget::commitChanges()
    {
       if (hasConflicts())
          QMessageBox::warning(this, tr("Impossible to commit"),
-                              tr("There are files with conflicts. Please, resolve the conflicts first."));
+                              tr("There are files with conflicts. Please, resolve "
+                                 "the conflicts first."));
       else if (checkMsg(msg))
       {
          const auto revInfo = mCache->commitInfo(CommitInfo::ZERO_SHA);
@@ -69,6 +70,7 @@ void WipWidget::commitChanges()
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
             const auto ret = gitLocal->commitFiles(selFiles, files.value(), msg);
+            QApplication::restoreOverrideCursor();
 
             if (ret.success)
             {
@@ -114,8 +116,18 @@ void WipWidget::commitChanges()
                emit mCache->signalCacheUpdated();
                emit changesCommitted();
             }
+            else
+            {
+               QMessageBox msgBox(QMessageBox::Critical, tr("Error when commiting"),
+                                  tr("There were problems during the commit "
+                                     "operation. Please, see the detailed "
+                                     "description for more information."),
+                                  QMessageBox::Ok, this);
+               msgBox.setDetailedText(ret.output);
+               msgBox.setStyleSheet(GitQlientStyles::getStyles());
+               msgBox.exec();
+            }
 
-            QApplication::restoreOverrideCursor();
             lastMsgBeforeError = (ret.success ? "" : msg);
          }
       }
