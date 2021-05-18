@@ -31,5 +31,5 @@ class GitCredentials
 {
 public:
    static void configureStorage(const QString &user, const QString &password, const QSharedPointer<GitBase> &gitBase);
-   static void configureCache(u_int64_t timout, const QSharedPointer<GitBase> &gitBase);
+   static void configureCache(uint64_t timout, const QSharedPointer<GitBase> &gitBase);
 };
