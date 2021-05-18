@@ -570,7 +570,7 @@ void HistoryWidget::cherryPickCommit()
       if (ret.success)
       {
          mSearchInput->clear();
-         emit fullReload();
+         emit logReload();
       }
       else
       {
