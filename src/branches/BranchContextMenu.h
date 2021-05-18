@@ -54,6 +54,7 @@ class BranchContextMenu : public QMenu
 
 signals:
    void fullReload();
+   void logReload();
 
    /*!
     \brief Signal triggered when a branch has been checked out.

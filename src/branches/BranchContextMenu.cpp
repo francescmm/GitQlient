@@ -222,6 +222,7 @@ void BranchContextMenu::deleteBranch()
          {
             mConfig.mCache->deleteReference(sha, type, mConfig.branchSelected);
             emit mConfig.mCache->signalCacheUpdated();
+            emit logReload();
          }
          else
             QMessageBox::critical(
