@@ -4,6 +4,7 @@
 #include <BranchContextMenu.h>
 #include <GitBase.h>
 #include <GitBranches.h>
+#include <GitCache.h>
 #include <GitQlientBranchItemRole.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
@@ -96,11 +97,15 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
       else if (item->data(0, IsRoot).toBool())
       {
          const auto menu = new QMenu(this);
-         const auto addRemote = menu->addAction(tr("Remove remote"));
-         connect(addRemote, &QAction::triggered, this, [this, item]() {
+         const auto removeRemote = menu->addAction(tr("Remove remote"));
+         connect(removeRemote, &QAction::triggered, this, [this, item]() {
             QScopedPointer<GitRemote> git(new GitRemote(mGit));
             if (const auto ret = git->removeRemote(item->text(0)); ret.success)
-               emit fullReload();
+            {
+               mCache->deleteReference(item->data(0, ShaRole).toString(), References::Type::RemoteBranches,
+                                       item->text(0));
+               emit logReload();
+            }
          });
 
          menu->exec(viewport()->mapToGlobal(pos));

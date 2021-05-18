@@ -132,6 +132,7 @@ void BranchContextMenu::push()
          mConfig.mCache->insertReference(sha, References::Type::RemoteBranches,
                                          QString("%1/%2").arg(remote.output, mConfig.branchSelected));
          emit mConfig.mCache->signalCacheUpdated();
+         emit logReload();
       }
    }
    else
