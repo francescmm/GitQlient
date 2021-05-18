@@ -499,6 +499,7 @@ void CommitChangesWidget::clear()
 void CommitChangesWidget::clearStaged()
 {
    ui->stagedFilesList->clear();
+   mInternalCache.clear();
    ui->applyActionBtn->setEnabled(false);
 }
 
