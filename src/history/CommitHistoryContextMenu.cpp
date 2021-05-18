@@ -8,6 +8,7 @@
 #include <GitBranches.h>
 #include <GitCache.h>
 #include <GitConfig.h>
+#include <GitHistory.h>
 #include <GitHubRestApi.h>
 #include <GitLocal.h>
 #include <GitPatches.h>
@@ -372,13 +373,29 @@ void CommitHistoryContextMenu::cherryPickCommit()
    auto shas = mShas;
    for (const auto &sha : qAsConst(mShas))
    {
+      const auto lastShaBeforeCommit = mGit->getLastCommit().output.trimmed();
       QScopedPointer<GitLocal> git(new GitLocal(mGit));
       const auto ret = git->cherryPickCommit(sha);
 
       shas.takeFirst();
 
       if (ret.success && shas.isEmpty())
+      {
+         auto commit = mCache->commitInfo(sha);
+         commit.sha = mGit->getLastCommit().output.trimmed();
+
+         mCache->insertCommit(commit);
+         mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
+         mCache->insertReference(commit.sha, References::Type::LocalBranch, mGit->getCurrentBranch());
+
+         QScopedPointer<GitHistory> gitHistory(new GitHistory(mGit));
+         const auto ret = gitHistory->getDiffFiles(commit.sha, lastShaBeforeCommit);
+
+         mCache->insertRevisionFiles(commit.sha, lastShaBeforeCommit, RevisionFiles(ret.output));
+
+         emit mCache->signalCacheUpdated();
          emit logReload();
+      }
       else if (!ret.success)
       {
          const auto errorMsg = ret.output;

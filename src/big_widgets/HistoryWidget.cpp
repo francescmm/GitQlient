@@ -562,14 +562,28 @@ void HistoryWidget::returnToView()
 
 void HistoryWidget::cherryPickCommit()
 {
-   if (const auto commit = mCache->commitInfo(mSearchInput->text()); commit.isValid())
+   if (auto commit = mCache->commitInfo(mSearchInput->text()); commit.isValid())
    {
+      const auto lastShaBeforeCommit = mGit->getLastCommit().output.trimmed();
       const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
       const auto ret = git->cherryPickCommit(commit.sha);
 
       if (ret.success)
       {
          mSearchInput->clear();
+
+         commit.sha = mGit->getLastCommit().output.trimmed();
+
+         mCache->insertCommit(commit);
+         mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
+         mCache->insertReference(commit.sha, References::Type::LocalBranch, mGit->getCurrentBranch());
+
+         QScopedPointer<GitHistory> gitHistory(new GitHistory(mGit));
+         const auto ret = gitHistory->getDiffFiles(commit.sha, lastShaBeforeCommit);
+
+         mCache->insertRevisionFiles(commit.sha, lastShaBeforeCommit, RevisionFiles(ret.output));
+
+         emit mCache->signalCacheUpdated();
          emit logReload();
       }
       else
