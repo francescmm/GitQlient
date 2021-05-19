@@ -239,22 +239,22 @@ QScrollBar:horizontal
 QScrollBar::handle:vertical, QScrollBar::handle:horizontal
 {
     border-color: #202122;
-    background: #2E2F30;
+    background: #A6A6A7;
 }
 
 QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover
 {
-    background: #404142;
+    background: #808182;
 }
 
 QScrollBar::handle:vertical:pressed, QScrollBar::handle:horizontal:pressed
 {
-    background: #303132;
+    background: #606162;
 }
 
 QScrollBar::add-page, QScrollBar::sub-page
 {
-    background: #606162;
+    background: #E6E6E7;
 }
 
 QProgressDialog
