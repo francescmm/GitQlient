@@ -946,6 +946,9 @@ void BranchesWidget::onSubtreesHeaderClicked()
    mSubtreeArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mSubtreeList->setVisible(!subtreesAreVisible);
 
+   GitQlientSettings settings(mGit->getGitDir());
+   settings.setLocalValue("SubtreeHeader", !subtreesAreVisible);
+
    emit panelsVisibilityChanged();
 }
 
