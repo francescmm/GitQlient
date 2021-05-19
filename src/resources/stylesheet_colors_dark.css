@@ -286,6 +286,11 @@ QProgressBar::chunk
     background-color: #D89000;
 }
 
+QSplitter::handle
+{
+   background: #404142;
+}
+
 /*********************************************/
 /*                QWidgets END               */
 /*********************************************/
