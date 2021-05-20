@@ -18,7 +18,7 @@ jobs:
         run: bash ci-scripts/linux/5.15.2/install.sh
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2.2.0
+        uses: jurplel/install-qt-action@v2.13.2
         env:
             ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         timeout-minutes: 10
@@ -27,7 +27,7 @@ jobs:
           target: desktop
           host: linux
           install-deps: true
-          modules: qtwebengine
+          modules: 'qtwebengine'
 
       - name: Building GitQlient
         run: |
