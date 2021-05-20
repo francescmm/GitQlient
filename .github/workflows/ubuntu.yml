@@ -11,11 +11,11 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Install dependencies
-        run: bash ci-scripts/linux/5.15.2/install.sh
-        
       - name: Checking out the code
         uses: actions/checkout@v2
-        
+
+      - name: Install dependencies
+        run: bash ci-scripts/linux/5.15.2/install.sh
+                
       - name: Building GitQlient
         run: bash ci-scripts/linux/5.15.2/build.sh
