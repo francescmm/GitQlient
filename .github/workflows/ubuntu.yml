@@ -28,9 +28,9 @@ jobs:
           host: linux
           install-deps: true
           modules: qtwebengine
-                
+
       - name: Building GitQlient
-        run:
+        run: |
           qmake -v
           export QT_PLUGIN_PATH=/home/runner/work/GitQlient/Qt/5.12.5/gcc_64/plugins;
           mkdir build
