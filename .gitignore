@@ -15,6 +15,7 @@ release/
 /ui_*.h
 
 /.*
+!/.github
 !/.clang-format
 !/.gitignore
 !/.gitmodules

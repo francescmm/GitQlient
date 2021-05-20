@@ -1,0 +1,21 @@
+name: Linux (Ubuntu 18.04)
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-18.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Install dependencies
+        run: bash ci-scripts/linux/5.15.2/install.sh
+        
+      - name: Checking out the code
+        uses: actions/checkout@v2
+        
+      - name: Building GitQlient
+        run: bash ci-scripts/linux/5.15.2/build.sh
