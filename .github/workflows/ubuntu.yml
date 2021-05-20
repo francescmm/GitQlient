@@ -16,6 +16,16 @@ jobs:
 
       - name: Install dependencies
         run: bash ci-scripts/linux/5.15.2/install.sh
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2.2.0
+        timeout-minutes: 10
+        with:
+          version: 5.12.5
+          target: desktop
+          host: linux
+          install-deps: true
+          modules: qtwebengine
                 
       - name: Building GitQlient
         run: bash ci-scripts/linux/5.15.2/build.sh
