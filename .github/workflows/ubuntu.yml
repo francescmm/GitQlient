@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     # The type of runner that the job will run on
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -43,7 +43,7 @@ jobs:
           qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr
           make -j 4
           make install
-          wget -q -O linuxdeployqt https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
+          wget -q -O linuxdeployqt https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
           chmod +x linuxdeployqt
           ./linuxdeployqt AppImage/gitqlient/usr/share/applications/*.desktop -appimage -no-translations -bundle-non-qt-libs -extra-plugins=iconengines,imageformats
           chmod +x GitQlient-*
