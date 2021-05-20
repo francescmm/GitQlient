@@ -15,7 +15,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: bash ci-scripts/linux/5.15.2/install.sh
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install libgl1-mesa-dev libxkbcommon-x11-0 libc6-i386 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxkbcommon-x11-0 libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-*
+          sudo apt-get -qq remove gcc g++
+          sudo apt-get install -y -qq gcc-9 g++-9
+          sudo ln -s /usr/bin/g++-9 /usr/bin/g++
+          sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v2.13.2
