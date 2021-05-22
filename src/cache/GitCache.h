@@ -61,6 +61,7 @@ public:
    bool isCommitInCurrentGeneologyTree(const QString &sha);
    bool updateWipCommit(const WipRevisionInfo &wipInfo);
    void insertCommit(CommitInfo commit);
+   void updateCommit(const QString &oldSha, CommitInfo newCommit);
 
    bool insertRevisionFiles(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    std::optional<RevisionFiles> revisionFile(const QString &sha1, const QString &sha2) const;

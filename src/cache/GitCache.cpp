@@ -346,6 +346,40 @@ void GitCache::insertCommit(CommitInfo commit)
    mCommits.insert(1, &mCommitsMap[sha]);
 }
 
+void GitCache::updateCommit(const QString &oldSha, CommitInfo newCommit)
+{
+   QMutexLocker lock(&mCommitsMutex);
+   QMutexLocker lock2(&mRevisionsMutex);
+
+   auto &oldCommit = mCommitsMap[oldSha];
+   const auto oldCommitParens = oldCommit.parents();
+   const auto newCommitSha = newCommit.sha;
+
+   mCommitsMap.remove(oldSha);
+   mCommitsMap.insert(newCommitSha, std::move(newCommit));
+   mCommits[1] = &mCommitsMap[newCommitSha];
+
+   for (const auto &parent : oldCommitParens)
+   {
+      mCommitsMap[parent].removeChild(&oldCommit);
+      mCommitsMap[parent].appendChild(&mCommitsMap[newCommitSha]);
+   }
+
+   const auto tags = getReferences(oldSha, References::Type::LocalTag);
+   for (const auto &tag : tags)
+   {
+      insertReference(newCommitSha, References::Type::LocalTag, tag);
+      deleteReference(oldSha, References::Type::LocalTag, tag);
+   }
+
+   const auto localBranches = getReferences(oldSha, References::Type::LocalBranch);
+   for (const auto &branch : localBranches)
+   {
+      insertReference(newCommitSha, References::Type::LocalBranch, branch);
+      deleteReference(oldSha, References::Type::LocalBranch, branch);
+   }
+}
+
 void GitCache::calculateLanes(CommitInfo &c)
 {
    const auto sha = c.sha;

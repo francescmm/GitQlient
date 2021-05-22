@@ -97,7 +97,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          if (auto ret = git->getLastCommitOfBranch(mGit->getCurrentBranch()); ret.success)
          {
-            const auto lastShaStr = ret.output.remove('\n');
+            const auto lastShaStr = ret.output.trimmed();
 
             if (lastShaStr == sha)
             {

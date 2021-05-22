@@ -1,6 +1,7 @@
 #include <AmendWidget.h>
 #include <ui_CommitChangesWidget.h>
 
+#include <GitBase.h>
 #include <GitCache.h>
 #include <GitHistory.h>
 #include <GitLocal.h>
@@ -122,7 +123,13 @@ void AmendWidget::commitChanges()
 
             if (ret.success)
             {
-               const auto commit = mCache->commitInfo(mCurrentSha);
+               const auto newSha = mGit->getLastCommit().output.trimmed();
+               auto commit = mCache->commitInfo(mCurrentSha);
+               const auto oldSha = commit.sha;
+               commit.sha = newSha;
+
+               mCache->updateCommit(oldSha, std::move(commit));
+
                QScopedPointer<GitHistory> git(new GitHistory(mGit));
                const auto ret = git->getDiffFiles(mCurrentSha, commit.firstParent());
 
