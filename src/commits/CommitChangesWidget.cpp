@@ -188,6 +188,7 @@ void CommitChangesWidget::prepareCache()
 
 void CommitChangesWidget::clearCache()
 {
+
    for (auto it = mInternalCache.begin(); it != mInternalCache.end();)
    {
       if (!it.value().keep)
@@ -204,7 +205,7 @@ void CommitChangesWidget::clearCache()
 
 void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *fileList)
 {
-   for (auto &cachedItem : mInternalCache)
+   for (auto &cachedItem : mInternalCache) // Move to prepareCache
       cachedItem.keep = false;
 
    for (auto i = 0; i < files.count(); ++i)
@@ -499,7 +500,16 @@ void CommitChangesWidget::clear()
 void CommitChangesWidget::clearStaged()
 {
    ui->stagedFilesList->clear();
-   mInternalCache.clear();
+
+   const auto end = mInternalCache.end();
+   for (auto it = mInternalCache.begin(); it != end;)
+   {
+      if (it.key().contains(QString("-%1").arg(ui->stagedFilesList->objectName())))
+         it = mInternalCache.erase(it);
+      else
+         ++it;
+   }
+
    ui->applyActionBtn->setEnabled(false);
 }
 
