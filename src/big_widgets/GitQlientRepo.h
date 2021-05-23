@@ -32,7 +32,6 @@ class GitQlientSettings;
 class GitCache;
 class GitRepoLoader;
 class QCloseEvent;
-class QFileSystemWatcher;
 class QStackedLayout;
 class Controls;
 class HistoryWidget;
@@ -165,7 +164,6 @@ private:
    QTimer *mAutoFilesUpdate = nullptr;
    QTimer *mAutoPrUpdater = nullptr;
    QPointer<WaitingDlg> mWaitDlg;
-   QFileSystemWatcher *mGitWatcher = nullptr;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
    QSharedPointer<GitServer::IRestApi> mApi;
    QSharedPointer<GitTags> mGitTags;
@@ -195,11 +193,6 @@ private:
     \param ok True if the changes are committed, otherwise false.
    */
    void onChangesCommitted();
-   /*!
-    \brief Method that sets the watcher for the files in the system.
-
-   */
-   void setWatcher();
    /*!
     \brief Clears the views and its subwidgets.
 

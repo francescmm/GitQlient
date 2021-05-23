@@ -46,8 +46,7 @@ public:
 
    ~WipWidget() = default;
 
-   void configure(const QString &sha) override;
-
 private:
+   void configure(const QString &sha) override;
    void commitChanges() override;
 };

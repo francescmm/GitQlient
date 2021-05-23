@@ -32,7 +32,6 @@
 #include <QApplication>
 #include <QDirIterator>
 #include <QFileDialog>
-#include <QFileSystemWatcher>
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QStackedLayout>
@@ -137,7 +136,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mHistoryWidget, &HistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
    connect(mHistoryWidget, &HistoryWidget::signalShowDiff, this, &GitQlientRepo::loadFileDiff);
    connect(mHistoryWidget, &HistoryWidget::changesCommitted, this, &GitQlientRepo::onChangesCommitted);
-   connect(mHistoryWidget, &HistoryWidget::signalUpdateUi, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mHistoryWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, mControls, &Controls::activateMergeWarning);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, this, &GitQlientRepo::showWarningMerge);
@@ -187,7 +185,6 @@ GitQlientRepo::~GitQlientRepo()
 {
    delete mAutoFetch;
    delete mAutoFilesUpdate;
-   delete mGitWatcher;
 
    m_loaderThread->exit();
    m_loaderThread->wait();
@@ -233,19 +230,6 @@ void GitQlientRepo::setRepository(const QString &newDir)
       clearWindow();
       setWidgetsEnabled(false);
    }
-}
-
-void GitQlientRepo::setWatcher()
-{
-   mGitWatcher = new QFileSystemWatcher(this);
-   connect(mGitWatcher, &QFileSystemWatcher::fileChanged, this, [this](const QString &path) {
-      if (!path.endsWith(".autosave") && !path.endsWith(".tmp") && !path.endsWith(".user"))
-         updateUiFromWatcher();
-   });
-
-   QLog_Info("UI", QString("Setting the file watcher for dir {%1}").arg(mCurrentDir));
-
-   mGitWatcher->addPath(mCurrentDir);
 }
 
 void GitQlientRepo::clearWindow()
@@ -298,8 +282,6 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
 
       setWidgetsEnabled(true);
 
-      setWatcher();
-
       mBlameWidget->init(mCurrentDir);
 
       mControls->enableButtons(true);
@@ -325,7 +307,7 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
    const auto totalCommits = mGitQlientCache->commitCount();
 
    mHistoryWidget->loadBranches(fullReload);
-   mHistoryWidget->onNewRevisions(totalCommits);
+   mHistoryWidget->updateGraphView(totalCommits);
 
    mBlameWidget->onNewRevisions(totalCommits);
 
@@ -582,7 +564,7 @@ void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
 
 void GitQlientRepo::onChangesCommitted()
 {
-   mHistoryWidget->onCommitSelected(CommitInfo::ZERO_SHA);
+   mHistoryWidget->selectCommit(CommitInfo::ZERO_SHA);
    mHistoryWidget->loadBranches(false);
    showHistoryView();
 }

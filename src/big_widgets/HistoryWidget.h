@@ -32,8 +32,7 @@ class CommitHistoryView;
 class QLineEdit;
 class BranchesWidget;
 class QStackedWidget;
-class WipWidget;
-class AmendWidget;
+class CommitChangesWidget;
 class CommitInfoWidget;
 class CheckBox;
 class RepositoryViewDelegate;
@@ -72,11 +71,6 @@ signals:
 
    void logReload();
 
-   /*!
-    \brief Signal triggered when GitQlientRepo needs to update the UI for the current repo.
-
-   */
-   void signalUpdateUi();
    /*!
     \brief Signal triggered when the user wants to see the diff of the selected SHA compared to its first parent.
 
@@ -202,30 +196,14 @@ public:
 
     \param goToSha The SHA to show.
    */
-   void onCommitSelected(const QString &goToSha);
-   /*!
-    \brief Opens the AmendWidget.
+   void selectCommit(const QString &goToSha);
 
-    \param sha The commit SHA to amend.
-   */
-   void onAmendCommit(const QString &sha);
-   /*!
-    \brief Gets the current SHA.
-
-    \return QString The current SHA.
-   */
-   QString getCurrentSha() const;
    /*!
     \brief Reloads the history model of the repository graph view when it finishes the loading process.
 
     \param totalCommits The new total of commits to show in the graph.
    */
-   void onNewRevisions(int totalCommits);
-
-   /**
-    * @brief updateConfig Updates the informative panel.
-    */
-   void updateConfig();
+   void updateGraphView(int totalCommits);
 
    /**
     * @brief onCommitTitleMaxLenghtChanged Changes the maximum length of the commit title.
@@ -259,8 +237,8 @@ private:
    QLineEdit *mSearchInput = nullptr;
    QStackedWidget *mCommitStackedWidget = nullptr;
    QStackedWidget *mCenterStackedWidget = nullptr;
-   WipWidget *mWipWidget = nullptr;
-   AmendWidget *mAmendWidget = nullptr;
+   CommitChangesWidget *mWipWidget = nullptr;
+   CommitChangesWidget *mAmendWidget = nullptr;
    CommitInfoWidget *mCommitInfoWidget = nullptr;
    CheckBox *mChShowAllBranches = nullptr;
    RepositoryViewDelegate *mItemDelegate = nullptr;
@@ -298,11 +276,14 @@ private:
     \param showAll True to show all branches, false to show only the current branch.
    */
    void onShowAllUpdated(bool showAll);
-   /*!
-    \brief Updates the visible widgets when a different branch to the former one is checked out.
 
+   /*!
+    \brief Opens the AmendWidget.
+
+    \param sha The commit SHA to amend.
    */
-   void onBranchCheckout();
+   void onAmendCommit(const QString &sha);
+
    /*!
     \brief Tries to perform the git merge operation from \p branchToMerge into the \p current. If there are conflicts
     the GitQlientRepo class is notified to take actions.
@@ -353,9 +334,11 @@ private:
     * @param sha The base commit SHA.
     * @param parentSha The commit SHA to compare with.
     */
-   void showFullDiff();
+   void onOpenFullDiff(const QString &sha);
 
    void rearrangeSplittrer(bool minimalActive);
 
    void cleanCommitPanels();
+
+   void onRevertedChanges();
 };
