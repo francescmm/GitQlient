@@ -1,9 +1,8 @@
 export QTDIR="/opt/qt512"
 export PATH="$QTDIR/bin:$PATH"
 source /opt/qt512/bin/qt512-env.sh
-qmake -v
 mkdir build
-$QTDIR/bin/qmake GitQlient.pro
+$QTDIR/bin/qmake GitQlient.pro QMAKE_CXXFLAGS+=-Werror
 make -j 4
 make install
 echo "Version: ${VERSION}" >> deb_pkg/DEBIAN/control
