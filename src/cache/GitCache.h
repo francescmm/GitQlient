@@ -78,9 +78,9 @@ public:
    bool pendingLocalChanges();
 
    QVector<QPair<QString, QStringList>> getBranches(References::Type type);
-   QHash<QString, QString> getTags(References::Type tagType) const;
+   QMap<QString, QString> getTags(References::Type tagType) const;
 
-   void updateTags(QHash<QString, QString> remoteTags);
+   void updateTags(QMap<QString, QString> remoteTags);
 
    bool isInitialized() const { return mInitialized; }
 
@@ -101,9 +101,6 @@ private:
 
    mutable QMutex mReferencesMutex;
    QHash<QString, References> mReferences;
-
-   mutable QMutex mTagsMutex;
-   QHash<QString, QString> mRemoteTags;
 
    void setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits);
    void setConfigurationDone() { mConfigured = true; }

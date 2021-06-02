@@ -610,7 +610,7 @@ void BranchesWidget::processTags()
    mTagsTree->clear();
 
    const auto localTags = mCache->getTags(References::Type::LocalTag);
-   const auto remoteTags = mCache->getTags(References::Type::RemoteTag);
+   auto remoteTags = mCache->getTags(References::Type::RemoteTag);
 
    for (auto iter = localTags.cbegin(); iter != localTags.cend(); ++iter)
    {
@@ -624,9 +624,7 @@ void BranchesWidget::processTags()
          QTreeWidgetItem *child = nullptr;
 
          if (parent)
-         {
             child = getChild(parent, folder);
-         }
          else
          {
             for (auto i = 0; i < mTagsTree->topLevelItemCount(); ++i)
@@ -652,16 +650,68 @@ void BranchesWidget::processTags()
 
       const auto item = new QTreeWidgetItem(parent);
 
-      if (!remoteTags.contains(tagName))
+      if (!remoteTags.contains(fullTagName))
       {
          tagName += " (local)";
          item->setData(0, LocalBranchRole, false);
       }
       else
+      {
          item->setData(0, LocalBranchRole, true);
+         remoteTags.remove(fullTagName);
+      }
 
       QLog_Trace("UI", QString("Adding tag {%1}").arg(tagName));
 
+      item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
+      item->setText(0, tagName);
+      item->setData(0, GitQlient::FullNameRole, fullTagName);
+      item->setData(0, GitQlient::ShaRole, iter.value());
+      item->setData(0, Qt::ToolTipRole, fullTagName);
+      item->setData(0, GitQlient::IsLeaf, true);
+
+      mTagsTree->addTopLevelItem(item);
+   }
+
+   for (auto iter = remoteTags.cbegin(); iter != remoteTags.cend(); ++iter)
+   {
+      QTreeWidgetItem *parent = nullptr;
+      auto fullTagName = iter.key();
+      auto folders = fullTagName.split("/");
+      auto tagName = folders.takeLast();
+
+      for (const auto &folder : qAsConst(folders))
+      {
+         QTreeWidgetItem *child = nullptr;
+
+         if (parent)
+            child = getChild(parent, folder);
+         else
+         {
+            for (auto i = 0; i < mTagsTree->topLevelItemCount(); ++i)
+            {
+               if (mTagsTree->topLevelItem(i)->text(0) == folder)
+                  child = mTagsTree->topLevelItem(i);
+            }
+         }
+
+         if (!child)
+         {
+            const auto item = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem();
+            item->setText(0, folder);
+
+            if (!parent)
+               mTagsTree->addTopLevelItem(item);
+
+            parent = item;
+         }
+         else
+            parent = child;
+      }
+
+      QLog_Trace("UI", QString("Adding tag {%1}").arg(tagName));
+
+      const auto item = new QTreeWidgetItem(parent);
       item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
       item->setText(0, tagName);
       item->setData(0, GitQlient::FullNameRole, fullTagName);

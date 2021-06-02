@@ -108,7 +108,7 @@ GitExecResult GitTags::getTagCommit(const QString &tagName)
 
 void GitTags::onRemoteTagsRecieved(GitExecResult result)
 {
-   QHash<QString, QString> tags;
+   QMap<QString, QString> tags;
 
    if (result.success)
    {
@@ -116,12 +116,16 @@ void GitTags::onRemoteTagsRecieved(GitExecResult result)
 
       for (const auto &tag : tagsTmp)
       {
-         if (tag != "\n" && !tag.isEmpty() && tag.contains("^{}"))
+         if (tag != "\n" && !tag.isEmpty())
          {
+            const auto isDereferenced = tag.contains("^{}");
             const auto sha = tag.split('\t').constFirst();
             const auto tagName = tag.split('\t').last().remove("refs/tags/").remove("^{}");
 
-            tags.insert(tagName, sha);
+            if (isDereferenced)
+               tags[tagName] = sha;
+            else if (!tags.contains(tagName))
+               tags[tagName] = sha;
          }
       }
    }

@@ -10,7 +10,6 @@ GitCache::GitCache(QObject *parent)
    , mCommitsMutex(QMutex::Recursive)
    , mRevisionsMutex(QMutex::Recursive)
    , mReferencesMutex(QMutex::Recursive)
-   , mTagsMutex(QMutex::Recursive)
 {
 }
 
@@ -434,35 +433,29 @@ QVector<QPair<QString, QStringList>> GitCache::getBranches(References::Type type
    return branches;
 }
 
-QHash<QString, QString> GitCache::getTags(References::Type tagType) const
+QMap<QString, QString> GitCache::getTags(References::Type tagType) const
 {
-   QMutexLocker lock(&mTagsMutex);
+   QMutexLocker lock(&mReferencesMutex);
 
-   decltype(mRemoteTags) tags;
+   QMap<QString, QString> tags;
 
-   if (tagType == References::Type::LocalTag)
+   for (auto iter = mReferences.cbegin(); iter != mReferences.cend(); ++iter)
    {
-      for (auto iter = mReferences.cbegin(); iter != mReferences.cend(); ++iter)
-      {
-         const auto tagNames = iter->getReferences(tagType);
+      const auto tagNames = iter->getReferences(tagType);
 
-         for (const auto &tag : tagNames)
-            tags[tag] = iter.key();
-      }
+      for (const auto &tag : tagNames)
+         tags[tag] = iter.key();
    }
-   else
-      tags = mRemoteTags;
 
    return tags;
 }
 
-void GitCache::updateTags(QHash<QString, QString> remoteTags)
+void GitCache::updateTags(QMap<QString, QString> remoteTags)
 {
-   QMutexLocker lock(&mTagsMutex);
+   const auto end = remoteTags.cend();
 
-   mRemoteTags.clear();
-   mRemoteTags.squeeze();
-   mRemoteTags = std::move(remoteTags);
+   for (auto iter = remoteTags.cbegin(); iter != end; ++iter)
+      insertReference(iter.value(), References::Type::RemoteTag, iter.key());
 
    emit signalCacheUpdated();
 }
@@ -506,8 +499,6 @@ void GitCache::clearInternalData()
    mLanes.clear();
    mReferences.clear();
    mReferences.squeeze();
-   mRemoteTags.clear();
-   mRemoteTags.squeeze();
 }
 
 int GitCache::commitCount() const
