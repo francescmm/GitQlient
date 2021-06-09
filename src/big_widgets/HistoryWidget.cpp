@@ -579,6 +579,17 @@ void HistoryWidget::cherryPickCommit()
          }
       }
    }
+   else
+   {
+      const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
+      const auto ret = git->cherryPickCommit(commit.sha);
+
+      if (ret.success)
+      {
+         mSearchInput->clear();
+         emit logReload();
+      }
+   }
 }
 
 void HistoryWidget::showFileDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached)
