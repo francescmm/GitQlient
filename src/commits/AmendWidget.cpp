@@ -127,6 +127,12 @@ void AmendWidget::commitChanges()
                auto commit = mCache->commitInfo(mCurrentSha);
                const auto oldSha = commit.sha;
                commit.sha = newSha;
+               commit.committer = author;
+               commit.author = author;
+
+               const auto log = msg.split("\n\n");
+               commit.shortLog = log.constFirst();
+               commit.longLog = log.constLast();
 
                mCache->updateCommit(oldSha, std::move(commit));
 
