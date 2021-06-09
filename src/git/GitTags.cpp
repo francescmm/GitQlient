@@ -6,6 +6,16 @@
 
 using namespace QLogger;
 
+namespace
+{
+bool validateSha(const QString &sha)
+{
+   static QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
+
+   return !sha.isEmpty() && hexMatcher.exactMatch(sha);
+}
+}
+
 GitTags::GitTags(const QSharedPointer<GitBase> &gitBase)
    : mGitBase(gitBase)
 {
@@ -122,10 +132,13 @@ void GitTags::onRemoteTagsRecieved(GitExecResult result)
             const auto sha = tag.split('\t').constFirst();
             const auto tagName = tag.split('\t').last().remove("refs/tags/").remove("^{}");
 
-            if (isDereferenced)
-               tags[tagName] = sha;
-            else if (!tags.contains(tagName))
-               tags[tagName] = sha;
+            if (validateSha(sha))
+            {
+               if (isDereferenced)
+                  tags[tagName] = sha;
+               else if (!tags.contains(tagName))
+                  tags[tagName] = sha;
+            }
          }
       }
    }
