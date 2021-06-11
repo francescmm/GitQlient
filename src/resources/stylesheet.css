@@ -518,11 +518,17 @@ HistoryWidget CommitHistoryView
    border-style: solid;
 }
 
-HistoryWidget CommitHistoryView QHeaderView:section:first
+HistoryWidget CommitHistoryView QHeaderView:section
 {
    border-right-width: 1px;
    border-right-style: solid;
 }
+
+HistoryWidget CommitHistoryView QHeaderView:section:last
+{
+   border-right-width: 0;
+}
+
 
 DiffWidget FileListWidget
 {
