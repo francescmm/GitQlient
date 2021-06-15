@@ -582,7 +582,7 @@ void HistoryWidget::cherryPickCommit()
    else
    {
       const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
-      const auto ret = git->cherryPickCommit(commit.sha);
+      const auto ret = git->cherryPickCommit(mSearchInput->text());
 
       if (ret.success)
       {
