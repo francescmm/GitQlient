@@ -43,6 +43,7 @@ class CommitChangesWidget : public QWidget
    Q_OBJECT
 
 signals:
+   void logReload();
    void changeReverted(const QString &revertedFile);
    void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
    void changesCommitted();

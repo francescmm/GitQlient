@@ -121,6 +121,8 @@ void AmendWidget::commitChanges()
             const auto ret = gitLocal->ammendCommit(selFiles, files.value(), msg, author);
             QApplication::restoreOverrideCursor();
 
+            emit logReload();
+
             if (ret.success)
             {
                const auto newSha = mGit->getLastCommit().output.trimmed();

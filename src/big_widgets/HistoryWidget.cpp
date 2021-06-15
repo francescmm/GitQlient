@@ -105,6 +105,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
       }
    });
 
+   connect(mAmendWidget, &CommitChangesWidget::logReload, this, &HistoryWidget::logReload);
    connect(mAmendWidget, &CommitChangesWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
    connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::returnToView);
    connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
