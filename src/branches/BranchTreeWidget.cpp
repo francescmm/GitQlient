@@ -169,9 +169,9 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
                   oldItem.clear();
                   oldItem.squeeze();
                }
-
-               emit logReload();
             }
+
+            emit logReload();
          }
          else
          {
