@@ -60,7 +60,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    , mGitTags(new GitTags(mGit, mCache))
    , mLocalBranchesTree(new BranchTreeWidget(mCache, mGit))
    , mRemoteBranchesTree(new BranchTreeWidget(mCache, mGit))
-   , mTagsTree(new QTreeWidget())
+   , mTagsTree(new RefTreeWidget())
    , mStashesList(new QListWidget())
    , mStashesCount(new QLabel(tr("(0)")))
    , mStashesArrow(new QLabel())
@@ -213,7 +213,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    /* SUBTREE END */
 
    const auto searchBranch = new QLineEdit();
-   searchBranch->setPlaceholderText(tr("Prese ENTER to search a branch..."));
+   searchBranch->setPlaceholderText(tr("Prese ENTER to search a branch or tag..."));
    searchBranch->setObjectName("SearchInput");
    connect(searchBranch, &QLineEdit::returnPressed, this, &BranchesWidget::onSearchBranch);
 
@@ -1030,7 +1030,7 @@ void BranchesWidget::onSearchBranch()
    if (mLastSearch != text)
    {
       mLastSearch = text;
-      mLastIndex = mLocalBranchesTree->focusOnBranch(text);
+      mLastIndex = mLocalBranchesTree->focusOnBranch(mLastSearch);
       mLastTreeSearched = mLocalBranchesTree;
 
       if (mLastIndex == -1)
@@ -1039,7 +1039,13 @@ void BranchesWidget::onSearchBranch()
          mLastTreeSearched = mRemoteBranchesTree;
 
          if (mLastIndex == -1)
-            mLastTreeSearched = mLocalBranchesTree;
+         {
+            mLastIndex = mTagsTree->focusOnBranch(mLastSearch);
+            mLastTreeSearched = mTagsTree;
+
+            if (mLastIndex == -1)
+               mLastTreeSearched = mLocalBranchesTree;
+         }
       }
    }
    else
@@ -1057,11 +1063,31 @@ void BranchesWidget::onSearchBranch()
             mLastIndex = mRemoteBranchesTree->focusOnBranch(mLastSearch);
             mLastTreeSearched = mRemoteBranchesTree;
          }
+
+         if (mLastIndex == -1)
+         {
+            mLastIndex = mTagsTree->focusOnBranch(mLastSearch);
+            mLastTreeSearched = mTagsTree;
+         }
+      }
+      else if (mLastTreeSearched == mRemoteBranchesTree)
+      {
+         if (mLastIndex == -1)
+         {
+            mLastIndex = mRemoteBranchesTree->focusOnBranch(mLastSearch);
+            mLastTreeSearched = mRemoteBranchesTree;
+         }
+
+         if (mLastIndex == -1)
+         {
+            mLastIndex = mTagsTree->focusOnBranch(mLastSearch);
+            mLastTreeSearched = mTagsTree;
+         }
       }
       else if (mLastIndex != -1)
       {
-         mLastIndex = mRemoteBranchesTree->focusOnBranch(mLastSearch, mLastIndex);
-         mLastTreeSearched = mRemoteBranchesTree;
+         mLastIndex = mTagsTree->focusOnBranch(mLastSearch, mLastIndex);
+         mLastTreeSearched = mTagsTree;
 
          if (mLastIndex == -1)
             mLastTreeSearched = mLocalBranchesTree;

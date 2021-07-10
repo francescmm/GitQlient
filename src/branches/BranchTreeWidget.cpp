@@ -15,14 +15,65 @@
 
 using namespace GitQlient;
 
-BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                                   QWidget *parent)
+RefTreeWidget::RefTreeWidget(QWidget *parent)
    : QTreeWidget(parent)
-   , mCache(cache)
-   , mGit(git)
+
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
    setAttribute(Qt::WA_DeleteOnClose);
+}
+
+int RefTreeWidget::focusOnBranch(const QString &itemText, int startSearchPos)
+{
+   const auto items = findChildItem(itemText);
+
+   if (startSearchPos + 1 >= items.count())
+      return -1;
+
+   if (startSearchPos != -1)
+   {
+      auto itemToUnselect = items.at(startSearchPos);
+      itemToUnselect->setSelected(false);
+   }
+
+   ++startSearchPos;
+
+   auto itemToExpand = items.at(startSearchPos);
+   itemToExpand->setExpanded(true);
+   setCurrentItem(itemToExpand);
+   setCurrentIndex(indexFromItem(itemToExpand));
+
+   while (itemToExpand->parent())
+   {
+      itemToExpand->setExpanded(true);
+      itemToExpand = itemToExpand->parent();
+   }
+
+   itemToExpand->setExpanded(true);
+
+   return startSearchPos;
+}
+
+QVector<QTreeWidgetItem *> RefTreeWidget::findChildItem(const QString &text) const
+{
+   QModelIndexList indexes = model()->match(model()->index(0, 0, QModelIndex()), GitQlient::FullNameRole, text, -1,
+                                            Qt::MatchContains | Qt::MatchRecursive);
+   QVector<QTreeWidgetItem *> items;
+   const int indexesSize = indexes.size();
+   items.reserve(indexesSize);
+
+   for (int i = 0; i < indexesSize; ++i)
+      items.append(static_cast<QTreeWidgetItem *>(indexes.at(i).internalPointer()));
+
+   return items;
+}
+
+BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+                                   QWidget *parent)
+   : RefTreeWidget(parent)
+   , mCache(cache)
+   , mGit(git)
+{
 
    connect(this, &BranchTreeWidget::customContextMenuRequested, this, &BranchTreeWidget::showBranchesContextMenu);
    connect(this, &BranchTreeWidget::itemClicked, this, &BranchTreeWidget::selectCommit);
@@ -39,37 +90,6 @@ void BranchTreeWidget::reloadCurrentBranchLink() const
       items.at(0)->setData(0, GitQlient::ShaRole, mGit->getLastCommit().output.trimmed());
       items.at(0)->setData(0, GitQlient::IsCurrentBranchRole, true);
    }
-}
-
-int BranchTreeWidget::focusOnBranch(const QString &branch, int lastPos)
-{
-   const auto items = findChildItem(branch);
-
-   if (lastPos + 1 >= items.count())
-      return -1;
-
-   if (lastPos != -1)
-   {
-      auto itemToUnselect = items.at(lastPos);
-      itemToUnselect->setSelected(false);
-   }
-
-   ++lastPos;
-
-   auto itemToExpand = items.at(lastPos);
-   itemToExpand->setExpanded(true);
-   setCurrentItem(itemToExpand);
-   setCurrentIndex(indexFromItem(itemToExpand));
-
-   while (itemToExpand->parent())
-   {
-      itemToExpand->setExpanded(true);
-      itemToExpand = itemToExpand->parent();
-   }
-
-   itemToExpand->setExpanded(true);
-
-   return lastPos;
 }
 
 void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
@@ -199,16 +219,4 @@ void BranchTreeWidget::onSelectionChanged()
 
    if (!selection.isEmpty())
       selectCommit(selection.constFirst());
-}
-
-QVector<QTreeWidgetItem *> BranchTreeWidget::findChildItem(const QString &text) const
-{
-   QModelIndexList indexes = model()->match(model()->index(0, 0, QModelIndex()), GitQlient::FullNameRole, text, -1,
-                                            Qt::MatchContains | Qt::MatchRecursive);
-   QVector<QTreeWidgetItem *> items;
-   const int indexesSize = indexes.size();
-   items.reserve(indexesSize);
-   for (int i = 0; i < indexesSize; ++i)
-      items.append(static_cast<QTreeWidgetItem *>(indexes.at(i).internalPointer()));
-   return items;
 }

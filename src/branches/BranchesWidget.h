@@ -37,6 +37,7 @@ class BranchesWidgetMinimal;
 class BranchesViewDelegate;
 class QTreeWidget;
 class QTreeWidgetItem;
+class RefTreeWidget;
 
 /*!
  \brief BranchesWidget is the widget that creates the layout that contains all the widgets related with the display of
@@ -158,7 +159,7 @@ private:
    BranchTreeWidget *mRemoteBranchesTree = nullptr;
    BranchesViewDelegate *mRemotesDelegate = nullptr;
    BranchesViewDelegate *mTagsDelegate = nullptr;
-   QTreeWidget *mTagsTree = nullptr;
+   RefTreeWidget *mTagsTree = nullptr;
    QListWidget *mStashesList = nullptr;
    QLabel *mStashesCount = nullptr;
    QLabel *mStashesArrow = nullptr;
@@ -173,7 +174,7 @@ private:
    BranchesWidgetMinimal *mMinimal = nullptr;
    QString mLastSearch;
    int mLastIndex;
-   BranchTreeWidget *mLastTreeSearched = nullptr;
+   RefTreeWidget *mLastTreeSearched = nullptr;
 
    /**
     * @brief fullView Shows the full branches view.
