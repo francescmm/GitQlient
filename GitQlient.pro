@@ -1,10 +1,6 @@
 #General stuff
 CONFIG += qt warn_on c++17 c++1z
 
-greaterThan(QT_MINOR_VERSION, 12) {
-!msvc:QMAKE_CXXFLAGS += -Werror
-}
-
 TARGET = gitqlient
 QT += widgets core network webenginewidgets webchannel
 DEFINES += QT_DEPRECATED_WARNINGS
