@@ -22,6 +22,7 @@
 #define BUTTONLINK_H
 
 #include <QLabel>
+#include <QVariant>
 
 /**
  * @brief This class creates a clickable QLabel that emits a signal when it's clicked and another one with the data the
@@ -52,10 +53,22 @@ public:
     * it.
     *
     * @param text The text that the will be shown
-    * @param data The user data input
     * @param parent The parent widget
     */
    explicit ButtonLink(const QString &text, QWidget *parent = nullptr);
+
+   /**
+    * @brief Overload constructor of the ButtonLink class that creates a button link with text and data if the user sets
+    * it.
+    *
+    * @param text The text that the will be shown
+    * @param data The user data input
+    * @param parent The parent widget
+    */
+   explicit ButtonLink(const QString &text, const QVariant &data, QWidget *parent = nullptr);
+
+   void setData(const QVariant &data) { mData = data; }
+   QVariant data() const { return mData; }
 
 protected:
    /**
@@ -89,6 +102,7 @@ protected:
 
 private:
    bool mPressed = false;
+   QVariant mData;
 };
 
 #endif // BUTTONLINK_H

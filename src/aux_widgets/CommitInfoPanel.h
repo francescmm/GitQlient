@@ -28,6 +28,7 @@
 class CommitInfo;
 class QLabel;
 class QScrollArea;
+class ButtonLink;
 
 /**
  * @brief The CommitInfoPanel class represents the basic information of a commit. It's presented in the form of a simple
@@ -54,7 +55,7 @@ public:
    void clear();
 
 private:
-   QLabel *mLabelSha = nullptr;
+   ButtonLink *mLabelSha = nullptr;
    QLabel *mLabelTitle = nullptr;
    QLabel *mLabelDescription = nullptr;
    QScrollArea *mScrollArea = nullptr;

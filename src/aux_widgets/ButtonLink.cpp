@@ -1,17 +1,22 @@
 #include "ButtonLink.hpp"
-#include <QStyle>
 #include <QApplication>
+#include <QStyle>
 
 ButtonLink::ButtonLink(QWidget *parent)
    : QLabel(parent)
 {
-   setContentsMargins(0, 0, 0, 0);
 }
 
 ButtonLink::ButtonLink(const QString &text, QWidget *parent)
    : QLabel(text, parent)
 {
-   setContentsMargins(0, 0, 0, 0);
+}
+
+ButtonLink::ButtonLink(const QString &text, const QVariant &data, QWidget *parent)
+   : QLabel(text, parent)
+   , mData(data)
+{
+   setContentsMargins(QMargins());
 }
 
 void ButtonLink::mousePressEvent(QMouseEvent *e)
