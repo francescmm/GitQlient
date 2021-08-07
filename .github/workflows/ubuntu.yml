@@ -12,11 +12,11 @@ jobs:
     strategy:
       matrix:
         env:
-          - name: Linux 18.04
-            os: ubuntu-18.04
+          - name: Linux DEB package
+            os: ubuntu-20.04
             qtplatform: linux
             qtversion: 5.12.5
-          - name: Linux 20.04
+          - name: Linux AppImage
             os: ubuntu-18.04
             qtplatform: linux
             qtversion: 5.15.2
@@ -60,16 +60,9 @@ jobs:
           ./linuxdeployqt AppImage/gitqlient/usr/share/applications/*.desktop -appimage -no-translations -bundle-non-qt-libs -extra-plugins=iconengines,imageformats
           chmod +x GitQlient-*
           cp GitQlient-* ../
-          echo "Version: ${{env.VERSION}}" >> deb_pkg/DEBIAN/control
-          echo "Standards-Version: ${{env.VERSION}}" >> deb_pkg/DEBIAN/control
-          mkdir -p deb_pkg/usr/local/bin
-          cp gitqlient deb_pkg/usr/local/bin/
-          mv deb_pkg gitqlient_${{matrix.env.os}}_${{env.VERSION}}_amd64
-          fakeroot dpkg-deb -v --build gitqlient_${{matrix.env.os}}_${{env.VERSION}}_amd64
-          cp *.deb ../
 
       - name: Build GitQlient DEB package
-        if: matrix.env.name == 'Linux 18.04'
+        if: matrix.env.name == 'Linux DEB package'
         run: |
           mkdir build
           qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr
@@ -79,24 +72,22 @@ jobs:
           echo "Standards-Version: ${{env.VERSION}}" >> deb_pkg/DEBIAN/control
           mkdir -p deb_pkg/usr/local/bin
           cp gitqlient deb_pkg/usr/local/bin/
-          mv deb_pkg gitqlient_${{matrix.env.os}}_${{env.VERSION}}_amd64
-          fakeroot dpkg-deb -v --build gitqlient_${{matrix.env.os}}_${{env.VERSION}}_amd64
+          mv deb_pkg gitqlient_${{env.VERSION}}_amd64
+          fakeroot dpkg-deb -v --build gitqlient_${{env.VERSION}}_amd64
           cp *.deb ../
 
       - name: Uploading GitQlient AppImage
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/') && matrix.env.name == 'Linux 20.04'
+        if: startsWith(github.ref, 'refs/tags/') && matrix.env.name == 'Linux AppImage'
         with:
-          files: |
-            GitQlient-*
-            gitqlient*.deb
+          files: GitQlient-*
 
       - name: Uploading GitQlient DEB package
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/') && matrix.env.name == 'Linux 18.04'
+        if: startsWith(github.ref, 'refs/tags/') && matrix.env.name == 'Linux DEB package'
         with:
           files: gitqlient*.deb
