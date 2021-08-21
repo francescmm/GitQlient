@@ -13,9 +13,8 @@ jobs:
       matrix:
         env:
           - name: Linux DEB package
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             qtplatform: linux
-            qtversion: 5.12.5
           - name: Linux AppImage
             os: ubuntu-18.04
             qtplatform: linux
@@ -35,7 +34,13 @@ jobs:
           sudo ln -s /usr/bin/g++-9 /usr/bin/g++
           sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
 
-      - name: Install Qt
+      - name: Install Qt for DEB package
+        if: matrix.env.name == 'Linux DEB package'
+        run: |
+          sudo apt-get -qq install qt5-qmake qt5-default qtwebengine5-dev
+
+      - name: Install Qt for AppImage
+        if: matrix.env.name == 'Linux AppImage'
         uses: jurplel/install-qt-action@v2.13.2
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
