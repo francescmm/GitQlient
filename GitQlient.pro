@@ -5,7 +5,7 @@ TARGET = gitqlient
 QT += widgets core network webenginewidgets webchannel
 DEFINES += QT_DEPRECATED_WARNINGS
 
-unix {
+unix:!macos {
    QMAKE_LFLAGS += -no-pie
 
    isEmpty(PREFIX) {
@@ -74,22 +74,27 @@ DEFINES += \
    QT_USE_QSTRINGBUILDER
 
 macos{
+   QMAKE_INFO_PLIST=$$PWD/src/resources/Info.plist
+   CONFIG+=sdk_no_version_check
+   ICON = $$PWD/src/resources/icon.icns
+
    BUNDLE_FILENAME = $${TARGET}.app
    DMG_FILENAME = "GitQlient-$$(VERSION).dmg"
 #Target for pretty DMG generation
    dmg.commands += echo "Generate DMG";
-   dmg.commands += macdeployqt $$BUNDLE_FILENAME &&
-   dmg.commands += create-dmg \
-         --volname $${TARGET} \
-         --background $${PWD}/src/resources/dmg_bg.png \
-         --icon $${PWD}/src/resources/icons/GitQlientLogo128.png 150 218 \
-         --window-pos 200 120 \
-         --window-size 600 450 \
-         --icon-size 100 \
-         --hdiutil-quiet \
-         --app-drop-link 450 218 \
-         $${DMG_FILENAME} \
-         $${BUNDLE_FILENAME}
+   dmg.commands += rm -f *.dmg && macdeployqt $$BUNDLE_FILENAME &&
+   dmg.commands += /usr/local/bin/create-dmg \
+    --volname $${TARGET} \
+    --volicon "$${PWD}/src/resources/icon.icns" \
+    --background "$${PWD}/src/resources/dmg_bg.png" \
+    --icon "$${TARGET}.app" 125 220 \
+    --window-size 600 450 \
+    --icon-size 100 \
+    --hdiutil-quiet \
+    --hide-extension "gitqlient.app" \
+    --app-drop-link 475 220 \
+    ../$${DMG_FILENAME} \
+    $${BUNDLE_FILENAME}
 
    QMAKE_EXTRA_TARGETS += dmg
 }
