@@ -23,7 +23,7 @@ jobs:
       - name: Checking out the code
         uses: actions/checkout@v2
 
-      - name: Install Qt
+      - name: Installing Qt
         uses: jurplel/install-qt-action@v2.13.2
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
@@ -34,6 +34,12 @@ jobs:
           host: ${{ matrix.env.qtplatform }}
           install-deps: true
           modules: 'qtwebengine'
+
+      - name: Installing dependencies
+        run: |
+          brew install glew
+          brew install create-dmg
+          brew uninstall --force --ignore-dependencies java
 
       - name: Build GitQlient
         run: |
