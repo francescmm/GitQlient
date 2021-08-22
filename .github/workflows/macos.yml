@@ -1,0 +1,55 @@
+name: MacOS
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    runs-on: ${{ matrix.env.os }}
+    env:
+      VERSION: 1.4.0
+    strategy:
+      matrix:
+        env:
+          - name: MacOS
+            os: macos-11
+            qtplatform: mac
+            qtversion: 5.15.2
+            arch: darwin64-x86_64-cc
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checking out the code
+        uses: actions/checkout@v2
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2.13.2
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        timeout-minutes: 10
+        with:
+          version: ${{ matrix.env.qtversion }}
+          target: desktop
+          host: ${{ matrix.env.qtplatform }}
+          install-deps: true
+          modules: 'qtwebengine'
+
+      - name: Build GitQlient
+        run: |
+          mkdir build
+          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr CONFIG+=_LIBCPP_DISABLE_AVAILABILITY
+          make -j 4
+          make install
+
+      - name: Creating DMG
+        run:
+          make dmg
+
+      - name: Uploading GitQlient DMG
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: GitQlient-*
