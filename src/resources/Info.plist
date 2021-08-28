@@ -11,7 +11,7 @@
     <key>CFBundleIconFile</key>
     <string>icon.icns</string>
     <key>CFBundleIdentifier</key>
-    <string>com.francescmm.gitqlient</string>
+    <string>org.gitqlient.gitqlient</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleSignature</key>
