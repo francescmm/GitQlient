@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ${{ matrix.env.os }}
     env:
-      VERSION: 1.4.0
+      VERSION: 1.4.2
     strategy:
       matrix:
         env:
@@ -57,7 +57,7 @@ jobs:
         run: |
           qmake -v
           mkdir build
-          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr
+          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=${{env.VERSION}}
           make -j 4
           make install
           wget -q -O linuxdeployqt https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage

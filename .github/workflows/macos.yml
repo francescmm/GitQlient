@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ${{ matrix.env.os }}
     env:
-      VERSION: 1.4.0
+      VERSION: 1.4.2
     strategy:
       matrix:
         env:
@@ -44,7 +44,7 @@ jobs:
       - name: Build GitQlient
         run: |
           mkdir build
-          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr CONFIG+=_LIBCPP_DISABLE_AVAILABILITY
+          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
           make -j 4
           make install
 
