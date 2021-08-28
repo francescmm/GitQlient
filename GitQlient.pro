@@ -93,7 +93,7 @@ macos{
     --hdiutil-quiet \
     --hide-extension "gitqlient.app" \
     --app-drop-link 475 220 \
-    ../$${DMG_FILENAME} \
+    $${DMG_FILENAME} \
     $${BUNDLE_FILENAME}
 
    QMAKE_EXTRA_TARGETS += dmg
