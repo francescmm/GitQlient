@@ -75,9 +75,29 @@ jobs:
           make install
           echo "Version: ${{env.VERSION}}" >> deb_pkg/DEBIAN/control
           echo "Standards-Version: ${{env.VERSION}}" >> deb_pkg/DEBIAN/control
-          mkdir -p deb_pkg/usr/local/bin
-          cp gitqlient deb_pkg/usr/local/bin/
+          mkdir -p deb_pkg/usr/bin
+          cp gitqlient deb_pkg/usr/bin/
           mv deb_pkg gitqlient_${{env.VERSION}}_amd64
+          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/scalable/apps
+          cp ./src/resources/icons/GitQlientLogo.svg gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/scalable/apps/gitqlient.svg
+          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/16x16/apps/
+          cp ./src/resources/icons/GitQlientLogo16.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/16x16/apps/gitqlient.png
+          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/24x24/apps/
+          cp ./src/resources/icons/GitQlientLogo24.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/24x24/apps/gitqlient.png
+          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/32x32/apps/
+          cp ./src/resources/icons/GitQlientLogo32.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/32x32/apps/gitqlient.png
+          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/48x48/apps/
+          cp ./src/resources/icons/GitQlientLogo48.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/48x48/apps/gitqlient.png
+          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/64x64/apps/
+          cp ./src/resources/icons/GitQlientLogo64.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/64x64/apps/gitqlient.png
+          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/96x96/apps/
+          cp ./src/resources/icons/GitQlientLogo96.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/96x96/apps/gitqlient.png
+          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/128x128/apps/
+          cp ./src/resources/icons/GitQlientLogo128.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/128x128/apps/gitqlient.png
+          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/256x256/apps/
+          cp ./src/resources/icons/GitQlientLogo256.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/256x256/apps/gitqlient.png
+          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/512x512/apps/
+          cp ./src/resources/icons/GitQlientLogo512.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/512x512/apps/gitqlient.png
           fakeroot dpkg-deb -v --build gitqlient_${{env.VERSION}}_amd64
           cp *.deb ../
 

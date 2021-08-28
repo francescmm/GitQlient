@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
-Name=gitqlient
+Name=GitQlient
 GenericName=GitQlient
-Comment=Multi-platform Git client written with Qt
+Comment=GitQlient is a multi-platform Git client written with Qt
 Exec=gitqlient
 Icon=gitqlient
 Categories=Development;RevisionControl;Qt
