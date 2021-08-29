@@ -1,0 +1,49 @@
+name: Windows
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    runs-on: ${{ matrix.env.os }}
+    env:
+      VERSION: 1.4.2
+    strategy:
+      matrix:
+        env:
+          - name: Windows
+            os: windows-2019
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checking out the code
+        uses: actions/checkout@v2
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2.13.2
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        timeout-minutes: 10
+        with:
+          version: 5.15.2
+          target: desktop
+          host: windows
+          install-deps: true
+          modules: 'qtwebengine'
+          arch: win64_msvc2019_64
+
+      - name: Build GitQlient
+        run: |
+          qmake -v
+          mkdir build
+          qmake GitQlient.pro VERSION=${{env.VERSION}}
+          jom.exe
+
+      - name: Uploading GitQlient AppImage
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: GitQlient*.exe
