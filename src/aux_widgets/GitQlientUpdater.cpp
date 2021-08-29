@@ -3,16 +3,16 @@
 #include <GitQlientStyles.h>
 #include <QLogger.h>
 
-#include <QProgressDialog>
-#include <QTimer>
-#include <QStandardPaths>
 #include <QFile>
-#include <QMessageBox>
-#include <QNetworkRequest>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMessageBox>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QProgressDialog>
+#include <QStandardPaths>
+#include <QTimer>
 
 using namespace QLogger;
 
@@ -86,9 +86,13 @@ void GitQlientUpdater::processUpdateFile()
    QLog_Error("Ui", QString("Platform not supported for updates"));
 #endif
 
+   const auto curVersion = QString("%1").arg(VER).split(".");
+
+   if (curVersion.count() == 1)
+      return;
+
    const auto newVersion = mLatestGitQlient.split(".");
    const auto nv = newVersion.at(0).toInt() * 10000 + newVersion.at(1).toInt() * 100 + newVersion.at(2).toInt();
-   const auto curVersion = QString("%1").arg(VER).split(".");
    const auto cv = curVersion.at(0).toInt() * 10000 + curVersion.at(1).toInt() * 100 + curVersion.at(2).toInt();
 
    if (nv > cv)
