@@ -18,7 +18,7 @@ GitCache::~GitCache()
    clearInternalData();
 }
 
-void GitCache::setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits)
+void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVector<CommitInfo> commits)
 {
    QMutexLocker lock(&mCommitsMutex);
 
@@ -43,7 +43,7 @@ void GitCache::setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits
 
    QLog_Debug("Cache", QString("Adding WIP revision."));
 
-   insertWipRevision(wipInfo);
+   insertWipRevision(parentSha, files);
 
    QLog_Debug("Cache", QString("Adding committed revisions."));
 
@@ -185,15 +185,13 @@ void GitCache::clearReferences()
    mReferences.squeeze();
 }
 
-void GitCache::insertWipRevision(const WipRevisionInfo &wipInfo)
+void GitCache::insertWipRevision(const QString parentSha, const RevisionFiles &files)
 {
-   auto newParentSha = wipInfo.parentSha;
+   auto newParentSha = parentSha;
 
    QLog_Debug("Cache", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(newParentSha));
 
-   const auto fakeRevFile = fakeWorkDirRevFile(wipInfo.diffIndex, wipInfo.diffIndexCached);
-
-   insertRevisionFile(CommitInfo::ZERO_SHA, newParentSha, fakeRevFile);
+   insertRevisionFile(CommitInfo::ZERO_SHA, newParentSha, files);
 
    QStringList parents;
 
@@ -203,7 +201,7 @@ void GitCache::insertWipRevision(const WipRevisionInfo &wipInfo)
    if (mLanes.isEmpty())
       mLanes.init(CommitInfo::ZERO_SHA);
 
-   const auto log = fakeRevFile.count() == mUntrackedFiles.count() ? tr("No local changes") : tr("Local changes");
+   const auto log = files.count() == mUntrackedFiles.count() ? tr("No local changes") : tr("Local changes");
    CommitInfo c(CommitInfo::ZERO_SHA, parents, std::chrono::seconds(QDateTime::currentSecsSinceEpoch()), log);
    calculateLanes(c);
 
@@ -308,14 +306,14 @@ void GitCache::reloadCurrentBranchInfo(const QString &currentBranch, const QStri
    mReferences[currentSha].addReference(References::Type::LocalBranch, currentBranch);
 }
 
-bool GitCache::updateWipCommit(const WipRevisionInfo &wipInfo)
+bool GitCache::updateWipCommit(const QString &parentSha, const RevisionFiles &files)
 {
    QMutexLocker lock(&mRevisionsMutex);
    QMutexLocker lock2(&mCommitsMutex);
 
    if (mConfigured)
    {
-      insertWipRevision(wipInfo);
+      insertWipRevision(parentSha, files);
       return true;
    }
 
@@ -504,37 +502,6 @@ void GitCache::clearInternalData()
 int GitCache::commitCount() const
 {
    return mCommits.count();
-}
-
-RevisionFiles GitCache::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache)
-{
-   RevisionFiles rf(diffIndex);
-   rf.setOnlyModified(false);
-
-   for (const auto &it : qAsConst(mUntrackedFiles))
-   {
-      rf.mFiles.append(it);
-      rf.setStatus(RevisionFiles::UNKNOWN);
-      rf.mergeParent.append(1);
-   }
-
-   RevisionFiles cachedFiles(diffIndexCache, true);
-
-   for (auto i = 0; i < rf.count(); i++)
-   {
-      if (const auto cachedIndex = cachedFiles.mFiles.indexOf(rf.getFile(i)); cachedIndex != -1)
-      {
-         if (cachedFiles.statusCmp(cachedIndex, RevisionFiles::CONFLICT))
-            rf.appendStatus(i, RevisionFiles::CONFLICT);
-         else if (cachedFiles.statusCmp(cachedIndex, RevisionFiles::MODIFIED)
-                  && cachedFiles.statusCmp(cachedIndex, RevisionFiles::IN_INDEX))
-            rf.appendStatus(i, RevisionFiles::PARTIALLY_CACHED);
-         else if (cachedFiles.statusCmp(cachedIndex, RevisionFiles::IN_INDEX))
-            rf.appendStatus(i, RevisionFiles::IN_INDEX);
-      }
-   }
-
-   return rf;
 }
 
 void GitCache::setUntrackedFilesList(QVector<QString> untrackedFiles)

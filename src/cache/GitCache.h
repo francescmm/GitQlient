@@ -59,7 +59,7 @@ public:
    CommitInfo commitInfo(int row);
    CommitInfo searchCommitInfo(const QString &text, int startingPoint = 0, bool reverse = false);
    bool isCommitInCurrentGeneologyTree(const QString &sha);
-   bool updateWipCommit(const WipRevisionInfo &wipInfo);
+   bool updateWipCommit(const QString &parentSha, const RevisionFiles &files);
    void insertCommit(CommitInfo commit);
    void updateCommit(const QString &oldSha, CommitInfo newCommit);
 
@@ -74,6 +74,7 @@ public:
    QString getShaOfReference(const QString &referenceName, References::Type type) const;
    void reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha);
 
+   QVector<QString> getUntrackedFiles() const { return mUntrackedFiles; }
    void setUntrackedFilesList(QVector<QString> untrackedFiles);
    bool pendingLocalChanges();
 
@@ -102,12 +103,11 @@ private:
    mutable QMutex mReferencesMutex;
    QHash<QString, References> mReferences;
 
-   void setup(const WipRevisionInfo &wipInfo, QVector<CommitInfo> commits);
+   void setup(const QString &parentSha, const RevisionFiles &files, QVector<CommitInfo> commits);
    void setConfigurationDone() { mConfigured = true; }
 
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
-   void insertWipRevision(const WipRevisionInfo &wipInfo);
-   RevisionFiles fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache);
+   void insertWipRevision(const QString parentSha, const RevisionFiles &files);
    void calculateLanes(CommitInfo &c);
    auto searchCommit(const QString &text, int startingPoint = 0) const;
    auto reverseSearchCommit(const QString &text, int startingPoint = 0) const;

@@ -270,7 +270,9 @@ void GitRepoLoader::processRevisions(QByteArray ba)
    const auto files = git->getUntrackedFiles();
 
    mRevCache->setUntrackedFilesList(std::move(files));
-   mRevCache->setup(git->getWipInfo(), std::move(commits));
+   const auto info = git->getWipInfo().value();
+
+   mRevCache->setup(info.first, info.second, std::move(commits));
 
    --mSteps;
 

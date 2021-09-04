@@ -164,8 +164,10 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
    {
       const auto fileName = files.getFile(i);
       const auto fileInConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
+      const auto fileDeleted = fileInConflict ? files.statusCmp(i, RevisionFiles::DELETED) : false;
       const auto item = new QListWidgetItem(fileName);
       item->setData(Qt::UserRole, fileInConflict);
+      item->setData(Qt::UserRole + 1, fileDeleted);
 
       fileInConflict ? mConflictFiles->addItem(item) : mMergedFiles->addItem(item);
    }

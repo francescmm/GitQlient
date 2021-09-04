@@ -37,7 +37,7 @@ QVector<QString> GitWip::getUntrackedFiles() const
    return ret;
 }
 
-WipRevisionInfo GitWip::getWipInfo() const
+std::optional<QPair<QString, RevisionFiles>> GitWip::getWipInfo() const
 {
    QLog_Debug("Git", QString("Executing processWip."));
 
@@ -59,10 +59,38 @@ WipRevisionInfo GitWip::getWipInfo() const
       const auto ret4 = mGit->run(QString("git diff-index --cached %1").arg(parentSha));
       diffIndexCached = ret4.success ? ret4.output : QString();
 
-      return { parentSha, diffIndex, diffIndexCached };
+      auto files = fakeWorkDirRevFile(diffIndex, diffIndexCached);
+
+      return qMakePair(parentSha, std::move(files));
    }
 
-   return {};
+   return std::nullopt;
+}
+
+std::optional<GitWip::FileStatus> GitWip::getFileStatus(const QString &filePath) const
+{
+   QLog_Debug("Git", QString("Getting file status."));
+
+   const auto ret = mGit->run(QString("git diff-files -c %1").arg(filePath));
+
+   if (ret.success)
+   {
+      const auto lines = ret.output.split("\n", Qt::SkipEmptyParts);
+
+      if (lines.count() > 1)
+         return FileStatus::DeletedByThem;
+      else
+      {
+         const auto statusField = lines[0].split(" ").last().split("\t").constFirst();
+
+         if (statusField.count() == 2)
+            return FileStatus::BothModified;
+
+         return FileStatus::DeletedByUs;
+      }
+   }
+
+   return std::nullopt;
 }
 
 bool GitWip::updateWip() const
@@ -70,8 +98,55 @@ bool GitWip::updateWip() const
    const auto files = getUntrackedFiles();
    mCache->setUntrackedFilesList(std::move(files));
 
-   if (const auto wipInfo = getWipInfo(); wipInfo.isValid())
-      return mCache->updateWipCommit(wipInfo);
+   if (const auto info = getWipInfo())
+   {
+      return mCache->updateWipCommit(info->first, info->second);
+   }
 
    return false;
+}
+
+RevisionFiles GitWip::fakeWorkDirRevFile(const QString &diffIndex, const QString &diffIndexCache) const
+{
+   RevisionFiles rf(diffIndex);
+   rf.setOnlyModified(false);
+
+   for (const auto &it : mCache->getUntrackedFiles())
+   {
+      rf.mFiles.append(it);
+      rf.setStatus(RevisionFiles::UNKNOWN);
+      rf.mergeParent.append(1);
+   }
+
+   RevisionFiles cachedFiles(diffIndexCache, true);
+
+   for (auto i = 0; i < rf.count(); i++)
+   {
+      if (const auto cachedIndex = cachedFiles.mFiles.indexOf(rf.getFile(i)); cachedIndex != -1)
+      {
+         if (cachedFiles.statusCmp(cachedIndex, RevisionFiles::CONFLICT))
+         {
+            rf.appendStatus(i, RevisionFiles::CONFLICT);
+
+            const auto status = getFileStatus(rf.getFile(i));
+
+            switch (status.value_or(GitWip::FileStatus::BothModified))
+            {
+               case GitWip::FileStatus::DeletedByThem:
+               case GitWip::FileStatus::DeletedByUs:
+                  rf.appendStatus(i, RevisionFiles::DELETED);
+                  break;
+               default:
+                  break;
+            }
+         }
+         else if (cachedFiles.statusCmp(cachedIndex, RevisionFiles::MODIFIED)
+                  && cachedFiles.statusCmp(cachedIndex, RevisionFiles::IN_INDEX))
+            rf.appendStatus(i, RevisionFiles::PARTIALLY_CACHED);
+         else if (cachedFiles.statusCmp(cachedIndex, RevisionFiles::IN_INDEX))
+            rf.appendStatus(i, RevisionFiles::IN_INDEX);
+      }
+   }
+
+   return rf;
 }
