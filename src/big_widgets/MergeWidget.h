@@ -122,6 +122,14 @@ private:
     *
     */
    void abort();
+
+   /**
+    * @brief Generates the message that will be sent as a commit message.
+    * @param msg The message of the commit.
+    * @return True if the message is valid, otherwise false.
+    */
+   bool checkMsg(QString &msg);
+
    /**
     * @brief Commits the current merge.
     *

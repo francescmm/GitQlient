@@ -225,44 +225,82 @@ void MergeWidget::abort()
    }
 }
 
+bool MergeWidget::checkMsg(QString &msg)
+{
+   const auto title = mCommitTitle->text();
+
+   if (title.isEmpty())
+      QMessageBox::warning(this, "Commit changes", "Please, add a title.");
+
+   msg = title;
+
+   if (!mDescription->toPlainText().isEmpty())
+   {
+      auto description = QString("\n\n%1").arg(mDescription->toPlainText());
+      description.remove(QRegExp("(^|\\n)\\s*#[^\\n]*")); // strip comments
+      msg += description;
+   }
+
+   msg.replace(QRegExp("[ \\t\\r\\f\\v]+\\n"), "\n"); // strip line trailing cruft
+   msg = msg.trimmed();
+
+   if (msg.isEmpty())
+   {
+      QMessageBox::warning(this, "Commit changes", "Please, add a title.");
+      return false;
+   }
+
+   msg = QString("%1\n%2\n")
+             .arg(msg.section('\n', 0, 0, QString::SectionIncludeTrailingSep), msg.section('\n', 1).trimmed());
+
+   return true;
+}
+
 void MergeWidget::commit()
 {
    GitExecResult ret;
 
-   switch (mReason)
+   QString msg;
+
+   const auto msgIsValid = checkMsg(msg);
+
+   if (msgIsValid)
    {
-      case ConflictReason::Pull:
-      case ConflictReason::Merge: {
-         QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
-         ret = git->applyMerge();
-         break;
+      switch (mReason)
+      {
+         case ConflictReason::Pull:
+         case ConflictReason::Merge: {
+            QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
+            ret = git->applyMerge(msg);
+            break;
+         }
+         case ConflictReason::CherryPick: {
+            QScopedPointer<GitLocal> git(new GitLocal(mGit));
+            ret = git->cherryPickContinue(msg);
+            break;
+         }
+         default:
+            break;
       }
-      case ConflictReason::CherryPick: {
-         QScopedPointer<GitLocal> git(new GitLocal(mGit));
-         ret = git->cherryPickContinue();
-         break;
+
+      if (!ret.success)
+      {
+         QMessageBox msgBox(QMessageBox::Critical, tr("Error while merging"),
+                            tr("There were problems during the merge operation. Please, see the detailed description "
+                               "for more information."),
+                            QMessageBox::Ok, this);
+         msgBox.setDetailedText(ret.output);
+         msgBox.setStyleSheet(GitQlientStyles::getStyles());
+         msgBox.exec();
       }
-      default:
-         break;
-   }
+      else
+      {
+         removeMergeComponents();
 
-   if (!ret.success)
-   {
-      QMessageBox msgBox(QMessageBox::Critical, tr("Error while merging"),
-                         tr("There were problems during the merge operation. Please, see the detailed description "
-                            "for more information."),
-                         QMessageBox::Ok, this);
-      msgBox.setDetailedText(ret.output);
-      msgBox.setStyleSheet(GitQlientStyles::getStyles());
-      msgBox.exec();
-   }
-   else
-   {
-      removeMergeComponents();
+         if (!mPendingShas.isEmpty()) { }
 
-      if (!mPendingShas.isEmpty()) { }
-
-      emit signalMergeFinished();
+         emit signalMergeFinished();
+      }
    }
 }
 

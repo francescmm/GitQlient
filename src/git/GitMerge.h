@@ -38,7 +38,7 @@ public:
    bool isInMerge() const;
    GitExecResult merge(const QString &into, QStringList sources);
    GitExecResult abortMerge() const;
-   GitExecResult applyMerge() const;
+   GitExecResult applyMerge(const QString &msg) const;
    GitExecResult squashMerge(const QString &into, QStringList sources, const QString &msg = QString()) const;
 
 private:

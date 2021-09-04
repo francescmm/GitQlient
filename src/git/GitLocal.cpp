@@ -71,11 +71,16 @@ GitExecResult GitLocal::cherryPickAbort() const
    return ret;
 }
 
-GitExecResult GitLocal::cherryPickContinue() const
+GitExecResult GitLocal::cherryPickContinue(const QString &msg) const
 {
    QLog_Debug("Git", QString("Applying cherryPick"));
 
-   const auto cmd = QString("git cherry-pick --continue");
+   QString cmd;
+
+   if (msg.isEmpty())
+      cmd = QString("git cherry-pick --continue");
+   else
+      cmd = QString("git commit -m \"%1\"").arg(msg);
 
    QLog_Trace("Git", QString("Applying cherryPick: {%1}").arg(cmd));
 

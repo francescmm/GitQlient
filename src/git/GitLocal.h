@@ -44,7 +44,7 @@ public:
    bool isInCherryPickMerge() const;
    GitExecResult cherryPickCommit(const QString &sha) const;
    GitExecResult cherryPickAbort() const;
-   GitExecResult cherryPickContinue() const;
+   GitExecResult cherryPickContinue(const QString &msg) const;
    GitExecResult checkoutCommit(const QString &sha) const;
    GitExecResult stageFile(const QString &fileName) const;
    GitExecResult markFilesAsResolved(const QStringList &files);
