@@ -167,7 +167,13 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
       const auto fileDeleted = fileInConflict ? files.statusCmp(i, RevisionFiles::DELETED) : false;
       const auto item = new QListWidgetItem(fileName);
       item->setData(Qt::UserRole, fileInConflict);
-      item->setData(Qt::UserRole + 1, fileDeleted);
+
+      QScopedPointer<GitWip> git(new GitWip(mGit, mGitQlientCache));
+
+      if (fileInConflict && fileDeleted)
+         item->setData(Qt::UserRole + 1, static_cast<int>(git->getFileStatus(fileName).value()));
+      else
+         item->setData(Qt::UserRole + 1, 0);
 
       fileInConflict ? mConflictFiles->addItem(item) : mMergedFiles->addItem(item);
    }
@@ -177,6 +183,37 @@ void MergeWidget::changeDiffView(QListWidgetItem *item)
 {
    const auto file = item->text();
    const auto wip = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
+   const auto status = static_cast<GitWip::FileStatus>(item->data(Qt::UserRole + 1).toInt());
+
+   if (status != GitWip::FileStatus::BothModified)
+   {
+      int resolution = 0;
+      if (status == GitWip::FileStatus::DeletedByThem)
+      {
+         resolution = QMessageBox::warning(
+             this, tr("File deleted by them"),
+             tr("The file has been deleted by them. Please add or remove the file to mark resolution."), "Remove file",
+             "Add file");
+      }
+      else
+      {
+         resolution = QMessageBox::warning(
+             this, tr("File deleted by us"),
+             tr("The file has been deleted by us. Please add or remove the file to mark resolution."), "Remove file",
+             "Add file");
+      }
+
+      QScopedPointer<GitLocal> git(new GitLocal(mGit));
+
+      if (resolution == 1)
+         git->stageFile(file);
+      else
+         git->removeFile(file);
+
+      onConflictResolved(file);
+
+      return;
+   }
 
    const auto configured
        = mFileDiff->configure(CommitInfo::ZERO_SHA, wip.firstParent(), mGit->getWorkingDir() + "/" + file, false);

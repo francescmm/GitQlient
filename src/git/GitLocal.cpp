@@ -38,6 +38,19 @@ GitExecResult GitLocal::stageFile(const QString &fileName) const
    return ret;
 }
 
+GitExecResult GitLocal::removeFile(const QString &fileName) const
+{
+   QLog_Debug("Git", QString("Removing file: {%1}").arg(fileName));
+
+   const auto cmd = QString("git rm %1").arg(fileName);
+
+   QLog_Trace("Git", QString("Removing file: {%1}").arg(cmd));
+
+   const auto ret = mGitBase->run(cmd);
+
+   return ret;
+}
+
 bool GitLocal::isInCherryPickMerge() const
 {
    QFile cherrypickHead(QString("%1/CHERRY_PICK_HEAD").arg(mGitBase->getGitDir()));

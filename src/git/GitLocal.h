@@ -47,6 +47,7 @@ public:
    GitExecResult cherryPickContinue(const QString &msg) const;
    GitExecResult checkoutCommit(const QString &sha) const;
    GitExecResult stageFile(const QString &fileName) const;
+   GitExecResult removeFile(const QString &fileName) const;
    GitExecResult markFilesAsResolved(const QStringList &files);
    bool checkoutFile(const QString &fileName) const;
 
