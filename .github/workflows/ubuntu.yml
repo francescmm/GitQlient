@@ -26,7 +26,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
+        id: vars
         run: |
+          echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
           sudo apt-get -qq update
           sudo apt-get -qq install libgl1-mesa-dev libxkbcommon-x11-0 libc6-i386 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxkbcommon-x11-0 libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-* fakeroot
           sudo apt-get -qq remove gcc g++
@@ -116,3 +118,55 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') && matrix.env.name == 'Linux DEB package'
         with:
           files: gitqlient*.deb
+
+      - name: Prune previous runs
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const days_to_expiration = 30;
+            const ms_in_day = 86400000;
+            const now = Date.now();
+            const pages = 5;
+
+            // we don't want to prune old runs from test.yml
+            // because we track the duration of runs over time
+
+            const workflows = [
+              'ubuntu.yml'
+            ]
+
+            let runs_to_delete = [];
+
+            for (const workflow of workflows) {
+              for (let page = 0; page < pages; page += 1) {
+                let response = await github.actions.listWorkflowRuns({
+                  owner: context.repo.owner,
+                  page: page,
+                  per_page: 100,
+                  repo: context.repo.repo,
+                  workflow_id: workflow
+                });
+
+                if (response.data.workflow_runs.length > 0) {
+                  for (const run of response.data.workflow_runs) {
+                    if (run.head_branch == "${{ steps.vars.outputs.short_ref }}" && run.head_sha != "${GITHUB_SHA}") {
+                      runs_to_delete.push([run.id, run.name]);
+                    }
+                  }
+                }
+              }
+            }
+
+            for (const run of runs_to_delete) {
+              console.log(`Run id ${run[0]} of '${run[1]}' is older than ${days_to_expiration} days. Deleting...`);
+              try {
+                await github.actions.deleteWorkflowRun({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  run_id: run[0]
+                });
+              } catch (error) {
+                // ignore errors
+              }
+            }
