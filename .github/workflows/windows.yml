@@ -33,18 +33,13 @@ jobs:
           modules: 'qtwebengine'
           arch: win64_msvc2019_64
 
-      - name: Build GitQlient
-        run: |
-          "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
-          qmake -v
-          mkdir build
-          qmake GitQlient.pro VERSION=${{env.VERSION}}
-          jom.exe
+      - name: Install jom
+        run: choco install jom -y
 
-      - name: Uploading GitQlient AppImage
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: GitQlient*.exe
+      - name: Buil GitQlient
+        run: |
+          # Setup VS compiler
+          cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+          Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+          qmake GitQlient.pro VERSION=${{env.VERSION}}
+          jom -j2

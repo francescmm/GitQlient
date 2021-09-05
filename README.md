@@ -4,7 +4,7 @@
 
 [![Linux](https://github.com/francescmm/GitQlient/actions/workflows/ubuntu.yml/badge.svg?branch=master)](https://github.com/francescmm/GitQlient/actions/workflows/ubuntu.yml)
 [![MacOS](https://github.com/francescmm/GitQlient/actions/workflows/macos.yml/badge.svg?branch=master)](https://github.com/francescmm/GitQlient/actions/workflows/macos.yml)
-<a href="https://ci.appveyor.com/project/francescmm/gitqlient/branch/master" target="_blank"><img src="https://ci.appveyor.com/api/projects/status/ihw50uwdiim952c0/branch/master"/></a>
+[![Windows](https://github.com/francescmm/GitQlient/actions/workflows/windows.yml/badge.svg?branch=master)](https://github.com/francescmm/GitQlient/actions/workflows/windows.yml)
 
 GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client originally forked from QGit. Nowadays it goes beyond of just a fork and adds a lot of new functionality.
 
