@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ${{ matrix.env.os }}
     env:
-      VERSION: 1.4.2
+      VERSION: 1.4.3
     strategy:
       matrix:
         env:
@@ -70,7 +70,7 @@ jobs:
         if: matrix.env.name == 'Linux DEB package'
         run: |
           mkdir build
-          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr
+          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=${{env.VERSION}}
           make -j 4
           make install
           echo "Version: ${{env.VERSION}}" >> deb_pkg/DEBIAN/control
