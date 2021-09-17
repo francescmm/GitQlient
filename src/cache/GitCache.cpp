@@ -354,7 +354,7 @@ void GitCache::updateCommit(const QString &oldSha, CommitInfo newCommit)
 
    mCommitsMap.remove(oldSha);
    mCommitsMap.insert(newCommitSha, std::move(newCommit));
-   mCommits[1] = &mCommitsMap[newCommitSha];
+   mCommits[newCommit.pos] = &mCommitsMap[newCommitSha];
 
    for (const auto &parent : oldCommitParens)
    {
