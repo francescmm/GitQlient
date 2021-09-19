@@ -23,35 +23,10 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QTreeWidget>
+#include <RefTreeWidget.h>
 
 class GitBase;
 class GitCache;
-
-class RefTreeWidget : public QTreeWidget
-{
-   Q_OBJECT
-
-public:
-   /**
-    * @brief Default constructor
-    * @param cache The GitQlient cache.
-    * @param git The git object to perform Git operations.
-    * @param parentThe parent widget if needed.
-    */
-   explicit RefTreeWidget(QWidget *parent = nullptr);
-   /**
-    * @brief focusOnBranch Sets the focus of the three in the item specified in  @p branch starting from the position @p
-    * lastPos.
-    * @param item The text to seach in the tree and set the focus.
-    * @param lastPos Starting position for the search.
-    * @return
-    */
-   int focusOnBranch(const QString &itemText, int startSearchPos = -1);
-
-protected:
-   QVector<QTreeWidgetItem *> findChildItem(const QString &text) const;
-};
 
 /*!
  \brief The BranchTreeWidget class shows all the information regarding the branches and its position respect master and
