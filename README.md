@@ -32,6 +32,14 @@ Please, if you have any doubts about how to use it or you just want to know all 
 
 It is planned to release for Linux, MacOs and Windows. However, take into account that the development environment is based on Linux and it will be the first platform released.
 
+## Interactive UI guide (with code links)
+
+I've set up a small (and ugly) webpage for those developers that want to get some help understanding the different parts of the UI of GitQlient and how they are connected with the C++ code.
+
+The web shows the current UI deisgn with links to the code of the widgets when you click on the areas of the image. The code is shown in a frame near to the image, so a 1920px screen might be needed. Since I'm not a web developer and I don't intend to dedicate too much time to that, I'll update the guide only with major releases. If anybody wants to make it pritier and knows how to do it, please contact me to see if we can collaborate.
+
+[Check the Interactive UI guide of GitQlient.](https://francescmm.github.io/gitqlient/)
+
 ## How to install GitQlient
 
 ### Linux
