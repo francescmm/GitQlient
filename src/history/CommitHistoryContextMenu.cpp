@@ -343,7 +343,9 @@ void CommitHistoryContextMenu::checkoutBranch()
 void CommitHistoryContextMenu::createCheckoutBranch()
 {
    BranchDlg dlg({ mShas.constFirst(), BranchDlgMode::CREATE_CHECKOUT_FROM_COMMIT, mCache, mGit });
-   dlg.exec();
+
+   if (dlg.exec() == QDialog::Accepted)
+      emit logReload();
 }
 
 void CommitHistoryContextMenu::checkoutCommit()
