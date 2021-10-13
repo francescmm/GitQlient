@@ -138,7 +138,7 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
                }
             }
 
-            emit logReload();
+            emit fullReload();
          }
          else
          {
