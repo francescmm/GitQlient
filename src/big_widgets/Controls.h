@@ -182,6 +182,11 @@ public:
    */
    ControlsMainViews getCurrentSelectedButton() const;
 
+   /**
+    * @brief changePomodoroVisibility Toggles the visibility for the pomodoro button.
+    */
+   void changePomodoroVisibility();
+
 private:
    QString mCurrentSha;
    QSharedPointer<GitCache> mCache;

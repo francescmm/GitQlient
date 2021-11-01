@@ -22,7 +22,8 @@ signals:
    void reloadView();
    void buildSystemConfigured(bool configured);
    void commitTitleMaxLenghtChanged();
-   void panelsVisibilityChaned();
+   void panelsVisibilityChanged();
+   void pomodoroVisibilityChanged();
 
 public:
    explicit ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
@@ -50,4 +51,5 @@ private:
 private slots:
    void saveConfig();
    void onCredentialsOptionChanged(QAbstractButton *button);
+   void onPullStrategyChanged(int index);
 };

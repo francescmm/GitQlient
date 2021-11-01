@@ -65,6 +65,7 @@ public:
    QString getServerUrl() const;
    QString getServerHost() const;
    QPair<QString, QString> getCurrentRepoAndOwner() const;
+   GitExecResult unset(const QString &key, bool isGlobal = false) const;
 
 private:
    QSharedPointer<GitBase> mGitBase;

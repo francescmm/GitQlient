@@ -136,10 +136,25 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
       ui->leBsToken->setText(token);
    }
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(git));
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
 
    const auto url = gitConfig->getServerUrl();
    ui->credentialsFrames->setVisible(url.startsWith("https"));
+
+   const auto mergeStrategyFF = gitConfig->getGitValue("pull.ff").output;
+   const auto mergeStrategyRebase = gitConfig->getGitValue("pull.rebase").output;
+
+   if (mergeStrategyFF.isEmpty())
+   {
+      if (mergeStrategyRebase.isEmpty() || mergeStrategyRebase.toLower().contains("false"))
+         ui->cbPullStrategy->setCurrentIndex(0);
+      else if (mergeStrategyRebase.toLower().contains("true"))
+         ui->cbPullStrategy->setCurrentIndex(1);
+   }
+   else if (mergeStrategyFF.toLower().contains("true"))
+      ui->cbPullStrategy->setCurrentIndex(2);
+
+   connect(ui->cbPullStrategy, SIGNAL(currentIndexChanged(int)), this, SLOT(onPullStrategyChanged(int)));
 
    connect(ui->buttonGroup, SIGNAL(buttonClicked(QAbstractButton *)), this,
            SLOT(onCredentialsOptionChanged(QAbstractButton *)));
@@ -186,6 +201,27 @@ void ConfigWidget::onPanelsVisibilityChanged()
 void ConfigWidget::onCredentialsOptionChanged(QAbstractButton *button)
 {
    ui->sbTimeout->setEnabled(button == ui->rbCache);
+}
+
+void ConfigWidget::onPullStrategyChanged(int index)
+{
+   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+
+   switch (index)
+   {
+      case 0:
+         gitConfig->unset("pull.ff");
+         gitConfig->setLocalData("pull.rebase", "false");
+         break;
+      case 1:
+         gitConfig->unset("pull.ff");
+         gitConfig->setLocalData("pull.rebase", "true");
+         break;
+      case 2:
+         gitConfig->unset("pull.rebase");
+         gitConfig->setLocalData("pull.ff", "only");
+         break;
+   }
 }
 
 void ConfigWidget::clearCache()
@@ -273,10 +309,12 @@ void ConfigWidget::saveConfig()
    settings.setLocalValue("SubmodulesHeader", ui->cbSubmodule->isChecked());
    settings.setLocalValue("SubtreeHeader", ui->cbSubtree->isChecked());
 
-   emit panelsVisibilityChaned();
+   emit panelsVisibilityChanged();
 
    /* POMODORO CONFIG */
    settings.setLocalValue("Pomodoro/Enabled", ui->cbPomodoroEnabled->isChecked());
+
+   emit pomodoroVisibilityChanged();
 
    /* BUILD SYSTEM CONFIG */
 

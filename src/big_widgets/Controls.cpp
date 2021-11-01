@@ -306,6 +306,13 @@ ControlsMainViews Controls::getCurrentSelectedButton() const
    return mBlame->isChecked() ? ControlsMainViews::Blame : ControlsMainViews::History;
 }
 
+void Controls::changePomodoroVisibility()
+{
+   GitQlientSettings settings(mGit->getGitDir());
+   const auto isVisible = settings.localValue("Pomodoro/Enabled", true);
+   mPomodoro->setVisible(isVisible.toBool());
+}
+
 void Controls::pushCurrentBranch()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
