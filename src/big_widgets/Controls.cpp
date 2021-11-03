@@ -163,6 +163,9 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    separator3->setFixedHeight(20);
    hLayout->addWidget(separator3);
 
+   const auto isVisible = settings.localValue("Pomodoro/Enabled", true);
+   mPomodoro->setVisible(isVisible.toBool());
+
    mVersionCheck->setIcon(QIcon(":/icons/get_gitqlient"));
    mVersionCheck->setIconSize(QSize(22, 22));
    mVersionCheck->setText(tr("New version"));
