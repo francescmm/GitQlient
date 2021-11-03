@@ -1,11 +1,12 @@
 #include "FileEditor.h"
 
 #include <FileDiffEditor.h>
+#include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 #include <Highlighter.h>
 
-#include <QVBoxLayout>
 #include <QMessageBox>
+#include <QVBoxLayout>
 
 FileEditor::FileEditor(bool highlighter, QWidget *parent)
    : QFrame(parent)
@@ -74,6 +75,20 @@ void FileEditor::saveFile()
    const auto currentContent = mFileEditor->toPlainText();
 
    saveTextInFile(currentContent);
+}
+
+void FileEditor::changeFontSize()
+{
+   GitQlientSettings settings;
+   const auto fontSize = settings.globalValue("FileDiffView/FontSize", 8).toInt();
+
+   auto font = mFileEditor->font();
+   font.setPointSize(fontSize);
+
+   const auto cursor = mFileEditor->textCursor();
+   mFileEditor->selectAll();
+   mFileEditor->setFont(font);
+   mFileEditor->setTextCursor(cursor);
 }
 
 void FileEditor::saveTextInFile(const QString &content) const

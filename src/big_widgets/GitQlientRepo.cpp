@@ -161,6 +161,8 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
            &HistoryWidget::onCommitTitleMaxLenghtChanged);
    connect(mConfigWidget, &ConfigWidget::panelsVisibilityChanged, mHistoryWidget,
            &HistoryWidget::onPanelsVisibilityChanged);
+   connect(mConfigWidget, &ConfigWidget::reloadDiffFont, mHistoryWidget, &HistoryWidget::onDiffFontSizeChanged);
+   // connect(mConfigWidget, &ConfigWidget::reloadDiffFont, mDiffWidget, );
    connect(mConfigWidget, &ConfigWidget::pomodoroVisibilityChanged, mControls, &Controls::changePomodoroVisibility);
 
    connect(mGitServerWidget, &GitServerWidget::openDiff, this, &GitQlientRepo::openCommitDiff);

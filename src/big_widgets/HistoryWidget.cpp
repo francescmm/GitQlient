@@ -381,6 +381,12 @@ void HistoryWidget::onPanelsVisibilityChanged()
    mBranchesWidget->onPanelsVisibilityChaned();
 }
 
+void HistoryWidget::onDiffFontSizeChanged()
+{
+   mFullDiffWidget->changeFontSize();
+   mFileDiff->changeFontSize();
+}
+
 void HistoryWidget::search()
 {
    if (const auto text = mSearchInput->text(); !text.isEmpty())

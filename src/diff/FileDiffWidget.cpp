@@ -49,6 +49,13 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mNewFile->setObjectName("newFile");
    mOldFile->setObjectName("oldFile");
 
+   GitQlientSettings settings(mGit->getGitDir());
+   QFont font = mNewFile->font();
+   const auto points = settings.globalValue("FileDiffView/FontSize", 8).toInt();
+   font.setPointSize(points);
+   mNewFile->setFont(font);
+   mOldFile->setFont(font);
+
    const auto optionsLayout = new QHBoxLayout();
    optionsLayout->setContentsMargins(5, 5, 0, 0);
    optionsLayout->setSpacing(5);
@@ -113,7 +120,6 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    vLayout->addLayout(optionsLayout);
    vLayout->addWidget(mViewStackedWidget);
 
-   GitQlientSettings settings(mGit->getGitDir());
    mFileVsFile = settings.localValue(GitQlientSettings::SplitFileDiffView, false).toBool();
 
    mBack->setIcon(QIcon(":/icons/back"));
@@ -184,6 +190,26 @@ bool FileDiffWidget::reload()
       return configure(mCurrentSha, mPreviousSha, mCurrentFile, mIsCached, mEdition->isChecked());
 
    return false;
+}
+
+void FileDiffWidget::changeFontSize()
+{
+   GitQlientSettings settings;
+   const auto fontSize = settings.globalValue("FileDiffView/FontSize", 8).toInt();
+
+   auto font = mNewFile->font();
+   font.setPointSize(fontSize);
+
+   auto cursor = mNewFile->textCursor();
+
+   mNewFile->selectAll();
+   mNewFile->setFont(font);
+   mNewFile->setTextCursor(cursor);
+
+   cursor = mOldFile->textCursor();
+   mOldFile->selectAll();
+   mOldFile->setFont(font);
+   mOldFile->setTextCursor(cursor);
 }
 
 bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file,

@@ -190,6 +190,12 @@ bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
    return true;
 }
 
+void DiffWidget::onDiffFontSizeChanged()
+{
+   for (auto diffWidget : mDiffWidgets)
+      diffWidget->changeFontSize();
+}
+
 void DiffWidget::changeSelection(int index)
 {
    const auto widget = qobject_cast<IDiffWidget *>(mCenterStackedWidget->widget(index));

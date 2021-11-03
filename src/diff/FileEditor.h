@@ -56,6 +56,11 @@ public:
     */
    void saveFile();
 
+   /**
+    * @brief changeFontSize Updates the font size of the view.
+    */
+   void changeFontSize();
+
 private:
    FileDiffEditor *mFileEditor = nullptr;
    Highlighter *mHighlighter = nullptr;

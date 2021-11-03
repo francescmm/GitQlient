@@ -20,6 +20,7 @@ class ConfigWidget : public QWidget
 
 signals:
    void reloadView();
+   void reloadDiffFont();
    void buildSystemConfigured(bool configured);
    void commitTitleMaxLenghtChanged();
    void panelsVisibilityChanged();

@@ -86,6 +86,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->chDisableLogs->setChecked(settings.globalValue("logsDisabled", true).toBool());
    ui->cbLogLevel->setCurrentIndex(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
    ui->spCommitTitleLength->setValue(settings.globalValue("commitTitleMaxLength", 50).toInt());
+   ui->sbEditorFontSize->setValue(settings.globalValue("FileDiffView/FontSize", 8).toInt());
 
    const auto originalStyles = settings.globalValue("colorSchema", "dark").toString();
    ui->cbStyle->setCurrentText(originalStyles);
@@ -166,6 +167,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->cbLogLevel, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->leGitPath, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->spCommitTitleLength, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->sbEditorFontSize, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbTranslations, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->sbMaxCommits, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbLogOrder, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
@@ -274,9 +276,14 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("logsDisabled", ui->chDisableLogs->isChecked());
    settings.setGlobalValue("logsLevel", ui->cbLogLevel->currentIndex());
    settings.setGlobalValue("commitTitleMaxLength", ui->spCommitTitleLength->value());
+   settings.setGlobalValue("FileDiffView/FontSize", ui->sbEditorFontSize->value());
    settings.setGlobalValue("colorSchema", ui->cbStyle->currentText());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
 
+   mLocalGit->changeFontSize();
+   mGlobalGit->changeFontSize();
+
+   emit reloadDiffFont();
    emit commitTitleMaxLenghtChanged();
 
    if (mShowResetMsg)

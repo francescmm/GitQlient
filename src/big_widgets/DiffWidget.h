@@ -101,6 +101,11 @@ public:
    */
    bool loadCommitDiff(const QString &sha, const QString &parentSha);
 
+   /**
+    * @brief onDiffFontSizeChanged Reloads the diff widgets with the new font size stored in the settings.
+    */
+   void onDiffFontSizeChanged();
+
 private:
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitCache> mCache;

@@ -5,7 +5,6 @@
 *
 {
    outline: none;
-   font-size: 10pt;
 }
 
 a
@@ -747,7 +746,6 @@ CommitInfoWidget FileListWidget
 FileDiffView
 {
     font-family: "DejaVu Sans Mono";
-    font-size: 8pt;
 }
 
 #LineNumberArea
@@ -1196,7 +1194,6 @@ PrChangesList FileDiffView
 SourceCodeReview > FileDiffView, #PrChangeListItem > FileDiffView
 {
    border: 0;
-   font-size: 8pt;
 }
 
 SourceCodeReview QLabel

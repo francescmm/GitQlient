@@ -65,6 +65,8 @@ public:
    */
    void loadDiff(const QString &sha, const QString &diffToSha, const QString &diffData);
 
+   void changeFontSize() override;
+
 private:
    QPushButton *mGoPrevious = nullptr;
    QPushButton *mGoNext = nullptr;

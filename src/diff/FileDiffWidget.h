@@ -25,8 +25,8 @@
 
 #include <IDiffWidget.h>
 
-#include <QFrame>
 #include <DiffInfo.h>
+#include <QFrame>
 
 class FileDiffView;
 class QPushButton;
@@ -85,6 +85,9 @@ public:
     was done, otherwise false.
    */
    bool reload() override;
+
+   void changeFontSize() override;
+
    /*!
     \brief Configures the diff view with the two commits that will be compared and the file that will be applied.
 

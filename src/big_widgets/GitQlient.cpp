@@ -11,6 +11,7 @@
 #include <ProgressDlg.h>
 #include <QPinnableTabWidget.h>
 
+#include <QApplication>
 #include <QCommandLineParser>
 #include <QEvent>
 #include <QFile>
@@ -33,8 +34,13 @@ GitQlient::GitQlient(QWidget *parent)
    , mStackedLayout(new QStackedLayout(this))
    , mRepos(new QPinnableTabWidget())
    , mConfigWidget(new InitScreen())
-
 {
+
+   auto font = QApplication::font();
+   font.setPointSize(10);
+
+   QApplication::setFont(font);
+
    QLog_Info("UI", "*******************************************");
    QLog_Info("UI", "*          GitQlient has started          *");
    QLog_Info("UI", QString("*                  %1                  *").arg(VER));

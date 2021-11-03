@@ -215,6 +215,11 @@ public:
     */
    void onPanelsVisibilityChanged();
 
+   /**
+    * @brief onDiffFontSizeChanged Reloads the diff widgets with the new font size stored in the settings.
+    */
+   void onDiffFontSizeChanged();
+
 protected:
    void keyPressEvent(QKeyEvent *event) override;
    void keyReleaseEvent(QKeyEvent *event) override;

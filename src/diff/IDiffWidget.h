@@ -11,14 +11,18 @@ class IDiffWidget : public QFrame
 signals:
 
 public:
-   explicit IDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
-                        QWidget *parent = nullptr);
+   explicit IDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *parent = nullptr);
 
    /*!
     \brief Reloads the current diff in case the user loaded the work in progress as base commit.
 
    */
    virtual bool reload() = 0;
+
+   /**
+    * @brief changeFontSize Changes the font size (in points) for the widgets used to show the diff.
+    */
+   virtual void changeFontSize() = 0;
 
    /*!
     \brief Gets the current SHA.
