@@ -50,6 +50,14 @@ QTreeWidgetItem *getChild(QTreeWidgetItem *parent, const QString &childName)
 
    return child;
 }
+
+struct RemoteBranch
+{
+   QString remote;
+   QString branch;
+   QString sha;
+};
+
 }
 
 BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
@@ -336,21 +344,40 @@ void BranchesWidget::showBranches()
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
    auto branches = mCache->getBranches(References::Type::LocalBranch);
+   std::map<QString, QString> branchShaMap;
+   std::map<QString, QString> branchFolderShaMap;
+
+   for (const auto &pair : qAsConst(branches))
+   {
+      for (const auto &branch : pair.second)
+      {
+         if (branch.contains("/"))
+            branchFolderShaMap.insert(std::make_pair(branch, pair.first));
+         else
+            branchShaMap.insert(std::make_pair(branch, pair.first));
+      }
+   }
 
    if (!branches.empty())
    {
       QLog_Info("UI", QString("Fetched {%1} local branches").arg(branches.count()));
       QLog_Info("UI", QString("Processing local branches..."));
 
-      for (const auto &pair : qAsConst(branches))
+      for (auto iter : branchFolderShaMap)
       {
-         for (const auto &branch : pair.second)
+         if (!iter.first.contains("HEAD->"))
          {
-            if (!branch.contains("HEAD->"))
-            {
-               processLocalBranch(pair.first, branch);
-               mMinimal->configureLocalMenu(pair.first, branch);
-            }
+            processLocalBranch(iter.second, iter.first);
+            mMinimal->configureLocalMenu(iter.second, iter.first);
+         }
+      }
+
+      for (auto iter : branchShaMap)
+      {
+         if (!iter.first.contains("HEAD->"))
+         {
+            processLocalBranch(iter.second, iter.first);
+            mMinimal->configureLocalMenu(iter.second, iter.first);
          }
       }
 
@@ -359,22 +386,55 @@ void BranchesWidget::showBranches()
 
    branches.clear();
    branches.squeeze();
+   branchShaMap.clear();
+   branchFolderShaMap.clear();
    branches = mCache->getBranches(References::Type::RemoteBranches);
+
+   QVector<RemoteBranch> remoteBranches;
+
+   for (const auto &pair : qAsConst(branches))
+   {
+      for (const auto &branch : pair.second)
+      {
+         remoteBranches.append(
+             RemoteBranch { branch.mid(0, branch.indexOf("/")), branch.mid(branch.indexOf("/") + 1), pair.first });
+      }
+   }
+
+   std::sort(remoteBranches.begin(), remoteBranches.end(), [](const RemoteBranch &r1, const RemoteBranch &r2) {
+      return r1.remote == r2.remote ? r1.branch < r2.branch : r1.remote < r2.remote;
+   });
+
+   for (const auto &branchInfo : qAsConst(remoteBranches))
+   {
+      const auto fullBranchName = QString("%1/%2").arg(branchInfo.remote, branchInfo.branch);
+
+      if (branchInfo.branch.contains("/"))
+         branchFolderShaMap.insert(std::make_pair(fullBranchName, branchInfo.sha));
+      else
+         branchShaMap.insert(std::make_pair(fullBranchName, branchInfo.sha));
+   }
 
    if (!branches.empty())
    {
       QLog_Info("UI", QString("Fetched {%1} remote branches").arg(branches.count()));
       QLog_Info("UI", QString("Processing remote branches..."));
 
-      for (const auto &pair : qAsConst(branches))
+      for (auto iter : branchFolderShaMap)
       {
-         for (const auto &branch : pair.second)
+         if (!iter.first.contains("HEAD->"))
          {
-            if (!branch.contains("HEAD->"))
-            {
-               processRemoteBranch(pair.first, branch);
-               mMinimal->configureRemoteMenu(pair.first, branch);
-            }
+            processRemoteBranch(iter.second, iter.first);
+            mMinimal->configureRemoteMenu(iter.second, iter.first);
+         }
+      }
+
+      for (auto iter : branchShaMap)
+      {
+         if (!iter.first.contains("HEAD->"))
+         {
+            processRemoteBranch(iter.second, iter.first);
+            mMinimal->configureRemoteMenu(iter.second, iter.first);
          }
       }
 
