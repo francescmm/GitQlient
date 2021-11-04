@@ -1,23 +1,23 @@
 #include "JenkinsWidget.h"
 
-#include <RepoFetcher.h>
-#include <JobContainer.h>
-#include <GitQlientSettings.h>
 #include <GitBase.h>
+#include <GitQlientSettings.h>
+#include <JobContainer.h>
+#include <RepoFetcher.h>
 
-#include <QTimer>
 #include <QButtonGroup>
-#include <QStackedLayout>
-#include <QPushButton>
 #include <QHBoxLayout>
 #include <QNetworkAccessManager>
+#include <QPushButton>
+#include <QStackedLayout>
+#include <QTimer>
 
 namespace Jenkins
 {
 
-JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
+JenkinsWidget::JenkinsWidget(const QString &repoDir, QWidget *parent)
    : QWidget(parent)
-   , mGit(git)
+   , mRepoDir(repoDir)
    , mStackedLayout(new QStackedLayout())
    , mBodyLayout(new QHBoxLayout())
    , mBtnGroup(new QButtonGroup())
@@ -26,7 +26,7 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitBase> &git, QWidget *parent
 {
    setObjectName("JenkinsWidget");
 
-   GitQlientSettings settings(mGit->getGitDir());
+   GitQlientSettings settings(mRepoDir);
    const auto url = settings.localValue("BuildSystemUrl", "").toString();
    const auto user = settings.localValue("BuildSystemUser", "").toString();
    const auto token = settings.localValue("BuildSystemToken", "").toString();
