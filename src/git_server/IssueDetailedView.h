@@ -75,7 +75,6 @@ private:
    };
 
    GitServer::Issue mIssue;
-   QSharedPointer<GitBase> mGit;
    QSharedPointer<GitServerCache> mGitServerCache;
    Config mConfig;
    int mIssueNumber = -1;

@@ -224,10 +224,16 @@ QMessageBox
     color: black;
 }
 
+QTreeView > QWidget
+{
+    background: #C6C6C7;
+}
+
 QScrollBar:vertical
 {
-    border-left-color: #202122;
-    background: transparent;
+    border-left-color: transparent;
+    background: #FFFFFF;
+    border-top-color: #2E2F30;
 }
 
 QScrollBar:horizontal
@@ -254,7 +260,7 @@ QScrollBar::handle:vertical:pressed, QScrollBar::handle:horizontal:pressed
 
 QScrollBar::add-page, QScrollBar::sub-page
 {
-    background: #E6E6E7;
+    background: #FFFFFF;
 }
 
 QProgressDialog

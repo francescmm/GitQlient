@@ -1,35 +1,34 @@
 ﻿#include <IssueDetailedView.h>
 
-#include <IssueItem.h>
+#include <AddCodeReviewDialog.h>
 #include <CircularPixmap.h>
 #include <GitServerCache.h>
 #include <IRestApi.h>
-#include <PrCommitsList.h>
+#include <IssueItem.h>
 #include <PrChangesList.h>
 #include <PrCommentsList.h>
-#include <AddCodeReviewDialog.h>
+#include <PrCommitsList.h>
 
-#include <QMessageBox>
-#include <QLocale>
-#include <QPushButton>
-#include <QToolButton>
 #include <QButtonGroup>
-#include <QStackedLayout>
-#include <QMenu>
 #include <QEvent>
+#include <QLocale>
+#include <QMenu>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QStackedLayout>
+#include <QToolButton>
 
 using namespace GitServer;
 
 IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
                                      const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
-   , mGit(git)
    , mGitServerCache(gitServerCache)
    , mBtnGroup(new QButtonGroup())
    , mTitleLabel(new QLabel())
    , mStackedLayout(new QStackedLayout())
    , mPrCommentsList(new PrCommentsList(mGitServerCache))
-   , mPrChangesList(new PrChangesList(mGit))
+   , mPrChangesList(new PrChangesList(git))
    , mPrCommitsList(new PrCommitsList(mGitServerCache))
    , mReviewBtn(new QToolButton())
 {
