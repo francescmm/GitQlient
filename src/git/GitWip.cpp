@@ -19,14 +19,7 @@ QVector<QString> GitWip::getUntrackedFiles() const
 {
    QLog_Debug("Git", QString("Executing getUntrackedFiles."));
 
-   auto runCmd = QString("git ls-files --others");
-   const auto exFile = QString("info/exclude");
-   const auto path = QString("%1/%2").arg(mGit->getGitDir(), exFile);
-
-   if (QFile::exists(path))
-      runCmd.append(QString(" --exclude-from=$%1$").arg(path));
-
-   runCmd.append(QString(" --exclude-per-directory=$%1$").arg(".gitignore"));
+   auto runCmd = QString("git ls-files --others --exclude-standard");
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
    const auto ret = mGit->run(runCmd).output.split('\n', Qt::SkipEmptyParts).toVector();
