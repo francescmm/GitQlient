@@ -294,7 +294,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, mRemoteBranchesTree,
            &BranchTreeWidget::clearSelection);
-   connect(mLocalBranchesTree, &BranchTreeWidget::signalFetchPerformed, mGitTags.data(), &GitTags::getRemoteTags);
    connect(mLocalBranchesTree, &BranchTreeWidget::fullReload, this, &BranchesWidget::fullReload);
    connect(mLocalBranchesTree, &BranchTreeWidget::logReload, this, &BranchesWidget::logReload);
    connect(mLocalBranchesTree, &BranchTreeWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
@@ -304,7 +303,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, mLocalBranchesTree,
            &BranchTreeWidget::clearSelection);
-   connect(mRemoteBranchesTree, &BranchTreeWidget::signalFetchPerformed, mGitTags.data(), &GitTags::getRemoteTags);
    connect(mRemoteBranchesTree, &BranchTreeWidget::fullReload, this, &BranchesWidget::fullReload);
    connect(mRemoteBranchesTree, &BranchTreeWidget::logReload, this, &BranchesWidget::logReload);
    connect(mRemoteBranchesTree, &BranchTreeWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
@@ -363,7 +361,7 @@ void BranchesWidget::showBranches()
       QLog_Info("UI", QString("Fetched {%1} local branches").arg(branches.count()));
       QLog_Info("UI", QString("Processing local branches..."));
 
-      for (auto iter : branchFolderShaMap)
+      for (const auto &iter : branchFolderShaMap)
       {
          if (!iter.first.contains("HEAD->"))
          {
@@ -372,7 +370,7 @@ void BranchesWidget::showBranches()
          }
       }
 
-      for (auto iter : branchShaMap)
+      for (const auto &iter : branchShaMap)
       {
          if (!iter.first.contains("HEAD->"))
          {
@@ -420,7 +418,7 @@ void BranchesWidget::showBranches()
       QLog_Info("UI", QString("Fetched {%1} remote branches").arg(branches.count()));
       QLog_Info("UI", QString("Processing remote branches..."));
 
-      for (auto iter : branchFolderShaMap)
+      for (const auto &iter : branchFolderShaMap)
       {
          if (!iter.first.contains("HEAD->"))
          {
@@ -429,7 +427,7 @@ void BranchesWidget::showBranches()
          }
       }
 
-      for (auto iter : branchShaMap)
+      for (const auto &iter : branchShaMap)
       {
          if (!iter.first.contains("HEAD->"))
          {

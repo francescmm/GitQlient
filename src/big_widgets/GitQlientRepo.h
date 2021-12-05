@@ -166,7 +166,6 @@ private:
    QPointer<WaitingDlg> mWaitDlg;
    QPair<ControlsMainViews, QWidget *> mPreviousView;
    QSharedPointer<GitServer::IRestApi> mApi;
-   QSharedPointer<GitTags> mGitTags;
 
    bool mIsInit = false;
    QThread *m_loaderThread;

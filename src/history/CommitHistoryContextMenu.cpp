@@ -16,7 +16,6 @@
 #include <GitRemote.h>
 #include <GitServerCache.h>
 #include <GitStashes.h>
-#include <GitTags.h>
 #include <MergePullRequestDlg.h>
 #include <PullDlg.h>
 #include <SquashDlg.h>
@@ -41,7 +40,6 @@ CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<GitCache
    , mCache(cache)
    , mGit(git)
    , mGitServerCache(gitServerCache)
-   , mGitTags(new GitTags(mGit, mCache))
    , mShas(shas)
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -522,10 +520,7 @@ void CommitHistoryContextMenu::fetch()
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
 
    if (git->fetch())
-   {
-      mGitTags->getRemoteTags();
       emit fullReload();
-   }
 }
 
 void CommitHistoryContextMenu::resetSoft()

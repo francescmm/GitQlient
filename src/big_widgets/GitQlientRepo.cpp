@@ -61,7 +61,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    , mConfigWidget(new ConfigWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
-   , mGitTags(new GitTags(mGitBase, mGitQlientCache))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -273,8 +272,6 @@ void GitQlientRepo::createProgressDialog()
 
 void GitQlientRepo::onRepoLoadFinished(bool fullReload)
 {
-   mGitTags->getRemoteTags();
-
    if (!mIsInit)
    {
       mIsInit = true;

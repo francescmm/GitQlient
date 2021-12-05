@@ -7,6 +7,7 @@
 #include <GitLocal.h>
 #include <GitQlientSettings.h>
 #include <GitRequestorProcess.h>
+#include <GitTags.h>
 #include <GitWip.h>
 
 #include <QLogger.h>
@@ -23,6 +24,7 @@ GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<Git
    , mGitBase(gitBase)
    , mRevCache(std::move(cache))
    , mSettings(settings)
+   , mGitTags(new GitTags(mGitBase, mRevCache))
 {
 }
 
@@ -41,7 +43,7 @@ void GitRepoLoader::loadLogHistory()
          QLog_Error("Git", "No working directory set.");
       else
       {
-         mRefreshReferences = true;
+         mRefreshReferences = false;
          mLocked = true;
 
          if (configureRepoDirectory())
@@ -145,6 +147,8 @@ void GitRepoLoader::requestReferences()
    connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
 
    requestor->run("git show-ref -d");
+
+   mGitTags->getRemoteTags();
 }
 
 void GitRepoLoader::processReferences(QByteArray ba)

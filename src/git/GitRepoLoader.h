@@ -30,10 +30,11 @@
 #include <QSharedPointer>
 #include <QVector>
 
+struct WipRevisionInfo;
 class GitBase;
 class GitCache;
-struct WipRevisionInfo;
 class GitQlientSettings;
+class GitTags;
 
 class GitRepoLoader : public QObject
 {
@@ -63,6 +64,7 @@ private:
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitCache> mRevCache;
    QSharedPointer<GitQlientSettings> mSettings;
+   QSharedPointer<GitTags> mGitTags;
 
    bool configureRepoDirectory();
    void requestReferences();

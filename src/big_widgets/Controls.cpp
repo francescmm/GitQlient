@@ -9,7 +9,6 @@
 #include <GitQlientUpdater.h>
 #include <GitRemote.h>
 #include <GitStashes.h>
-#include <GitTags.h>
 #include <PomodoroButton.h>
 #include <QLogger.h>
 
@@ -29,7 +28,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
-   , mGitTags(new GitTags(mGit, mCache))
    , mHistory(new QToolButton())
    , mDiff(new QToolButton())
    , mBlame(new QToolButton())
@@ -278,10 +276,7 @@ void Controls::fetchAll()
    QApplication::restoreOverrideCursor();
 
    if (ret)
-   {
-      mGitTags->getRemoteTags();
       emit requestFullReload();
-   }
 }
 
 void Controls::activateMergeWarning()

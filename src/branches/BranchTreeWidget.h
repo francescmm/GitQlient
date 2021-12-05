@@ -60,10 +60,6 @@ signals:
    void signalPullConflict();
 
    /**
-    * @brief signalFetchPerformed Signal triggered when a deep fetch is performed.
-    */
-   void signalFetchPerformed();
-   /**
     * @brief signalRefreshPRsCache Signal that refreshes PRs cache.
     */
    void signalRefreshPRsCache();

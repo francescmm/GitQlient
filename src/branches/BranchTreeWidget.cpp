@@ -51,7 +51,6 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 
          const auto menu = new BranchContextMenu({ currentBranch, selectedBranch, mLocal, mCache, mGit }, this);
          connect(menu, &BranchContextMenu::signalRefreshPRsCache, this, &BranchTreeWidget::signalRefreshPRsCache);
-         connect(menu, &BranchContextMenu::signalFetchPerformed, this, &BranchTreeWidget::signalFetchPerformed);
          connect(menu, &BranchContextMenu::logReload, this, &BranchTreeWidget::logReload);
          connect(menu, &BranchContextMenu::fullReload, this, &BranchTreeWidget::fullReload);
          connect(menu, &BranchContextMenu::signalCheckoutBranch, this, [this, item]() { checkoutBranch(item); });
