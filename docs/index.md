@@ -116,7 +116,7 @@ In addition to this, you can select any of the projects listed in the *Most used
 
 # <a name="quick-access-actions"></a>Quick access actions
 
-Once you have selected and opened our repo, the new view shows in first place a series of controls to manage the most used actions done in Git. This controls are organized horizontally as sqaured buttons as the following image shows:
+Once you have selected and opened our repo, the new view shows in first place a series of controls to manage the most used actions done in Git. This controls are organized horizontally as squared buttons as the following image shows:
 
 ![GitQlient - Quick access actions (GitHub)](/GitQlient/assets/2_quick_access_actions.png "GitQlient - Quick access actions (GitHub)")
 

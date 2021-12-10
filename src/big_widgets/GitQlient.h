@@ -84,7 +84,7 @@ public:
     repos out parameter.
 
     \param arguments Arguments from the command prompt.
-    \param repos Output paramter, repositories to open.
+    \param repos Output parameter, repositories to open.
     \return Returns true if application should continue or false if it should quit.
    */
    static bool parseArguments(const QStringList &arguments, QStringList *repos);

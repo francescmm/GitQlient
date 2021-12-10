@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     // The log message is written into the file1
     QLog_Debug(l_module1, QStringLiteral("This is a debug log message 0."));
 
-    // The module doesn't exist yet - messges are enqueued
+    // The module doesn't exist yet - messages are enqueued
     QLog_Debug(l_module2, QStringLiteral("This is a TestiiTest."));
     // Create the corresponding module
     l_manager->addDestination(l_file2, l_module2, LogLevel::Debug);
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     QLog_Debug(l_module3, QStringLiteral("This is a debug log message 2..."));
     QLog_Debug(l_module3, QStringLiteral("This is a debug log message 3...."));
 
-    // The module doesn't exist yet - messges are enqueued
+    // The module doesn't exist yet - messages are enqueued
     QLog_Debug(l_module4, QStringLiteral("This is a TestiiTest."));
     // Create the corresponding module with auto-generated filename, default destination folder with a custom log message display
     l_manager->addDestination(QString(), l_module4, LogLevel::Debug, QString(), LogMode::Full

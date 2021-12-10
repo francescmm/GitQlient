@@ -181,11 +181,11 @@ bool GitLocal::resetCommit(const QString &sha, CommitResetType type)
          break;
    }
 
-   QLog_Debug("Git", QString("Reseting commit: {%1} type {%2}").arg(sha, typeStr));
+   QLog_Debug("Git", QString("Resetting commit: {%1} type {%2}").arg(sha, typeStr));
 
    const auto cmd = QString("git reset --%1 %2").arg(typeStr, sha);
 
-   QLog_Trace("Git", QString("Reseting commit: {%1}").arg(cmd));
+   QLog_Trace("Git", QString("Resetting commit: {%1}").arg(cmd));
 
    const auto ret = mGitBase->run(cmd);
 
