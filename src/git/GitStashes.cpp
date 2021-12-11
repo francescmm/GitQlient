@@ -37,11 +37,11 @@ QVector<QString> GitStashes::getStashes()
 
 GitExecResult GitStashes::pop() const
 {
-   QLog_Debug("Git", QString("Poping the stash"));
+   QLog_Debug("Git", QString("Popping the stash"));
 
    const auto cmd = QString("git stash pop");
 
-   QLog_Trace("Git", QString("Poping the stash: {%1}").arg(cmd));
+   QLog_Trace("Git", QString("Popping the stash: {%1}").arg(cmd));
 
    const auto ret = mGitBase->run(cmd);
 
@@ -76,11 +76,11 @@ GitExecResult GitStashes::stashBranch(const QString &stashId, const QString &bra
 
 GitExecResult GitStashes::stashDrop(const QString &stashId)
 {
-   QLog_Debug("Git", QString("Droping stash: {%1}").arg(stashId));
+   QLog_Debug("Git", QString("Dropping stash: {%1}").arg(stashId));
 
    const auto cmd = QString("git stash drop -q %1").arg(stashId);
 
-   QLog_Trace("Git", QString("Droping stash: {%1}").arg(cmd));
+   QLog_Trace("Git", QString("Dropping stash: {%1}").arg(cmd));
 
    const auto ret = mGitBase->run(cmd);
 

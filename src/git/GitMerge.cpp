@@ -67,12 +67,12 @@ GitExecResult GitMerge::abortMerge() const
 
 GitExecResult GitMerge::applyMerge(const QString &msg) const
 {
-   QLog_Debug("Git", QString("Commiting merge"));
+   QLog_Debug("Git", QString("Committing merge"));
 
    const auto cmd = QString("git commit %1")
                         .arg(msg.isEmpty() ? QString::fromUtf8("--no-edit") : QString::fromUtf8("-m \"%1\"").arg(msg));
 
-   QLog_Trace("Git", QString("Commiting merge: {%1}").arg(cmd));
+   QLog_Trace("Git", QString("Committing merge: {%1}").arg(cmd));
 
    const auto ret = mGitBase->run(cmd);
 

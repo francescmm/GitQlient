@@ -102,7 +102,7 @@ signals:
    /*!
     \brief Signal triggered when changes are committed.
 
-    \param commited True if there was no error, false otherwise.
+    \param committed True if there was no error, false otherwise.
    */
    void changesCommitted();
    /*!

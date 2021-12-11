@@ -118,7 +118,7 @@ void WipWidget::commitChanges()
             }
             else
             {
-               QMessageBox msgBox(QMessageBox::Critical, tr("Error when commiting"),
+               QMessageBox msgBox(QMessageBox::Critical, tr("Error when committing"),
                                   tr("There were problems during the commit "
                                      "operation. Please, see the detailed "
                                      "description for more information."),

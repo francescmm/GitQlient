@@ -683,7 +683,7 @@ void CommitHistoryContextMenu::showSquashDialog()
    if (mCache->pendingLocalChanges())
    {
       QMessageBox::warning(this, tr("Squash not possible"),
-                           tr("Please, make sure there are no pending changes to be commited."));
+                           tr("Please, make sure there are no pending changes to be committed."));
    }
    else
    {

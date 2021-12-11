@@ -31,7 +31,7 @@ bool GitTags::getRemoteTags() const
 {
    if (!mCache.get())
    {
-      QLog_Fatal("Git", QString("Getting remote tages without cache."));
+      QLog_Fatal("Git", QString("Getting remote tags without cache."));
       assert(mCache.get());
    }
 

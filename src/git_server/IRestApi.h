@@ -152,7 +152,7 @@ public:
    virtual void testConnection() = 0;
    /**
     * @brief createIssue Creates a new issue in the remote Git server.
-    * @param issue The informatio of the issue.
+    * @param issue The information of the issue.
     */
    virtual void createIssue(const Issue &issue) = 0;
    /**

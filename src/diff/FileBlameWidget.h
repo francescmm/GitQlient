@@ -104,7 +104,7 @@ private:
    QString mCurrentFile;
 
    /*!
-    \brief Private class that stores data of a annotation. An annotation is the informatio regarding when a line was
+    \brief Private class that stores data of a annotation. An annotation is the information regarding when a line was
     last modified.
 
    */
@@ -147,7 +147,7 @@ private:
    */
    QLabel *createAuthorLabel(const QString &author, bool isFirst);
    /*!
-    \brief Factory method that creates a Clickable frame with the informatio of the commit (SHA and title).
+    \brief Factory method that creates a Clickable frame with the information of the commit (SHA and title).
 
     \param sha The sha to show.
     \param isFirst Indicates if it's the first item in the blame.
