@@ -40,7 +40,7 @@ public:
    /**
     * @brief focusOnBranch Sets the focus of the three in the item specified in  @p branch starting from the position @p
     * lastPos.
-    * @param item The text to seach in the tree and set the focus.
+    * @param item The text to search in the tree and set the focus.
     * @param lastPos Starting position for the search.
     * @return
     */

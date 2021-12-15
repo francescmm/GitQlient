@@ -49,7 +49,7 @@ signals:
 
 public:
    /**
-    * @brief Default constructor. This creates an empty
+    * @brief Default constructor. This creates an empty clickable (without label or possibility to add text later on).
     *
     * @param parent The parent widget if needed.
     */

@@ -36,7 +36,7 @@ It is planned to release for Linux, MacOs and Windows. However, take into accoun
 
 I've set up a small (and ugly) webpage for those developers that want to get some help understanding the different parts of the UI of GitQlient and how they are connected with the C++ code.
 
-The web shows the current UI deisgn with links to the code of the widgets when you click on the areas of the image. The code is shown in a frame near to the image, so a 1920px screen might be needed. Since I'm not a web developer and I don't intend to dedicate too much time to that, I'll update the guide only with major releases. If anybody wants to make it pritier and knows how to do it, please contact me to see if we can collaborate.
+The web shows the current UI design with links to the code of the widgets when you click on the areas of the image. The code is shown in a frame near to the image, so a 1920px screen might be needed. Since I'm not a web developer and I don't intend to dedicate too much time to that, I'll update the guide only with major releases. If anybody wants to make it pritier and knows how to do it, please contact me to see if we can collaborate.
 
 [Check the Interactive UI guide of GitQlient.](https://francescmm.github.io/gitqlient/)
 
@@ -46,7 +46,7 @@ The web shows the current UI deisgn with links to the code of the widgets when y
 
 #### AppImage
 
-GitQlient is offered in the form of AppImage. Although a big binary, it includes all the libraries needed to run. It is a portable multi-OS version so just download the versio you want from the [releases page](https://github.com/francescmm/GitQlient/releases) and execute it (make sure it has execution rights).
+GitQlient is offered in the form of AppImage. Although a big binary, it includes all the libraries needed to run. It is a portable multi-OS version so just download the version you want from the [releases page](https://github.com/francescmm/GitQlient/releases) and execute it (make sure it has execution rights).
 
 #### RPM package for Fedora
 

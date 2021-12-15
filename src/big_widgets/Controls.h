@@ -113,7 +113,7 @@ signals:
    void requestReferencesReload();
 
    /**
-    * @brief goConfig Signal triggered when the user seleced the config view.
+    * @brief goConfig Signal triggered when the user selected the config view.
     */
    void goConfig();
 
