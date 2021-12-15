@@ -118,6 +118,8 @@ QStringList splitArgList(const QString &cmd)
 AGitProcess::AGitProcess(const QString &workingDir)
    : mWorkingDirectory(workingDir)
 {
+   qRegisterMetaType<GitExecResult>("GitExecResult");
+
    setWorkingDirectory(mWorkingDirectory);
 
    connect(this, &AGitProcess::readyReadStandardOutput, this, &AGitProcess::onReadyStandardOutput,
@@ -187,8 +189,8 @@ void AGitProcess::onFinished(int exitCode, QProcess::ExitStatus exitStatus)
    const auto errorOutput = readAllStandardError();
 
    mErrorOutput = QString::fromUtf8(errorOutput);
-   mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error") || errorOutput.contains("fatal: ")
-       || errorOutput.toLower().contains("could not read username");
+   mRealError = exitStatus != QProcess::NormalExit || mCanceling || errorOutput.contains("error")
+       || errorOutput.contains("fatal: ") || errorOutput.toLower().contains("could not read username");
 
    if (mRealError)
    {
