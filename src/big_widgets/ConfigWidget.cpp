@@ -113,6 +113,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->cbStash->setChecked(settings.localValue("StashesHeader", true).toBool());
    ui->cbSubmodule->setChecked(settings.localValue("SubmodulesHeader", true).toBool());
    ui->cbSubtree->setChecked(settings.localValue("SubtreeHeader", true).toBool());
+   ui->cbDeleteFolder->setChecked(settings.localValue("DeleteRemoteFolder", false).toBool());
 
    // Build System configuration
    const auto isConfigured = settings.localValue("BuildSystemEnabled", false).toBool();
@@ -179,6 +180,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->cbStash, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbSubmodule, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbSubtree, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbDeleteFolder, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->leBsUrl, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->leBsUser, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->leBsToken, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
@@ -315,6 +317,8 @@ void ConfigWidget::saveConfig()
    settings.setLocalValue("StashesHeader", ui->cbStash->isChecked());
    settings.setLocalValue("SubmodulesHeader", ui->cbSubmodule->isChecked());
    settings.setLocalValue("SubtreeHeader", ui->cbSubtree->isChecked());
+
+   settings.setLocalValue("DeleteRemoteFolder", ui->cbDeleteFolder->isChecked());
 
    emit panelsVisibilityChanged();
 

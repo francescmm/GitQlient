@@ -122,4 +122,6 @@ private:
     * @brief onSelectionChanged Process when a selection has changed.
     */
    void onSelectionChanged();
+
+   void showDeleteFolderMenu(QTreeWidgetItem *item, const QPoint &pos);
 };

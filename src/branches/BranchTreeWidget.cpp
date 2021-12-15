@@ -6,6 +6,7 @@
 #include <GitBranches.h>
 #include <GitCache.h>
 #include <GitQlientBranchItemRole.h>
+#include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
 #include <PullDlg.h>
@@ -75,6 +76,20 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
          });
 
          menu->exec(viewport()->mapToGlobal(pos));
+      }
+      else
+      {
+         GitQlientSettings settings(mGit->getGitDir());
+         if (settings.localValue("DeleteRemoteFolder", false).toBool() || mLocal)
+            showDeleteFolderMenu(item, pos);
+         else
+         {
+            QMessageBox::warning(this, tr("Delete branch!"),
+                                 tr("Deleting multiple remote branches at the same time is disabled in the "
+                                    "configuration of GitQlient.\n\n"
+                                    "To enable, go to the Configuration panel, Repository tab."),
+                                 QMessageBox::Ok);
+         }
       }
    }
    else if (!mLocal)
@@ -165,4 +180,55 @@ void BranchTreeWidget::onSelectionChanged()
 
    if (!selection.isEmpty())
       selectCommit(selection.constFirst());
+}
+
+void BranchTreeWidget::showDeleteFolderMenu(QTreeWidgetItem *item, const QPoint &pos)
+{
+   const auto childrenCount = item->childCount();
+   QStringList branchesToRemove;
+
+   for (auto i = 0; i < childrenCount; ++i)
+      branchesToRemove.append(item->child(i)->data(0, FullNameRole).toString());
+
+   const auto menu = new QMenu(this);
+   connect(menu->addAction("Delete folder"), &QAction::triggered, this, [this, branchesToRemove]() {
+      auto ret = QMessageBox::warning(
+          this, tr("Delete branch!"),
+          tr("Are you sure you want to delete the following branches?\n\n%1").arg(branchesToRemove.join("\n")),
+          QMessageBox::Ok, QMessageBox::Cancel);
+
+      if (ret == QMessageBox::Ok)
+      {
+         auto deleted = false;
+         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+         for (const auto &branch : branchesToRemove)
+         {
+            const auto type = mLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
+            const auto sha = mCache->getShaOfReference(branch, type);
+            QScopedPointer<GitBranches> git(new GitBranches(mGit));
+            const auto ret2 = mLocal ? git->removeLocalBranch(branch) : git->removeRemoteBranch(branch);
+
+            if (ret2.success)
+            {
+               mCache->deleteReference(sha, type, branch);
+               deleted = true;
+            }
+            else
+               QMessageBox::critical(
+                   this, tr("Delete a branch failed"),
+                   tr("There were some problems while deleting the branch:<br><br> %1").arg(ret2.output));
+         }
+
+         QApplication::restoreOverrideCursor();
+
+         if (deleted)
+         {
+            emit mCache->signalCacheUpdated();
+            emit logReload();
+         }
+      }
+   });
+
+   menu->exec(viewport()->mapToGlobal(pos));
 }
