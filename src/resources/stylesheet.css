@@ -531,12 +531,6 @@ HistoryWidget CommitHistoryView QHeaderView:section
    border-right-style: solid;
 }
 
-HistoryWidget CommitHistoryView QHeaderView:section:last
-{
-   border-right-width: 0;
-}
-
-
 DiffWidget FileListWidget
 {
     border: 0;
@@ -841,6 +835,12 @@ BranchDlg > QLineEdit
     min-width: 15px;
     max-height: 15px;
     min-height: 15px;
+}
+
+BranchesWidget RefTreeWidget QHeaderView:section
+{
+   border-right-width: 1px;
+   border-right-style: solid;
 }
 
 /*********************************************/

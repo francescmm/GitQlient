@@ -705,6 +705,11 @@ BranchesWidget QListWidget
     background: #E6E6E7;
 }
 
+RefTreeWidget QHeaderView::section:last
+{
+   border-color: #E6E6E7;
+}
+
 /*********************************************/
 /*              BranchesWidget END           */
 /*********************************************/

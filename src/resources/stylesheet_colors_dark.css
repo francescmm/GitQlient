@@ -695,6 +695,11 @@ BranchDlg
     background: #606162;
 }
 
+RefTreeWidget QHeaderView::section:last
+{
+   border-color: #606162;
+}
+
 /*********************************************/
 /*              BranchesWidget END           */
 /*********************************************/
