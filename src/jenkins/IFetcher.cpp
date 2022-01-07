@@ -1,9 +1,9 @@
 #include "IFetcher.h"
 
+#include <QJsonDocument>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
-#include <QJsonDocument>
 
 #include <QLogger.h>
 

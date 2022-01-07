@@ -1,16 +1,16 @@
 #include "JobContainer.h"
-#include <JenkinsViewInfo.h>
-#include <JobFetcher.h>
-#include <JobButton.h>
 #include <ClickableFrame.h>
 #include <JenkinsJobPanel.h>
+#include <JenkinsViewInfo.h>
+#include <JobButton.h>
 #include <JobDetailsFetcher.h>
+#include <JobFetcher.h>
 
-#include <QVBoxLayout>
-#include <QScrollArea>
-#include <QTreeWidget>
 #include <QLabel>
 #include <QListWidget>
+#include <QScrollArea>
+#include <QTreeWidget>
+#include <QVBoxLayout>
 
 namespace Jenkins
 {
@@ -19,7 +19,7 @@ JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo
    : QFrame(parent)
    , mConfig(config)
    , mView(viewInfo)
-   , mJobFetcher(new JobFetcher(config, viewInfo.url, this))
+   , mJobFetcher(new JobFetcher(config, viewInfo.url, viewInfo.isCustomUrl, this))
    , mJobListLayout(new QVBoxLayout())
    , mJobPanel(new JenkinsJobPanel(config))
 {
@@ -35,8 +35,6 @@ JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo
    mMainLayout->setStretch(1, 70);
 
    connect(mJobFetcher, &JobFetcher::signalJobsReceived, this, &JobContainer::addJobs);
-   mJobFetcher->triggerFetch();
-
    connect(mJobPanel, &JenkinsJobPanel::gotoBranch, this, &JobContainer::gotoBranch);
    connect(mJobPanel, &JenkinsJobPanel::gotoPullRequest, this, &JobContainer::gotoPullRequest);
 }
@@ -44,6 +42,13 @@ JobContainer::JobContainer(const IFetcher::Config &config, const JenkinsViewInfo
 void JobContainer::reload()
 {
    mJobFetcher->triggerFetch();
+}
+
+void JobContainer::showEvent(QShowEvent *e)
+{
+   mJobFetcher->triggerFetch();
+
+   QFrame::showEvent(e);
 }
 
 void JobContainer::addJobs(const QMultiMap<QString, JenkinsJobInfo> &jobs)

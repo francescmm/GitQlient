@@ -1,8 +1,8 @@
 #pragma once
 
-#include <JenkinsViewInfo.h>
-#include <JenkinsJobInfo.h>
 #include <IFetcher.h>
+#include <JenkinsJobInfo.h>
+#include <JenkinsViewInfo.h>
 
 #include <QFrame>
 
@@ -31,6 +31,9 @@ public:
    explicit JobContainer(const IFetcher::Config &config, const JenkinsViewInfo &viewInfo, QWidget *parent = nullptr);
 
    void reload();
+
+protected:
+   void showEvent(QShowEvent *e) override;
 
 private:
    IFetcher::Config mConfig;

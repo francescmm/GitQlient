@@ -1,10 +1,10 @@
 #include "RepoFetcher.h"
 
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 #include <QLogger.h>
 
@@ -65,6 +65,9 @@ void RepoFetcher::processData(const QJsonDocument &json)
             if (jobObject.contains(QStringLiteral("name")))
                info.name = jobObject[QStringLiteral("name")].toString();
 
+            info.name.replace("%2F", "/");
+            info.name.replace("%20", " ");
+
             viewsInfo.append(info);
          }
          else if (jobObject[QStringLiteral("_class")].toString().contains("WorkflowJob"))
@@ -79,9 +82,11 @@ void RepoFetcher::processData(const QJsonDocument &json)
          const auto flag = QString::SkipEmptyParts;
 #endif
 
+         const auto url = viewObject[QStringLiteral("url")].toString();
          JenkinsViewInfo info;
-         info.url = viewObject[QStringLiteral("url")].toString();
-         info.name = info.url.split("/", flag).constLast();
+         info.name = url.split("/", flag).constLast();
+         info.url = url + QString::fromUtf8("api/json");
+         info.isCustomUrl = true;
          viewsInfo.prepend(info);
       }
    }
