@@ -1,36 +1,34 @@
 #include <JenkinsJobPanel.h>
 
 #include <BuildGeneralInfoFetcher.h>
-#include <CheckBox.h>
 #include <ButtonLink.hpp>
-#include <QPinnableTabWidget.h>
-#include <JobDetailsFetcher.h>
+#include <CheckBox.h>
 #include <DiffHelper.h>
+#include <JobDetailsFetcher.h>
+#include <QPinnableTabWidget.h>
 
 #include <QLogger.h>
 
-#include <QTimer>
 #include <QAuthenticator>
-#include <QUrlQuery>
+#include <QButtonGroup>
 #include <QComboBox>
-#include <QLineEdit>
-#include <QPlainTextEdit>
-#include <QUrl>
+#include <QDesktopServices>
 #include <QFile>
-#include <QLabel>
-#include <QGroupBox>
 #include <QGridLayout>
-#include <QScrollArea>
-#include <QRadioButton>
-#include <QButtonGroup>
-#include <QButtonGroup>
-#include <QStandardPaths>
+#include <QGroupBox>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMessageBox>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QMessageBox>
+#include <QPlainTextEdit>
 #include <QPushButton>
-#include <QDesktopServices>
-#include <QMessageBox>
+#include <QRadioButton>
+#include <QScrollArea>
+#include <QStandardPaths>
+#include <QTimer>
+#include <QUrl>
+#include <QUrlQuery>
 
 using namespace QLogger;
 
@@ -41,6 +39,7 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    : QFrame(parent)
    , mConfig(config)
    , mName(new ButtonLink())
+   , mRefresh(new ButtonLink(tr("Refresh view")))
    , mUrl(new ButtonLink(tr("Open job in Jenkins...")))
    , mBuild(new QPushButton(tr("Trigger build")))
    , mManager(new QNetworkAccessManager(this))
@@ -74,6 +73,8 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
    const auto linkLayout = new QHBoxLayout();
    linkLayout->setContentsMargins(QMargins());
    linkLayout->setSpacing(0);
+   linkLayout->addWidget(mRefresh);
+   linkLayout->addStretch();
    linkLayout->addWidget(mUrl);
    linkLayout->addStretch();
    linkLayout->addWidget(mBuild);
@@ -95,6 +96,8 @@ JenkinsJobPanel::JenkinsJobPanel(const IFetcher::Config &config, QWidget *parent
       else
          emit gotoBranch(mRequestedJob.name);
    });
+
+   connect(mRefresh, &ButtonLink::clicked, this, &JenkinsJobPanel::reloadJobInfo);
    connect(mUrl, &ButtonLink::clicked, this, [this]() { QDesktopServices::openUrl(mRequestedJob.url); });
    connect(mBuild, &QPushButton::clicked, this, &JenkinsJobPanel::triggerBuild);
 }
@@ -266,7 +269,11 @@ void JenkinsJobPanel::fillBuildLayout(const JenkinsJobBuildInfo &build, QHBoxLay
       stageLayout->setSpacing(0);
       stageLayout->addWidget(label);
       stageLayout->addWidget(time);
-      stageLayout->addStretch();
+
+      // Nasty workaround to remove 1px space in the first build that doesn't appear in the other because of the stretch
+      // at the end. It prevents the marks on the builds list to be in a different line.
+      if (layout == mLastBuildLayout)
+         stageLayout->addStretch();
 
       layout->addLayout(stageLayout);
    }
@@ -525,4 +532,19 @@ void JenkinsJobPanel::storeArtifact(const QString &fileName, int buildNumber)
       QMessageBox::warning(this, tr("File download error!"), tr("The file (%1) couldn't be downloaded.").arg(fileName));
 }
 
+void JenkinsJobPanel::reloadJobInfo()
+{
+   mRequestedJob.configFields.clear();
+   mRequestedJob.builds.clear();
+   const auto jobRequest = new JobDetailsFetcher(mConfig, mRequestedJob);
+   connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, this, &JenkinsJobPanel::onJobInfoReceived);
+   connect(jobRequest, &JobDetailsFetcher::signalJobDetailsRecieved, jobRequest, &JobDetailsFetcher::deleteLater);
+
+   jobRequest->triggerFetch();
+}
+
+void JenkinsJobPanel::onJobInfoReceived(const JenkinsJobInfo &newInfo)
+{
+   loadJobInfo(newInfo);
+}
 }
