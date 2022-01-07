@@ -15,9 +15,8 @@
 namespace Jenkins
 {
 
-JenkinsWidget::JenkinsWidget(const QString &repoDir, QWidget *parent)
+JenkinsWidget::JenkinsWidget(const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QWidget(parent)
-   , mRepoDir(repoDir)
    , mStackedLayout(new QStackedLayout())
    , mBodyLayout(new QHBoxLayout())
    , mBtnGroup(new QButtonGroup())
@@ -26,10 +25,9 @@ JenkinsWidget::JenkinsWidget(const QString &repoDir, QWidget *parent)
 {
    setObjectName("JenkinsWidget");
 
-   GitQlientSettings settings(mRepoDir);
-   const auto url = settings.localValue("BuildSystemUrl", "").toString();
-   const auto user = settings.localValue("BuildSystemUser", "").toString();
-   const auto token = settings.localValue("BuildSystemToken", "").toString();
+   const auto url = settings->localValue("BuildSystemUrl", "").toString();
+   const auto user = settings->localValue("BuildSystemUser", "").toString();
+   const auto token = settings->localValue("BuildSystemToken", "").toString();
 
    mConfig = IFetcher::Config { user, token, nullptr };
    mConfig.accessManager.reset(new QNetworkAccessManager());

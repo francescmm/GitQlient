@@ -12,6 +12,7 @@ class QButtonGroup;
 class QHBoxLayout;
 class QVBoxLayout;
 class QTimer;
+class GitQlientSettings;
 
 namespace Jenkins
 {
@@ -28,13 +29,12 @@ signals:
    void gotoBranch(const QString &branchName);
 
 public:
-   JenkinsWidget(const QString &repoDir, QWidget *parent = nullptr);
+   JenkinsWidget(const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
    ~JenkinsWidget() override;
 
    void reload() const;
 
 private:
-   QString mRepoDir;
    IFetcher::Config mConfig;
    QStackedLayout *mStackedLayout = nullptr;
    RepoFetcher *mRepoFetcher = nullptr;
