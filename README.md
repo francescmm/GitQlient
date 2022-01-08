@@ -42,6 +42,10 @@ The web shows the current UI design with links to the code of the widgets when y
 
 ## How to install GitQlient
 
+<a href="https://repology.org/project/gitqlient/versions">
+    <img src="https://repology.org/badge/vertical-allrepos/gitqlient.svg" alt="Packaging status" align="right">
+</a>
+
 ### Linux
 
 #### AppImage
@@ -69,6 +73,14 @@ For Windows 10 there is a package provided on every release. It installs all the
 ### MacOS
 
 For MacOS there is also a DMG package you can install as usual. Take into account that because of lack of resources this version is not tested.
+
+#### MacPorts package
+
+GitQlient is available in [MacPorts](https://ports.macports.org/port/gitqlient/). To install, type the following command in the terminal:
+
+```
+sudo port install gitqlient
+```
 
 ## Translating GitQlient
 
