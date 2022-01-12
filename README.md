@@ -73,6 +73,12 @@ For Windows 10 there is a package provided on every release. It installs all the
 ### MacOS
 
 For MacOS there is also a DMG package you can install as usual. Take into account that because of lack of resources this version is not tested.
+    
+If the app appears damaged and can't be opened, run the following (see [#234](https://github.com/francescmm/GitQlient/issues/234)):
+
+```
+sudo xattr -rd com.apple.quarantine /Applications/gitqlient.app
+```
 
 #### MacPorts package
 
