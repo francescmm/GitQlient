@@ -144,6 +144,9 @@ GitQlient::~GitQlient()
    settings.setGlobalValue("GitQlientGeometry", saveGeometry());
 
    QLog_Info("UI", "*            Closing GitQlient            *\n\n");
+
+   if (mMoveLogs)
+      QLoggerManager::getInstance()->moveLogsWhenClose(settings.globalValue("logsFolder").toString());
 }
 
 bool GitQlient::eventFilter(QObject *obj, QEvent *event)
@@ -291,6 +294,9 @@ bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
    else
       QLoggerManager::getInstance()->pause();
 
+   const auto logsFolder = settings.globalValue("logsFolder").toString();
+   QLoggerManager::getInstance()->setDefaultFileDestinationFolder(logsFolder);
+
    if (parser.isSet(versionOption))
    {
       QTextStream out(stdout);
@@ -302,7 +308,8 @@ bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
       ret = false;
 
    const auto manager = QLoggerManager::getInstance();
-   manager->addDestination("GitQlient.log", { "UI", "Git", "Cache" }, logLevel);
+   manager->addDestination("GitQlient.log", { "UI", "Git", "Cache" }, logLevel, {}, LogMode::OnlyFile,
+                           LogFileDisplay::DateTime, LogMessageDisplay::Default, false);
 
    return ret;
 }
@@ -344,6 +351,7 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
          connect(repo, &GitQlientRepo::signalOpenSubmodule, this, &GitQlient::addRepoTab);
          connect(repo, &GitQlientRepo::repoOpened, this, &GitQlient::onSuccessOpen);
          connect(repo, &GitQlientRepo::currentBranchChanged, this, &GitQlient::updateWindowTitle);
+         connect(repo, &GitQlientRepo::moveLogsAndClose, this, &GitQlient::moveLogsBeforeClose);
 
          repo->setRepository(repoName);
 
@@ -453,4 +461,11 @@ void GitQlient::updateWindowTitle()
          setWindowTitle(QString("GitQlient %1 - %2 (%3)").arg(VER, currentName, currentBranch));
       }
    }
+}
+
+void GitQlient::moveLogsBeforeClose()
+{
+   mMoveLogs = true;
+
+   close();
 }

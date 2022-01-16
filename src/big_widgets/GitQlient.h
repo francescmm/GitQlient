@@ -100,6 +100,7 @@ private:
    QSharedPointer<GitConfig> mGit;
    ProgressDlg *mProgressDlg = nullptr;
    QString mPathToOpen;
+   bool mMoveLogs = false;
 
    /*!
     \brief Opens a QFileDialog to select a repository in the local disk.
@@ -180,4 +181,9 @@ private:
     * @param currentTabIndex The current tab index used to retrieve the repository.
     */
    void updateWindowTitle();
+
+   /**
+    * @brief moveLogsBeforeClose Marks the logs to be moved to their new folder before GitQlient closes.
+    */
+   void moveLogsBeforeClose();
 };

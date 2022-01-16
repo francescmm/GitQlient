@@ -25,6 +25,7 @@ signals:
    void commitTitleMaxLenghtChanged();
    void panelsVisibilityChanged();
    void pomodoroVisibilityChanged();
+   void moveLogsAndClose();
 
 public:
    explicit ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
@@ -48,6 +49,8 @@ private:
    void enableWidgets();
    void saveFile();
    void showCredentialsDlg();
+   void selectFolder();
+   void useDefaultLogsFolder();
 
 private slots:
    void saveConfig();

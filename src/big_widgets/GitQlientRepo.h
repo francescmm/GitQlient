@@ -101,6 +101,12 @@ signals:
     */
    void currentBranchChanged();
 
+   /**
+    * @brief moveLogsAndClose Signal triggered when the logs have change the destination folder. GitQlient needs to
+    * restart.
+    */
+   void moveLogsAndClose();
+
 public:
    /*!
     \brief Default constructor.

@@ -1,15 +1,16 @@
 #include "ConfigWidget.h"
 #include "ui_ConfigWidget.h"
 
+#include <CredentialsDlg.h>
 #include <FileEditor.h>
 #include <GitBase.h>
+#include <GitConfig.h>
+#include <GitCredentials.h>
 #include <GitQlientSettings.h>
 #include <QLogger.h>
 
-#include <CredentialsDlg.h>
-#include <GitConfig.h>
-#include <GitCredentials.h>
 #include <QDir>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QProcess>
@@ -78,6 +79,12 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    globalGitLayout->addWidget(mGlobalGit);
 
    GitQlientSettings settings(mGit->getGitDir());
+
+   const auto logsFolder = settings.globalValue("logsFolder").toString();
+   if (logsFolder.isEmpty())
+      settings.setGlobalValue("logsFolder", QString(QDir::currentPath()).append("/logs/"));
+
+   ui->leLogsLocation->setText(settings.globalValue("logsFolder").toString());
 
    ui->chDevMode->setChecked(settings.localValue("DevMode", false).toBool());
    enableWidgets();
@@ -184,6 +191,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->leBsUrl, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->leBsUser, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->leBsToken, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
+   connect(ui->pbSelectFolder, &QPushButton::clicked, this, &ConfigWidget::selectFolder);
+   connect(ui->pbDefault, &QPushButton::clicked, this, &ConfigWidget::useDefaultLogsFolder);
 
    calculateCacheSize();
 }
@@ -277,6 +286,7 @@ void ConfigWidget::saveConfig()
 
    settings.setGlobalValue("logsDisabled", ui->chDisableLogs->isChecked());
    settings.setGlobalValue("logsLevel", ui->cbLogLevel->currentIndex());
+   settings.setGlobalValue("logsFolder", ui->leLogsLocation->text());
    settings.setGlobalValue("commitTitleMaxLength", ui->spCommitTitleLength->value());
    settings.setGlobalValue("FileDiffView/FontSize", ui->sbEditorFontSize->value());
    settings.setGlobalValue("colorSchema", ui->cbStyle->currentText());
@@ -383,5 +393,53 @@ void ConfigWidget::showCredentialsDlg()
          CredentialsDlg dlg(mGit, this);
          dlg.exec();
       }
+   }
+}
+
+void ConfigWidget::selectFolder()
+{
+   const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory for the GitQlient logs"));
+
+   if (!dirName.isEmpty())
+   {
+      QDir d(dirName);
+
+      const auto ret = QMessageBox::information(
+          this, tr("Restart needed!"),
+          tr("The folder chosen to store GitQlient logs is: <br> <strong>%1</strong>. If you "
+             "confirm the change, GitQlient will move all the logs to that folder. Once done, "
+             "GitQlient will close. You need to restart it.")
+              .arg(d.absolutePath()),
+          QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Cancel);
+
+      if (ret == QMessageBox::Ok)
+      {
+         ui->leLogsLocation->setText(d.absolutePath());
+
+         saveConfig();
+
+         emit moveLogsAndClose();
+      }
+   }
+}
+
+void ConfigWidget::useDefaultLogsFolder()
+{
+   const auto dir = QDir::currentPath() + "/logs/";
+   const auto ret
+       = QMessageBox::information(this, tr("Restart needed!"),
+                                  tr("The folder chosen to store GitQlient logs is: <br> <strong>%1</strong>. If you "
+                                     "confirm the change, GitQlient will move all the logs to that folder. Once done, "
+                                     "GitQlient will close. You need to restart it.")
+                                      .arg(dir),
+                                  QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Cancel);
+
+   if (ret == QMessageBox::Ok)
+   {
+      ui->leLogsLocation->setText(dir);
+
+      saveConfig();
+
+      emit moveLogsAndClose();
    }
 }
