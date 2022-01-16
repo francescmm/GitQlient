@@ -168,6 +168,12 @@ public:
     */
    void overwriteMaxFileSize(int maxSize);
 
+   /**
+    * @brief moveLogsWhenClose Moves all the logs to a new folder. This will happen only on close.
+    * @param newLogsFolder The new folder that will store the logs.
+    */
+   void moveLogsWhenClose(const QString &newLogsFolder) { mNewLogsFolder = newLogsFolder; }
+
 private:
    /**
     * @brief Checks if the logger is stop
@@ -195,6 +201,7 @@ private:
    LogLevel mDefaultLevel = LogLevel::Warning;
    int mDefaultMaxFileSize = 1024 * 1024; //! @note 1Mio
    LogMessageDisplays mDefaultMessageOptions = LogMessageDisplay::Default;
+   QString mNewLogsFolder;
 
    /**
     * @brief Mutex to make the method thread-safe.

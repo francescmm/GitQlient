@@ -145,18 +145,18 @@ void QLoggerManager::writeAndDequeueMessages(const QString &module)
    {
       const auto values = mNonWriterQueue.values(module);
 
-      for (const auto &values : values)
+      for (const auto &vals : values)
       {
-         const auto level = qvariant_cast<LogLevel>(values.at(2).toInt());
+         const auto level = qvariant_cast<LogLevel>(vals.at(2).toInt());
 
          if (logWriter->getLevel() <= level)
          {
-            const auto datetime = values.at(0).toDateTime();
-            const auto threadId = values.at(1).toString();
-            const auto function = values.at(3).toString();
-            const auto file = values.at(4).toString();
-            const auto line = values.at(5).toInt();
-            const auto message = values.at(6).toString();
+            const auto datetime = vals.at(0).toDateTime();
+            const auto threadId = vals.at(1).toString();
+            const auto function = vals.at(3).toString();
+            const auto file = vals.at(4).toString();
+            const auto line = vals.at(5).toInt();
+            const auto message = vals.at(6).toString();
 
             logWriter->enqueue(datetime, threadId, module, level, function, file, line, message);
          }
@@ -250,16 +250,43 @@ QLoggerManager::~QLoggerManager()
    for (const auto &dest : mModuleDest.toStdMap())
       writeAndDequeueMessages(dest.first);
 
+   QVector<QString> oldFiles;
+
    for (auto dest : qAsConst(mModuleDest))
    {
       dest->closeDestination();
       dest->wait();
+
+      oldFiles.append(dest->getFileDestinationFolder());
    }
 
    for (auto dest : qAsConst(mModuleDest))
       delete dest;
 
    mModuleDest.clear();
+
+   if (!mNewLogsFolder.isEmpty() && mNewLogsFolder != mDefaultFileDestinationFolder)
+   {
+      for (const auto &oldDestination : oldFiles)
+      {
+         QDir dir(oldDestination);
+
+         auto entryList = dir.entryList(QDir::Files | QDir::System | QDir::Hidden);
+
+         for (const auto &filePath : qAsConst(entryList))
+         {
+            auto destination = mNewLogsFolder;
+            if (!destination.endsWith("/"))
+               destination.append("/");
+            destination.append(filePath.split("/").last());
+
+            QDir().rename(oldDestination + "/" + filePath, destination);
+
+            if (dir.isEmpty())
+               dir.removeRecursively();
+         }
+      }
+   }
 }
 
 }
