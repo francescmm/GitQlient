@@ -45,7 +45,11 @@ QLoggerWriter::QLoggerWriter(const QString &fileDestination, LogLevel level, con
    , mLevel(level)
    , mMessageOptions(messageOptions)
 {
-   mFileDestinationFolder = (fileFolderDestination.isEmpty() ? QDir::currentPath() : fileFolderDestination) + "/logs/";
+   mFileDestinationFolder = fileFolderDestination.isEmpty() ? QDir::currentPath() + "/logs/" : fileFolderDestination;
+
+   if (!mFileDestinationFolder.endsWith("/"))
+      mFileDestinationFolder.append("/");
+
    mFileDestination = mFileDestinationFolder + fileDestination;
 
    QDir dir(mFileDestinationFolder);
@@ -216,7 +220,7 @@ void QLoggerWriter::enqueue(const QDateTime &date, const QString &threadId, cons
 
    text.append(QString::fromLatin1("\n"));
 
-   mMessages.append({ threadId, text });
+   mMessages.append(text);
 
    if (!mIsStop)
       mQueueNotEmpty.wakeAll();
