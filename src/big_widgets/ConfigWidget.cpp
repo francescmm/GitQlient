@@ -95,6 +95,13 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->spCommitTitleLength->setValue(settings.globalValue("commitTitleMaxLength", 50).toInt());
    ui->sbEditorFontSize->setValue(settings.globalValue("FileDiffView/FontSize", 8).toInt());
 
+#ifdef Q_OS_LINUX
+   ui->leExtFileExplorer->setText(settings.globalValue("FileExplorer", "xdg-open").toString());
+#else
+   ui->leExtFileExplorer->setHidden(true);
+   ui->labelExtFileExplorer->setHidden(true);
+#endif
+
    const auto originalStyles = settings.globalValue("colorSchema", "dark").toString();
    ui->cbStyle->setCurrentText(originalStyles);
    connect(ui->cbStyle, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged), this,
@@ -193,6 +200,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->leBsToken, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->pbSelectFolder, &QPushButton::clicked, this, &ConfigWidget::selectFolder);
    connect(ui->pbDefault, &QPushButton::clicked, this, &ConfigWidget::useDefaultLogsFolder);
+   connect(ui->leExtFileExplorer, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
 
    calculateCacheSize();
 }
@@ -291,6 +299,10 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("FileDiffView/FontSize", ui->sbEditorFontSize->value());
    settings.setGlobalValue("colorSchema", ui->cbStyle->currentText());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
+
+#ifdef Q_OS_LINUX
+   settings.setGlobalValue("FileExplorer", ui->leExtFileExplorer->text());
+#endif
 
    mLocalGit->changeFontSize();
    mGlobalGit->changeFontSize();
