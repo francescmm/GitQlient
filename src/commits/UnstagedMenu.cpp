@@ -2,6 +2,7 @@
 
 #include <GitBase.h>
 #include <GitLocal.h>
+#include <GitQlientSettings.h>
 #include <GitSyncProcess.h>
 #include <QLogger.h>
 
@@ -22,6 +23,7 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
    connect(addAction(tr("Blame")), &QAction::triggered, this, [this]() { emit signalShowFileHistory(mFileName); });
    connect(addAction(tr("Edit file")), &QAction::triggered, this,
            [this]() { emit signalEditFile(mGit->getWorkingDir() + "/" + mFileName); });
+   connect(addAction(tr("Open containing folder")), &QAction::triggered, this, &UnstagedMenu::openFileExplorer);
 
    addSeparator();
 
@@ -150,4 +152,42 @@ void UnstagedMenu::onDeleteFile()
 
    if (p.waitForFinished())
       emit signalCheckedOut();
+}
+
+void UnstagedMenu::openFileExplorer()
+{
+   QString absoluteFilePath = mGit->getWorkingDir() + QString("/") + mFileName;
+   absoluteFilePath = absoluteFilePath.left(absoluteFilePath.lastIndexOf("/"));
+   QString app;
+   QStringList arguments;
+#ifdef Q_OS_LINUX
+   GitQlientSettings settings;
+   const auto fileExplorer = settings.globalValue("FileExplorer", "xdg-open").toString();
+
+   if (fileExplorer.isEmpty())
+   {
+      QMessageBox::critical(parentWidget(), tr("Error opening file explorer"),
+                            tr("The file explorer value in the settings is invalid. Please define what file explorer "
+                               "you want to use to open file locations."));
+      return;
+   }
+
+   arguments = fileExplorer.split(" ");
+   arguments.append(absoluteFilePath);
+   app = arguments.takeFirst();
+#elif Q_OS_WIN
+   app = QString::fromUtf8("explorer.ext");
+   arguments = { "/select", QDir::toNativeSeparators(absoluteFilePath) };
+#elif Q_OS_MACOS
+   app = QString::fromUtf8("/usr/bin/open");
+   arguments = { "-R", absoluteFilePath };
+#endif
+
+   auto ret = QProcess::startDetached(app, arguments);
+
+   if (!ret)
+   {
+      QMessageBox::critical(parentWidget(), tr("Error opening file explorer"),
+                            tr("There was a problem opening the file explorer."));
+   }
 }
