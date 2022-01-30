@@ -1,10 +1,16 @@
 #include "FileContextMenu.h"
 
+#include <GitQlientSettings.h>
 #include <QApplication>
 #include <QClipboard>
+#include <QDir>
+#include <QMessageBox>
+#include <QProcess>
 
-FileContextMenu::FileContextMenu(const QString &file, bool editionAllowed, QWidget *parent)
+FileContextMenu::FileContextMenu(const QString gitProject, const QString &file, bool editionAllowed, QWidget *parent)
    : QMenu(parent)
+   , mFile(file)
+   , mGitProject(gitProject.endsWith("/") ? gitProject : gitProject + QString("/"))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -25,6 +31,45 @@ FileContextMenu::FileContextMenu(const QString &file, bool editionAllowed, QWidg
       addSeparator();
    }
 
-   const auto copyPathAction = addAction(tr("Copy path"));
-   connect(copyPathAction, &QAction::triggered, this, [file]() { QApplication::clipboard()->setText(file); });
+   connect(addAction(tr("Open containing folder")), &QAction::triggered, this, &FileContextMenu::openFileExplorer);
+   connect(addAction(tr("Copy path")), &QAction::triggered, this,
+           [this]() { QApplication::clipboard()->setText(mFile); });
+}
+
+void FileContextMenu::openFileExplorer()
+{
+   QString absoluteFilePath = mGitProject + mFile;
+   absoluteFilePath = absoluteFilePath.left(absoluteFilePath.lastIndexOf("/"));
+   QString app;
+   QStringList arguments;
+#ifdef Q_OS_LINUX
+   GitQlientSettings settings;
+   const auto fileExplorer = settings.globalValue("FileBrowser", "xdg-open").toString();
+
+   if (fileExplorer.isEmpty())
+   {
+      QMessageBox::critical(parentWidget(), tr("Error opening file explorer"),
+                            tr("The file explorer value in the settings is invalid. Please define what file explorer "
+                               "you want to use to open file locations."));
+      return;
+   }
+
+   arguments = fileExplorer.split(" ");
+   arguments.append(absoluteFilePath);
+   app = arguments.takeFirst();
+#elif Q_OS_WIN
+   app = QString::fromUtf8("explorer.ext");
+   arguments = { "/select", QDir::toNativeSeparators(absoluteFilePath) };
+#elif Q_OS_MACOS
+   app = QString::fromUtf8("/usr/bin/open");
+   arguments = { "-R", absoluteFilePath };
+#endif
+
+   auto ret = QProcess::startDetached(app, arguments);
+
+   if (!ret)
+   {
+      QMessageBox::critical(parentWidget(), tr("Error opening file explorer"),
+                            tr("There was a problem opening the file explorer."));
+   }
 }
