@@ -109,9 +109,9 @@
         <file alias="ahead">resources/icons/ahead.svg</file>
         <file>resources/icons/arrow_down.png</file>
         <file>resources/icons/arrow_up.png</file>
-        <file>resources/icons/remove-symbol.png</file>
-        <file>resources/icons/remove-symbol_hover.png</file>
-        <file>resources/icons/remove-symbol_press.png</file>
+        <file alias="rm_symbol">resources/icons/remove-symbol.png</file>
+        <file alias="rm_symbol_hover">resources/icons/remove-symbol_hover.png</file>
+        <file alias="rm_symbol_press">resources/icons/remove-symbol_press.png</file>
         <file alias="tag_indicator">resources/icons/tag_indicator.svg</file>
         <file alias="burger_menu">resources/icons/burger_menu.svg</file>
         <file alias="unsigned">resources/icons/unsigned.svg</file>

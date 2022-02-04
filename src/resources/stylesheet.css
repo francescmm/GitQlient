@@ -183,17 +183,17 @@ QTabWidget > QTabBar::tab:!selected
 
 QTabWidget > QTabBar::close-button
 {
-   image: url(:/icons/resources/icons/remove-symbol.png);
+   image: url(:/icons/rm_symbol);
 }
 
 QTabWidget > QTabBar::close-button:hover
 {
-   image: url(:/icons/resources/icons/remove-symbol_hover.png);
+   image: url(:/icons/rm_symbol_hover);
 }
 
 QTabWidget > QTabBar::close-button:pressed
 {
-   image: url(":/icons/resources/icons/remove-symbol_press");
+   image: url(:/icons/rm_symbol_press);
 }
 
 QToolTip
@@ -464,7 +464,7 @@ PomodoroButton > QLabel
 }
 
 #MainMenuBtn::menu-indicator {
-    image: url();
+    image: none;
 }
 
 /*********************************************/
