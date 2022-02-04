@@ -98,6 +98,7 @@ GitQlient::GitQlient(QWidget *parent)
    menu->addMenu(mostUsed);
 
    mRepos->setObjectName("GitQlientTab");
+   mRepos->setStyleSheet(GitQlientStyles::getStyles());
    mRepos->setCornerWidget(homeMenu, Qt::TopLeftCorner);
    connect(mRepos, &QTabWidget::tabCloseRequested, this, &GitQlient::closeTab);
    connect(mRepos, &QTabWidget::currentChanged, this, &GitQlient::updateWindowTitle);

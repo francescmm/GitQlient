@@ -175,12 +175,12 @@ void UnstagedMenu::openFileExplorer()
    arguments = fileExplorer.split(" ");
    arguments.append(absoluteFilePath);
    app = arguments.takeFirst();
-#elif Q_OS_WIN
+#elif defined(Q_OS_WIN)
    app = QString::fromUtf8("explorer.ext");
-   arguments = { "/select", QDir::toNativeSeparators(absoluteFilePath) };
-#elif Q_OS_MACOS
+   arguments = QStringList { "/select", QDir::toNativeSeparators(absoluteFilePath) };
+#elif defined(Q_OS_OSX)
    app = QString::fromUtf8("/usr/bin/open");
-   arguments = { "-R", absoluteFilePath };
+   arguments = QStringList { "-R", absoluteFilePath };
 #endif
 
    auto ret = QProcess::startDetached(app, arguments);
