@@ -116,6 +116,7 @@ RevisionFiles GitWip::fakeWorkDirRevFile(const QString &diffIndex, const QString
    }
 
    RevisionFiles cachedFiles(diffIndexCache, true);
+   cachedFiles.setOnlyModified(false);
 
    for (auto i = 0; i < rf.count(); i++)
    {
