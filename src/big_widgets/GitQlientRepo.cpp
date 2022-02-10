@@ -288,6 +288,7 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
       mControls->enableButtons(true);
 
       mAutoFilesUpdate->start();
+      mAutoFetch->start();
 
       QScopedPointer<GitConfig> git(new GitConfig(mGitBase));
 
