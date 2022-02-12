@@ -410,9 +410,10 @@ void ConfigWidget::showCredentialsDlg()
 
 void ConfigWidget::selectFolder()
 {
-   const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory for the GitQlient logs"));
+   const QString dirName(
+       QFileDialog::getExistingDirectory(this, "Choose the directory for the GitQlient logs", QDir::currentPath()));
 
-   if (!dirName.isEmpty())
+   if (!dirName.isEmpty() && dirName != QDir::currentPath().append("logs"))
    {
       QDir d(dirName);
 
@@ -437,21 +438,25 @@ void ConfigWidget::selectFolder()
 
 void ConfigWidget::useDefaultLogsFolder()
 {
-   const auto dir = QDir::currentPath() + "/logs/";
-   const auto ret
-       = QMessageBox::information(this, tr("Restart needed!"),
-                                  tr("The folder chosen to store GitQlient logs is: <br> <strong>%1</strong>. If you "
-                                     "confirm the change, GitQlient will move all the logs to that folder. Once done, "
-                                     "GitQlient will close. You need to restart it.")
-                                      .arg(dir),
-                                  QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Cancel);
+   const auto dir = QDir::currentPath().append("/logs");
 
-   if (ret == QMessageBox::Ok)
+   if (dir != ui->leLogsLocation->text())
    {
-      ui->leLogsLocation->setText(dir);
+      const auto ret = QMessageBox::information(
+          this, tr("Restart needed!"),
+          tr("The folder chosen to store GitQlient logs is: <br> <strong>%1</strong>. If you "
+             "confirm the change, GitQlient will move all the logs to that folder. Once done, "
+             "GitQlient will close. You need to restart it.")
+              .arg(dir),
+          QMessageBox::StandardButton::Ok, QMessageBox::StandardButton::Cancel);
 
-      saveConfig();
+      if (ret == QMessageBox::Ok)
+      {
+         ui->leLogsLocation->setText(dir);
 
-      emit moveLogsAndClose();
+         saveConfig();
+
+         emit moveLogsAndClose();
+      }
    }
 }

@@ -223,6 +223,9 @@
             </item>
             <item>
              <widget class="QPushButton" name="pbDefault">
+              <property name="toolTip">
+               <string>Reset to default value</string>
+              </property>
               <property name="icon">
                <iconset resource="../resources.qrc">
                 <normaloff>:/icons/back</normaloff>:/icons/back</iconset>
