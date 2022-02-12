@@ -7,6 +7,8 @@
 
 using namespace GitQlient;
 
+constexpr auto DefaultHeight = 30.0;
+
 BranchesViewDelegate::BranchesViewDelegate(bool isTag, QObject *parent)
    : QStyledItemDelegate(parent)
    , mIsTag(isTag)
@@ -65,26 +67,21 @@ void BranchesViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &o, con
 
    p->setPen(GitQlientStyles::getTextColor());
 
-   QFontMetrics fm(newOpt.font);
-
    newOpt.font.setBold(i.data(Qt::UserRole).toBool());
 
    if (i.data().toString() == "detached")
       newOpt.font.setItalic(true);
-
-   p->setFont(newOpt.font);
-
-   const auto elidedText = fm.elidedText(i.data().toString(), Qt::ElideRight, newOpt.rect.width());
 
    if (i.column() == 0)
       newOpt.rect.setX(newOpt.rect.x() + iconSize + offset);
    else
       newOpt.rect.setX(newOpt.rect.x() + iconSize - offset);
 
-   p->drawText(newOpt.rect, elidedText, QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
+   p->setFont(newOpt.font);
+   p->drawText(newOpt.rect, i.data().toString(), QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
 }
 
 QSize BranchesViewDelegate::sizeHint(const QStyleOptionViewItem &, const QModelIndex &) const
 {
-   return QSize(0, 25);
+   return QSize(0, DefaultHeight);
 }
