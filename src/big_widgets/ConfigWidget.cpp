@@ -124,6 +124,9 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    ui->cbPomodoroEnabled->setChecked(settings.localValue("Pomodoro/Enabled", true).toBool());
 
+   ui->cbLocal->setChecked(settings.localValue("LocalHeader", true).toBool());
+   ui->cbRemote->setChecked(settings.localValue("RemoteHeader", true).toBool());
+   ui->cbTags->setChecked(settings.localValue("TagsHeader", true).toBool());
    ui->cbStash->setChecked(settings.localValue("StashesHeader", true).toBool());
    ui->cbSubmodule->setChecked(settings.localValue("SubmodulesHeader", true).toBool());
    ui->cbSubtree->setChecked(settings.localValue("SubtreeHeader", true).toBool());
@@ -191,6 +194,9 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->updateOnPull, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->clangFormat, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbPomodoroEnabled, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbLocal, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbRemote, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbTags, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbStash, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbSubmodule, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbSubtree, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
@@ -214,6 +220,9 @@ void ConfigWidget::onPanelsVisibilityChanged()
 {
    GitQlientSettings settings(mGit->getGitDir());
 
+   ui->cbLocal->setChecked(settings.localValue("LocalHeader", true).toBool());
+   ui->cbRemote->setChecked(settings.localValue("RemoteHeader", true).toBool());
+   ui->cbTags->setChecked(settings.localValue("TagsHeader", true).toBool());
    ui->cbStash->setChecked(settings.localValue("StashesHeader", true).toBool());
    ui->cbSubmodule->setChecked(settings.localValue("SubmodulesHeader", true).toBool());
    ui->cbSubtree->setChecked(settings.localValue("SubtreeHeader", true).toBool());
@@ -336,6 +345,9 @@ void ConfigWidget::saveConfig()
    settings.setLocalValue("UpdateOnPull", ui->updateOnPull->isChecked());
    settings.setLocalValue("MaxCommits", ui->sbMaxCommits->value());
 
+   settings.setLocalValue("LocalHeader", ui->cbLocal->isChecked());
+   settings.setLocalValue("RemoteHeader", ui->cbRemote->isChecked());
+   settings.setLocalValue("TagsHeader", ui->cbTags->isChecked());
    settings.setLocalValue("StashesHeader", ui->cbStash->isChecked());
    settings.setLocalValue("SubmodulesHeader", ui->cbSubmodule->isChecked());
    settings.setLocalValue("SubtreeHeader", ui->cbSubtree->isChecked());

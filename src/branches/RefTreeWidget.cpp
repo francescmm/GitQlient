@@ -2,6 +2,8 @@
 
 #include <GitQlientBranchItemRole.h>
 
+#include <QHeaderView>
+
 using namespace GitQlient;
 
 RefTreeWidget::RefTreeWidget(QWidget *parent)
@@ -10,6 +12,7 @@ RefTreeWidget::RefTreeWidget(QWidget *parent)
 {
    setContextMenuPolicy(Qt::CustomContextMenu);
    setAttribute(Qt::WA_DeleteOnClose);
+   header()->setHidden(true);
 }
 
 int RefTreeWidget::focusOnBranch(const QString &itemText, int startSearchPos)

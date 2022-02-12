@@ -154,11 +154,17 @@ private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitTags> mGitTags;
+   QLabel *mLocalBranchesCount = nullptr;
+   QLabel *mLocalBranchesArrow = nullptr;
    BranchTreeWidget *mLocalBranchesTree = nullptr;
    BranchesViewDelegate *mLocalDelegate = nullptr;
+   QLabel *mRemoteBranchesCount = nullptr;
+   QLabel *mRemoteBranchesArrow = nullptr;
    BranchTreeWidget *mRemoteBranchesTree = nullptr;
    BranchesViewDelegate *mRemotesDelegate = nullptr;
    BranchesViewDelegate *mTagsDelegate = nullptr;
+   QLabel *mTagsCount = nullptr;
+   QLabel *mTagsArrow = nullptr;
    RefTreeWidget *mTagsTree = nullptr;
    QListWidget *mStashesList = nullptr;
    QLabel *mStashesCount = nullptr;
@@ -251,6 +257,22 @@ private:
     * @param p The position where the menu will be displayed.
     */
    void showSubtreesContextMenu(const QPoint &p);
+
+   /**
+    * @brief Expands or collapses the local branches list.
+    */
+   void onLocalHeaderClicked();
+
+   /**
+    * @brief Expands or collapses the remote branches list.
+    */
+   void onRemoteHeaderClicked();
+
+   /**
+    * @brief Expands or collapses the tags list.
+    */
+   void onTagsHeaderClicked();
+
    /*!
     \brief Expands or contracts the stashes list widget.
 
