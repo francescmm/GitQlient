@@ -340,6 +340,9 @@ void ConfigWidget::saveConfig()
    }
 
    settings.setLocalValue("AutoFetch", ui->autoFetch->value());
+
+   emit autoFetchChanged(ui->autoFetch->value());
+
    settings.setLocalValue("PruneOnFetch", ui->pruneOnFetch->isChecked());
    settings.setLocalValue("ClangFormatOnCommit", ui->clangFormat->isChecked());
    settings.setLocalValue("UpdateOnPull", ui->updateOnPull->isChecked());

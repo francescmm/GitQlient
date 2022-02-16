@@ -315,4 +315,10 @@ private:
     * @param prNumber The PR to put the focus on.
     */
    void focusHistoryOnPr(int prNumber);
+
+   /**
+    * @brief reconfigureAutoFetch Changes the interval for the auto fetch timer.
+    * @param newInterval The new interval (in minutes) to automatically fetch the data from the server.
+    */
+   void reconfigureAutoFetch(int newInterval);
 };

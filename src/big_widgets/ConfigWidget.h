@@ -26,6 +26,7 @@ signals:
    void panelsVisibilityChanged();
    void pomodoroVisibilityChanged();
    void moveLogsAndClose();
+   void autoFetchChanged(int minutes);
 
 public:
    explicit ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);

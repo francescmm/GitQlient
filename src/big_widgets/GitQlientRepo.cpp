@@ -161,9 +161,9 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mConfigWidget, &ConfigWidget::panelsVisibilityChanged, mHistoryWidget,
            &HistoryWidget::onPanelsVisibilityChanged);
    connect(mConfigWidget, &ConfigWidget::reloadDiffFont, mHistoryWidget, &HistoryWidget::onDiffFontSizeChanged);
-   // connect(mConfigWidget, &ConfigWidget::reloadDiffFont, mDiffWidget, );
    connect(mConfigWidget, &ConfigWidget::pomodoroVisibilityChanged, mControls, &Controls::changePomodoroVisibility);
    connect(mConfigWidget, &ConfigWidget::moveLogsAndClose, this, &GitQlientRepo::moveLogsAndClose);
+   connect(mConfigWidget, &ConfigWidget::autoFetchChanged, this, &GitQlientRepo::reconfigureAutoFetch);
 
    connect(mGitServerWidget, &GitServerWidget::openDiff, this, &GitQlientRepo::openCommitDiff);
 
@@ -537,6 +537,11 @@ void GitQlientRepo::focusHistoryOnPr(int prNumber)
 
    mHistoryWidget->focusOnCommit(pr.state.sha);
    showHistoryView();
+}
+
+void GitQlientRepo::reconfigureAutoFetch(int newInterval)
+{
+   mAutoFetch->start(newInterval * 60 * 1000);
 }
 
 void GitQlientRepo::openCommitDiff(const QString currentSha)
