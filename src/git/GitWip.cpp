@@ -95,10 +95,8 @@ bool GitWip::updateWip() const
    const auto files = getUntrackedFiles();
    mCache->setUntrackedFilesList(std::move(files));
 
-   if (const auto info = getWipInfo())
-   {
+   if (const auto info = getWipInfo(); info->second.isValid())
       return mCache->updateWipCommit(info->first, info->second);
-   }
 
    return false;
 }

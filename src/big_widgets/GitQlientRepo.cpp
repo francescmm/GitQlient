@@ -308,6 +308,14 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
 
    const auto totalCommits = mGitQlientCache->commitCount();
 
+   if (totalCommits == 0)
+   {
+      if (mWaitDlg)
+         mWaitDlg->close();
+
+      return;
+   }
+
    mHistoryWidget->loadBranches(fullReload);
    mHistoryWidget->updateGraphView(totalCommits);
 
