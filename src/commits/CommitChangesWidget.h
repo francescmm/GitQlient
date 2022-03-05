@@ -47,7 +47,7 @@ signals:
    void changeReverted(const QString &revertedFile);
    void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
    void changesCommitted();
-   void signalCheckoutPerformed();
+   void unstagedFilesChanged();
    void signalShowFileHistory(const QString &fileName);
    void signalUpdateWip();
    void signalCancelAmend(const QString &commitSha);

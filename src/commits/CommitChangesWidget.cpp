@@ -177,7 +177,7 @@ void CommitChangesWidget::deleteUntrackedFiles()
       }
    }
 
-   emit signalCheckoutPerformed();
+   emit unstagedFilesChanged();
 }
 
 void CommitChangesWidget::prepareCache()
@@ -384,7 +384,7 @@ void CommitChangesWidget::revertAllChanges()
    }
 
    if (needsUpdate)
-      emit signalCheckoutPerformed();
+      emit unstagedFilesChanged();
 }
 
 void CommitChangesWidget::removeFileFromCommitList(QListWidgetItem *item)
@@ -535,7 +535,7 @@ void CommitChangesWidget::showUnstagedMenu(const QPoint &pos)
       connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &CommitChangesWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &CommitChangesWidget::revertAllChanges);
       connect(contextMenu, &UnstagedMenu::changeReverted, this, &CommitChangesWidget::changeReverted);
-      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &CommitChangesWidget::signalCheckoutPerformed);
+      connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &CommitChangesWidget::unstagedFilesChanged);
       connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &CommitChangesWidget::signalShowFileHistory);
       connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
       connect(contextMenu, &UnstagedMenu::deleteUntracked, this, &CommitChangesWidget::deleteUntrackedFiles);
