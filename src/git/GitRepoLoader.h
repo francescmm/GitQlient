@@ -60,7 +60,7 @@ private:
    bool mShowAll = true;
    bool mLocked = false;
    bool mRefreshReferences = true;
-   int mSteps = 0;
+   std::atomic<int> mSteps { 0 };
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitCache> mRevCache;
    QSharedPointer<GitQlientSettings> mSettings;
@@ -73,4 +73,5 @@ private:
    void processRevisions(QByteArray ba);
    QVector<CommitInfo> processUnsignedLog(QByteArray &log) const;
    QVector<CommitInfo> processSignedLog(QByteArray &log) const;
+   void notifyLoadingFinished();
 };

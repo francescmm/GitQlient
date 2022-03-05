@@ -25,6 +25,8 @@
 
 #include <QTreeView>
 
+#include <CommitInfo.h>
+
 class GitCache;
 class GitBase;
 class CommitHistoryModel;
@@ -176,7 +178,7 @@ private:
    CommitHistoryModel *mCommitHistoryModel = nullptr;
    ShaFilterProxyModel *mProxyModel = nullptr;
    bool mIsFiltering = false;
-   QString mCurrentSha;
+   QString mCurrentSha = CommitInfo::ZERO_SHA;
 
    /**
     * @brief Shows the context menu for the CommitHistoryView.

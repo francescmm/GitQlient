@@ -106,7 +106,8 @@ RevisionFiles GitWip::fakeWorkDirRevFile(const QString &diffIndex, const QString
    RevisionFiles rf(diffIndex);
    rf.setOnlyModified(false);
 
-   for (const auto &it : mCache->getUntrackedFiles())
+   const auto untrackedFiles = mCache->getUntrackedFiles();
+   for (const auto &it : untrackedFiles)
    {
       rf.mFiles.append(it);
       rf.setStatus(RevisionFiles::UNKNOWN);

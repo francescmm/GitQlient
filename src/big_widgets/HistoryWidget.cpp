@@ -37,6 +37,7 @@
 #include <QScreen>
 #include <QSplitter>
 #include <QStackedWidget>
+#include <QTimer>
 
 using namespace QLogger;
 
@@ -292,15 +293,14 @@ void HistoryWidget::focusOnCommit(const QString &sha)
    mRepositoryView->focusOnCommit(sha);
 }
 
+#include <QDebug>
 void HistoryWidget::updateGraphView(int totalCommits)
 {
    mRepositoryModel->onNewRevisions(totalCommits);
 
-   selectCommit(CommitInfo::ZERO_SHA);
-
-   mRepositoryView->selectionModel()->select(
-       QItemSelection(mRepositoryModel->index(0, 0), mRepositoryModel->index(0, mRepositoryModel->columnCount() - 1)),
-       QItemSelectionModel::Select);
+   const auto currentSha = mRepositoryView->getCurrentSha();
+   selectCommit(currentSha);
+   focusOnCommit(currentSha);
 }
 
 void HistoryWidget::keyPressEvent(QKeyEvent *event)

@@ -198,17 +198,7 @@ void GitRepoLoader::processReferences(QByteArray ba)
 
    mRevCache->reloadCurrentBranchInfo(mGitBase->getCurrentBranch(), mGitBase->getLastCommit().output.trimmed());
 
-   --mSteps;
-
-   if (mSteps == 0)
-   {
-      mRevCache->setConfigurationDone();
-
-      emit signalLoadingFinished(mRefreshReferences);
-
-      mLocked = false;
-      mRefreshReferences = false;
-   }
+   notifyLoadingFinished();
 }
 
 void GitRepoLoader::requestRevisions()
@@ -282,17 +272,7 @@ void GitRepoLoader::processRevisions(QByteArray ba)
       mRevCache->setup(info.first, info.second, std::move(commits));
    }
 
-   --mSteps;
-
-   if (mSteps == 0)
-   {
-      mRevCache->setConfigurationDone();
-
-      emit signalLoadingFinished(mRefreshReferences);
-
-      mLocked = false;
-      mRefreshReferences = false;
-   }
+   notifyLoadingFinished();
 }
 
 QVector<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
@@ -378,4 +358,19 @@ QVector<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
    }
 
    return commits;
+}
+
+void GitRepoLoader::notifyLoadingFinished()
+{
+   --mSteps;
+
+   if (mSteps.load() == 0)
+   {
+      mRevCache->setConfigurationDone();
+
+      emit signalLoadingFinished(mRefreshReferences);
+
+      mLocked = false;
+      mRefreshReferences = false;
+   }
 }
