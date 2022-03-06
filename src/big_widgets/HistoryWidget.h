@@ -37,7 +37,7 @@ class CommitInfoWidget;
 class CheckBox;
 class RepositoryViewDelegate;
 class FullDiffWidget;
-class FileDiffWidget;
+class WipDiffWidget;
 class BranchesWidgetMinimal;
 class QPushButton;
 class GitServerCache;
@@ -248,7 +248,7 @@ private:
    CheckBox *mChShowAllBranches = nullptr;
    RepositoryViewDelegate *mItemDelegate = nullptr;
    QFrame *mGraphFrame = nullptr;
-   FileDiffWidget *mFileDiff = nullptr;
+   WipDiffWidget *mWipFileDiff = nullptr;
    FullDiffWidget *mFullDiffWidget = nullptr;
    QPushButton *mReturnFromFull = nullptr;
    QLabel *mUserName = nullptr;
@@ -306,6 +306,10 @@ private:
     */
    void mergeSquashBranch(const QString &current, const QString &branchToMerge);
 
+   /**
+    * @brief processMergeResponse
+    * @param ret
+    */
    void processMergeResponse(const GitExecResult &ret);
 
    /**
@@ -324,14 +328,6 @@ private:
     * @param isCached Indicates if the file to show the diff is already cached or is still unstaged.
     */
    void showWipFileDiff(const QString &fileName, bool isCached);
-
-   /**
-    * @brief showFileDiff Shows the file diff.
-    * @param sha The base commit SHA.
-    * @param parentSha The commit SHA to compare with.
-    * @param fileName The file name to diff.
-    */
-   void showFileDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
 
    /**
     * @brief showFullDiff Shows the full commit diff.

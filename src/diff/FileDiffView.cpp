@@ -56,8 +56,8 @@
 
 #include <QLogger.h>
 
-#include <QScrollBar>
 #include <QMenu>
+#include <QScrollBar>
 
 using namespace QLogger;
 
@@ -78,6 +78,7 @@ FileDiffView::FileDiffView(QWidget *parent)
 FileDiffView::~FileDiffView()
 {
    delete mDiffHighlighter;
+   mLineNumberArea->deleteLater();
 }
 
 void FileDiffView::addNumberArea(LineNumberArea *numberArea)

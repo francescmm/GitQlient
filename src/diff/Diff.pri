@@ -11,7 +11,8 @@ HEADERS += \
     $$PWD/FileEditor.h \
     $$PWD/FullDiffWidget.h \
     $$PWD/IDiffWidget.h \
-    $$PWD/LineNumberArea.h
+    $$PWD/LineNumberArea.h \
+    $$PWD/WipDiffWidget.h
 
 SOURCES += \
     $$PWD/FileBlameWidget.cpp \
@@ -22,4 +23,5 @@ SOURCES += \
     $$PWD/FileEditor.cpp \
     $$PWD/FullDiffWidget.cpp \
     $$PWD/IDiffWidget.cpp \
-    $$PWD/LineNumberArea.cpp
+    $$PWD/LineNumberArea.cpp \
+    $$PWD/WipDiffWidget.cpp

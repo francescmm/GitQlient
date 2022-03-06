@@ -1,4 +1,4 @@
-#include "FileDiffWidget.h"
+#include "WipDiffWidget.h"
 
 #include <CheckBox.h>
 #include <CommitInfo.h>
@@ -24,12 +24,13 @@
 #include <QStackedWidget>
 #include <QTemporaryFile>
 
-FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *parent)
+WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *parent)
    : IDiffWidget(git, cache, parent)
    , mBack(new QPushButton())
    , mGoPrevious(new QPushButton())
    , mGoNext(new QPushButton())
    , mEdition(new QPushButton())
+   , mHunksView(new QPushButton())
    , mFullView(new QPushButton())
    , mSplitView(new QPushButton())
    , mSave(new QPushButton())
@@ -41,8 +42,12 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mSearchOld(new QLineEdit())
    , mOldFile(new FileDiffView())
    , mFileEditor(new FileEditor())
+   , mHunksLayout(new QVBoxLayout())
+   , mHunksFrame(new QFrame())
    , mViewStackedWidget(new QStackedWidget())
 {
+   mCurrentSha = CommitInfo::ZERO_SHA;
+
    mNewFile->addNumberArea(new LineNumberArea(mNewFile));
    mOldFile->addNumberArea(new LineNumberArea(mOldFile));
 
@@ -62,6 +67,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    optionsLayout->addWidget(mBack);
    optionsLayout->addWidget(mGoPrevious);
    optionsLayout->addWidget(mGoNext);
+   optionsLayout->addWidget(mHunksView);
    optionsLayout->addWidget(mFullView);
    optionsLayout->addWidget(mSplitView);
    optionsLayout->addWidget(mEdition);
@@ -101,8 +107,12 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    const auto diffFrame = new QFrame();
    diffFrame->setLayout(diffLayout);
 
+   mHunksLayout->setContentsMargins(QMargins());
+   mHunksFrame->setLayout(mHunksLayout);
+
    mViewStackedWidget->addWidget(diffFrame);
    mViewStackedWidget->addWidget(mFileEditor);
+   mViewStackedWidget->addWidget(mHunksFrame);
 
    mTitleFrame->setVisible(false);
 
@@ -124,30 +134,35 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
 
    mBack->setIcon(QIcon(":/icons/back"));
    mBack->setToolTip(tr("Return to the view"));
-   connect(mBack, &QPushButton::clicked, this, &FileDiffWidget::exitRequested);
+   connect(mBack, &QPushButton::clicked, this, &WipDiffWidget::exitRequested);
 
    mGoPrevious->setIcon(QIcon(":/icons/arrow_up"));
    mGoPrevious->setToolTip(tr("Previous change"));
-   connect(mGoPrevious, &QPushButton::clicked, this, &FileDiffWidget::moveChunkUp);
+   connect(mGoPrevious, &QPushButton::clicked, this, &WipDiffWidget::moveChunkUp);
 
    mGoNext->setToolTip(tr("Next change"));
    mGoNext->setIcon(QIcon(":/icons/arrow_down"));
-   connect(mGoNext, &QPushButton::clicked, this, &FileDiffWidget::moveChunkDown);
+   connect(mGoNext, &QPushButton::clicked, this, &WipDiffWidget::moveChunkDown);
 
    mEdition->setIcon(QIcon(":/icons/edit"));
    mEdition->setCheckable(true);
    mEdition->setToolTip(tr("Edit file"));
-   connect(mEdition, &QPushButton::toggled, this, &FileDiffWidget::enterEditionMode);
+   connect(mEdition, &QPushButton::toggled, this, &WipDiffWidget::enterEditionMode);
+
+   mHunksView->setIcon(QIcon(":/icons/commit-list"));
+   mHunksView->setCheckable(true);
+   mHunksView->setToolTip(tr("Hunks view"));
+   connect(mHunksView, &QPushButton::toggled, this, &WipDiffWidget::setHunksViewEnabled);
 
    mFullView->setIcon(QIcon(":/icons/text-file"));
    mFullView->setCheckable(true);
    mFullView->setToolTip(tr("Full file view"));
-   connect(mFullView, &QPushButton::toggled, this, &FileDiffWidget::setFullViewEnabled);
+   connect(mFullView, &QPushButton::toggled, this, &WipDiffWidget::setFullViewEnabled);
 
    mSplitView->setIcon(QIcon(":/icons/split_view"));
    mSplitView->setCheckable(true);
    mSplitView->setToolTip(tr("Split file view"));
-   connect(mSplitView, &QPushButton::toggled, this, &FileDiffWidget::setSplitViewEnabled);
+   connect(mSplitView, &QPushButton::toggled, this, &WipDiffWidget::setSplitViewEnabled);
 
    mSave->setIcon(QIcon(":/icons/save"));
    mSave->setDisabled(true);
@@ -157,11 +172,11 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
 
    mStage->setIcon(QIcon(":/icons/staged"));
    mStage->setToolTip(tr("Stage file"));
-   connect(mStage, &QPushButton::clicked, this, &FileDiffWidget::stageFile);
+   connect(mStage, &QPushButton::clicked, this, &WipDiffWidget::stageFile);
 
    mRevert->setIcon(QIcon(":/icons/close"));
    mRevert->setToolTip(tr("Revert changes"));
-   connect(mRevert, &QPushButton::clicked, this, &FileDiffWidget::revertFile);
+   connect(mRevert, &QPushButton::clicked, this, &WipDiffWidget::revertFile);
 
    mViewStackedWidget->setCurrentIndex(0);
 
@@ -172,27 +187,24 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    }
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
-   connect(mNewFile, &FileDiffView::signalStageChunk, this, &FileDiffWidget::stageChunk);
+   connect(mNewFile, &FileDiffView::signalStageChunk, this, &WipDiffWidget::stageChunk);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
-   connect(mOldFile, &FileDiffView::signalStageChunk, this, &FileDiffWidget::stageChunk);
+   connect(mOldFile, &FileDiffView::signalStageChunk, this, &WipDiffWidget::stageChunk);
 
    setAttribute(Qt::WA_DeleteOnClose);
 }
 
-void FileDiffWidget::clear()
+void WipDiffWidget::clear()
 {
    mNewFile->clear();
 }
 
-bool FileDiffWidget::reload()
+bool WipDiffWidget::reload()
 {
-   if (mCurrentSha == CommitInfo::ZERO_SHA)
-      return configure(mCurrentSha, mPreviousSha, mCurrentFile, mIsCached, mEdition->isChecked());
-
-   return false;
+   return configure(mCurrentFile, mIsCached, mEdition->isChecked());
 }
 
-void FileDiffWidget::changeFontSize()
+void WipDiffWidget::changeFontSize()
 {
    GitQlientSettings settings;
    const auto fontSize = settings.globalValue("FileDiffView/FontSize", 8).toInt();
@@ -212,8 +224,7 @@ void FileDiffWidget::changeFontSize()
    mOldFile->setTextCursor(cursor);
 }
 
-bool FileDiffWidget::configure(const QString &currentSha, const QString &previousSha, const QString &file,
-                               bool isCached, bool editMode)
+bool WipDiffWidget::configure(const QString &file, bool isCached, bool editMode)
 {
    auto destFile = file;
 
@@ -222,10 +233,9 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
 
    QString text;
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
+   const auto previousSha = mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent();
 
-   if (const auto ret
-       = git->getFullFileDiff(currentSha == CommitInfo::ZERO_SHA ? QString() : currentSha, previousSha, destFile, isCached);
-       ret.success)
+   if (const auto ret = git->getFullFileDiff(QString(), previousSha, destFile, isCached); ret.success)
    {
       text = ret.output;
 
@@ -241,17 +251,8 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
 
    mFileNameLabel->setText(file);
 
-   const auto isWip = currentSha == CommitInfo::ZERO_SHA;
-   mBack->setVisible(isWip);
-   mEdition->setVisible(isWip);
-   mSave->setVisible(isWip);
-   mStage->setVisible(isWip);
-   mRevert->setVisible(isWip);
-   mTitleFrame->setVisible(isWip);
-
    mIsCached = isCached;
    mCurrentFile = file;
-   mCurrentSha = currentSha;
    mPreviousSha = previousSha;
 
    auto pos = 0;
@@ -262,6 +263,8 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
 
    if (!text.isEmpty())
    {
+      processHunks(destFile, isCached);
+
       if (mFileVsFile)
       {
          QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> oldData;
@@ -293,8 +296,15 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
       {
          mEdition->setChecked(false);
          mSave->setDisabled(true);
+         mHunksView->blockSignals(true);
+         mHunksView->setChecked(mViewStackedWidget->currentIndex() == 2);
+         mHunksView->blockSignals(false);
+         mFullView->blockSignals(true);
          mFullView->setChecked(!mFileVsFile);
+         mFullView->blockSignals(false);
+         mSplitView->blockSignals(true);
          mSplitView->setChecked(mFileVsFile);
+         mSplitView->blockSignals(false);
       }
 
       return true;
@@ -303,7 +313,7 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    return false;
 }
 
-void FileDiffWidget::setSplitViewEnabled(bool enable)
+void WipDiffWidget::setSplitViewEnabled(bool enable)
 {
    mFileVsFile = enable;
 
@@ -313,11 +323,15 @@ void FileDiffWidget::setSplitViewEnabled(bool enable)
    GitQlientSettings settings(mGit->getGitDir());
    settings.setLocalValue(GitQlientSettings::SplitFileDiffView, mFileVsFile);
 
-   configure(mCurrentSha, mPreviousSha, mCurrentFile, mIsCached);
+   configure(mCurrentFile, mIsCached);
 
    mFullView->blockSignals(true);
    mFullView->setChecked(!mFileVsFile);
    mFullView->blockSignals(false);
+
+   mHunksView->blockSignals(true);
+   mHunksView->setChecked(false);
+   mHunksView->blockSignals(false);
 
    mGoNext->setEnabled(true);
    mGoPrevious->setEnabled(true);
@@ -332,7 +346,7 @@ void FileDiffWidget::setSplitViewEnabled(bool enable)
    }
 }
 
-void FileDiffWidget::setFullViewEnabled(bool enable)
+void WipDiffWidget::setFullViewEnabled(bool enable)
 {
    mFileVsFile = !enable;
 
@@ -342,11 +356,15 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
    GitQlientSettings settings(mGit->getGitDir());
    settings.setLocalValue(GitQlientSettings::SplitFileDiffView, mFileVsFile);
 
-   configure(mCurrentSha, mPreviousSha, mCurrentFile, mIsCached);
+   configure(mCurrentFile, mIsCached);
 
    mSplitView->blockSignals(true);
    mSplitView->setChecked(mFileVsFile);
    mSplitView->blockSignals(false);
+
+   mHunksView->blockSignals(true);
+   mHunksView->setChecked(false);
+   mHunksView->blockSignals(false);
 
    mGoNext->setDisabled(true);
    mGoPrevious->setDisabled(true);
@@ -361,12 +379,26 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
    }
 }
 
-void FileDiffWidget::hideBackButton() const
+void WipDiffWidget::setHunksViewEnabled(bool enable)
+{
+   mSave->setDisabled(true);
+   mSplitView->blockSignals(true);
+   mSplitView->setChecked(!enable);
+   mSplitView->blockSignals(false);
+
+   mFullView->blockSignals(true);
+   mFullView->setChecked(!enable);
+   mFullView->blockSignals(false);
+
+   mViewStackedWidget->setCurrentIndex(2);
+}
+
+void WipDiffWidget::hideBackButton() const
 {
    mBack->setVisible(true);
 }
 
-void FileDiffWidget::moveChunkUp()
+void WipDiffWidget::moveChunkUp()
 {
    for (auto i = mChunks.chunks.count() - 1; i >= 0; --i)
    {
@@ -388,7 +420,7 @@ void FileDiffWidget::moveChunkUp()
    }
 }
 
-void FileDiffWidget::moveChunkDown()
+void WipDiffWidget::moveChunkDown()
 {
    const auto endIter = mChunks.chunks.constEnd();
    auto iter = mChunks.chunks.constBegin();
@@ -414,7 +446,7 @@ void FileDiffWidget::moveChunkDown()
    }
 }
 
-void FileDiffWidget::enterEditionMode(bool enter)
+void WipDiffWidget::enterEditionMode(bool enter)
 {
    if (enter)
    {
@@ -427,6 +459,10 @@ void FileDiffWidget::enterEditionMode(bool enter)
       mFullView->setChecked(!enter);
       mFullView->blockSignals(false);
 
+      mHunksView->blockSignals(true);
+      mHunksView->setChecked(false);
+      mHunksView->blockSignals(false);
+
       mFileEditor->editFile(mCurrentFile);
       mViewStackedWidget->setCurrentIndex(1);
    }
@@ -436,12 +472,12 @@ void FileDiffWidget::enterEditionMode(bool enter)
       setFullViewEnabled(true);
 }
 
-void FileDiffWidget::endEditFile()
+void WipDiffWidget::endEditFile()
 {
    mViewStackedWidget->setCurrentIndex(0);
 }
 
-void FileDiffWidget::stageFile()
+void WipDiffWidget::stageFile()
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
    const auto ret = git->stageFile(mCurrentFile);
@@ -453,7 +489,7 @@ void FileDiffWidget::stageFile()
    }
 }
 
-void FileDiffWidget::revertFile()
+void WipDiffWidget::revertFile()
 {
    const auto ret = QMessageBox::warning(
        this, tr("Revert all changes"),
@@ -473,7 +509,7 @@ void FileDiffWidget::revertFile()
    }
 }
 
-void FileDiffWidget::stageChunk(const QString &id)
+void WipDiffWidget::stageChunk(const QString &id)
 {
    const auto iter = std::find_if(mChunks.chunks.cbegin(), mChunks.chunks.cend(),
                                   [id](const ChunkDiffInfo &info) { return id == info.id; });
@@ -564,6 +600,44 @@ void FileDiffWidget::stageChunk(const QString &id)
             QMessageBox::information(this, tr("Stage failed"),
                                      tr("The chunk couldn't be applied:\n%1").arg(ret.output));
          }
+      }
+   }
+}
+
+void WipDiffWidget::processHunks(const QString &file, bool isCached)
+{
+   QScopedPointer<GitHistory> git(new GitHistory(mGit));
+   const auto hunks = git->getWipFileDiff(file, isCached);
+
+   if (hunks.success)
+   {
+      for (auto hunk : qAsConst(mHunks))
+         delete hunk;
+
+      mHunks.clear();
+
+      for (auto start = hunks.output.indexOf("@@"); start <= hunks.output.lastIndexOf("@@") && start != -1;)
+      {
+         const auto endOfCurrentLine = hunks.output.indexOf('\n', start);
+         const auto nextIndex = hunks.output.indexOf("@@", endOfCurrentLine);
+         auto textToProcess = hunks.output.mid(start, nextIndex != -1 ? nextIndex - start : nextIndex);
+
+         auto hunkView = new FileDiffView();
+         hunkView->addNumberArea(new LineNumberArea(mNewFile));
+
+         GitQlientSettings settings(mGit->getGitDir());
+         QFont font = hunkView->font();
+         const auto points = settings.globalValue("FileDiffView/FontSize", 8).toInt();
+         font.setPointSize(points);
+         hunkView->setFont(font);
+         hunkView->loadDiff(textToProcess);
+
+         mHunksLayout->addWidget(hunkView);
+         mHunksLayout->addStretch();
+
+         mHunks.append(hunkView);
+
+         start = nextIndex;
       }
    }
 }

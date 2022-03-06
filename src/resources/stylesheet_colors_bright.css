@@ -628,20 +628,22 @@ FileDiffView
    border-right-color: white;
 }
 
-FileDiffWidget
+FileDiffWidget, WipDiffWidget
 {
     background: #C6C6C7;
     border-color: #C6C6C7;
 }
 
 FullDiffWidget > QPushButton, FullDiffWidget > QToolButton,
-FileDiffWidget > QPushButton, FileDiffWidget > QToolButton
+FileDiffWidget > QPushButton, FileDiffWidget > QToolButton,
+WipDiffWidget > QPushButton, WipDiffWidget > QToolButton
 {
    background: transparent;
 }
 
 FullDiffWidget > QPushButton:checked, FullDiffWidget > QToolButton:checked,
-FileDiffWidget > QPushButton:checked, FileDiffWidget > QToolButton:checked
+FileDiffWidget > QPushButton:checked, FileDiffWidget > QToolButton:checked,
+WipDiffWidget > QPushButton:checked, WipDiffWidget > QToolButton:checked
 {
    background: #404142;
 }

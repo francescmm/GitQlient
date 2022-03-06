@@ -756,7 +756,7 @@ FileDiffView
     border-right-style: solid;
 }
 
-FileDiffWidget, FullDiffWidget
+FileDiffWidget, FullDiffWidget, WipDiffWidget
 {
     border-width: 1px;
     border-style: solid;

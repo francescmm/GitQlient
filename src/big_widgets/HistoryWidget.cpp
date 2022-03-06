@@ -23,6 +23,7 @@
 #include <GitRepoLoader.h>
 #include <GitWip.h>
 #include <RepositoryViewDelegate.h>
+#include <WipDiffWidget.h>
 #include <WipWidget.h>
 
 #include <QLogger.h>
@@ -99,7 +100,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mWipWidget, &CommitChangesWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
    connect(mWipWidget, &CommitChangesWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
    connect(mWipWidget, &CommitChangesWidget::changeReverted, this, [this](const QString &revertedFile) {
-      if (mFileDiff->getCurrentFile().contains(revertedFile))
+      if (mWipFileDiff->getCurrentFile().contains(revertedFile))
          returnToView();
    });
    connect(mWipWidget, &CommitChangesWidget::changeReverted, this, &HistoryWidget::onRevertedChanges);
@@ -119,6 +120,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    mSearchInput = new QLineEdit();
    mSearchInput->setObjectName("SearchInput");
+
    mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
@@ -191,7 +193,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mGraphFrame = new QFrame();
    mGraphFrame->setLayout(viewLayout);
 
-   mFileDiff = new FileDiffWidget(mGit, mCache);
+   mWipFileDiff = new WipDiffWidget(mGit, mCache);
 
    mReturnFromFull->setIcon(QIcon(":/icons/back"));
    connect(mReturnFromFull, &QPushButton::clicked, this, &HistoryWidget::returnToView);
@@ -208,12 +210,12 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mCenterStackedWidget = new QStackedWidget();
    mCenterStackedWidget->setMinimumWidth(600);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
-   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mFileDiff);
+   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mWipFileDiff);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FullDiff), fullFrame);
 
-   connect(mFileDiff, &FileDiffWidget::exitRequested, this, &HistoryWidget::returnToView);
-   connect(mFileDiff, &FileDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
-   connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
+   connect(mWipFileDiff, &WipDiffWidget::exitRequested, this, &HistoryWidget::returnToView);
+   connect(mWipFileDiff, &WipDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
+   connect(mWipFileDiff, &WipDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
 
    mSplitter->insertWidget(0, wipFrame);
    mSplitter->insertWidget(1, mCenterStackedWidget);
@@ -378,7 +380,7 @@ void HistoryWidget::onPanelsVisibilityChanged()
 void HistoryWidget::onDiffFontSizeChanged()
 {
    mFullDiffWidget->changeFontSize();
-   mFileDiff->changeFontSize();
+   mWipFileDiff->changeFontSize();
 }
 
 void HistoryWidget::search()
@@ -610,8 +612,7 @@ void HistoryWidget::cherryPickCommit()
 
 void HistoryWidget::showWipFileDiff(const QString &fileName, bool isCached)
 {
-   const auto parentSha = mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent();
-   mFileDiff->configure(CommitInfo::ZERO_SHA, parentSha, fileName, isCached);
+   mWipFileDiff->configure(fileName, isCached);
    mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
    mBranchesWidget->forceMinimalView();
 }

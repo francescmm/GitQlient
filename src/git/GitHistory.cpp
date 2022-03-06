@@ -99,8 +99,21 @@ GitExecResult GitHistory::getCommitDiff(const QString &sha, const QString &diffT
    return qMakePair(false, QString());
 }
 
-GitExecResult GitHistory::getFileDiff(const QString &currentSha, const QString &previousSha, const QString &file,
-                                      bool isCached)
+GitExecResult GitHistory::getWipFileDiff(const QString &file, bool isCached) const
+{
+   QLog_Debug(
+       "Git",
+       QString("Getting diff for a WIP %1 file: {%2}").arg(QString::fromUtf8(isCached ? "unstaged" : "staged"), file));
+
+   const auto cmd = QString("git diff %1 %2 ").arg(QString::fromUtf8(isCached ? "--cached" : ""), file);
+
+   QLog_Trace("Git", QString("Getting diff for the WIP file: {%1}").arg(cmd));
+
+   return mGitBase->run(cmd);
+}
+
+GitExecResult GitHistory::getFullFileDiff(const QString &currentSha, const QString &previousSha, const QString &file,
+                                          bool isCached)
 {
    QLog_Debug("Git", QString("Getting diff for a file: {%1} between {%2} and {%3}").arg(file, currentSha, previousSha));
 
