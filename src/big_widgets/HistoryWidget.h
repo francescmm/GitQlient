@@ -97,7 +97,7 @@ signals:
     \param parentSha The commit SHA to compare to.
     \param fileName The file name for the diff.
    */
-   void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
+   void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName);
 
    /*!
     \brief Signal triggered when changes are committed.
@@ -319,12 +319,11 @@ private:
    void cherryPickCommit();
 
    /**
-    * @brief showFileDiff Shows the file diff.
-    * @param sha The base commit SHA.
-    * @param parentSha The commit SHA to compare with.
+    * @brief showWipFileDiff Shows the file diff.
     * @param fileName The file name to diff.
+    * @param isCached Indicates if the file to show the diff is already cached or is still unstaged.
     */
-   void showFileDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
+   void showWipFileDiff(const QString &fileName, bool isCached);
 
    /**
     * @brief showFileDiff Shows the file diff.
@@ -332,7 +331,7 @@ private:
     * @param parentSha The commit SHA to compare with.
     * @param fileName The file name to diff.
     */
-   void showFileDiffEdition(const QString &sha, const QString &parentSha, const QString &fileName);
+   void showFileDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
 
    /**
     * @brief showFullDiff Shows the full commit diff.

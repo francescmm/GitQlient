@@ -91,7 +91,7 @@ public:
     \param file The file to show the diff of.
     \return bool Returns true if the file diff was loaded correctly.
    */
-   bool loadFileDiff(const QString &sha, const QString &previousSha, const QString &file, bool isCached);
+   bool loadFileDiff(const QString &sha, const QString &previousSha, const QString &file);
    /*!
     \brief Loads a full commit diff.
 

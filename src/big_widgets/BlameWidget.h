@@ -63,7 +63,7 @@ signals:
     * @param parentSha The previous sha
     * @param file The full path of the file to diff
     */
-   void showFileDiff(const QString &sha, const QString &parentSha, const QString &file, bool isCached);
+   void showFileDiff(const QString &sha, const QString &parentSha, const QString &file);
 
    /**
     * @brief Signal triggered when the user wants to see the diff of the selected SHA compared to its previous one.

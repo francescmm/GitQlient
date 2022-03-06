@@ -91,7 +91,7 @@ void DiffWidget::clear() const
    mCenterStackedWidget->setCurrentIndex(0);
 }
 
-bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file, bool isCached)
+bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
    const auto id = QString("%1 (%2 \u2194 %3)").arg(file.split("/").last(), currentSha.left(6), previousSha.left(6));
 
@@ -105,7 +105,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
           QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
 
       const auto fileDiffWidget = new FileDiffWidget(mGit, mCache);
-      const auto fileWithModifications = fileDiffWidget->configure(currentSha, previousSha, file, isCached);
+      const auto fileWithModifications = fileDiffWidget->configure(currentSha, previousSha, file, false);
 
       if (fileWithModifications)
       {
@@ -192,7 +192,7 @@ bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 
 void DiffWidget::onDiffFontSizeChanged()
 {
-   for (auto diffWidget : mDiffWidgets)
+   for (const auto &diffWidget : qAsConst(mDiffWidgets))
       diffWidget->changeFontSize();
 }
 
@@ -222,5 +222,5 @@ void DiffWidget::onTabClosed(int index)
 
 void DiffWidget::onDoubleClick(QListWidgetItem *item)
 {
-   loadFileDiff(mCurrentSha, mParentSha, item->text(), false);
+   loadFileDiff(mCurrentSha, mParentSha, item->text());
 }

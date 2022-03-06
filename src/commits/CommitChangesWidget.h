@@ -45,20 +45,12 @@ class CommitChangesWidget : public QWidget
 signals:
    void logReload();
    void changeReverted(const QString &revertedFile);
-   void signalShowDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached);
+   void signalShowDiff(const QString &fileName, bool isCached);
    void changesCommitted();
    void unstagedFilesChanged();
    void signalShowFileHistory(const QString &fileName);
    void signalUpdateWip();
    void signalCancelAmend(const QString &commitSha);
-
-   /**
-    * @brief signalEditFile Signal triggered when the user wants to edit a file and is running GitQlient from QtCreator.
-    * @param fileName The file name
-    * @param line The line
-    * @param column The column
-    */
-   void signalEditFile(const QString &fileName);
 
 public:
    explicit CommitChangesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,

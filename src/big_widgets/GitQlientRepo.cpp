@@ -191,6 +191,7 @@ GitQlientRepo::~GitQlientRepo()
 
    m_loaderThread->exit();
    m_loaderThread->wait();
+
    delete m_loaderThread;
 }
 
@@ -347,10 +348,9 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
    emit currentBranchChanged();
 }
 
-void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file,
-                                 bool isCached)
+void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previousSha, const QString &file)
 {
-   const auto loaded = mDiffWidget->loadFileDiff(currentSha, previousSha, file, isCached);
+   const auto loaded = mDiffWidget->loadFileDiff(currentSha, previousSha, file);
 
    if (loaded)
    {

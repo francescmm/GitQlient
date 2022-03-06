@@ -275,7 +275,7 @@ void Controls::fetchAll()
    const auto ret = git->fetch();
    QApplication::restoreOverrideCursor();
 
-   if (ret)
+   if (!ret)
       emit requestFullReload();
 }
 
@@ -366,7 +366,7 @@ void Controls::pruneBranches()
    const auto ret = git->prune();
    QApplication::restoreOverrideCursor();
 
-   if (ret.success)
+   if (!ret.success)
       emit requestReferencesReload();
 }
 

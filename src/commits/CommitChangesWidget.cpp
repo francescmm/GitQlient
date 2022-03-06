@@ -316,8 +316,7 @@ void CommitChangesWidget::addAllFilesToCommitList()
 void CommitChangesWidget::requestDiff(const QString &fileName)
 {
    const auto isCached = qobject_cast<StagedFilesList *>(sender()) == ui->stagedFilesList;
-   emit signalShowDiff(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent(), fileName,
-                       isCached);
+   emit signalShowDiff(fileName, isCached);
 }
 
 QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool updateGit)
@@ -530,7 +529,6 @@ void CommitChangesWidget::showUnstagedMenu(const QPoint &pos)
    {
       const auto fileName = item->toolTip();
       const auto contextMenu = new UnstagedMenu(mGit, fileName, this);
-      connect(contextMenu, &UnstagedMenu::signalEditFile, this, &CommitChangesWidget::signalEditFile);
       connect(contextMenu, &UnstagedMenu::signalShowDiff, this, &CommitChangesWidget::requestDiff);
       connect(contextMenu, &UnstagedMenu::signalCommitAll, this, &CommitChangesWidget::addAllFilesToCommitList);
       connect(contextMenu, &UnstagedMenu::signalRevertAll, this, &CommitChangesWidget::revertAllChanges);

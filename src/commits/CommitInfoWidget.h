@@ -36,7 +36,7 @@ class CommitInfoWidget : public QFrame
    Q_OBJECT
 
 signals:
-   void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file, bool isCached);
+   void signalOpenFileCommit(const QString &currentSha, const QString &previousSha, const QString &file);
    void signalOpenFileContextMenu(const QString &, int);
    void signalShowFileHistory(const QString &fileName);
 

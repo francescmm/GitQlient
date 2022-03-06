@@ -91,7 +91,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    wipFrame->setMinimumWidth(200);
    wipFrame->setMaximumWidth(500);
 
-   connect(mWipWidget, &CommitChangesWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
+   connect(mWipWidget, &CommitChangesWidget::signalShowDiff, this, &HistoryWidget::showWipFileDiff);
    connect(mWipWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::returnToView);
    connect(mWipWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
    connect(mWipWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::cleanCommitPanels);
@@ -105,7 +105,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mWipWidget, &CommitChangesWidget::changeReverted, this, &HistoryWidget::onRevertedChanges);
 
    connect(mAmendWidget, &CommitChangesWidget::logReload, this, &HistoryWidget::logReload);
-   connect(mAmendWidget, &CommitChangesWidget::signalShowDiff, this, &HistoryWidget::showFileDiff);
+   connect(mAmendWidget, &CommitChangesWidget::signalShowDiff, this, &HistoryWidget::showWipFileDiff);
    connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::returnToView);
    connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
    connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::cleanCommitPanels);
@@ -114,7 +114,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mAmendWidget, &CommitChangesWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
    connect(mAmendWidget, &CommitChangesWidget::signalCancelAmend, this, &HistoryWidget::selectCommit);
 
-   connect(mCommitInfoWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::showFileDiff);
+   connect(mCommitInfoWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalShowDiff);
    connect(mCommitInfoWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
 
    mSearchInput = new QLineEdit();
@@ -214,10 +214,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mFileDiff, &FileDiffWidget::exitRequested, this, &HistoryWidget::returnToView);
    connect(mFileDiff, &FileDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
    connect(mFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
-
-   connect(mWipWidget, &WipWidget::signalEditFile, mFileDiff, [this](const QString &fileName) {
-      showFileDiffEdition(CommitInfo::ZERO_SHA, mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent(), fileName);
-   });
 
    mSplitter->insertWidget(0, wipFrame);
    mSplitter->insertWidget(1, mCenterStackedWidget);
@@ -612,26 +608,10 @@ void HistoryWidget::cherryPickCommit()
    }
 }
 
-void HistoryWidget::showFileDiff(const QString &sha, const QString &parentSha, const QString &fileName, bool isCached)
+void HistoryWidget::showWipFileDiff(const QString &fileName, bool isCached)
 {
-   if (sha == CommitInfo::ZERO_SHA)
-   {
-      mFileDiff->configure(sha, parentSha, fileName, isCached);
-      mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
-      mBranchesWidget->forceMinimalView();
-   }
-   else
-      emit signalShowDiff(sha, parentSha, fileName, isCached);
-}
-
-void HistoryWidget::showFileDiffEdition(const QString &sha, const QString &parentSha, const QString &fileName)
-{
-   if (sha == CommitInfo::ZERO_SHA)
-   {
-      mFileDiff->configure(sha, parentSha, fileName, true);
-      mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
-      mBranchesWidget->forceMinimalView();
-   }
-   else
-      emit signalShowDiff(sha, parentSha, fileName, false);
+   const auto parentSha = mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent();
+   mFileDiff->configure(CommitInfo::ZERO_SHA, parentSha, fileName, isCached);
+   mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
+   mBranchesWidget->forceMinimalView();
 }

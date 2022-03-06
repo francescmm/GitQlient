@@ -21,8 +21,13 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
 
    connect(addAction(tr("See changes")), &QAction::triggered, this, [this]() { emit signalShowDiff(mFileName); });
    connect(addAction(tr("Blame")), &QAction::triggered, this, [this]() { emit signalShowFileHistory(mFileName); });
+
+   /* TODO: Add back when GitQlientPlugin can be released
+
    connect(addAction(tr("Edit file")), &QAction::triggered, this,
            [this]() { emit signalEditFile(mGit->getWorkingDir() + "/" + mFileName); });
+
+   */
    connect(addAction(tr("Open containing folder")), &QAction::triggered, this, &UnstagedMenu::openFileExplorer);
 
    addSeparator();
