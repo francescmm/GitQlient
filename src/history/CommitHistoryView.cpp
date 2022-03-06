@@ -130,24 +130,17 @@ void CommitHistoryView::refreshView()
    QModelIndex topLeft;
    QModelIndex bottomRight;
 
-   if (mProxyModel)
-   {
-      topLeft = mProxyModel->index(0, 0);
-      bottomRight = mProxyModel->index(mProxyModel->rowCount() - 1, mProxyModel->columnCount() - 1);
-      mProxyModel->beginResetModel();
-      mProxyModel->endResetModel();
-   }
-   else
+   if (!mProxyModel)
    {
       topLeft = mCommitHistoryModel->index(0, 0);
       bottomRight
           = mCommitHistoryModel->index(mCommitHistoryModel->rowCount() - 1, mCommitHistoryModel->columnCount() - 1);
       mCommitHistoryModel->onNewRevisions(mCache->commitCount());
-   }
 
-   const auto auxTL = visualRect(topLeft);
-   const auto auxBR = visualRect(bottomRight);
-   viewport()->update(auxTL.x(), auxTL.y(), auxBR.x() + auxBR.width(), auxBR.y() + auxBR.height());
+      const auto auxTL = visualRect(topLeft);
+      const auto auxBR = visualRect(bottomRight);
+      viewport()->update(auxTL.x(), auxTL.y(), auxBR.x() + auxBR.width(), auxBR.y() + auxBR.height());
+   }
 }
 
 void CommitHistoryView::onHeaderContextMenu(const QPoint &pos)
