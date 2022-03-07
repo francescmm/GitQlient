@@ -11,6 +11,7 @@
 #include <GitLocal.h>
 #include <GitPatches.h>
 #include <GitQlientSettings.h>
+#include <HunkWidget.h>
 #include <LineNumberArea.h>
 
 #include <QDateTime>
@@ -616,28 +617,34 @@ void WipDiffWidget::processHunks(const QString &file, bool isCached)
 
       mHunks.clear();
 
+      const auto header = hunks.output.left(hunks.output.indexOf("@@"));
+
       for (auto start = hunks.output.indexOf("@@"); start <= hunks.output.lastIndexOf("@@") && start != -1;)
       {
          const auto endOfCurrentLine = hunks.output.indexOf('\n', start);
          const auto nextIndex = hunks.output.indexOf("@@", endOfCurrentLine);
          auto textToProcess = hunks.output.mid(start, nextIndex != -1 ? nextIndex - start : nextIndex);
 
-         auto hunkView = new FileDiffView();
-         hunkView->addNumberArea(new LineNumberArea(mNewFile));
-
-         GitQlientSettings settings(mGit->getGitDir());
-         QFont font = hunkView->font();
-         const auto points = settings.globalValue("FileDiffView/FontSize", 8).toInt();
-         font.setPointSize(points);
-         hunkView->setFont(font);
-         hunkView->loadDiff(textToProcess);
+         auto hunkView = new HunkWidget(mGit, mCache, file, header, textToProcess);
+         connect(hunkView, &HunkWidget::hunkStaged, this, &WipDiffWidget::deleteHunkView);
 
          mHunksLayout->addWidget(hunkView);
-         mHunksLayout->addStretch();
 
          mHunks.append(hunkView);
 
          start = nextIndex;
       }
    }
+}
+
+void WipDiffWidget::deleteHunkView()
+{
+   auto hunkView = qobject_cast<HunkWidget *>(sender());
+
+   const auto iter = std::find(mHunks.begin(), mHunks.end(), hunkView);
+
+   if (iter != mHunks.end())
+      mHunks.erase(iter);
+
+   hunkView->deleteLater();
 }

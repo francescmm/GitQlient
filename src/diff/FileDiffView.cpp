@@ -78,7 +78,9 @@ FileDiffView::FileDiffView(QWidget *parent)
 FileDiffView::~FileDiffView()
 {
    delete mDiffHighlighter;
-   mLineNumberArea->deleteLater();
+
+   if (mLineNumberArea)
+      mLineNumberArea->deleteLater();
 }
 
 void FileDiffView::addNumberArea(LineNumberArea *numberArea)

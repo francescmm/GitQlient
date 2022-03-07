@@ -1,7 +1,6 @@
 #include "AGitProcess.h"
 
 #include <GitQlientSettings.h>
-#include <QTemporaryFile>
 #include <QTextStream>
 
 #include <QLogger.h>

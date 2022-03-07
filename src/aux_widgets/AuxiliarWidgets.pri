@@ -21,6 +21,7 @@ HEADERS += \
     $$PWD/CredentialsDlg.h \
     $$PWD/GitQlientUpdater.h \
     $$PWD/Highlighter.h \
+    $$PWD/HunkWidget.h \
     $$PWD/InitialRepoConfig.h \
     $$PWD/PomodoroButton.h \
     $$PWD/PomodoroConfigDlg.h \
@@ -40,6 +41,7 @@ SOURCES += \
     $$PWD/CredentialsDlg.cpp \
     $$PWD/GitQlientUpdater.cpp \
     $$PWD/Highlighter.cpp \
+    $$PWD/HunkWidget.cpp \
     $$PWD/InitialRepoConfig.cpp \
     $$PWD/PomodoroButton.cpp \
     $$PWD/PomodoroConfigDlg.cpp \

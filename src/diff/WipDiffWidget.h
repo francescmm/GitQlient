@@ -37,6 +37,7 @@ class QLabel;
 class QLineEdit;
 class QPlainTextEdit;
 class QVBoxLayout;
+class HunkWidget;
 
 /*!
  \brief The WipDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
@@ -152,7 +153,7 @@ private:
    DiffInfo mChunks;
    int mCurrentChunkLine = 0;
    FileEditor *mFileEditor = nullptr;
-   QVector<FileDiffView *> mHunks;
+   QVector<HunkWidget *> mHunks;
    QVBoxLayout *mHunksLayout = nullptr;
    QFrame *mHunksFrame = nullptr;
    QStackedWidget *mViewStackedWidget = nullptr;
@@ -188,4 +189,6 @@ private:
    void stageChunk(const QString &id);
 
    void processHunks(const QString &file, bool isCached);
+
+   void deleteHunkView();
 };
