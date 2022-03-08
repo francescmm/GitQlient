@@ -612,7 +612,7 @@ void HistoryWidget::cherryPickCommit()
 
 void HistoryWidget::showWipFileDiff(const QString &fileName, bool isCached)
 {
-   mWipFileDiff->configure(fileName, isCached);
+   mWipFileDiff->setup(fileName, isCached);
    mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FileDiff));
    mBranchesWidget->forceMinimalView();
 }

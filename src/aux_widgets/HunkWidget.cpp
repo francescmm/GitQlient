@@ -57,12 +57,17 @@ void HunkWidget::discardHunk()
 {
    auto hunkLines = mHunk.split('\n');
 
-   // Creating the dark side header line
+// Creating the dark side header line
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+   auto splitBehavior = Qt::SkipEmptyParts;
+#else
+   auto splitBehavior = QString::SkipEmptyParts;
+#endif
    const auto headerLine = hunkLines.takeFirst();
-   const auto parts = headerLine.split("@@", Qt::SkipEmptyParts);
-   const auto lineParts = parts.first().split(' ', Qt::SkipEmptyParts);
-   const auto lineA = lineParts.first().split(',', Qt::SkipEmptyParts);
-   const auto lineB = lineParts.last().split(',', Qt::SkipEmptyParts);
+   const auto parts = headerLine.split("@@", splitBehavior);
+   const auto lineParts = parts.first().split(' ', splitBehavior);
+   const auto lineA = lineParts.first().split(',', splitBehavior);
+   const auto lineB = lineParts.last().split(',', splitBehavior);
    auto lines = QString("%1,%2 %3,%4").arg(lineA.first(), lineB.last(), lineB.first(), lineA.last());
    const auto heading = parts.count() > 1 && parts.last().isEmpty() ? QString::fromUtf8("") : parts.last();
    auto finalHeader = QString("@@ %1 @@%2").arg(lines, heading);
@@ -90,7 +95,7 @@ void HunkWidget::stageHunk()
 
    if (file->open())
    {
-      const auto content = mHeader + mHunk;
+      const auto content = QString("%1%2").arg(mHeader, mHunk);
       file->write(content.toUtf8());
       file->close();
 

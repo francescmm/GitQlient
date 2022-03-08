@@ -90,39 +90,7 @@ public:
 
    void changeFontSize() override;
 
-   /*!
-    \brief Configures the diff view with the two commits that will be compared and the file that will be applied.
-
-    \param currentSha The base SHA.
-    \param previousSha The SHA to compare to.
-    \param file The file that will show the diff.
-    \param editMode Enters edit mode directly.
-    \return bool Returns true if the configuration was applied, otherwise false.
-   */
-   bool configure(const QString &file, bool isCached, bool editMode = false);
-
-   /**
-    * @brief setFileVsFileEnable Enables the widget to show file vs file view.
-    * @param enable If true, enables the file vs file view.
-    */
-   void setSplitViewEnabled(bool enable);
-
-   /**
-    * @brief setFullViewEnabled Sets the full file view enabled.
-    * @param enable True to enable, otherwise false.
-    */
-   void setFullViewEnabled(bool enable);
-
-   /**
-    * @brief setHunksViewEnabled Sets the hunks view enabled.
-    * @param enable True to enable, otherwise false.
-    */
-   void setHunksViewEnabled(bool enable);
-
-   /**
-    * @brief hideBackButton Hides the back button.
-    */
-   void hideBackButton() const;
+   bool setup(const QString &file, bool isCached, bool editMode = false);
 
    /**
     * @brief getCurrentFile Gets the current loaded file.
@@ -157,6 +125,39 @@ private:
    QVBoxLayout *mHunksLayout = nullptr;
    QFrame *mHunksFrame = nullptr;
    QStackedWidget *mViewStackedWidget = nullptr;
+
+   /**
+    * @brief Configures the diff view with the two commits that will be compared and the file that will be applied.
+    * @param currentSha The base SHA.
+    * @param previousSha The SHA to compare to.
+    * @param file The file that will show the diff.
+    * @param editMode Enters edit mode directly.
+    * @return bool Returns true if the configuration was applied, otherwise false.
+    */
+   bool configure(const QString &file, bool isCached);
+
+   /**
+    * @brief setFileVsFileEnable Enables the widget to show file vs file view.
+    * @param enable If true, enables the file vs file view.
+    */
+   void setSplitViewEnabled(bool enable);
+
+   /**
+    * @brief setFullViewEnabled Sets the full file view enabled.
+    * @param enable True to enable, otherwise false.
+    */
+   void setFullViewEnabled(bool enable);
+
+   /**
+    * @brief setHunksViewEnabled Sets the hunks view enabled.
+    * @param enable True to enable, otherwise false.
+    */
+   void setHunksViewEnabled(bool enable);
+
+   /**
+    * @brief hideBackButton Hides the back button.
+    */
+   void hideBackButton() const;
 
    /**
     * @brief moveChunkUp Moves to the previous diff chunk.

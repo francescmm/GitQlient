@@ -202,7 +202,7 @@ void WipDiffWidget::clear()
 
 bool WipDiffWidget::reload()
 {
-   return configure(mCurrentFile, mIsCached, mEdition->isChecked());
+   return setup(mCurrentFile, mIsCached, mEdition->isChecked());
 }
 
 void WipDiffWidget::changeFontSize()
@@ -225,7 +225,37 @@ void WipDiffWidget::changeFontSize()
    mOldFile->setTextCursor(cursor);
 }
 
-bool WipDiffWidget::configure(const QString &file, bool isCached, bool editMode)
+bool WipDiffWidget::setup(const QString &file, bool isCached, bool editMode)
+{
+   if (configure(file, isCached))
+   {
+      if (editMode)
+      {
+         mEdition->setChecked(true);
+         mSave->setEnabled(true);
+      }
+      else
+      {
+         mEdition->setChecked(false);
+         mSave->setDisabled(true);
+         mHunksView->blockSignals(true);
+         mHunksView->setChecked(mViewStackedWidget->currentIndex() == 2);
+         mHunksView->blockSignals(false);
+         mFullView->blockSignals(true);
+         mFullView->setChecked(!mFileVsFile && !mHunksView->isChecked());
+         mFullView->blockSignals(false);
+         mSplitView->blockSignals(true);
+         mSplitView->setChecked(mFileVsFile && !mHunksView->isChecked());
+         mSplitView->blockSignals(false);
+      }
+
+      return true;
+   }
+
+   return false;
+}
+
+bool WipDiffWidget::configure(const QString &file, bool isCached)
 {
    auto destFile = file;
 
@@ -286,26 +316,6 @@ bool WipDiffWidget::configure(const QString &file, bool isCached, bool editMode)
          mNewFile->blockSignals(true);
          mNewFile->loadDiff(text, {});
          mNewFile->blockSignals(false);
-      }
-
-      if (editMode)
-      {
-         mEdition->setChecked(true);
-         mSave->setEnabled(true);
-      }
-      else
-      {
-         mEdition->setChecked(false);
-         mSave->setDisabled(true);
-         mHunksView->blockSignals(true);
-         mHunksView->setChecked(mViewStackedWidget->currentIndex() == 2);
-         mHunksView->blockSignals(false);
-         mFullView->blockSignals(true);
-         mFullView->setChecked(!mFileVsFile);
-         mFullView->blockSignals(false);
-         mSplitView->blockSignals(true);
-         mSplitView->setChecked(mFileVsFile);
-         mSplitView->blockSignals(false);
       }
 
       return true;
@@ -678,5 +688,8 @@ void WipDiffWidget::deleteHunkView()
 
    hunkView->deleteLater();
 
-   reload();
+   if (mHunks.isEmpty())
+      emit exitRequested();
+   else
+      reload();
 }
