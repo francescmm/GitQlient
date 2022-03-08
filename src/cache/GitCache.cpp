@@ -330,6 +330,8 @@ void GitCache::insertCommit(CommitInfo commit)
    commit.setLanes({ LaneType::ACTIVE });
    commit.pos = 1;
 
+   mCommitsMap[CommitInfo::ZERO_SHA].setParents({ commit.sha });
+
    mCommitsMap[sha] = std::move(commit);
    mCommitsMap[sha].appendChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
 

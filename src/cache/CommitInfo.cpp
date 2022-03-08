@@ -14,36 +14,36 @@ CommitInfo::CommitInfo(QByteArray commitData, const QString &gpg, bool goodSigna
 
 CommitInfo::CommitInfo(QByteArray data)
 {
-    parseDiff(data, 1);
+   parseDiff(data, 1);
 }
 
 void CommitInfo::parseDiff(QByteArray &data, int startingField)
 {
-    if (const auto fields = QString::fromUtf8(data).split('\n'); fields.count() > 0)
-    {
-       const auto firstField = fields.constFirst();
-       auto combinedShas = fields.at(startingField++);
-       auto shas = combinedShas.split('X');
-       sha = shas.takeFirst().remove(0, 1);
+   if (const auto fields = QString::fromUtf8(data).split('\n'); fields.count() > 0)
+   {
+      const auto firstField = fields.constFirst();
+      auto combinedShas = fields.at(startingField++);
+      auto shas = combinedShas.split('X');
+      sha = shas.takeFirst().remove(0, 1);
 
-       if (!shas.isEmpty())
-       {
- #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-          mParentsSha = shas.takeFirst().split(' ', Qt::SkipEmptyParts);
- #else
-          mParentsSha = shas.takeFirst().split(' ', QString::SkipEmptyParts);
- #endif
-       }
-       committer = fields.at(startingField++);
-       author = fields.at(startingField++);
-       dateSinceEpoch = std::chrono::seconds(fields.at(startingField++).toInt());
-       shortLog = fields.at(startingField);
+      if (!shas.isEmpty())
+      {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+         mParentsSha = shas.takeFirst().split(' ', Qt::SkipEmptyParts);
+#else
+         mParentsSha = shas.takeFirst().split(' ', QString::SkipEmptyParts);
+#endif
+      }
+      committer = fields.at(startingField++);
+      author = fields.at(startingField++);
+      dateSinceEpoch = std::chrono::seconds(fields.at(startingField++).toInt());
+      shortLog = fields.at(startingField);
 
-       for (auto i = 6; i < fields.count(); ++i)
-          longLog += fields.at(i) + '\n';
+      for (auto i = 6; i < fields.count(); ++i)
+         longLog += fields.at(i) + '\n';
 
-       longLog = longLog.trimmed();
-    }
+      longLog = longLog.trimmed();
+   }
 }
 
 CommitInfo::CommitInfo(const QString &sha, const QStringList &parents, std::chrono::seconds commitDate,
@@ -91,6 +91,11 @@ QString CommitInfo::firstParent() const
 QStringList CommitInfo::parents() const
 {
    return mParentsSha;
+}
+
+void CommitInfo::setParents(const QStringList &parents)
+{
+   mParentsSha = parents;
 }
 
 bool CommitInfo::isInWorkingBranch() const

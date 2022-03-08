@@ -61,6 +61,7 @@ public:
    int parentsCount() const;
    QString firstParent() const;
    QStringList parents() const;
+   void setParents(const QStringList &parents);
    bool isInWorkingBranch() const;
 
    void setLanes(QVector<Lane> lanes);
