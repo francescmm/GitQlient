@@ -75,3 +75,25 @@ GitExecResult GitPatches::stagePatch(const QString &fileName) const
 
    return mGitBase->run(cmd);
 }
+
+GitExecResult GitPatches::discardPatch(const QString &fileName) const
+{
+   QLog_Debug("Git", QString("Staging patch: {%1}").arg(fileName));
+
+   const auto cmd = QString("git apply --reverse %1").arg(fileName);
+
+   QLog_Trace("Git", QString("Staging patch: {%1}").arg(cmd));
+
+   return mGitBase->run(cmd);
+}
+
+GitExecResult GitPatches::resetPatch(const QString &fileName) const
+{
+   QLog_Debug("Git", QString("Staging patch: {%1}").arg(fileName));
+
+   const auto cmd = QString("git apply --cached --reverse %1").arg(fileName);
+
+   QLog_Trace("Git", QString("Staging patch: {%1}").arg(cmd));
+
+   return mGitBase->run(cmd);
+}

@@ -36,6 +36,8 @@ public:
    GitExecResult exportPatch(const QStringList &shaList);
    bool applyPatch(const QString &fileName, bool asCommit = false);
    GitExecResult stagePatch(const QString &fileName) const;
+   GitExecResult discardPatch(const QString &fileName) const;
+   GitExecResult resetPatch(const QString &fileName) const;
 
 private:
    QSharedPointer<GitBase> mGitBase;
