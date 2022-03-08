@@ -355,6 +355,7 @@ void WipDiffWidget::setFullViewEnabled(bool enable)
    mSearchOld->setVisible(mFileVsFile);
 
    GitQlientSettings settings(mGit->getGitDir());
+
    settings.setLocalValue(GitQlientSettings::SplitFileDiffView, mFileVsFile);
 
    configure(mCurrentFile, mIsCached);
@@ -383,6 +384,7 @@ void WipDiffWidget::setFullViewEnabled(bool enable)
 void WipDiffWidget::setHunksViewEnabled(bool enable)
 {
    mSave->setDisabled(true);
+
    mSplitView->blockSignals(true);
    mSplitView->setChecked(!enable);
    mSplitView->blockSignals(false);
@@ -617,22 +619,50 @@ void WipDiffWidget::processHunks(const QString &file, bool isCached)
 
       mHunks.clear();
 
-      const auto header = hunks.output.left(hunks.output.indexOf("@@"));
+      auto chunk = hunks.output;
+      const auto header = chunk.left(chunk.indexOf("@@"));
+      chunk.remove(0, header.count());
 
-      for (auto start = hunks.output.indexOf("@@"); start <= hunks.output.lastIndexOf("@@") && start != -1;)
+      auto chunkLines = chunk.split('\n');
+      QString hunk;
+
+      for (auto &line : chunkLines)
       {
-         const auto endOfCurrentLine = hunks.output.indexOf('\n', start);
-         const auto nextIndex = hunks.output.indexOf("@@", endOfCurrentLine);
-         auto textToProcess = hunks.output.mid(start, nextIndex != -1 ? nextIndex - start : nextIndex);
+         if (line.startsWith("@@") && !hunk.isEmpty())
+         {
+            auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk);
+            connect(hunkView, &HunkWidget::hunkStaged, this, &WipDiffWidget::deleteHunkView);
 
-         auto hunkView = new HunkWidget(mGit, mCache, file, header, textToProcess);
+            mHunksLayout->addWidget(hunkView);
+
+            mHunks.append(hunkView);
+
+            hunk.clear();
+
+            hunk.append(line);
+
+            if (!(line.count() == 1 && line[0] == '\n'))
+               hunk.append('\n');
+         }
+         else
+         {
+            hunk.append(line);
+
+            if (!(line.count() == 1 && line[0] == '\n'))
+               hunk.append('\n');
+         }
+      }
+
+      if (!hunk.isEmpty())
+      {
+         auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk);
          connect(hunkView, &HunkWidget::hunkStaged, this, &WipDiffWidget::deleteHunkView);
 
          mHunksLayout->addWidget(hunkView);
 
          mHunks.append(hunkView);
 
-         start = nextIndex;
+         hunk.clear();
       }
    }
 }
@@ -647,4 +677,6 @@ void WipDiffWidget::deleteHunkView()
       mHunks.erase(iter);
 
    hunkView->deleteLater();
+
+   reload();
 }

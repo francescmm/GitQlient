@@ -24,19 +24,22 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
    GitQlientSettings settings;
    const auto points = settings.globalValue("FileDiffView/FontSize", 8).toInt();
 
-   QFont font = mHunkView->font();
+   auto font = mHunkView->font();
    font.setPointSize(points);
    mHunkView->setFont(font);
    mHunkView->loadDiff(mHunk.right(mHunk.count() - mHunk.indexOf('\n')));
 
-   const auto title = mHunk.mid(0, mHunk.indexOf('\n'));
+   const auto labelTitle = new QLabel(mHunk.mid(0, mHunk.indexOf('\n')));
+   font = labelTitle->font();
+   font.setFamily("DejaVu Sans Mono");
+   labelTitle->setFont(font);
    const auto discardBtn = new QPushButton("Discard");
    const auto stageBtn = new QPushButton("Stage");
 
    const auto layout = new QGridLayout();
    layout->setContentsMargins(QMargins());
    layout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, 1);
-   layout->addWidget(new QLabel(title), 0, 1);
+   layout->addWidget(labelTitle, 0, 1);
    layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 2);
    layout->addWidget(discardBtn, 0, 3);
    layout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, 4);
@@ -50,7 +53,34 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
    connect(stageBtn, &QPushButton::clicked, this, &HunkWidget::stageHunk);
 }
 
-void HunkWidget::discardHunk() { }
+void HunkWidget::discardHunk()
+{
+   auto hunkLines = mHunk.split('\n');
+
+   // Creating the dark side header line
+   const auto headerLine = hunkLines.takeFirst();
+   const auto parts = headerLine.split("@@", Qt::SkipEmptyParts);
+   const auto lineParts = parts.first().split(' ', Qt::SkipEmptyParts);
+   const auto lineA = lineParts.first().split(',', Qt::SkipEmptyParts);
+   const auto lineB = lineParts.last().split(',', Qt::SkipEmptyParts);
+   auto lines = QString("%1,%2 %3,%4").arg(lineA.first(), lineB.last(), lineB.first(), lineA.last());
+   const auto heading = parts.count() > 1 && parts.last().isEmpty() ? QString::fromUtf8("") : parts.last();
+   auto finalHeader = QString("@@ %1 @@%2").arg(lines, heading);
+
+   // Creating the dark side diff
+   for (auto &line : hunkLines)
+   {
+      if (line[0] == '+')
+         line[0] = '-';
+      else if (line[0] == '-')
+         line[0] = '+';
+   }
+
+   hunkLines.prepend(finalHeader);
+   mHunk = hunkLines.join('\n');
+
+   stageHunk();
+}
 
 void HunkWidget::stageHunk()
 {
