@@ -640,7 +640,7 @@ void WipDiffWidget::processHunks(const QString &file, bool isCached)
       {
          if (line.startsWith("@@") && !hunk.isEmpty())
          {
-            auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk);
+            auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk, isCached);
             connect(hunkView, &HunkWidget::hunkStaged, this, &WipDiffWidget::deleteHunkView);
 
             mHunksLayout->addWidget(hunkView);
@@ -665,7 +665,7 @@ void WipDiffWidget::processHunks(const QString &file, bool isCached)
 
       if (!hunk.isEmpty())
       {
-         auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk);
+         auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk, isCached);
          connect(hunkView, &HunkWidget::hunkStaged, this, &WipDiffWidget::deleteHunkView);
 
          mHunksLayout->addWidget(hunkView);

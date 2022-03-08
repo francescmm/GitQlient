@@ -128,8 +128,6 @@ private:
 
    /**
     * @brief Configures the diff view with the two commits that will be compared and the file that will be applied.
-    * @param currentSha The base SHA.
-    * @param previousSha The SHA to compare to.
     * @param file The file that will show the diff.
     * @param editMode Enters edit mode directly.
     * @return bool Returns true if the configuration was applied, otherwise false.

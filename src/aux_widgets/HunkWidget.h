@@ -5,6 +5,7 @@
 class FileDiffView;
 class GitBase;
 class GitCache;
+class QTemporaryFile;
 
 class HunkWidget : public QFrame
 {
@@ -15,7 +16,7 @@ signals:
 
 public:
    explicit HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cache, const QString &fileName,
-                       const QString &header, const QString &hunk, QWidget *parent = nullptr);
+                       const QString &header, const QString &hunk, bool isCached = false, QWidget *parent = nullptr);
 
 private:
    QSharedPointer<GitBase> mGit;
@@ -23,8 +24,10 @@ private:
    QString mFileName;
    QString mHeader;
    QString mHunk;
+   bool mIsCached = false;
    FileDiffView *mHunkView = nullptr;
 
    void discardHunk();
    void stageHunk();
+   QTemporaryFile *createPatchFile();
 };

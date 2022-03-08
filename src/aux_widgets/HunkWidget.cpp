@@ -12,13 +12,14 @@
 #include <QTemporaryFile>
 
 HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cache, const QString &fileName,
-                       const QString &header, const QString &hunk, QWidget *parent)
+                       const QString &header, const QString &hunk, bool isCached, QWidget *parent)
    : QFrame { parent }
    , mGit(git)
    , mCache(cache)
    , mFileName(fileName)
    , mHeader(header)
    , mHunk(hunk)
+   , mIsCached(isCached)
    , mHunkView(new FileDiffView())
 {
    GitQlientSettings settings;
@@ -59,24 +60,37 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
 
 void HunkWidget::discardHunk()
 {
-   QScopedPointer<GitPatches> git(new GitPatches(mGit));
+   const auto file = createPatchFile();
 
-   auto file = new QTemporaryFile(this);
-
-   if (file->open())
+   if (file)
    {
-      const auto content = QString("%1%2").arg(mHeader, mHunk);
-      file->write(content.toUtf8());
-      file->close();
+      QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
-      if (auto ret = git->discardPatch(file->fileName()); ret.success)
-      {
+      const auto ret = mIsCached ? git->resetPatch(file->fileName()) : git->discardPatch(file->fileName());
+
+      if (ret.success)
          emit hunkStaged();
-      }
+
+      delete file;
    }
 }
 
 void HunkWidget::stageHunk()
+{
+   const auto file = createPatchFile();
+
+   if (file)
+   {
+      QScopedPointer<GitPatches> git(new GitPatches(mGit));
+
+      if (auto ret = git->stagePatch(file->fileName()); ret.success)
+         emit hunkStaged();
+
+      delete file;
+   }
+}
+
+QTemporaryFile *HunkWidget::createPatchFile()
 {
    QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
@@ -87,10 +101,8 @@ void HunkWidget::stageHunk()
       const auto content = QString("%1%2").arg(mHeader, mHunk);
       file->write(content.toUtf8());
       file->close();
-
-      if (auto ret = git->stagePatch(file->fileName()); ret.success)
-      {
-         emit hunkStaged();
-      }
+      return file;
    }
+
+   return nullptr;
 }
