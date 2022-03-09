@@ -628,7 +628,7 @@ FileDiffView
    border-right-color: white;
 }
 
-FileDiffWidget, WipDiffWidget
+FileDiffWidget, WipDiffWidget, #HunksFrame
 {
     background: #C6C6C7;
     border-color: #C6C6C7;

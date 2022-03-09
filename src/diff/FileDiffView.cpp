@@ -154,6 +154,11 @@ int FileDiffView::getLineHeigth() const
    return blockBoundingRect(firstVisibleBlock()).height();
 }
 
+QSize FileDiffView::sizeHint() const
+{
+   return viewport()->size();
+}
+
 int FileDiffView::lineNumberAreaWidth()
 {
    const auto width = fontMetrics().horizontalAdvance(QLatin1Char('9'));

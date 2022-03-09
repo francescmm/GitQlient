@@ -23,12 +23,9 @@ void FileDiffHighlighter::highlightBlock(const QString &text)
          if (diff.startLine <= currentLine && currentLine <= diff.endLine)
          {
             if (diff.addition)
-            {
-               myFormat.setBackground(GitQlientStyles::getGreen());
-               // myFormat.setForeground(GitQlientStyles::getGreen());
-            }
+               myFormat.setBackground(GitQlientStyles::getShadowedGreen());
             else
-               myFormat.setBackground(GitQlientStyles::getRed());
+               myFormat.setBackground(GitQlientStyles::getShadowedRed());
          }
       }
    }
@@ -41,10 +38,10 @@ void FileDiffHighlighter::highlightBlock(const QString &text)
             format.setFontWeight(QFont::ExtraBold);
             break;
          case '+':
-            myFormat.setBackground(GitQlientStyles::getGreen());
+            myFormat.setBackground(GitQlientStyles::getShadowedGreen());
             break;
          case '-':
-            myFormat.setBackground(GitQlientStyles::getRed());
+            myFormat.setBackground(GitQlientStyles::getShadowedRed());
             break;
          default:
             break;

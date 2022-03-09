@@ -65,7 +65,10 @@ public:
    */
    void loadDiff(const QString &sha, const QString &diffToSha, const QString &diffData);
 
-   void changeFontSize() override;
+   /**
+    * @brief Changes the font size (in points) for the widgets used to show the diff.
+    */
+   void updateFontSize() override;
 
 private:
    QPushButton *mGoPrevious = nullptr;

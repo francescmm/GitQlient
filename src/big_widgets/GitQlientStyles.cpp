@@ -97,6 +97,20 @@ QColor GitQlientStyles::getOrange()
    return graphOrange;
 }
 
+QColor GitQlientStyles::getShadowedRed()
+{
+   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+
+   return colorSchema == "dark" ? QColor(255, 85, 85, 255 * 0.45) : QColor(255, 85, 85, 255 * 0.65);
+}
+
+QColor GitQlientStyles::getShadowedGreen()
+{
+   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+
+   return colorSchema == "dark" ? QColor(141, 201, 68, 255 * 0.45) : QColor(141, 201, 68, 255 * 0.65);
+}
+
 std::array<QColor, GitQlientStyles::kBranchColors> GitQlientStyles::getBranchColors()
 {
    static std::array<QColor, kBranchColors> colors { { getTextColor(), graphRed, getBlue(), graphGreen, graphOrange,

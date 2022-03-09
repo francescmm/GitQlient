@@ -197,7 +197,7 @@ void FullDiffWidget::loadDiff(const QString &sha, const QString &diffToSha, cons
    processData(diffData);
 }
 
-void FullDiffWidget::changeFontSize()
+void FullDiffWidget::updateFontSize()
 {
    GitQlientSettings settings;
    const auto fontSize = settings.globalValue("FileDiffView/FontSize", 8).toInt();

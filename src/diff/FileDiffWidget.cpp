@@ -192,7 +192,7 @@ bool FileDiffWidget::reload()
    return false;
 }
 
-void FileDiffWidget::changeFontSize()
+void FileDiffWidget::updateFontSize()
 {
    GitQlientSettings settings;
    const auto fontSize = settings.globalValue("FileDiffView/FontSize", 8).toInt();

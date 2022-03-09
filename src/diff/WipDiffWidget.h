@@ -37,6 +37,7 @@ class QLabel;
 class QLineEdit;
 class QPlainTextEdit;
 class QVBoxLayout;
+class QSpacerItem;
 class HunkWidget;
 
 /*!
@@ -88,7 +89,7 @@ public:
    */
    bool reload() override;
 
-   void changeFontSize() override;
+   void updateFontSize() override;
 
    bool setup(const QString &file, bool isCached, bool editMode = false);
 
@@ -124,6 +125,7 @@ private:
    QVector<HunkWidget *> mHunks;
    QVBoxLayout *mHunksLayout = nullptr;
    QFrame *mHunksFrame = nullptr;
+   QSpacerItem *mHunkSpacer = nullptr;
    QStackedWidget *mViewStackedWidget = nullptr;
 
    /**
@@ -187,7 +189,9 @@ private:
 
    void stageChunk(const QString &id);
 
-   void processHunks(const QString &file, bool isCached);
+   void processHunks(const QString &file);
+
+   void createAndAddHunk(const QString &file, const QString &header, const QString &hunk);
 
    void deleteHunkView();
 };

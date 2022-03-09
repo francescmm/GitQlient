@@ -470,7 +470,7 @@ ConfigWidget QTabBar::tab:selected, ConfigWidget QTabWidget > QWidget, ConfigWid
    background-color: #2E2F30;
 }
 
-ConfigWidget FileDiffView
+ConfigWidget FileDiffView, HunkWidget FileDiffView
 {
    border: 0;
 }
@@ -614,7 +614,7 @@ FileDiffView
    border-right-color: white;
 }
 
-FileDiffWidget, WipDiffWidget
+FileDiffWidget, WipDiffWidget, #HunksFrame
 {
     background-color: #2E2F30;
     border-color: #202122;

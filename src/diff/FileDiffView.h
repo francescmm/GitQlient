@@ -51,8 +51,8 @@
 **
 ****************************************************************************/
 
-#include <QPlainTextEdit>
 #include <DiffInfo.h>
+#include <QPlainTextEdit>
 
 class FileDiffHighlighter;
 
@@ -132,6 +132,8 @@ public:
     * @return The height of a row.
     */
    int getLineHeigth() const;
+
+   QSize sizeHint() const override;
 
 protected:
    /*!

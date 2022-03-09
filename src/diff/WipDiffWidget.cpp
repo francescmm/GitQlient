@@ -21,6 +21,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QScrollBar>
 #include <QStackedWidget>
 #include <QTemporaryFile>
@@ -45,6 +46,7 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
    , mFileEditor(new FileEditor())
    , mHunksLayout(new QVBoxLayout())
    , mHunksFrame(new QFrame())
+   , mHunkSpacer(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding))
    , mViewStackedWidget(new QStackedWidget())
 {
    mCurrentSha = CommitInfo::ZERO_SHA;
@@ -109,13 +111,17 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
    diffFrame->setLayout(diffLayout);
 
    mHunksLayout->setContentsMargins(QMargins());
+   mHunksLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
    mHunksFrame->setLayout(mHunksLayout);
+   mHunksFrame->setObjectName("HunksFrame");
+
+   const auto scrollArea = new QScrollArea();
+   scrollArea->setWidget(mHunksFrame);
+   scrollArea->setWidgetResizable(true);
 
    mViewStackedWidget->addWidget(diffFrame);
    mViewStackedWidget->addWidget(mFileEditor);
-   mViewStackedWidget->addWidget(mHunksFrame);
-
-   mTitleFrame->setVisible(false);
+   mViewStackedWidget->addWidget(scrollArea);
 
    const auto titleLayout = new QHBoxLayout(mTitleFrame);
    titleLayout->setContentsMargins(0, 10, 0, 10);
@@ -205,7 +211,7 @@ bool WipDiffWidget::reload()
    return setup(mCurrentFile, mIsCached, mEdition->isChecked());
 }
 
-void WipDiffWidget::changeFontSize()
+void WipDiffWidget::updateFontSize()
 {
    GitQlientSettings settings;
    const auto fontSize = settings.globalValue("FileDiffView/FontSize", 8).toInt();
@@ -294,7 +300,7 @@ bool WipDiffWidget::configure(const QString &file, bool isCached)
 
    if (!text.isEmpty())
    {
-      processHunks(destFile, isCached);
+      processHunks(destFile);
 
       if (mFileVsFile)
       {
@@ -617,18 +623,19 @@ void WipDiffWidget::stageChunk(const QString &id)
    }
 }
 
-void WipDiffWidget::processHunks(const QString &file, bool isCached)
+void WipDiffWidget::processHunks(const QString &file)
 {
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
-   const auto hunks = git->getWipFileDiff(file, isCached);
+   const auto hunks = git->getWipFileDiff(file, mIsCached);
 
-   if (hunks.success)
+   for (auto hunk : qAsConst(mHunks))
+      delete hunk;
+
+   mHunks.clear();
+   mHunksLayout->removeItem(mHunkSpacer);
+
+   if (hunks.success && !hunks.output.isEmpty())
    {
-      for (auto hunk : qAsConst(mHunks))
-         delete hunk;
-
-      mHunks.clear();
-
       auto chunk = hunks.output;
       const auto header = chunk.left(chunk.indexOf("@@"));
       chunk.remove(0, header.count());
@@ -640,41 +647,43 @@ void WipDiffWidget::processHunks(const QString &file, bool isCached)
       {
          if (line.startsWith("@@") && !hunk.isEmpty())
          {
-            auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk, isCached);
-            connect(hunkView, &HunkWidget::hunkStaged, this, &WipDiffWidget::deleteHunkView);
+            if (hunk.endsWith('\n'))
+               hunk = hunk.left(hunk.size() - 1);
 
-            mHunksLayout->addWidget(hunkView);
-
-            mHunks.append(hunkView);
-
+            createAndAddHunk(file, header, hunk);
             hunk.clear();
-
-            hunk.append(line);
-
-            if (!(line.count() == 1 && line[0] == '\n'))
-               hunk.append('\n');
          }
-         else
-         {
-            hunk.append(line);
 
-            if (!(line.count() == 1 && line[0] == '\n'))
-               hunk.append('\n');
-         }
+         hunk.append(line);
+
+         if (!(line.count() == 1 && line[0] == '\n'))
+            hunk.append('\n');
       }
 
       if (!hunk.isEmpty())
       {
-         auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk, isCached);
-         connect(hunkView, &HunkWidget::hunkStaged, this, &WipDiffWidget::deleteHunkView);
+         // This time we need to remove two \n characters since output brings one by default.
+         if (hunk.endsWith('\n'))
+            hunk = hunk.left(hunk.size() - 2);
 
-         mHunksLayout->addWidget(hunkView);
-
-         mHunks.append(hunkView);
-
-         hunk.clear();
+         createAndAddHunk(file, header, hunk);
       }
+
+      if (!mHunks.isEmpty())
+         mHunksLayout->addItem(mHunkSpacer);
    }
+
+   mHunksView->setEnabled(hunks.success && !mHunks.isEmpty());
+}
+
+void WipDiffWidget::createAndAddHunk(const QString &file, const QString &header, const QString &hunk)
+{
+   auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk, mIsCached);
+   connect(hunkView, &HunkWidget::hunkStaged, this, &WipDiffWidget::deleteHunkView);
+
+   mHunksLayout->addWidget(hunkView);
+
+   mHunks.append(hunkView);
 }
 
 void WipDiffWidget::deleteHunkView()

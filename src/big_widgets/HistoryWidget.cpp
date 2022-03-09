@@ -379,8 +379,8 @@ void HistoryWidget::onPanelsVisibilityChanged()
 
 void HistoryWidget::onDiffFontSizeChanged()
 {
-   mFullDiffWidget->changeFontSize();
-   mWipFileDiff->changeFontSize();
+   mFullDiffWidget->updateFontSize();
+   mWipFileDiff->updateFontSize();
 }
 
 void HistoryWidget::search()

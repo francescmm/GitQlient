@@ -29,28 +29,33 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
    font.setPointSize(points);
    mHunkView->setFont(font);
    mHunkView->loadDiff(mHunk.right(mHunk.count() - mHunk.indexOf('\n') - 1));
+   mHunkView->setFixedHeight(mHunkView->getHeight() + mHunkView->getLineHeigth() * 2);
 
    const auto labelTitle = new QLabel(mHunk.mid(0, mHunk.indexOf('\n')));
    font = labelTitle->font();
    font.setFamily("DejaVu Sans Mono");
+   font.setBold(true);
    labelTitle->setFont(font);
+
    const auto discardBtn = new QPushButton("Discard");
    discardBtn->setObjectName("warningButton");
 
    const auto stageBtn = new QPushButton("Stage");
    stageBtn->setObjectName("applyActionBtn");
 
-   const auto layout = new QGridLayout();
-   layout->setContentsMargins(10, 01, 10, 10);
-   layout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, 1);
-   layout->addWidget(labelTitle, 0, 1);
-   layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 2);
-   layout->addWidget(discardBtn, 0, 3);
-   layout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, 4);
-   layout->addWidget(stageBtn, 0, 5);
-   layout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed), 0, 6);
-   layout->addWidget(mHunkView, 1, 0, 1, 7);
-   layout->addItem(new QSpacerItem(1, 20, QSizePolicy::Fixed, QSizePolicy::Fixed), 2, 0);
+   auto controlsLayout = new QHBoxLayout();
+   controlsLayout->setContentsMargins(5, 0, 5, 10);
+   controlsLayout->addWidget(labelTitle);
+   controlsLayout->addStretch();
+   controlsLayout->addWidget(discardBtn);
+   controlsLayout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
+   controlsLayout->addWidget(stageBtn);
+
+   const auto layout = new QVBoxLayout();
+   layout->setContentsMargins(10, 10, 10, 10);
+   layout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
+   layout->addLayout(controlsLayout);
+   layout->addWidget(mHunkView);
 
    setLayout(layout);
 

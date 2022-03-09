@@ -86,7 +86,7 @@ public:
    */
    bool reload() override;
 
-   void changeFontSize() override;
+   void updateFontSize() override;
 
    /*!
     \brief Configures the diff view with the two commits that will be compared and the file that will be applied.
