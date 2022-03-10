@@ -8,9 +8,10 @@
 #include <QPainter>
 #include <QTextBlock>
 
-LineNumberArea::LineNumberArea(FileDiffView *editor, bool allowComments)
+LineNumberArea::LineNumberArea(FileDiffView *editor, bool allowComments, bool skipDeletions)
    : QWidget(editor)
    , mCommentsAllowed(allowComments)
+   , mSkipDeletions(skipDeletions)
 {
    fileDiffWidget = editor;
    setMouseTracking(true);
@@ -48,14 +49,13 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
    {
       if (block.isVisible() && bottom >= event->rect().top())
       {
-         const auto blockText = block.text();
+         painter.setPen(GitQlientStyles::getTextColor());
 
-         if (!fileDiffWidget->mUnified)
+         const auto number = blockNumber + lineCorrection;
+         const auto height = fileDiffWidget->fontMetrics().height();
+
+         if (mCommentsAllowed)
          {
-            const auto height = fileDiffWidget->fontMetrics().height();
-            const auto number = blockNumber + lineCorrection;
-            painter.setPen(GitQlientStyles::getTextColor());
-
             if (mBookmarks.contains(number))
             {
                painter.drawPixmap(6, static_cast<int>(top), height, height,
@@ -70,7 +70,11 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
 
                painter.setPen(gitQlientOrange);
             }
+         }
 
+         auto paintNumber = true;
+         if (mSkipDeletions)
+         {
             const auto skipDeletion
                 = std::find_if(fileDiffWidget->mFileDiffInfo.cbegin(), fileDiffWidget->mFileDiffInfo.cend(),
                                [blockNumber](const ChunkDiffInfo::ChunkInfo &hunk) {
@@ -78,14 +82,16 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
                                })
                 != fileDiffWidget->mFileDiffInfo.cend();
 
-            if (!skipDeletion)
-               painter.drawText(0, static_cast<int>(top), width() - offset, height, Qt::AlignRight,
-                                QString::number(number));
-            else
+            if (skipDeletion)
+            {
+               paintNumber = false;
                --lineCorrection;
+            }
          }
-         else
-            --lineCorrection;
+
+         if (paintNumber)
+            painter.drawText(0, static_cast<int>(top), width() - offset, height, Qt::AlignRight,
+                             QString::number(number));
       }
 
       block = block.next();

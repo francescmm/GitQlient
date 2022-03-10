@@ -41,7 +41,7 @@ public:
    using BookmarkLine = int;
    using LinkId = int;
 
-   LineNumberArea(FileDiffView *editor, bool allowComments = false);
+   LineNumberArea(FileDiffView *editor, bool allowComments = false, bool skipDeletions = false);
 
    int widthInDigitsSize();
    QSize sizeHint() const override;
@@ -59,5 +59,6 @@ private:
    FileDiffView *fileDiffWidget;
    bool mPressed = false;
    bool mCommentsAllowed = false;
+   bool mSkipDeletions = false;
    QMap<BookmarkLine, LinkId> mBookmarks;
 };

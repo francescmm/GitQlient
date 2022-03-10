@@ -100,6 +100,14 @@ public:
    QString getCurrentFile() const { return mCurrentFile; }
 
 private:
+   enum View
+   {
+      Hunks,
+      Unified,
+      Split,
+      Edition
+   };
+
    QString mCurrentFile;
    bool mIsCached = false;
    QPushButton *mBack = nullptr;
@@ -114,6 +122,7 @@ private:
    QPushButton *mRevert = nullptr;
    QLabel *mFileNameLabel = nullptr;
    QFrame *mTitleFrame = nullptr;
+   FileDiffView *mUnifiedFile = nullptr;
    FileDiffView *mNewFile = nullptr;
    QLineEdit *mSearchOld = nullptr;
    FileDiffView *mOldFile = nullptr;
@@ -186,8 +195,6 @@ private:
     * @brief revertFile Revert all the changes to the file.
     */
    void revertFile();
-
-   void stageChunk(const QString &id);
 
    void processHunks(const QString &file);
 

@@ -74,12 +74,6 @@ signals:
     */
    void signalScrollChanged(int value);
 
-   /**
-    * @brief signalStageChunk Signal triggered when the user orders to stage a chunk.
-    * @param id The internal chunk id.
-    */
-   void signalStageChunk(const QString &id);
-
 public:
    /*!
     \brief Default constructor.
@@ -114,12 +108,6 @@ public:
     * @param lineNumber The starting line number.
     */
    void setStartingLine(int lineNumber) { mStartingLine = lineNumber; }
-
-   /**
-    * @brief setUnifiedDiff Sets the diff as unified view.
-    * @param unified True if unified view must be shown.
-    */
-   void setUnifiedDiff(bool unified) { mUnified = unified; }
 
    /**
     * @brief getHeight Gets the approximated height of the widget based on the text of the QTextDocument.
@@ -177,7 +165,6 @@ private:
    LineNumberArea *mLineNumberArea = nullptr;
    FileDiffHighlighter *mDiffHighlighter = nullptr;
    int mStartingLine = 0;
-   bool mUnified = false;
    int mRow = -1;
 
    friend class LineNumberArea;

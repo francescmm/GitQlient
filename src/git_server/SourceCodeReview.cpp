@@ -47,9 +47,8 @@ SourceCodeReview::SourceCodeReview(const QString &filePath, const QString &sourc
    }
 
    const auto diff = new FileDiffView();
-   diff->addNumberArea(new LineNumberArea(diff));
+   diff->addNumberArea(new LineNumberArea(diff, true));
    diff->setStartingLine(commentLine - linesCount + 1);
-   diff->setUnifiedDiff(true);
    diff->loadDiff(summary.trimmed());
    diff->setTextInteractionFlags(Qt::NoTextInteraction);
    diff->setMinimumWidth(800);

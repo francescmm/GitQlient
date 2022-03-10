@@ -40,6 +40,7 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
    , mRevert(new QPushButton())
    , mFileNameLabel(new QLabel())
    , mTitleFrame(new QFrame())
+   , mUnifiedFile(new FileDiffView())
    , mNewFile(new FileDiffView())
    , mSearchOld(new QLineEdit())
    , mOldFile(new FileDiffView())
@@ -51,6 +52,8 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
 {
    mCurrentSha = CommitInfo::ZERO_SHA;
 
+   mUnifiedFile->addNumberArea(new LineNumberArea(mUnifiedFile, false, true));
+
    mNewFile->addNumberArea(new LineNumberArea(mNewFile));
    mOldFile->addNumberArea(new LineNumberArea(mOldFile));
 
@@ -61,6 +64,7 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
    QFont font = mNewFile->font();
    const auto points = settings.globalValue("FileDiffView/FontSize", 8).toInt();
    font.setPointSize(points);
+   mUnifiedFile->setFont(font);
    mNewFile->setFont(font);
    mOldFile->setFont(font);
 
@@ -79,6 +83,25 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
    optionsLayout->addWidget(mRevert);
    optionsLayout->addStretch();
 
+   const auto searchUnified = new QLineEdit();
+   searchUnified->setObjectName("SearchInput");
+   searchUnified->setPlaceholderText(tr("Press Enter to search a text... "));
+   connect(searchUnified, &QLineEdit::editingFinished, this,
+           [this, searchUnified]() { DiffHelper::findString(searchUnified->text(), mUnifiedFile, this); });
+
+   const auto unifiedLayout = new QVBoxLayout();
+   unifiedLayout->setContentsMargins(QMargins());
+   unifiedLayout->setSpacing(5);
+   unifiedLayout->addWidget(searchUnified);
+   unifiedLayout->addWidget(mUnifiedFile);
+
+   const auto unifiedDiffLayout = new QHBoxLayout();
+   unifiedDiffLayout->setContentsMargins(10, 0, 10, 0);
+   unifiedDiffLayout->addLayout(unifiedLayout);
+
+   const auto unifiedDiffFrame = new QFrame();
+   unifiedDiffFrame->setLayout(unifiedDiffLayout);
+
    const auto searchNew = new QLineEdit();
    searchNew->setObjectName("SearchInput");
    searchNew->setPlaceholderText(tr("Press Enter to search a text... "));
@@ -94,7 +117,7 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
    mSearchOld->setPlaceholderText(tr("Press Enter to search a text... "));
    mSearchOld->setObjectName("SearchInput");
    connect(mSearchOld, &QLineEdit::editingFinished, this,
-           [this]() { DiffHelper::findString(mSearchOld->text(), mNewFile, this); });
+           [this]() { DiffHelper::findString(mSearchOld->text(), mOldFile, this); });
 
    const auto oldFileLayout = new QVBoxLayout();
    oldFileLayout->setContentsMargins(QMargins());
@@ -102,13 +125,13 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
    oldFileLayout->addWidget(mSearchOld);
    oldFileLayout->addWidget(mOldFile);
 
-   const auto diffLayout = new QHBoxLayout();
-   diffLayout->setContentsMargins(10, 0, 10, 0);
-   diffLayout->addLayout(newFileLayout);
-   diffLayout->addLayout(oldFileLayout);
+   const auto splitDiffLayout = new QHBoxLayout();
+   splitDiffLayout->setContentsMargins(10, 0, 10, 0);
+   splitDiffLayout->addLayout(newFileLayout);
+   splitDiffLayout->addLayout(oldFileLayout);
 
-   const auto diffFrame = new QFrame();
-   diffFrame->setLayout(diffLayout);
+   const auto splitDiffFrame = new QFrame();
+   splitDiffFrame->setLayout(splitDiffLayout);
 
    mHunksLayout->setContentsMargins(QMargins());
    mHunksLayout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
@@ -119,9 +142,10 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
    scrollArea->setWidget(mHunksFrame);
    scrollArea->setWidgetResizable(true);
 
-   mViewStackedWidget->addWidget(diffFrame);
-   mViewStackedWidget->addWidget(mFileEditor);
    mViewStackedWidget->addWidget(scrollArea);
+   mViewStackedWidget->addWidget(unifiedDiffFrame);
+   mViewStackedWidget->addWidget(splitDiffFrame);
+   mViewStackedWidget->addWidget(mFileEditor);
 
    const auto titleLayout = new QHBoxLayout(mTitleFrame);
    titleLayout->setContentsMargins(0, 10, 0, 10);
@@ -185,18 +209,10 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
    mRevert->setToolTip(tr("Revert changes"));
    connect(mRevert, &QPushButton::clicked, this, &WipDiffWidget::revertFile);
 
-   mViewStackedWidget->setCurrentIndex(0);
-
-   if (!mFileVsFile)
-   {
-      mOldFile->setHidden(true);
-      mSearchOld->setHidden(true);
-   }
+   mViewStackedWidget->setCurrentIndex(mFileVsFile ? View::Split : View::Unified);
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
-   connect(mNewFile, &FileDiffView::signalStageChunk, this, &WipDiffWidget::stageChunk);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
-   connect(mOldFile, &FileDiffView::signalStageChunk, this, &WipDiffWidget::stageChunk);
 
    setAttribute(Qt::WA_DeleteOnClose);
 }
@@ -220,6 +236,10 @@ void WipDiffWidget::updateFontSize()
    font.setPointSize(fontSize);
 
    auto cursor = mNewFile->textCursor();
+
+   mUnifiedFile->selectAll();
+   mUnifiedFile->setFont(font);
+   mUnifiedFile->setTextCursor(cursor);
 
    mNewFile->selectAll();
    mNewFile->setFont(font);
@@ -245,7 +265,7 @@ bool WipDiffWidget::setup(const QString &file, bool isCached, bool editMode)
          mEdition->setChecked(false);
          mSave->setDisabled(true);
          mHunksView->blockSignals(true);
-         mHunksView->setChecked(mViewStackedWidget->currentIndex() == 2);
+         mHunksView->setChecked(mViewStackedWidget->currentIndex() == View::Hunks);
          mHunksView->blockSignals(false);
          mFullView->blockSignals(true);
          mFullView->setChecked(!mFileVsFile && !mHunksView->isChecked());
@@ -320,9 +340,9 @@ bool WipDiffWidget::configure(const QString &file, bool isCached)
       {
          const auto data = DiffHelper::processDiff(text);
 
-         mNewFile->blockSignals(true);
-         mNewFile->loadDiff(text, data);
-         mNewFile->blockSignals(false);
+         mUnifiedFile->blockSignals(true);
+         mUnifiedFile->loadDiff(text, data);
+         mUnifiedFile->blockSignals(false);
       }
 
       return true;
@@ -335,13 +355,12 @@ void WipDiffWidget::setSplitViewEnabled(bool enable)
 {
    mFileVsFile = enable;
 
-   mOldFile->setVisible(mFileVsFile);
-   mSearchOld->setVisible(mFileVsFile);
-
    GitQlientSettings settings(mGit->getGitDir());
    settings.setLocalValue(GitQlientSettings::SplitFileDiffView, mFileVsFile);
 
    configure(mCurrentFile, mIsCached);
+
+   mViewStackedWidget->setCurrentIndex(View::Split);
 
    mFullView->blockSignals(true);
    mFullView->setChecked(!mFileVsFile);
@@ -368,14 +387,13 @@ void WipDiffWidget::setFullViewEnabled(bool enable)
 {
    mFileVsFile = !enable;
 
-   mOldFile->setVisible(mFileVsFile);
-   mSearchOld->setVisible(mFileVsFile);
-
    GitQlientSettings settings(mGit->getGitDir());
 
    settings.setLocalValue(GitQlientSettings::SplitFileDiffView, mFileVsFile);
 
    configure(mCurrentFile, mIsCached);
+
+   mViewStackedWidget->setCurrentIndex(View::Unified);
 
    mSplitView->blockSignals(true);
    mSplitView->setChecked(mFileVsFile);
@@ -410,7 +428,7 @@ void WipDiffWidget::setHunksViewEnabled(bool enable)
    mFullView->setChecked(!enable);
    mFullView->blockSignals(false);
 
-   mViewStackedWidget->setCurrentIndex(2);
+   mViewStackedWidget->setCurrentIndex(View::Hunks);
 }
 
 void WipDiffWidget::hideBackButton() const
@@ -484,7 +502,8 @@ void WipDiffWidget::enterEditionMode(bool enter)
       mHunksView->blockSignals(false);
 
       mFileEditor->editFile(mCurrentFile);
-      mViewStackedWidget->setCurrentIndex(1);
+
+      mViewStackedWidget->setCurrentIndex(View::Edition);
    }
    else if (mFileVsFile)
       setSplitViewEnabled(true);
@@ -494,7 +513,7 @@ void WipDiffWidget::enterEditionMode(bool enter)
 
 void WipDiffWidget::endEditFile()
 {
-   mViewStackedWidget->setCurrentIndex(0);
+   mViewStackedWidget->setCurrentIndex(mFileVsFile ? View::Split : View::Unified);
 }
 
 void WipDiffWidget::stageFile()
@@ -525,101 +544,6 @@ void WipDiffWidget::revertFile()
       {
          emit fileReverted(mCurrentFile);
          emit exitRequested();
-      }
-   }
-}
-
-void WipDiffWidget::stageChunk(const QString &id)
-{
-   const auto iter = std::find_if(mChunks.chunks.cbegin(), mChunks.chunks.cend(),
-                                  [id](const ChunkDiffInfo &info) { return id == info.id; });
-
-   if (iter != mChunks.chunks.cend())
-   {
-      auto startingLine = 0;
-
-      if (iter->newFile.startLine != -1
-          && (iter->oldFile.startLine == -1 || iter->newFile.startLine < iter->oldFile.startLine))
-         startingLine = iter->newFile.startLine;
-      else
-         startingLine = iter->oldFile.startLine;
-
-      const auto buffer = 3;
-      QString text;
-      QString postLine = " \n";
-      auto fileCount = startingLine - 1 - buffer;
-
-      if (fileCount < 0)
-         fileCount = 0;
-
-      for (; fileCount < startingLine - 1 && fileCount < mChunks.oldFileDiff.count(); ++fileCount)
-         text.append(QString(" %1\n").arg(mChunks.oldFileDiff.at(fileCount)));
-
-      if (fileCount < mChunks.oldFileDiff.count())
-         postLine = QString(" %1\n").arg(mChunks.oldFileDiff.at(fileCount));
-
-      auto totalLinesOldFile = 0;
-
-      if (iter->oldFile.startLine != -1)
-      {
-         const auto realStart = iter->oldFile.startLine - 1;
-         totalLinesOldFile = iter->oldFile.startLine == iter->oldFile.endLine ? 1 : iter->oldFile.endLine - realStart;
-
-         auto i = realStart;
-         for (; i < iter->oldFile.endLine && i < mChunks.oldFileDiff.count(); ++i)
-            text.append(QString("-%1\n").arg(mChunks.oldFileDiff.at(i)));
-
-         postLine = QString(" %1\n").arg(mChunks.oldFileDiff.at(i));
-      }
-
-      auto totalLinesNewFile = 0;
-
-      if (iter->newFile.startLine != -1)
-      {
-         const auto realStart = iter->newFile.startLine - 1;
-         totalLinesNewFile = iter->newFile.startLine == iter->newFile.endLine ? 1 : iter->newFile.endLine - realStart;
-
-         for (auto i = realStart; i < iter->newFile.endLine && i < mChunks.newFileDiff.count(); ++i)
-            text.append(QString("+%1\n").arg(mChunks.newFileDiff.at(i)));
-      }
-
-      text.append(postLine);
-
-      const auto filePath = QString(mCurrentFile).remove(mGit->getWorkingDir());
-      const auto patch
-          = QString("--- a%1\n"
-                    "+++ b%1\n"
-                    "@@ -%2,%3 +%2,%4 @@\n"
-                    "%5")
-                .arg(filePath, QString::number(startingLine - buffer), QString::number(buffer + totalLinesOldFile + 1),
-                     QString::number(buffer + totalLinesNewFile + 1), text);
-
-      QTemporaryFile f;
-
-      if (f.open())
-      {
-         f.write(patch.toUtf8());
-         f.close();
-
-         QScopedPointer<GitPatches> git(new GitPatches(mGit));
-
-         if (const auto ret = git->stagePatch(f.fileName()); ret.success)
-            QMessageBox::information(this, tr("Changes staged!"), tr("The chunk has been successfully staged."));
-         else
-         {
-#ifdef DEBUG
-            QFile patch("aux.patch");
-
-            if (patch.open(QIODevice::WriteOnly) && f.open())
-            {
-               patch.write(f.readAll());
-               patch.close();
-               f.close();
-            }
-#endif
-            QMessageBox::information(this, tr("Stage failed"),
-                                     tr("The chunk couldn't be applied:\n%1").arg(ret.output));
-         }
       }
    }
 }

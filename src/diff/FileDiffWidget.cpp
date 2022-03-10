@@ -172,9 +172,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    }
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
-   connect(mNewFile, &FileDiffView::signalStageChunk, this, &FileDiffWidget::stageChunk);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
-   connect(mOldFile, &FileDiffView::signalStageChunk, this, &FileDiffWidget::stageChunk);
 
    setAttribute(Qt::WA_DeleteOnClose);
 }
