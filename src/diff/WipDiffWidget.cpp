@@ -304,9 +304,8 @@ bool WipDiffWidget::configure(const QString &file, bool isCached)
 
       if (mFileVsFile)
       {
-         QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> oldData;
          QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> newData;
-
+         QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> oldData;
          mChunks = DiffHelper::processDiff(text, newData, oldData);
 
          mOldFile->blockSignals(true);
@@ -319,8 +318,10 @@ bool WipDiffWidget::configure(const QString &file, bool isCached)
       }
       else
       {
+         const auto data = DiffHelper::processDiff(text);
+
          mNewFile->blockSignals(true);
-         mNewFile->loadDiff(text, {});
+         mNewFile->loadDiff(text, data);
          mNewFile->blockSignals(false);
       }
 

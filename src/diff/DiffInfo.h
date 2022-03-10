@@ -23,9 +23,9 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QVector>
-#include <QUuid>
 #include <QStringList>
+#include <QUuid>
+#include <QVector>
 
 struct ChunkDiffInfo
 {
@@ -34,6 +34,7 @@ struct ChunkDiffInfo
 #if QT_VERSION <= QT_VERSION_CHECK(5, 13, 0)
       ChunkInfo() = default;
 #endif
+      ChunkInfo() = default;
       ChunkInfo(const QString &_id)
          : id(_id)
       {

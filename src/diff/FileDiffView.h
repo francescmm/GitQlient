@@ -151,12 +151,6 @@ protected:
     */
    bool eventFilter(QObject *target, QEvent *event) override;
 
-   /**
-    * @brief showStagingMenu Shows the context menu to stage lines or chunks.
-    * @param cursorPos The current position of the mouse cursor.
-    */
-   void showStagingMenu(const QPoint &cursorPos);
-
 private:
    /*!
     \brief Updates the line number area width based on the number of the line.

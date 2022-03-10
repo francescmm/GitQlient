@@ -25,11 +25,11 @@
 
 #include <DiffInfo.h>
 
-#include <QStringList>
-#include <QPair>
-#include <QVector>
-#include <QPlainTextEdit>
 #include <QMessageBox>
+#include <QPair>
+#include <QPlainTextEdit>
+#include <QStringList>
+#include <QVector>
 
 namespace DiffHelper
 {
@@ -128,9 +128,14 @@ inline DiffInfo processDiff(const QString &text, QPair<QStringList, QVector<Chun
    const auto lines = text.split("\n");
    for (auto line : lines)
    {
-      if (line.startsWith('-'))
+      if (line.isEmpty())
+         break;
+
+      const auto start = line.at(0);
+      line.remove(0, 1);
+
+      if (start == '-')
       {
-         line.remove(0, 1);
 
          if (diff.oldFile.startLine == -1)
             diff.oldFile.startLine = oldFileRow;
@@ -139,10 +144,8 @@ inline DiffInfo processDiff(const QString &text, QPair<QStringList, QVector<Chun
 
          ++oldFileRow;
       }
-      else if (line.startsWith('+'))
+      else if (start == '+')
       {
-         line.remove(0, 1);
-
          if (diff.newFile.startLine == -1)
          {
             diff.newFile.startLine = newFileRow;
@@ -155,8 +158,6 @@ inline DiffInfo processDiff(const QString &text, QPair<QStringList, QVector<Chun
       }
       else
       {
-         line.remove(0, 1);
-
          if (diff.oldFile.startLine != -1)
             diff.oldFile.endLine = oldFileRow - 1;
 
@@ -189,6 +190,86 @@ inline DiffInfo processDiff(const QString &text, QPair<QStringList, QVector<Chun
    diffInfo.oldFileDiff = oldFileData.first;
 
    return diffInfo;
+}
+
+inline QVector<ChunkDiffInfo::ChunkInfo> processDiff(QString &text)
+{
+   ChunkDiffInfo::ChunkInfo hunk;
+   QVector<ChunkDiffInfo::ChunkInfo> data;
+   ChunkDiffInfo diff;
+   int fileRow = 1;
+   QString altText;
+   auto lines = text.split("\n");
+
+   for (auto &line : lines)
+   {
+      if (line.isEmpty())
+         break;
+
+      const auto start = line.at(0);
+      line.remove(0, 1);
+
+      if (start == '-')
+      {
+         if (hunk.addition && hunk.startLine != -1)
+         {
+            hunk.endLine = fileRow - 1;
+            data.append(hunk);
+
+            hunk = ChunkDiffInfo::ChunkInfo {};
+         }
+
+         if (hunk.startLine == -1)
+         {
+            hunk.addition = false;
+            hunk.startLine = fileRow;
+         }
+
+         ++fileRow;
+      }
+      else if (start == '+')
+      {
+         if (!hunk.addition && hunk.startLine != -1)
+         {
+            hunk.endLine = fileRow - 1;
+            data.append(hunk);
+
+            hunk = ChunkDiffInfo::ChunkInfo {};
+         }
+
+         if (hunk.startLine == -1)
+         {
+            hunk.addition = true;
+            hunk.startLine = fileRow;
+         }
+
+         ++fileRow;
+      }
+      else
+      {
+         if (hunk.startLine != -1)
+         {
+            hunk.endLine = fileRow - 1;
+            data.append(hunk);
+
+            hunk = ChunkDiffInfo::ChunkInfo {};
+         }
+
+         ++fileRow;
+      }
+
+      altText.append(line).append('\n');
+   }
+
+   if (hunk.startLine != -1)
+   {
+      hunk.endLine = fileRow - 1;
+      data.append(hunk);
+   }
+
+   text = altText;
+
+   return data;
 }
 
 inline void findString(const QString &s, QPlainTextEdit *textEdit, QWidget *managerWidget)

@@ -37,11 +37,9 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
    font.setBold(true);
    labelTitle->setFont(font);
 
-   const auto discardBtn = new QPushButton("Discard");
+   const auto discardBtn = new QPushButton(isCached ? "Unstage" : "Discard");
    discardBtn->setObjectName("warningButton");
-
-   const auto stageBtn = new QPushButton("Stage");
-   stageBtn->setObjectName("applyActionBtn");
+   connect(discardBtn, &QPushButton::clicked, this, &HunkWidget::discardHunk);
 
    auto controlsLayout = new QHBoxLayout();
    controlsLayout->setContentsMargins(5, 0, 5, 10);
@@ -49,7 +47,15 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
    controlsLayout->addStretch();
    controlsLayout->addWidget(discardBtn);
    controlsLayout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
-   controlsLayout->addWidget(stageBtn);
+
+   if (!mIsCached)
+   {
+      const auto stageBtn = new QPushButton("Stage");
+      stageBtn->setObjectName("applyActionBtn");
+      connect(stageBtn, &QPushButton::clicked, this, &HunkWidget::stageHunk);
+
+      controlsLayout->addWidget(stageBtn);
+   }
 
    const auto layout = new QVBoxLayout();
    layout->setContentsMargins(10, 10, 10, 10);
@@ -58,9 +64,6 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
    layout->addWidget(mHunkView);
 
    setLayout(layout);
-
-   connect(discardBtn, &QPushButton::clicked, this, &HunkWidget::discardHunk);
-   connect(stageBtn, &QPushButton::clicked, this, &HunkWidget::stageHunk);
 }
 
 void HunkWidget::discardHunk()
@@ -103,7 +106,7 @@ QTemporaryFile *HunkWidget::createPatchFile()
 
    if (file->open())
    {
-      const auto content = QString("%1%2").arg(mHeader, mHunk);
+      const auto content = QString("%1%2\n").arg(mHeader, mHunk);
       file->write(content.toUtf8());
       file->close();
       return file;

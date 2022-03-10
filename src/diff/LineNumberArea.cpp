@@ -1,12 +1,12 @@
 #include <LineNumberArea.h>
 
+#include <Colors.h>
 #include <FileDiffView.h>
 #include <GitQlientStyles.h>
-#include <Colors.h>
 
+#include <QIcon>
 #include <QPainter>
 #include <QTextBlock>
-#include <QIcon>
 
 LineNumberArea::LineNumberArea(FileDiffView *editor, bool allowComments)
    : QWidget(editor)
@@ -39,23 +39,21 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
    const auto fontWidth = fileDiffWidget->fontMetrics().horizontalAdvance(QLatin1Char(' '));
    const auto offset = fontWidth * (mCommentsAllowed ? 4 : 1);
    auto block = fileDiffWidget->firstVisibleBlock();
-   auto blockNumber = block.blockNumber() + fileDiffWidget->mStartingLine;
+   auto blockNumber = block.blockNumber() + fileDiffWidget->mStartingLine + 1;
    auto top = fileDiffWidget->blockBoundingGeometry(block).translated(fileDiffWidget->contentOffset()).top();
    auto bottom = top + fileDiffWidget->blockBoundingRect(block).height();
    auto lineCorrection = 0;
 
    while (block.isValid() && top <= event->rect().bottom())
    {
-
       if (block.isVisible() && bottom >= event->rect().top())
       {
-         const auto skipDeletion
-             = fileDiffWidget->mUnified && !block.text().startsWith("-") && !block.text().startsWith("@");
+         const auto blockText = block.text();
 
-         if (!fileDiffWidget->mUnified || skipDeletion)
+         if (!fileDiffWidget->mUnified)
          {
             const auto height = fileDiffWidget->fontMetrics().height();
-            const auto number = blockNumber + 1 + lineCorrection;
+            const auto number = blockNumber + lineCorrection;
             painter.setPen(GitQlientStyles::getTextColor());
 
             if (mBookmarks.contains(number))
@@ -73,8 +71,18 @@ void LineNumberArea::paintEvent(QPaintEvent *event)
                painter.setPen(gitQlientOrange);
             }
 
-            painter.drawText(0, static_cast<int>(top), width() - offset, height, Qt::AlignRight,
-                             QString::number(number));
+            const auto skipDeletion
+                = std::find_if(fileDiffWidget->mFileDiffInfo.cbegin(), fileDiffWidget->mFileDiffInfo.cend(),
+                               [blockNumber](const ChunkDiffInfo::ChunkInfo &hunk) {
+                                  return !hunk.addition && hunk.startLine <= blockNumber && blockNumber <= hunk.endLine;
+                               })
+                != fileDiffWidget->mFileDiffInfo.cend();
+
+            if (!skipDeletion)
+               painter.drawText(0, static_cast<int>(top), width() - offset, height, Qt::AlignRight,
+                                QString::number(number));
+            else
+               --lineCorrection;
          }
          else
             --lineCorrection;

@@ -69,7 +69,6 @@ FileDiffView::FileDiffView(QWidget *parent)
    setReadOnly(true);
    setContextMenuPolicy(Qt::CustomContextMenu);
 
-   connect(this, &FileDiffView::customContextMenuRequested, this, &FileDiffView::showStagingMenu);
    connect(this, &FileDiffView::blockCountChanged, this, &FileDiffView::updateLineNumberAreaWidth);
    connect(this, &FileDiffView::updateRequest, this, &FileDiffView::updateLineNumberArea);
    connect(verticalScrollBar(), &QScrollBar::valueChanged, this, &FileDiffView::signalScrollChanged);
@@ -129,6 +128,9 @@ void FileDiffView::moveScrollBarToPos(int value)
    blockSignals(false);
 
    emit updateRequest(viewport()->rect(), 0);
+
+   if (mLineNumberArea)
+      mLineNumberArea->repaint();
 
    QLog_Trace("UI",
               QString("FileDiffView::moveScrollBarToPos - {%1} move scroll to pos {%2}")
@@ -194,7 +196,7 @@ void FileDiffView::updateLineNumberArea(const QRect &rect, int dy)
       if (dy != 0)
          mLineNumberArea->scroll(0, dy);
       else
-         mLineNumberArea->update(0, rect.y(), mLineNumberArea->width(), rect.height());
+         mLineNumberArea->repaint();
 
       if (rect.contains(viewport()->rect()))
          updateLineNumberAreaWidth(0);
@@ -249,41 +251,4 @@ bool FileDiffView::eventFilter(QObject *obj, QEvent *event)
    }
 
    return QPlainTextEdit::eventFilter(obj, event);
-}
-
-void FileDiffView::showStagingMenu(const QPoint &cursorPos)
-{
-   const auto helpPos = mapFromGlobal(QCursor::pos());
-   const auto x = helpPos.x();
-   auto row = -1;
-
-   if (x >= 0 && x > mLineNumberArea->width())
-   {
-      const auto cursor = cursorForPosition(helpPos);
-      row = cursor.block().blockNumber() + mStartingLine + 1;
-
-      if (row != -1)
-      {
-         const auto chunk
-             = std::find_if(mFileDiffInfo.cbegin(), mFileDiffInfo.cend(), [row](const ChunkDiffInfo::ChunkInfo &chunk) {
-                  return chunk.startLine <= row && row <= chunk.endLine;
-               });
-
-         if (chunk != mFileDiffInfo.cend())
-         {
-            const auto menu = new QMenu(this);
-            /*
-            const auto stageLine = menu->addAction(tr("Stage line"));
-            connect(stageLine, &QAction::triggered, this, &FileDiffView::stageLine);
-            */
-
-            const auto stageChunk = menu->addAction(tr("Stage chunk"));
-            connect(stageChunk, &QAction::triggered, this,
-                    [this, chunkId = chunk->id]() { emit signalStageChunk(chunkId); });
-
-            menu->move(viewport()->mapToGlobal(cursorPos));
-            menu->exec();
-         }
-      }
-   }
 }
