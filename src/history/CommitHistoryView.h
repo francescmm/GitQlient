@@ -50,19 +50,6 @@ signals:
    void logReload();
 
    /*!
-    \brief Signal triggered when the user wants to open the diff of a commit compared to its parent.
-
-    \param sha The SHA to diff.
-   */
-   void signalOpenDiff(const QString &sha);
-   /*!
-    \brief Signal triggered when the user wants to diff the shas in the list. This signal is only emitted if the user
-    selected two SHAs.
-
-    \param sha The shas to diff between.
-   */
-   void signalOpenCompareDiff(const QStringList &sha);
-   /*!
     \brief Signal triggered when the user wants to amend a commit.
 
     \param sha The SHA of the commit to amend.

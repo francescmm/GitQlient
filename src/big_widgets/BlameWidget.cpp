@@ -47,7 +47,6 @@ BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPoi
    mRepoView->filterBySha({});
    connect(mRepoView, &CommitHistoryView::customContextMenuRequested, this, &BlameWidget::showRepoViewMenu);
    connect(mRepoView, &CommitHistoryView::clicked, this, &BlameWidget::reloadBlame);
-   connect(mRepoView, &CommitHistoryView::doubleClicked, this, &BlameWidget::openDiff);
 
    fileSystemModel->setFilter(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot);
 
@@ -255,20 +254,5 @@ void BlameWidget::showRepoViewMenu(const QPoint &pos)
       emit showFileDiff(sha, previousSha, currentFile);
    });
 
-   const auto commitDiff = menu->addAction(tr("Show commit diff"));
-   connect(commitDiff, &QAction::triggered, this, [this, sha, previousSha]() {
-      emit signalOpenDiff({ previousSha, sha });
-   });
-
    menu->exec(mRepoView->viewport()->mapToGlobal(pos));
-}
-
-void BlameWidget::openDiff(const QModelIndex &index)
-{
-   const auto sha
-       = mRepoView->model()->index(index.row(), static_cast<int>(CommitHistoryColumns::Sha)).data().toString();
-   const auto previousSha
-       = mRepoView->model()->index(index.row() + 1, static_cast<int>(CommitHistoryColumns::Sha)).data().toString();
-
-   emit signalOpenDiff({ previousSha, sha });
 }

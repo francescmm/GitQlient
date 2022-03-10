@@ -131,8 +131,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mHistoryWidget, &HistoryWidget::panelsVisibilityChanged, mConfigWidget,
            &ConfigWidget::onPanelsVisibilityChanged);
    connect(mHistoryWidget, &HistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
-   connect(mHistoryWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
-   connect(mHistoryWidget, &HistoryWidget::signalOpenCompareDiff, this, &GitQlientRepo::openCommitCompareDiff);
    connect(mHistoryWidget, &HistoryWidget::signalShowDiff, this, &GitQlientRepo::loadFileDiff);
    connect(mHistoryWidget, &HistoryWidget::changesCommitted, this, &GitQlientRepo::onChangesCommitted);
    connect(mHistoryWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
@@ -150,7 +148,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mDiffWidget, &DiffWidget::signalDiffEmpty, this, &GitQlientRepo::showPreviousView);
 
    connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::loadFileDiff);
-   connect(mBlameWidget, &BlameWidget::signalOpenDiff, this, &GitQlientRepo::openCommitCompareDiff);
 
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, &GitQlientRepo::showHistoryView);
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, mGitLoader.data(), &GitRepoLoader::loadAll);
@@ -164,8 +161,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mConfigWidget, &ConfigWidget::pomodoroVisibilityChanged, mControls, &Controls::changePomodoroVisibility);
    connect(mConfigWidget, &ConfigWidget::moveLogsAndClose, this, &GitQlientRepo::moveLogsAndClose);
    connect(mConfigWidget, &ConfigWidget::autoFetchChanged, this, &GitQlientRepo::reconfigureAutoFetch);
-
-   connect(mGitServerWidget, &GitServerWidget::openDiff, this, &GitQlientRepo::openCommitDiff);
 
    connect(mJenkins, &JenkinsWidget::gotoBranch, this, &GitQlientRepo::focusHistoryOnBranch);
    connect(mJenkins, &JenkinsWidget::gotoPullRequest, this, &GitQlientRepo::focusHistoryOnPr);
@@ -550,31 +545,6 @@ void GitQlientRepo::focusHistoryOnPr(int prNumber)
 void GitQlientRepo::reconfigureAutoFetch(int newInterval)
 {
    mAutoFetch->start(newInterval * 60 * 1000);
-}
-
-void GitQlientRepo::openCommitDiff(const QString currentSha)
-{
-   const auto rev = mGitQlientCache->commitInfo(currentSha);
-   const auto loaded = mDiffWidget->loadCommitDiff(currentSha, rev.firstParent());
-
-   if (loaded)
-   {
-      mControls->enableDiff();
-
-      showDiffView();
-   }
-}
-
-void GitQlientRepo::openCommitCompareDiff(const QStringList &shas)
-{
-   const auto loaded = mDiffWidget->loadCommitDiff(shas.last(), shas.first());
-
-   if (loaded)
-   {
-      mControls->enableDiff();
-
-      showDiffView();
-   }
 }
 
 void GitQlientRepo::onChangesCommitted()

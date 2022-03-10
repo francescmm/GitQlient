@@ -41,9 +41,6 @@ class PrCommitsList : public QFrame
 {
    Q_OBJECT
 
-signals:
-   void openDiff(const QString &sha);
-
 public:
    explicit PrCommitsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
    ~PrCommitsList();

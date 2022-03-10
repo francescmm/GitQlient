@@ -23,8 +23,8 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QFrame>
 #include <ConfigData.h>
+#include <QFrame>
 
 class GitCache;
 class GitBase;
@@ -44,9 +44,6 @@ struct Issue;
 class GitServerWidget : public QFrame
 {
    Q_OBJECT
-
-signals:
-   void openDiff(const QString &sha);
 
 public:
    explicit GitServerWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,

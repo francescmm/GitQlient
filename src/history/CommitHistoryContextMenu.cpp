@@ -68,9 +68,6 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          connect(popAction, &QAction::triggered, this, &CommitHistoryContextMenu::stashPop);
       }
 
-      const auto commitAction = addAction(tr("See diff"));
-      connect(commitAction, &QAction::triggered, this, [this]() { emit signalOpenDiff(mShas.first()); });
-
       if (sha != CommitInfo::ZERO_SHA)
       {
          const auto createMenu = addMenu(tr("Create"));
@@ -197,12 +194,6 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
 void CommitHistoryContextMenu::createMultipleShasMenu()
 {
-   if (mShas.count() == 2)
-   {
-      const auto diffAction = addAction(tr("See diff"));
-      connect(diffAction, &QAction::triggered, this, [this]() { emit signalOpenCompareDiff(mShas); });
-   }
-
    if (!mShas.contains(CommitInfo::ZERO_SHA))
    {
       const auto exportAsPatchAction = addAction(tr("Export as patch"));

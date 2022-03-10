@@ -87,6 +87,11 @@ public:
     */
    ~FileDiffView();
 
+   /**
+    * @brief Adds a number area to the current widget. If the widget already had one, it will delete the old one and add
+    * the new one.
+    * @param numberArea The LineNumberArea to be added.
+    */
    void addNumberArea(LineNumberArea *numberArea);
 
    /**

@@ -182,17 +182,6 @@ private:
    */
    void updateUiFromWatcher();
    /*!
-    \brief Opens the diff view with the selected commit from the repository view.
-    \param currentSha The current selected commit SHA.
-   */
-   void openCommitDiff(const QString currentSha);
-   /*!
-    \brief Opens the diff view with the selected SHAs to compare between them.
-
-    \param shas The list of shas to compare between.
-   */
-   void openCommitCompareDiff(const QStringList &shas);
-   /*!
     \brief Method called when changes are commites through the WIP widget.
 
     \param ok True if the changes are committed, otherwise false.

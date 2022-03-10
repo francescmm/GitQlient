@@ -1,23 +1,23 @@
 #include <PrCommitsList.h>
 
-#include <GitServerCache.h>
+#include <AvatarHelper.h>
+#include <ButtonLink.hpp>
+#include <CircularPixmap.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
-#include <CircularPixmap.h>
-#include <ButtonLink.hpp>
-#include <AvatarHelper.h>
+#include <GitServerCache.h>
 
 #include <QApplication>
 #include <QClipboard>
-#include <QToolTip>
 #include <QCursor>
-#include <QLabel>
-#include <QScrollArea>
-#include <QStandardPaths>
-#include <QVBoxLayout>
-#include <QNetworkReply>
 #include <QDir>
 #include <QFile>
+#include <QLabel>
+#include <QNetworkReply>
+#include <QScrollArea>
+#include <QStandardPaths>
+#include <QToolTip>
+#include <QVBoxLayout>
 
 PrCommitsList::PrCommitsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
    : QFrame(parent)
@@ -98,9 +98,6 @@ QFrame *PrCommitsList::createBubbleForComment(const GitServer::Commit &commit)
    if (commitMsg.count() >= 47)
       commitMsg = commitMsg.left(47).append("...");
 
-   const auto link = new ButtonLink(QString("<b>%1</b>").arg(commitMsg));
-   connect(link, &ButtonLink::clicked, this, [this, sha = commit.sha]() { emit openDiff(sha); });
-
    const auto frame = new QFrame();
    frame->setObjectName("IssueIntro");
 
@@ -110,7 +107,7 @@ QFrame *PrCommitsList::createBubbleForComment(const GitServer::Commit &commit)
    layout->setHorizontalSpacing(10);
    layout->setVerticalSpacing(5);
    layout->addWidget(createAvatar(commit.author.name, commit.author.avatar), 0, 0, 2, 1);
-   layout->addWidget(link, 0, 1);
+   layout->addWidget(new QLabel(QString("<b>%1</b>").arg(commitMsg)), 0, 1);
    layout->addWidget(creator, 1, 1);
    layout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), 1, 2);
 

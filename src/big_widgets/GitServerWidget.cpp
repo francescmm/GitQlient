@@ -1,25 +1,24 @@
 #include <GitServerWidget.h>
 
-#include <ServerConfigDlg.h>
-#include <GitServerCache.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
+#include <GitBase.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
-#include <IssuesList.h>
-#include <PrList.h>
+#include <GitServerCache.h>
 #include <IssueDetailedView.h>
+#include <IssuesList.h>
 #include <Platform.h>
-#include <GitBase.h>
+#include <PrList.h>
+#include <ServerConfigDlg.h>
 
-#include <QPushButton>
-#include <QToolButton>
 #include <QHBoxLayout>
-#include <QScrollArea>
-#include <QStackedLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QPushButton>
+#include <QScrollArea>
 #include <QStackedLayout>
+#include <QToolButton>
 
 using namespace GitServer;
 
@@ -95,7 +94,6 @@ void GitServerWidget::createWidget()
    buttonsLayout->addStretch();
 
    mDetailedView = new IssueDetailedView(mGit, mGitServerCache);
-   connect(mDetailedView, &IssueDetailedView::openDiff, this, &GitServerWidget::openDiff);
 
    const auto issues = new IssuesList(mGitServerCache);
    connect(issues, &AGitServerItemList::selected, mDetailedView,

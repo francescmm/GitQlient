@@ -83,8 +83,6 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
    mergeLayout->addStretch(2);
    mergeLayout->addLayout(mergeInfoLayout);
 
-   mFileDiff->hideBackButton();
-
    const auto noFileFrame = new QFrame();
    const auto noFileLayout = new QGridLayout();
    noFileLayout->setContentsMargins(0, 0, 0, 0);

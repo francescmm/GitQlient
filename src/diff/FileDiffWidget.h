@@ -97,8 +97,7 @@ public:
     \param editMode Enters edit mode directly.
     \return bool Returns true if the configuration was applied, otherwise false.
    */
-   bool configure(const QString &currentSha, const QString &previousSha, const QString &file, bool isCached,
-                  bool editMode = false);
+   bool configure(const QString &currentSha, const QString &previousSha, const QString &file, bool isCached);
 
    /**
     * @brief setFileVsFileEnable Enables the widget to show file vs file view.
@@ -113,11 +112,6 @@ public:
    void setFullViewEnabled(bool enable);
 
    /**
-    * @brief hideBackButton Hides the back button.
-    */
-   void hideBackButton() const;
-
-   /**
     * @brief getCurrentFile Gets the current loaded file.
     * @return The current file name.
     */
@@ -126,26 +120,16 @@ public:
 private:
    QString mCurrentFile;
    bool mIsCached = false;
-   QPushButton *mBack = nullptr;
    QPushButton *mGoPrevious = nullptr;
    QPushButton *mGoNext = nullptr;
-   QPushButton *mEdition = nullptr;
    QPushButton *mFullView = nullptr;
    QPushButton *mSplitView = nullptr;
-   QPushButton *mSave = nullptr;
-   QPushButton *mStage = nullptr;
-   QPushButton *mRevert = nullptr;
-   QLabel *mFileNameLabel = nullptr;
-   QFrame *mTitleFrame = nullptr;
    FileDiffView *mNewFile = nullptr;
    QLineEdit *mSearchOld = nullptr;
    FileDiffView *mOldFile = nullptr;
-   QVector<int> mModifications;
    bool mFileVsFile = false;
    DiffInfo mChunks;
    int mCurrentChunkLine = 0;
-   FileEditor *mFileEditor = nullptr;
-   QStackedWidget *mViewStackedWidget = nullptr;
 
    /**
     * @brief moveChunkUp Moves to the previous diff chunk.
@@ -162,10 +146,6 @@ private:
     */
    void enterEditionMode(bool enter);
 
-   /**
-    * @brief endEditFile Closes the file editor.
-    */
-   void endEditFile();
    /**
     * @brief stageFile Stages the file.
     */

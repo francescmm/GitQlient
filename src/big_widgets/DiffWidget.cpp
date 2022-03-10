@@ -3,7 +3,6 @@
 #include <CommitInfoPanel.h>
 #include <FileDiffWidget.h>
 #include <FileListWidget.h>
-#include <FullDiffWidget.h>
 #include <GitCache.h>
 #include <GitHistory.h>
 #include <GitQlientSettings.h>
@@ -81,8 +80,6 @@ void DiffWidget::reload()
    {
       if (const auto fileDiff = dynamic_cast<FileDiffWidget *>(mCenterStackedWidget->currentWidget()))
          fileDiff->reload();
-      else if (const auto fullDiff = dynamic_cast<FullDiffWidget *>(mCenterStackedWidget->currentWidget()))
-         fullDiff->reload();
    }
 }
 
@@ -140,54 +137,6 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
 
       return true;
    }
-}
-
-bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
-{
-   const auto id = QString("Commit diff (%1 \u2194 %2)").arg(sha.left(6), parentSha.left(6));
-
-   mCurrentSha = sha;
-   mParentSha = parentSha;
-
-   if (!mDiffWidgets.contains(id))
-   {
-      QScopedPointer<GitHistory> git(new GitHistory(mGit));
-      const auto ret = git->getCommitDiff(sha, parentSha);
-
-      if (ret.success && !ret.output.isEmpty())
-      {
-         const auto fullDiffWidget = new FullDiffWidget(mGit, mCache);
-         fullDiffWidget->loadDiff(sha, parentSha, ret.output);
-
-         mInfoPanelBase->configure(mCache->commitInfo(sha));
-         mInfoPanelParent->configure(mCache->commitInfo(parentSha));
-
-         mDiffWidgets.insert(id, fullDiffWidget);
-
-         const auto index = mCenterStackedWidget->addTab(fullDiffWidget,
-                                                         QString("(%1 \u2194 %2)").arg(sha.left(6), parentSha.left(6)));
-         mCenterStackedWidget->setCurrentIndex(index);
-
-         fileListWidget->insertFiles(sha, parentSha);
-         fileListWidget->setVisible(true);
-
-         return true;
-      }
-      else
-         QMessageBox::information(this, tr("No diff to show!"),
-                                  tr("There is no diff to show between commit SHAs {%1} and {%2}").arg(sha, parentSha));
-
-      return false;
-   }
-   else
-   {
-      const auto diffWidget = mDiffWidgets.value(id);
-      const auto diff = dynamic_cast<FullDiffWidget *>(diffWidget);
-      diff->reload();
-      mCenterStackedWidget->setCurrentWidget(diff);
-   }
-
-   return true;
 }
 
 void DiffWidget::onDiffFontSizeChanged()

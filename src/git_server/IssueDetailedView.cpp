@@ -165,7 +165,6 @@ IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
       mPrCommentsList->highlightComment(frameId);
    });
    connect(mPrChangesList, &PrChangesList::addCodeReview, this, &IssueDetailedView::addCodeReview);
-   connect(mPrCommitsList, &PrCommitsList::openDiff, this, &IssueDetailedView::openDiff);
 }
 
 IssueDetailedView::~IssueDetailedView()

@@ -48,8 +48,6 @@ struct PullRequest;
 class IssueDetailedView : public QFrame
 {
    Q_OBJECT
-signals:
-   void openDiff(const QString &sha);
 
 public:
    enum class Config

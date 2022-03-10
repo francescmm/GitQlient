@@ -84,6 +84,9 @@ FileDiffView::~FileDiffView()
 
 void FileDiffView::addNumberArea(LineNumberArea *numberArea)
 {
+   if (mLineNumberArea)
+      mLineNumberArea->deleteLater();
+
    mLineNumberArea = numberArea;
 
    if (mLineNumberArea->commentsAllowed())
