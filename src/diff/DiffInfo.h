@@ -31,9 +31,6 @@ struct ChunkDiffInfo
 {
    struct ChunkInfo
    {
-#if QT_VERSION <= QT_VERSION_CHECK(5, 13, 0)
-      ChunkInfo() = default;
-#endif
       ChunkInfo() = default;
       ChunkInfo(const QString &_id)
          : id(_id)

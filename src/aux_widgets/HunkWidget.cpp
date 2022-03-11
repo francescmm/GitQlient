@@ -37,7 +37,7 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
    font.setBold(true);
    labelTitle->setFont(font);
 
-   const auto discardBtn = new QPushButton(isCached ? "Unstage" : "Discard");
+   const auto discardBtn = new QPushButton(QString::fromUtf8(isCached ? "Unstage" : "Discard"));
    discardBtn->setObjectName("warningButton");
    connect(discardBtn, &QPushButton::clicked, this, &HunkWidget::discardHunk);
 

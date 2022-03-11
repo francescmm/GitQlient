@@ -5,10 +5,10 @@
 #include <QDateTime>
 #include <QDir>
 
-Q_DECLARE_METATYPE(QLogger::LogLevel);
-Q_DECLARE_METATYPE(QLogger::LogMode);
-Q_DECLARE_METATYPE(QLogger::LogFileDisplay);
-Q_DECLARE_METATYPE(QLogger::LogMessageDisplay);
+Q_DECLARE_METATYPE(QLogger::LogLevel)
+Q_DECLARE_METATYPE(QLogger::LogMode)
+Q_DECLARE_METATYPE(QLogger::LogFileDisplay)
+Q_DECLARE_METATYPE(QLogger::LogMessageDisplay)
 
 namespace QLogger
 {
