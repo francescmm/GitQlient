@@ -91,6 +91,8 @@ public:
 
    void updateFontSize() override;
 
+   void hideHunks() const;
+
    bool setup(const QString &file, bool isCached, bool editMode = false);
 
    /**

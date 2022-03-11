@@ -251,6 +251,11 @@ void WipDiffWidget::updateFontSize()
    mOldFile->setTextCursor(cursor);
 }
 
+void WipDiffWidget::hideHunks() const
+{
+   mHunksView->setHidden(true);
+}
+
 bool WipDiffWidget::setup(const QString &file, bool isCached, bool editMode)
 {
    if (configure(file, isCached))
