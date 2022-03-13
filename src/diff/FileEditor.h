@@ -38,6 +38,8 @@ signals:
 public:
    explicit FileEditor(bool highlighter = true, QWidget *parent = nullptr);
 
+   ~FileEditor();
+
    /**
     * @brief editFile Shows the file edition window with the content of
     * @p fileName loaded on it.

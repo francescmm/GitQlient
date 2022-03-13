@@ -31,4 +31,6 @@ void FileDiffEditor::highlightCurrentLine()
    }
 
    setExtraSelections(extraSelections);
+
+   repaint();
 }

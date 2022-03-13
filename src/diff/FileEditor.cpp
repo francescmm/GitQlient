@@ -21,6 +21,12 @@ FileEditor::FileEditor(bool highlighter, QWidget *parent)
    layout->addWidget(mFileEditor);
 }
 
+FileEditor::~FileEditor()
+{
+   if (mFileEditor)
+      delete mFileEditor;
+}
+
 void FileEditor::editFile(const QString &fileName)
 {
    mFileName = fileName;
