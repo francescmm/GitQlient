@@ -24,7 +24,8 @@ void CommitInfo::parseDiff(QByteArray &data, int startingField)
       const auto firstField = fields.constFirst();
       auto combinedShas = fields.at(startingField++);
       auto shas = combinedShas.split('X');
-      sha = shas.takeFirst().remove(0, 1);
+      auto first = shas.takeFirst();
+      sha = first.remove(0, 1);
 
       if (!shas.isEmpty())
       {
