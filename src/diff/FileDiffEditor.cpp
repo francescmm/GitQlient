@@ -21,16 +21,24 @@ void FileDiffEditor::highlightCurrentLine()
 
    if (!isReadOnly())
    {
+      prevSelection.format.setBackground(QBrush("transparent"));
+      prevSelection.format.setProperty(QTextFormat::FullWidthSelection, true);
+      prevSelection.cursor.clearSelection();
+
       QTextEdit::ExtraSelection selection;
 
       selection.format.setBackground(GitQlientStyles::getGraphSelectionColor());
       selection.format.setProperty(QTextFormat::FullWidthSelection, true);
       selection.cursor = textCursor();
       selection.cursor.clearSelection();
+
+      extraSelections.append(prevSelection);
       extraSelections.append(selection);
+
+      prevSelection = selection;
    }
 
    setExtraSelections(extraSelections);
 
-   repaint();
+   viewport()->update();
 }

@@ -198,8 +198,6 @@ void FileDiffView::updateLineNumberArea(const QRect &rect, int dy)
    {
       if (dy != 0)
          mLineNumberArea->scroll(0, dy);
-      else
-         mLineNumberArea->repaint();
 
       if (rect.contains(viewport()->rect()))
          updateLineNumberAreaWidth(0);

@@ -39,4 +39,6 @@ private:
     * @brief highlightCurrentLine Highlights the current line where the cursor is placed.
     */
    void highlightCurrentLine();
+   
+   QTextEdit::ExtraSelection prevSelection;
 };
