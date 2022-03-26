@@ -528,6 +528,8 @@ void WipDiffWidget::stageFile()
 
    if (ret.success)
    {
+      mIsCached = true;
+
       emit fileStaged(mCurrentFile);
       emit exitRequested();
    }
