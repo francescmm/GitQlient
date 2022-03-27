@@ -11,7 +11,7 @@ class JobFetcher final : public IFetcher
    Q_OBJECT
 
 signals:
-   void signalJobsReceived(const QMultiMap<QString, JenkinsJobInfo> &jobs);
+   void signalJobsReceived(const QMultiMap<QString, Jenkins::JenkinsJobInfo> &jobs);
 
 public:
    explicit JobFetcher(const IFetcher::Config &config, const QString &jobUrl, bool isCustomUrl,

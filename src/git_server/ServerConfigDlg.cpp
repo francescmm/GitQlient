@@ -3,24 +3,24 @@
 
 #include <GitBase.h>
 #include <GitConfig.h>
-#include <GitQlientStyles.h>
-#include <GitQlientSettings.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
+#include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
 #include <GitServerCache.h>
 
 #include <QLogger.h>
 
-#include <QTimer>
-#include <QNetworkAccessManager>
-#include <QNetworkRequest>
-#include <QNetworkReply>
+#include <QDesktopServices>
+#include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
-#include <QFile>
 #include <QMessageBox>
-#include <QDesktopServices>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QTimer>
 
 #include <utility>
 
@@ -80,8 +80,8 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServer
    }
 
    ui->lAccessToken->setText(tr("How to get a token?"));
-   connect(ui->lAccessToken, &ButtonLink::clicked, [this]() {
-      const auto url = mData.serverUrl.contains("github")
+   connect(ui->lAccessToken, &ButtonLink::clicked, [isGitHub = mData.serverUrl.contains("github")]() {
+      const auto url = isGitHub
           ? "https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token"
           : "https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html";
       QDesktopServices::openUrl(QUrl(QString::fromUtf8(url)));

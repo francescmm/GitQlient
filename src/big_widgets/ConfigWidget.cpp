@@ -165,12 +165,12 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    if (mergeStrategyFF.isEmpty())
    {
-      if (mergeStrategyRebase.isEmpty() || mergeStrategyRebase.toLower().contains("false"))
+      if (mergeStrategyRebase.isEmpty() || mergeStrategyRebase.contains("false", Qt::CaseInsensitive))
          ui->cbPullStrategy->setCurrentIndex(0);
-      else if (mergeStrategyRebase.toLower().contains("true"))
+      else if (mergeStrategyRebase.contains("true", Qt::CaseInsensitive))
          ui->cbPullStrategy->setCurrentIndex(1);
    }
-   else if (mergeStrategyFF.toLower().contains("true"))
+   else if (mergeStrategyFF.contains("true", Qt::CaseInsensitive))
       ui->cbPullStrategy->setCurrentIndex(2);
 
    connect(ui->cbPullStrategy, SIGNAL(currentIndexChanged(int)), this, SLOT(onPullStrategyChanged(int)));

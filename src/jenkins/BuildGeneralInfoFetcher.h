@@ -11,7 +11,7 @@ class BuildGeneralInfoFetcher : public IFetcher
    Q_OBJECT
 
 signals:
-   void signalBuildInfoReceived(const JenkinsJobBuildInfo &buildInfo);
+   void signalBuildInfoReceived(const Jenkins::JenkinsJobBuildInfo &buildInfo);
 
 public:
    BuildGeneralInfoFetcher(const IFetcher::Config &config, const JenkinsJobBuildInfo &build, QObject *parent = nullptr);

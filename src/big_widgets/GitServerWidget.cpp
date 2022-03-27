@@ -149,8 +149,8 @@ void GitServerWidget::createWidget()
    pullRequests->loadData();
 
    connect(home, &QPushButton::clicked, this, [this]() { mStackedLayout->setCurrentIndex(0); });
-   connect(newIssue, &QPushButton::clicked, [this]() { mStackedLayout->setCurrentIndex(1); });
-   connect(newPr, &QPushButton::clicked, [this]() {
+   connect(newIssue, &QPushButton::clicked, this, [this]() { mStackedLayout->setCurrentIndex(1); });
+   connect(newPr, &QPushButton::clicked, this, [this]() {
       mStackedLayout->setCurrentIndex(2);
       mCreatePrView->configure(mGit->getWorkingDir(), mGit->getCurrentBranch());
    });

@@ -23,7 +23,7 @@ class JobContainer : public QFrame
    Q_OBJECT
 
 signals:
-   void signalJobAreViews(const QVector<JenkinsViewInfo> &views);
+   void signalJobAreViews(const QVector<Jenkins::JenkinsViewInfo> &views);
    void gotoPullRequest(int prNumber);
    void gotoBranch(const QString &branchName);
 

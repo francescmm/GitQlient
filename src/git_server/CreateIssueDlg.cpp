@@ -8,12 +8,12 @@
 
 #include <previewpage.h>
 
-#include <QMessageBox>
-#include <QStandardItemModel>
-#include <QStandardItem>
-#include <QFile>
-#include <QWebChannel>
 #include <QDirIterator>
+#include <QFile>
+#include <QMessageBox>
+#include <QStandardItem>
+#include <QStandardItemModel>
+#include <QWebChannel>
 
 using namespace GitServer;
 
@@ -35,7 +35,7 @@ CreateIssueDlg::CreateIssueDlg(const QSharedPointer<GitServerCache> &gitServerCa
 
    connect(ui->pbAccept, &QPushButton::clicked, this, &CreateIssueDlg::accept);
 
-   connect(ui->teDescription, &QTextEdit::textChanged,
+   connect(ui->teDescription, &QTextEdit::textChanged, this,
            [this]() { m_content.setText(ui->teDescription->toPlainText()); });
 
    if (QFile f(workingDir + "/.github/ISSUE_TEMPLATE.md"); f.exists())
@@ -89,7 +89,7 @@ bool CreateIssueDlg::configure(const QString &workingDir)
       PreviewPage *page = new PreviewPage(this);
       ui->preview->setPage(page);
 
-      connect(ui->teDescription, &QTextEdit::textChanged,
+      connect(ui->teDescription, &QTextEdit::textChanged, this,
               [this]() { m_content.setText(ui->teDescription->toPlainText()); });
 
       ui->teDescription->setText(QString::fromUtf8(fileContent));

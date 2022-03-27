@@ -21,7 +21,6 @@ void CommitInfo::parseDiff(QByteArray &data, int startingField)
 {
    if (const auto fields = QString::fromUtf8(data).split('\n'); fields.count() > 0)
    {
-      const auto firstField = fields.constFirst();
       auto combinedShas = fields.at(startingField++);
       auto shas = combinedShas.split('X');
       auto first = shas.takeFirst();
@@ -150,7 +149,5 @@ void CommitInfo::removeChild(CommitInfo *commit)
 
 QString CommitInfo::getFirstChildSha() const
 {
-   if (!mChilds.isEmpty())
-      mChilds.constFirst();
-   return QString();
+   return !mChilds.isEmpty() ? mChilds.constFirst()->sha : QString {};
 }

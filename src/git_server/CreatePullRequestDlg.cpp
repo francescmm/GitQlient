@@ -34,7 +34,7 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
 
    connect(mGitServerCache.get(), &GitServerCache::errorOccurred, this, &CreatePullRequestDlg::onGitServerError);
    connect(ui->pbCreate, &QPushButton::clicked, this, &CreatePullRequestDlg::accept);
-   connect(ui->teDescription, &QTextEdit::textChanged,
+   connect(ui->teDescription, &QTextEdit::textChanged, this,
            [this]() { m_content.setText(ui->teDescription->toPlainText()); });
    // connect(ui->pbClose, &QPushButton::clicked, this, &CreatePullRequestDlg::reject);
 

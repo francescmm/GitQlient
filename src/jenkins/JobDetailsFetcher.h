@@ -13,7 +13,7 @@ class JobDetailsFetcher : public IFetcher
    Q_OBJECT
 
 signals:
-   void signalJobDetailsRecieved(const JenkinsJobInfo &updatedInfo);
+   void signalJobDetailsRecieved(const Jenkins::JenkinsJobInfo &updatedInfo);
 
 public:
    JobDetailsFetcher(const Config &config, const JenkinsJobInfo &info, QObject *parent = nullptr);

@@ -11,7 +11,7 @@ class StageFetcher : public IFetcher
    Q_OBJECT
 
 signals:
-   void signalStagesReceived(const QVector<JenkinsStageInfo> stages);
+   void signalStagesReceived(const QVector<Jenkins::JenkinsStageInfo> stages);
 
 public:
    StageFetcher(const IFetcher::Config &config, const JenkinsJobBuildInfo &build, QObject *parent = nullptr);
