@@ -415,7 +415,7 @@ void CommitHistoryContextMenu::applyPatch()
    const QString fileName(QFileDialog::getOpenFileName(this, tr("Select a patch to apply")));
    QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
-   if (!fileName.isEmpty() && git->applyPatch(fileName))
+   if (!fileName.isEmpty() && git->applyPatch(fileName).success)
       emit logReload();
 }
 
@@ -424,7 +424,7 @@ void CommitHistoryContextMenu::applyCommit()
    const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
    QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
-   if (!fileName.isEmpty() && git->applyPatch(fileName, true))
+   if (!fileName.isEmpty() && git->applyPatch(fileName, true).success)
       emit logReload();
 }
 

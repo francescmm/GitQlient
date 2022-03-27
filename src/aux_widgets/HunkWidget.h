@@ -26,8 +26,15 @@ private:
    QString mHunk;
    bool mIsCached = false;
    FileDiffView *mHunkView = nullptr;
+   int mLineToDiscard {};
+
+   QTemporaryFile *createPatchFile();
 
    void discardHunk();
    void stageHunk();
-   QTemporaryFile *createPatchFile();
+   void stageLine();
+   void discardLine();
+   void revertLine();
+
+   void showContextMenu(const QPoint &pos);
 };
