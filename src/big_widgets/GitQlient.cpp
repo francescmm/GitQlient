@@ -182,13 +182,19 @@ void GitQlient::openRepoWithPath(const QString &path)
 
 void GitQlient::cloneRepo()
 {
+   mPathToOpen = "";
    CreateRepoDlg cloneDlg(CreateRepoDlgType::CLONE, mGit);
    connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, [this](const QString &path) { mPathToOpen = path; });
 
    if (cloneDlg.exec() == QDialog::Accepted)
    {
-      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 100, false);
+      const auto data = cloneDlg.getCloneInfo();
+
+      mProgressDlg = new ProgressDlg(tr("Clonin g repository..."), QString(), 100, false);
       connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
+
+      mGit->clone(data.first, data.second);
+
       mProgressDlg->show();
    }
 }
@@ -202,11 +208,14 @@ void GitQlient::initRepo()
 
 void GitQlient::updateProgressDialog(QString stepDescription, int value)
 {
+   if (!mProgressDlg)
+      return;
+
    if (value >= 0)
    {
       mProgressDlg->setValue(value);
 
-      if (stepDescription.contains("done", Qt::CaseInsensitive))
+      if (stepDescription.contains("done", Qt::CaseInsensitive) && !mPathToOpen.isEmpty())
       {
          mProgressDlg->close();
          openRepoWithPath(mPathToOpen);

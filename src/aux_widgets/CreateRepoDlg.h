@@ -83,10 +83,14 @@ public:
     */
    void accept() override;
 
+   QPair<QString, QString> getCloneInfo() const { return qMakePair(mCloneUrl, mClonePath); }
+
 private:
    Ui::CreateRepoDlg *ui;
    CreateRepoDlgType mType;
    QSharedPointer<GitConfig> mGit;
+   QString mCloneUrl;
+   QString mClonePath;
 
    /**
     * @brief Opens a file dialog configured to select the destination folder of the repository.
@@ -101,4 +105,6 @@ private:
     * @brief Allows the user to configure the local repository email and user name.
     */
    void showGitControls();
+
+   void saveConfigAndAccept(const QString &fullPath);
 };

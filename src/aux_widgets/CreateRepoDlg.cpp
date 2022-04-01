@@ -87,6 +87,23 @@ void CreateRepoDlg::showGitControls()
    ui->leGitEmail->setVisible(checkedState);
 }
 
+void CreateRepoDlg::saveConfigAndAccept(const QString &fullPath)
+{
+   if (ui->chbDefaultDir->isChecked())
+   {
+      GitQlientSettings settings;
+      settings.setGlobalValue("DefaultCloneLocation", ui->lePath->text());
+   }
+
+   if (ui->cbGitUser->isChecked())
+      mGit->setLocalUserInfo({ ui->leGitName->text().trimmed(), ui->leGitEmail->text().trimmed() });
+
+   if (ui->chbOpen->isChecked())
+      emit signalOpenWhenFinish(fullPath);
+
+   QDialog::accept();
+}
+
 void CreateRepoDlg::accept()
 {
    auto path = ui->lePath->text().trimmed();
@@ -115,13 +132,16 @@ void CreateRepoDlg::accept()
             if (!dir.exists())
                dir.mkpath(fullPath);
 
-            ret = mGit->clone(url, fullPath);
+            ret.success = true;
+
+            mClonePath = fullPath;
+            mCloneUrl = url;
          }
          else
          {
             const auto msg = QString(tr("You need to provider a URL to clone a repository."));
 
-            QMessageBox::critical(this, tr("Nor URL provided"), msg);
+            ret.output = msg;
 
             QLog_Error("UI", msg);
          }
@@ -135,24 +155,10 @@ void CreateRepoDlg::accept()
       QApplication::restoreOverrideCursor();
 
       if (ret.success)
-      {
-         if (ui->chbDefaultDir->isChecked())
-         {
-            GitQlientSettings settings;
-            settings.setGlobalValue("DefaultCloneLocation", ui->lePath->text());
-         }
-
-         if (ui->cbGitUser->isChecked())
-            mGit->setLocalUserInfo({ ui->leGitName->text().trimmed(), ui->leGitEmail->text().trimmed() });
-
-         if (ui->chbOpen->isChecked())
-            emit signalOpenWhenFinish(fullPath);
-
-         QDialog::accept();
-      }
+         saveConfigAndAccept(fullPath);
       else
       {
-         QMessageBox::critical(this, tr("Error when %1").arg(actionApplied), ret.output);
+         QMessageBox::critical(this, tr("Error when %1: \n %2").arg(actionApplied), ret.output);
 
          QLog_Error("UI", ret.output);
       }
