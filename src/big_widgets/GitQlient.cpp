@@ -167,7 +167,6 @@ bool GitQlient::eventFilter(QObject *obj, QEvent *event)
 
 void GitQlient::openRepo()
 {
-
    const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
 
    if (!dirName.isEmpty())

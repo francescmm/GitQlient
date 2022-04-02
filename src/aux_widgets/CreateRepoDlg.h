@@ -106,5 +106,7 @@ private:
     */
    void showGitControls();
 
+   void verifyDefaultFolder();
+
    void saveConfigAndAccept(const QString &fullPath);
 };

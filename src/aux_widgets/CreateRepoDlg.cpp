@@ -33,7 +33,10 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
    const auto defaultLocation = settings.globalValue("DefaultCloneLocation", QString()).toString();
 
    if (!defaultLocation.isEmpty())
+   {
       ui->lePath->setText(defaultLocation);
+      ui->chbDefaultDir->setChecked(true);
+   }
 
    setWindowTitle(QString(tr("%1 repository"))
                       .arg(mType == CreateRepoDlgType::INIT ? QString(tr("Initialize")) : QString(tr("Clone"))));
@@ -41,6 +44,7 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
    connect(ui->leURL, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
    connect(ui->leURL, &QLineEdit::textChanged, this, &CreateRepoDlg::addDefaultName);
    connect(ui->pbBrowse, &QPushButton::clicked, this, &CreateRepoDlg::selectFolder);
+   connect(ui->lePath, &QLineEdit::textEdited, this, &CreateRepoDlg::verifyDefaultFolder);
    connect(ui->lePath, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
    connect(ui->leRepoName, &QLineEdit::returnPressed, this, &CreateRepoDlg::accept);
    connect(ui->pbAccept, &QPushButton::clicked, this, &CreateRepoDlg::accept);
@@ -53,6 +57,15 @@ CreateRepoDlg::CreateRepoDlg(CreateRepoDlgType type, QSharedPointer<GitConfig> g
 CreateRepoDlg::~CreateRepoDlg()
 {
    delete ui;
+}
+
+void CreateRepoDlg::verifyDefaultFolder()
+{
+   GitQlientSettings settings;
+   const auto isSameDir = settings.globalValue("DefaultCloneLocation", QString()).toString() == ui->lePath->text();
+
+   if (ui->chbDefaultDir->isChecked() && !isSameDir)
+      ui->chbDefaultDir->setChecked(false);
 }
 
 void CreateRepoDlg::selectFolder()
@@ -89,9 +102,11 @@ void CreateRepoDlg::showGitControls()
 
 void CreateRepoDlg::saveConfigAndAccept(const QString &fullPath)
 {
-   if (ui->chbDefaultDir->isChecked())
+   GitQlientSettings settings;
+
+   if (ui->chbDefaultDir->isChecked()
+       && settings.globalValue("DefaultCloneLocation", QString()).toString() == ui->lePath->text())
    {
-      GitQlientSettings settings;
       settings.setGlobalValue("DefaultCloneLocation", ui->lePath->text());
    }
 
