@@ -97,6 +97,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
             if (lastShaStr == sha)
             {
                const auto amendCommitAction = addAction(tr("Amend (edit last commit)"));
+               amendCommitAction->setToolTip(tr("Edit the last commit of the branch."));
                connect(amendCommitAction, &QAction::triggered, this,
                        [this]() { emit signalAmendCommit(mShas.first()); });
 
@@ -126,13 +127,17 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          const auto resetMenu = addMenu(tr("Reset"));
 
-         const auto resetSoftAction = resetMenu->addAction(tr("Soft"));
+         const auto resetSoftAction = resetMenu->addAction(tr("Soft (keep changes)"));
+         resetSoftAction->setToolTip(tr("Point to the selected commit <strong>keeping all changes</strong>."));
          connect(resetSoftAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetSoft);
 
-         const auto resetMixedAction = resetMenu->addAction(tr("Mixed"));
+         const auto resetMixedAction = resetMenu->addAction(tr("Mixed (keep files, reset their changes)"));
+         resetMixedAction->setToolTip(
+             tr("Point to the selected commit <strong>keeping all changes but reseting the file status<strong>."));
          connect(resetMixedAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetMixed);
 
-         const auto resetHardAction = resetMenu->addAction(tr("Hard"));
+         const auto resetHardAction = resetMenu->addAction(tr("Hard (discard chanbges)"));
+         resetHardAction->setToolTip(tr("Point to the selected commit <strong>losing all changes<strong>."));
          connect(resetHardAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetHard);
 
          addSeparator();
