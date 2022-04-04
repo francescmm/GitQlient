@@ -96,7 +96,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
             if (lastShaStr == sha)
             {
-               const auto amendCommitAction = addAction(tr("Amend"));
+               const auto amendCommitAction = addAction(tr("Amend (edit last commit)"));
                connect(amendCommitAction, &QAction::triggered, this,
                        [this]() { emit signalAmendCommit(mShas.first()); });
 
