@@ -38,6 +38,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    , mConfigBtn(new QToolButton())
    , mGitPlatform(new QToolButton())
    , mBuildSystem(new QToolButton())
+   , mTerminal(new QToolButton())
    , mPomodoro(new PomodoroButton(mGit))
    , mVersionCheck(new QToolButton())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be committed! Click here to solve it.")))
@@ -118,6 +119,14 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mConfigBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mBtnGroup->addButton(mConfigBtn, static_cast<int>(ControlsMainViews::Config));
 
+   mTerminal->setVisible(false);
+   mTerminal->setCheckable(true);
+   mTerminal->setIcon(QIcon(":/icons/terminal"));
+   mTerminal->setIconSize(QSize(22, 22));
+   mTerminal->setToolTip(tr("Terminal"));
+   mTerminal->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mBtnGroup->addButton(mTerminal, static_cast<int>(ControlsMainViews::Terminal));
+
    const auto separator = new QFrame();
    separator->setObjectName("orangeSeparator");
    separator->setFixedHeight(20);
@@ -150,8 +159,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mBuildSystem->setPopupMode(QToolButton::InstantPopup);
    mBtnGroup->addButton(mBuildSystem, static_cast<int>(ControlsMainViews::BuildSystem));
 
-   connect(mBuildSystem, &QToolButton::clicked, this, &Controls::signalGoBuildSystem);
-
    hLayout->addWidget(mBuildSystem);
 
    configBuildSystemButton();
@@ -175,6 +182,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    hLayout->addWidget(mRefreshBtn);
    hLayout->addWidget(mConfigBtn);
+   hLayout->addWidget(mTerminal);
    hLayout->addWidget(mPomodoro);
    hLayout->addWidget(mVersionCheck);
    hLayout->addStretch();
@@ -198,6 +206,8 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
    connect(mVersionCheck, &QToolButton::clicked, mUpdater, &GitQlientUpdater::showInfoMessage);
    connect(mConfigBtn, &QToolButton::clicked, this, &Controls::goConfig);
+   connect(mTerminal, &QToolButton::clicked, this, &Controls::goTerminal);
+   connect(mBuildSystem, &QToolButton::clicked, this, &Controls::signalGoBuildSystem);
 
    enableButtons(false);
 }
@@ -309,6 +319,11 @@ void Controls::changePomodoroVisibility()
    GitQlientSettings settings(mGit->getGitDir());
    const auto isVisible = settings.localValue("Pomodoro/Enabled", true);
    mPomodoro->setVisible(isVisible.toBool());
+}
+
+void Controls::enableTerminal()
+{
+   mTerminal->setVisible(true);
 }
 
 void Controls::pushCurrentBranch()
