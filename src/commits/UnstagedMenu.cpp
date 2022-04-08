@@ -22,12 +22,13 @@ UnstagedMenu::UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fi
    connect(addAction(tr("See changes")), &QAction::triggered, this, [this]() { emit signalShowDiff(mFileName); });
    connect(addAction(tr("Blame")), &QAction::triggered, this, [this]() { emit signalShowFileHistory(mFileName); });
 
-   /* TODO: Add back when GitQlientPlugin can be released
+#ifndef GitQlientPlugin
+   const auto externalEditor = GitQlientSettings().globalValue("ExternalEditor", QString()).toString();
 
-   connect(addAction(tr("Edit file")), &QAction::triggered, this,
-           [this]() { emit signalEditFile(mGit->getWorkingDir() + "/" + mFileName); });
+   if (!externalEditor.isEmpty())
+      connect(addAction(tr("Open with external editor")), &QAction::triggered, this, &UnstagedMenu::openExternalEditor);
+#endif
 
-   */
    connect(addAction(tr("Open containing folder")), &QAction::triggered, this, &UnstagedMenu::openFileExplorer);
 
    addSeparator();
@@ -147,13 +148,11 @@ bool UnstagedMenu::addEntryToGitIgnore(const QString &entry)
 
 void UnstagedMenu::onDeleteFile()
 {
-   const auto path = QString("%1").arg(mFileName);
-
-   QLog_Info("UI", "Removing path: " + path);
+   QLog_Info("UI", "Removing path: " + mFileName);
 
    QProcess p;
    p.setWorkingDirectory(mGit->getWorkingDir());
-   p.start("rm", { "-rf", path });
+   p.start("rm", { "-rf", mFileName });
 
    if (p.waitForFinished())
       emit signalCheckedOut();
@@ -166,8 +165,7 @@ void UnstagedMenu::openFileExplorer()
    QString app;
    QStringList arguments;
 #ifdef Q_OS_LINUX
-   GitQlientSettings settings;
-   const auto fileExplorer = settings.globalValue("FileExplorer", "xdg-open").toString();
+   const auto fileExplorer = GitQlientSettings().globalValue("FileExplorer", "xdg-open").toString();
 
    if (fileExplorer.isEmpty())
    {
@@ -188,11 +186,36 @@ void UnstagedMenu::openFileExplorer()
    arguments = QStringList { "-R", absoluteFilePath };
 #endif
 
-   auto ret = QProcess::startDetached(app, arguments);
+   const auto ret = QProcess::startDetached(app, arguments);
 
    if (!ret)
    {
       QMessageBox::critical(parentWidget(), tr("Error opening file explorer"),
                             tr("There was a problem opening the file explorer."));
+   }
+}
+
+void UnstagedMenu::openExternalEditor()
+{
+   const auto fileExplorer = GitQlientSettings().globalValue("ExternalEditor", "").toString();
+
+   if (!fileExplorer.isEmpty())
+   {
+      const auto absoluteFilePath = QString("%1/%2").arg(mGit->getWorkingDir(), mFileName);
+      auto arguments = fileExplorer.split(" ");
+      arguments.append(absoluteFilePath);
+      const auto app = arguments.takeFirst();
+
+      QProcess p;
+      p.setEnvironment(QProcess::systemEnvironment());
+
+      const auto ret = p.startDetached(app, arguments);
+
+      if (!ret)
+      {
+         QMessageBox::critical(
+             parentWidget(), tr("Error opening file editor"),
+             tr("There was a problem opening the file editor, please review the value set in GitQlient config."));
+      }
    }
 }

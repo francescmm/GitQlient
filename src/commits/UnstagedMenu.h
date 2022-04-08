@@ -51,4 +51,5 @@ private:
    bool addEntryToGitIgnore(const QString &entry);
    void onDeleteFile();
    void openFileExplorer();
+   void openExternalEditor();
 };

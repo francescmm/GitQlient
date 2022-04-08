@@ -106,10 +106,10 @@ private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitQlientSettings> mSettings;
-   QFileSystemModel *fileSystemModel = nullptr;
+   QFileSystemModel *mFileSystemModel = nullptr;
    CommitHistoryModel *mRepoModel = nullptr;
    CommitHistoryView *mRepoView = nullptr;
-   QTreeView *fileSystemView = nullptr;
+   QTreeView *mFileSystemView = nullptr;
    QTabWidget *mTabWidget = nullptr;
    QString mWorkingDirectory;
    QMap<QString, FileBlameWidget *> mTabsMap;
@@ -146,4 +146,8 @@ private:
     * @param tabIndex The new tab index selected.
     */
    void reloadHistory(int tabIndex);
+
+   void showFileSystemMenu(const QPoint &pos);
+
+   void openExternalEditor();
 };
