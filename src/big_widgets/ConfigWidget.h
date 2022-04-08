@@ -51,6 +51,7 @@ private:
    void saveFile();
    void showCredentialsDlg();
    void selectFolder();
+   void selectEditor();
    void useDefaultLogsFolder();
 
 private slots:

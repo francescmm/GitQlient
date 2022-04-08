@@ -96,6 +96,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->sbEditorFontSize->setValue(settings.globalValue("FileDiffView/FontSize", 8).toInt());
 
 #ifdef Q_OS_LINUX
+   ui->leEditor->setText(settings.globalValue("ExternalEditor", QString()).toString());
    ui->leExtFileExplorer->setText(settings.globalValue("FileExplorer", "xdg-open").toString());
 #else
    ui->leExtFileExplorer->setHidden(true);
@@ -206,6 +207,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->leBsToken, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->pbSelectFolder, &QPushButton::clicked, this, &ConfigWidget::selectFolder);
    connect(ui->pbDefault, &QPushButton::clicked, this, &ConfigWidget::useDefaultLogsFolder);
+   connect(ui->leEditor, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
+   connect(ui->pbSelectEditor, &QPushButton::clicked, this, &ConfigWidget::selectEditor);
    connect(ui->leExtFileExplorer, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
 
    calculateCacheSize();
@@ -308,6 +311,9 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("FileDiffView/FontSize", ui->sbEditorFontSize->value());
    settings.setGlobalValue("colorSchema", ui->cbStyle->currentText());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
+
+   if (!ui->leEditor->text().isEmpty())
+      settings.setGlobalValue("ExternalEditor", ui->leEditor->text());
 
 #ifdef Q_OS_LINUX
    settings.setGlobalValue("FileExplorer", ui->leExtFileExplorer->text());
@@ -448,6 +454,21 @@ void ConfigWidget::selectFolder()
 
          emit moveLogsAndClose();
       }
+   }
+}
+
+void ConfigWidget::selectEditor()
+{
+   const QString dirName(
+       QFileDialog::getOpenFileName(this, "Choose the directory of the external editor", QDir::currentPath()));
+
+   if (!dirName.isEmpty())
+   {
+      QDir d(dirName);
+
+      ui->leEditor->setText(d.absolutePath());
+
+      saveConfig();
    }
 }
 

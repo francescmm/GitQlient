@@ -109,27 +109,6 @@
        <item>
         <widget class="QFrame" name="frame">
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="2" column="2">
-           <widget class="QSpinBox" name="spCommitTitleLength">
-            <property name="value">
-             <number>50</number>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0" colspan="2">
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>Commit title max. length</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="CheckBox" name="chDisableLogs">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="3">
            <widget class="QLabel" name="label_2">
             <property name="text">
@@ -137,7 +116,49 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="1">
+          <item row="2" column="2">
+           <widget class="QSpinBox" name="spCommitTitleLength">
+            <property name="value">
+             <number>50</number>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="labelExtFileExplorer">
+            <property name="text">
+             <string>External file browser</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="3">
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>Styles schema</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2" colspan="3">
+           <widget class="QLineEdit" name="leGitPath">
+            <property name="placeholderText">
+             <string>Git location...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Git Location (if not in PATH)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Disable logs</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
            <spacer name="verticalSpacer_2">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -149,20 +170,6 @@
              </size>
             </property>
            </spacer>
-          </item>
-          <item row="2" column="3">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Styles schema</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QSpinBox" name="sbEditorFontSize">
-            <property name="suffix">
-             <string> pt</string>
-            </property>
-           </widget>
           </item>
           <item row="0" column="4">
            <widget class="QComboBox" name="cbLogLevel">
@@ -196,6 +203,13 @@
               <string>Fatal</string>
              </property>
             </item>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="CheckBox" name="chDisableLogs">
+            <property name="text">
+             <string/>
+            </property>
            </widget>
           </item>
           <item row="1" column="2" colspan="3">
@@ -234,40 +248,8 @@
             </item>
            </layout>
           </item>
-          <item row="3" column="0" colspan="2">
-           <widget class="QLabel" name="label_21">
-            <property name="text">
-             <string>Editor font size</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Disable logs</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QLabel" name="label_23">
-            <property name="text">
-             <string>Logs location</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Git Location (if not in PATH)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="2" colspan="3">
-           <widget class="QLineEdit" name="leGitPath">
-            <property name="placeholderText">
-             <string>Git location...</string>
-            </property>
-           </widget>
+          <item row="5" column="2" colspan="3">
+           <widget class="QLineEdit" name="leExtFileExplorer"/>
           </item>
           <item row="2" column="4">
            <widget class="QComboBox" name="cbStyle">
@@ -283,15 +265,55 @@
             </item>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="labelExtFileExplorer">
+          <item row="2" column="0" colspan="2">
+           <widget class="QLabel" name="label_15">
             <property name="text">
-             <string>External file browser</string>
+             <string>Commit title max. length</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="2" colspan="3">
-           <widget class="QLineEdit" name="leExtFileExplorer"/>
+          <item row="1" column="0" colspan="2">
+           <widget class="QLabel" name="label_23">
+            <property name="text">
+             <string>Logs location</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QSpinBox" name="sbEditorFontSize">
+            <property name="suffix">
+             <string> pt</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>Editor font size</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>External editor (IDE)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2" colspan="3">
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QLineEdit" name="leEditor"/>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pbSelectEditor">
+              <property name="icon">
+               <iconset resource="../resources.qrc">
+                <normaloff>:/icons/go_to</normaloff>:/icons/go_to</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </widget>
@@ -966,7 +988,6 @@
   <tabstop>clangFormat</tabstop>
   <tabstop>cbPomodoroEnabled</tabstop>
   <tabstop>cbLocal</tabstop>
-  <tabstop>chDevMode</tabstop>
   <tabstop>cbRemote</tabstop>
   <tabstop>cbTags</tabstop>
   <tabstop>cbStash</tabstop>
@@ -982,6 +1003,7 @@
   <tabstop>leBsUrl</tabstop>
   <tabstop>leBsUser</tabstop>
   <tabstop>leBsToken</tabstop>
+  <tabstop>chDevMode</tabstop>
   <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources>
