@@ -120,6 +120,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mControls, &Controls::signalGoServer, this, &GitQlientRepo::showGitServerView);
    connect(mControls, &Controls::signalGoBuildSystem, this, &GitQlientRepo::showBuildSystemView);
    connect(mControls, &Controls::goConfig, this, &GitQlientRepo::showConfig);
+   connect(mControls, &Controls::goTerminal, this, &GitQlientRepo::showTerminal);
    connect(mControls, &Controls::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
 
@@ -491,6 +492,12 @@ void GitQlientRepo::showConfig()
 {
    mStackedLayout->setCurrentWidget(mConfigWidget);
    mControls->toggleButton(ControlsMainViews::Config);
+}
+
+void GitQlientRepo::showTerminal()
+{
+   mStackedLayout->setCurrentIndex(mStackedLayout->count() - 1);
+   mControls->toggleButton(ControlsMainViews::Terminal);
 }
 
 void GitQlientRepo::showPreviousView()
