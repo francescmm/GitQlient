@@ -27,12 +27,14 @@ signals:
    void pomodoroVisibilityChanged();
    void moveLogsAndClose();
    void autoFetchChanged(int minutes);
+   void pluginsLoaded(QMap<QString, QObject *> plugins);
 
 public:
    explicit ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    ~ConfigWidget();
 
    void onPanelsVisibilityChanged();
+   void loadPlugins();
 
 private:
    Ui::ConfigWidget *ui;
@@ -43,6 +45,7 @@ private:
    QPushButton *mSave = nullptr;
    FileEditor *mLocalGit = nullptr;
    FileEditor *mGlobalGit = nullptr;
+   QVector<QWidget *> mPluginWidgets;
 
    void clearCache();
    void calculateCacheSize();

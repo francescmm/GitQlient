@@ -162,6 +162,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mConfigWidget, &ConfigWidget::pomodoroVisibilityChanged, mControls, &Controls::changePomodoroVisibility);
    connect(mConfigWidget, &ConfigWidget::moveLogsAndClose, this, &GitQlientRepo::moveLogsAndClose);
    connect(mConfigWidget, &ConfigWidget::autoFetchChanged, this, &GitQlientRepo::reconfigureAutoFetch);
+   connect(mConfigWidget, &ConfigWidget::pluginsLoaded, this, &GitQlientRepo::onPluginsLoaded);
 
    connect(mJenkins, &JenkinsWidget::gotoBranch, this, &GitQlientRepo::focusHistoryOnBranch);
    connect(mJenkins, &JenkinsWidget::gotoPullRequest, this, &GitQlientRepo::focusHistoryOnPr);
@@ -178,6 +179,8 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    m_loaderThread->start();
 
    mGitLoader->setShowAll(mSettings->localValue("ShowAllBranches", true).toBool());
+
+   mConfigWidget->loadPlugins();
 }
 
 GitQlientRepo::~GitQlientRepo()
@@ -552,6 +555,25 @@ void GitQlientRepo::focusHistoryOnPr(int prNumber)
 void GitQlientRepo::reconfigureAutoFetch(int newInterval)
 {
    mAutoFetch->start(newInterval * 60 * 1000);
+}
+
+void GitQlientRepo::onPluginsLoaded(QMap<QString, QObject *> plugins)
+{
+   mPlugins = plugins;
+
+   for (auto iter = plugins.constBegin(); iter != plugins.constEnd(); ++iter)
+   {
+      if (const auto storedPlugin = mPlugins.find(iter.key()); storedPlugin == mPlugins.end())
+      {
+         mPlugins[iter.key()] = iter.value();
+      }
+      else if (storedPlugin.key().split("-").constLast() < iter.key().split("-").constLast())
+      {
+         QMessageBox::warning(this, tr("Newer plugin detected!"),
+                              tr("GitQlient has detected a newer version of an existing plugin. To be able to use it, "
+                                 "please restart GitQlient and remove the old versions of the plugin."));
+      }
+   }
 }
 
 void GitQlientRepo::onChangesCommitted()

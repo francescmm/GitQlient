@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <QFrame>
+#include <QMap>
 #include <QPointer>
 #include <QThread>
 
@@ -166,6 +167,7 @@ private:
    GitServerWidget *mGitServerWidget = nullptr;
    Jenkins::JenkinsWidget *mJenkins = nullptr;
    ConfigWidget *mConfigWidget = nullptr;
+   QMap<QString, QObject *> mPlugins;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    QTimer *mAutoPrUpdater = nullptr;
@@ -312,4 +314,6 @@ private:
     * @param newInterval The new interval (in minutes) to automatically fetch the data from the server.
     */
    void reconfigureAutoFetch(int newInterval);
+
+   void onPluginsLoaded(QMap<QString, QObject *> plugins);
 };

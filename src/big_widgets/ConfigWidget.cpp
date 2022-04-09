@@ -12,7 +12,9 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QGridLayout>
 #include <QMessageBox>
+#include <QPluginLoader>
 #include <QProcess>
 #include <QPushButton>
 #include <QStandardPaths>
@@ -210,6 +212,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->leEditor, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->pbSelectEditor, &QPushButton::clicked, this, &ConfigWidget::selectEditor);
    connect(ui->leExtFileExplorer, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
+   connect(ui->pbRefreshPlugins, &QPushButton::clicked, this, &ConfigWidget::loadPlugins);
 
    calculateCacheSize();
 }
@@ -495,4 +498,72 @@ void ConfigWidget::useDefaultLogsFolder()
          emit moveLogsAndClose();
       }
    }
+}
+
+void ConfigWidget::loadPlugins()
+{
+   for (auto plugin : qAsConst(mPluginWidgets))
+      delete plugin;
+
+   mPluginWidgets.clear();
+
+   QDir pluginsDir(QCoreApplication::applicationDirPath());
+#if defined(Q_OS_WIN)
+   if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+      pluginsDir.cdUp();
+#elif defined(Q_OS_MAC)
+   if (pluginsDir.dirName() == "MacOS")
+   {
+      pluginsDir.cdUp();
+      pluginsDir.cdUp();
+      pluginsDir.cdUp();
+   }
+#endif
+   pluginsDir.cd("plugins");
+
+   const auto entries = pluginsDir.entryList(QDir::Files);
+   auto row = 0U;
+   QMap<QString, QObject *> plugins;
+
+   for (const auto &fileName : entries)
+   {
+      QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+      if (const auto plugin = pluginLoader.instance())
+      {
+         const auto metadata = pluginLoader.metaData();
+         const auto name = metadata.value("MetaData").toObject().value("Name").toString();
+         const auto version = metadata.value("MetaData").toObject().value("Version").toString();
+
+         const auto labelName = new QLabel(name);
+         const auto labelVersion = new QLabel(version);
+
+         ui->pluginsLayout->addWidget(labelName, row, 0);
+         ui->pluginsLayout->addWidget(labelVersion, row, 1);
+
+         ++row;
+
+         mPluginWidgets.append(labelName);
+         mPluginWidgets.append(labelVersion);
+
+         const auto newKey = QString("%1-%2").arg(name, version);
+
+         if (const auto iter = plugins.find(newKey); iter != plugins.end())
+         {
+            const auto key = iter.key().split("-");
+
+            if (key.count() == 2 && name == key.constFirst() && version > key.constLast())
+            {
+               plugins.erase(iter);
+               plugins[newKey] = plugin;
+            }
+         }
+         else
+            plugins[newKey] = plugin;
+      }
+      else
+         QLog_Error("UI", QString("%1").arg(pluginLoader.errorString()));
+   }
+
+   if (!plugins.isEmpty())
+      emit pluginsLoaded(plugins);
 }
