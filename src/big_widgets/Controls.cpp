@@ -39,15 +39,21 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    , mGitPlatform(new QToolButton())
    , mBuildSystem(new QToolButton())
    , mTerminal(new QToolButton())
+   , mPlugins(new QToolButton())
    , mPomodoro(new PomodoroButton(mGit))
    , mVersionCheck(new QToolButton())
    , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be committed! Click here to solve it.")))
    , mUpdater(new GitQlientUpdater(this))
    , mBtnGroup(new QButtonGroup())
+   , mLastSeparator(new QFrame())
+
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
-   connect(mUpdater, &GitQlientUpdater::newVersionAvailable, this, [this]() { mVersionCheck->setVisible(true); });
+   connect(mUpdater, &GitQlientUpdater::newVersionAvailable, this, [this]() {
+      mVersionCheck->setVisible(true);
+      mLastSeparator->setVisible(mPomodoro->isVisible() || mVersionCheck->isVisible());
+   });
 
    mHistory->setCheckable(true);
    mHistory->setIcon(QIcon(":/icons/git_orange"));
@@ -127,6 +133,14 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mTerminal->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mBtnGroup->addButton(mTerminal, static_cast<int>(ControlsMainViews::Terminal));
 
+   mPlugins->setVisible(false);
+   mPlugins->setCheckable(true);
+   mPlugins->setIcon(QIcon(":/icons/plugin"));
+   mPlugins->setIconSize(QSize(22, 22));
+   mPlugins->setToolTip(tr("Plugins"));
+   mPlugins->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mBtnGroup->addButton(mPlugins, static_cast<int>(ControlsMainViews::Plugins));
+
    const auto separator = new QFrame();
    separator->setObjectName("orangeSeparator");
    separator->setFixedHeight(20);
@@ -183,6 +197,13 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    hLayout->addWidget(mRefreshBtn);
    hLayout->addWidget(mConfigBtn);
    hLayout->addWidget(mTerminal);
+   hLayout->addWidget(mPlugins);
+
+   mLastSeparator->setObjectName("orangeSeparator");
+   mLastSeparator->setFixedHeight(20);
+   mLastSeparator->setVisible(mPomodoro->isVisible() || mVersionCheck->isVisible());
+
+   hLayout->addWidget(mLastSeparator);
    hLayout->addWidget(mPomodoro);
    hLayout->addWidget(mVersionCheck);
    hLayout->addStretch();
@@ -207,6 +228,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    connect(mVersionCheck, &QToolButton::clicked, mUpdater, &GitQlientUpdater::showInfoMessage);
    connect(mConfigBtn, &QToolButton::clicked, this, &Controls::goConfig);
    connect(mTerminal, &QToolButton::clicked, this, &Controls::goTerminal);
+   connect(mPlugins, &QToolButton::clicked, this, &Controls::goPlugins);
    connect(mBuildSystem, &QToolButton::clicked, this, &Controls::signalGoBuildSystem);
 
    enableButtons(false);
@@ -324,6 +346,11 @@ void Controls::changePomodoroVisibility()
 void Controls::enableTerminal()
 {
    mTerminal->setVisible(true);
+}
+
+void Controls::enablePlugins()
+{
+   mPlugins->setVisible(true);
 }
 
 void Controls::pushCurrentBranch()
