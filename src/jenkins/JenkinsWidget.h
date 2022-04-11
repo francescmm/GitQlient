@@ -29,8 +29,10 @@ signals:
    void gotoBranch(const QString &branchName);
 
 public:
-   JenkinsWidget(const QString &url, const QString &user, const QString &token, QWidget *parent = nullptr);
+   JenkinsWidget(QWidget *parent = nullptr);
    ~JenkinsWidget() override;
+
+   void initialize(const QString &url, const QString &user, const QString &token);
 
    void reload() const;
 

@@ -13,7 +13,7 @@
 namespace Jenkins
 {
 
-JenkinsWidget::JenkinsWidget(const QString &url, const QString &user, const QString &token, QWidget *parent)
+JenkinsWidget::JenkinsWidget(QWidget *parent)
    : QWidget(parent)
    , mStackedLayout(new QStackedLayout())
    , mBodyLayout(new QHBoxLayout())
@@ -22,9 +22,6 @@ JenkinsWidget::JenkinsWidget(const QString &url, const QString &user, const QStr
    , mTimer(new QTimer(this))
 {
    setObjectName("JenkinsWidget");
-
-   mConfig = IFetcher::Config { user, token, nullptr };
-   mConfig.accessManager.reset(new QNetworkAccessManager());
 
    const auto superBtnsLayout = new QVBoxLayout();
    superBtnsLayout->setContentsMargins(QMargins());
@@ -43,21 +40,27 @@ JenkinsWidget::JenkinsWidget(const QString &url, const QString &user, const QStr
 
    setMinimumSize(800, 600);
 
-   mRepoFetcher = new RepoFetcher(mConfig, url, this);
-   connect(mRepoFetcher, &RepoFetcher::signalViewsReceived, this, &JenkinsWidget::configureGeneralView);
+   mTimer->setInterval(15 * 60 * 1000); // 15 mins
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
    connect(mBtnGroup, &QButtonGroup::idClicked, mStackedLayout, &QStackedLayout::setCurrentIndex);
 #else
    connect(mBtnGroup, SIGNAL(buttonClicked(int)), mStackedLayout, SLOT(setCurrentIndex(int)));
 #endif
-
-   mTimer->setInterval(15 * 60 * 1000); // 15 mins
 }
 
 JenkinsWidget::~JenkinsWidget()
 {
    delete mBtnGroup;
+}
+
+void JenkinsWidget::initialize(const QString &url, const QString &user, const QString &token)
+{
+   mConfig = IFetcher::Config { user, token, nullptr };
+   mConfig.accessManager.reset(new QNetworkAccessManager());
+
+   mRepoFetcher = new RepoFetcher(mConfig, url, this);
+   connect(mRepoFetcher, &RepoFetcher::signalViewsReceived, this, &JenkinsWidget::configureGeneralView);
 }
 
 void JenkinsWidget::reload() const
