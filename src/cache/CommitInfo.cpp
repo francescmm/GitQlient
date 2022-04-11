@@ -19,6 +19,9 @@ CommitInfo::CommitInfo(QByteArray data)
 
 void CommitInfo::parseDiff(QByteArray &data, int startingField)
 {
+   if (data.isEmpty())
+      return;
+
    if (const auto fields = QString::fromUtf8(data).split('\n'); fields.count() > 0)
    {
       auto combinedShas = fields.at(startingField++);
