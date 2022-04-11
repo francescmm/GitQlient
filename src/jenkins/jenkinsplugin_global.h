@@ -1,0 +1,7 @@
+#pragma once
+
+#if defined(JENKINSPLUGIN_LIBRARY)
+#   define JENKINSPLUGIN_EXPORT Q_DECL_EXPORT
+#else
+#   define JENKINSPLUGIN_EXPORT Q_DECL_IMPORT
+#endif

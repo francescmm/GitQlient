@@ -46,10 +46,7 @@ class GitServerCache;
 class GitTags;
 class ConfigWidget;
 
-namespace Jenkins
-{
-class JenkinsWidget;
-}
+class IJenkinsWidget;
 
 namespace GitServer
 {
@@ -165,7 +162,7 @@ private:
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
    GitServerWidget *mGitServerWidget = nullptr;
-   Jenkins::JenkinsWidget *mJenkins = nullptr;
+   IJenkinsWidget *mJenkins = nullptr;
    ConfigWidget *mConfigWidget = nullptr;
    QMap<QString, QObject *> mPlugins;
    QTimer *mAutoFetch = nullptr;
