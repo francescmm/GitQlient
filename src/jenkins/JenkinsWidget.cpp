@@ -1,7 +1,5 @@
 #include "JenkinsWidget.h"
 
-#include <GitBase.h>
-#include <GitQlientSettings.h>
 #include <JobContainer.h>
 #include <RepoFetcher.h>
 
@@ -15,7 +13,7 @@
 namespace Jenkins
 {
 
-JenkinsWidget::JenkinsWidget(const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
+JenkinsWidget::JenkinsWidget(const QString &url, const QString &user, const QString &token, QWidget *parent)
    : QWidget(parent)
    , mStackedLayout(new QStackedLayout())
    , mBodyLayout(new QHBoxLayout())
@@ -24,10 +22,6 @@ JenkinsWidget::JenkinsWidget(const QSharedPointer<GitQlientSettings> &settings, 
    , mTimer(new QTimer(this))
 {
    setObjectName("JenkinsWidget");
-
-   const auto url = settings->localValue("BuildSystemUrl", "").toString();
-   const auto user = settings->localValue("BuildSystemUser", "").toString();
-   const auto token = settings->localValue("BuildSystemToken", "").toString();
 
    mConfig = IFetcher::Config { user, token, nullptr };
    mConfig.accessManager.reset(new QNetworkAccessManager());

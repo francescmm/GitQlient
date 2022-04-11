@@ -29,7 +29,7 @@ signals:
    void gotoBranch(const QString &branchName);
 
 public:
-   JenkinsWidget(const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
+   JenkinsWidget(const QString &url, const QString &user, const QString &token, QWidget *parent = nullptr);
    ~JenkinsWidget() override;
 
    void reload() const;

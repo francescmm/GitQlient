@@ -57,7 +57,9 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase, mSettings))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
    , mGitServerWidget(new GitServerWidget(mGitQlientCache, mGitBase, mGitServerCache))
-   , mJenkins(new JenkinsWidget(mSettings))
+   , mJenkins(new JenkinsWidget(mSettings->localValue("BuildSystemUrl", "").toString(),
+                                mSettings->localValue("BuildSystemUser", "").toString(),
+                                mSettings->localValue("BuildSystemToken", "").toString()))
    , mConfigWidget(new ConfigWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())

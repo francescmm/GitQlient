@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QFrame>
 #include <JenkinsJobInfo.h>
+
+#include <QFrame>
 
 namespace Jenkins
 {
