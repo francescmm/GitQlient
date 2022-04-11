@@ -1,0 +1,3 @@
+[submodule "src/QPinnableTabWidget"]
+	path = src/QPinnableTabWidget
+	url = https://github.com/francescmm/QPinnableTabWidget.git
