@@ -1,3 +1,6 @@
 [submodule "src/QPinnableTabWidget"]
 	path = src/QPinnableTabWidget
 	url = https://github.com/francescmm/QPinnableTabWidget.git
+[submodule "src/QLogger"]
+	path = src/QLogger
+	url = https://github.com/francescmm/QLogger.git
