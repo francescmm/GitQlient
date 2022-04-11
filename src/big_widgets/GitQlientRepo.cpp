@@ -24,7 +24,6 @@
 #include <GitTags.h>
 #include <GitWip.h>
 #include <HistoryWidget.h>
-#include <JenkinsWidget.h>
 #include <MergeWidget.h>
 #include <QLogger.h>
 #include <WaitingDlg.h>
@@ -41,7 +40,6 @@
 
 using namespace QLogger;
 using namespace GitServer;
-using namespace Jenkins;
 
 GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPointer<GitQlientSettings> &settings,
                              QWidget *parent)
