@@ -2,6 +2,7 @@
 
 #include <BranchDlg.h>
 #include <CommitInfo.h>
+#include <ConfigData.h>
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
 #include <GitBase.h>
@@ -12,9 +13,9 @@
 #include <GitHubRestApi.h>
 #include <GitLocal.h>
 #include <GitPatches.h>
+#include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
-#include <GitServerCache.h>
 #include <GitStashes.h>
 #include <MergePullRequestDlg.h>
 #include <PullDlg.h>
@@ -33,13 +34,11 @@
 using namespace QLogger;
 
 CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache,
-                                                   const QSharedPointer<GitBase> &git,
-                                                   const QSharedPointer<GitServerCache> &gitServerCache,
-                                                   const QStringList &shas, QWidget *parent)
+                                                   const QSharedPointer<GitBase> &git, const QStringList &shas,
+                                                   QWidget *parent)
    : QMenu(parent)
    , mCache(cache)
    , mGit(git)
-   , mGitServerCache(gitServerCache)
    , mShas(shas)
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -153,46 +152,6 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
             const auto title = mCache->commitInfo(mShas.first()).shortLog;
             QApplication::clipboard()->setText(title);
          });
-      }
-   }
-
-   if (mGitServerCache)
-   {
-      const auto isGitHub = mGitServerCache->getPlatform() == GitServer::Platform::GitHub;
-      const auto gitServerMenu = new QMenu(QString::fromUtf8(isGitHub ? "GitHub" : "GitLab"), this);
-
-      addSeparator();
-      addMenu(gitServerMenu);
-
-      if (const auto pr = mGitServerCache->getPullRequest(mShas.first()); singleSelection && pr.isValid())
-      {
-         const auto prInfo = mGitServerCache->getPullRequest(mShas.first());
-
-         const auto checksMenu = new QMenu("Checks", gitServerMenu);
-         gitServerMenu->addMenu(checksMenu);
-
-         for (const auto &check : prInfo.state.checks)
-         {
-            const auto link = check.url;
-            checksMenu->addAction(QIcon(QString(":/icons/%1").arg(check.state)), check.name, this,
-                                  [link]() { QDesktopServices::openUrl(link); });
-         }
-
-         if (isGitHub)
-         {
-            connect(gitServerMenu->addAction(tr("Merge PR")), &QAction::triggered, this, [this, pr]() {
-               const auto mergeDlg = new MergePullRequestDlg(mGit, pr, mShas.first(), this);
-               connect(mergeDlg, &MergePullRequestDlg::signalRepositoryUpdated, this,
-                       &CommitHistoryContextMenu::fullReload);
-
-               mergeDlg->exec();
-            });
-         }
-
-         connect(gitServerMenu->addAction(tr("Show PR detailed view")), &QAction::triggered, this,
-                 [this, num = pr.number]() { emit showPrDetailedView(num); });
-
-         gitServerMenu->addSeparator();
       }
    }
 }

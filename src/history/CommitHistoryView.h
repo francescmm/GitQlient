@@ -31,7 +31,6 @@ class GitCache;
 class GitBase;
 class CommitHistoryModel;
 class ShaFilterProxyModel;
-class GitServerCache;
 class GitQlientSettings;
 
 /**
@@ -96,8 +95,7 @@ public:
     * @param parent The parent widget if needed.
     */
    explicit CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                              const QSharedPointer<GitQlientSettings> &settings,
-                              const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+                              const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
    /**
     * @brief Destructor.
     */
@@ -161,7 +159,6 @@ private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitQlientSettings> mSettings;
-   QSharedPointer<GitServerCache> mGitServerCache;
    CommitHistoryModel *mCommitHistoryModel = nullptr;
    ShaFilterProxyModel *mProxyModel = nullptr;
    bool mIsFiltering = false;

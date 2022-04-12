@@ -58,11 +58,9 @@ ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServer
 
    ui->leEndPoint->setHidden(true);
 
-   GitQlientSettings settings("");
    ui->leUserName->setText(mData.user);
    ui->leUserToken->setText(mData.token);
-   ui->leEndPoint->setText(
-       settings.globalValue(QString("%1/endpoint").arg(mData.serverUrl), repoUrls.value(GitHub)).toString());
+   ui->leEndPoint->setText(mData.endPoint);
 
    ui->cbServer->insertItem(GitHub, "GitHub", repoUrls.value(GitHub));
    ui->cbServer->insertItem(GitHubEnterprise, "GitHub Enterprise", repoUrls.value(GitHubEnterprise));
@@ -118,7 +116,7 @@ void ServerConfigDlg::accept()
    connect(mGitServerCache.get(), &GitServerCache::errorOccurred, this, &ServerConfigDlg::onGitServerError);
    connect(mGitServerCache.get(), &GitServerCache::connectionTested, this, [this]() { onDataValidated(); });
 
-   mGitServerCache->init(mData.serverUrl, mData.repoInfo);
+   mGitServerCache->init(mData.serverUrl, qMakePair(mData.repoOwner, mData.repoName));
 }
 
 void ServerConfigDlg::testToken()
@@ -133,12 +131,12 @@ void ServerConfigDlg::testToken()
 
       if (ui->cbServer->currentIndex() == GitLab)
       {
-         api = new GitLabRestApi(ui->leUserName->text(), mData.repoInfo.second, mData.serverUrl,
+         api = new GitLabRestApi(ui->leUserName->text(), mData.repoName, mData.serverUrl,
                                  { ui->leUserName->text(), ui->leUserToken->text(), endpoint }, this);
       }
       else
       {
-         api = new GitHubRestApi(mData.repoInfo.first, mData.repoInfo.second,
+         api = new GitHubRestApi(mData.repoOwner, mData.repoName,
                                  { ui->leUserName->text(), ui->leUserToken->text(), endpoint }, this);
       }
 

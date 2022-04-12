@@ -124,8 +124,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
-   mRepositoryModel = new CommitHistoryModel(mCache, mGit, mGitServerCache);
-   mRepositoryView = new CommitHistoryView(mCache, mGit, mSettings, mGitServerCache);
+   mRepositoryModel = new CommitHistoryModel(mCache, mGit);
+   mRepositoryView = new CommitHistoryView(mCache, mGit, mSettings);
 
    connect(mRepositoryView, &CommitHistoryView::fullReload, this, &HistoryWidget::fullReload);
    connect(mRepositoryView, &CommitHistoryView::referencesReload, this, &HistoryWidget::referencesReload);

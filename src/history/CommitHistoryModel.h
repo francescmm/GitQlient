@@ -29,7 +29,6 @@
 class GitCache;
 class GitBase;
 class CommitInfo;
-class GitServerCache;
 enum class CommitHistoryColumns;
 
 /**
@@ -50,7 +49,7 @@ public:
     * @param parent The parent widget if needed.
     */
    explicit CommitHistoryModel(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                               const QSharedPointer<GitServerCache> &gitServerCache, QObject *parent = nullptr);
+                               QObject *parent = nullptr);
 
    /**
     * @brief Clears the contents without deleting the cache.
@@ -134,7 +133,6 @@ public:
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<GitServerCache> mGitServerCache;
    QMap<CommitHistoryColumns, QString> mColumns;
 
    /**

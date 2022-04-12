@@ -10,11 +10,10 @@
 #include <QLocale>
 
 CommitHistoryModel::CommitHistoryModel(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                                       const QSharedPointer<GitServerCache> &gitServerCache, QObject *p)
+                                       QObject *p)
    : QAbstractItemModel(p)
    , mCache(cache)
    , mGit(git)
-   , mGitServerCache(gitServerCache)
 {
    mColumns.insert(CommitHistoryColumns::TreeViewIcon, "");
    mColumns.insert(CommitHistoryColumns::Graph, "");
@@ -101,7 +100,7 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
 
    QLocale locale;
 
-   auto tooltip = sha == CommitInfo::ZERO_SHA
+   return sha == CommitInfo::ZERO_SHA
        ? QString()
        : QString("<p>%1 - %2</p><p>%3</p>%4%5")
              .arg(r.author.split("<").first(), d.toString(locale.dateTimeFormat(QLocale::ShortFormat)), sha,
@@ -110,14 +109,6 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
                       ? tr("<p> GPG key (%1): %2</p>")
                             .arg(QString::fromUtf8(r.verifiedSignature() ? "verified" : "not verified"), r.gpgKey)
                       : "");
-
-   if (mGitServerCache)
-   {
-      if (const auto pr = mGitServerCache->getPullRequest(sha); pr.isValid())
-         tooltip.append(tr("<p><b>PR state: </b>%1.</p>").arg(pr.state.state));
-   }
-
-   return tooltip;
 }
 
 QVariant CommitHistoryModel::getDisplayData(const CommitInfo &rev, int column) const

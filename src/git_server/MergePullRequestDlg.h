@@ -23,6 +23,7 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <ConfigData.h>
 #include <PullRequest.h>
 
 #include <QDialog>
@@ -52,7 +53,7 @@ signals:
    /*!
     \brief Signal triggered when some action in the context menu things the main UI needs an update.
    */
-   void signalRepositoryUpdated();
+   void pullRequestMerged();
 
 public:
    /**
@@ -62,8 +63,8 @@ public:
     * @param sha The sha of the current commit to check that is the current sha in the server.
     * @param parent The parent widget.
     */
-   explicit MergePullRequestDlg(const QSharedPointer<GitBase> git, const GitServer::PullRequest &pr, const QString &sha,
-                                QWidget *parent = nullptr);
+   explicit MergePullRequestDlg(const QSharedPointer<GitBase> git, GitServer::ConfigData data,
+                                const GitServer::PullRequest &pr, const QString &sha, QWidget *parent = nullptr);
    /**
     * Destructor
     */

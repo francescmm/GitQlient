@@ -27,7 +27,6 @@
 
 class GitCache;
 class GitBase;
-class GitServerCache;
 
 /*!
  \brief This class configures the context menu that will be shown when the user right-click over a commit in the
@@ -96,13 +95,11 @@ public:
     \param parent The parent widget if needed.
    */
    explicit CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                                     const QSharedPointer<GitServerCache> &gitServerCache, const QStringList &shas,
-                                     QWidget *parent = nullptr);
+                                     const QStringList &shas, QWidget *parent = nullptr);
 
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<GitServerCache> mGitServerCache;
    QStringList mShas;
 
    /*!
