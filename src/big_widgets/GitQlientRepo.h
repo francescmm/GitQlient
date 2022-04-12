@@ -46,10 +46,7 @@ class GitServerCache;
 class GitTags;
 class ConfigWidget;
 
-namespace Jenkins
-{
 class IJenkinsWidget;
-}
 
 namespace GitServer
 {
@@ -171,14 +168,15 @@ private:
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
    GitServerWidget *mGitServerWidget = nullptr;
-   Jenkins::IJenkinsWidget *mJenkins = nullptr;
+   IJenkinsWidget *mJenkins = nullptr;
    ConfigWidget *mConfigWidget = nullptr;
    QMap<QString, QObject *> mPlugins;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    QTimer *mAutoPrUpdater = nullptr;
    QPointer<WaitingDlg> mWaitDlg;
-   QPair<ControlsMainViews, QWidget *> mPreviousView;
+   int mPreviousView;
+   QMap<ControlsMainViews, int> mIndexMap;
    QSharedPointer<GitServer::IRestApi> mApi;
 
    bool mIsInit = false;
@@ -306,6 +304,13 @@ private:
    void updateWip();
 
    /**
+    * @brief reconfigureAutoFetch Changes the interval for the auto fetch timer.
+    * @param newInterval The new interval (in minutes) to automatically fetch the data from the server.
+    */
+   void reconfigureAutoFetch(int newInterval);
+
+private slots:
+   /**
     * @brief focusHistoryOnBranch Opens the graph view and focuses on the SHA of the last commit of the given branch.
     * @param branch The branch.
     */
@@ -316,10 +321,4 @@ private:
     * @param prNumber The PR to put the focus on.
     */
    void focusHistoryOnPr(int prNumber);
-
-   /**
-    * @brief reconfigureAutoFetch Changes the interval for the auto fetch timer.
-    * @param newInterval The new interval (in minutes) to automatically fetch the data from the server.
-    */
-   void reconfigureAutoFetch(int newInterval);
 };

@@ -34,6 +34,7 @@ class GitConfig;
 class QStackedLayout;
 class GitQlientSettings;
 class GitBase;
+class IJenkinsWidget;
 
 /*!
  \brief The GitQlient class is the MainWindow of the GitQlient application. Is the widget that stores all the tabs about
@@ -103,6 +104,7 @@ private:
    QString mPathToOpen;
    bool mMoveLogs = false;
    QMap<QString, QObject *> mPlugins;
+   QPair<QString, IJenkinsWidget *> mJenkinsPluginInstance;
 
    /*!
     \brief Opens a QFileDialog to select a repository in the local disk.

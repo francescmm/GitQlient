@@ -81,12 +81,12 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    mGitServerWidget->setContentsMargins(QMargins(5, 5, 5, 5));
    mConfigWidget->setContentsMargins(QMargins(5, 5, 5, 5));
 
-   mStackedLayout->addWidget(mHistoryWidget);
-   mStackedLayout->addWidget(mDiffWidget);
-   mStackedLayout->addWidget(mBlameWidget);
-   mStackedLayout->addWidget(mMergeWidget);
-   mStackedLayout->addWidget(mGitServerWidget);
-   mStackedLayout->addWidget(mConfigWidget);
+   mIndexMap[ControlsMainViews::History] = mStackedLayout->addWidget(mHistoryWidget);
+   mIndexMap[ControlsMainViews::Diff] = mStackedLayout->addWidget(mDiffWidget);
+   mIndexMap[ControlsMainViews::Blame] = mStackedLayout->addWidget(mBlameWidget);
+   mIndexMap[ControlsMainViews::Merge] = mStackedLayout->addWidget(mMergeWidget);
+   mIndexMap[ControlsMainViews::GitServer] = mStackedLayout->addWidget(mGitServerWidget);
+   mIndexMap[ControlsMainViews::Config] = mStackedLayout->addWidget(mConfigWidget);
 
    const auto mainLayout = new QVBoxLayout();
    mainLayout->setSpacing(0);
@@ -239,17 +239,20 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
       if (iter.key().split("-").constFirst().contains("jenkins", Qt::CaseInsensitive)
           && qobject_cast<QWidget *>(iter.value()))
       {
-         auto jenkins = reinterpret_cast<Jenkins::IJenkinsWidget *>(iter.value());
-         jenkins->initialize(mSettings->localValue("BuildSystemUrl", "").toString(),
-                             mSettings->localValue("BuildSystemUser", "").toString(),
-                             mSettings->localValue("BuildSystemToken", "").toString());
+         auto jenkins = qobject_cast<IJenkinsWidget *>(iter.value());
+         jenkins->init(mSettings->localValue("BuildSystemUrl", "").toString(),
+                       mSettings->localValue("BuildSystemUser", "").toString(),
+                       mSettings->localValue("BuildSystemToken", "").toString());
          jenkins->setContentsMargins(QMargins(5, 5, 5, 5));
 
          connect(jenkins, SIGNAL(gotoBranch(const QString &)), this, SLOT(focusHistoryOnBranch(const QString &)));
          connect(jenkins, SIGNAL(gotoPullRequest(int)), this, SLOT(focusHistoryOnPr(int)));
 
          mJenkins = jenkins;
-         mStackedLayout->addWidget(jenkins);
+
+         auto widget = dynamic_cast<QWidget *>(iter.value());
+
+         mIndexMap[ControlsMainViews::BuildSystem] = mStackedLayout->addWidget(widget);
       }
       else
          mPlugins[iter.key()] = iter.value();
@@ -381,25 +384,25 @@ void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previ
 
 void GitQlientRepo::showHistoryView()
 {
-   mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
+   mPreviousView = mStackedLayout->currentIndex();
 
-   mStackedLayout->setCurrentWidget(mHistoryWidget);
+   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::History]);
    mControls->toggleButton(ControlsMainViews::History);
 }
 
 void GitQlientRepo::showBlameView()
 {
-   mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
+   mPreviousView = mStackedLayout->currentIndex();
 
-   mStackedLayout->setCurrentWidget(mBlameWidget);
+   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Blame]);
    mControls->toggleButton(ControlsMainViews::Blame);
 }
 
 void GitQlientRepo::showDiffView()
 {
-   mPreviousView = qMakePair(mControls->getCurrentSelectedButton(), mStackedLayout->currentWidget());
+   mPreviousView = mStackedLayout->currentIndex();
 
-   mStackedLayout->setCurrentWidget(mDiffWidget);
+   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Diff]);
    mControls->toggleButton(ControlsMainViews::Diff);
 }
 
@@ -453,7 +456,7 @@ void GitQlientRepo::showPullConflict()
 
 void GitQlientRepo::showMergeView()
 {
-   mStackedLayout->setCurrentWidget(mMergeWidget);
+   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Merge]);
    mControls->toggleButton(ControlsMainViews::Merge);
 }
 
@@ -489,7 +492,7 @@ void GitQlientRepo::showGitServerView()
 {
    if (configureGitServer())
    {
-      mStackedLayout->setCurrentWidget(mGitServerWidget);
+      mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::GitServer]);
       mControls->toggleButton(ControlsMainViews::GitServer);
    }
    else
@@ -507,33 +510,33 @@ void GitQlientRepo::showGitServerPrView(int prNumber)
 
 void GitQlientRepo::showBuildSystemView()
 {
-   mJenkins->reload();
-   mStackedLayout->setCurrentWidget(dynamic_cast<QWidget *>(mJenkins));
+   mJenkins->update();
+   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::BuildSystem]);
    mControls->toggleButton(ControlsMainViews::BuildSystem);
 }
 
 void GitQlientRepo::showConfig()
 {
-   mStackedLayout->setCurrentWidget(mConfigWidget);
+   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Config]);
    mControls->toggleButton(ControlsMainViews::Config);
 }
 
 void GitQlientRepo::showTerminal()
 {
-   mStackedLayout->setCurrentIndex(mStackedLayout->count() - 1);
+   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Terminal]);
    mControls->toggleButton(ControlsMainViews::Terminal);
 }
 
 void GitQlientRepo::showPlugins()
 {
-   mStackedLayout->setCurrentIndex(mStackedLayout->count() - 1);
+   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Plugins]);
    mControls->toggleButton(ControlsMainViews::Plugins);
 }
 
 void GitQlientRepo::showPreviousView()
 {
-   mStackedLayout->setCurrentWidget(mPreviousView.second);
-   mControls->toggleButton(mPreviousView.first);
+   mStackedLayout->setCurrentIndex(mPreviousView);
+   mControls->toggleButton(static_cast<ControlsMainViews>(mPreviousView));
 }
 
 void GitQlientRepo::updateWip()

@@ -31,7 +31,6 @@
 #include <QLogger.h>
 
 using namespace QLogger;
-using namespace Jenkins;
 
 GitQlient::GitQlient(QWidget *parent)
    : QWidget(parent)
@@ -369,8 +368,13 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
 
          repo->setRepository(repoName);
 
-         if (!mPlugins.isEmpty())
-            repo->setPlugins(mPlugins);
+         if (!mPlugins.isEmpty() || (mPlugins.empty() && mJenkinsPluginInstance.second))
+         {
+            decltype(mPlugins) plugins;
+            plugins = mPlugins;
+            plugins[mJenkinsPluginInstance.first] = mJenkinsPluginInstance.second->createWidget();
+            repo->setPlugins(plugins);
+         }
 
          if (!repoPath.isEmpty())
          {
@@ -517,8 +521,8 @@ void GitQlient::loadPlugins()
 
          if (name.contains("jenkins", Qt::CaseInsensitive))
          {
-            const auto newWidget = reinterpret_cast<Jenkins::IJenkinsWidget *>(plugin)->createJenkinsWidget();
-            mPlugins[newKey] = reinterpret_cast<QObject *>(newWidget);
+            mJenkinsPluginInstance = qMakePair(newKey, qobject_cast<IJenkinsWidget *>(plugin));
+            // mPlugins[newKey] = dynamic_cast<QObject *>(mJenkinsPluginInstance->createWidget());
          }
          else
             mPlugins[newKey] = plugin;
