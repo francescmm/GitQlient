@@ -9,6 +9,7 @@ include($$PWD/cache/Cache.pri)
 include($$PWD/history/History.pri)
 include($$PWD/git_server/GitServer.pri)
 include($$PWD/git_server/GitServerWidgets.pri)
+include($$PWD/QLogger/QLogger.pri)
 include($$PWD/QPinnableTabWidget/QPinnableTabWidget.pri)
 include($$PWD/jenkins/Jenkins.pri)
 
