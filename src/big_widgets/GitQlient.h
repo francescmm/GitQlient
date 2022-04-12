@@ -23,6 +23,7 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <QMap>
 #include <QSet>
 #include <QWidget>
 
@@ -101,6 +102,7 @@ private:
    ProgressDlg *mProgressDlg = nullptr;
    QString mPathToOpen;
    bool mMoveLogs = false;
+   QMap<QString, QObject *> mPlugins;
 
    /*!
     \brief Opens a QFileDialog to select a repository in the local disk.
@@ -186,4 +188,6 @@ private:
     * @brief moveLogsBeforeClose Marks the logs to be moved to their new folder before GitQlient closes.
     */
    void moveLogsBeforeClose();
+
+   void loadPlugins();
 };

@@ -46,7 +46,10 @@ class GitServerCache;
 class GitTags;
 class ConfigWidget;
 
+namespace Jenkins
+{
 class IJenkinsWidget;
+}
 
 namespace GitServer
 {
@@ -140,6 +143,12 @@ public:
    */
    void setRepository(const QString &newDir);
 
+   /**
+    * @brief Sets the plugins loaded by GitQlient to be used by the repo instance.
+    * @param plugins The list of plugins.
+    */
+   void setPlugins(QMap<QString, QObject *> plugins);
+
 protected:
    /*!
     \brief Overload of the close event cancel any pending loading.
@@ -162,7 +171,7 @@ private:
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
    GitServerWidget *mGitServerWidget = nullptr;
-   IJenkinsWidget *mJenkins = nullptr;
+   Jenkins::IJenkinsWidget *mJenkins = nullptr;
    ConfigWidget *mConfigWidget = nullptr;
    QMap<QString, QObject *> mPlugins;
    QTimer *mAutoFetch = nullptr;
@@ -313,6 +322,4 @@ private:
     * @param newInterval The new interval (in minutes) to automatically fetch the data from the server.
     */
    void reconfigureAutoFetch(int newInterval);
-
-   void onPluginsLoaded(QMap<QString, QObject *> plugins);
 };

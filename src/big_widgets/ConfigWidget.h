@@ -27,14 +27,13 @@ signals:
    void pomodoroVisibilityChanged();
    void moveLogsAndClose();
    void autoFetchChanged(int minutes);
-   void pluginsLoaded(QMap<QString, QObject *> plugins);
 
 public:
    explicit ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    ~ConfigWidget();
 
    void onPanelsVisibilityChanged();
-   void loadPlugins();
+   void loadPlugins(QMap<QString, QObject *> plugins);
 
 private:
    Ui::ConfigWidget *ui;

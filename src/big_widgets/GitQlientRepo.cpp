@@ -24,11 +24,11 @@
 #include <GitTags.h>
 #include <GitWip.h>
 #include <HistoryWidget.h>
+#include <IJenkinsWidget.h>
 #include <MergeWidget.h>
 #include <QLogger.h>
 #include <WaitingDlg.h>
 
-#include <IJenkinsWidget.h>
 #include <QApplication>
 #include <QDirIterator>
 #include <QFileDialog>
@@ -56,7 +56,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase, mSettings))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
    , mGitServerWidget(new GitServerWidget(mGitQlientCache, mGitBase, mGitServerCache))
-   //, mJenkins(new JenkinsWidget())
    , mConfigWidget(new ConfigWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
@@ -87,7 +86,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    mStackedLayout->addWidget(mBlameWidget);
    mStackedLayout->addWidget(mMergeWidget);
    mStackedLayout->addWidget(mGitServerWidget);
-   // mStackedLayout->addWidget(mJenkins);
    mStackedLayout->addWidget(mConfigWidget);
 
    const auto mainLayout = new QVBoxLayout();
@@ -161,7 +159,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mConfigWidget, &ConfigWidget::pomodoroVisibilityChanged, mControls, &Controls::changePomodoroVisibility);
    connect(mConfigWidget, &ConfigWidget::moveLogsAndClose, this, &GitQlientRepo::moveLogsAndClose);
    connect(mConfigWidget, &ConfigWidget::autoFetchChanged, this, &GitQlientRepo::reconfigureAutoFetch);
-   connect(mConfigWidget, &ConfigWidget::pluginsLoaded, this, &GitQlientRepo::onPluginsLoaded);
 
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::createProgressDialog);
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished);
@@ -175,8 +172,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    m_loaderThread->start();
 
    mGitLoader->setShowAll(mSettings->localValue("ShowAllBranches", true).toBool());
-
-   mConfigWidget->loadPlugins();
 }
 
 GitQlientRepo::~GitQlientRepo()
@@ -228,6 +223,36 @@ void GitQlientRepo::setRepository(const QString &newDir)
       mCurrentDir = "";
       clearWindow();
       setWidgetsEnabled(false);
+   }
+}
+
+void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
+{
+   if (plugins.isEmpty())
+      return;
+
+   mConfigWidget->loadPlugins(plugins);
+   mControls->enablePlugins();
+
+   for (auto iter = plugins.constBegin(); iter != plugins.constEnd(); ++iter)
+   {
+      if (iter.key().split("-").constFirst().contains("jenkins", Qt::CaseInsensitive)
+          && qobject_cast<QWidget *>(iter.value()))
+      {
+         auto jenkins = reinterpret_cast<Jenkins::IJenkinsWidget *>(iter.value());
+         jenkins->initialize(mSettings->localValue("BuildSystemUrl", "").toString(),
+                             mSettings->localValue("BuildSystemUser", "").toString(),
+                             mSettings->localValue("BuildSystemToken", "").toString());
+         jenkins->setContentsMargins(QMargins(5, 5, 5, 5));
+
+         connect(jenkins, SIGNAL(gotoBranch(const QString &)), this, SLOT(focusHistoryOnBranch(const QString &)));
+         connect(jenkins, SIGNAL(gotoPullRequest(int)), this, SLOT(focusHistoryOnPr(int)));
+
+         mJenkins = jenkins;
+         mStackedLayout->addWidget(jenkins);
+      }
+      else
+         mPlugins[iter.key()] = iter.value();
    }
 }
 
@@ -557,45 +582,6 @@ void GitQlientRepo::focusHistoryOnPr(int prNumber)
 void GitQlientRepo::reconfigureAutoFetch(int newInterval)
 {
    mAutoFetch->start(newInterval * 60 * 1000);
-}
-
-void GitQlientRepo::onPluginsLoaded(QMap<QString, QObject *> plugins)
-{
-   for (auto iter = plugins.constBegin(); iter != plugins.constEnd(); ++iter)
-   {
-      if (const auto storedPlugin = mPlugins.find(iter.key()); storedPlugin == mPlugins.end())
-      {
-         if (const auto jenkins = dynamic_cast<IJenkinsWidget *>(iter.value());
-             jenkins && qobject_cast<QWidget *>(iter.value()))
-         {
-            jenkins->initialize(mSettings->localValue("BuildSystemUrl", "").toString(),
-                                mSettings->localValue("BuildSystemUser", "").toString(),
-                                mSettings->localValue("BuildSystemToken", "").toString());
-            const auto jenkinsWidget = qobject_cast<QWidget *>(iter.value());
-            jenkinsWidget->setContentsMargins(QMargins(5, 5, 5, 5));
-
-            /*
-            connect(jenkinsWidget, &JenkinsWidget::gotoBranch, this, &GitQlientRepo::focusHistoryOnBranch);
-            connect(jenkinsWidget, &JenkinsWidget::gotoPullRequest, this, &GitQlientRepo::focusHistoryOnPr);
-            */
-
-            delete mJenkins;
-            mJenkins = jenkins;
-            mStackedLayout->addWidget(jenkinsWidget);
-         }
-         else
-            mPlugins[iter.key()] = iter.value();
-      }
-      else if (storedPlugin.key().split("-").constLast() < iter.key().split("-").constLast())
-      {
-         QMessageBox::warning(this, tr("Newer plugin detected!"),
-                              tr("GitQlient has detected a newer version of an existing plugin. To be able to use it, "
-                                 "please restart GitQlient and remove the old versions of the plugin."));
-      }
-   }
-
-   if (!mPlugins.isEmpty())
-      mControls->enablePlugins();
 }
 
 void GitQlientRepo::onChangesCommitted()

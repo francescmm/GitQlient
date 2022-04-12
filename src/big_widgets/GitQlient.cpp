@@ -18,6 +18,7 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPluginLoader>
 #include <QProcess>
 #include <QPushButton>
 #include <QStackedLayout>
@@ -25,9 +26,12 @@
 #include <QTextStream>
 #include <QToolButton>
 
+#include <IJenkinsWidget.h>
+
 #include <QLogger.h>
 
 using namespace QLogger;
+using namespace Jenkins;
 
 GitQlient::GitQlient(QWidget *parent)
    : QWidget(parent)
@@ -45,6 +49,8 @@ GitQlient::GitQlient(QWidget *parent)
    QLog_Info("UI", "*          GitQlient has started          *");
    QLog_Info("UI", QString("*                  %1                  *").arg(VER));
    QLog_Info("UI", "*******************************************");
+
+   loadPlugins();
 
    setStyleSheet(GitQlientStyles::getStyles());
 
@@ -363,6 +369,9 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
 
          repo->setRepository(repoName);
 
+         if (!mPlugins.isEmpty())
+            repo->setPlugins(mPlugins);
+
          if (!repoPath.isEmpty())
          {
             QProcess p;
@@ -476,4 +485,45 @@ void GitQlient::moveLogsBeforeClose()
    mMoveLogs = true;
 
    close();
+}
+
+void GitQlient::loadPlugins()
+{
+   QDir pluginsDir(QCoreApplication::applicationDirPath());
+#if defined(Q_OS_WIN)
+   if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+      pluginsDir.cdUp();
+#elif defined(Q_OS_MAC)
+   if (pluginsDir.dirName() == "MacOS")
+   {
+      pluginsDir.cdUp();
+      pluginsDir.cdUp();
+      pluginsDir.cdUp();
+   }
+#endif
+   pluginsDir.cd("plugins");
+
+   const auto entries = pluginsDir.entryList(QDir::Files);
+
+   for (const auto &fileName : entries)
+   {
+      QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+      if (const auto plugin = pluginLoader.instance())
+      {
+         const auto metadata = pluginLoader.metaData();
+         const auto name = metadata.value("MetaData").toObject().value("Name").toString();
+         const auto version = metadata.value("MetaData").toObject().value("Version").toString();
+         const auto newKey = QString("%1-%2").arg(name, version);
+
+         if (name.contains("jenkins", Qt::CaseInsensitive))
+         {
+            const auto newWidget = reinterpret_cast<Jenkins::IJenkinsWidget *>(plugin)->createJenkinsWidget();
+            mPlugins[newKey] = reinterpret_cast<QObject *>(newWidget);
+         }
+         else
+            mPlugins[newKey] = plugin;
+      }
+      else
+         QLog_Error("UI", QString("%1").arg(pluginLoader.errorString()));
+   }
 }
