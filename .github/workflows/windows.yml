@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checking out the code
         uses: actions/checkout@v2
+        with:
+          submodules: 'true'
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v2.13.2
