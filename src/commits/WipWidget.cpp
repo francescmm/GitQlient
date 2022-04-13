@@ -12,6 +12,7 @@
 #include <GitRepoLoader.h>
 #include <GitWip.h>
 #include <UnstagedMenu.h>
+#include <WipHelper.h>
 
 #include <QMessageBox>
 
@@ -22,17 +23,16 @@ using namespace QLogger;
 WipWidget::WipWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : CommitChangesWidget(cache, git, parent)
 {
-   mCurrentSha = CommitInfo::ZERO_SHA;
+   mCurrentSha = ZERO_SHA;
 }
 
 void WipWidget::configure(const QString &sha)
 {
    const auto commit = mCache->commitInfo(sha);
 
-   QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
-   git->updateWip();
+   WipHelper::update(mGit, mCache);
 
-   const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, commit.firstParent());
+   const auto files = mCache->revisionFile(ZERO_SHA, commit.firstParent());
 
    QLog_Info("UI", QString("Configuring WIP widget"));
 
@@ -59,12 +59,11 @@ void WipWidget::commitChanges()
                                  "the conflicts first."));
       else if (checkMsg(msg))
       {
-         const auto revInfo = mCache->commitInfo(CommitInfo::ZERO_SHA);
+         const auto revInfo = mCache->commitInfo(ZERO_SHA);
 
-         QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
-         git->updateWip();
+         WipHelper::update(mGit, mCache);
 
-         if (const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, revInfo.firstParent()); files)
+         if (const auto files = mCache->revisionFile(ZERO_SHA, revInfo.firstParent()); files)
          {
             const auto lastShaBeforeCommit = mGit->getLastCommit().output.trimmed();
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
@@ -111,7 +110,7 @@ void WipWidget::commitChanges()
                ui->leCommitTitle->clear();
                ui->teDescription->clear();
 
-               git->updateWip();
+               WipHelper::update(mGit, mCache);
 
                emit mCache->signalCacheUpdated();
                emit changesCommitted();

@@ -9,6 +9,7 @@
 #include <GitQlientStyles.h>
 #include <GitWip.h>
 #include <UnstagedMenu.h>
+#include <WipHelper.h>
 
 #include <QMessageBox>
 
@@ -32,10 +33,9 @@ void AmendWidget::configure(const QString &sha)
    if (commit.parentsCount() <= 0)
       return;
 
-   QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
-   git->updateWip();
+   WipHelper::update(mGit, mCache);
 
-   const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, sha);
+   const auto files = mCache->revisionFile(ZERO_SHA, sha);
    auto amendFiles = mCache->revisionFile(sha, commit.firstParent());
 
    if (!amendFiles)
@@ -107,10 +107,9 @@ void AmendWidget::commitChanges()
       }
       else if (checkMsg(msg))
       {
-         QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
-         git->updateWip();
+         WipHelper::update(mGit, mCache);
 
-         const auto files = mCache->revisionFile(CommitInfo::ZERO_SHA, mCurrentSha);
+         const auto files = mCache->revisionFile(ZERO_SHA, mCurrentSha);
 
          if (files)
          {

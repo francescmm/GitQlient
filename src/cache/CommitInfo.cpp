@@ -1,9 +1,8 @@
 #include "CommitInfo.h"
 
-#include <QStringList>
+#include <GitExecResult.h>
 
-const QString CommitInfo::ZERO_SHA = QString("0000000000000000000000000000000000000000");
-const QString CommitInfo::INIT_SHA = QString("4b825dc642cb6eb9a060e54bf8d69288fbee4904");
+#include <QStringList>
 
 CommitInfo::CommitInfo(QByteArray commitData, const QString &gpg, bool goodSignature)
    : gpgKey(gpg)
@@ -77,7 +76,7 @@ int CommitInfo::parentsCount() const
 {
    auto count = mParentsSha.count();
 
-   if (count > 0 && mParentsSha.contains(CommitInfo::INIT_SHA))
+   if (count > 0 && mParentsSha.contains(ZERO_SHA))
       --count;
 
    return count;
@@ -102,7 +101,7 @@ bool CommitInfo::isInWorkingBranch() const
 {
    for (const auto &child : mChilds)
    {
-      if (child->sha == CommitInfo::ZERO_SHA)
+      if (child->sha == ZERO_SHA)
       {
          return true;
          break;

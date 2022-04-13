@@ -132,7 +132,7 @@ void FileDiffWidget::clear()
 
 bool FileDiffWidget::reload()
 {
-   if (mCurrentSha == CommitInfo::ZERO_SHA)
+   if (mCurrentSha == ZERO_SHA)
       return configure(mCurrentSha, mPreviousSha, mCurrentFile, mIsCached);
 
    return false;
@@ -169,8 +169,8 @@ bool FileDiffWidget::configure(const QString &currentSha, const QString &previou
    QString text;
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
 
-   if (const auto ret = git->getFullFileDiff(currentSha == CommitInfo::ZERO_SHA ? QString() : currentSha, previousSha,
-                                             destFile, isCached);
+   if (const auto ret
+       = git->getFullFileDiff(currentSha == ZERO_SHA ? QString() : currentSha, previousSha, destFile, isCached);
        ret.success)
    {
       text = ret.output;

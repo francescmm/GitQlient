@@ -79,9 +79,6 @@ public:
    bool isSigned() const { return !gpgKey.isEmpty(); }
    bool verifiedSignature() const { return mGoodSignature && !gpgKey.isEmpty(); }
 
-   static const QString ZERO_SHA;
-   static const QString INIT_SHA;
-
    uint pos = 0;
    QString sha;
    QString committer;

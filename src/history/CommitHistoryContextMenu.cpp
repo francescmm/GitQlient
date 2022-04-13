@@ -57,7 +57,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
    {
       const auto sha = mShas.first();
 
-      if (sha == CommitInfo::ZERO_SHA)
+      if (sha == ZERO_SHA)
       {
          const auto stashMenu = addMenu(tr("Stash"));
          const auto stashAction = stashMenu->addAction(tr("Push"));
@@ -67,7 +67,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          connect(popAction, &QAction::triggered, this, &CommitHistoryContextMenu::stashPop);
       }
 
-      if (sha != CommitInfo::ZERO_SHA)
+      if (sha != ZERO_SHA)
       {
          const auto createMenu = addMenu(tr("Create"));
 
@@ -158,7 +158,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
 void CommitHistoryContextMenu::createMultipleShasMenu()
 {
-   if (!mShas.contains(CommitInfo::ZERO_SHA))
+   if (!mShas.contains(ZERO_SHA))
    {
       const auto exportAsPatchAction = addAction(tr("Export as patch"));
       connect(exportAsPatchAction, &QAction::triggered, this, &CommitHistoryContextMenu::exportAsPatch);
@@ -441,9 +441,12 @@ void CommitHistoryContextMenu::push()
 
 void CommitHistoryContextMenu::pull()
 {
+   GitQlientSettings settings(mGit->getGitDir());
+   const auto updateOnPull = settings.localValue("UpdateOnPull", true).toBool();
+
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
-   const auto ret = git->pull();
+   const auto ret = git->pull(updateOnPull);
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
@@ -472,9 +475,12 @@ void CommitHistoryContextMenu::pull()
 
 void CommitHistoryContextMenu::fetch()
 {
+   GitQlientSettings settings(mGit->getGitDir());
+   const auto pruneOnFetch = settings.localValue("PruneOnFetch", true).toBool();
+
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
 
-   if (git->fetch())
+   if (git->fetch(pruneOnFetch))
       emit fullReload();
 }
 

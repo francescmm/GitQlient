@@ -28,6 +28,7 @@
 #include <MergeWidget.h>
 #include <QLogger.h>
 #include <WaitingDlg.h>
+#include <WipHelper.h>
 
 #include <QApplication>
 #include <QDirIterator>
@@ -202,8 +203,7 @@ void GitQlientRepo::updateUiFromWatcher()
 {
    QLog_Info("UI", QString("Updating the GitQlient UI from watcher"));
 
-   QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
-   git->updateWip();
+   WipHelper::update(mGitBase, mGitQlientCache);
 
    mHistoryWidget->updateUiFromWatcher();
 
@@ -419,12 +419,11 @@ void GitQlientRepo::showWarningMerge()
 {
    showMergeView();
 
-   const auto wipCommit = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
+   const auto wipCommit = mGitQlientCache->commitInfo(ZERO_SHA);
 
-   QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
-   git->updateWip();
+   WipHelper::update(mGitBase, mGitQlientCache);
 
-   const auto file = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
+   const auto file = mGitQlientCache->revisionFile(ZERO_SHA, wipCommit.firstParent());
 
    if (file)
       mMergeWidget->configure(file.value(), MergeWidget::ConflictReason::Merge);
@@ -435,12 +434,11 @@ void GitQlientRepo::showCherryPickConflict(const QStringList &shas)
 {
    showMergeView();
 
-   const auto wipCommit = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
+   const auto wipCommit = mGitQlientCache->commitInfo(ZERO_SHA);
 
-   QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
-   git->updateWip();
+   WipHelper::update(mGitBase, mGitQlientCache);
 
-   const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
+   const auto files = mGitQlientCache->revisionFile(ZERO_SHA, wipCommit.firstParent());
 
    if (files)
       mMergeWidget->configureForCherryPick(files.value(), shas);
@@ -451,12 +449,11 @@ void GitQlientRepo::showPullConflict()
 {
    showMergeView();
 
-   const auto wipCommit = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
+   const auto wipCommit = mGitQlientCache->commitInfo(ZERO_SHA);
 
-   QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
-   git->updateWip();
+   WipHelper::update(mGitBase, mGitQlientCache);
 
-   const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
+   const auto files = mGitQlientCache->revisionFile(ZERO_SHA, wipCommit.firstParent());
 
    if (files)
       mMergeWidget->configure(files.value(), MergeWidget::ConflictReason::Pull);
@@ -555,8 +552,7 @@ void GitQlientRepo::updateWip()
 {
    mHistoryWidget->resetWip();
 
-   QScopedPointer<GitWip> git(new GitWip(mGitBase, mGitQlientCache));
-   git->updateWip();
+   WipHelper::update(mGitBase, mGitQlientCache);
 
    mHistoryWidget->updateUiFromWatcher();
 }
@@ -601,7 +597,7 @@ void GitQlientRepo::reconfigureAutoFetch(int newInterval)
 
 void GitQlientRepo::onChangesCommitted()
 {
-   mHistoryWidget->selectCommit(CommitInfo::ZERO_SHA);
+   mHistoryWidget->selectCommit(ZERO_SHA);
    mHistoryWidget->loadBranches(false);
    showHistoryView();
 }

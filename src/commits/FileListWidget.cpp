@@ -48,7 +48,7 @@ void FileListWidget::showContextMenu(const QPoint &pos)
    if (item)
    {
       const auto fileName = item->data(Qt::DisplayRole).toString();
-      const auto menu = new FileContextMenu(mGit->getWorkingDir(), fileName, mCurrentSha == CommitInfo::ZERO_SHA, this);
+      const auto menu = new FileContextMenu(mGit->getWorkingDir(), fileName, mCurrentSha == ZERO_SHA, this);
       connect(menu, &FileContextMenu::signalShowFileHistory, this,
               [this, fileName]() { emit signalShowFileHistory(fileName); });
       connect(menu, &FileContextMenu::signalOpenFileDiff, this,

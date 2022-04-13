@@ -405,6 +405,8 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    connect(stashHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onStashesHeaderClicked);
    connect(submoduleHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onSubmodulesHeaderClicked);
    connect(subtreeHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onSubtreesHeaderClicked);
+
+   connect(mGitTags.get(), &GitTags::remoteTagsReceived, mCache.get(), &GitCache::updateTags);
 }
 
 BranchesWidget::~BranchesWidget()

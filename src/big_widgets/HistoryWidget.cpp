@@ -23,6 +23,7 @@
 #include <GitWip.h>
 #include <RepositoryViewDelegate.h>
 #include <WipDiffWidget.h>
+#include <WipHelper.h>
 #include <WipWidget.h>
 
 #include <QLogger.h>
@@ -328,8 +329,7 @@ void HistoryWidget::cleanCommitPanels()
 
 void HistoryWidget::onRevertedChanges()
 {
-   QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
-   git->updateWip();
+   WipHelper::update(mGit, mCache);
 
    updateUiFromWatcher();
 }
@@ -409,8 +409,10 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
    QScopedPointer<GitMerge> git(new GitMerge(mGit, mCache));
    const auto ret = git->merge(current, { branchToMerge });
 
-   QScopedPointer<GitWip> gitWip(new GitWip(mGit, mCache));
-   gitWip->updateWip();
+   if (ret.success)
+      WipHelper::update(mGit, mCache);
+
+   WipHelper::update(mGit, mCache);
 
    QApplication::restoreOverrideCursor();
 
@@ -423,8 +425,10 @@ void HistoryWidget::mergeSquashBranch(const QString &current, const QString &bra
    QScopedPointer<GitMerge> git(new GitMerge(mGit, mCache));
    const auto ret = git->squashMerge(current, { branchToMerge });
 
-   QScopedPointer<GitWip> gitWip(new GitWip(mGit, mCache));
-   gitWip->updateWip();
+   if (ret.success)
+      WipHelper::update(mGit, mCache);
+
+   WipHelper::update(mGit, mCache);
 
    QApplication::restoreOverrideCursor();
 
@@ -481,7 +485,7 @@ void HistoryWidget::processMergeResponse(const GitExecResult &ret)
 
 void HistoryWidget::selectCommit(const QString &goToSha)
 {
-   const auto isWip = goToSha == CommitInfo::ZERO_SHA;
+   const auto isWip = goToSha == ZERO_SHA;
    mCommitStackedWidget->setCurrentIndex(isWip);
 
    QLog_Info("UI", QString("Selected commit {%1}").arg(goToSha));

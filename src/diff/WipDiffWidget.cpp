@@ -50,7 +50,7 @@ WipDiffWidget::WipDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<
    , mHunkSpacer(new QSpacerItem(1, 1, QSizePolicy::Fixed, QSizePolicy::Expanding))
    , mViewStackedWidget(new QStackedWidget())
 {
-   mCurrentSha = CommitInfo::ZERO_SHA;
+   mCurrentSha = ZERO_SHA;
 
    mUnifiedFile->addNumberArea(new LineNumberArea(mUnifiedFile, false, true));
 
@@ -295,7 +295,7 @@ bool WipDiffWidget::configure(const QString &file, bool isCached)
 
    QString text;
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
-   const auto previousSha = mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent();
+   const auto previousSha = mCache->commitInfo(ZERO_SHA).firstParent();
 
    if (const auto ret = git->getFullFileDiff(QString(), previousSha, destFile, isCached); ret.success)
    {

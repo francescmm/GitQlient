@@ -13,6 +13,7 @@
 #include <GitWip.h>
 #include <RevisionFiles.h>
 #include <UnstagedMenu.h>
+#include <WipHelper.h>
 
 #include <QDir>
 #include <QItemDelegate>
@@ -306,8 +307,7 @@ void CommitChangesWidget::addAllFilesToCommitList()
 
    if (const auto ret = git->markFilesAsResolved(files); ret.success)
    {
-      QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
-      git->updateWip();
+      WipHelper::update(mGit, mCache);
    }
 
    ui->applyActionBtn->setEnabled(ui->stagedFilesList->count() > 0);
@@ -330,10 +330,7 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
       const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
 
       if (const auto ret = git->stageFile(fileName); ret.success)
-      {
-         QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
-         git->updateWip();
-      }
+         WipHelper::update(mGit, mCache);
    }
 
    const auto row = fileList->row(item);

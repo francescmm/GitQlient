@@ -99,7 +99,7 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
 
    QLocale locale;
 
-   return sha == CommitInfo::ZERO_SHA
+   return sha == ZERO_SHA
        ? QString()
        : QString("<p>%1 - %2</p><p>%3</p>%4%5")
              .arg(r.author.split("<").first(), d.toString(locale.dateTimeFormat(QLocale::ShortFormat)), sha,

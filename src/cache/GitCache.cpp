@@ -56,8 +56,8 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
 
       const auto sha = commit.sha;
 
-      if (sha == mCommitsMap.value(CommitInfo::ZERO_SHA).firstParent())
-         commit.appendChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
+      if (sha == mCommitsMap.value(ZERO_SHA).firstParent())
+         commit.appendChild(&mCommitsMap[ZERO_SHA]);
 
       mCommitsMap[sha] = commit;
       mCommits[++count] = &mCommitsMap[sha];
@@ -137,7 +137,7 @@ bool GitCache::isCommitInCurrentGeneologyTree(const QString &sha)
 {
    QMutexLocker lock(&mCommitsMutex);
 
-   return checkSha(sha, CommitInfo::ZERO_SHA);
+   return checkSha(sha, ZERO_SHA);
 }
 
 CommitInfo GitCache::commitInfo(const QString &sha)
@@ -191,7 +191,7 @@ void GitCache::insertWipRevision(const QString parentSha, const RevisionFiles &f
 
    QLog_Debug("Cache", QString("Updating the WIP commit. The actual parent has SHA {%1}.").arg(newParentSha));
 
-   insertRevisionFile(CommitInfo::ZERO_SHA, newParentSha, files);
+   insertRevisionFile(ZERO_SHA, newParentSha, files);
 
    QStringList parents;
 
@@ -199,17 +199,17 @@ void GitCache::insertWipRevision(const QString parentSha, const RevisionFiles &f
       parents.append(newParentSha);
 
    if (mLanes.isEmpty())
-      mLanes.init(CommitInfo::ZERO_SHA);
+      mLanes.init(ZERO_SHA);
 
    const auto log = files.count() == mUntrackedFiles.count() ? tr("No local changes") : tr("Local changes");
-   CommitInfo c(CommitInfo::ZERO_SHA, parents, std::chrono::seconds(QDateTime::currentSecsSinceEpoch()), log);
+   CommitInfo c(ZERO_SHA, parents, std::chrono::seconds(QDateTime::currentSecsSinceEpoch()), log);
    calculateLanes(c);
 
    if (mCommits[0])
       c.setLanes(mCommits[0]->lanes());
 
-   mCommitsMap.insert(CommitInfo::ZERO_SHA, std::move(c));
-   mCommits[0] = &mCommitsMap[CommitInfo::ZERO_SHA];
+   mCommitsMap.insert(ZERO_SHA, std::move(c));
+   mCommits[0] = &mCommitsMap[ZERO_SHA];
 }
 
 bool GitCache::insertRevisionFiles(const QString &sha1, const QString &sha2, const RevisionFiles &file)
@@ -223,7 +223,7 @@ bool GitCache::insertRevisionFile(const QString &sha1, const QString &sha2, cons
 {
    const auto key = qMakePair(sha1, sha2);
    const auto emptyShas = !sha1.isEmpty() && !sha2.isEmpty();
-   const auto isWip = sha1 == CommitInfo::ZERO_SHA;
+   const auto isWip = sha1 == ZERO_SHA;
 
    if ((emptyShas || isWip) && mRevisionFilesMap.value(key) != file)
    {
@@ -330,12 +330,12 @@ void GitCache::insertCommit(CommitInfo commit)
    commit.setLanes({ LaneType::ACTIVE });
    commit.pos = 1;
 
-   mCommitsMap[CommitInfo::ZERO_SHA].setParents({ commit.sha });
+   mCommitsMap[ZERO_SHA].setParents({ commit.sha });
 
    mCommitsMap[sha] = std::move(commit);
-   mCommitsMap[sha].appendChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
+   mCommitsMap[sha].appendChild(&mCommitsMap[ZERO_SHA]);
 
-   mCommitsMap[parentSha].removeChild(&mCommitsMap[CommitInfo::ZERO_SHA]);
+   mCommitsMap[parentSha].removeChild(&mCommitsMap[ZERO_SHA]);
    mCommitsMap[parentSha].appendChild(&mCommitsMap[sha]);
 
    const auto total = mCommits.count();
@@ -413,9 +413,9 @@ bool GitCache::pendingLocalChanges()
 
    auto localChanges = false;
 
-   if (const auto commit = mCommitsMap.value(CommitInfo::ZERO_SHA, CommitInfo()); commit.isValid())
+   if (const auto commit = mCommitsMap.value(ZERO_SHA, CommitInfo()); commit.isValid())
    {
-      if (const auto rf = revisionFile(CommitInfo::ZERO_SHA, commit.firstParent()); rf)
+      if (const auto rf = revisionFile(ZERO_SHA, commit.firstParent()); rf)
          localChanges = rf.value().count() - mUntrackedFiles.count() > 0;
    }
 

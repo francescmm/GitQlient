@@ -9,6 +9,7 @@
 #include <GitMerge.h>
 #include <GitQlientSettings.h>
 #include <GitWip.h>
+#include <WipHelper.h>
 
 #include <QLabel>
 #include <QMessageBox>
@@ -71,10 +72,9 @@ void SquashDlg::accept()
 
    if (checkMsg(msg))
    {
-      const auto revInfo = mCache->commitInfo(CommitInfo::ZERO_SHA);
+      const auto revInfo = mCache->commitInfo(ZERO_SHA);
 
-      QScopedPointer<GitWip> git(new GitWip(mGit, mCache));
-      git->updateWip();
+      WipHelper::update(mGit, mCache);
 
       const auto lastChild = mCache->commitInfo(mShas.last());
 
@@ -104,7 +104,7 @@ void SquashDlg::accept()
 
             // Create auxiliary branch for final rebase
             const auto auxBranch3 = QUuid::createUuid().toString();
-            const auto lastCommit = mCache->commitInfo(CommitInfo::ZERO_SHA).firstParent();
+            const auto lastCommit = mCache->commitInfo(ZERO_SHA).firstParent();
             gitBranches->createBranchAtCommit(lastCommit, auxBranch3);
 
             // Reset hard to the first commit to squash
@@ -113,7 +113,10 @@ void SquashDlg::accept()
 
             // Merge squash auxiliary branch 2
             QScopedPointer<GitMerge> gitMerge(new GitMerge(mGit, mCache));
-            const auto ret = gitMerge->squashMerge(mGit->getCurrentBranch(), { auxBranch2 }, msg);
+            auto ret = gitMerge->squashMerge(mGit->getCurrentBranch(), { auxBranch2 }, msg);
+
+            if (ret.success)
+               WipHelper::update(mGit, mCache);
 
             gitBranches->removeLocalBranch(auxBranch2);
 
@@ -123,7 +126,11 @@ void SquashDlg::accept()
             gitBranches->rebaseOnto(destBranch, auxBranch1, auxBranch3);
             gitBranches->removeLocalBranch(auxBranch1);
             gitBranches->checkoutLocalBranch(destBranch);
-            gitMerge->merge(destBranch, { auxBranch3 });
+            ret = gitMerge->merge(destBranch, { auxBranch3 });
+
+            if (ret.success)
+               WipHelper::update(mGit, mCache);
+
             gitBranches->removeLocalBranch(auxBranch3);
          }
       }

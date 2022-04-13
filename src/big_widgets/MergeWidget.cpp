@@ -12,6 +12,7 @@
 #include <QPinnableTabWidget.h>
 #include <RevisionFiles.h>
 #include <WipDiffWidget.h>
+#include <WipHelper.h>
 
 #include <QFile>
 #include <QLabel>
@@ -182,7 +183,7 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
 void MergeWidget::changeDiffView(QListWidgetItem *item)
 {
    const auto file = item->text();
-   const auto wip = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
+   const auto wip = mGitQlientCache->commitInfo(ZERO_SHA);
    const auto status = static_cast<GitWip::FileStatus>(item->data(Qt::UserRole + 1).toInt());
 
    if (status != GitWip::FileStatus::BothModified)
@@ -392,12 +393,11 @@ void MergeWidget::cherryPickCommit()
          if (errorMsg.contains("error: could not apply", Qt::CaseInsensitive)
              && errorMsg.contains("after resolving the conflicts", Qt::CaseInsensitive))
          {
-            const auto wipCommit = mGitQlientCache->commitInfo(CommitInfo::ZERO_SHA);
+            const auto wipCommit = mGitQlientCache->commitInfo(ZERO_SHA);
 
-            QScopedPointer<GitWip> git(new GitWip(mGit, mGitQlientCache));
-            git->updateWip();
+            WipHelper::update(mGit, mGitQlientCache);
 
-            const auto files = mGitQlientCache->revisionFile(CommitInfo::ZERO_SHA, wipCommit.firstParent());
+            const auto files = mGitQlientCache->revisionFile(ZERO_SHA, wipCommit.firstParent());
 
             if (files)
                configureForCherryPick(files.value(), shas);

@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <CommitInfo.h>
+#include <GitExecResult.h>
 #include <RevisionFiles.h>
 #include <lanes.h>
 
@@ -74,7 +75,6 @@ public:
    QString getShaOfReference(const QString &referenceName, References::Type type) const;
    void reloadCurrentBranchInfo(const QString &currentBranch, const QString &currentSha);
 
-   QVector<QString> getUntrackedFiles() const { return mUntrackedFiles; }
    void setUntrackedFilesList(QVector<QString> untrackedFiles);
    bool pendingLocalChanges();
 

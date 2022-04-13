@@ -94,7 +94,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
          newOpt.font.setPointSize(8);
          newOpt.font.setFamily("DejaVu Sans Mono");
 
-         text = commit.sha != CommitInfo::ZERO_SHA ? text.left(8) : "";
+         text = commit.sha != ZERO_SHA ? text.left(8) : "";
       }
       else if (index.column() == static_cast<int>(CommitHistoryColumns::Author) && commit.isSigned())
       {
@@ -143,7 +143,7 @@ bool RepositoryViewDelegate::editorEvent(QEvent *event, QAbstractItemModel *mode
    else if (event->type() == QEvent::MouseButtonRelease && cursorColumn == index.column() && mColumnPressed != -1)
    {
       const auto text = index.data().toString();
-      if (cursorColumn == static_cast<int>(CommitHistoryColumns::Sha) && text != CommitInfo::ZERO_SHA)
+      if (cursorColumn == static_cast<int>(CommitHistoryColumns::Sha) && text != ZERO_SHA)
       {
          QApplication::clipboard()->setText(text);
          QToolTip::showText(QCursor::pos(), tr("Copied!"), mView);
@@ -364,7 +364,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    }
    else
    {
-      if (commit.sha == CommitInfo::ZERO_SHA)
+      if (commit.sha == ZERO_SHA)
       {
          const auto activeColor = GitQlientStyles::getBranchColorAt(0);
          QColor color = activeColor;

@@ -5,6 +5,7 @@
 #include <GitBranches.h>
 #include <GitCache.h>
 #include <GitConfig.h>
+#include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
 
@@ -59,9 +60,12 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
 
 void BranchContextMenu::pull()
 {
+   GitQlientSettings settings(mConfig.mGit->getGitDir());
+   const auto updateOnPull = settings.localValue("UpdateOnPull", true).toBool();
+
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
-   const auto ret = git->pull();
+   const auto ret = git->pull(updateOnPull);
    QApplication::restoreOverrideCursor();
 
    if (ret.success)
@@ -90,9 +94,12 @@ void BranchContextMenu::pull()
 
 void BranchContextMenu::fetch()
 {
+   GitQlientSettings settings(mConfig.mGit->getGitDir());
+   const auto pruneOnFetch = settings.localValue("PruneOnFetch", true).toBool();
+
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
-   const auto ret = git->fetch();
+   const auto ret = git->fetch(pruneOnFetch);
    QApplication::restoreOverrideCursor();
 
    if (ret)

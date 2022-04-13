@@ -142,7 +142,7 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
 
       annotations.append({ revision.sha, name, dt, lineText.toInt(), content });
 
-      if (revision.sha != CommitInfo::ZERO_SHA)
+      if (revision.sha != ZERO_SHA)
       {
          const auto dtSinceEpoch = dt.toSecsSinceEpoch();
 
@@ -223,7 +223,7 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
 
 QLabel *FileBlameWidget::createDateLabel(const Annotation &annotation, bool isFirst)
 {
-   auto isWip = annotation.sha == CommitInfo::ZERO_SHA;
+   auto isWip = annotation.sha == ZERO_SHA;
    QString when;
 
    if (!isWip)
@@ -300,7 +300,7 @@ QLabel *FileBlameWidget::createNumLabel(const Annotation &annotation, int row)
    numberLabel->setObjectName("numberLabel");
    numberLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
 
-   if (annotation.sha != CommitInfo::ZERO_SHA)
+   if (annotation.sha != ZERO_SHA)
    {
       const auto dtSinceEpoch = annotation.dateTime.toSecsSinceEpoch();
       const auto colorIndex = qCeil((kSecondsNewest - dtSinceEpoch) / kIncrementSecs);
