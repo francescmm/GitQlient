@@ -7,3 +7,6 @@
 [submodule "src/AuxiliarCustomWidgets"]
 	path = src/AuxiliarCustomWidgets
 	url = https://github.com/francescmm/AuxiliarCustomWidgets.git
+[submodule "src/git"]
+	path = src/git
+	url = https://github.com/francescmm/git.git
