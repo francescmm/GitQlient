@@ -1,16 +1,19 @@
 #include "PrChangesList.h"
 
 #include <DiffHelper.h>
-#include <GitHistory.h>
 #include <FileDiffView.h>
+#include <GitConfig.h>
+#include <GitHistory.h>
+#include <GitRemote.h>
+
 #include <PrChangeListItem.h>
 #include <PullRequest.h>
-#include <GitRemote.h>
-#include <GitConfig.h>
+
 #include <QLogger.h>
 
 #include <QGridLayout>
 #include <QLabel>
+#include <QMessageBox>
 #include <QScrollArea>
 
 using namespace GitServer;
@@ -47,9 +50,7 @@ void PrChangesList::loadData(const GitServer::PullRequest &prInfo)
             QScopedPointer<GitRemote> git(new GitRemote(mGit));
             const auto remoteAdded = git->addRemote(prInfo.headUrl, prInfo.headRepo.split("/").constFirst());
 
-            showDiff = remoteAdded.success;
-
-            if (!showDiff)
+            if (!remoteAdded.success)
                QLog_Warning("UI", QString("Problems adding a remote: {%1}").arg(remoteAdded.output));
          }
          else

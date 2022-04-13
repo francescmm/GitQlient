@@ -1,6 +1,5 @@
 #include <GitServerCache.h>
 
-#include <GitQlientSettings.h>
 #include <GitConfig.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
@@ -17,19 +16,14 @@ GitServerCache::GitServerCache(QObject *parent)
 
 GitServerCache::~GitServerCache() { }
 
-bool GitServerCache::init(const QString &serverUrl, const QPair<QString, QString> &repoInfo)
+bool GitServerCache::init(GitServer::ConfigData data)
 {
    mInit = true;
 
-   GitQlientSettings settings;
-   const auto userName = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
-   const auto userToken = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
-   const auto endpoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
-
-   if (serverUrl.contains("github"))
-      mApi.reset(new GitHubRestApi(repoInfo.first, repoInfo.second, { userName, userToken, endpoint }));
-   else if (serverUrl.contains("gitlab"))
-      mApi.reset(new GitLabRestApi(userName, repoInfo.second, serverUrl, { userName, userToken, endpoint }));
+   if (data.serverUrl.contains("github"))
+      mApi.reset(new GitHubRestApi(data.repoOwner, data.repoName, { data.user, data.token, data.endPoint }));
+   else if (data.serverUrl.contains("gitlab"))
+      mApi.reset(new GitLabRestApi(data.user, data.repoName, data.serverUrl, { data.user, data.token, data.endPoint }));
    else
    {
       mInit = false;

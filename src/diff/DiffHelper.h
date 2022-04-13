@@ -58,7 +58,7 @@ inline void extractLinesFromHeader(QString header, int &startOldFile, int &start
 
 inline QVector<DiffChange> splitDiff(const QString &diff)
 {
-   QVector<DiffHelper::DiffChange> changes;
+   QVector<DiffChange> changes;
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
    const auto flag = Qt::SkipEmptyParts;
@@ -71,7 +71,7 @@ inline QVector<DiffChange> splitDiff(const QString &diff)
    for (const auto &chunk : chunks)
    {
       auto lines = chunk.split("\n");
-      DiffHelper::DiffChange change;
+      DiffChange change;
 
       auto filesStr = lines.takeFirst();
       auto files = filesStr.trimmed().split(" ");

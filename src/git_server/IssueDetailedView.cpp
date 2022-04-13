@@ -21,13 +21,14 @@
 using namespace GitServer;
 
 IssueDetailedView::IssueDetailedView(const QSharedPointer<GitBase> &git,
-                                     const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
+                                     const QSharedPointer<GitServerCache> &gitServerCache, const QString &style,
+                                     QWidget *parent)
    : QFrame(parent)
    , mGitServerCache(gitServerCache)
    , mBtnGroup(new QButtonGroup())
    , mTitleLabel(new QLabel())
    , mStackedLayout(new QStackedLayout())
-   , mPrCommentsList(new PrCommentsList(mGitServerCache))
+   , mPrCommentsList(new PrCommentsList(mGitServerCache, style))
    , mPrChangesList(new PrChangesList(git))
    , mPrCommitsList(new PrCommitsList(mGitServerCache))
    , mReviewBtn(new QToolButton())

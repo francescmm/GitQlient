@@ -72,7 +72,15 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    const auto serverUrl = gitConfig->getServerHost();
    const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
-   mGitServerCache->init(serverUrl, repoInfo);
+   GitServer::ConfigData data;
+   data.user = mSettings->globalValue(QString("%1/user").arg(serverUrl)).toString();
+   data.token = mSettings->globalValue(QString("%1/token").arg(serverUrl)).toString();
+   data.endPoint = mSettings->globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
+   data.repoOwner = repoInfo.first;
+   data.repoName = repoInfo.second;
+   data.serverUrl = serverUrl;
+
+   mGitServerCache->init(data);
 
    mHistoryWidget->setContentsMargins(QMargins(5, 5, 5, 5));
    mDiffWidget->setContentsMargins(QMargins(5, 5, 5, 5));
@@ -478,12 +486,16 @@ bool GitQlientRepo::configureGitServer() const
       data.user = user;
       data.token = token;
       data.serverUrl = serverUrl;
-      data.repoInfo = repoInfo;
+      data.repoOwner = repoInfo.first;
+      data.repoName = repoInfo.second;
 
       isConfigured = mGitServerWidget->configure(data);
    }
    else
       isConfigured = true;
+
+   if (isConfigured)
+      mGitServerWidget->start();
 
    return isConfigured;
 }

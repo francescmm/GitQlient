@@ -1,40 +1,41 @@
 #include "PrCommentsList.h"
 
-#include <GitServerCache.h>
+#include <AvatarHelper.h>
+#include <ButtonLink.hpp>
+#include <CircularPixmap.h>
+#include <CodeReviewComment.h>
+#include <Colors.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
-#include <CircularPixmap.h>
+#include <GitServerCache.h>
 #include <SourceCodeReview.h>
-#include <AvatarHelper.h>
-#include <CodeReviewComment.h>
-#include <ButtonLink.hpp>
-#include <Colors.h>
 #include <previewpage.h>
-#include <GitQlientSettings.h>
 
-#include <QNetworkAccessManager>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QScrollArea>
 #include <QDir>
 #include <QFile>
-#include <QStandardPaths>
-#include <QNetworkReply>
-#include <QTextEdit>
-#include <QPropertyAnimation>
-#include <QSequentialAnimationGroup>
-#include <QPushButton>
 #include <QIcon>
+#include <QLabel>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QPropertyAnimation>
+#include <QPushButton>
+#include <QScrollArea>
 #include <QScrollBar>
+#include <QSequentialAnimationGroup>
+#include <QStandardPaths>
+#include <QTextEdit>
+#include <QVBoxLayout>
 #include <QWebChannel>
 #include <QWebEngineView>
 
 using namespace GitServer;
 
-PrCommentsList::PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
+PrCommentsList::PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, const QString &styleName,
+                               QWidget *parent)
    : QFrame(parent)
    , mMutex(QMutex::Recursive)
    , mGitServerCache(gitServerCache)
+   , mStyleName(styleName)
    , mManager(new QNetworkAccessManager())
 {
    setObjectName("IssuesViewFrame");
@@ -212,10 +213,6 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    const auto bodyDescLayout = new QVBoxLayout(bodyDescFrame);
    bodyDescLayout->setContentsMargins(10, 10, 10, 10);
 
-   GitQlientSettings settings("");
-   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
-   const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
-
    QPointer<QWebEngineView> body = new QWebEngineView();
 
    PreviewPage *page = new PreviewPage(this);
@@ -225,7 +222,7 @@ void PrCommentsList::loadData(PrCommentsList::Config config, int issueNumber)
    channel->registerObject(QStringLiteral("content"), &m_content);
    page->setWebChannel(channel);
 
-   body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
+   body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(mStyleName)));
    body->setFixedHeight(20);
 
    connect(page, &PreviewPage::contentsSizeChanged, this, [body](const QSizeF size) {
@@ -394,10 +391,6 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
    creationLayout->addStretch();
    creationLayout->addWidget(new QLabel(comment.association));
 
-   GitQlientSettings settings("");
-   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
-   const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
-
    const auto doc = new Document(this);
    m_commentContents.append(doc);
 
@@ -415,7 +408,7 @@ QLayout *PrCommentsList::createBubbleForComment(const Comment &comment)
    });
 
    body->setPage(page);
-   body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
+   body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(mStyleName)));
    body->setFixedHeight(20);
 
    doc->setText(comment.body.trimmed());

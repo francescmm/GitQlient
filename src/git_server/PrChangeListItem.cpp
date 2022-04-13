@@ -1,9 +1,9 @@
 #include "PrChangeListItem.h"
 
+#include <AddCodeReviewDialog.h>
 #include <DiffHelper.h>
 #include <FileDiffView.h>
 #include <LineNumberArea.h>
-#include <AddCodeReviewDialog.h>
 
 #include <QGridLayout>
 #include <QLabel>

@@ -70,6 +70,11 @@ public:
     */
    void openPullRequest(int prNumber);
 
+   /**
+    * @brief createWidget Creates all the contents of the GitServerWidget.
+    */
+   void start();
+
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
@@ -83,9 +88,4 @@ private:
    QPushButton *mOldPr = nullptr;
    QPushButton *mRefresh = nullptr;
    bool mConfigured = false;
-
-   /**
-    * @brief createWidget Creates all the contents of the GitServerWidget.
-    */
-   void createWidget();
 };

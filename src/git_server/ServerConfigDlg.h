@@ -49,9 +49,6 @@ class ServerConfigDlg : public QDialog
 {
    Q_OBJECT
 
-signals:
-   void configured();
-
 public:
    /**
     * @brief Constructor builds the UI layout and configures some widgets based on the configuration.
@@ -59,17 +56,20 @@ public:
     * @param parent The parent widget if needed
     */
    explicit ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServerCache, const GitServer::ConfigData &data,
-                            QWidget *parent = nullptr);
+                            const QString &styleSheet, QWidget *parent = nullptr);
    /**
     * @brief Destructor that deallocates the Ui::ServerConfigDlg class.
     */
    ~ServerConfigDlg() override;
+
+   GitServer::ConfigData getNewConfigData() const;
 
 private:
    Ui::ServerConfigDlg *ui = nullptr;
    QSharedPointer<GitServerCache> mGitServerCache;
    GitServer::ConfigData mData;
    QNetworkAccessManager *mManager;
+   QString mEndPoint;
 
    /**
     * @brief Validates the provided token by the user.
@@ -94,14 +94,4 @@ private:
     * @brief onTestSucceeded Notifies the user through the UI that the connection test succeeded.
     */
    void onTestSucceeded();
-
-   /**
-    * @brief onGitServerError Notifies the user that an error happened in the API connection or data exchange.
-    */
-   void onGitServerError(const QString &error);
-
-   /**
-    * @brief onDataValidated Stores the data in the settings and sends a success signal. Finally it closes the dialog.
-    */
-   void onDataValidated();
 };

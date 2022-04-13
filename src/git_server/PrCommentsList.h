@@ -23,8 +23,8 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <Issue.h>
 #include <GitServerCache.h>
+#include <Issue.h>
 #include <document.h>
 
 #include <QFrame>
@@ -72,7 +72,8 @@ public:
       PullRequests
    };
 
-   explicit PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+   explicit PrCommentsList(const QSharedPointer<GitServerCache> &gitServerCache, const QString &styleName,
+                           QWidget *parent = nullptr);
    ~PrCommentsList();
 
    void loadData(Config config, int issueNumber);
@@ -82,6 +83,7 @@ public:
 private:
    QMutex mMutex;
    QSharedPointer<GitServerCache> mGitServerCache = nullptr;
+   QString mStyleName;
    QNetworkAccessManager *mManager = nullptr;
    QFrame *mCommentsFrame = nullptr;
    QVBoxLayout *mIssuesLayout = nullptr;

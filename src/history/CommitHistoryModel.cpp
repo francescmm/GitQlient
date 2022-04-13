@@ -4,7 +4,6 @@
 #include <CommitInfo.h>
 #include <GitBase.h>
 #include <GitCache.h>
-#include <GitServerCache.h>
 
 #include <QDateTime>
 #include <QLocale>

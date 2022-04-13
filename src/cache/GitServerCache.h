@@ -23,13 +23,14 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QObject>
 #include <QMap>
+#include <QObject>
 #include <QVector>
 
-#include <PullRequest.h>
+#include <ConfigData.h>
 #include <Issue.h>
 #include <Platform.h>
+#include <PullRequest.h>
 
 namespace GitServer
 {
@@ -57,7 +58,7 @@ public:
    explicit GitServerCache(QObject *parent = nullptr);
    ~GitServerCache();
 
-   bool init(const QString &serverUrl, const QPair<QString, QString> &repoInfo);
+   bool init(GitServer::ConfigData data);
 
    QString getUserName() const;
 

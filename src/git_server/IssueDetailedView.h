@@ -56,7 +56,7 @@ public:
       PullRequests
    };
    explicit IssueDetailedView(const QSharedPointer<GitBase> &git, const QSharedPointer<GitServerCache> &gitServerCache,
-                              QWidget *parent = nullptr);
+                              const QString &style, QWidget *parent = nullptr);
    ~IssueDetailedView();
 
    void loadData(Config config, int issueNum, bool force = false);

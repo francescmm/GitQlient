@@ -1,12 +1,8 @@
 ﻿#include "ServerConfigDlg.h"
 #include "ui_ServerConfigDlg.h"
 
-#include <GitBase.h>
-#include <GitConfig.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
-#include <GitQlientSettings.h>
-#include <GitQlientStyles.h>
 #include <GitServerCache.h>
 
 #include <QLogger.h>
@@ -43,14 +39,14 @@ static const QMap<GitServerPlatform, const char *> repoUrls { { GitHub, "https:/
 }
 
 ServerConfigDlg::ServerConfigDlg(const QSharedPointer<GitServerCache> &gitServerCache,
-                                 const GitServer::ConfigData &data, QWidget *parent)
+                                 const GitServer::ConfigData &data, const QString &styleSheet, QWidget *parent)
    : QDialog(parent)
    , ui(new Ui::ServerConfigDlg)
    , mGitServerCache(gitServerCache)
    , mData(data)
    , mManager(new QNetworkAccessManager())
 {
-   setStyleSheet(GitQlientStyles::getStyles());
+   setStyleSheet(styleSheet);
 
    ui->setupUi(this);
 
@@ -98,6 +94,12 @@ ServerConfigDlg::~ServerConfigDlg()
    delete ui;
 }
 
+ConfigData ServerConfigDlg::getNewConfigData() const
+{
+   return GitServer::ConfigData { ui->leUserName->text(), ui->leUserToken->text(), mData.serverUrl, mEndPoint,
+                                  mData.repoName,         mData.repoOwner };
+}
+
 void ServerConfigDlg::checkToken()
 {
    if (ui->leUserToken->text().isEmpty())
@@ -106,17 +108,8 @@ void ServerConfigDlg::checkToken()
 
 void ServerConfigDlg::accept()
 {
-   const auto endpoint = ui->cbServer->currentIndex() == GitHubEnterprise ? ui->leEndPoint->text()
-                                                                          : ui->cbServer->currentData().toString();
-   GitQlientSettings settings("");
-   settings.setGlobalValue(QString("%1/user").arg(mData.serverUrl), ui->leUserName->text());
-   settings.setGlobalValue(QString("%1/token").arg(mData.serverUrl), ui->leUserToken->text());
-   settings.setGlobalValue(QString("%1/endpoint").arg(mData.serverUrl), endpoint);
-
-   connect(mGitServerCache.get(), &GitServerCache::errorOccurred, this, &ServerConfigDlg::onGitServerError);
-   connect(mGitServerCache.get(), &GitServerCache::connectionTested, this, [this]() { onDataValidated(); });
-
-   mGitServerCache->init(mData.serverUrl, qMakePair(mData.repoOwner, mData.repoName));
+   mEndPoint = ui->cbServer->currentIndex() == GitHubEnterprise ? ui->leEndPoint->text()
+                                                                : ui->cbServer->currentData().toString();
 }
 
 void ServerConfigDlg::testToken()
@@ -143,7 +136,8 @@ void ServerConfigDlg::testToken()
       api->testConnection();
 
       connect(api, &IRestApi::connectionTested, this, &ServerConfigDlg::onTestSucceeded);
-      connect(api, &IRestApi::errorOccurred, this, &ServerConfigDlg::onGitServerError);
+      connect(api, &IRestApi::errorOccurred, this,
+              [this](const QString &error) { QMessageBox::warning(this, tr("API access error!"), error); });
    }
 }
 
@@ -156,16 +150,4 @@ void ServerConfigDlg::onTestSucceeded()
 {
    ui->lTestResult->setText(tr("Token confirmed!"));
    QTimer::singleShot(3000, ui->lTestResult, &QLabel::clear);
-}
-
-void ServerConfigDlg::onGitServerError(const QString &error)
-{
-   QMessageBox::warning(this, tr("API access error!"), error);
-}
-
-void ServerConfigDlg::onDataValidated()
-{
-   emit configured();
-
-   QDialog::accept();
 }

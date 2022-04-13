@@ -5,6 +5,8 @@
 #include <GitBase.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
+#include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
 #include <GitServerCache.h>
 #include <IssueDetailedView.h>
 #include <IssuesList.h>
@@ -46,14 +48,27 @@ bool GitServerWidget::configure(const GitServer::ConfigData &config)
 
    if (config.user.isEmpty() || config.token.isEmpty())
    {
-      const auto configDlg = new ServerConfigDlg(mGitServerCache, config, this);
+      const auto configDlg = new ServerConfigDlg(mGitServerCache, config, GitQlientStyles::getStyles(), this);
+      connect(mGitServerCache.get(), &GitServerCache::errorOccurred, this,
+              [this](const QString &error) { QMessageBox::warning(this, tr("API access error!"), error); });
+      connect(mGitServerCache.get(), &GitServerCache::connectionTested, this, &GitServerWidget::start);
+
       mConfigured = configDlg->exec() == QDialog::Accepted;
+
+      if (mConfigured)
+      {
+         const auto data = configDlg->getNewConfigData();
+
+         GitQlientSettings settings("");
+         settings.setGlobalValue(QString("%1/user").arg(data.serverUrl), data.user);
+         settings.setGlobalValue(QString("%1/token").arg(data.serverUrl), data.token);
+         settings.setGlobalValue(QString("%1/endpoint").arg(data.serverUrl), data.endPoint);
+
+         mGitServerCache->init(std::move(data));
+      }
    }
    else
       mConfigured = true;
-
-   if (mConfigured)
-      createWidget();
 
    return mConfigured;
 }
@@ -63,7 +78,7 @@ void GitServerWidget::openPullRequest(int prNumber)
    mDetailedView->loadData(IssueDetailedView::Config::PullRequests, prNumber);
 }
 
-void GitServerWidget::createWidget()
+void GitServerWidget::start()
 {
    const auto prLabel = QString::fromUtf8(
        mGitServerCache->getPlatform() == GitServer::Platform::GitHub ? "pull request" : "merge request");
@@ -93,7 +108,8 @@ void GitServerWidget::createWidget()
    buttonsLayout->addWidget(refresh);
    buttonsLayout->addStretch();
 
-   mDetailedView = new IssueDetailedView(mGit, mGitServerCache);
+   mDetailedView = new IssueDetailedView(mGit, mGitServerCache,
+                                         GitQlientSettings().globalValue("colorSchema", "dark").toString());
 
    const auto issues = new IssuesList(mGitServerCache);
    connect(issues, &AGitServerItemList::selected, mDetailedView,
