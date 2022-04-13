@@ -11,10 +11,6 @@ FORMS += \
 
 HEADERS += \
     $$PWD/BranchDlg.h \
-    $$PWD/ButtonLink.hpp \
-    $$PWD/CheckBox.h \
-    $$PWD/ClickableFrame.h \
-    $$PWD/Colors.h \
     $$PWD/CommitInfoPanel.h \
     $$PWD/ConflictButton.h \
     $$PWD/CreateRepoDlg.h \
@@ -32,9 +28,6 @@ HEADERS += \
 
 SOURCES += \
     $$PWD/BranchDlg.cpp \
-    $$PWD/ButtonLink.cpp \
-    $$PWD/CheckBox.cpp \
-    $$PWD/ClickableFrame.cpp \
     $$PWD/CommitInfoPanel.cpp \
     $$PWD/ConflictButton.cpp \
     $$PWD/CreateRepoDlg.cpp \

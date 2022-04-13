@@ -99,16 +99,16 @@ QColor GitQlientStyles::getOrange()
 
 QColor GitQlientStyles::getShadowedRed()
 {
-   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+   const auto colorScheme = GitQlientSettings().globalValue("colorSchema", "dark").toString();
 
-   return colorSchema == "dark" ? QColor(255, 85, 85, 255 * 0.45) : QColor(255, 85, 85, 255 * 0.65);
+   return colorScheme == "dark" ? editorRedShadowDark : editorRedShadowBright;
 }
 
 QColor GitQlientStyles::getShadowedGreen()
 {
-   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+   const auto colorScheme = GitQlientSettings().globalValue("colorSchema", "dark").toString();
 
-   return colorSchema == "dark" ? QColor(141, 201, 68, 255 * 0.45) : QColor(141, 201, 68, 255 * 0.65);
+   return colorScheme == "dark" ? editorGreenShadowDark : editorGreenShadowBright;
 }
 
 std::array<QColor, GitQlientStyles::kBranchColors> GitQlientStyles::getBranchColors()

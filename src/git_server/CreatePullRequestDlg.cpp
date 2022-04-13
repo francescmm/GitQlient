@@ -1,10 +1,8 @@
 #include "CreatePullRequestDlg.h"
 #include "ui_CreatePullRequestDlg.h"
 
-#include <GitCache.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
-#include <GitQlientSettings.h>
 #include <GitServerCache.h>
 #include <Issue.h>
 #include <Label.h>
@@ -15,17 +13,17 @@
 
 #include <QFile>
 #include <QMessageBox>
+#include <QSettings>
 #include <QStandardItemModel>
 #include <QTimer>
 #include <QWebChannel>
 
 using namespace GitServer;
 
-CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache,
-                                           const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent)
+CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitServerCache> &gitServerCache,
+                                           QVector<QPair<QString, QStringList>> remoteBranches, QWidget *parent)
    : QFrame(parent)
    , ui(new Ui::CreatePullRequestDlg)
-   , mCache(cache)
    , mGitServerCache(gitServerCache)
 {
    setAttribute(Qt::WA_DeleteOnClose);
@@ -41,16 +39,14 @@ CreatePullRequestDlg::CreatePullRequestDlg(const QSharedPointer<GitCache> &cache
    onMilestones(mGitServerCache->getMilestones());
    onLabels(mGitServerCache->getLabels());
 
-   auto branches = mCache->getBranches(References::Type::RemoteBranches);
-
-   for (const auto &value : qAsConst(branches))
+   for (const auto &value : qAsConst(remoteBranches))
    {
       ui->cbOrigin->addItems(value.second);
       ui->cbDestination->addItems(value.second);
    }
 
-   branches.clear();
-   branches.squeeze();
+   remoteBranches.clear();
+   remoteBranches.squeeze();
 }
 
 bool CreatePullRequestDlg::configure(const QString &workingDir, const QString &currentBranch)
@@ -72,19 +68,16 @@ bool CreatePullRequestDlg::configure(const QString &workingDir, const QString &c
       const auto fileContent = f.readAll();
       f.close();
 
-      GitQlientSettings settings("");
-      const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
-      const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
-
-      PreviewPage *page = new PreviewPage(this);
+      const auto page = new PreviewPage(this);
       ui->preview->setPage(page);
       ui->teDescription->setText(QString::fromUtf8(fileContent));
 
-      QWebChannel *channel = new QWebChannel(this);
+      const auto channel = new QWebChannel(this);
       channel->registerObject(QStringLiteral("content"), &m_content);
       page->setWebChannel(channel);
 
-      ui->preview->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
+      ui->preview->setUrl(
+          QUrl(QString("qrc:/resources/index_%1.html").arg(QSettings().value("colorSchema", "dark").toString())));
    }
 
    return true;

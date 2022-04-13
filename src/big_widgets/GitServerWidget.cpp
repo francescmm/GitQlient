@@ -3,6 +3,7 @@
 #include <CreateIssueDlg.h>
 #include <CreatePullRequestDlg.h>
 #include <GitBase.h>
+#include <GitCache.h>
 #include <GitHubRestApi.h>
 #include <GitLabRestApi.h>
 #include <GitQlientSettings.h>
@@ -148,7 +149,9 @@ void GitServerWidget::start()
    mGeneralView->setLayout(generalViewLayout);
 
    mCreateIssueView = new CreateIssueDlg(mGitServerCache, mGit->getWorkingDir(), this);
-   mCreatePrView = new CreatePullRequestDlg(mCache, mGitServerCache, this);
+
+   mCreatePrView
+       = new CreatePullRequestDlg(mGitServerCache, mCache->getBranches(References::Type::RemoteBranches), this);
 
    mStackedLayout = new QStackedLayout();
    mStackedLayout->addWidget(mGeneralView);

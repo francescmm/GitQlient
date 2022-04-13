@@ -1,3 +1,4 @@
+include($$PWD/AuxiliarCustomWidgets/AuxiliarCustomWidgets.pri)
 include($$PWD/aux_widgets/AuxiliarWidgets.pri)
 include($$PWD/big_widgets/BigWidgets.pri)
 include($$PWD/branches/Branches.pri)

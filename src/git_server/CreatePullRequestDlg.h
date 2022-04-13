@@ -64,8 +64,8 @@ public:
     * @param git The git object to perform Git operations.
     * @param parent The parent widget.
     */
-   explicit CreatePullRequestDlg(const QSharedPointer<GitCache> &cache,
-                                 const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+   explicit CreatePullRequestDlg(const QSharedPointer<GitServerCache> &gitServerCache,
+                                 QVector<QPair<QString, QStringList>> remoteBranches, QWidget *parent = nullptr);
 
    bool configure(const QString &workingDir, const QString &currentBranch);
 
@@ -76,7 +76,6 @@ public:
 
 private:
    Ui::CreatePullRequestDlg *ui;
-   QSharedPointer<GitCache> mCache;
    QSharedPointer<GitServerCache> mGitServerCache;
    Document m_content;
 

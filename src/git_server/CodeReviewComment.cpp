@@ -1,16 +1,16 @@
 #include <CodeReviewComment.h>
 
-#include <Comment.h>
 #include <AvatarHelper.h>
+#include <Comment.h>
 #include <previewpage.h>
-#include <GitQlientSettings.h>
 
-#include <QVBoxLayout>
-#include <QTextEdit>
 #include <QLabel>
 #include <QLocale>
-#include <QWebEngineView>
+#include <QSettings>
+#include <QTextEdit>
+#include <QVBoxLayout>
 #include <QWebChannel>
+#include <QWebEngineView>
 
 CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidget *parent)
    : QFrame(parent)
@@ -28,19 +28,15 @@ CodeReviewComment::CodeReviewComment(const GitServer::CodeReview &review, QWidge
    avatarLayout->addWidget(creator);
    avatarLayout->addStretch();
 
-   GitQlientSettings settings("");
-   const auto colorSchema = settings.globalValue("colorSchema", "dark").toString();
-   const auto style = colorSchema == "dark" ? QString::fromUtf8("dark") : QString::fromUtf8("bright");
-
    QPointer<QWebEngineView> body = new QWebEngineView();
-   PreviewPage *page = new PreviewPage(this);
+   const auto page = new PreviewPage(this);
    body->setPage(page);
 
-   QWebChannel *channel = new QWebChannel(this);
+   const auto channel = new QWebChannel(this);
    channel->registerObject(QStringLiteral("content"), &m_content);
    page->setWebChannel(channel);
 
-   body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(style)));
+   body->setUrl(QUrl(QString("qrc:/resources/index_%1.html").arg(QSettings().value("colorSchema", "dark").toString())));
    body->setFixedHeight(20);
 
    connect(page, &PreviewPage::contentsSizeChanged, this, [body](const QSizeF size) {
