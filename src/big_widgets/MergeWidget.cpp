@@ -169,7 +169,7 @@ void MergeWidget::fillButtonFileList(const RevisionFiles &files)
       const auto item = new QListWidgetItem(fileName);
       item->setData(Qt::UserRole, fileInConflict);
 
-      QScopedPointer<GitWip> git(new GitWip(mGit, mGitQlientCache));
+      QScopedPointer<GitWip> git(new GitWip(mGit));
 
       if (fileInConflict && fileDeleted)
          item->setData(Qt::UserRole + 1, static_cast<int>(git->getFileStatus(fileName).value()));
@@ -232,7 +232,7 @@ void MergeWidget::abort()
    {
       case ConflictReason::Pull:
       case ConflictReason::Merge: {
-         QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
+         QScopedPointer<GitMerge> git(new GitMerge(mGit));
          ret = git->abortMerge();
          break;
       }
@@ -309,7 +309,7 @@ void MergeWidget::commit()
       {
          case ConflictReason::Pull:
          case ConflictReason::Merge: {
-            QScopedPointer<GitMerge> git(new GitMerge(mGit, mGitQlientCache));
+            QScopedPointer<GitMerge> git(new GitMerge(mGit));
             ret = git->applyMerge(msg);
             break;
          }

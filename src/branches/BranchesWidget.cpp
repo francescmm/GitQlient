@@ -65,7 +65,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
-   , mGitTags(new GitTags(mGit, mCache))
+   , mGitTags(new GitTags(mGit))
    , mLocalBranchesCount(new QLabel("(0)"))
    , mLocalBranchesArrow(new QLabel())
    , mLocalBranchesTree(new BranchTreeWidget(mCache, mGit))

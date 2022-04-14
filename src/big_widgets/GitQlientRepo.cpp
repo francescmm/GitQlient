@@ -370,7 +370,7 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
    if (mWaitDlg)
       mWaitDlg->close();
 
-   if (QScopedPointer<GitMerge> gitMerge(new GitMerge(mGitBase, mGitQlientCache)); gitMerge->isInMerge())
+   if (QScopedPointer<GitMerge> gitMerge(new GitMerge(mGitBase)); gitMerge->isInMerge())
    {
       mControls->activateMergeWarning();
       showWarningMerge();

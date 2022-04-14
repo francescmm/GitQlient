@@ -24,7 +24,7 @@ GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<Git
    , mGitBase(gitBase)
    , mRevCache(std::move(cache))
    , mSettings(settings)
-   , mGitTags(new GitTags(mGitBase, mRevCache))
+   , mGitTags(new GitTags(mGitBase))
 {
    connect(mGitTags.get(), &GitTags::remoteTagsReceived, mRevCache.get(), &GitCache::updateTags);
 }
@@ -264,7 +264,7 @@ void GitRepoLoader::processRevisions(QByteArray ba)
    if (!ba.isEmpty())
    {
       auto commits = showSignature ? processSignedLog(ba) : processUnsignedLog(ba);
-      QScopedPointer<GitWip> git(new GitWip(mGitBase, mRevCache));
+      QScopedPointer<GitWip> git(new GitWip(mGitBase));
       const auto files = git->getUntrackedFiles();
 
       mRevCache->setUntrackedFilesList(std::move(files));

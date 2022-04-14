@@ -414,7 +414,7 @@ void HistoryWidget::onShowAllUpdated(bool showAll)
 void HistoryWidget::mergeBranch(const QString &current, const QString &branchToMerge)
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<GitMerge> git(new GitMerge(mGit, mCache));
+   QScopedPointer<GitMerge> git(new GitMerge(mGit));
    const auto ret = git->merge(current, { branchToMerge });
 
    if (ret.success)
@@ -430,7 +430,7 @@ void HistoryWidget::mergeBranch(const QString &current, const QString &branchToM
 void HistoryWidget::mergeSquashBranch(const QString &current, const QString &branchToMerge)
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-   QScopedPointer<GitMerge> git(new GitMerge(mGit, mCache));
+   QScopedPointer<GitMerge> git(new GitMerge(mGit));
    const auto ret = git->squashMerge(current, { branchToMerge });
 
    if (ret.success)

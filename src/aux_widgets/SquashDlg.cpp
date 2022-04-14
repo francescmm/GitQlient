@@ -112,7 +112,7 @@ void SquashDlg::accept()
             gitLocal->resetCommit(mShas.constFirst(), GitLocal::CommitResetType::HARD);
 
             // Merge squash auxiliary branch 2
-            QScopedPointer<GitMerge> gitMerge(new GitMerge(mGit, mCache));
+            QScopedPointer<GitMerge> gitMerge(new GitMerge(mGit));
             auto ret = gitMerge->squashMerge(mGit->getCurrentBranch(), { auxBranch2 }, msg);
 
             if (ret.success)
