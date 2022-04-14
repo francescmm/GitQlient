@@ -9,10 +9,10 @@
 #include <GitCache.h>
 #include <GitLocal.h>
 #include <GitQlientStyles.h>
-#include <GitServerCache.h>
+#include <GitServerTypes.h>
+#include <IGitServerCache.h>
 #include <Lane.h>
 #include <LaneType.h>
-#include <PullRequest.h>
 
 #include <QApplication>
 #include <QClipboard>
@@ -24,13 +24,13 @@
 #include <QToolTip>
 #include <QUrl>
 
-using namespace GitServer;
+using namespace GitServerPlugin;
 
 static const int MIN_VIEW_WIDTH_PX = 480;
 
 RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<GitCache> &cache,
                                                const QSharedPointer<GitBase> &git,
-                                               const QSharedPointer<GitServerCache> &gitServerCache,
+                                               const QSharedPointer<IGitServerCache> &gitServerCache,
                                                CommitHistoryView *view)
    : mCache(cache)
    , mGit(git)

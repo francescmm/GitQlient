@@ -23,69 +23,65 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <ConfigData.h>
 #include <QFrame>
+#include <QtPlugin>
 
-class GitCache;
+#include <gitserverplugin_global.h>
+
+#include <ConfigData.h>
+
 class GitBase;
-class GitServerCache;
-class IssueDetailedView;
-class QPushButton;
-class QStackedLayout;
-class CreateIssueDlg;
-class CreatePullRequestDlg;
+class IGitServerCache;
 
-namespace GitServer
+#define IGitServerWidget_iid "francescmm.GitServerPlugin/0.1.0"
+
+class GITSERVERPLUGIN_EXPORT IGitServerWidget : public QFrame
 {
-class IRestApi;
-struct Issue;
-}
-
-class GitServerWidget : public QFrame
-{
-   Q_OBJECT
-
 public:
-   explicit GitServerWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                            const QSharedPointer<GitServerCache> &gitServerCache, QWidget *parent = nullptr);
+   explicit IGitServerWidget(QWidget *parent = nullptr)
+      : QFrame(parent)
+   {
+   }
 
-   ~GitServerWidget();
+   virtual ~IGitServerWidget() = default;
 
    /**
     * @brief configure Configures the widget by showing the config dialog or the full content if it was already
     * configured.
     * @return Returns true if configured, otherwise false.
     */
-   bool configure(const GitServer::ConfigData &config = GitServer::ConfigData());
+   virtual bool configure(const GitServerPlugin::ConfigData &config,
+                          const QVector<QPair<QString, QStringList>> &remoteBranches, const QString &styles)
+       = 0;
 
    /**
     * @brief isConfigured Returns the current state of the widget
     * @return True if configured, otherwise false.
     */
-   bool isConfigured() const { return mConfigured; }
+   virtual bool isConfigured() const = 0;
 
    /**
     * @brief openPullRequest The method opens the PR view directly.
     * @param prNumber The PR number.
     */
-   void openPullRequest(int prNumber);
+   virtual void openPullRequest(int prNumber) = 0;
 
    /**
-    * @brief createWidget Creates all the contents of the GitServerWidget.
+    * @brief start Creates all the contents of the GitServerWidget.
+    * @param The remote branches of the current repo.
     */
-   void start();
+   virtual void start(const QVector<QPair<QString, QStringList>> &remoteBranches) = 0;
 
-private:
-   QSharedPointer<GitCache> mCache;
-   QSharedPointer<GitBase> mGit;
-   QSharedPointer<GitServerCache> mGitServerCache;
-   QStackedLayout *mStackedLayout = nullptr;
-   IssueDetailedView *mDetailedView = nullptr;
-   QFrame *mGeneralView = nullptr;
-   CreateIssueDlg *mCreateIssueView = nullptr;
-   CreatePullRequestDlg *mCreatePrView = nullptr;
-   QPushButton *mOldIssue = nullptr;
-   QPushButton *mOldPr = nullptr;
-   QPushButton *mRefresh = nullptr;
+   /**
+    * @brief getCache Retrieves the internal cache to be read by any other application.
+    * @return A shared pointer to the internal cache.
+    */
+   virtual QSharedPointer<IGitServerCache> getCache() = 0;
+
+   virtual IGitServerWidget *createWidget(const QSharedPointer<GitBase> &git) = 0;
+
+protected:
    bool mConfigured = false;
 };
+
+Q_DECLARE_INTERFACE(IGitServerWidget, IGitServerWidget_iid)

@@ -23,11 +23,33 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-namespace GitServer
+#include <ConfigData.h>
+
+namespace GitServerPlugin
 {
-enum class Platform
-{
-   GitLab,
-   GitHub
+enum class Platform;
+class IRestApi;
+struct Issue;
+struct Label;
+struct Milestone;
+struct PullRequest;
 };
-}
+
+class IGitServerCache
+{
+public:
+   virtual ~IGitServerCache() = default;
+
+   virtual bool init(GitServerPlugin::ConfigData data) = 0;
+   virtual QString getUserName() const = 0;
+   virtual QVector<GitServerPlugin::PullRequest> getPullRequests() const = 0;
+   virtual GitServerPlugin::PullRequest getPullRequest(int number) const = 0;
+   virtual GitServerPlugin::PullRequest getPullRequest(const QString &sha) const = 0;
+   virtual QVector<GitServerPlugin::Issue> getIssues() const = 0;
+   virtual GitServerPlugin::Issue getIssue(int number) const = 0;
+   virtual QVector<GitServerPlugin::Label> getLabels() const = 0;
+   virtual QVector<GitServerPlugin::Milestone> getMilestones() const = 0;
+
+   virtual GitServerPlugin::Platform getPlatform() const = 0;
+   virtual GitServerPlugin::IRestApi *getApi() const = 0;
+};

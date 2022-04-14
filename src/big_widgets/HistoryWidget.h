@@ -39,7 +39,7 @@ class RepositoryViewDelegate;
 class WipDiffWidget;
 class BranchesWidgetMinimal;
 class QPushButton;
-class GitServerCache;
+class IGitServerCache;
 class QLabel;
 class GitQlientSettings;
 class QSplitter;
@@ -141,13 +141,15 @@ public:
     \param parent The parent widget if needed.
    */
    explicit HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
-                          const QSharedPointer<GitServerCache> &gitServerCache,
                           const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
    /*!
     \brief Destructor.
 
    */
    ~HistoryWidget();
+
+   void enableGitServerFeatures(const QSharedPointer<IGitServerCache> &gitServerCache);
+
    /*!
     \brief Clears all the information in the subwidgets.
 
@@ -220,7 +222,7 @@ private:
 
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitCache> mCache;
-   QSharedPointer<GitServerCache> mGitServerCache;
+   QSharedPointer<IGitServerCache> mGitServerCache;
    QSharedPointer<GitQlientSettings> mSettings;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;

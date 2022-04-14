@@ -39,10 +39,10 @@ class HistoryWidget;
 class DiffWidget;
 class BlameWidget;
 class MergeWidget;
-class GitServerWidget;
+class IGitServerWidget;
 class QTimer;
 class WaitingDlg;
-class GitServerCache;
+class IGitServerCache;
 class GitTags;
 class ConfigWidget;
 
@@ -146,6 +146,12 @@ public:
     */
    void setPlugins(QMap<QString, QObject *> plugins);
 
+   /**
+    * @brief getGitQlientCache Retrieves the GitQlient internal cache object.
+    * @return Shared pointer to the internal cache.
+    */
+   QSharedPointer<GitCache> getGitQlientCache() const { return mGitQlientCache; }
+
 protected:
    /*!
     \brief Overload of the close event cancel any pending loading.
@@ -157,7 +163,7 @@ protected:
 private:
    QString mCurrentDir;
    QSharedPointer<GitCache> mGitQlientCache;
-   QSharedPointer<GitServerCache> mGitServerCache;
+   QSharedPointer<IGitServerCache> mGitServerCache;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitQlientSettings> mSettings;
    QSharedPointer<GitRepoLoader> mGitLoader;
@@ -167,7 +173,7 @@ private:
    DiffWidget *mDiffWidget = nullptr;
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
-   GitServerWidget *mGitServerWidget = nullptr;
+   IGitServerWidget *mGitServerWidget = nullptr;
    IJenkinsWidget *mJenkins = nullptr;
    ConfigWidget *mConfigWidget = nullptr;
    QMap<QString, QObject *> mPlugins;

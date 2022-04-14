@@ -26,6 +26,7 @@
 #include <QTextStream>
 #include <QToolButton>
 
+#include <IGitServerWidget.h>
 #include <IJenkinsWidget.h>
 
 #include <QLogger.h>
@@ -368,11 +369,22 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
 
          repo->setRepository(repoName);
 
-         if (!mPlugins.isEmpty() || (mPlugins.empty() && mJenkinsPluginInstance.second))
+         if (!mPlugins.isEmpty() || (mPlugins.empty() && mJenkinsPluginInstance.second)
+             || (mPlugins.empty() && mGitServerPluginInstance.second))
          {
             decltype(mPlugins) plugins;
             plugins = mPlugins;
-            plugins[mJenkinsPluginInstance.first] = mJenkinsPluginInstance.second->createWidget();
+
+            if (mJenkinsPluginInstance.second)
+               plugins[mJenkinsPluginInstance.first] = mJenkinsPluginInstance.second->createWidget();
+
+            if (mGitServerPluginInstance.second)
+            {
+               const auto gitServerWidget = mGitServerPluginInstance.second->createWidget(git);
+
+               plugins[mGitServerPluginInstance.first] = gitServerWidget;
+            }
+
             repo->setPlugins(plugins);
          }
 
@@ -520,14 +532,16 @@ void GitQlient::loadPlugins()
          const auto newKey = QString("%1-%2").arg(name, version);
 
          if (name.contains("jenkins", Qt::CaseInsensitive))
-         {
             mJenkinsPluginInstance = qMakePair(newKey, qobject_cast<IJenkinsWidget *>(plugin));
-            // mPlugins[newKey] = dynamic_cast<QObject *>(mJenkinsPluginInstance->createWidget());
-         }
+         else if (name.contains("gitserver", Qt::CaseInsensitive))
+            mGitServerPluginInstance = qMakePair(newKey, qobject_cast<IGitServerWidget *>(plugin));
          else
             mPlugins[newKey] = plugin;
       }
       else
-         QLog_Error("UI", QString("%1").arg(pluginLoader.errorString()));
+      {
+         const auto errorStr = pluginLoader.errorString();
+         QLog_Error("UI", QString("%1").arg(errorStr));
+      }
    }
 }

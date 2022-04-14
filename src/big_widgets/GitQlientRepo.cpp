@@ -13,17 +13,18 @@
 #include <GitConfig.h>
 #include <GitConfigDlg.h>
 #include <GitHistory.h>
-#include <GitHubRestApi.h>
 #include <GitLocal.h>
 #include <GitMerge.h>
 #include <GitQlientSettings.h>
+#include <GitQlientStyles.h>
 #include <GitRepoLoader.h>
-#include <GitServerCache.h>
-#include <GitServerWidget.h>
+#include <GitServerTypes.h>
 #include <GitSubmodules.h>
 #include <GitTags.h>
 #include <GitWip.h>
 #include <HistoryWidget.h>
+#include <IGitServerCache.h>
+#include <IGitServerWidget.h>
 #include <IJenkinsWidget.h>
 #include <MergeWidget.h>
 #include <QLogger.h>
@@ -40,23 +41,21 @@
 #include <QTimer>
 
 using namespace QLogger;
-using namespace GitServer;
+using namespace GitServerPlugin;
 
 GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPointer<GitQlientSettings> &settings,
                              QWidget *parent)
    : QFrame(parent)
    , mGitQlientCache(new GitCache())
-   , mGitServerCache(new GitServerCache())
    , mGitBase(git)
    , mSettings(settings)
    , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache, mSettings))
-   , mHistoryWidget(new HistoryWidget(mGitQlientCache, mGitBase, mGitServerCache, mSettings))
+   , mHistoryWidget(new HistoryWidget(mGitQlientCache, mGitBase, mSettings))
    , mStackedLayout(new QStackedLayout())
    , mControls(new Controls(mGitQlientCache, mGitBase))
    , mDiffWidget(new DiffWidget(mGitBase, mGitQlientCache))
    , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase, mSettings))
    , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
-   , mGitServerWidget(new GitServerWidget(mGitQlientCache, mGitBase, mGitServerCache))
    , mConfigWidget(new ConfigWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
@@ -69,32 +68,16 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    setWindowTitle("GitQlient");
    setAttribute(Qt::WA_DeleteOnClose);
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
-   const auto serverUrl = gitConfig->getServerHost();
-   const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
-
-   GitServer::ConfigData data;
-   data.user = mSettings->globalValue(QString("%1/user").arg(serverUrl)).toString();
-   data.token = mSettings->globalValue(QString("%1/token").arg(serverUrl)).toString();
-   data.endPoint = mSettings->globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
-   data.repoOwner = repoInfo.first;
-   data.repoName = repoInfo.second;
-   data.serverUrl = serverUrl;
-
-   mGitServerCache->init(data);
-
    mHistoryWidget->setContentsMargins(QMargins(5, 5, 5, 5));
    mDiffWidget->setContentsMargins(QMargins(5, 5, 5, 5));
    mBlameWidget->setContentsMargins(QMargins(5, 5, 5, 5));
    mMergeWidget->setContentsMargins(QMargins(5, 5, 5, 5));
-   mGitServerWidget->setContentsMargins(QMargins(5, 5, 5, 5));
    mConfigWidget->setContentsMargins(QMargins(5, 5, 5, 5));
 
    mIndexMap[ControlsMainViews::History] = mStackedLayout->addWidget(mHistoryWidget);
    mIndexMap[ControlsMainViews::Diff] = mStackedLayout->addWidget(mDiffWidget);
    mIndexMap[ControlsMainViews::Blame] = mStackedLayout->addWidget(mBlameWidget);
    mIndexMap[ControlsMainViews::Merge] = mStackedLayout->addWidget(mMergeWidget);
-   mIndexMap[ControlsMainViews::GitServer] = mStackedLayout->addWidget(mGitServerWidget);
    mIndexMap[ControlsMainViews::Config] = mStackedLayout->addWidget(mConfigWidget);
 
    const auto mainLayout = new QVBoxLayout();
@@ -261,6 +244,35 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
          auto widget = dynamic_cast<QWidget *>(iter.value());
 
          mIndexMap[ControlsMainViews::BuildSystem] = mStackedLayout->addWidget(widget);
+      }
+      else if (iter.key().split("-").constFirst().contains("gitserver", Qt::CaseInsensitive)
+               && qobject_cast<QWidget *>(iter.value()))
+      {
+         QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+         const auto serverUrl = gitConfig->getServerHost();
+         const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+
+         GitServerPlugin::ConfigData data;
+         data.user = mSettings->globalValue(QString("%1/user").arg(serverUrl)).toString();
+         data.token = mSettings->globalValue(QString("%1/token").arg(serverUrl)).toString();
+         data.endPoint = mSettings->globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
+         data.repoOwner = repoInfo.first;
+         data.repoName = repoInfo.second;
+         data.serverUrl = serverUrl;
+
+         const auto remoteBranches = mGitQlientCache->getBranches(References::Type::RemoteBranches);
+         mGitServerWidget = qobject_cast<IGitServerWidget *>(iter.value());
+         const auto isConfigured = mGitServerWidget->configure(data, remoteBranches, GitQlientStyles::getStyles());
+
+         auto widget = dynamic_cast<QWidget *>(iter.value());
+         widget->setContentsMargins(QMargins(5, 5, 5, 5));
+         mIndexMap[ControlsMainViews::GitServer] = mStackedLayout->addWidget(widget);
+
+         if (isConfigured)
+         {
+            mGitServerCache = mGitServerWidget->getCache();
+            mHistoryWidget->enableGitServerFeatures(mGitServerCache);
+         }
       }
       else
          mPlugins[iter.key()] = iter.value();
@@ -469,6 +481,8 @@ bool GitQlientRepo::configureGitServer() const
 {
    bool isConfigured = false;
 
+   auto remoteBranches = mGitQlientCache->getBranches(References::Type::RemoteBranches);
+
    if (!mGitServerWidget->isConfigured())
    {
       QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
@@ -479,20 +493,20 @@ bool GitQlientRepo::configureGitServer() const
       const auto user = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
       const auto token = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
 
-      GitServer::ConfigData data;
+      GitServerPlugin::ConfigData data;
       data.user = user;
       data.token = token;
       data.serverUrl = serverUrl;
       data.repoOwner = repoInfo.first;
       data.repoName = repoInfo.second;
 
-      isConfigured = mGitServerWidget->configure(data);
+      isConfigured = mGitServerWidget->configure(data, remoteBranches, GitQlientStyles::getStyles());
    }
    else
+   {
       isConfigured = true;
-
-   if (isConfigured)
-      mGitServerWidget->start();
+      mGitServerWidget->start(remoteBranches);
+   }
 
    return isConfigured;
 }

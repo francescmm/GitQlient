@@ -44,12 +44,10 @@
 using namespace QLogger;
 
 HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
-                             const QSharedPointer<GitServerCache> &gitServerCache,
                              const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)
-   , mGitServerCache(gitServerCache)
    , mSettings(settings)
    , mWipWidget(new WipWidget(mCache, mGit))
    , mAmendWidget(new AmendWidget(mCache, mGit))
@@ -148,7 +146,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mRepositoryView->setObjectName("historyGraphView");
    mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setItemDelegate(mItemDelegate
-                                    = new RepositoryViewDelegate(cache, mGit, mGitServerCache, mRepositoryView));
+                                    = new RepositoryViewDelegate(mCache, mGit, mGitServerCache, mRepositoryView));
    mRepositoryView->setEnabled(true);
 
    mBranchesWidget = new BranchesWidget(mCache, mGit);
@@ -240,6 +238,16 @@ HistoryWidget::~HistoryWidget()
 
    delete mItemDelegate;
    delete mRepositoryModel;
+}
+
+void HistoryWidget::enableGitServerFeatures(const QSharedPointer<IGitServerCache> &gitServerCache)
+{
+   mGitServerCache = gitServerCache;
+
+   delete mItemDelegate;
+
+   mRepositoryView->setItemDelegate(mItemDelegate
+                                    = new RepositoryViewDelegate(mCache, mGit, mGitServerCache, mRepositoryView));
 }
 
 void HistoryWidget::clear()

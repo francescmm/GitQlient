@@ -26,7 +26,7 @@
 #include <QPair>
 #include <QString>
 
-namespace GitServer
+namespace GitServerPlugin
 {
 struct ConfigData
 {

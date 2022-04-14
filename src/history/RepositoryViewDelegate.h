@@ -23,17 +23,17 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <QStyledItemDelegate>
 #include <QDateTime>
+#include <QStyledItemDelegate>
 
 class CommitHistoryView;
 class GitCache;
 class GitBase;
 class Lane;
 class CommitInfo;
-class GitServerCache;
+class IGitServerCache;
 
-namespace GitServer
+namespace GitServerPlugin
 {
 struct PullRequest;
 }
@@ -60,7 +60,7 @@ public:
     * @param view The view that uses the delegate.
     */
    RepositoryViewDelegate(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                          const QSharedPointer<GitServerCache> &gitServerCache, CommitHistoryView *view);
+                          const QSharedPointer<IGitServerCache> &gitServerCache, CommitHistoryView *view);
 
    /**
     * @brief Overridden method to paint the different columns and rows in the view.
@@ -84,7 +84,7 @@ protected:
 private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<GitServerCache> mGitServerCache;
+   QSharedPointer<IGitServerCache> mGitServerCache;
    CommitHistoryView *mView = nullptr;
    int diffTargetRow = -1;
    int mColumnPressed = -1;
@@ -143,7 +143,7 @@ private:
     * @param pr The PullRequest status.
     */
    void paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
-                      const GitServer::PullRequest &pr) const;
+                      const GitServerPlugin::PullRequest &pr) const;
 
    /**
     * @brief getMergeColor Returns the color to be used for painting the external circle of the node. This methods
