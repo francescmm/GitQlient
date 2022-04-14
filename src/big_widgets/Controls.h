@@ -192,6 +192,10 @@ public:
     */
    void changePomodoroVisibility();
 
+   void enableJenkins();
+
+   void enableGitServer();
+
    void enableTerminal();
 
    void enablePlugins();
@@ -218,6 +222,7 @@ private:
    GitQlientUpdater *mUpdater = nullptr;
    QButtonGroup *mBtnGroup = nullptr;
    QFrame *mLastSeparator = nullptr;
+   QFrame *mPluginsSeparator = nullptr;
    bool mGoGitServerView = false;
 
    /*!

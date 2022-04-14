@@ -164,7 +164,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    createGitPlatformButton(hLayout);
 
    GitQlientSettings settings(mGit->getGitDir());
-   mBuildSystem->setVisible(settings.localValue("BuildSystemEnabled", false).toBool());
+   mBuildSystem->setVisible(false);
    mBuildSystem->setCheckable(true);
    mBuildSystem->setIcon(QIcon(":/icons/build_system"));
    mBuildSystem->setIconSize(QSize(22, 22));
@@ -177,10 +177,11 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    configBuildSystemButton();
 
-   const auto separator3 = new QFrame();
-   separator3->setObjectName("orangeSeparator");
-   separator3->setFixedHeight(20);
-   hLayout->addWidget(separator3);
+   mPluginsSeparator = new QFrame();
+   mPluginsSeparator->setObjectName("orangeSeparator");
+   mPluginsSeparator->setFixedHeight(20);
+   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible());
+   hLayout->addWidget(mPluginsSeparator);
 
    const auto isVisible = settings.localValue("Pomodoro/Enabled", true);
    mPomodoro->setVisible(isVisible.toBool());
@@ -343,6 +344,21 @@ void Controls::changePomodoroVisibility()
    mPomodoro->setVisible(isVisible.toBool());
 }
 
+void Controls::enableJenkins()
+{
+   GitQlientSettings settings(mGit->getGitDir());
+   mBuildSystem->setVisible(settings.localValue("BuildSystemEnabled", false).toBool());
+
+   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible());
+}
+
+void Controls::enableGitServer()
+{
+   mGitPlatform->setVisible(!mGitPlatform->toolTip().isEmpty());
+
+   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible());
+}
+
 void Controls::enableTerminal()
 {
    mTerminal->setVisible(true);
@@ -440,6 +456,7 @@ void Controls::createGitPlatformButton(QHBoxLayout *layout)
 
    if (add)
    {
+      mGitPlatform->setVisible(false);
       mGitPlatform->setCheckable(true);
       mGitPlatform->setIcon(gitPlatformIcon);
       mGitPlatform->setIconSize(QSize(22, 22));

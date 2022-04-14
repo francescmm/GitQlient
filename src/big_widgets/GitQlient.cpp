@@ -16,6 +16,7 @@
 #include <QEvent>
 #include <QFile>
 #include <QFileDialog>
+#include <QLibrary>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPluginLoader>
@@ -534,7 +535,16 @@ void GitQlient::loadPlugins()
          if (name.contains("jenkins", Qt::CaseInsensitive))
             mJenkinsPluginInstance = qMakePair(newKey, qobject_cast<IJenkinsWidget *>(plugin));
          else if (name.contains("gitserver", Qt::CaseInsensitive))
-            mGitServerPluginInstance = qMakePair(newKey, qobject_cast<IGitServerWidget *>(plugin));
+         {
+            QLibrary webChannel("libQt5WebChannel");
+            webChannel.load();
+
+            QLibrary webEngineWidgets("libQt5WEebEngineWidgets");
+            webEngineWidgets.load();
+
+            if (webChannel.isLoaded() && webEngineWidgets.isLoaded())
+               mGitServerPluginInstance = qMakePair(newKey, qobject_cast<IGitServerWidget *>(plugin));
+         }
          else
             mPlugins[newKey] = plugin;
       }
