@@ -208,6 +208,22 @@ QComboBox QAbstractItemView
    border-color: #D89000;
 }
 
+QComboBox::item
+{
+   background-color: #2E2F30;
+}
+
+QComboBox::item:selected
+{
+   background-color: #202122;
+}
+
+QComboBox::item:hover
+{
+   background-color: #404142;
+}
+
+
 QComboBox::drop-down:hover
 {
    background: #606162;
