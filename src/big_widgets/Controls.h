@@ -36,6 +36,7 @@ class GitQlientUpdater;
 class QButtonGroup;
 class QHBoxLayout;
 class PomodoroButton;
+class QTermWidgetInterface;
 
 /*!
  \brief Enum used to configure the different views handled by the Controls widget.

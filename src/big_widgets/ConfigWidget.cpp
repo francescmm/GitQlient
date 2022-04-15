@@ -8,6 +8,7 @@
 #include <GitCredentials.h>
 #include <GitQlientSettings.h>
 #include <QLogger.h>
+#include <qtermwidget_interface.h>
 
 #include <QDir>
 #include <QFileDialog>
@@ -53,6 +54,9 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    , mSave(new QPushButton())
 {
    ui->setupUi(this);
+
+   ui->lTerminalColorScheme->setVisible(false);
+   ui->cbTerminalColorScheme->setVisible(false);
 
    mFeedbackTimer->setInterval(3000);
 
@@ -514,5 +518,28 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 
       mPluginWidgets.append(labelName);
       mPluginWidgets.append(labelVersion);
+
+      if (labelName->text().contains("qtermwidget", Qt::CaseInsensitive))
+      {
+         const auto terminal = dynamic_cast<QTermWidgetInterface *>(iter.value());
+         const auto availableSchemes = terminal->getAvailableColorSchemes();
+
+         ui->lTerminalColorScheme->setVisible(true);
+         ui->cbTerminalColorScheme->setVisible(true);
+         ui->cbTerminalColorScheme->addItems(availableSchemes);
+
+         if (const auto lastScheme = QSettings().value("TerminalScheme", QString()).toString();
+             !lastScheme.isEmpty() && availableSchemes.contains(lastScheme))
+         {
+            ui->cbTerminalColorScheme->setCurrentText(lastScheme);
+            terminal->setColorScheme(lastScheme);
+         }
+
+         connect(ui->cbTerminalColorScheme, &QComboBox::currentTextChanged, this, [terminal](const QString &newScheme) {
+            dynamic_cast<QTermWidgetInterface *>(terminal)->setColorScheme(newScheme);
+
+            QSettings().setValue("TerminalScheme", newScheme);
+         });
+      }
    }
 }

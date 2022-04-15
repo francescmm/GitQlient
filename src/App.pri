@@ -12,6 +12,7 @@ include($$PWD/git_server/GitServer.pri)
 include($$PWD/QLogger/QLogger.pri)
 include($$PWD/QPinnableTabWidget/QPinnableTabWidget.pri)
 include($$PWD/jenkins/Jenkins.pri)
+include($$PWD/terminal/Terminal.pri)
 
 RESOURCES += \
     $$PWD/resources.qrc

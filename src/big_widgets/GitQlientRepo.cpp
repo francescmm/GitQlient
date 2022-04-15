@@ -30,6 +30,7 @@
 #include <QLogger.h>
 #include <WaitingDlg.h>
 #include <WipHelper.h>
+#include <qtermwidget_interface.h>
 
 #include <QApplication>
 #include <QDirIterator>
@@ -168,6 +169,8 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
 
 GitQlientRepo::~GitQlientRepo()
 {
+   mStackedLayout->widget(mIndexMap[ControlsMainViews::Terminal])->deleteLater();
+
    delete mAutoFetch;
    delete mAutoFilesUpdate;
 
@@ -244,6 +247,8 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
          auto widget = dynamic_cast<QWidget *>(iter.value());
 
          mIndexMap[ControlsMainViews::BuildSystem] = mStackedLayout->addWidget(widget);
+
+         mControls->enableJenkins();
       }
       else if (iter.key().split("-").constFirst().contains("gitserver", Qt::CaseInsensitive)
                && qobject_cast<QWidget *>(iter.value()))
@@ -273,6 +278,37 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
             mGitServerCache = mGitServerWidget->getCache();
             mHistoryWidget->enableGitServerFeatures(mGitServerCache);
          }
+
+         mControls->enableGitServer();
+      }
+      else if (iter.key().split("-").constFirst().contains("qtermwidget", Qt::CaseInsensitive)
+               && qobject_cast<QWidget *>(iter.value()))
+      {
+         QFont font = QApplication::font();
+#ifdef Q_OS_MACOS
+         font.setFamily(QStringLiteral("Monaco"));
+#elif defined(Q_WS_QWS)
+         font.setFamily(QStringLiteral("fixed"));
+#else
+         font.setFamily(QStringLiteral("Monospace"));
+#endif
+         font.setPointSize(12);
+
+         const auto terminalWidget = qobject_cast<QTermWidgetInterface *>(iter.value());
+         terminalWidget->setTerminalFont(font);
+         terminalWidget->setScrollBarPosition(QTermWidgetInterface::ScrollBarRight);
+         terminalWidget->setBlinkingCursor(true);
+         terminalWidget->startShellProgram();
+
+         QTimer::singleShot(250, this, [terminalWidget]() {
+            terminalWidget->sendText(QString::fromUtf8("export TERM=xterm-color\nsource  ~/.bashrc\nclear\n"));
+         });
+
+         auto widget = dynamic_cast<QWidget *>(iter.value());
+         widget->setContentsMargins(QMargins(5, 5, 5, 5));
+         mIndexMap[ControlsMainViews::Terminal] = mStackedLayout->addWidget(widget);
+
+         mControls->enableTerminal();
       }
       else
          mPlugins[iter.key()] = iter.value();

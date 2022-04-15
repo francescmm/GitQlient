@@ -29,6 +29,7 @@
 
 #include <IGitServerWidget.h>
 #include <IJenkinsWidget.h>
+#include <qtermwidget_interface.h>
 
 #include <QLogger.h>
 
@@ -134,6 +135,9 @@ GitQlient::GitQlient(QWidget *parent)
 
 GitQlient::~GitQlient()
 {
+   mTerminal.second->sendText("exit\n");
+   delete mTerminal.second;
+
    QStringList pinnedRepos;
    const auto totalTabs = mRepos->count();
 
@@ -371,7 +375,7 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
          repo->setRepository(repoName);
 
          if (!mPlugins.isEmpty() || (mPlugins.empty() && mJenkinsPluginInstance.second)
-             || (mPlugins.empty() && mGitServerPluginInstance.second))
+             || (mPlugins.empty() && mGitServerPluginInstance.second) || (mPlugins.empty() && mTerminal.second))
          {
             decltype(mPlugins) plugins;
             plugins = mPlugins;
@@ -380,11 +384,10 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
                plugins[mJenkinsPluginInstance.first] = mJenkinsPluginInstance.second->createWidget();
 
             if (mGitServerPluginInstance.second)
-            {
-               const auto gitServerWidget = mGitServerPluginInstance.second->createWidget(git);
+               plugins[mGitServerPluginInstance.first] = mGitServerPluginInstance.second->createWidget(git);
 
-               plugins[mGitServerPluginInstance.first] = gitServerWidget;
-            }
+            if (mTerminal.second)
+               plugins[mTerminal.first] = dynamic_cast<QObject *>(mTerminal.second->createWidget(0));
 
             repo->setPlugins(plugins);
          }
@@ -545,6 +548,8 @@ void GitQlient::loadPlugins()
             if (webChannel.isLoaded() && webEngineWidgets.isLoaded())
                mGitServerPluginInstance = qMakePair(newKey, qobject_cast<IGitServerWidget *>(plugin));
          }
+         if (name.contains("qtermwidget", Qt::CaseInsensitive))
+            mTerminal = qMakePair(newKey, qobject_cast<QTermWidgetInterface *>(plugin));
          else
             mPlugins[newKey] = plugin;
       }
