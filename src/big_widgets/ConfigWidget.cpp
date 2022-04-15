@@ -7,6 +7,7 @@
 #include <GitConfig.h>
 #include <GitCredentials.h>
 #include <GitQlientSettings.h>
+#include <PluginsDownloader.h>
 #include <QLogger.h>
 #include <qtermwidget_interface.h>
 
@@ -184,6 +185,11 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->buttonGroup, SIGNAL(buttonClicked(QAbstractButton *)), this,
            SLOT(onCredentialsOptionChanged(QAbstractButton *)));
    connect(ui->pbAddCredentials, &QPushButton::clicked, this, &ConfigWidget::showCredentialsDlg);
+
+   // Plugins widget
+
+   // TODO: Download the plugins info
+   connect(ui->pbPluginsFolder, &QPushButton::clicked, this, &ConfigWidget::selectPluginsFolder);
 
    // Connects for automatic save
    connect(ui->chDevMode, &CheckBox::stateChanged, this, &ConfigWidget::enableWidgets);
@@ -462,6 +468,22 @@ void ConfigWidget::selectFolder()
    }
 }
 
+void ConfigWidget::selectPluginsFolder()
+{
+   const QString dirName(
+       QFileDialog::getExistingDirectory(this, "Choose the directory for the GitQlient plugins", QDir::currentPath()));
+
+   if (!dirName.isEmpty() && dirName != QDir::currentPath().append("logs"))
+   {
+      QDir d(dirName);
+
+      ui->lePluginsDestination->setText(d.absolutePath());
+      ui->availablePluginsWidget->setEnabled(true);
+
+      QSettings().value("PluginsFolder", d.absolutePath());
+   }
+}
+
 void ConfigWidget::selectEditor()
 {
    const QString dirName(
@@ -501,6 +523,8 @@ void ConfigWidget::useDefaultLogsFolder()
       }
    }
 }
+
+void ConfigWidget::readRemotePluginsInfo() { }
 
 void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 {

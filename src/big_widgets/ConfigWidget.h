@@ -53,8 +53,10 @@ private:
    void saveFile();
    void showCredentialsDlg();
    void selectFolder();
+   void selectPluginsFolder();
    void selectEditor();
    void useDefaultLogsFolder();
+   void readRemotePluginsInfo();
 
 private slots:
    void saveConfig();

@@ -19,6 +19,7 @@ HEADERS += \
     $$PWD/Highlighter.h \
     $$PWD/HunkWidget.h \
     $$PWD/InitialRepoConfig.h \
+    $$PWD/PluginsDownloader.h \
     $$PWD/PomodoroButton.h \
     $$PWD/PomodoroConfigDlg.h \
     $$PWD/ProgressDlg.h \
@@ -36,6 +37,7 @@ SOURCES += \
     $$PWD/Highlighter.cpp \
     $$PWD/HunkWidget.cpp \
     $$PWD/InitialRepoConfig.cpp \
+    $$PWD/PluginsDownloader.cpp \
     $$PWD/PomodoroButton.cpp \
     $$PWD/PomodoroConfigDlg.cpp \
     $$PWD/ProgressDlg.cpp \

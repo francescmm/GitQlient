@@ -23,32 +23,34 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include <QMap>
 #include <QObject>
+
+#include <cstdint>
 
 class QNetworkAccessManager;
 class QProgressDialog;
+class QNetworkReply;
 
-class GitQlientUpdater : public QObject
+class PluginsDownloader : public QObject
 {
    Q_OBJECT
+
 signals:
-   void newVersionAvailable();
 
 public:
-   explicit GitQlientUpdater(QObject *parent = nullptr);
-   ~GitQlientUpdater();
+   explicit PluginsDownloader(QObject *parent = nullptr);
 
-   void checkNewGitQlientVersion();
-   void showInfoMessage();
+   void checkAvailablePlugins();
 
 private:
    QNetworkAccessManager *mManager = nullptr;
    QProgressDialog *mDownloadLog = nullptr;
-   QString mLatestGitQlient;
-   QString mChangeLog;
-   QString mGitQlientDownloadUrl;
+   QMap<QNetworkReply *, QPair<uint8_t, QString>> mDownloads;
+   uint64_t mTotal = 0U;
 
-   void processUpdateFile();
-   void processChangeLog();
-   void downloadFile();
+   void processPluginsFile();
+   void downloadPlugin(const QString &url);
+   void onDownloadProgress(qint64 read, qint64 total);
+   void onDownloadFinished();
 };
