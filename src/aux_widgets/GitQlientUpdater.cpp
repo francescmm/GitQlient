@@ -172,12 +172,10 @@ void GitQlientUpdater::downloadFile()
       const auto b = reply->readAll();
       const auto destination = QString("%1/%2").arg(
           QStandardPaths::standardLocations(QStandardPaths::DownloadLocation).constFirst(), fileName);
-      QFile file(destination);
-      if (file.open(QIODevice::WriteOnly))
-      {
-         QDataStream out(&file);
-         out << b;
 
+      if (QFile file(destination); file.open(QIODevice::WriteOnly))
+      {
+         file.write(b);
          file.close();
       }
 

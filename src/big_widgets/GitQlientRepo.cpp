@@ -222,10 +222,11 @@ void GitQlientRepo::setRepository(const QString &newDir)
 
 void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
 {
+   mConfigWidget->loadPlugins(plugins);
+
    if (plugins.isEmpty())
       return;
 
-   mConfigWidget->loadPlugins(plugins);
    mControls->enablePlugins();
 
    for (auto iter = plugins.constBegin(); iter != plugins.constEnd(); ++iter)

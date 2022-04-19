@@ -135,8 +135,11 @@ GitQlient::GitQlient(QWidget *parent)
 
 GitQlient::~GitQlient()
 {
-   mTerminal.second->sendText("exit\n");
-   delete mTerminal.second;
+   if (mTerminal.second)
+   {
+      mTerminal.second->sendText("exit\n");
+      delete mTerminal.second;
+   }
 
    QStringList pinnedRepos;
    const auto totalTabs = mRepos->count();
@@ -509,7 +512,7 @@ void GitQlient::moveLogsBeforeClose()
 
 void GitQlient::loadPlugins()
 {
-   QDir pluginsDir(QCoreApplication::applicationDirPath());
+   QDir pluginsDir(QSettings().value("PluginsFolder").toString());
 #if defined(Q_OS_WIN)
    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
       pluginsDir.cdUp();
@@ -521,7 +524,6 @@ void GitQlient::loadPlugins()
       pluginsDir.cdUp();
    }
 #endif
-   pluginsDir.cd("plugins");
 
    const auto entries = pluginsDir.entryList(QDir::Files);
 

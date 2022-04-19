@@ -1,7 +1,10 @@
 #pragma once
 
+#include <QButtonGroup>
 #include <QMap>
 #include <QWidget>
+
+#include <PluginsDownloader.h>
 
 class GitBase;
 class QTimer;
@@ -44,7 +47,12 @@ private:
    QPushButton *mSave = nullptr;
    FileEditor *mLocalGit = nullptr;
    FileEditor *mGlobalGit = nullptr;
+   PluginsDownloader *mPluginsDownloader = nullptr;
+   QButtonGroup *mDownloadButtons = nullptr;
    QVector<QWidget *> mPluginWidgets;
+   QVector<PluginInfo> mPluginsInfo;
+   QMap<QPushButton *, PluginInfo> mPluginDataMap;
+   QStringList mPluginNames;
 
    void clearCache();
    void calculateCacheSize();
@@ -62,4 +70,6 @@ private slots:
    void saveConfig();
    void onCredentialsOptionChanged(QAbstractButton *button);
    void onPullStrategyChanged(int index);
+   void onPluginsInfoReceived(const QVector<PluginInfo> &pluginsInfo);
+   void onPluginStored();
 };

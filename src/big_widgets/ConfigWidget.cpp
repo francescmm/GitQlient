@@ -53,8 +53,12 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    , mGit(git)
    , mFeedbackTimer(new QTimer())
    , mSave(new QPushButton())
+   , mPluginsDownloader(new PluginsDownloader(this))
+   , mDownloadButtons(new QButtonGroup(this))
 {
    ui->setupUi(this);
+   
+   ui->lePluginsDestination->setText(QSettings().value("PluginsFolder", QString()).toString());
 
    ui->lTerminalColorScheme->setVisible(false);
    ui->cbTerminalColorScheme->setVisible(false);
@@ -221,8 +225,16 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->leEditor, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->pbSelectEditor, &QPushButton::clicked, this, &ConfigWidget::selectEditor);
    connect(ui->leExtFileExplorer, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
+   connect(mPluginsDownloader, &PluginsDownloader::availablePlugins, this, &ConfigWidget::onPluginsInfoReceived);
+   connect(mPluginsDownloader, &PluginsDownloader::pluginStored, this, &ConfigWidget::onPluginStored);
+   connect(mDownloadButtons, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked), this,
+           [this](QAbstractButton *button) {
+              const auto url = mPluginDataMap.value(qobject_cast<QPushButton *>(button)).url;
+           });
 
    calculateCacheSize();
+
+   mPluginsDownloader->checkAvailablePlugins();
 }
 
 ConfigWidget::~ConfigWidget()
@@ -266,6 +278,32 @@ void ConfigWidget::onPullStrategyChanged(int index)
          gitConfig->setLocalData("pull.ff", "only");
          break;
    }
+}
+
+void ConfigWidget::onPluginsInfoReceived(const QVector<PluginInfo> &pluginsInfo)
+{
+   mPluginsInfo = pluginsInfo;
+
+   auto row = 0;
+   for (const auto &plugin : qAsConst(mPluginsInfo))
+   {
+      ui->availablePluginsLayout->addWidget(new QLabel(plugin.name), ++row, 0);
+      ui->availablePluginsLayout->addWidget(new QLabel(plugin.version), row, 1);
+
+      const auto pbDownload = new QPushButton("Download");
+      connect(pbDownload, &QPushButton::clicked, this,
+              [url = plugin.url, this]() { mPluginsDownloader->downloadPlugin(url); });
+      mDownloadButtons->addButton(pbDownload);
+
+      pbDownload->setEnabled(!mPluginNames.contains(plugin.name));
+
+      ui->availablePluginsLayout->addWidget(pbDownload, row, 2);
+   }
+}
+
+void ConfigWidget::onPluginStored()
+{
+   QMessageBox::information(this, tr("Reset needed"), tr("You need to restart GitQlient to load the plugins."));
 }
 
 void ConfigWidget::clearCache()
@@ -339,7 +377,7 @@ void ConfigWidget::saveConfig()
    if (mShowResetMsg)
    {
       QMessageBox::information(this, tr("Reset needed!"),
-                               tr("You need to restart GitQlient to see the changes in the styles applid."));
+                               tr("You need to restart GitQlient to see the changes in the styles applied."));
    }
 
    const auto logger = QLoggerManager::getInstance();
@@ -480,7 +518,7 @@ void ConfigWidget::selectPluginsFolder()
       ui->lePluginsDestination->setText(d.absolutePath());
       ui->availablePluginsWidget->setEnabled(true);
 
-      QSettings().value("PluginsFolder", d.absolutePath());
+      QSettings().setValue("PluginsFolder", d.absolutePath());
    }
 }
 
@@ -528,12 +566,24 @@ void ConfigWidget::readRemotePluginsInfo() { }
 
 void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 {
+   mPluginNames.clear();
+
+   if (plugins.isEmpty())
+   {
+      for (const auto &button : mDownloadButtons->buttons())
+         button->setEnabled(true);
+
+      return;
+   }
+
    auto row = 1U;
    for (auto iter = plugins.cbegin(); iter != plugins.cend(); ++iter)
    {
       auto metadata = iter.key().split("-");
       const auto labelName = new QLabel(metadata.takeFirst());
       const auto labelVersion = new QLabel(metadata.takeFirst());
+
+      mPluginNames.append(labelName->text());
 
       ui->pluginsLayout->addWidget(labelName, row, 0);
       ui->pluginsLayout->addWidget(labelVersion, row, 1);
@@ -565,5 +615,10 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
             QSettings().setValue("TerminalScheme", newScheme);
          });
       }
+   }
+
+   for (auto iter = mPluginDataMap.cbegin(); iter != mPluginDataMap.cend(); ++iter)
+   {
+      iter.key()->setEnabled(!mPluginNames.contains(iter.value().name));
    }
 }

@@ -25,6 +25,7 @@
 
 #include <QMap>
 #include <QObject>
+#include <QVector>
 
 #include <cstdint>
 
@@ -32,25 +33,35 @@ class QNetworkAccessManager;
 class QProgressDialog;
 class QNetworkReply;
 
+struct PluginInfo
+{
+   QString name;
+   QString version;
+   QString url;
+};
+
 class PluginsDownloader : public QObject
 {
    Q_OBJECT
 
 signals:
+   void availablePlugins(const QVector<PluginInfo> &pluginsInfo);
+   void pluginStored();
 
 public:
    explicit PluginsDownloader(QObject *parent = nullptr);
 
    void checkAvailablePlugins();
+   void downloadPlugin(const QString &url);
 
 private:
    QNetworkAccessManager *mManager = nullptr;
    QProgressDialog *mDownloadLog = nullptr;
    QMap<QNetworkReply *, QPair<uint8_t, QString>> mDownloads;
    uint64_t mTotal = 0U;
+   QVector<PluginInfo> mPluginsInfo;
 
    void processPluginsFile();
-   void downloadPlugin(const QString &url);
    void onDownloadProgress(qint64 read, qint64 total);
    void onDownloadFinished();
 };
