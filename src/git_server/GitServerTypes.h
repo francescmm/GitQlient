@@ -37,7 +37,7 @@ enum class Platform
    GitHub
 };
 
-struct GITSERVERPLUGIN_EXPORT User
+struct User
 {
    int id;
    QString name;
@@ -46,7 +46,7 @@ struct GITSERVERPLUGIN_EXPORT User
    QString type;
 };
 
-struct GITSERVERPLUGIN_EXPORT Milestone
+struct Milestone
 {
    int id = -1;
    int number = -1;
@@ -56,7 +56,7 @@ struct GITSERVERPLUGIN_EXPORT Milestone
    bool isOpen = false;
 };
 
-struct GITSERVERPLUGIN_EXPORT Label
+struct Label
 {
    int id;
    QString nodeId;
@@ -67,7 +67,7 @@ struct GITSERVERPLUGIN_EXPORT Label
    bool isDefault;
 };
 
-struct GITSERVERPLUGIN_EXPORT Diff
+struct Diff
 {
    QString diff;
    QString file;
@@ -75,7 +75,7 @@ struct GITSERVERPLUGIN_EXPORT Diff
    int originalLine;
 };
 
-struct GITSERVERPLUGIN_EXPORT Comment
+struct Comment
 {
    Comment() = default;
    Comment(int _id, const QString _body, const User &_user, const QDateTime dt, const QString relation)
@@ -96,14 +96,14 @@ struct GITSERVERPLUGIN_EXPORT Comment
    QString association;
 };
 
-struct GITSERVERPLUGIN_EXPORT Review : public Comment
+struct Review : public Comment
 {
    Review() = default;
 
    QString state;
 };
 
-struct GITSERVERPLUGIN_EXPORT CodeReview : public Comment
+struct CodeReview : public Comment
 {
    CodeReview() = default;
    bool operator==(const CodeReview &c) const { return c.reviewId == reviewId; }
@@ -114,7 +114,7 @@ struct GITSERVERPLUGIN_EXPORT CodeReview : public Comment
    bool outdated;
 };
 
-struct GITSERVERPLUGIN_EXPORT Commit
+struct Commit
 {
    bool operator==(const Commit &c) const { return sha == c.sha; }
    QString sha;
@@ -125,7 +125,7 @@ struct GITSERVERPLUGIN_EXPORT Commit
    QDateTime authorCommittedTimestamp;
 };
 
-struct GITSERVERPLUGIN_EXPORT Issue
+struct Issue
 {
    Issue() = default;
    Issue(const QString &_title, const QByteArray &_body, const Milestone &goal, const QVector<Label> &_labels,
@@ -185,7 +185,7 @@ struct GITSERVERPLUGIN_EXPORT Issue
    }
 };
 
-struct GITSERVERPLUGIN_EXPORT PullRequest : public Issue
+struct PullRequest : public Issue
 {
    PullRequest() = default;
 
