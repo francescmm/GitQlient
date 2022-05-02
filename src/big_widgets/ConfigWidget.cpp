@@ -58,6 +58,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 {
    ui->setupUi(this);
    
+   ui->buildSystemTab->setVisible(false);
    ui->lePluginsDestination->setText(QSettings().value("PluginsFolder", QString()).toString());
 
    ui->lTerminalColorScheme->setVisible(false);
@@ -614,6 +615,14 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 
             QSettings().setValue("TerminalScheme", newScheme);
          });
+      }
+      else if (labelName->text().contains("jenkins", Qt::CaseInsensitive))
+      {
+          ui->buildSystemTab->setVisible(true);
+      }
+      else if (labelName->text().contains("gitserver", Qt::CaseInsensitive))
+      {
+          
       }
    }
 

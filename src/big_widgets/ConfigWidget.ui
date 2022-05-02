@@ -78,9 +78,9 @@
    <item row="1" column="0" rowspan="2">
     <widget class="QTabWidget" name="tabWidget_2">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_3">
+     <widget class="QWidget" name="gitQlientTab">
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
@@ -330,7 +330,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_4">
+     <widget class="QWidget" name="repositoryTab">
       <attribute name="title">
        <string>Repository</string>
       </attribute>
@@ -839,7 +839,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_5">
+     <widget class="QWidget" name="buildSystemTab">
       <property name="styleSheet">
        <string notr="true">background: transparent;</string>
       </property>
@@ -959,7 +959,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="pluginsTab">
       <attribute name="title">
        <string>Plugins</string>
       </attribute>

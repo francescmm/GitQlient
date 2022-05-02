@@ -299,6 +299,7 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
          terminalWidget->setTerminalFont(font);
          terminalWidget->setScrollBarPosition(QTermWidgetInterface::ScrollBarRight);
          terminalWidget->setBlinkingCursor(true);
+         terminalWidget->setWorkingDirectory(mGitBase->getWorkingDir());
          terminalWidget->startShellProgram();
 
          QTimer::singleShot(250, this, [terminalWidget]() {
