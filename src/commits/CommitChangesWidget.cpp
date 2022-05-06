@@ -443,7 +443,10 @@ bool CommitChangesWidget::checkMsg(QString &msg)
    const auto title = ui->leCommitTitle->text();
 
    if (title.isEmpty())
+   {
       QMessageBox::warning(this, "Commit changes", "Please, add a title.");
+      return false;
+   }
 
    msg = title;
 

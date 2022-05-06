@@ -203,6 +203,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mWipFileDiff, &WipDiffWidget::exitRequested, this, &HistoryWidget::returnToView);
    connect(mWipFileDiff, &WipDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
    connect(mWipFileDiff, &WipDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
+   connect(mWipFileDiff, &WipDiffWidget::exitRequested, this, &HistoryWidget::signalUpdateWip);
 
    mSplitter->insertWidget(0, wipFrame);
    mSplitter->insertWidget(1, mCenterStackedWidget);

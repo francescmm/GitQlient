@@ -630,7 +630,16 @@ void WipDiffWidget::deleteHunkView()
    hunkView->deleteLater();
 
    if (mHunks.isEmpty())
+   {
+      // We stage the file no matter what: if the file has no modifications, nothing will hapen. But if the file has
+      // modifications this will force Git to refresh the information about the changes and avoid partially cached
+      // misleading info.
+
+      QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+      gitLocal->stageFile(mCurrentFile);
+
       emit exitRequested();
+   }
    else
       reload();
 }
