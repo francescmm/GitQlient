@@ -596,7 +596,7 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 
       if (labelName->text().contains("qtermwidget", Qt::CaseInsensitive))
       {
-         const auto terminal = dynamic_cast<QTermWidgetInterface *>(iter.value());
+         const auto terminal = qobject_cast<QTermWidgetInterface *>(iter.value());
          const auto availableSchemes = terminal->getAvailableColorSchemes();
 
          ui->lTerminalColorScheme->setVisible(true);
