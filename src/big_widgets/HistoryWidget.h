@@ -304,6 +304,8 @@ private:
     */
    void returnToView();
 
+   void returnToViewIfObsolete(const QString &fileName);
+
    /**
     * @brief cherryPickCommit Cherry-picks the commit defined by the SHA in the QLineEdit of the filter.
     */

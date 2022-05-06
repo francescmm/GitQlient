@@ -51,6 +51,7 @@ signals:
    void signalShowFileHistory(const QString &fileName);
    void signalUpdateWip();
    void signalCancelAmend(const QString &commitSha);
+   void fileStaged(const QString &fileName);
 
 public:
    explicit CommitChangesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,

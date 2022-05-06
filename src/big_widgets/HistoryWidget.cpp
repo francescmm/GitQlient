@@ -93,6 +93,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    connect(mWipWidget, &CommitChangesWidget::signalShowDiff, this, &HistoryWidget::showWipFileDiff);
    connect(mWipWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::returnToView);
+   connect(mWipWidget, &CommitChangesWidget::fileStaged, this, &HistoryWidget::returnToViewIfObsolete);
    connect(mWipWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
    connect(mWipWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::cleanCommitPanels);
    connect(mWipWidget, &CommitChangesWidget::unstagedFilesChanged, this, &HistoryWidget::onRevertedChanges);
@@ -107,6 +108,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mAmendWidget, &CommitChangesWidget::logReload, this, &HistoryWidget::logReload);
    connect(mAmendWidget, &CommitChangesWidget::signalShowDiff, this, &HistoryWidget::showWipFileDiff);
    connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::returnToView);
+   connect(mAmendWidget, &CommitChangesWidget::fileStaged, this, &HistoryWidget::returnToViewIfObsolete);
    connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
    connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::cleanCommitPanels);
    connect(mAmendWidget, &CommitChangesWidget::unstagedFilesChanged, this, &HistoryWidget::onRevertedChanges);
@@ -515,6 +517,12 @@ void HistoryWidget::returnToView()
 {
    mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::Graph));
    mBranchesWidget->returnToSavedView();
+}
+
+void HistoryWidget::returnToViewIfObsolete(const QString &fileName)
+{
+   if (mWipFileDiff->getCurrentFile().contains(fileName, Qt::CaseInsensitive))
+      returnToView();
 }
 
 void HistoryWidget::cherryPickCommit()

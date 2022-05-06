@@ -366,6 +366,8 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
 
    ui->applyActionBtn->setEnabled(true);
 
+   emit fileStaged(fileName);
+
    return fileName;
 }
 
