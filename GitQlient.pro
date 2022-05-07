@@ -54,7 +54,7 @@ OTHER_FILES += \
 
 isEmpty(VERSION) {
 win32 {
-   VERSION = 0.0
+   VERSION = 0.0.0
 } else {
    VERSION = $$system(git rev-parse --short HEAD)
 }
