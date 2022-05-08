@@ -15,6 +15,6 @@ include($$PWD/jenkins/Jenkins.pri)
 include($$PWD/terminal/Terminal.pri)
 
 RESOURCES += \
-    $$PWD/resources.qrc
+    $$PWD/GitQlient.qrc
 
 RC_FILE = $$PWD/resources.rc

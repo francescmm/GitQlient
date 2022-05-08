@@ -1,0 +1,21 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="GitQlientLogoMedium">resources/icons/GitQlientLogoMedium.png</file>
+        <file alias="GitQlientLogo">resources/icons/GitQlientLogoLarge.png</file>
+        <file alias="GitQlientLogo32">resources/icons/GitQlientLogo32.png</file>
+        <file alias="GitQlientLogoSVG">resources/icons/GitQlientLogo.svg</file>
+        <file alias="GitQlientLogoIco">resources/icons/GitQlientLogo.ico</file>
+    </qresource>
+    <qresource prefix="/">
+        <file alias="stylesheet">resources/stylesheet.css</file>
+        <file alias="colors_bright">resources/stylesheet_colors_bright.css</file>
+        <file alias="colors_dark">resources/stylesheet_colors_dark.css</file>
+        <file>resources.rc</file>
+        <file alias="DejaVuSans">resources/DejaVuSans.ttf</file>
+        <file alias="DejaVuSansMono">resources/DejaVuSansMono.ttf</file>
+    </qresource>
+    <qresource prefix="/translations">
+        <file alias="gitqlient_en.qm">resources/translations/gitqlient_en.qm</file>
+        <file alias="gitqlient_en.ts">resources/translations/gitqlient_en.ts</file>
+    </qresource>
+</RCC>
