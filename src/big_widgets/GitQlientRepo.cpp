@@ -307,7 +307,12 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
          terminalWidget->startShellProgram();
 
          QTimer::singleShot(250, this, [terminalWidget]() {
-            terminalWidget->sendText(QString::fromUtf8("export TERM=xterm-color\nsource  ~/.bashrc\nclear\n"));
+            const auto historySize = terminalWidget->historySize();
+            terminalWidget->setHistorySize(0);
+            terminalWidget->sendText(
+                QString::fromUtf8(" export TERM=xterm-color\n source  ~/.bashrc\n alias "
+                                  "exit=\"echo \\\"The exit command has been disabled\\\"\"\n clear\n"));
+            terminalWidget->setHistorySize(historySize);
          });
 
          auto widget = dynamic_cast<QWidget *>(iter.value());
