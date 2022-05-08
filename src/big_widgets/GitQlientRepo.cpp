@@ -235,21 +235,25 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
           && qobject_cast<QWidget *>(iter.value()))
       {
          auto jenkins = qobject_cast<IJenkinsWidget *>(iter.value());
-         jenkins->init(mSettings->localValue("BuildSystemUrl", "").toString(),
-                       mSettings->localValue("BuildSystemUser", "").toString(),
-                       mSettings->localValue("BuildSystemToken", "").toString());
-         jenkins->setContentsMargins(QMargins(5, 5, 5, 5));
+         if (jenkins->configure({ mSettings->localValue("BuildSystemUser", "").toString(),
+                                  mSettings->localValue("BuildSystemToken", "").toString(),
+                                  mSettings->localValue("BuildSystemUrl", "").toString() },
+                                GitQlientStyles::getStyles()))
+         {
+            jenkins->start();
+            jenkins->setContentsMargins(QMargins(5, 5, 5, 5));
 
-         connect(jenkins, SIGNAL(gotoBranch(const QString &)), this, SLOT(focusHistoryOnBranch(const QString &)));
-         connect(jenkins, SIGNAL(gotoPullRequest(int)), this, SLOT(focusHistoryOnPr(int)));
+            connect(jenkins, &IJenkinsWidget::gotoBranch, this, &GitQlientRepo::focusHistoryOnBranch);
+            connect(jenkins, &IJenkinsWidget::gotoPullRequest, this, &GitQlientRepo::focusHistoryOnPr);
 
-         mJenkins = jenkins;
+            mJenkins = jenkins;
 
-         auto widget = dynamic_cast<QWidget *>(iter.value());
+            auto widget = dynamic_cast<QWidget *>(iter.value());
 
-         mIndexMap[ControlsMainViews::BuildSystem] = mStackedLayout->addWidget(widget);
+            mIndexMap[ControlsMainViews::BuildSystem] = mStackedLayout->addWidget(widget);
 
-         mControls->enableJenkins();
+            mControls->enableJenkins();
+         }
       }
       else if (iter.key().split("-").constFirst().contains("gitserver", Qt::CaseInsensitive)
                && qobject_cast<QWidget *>(iter.value()))
