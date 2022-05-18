@@ -25,6 +25,7 @@ HEADERS += \
     $$PWD/ProgressDlg.h \
     $$PWD/PullDlg.h \
     $$PWD/SquashDlg.h \
+    $$PWD/UpstreamDlg.h \
     $$PWD/WaitingDlg.h
 
 SOURCES += \
@@ -43,4 +44,5 @@ SOURCES += \
     $$PWD/ProgressDlg.cpp \
     $$PWD/PullDlg.cpp \
     $$PWD/SquashDlg.cpp \
+    $$PWD/UpstreamDlg.cpp \
     $$PWD/WaitingDlg.cpp

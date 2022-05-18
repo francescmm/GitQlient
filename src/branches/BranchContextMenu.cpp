@@ -8,6 +8,7 @@
 #include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
+#include <UpstreamDlg.h>
 
 #include <QApplication>
 #include <QClipboard>
@@ -119,6 +120,13 @@ void BranchContextMenu::push()
    if (ret.output.contains("has no upstream branch"))
    {
       BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::PUSH_UPSTREAM, mConfig.mCache, mConfig.mGit });
+      dlg.exec();
+   }
+   else if (ret.output.contains("upstream branch", Qt::CaseInsensitive)
+            && ret.output.contains("does not match", Qt::CaseInsensitive)
+            && ret.output.contains("the name of your current branch", Qt::CaseInsensitive))
+   {
+      UpstreamDlg dlg(mConfig.mGit, ret.output);
       dlg.exec();
    }
    else if (ret.success)
