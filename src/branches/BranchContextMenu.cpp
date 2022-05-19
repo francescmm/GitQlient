@@ -35,7 +35,10 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
    }
 
    if (mConfig.currentBranch == mConfig.branchSelected)
+   {
+      connect(addAction(tr("Unset upstream")), &QAction::triggered, this, &BranchContextMenu::unsetUpstream);
       connect(addAction(tr("Push force")), &QAction::triggered, this, &BranchContextMenu::pushForce);
+   }
 
    addSeparator();
 
@@ -157,6 +160,14 @@ void BranchContextMenu::push()
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
+}
+
+void BranchContextMenu::unsetUpstream() const
+{
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   QScopedPointer<GitBranches> git(new GitBranches(mConfig.mGit));
+   const auto ret = git->unsetUpstream();
+   QApplication::restoreOverrideCursor();
 }
 
 void BranchContextMenu::pushForce()
