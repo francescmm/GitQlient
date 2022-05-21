@@ -57,9 +57,10 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    , mDownloadButtons(new QButtonGroup(this))
 {
    ui->setupUi(this);
-   
+
    ui->buildSystemTab->setVisible(false);
    ui->lePluginsDestination->setText(QSettings().value("PluginsFolder", QString()).toString());
+   ui->lPluginsWarning->setVisible(ui->lePluginsDestination->text().isEmpty());
 
    ui->lTerminalColorScheme->setVisible(false);
    ui->cbTerminalColorScheme->setVisible(false);
@@ -296,7 +297,7 @@ void ConfigWidget::onPluginsInfoReceived(const QVector<PluginInfo> &pluginsInfo)
               [url = plugin.url, this]() { mPluginsDownloader->downloadPlugin(url); });
       mDownloadButtons->addButton(pbDownload);
 
-      pbDownload->setEnabled(!mPluginNames.contains(plugin.name));
+      pbDownload->setDisabled(mPluginNames.contains(plugin.name) || ui->lePluginsDestination->text().isEmpty());
 
       ui->availablePluginsLayout->addWidget(pbDownload, row, 2);
    }
@@ -519,6 +520,11 @@ void ConfigWidget::selectPluginsFolder()
       ui->lePluginsDestination->setText(d.absolutePath());
       ui->availablePluginsWidget->setEnabled(true);
 
+      ui->lPluginsWarning->setVisible(false);
+
+      for (const auto &button : mDownloadButtons->buttons())
+         button->setEnabled(true);
+
       QSettings().setValue("PluginsFolder", d.absolutePath());
    }
 }
@@ -618,11 +624,10 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
       }
       else if (labelName->text().contains("jenkins", Qt::CaseInsensitive))
       {
-          ui->buildSystemTab->setVisible(true);
+         ui->buildSystemTab->setVisible(true);
       }
       else if (labelName->text().contains("gitserver", Qt::CaseInsensitive))
       {
-          
       }
    }
 
