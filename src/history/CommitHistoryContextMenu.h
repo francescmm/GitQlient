@@ -198,4 +198,6 @@ private:
    void addBranchActions(const QString &sha);
 
    void showSquashDialog();
+
+   void amendNoEdit();
 };

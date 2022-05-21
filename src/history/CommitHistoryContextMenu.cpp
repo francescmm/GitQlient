@@ -96,6 +96,10 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
                connect(amendCommitAction, &QAction::triggered, this,
                        [this]() { emit signalAmendCommit(mShas.first()); });
 
+               const auto amendNoEditCommitAction = addAction(tr("Amend without edit"));
+               amendNoEditCommitAction->setToolTip(tr("Edit the last commit of the branch."));
+               connect(amendNoEditCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::amendNoEdit);
+
                const auto applyMenu = addMenu(tr("Apply"));
 
                const auto applyPatchAction = applyMenu->addAction(tr("Patch"));
@@ -647,5 +651,38 @@ void CommitHistoryContextMenu::showSquashDialog()
       const auto squash = new SquashDlg(mGit, mCache, mShas, this);
       connect(squash, &SquashDlg::changesCommitted, this, &CommitHistoryContextMenu::fullReload);
       squash->exec();
+   }
+}
+
+void CommitHistoryContextMenu::amendNoEdit()
+{
+   QScopedPointer<GitLocal> git(new GitLocal(mGit));
+   const auto ret = git->ammend();
+   emit logReload();
+
+   if (ret.success)
+   {
+      const auto newSha = mGit->getLastCommit().output.trimmed();
+      auto commit = mCache->commitInfo(mShas.first());
+      const auto oldSha = commit.sha;
+      commit.sha = newSha;
+
+      mCache->updateCommit(oldSha, std::move(commit));
+
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
+      const auto ret = git->getDiffFiles(mShas.first(), commit.firstParent());
+
+      mCache->insertRevisionFiles(mShas.first(), commit.firstParent(), RevisionFiles(ret.output));
+   }
+   else
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error when amending"),
+                         tr("There were problems during the commit "
+                            "operation. Please, see the detailed "
+                            "description for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output);
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
    }
 }
