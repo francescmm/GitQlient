@@ -16,8 +16,7 @@ UpstreamDlg::UpstreamDlg(QSharedPointer<GitBase> git, const QString &text, QWidg
    ui->setupUi(this);
 
    ui->lText->setText(text);
-   ui->lQuestion->setText(tr("<strong>Would you like to reconfigure the upstream?</strong>"));
-   ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Reconfigure");
+   ui->lQuestion->setText(tr("<strong>Would you like to reconfigure the upstream and push the branch?</strong>"));
 
    setStyleSheet(GitQlientStyles::getStyles());
 }
