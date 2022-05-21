@@ -1,18 +1,19 @@
 #include "BranchesWidgetMinimal.h"
 
+#include <GitBase.h>
 #include <GitCache.h>
-#include <GitSubmodules.h>
 #include <GitStashes.h>
+#include <GitSubmodules.h>
 
-#include <QVBoxLayout>
+#include <QEvent>
 #include <QLabel>
 #include <QMenu>
-#include <QToolButton>
 #include <QPushButton>
-#include <QEvent>
+#include <QToolButton>
+#include <QVBoxLayout>
 
-BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<GitCache> &cache,
-                                             const QSharedPointer<GitBase> git, QWidget *parent)
+BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
+                                             QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)
@@ -108,6 +109,14 @@ bool BranchesWidgetMinimal::eventFilter(QObject *obj, QEvent *event)
 void BranchesWidgetMinimal::addActionToMenu(const QString &sha, const QString &name, QMenu *menu)
 {
    const auto action = new QAction(name, menu);
+
+   if (mGit->getCurrentBranch() == name)
+   {
+      auto font = action->font();
+      font.setBold(true);
+      action->setFont(font);
+   }
+
    action->setData(sha);
    connect(action, &QAction::triggered, this, [this, sha] { emit commitSelected(sha); });
 
