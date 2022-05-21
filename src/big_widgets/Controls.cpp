@@ -304,8 +304,9 @@ void Controls::pullCurrentBranch()
 void Controls::fetchAll()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   GitQlientSettings settings(mGit->getGitDir());
    QScopedPointer<GitRemote> git(new GitRemote(mGit));
-   const auto ret = git->fetch();
+   const auto ret = git->fetch(settings.localValue("PruneOnFetch").toBool());
    QApplication::restoreOverrideCursor();
 
    if (!ret)
