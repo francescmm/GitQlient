@@ -36,22 +36,23 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
          break;
       case BranchDlgMode::CREATE_CHECKOUT:
          setWindowTitle(tr("Create and checkout branch"));
-         ui->leOldName->setHidden(true);
+         ui->currentBranchFrame->setHidden(true);
          break;
       case BranchDlgMode::CREATE_FROM_COMMIT:
          setWindowTitle(tr("Create branch at commit"));
-         ui->leOldName->setHidden(true);
+         ui->currentBranchFrame->setHidden(true);
          break;
       case BranchDlgMode::CREATE_CHECKOUT_FROM_COMMIT:
          setWindowTitle(tr("Create and checkout branch"));
-         ui->leOldName->setHidden(true);
+         ui->currentBranchFrame->setHidden(true);
          break;
       case BranchDlgMode::STASH_BRANCH:
          setWindowTitle(tr("Stash branch"));
          break;
       case BranchDlgMode::PUSH_UPSTREAM:
+         connect(ui->chbCopyRemote, &CheckBox::stateChanged, this, &BranchDlg::copyBranchName);
          ui->chbCopyRemote->setVisible(true);
-         connect(ui->chbCopyRemote, &CheckBox::clicked, this, &BranchDlg::copyBranchName);
+         ui->chbCopyRemote->setChecked(true);
          setWindowTitle(tr("Push upstream branch"));
          ui->pbAccept->setText(tr("Push"));
          break;
@@ -202,6 +203,7 @@ void BranchDlg::accept()
 
 void BranchDlg::copyBranchName()
 {
-   const auto remote = ui->leOldName->text();
-   ui->leNewName->setText(remote);
+   const auto checked = ui->chbCopyRemote->isChecked();
+   ui->leNewName->setVisible(!checked);
+   ui->leNewName->setText(checked ? ui->leOldName->text() : "");
 }
