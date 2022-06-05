@@ -25,9 +25,12 @@
 
 #include <gitserverplugin_global.h>
 
+#include <QDateTime>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QMap>
 #include <QString>
+#include <QVector>
 
 namespace GitServerPlugin
 {

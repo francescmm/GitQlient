@@ -35,7 +35,7 @@ class IGitServerCache;
 
 #define IGitServerWidget_iid "francescmm.GitServerPlugin/0.1.0"
 
-class GITSERVERPLUGIN_EXPORT IGitServerWidget : public QFrame
+class IGitServerWidget : public QFrame
 {
 public:
    explicit IGitServerWidget(QWidget *parent = nullptr)
@@ -78,6 +78,11 @@ public:
     */
    virtual QSharedPointer<IGitServerCache> getCache() = 0;
 
+   /**
+    * @brief createWidget Creates a IGitServerWidget.
+    * @param git The configured GitBase object pointing to the repository directory.
+    * @return Return a newly created widget.
+    */
    virtual IGitServerWidget *createWidget(const QSharedPointer<GitBase> &git) = 0;
 
 protected:
@@ -85,3 +90,5 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IGitServerWidget, IGitServerWidget_iid)
+
+GITSERVERPLUGIN_EXPORT IGitServerWidget *createWidget(const QSharedPointer<GitBase> &git);
