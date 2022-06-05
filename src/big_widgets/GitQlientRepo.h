@@ -295,8 +295,6 @@ private:
 
    void showTerminal();
 
-   void showPlugins();
-
    /*!
     \brief Opens the previous view. This method is used when the diff view is closed and GitQlientRepo must return to
     the previous one.

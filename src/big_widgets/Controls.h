@@ -51,7 +51,6 @@ enum class ControlsMainViews
    GitServer,
    BuildSystem,
    Terminal,
-   Plugins,
    Config
 };
 
@@ -199,8 +198,6 @@ public:
 
    void enableTerminal();
 
-   void enablePlugins();
-
 private:
    QString mCurrentSha;
    QSharedPointer<GitCache> mCache;
@@ -216,7 +213,6 @@ private:
    QToolButton *mGitPlatform = nullptr;
    QToolButton *mBuildSystem = nullptr;
    QToolButton *mTerminal = nullptr;
-   QToolButton *mPlugins = nullptr;
    PomodoroButton *mPomodoro = nullptr;
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;
