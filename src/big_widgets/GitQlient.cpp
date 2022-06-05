@@ -550,7 +550,7 @@ void GitQlient::loadPlugins()
             if (webChannel.isLoaded() && webEngineWidgets.isLoaded())
                mGitServerPluginInstance = qMakePair(newKey, qobject_cast<IGitServerWidget *>(plugin));
          }
-         if (name.contains("qtermwidget", Qt::CaseInsensitive))
+         else if (name.contains("qtermwidget", Qt::CaseInsensitive))
             mTerminal = qMakePair(newKey, qobject_cast<QTermWidgetInterface *>(plugin));
          else
             mPlugins[newKey] = plugin;
