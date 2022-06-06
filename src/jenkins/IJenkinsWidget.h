@@ -18,7 +18,7 @@ struct ConfigData
 };
 }
 
-class JENKINSPLUGIN_EXPORT IJenkinsWidget : public QWidget
+class IJenkinsWidget : public QWidget
 {
    Q_OBJECT
 
@@ -40,3 +40,5 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IJenkinsWidget, IJenkinsWidget_iid)
+
+JENKINSPLUGIN_EXPORT IJenkinsWidget *createWidget();
