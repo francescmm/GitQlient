@@ -291,6 +291,10 @@ private:
     */
    void showBuildSystemView();
 
+   void buildSystemActivationToggled(bool enabled);
+
+   void gitServerActivationToggled(bool enabled);
+
    void showConfig();
 
    void showTerminal();

@@ -1,6 +1,7 @@
 #include "ConfigWidget.h"
 #include "ui_ConfigWidget.h"
 
+#include <CheckBox.h>
 #include <CredentialsDlg.h>
 #include <FileEditor.h>
 #include <GitBase.h>
@@ -58,7 +59,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 {
    ui->setupUi(this);
 
-   ui->buildSystemTab->setVisible(false);
    ui->lePluginsDestination->setText(QSettings().value("PluginsFolder", QString()).toString());
    ui->lPluginsWarning->setVisible(ui->lePluginsDestination->text().isEmpty());
 
@@ -145,29 +145,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->cbSubtree->setChecked(settings.localValue("SubtreeHeader", true).toBool());
    ui->cbDeleteFolder->setChecked(settings.localValue("DeleteRemoteFolder", false).toBool());
 
-   // Build System configuration
-   const auto isConfigured = settings.localValue("BuildSystemEnabled", false).toBool();
-   ui->chBoxBuildSystem->setChecked(isConfigured);
-   connect(ui->chBoxBuildSystem, &QCheckBox::stateChanged, this, &ConfigWidget::toggleBsAccesInfo);
-
-   ui->leBsUser->setVisible(isConfigured);
-   ui->leBsUserLabel->setVisible(isConfigured);
-   ui->leBsToken->setVisible(isConfigured);
-   ui->leBsTokenLabel->setVisible(isConfigured);
-   ui->leBsUrl->setVisible(isConfigured);
-   ui->leBsUrlLabel->setVisible(isConfigured);
-
-   if (isConfigured)
-   {
-      const auto url = settings.localValue("BuildSystemUrl", "").toString();
-      const auto user = settings.localValue("BuildSystemUser", "").toString();
-      const auto token = settings.localValue("BuildSystemToken", "").toString();
-
-      ui->leBsUrl->setText(url);
-      ui->leBsUser->setText(user);
-      ui->leBsToken->setText(token);
-   }
-
    QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
 
    const auto url = gitConfig->getServerUrl();
@@ -219,9 +196,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->cbSubmodule, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbSubtree, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbDeleteFolder, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->leBsUrl, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
-   connect(ui->leBsUser, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
-   connect(ui->leBsToken, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->pbSelectFolder, &QPushButton::clicked, this, &ConfigWidget::selectFolder);
    connect(ui->pbDefault, &QPushButton::clicked, this, &ConfigWidget::useDefaultLogsFolder);
    connect(ui->leEditor, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
@@ -336,17 +310,6 @@ void ConfigWidget::calculateCacheSize()
    ui->lCacheSize->setText(QString("%1 KB").arg(size / 1024.0));
 }
 
-void ConfigWidget::toggleBsAccesInfo()
-{
-   const auto visible = ui->chBoxBuildSystem->isChecked();
-   ui->leBsUser->setVisible(visible);
-   ui->leBsUserLabel->setVisible(visible);
-   ui->leBsToken->setVisible(visible);
-   ui->leBsTokenLabel->setVisible(visible);
-   ui->leBsUrl->setVisible(visible);
-   ui->leBsUrlLabel->setVisible(visible);
-}
-
 void ConfigWidget::saveConfig()
 {
    mFeedbackTimer->stop();
@@ -420,27 +383,6 @@ void ConfigWidget::saveConfig()
    settings.setLocalValue("Pomodoro/Enabled", ui->cbPomodoroEnabled->isChecked());
 
    emit pomodoroVisibilityChanged();
-
-   /* BUILD SYSTEM CONFIG */
-
-   const auto showBs = ui->chBoxBuildSystem->isChecked();
-   const auto bsUser = ui->leBsUser->text();
-   const auto bsToken = ui->leBsToken->text();
-   const auto bsUrl = ui->leBsUrl->text();
-
-   if (showBs && !bsUser.isEmpty() && !bsToken.isEmpty() && !bsUrl.isEmpty())
-   {
-      settings.setLocalValue("BuildSystemEnabled", showBs);
-      settings.setLocalValue("BuildSystemUrl", bsUrl);
-      settings.setLocalValue("BuildSystemUser", bsUser);
-      settings.setLocalValue("BuildSystemToken", bsToken);
-      emit buildSystemConfigured(showBs);
-   }
-   else
-   {
-      settings.setLocalValue("BuildSystemEnabled", false);
-      emit buildSystemConfigured(false);
-   }
 
    mFeedbackTimer->singleShot(3000, ui->lFeedback, &QLabel::clear);
 }
@@ -595,6 +537,13 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
       ui->pluginsLayout->addWidget(labelName, row, 0);
       ui->pluginsLayout->addWidget(labelVersion, row, 1);
 
+      auto chEnabled = new CheckBox("");
+      const auto auxLayout = new QHBoxLayout();
+      auxLayout->addStretch();
+      auxLayout->addWidget(chEnabled);
+      auxLayout->addStretch();
+
+      ui->pluginsLayout->addLayout(auxLayout, row, 2);
       ++row;
 
       mPluginWidgets.append(labelName);
@@ -621,13 +570,28 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 
             QSettings().setValue("TerminalScheme", newScheme);
          });
+
+         connect(chEnabled, &QCheckBox::stateChanged, this, [](int) {});
       }
-      else if (labelName->text().contains("jenkins", Qt::CaseInsensitive))
+      else if (labelName->text().contains("jenkinsplugin", Qt::CaseInsensitive))
       {
-         ui->buildSystemTab->setVisible(true);
+         chEnabled->setChecked(GitQlientSettings(mGit->getGitDir()).localValue("BuildSystemEnabled", false).toBool());
+
+         connect(chEnabled, &QCheckBox::stateChanged, this, [this, chEnabled]() {
+            const auto checked = chEnabled->isChecked();
+            GitQlientSettings(mGit->getGitDir()).setLocalValue("BuildSystemEnabled", checked);
+            emit buildSystemEnabled(checked);
+         });
       }
-      else if (labelName->text().contains("gitserver", Qt::CaseInsensitive))
+      else if (labelName->text().contains("gitserverplugin", Qt::CaseInsensitive))
       {
+         chEnabled->setChecked(GitQlientSettings(mGit->getGitDir()).localValue("GitServerEnabled", false).toBool());
+
+         connect(chEnabled, &QCheckBox::stateChanged, this, [this, chEnabled]() {
+            const auto checked = chEnabled->isChecked();
+            GitQlientSettings(mGit->getGitDir()).setLocalValue("GitServerEnabled", checked);
+            emit buildSystemEnabled(checked);
+         });
       }
    }
 

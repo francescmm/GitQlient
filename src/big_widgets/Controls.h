@@ -192,9 +192,13 @@ public:
     */
    void changePomodoroVisibility();
 
-   void enableJenkins();
+   void showJenkinsButton(bool show);
 
-   void enableGitServer();
+   void enableJenkins(bool enable);
+
+   void showGitServerButton(bool show);
+
+   void enableGitServer(bool enabled);
 
    void enableTerminal();
 

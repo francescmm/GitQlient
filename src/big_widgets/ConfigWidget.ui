@@ -839,126 +839,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="buildSystemTab">
-      <property name="styleSheet">
-       <string notr="true">background: transparent;</string>
-      </property>
-      <attribute name="title">
-       <string>Build System</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <property name="spacing">
-        <number>0</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QFrame" name="frame_3">
-         <layout class="QGridLayout" name="gridLayout_3">
-          <property name="leftMargin">
-           <number>10</number>
-          </property>
-          <property name="topMargin">
-           <number>10</number>
-          </property>
-          <property name="rightMargin">
-           <number>10</number>
-          </property>
-          <property name="bottomMargin">
-           <number>10</number>
-          </property>
-          <property name="spacing">
-           <number>10</number>
-          </property>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="leBsUser"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="leBsUserLabel">
-            <property name="text">
-             <string>User:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="leBsUrl"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="leBsUrlLabel">
-            <property name="text">
-             <string>Endpoint URL:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="CheckBox" name="chBoxBuildSystem">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="4" column="1">
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="leBsTokenLabel">
-            <property name="text">
-             <string>Token:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_14">
-            <property name="text">
-             <string>Enable build system view</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="leBsToken">
-            <property name="echoMode">
-             <enum>QLineEdit::Password</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="pluginsTab">
       <attribute name="title">
        <string>Plugins</string>
@@ -1032,6 +912,27 @@
             </property>
             <property name="text">
              <string>Version</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_14">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Enabled</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -1196,10 +1097,6 @@
   <tabstop>rbStorage</tabstop>
   <tabstop>sbTimeout</tabstop>
   <tabstop>pbAddCredentials</tabstop>
-  <tabstop>chBoxBuildSystem</tabstop>
-  <tabstop>leBsUrl</tabstop>
-  <tabstop>leBsUser</tabstop>
-  <tabstop>leBsToken</tabstop>
   <tabstop>chDevMode</tabstop>
   <tabstop>tabWidget</tabstop>
  </tabstops>

@@ -541,14 +541,21 @@ void GitQlient::loadPlugins()
             mJenkinsPluginInstance = qMakePair(newKey, qobject_cast<IJenkinsWidget *>(plugin));
          else if (name.contains("gitserver", Qt::CaseInsensitive))
          {
+            bool loaded = true;
+
             QLibrary webChannel("libQt5WebChannel");
-            webChannel.load();
+            loaded &= webChannel.load();
 
-            QLibrary webEngineWidgets("libQt5WEebEngineWidgets");
-            webEngineWidgets.load();
+            if (!loaded)
+               QLog_Error("UI", QString("Impossible to load QtWebChannel: %1").arg(webChannel.errorString()));
 
-            if (webChannel.isLoaded() && webEngineWidgets.isLoaded())
+            QLibrary webEngineWidgets("libQt5WebEngineWidgets");
+            loaded &= webEngineWidgets.load();
+
+            if (loaded)
                mGitServerPluginInstance = qMakePair(newKey, qobject_cast<IGitServerWidget *>(plugin));
+            else
+               QLog_Error("UI", "It was impossible to load the GitServerPlugin since there are dependencies missing.");
          }
          else if (name.contains("qtermwidget", Qt::CaseInsensitive))
             mTerminal = qMakePair(newKey, qobject_cast<QTermWidgetInterface *>(plugin));

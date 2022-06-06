@@ -151,6 +151,8 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mConfigWidget, &ConfigWidget::pomodoroVisibilityChanged, mControls, &Controls::changePomodoroVisibility);
    connect(mConfigWidget, &ConfigWidget::moveLogsAndClose, this, &GitQlientRepo::moveLogsAndClose);
    connect(mConfigWidget, &ConfigWidget::autoFetchChanged, this, &GitQlientRepo::reconfigureAutoFetch);
+   connect(mConfigWidget, &ConfigWidget::buildSystemEnabled, this, &GitQlientRepo::buildSystemActivationToggled);
+   connect(mConfigWidget, &ConfigWidget::gitServerEnabled, this, &GitQlientRepo::gitServerActivationToggled);
 
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::createProgressDialog);
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished);
@@ -231,57 +233,26 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
       if (iter.key().split("-").constFirst().contains("jenkins", Qt::CaseInsensitive)
           && qobject_cast<QWidget *>(iter.value()))
       {
-         auto jenkins = qobject_cast<IJenkinsWidget *>(iter.value());
-         if (jenkins->configure({ mSettings->localValue("BuildSystemUser", "").toString(),
-                                  mSettings->localValue("BuildSystemToken", "").toString(),
-                                  mSettings->localValue("BuildSystemUrl", "").toString() },
-                                GitQlientStyles::getStyles()))
-         {
-            jenkins->start();
-            jenkins->setContentsMargins(QMargins(5, 5, 5, 5));
+         mJenkins = qobject_cast<IJenkinsWidget *>(iter.value());
+         mJenkins->setContentsMargins(QMargins(5, 5, 5, 5));
+         connect(mJenkins, &IJenkinsWidget::gotoBranch, this, &GitQlientRepo::focusHistoryOnBranch);
+         connect(mJenkins, &IJenkinsWidget::gotoPullRequest, this, &GitQlientRepo::focusHistoryOnPr);
 
-            connect(jenkins, &IJenkinsWidget::gotoBranch, this, &GitQlientRepo::focusHistoryOnBranch);
-            connect(jenkins, &IJenkinsWidget::gotoPullRequest, this, &GitQlientRepo::focusHistoryOnPr);
+         if (mJenkins->isConfigured())
+            mJenkins->update();
 
-            mJenkins = jenkins;
-
-            auto widget = dynamic_cast<QWidget *>(iter.value());
-
-            mIndexMap[ControlsMainViews::BuildSystem] = mStackedLayout->addWidget(widget);
-
-            mControls->enableJenkins();
-         }
+         mControls->showJenkinsButton(true);
+         mIndexMap[ControlsMainViews::BuildSystem] = mStackedLayout->addWidget(mJenkins);
       }
       else if (iter.key().split("-").constFirst().contains("gitserver", Qt::CaseInsensitive)
                && qobject_cast<QWidget *>(iter.value()))
       {
-         QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
-         const auto serverUrl = gitConfig->getServerHost();
-         const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
-         GitServerPlugin::ConfigData data;
-         data.user = mSettings->globalValue(QString("%1/user").arg(serverUrl)).toString();
-         data.token = mSettings->globalValue(QString("%1/token").arg(serverUrl)).toString();
-         data.endPoint = mSettings->globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
-         data.repoOwner = repoInfo.first;
-         data.repoName = repoInfo.second;
-         data.serverUrl = serverUrl;
-
-         const auto remoteBranches = mGitQlientCache->getBranches(References::Type::RemoteBranches);
          mGitServerWidget = qobject_cast<IGitServerWidget *>(iter.value());
-         const auto isConfigured = mGitServerWidget->configure(data, remoteBranches, GitQlientStyles::getStyles());
+         mGitServerWidget->setContentsMargins(QMargins(5, 5, 5, 5));
 
-         auto widget = dynamic_cast<QWidget *>(iter.value());
-         widget->setContentsMargins(QMargins(5, 5, 5, 5));
-         mIndexMap[ControlsMainViews::GitServer] = mStackedLayout->addWidget(widget);
-
-         if (isConfigured)
-         {
-            mGitServerCache = mGitServerWidget->getCache();
-            mHistoryWidget->enableGitServerFeatures(mGitServerCache);
-         }
-
-         mControls->enableGitServer();
+         mControls->showGitServerButton(true);
+         mIndexMap[ControlsMainViews::GitServer] = mStackedLayout->addWidget(mGitServerWidget);
       }
       else if (iter.key().split("-").constFirst().contains("qtermwidget", Qt::CaseInsensitive)
                && qobject_cast<QWidget *>(iter.value()))
@@ -525,33 +496,35 @@ bool GitQlientRepo::configureGitServer() const
 {
    bool isConfigured = false;
 
-   auto remoteBranches = mGitQlientCache->getBranches(References::Type::RemoteBranches);
-
-   if (!mGitServerWidget->isConfigured())
+   if (mSettings->localValue("GitServerEnabled", false).toBool())
    {
-      QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
-      const auto serverUrl = gitConfig->getServerHost();
-      const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
+      const auto remoteBranches = mGitQlientCache->getBranches(References::Type::RemoteBranches);
 
-      GitQlientSettings settings("");
-      const auto user = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
-      const auto token = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
+      if (!mGitServerWidget->isConfigured())
+      {
+         QScopedPointer<GitConfig> gitConfig(new GitConfig(mGitBase));
+         const auto serverUrl = gitConfig->getServerHost();
+         const auto repoInfo = gitConfig->getCurrentRepoAndOwner();
 
-      GitServerPlugin::ConfigData data;
-      data.user = user;
-      data.token = token;
-      data.serverUrl = serverUrl;
-      data.repoOwner = repoInfo.first;
-      data.repoName = repoInfo.second;
+         GitQlientSettings settings("");
+         const auto user = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
+         const auto token = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
 
-      isConfigured = mGitServerWidget->configure(data, remoteBranches, GitQlientStyles::getStyles());
+         GitServerPlugin::ConfigData data;
+         data.user = user;
+         data.token = token;
+         data.serverUrl = serverUrl;
+         data.repoOwner = repoInfo.first;
+         data.repoName = repoInfo.second;
+
+         isConfigured = mGitServerWidget->configure(data, remoteBranches, GitQlientStyles::getStyles());
+      }
+      else
+      {
+         isConfigured = true;
+         mGitServerWidget->start(remoteBranches);
+      }
    }
-   else
-   {
-      isConfigured = true;
-      mGitServerWidget->start(remoteBranches);
-   }
-
    return isConfigured;
 }
 
@@ -559,6 +532,9 @@ void GitQlientRepo::showGitServerView()
 {
    if (configureGitServer())
    {
+      mGitServerCache = mGitServerWidget->getCache();
+      mHistoryWidget->enableGitServerFeatures(mGitServerCache);
+
       mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::GitServer]);
       mControls->toggleButton(ControlsMainViews::GitServer);
    }
@@ -577,9 +553,33 @@ void GitQlientRepo::showGitServerPrView(int prNumber)
 
 void GitQlientRepo::showBuildSystemView()
 {
-   mJenkins->update();
-   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::BuildSystem]);
+   if (mSettings->localValue("BuildSystemEnabled", false).toBool())
+   {
+      if (mJenkins->isConfigured())
+         mJenkins->update();
+      else
+      {
+         mJenkins->configure({ mSettings->localValue("BuildSystemUser", "").toString(),
+                               mSettings->localValue("BuildSystemToken", "").toString(),
+                               mSettings->localValue("BuildSystemUrl", "").toString() },
+                             GitQlientStyles::getStyles());
+         mJenkins->start();
+      }
+
+      mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::BuildSystem]);
+   }
+
    mControls->toggleButton(ControlsMainViews::BuildSystem);
+}
+
+void GitQlientRepo::buildSystemActivationToggled(bool enabled)
+{
+   mControls->enableJenkins(enabled);
+}
+
+void GitQlientRepo::gitServerActivationToggled(bool enabled)
+{
+   mControls->enableGitServer(enabled);
 }
 
 void GitQlientRepo::showConfig()

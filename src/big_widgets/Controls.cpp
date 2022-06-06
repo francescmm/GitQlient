@@ -334,19 +334,26 @@ void Controls::changePomodoroVisibility()
    mPomodoro->setVisible(isVisible.toBool());
 }
 
-void Controls::enableJenkins()
+void Controls::showJenkinsButton(bool show)
 {
-   GitQlientSettings settings(mGit->getGitDir());
-   mBuildSystem->setVisible(settings.localValue("BuildSystemEnabled", false).toBool());
-
+   mBuildSystem->setVisible(show);
    mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible());
 }
 
-void Controls::enableGitServer()
+void Controls::enableJenkins(bool enable)
 {
-   mGitPlatform->setVisible(!mGitPlatform->toolTip().isEmpty());
+   mBuildSystem->setEnabled(enable);
+}
 
+void Controls::showGitServerButton(bool show)
+{
+   mGitPlatform->setVisible(show);
    mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible());
+}
+
+void Controls::enableGitServer(bool enabled)
+{
+   mGitPlatform->setVisible(enabled);
 }
 
 void Controls::enableTerminal()

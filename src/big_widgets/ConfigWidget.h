@@ -24,7 +24,8 @@ class ConfigWidget : public QWidget
 signals:
    void reloadView();
    void reloadDiffFont();
-   void buildSystemConfigured(bool configured);
+   void buildSystemEnabled(bool enabled);
+   void gitServerEnabled(bool enabled);
    void commitTitleMaxLenghtChanged();
    void panelsVisibilityChanged();
    void pomodoroVisibilityChanged();
@@ -56,7 +57,6 @@ private:
 
    void clearCache();
    void calculateCacheSize();
-   void toggleBsAccesInfo();
    void enableWidgets();
    void saveFile();
    void showCredentialsDlg();
