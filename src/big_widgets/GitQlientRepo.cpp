@@ -509,6 +509,7 @@ bool GitQlientRepo::configureGitServer() const
          GitQlientSettings settings("");
          const auto user = settings.globalValue(QString("%1/user").arg(serverUrl)).toString();
          const auto token = settings.globalValue(QString("%1/token").arg(serverUrl)).toString();
+         const auto endPoint = settings.globalValue(QString("%1/endpoint").arg(serverUrl)).toString();
 
          GitServerPlugin::ConfigData data;
          data.user = user;
@@ -516,15 +517,16 @@ bool GitQlientRepo::configureGitServer() const
          data.serverUrl = serverUrl;
          data.repoOwner = repoInfo.first;
          data.repoName = repoInfo.second;
+         data.endPoint = endPoint;
 
          isConfigured = mGitServerWidget->configure(data, remoteBranches, GitQlientStyles::getStyles());
       }
       else
-      {
          isConfigured = true;
-         mGitServerWidget->start(remoteBranches);
-      }
+
+      mGitServerWidget->start(remoteBranches);
    }
+
    return isConfigured;
 }
 
