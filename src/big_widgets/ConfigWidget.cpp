@@ -590,7 +590,7 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
          connect(chEnabled, &QCheckBox::stateChanged, this, [this, chEnabled]() {
             const auto checked = chEnabled->isChecked();
             GitQlientSettings(mGit->getGitDir()).setLocalValue("GitServerEnabled", checked);
-            emit buildSystemEnabled(checked);
+            emit gitServerEnabled(checked);
          });
       }
    }
