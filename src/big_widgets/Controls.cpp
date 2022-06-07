@@ -337,7 +337,7 @@ void Controls::changePomodoroVisibility()
 void Controls::showJenkinsButton(bool show)
 {
    mBuildSystem->setVisible(show);
-   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible());
+   mPluginsSeparator->setVisible(show || mGitPlatform->isVisible());
 }
 
 void Controls::enableJenkins(bool enable)
@@ -348,12 +348,12 @@ void Controls::enableJenkins(bool enable)
 void Controls::showGitServerButton(bool show)
 {
    mGitPlatform->setVisible(show);
-   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible());
+   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || show);
 }
 
 void Controls::enableGitServer(bool enabled)
 {
-   mGitPlatform->setVisible(enabled);
+   mGitPlatform->setEnabled(enabled);
 }
 
 void Controls::enableTerminal()
