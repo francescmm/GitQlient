@@ -524,7 +524,8 @@ bool GitQlientRepo::configureGitServer() const
       else
          isConfigured = true;
 
-      mGitServerWidget->start(remoteBranches);
+      if (isConfigured)
+         mGitServerWidget->start(remoteBranches);
    }
 
    return isConfigured;
