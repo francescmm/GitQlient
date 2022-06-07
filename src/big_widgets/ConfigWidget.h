@@ -10,6 +10,7 @@ class GitBase;
 class QTimer;
 class FileEditor;
 class QPushButton;
+class QLabel;
 class QAbstractButton;
 
 namespace Ui
@@ -56,7 +57,10 @@ private:
    QStringList mPluginNames;
 
    void clearCache();
-   void calculateCacheSize();
+   void clearLogs();
+   void clearFolder(const QString &folder, QLabel *label);
+   void calculateLogsSize();
+   uint64_t calculateDirSize(const QString &dirPath);
    void enableWidgets();
    void saveFile();
    void showCredentialsDlg();

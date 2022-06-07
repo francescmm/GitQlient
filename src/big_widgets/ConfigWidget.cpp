@@ -133,6 +133,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->sbMaxCommits->setValue(settings.localValue("MaxCommits", 0).toInt());
 
    ui->tabWidget->setCurrentIndex(0);
+   connect(ui->pbClearLogs, &ButtonLink::clicked, this, &ConfigWidget::clearLogs);
    connect(ui->pbClearCache, &ButtonLink::clicked, this, &ConfigWidget::clearCache);
 
    ui->cbPomodoroEnabled->setChecked(settings.localValue("Pomodoro/Enabled", true).toBool());
@@ -203,12 +204,12 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->leExtFileExplorer, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(mPluginsDownloader, &PluginsDownloader::availablePlugins, this, &ConfigWidget::onPluginsInfoReceived);
    connect(mPluginsDownloader, &PluginsDownloader::pluginStored, this, &ConfigWidget::onPluginStored);
-   connect(mDownloadButtons, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked), this,
-           [this](QAbstractButton *button) {
-              const auto url = mPluginDataMap.value(qobject_cast<QPushButton *>(button)).url;
-           });
 
-   calculateCacheSize();
+   auto size = calculateDirSize(ui->leLogsLocation->text());
+   ui->lLogsSize->setText(QString("%1 KB").arg(size));
+
+   size = calculateDirSize(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+   ui->lCacheSize->setText(QString("%1 KB").arg(size));
 
    mPluginsDownloader->checkAvailablePlugins();
 }
@@ -284,19 +285,47 @@ void ConfigWidget::onPluginStored()
 
 void ConfigWidget::clearCache()
 {
-   const auto path = QString("%1").arg(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+   const auto path = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
    QProcess p;
-   p.setWorkingDirectory(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+   p.setWorkingDirectory(path);
    p.start("rm", { "-rf", path });
 
    if (p.waitForFinished())
-      calculateCacheSize();
+   {
+      const auto size = calculateDirSize(path);
+      ui->lCacheSize->setText(QString("%1 KB").arg(size));
+   }
 }
 
-void ConfigWidget::calculateCacheSize()
+void ConfigWidget::clearLogs()
 {
-   auto size = 0;
-   const auto dirPath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
+   const auto path = ui->leLogsLocation->text();
+   QDir dir(path, { "GitQlient_*.log" });
+   const auto entryList = dir.entryList();
+   for (const auto &filename : entryList)
+      dir.remove(filename);
+
+   const auto size = calculateDirSize(path);
+   ui->lLogsSize->setText(QString("%1 KB").arg(size));
+}
+
+void ConfigWidget::clearFolder(const QString &folder, QLabel *label)
+{
+   const auto path = folder;
+   QProcess p;
+   p.setWorkingDirectory(path);
+   p.start("rm", { "-rf", path });
+
+   if (p.waitForFinished())
+   {
+      const auto size = calculateDirSize(path);
+      label->setText(QString("%1 KB").arg(size));
+   }
+}
+
+uint64_t ConfigWidget::calculateDirSize(const QString &dirPath)
+{
+   auto size = 0U;
    QDir dir(dirPath);
    QDir::Filters dirFilters = QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden | QDir::Files;
    const auto &list = dir.entryInfoList(dirFilters);
@@ -307,7 +336,7 @@ void ConfigWidget::calculateCacheSize()
       size += dirSize(dirPath + "/" + file.fileName());
    }
 
-   ui->lCacheSize->setText(QString("%1 KB").arg(size / 1024.0));
+   return size / 1024.0;
 }
 
 void ConfigWidget::saveConfig()
