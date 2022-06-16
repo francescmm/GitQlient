@@ -242,15 +242,14 @@ void Controls::enableButtons(bool enabled)
    mPullOptions->setEnabled(enabled);
    mPushBtn->setEnabled(enabled);
    mRefreshBtn->setEnabled(enabled);
-   mGitPlatform->setEnabled(enabled);
    mConfigBtn->setEnabled(enabled);
 
    if (enabled)
    {
       GitQlientSettings settings(mGit->getGitDir());
-      const auto isConfigured = settings.localValue("BuildSystemEnabled", false).toBool();
 
-      mBuildSystem->setEnabled(isConfigured);
+      mBuildSystem->setEnabled(settings.localValue("BuildSystemEnabled", false).toBool());
+      mGitPlatform->setEnabled(settings.localValue("GitServerEnabled", false).toBool());
    }
    else
       mBuildSystem->setEnabled(false);
