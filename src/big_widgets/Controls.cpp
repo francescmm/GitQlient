@@ -168,6 +168,9 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    configBuildSystemButton();
 
+   mBuildSystem->setEnabled(settings.localValue("BuildSystemEnabled", false).toBool());
+   mGitPlatform->setEnabled(settings.localValue("GitServerEnabled", false).toBool());
+
    mPluginsSeparator = new QFrame();
    mPluginsSeparator->setObjectName("orangeSeparator");
    mPluginsSeparator->setFixedHeight(20);
