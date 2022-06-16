@@ -203,7 +203,9 @@ void BranchContextMenu::createBranch()
 void BranchContextMenu::createCheckoutBranch()
 {
    BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::CREATE_CHECKOUT, mConfig.mCache, mConfig.mGit });
-   dlg.exec();
+
+   if (dlg.exec() == QDialog::Accepted)
+      emit fullReload();
 }
 
 void BranchContextMenu::merge()

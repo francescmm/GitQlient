@@ -112,7 +112,7 @@ void BranchDlg::accept()
       }
       else if (mConfig.mDialogMode == BranchDlgMode::CREATE_CHECKOUT)
       {
-         ret = git->checkoutNewLocalBranch(ui->leNewName->text());
+         ret = git->checkoutNewLocalBranchFromAnotherBranch(ui->leOldName->text(), ui->leNewName->text());
 
          if (ret.success)
          {
