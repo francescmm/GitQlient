@@ -45,8 +45,9 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    , mUpdater(new GitQlientUpdater(this))
    , mBtnGroup(new QButtonGroup())
    , mLastSeparator(new QFrame())
-
 {
+   GitQlientSettings settings(mGit->getGitDir());
+
    setAttribute(Qt::WA_DeleteOnClose);
 
    connect(mUpdater, &GitQlientUpdater::newVersionAvailable, this, [this]() {
@@ -59,6 +60,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mHistory->setIconSize(QSize(22, 22));
    mHistory->setToolTip(tr("View"));
    mHistory->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mHistory->setShortcut(Qt::CTRL | Qt::Key_1);
    mBtnGroup->addButton(mHistory, static_cast<int>(ControlsMainViews::History));
 
    mDiff->setCheckable(true);
@@ -67,6 +69,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mDiff->setToolTip(tr("Diff"));
    mDiff->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mDiff->setEnabled(false);
+   mDiff->setShortcut(Qt::CTRL | Qt::Key_2);
    mBtnGroup->addButton(mDiff, static_cast<int>(ControlsMainViews::Diff));
 
    mBlame->setCheckable(true);
@@ -74,6 +77,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mBlame->setIconSize(QSize(22, 22));
    mBlame->setToolTip(tr("Blame"));
    mBlame->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mBlame->setShortcut(Qt::CTRL | Qt::Key_3);
    mBtnGroup->addButton(mBlame, static_cast<int>(ControlsMainViews::Blame));
 
    const auto menu = new QMenu(mPullOptions);
@@ -92,6 +96,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mPullBtn->setPopupMode(QToolButton::InstantPopup);
    mPullBtn->setIcon(QIcon(":/icons/git_pull"));
    mPullBtn->setObjectName("ToolButtonAboveMenu");
+   mPullBtn->setShortcut(Qt::CTRL | Qt::Key_4);
 
    mPullOptions->setMenu(menu);
    mPullOptions->setIcon(QIcon(":/icons/arrow_down"));
@@ -111,17 +116,20 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mPushBtn->setIconSize(QSize(22, 22));
    mPushBtn->setToolTip(tr("Push"));
    mPushBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mPushBtn->setShortcut(Qt::CTRL | Qt::Key_5);
 
    mRefreshBtn->setIcon(QIcon(":/icons/refresh"));
    mRefreshBtn->setIconSize(QSize(22, 22));
    mRefreshBtn->setToolTip(tr("Refresh"));
    mRefreshBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mRefreshBtn->setShortcut(Qt::Key_F5);
 
    mConfigBtn->setCheckable(true);
    mConfigBtn->setIcon(QIcon(":/icons/config"));
    mConfigBtn->setIconSize(QSize(22, 22));
    mConfigBtn->setToolTip(tr("Config"));
    mConfigBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mConfigBtn->setShortcut(Qt::CTRL | Qt::Key_6);
    mBtnGroup->addButton(mConfigBtn, static_cast<int>(ControlsMainViews::Config));
 
    mTerminal->setVisible(false);
@@ -130,6 +138,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mTerminal->setIconSize(QSize(22, 22));
    mTerminal->setToolTip(tr("Terminal"));
    mTerminal->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mTerminal->setShortcut(Qt::CTRL | Qt::Key_7);
    mBtnGroup->addButton(mTerminal, static_cast<int>(ControlsMainViews::Terminal));
 
    const auto separator = new QFrame();
@@ -152,32 +161,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    hLayout->addWidget(mPushBtn);
    hLayout->addWidget(separator2);
 
-   createGitPlatformButton(hLayout);
-
-   GitQlientSettings settings(mGit->getGitDir());
-   mBuildSystem->setVisible(false);
-   mBuildSystem->setCheckable(true);
-   mBuildSystem->setIcon(QIcon(":/icons/build_system"));
-   mBuildSystem->setIconSize(QSize(22, 22));
-   mBuildSystem->setToolTip("Jenkins");
-   mBuildSystem->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mBuildSystem->setPopupMode(QToolButton::InstantPopup);
-   mBtnGroup->addButton(mBuildSystem, static_cast<int>(ControlsMainViews::BuildSystem));
-
-   hLayout->addWidget(mBuildSystem);
-
-   configBuildSystemButton();
-
-   mBuildSystem->setEnabled(settings.localValue("BuildSystemEnabled", false).toBool());
-   mGitPlatform->setEnabled(settings.localValue("GitServerEnabled", false).toBool());
-   mTerminal->setEnabled(settings.localValue("TerminalEnabled", false).toBool());
-
-   mPluginsSeparator = new QFrame();
-   mPluginsSeparator->setObjectName("orangeSeparator");
-   mPluginsSeparator->setFixedHeight(20);
-   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible());
-   hLayout->addWidget(mPluginsSeparator);
-
    const auto isVisible = settings.localValue("Pomodoro/Enabled", true);
    mPomodoro->setVisible(isVisible.toBool());
 
@@ -192,7 +175,35 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    hLayout->addWidget(mRefreshBtn);
    hLayout->addWidget(mConfigBtn);
+
+   mGitPlatform->setVisible(false);
+   mBuildSystem->setVisible(false);
+
+   mPluginsSeparator = new QFrame();
+   mPluginsSeparator->setObjectName("orangeSeparator");
+   mPluginsSeparator->setFixedHeight(20);
+   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible() || mTerminal->isVisible());
+   hLayout->addWidget(mPluginsSeparator);
    hLayout->addWidget(mTerminal);
+
+   createGitPlatformButton(hLayout);
+
+   mBuildSystem->setCheckable(true);
+   mBuildSystem->setIcon(QIcon(":/icons/build_system"));
+   mBuildSystem->setIconSize(QSize(22, 22));
+   mBuildSystem->setToolTip("Jenkins");
+   mBuildSystem->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mBuildSystem->setPopupMode(QToolButton::InstantPopup);
+   mBuildSystem->setShortcut(Qt::CTRL | Qt::Key_9);
+   mBtnGroup->addButton(mBuildSystem, static_cast<int>(ControlsMainViews::BuildSystem));
+
+   hLayout->addWidget(mBuildSystem);
+
+   configBuildSystemButton();
+
+   mBuildSystem->setEnabled(settings.localValue("BuildSystemEnabled", false).toBool());
+   mGitPlatform->setEnabled(settings.localValue("GitServerEnabled", false).toBool());
+   mTerminal->setEnabled(settings.localValue("TerminalEnabled", false).toBool());
 
    mLastSeparator->setObjectName("orangeSeparator");
    mLastSeparator->setFixedHeight(20);
@@ -340,7 +351,7 @@ void Controls::changePomodoroVisibility()
 void Controls::showJenkinsButton(bool show)
 {
    mBuildSystem->setVisible(show);
-   mPluginsSeparator->setVisible(show || mGitPlatform->isVisible());
+   mPluginsSeparator->setVisible(show || mGitPlatform->isVisible() || mTerminal->isVisible());
 }
 
 void Controls::enableJenkins(bool enable)
@@ -351,7 +362,7 @@ void Controls::enableJenkins(bool enable)
 void Controls::showGitServerButton(bool show)
 {
    mGitPlatform->setVisible(show);
-   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || show);
+   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || show || mTerminal->isVisible());
 }
 
 void Controls::enableGitServer(bool enabled)
@@ -362,6 +373,8 @@ void Controls::enableGitServer(bool enabled)
 void Controls::showTerminalButton(bool show)
 {
    mTerminal->setVisible(show);
+
+   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible() || show);
 }
 
 void Controls::enableTerminal(bool enabled)
@@ -462,14 +475,13 @@ void Controls::createGitPlatformButton(QHBoxLayout *layout)
       mGitPlatform->setToolTip(name);
       mGitPlatform->setToolButtonStyle(Qt::ToolButtonIconOnly);
       mGitPlatform->setPopupMode(QToolButton::InstantPopup);
+      mGitPlatform->setShortcut(Qt::CTRL | Qt::Key_8);
       mBtnGroup->addButton(mGitPlatform, static_cast<int>(ControlsMainViews::GitServer));
 
       layout->addWidget(mGitPlatform);
 
       connect(mGitPlatform, &QToolButton::clicked, this, &Controls::signalGoServer);
    }
-
-   mGitPlatform->setVisible(false);
 }
 
 void Controls::configBuildSystemButton()
