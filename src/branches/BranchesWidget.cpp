@@ -316,6 +316,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    mMinimize->setIcon(QIcon(":/icons/ahead"));
    mMinimize->setToolTip(tr("Show minimalist view"));
    mMinimize->setObjectName("BranchesWidgetOptionsButton");
+   mMinimize->setShortcut(Qt::CTRL + Qt::Key_B);
    connect(mMinimize, &QPushButton::clicked, this, &BranchesWidget::minimalView);
 
    const auto mainControlsLayout = new QHBoxLayout();
