@@ -27,6 +27,7 @@ signals:
    void reloadDiffFont();
    void buildSystemEnabled(bool enabled);
    void gitServerEnabled(bool enabled);
+   void terminalEnabled(bool enabled);
    void commitTitleMaxLenghtChanged();
    void panelsVisibilityChanged();
    void pomodoroVisibilityChanged();

@@ -170,6 +170,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    mBuildSystem->setEnabled(settings.localValue("BuildSystemEnabled", false).toBool());
    mGitPlatform->setEnabled(settings.localValue("GitServerEnabled", false).toBool());
+   mTerminal->setEnabled(settings.localValue("TerminalEnabled", false).toBool());
 
    mPluginsSeparator = new QFrame();
    mPluginsSeparator->setObjectName("orangeSeparator");
@@ -358,9 +359,14 @@ void Controls::enableGitServer(bool enabled)
    mGitPlatform->setEnabled(enabled);
 }
 
-void Controls::enableTerminal()
+void Controls::showTerminalButton(bool show)
 {
-   mTerminal->setVisible(true);
+   mTerminal->setVisible(show);
+}
+
+void Controls::enableTerminal(bool enabled)
+{
+   mTerminal->setEnabled(enabled);
 }
 
 void Controls::pushCurrentBranch()

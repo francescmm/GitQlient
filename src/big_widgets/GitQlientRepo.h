@@ -295,6 +295,8 @@ private:
 
    void gitServerActivationToggled(bool enabled);
 
+   void terminalActivationToggled(bool enabled);
+
    void showConfig();
 
    void showTerminal();

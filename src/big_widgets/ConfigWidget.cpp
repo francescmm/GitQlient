@@ -580,11 +580,13 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 
       if (labelName->text().contains("qtermwidget", Qt::CaseInsensitive))
       {
+         GitQlientSettings settings(mGit->getGitDir());
+         const auto isTerminalEnabled = settings.localValue("TerminalEnabled", false).toBool();
          const auto terminal = qobject_cast<QTermWidgetInterface *>(iter.value());
          const auto availableSchemes = terminal->getAvailableColorSchemes();
 
-         ui->lTerminalColorScheme->setVisible(true);
-         ui->cbTerminalColorScheme->setVisible(true);
+         ui->lTerminalColorScheme->setVisible(isTerminalEnabled);
+         ui->cbTerminalColorScheme->setVisible(isTerminalEnabled);
          ui->cbTerminalColorScheme->addItems(availableSchemes);
 
          if (const auto lastScheme = QSettings().value("TerminalScheme", QString()).toString();
@@ -600,7 +602,15 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
             QSettings().setValue("TerminalScheme", newScheme);
          });
 
-         connect(chEnabled, &QCheckBox::stateChanged, this, [](int) {});
+         connect(chEnabled, &QCheckBox::stateChanged, this, [this, chEnabled](int) {
+            const auto checked = chEnabled->isChecked();
+            GitQlientSettings(mGit->getGitDir()).setLocalValue("TerminalEnabled", checked);
+
+            ui->lTerminalColorScheme->setVisible(checked);
+            ui->cbTerminalColorScheme->setVisible(checked);
+
+            emit terminalEnabled(checked);
+         });
       }
       else if (labelName->text().contains("jenkinsplugin", Qt::CaseInsensitive))
       {

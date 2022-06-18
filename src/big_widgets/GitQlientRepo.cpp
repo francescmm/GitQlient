@@ -153,6 +153,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mConfigWidget, &ConfigWidget::autoFetchChanged, this, &GitQlientRepo::reconfigureAutoFetch);
    connect(mConfigWidget, &ConfigWidget::buildSystemEnabled, this, &GitQlientRepo::buildSystemActivationToggled);
    connect(mConfigWidget, &ConfigWidget::gitServerEnabled, this, &GitQlientRepo::gitServerActivationToggled);
+   connect(mConfigWidget, &ConfigWidget::terminalEnabled, this, &GitQlientRepo::terminalActivationToggled);
 
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::createProgressDialog);
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished);
@@ -287,7 +288,7 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
          widget->setContentsMargins(QMargins(5, 5, 5, 5));
          mIndexMap[ControlsMainViews::Terminal] = mStackedLayout->addWidget(widget);
 
-         mControls->enableTerminal();
+         mControls->showTerminalButton(true);
       }
       else
          mPlugins[iter.key()] = iter.value();
@@ -583,6 +584,11 @@ void GitQlientRepo::buildSystemActivationToggled(bool enabled)
 void GitQlientRepo::gitServerActivationToggled(bool enabled)
 {
    mControls->enableGitServer(enabled);
+}
+
+void GitQlientRepo::terminalActivationToggled(bool enabled)
+{
+   mControls->enableTerminal(enabled);
 }
 
 void GitQlientRepo::showConfig()

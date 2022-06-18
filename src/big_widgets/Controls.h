@@ -200,7 +200,9 @@ public:
 
    void enableGitServer(bool enabled);
 
-   void enableTerminal();
+   void showTerminalButton(bool show);
+
+   void enableTerminal(bool enabled);
 
 private:
    QString mCurrentSha;
