@@ -106,8 +106,8 @@ private:
    QString mPathToOpen;
    bool mMoveLogs = false;
    QMap<QString, QObject *> mPlugins;
-   QPair<QString, IJenkinsWidget *> mJenkinsPluginInstance;
-   QPair<QString, IGitServerWidget *> mGitServerPluginInstance;
+   QPair<QString, IJenkinsWidget *> mJenkins;
+   QPair<QString, IGitServerWidget *> mGitServer;
    QPair<QString, QTermWidgetInterface *> mTerminal;
 
    /*!

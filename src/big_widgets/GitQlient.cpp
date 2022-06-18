@@ -377,17 +377,17 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
 
          repo->setRepository(repoName);
 
-         if (!mPlugins.isEmpty() || (mPlugins.empty() && mJenkinsPluginInstance.second)
-             || (mPlugins.empty() && mGitServerPluginInstance.second) || (mPlugins.empty() && mTerminal.second))
+         if (!mPlugins.isEmpty() || (mPlugins.empty() && mJenkins.second) || (mPlugins.empty() && mGitServer.second)
+             || (mPlugins.empty() && mTerminal.second))
          {
             decltype(mPlugins) plugins;
             plugins = mPlugins;
 
-            if (mJenkinsPluginInstance.second)
-               plugins[mJenkinsPluginInstance.first] = mJenkinsPluginInstance.second->createWidget();
+            if (mJenkins.second)
+               plugins[mJenkins.first] = mJenkins.second->createWidget();
 
-            if (mGitServerPluginInstance.second)
-               plugins[mGitServerPluginInstance.first] = mGitServerPluginInstance.second->createWidget(git);
+            if (mGitServer.second)
+               plugins[mGitServer.first] = mGitServer.second->createWidget(git);
 
             if (mTerminal.second)
                plugins[mTerminal.first] = dynamic_cast<QObject *>(mTerminal.second->createWidget(0));
@@ -537,9 +537,13 @@ void GitQlient::loadPlugins()
          const auto version = metadata.value("MetaData").toObject().value("Version").toString();
          const auto newKey = QString("%1-%2").arg(name, version);
 
-         if (name.contains("jenkins", Qt::CaseInsensitive))
-            mJenkinsPluginInstance = qMakePair(newKey, qobject_cast<IJenkinsWidget *>(plugin));
-         else if (name.contains("gitserver", Qt::CaseInsensitive))
+         if (name.contains("jenkins", Qt::CaseInsensitive)
+             && (!mJenkins.second || mJenkins.first.split("-").constLast() < version))
+         {
+            mJenkins = qMakePair(newKey, qobject_cast<IJenkinsWidget *>(plugin));
+         }
+         else if (name.contains("gitserver", Qt::CaseInsensitive)
+                  && (!mGitServer.second || mGitServer.first.split("-").constLast() < version))
          {
             bool loaded = true;
 
@@ -553,14 +557,17 @@ void GitQlient::loadPlugins()
             loaded &= webEngineWidgets.load();
 
             if (loaded)
-               mGitServerPluginInstance = qMakePair(newKey, qobject_cast<IGitServerWidget *>(plugin));
+               mGitServer = qMakePair(newKey, qobject_cast<IGitServerWidget *>(plugin));
             else
                QLog_Error("UI", "It was impossible to load the GitServerPlugin since there are dependencies missing.");
          }
-         else if (name.contains("qtermwidget", Qt::CaseInsensitive))
+         else if (name.contains("qtermwidget", Qt::CaseInsensitive)
+                  && (!mTerminal.second || mTerminal.first.split("-").constLast() < version))
             mTerminal = qMakePair(newKey, qobject_cast<QTermWidgetInterface *>(plugin));
+         /*
          else
             mPlugins[newKey] = plugin;
+         */
       }
       else
       {
