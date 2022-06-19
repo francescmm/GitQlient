@@ -7,7 +7,8 @@ FORMS += \
     $$PWD/InitialRepoConfig.ui \
     $$PWD/PomodoroConfigDlg.ui \
     $$PWD/PullDlg.ui \
-    $$PWD/SquashDlg.ui
+    $$PWD/SquashDlg.ui \
+    $$PWD/NewVersionInfoDlg.ui
 
 HEADERS += \
     $$PWD/BranchDlg.h \
@@ -26,7 +27,8 @@ HEADERS += \
     $$PWD/PullDlg.h \
     $$PWD/SquashDlg.h \
     $$PWD/UpstreamDlg.h \
-    $$PWD/WaitingDlg.h
+    $$PWD/WaitingDlg.h \
+    $$PWD/NewVersionInfoDlg.h
 
 SOURCES += \
     $$PWD/BranchDlg.cpp \
@@ -45,4 +47,5 @@ SOURCES += \
     $$PWD/PullDlg.cpp \
     $$PWD/SquashDlg.cpp \
     $$PWD/UpstreamDlg.cpp \
-    $$PWD/WaitingDlg.cpp
+    $$PWD/WaitingDlg.cpp \
+    $$PWD/NewVersionInfoDlg.cpp
