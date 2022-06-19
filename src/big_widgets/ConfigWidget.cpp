@@ -8,6 +8,7 @@
 #include <GitConfig.h>
 #include <GitCredentials.h>
 #include <GitQlientSettings.h>
+#include <NewVersionInfoDlg.h>
 #include <PluginsDownloader.h>
 #include <QLogger.h>
 #include <qtermwidget_interface.h>
@@ -170,8 +171,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
            SLOT(onCredentialsOptionChanged(QAbstractButton *)));
    connect(ui->pbAddCredentials, &QPushButton::clicked, this, &ConfigWidget::showCredentialsDlg);
 
-   // Plugins widget
-
    // TODO: Download the plugins info
    connect(ui->pbPluginsFolder, &QPushButton::clicked, this, &ConfigWidget::selectPluginsFolder);
 
@@ -204,6 +203,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->leExtFileExplorer, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(mPluginsDownloader, &PluginsDownloader::availablePlugins, this, &ConfigWidget::onPluginsInfoReceived);
    connect(mPluginsDownloader, &PluginsDownloader::pluginStored, this, &ConfigWidget::onPluginStored);
+   connect(ui->pbFeaturesTour, &QPushButton::clicked, this, &ConfigWidget::showFeaturesTour);
 
    auto size = calculateDirSize(ui->leLogsLocation->text());
    ui->lLogsSize->setText(QString("%1 KB").arg(size));
@@ -493,7 +493,8 @@ void ConfigWidget::selectPluginsFolder()
 
       ui->lPluginsWarning->setVisible(false);
 
-      for (const auto &button : mDownloadButtons->buttons())
+      const auto buttons = mDownloadButtons->buttons();
+      for (const auto &button : buttons)
          button->setEnabled(true);
 
       QSettings().setValue("PluginsFolder", d.absolutePath());
@@ -542,13 +543,21 @@ void ConfigWidget::useDefaultLogsFolder()
 
 void ConfigWidget::readRemotePluginsInfo() { }
 
+void ConfigWidget::showFeaturesTour()
+{
+   NewVersionInfoDlg dlg(this);
+   dlg.setFixedSize(600, 400);
+   dlg.exec();
+}
+
 void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 {
    mPluginNames.clear();
 
    if (plugins.isEmpty())
    {
-      for (const auto &button : mDownloadButtons->buttons())
+      const auto buttons = mDownloadButtons->buttons();
+      for (const auto &button : buttons)
          button->setEnabled(true);
 
       return;
@@ -602,6 +611,7 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
             QSettings().setValue("TerminalScheme", newScheme);
          });
 
+         chEnabled->setChecked(GitQlientSettings(mGit->getGitDir()).localValue("TerminalEnabled", false).toBool());
          connect(chEnabled, &QCheckBox::stateChanged, this, [this, chEnabled](int) {
             const auto checked = chEnabled->isChecked();
             GitQlientSettings(mGit->getGitDir()).setLocalValue("TerminalEnabled", checked);

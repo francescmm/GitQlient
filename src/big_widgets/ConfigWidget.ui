@@ -108,167 +108,289 @@
        </property>
        <item>
         <widget class="QFrame" name="frame">
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="3" column="2">
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Styles schema</string>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Logs</string>
             </property>
+            <layout class="QGridLayout" name="gridLayout_3">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Disable logs</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1" colspan="3">
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QLineEdit" name="leLogsLocation">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pbSelectFolder">
+                 <property name="toolTip">
+                  <string>Select folder</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../AuxiliarCustomWidgets/resources.qrc">
+                   <normaloff>:/icons/open_repo</normaloff>:/icons/open_repo</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pbDefault">
+                 <property name="toolTip">
+                  <string>Reset to default value</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../AuxiliarCustomWidgets/resources.qrc">
+                   <normaloff>:/icons/back</normaloff>:/icons/back</iconset>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="0" column="1">
+              <widget class="CheckBox" name="chDisableLogs">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Set log level</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QComboBox" name="cbLogLevel">
+               <item>
+                <property name="text">
+                 <string>Trace</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Debug</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Info</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Warning</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Error</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Fatal</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_23">
+               <property name="text">
+                <string>Logs location</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_33">
+               <property name="text">
+                <string>Logs space used:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1" colspan="3">
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <property name="spacing">
+                <number>10</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="lLogsSize">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="ButtonLink" name="pbClearLogs">
+                 <property name="text">
+                  <string>Clear</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_23">
-            <property name="text">
-             <string>Logs location</string>
+          <item>
+           <widget class="QGroupBox" name="groupBox_2">
+            <property name="title">
+             <string>GitQlient styles</string>
             </property>
+            <layout class="QGridLayout" name="gridLayout_6">
+             <item row="0" column="2">
+              <widget class="QLabel" name="label_21">
+               <property name="text">
+                <string>Editor font size</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QSpinBox" name="sbEditorFontSize">
+               <property name="suffix">
+                <string> pt</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Styles schema</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="cbStyle">
+               <item>
+                <property name="text">
+                 <string>dark</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>bright</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_15">
+               <property name="text">
+                <string>Commit title max. length</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="spCommitTitleLength">
+               <property name="value">
+                <number>50</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="labelExtFileExplorer">
-            <property name="text">
-             <string>External file browser</string>
+          <item>
+           <widget class="QGroupBox" name="groupBox_3">
+            <property name="title">
+             <string>External config</string>
             </property>
+            <layout class="QFormLayout" name="formLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Git Location (if not in PATH)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="leGitPath">
+               <property name="placeholderText">
+                <string>Git location...</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="labelExtFileExplorer">
+               <property name="text">
+                <string>External file browser</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="leExtFileExplorer"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_27">
+               <property name="text">
+                <string>External editor (IDE)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <item>
+                <widget class="QLineEdit" name="leEditor"/>
+               </item>
+               <item>
+                <widget class="QPushButton" name="pbSelectEditor">
+                 <property name="icon">
+                  <iconset resource="../AuxiliarCustomWidgets/resources.qrc">
+                   <normaloff>:/icons/go_to</normaloff>:/icons/go_to</iconset>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
            </widget>
           </item>
-          <item row="3" column="3">
-           <widget class="QComboBox" name="cbStyle">
-            <item>
-             <property name="text">
-              <string>dark</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>bright</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="1" column="1" colspan="3">
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <widget class="QLineEdit" name="leLogsLocation">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
+          <item>
+           <layout class="QFormLayout" name="formLayout_2">
+            <property name="leftMargin">
+             <number>10</number>
+            </property>
+            <property name="rightMargin">
+             <number>10</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="lTerminalColorScheme">
+              <property name="text">
+               <string>Terminal color scheme:</string>
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QPushButton" name="pbSelectFolder">
-              <property name="toolTip">
-               <string>Select folder</string>
-              </property>
-              <property name="icon">
-               <iconset resource="../AuxiliarCustomWidgets/resources.qrc">
-                <normaloff>:/icons/open_repo</normaloff>:/icons/open_repo</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pbDefault">
-              <property name="toolTip">
-               <string>Reset to default value</string>
-              </property>
-              <property name="icon">
-               <iconset resource="../AuxiliarCustomWidgets/resources.qrc">
-                <normaloff>:/icons/back</normaloff>:/icons/back</iconset>
-              </property>
-             </widget>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="cbTerminalColorScheme"/>
             </item>
            </layout>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_15">
-            <property name="text">
-             <string>Commit title max. length</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1" colspan="3">
-           <widget class="QLineEdit" name="leGitPath">
-            <property name="placeholderText">
-             <string>Git location...</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Git Location (if not in PATH)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_21">
-            <property name="text">
-             <string>Editor font size</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1" colspan="3">
-           <widget class="QComboBox" name="cbTerminalColorScheme"/>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>Disable logs</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QSpinBox" name="spCommitTitleLength">
-            <property name="value">
-             <number>50</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Set log level</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="CheckBox" name="chDisableLogs">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0">
-           <widget class="QLabel" name="label_27">
-            <property name="text">
-             <string>External editor (IDE)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1" colspan="3">
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <widget class="QLineEdit" name="leEditor"/>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pbSelectEditor">
-              <property name="icon">
-               <iconset resource="../AuxiliarCustomWidgets/resources.qrc">
-                <normaloff>:/icons/go_to</normaloff>:/icons/go_to</iconset>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="4" column="1">
-           <widget class="QSpinBox" name="sbEditorFontSize">
-            <property name="suffix">
-             <string> pt</string>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="0">
+          <item>
            <spacer name="verticalSpacer_2">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -281,88 +403,10 @@
             </property>
            </spacer>
           </item>
-          <item row="6" column="1" colspan="3">
-           <widget class="QLineEdit" name="leExtFileExplorer"/>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="lTerminalColorScheme">
+          <item>
+           <widget class="QPushButton" name="pbFeaturesTour">
             <property name="text">
-             <string>Terminal color scheme:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QComboBox" name="cbLogLevel">
-            <item>
-             <property name="text">
-              <string>Trace</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Debug</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Info</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Warning</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Error</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Fatal</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="2" column="1" colspan="3">
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
-            <property name="spacing">
-             <number>10</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="lLogsSize">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="ButtonLink" name="pbClearLogs">
-              <property name="text">
-               <string>Clear</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_33">
-            <property name="text">
-             <string>Logs space used:</string>
+             <string>Features tour</string>
             </property>
            </widget>
           </item>
@@ -1106,16 +1150,9 @@
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget_2</tabstop>
-  <tabstop>chDisableLogs</tabstop>
-  <tabstop>cbLogLevel</tabstop>
   <tabstop>leLogsLocation</tabstop>
   <tabstop>pbSelectFolder</tabstop>
   <tabstop>pbDefault</tabstop>
-  <tabstop>spCommitTitleLength</tabstop>
-  <tabstop>cbStyle</tabstop>
-  <tabstop>sbEditorFontSize</tabstop>
-  <tabstop>leGitPath</tabstop>
-  <tabstop>leExtFileExplorer</tabstop>
   <tabstop>scrollArea</tabstop>
   <tabstop>cbTranslations</tabstop>
   <tabstop>sbMaxCommits</tabstop>

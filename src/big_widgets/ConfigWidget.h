@@ -56,6 +56,7 @@ private:
    QVector<PluginInfo> mPluginsInfo;
    QMap<QPushButton *, PluginInfo> mPluginDataMap;
    QStringList mPluginNames;
+   QPushButton *mPbFeaturesTour;
 
    void clearCache();
    void clearLogs();
@@ -70,6 +71,7 @@ private:
    void selectEditor();
    void useDefaultLogsFolder();
    void readRemotePluginsInfo();
+   void showFeaturesTour();
 
 private slots:
    void saveConfig();

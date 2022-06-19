@@ -8,6 +8,7 @@
 #include <GitQlientStyles.h>
 #include <InitScreen.h>
 #include <InitialRepoConfig.h>
+#include <NewVersionInfoDlg.h>
 #include <ProgressDlg.h>
 #include <QPinnableTabWidget.h>
 
@@ -459,6 +460,10 @@ void GitQlient::closeTab(int tabIndex)
 
 void GitQlient::restorePinnedRepos()
 {
+   NewVersionInfoDlg dlg(this);
+   dlg.setFixedSize(600, 400);
+   dlg.exec();
+
    const auto pinnedRepos
        = GitQlientSettings().globalValue(GitQlientSettings::PinnedRepos, QStringList()).toStringList();
 
