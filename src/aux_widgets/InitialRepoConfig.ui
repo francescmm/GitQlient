@@ -29,7 +29,7 @@
    <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="label_4">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this new version, GitQlient includes some new parameters to help you to configure the repository. Please, take a moment to change them if you'd like.&lt;/p&gt;&lt;p&gt;If you already have configured some of them, they will show the already set value.&lt;/p&gt;&lt;p&gt;You can modify these values at any moment using the &lt;span style=&quot; font-style:italic;&quot;&gt;Config &lt;/span&gt;button in the top icons list of GitQlient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the first time you open this repository. GitQlient includes some parameters to help you to configure the it. Please, take a moment to change them if you'd like.&lt;/p&gt;&lt;p&gt;If you already have configured some of them, they will show the already set value.&lt;/p&gt;&lt;p&gt;You can modify these values at any moment using the &lt;span style=&quot; font-style:italic;&quot;&gt;Config &lt;/span&gt;button in the top icons list of GitQlient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
