@@ -102,7 +102,8 @@ void GitQlientUpdater::processUpdateFile()
          QMessageBox::information(
              qobject_cast<QWidget *>(parent()), tr("New version available!"),
              tr("There is a new version of GitQlient available but your OS doesn't have a binary built. If you want to "
-                "get the latest version, please <a href='https://github.com/francescmm/GitQlient/releases/tag/v%1'>get "
+                "get the latest version, please <a style='color: #D89000' "
+                "href='https://github.com/francescmm/GitQlient/releases/tag/v%1'>get "
                 "the source code from GitHub</a>.")
                  .arg(mLatestGitQlient));
       }

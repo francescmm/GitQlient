@@ -460,12 +460,15 @@ void GitQlient::closeTab(int tabIndex)
 
 void GitQlient::restorePinnedRepos()
 {
-   NewVersionInfoDlg dlg(this);
-   dlg.setFixedSize(600, 400);
-   dlg.exec();
+   GitQlientSettings settings;
 
-   const auto pinnedRepos
-       = GitQlientSettings().globalValue(GitQlientSettings::PinnedRepos, QStringList()).toStringList();
+   if (settings.globalValue("ShowFeaturesDlg", false).toBool())
+   {
+      NewVersionInfoDlg dlg(this);
+      dlg.exec();
+   }
+
+   const auto pinnedRepos = settings.globalValue(GitQlientSettings::PinnedRepos, QStringList()).toStringList();
 
    for (auto &repo : pinnedRepos)
       addNewRepoTab(repo, true);

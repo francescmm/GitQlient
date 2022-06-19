@@ -18,4 +18,11 @@
         <file alias="gitqlient_en.qm">resources/translations/gitqlient_en.qm</file>
         <file alias="gitqlient_en.ts">resources/translations/gitqlient_en.ts</file>
     </qresource>
+    <qresource prefix="/images/NewVersionInfoDlg">
+        <file alias="hunkPage">resources/images/hunkPage.png</file>
+        <file alias="pluginsPage">resources/images/pluginsPage.png</file>
+        <file alias="terminalPage">resources/images/terminalPage01.png</file>
+        <file alias="branchesPage">resources/images/branchesPage.png</file>
+        <file alias="shortcutsPage">resources/images/shortcutsPage.png</file>
+    </qresource>
 </RCC>

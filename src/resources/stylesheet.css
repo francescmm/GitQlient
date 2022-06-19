@@ -447,6 +447,11 @@ PomodoroButton > QLabel
    font-family: DejaVu Sans Mono;
 }
 
+NewVersionInfoDlg #gridFrame
+{
+   border-top: 1px solid #D89000;
+}
+
 /*********************************************/
 /*             Custom Widgets END            */
 /*********************************************/

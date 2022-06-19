@@ -20,4 +20,7 @@ private:
 
    void goPreviousPage();
    void goNextPage();
+
+   void createAddPage(const QString &title, const QStringList &imgsSrc, const QString &desc);
+   void saveConfig();
 };
