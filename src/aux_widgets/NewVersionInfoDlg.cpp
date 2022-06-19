@@ -71,6 +71,18 @@ NewVersionInfoDlg::NewVersionInfoDlg(QWidget *parent)
           "<li>GitHub (if enabled): <strong>Ctrl+8</strong></li><li>Jenkins (if enabled): <strong>Ctrl+9</strong></li>"
           "</ul>"));
 
+   createAddPage(
+       tr("7. New version notification"), { "" },
+       tr("Until now, whenever a new version of GitQlient was released, the app would notify making it "
+          "available for download.<br><br>"
+          "This will change from now on since GitQlient is available through different ways: DEB and <a style='color: "
+          "#D89000' href='https://src.fedoraproject.org/rpms/gitqlient'>RPM</a> "
+          "packages, AppImage, installer for Windows, and DMG/ports for MacOS. Since it's quite hard and error "
+          "prone to verify what binary is being used, the icon will notify that a new version have been "
+          "released but it the download will have to happen manually.<br><br>"
+          "You can of course download the latest version <a style='color: #D89000' "
+          "href='https://github.com/francescmm/GitQlient/releases'>from the official GitHub repo</a>."));
+
    connect(ui->pbPrevious, &QPushButton::clicked, this, &NewVersionInfoDlg::goPreviousPage);
    connect(ui->pbNext, &QPushButton::clicked, this, &NewVersionInfoDlg::goNextPage);
    connect(ui->pbClose, &QPushButton::clicked, this, &QDialog::close);

@@ -51,9 +51,7 @@ void GitQlientUpdater::showInfoMessage()
    msgBox.setButtonText(QMessageBox::Ok, tr("Download"));
    msgBox.setDetailedText(mChangeLog);
    msgBox.setStyleSheet(GitQlientStyles::getStyles());
-
-   if (msgBox.exec() == QMessageBox::Ok)
-      downloadFile();
+   msgBox.exec();
 }
 
 void GitQlientUpdater::processUpdateFile()
@@ -69,23 +67,7 @@ void GitQlientUpdater::processUpdateFile()
    }
 
    const auto json = jsonDoc.object();
-
    mLatestGitQlient = json["latest-version"].toString();
-   const auto changeLogUrl = json["changelog"].toString();
-
-   QJsonObject os;
-   auto platformSupported = true;
-#if defined(Q_OS_WIN)
-   os = json["windows"].toObject();
-#elif defined(Q_OS_LINUX)
-   os = json["linux"].toObject();
-#elif defined(Q_OS_OSX)
-   os = json["osx"].toObject();
-#else
-   platformSupported = false;
-   QLog_Error("Ui", QString("Platform not supported for updates"));
-#endif
-
    const auto curVersion = QString("%1").arg(VER).split(".");
 
    if (curVersion.count() == 1)
@@ -97,34 +79,20 @@ void GitQlientUpdater::processUpdateFile()
 
    if (nv > cv)
    {
-      if (!platformSupported)
-      {
-         QMessageBox::information(
-             qobject_cast<QWidget *>(parent()), tr("New version available!"),
-             tr("There is a new version of GitQlient available but your OS doesn't have a binary built. If you want to "
-                "get the latest version, please <a style='color: #D89000' "
-                "href='https://github.com/francescmm/GitQlient/releases/tag/v%1'>get "
-                "the source code from GitHub</a>.")
-                 .arg(mLatestGitQlient));
-      }
-      else
-      {
-         mGitQlientDownloadUrl = os["download-url"].toString();
-         emit newVersionAvailable();
+      emit newVersionAvailable();
 
-         QTimer::singleShot(200, this, [this, changeLogUrl] {
-            QNetworkRequest request;
-            request.setRawHeader("User-Agent", "GitQlient");
-            request.setRawHeader("X-Custom-User-Agent", "GitQlient");
-            request.setRawHeader("Content-Type", "application/json");
-            request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, true);
-            request.setUrl(QUrl(changeLogUrl));
+      QTimer::singleShot(200, this, [this, changeLogUrl = json["changelog"].toString()] {
+         QNetworkRequest request;
+         request.setRawHeader("User-Agent", "GitQlient");
+         request.setRawHeader("X-Custom-User-Agent", "GitQlient");
+         request.setRawHeader("Content-Type", "application/json");
+         request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, true);
+         request.setUrl(QUrl(changeLogUrl));
 
-            const auto reply = mManager->get(request);
+         const auto reply = mManager->get(request);
 
-            connect(reply, &QNetworkReply::finished, this, &GitQlientUpdater::processChangeLog);
-         });
-      }
+         connect(reply, &QNetworkReply::finished, this, &GitQlientUpdater::processChangeLog);
+      });
    }
 }
 
@@ -132,54 +100,4 @@ void GitQlientUpdater::processChangeLog()
 {
    const auto reply = qobject_cast<QNetworkReply *>(sender());
    mChangeLog = QString::fromUtf8(reply->readAll());
-}
-
-void GitQlientUpdater::downloadFile()
-{
-   QNetworkRequest request;
-   request.setRawHeader("User-Agent", "GitQlient");
-   request.setRawHeader("X-Custom-User-Agent", "GitQlient");
-   request.setRawHeader("Content-Type", "application/octet-stream");
-   request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, true);
-   request.setUrl(QUrl(mGitQlientDownloadUrl));
-
-   const auto fileName = mGitQlientDownloadUrl.split("/").last();
-
-   const auto reply = mManager->get(request);
-
-   connect(reply, &QNetworkReply::downloadProgress, this, [this](qint64 read, qint64 total) {
-      if (mDownloadLog == nullptr)
-      {
-         mDownloadLog
-             = new QProgressDialog(tr("Downloading..."), tr("Close"), 0, total, qobject_cast<QWidget *>(parent()));
-         mDownloadLog->setAttribute(Qt::WA_DeleteOnClose);
-         mDownloadLog->setAutoClose(false);
-         mDownloadLog->setAutoReset(false);
-         mDownloadLog->setMaximum(total);
-         mDownloadLog->setCancelButton(nullptr);
-         mDownloadLog->setWindowFlag(Qt::FramelessWindowHint);
-
-         connect(mDownloadLog, &QProgressDialog::destroyed, this, [this]() { mDownloadLog = nullptr; });
-      }
-
-      mDownloadLog->setValue(read);
-      mDownloadLog->show();
-   });
-
-   connect(reply, &QNetworkReply::finished, this, [this, reply, fileName]() {
-      mDownloadLog->close();
-      mDownloadLog = nullptr;
-
-      const auto b = reply->readAll();
-      const auto destination = QString("%1/%2").arg(
-          QStandardPaths::standardLocations(QStandardPaths::DownloadLocation).constFirst(), fileName);
-
-      if (QFile file(destination); file.open(QIODevice::WriteOnly))
-      {
-         file.write(b);
-         file.close();
-      }
-
-      reply->deleteLater();
-   });
 }

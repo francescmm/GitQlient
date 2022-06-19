@@ -46,9 +46,7 @@ private:
    QProgressDialog *mDownloadLog = nullptr;
    QString mLatestGitQlient;
    QString mChangeLog;
-   QString mGitQlientDownloadUrl;
 
    void processUpdateFile();
    void processChangeLog();
-   void downloadFile();
 };
