@@ -16,5 +16,3 @@ include($$PWD/terminal/Terminal.pri)
 
 RESOURCES += \
     $$PWD/GitQlient.qrc
-
-RC_FILE = $$PWD/resources.rc
