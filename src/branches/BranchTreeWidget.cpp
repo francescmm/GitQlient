@@ -184,51 +184,72 @@ void BranchTreeWidget::onSelectionChanged()
 
 void BranchTreeWidget::showDeleteFolderMenu(QTreeWidgetItem *item, const QPoint &pos)
 {
-   const auto childrenCount = item->childCount();
-   QStringList branchesToRemove;
-
-   for (auto i = 0; i < childrenCount; ++i)
-      branchesToRemove.append(item->child(i)->data(0, FullNameRole).toString());
+   mFolderToRemove = item;
 
    const auto menu = new QMenu(this);
-   connect(menu->addAction("Delete folder"), &QAction::triggered, this, [this, branchesToRemove]() {
-      auto ret = QMessageBox::warning(
-          this, tr("Delete branch!"),
-          tr("Are you sure you want to delete the following branches?\n\n%1").arg(branchesToRemove.join("\n")),
-          QMessageBox::Ok, QMessageBox::Cancel);
-
-      if (ret == QMessageBox::Ok)
-      {
-         auto deleted = false;
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-         for (const auto &branch : branchesToRemove)
-         {
-            const auto type = mLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
-            const auto sha = mCache->getShaOfReference(branch, type);
-            QScopedPointer<GitBranches> git(new GitBranches(mGit));
-            const auto ret2 = mLocal ? git->removeLocalBranch(branch) : git->removeRemoteBranch(branch);
-
-            if (ret2.success)
-            {
-               mCache->deleteReference(sha, type, branch);
-               deleted = true;
-            }
-            else
-               QMessageBox::critical(
-                   this, tr("Delete a branch failed"),
-                   tr("There were some problems while deleting the branch:<br><br> %1").arg(ret2.output));
-         }
-
-         QApplication::restoreOverrideCursor();
-
-         if (deleted)
-         {
-            emit mCache->signalCacheUpdated();
-            emit logReload();
-         }
-      }
-   });
-
+   connect(menu->addAction("Delete folder"), &QAction::triggered, this, &BranchTreeWidget::deleteFolder);
    menu->exec(viewport()->mapToGlobal(pos));
+}
+
+void BranchTreeWidget::discoverBranchesInFolder(QTreeWidgetItem *folder, QStringList &branches)
+{
+   const auto childrenCount = folder->childCount();
+
+   for (auto i = 0; i < childrenCount; ++i)
+   {
+      if (const auto fullName = folder->child(i)->data(0, FullNameRole).toString(); !fullName.isEmpty())
+         branches.append(fullName);
+      else
+      {
+         discoverBranchesInFolder(folder->child(i), branches);
+      }
+   }
+}
+
+void BranchTreeWidget::deleteFolder()
+{
+   if (!mFolderToRemove)
+      return;
+
+   QStringList branchesToRemove;
+   discoverBranchesInFolder(mFolderToRemove, branchesToRemove);
+
+   auto ret = QMessageBox::warning(
+       this, tr("Delete branch!"),
+       tr("Are you sure you want to delete the following branches?\n\n%1").arg(branchesToRemove.join("\n")),
+       QMessageBox::Ok, QMessageBox::Cancel);
+
+   if (ret == QMessageBox::Ok)
+   {
+      auto deleted = false;
+      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+      for (const auto &branch : qAsConst(branchesToRemove))
+      {
+         const auto type = mLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
+         const auto sha = mCache->getShaOfReference(branch, type);
+         QScopedPointer<GitBranches> git(new GitBranches(mGit));
+         const auto ret2 = mLocal ? git->removeLocalBranch(branch) : git->removeRemoteBranch(branch);
+
+         if (ret2.success)
+         {
+            mCache->deleteReference(sha, type, branch);
+            deleted = true;
+         }
+         else
+            QMessageBox::critical(
+                this, tr("Delete a branch failed"),
+                tr("There were some problems while deleting the branch:<br><br> %1").arg(ret2.output));
+      }
+
+      QApplication::restoreOverrideCursor();
+
+      if (deleted)
+      {
+         emit mCache->signalCacheUpdated();
+         emit logReload();
+      }
+   }
+
+   mFolderToRemove = nullptr;
 }

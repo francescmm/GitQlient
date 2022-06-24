@@ -98,6 +98,7 @@ private:
    bool mLocal = false;
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QTreeWidgetItem *mFolderToRemove = nullptr;
 
    /*!
     \brief Shows the context menu.
@@ -124,4 +125,8 @@ private:
    void onSelectionChanged();
 
    void showDeleteFolderMenu(QTreeWidgetItem *item, const QPoint &pos);
+
+   void discoverBranchesInFolder(QTreeWidgetItem *folder, QStringList &branches);
+
+   void deleteFolder();
 };
