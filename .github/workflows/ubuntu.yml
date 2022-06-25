@@ -54,7 +54,6 @@ jobs:
           target: desktop
           host: ${{ matrix.env.qtplatform }}
           install-deps: true
-          modules: 'qtwebengine'
 
       - name: Build GitQlient AppImage
         if: matrix.env.name == 'Linux AppImage'

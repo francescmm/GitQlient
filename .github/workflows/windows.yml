@@ -32,7 +32,6 @@ jobs:
           target: desktop
           host: windows
           install-deps: true
-          modules: 'qtwebengine'
           arch: win64_msvc2019_64
 
       - name: Install dependencies
