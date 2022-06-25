@@ -268,8 +268,17 @@ void ConfigWidget::onPluginsInfoReceived(const QVector<PluginInfo> &pluginsInfo)
       ui->availablePluginsLayout->addWidget(new QLabel(plugin.version), row, 1);
 
       const auto pbDownload = new QPushButton("Download");
-      connect(pbDownload, &QPushButton::clicked, this,
-              [url = plugin.url, this]() { mPluginsDownloader->downloadPlugin(url); });
+      connect(pbDownload, &QPushButton::clicked, this, [url = plugin.url, dependencies = plugin.dependencies, this]() {
+         if (!dependencies.empty())
+         {
+            QMessageBox::information(
+                this, tr("Dependencies needed!"),
+                tr("This plugin needs some dependencies to work. Please make sure you have them instsalled:<br><br>%1")
+                    .arg(dependencies.join("<br>")));
+         }
+
+         mPluginsDownloader->downloadPlugin(url);
+      });
       mDownloadButtons->addButton(pbDownload);
 
       pbDownload->setDisabled(mPluginNames.contains(plugin.name) || ui->lePluginsDestination->text().isEmpty());

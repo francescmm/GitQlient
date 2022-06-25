@@ -38,6 +38,7 @@ struct PluginInfo
    QString name;
    QString version;
    QString url;
+   QStringList dependencies;
 };
 
 class PluginsDownloader : public QObject

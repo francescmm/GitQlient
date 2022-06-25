@@ -62,8 +62,17 @@ void PluginsDownloader::processPluginsFile()
 #endif
       if (const auto jsonUrl = QStringLiteral("%1-url").arg(platform); jsonObject.contains(jsonUrl))
       {
-         pluginsInfo.append(PluginInfo { jsonObject["name"].toString(), jsonObject["version"].toString(),
-                                         jsonObject[jsonUrl].toString() });
+         PluginInfo pluginInfo {
+            jsonObject["name"].toString(), jsonObject["version"].toString(), jsonObject[jsonUrl].toString(), {}
+         };
+
+         if (const auto dependencies = QStringLiteral("dependencies"); jsonObject.contains(dependencies))
+         {
+            for (auto dependency : jsonObject[dependencies].toArray())
+               pluginInfo.dependencies.append(std::move(dependency.toString()));
+         }
+
+         pluginsInfo.append(std::move(pluginInfo));
       }
    }
 
