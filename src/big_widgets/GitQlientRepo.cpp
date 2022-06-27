@@ -91,9 +91,9 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
 
    showHistoryView();
 
-   const auto fetchInterval = mSettings->localValue("AutoFetch", 5).toInt();
+   if (const auto fetchInterval = mSettings->localValue("AutoFetch", 5).toInt(); fetchInterval > 0)
+      mAutoFetch->setInterval(fetchInterval * 60 * 1000);
 
-   mAutoFetch->setInterval(fetchInterval * 60 * 1000);
    mAutoFilesUpdate->setInterval(15000);
 
    connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
@@ -348,7 +348,9 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
       mControls->enableButtons(true);
 
       mAutoFilesUpdate->start();
-      mAutoFetch->start();
+
+      if (const auto fetchInterval = mSettings->localValue("AutoFetch", 5).toInt(); fetchInterval > 0)
+         mAutoFetch->start();
 
       QScopedPointer<GitConfig> git(new GitConfig(mGitBase));
 
@@ -653,7 +655,10 @@ void GitQlientRepo::focusHistoryOnPr(int prNumber)
 
 void GitQlientRepo::reconfigureAutoFetch(int newInterval)
 {
-   mAutoFetch->start(newInterval * 60 * 1000);
+   if (newInterval > 0)
+      mAutoFetch->start(newInterval * 60 * 1000);
+   else
+      mAutoFetch->stop();
 }
 
 void GitQlientRepo::onChangesCommitted()
