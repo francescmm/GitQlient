@@ -92,6 +92,9 @@
    </item>
    <item row="4" column="1">
     <widget class="QSpinBox" name="sbMaxCommits">
+     <property name="specialValueText">
+      <string>All commits</string>
+     </property>
      <property name="suffix">
       <string> last commits</string>
      </property>
@@ -155,6 +158,9 @@
    </item>
    <item row="5" column="1">
     <widget class="QSpinBox" name="autoFetch">
+     <property name="specialValueText">
+      <string>Never</string>
+     </property>
      <property name="suffix">
       <string> minutes</string>
      </property>
