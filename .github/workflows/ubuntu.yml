@@ -38,6 +38,11 @@ jobs:
           sudo ln -s /usr/bin/g++-9 /usr/bin/g++
           sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
 
+      - name: Create Tarball
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          git archive --format=tar.gz -o gitqlient_${{env.VERSION}}.tar.gz --prefix=gitqlient_${{env.VERSION}}/ master
+
       - name: Install Qt for DEB package
         if: matrix.env.name == 'Linux DEB package'
         run: |
@@ -118,7 +123,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: startsWith(github.ref, 'refs/tags/') && matrix.env.name == 'Linux DEB package'
         with:
-          files: gitqlient*.deb
+          files: |
+            gitqlient*.deb
+            gitqlient_${{env.VERSION}}.tar.gz
 
       - name: Prune previous runs
         uses: actions/github-script@v4
