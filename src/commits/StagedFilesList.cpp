@@ -13,14 +13,7 @@ StagedFilesList::StagedFilesList(QWidget *parent)
 
    bool singleClick = GitQlientSettings().globalValue("singleClickDiffView", false).toBool();
 
-   if (singleClick)
-   {
-        connect(this, &QListWidget::itemClicked, this, &StagedFilesList::onDoubleClick);
-   }
-   else
-   {
-        connect(this, &QListWidget::itemDoubleClicked, this, &StagedFilesList::onDoubleClick);
-   }
+   connect(this, singleClick ? &QListWidget::itemClicked : &QListWidget::itemDoubleClicked, this, &StagedFilesList::onDoubleClick);
 }
 
 void StagedFilesList::onContextMenu(const QPoint &pos)

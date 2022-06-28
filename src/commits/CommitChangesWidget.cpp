@@ -72,16 +72,8 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
            &CommitChangesWidget::showUnstagedMenu);
 
-   if (singleClick)
-   {
-       connect(ui->unstagedFilesList, &QListWidget::itemClicked, this,
-               [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
-   }
-   else
-   {
-       connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
-               [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
-   }
+   connect(ui->unstagedFilesList, singleClick ? &QListWidget::itemClicked : &QListWidget::itemDoubleClicked, this,
+           [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
 
    ui->warningButton->setVisible(false);
    ui->applyActionBtn->setText(tr("Commit"));

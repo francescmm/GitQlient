@@ -399,7 +399,7 @@
              <item row="0" column="0">
               <widget class="QLabel" name="label_34">
                <property name="text">
-                <string>Single click to open diff view </string>
+                <string>Single click on file to open diff view (needs restart) </string>
                </property>
               </widget>
              </item>
