@@ -56,6 +56,7 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
    ui->amendFrame->setVisible(false);
 
    mTitleMaxLength = GitQlientSettings().globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
+   bool singleClick = GitQlientSettings().globalValue("singleClickDiffView", false).toBool();
 
    ui->lCounter->setText(QString::number(mTitleMaxLength));
    ui->leCommitTitle->setMaxLength(mTitleMaxLength);
@@ -70,8 +71,17 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
            [this](const QString &fileName) { requestDiff(mGit->getWorkingDir() + "/" + fileName); });
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
            &CommitChangesWidget::showUnstagedMenu);
-   connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
-           [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
+
+   if (singleClick)
+   {
+       connect(ui->unstagedFilesList, &QListWidget::itemClicked, this,
+               [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
+   }
+   else
+   {
+       connect(ui->unstagedFilesList, &QListWidget::itemDoubleClicked, this,
+               [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
+   }
 
    ui->warningButton->setVisible(false);
    ui->applyActionBtn->setText(tr("Commit"));

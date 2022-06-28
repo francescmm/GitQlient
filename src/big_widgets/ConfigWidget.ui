@@ -391,6 +391,29 @@
            </layout>
           </item>
           <item>
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="title">
+             <string>General</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_34">
+               <property name="text">
+                <string>Single click to open diff view </string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="CheckBox" name="chSingleClickDiffView">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_2">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
@@ -445,8 +468,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>551</width>
-            <height>778</height>
+            <width>475</width>
+            <height>712</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

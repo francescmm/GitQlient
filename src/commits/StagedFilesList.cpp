@@ -1,14 +1,26 @@
 #include "StagedFilesList.h"
 
+#include <GitQlientSettings.h>
 #include <GitQlientRole.h>
 
 #include <QMenu>
 
 StagedFilesList::StagedFilesList(QWidget *parent)
    : QListWidget(parent)
+
 {
    connect(this, &QListWidget::customContextMenuRequested, this, &StagedFilesList::onContextMenu);
-   connect(this, &QListWidget::itemDoubleClicked, this, &StagedFilesList::onDoubleClick);
+
+   bool singleClick = GitQlientSettings().globalValue("singleClickDiffView", false).toBool();
+
+   if (singleClick)
+   {
+        connect(this, &QListWidget::itemClicked, this, &StagedFilesList::onDoubleClick);
+   }
+   else
+   {
+        connect(this, &QListWidget::itemDoubleClicked, this, &StagedFilesList::onDoubleClick);
+   }
 }
 
 void StagedFilesList::onContextMenu(const QPoint &pos)
