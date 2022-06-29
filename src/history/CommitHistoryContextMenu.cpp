@@ -657,7 +657,7 @@ void CommitHistoryContextMenu::showSquashDialog()
 void CommitHistoryContextMenu::amendNoEdit()
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
-   const auto ret = git->ammend();
+   const auto ret = git->amend();
    emit logReload();
 
    if (ret.success)

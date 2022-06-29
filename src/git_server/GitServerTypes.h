@@ -123,7 +123,7 @@ struct Commit
    QString sha;
    QString url;
    QString message;
-   User commiter;
+   User committer;
    User author;
    QDateTime authorCommittedTimestamp;
 };
