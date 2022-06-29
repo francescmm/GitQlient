@@ -107,6 +107,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->cbLogLevel->setCurrentIndex(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
    ui->spCommitTitleLength->setValue(settings.globalValue("commitTitleMaxLength", 50).toInt());
    ui->sbEditorFontSize->setValue(settings.globalValue("FileDiffView/FontSize", 8).toInt());
+   ui->chSingleClickDiffView->setChecked(settings.globalValue("singleClickDiffView", false).toBool());
 
 #ifdef Q_OS_LINUX
    ui->leEditor->setText(settings.globalValue("ExternalEditor", QString()).toString());
@@ -204,6 +205,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(mPluginsDownloader, &PluginsDownloader::availablePlugins, this, &ConfigWidget::onPluginsInfoReceived);
    connect(mPluginsDownloader, &PluginsDownloader::pluginStored, this, &ConfigWidget::onPluginStored);
    connect(ui->pbFeaturesTour, &QPushButton::clicked, this, &ConfigWidget::showFeaturesTour);
+   connect(ui->chSingleClickDiffView, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
 
    auto size = calculateDirSize(ui->leLogsLocation->text());
    ui->lLogsSize->setText(QString("%1 KB").arg(size));
@@ -363,6 +365,7 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("FileDiffView/FontSize", ui->sbEditorFontSize->value());
    settings.setGlobalValue("colorSchema", ui->cbStyle->currentText());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
+   settings.setGlobalValue("singleClickDiffView", ui->chSingleClickDiffView->isChecked());
 
    if (!ui->leEditor->text().isEmpty())
       settings.setGlobalValue("ExternalEditor", ui->leEditor->text());
