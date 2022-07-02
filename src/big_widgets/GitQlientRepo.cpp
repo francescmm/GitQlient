@@ -100,6 +100,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mAutoFilesUpdate, &QTimer::timeout, this, &GitQlientRepo::updateUiFromWatcher);
 
    connect(mControls, &Controls::requestFullReload, this, &GitQlientRepo::fullReload);
+   connect(mControls, &Controls::requestFullReload, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mControls, &Controls::requestReferencesReload, this, &GitQlientRepo::referencesReload);
 
    connect(mControls, &Controls::signalGoRepo, this, &GitQlientRepo::showHistoryView);
@@ -207,6 +208,8 @@ void GitQlientRepo::setRepository(const QString &newDir)
       mGitLoader->cancelAll();
 
       emit fullReload();
+
+      updateUiFromWatcher();
 
       mCurrentDir = newDir;
       clearWindow();

@@ -373,7 +373,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
             color = gitQlientOrange;
 
          paintGraphLane(p, LaneType::BRANCH, false, 0, LANE_WIDTH, color, activeColor, activeColor, true,
-                        commit.parentsCount() != 0);
+                        commit.parentsCount() != 0 && !commit.parents().contains(INIT_SHA));
       }
       else
       {

@@ -205,11 +205,15 @@ void GitCache::insertWipRevision(const QString parentSha, const RevisionFiles &f
    CommitInfo c(ZERO_SHA, parents, std::chrono::seconds(QDateTime::currentSecsSinceEpoch()), log);
    calculateLanes(c);
 
-   if (mCommits[0])
+   if (!mCommits.isEmpty() && mCommits[0])
       c.setLanes(mCommits[0]->lanes());
 
    mCommitsMap.insert(ZERO_SHA, std::move(c));
-   mCommits[0] = &mCommitsMap[ZERO_SHA];
+
+   if (!mCommits.isEmpty())
+      mCommits[0] = &mCommitsMap[ZERO_SHA];
+   else
+      mCommits.append(&mCommitsMap[ZERO_SHA]);
 }
 
 bool GitCache::insertRevisionFiles(const QString &sha1, const QString &sha2, const RevisionFiles &file)
