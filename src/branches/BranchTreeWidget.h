@@ -94,6 +94,9 @@ public:
     */
    void reloadCurrentBranchLink() const;
 
+protected:
+   bool eventFilter(QObject *obj, QEvent *event) override;
+
 private:
    bool mLocal = false;
    QSharedPointer<GitCache> mCache;
@@ -129,4 +132,6 @@ private:
    void discoverBranchesInFolder(QTreeWidgetItem *folder, QStringList &branches);
 
    void deleteFolder();
+
+   void onDeleteBranch();
 };
