@@ -194,7 +194,7 @@ private:
    */
    void updateUiFromWatcher();
    /*!
-    \brief Method called when changes are commites through the WIP widget.
+    \brief Method called when changes are committed through the WIP widget.
 
     \param ok True if the changes are committed, otherwise false.
    */

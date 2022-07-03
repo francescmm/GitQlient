@@ -132,7 +132,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
          const auto resetMixedAction = resetMenu->addAction(tr("Mixed (keep files, reset their changes)"));
          resetMixedAction->setToolTip(
-             tr("Point to the selected commit <strong>keeping all changes but reseting the file status<strong>."));
+             tr("Point to the selected commit <strong>keeping all changes but resetting the file status<strong>."));
          connect(resetMixedAction, &QAction::triggered, this, &CommitHistoryContextMenu::resetMixed);
 
          const auto resetHardAction = resetMenu->addAction(tr("Hard (discard chanbges)"));
@@ -657,7 +657,7 @@ void CommitHistoryContextMenu::showSquashDialog()
 void CommitHistoryContextMenu::amendNoEdit()
 {
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
-   const auto ret = git->ammend();
+   const auto ret = git->amend();
    emit logReload();
 
    if (ret.success)

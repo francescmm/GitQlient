@@ -275,7 +275,7 @@ void ConfigWidget::onPluginsInfoReceived(const QVector<PluginInfo> &pluginsInfo)
          {
             QMessageBox::information(
                 this, tr("Dependencies needed!"),
-                tr("This plugin needs some dependencies to work. Please make sure you have them instsalled:<br><br>%1")
+                tr("This plugin needs some dependencies to work. Please make sure you have them installed:<br><br>%1")
                     .arg(dependencies.join("<br>")));
          }
 

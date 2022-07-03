@@ -87,7 +87,7 @@ void SquashDlg::accept()
             // Reset soft to the first commit to squash
             QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
             gitLocal->resetCommit(mShas.constFirst(), GitLocal::CommitResetType::SOFT);
-            gitLocal->ammend(msg);
+            gitLocal->amend(msg);
          }
          else
          {

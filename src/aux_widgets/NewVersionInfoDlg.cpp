@@ -17,8 +17,8 @@ NewVersionInfoDlg::NewVersionInfoDlg(QWidget *parent)
        tr("After some months of work and refactor, GitQlient can be extended with plugins!<br><br>"
           "The plugin system works by deploying <a style='color: #D89000' "
           "href='https://doc.qt.io/qt-6/plugins-howto.html'>Qt plugins</a> "
-          "into the selected folder. GitQlient will automaticall read the metadata for the plugins on every restart "
-          "and list the available plugins (thos that are valid) in the installed plugins pannel.<br><br>"
+          "into the selected folder. GitQlient will automatically read the metadata for the plugins on every restart "
+          "and list the available plugins (those that are valid) in the installed plugins panel.<br><br>"
           "All the GitQlient plugins are downloaded from their official GitHub repo page and stored in the folder "
           "selected. Once they are downloaded, a list with checkbox will be shown in the <em>Installed plugins</em> "
           "section where you can enable/disable them. In addition, the icon will be shown in the Controls panel for an "
@@ -32,12 +32,12 @@ NewVersionInfoDlg::NewVersionInfoDlg(QWidget *parent)
           "shortcut to update and generate your projects.<br><br>"
           "Once the plugin is enabled, it will show an icon in the Controls panel to access it directly. In "
           "addition, in the <em>GitQlient</em> section of the configuration, you will find a combo box to "
-          "selecte your preferred color scheme for the terminal widget based on the ones available in your OS."));
+          "select your preferred color scheme for the terminal widget based on the ones available in your OS."));
 
    createAddPage(
        tr("3. GiHub and Jenkins become plugins"), {},
        tr("The old GitServer view (to connect to GitHub) and Jenkins view (to show and trigger Jenkins jobs and "
-          "builds) have been converted into plugins and are now availble to be downloaded from their release page in "
+          "builds) have been converted into plugins and are now available to be downloaded from their release page in "
           "their own GitHub repo. By having this views detached, GitQlient takes less dependencies (WebEngine, "
           "WebChannel, etc.), allows the release of the GitQlientPlugin for QtCreator and in addition, makes it "
           "possible to improve those plugins independently to GitQlient.<br><br>"));
@@ -60,7 +60,7 @@ NewVersionInfoDlg::NewVersionInfoDlg(QWidget *parent)
        tr("6. Shortcuts"), { "shortcutsPage" },
        tr("In this new version of GitQlient, some shortcuts have been introduced so you don't need to "
           "navigate with the mouse the whole time.<br><br>"
-          "For now, the shorcuts are used in the Controls panel and in the branches panel (in this case to "
+          "For now, the shortcuts are used in the Controls panel and in the branches panel (in this case to "
           "use toggle the minimal/normal view). The shortcuts are:"
           "<ul>"
           "<li>Graph view: <strong>Ctrl+1</strong></li><li>Diff view: <strong>Ctrl+2</strong></li><li>Blame view: "

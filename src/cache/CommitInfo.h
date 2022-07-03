@@ -39,7 +39,7 @@ public:
    {
       SHA,
       PARENTS_SHA,
-      COMMITER,
+      COMMITTER,
       AUTHOR,
       DATE,
       SHORT_LOG,
