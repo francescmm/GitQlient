@@ -37,11 +37,12 @@ jobs:
           sudo apt-get install -y -qq gcc-9 g++-9
           sudo ln -s /usr/bin/g++-9 /usr/bin/g++
           sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
+          sudo pip install git-archive-all
 
       - name: Create Tarball
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          git archive --format=tar.gz -o gitqlient_${{env.VERSION}}.tar.gz --prefix=gitqlient_${{env.VERSION}}/ master
+          git-archive-all --prefix=gitqlient_${{env.VERSION}} gitqlient_${{env.VERSION}}.tar.gz
 
       - name: Install Qt for DEB package
         if: matrix.env.name == 'Linux DEB package'
