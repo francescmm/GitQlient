@@ -160,29 +160,6 @@ QColor CommitChangesWidget::getColorForFile(const RevisionFiles &files, int inde
    return myColor;
 }
 
-void CommitChangesWidget::deleteUntrackedFiles()
-{
-   for (auto i = 0; i < ui->unstagedFilesList->count(); ++i)
-   {
-      const auto item = ui->unstagedFilesList->item(i);
-
-      if (item->data(GitQlientRole::U_IsUntracked).toBool())
-      {
-         const auto path = QString("%1").arg(item->data(GitQlientRole::U_FullPath).toString());
-
-         QLog_Info("UI", "Removing path: " + path);
-
-         QProcess p;
-         p.setWorkingDirectory(mGit->getWorkingDir());
-         p.start("rm", { "-rf", path });
-
-         p.waitForFinished();
-      }
-   }
-
-   emit unstagedFilesChanged();
-}
-
 void CommitChangesWidget::prepareCache()
 {
    for (auto it = mInternalCache.begin(); it != mInternalCache.end(); ++it)
@@ -540,7 +517,7 @@ void CommitChangesWidget::showUnstagedMenu(const QPoint &pos)
       connect(contextMenu, &UnstagedMenu::signalCheckedOut, this, &CommitChangesWidget::unstagedFilesChanged);
       connect(contextMenu, &UnstagedMenu::signalShowFileHistory, this, &CommitChangesWidget::signalShowFileHistory);
       connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
-      connect(contextMenu, &UnstagedMenu::deleteUntracked, this, &CommitChangesWidget::deleteUntrackedFiles);
+      connect(contextMenu, &UnstagedMenu::untrackedDeleted, this, &CommitChangesWidget::unstagedFilesChanged);
 
       const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
       contextMenu->popup(mapToGlobal(parentPos));

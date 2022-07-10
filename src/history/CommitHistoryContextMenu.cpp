@@ -17,6 +17,7 @@
 #include <PullDlg.h>
 #include <SquashDlg.h>
 #include <TagDlg.h>
+#include <WipHelper.h>
 
 #include <QApplication>
 #include <QClipboard>
@@ -121,6 +122,10 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
             {
                const auto pushAction = addAction(tr("Push"));
                connect(pushAction, &QAction::triggered, this, &CommitHistoryContextMenu::push);
+
+               const auto amendCommitAction = addAction(tr("Revert commit"));
+               amendCommitAction->setToolTip(tr("Reverts the selected commit of the branch."));
+               connect(amendCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::revertCommit);
             }
          }
 
@@ -482,6 +487,47 @@ void CommitHistoryContextMenu::fetch()
 
    if (git->fetch(pruneOnFetch))
       emit fullReload();
+}
+
+void CommitHistoryContextMenu::revertCommit()
+{
+   QScopedPointer<GitLocal> git(new GitLocal(mGit));
+   const auto previousSha = mGit->getLastCommit().output.trimmed();
+
+   if (git->revert(mShas.first()).success)
+   {
+      const auto revertedCommit = mCache->commitInfo(mShas.constFirst());
+      const auto currentSha = mGit->getLastCommit().output.trimmed();
+      QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+      auto committer = gitConfig->getLocalUserInfo();
+
+      if (committer.mUserEmail.isEmpty() || committer.mUserName.isEmpty())
+         committer = gitConfig->getGlobalUserInfo();
+
+      CommitInfo newCommit { currentSha,
+                             { previousSha },
+                             std::chrono::seconds(QDateTime::currentDateTime().toSecsSinceEpoch()),
+                             tr("Revert \"%1\"").arg(revertedCommit.shortLog) };
+
+      newCommit.committer = QString("%1<%2>").arg(committer.mUserName, committer.mUserEmail);
+      newCommit.author = QString("%1<%2>").arg(committer.mUserName, committer.mUserEmail);
+      newCommit.longLog = QString("%1\n\n%2 %3")
+                              .arg(newCommit.shortLog, QString::fromUtf8("This reverts commit"), revertedCommit.sha);
+
+      mCache->insertCommit(newCommit);
+      mCache->deleteReference(previousSha, References::Type::LocalBranch, mGit->getCurrentBranch());
+      mCache->insertReference(currentSha, References::Type::LocalBranch, mGit->getCurrentBranch());
+
+      QScopedPointer<GitHistory> gitHistory(new GitHistory(mGit));
+      const auto ret = gitHistory->getDiffFiles(currentSha, previousSha);
+
+      mCache->insertRevisionFiles(currentSha, previousSha, RevisionFiles(ret.output));
+
+      WipHelper::update(mGit, mCache);
+
+      emit mCache->signalCacheUpdated();
+      emit logReload();
+   }
 }
 
 void CommitHistoryContextMenu::resetSoft()

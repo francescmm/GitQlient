@@ -166,6 +166,9 @@ private:
     \brief Fetches the changes from remote.
    */
    void fetch();
+
+   void revertCommit();
+
    /*!
     \brief Resets the current branch reference into the selected commit keeping all changes.
    */

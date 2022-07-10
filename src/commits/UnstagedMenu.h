@@ -39,7 +39,7 @@ signals:
    void signalCheckedOut();
    void signalShowFileHistory(const QString &fileName);
    void signalStageFile();
-   void deleteUntracked();
+   void untrackedDeleted();
 
 public:
    explicit UnstagedMenu(const QSharedPointer<GitBase> &git, const QString &fileName, QWidget *parent = nullptr);
@@ -52,4 +52,5 @@ private:
    void onDeleteFile();
    void openFileExplorer();
    void openExternalEditor();
+   void deleteUntracked();
 };

@@ -99,7 +99,6 @@ protected:
    virtual bool hasConflicts() final;
    virtual void resetFile(QListWidgetItem *item) final;
    virtual QColor getColorForFile(const RevisionFiles &files, int index) const final;
-   virtual void deleteUntrackedFiles() final;
 
    static QString lastMsgBeforeError;
 };

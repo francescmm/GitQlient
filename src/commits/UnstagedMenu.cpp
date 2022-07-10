@@ -219,3 +219,16 @@ void UnstagedMenu::openExternalEditor()
       }
    }
 }
+
+void UnstagedMenu::deleteUntracked()
+{
+   QScopedPointer<GitLocal> git(new GitLocal(mGit));
+
+   if (const auto ret = git->cleanUntracked(); ret.success)
+      emit untrackedDeleted();
+   else
+   {
+      QMessageBox::warning(parentWidget(), tr("Error cleaning untracked files"),
+                           tr("There was a problem removing all untracked files."));
+   }
+}
