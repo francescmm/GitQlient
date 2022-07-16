@@ -1,5 +1,5 @@
 Name:    {{{ git_name name="gitqlient" }}}
-Version: 1.4.3
+Version: 1.5.0
 Release: {{{ git_version }}}%{?dist}
 Summary: A multi-platform Git client
 
@@ -14,8 +14,6 @@ BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Gui)
 BuildRequires:  pkgconfig(Qt5Widgets)
 BuildRequires:  pkgconfig(Qt5Network)
-BuildRequires:  pkgconfig(Qt5WebEngineWidgets)
-BuildRequires:  pkgconfig(Qt5WebChannel)
 
 BuildRequires: desktop-file-utils
 
@@ -35,7 +33,7 @@ qmake-qt5 -makefile \
    PREFIX=%{_prefix} \
    GitQlient.pro
 %else
-%qmake_qt5 PREFIX=%{_prefix} GitQlient.pro
+%qmake_qt5 PREFIX=%{_prefix} GitQlient.pro VERSION=1.5.0
 %endif
 
 %make_build
