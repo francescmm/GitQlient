@@ -69,9 +69,28 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
    connect(ui->stagedFilesList, &StagedFilesList::signalResetFile, this, &CommitChangesWidget::resetFile);
    connect(ui->stagedFilesList, &StagedFilesList::signalShowDiff, this,
            [this](const QString &fileName) { requestDiff(mGit->getWorkingDir() + "/" + fileName); });
+
+   if (singleClick)
+   {
+      connect(ui->stagedFilesList, &QListWidget::itemSelectionChanged, this, [this]() {
+         if (const auto items = ui->stagedFilesList->selectedItems(); !items.empty())
+         {
+            const auto item = items.constFirst();
+            requestDiff(mGit->getWorkingDir() + "/" + item->toolTip());
+         }
+      });
+
+      connect(ui->unstagedFilesList, &QListWidget::itemSelectionChanged, this, [this]() {
+         if (const auto items = ui->unstagedFilesList->selectedItems(); !items.empty())
+         {
+            const auto item = items.constFirst();
+            requestDiff(mGit->getWorkingDir() + "/" + item->toolTip());
+         }
+      });
+   }
+
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
            &CommitChangesWidget::showUnstagedMenu);
-
    connect(ui->unstagedFilesList, singleClick ? &QListWidget::itemClicked : &QListWidget::itemDoubleClicked, this,
            [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
 
