@@ -2,7 +2,7 @@
 CONFIG += qt warn_on c++17 c++1z
 
 TARGET = gitqlient
-QT += widgets core network
+QT += widgets core network gui
 DEFINES += QT_DEPRECATED_WARNINGS
 
 unix:!macos {

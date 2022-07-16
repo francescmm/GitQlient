@@ -119,7 +119,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    const auto originalStyles = settings.globalValue("colorSchema", "dark").toString();
    ui->cbStyle->setCurrentText(originalStyles);
-   connect(ui->cbStyle, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged), this,
+   connect(ui->cbStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
            [this, originalStyles]() {
               mShowResetMsg = ui->cbStyle->currentText() != originalStyles;
               saveConfig();
