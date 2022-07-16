@@ -2,6 +2,7 @@
 
 #include <GitExecResult.h>
 
+#include <QRegularExpression>
 #include <QStringList>
 
 CommitInfo::CommitInfo(QByteArray commitData, const QString &gpg, bool goodSignature)
@@ -29,13 +30,8 @@ void CommitInfo::parseDiff(QByteArray &data, int startingField)
       sha = first.remove(0, 1);
 
       if (!shas.isEmpty())
-      {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
          mParentsSha = shas.takeFirst().split(' ', Qt::SkipEmptyParts);
-#else
-         mParentsSha = shas.takeFirst().split(' ', QString::SkipEmptyParts);
-#endif
-      }
+
       committer = fields.at(startingField++);
       author = fields.at(startingField++);
       dateSinceEpoch = std::chrono::seconds(fields.at(startingField++).toInt());
@@ -123,9 +119,9 @@ void CommitInfo::setLanes(QVector<Lane> lanes)
 
 bool CommitInfo::isValid() const
 {
-   static QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
+   static QRegularExpression hexMatcher("^[0-9A-F]{40}$", QRegularExpression::CaseInsensitiveOption);
 
-   return !sha.isEmpty() && hexMatcher.exactMatch(sha);
+   return !sha.isEmpty() && hexMatcher.match(sha).hasMatch();
 }
 
 int CommitInfo::getActiveLane() const

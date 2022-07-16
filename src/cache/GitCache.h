@@ -93,14 +93,14 @@ private:
    Lanes mLanes;
    QVector<QString> mUntrackedFiles;
 
-   mutable QMutex mCommitsMutex;
+   mutable QRecursiveMutex mCommitsMutex;
    QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo> mCommitsMap;
 
-   mutable QMutex mRevisionsMutex;
+   mutable QRecursiveMutex mRevisionsMutex;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
 
-   mutable QMutex mReferencesMutex;
+   mutable QRecursiveMutex mReferencesMutex;
    QHash<QString, References> mReferences;
 
    void setup(const QString &parentSha, const RevisionFiles &files, QVector<CommitInfo> commits);

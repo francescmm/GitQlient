@@ -87,8 +87,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    globalGitLayout->setContentsMargins(QMargins());
 
    mGlobalGit = new FileEditor(false, this);
-   mGlobalGit->editFile(
-       QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::HomeLocation), ".gitconfig"));
+   mGlobalGit->editFile(QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::HomeLocation),
+                                             QString::fromUtf8(".gitconfig")));
    globalGitLayout->addWidget(mGlobalGit);
 
    GitQlientSettings settings(mGit->getGitDir());

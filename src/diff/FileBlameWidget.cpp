@@ -110,11 +110,7 @@ QString FileBlameWidget::getCurrentSha() const
 
 QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString &blame)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
    const auto lines = blame.split("\n", Qt::SkipEmptyParts);
-#else
-   const auto lines = blame.split("\n", QString::SkipEmptyParts);
-#endif
    QVector<Annotation> annotations;
 
    for (const auto &line : lines)

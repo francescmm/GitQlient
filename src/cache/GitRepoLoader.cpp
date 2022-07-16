@@ -322,11 +322,7 @@ QVector<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
 
          if (line.contains("using RSA key"))
          {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
             gpgKey = QString::fromUtf8(line).split("using RSA key", Qt::SkipEmptyParts).last();
-#else
-            gpgKey = QString::fromUtf8(line).split("using RSA key", QString::SkipEmptyParts).last();
-#endif
             gpgKey.append('\n');
          }
       }

@@ -20,6 +20,7 @@
 #include <QListWidget>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QStackedWidget>
 #include <QTextEdit>
 #include <QVBoxLayout>
@@ -276,11 +277,11 @@ bool MergeWidget::checkMsg(QString &msg)
    if (!mDescription->toPlainText().isEmpty())
    {
       auto description = QString("\n\n%1").arg(mDescription->toPlainText());
-      description.remove(QRegExp("(^|\\n)\\s*#[^\\n]*")); // strip comments
+      description.remove(QRegularExpression("(^|\\n)\\s*#[^\\n]*")); // strip comments
       msg += description;
    }
 
-   msg.replace(QRegExp("[ \\t\\r\\f\\v]+\\n"), "\n"); // strip line trailing cruft
+   msg.replace(QRegularExpression("[ \\t\\r\\f\\v]+\\n"), "\n"); // strip line trailing cruft
    msg = msg.trimmed();
 
    if (msg.isEmpty())

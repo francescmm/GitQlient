@@ -5,6 +5,7 @@
 #include <GitQlientStyles.h>
 #include <Highlighter.h>
 
+#include <QFile>
 #include <QMessageBox>
 #include <QVBoxLayout>
 

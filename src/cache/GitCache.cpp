@@ -7,9 +7,6 @@ using namespace QLogger;
 
 GitCache::GitCache(QObject *parent)
    : QObject(parent)
-   , mCommitsMutex(QMutex::Recursive)
-   , mRevisionsMutex(QMutex::Recursive)
-   , mReferencesMutex(QMutex::Recursive)
 {
 }
 

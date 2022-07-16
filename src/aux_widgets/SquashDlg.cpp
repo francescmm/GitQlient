@@ -13,6 +13,7 @@
 
 #include <QLabel>
 #include <QMessageBox>
+#include <QRegularExpression>
 #include <QUuid>
 
 SquashDlg::SquashDlg(const QSharedPointer<GitBase> git, const QSharedPointer<GitCache> &cache, const QStringList &shas,
@@ -166,11 +167,11 @@ bool SquashDlg::checkMsg(QString &msg)
    if (!ui->teDescription->toPlainText().isEmpty())
    {
       auto description = QString("\n\n%1").arg(ui->teDescription->toPlainText());
-      description.remove(QRegExp("(^|\\n)\\s*#[^\\n]*")); // strip comments
+      description.remove(QRegularExpression("(^|\\n)\\s*#[^\\n]*")); // strip comments
       msg += description;
    }
 
-   msg.replace(QRegExp("[ \\t\\r\\f\\v]+\\n"), "\n"); // strip line trailing cruft
+   msg.replace(QRegularExpression("[ \\t\\r\\f\\v]+\\n"), "\n"); // strip line trailing cruft
    msg = msg.trimmed();
 
    if (msg.isEmpty())

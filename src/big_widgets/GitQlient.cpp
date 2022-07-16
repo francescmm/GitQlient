@@ -506,7 +506,7 @@ void GitQlient::updateWindowTitle()
          const auto currentName = repoPath.split("/").last();
          const auto currentBranch = currentTab->currentBranch();
 
-         setWindowTitle(QString("GitQlient %1 - %2 (%3)").arg(VER, currentName, currentBranch));
+         setWindowTitle(QString("GitQlient %1 - %2 (%3)").arg(QString::fromUtf8(VER), currentName, currentBranch));
       }
    }
 }
