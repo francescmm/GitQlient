@@ -69,13 +69,19 @@ GitQlient::GitQlient(QWidget *parent)
    menu->installEventFilter(this);
 
    const auto open = menu->addAction(tr("Open repo..."));
+   open->setShortcut(Qt::CTRL + Qt::Key_O);
    connect(open, &QAction::triggered, this, &GitQlient::openRepo);
 
    const auto clone = menu->addAction(tr("Clone repo..."));
    connect(clone, &QAction::triggered, this, &GitQlient::cloneRepo);
 
    const auto init = menu->addAction(tr("New repo..."));
+   init->setShortcut(Qt::CTRL + Qt::Key_N);
    connect(init, &QAction::triggered, this, &GitQlient::initRepo);
+
+   const auto close = menu->addAction(tr("Close repo"));
+   close->setShortcut(Qt::CTRL + Qt::Key_W);
+   connect(close, &QAction::triggered, this, &GitQlient::closeRepoIfNotPinned);
 
    menu->addSeparator();
 
@@ -581,6 +587,25 @@ void GitQlient::loadPlugins()
       {
          const auto errorStr = pluginLoader.errorString();
          QLog_Error("UI", QString("%1").arg(errorStr));
+      }
+   }
+}
+
+void GitQlient::closeRepoIfNotPinned()
+{
+   const auto totalTabs = mRepos->count();
+
+   for (auto i = 0; i < totalTabs; ++i)
+   {
+      if (mRepos->widget(i) == mRepos->currentWidget())
+      {
+         if (!mRepos->isPinned(i))
+         {
+            closeTab(i);
+            mRepos->removeTab(i);
+         }
+
+         break;
       }
    }
 }

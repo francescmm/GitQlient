@@ -196,4 +196,6 @@ private:
    void moveLogsBeforeClose();
 
    void loadPlugins();
+
+   void closeRepoIfNotPinned();
 };
