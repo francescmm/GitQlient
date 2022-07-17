@@ -9,8 +9,27 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 17)
 
-add_compile_definitions(SHA_VER="000000")
-add_compile_definitions(VER="1.5.0")
+execute_process(
+   COMMAND
+   git -C ${PROJECT_SOURCE_DIR} rev-parse --short HEAD
+   RESULT_VARIABLE
+   GQ_SHA_RESULT
+   OUTPUT_VARIABLE
+   GQ_SHA
+   OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+if (NOT DEFINED VERSION OR "${VERSION}" STREQUAL "")
+   if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+      set(VERSION "0.0.0")
+   else()
+      message("Pasa")
+      set(VERSION ${GQ_SHA})
+   endif()
+endif()
+
+add_compile_definitions(SHA_VER="${GQ_SHA}")
+add_compile_definitions(VER="${VERSION}")
 add_compile_definitions(QT_DEPRECATED_WARNINGS)
 
 #list(APPEND CPP_FLAGS "-Wall")
