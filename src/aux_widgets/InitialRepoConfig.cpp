@@ -30,8 +30,8 @@ InitialRepoConfig::InitialRepoConfig(const QSharedPointer<GitBase> &git,
    const auto url = gitConfig->getServerUrl();
    ui->credentialsFrames->setVisible(url.startsWith("https"));
 
-   connect(ui->buttonGroup, SIGNAL(buttonClicked(QAbstractButton *)), this,
-           SLOT(onCredentialsOptionChanged(QAbstractButton *)));
+   connect(ui->buttonGroup, qOverload<QAbstractButton *>(&QButtonGroup::buttonClicked), this,
+           &InitialRepoConfig::onCredentialsOptionChanged);
 }
 
 InitialRepoConfig::~InitialRepoConfig()

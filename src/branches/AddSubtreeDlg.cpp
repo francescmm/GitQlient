@@ -83,8 +83,6 @@ void AddSubtreeDlg::accept()
             settings.setLocalValue(QString("Subtrees/%1.url").arg(i), subtreeUrl);
             settings.setLocalValue(QString("Subtrees/%1.ref").arg(i), subtreeRef);
 
-            auto cmd = QString("git subtree add --prefix=%1 %2 %3").arg(subtreeName, subtreeUrl, subtreeRef);
-
             ret = git->add(subtreeUrl, subtreeRef, subtreeName, ui->chSquash->isChecked());
          }
          else if (repo.isEmpty())

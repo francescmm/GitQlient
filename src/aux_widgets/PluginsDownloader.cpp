@@ -50,7 +50,8 @@ void PluginsDownloader::processPluginsFile()
 
    QVector<PluginInfo> pluginsInfo;
 
-   for (const auto &plugin : jsonDoc.object()["plugins"].toArray())
+   const auto plugins = jsonDoc.object()["plugins"].toArray();
+   for (const auto &plugin : plugins)
    {
       const auto jsonObject = plugin.toObject();
       auto platform = QString("linux");
@@ -66,9 +67,10 @@ void PluginsDownloader::processPluginsFile()
             jsonObject["name"].toString(), jsonObject["version"].toString(), jsonObject[jsonUrl].toString(), {}
          };
 
-         if (const auto dependencies = QStringLiteral("dependencies"); jsonObject.contains(dependencies))
+         if (const auto dependenciesStr = QStringLiteral("dependencies"); jsonObject.contains(dependenciesStr))
          {
-            for (auto dependency : jsonObject[dependencies].toArray())
+            const auto dependencies = jsonObject[dependenciesStr].toArray();
+            for (const auto &dependency : dependencies)
                pluginInfo.dependencies.append(std::move(dependency.toString()));
          }
 
@@ -114,11 +116,14 @@ void PluginsDownloader::downloadPlugin(const QString &url)
 
 void PluginsDownloader::onDownloadProgress(qint64 read, qint64 total)
 {
-   if (mDownloadLog && mDownloads.value(qobject_cast<QNetworkReply *>(sender())).first == 0U)
-      mTotal += total;
+   if (mDownloadLog)
+   {
+      if (mDownloads.value(qobject_cast<QNetworkReply *>(sender())).first == 0U)
+         mTotal += total;
 
-   mDownloadLog->setMaximum(mTotal);
-   mDownloadLog->setValue(read);
+      mDownloadLog->setMaximum(mTotal);
+      mDownloadLog->setValue(read);
+   }
 }
 
 void PluginsDownloader::onDownloadFinished()

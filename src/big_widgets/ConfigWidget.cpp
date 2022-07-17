@@ -168,8 +168,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    connect(ui->cbPullStrategy, SIGNAL(currentIndexChanged(int)), this, SLOT(onPullStrategyChanged(int)));
 
-   connect(ui->buttonGroup, SIGNAL(buttonClicked(QAbstractButton *)), this,
-           SLOT(onCredentialsOptionChanged(QAbstractButton *)));
+   connect(ui->buttonGroup, qOverload<QAbstractButton *>(&QButtonGroup::buttonClicked), this,
+           &ConfigWidget::onCredentialsOptionChanged);
    connect(ui->pbAddCredentials, &QPushButton::clicked, this, &ConfigWidget::showCredentialsDlg);
 
    // TODO: Download the plugins info
