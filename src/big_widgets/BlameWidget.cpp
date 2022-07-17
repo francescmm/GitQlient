@@ -116,8 +116,11 @@ void BlameWidget::showFileHistory(const QString &filePath)
 
       if (ret.success)
       {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
          auto shaHistory = ret.output.split("\n", Qt::SkipEmptyParts);
-
+#else
+         auto shaHistory = ret.output.split("\n", QString::SkipEmptyParts);
+#endif
          for (auto i = 0; i < shaHistory.size();)
          {
             if (shaHistory.at(i).startsWith("gpg:"))
@@ -190,8 +193,11 @@ void BlameWidget::reloadHistory(int tabIndex)
 
       if (ret.success)
       {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
          auto shaHistory = ret.output.split("\n", Qt::SkipEmptyParts);
-
+#else
+         auto shaHistory = ret.output.split("\n", QString::SkipEmptyParts);
+#endif
          for (auto i = 0; i < shaHistory.size();)
          {
             if (shaHistory.at(i).startsWith("gpg:"))
