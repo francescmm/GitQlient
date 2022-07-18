@@ -73,6 +73,7 @@ GitQlient::GitQlient(QWidget *parent)
    connect(open, &QAction::triggered, this, &GitQlient::openRepo);
 
    const auto clone = menu->addAction(tr("Clone repo..."));
+   clone->setShortcut(Qt::CTRL + Qt::Key_I);
    connect(clone, &QAction::triggered, this, &GitQlient::cloneRepo);
 
    const auto init = menu->addAction(tr("New repo..."));
