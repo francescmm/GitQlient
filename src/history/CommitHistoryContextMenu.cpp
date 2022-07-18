@@ -63,8 +63,7 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
          const auto popAction = stashMenu->addAction(tr("Pop"));
          connect(popAction, &QAction::triggered, this, &CommitHistoryContextMenu::stashPop);
       }
-
-      if (sha != ZERO_SHA)
+      else
       {
          const auto createMenu = addMenu(tr("Create"));
 
@@ -117,15 +116,19 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
 
                const auto fetchAction = addAction(tr("Fetch"));
                connect(fetchAction, &QAction::triggered, this, &CommitHistoryContextMenu::fetch);
+
+               const auto revertCommitAction = addAction(tr("Revert commit"));
+               revertCommitAction->setToolTip(tr("Reverts the selected commit of the branch."));
+               connect(revertCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::revertCommit);
             }
-            else if (mCache->isCommitInCurrentGeneologyTree(mShas.first()))
+            else if (git->isCommitInCurrentGeneologyTree(mShas.first()))
             {
                const auto pushAction = addAction(tr("Push"));
                connect(pushAction, &QAction::triggered, this, &CommitHistoryContextMenu::push);
 
-               const auto amendCommitAction = addAction(tr("Revert commit"));
-               amendCommitAction->setToolTip(tr("Reverts the selected commit of the branch."));
-               connect(amendCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::revertCommit);
+               const auto revertCommitAction = addAction(tr("Revert commit"));
+               revertCommitAction->setToolTip(tr("Reverts the selected commit of the branch."));
+               connect(revertCommitAction, &QAction::triggered, this, &CommitHistoryContextMenu::revertCommit);
             }
          }
 
@@ -173,9 +176,10 @@ void CommitHistoryContextMenu::createMultipleShasMenu()
               [this]() { QApplication::clipboard()->setText(mShas.join(',')); });
 
       auto shasInCurrenTree = 0;
+      QScopedPointer<GitBranches> git(new GitBranches(mGit));
 
       for (const auto &sha : qAsConst(mShas))
-         shasInCurrenTree += mCache->isCommitInCurrentGeneologyTree(sha);
+         shasInCurrenTree += git->isCommitInCurrentGeneologyTree(sha);
 
       if (shasInCurrenTree == 0)
       {
@@ -658,7 +662,7 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
       branchMenu->addActions(branchesToCheckout);
    }
 
-   if (!mCache->isCommitInCurrentGeneologyTree(sha))
+   if (QScopedPointer<GitBranches> git(new GitBranches(mGit)); !git->isCommitInCurrentGeneologyTree(sha))
    {
       for (const auto &pair : branchTracking.toStdMap())
       {
