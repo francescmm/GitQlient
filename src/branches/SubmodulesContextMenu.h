@@ -52,10 +52,10 @@ public:
     \brief Default constructor.
 
     \param git The git object to perform Git operations.
-    \param stashId The stash ID that will be used to perform operations into.
+    \param index The QModelIndex refering to the submodule if available.
     \param parent The parent widget if needed.
    */
-   explicit SubmodulesContextMenu(const QSharedPointer<GitBase> &git, const QModelIndex &index,
+   explicit SubmodulesContextMenu(const QSharedPointer<GitBase> &git, const QModelIndex &index, int totalSubmodules,
                                   QWidget *parent = nullptr);
 
    explicit SubmodulesContextMenu(const QSharedPointer<GitBase> &git, const QString &name, QWidget *parent = nullptr);

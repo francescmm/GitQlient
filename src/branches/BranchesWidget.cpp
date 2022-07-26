@@ -1056,7 +1056,7 @@ void BranchesWidget::showSubmodulesContextMenu(const QPoint &p)
 {
    QLog_Info("UI", QString("Requesting context menu for submodules"));
 
-   const auto menu = new SubmodulesContextMenu(mGit, mSubmodulesList->indexAt(p), this);
+   const auto menu = new SubmodulesContextMenu(mGit, mSubmodulesList->indexAt(p), mSubmodulesList->count(), this);
    connect(menu, &SubmodulesContextMenu::openSubmodule, this, &BranchesWidget::signalOpenSubmodule);
    connect(menu, &SubmodulesContextMenu::infoUpdated, this, &BranchesWidget::fullReload);
 

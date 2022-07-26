@@ -1,18 +1,18 @@
 #include "SubmodulesContextMenu.h"
 
-#include <BranchDlg.h>
-#include <GitStashes.h>
-#include <GitQlientStyles.h>
 #include <AddSubmoduleDlg.h>
-#include <GitSubmodules.h>
+#include <BranchDlg.h>
 #include <GitBase.h>
+#include <GitQlientStyles.h>
+#include <GitStashes.h>
+#include <GitSubmodules.h>
 
 #include <QApplication>
-#include <QModelIndex>
 #include <QMessageBox>
+#include <QModelIndex>
 
 SubmodulesContextMenu::SubmodulesContextMenu(const QSharedPointer<GitBase> &git, const QModelIndex &index,
-                                             QWidget *parent)
+                                             int totalSubmodules, QWidget *parent)
    : QMenu(parent)
    , mGit(git)
 {
@@ -28,6 +28,20 @@ SubmodulesContextMenu::SubmodulesContextMenu(const QSharedPointer<GitBase> &git,
          if (ret == QDialog::Accepted)
             emit infoUpdated();
       });
+
+      if (totalSubmodules > 0)
+      {
+         const auto updateSubmoduleAction = addAction(tr("Update all"));
+         connect(updateSubmoduleAction, &QAction::triggered, this, [this]() {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            QScopedPointer<GitSubmodules> git(new GitSubmodules(mGit));
+            const auto ret = git->submoduleUpdate({});
+            QApplication::restoreOverrideCursor();
+
+            if (ret)
+               emit infoUpdated();
+         });
+      }
    }
    else
    {
