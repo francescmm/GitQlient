@@ -111,6 +111,12 @@ private:
 
    */
    void fetch();
+
+   /**
+    * @brief resetToOrigin Resets the local branch to it's origin without checkout.
+    */
+   void resetToOrigin();
+
    /*!
     \brief Pushes all the local changes to the remote repo.
 

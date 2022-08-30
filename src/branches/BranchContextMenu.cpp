@@ -31,6 +31,7 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
    {
       connect(addAction(tr("Pull")), &QAction::triggered, this, &BranchContextMenu::pull);
       connect(addAction(tr("Fetch")), &QAction::triggered, this, &BranchContextMenu::fetch);
+      connect(addAction(tr("Reset to origin")), &QAction::triggered, this, &BranchContextMenu::resetToOrigin);
       connect(addAction(tr("Push")), &QAction::triggered, this, &BranchContextMenu::push);
    }
 
@@ -98,15 +99,25 @@ void BranchContextMenu::pull()
 
 void BranchContextMenu::fetch()
 {
-   GitQlientSettings settings(mConfig.mGit->getGitDir());
-   const auto pruneOnFetch = settings.localValue("PruneOnFetch", true).toBool();
-
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
-   const auto ret = git->fetch(pruneOnFetch);
+   const auto ret = git->fetchBranch(mConfig.branchSelected);
    QApplication::restoreOverrideCursor();
 
    if (ret)
+      emit fullReload();
+   else
+      QMessageBox::critical(this, tr("Fetch failed"), tr("There were some problems while fetching. Please try again."));
+}
+
+void BranchContextMenu::resetToOrigin()
+{
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   QScopedPointer<GitBranches> git(new GitBranches(mConfig.mGit));
+   const auto ret = git->resetToOrigin(mConfig.branchSelected);
+   QApplication::restoreOverrideCursor();
+
+   if (ret.success)
       emit fullReload();
    else
       QMessageBox::critical(this, tr("Fetch failed"), tr("There were some problems while fetching. Please try again."));
