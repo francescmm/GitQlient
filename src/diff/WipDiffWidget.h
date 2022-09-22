@@ -93,7 +93,8 @@ public:
 
    void hideHunks() const;
 
-   bool setup(const QString &file, bool isCached, bool editMode = false);
+   bool setup(const QString &file, bool isCached, bool editMode = false, QString currentSha = QString(),
+              QString previousSha = QString());
 
    /**
     * @brief getCurrentFile Gets the current loaded file.
@@ -145,7 +146,7 @@ private:
     * @param editMode Enters edit mode directly.
     * @return bool Returns true if the configuration was applied, otherwise false.
     */
-   bool configure(const QString &file, bool isCached);
+   bool configure(const QString &file, bool isCached, QString currentSha = QString(), QString previousSha = QString());
 
    /**
     * @brief setFileVsFileEnable Enables the widget to show file vs file view.

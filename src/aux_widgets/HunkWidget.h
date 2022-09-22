@@ -16,7 +16,8 @@ signals:
 
 public:
    explicit HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cache, const QString &fileName,
-                       const QString &header, const QString &hunk, bool isCached = false, QWidget *parent = nullptr);
+                       const QString &header, const QString &hunk, bool isCached = false, bool isEditable = false,
+                       QWidget *parent = nullptr);
 
 private:
    QSharedPointer<GitBase> mGit;

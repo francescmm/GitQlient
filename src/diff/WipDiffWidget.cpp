@@ -256,9 +256,22 @@ void WipDiffWidget::hideHunks() const
    mHunksView->setHidden(true);
 }
 
-bool WipDiffWidget::setup(const QString &file, bool isCached, bool editMode)
+bool WipDiffWidget::setup(const QString &file, bool isCached, bool editMode, QString currentSha, QString previousSha)
 {
-   if (configure(file, isCached))
+   if (previousSha.isEmpty())
+   {
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
+      previousSha = mCache->commitInfo(ZERO_SHA).firstParent();
+   }
+   else
+   {
+      mEdition->setHidden(true);
+      mSave->setHidden(true);
+      mStage->setHidden(true);
+      mRevert->setHidden(true);
+   }
+
+   if (configure(file, isCached, currentSha, previousSha))
    {
       if (editMode)
       {
@@ -286,8 +299,14 @@ bool WipDiffWidget::setup(const QString &file, bool isCached, bool editMode)
    return false;
 }
 
-bool WipDiffWidget::configure(const QString &file, bool isCached)
+bool WipDiffWidget::configure(const QString &file, bool isCached, QString currentSha, QString previousSha)
 {
+   if (currentSha.isEmpty())
+      currentSha = mCurrentSha;
+
+   if (previousSha.isEmpty())
+      previousSha = mPreviousSha;
+
    auto destFile = file;
 
    if (destFile.contains("-->"))
@@ -295,9 +314,10 @@ bool WipDiffWidget::configure(const QString &file, bool isCached)
 
    QString text;
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
-   const auto previousSha = mCache->commitInfo(ZERO_SHA).firstParent();
 
-   if (const auto ret = git->getFullFileDiff(QString(), previousSha, destFile, isCached); ret.success)
+   if (const auto ret
+       = git->getFullFileDiff(currentSha == ZERO_SHA ? QString() : currentSha, previousSha, destFile, isCached);
+       ret.success)
    {
       text = ret.output;
 
@@ -315,6 +335,7 @@ bool WipDiffWidget::configure(const QString &file, bool isCached)
 
    mIsCached = isCached;
    mCurrentFile = file;
+   mCurrentSha = currentSha;
    mPreviousSha = previousSha;
 
    auto pos = 0;
@@ -558,7 +579,12 @@ void WipDiffWidget::revertFile()
 void WipDiffWidget::processHunks(const QString &file)
 {
    QScopedPointer<GitHistory> git(new GitHistory(mGit));
-   const auto hunks = git->getWipFileDiff(file, mIsCached);
+
+   GitExecResult hunks;
+   if (mCurrentSha == ZERO_SHA)
+      hunks = git->getWipFileDiff(file, mIsCached);
+   else
+      hunks = git->getFileDiff(file, mIsCached, mCurrentSha, mPreviousSha);
 
    for (auto hunk : qAsConst(mHunks))
       delete hunk;
@@ -610,11 +636,10 @@ void WipDiffWidget::processHunks(const QString &file)
 
 void WipDiffWidget::createAndAddHunk(const QString &file, const QString &header, const QString &hunk)
 {
-   auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk, mIsCached);
+   auto hunkView = new HunkWidget(mGit, mCache, file, header, hunk, mIsCached, mCurrentSha == ZERO_SHA);
    connect(hunkView, &HunkWidget::hunkStaged, this, &WipDiffWidget::deleteHunkView);
 
    mHunksLayout->addWidget(hunkView);
-
    mHunks.append(hunkView);
 }
 
