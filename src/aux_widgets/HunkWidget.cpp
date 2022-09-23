@@ -49,11 +49,12 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
    layout->setContentsMargins(10, 10, 10, 10);
    layout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
 
+   auto controlsLayout = new QHBoxLayout();
+   controlsLayout->setContentsMargins(5, 0, 5, 10);
+   controlsLayout->addWidget(labelTitle);
+
    if (isEditable)
    {
-      auto controlsLayout = new QHBoxLayout();
-      controlsLayout->setContentsMargins(5, 0, 5, 10);
-      controlsLayout->addWidget(labelTitle);
       controlsLayout->addStretch();
       controlsLayout->addWidget(discardBtn);
       controlsLayout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -66,10 +67,9 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
 
          controlsLayout->addWidget(stageBtn);
       }
-
-      layout->addLayout(controlsLayout);
    }
 
+   layout->addLayout(controlsLayout);
    layout->addWidget(mHunkView);
 
    setLayout(layout);

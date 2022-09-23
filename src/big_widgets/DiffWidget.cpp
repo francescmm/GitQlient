@@ -1,11 +1,11 @@
 #include "DiffWidget.h"
 
 #include <CommitInfoPanel.h>
+#include <FileDiffWidget.h>
 #include <FileListWidget.h>
 #include <GitCache.h>
 #include <GitHistory.h>
 #include <GitQlientSettings.h>
-#include <WipDiffWidget.h>
 
 #include <QLogger.h>
 #include <QPinnableTabWidget.h>
@@ -78,7 +78,7 @@ void DiffWidget::reload()
 {
    if (mCenterStackedWidget->count() > 0)
    {
-      if (const auto fileDiff = dynamic_cast<WipDiffWidget *>(mCenterStackedWidget->currentWidget()))
+      if (const auto fileDiff = dynamic_cast<FileDiffWidget *>(mCenterStackedWidget->currentWidget()))
          fileDiff->reload();
    }
 }
@@ -101,7 +101,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
           "UI",
           QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
 
-      const auto fileDiffWidget = new WipDiffWidget(mGit, mCache);
+      const auto fileDiffWidget = new FileDiffWidget(mGit, mCache);
       const auto fileWithModifications = fileDiffWidget->setup(file, false, false, currentSha, previousSha);
 
       if (fileWithModifications)
@@ -130,7 +130,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
    else
    {
       const auto diffWidget = mDiffWidgets.value(id);
-      const auto diff = dynamic_cast<WipDiffWidget *>(diffWidget);
+      const auto diff = dynamic_cast<FileDiffWidget *>(diffWidget);
       diff->reload();
 
       mCenterStackedWidget->setCurrentWidget(diff);

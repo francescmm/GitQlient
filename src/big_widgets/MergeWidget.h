@@ -32,7 +32,7 @@ class QPushButton;
 class MergeInfoWidget;
 class QLineEdit;
 class QTextEdit;
-class WipDiffWidget;
+class FileDiffWidget;
 class RevisionFiles;
 class GitCache;
 class QListWidget;
@@ -102,7 +102,7 @@ private:
    QPushButton *mAbortBtn = nullptr;
    ConflictReason mReason = ConflictReason::Merge;
    QStackedWidget *mStacked = nullptr;
-   WipDiffWidget *mFileDiff = nullptr;
+   FileDiffWidget *mFileDiff = nullptr;
    QStringList mPendingShas;
 
    /**
