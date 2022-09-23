@@ -76,7 +76,7 @@ public:
     \param parent The parent widget if needed.
    */
    explicit FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache,
-                          QWidget *parent = nullptr);
+                           QWidget *parent = nullptr);
 
    /*!
     \brief Clears the current information on the diff view.
@@ -130,7 +130,6 @@ private:
    QLineEdit *mSearchOld = nullptr;
    FileDiffView *mOldFile = nullptr;
    QVector<int> mModifications;
-   bool mFileVsFile = false;
    DiffInfo mChunks;
    int mCurrentChunkLine = 0;
    FileEditor *mFileEditor = nullptr;

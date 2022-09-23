@@ -161,8 +161,6 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    vLayout->addLayout(optionsLayout);
    vLayout->addWidget(mViewStackedWidget);
 
-   mFileVsFile = settings.localValue(GitQlientSettings::SplitFileDiffView, false).toBool();
-
    mBack->setIcon(QIcon(":/icons/back"));
    mBack->setToolTip(tr("Return to the view"));
    connect(mBack, &QPushButton::clicked, this, &FileDiffWidget::exitRequested);
@@ -209,7 +207,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    mRevert->setToolTip(tr("Revert changes"));
    connect(mRevert, &QPushButton::clicked, this, &FileDiffWidget::revertFile);
 
-   mViewStackedWidget->setCurrentIndex(mFileVsFile ? View::Split : View::Unified);
+   mViewStackedWidget->setCurrentIndex(settings.globalValue("DefaultDiffView", false).toInt());
 
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
@@ -224,7 +222,7 @@ void FileDiffWidget::clear()
 
 bool FileDiffWidget::reload()
 {
-   return setup(mCurrentFile, mIsCached, mEdition->isChecked());
+   return setup(mCurrentFile, mIsCached, mEdition->isChecked(), mCurrentSha, mPreviousSha);
 }
 
 void FileDiffWidget::updateFontSize()
@@ -286,10 +284,10 @@ bool FileDiffWidget::setup(const QString &file, bool isCached, bool editMode, QS
          mHunksView->setChecked(mViewStackedWidget->currentIndex() == View::Hunks);
          mHunksView->blockSignals(false);
          mFullView->blockSignals(true);
-         mFullView->setChecked(!mFileVsFile && !mHunksView->isChecked());
+         mFullView->setChecked(mViewStackedWidget->currentIndex() == View::Unified && !mHunksView->isChecked());
          mFullView->blockSignals(false);
          mSplitView->blockSignals(true);
-         mSplitView->setChecked(mFileVsFile && !mHunksView->isChecked());
+         mSplitView->setChecked(mViewStackedWidget->currentIndex() == View::Split && !mHunksView->isChecked());
          mSplitView->blockSignals(false);
       }
 
@@ -348,7 +346,7 @@ bool FileDiffWidget::configure(const QString &file, bool isCached, QString curre
    {
       processHunks(destFile);
 
-      if (mFileVsFile)
+      if (mViewStackedWidget->currentIndex() == View::Split)
       {
          QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> newData;
          QPair<QStringList, QVector<ChunkDiffInfo::ChunkInfo>> oldData;
@@ -379,17 +377,12 @@ bool FileDiffWidget::configure(const QString &file, bool isCached, QString curre
 
 void FileDiffWidget::setSplitViewEnabled(bool enable)
 {
-   mFileVsFile = enable;
-
-   GitQlientSettings settings(mGit->getGitDir());
-   settings.setLocalValue(GitQlientSettings::SplitFileDiffView, mFileVsFile);
-
-   configure(mCurrentFile, mIsCached);
+   configure(mCurrentFile, mIsCached, mCurrentSha, mPreviousSha);
 
    mViewStackedWidget->setCurrentIndex(View::Split);
 
    mFullView->blockSignals(true);
-   mFullView->setChecked(!mFileVsFile);
+   mFullView->setChecked(false);
    mFullView->blockSignals(false);
 
    mHunksView->blockSignals(true);
@@ -405,24 +398,17 @@ void FileDiffWidget::setSplitViewEnabled(bool enable)
       mEdition->blockSignals(true);
       mEdition->setChecked(false);
       mEdition->blockSignals(false);
-      endEditFile();
    }
 }
 
 void FileDiffWidget::setFullViewEnabled(bool enable)
 {
-   mFileVsFile = !enable;
-
-   GitQlientSettings settings(mGit->getGitDir());
-
-   settings.setLocalValue(GitQlientSettings::SplitFileDiffView, mFileVsFile);
-
-   configure(mCurrentFile, mIsCached);
+   configure(mCurrentFile, mIsCached, mCurrentSha, mPreviousSha);
 
    mViewStackedWidget->setCurrentIndex(View::Unified);
 
    mSplitView->blockSignals(true);
-   mSplitView->setChecked(mFileVsFile);
+   mSplitView->setChecked(false);
    mSplitView->blockSignals(false);
 
    mHunksView->blockSignals(true);
@@ -438,7 +424,6 @@ void FileDiffWidget::setFullViewEnabled(bool enable)
       mEdition->blockSignals(true);
       mEdition->setChecked(false);
       mEdition->blockSignals(false);
-      endEditFile();
    }
 }
 
@@ -531,15 +516,17 @@ void FileDiffWidget::enterEditionMode(bool enter)
 
       mViewStackedWidget->setCurrentIndex(View::Edition);
    }
-   else if (mFileVsFile)
+   else if (mViewStackedWidget->currentIndex() == View::Split)
       setSplitViewEnabled(true);
-   else
+   else if (mViewStackedWidget->currentIndex() == View::Unified)
       setFullViewEnabled(true);
+   else if (mViewStackedWidget->currentIndex() == View::Hunks)
+      setHunksViewEnabled(true);
 }
 
 void FileDiffWidget::endEditFile()
 {
-   mViewStackedWidget->setCurrentIndex(mFileVsFile ? View::Split : View::Unified);
+   enterEditionMode(false);
 }
 
 void FileDiffWidget::stageFile()

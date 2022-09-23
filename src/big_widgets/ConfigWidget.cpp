@@ -206,6 +206,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(mPluginsDownloader, &PluginsDownloader::pluginStored, this, &ConfigWidget::onPluginStored);
    connect(ui->pbFeaturesTour, &QPushButton::clicked, this, &ConfigWidget::showFeaturesTour);
    connect(ui->chSingleClickDiffView, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbDiffView, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
 
    auto size = calculateDirSize(ui->leLogsLocation->text());
    ui->lLogsSize->setText(QString("%1 KB").arg(size));
@@ -366,6 +367,7 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("colorSchema", ui->cbStyle->currentText());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
    settings.setGlobalValue("singleClickDiffView", ui->chSingleClickDiffView->isChecked());
+   settings.setGlobalValue("DefaultDiffView", ui->cbDiffView->currentIndex());
 
    if (!ui->leEditor->text().isEmpty())
       settings.setGlobalValue("ExternalEditor", ui->leEditor->text());
