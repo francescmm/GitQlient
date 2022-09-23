@@ -5,13 +5,11 @@ HEADERS += \
     $$PWD/FileDiffEditor.h \
     $$PWD/FileDiffWidget.h \
     $$PWD/FileEditor.h \
-    $$PWD/IDiffWidget.h \
-    $$PWD/WipDiffWidget.h
+    $$PWD/IDiffWidget.h
 
 SOURCES += \
     $$PWD/FileBlameWidget.cpp \
     $$PWD/FileDiffEditor.cpp \
     $$PWD/FileDiffWidget.cpp \
     $$PWD/FileEditor.cpp \
-    $$PWD/IDiffWidget.cpp \
-    $$PWD/WipDiffWidget.cpp
+    $$PWD/IDiffWidget.cpp

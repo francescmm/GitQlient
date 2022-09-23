@@ -36,7 +36,7 @@ class CommitChangesWidget;
 class CommitInfoWidget;
 class CheckBox;
 class RepositoryViewDelegate;
-class WipDiffWidget;
+class FileDiffWidget;
 class BranchesWidgetMinimal;
 class QPushButton;
 class IGitServerCache;
@@ -236,7 +236,7 @@ private:
    CheckBox *mChShowAllBranches = nullptr;
    RepositoryViewDelegate *mItemDelegate = nullptr;
    QFrame *mGraphFrame = nullptr;
-   WipDiffWidget *mWipFileDiff = nullptr;
+   FileDiffWidget *mWipFileDiff = nullptr;
    QPushButton *mReturnFromFull = nullptr;
    QLabel *mUserName = nullptr;
    QLabel *mUserEmail = nullptr;

@@ -3,7 +3,7 @@
 /****************************************************************************************
  ** GitQlient is an application to manage and operate one or several Git repositories. With
  ** GitQlient you will be able to add commits, branches and manage all the options Git provides.
- ** Copyright (C) 2021  Francesc Martinez
+ ** Copyright (C) 2022  Francesc Martinez
  **
  ** LinkedIn: www.linkedin.com/in/cescmm/
  ** Web: www.francescmm.com
@@ -36,12 +36,15 @@ class QStackedWidget;
 class QLabel;
 class QLineEdit;
 class QPlainTextEdit;
+class QVBoxLayout;
+class QSpacerItem;
+class HunkWidget;
 
 /*!
- \brief The FileDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
+ \brief The WipDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
  specific file.
 
- \class FileDiffWidget FileDiffWidget.h "FileDiffWidget.h"
+ \class WipDiffWidget WipDiffWidget.h "WipDiffWidget.h"
 */
 class FileDiffWidget : public IDiffWidget
 {
@@ -88,16 +91,61 @@ public:
 
    void updateFontSize() override;
 
-   /*!
-    \brief Configures the diff view with the two commits that will be compared and the file that will be applied.
+   void hideHunks() const;
 
-    \param currentSha The base SHA.
-    \param previousSha The SHA to compare to.
-    \param file The file that will show the diff.
-    \param editMode Enters edit mode directly.
-    \return bool Returns true if the configuration was applied, otherwise false.
-   */
-   bool configure(const QString &currentSha, const QString &previousSha, const QString &file, bool isCached);
+   bool setup(const QString &file, bool isCached, bool editMode = false, QString currentSha = QString(),
+              QString previousSha = QString());
+
+   /**
+    * @brief getCurrentFile Gets the current loaded file.
+    * @return The current file name.
+    */
+   QString getCurrentFile() const { return mCurrentFile; }
+
+private:
+   enum View
+   {
+      Hunks,
+      Unified,
+      Split,
+      Edition
+   };
+
+   QString mCurrentFile;
+   bool mIsCached = false;
+   QPushButton *mBack = nullptr;
+   QPushButton *mGoPrevious = nullptr;
+   QPushButton *mGoNext = nullptr;
+   QPushButton *mEdition = nullptr;
+   QPushButton *mHunksView = nullptr;
+   QPushButton *mFullView = nullptr;
+   QPushButton *mSplitView = nullptr;
+   QPushButton *mSave = nullptr;
+   QPushButton *mStage = nullptr;
+   QPushButton *mRevert = nullptr;
+   QLabel *mFileNameLabel = nullptr;
+   QFrame *mTitleFrame = nullptr;
+   FileDiffView *mUnifiedFile = nullptr;
+   FileDiffView *mNewFile = nullptr;
+   QLineEdit *mSearchOld = nullptr;
+   FileDiffView *mOldFile = nullptr;
+   QVector<int> mModifications;
+   DiffInfo mChunks;
+   int mCurrentChunkLine = 0;
+   FileEditor *mFileEditor = nullptr;
+   QVector<HunkWidget *> mHunks;
+   QVBoxLayout *mHunksLayout = nullptr;
+   QFrame *mHunksFrame = nullptr;
+   QSpacerItem *mHunkSpacer = nullptr;
+   QStackedWidget *mViewStackedWidget = nullptr;
+
+   /**
+    * @brief Configures the diff view with the two commits that will be compared and the file that will be applied.
+    * @param file The file that will show the diff.
+    * @param editMode Enters edit mode directly.
+    * @return bool Returns true if the configuration was applied, otherwise false.
+    */
+   bool configure(const QString &file, bool isCached, QString currentSha = QString(), QString previousSha = QString());
 
    /**
     * @brief setFileVsFileEnable Enables the widget to show file vs file view.
@@ -112,24 +160,15 @@ public:
    void setFullViewEnabled(bool enable);
 
    /**
-    * @brief getCurrentFile Gets the current loaded file.
-    * @return The current file name.
+    * @brief setHunksViewEnabled Sets the hunks view enabled.
+    * @param enable True to enable, otherwise false.
     */
-   QString getCurrentFile() const { return mCurrentFile; }
+   void setHunksViewEnabled(bool enable);
 
-private:
-   QString mCurrentFile;
-   bool mIsCached = false;
-   QPushButton *mGoPrevious = nullptr;
-   QPushButton *mGoNext = nullptr;
-   QPushButton *mFullView = nullptr;
-   QPushButton *mSplitView = nullptr;
-   FileDiffView *mNewFile = nullptr;
-   QLineEdit *mSearchOld = nullptr;
-   FileDiffView *mOldFile = nullptr;
-   bool mFileVsFile = false;
-   DiffInfo mChunks;
-   int mCurrentChunkLine = 0;
+   /**
+    * @brief hideBackButton Hides the back button.
+    */
+   void hideBackButton() const;
 
    /**
     * @brief moveChunkUp Moves to the previous diff chunk.
@@ -147,6 +186,10 @@ private:
    void enterEditionMode(bool enter);
 
    /**
+    * @brief endEditFile Closes the file editor.
+    */
+   void endEditFile();
+   /**
     * @brief stageFile Stages the file.
     */
    void stageFile();
@@ -155,5 +198,9 @@ private:
     */
    void revertFile();
 
-   void stageChunk(const QString &id);
+   void processHunks(const QString &file);
+
+   void createAndAddHunk(const QString &file, const QString &header, const QString &hunk);
+
+   void deleteHunkView();
 };

@@ -1,6 +1,7 @@
 #include "MergeWidget.h"
 
 #include <CommitInfo.h>
+#include <FileDiffWidget.h>
 #include <FileEditor.h>
 #include <GitBase.h>
 #include <GitCache.h>
@@ -11,7 +12,6 @@
 #include <GitWip.h>
 #include <QPinnableTabWidget.h>
 #include <RevisionFiles.h>
-#include <WipDiffWidget.h>
 #include <WipHelper.h>
 
 #include <QFile>
@@ -37,7 +37,7 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
    , mMergeBtn(new QPushButton(tr("Merge && Commit")))
    , mAbortBtn(new QPushButton(tr("Abort merge")))
    , mStacked(new QStackedWidget())
-   , mFileDiff(new WipDiffWidget(mGit, mGitQlientCache))
+   , mFileDiff(new FileDiffWidget(mGit, mGitQlientCache))
 {
    mFileDiff->hideHunks();
 
@@ -104,8 +104,8 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
    layout->addWidget(mergeFrame);
    layout->addWidget(mStacked);
 
-   connect(mFileDiff, &WipDiffWidget::exitRequested, this, [this]() { mStacked->setCurrentIndex(0); });
-   connect(mFileDiff, &WipDiffWidget::fileStaged, this, &MergeWidget::onConflictResolved);
+   connect(mFileDiff, &FileDiffWidget::exitRequested, this, [this]() { mStacked->setCurrentIndex(0); });
+   connect(mFileDiff, &FileDiffWidget::fileStaged, this, &MergeWidget::onConflictResolved);
 
    connect(mConflictFiles, &QListWidget::itemClicked, this, &MergeWidget::changeDiffView);
    connect(mConflictFiles, &QListWidget::itemDoubleClicked, this, &MergeWidget::changeDiffView);

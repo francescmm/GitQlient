@@ -381,7 +381,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="lTerminalColorScheme">
               <property name="text">
-               <string>Terminal color scheme:</string>
+               <string>Terminal color scheme</string>
               </property>
              </widget>
             </item>
@@ -408,6 +408,32 @@
                <property name="text">
                 <string/>
                </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_67">
+               <property name="text">
+                <string>Default diff view</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="cbDiffView">
+               <item>
+                <property name="text">
+                 <string>Hunks</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Unified</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Split</string>
+                </property>
+               </item>
               </widget>
              </item>
             </layout>

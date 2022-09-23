@@ -15,7 +15,7 @@
 #include <QTextBlock>
 
 HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cache, const QString &fileName,
-                       const QString &header, const QString &hunk, bool isCached, QWidget *parent)
+                       const QString &header, const QString &hunk, bool isCached, bool isEditable, QWidget *parent)
    : QFrame { parent }
    , mGit(git)
    , mCache(cache)
@@ -45,25 +45,30 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
    discardBtn->setObjectName("warningButton");
    connect(discardBtn, &QPushButton::clicked, this, &HunkWidget::discardHunk);
 
-   auto controlsLayout = new QHBoxLayout();
-   controlsLayout->setContentsMargins(5, 0, 5, 10);
-   controlsLayout->addWidget(labelTitle);
-   controlsLayout->addStretch();
-   controlsLayout->addWidget(discardBtn);
-   controlsLayout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
-
-   if (!mIsCached)
-   {
-      const auto stageBtn = new QPushButton("Stage");
-      stageBtn->setObjectName("applyActionBtn");
-      connect(stageBtn, &QPushButton::clicked, this, &HunkWidget::stageHunk);
-
-      controlsLayout->addWidget(stageBtn);
-   }
-
    const auto layout = new QVBoxLayout();
    layout->setContentsMargins(10, 10, 10, 10);
    layout->setAlignment(Qt::AlignTop | Qt::AlignVCenter);
+
+   auto controlsLayout = new QHBoxLayout();
+   controlsLayout->setContentsMargins(5, 0, 5, 10);
+   controlsLayout->addWidget(labelTitle);
+
+   if (isEditable)
+   {
+      controlsLayout->addStretch();
+      controlsLayout->addWidget(discardBtn);
+      controlsLayout->addItem(new QSpacerItem(10, 1, QSizePolicy::Fixed, QSizePolicy::Fixed));
+
+      if (!mIsCached)
+      {
+         const auto stageBtn = new QPushButton("Stage");
+         stageBtn->setObjectName("applyActionBtn");
+         connect(stageBtn, &QPushButton::clicked, this, &HunkWidget::stageHunk);
+
+         controlsLayout->addWidget(stageBtn);
+      }
+   }
+
    layout->addLayout(controlsLayout);
    layout->addWidget(mHunkView);
 

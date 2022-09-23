@@ -102,7 +102,7 @@ bool DiffWidget::loadFileDiff(const QString &currentSha, const QString &previous
           QString("Requested diff for file {%1} on between commits {%2} and {%3}").arg(file, currentSha, previousSha));
 
       const auto fileDiffWidget = new FileDiffWidget(mGit, mCache);
-      const auto fileWithModifications = fileDiffWidget->configure(currentSha, previousSha, file, false);
+      const auto fileWithModifications = fileDiffWidget->setup(file, false, false, currentSha, previousSha);
 
       if (fileWithModifications)
       {

@@ -22,7 +22,6 @@
 #include <GitRepoLoader.h>
 #include <GitWip.h>
 #include <RepositoryViewDelegate.h>
-#include <WipDiffWidget.h>
 #include <WipHelper.h>
 #include <WipWidget.h>
 
@@ -192,7 +191,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mGraphFrame = new QFrame();
    mGraphFrame->setLayout(viewLayout);
 
-   mWipFileDiff = new WipDiffWidget(mGit, mCache);
+   mWipFileDiff = new FileDiffWidget(mGit, mCache);
 
    mReturnFromFull->setIcon(QIcon(":/icons/back"));
    connect(mReturnFromFull, &QPushButton::clicked, this, &HistoryWidget::returnToView);
@@ -202,10 +201,10 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mWipFileDiff);
 
-   connect(mWipFileDiff, &WipDiffWidget::exitRequested, this, &HistoryWidget::returnToView);
-   connect(mWipFileDiff, &WipDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
-   connect(mWipFileDiff, &WipDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
-   connect(mWipFileDiff, &WipDiffWidget::exitRequested, this, &HistoryWidget::signalUpdateWip);
+   connect(mWipFileDiff, &FileDiffWidget::exitRequested, this, &HistoryWidget::returnToView);
+   connect(mWipFileDiff, &FileDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
+   connect(mWipFileDiff, &FileDiffWidget::fileReverted, this, &HistoryWidget::signalUpdateWip);
+   connect(mWipFileDiff, &FileDiffWidget::exitRequested, this, &HistoryWidget::signalUpdateWip);
 
    mSplitter->insertWidget(0, wipFrame);
    mSplitter->insertWidget(1, mCenterStackedWidget);
