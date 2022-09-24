@@ -1,5 +1,6 @@
 #include "FileDiffWidget.h"
 
+#include <ButtonLink.hpp>
 #include <CheckBox.h>
 #include <CommitInfo.h>
 #include <DiffHelper.h>
@@ -14,6 +15,8 @@
 #include <HunkWidget.h>
 #include <LineNumberArea.h>
 
+#include <QApplication>
+#include <QClipboard>
 #include <QDateTime>
 #include <QDir>
 #include <QHBoxLayout>
@@ -25,6 +28,7 @@
 #include <QScrollBar>
 #include <QStackedWidget>
 #include <QTemporaryFile>
+#include <QToolTip>
 
 FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointer<GitCache> cache, QWidget *parent)
    : IDiffWidget(git, cache, parent)
@@ -38,7 +42,7 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
    , mSave(new QPushButton())
    , mStage(new QPushButton())
    , mRevert(new QPushButton())
-   , mFileNameLabel(new QLabel())
+   , mFileNameLabel(new ButtonLink())
    , mTitleFrame(new QFrame())
    , mUnifiedFile(new FileDiffView())
    , mNewFile(new FileDiffView())
@@ -209,6 +213,11 @@ FileDiffWidget::FileDiffWidget(const QSharedPointer<GitBase> &git, QSharedPointe
 
    mViewStackedWidget->setCurrentIndex(settings.globalValue("DefaultDiffView", false).toInt());
 
+   connect(mFileNameLabel, &ButtonLink::clicked, this, [this]() {
+      QApplication::clipboard()->setText(mFileNameLabel->text());
+      const auto button = qobject_cast<ButtonLink *>(sender());
+      QToolTip::showText(QCursor::pos(), tr("Copied!"), button);
+   });
    connect(mNewFile, &FileDiffView::signalScrollChanged, mOldFile, &FileDiffView::moveScrollBarToPos);
    connect(mOldFile, &FileDiffView::signalScrollChanged, mNewFile, &FileDiffView::moveScrollBarToPos);
 
@@ -261,13 +270,6 @@ bool FileDiffWidget::setup(const QString &file, bool isCached, bool editMode, QS
       QScopedPointer<GitHistory> git(new GitHistory(mGit));
       previousSha = mCache->commitInfo(ZERO_SHA).firstParent();
    }
-   else
-   {
-      mEdition->setHidden(true);
-      mSave->setHidden(true);
-      mStage->setHidden(true);
-      mRevert->setHidden(true);
-   }
 
    if (configure(file, isCached, currentSha, previousSha))
    {
@@ -275,6 +277,14 @@ bool FileDiffWidget::setup(const QString &file, bool isCached, bool editMode, QS
       {
          mEdition->setChecked(true);
          mSave->setEnabled(true);
+      }
+      else if (mCurrentSha != ZERO_SHA)
+      {
+         mBack->setHidden(true);
+         mEdition->setHidden(true);
+         mSave->setHidden(true);
+         mStage->setHidden(true);
+         mRevert->setHidden(true);
       }
       else
       {

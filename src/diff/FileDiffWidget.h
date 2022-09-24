@@ -39,6 +39,7 @@ class QPlainTextEdit;
 class QVBoxLayout;
 class QSpacerItem;
 class HunkWidget;
+class ButtonLink;
 
 /*!
  \brief The WipDiffWidget creates the layout that contains all the widgets related with the creation of the diff of a
@@ -123,7 +124,7 @@ private:
    QPushButton *mSave = nullptr;
    QPushButton *mStage = nullptr;
    QPushButton *mRevert = nullptr;
-   QLabel *mFileNameLabel = nullptr;
+   ButtonLink *mFileNameLabel = nullptr;
    QFrame *mTitleFrame = nullptr;
    FileDiffView *mUnifiedFile = nullptr;
    FileDiffView *mNewFile = nullptr;
