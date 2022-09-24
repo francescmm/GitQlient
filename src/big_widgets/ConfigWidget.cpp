@@ -208,6 +208,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->chSingleClickDiffView, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbDiffView, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
 
+   ui->cbDiffView->setCurrentIndex(0);
+
    auto size = calculateDirSize(ui->leLogsLocation->text());
    ui->lLogsSize->setText(QString("%1 KB").arg(size));
 
