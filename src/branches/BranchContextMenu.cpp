@@ -22,23 +22,18 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
-   connect(addAction(tr("Copy name")), &QAction::triggered, this,
-           [this] { QApplication::clipboard()->setText(mConfig.branchSelected); });
-
-   addSeparator();
-
    if (mConfig.isLocal)
    {
-      connect(addAction(tr("Pull")), &QAction::triggered, this, &BranchContextMenu::pull);
-      connect(addAction(tr("Fetch")), &QAction::triggered, this, &BranchContextMenu::fetch);
       connect(addAction(tr("Reset to origin")), &QAction::triggered, this, &BranchContextMenu::resetToOrigin);
+      connect(addAction(tr("Fetch")), &QAction::triggered, this, &BranchContextMenu::fetch);
+      connect(addAction(tr("Pull")), &QAction::triggered, this, &BranchContextMenu::pull);
       connect(addAction(tr("Push")), &QAction::triggered, this, &BranchContextMenu::push);
    }
 
    if (mConfig.currentBranch == mConfig.branchSelected)
    {
-      connect(addAction(tr("Unset upstream")), &QAction::triggered, this, &BranchContextMenu::unsetUpstream);
       connect(addAction(tr("Push force")), &QAction::triggered, this, &BranchContextMenu::pushForce);
+      connect(addAction(tr("Unset upstream")), &QAction::triggered, this, &BranchContextMenu::unsetUpstream);
    }
 
    addSeparator();
@@ -61,6 +56,8 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
 
    connect(addAction(tr("Rename")), &QAction::triggered, this, &BranchContextMenu::rename);
    connect(addAction(tr("Delete")), &QAction::triggered, this, &BranchContextMenu::deleteBranch);
+   connect(addAction(tr("Copy name")), &QAction::triggered, this,
+           [this] { QApplication::clipboard()->setText(mConfig.branchSelected); });
 }
 
 void BranchContextMenu::pull()

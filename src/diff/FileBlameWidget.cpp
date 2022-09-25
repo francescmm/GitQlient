@@ -231,21 +231,23 @@ QLabel *FileBlameWidget::createDateLabel(const Annotation &annotation, bool isFi
       const auto days = annotation.dateTime.daysTo(QDateTime::currentDateTime());
       const auto secs = annotation.dateTime.secsTo(QDateTime::currentDateTime());
       if (days > 365)
-         when.append(tr("more than 1 year ago"));
+         when.append(tr("%1 years ago").arg(days / 365));
+      else if (days > 30)
+         when.append(tr("%1 months ago").arg(days / 30));
       else if (days > 1)
-         when.append(QString::number(days)).append(tr(" days ago"));
+         when.append(tr("%1 days ago").arg(days));
       else if (days == 1)
          when.append(tr("yesterday"));
       else if (secs > 3600)
-         when.append(QString::number(secs / 3600)).append(tr(" hours ago"));
+         when.append(tr("%1 hours ago").arg(secs / 3600));
       else if (secs == 3600)
          when.append(tr("1 hour ago"));
       else if (secs > 60)
-         when.append(QString::number(secs / 60)).append(tr(" minutes ago"));
+         when.append(tr("%1 secs / 60minutes ago"));
       else if (secs == 60)
          when.append(tr("1 minute ago"));
       else
-         when.append(QString::number(secs)).append(tr(" secs ago"));
+         when.append(tr("%1 secs ago").arg(secs));
    }
 
    const auto dateLabel = new QLabel(when);
