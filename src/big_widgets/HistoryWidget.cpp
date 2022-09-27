@@ -121,7 +121,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mSearchInput = new QLineEdit();
    mSearchInput->setObjectName("SearchInput");
 
-   mSearchInput->setPlaceholderText(tr("Press Enter to search by SHA or log message..."));
+   mSearchInput->setPlaceholderText(
+       tr("Press Return/Enter) to search by SHA/message. Press Ctrl+Return/Enter to cherry-pick the SHA."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
    mRepositoryModel = new CommitHistoryModel(mCache, mGit);
@@ -167,6 +168,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    cherryPickBtn->setEnabled(false);
    cherryPickBtn->setObjectName("cherryPickBtn");
    cherryPickBtn->setToolTip("Cherry-pick the commit");
+   cherryPickBtn->setShortcut(Qt::CTRL + Qt::Key_Return);
+   cherryPickBtn->setShortcut(Qt::CTRL + Qt::Key_Enter);
    connect(cherryPickBtn, &QPushButton::clicked, this, &HistoryWidget::cherryPickCommit);
    connect(mSearchInput, &QLineEdit::textChanged, this,
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });
@@ -526,6 +529,9 @@ void HistoryWidget::returnToViewIfObsolete(const QString &fileName)
 
 void HistoryWidget::cherryPickCommit()
 {
+   auto error = false;
+   QString errorStr;
+
    if (auto commit = mCache->commitInfo(mSearchInput->text()); commit.isValid())
    {
       const auto lastShaBeforeCommit = mGit->getLastCommit().output.trimmed();
@@ -559,13 +565,8 @@ void HistoryWidget::cherryPickCommit()
          }
          else
          {
-            QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
-                               tr("There were problems during the cherry-pick operation. Please, see the detailed "
-                                  "description for more information."),
-                               QMessageBox::Ok, this);
-            msgBox.setDetailedText(ret.output);
-            msgBox.setStyleSheet(GitQlientStyles::getStyles());
-            msgBox.exec();
+            error = true;
+            errorStr = ret.output;
          }
       }
    }
@@ -594,6 +595,22 @@ void HistoryWidget::cherryPickCommit()
 
          emit logReload();
       }
+      else
+      {
+         error = true;
+         errorStr = ret.output;
+      }
+   }
+
+   if (error)
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
+                         tr("There were problems during the cherry-pick operation. Please, see the detailed "
+                            "description for more information."),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(errorStr);
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
    }
 }
 
