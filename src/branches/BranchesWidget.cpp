@@ -1291,7 +1291,7 @@ void BranchesWidget::onSearchBranch()
       }
       else if (mLastTreeSearched == mRemoteBranchesTree)
       {
-         if (mLastIndex == -1)
+         if (mLastIndex != -1)
          {
             mLastIndex = mRemoteBranchesTree->focusOnBranch(mLastSearch);
             mLastTreeSearched = mRemoteBranchesTree;
@@ -1302,6 +1302,12 @@ void BranchesWidget::onSearchBranch()
             mLastIndex = mTagsTree->focusOnBranch(mLastSearch);
             mLastTreeSearched = mTagsTree;
          }
+
+         if (mLastIndex == -1)
+         {
+            mLastIndex = mLocalBranchesTree->focusOnBranch(mLastSearch, mLastIndex);
+            mLastTreeSearched = mLocalBranchesTree;
+         }
       }
       else if (mLastIndex != -1)
       {
@@ -1309,7 +1315,10 @@ void BranchesWidget::onSearchBranch()
          mLastTreeSearched = mTagsTree;
 
          if (mLastIndex == -1)
+         {
+            mLastIndex = mLocalBranchesTree->focusOnBranch(mLastSearch, mLastIndex);
             mLastTreeSearched = mLocalBranchesTree;
+         }
       }
    }
 }

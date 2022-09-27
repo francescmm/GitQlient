@@ -31,6 +31,10 @@ int RefTreeWidget::focusOnBranch(const QString &itemText, int startSearchPos)
    ++startSearchPos;
 
    auto itemToExpand = items.at(startSearchPos);
+
+   if (itemToExpand->isSelected())
+      return -1;
+
    itemToExpand->setExpanded(true);
    setCurrentItem(itemToExpand);
    setCurrentIndex(indexFromItem(itemToExpand));
