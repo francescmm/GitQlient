@@ -300,7 +300,8 @@ void GitCache::reloadCurrentBranchInfo(const QString &currentBranch, const QStri
       }
    }
 
-   mReferences[currentSha].addReference(References::Type::LocalBranch, currentBranch);
+   if (!currentBranch.isEmpty())
+      mReferences[currentSha].addReference(References::Type::LocalBranch, currentBranch);
 }
 
 bool GitCache::updateWipCommit(const QString &parentSha, const RevisionFiles &files)

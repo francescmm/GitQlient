@@ -442,7 +442,7 @@ void BranchesWidget::showBranches()
       {
          if (branch.contains("/"))
             branchFolderShaMap.insert(std::make_pair(branch, pair.first));
-         else
+         else if (!branch.isEmpty())
             branchShaMap.insert(std::make_pair(branch, pair.first));
       }
    }
