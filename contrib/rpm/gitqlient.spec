@@ -33,7 +33,7 @@ qmake-qt5 -makefile \
    PREFIX=%{_prefix} \
    GitQlient.pro
 %else
-%qmake_qt5 PREFIX=%{_prefix} GitQlient.pro VERSION=1.5.0
+%qmake_qt5 PREFIX=%{_prefix} GitQlient.pro VERSION=%{version}
 %endif
 
 %make_build
