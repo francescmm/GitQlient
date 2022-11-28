@@ -5,6 +5,7 @@ FORMS += \
     $$PWD/CreateRepoDlg.ui \
     $$PWD/CredentialsDlg.ui \
     $$PWD/InitialRepoConfig.ui \
+    $$PWD/InputShaDlg.ui \
     $$PWD/PomodoroConfigDlg.ui \
     $$PWD/PullDlg.ui \
     $$PWD/SquashDlg.ui \
@@ -20,6 +21,7 @@ HEADERS += \
     $$PWD/Highlighter.h \
     $$PWD/HunkWidget.h \
     $$PWD/InitialRepoConfig.h \
+    $$PWD/InputShaDlg.h \
     $$PWD/PluginsDownloader.h \
     $$PWD/PomodoroButton.h \
     $$PWD/PomodoroConfigDlg.h \
@@ -40,6 +42,7 @@ SOURCES += \
     $$PWD/Highlighter.cpp \
     $$PWD/HunkWidget.cpp \
     $$PWD/InitialRepoConfig.cpp \
+    $$PWD/InputShaDlg.cpp \
     $$PWD/PluginsDownloader.cpp \
     $$PWD/PomodoroButton.cpp \
     $$PWD/PomodoroConfigDlg.cpp \

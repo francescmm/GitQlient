@@ -8,6 +8,7 @@
 #include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
+#include <InputShaDlg.h>
 #include <UpstreamDlg.h>
 
 #include <QApplication>
@@ -25,6 +26,7 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
    if (mConfig.isLocal)
    {
       connect(addAction(tr("Reset to origin")), &QAction::triggered, this, &BranchContextMenu::resetToOrigin);
+      connect(addAction(tr("Reset to SHA...")), &QAction::triggered, this, &BranchContextMenu::resetToSha);
       connect(addAction(tr("Fetch")), &QAction::triggered, this, &BranchContextMenu::fetch);
       connect(addAction(tr("Pull")), &QAction::triggered, this, &BranchContextMenu::pull);
       connect(addAction(tr("Push")), &QAction::triggered, this, &BranchContextMenu::push);
@@ -118,6 +120,14 @@ void BranchContextMenu::resetToOrigin()
       emit fullReload();
    else
       QMessageBox::critical(this, tr("Fetch failed"), tr("There were some problems while fetching. Please try again."));
+}
+
+void BranchContextMenu::resetToSha()
+{
+   InputShaDlg dlg(mConfig.branchSelected, mConfig.mGit);
+
+   if (dlg.exec() == QDialog::Accepted)
+      emit fullReload();
 }
 
 void BranchContextMenu::push()

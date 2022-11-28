@@ -117,6 +117,11 @@ private:
     */
    void resetToOrigin();
 
+   /**
+    * @brief resetToSha Resets the local branch to a specific SHA.
+    */
+   void resetToSha();
+
    /*!
     \brief Pushes all the local changes to the remote repo.
 
