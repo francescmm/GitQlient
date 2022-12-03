@@ -44,12 +44,26 @@ class InitScreen : public QFrame
    Q_OBJECT
 
 signals:
-   /*!
-    \brief Signal triggered when the user tries to open a new repository.
-
-    \param repoPath The repository full path.
-   */
+   /**
+    * @brief Signal triggered when the user tries to open a new repository.
+    * @param repoPath The repository full path.
+    */
    void signalOpenRepo(const QString &repoPath);
+
+   /**
+    * @brief Signal triggered when the user tries to open a new repository.
+    */
+   void signalOpenRepo();
+
+   /**
+    * @brief Signal triggered when the user tries to clone an existing repository.
+    */
+   void signalCloneRepo();
+
+   /**
+    * @brief Signal triggered when the user whants to create a new repository.
+    */
+   void signalInitRepo();
 
 public:
    /*!
@@ -67,33 +81,19 @@ public:
    void onRepoOpened();
 
 private:
-   QSharedPointer<GitConfig> mGit;
    QPushButton *mOpenRepo = nullptr;
    QPushButton *mCloneRepo = nullptr;
    QPushButton *mInitRepo = nullptr;
    QButtonGroup *mBtnGroup = nullptr;
-   ProgressDlg *mProgressDlg = nullptr;
-   QString mPathToOpen;
    QVBoxLayout *mRecentProjectsLayout = nullptr;
    QVBoxLayout *mUsedProjectsLayout = nullptr;
    QWidget *mInnerWidget = nullptr;
    QWidget *mMostUsedInnerWidget = nullptr;
 
    /*!
-    \brief Opens an already cloned repository.
-
-   */
-   void openRepo();
-   /*!
     \brief Clones a new repository.
 
    */
-   void cloneRepo();
-   /*!
-    \brief Initiates a new local repository.
-
-   */
-   void initRepo();
    /*!
     \brief Creates the recent projects page.
 
@@ -107,21 +107,6 @@ private:
    \return QWidget The resultant widget.
     */
    QWidget *createUsedProjectsPage();
-
-   /*!
-    \brief Updates the progress dialog for cloning repos.
-
-    \param stepDescription The description step.
-    \param value The numeric value.
-   */
-   void updateProgressDialog(QString stepDescription, int value);
-
-   /**
-    * @brief showError Shows an error occurred during any configuration time.
-    * @param error The error code.
-    * @param description The error description.
-    */
-   void showError(int error, QString description);
 
    /**
     * @brief showAbout Shows GitQlient about info.

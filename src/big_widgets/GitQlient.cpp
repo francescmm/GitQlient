@@ -126,7 +126,10 @@ GitQlient::GitQlient(QWidget *parent)
 
    mConfigWidget->onRepoOpened();
 
-   connect(mConfigWidget, &InitScreen::signalOpenRepo, this, &GitQlient::addRepoTab);
+   connect(mConfigWidget, qOverload<>(&InitScreen::signalOpenRepo), this, &GitQlient::openRepo);
+   connect(mConfigWidget, qOverload<const QString &>(&InitScreen::signalOpenRepo), this, &GitQlient::addRepoTab);
+   connect(mConfigWidget, &InitScreen::signalCloneRepo, this, &GitQlient::cloneRepo);
+   connect(mConfigWidget, &InitScreen::signalInitRepo, this, &GitQlient::initRepo);
 
    const auto geometry = settings.globalValue("GitQlientGeometry", saveGeometry()).toByteArray();
 

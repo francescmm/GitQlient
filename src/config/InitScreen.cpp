@@ -134,47 +134,9 @@ InitScreen::InitScreen(QWidget *parent)
    layout->addWidget(centerFrame, 1, 1);
    layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 2);
 
-   connect(mOpenRepo, &QPushButton::clicked, this, &InitScreen::openRepo);
-   connect(mCloneRepo, &QPushButton::clicked, this, &InitScreen::cloneRepo);
-   connect(mInitRepo, &QPushButton::clicked, this, &InitScreen::initRepo);
-
-   const auto gitBase(QSharedPointer<GitBase>::create(""));
-   mGit = QSharedPointer<GitConfig>::create(gitBase);
-
-   connect(mGit.data(), &GitConfig::signalCloningProgress, this, &InitScreen::updateProgressDialog,
-           Qt::DirectConnection);
-   connect(mGit.data(), &GitConfig::signalCloningFailure, this, &InitScreen::showError, Qt::DirectConnection);
-}
-
-void InitScreen::openRepo()
-{
-   const QString dirName(QFileDialog::getExistingDirectory(this, "Choose the directory of a Git project"));
-
-   if (!dirName.isEmpty())
-   {
-      QDir d(dirName);
-      emit signalOpenRepo(d.absolutePath());
-   }
-}
-
-void InitScreen::cloneRepo()
-{
-   CreateRepoDlg cloneDlg(CreateRepoDlgType::CLONE, mGit);
-   connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, [this](const QString &path) { mPathToOpen = path; });
-
-   if (cloneDlg.exec() == QDialog::Accepted)
-   {
-      mProgressDlg = new ProgressDlg(tr("Loading repository..."), QString(), 100, false);
-      connect(mProgressDlg, &ProgressDlg::destroyed, this, [this]() { mProgressDlg = nullptr; });
-      mProgressDlg->show();
-   }
-}
-
-void InitScreen::initRepo()
-{
-   CreateRepoDlg cloneDlg(CreateRepoDlgType::INIT, mGit);
-   connect(&cloneDlg, &CreateRepoDlg::signalOpenWhenFinish, this, &InitScreen::signalOpenRepo);
-   cloneDlg.exec();
+   connect(mOpenRepo, &QPushButton::clicked, this, qOverload<>(&InitScreen::signalOpenRepo));
+   connect(mCloneRepo, &QPushButton::clicked, this, &InitScreen::signalCloneRepo);
+   connect(mInitRepo, &QPushButton::clicked, this, &InitScreen::signalInitRepo);
 }
 
 QWidget *InitScreen::createRecentProjectsPage()
@@ -261,33 +223,6 @@ QWidget *InitScreen::createUsedProjectsPage()
    innerLayout->addWidget(clear);
 
    return mMostUsedInnerWidget;
-}
-
-void InitScreen::updateProgressDialog(QString stepDescription, int value)
-{
-   if (value >= 0)
-   {
-      mProgressDlg->setValue(value);
-
-      if (stepDescription.contains("done", Qt::CaseInsensitive))
-      {
-         mProgressDlg->close();
-         emit signalOpenRepo(mPathToOpen);
-
-         mPathToOpen = "";
-      }
-   }
-
-   mProgressDlg->setLabelText(stepDescription);
-   mProgressDlg->repaint();
-}
-
-void InitScreen::showError(int, QString description)
-{
-   if (mProgressDlg)
-      mProgressDlg->deleteLater();
-
-   QMessageBox::critical(this, tr("Error!"), description);
 }
 
 void InitScreen::showAbout()
