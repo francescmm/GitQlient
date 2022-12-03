@@ -122,7 +122,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    mSearchInput->setObjectName("SearchInput");
 
    mSearchInput->setPlaceholderText(
-       tr("Press Return/Enter) to search by SHA/message. Press Ctrl+Return/Enter to cherry-pick the SHA."));
+       tr("Press Return/Enter to search by SHA/message. Press Ctrl+Return/Enter to cherry-pick the SHA."));
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
    mRepositoryModel = new CommitHistoryModel(mCache, mGit);
