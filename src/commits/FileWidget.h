@@ -39,6 +39,7 @@ signals:
 public:
    explicit FileWidget(const QIcon &icon, const QString &text, QWidget *parent = nullptr);
    explicit FileWidget(const QString &icon, const QString &text, QWidget *parent = nullptr);
+   void setIcon(const QString &icon);
    QString text() const;
    void setText(const QString &text);
    QSize sizeHint() const override;
@@ -46,7 +47,6 @@ public:
    QColor getTextColor() const { return mColor; }
 
 private:
-   QIcon mIcon;
    QPushButton *mButton = nullptr;
    QLabel *mText = nullptr;
    QColor mColor;

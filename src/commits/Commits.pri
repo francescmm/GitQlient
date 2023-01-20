@@ -12,7 +12,6 @@ HEADERS += \
     $$PWD/FileListWidget.h \
     $$PWD/FileWidget.h \
     $$PWD/GitQlientRole.h \
-    $$PWD/StagedFilesList.h \
     $$PWD/UnstagedMenu.h \
     $$PWD/WipWidget.h
 
@@ -24,6 +23,5 @@ SOURCES += \
     $$PWD/FileListDelegate.cpp \
     $$PWD/FileListWidget.cpp \
     $$PWD/FileWidget.cpp \
-    $$PWD/StagedFilesList.cpp \
     $$PWD/UnstagedMenu.cpp \
     $$PWD/WipWidget.cpp

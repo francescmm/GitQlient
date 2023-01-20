@@ -1,13 +1,12 @@
 #include "FileWidget.h"
 
-#include <QPushButton>
-#include <QLabel>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
 
 FileWidget::FileWidget(const QIcon &icon, const QString &text, QWidget *parent)
    : QFrame(parent)
-   , mIcon(icon)
-   , mButton(new QPushButton(mIcon, ""))
+   , mButton(new QPushButton(icon, ""))
    , mText(new QLabel(text))
 {
    const auto itemLayout = new QHBoxLayout(this);
@@ -18,12 +17,17 @@ FileWidget::FileWidget(const QIcon &icon, const QString &text, QWidget *parent)
    itemLayout->addWidget(mText);
 
    if (!icon.isNull())
-      connect(mButton, &QPushButton::clicked, this, [this]() { emit clicked(); });
+      connect(mButton, &QPushButton::clicked, this, &FileWidget::clicked);
 }
 
 FileWidget::FileWidget(const QString &icon, const QString &text, QWidget *parent)
    : FileWidget(QIcon(icon), text, parent)
 {
+}
+
+void FileWidget::setIcon(const QString &icon)
+{
+   mButton->setIcon(QIcon(icon));
 }
 
 QString FileWidget::text() const

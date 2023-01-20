@@ -83,9 +83,8 @@ protected:
    virtual void showUnstagedMenu(const QPoint &pos) final;
 
    virtual void insertFiles(const RevisionFiles &files, QListWidget *fileList) final;
-   QPair<QListWidgetItem *, FileWidget *> fillFileItemInfo(const QString &file, bool isConflict, bool isUntracked,
-                                                           const QString &icon, const QColor &color,
-                                                           QListWidget *parent);
+   QPair<QListWidgetItem *, FileWidget *> fillFileItemInfo(const QString &file, bool isConflict, const QString &icon,
+                                                           const QColor &color, QListWidget *parent);
    virtual void prepareCache() final;
    virtual void clearCache() final;
    virtual void addAllFilesToCommitList() final;
@@ -99,6 +98,4 @@ protected:
    virtual bool hasConflicts() final;
    virtual void resetFile(QListWidgetItem *item) final;
    virtual QColor getColorForFile(const RevisionFiles &files, int index) const final;
-
-   static QString lastMsgBeforeError;
 };

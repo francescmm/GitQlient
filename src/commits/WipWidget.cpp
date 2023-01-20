@@ -126,8 +126,6 @@ void WipWidget::commitChanges()
                msgBox.setStyleSheet(GitQlientStyles::getStyles());
                msgBox.exec();
             }
-
-            lastMsgBeforeError = (ret.success ? "" : msg);
          }
       }
    }

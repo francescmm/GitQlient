@@ -156,16 +156,6 @@
      </layout>
     </widget>
    </item>
-   <item row="9" column="1" colspan="2">
-    <widget class="StagedFilesList" name="stagedFilesList">
-     <property name="contextMenuPolicy">
-      <enum>Qt::CustomContextMenu</enum>
-     </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAsNeeded</enum>
-     </property>
-    </widget>
-   </item>
    <item row="7" column="1" colspan="2">
     <widget class="QTextEdit" name="teDescription">
      <property name="lineWrapMode">
@@ -196,16 +186,19 @@
      </property>
     </widget>
    </item>
+   <item row="9" column="1" colspan="2">
+    <widget class="QListWidget" name="stagedFilesList">
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAsNeeded</enum>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <customwidgets>
-  <customwidget>
-   <class>StagedFilesList</class>
-   <extends>QListWidget</extends>
-   <header>StagedFilesList.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>leCommitTitle</tabstop>
   <tabstop>teDescription</tabstop>
