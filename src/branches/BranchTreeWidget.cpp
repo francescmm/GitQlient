@@ -314,7 +314,6 @@ void BranchTreeWidget::onDeleteBranch()
             {
                mCache->deleteReference(sha, type, selectedBranch);
                emit mCache->signalCacheUpdated();
-               emit fullReload();
             }
             else
                QMessageBox::critical(
