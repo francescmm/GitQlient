@@ -350,6 +350,8 @@ bool GitQlient::parseArguments(const QStringList &arguments, QStringList *repos)
 void GitQlient::addRepoTab(const QString &repoPath)
 {
    addNewRepoTab(repoPath, false);
+   mRepos->setCurrentIndex(mRepos->count() - 1);
+   mStackedLayout->setCurrentIndex(1);
 }
 
 void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
@@ -386,7 +388,7 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
          connect(repo, &GitQlientRepo::currentBranchChanged, this, &GitQlient::updateWindowTitle);
          connect(repo, &GitQlientRepo::moveLogsAndClose, this, &GitQlient::moveLogsBeforeClose);
 
-         repo->setRepository(repoName);
+         repo->loadRepo();
 
          if (!mPlugins.isEmpty() || (mPlugins.empty() && mJenkins.second) || (mPlugins.empty() && mGitServer.second)
              || (mPlugins.empty() && mTerminal.second))
@@ -406,37 +408,31 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
             repo->setPlugins(plugins);
          }
 
-         if (!repoPath.isEmpty())
-         {
-            QProcess p;
-            p.setWorkingDirectory(repoPath);
-            p.start("git", { "rev-parse", "--show-superproject-working-tree" });
-            p.waitForFinished(5000);
-
-            const auto output = p.readAll().trimmed();
-            const auto isSubmodule = !output.isEmpty();
-
-            mRepos->setTabIcon(index, QIcon(isSubmodule ? QString(":/icons/submodules") : QString(":/icons/local")));
-
-            QLog_Info("UI", "Attaching repository to a new tab");
-
-            if (isSubmodule)
-            {
-               const auto parentRepo = QString::fromUtf8(output.split('/').last());
-
-               mRepos->setTabText(index, QString("%1 \u2192 %2").arg(parentRepo, repoName));
-
-               QLog_Info("UI",
-                         QString("Opening the submodule {%1} from the repo {%2} on tab index {%3}")
-                             .arg(repoName, parentRepo)
-                             .arg(index));
-            }
-         }
-
-         mRepos->setCurrentIndex(index);
-         mStackedLayout->setCurrentIndex(1);
-
          mCurrentRepos.insert(repoPath);
+
+         QProcess p;
+         p.setWorkingDirectory(repoPath);
+         p.start("git", { "rev-parse", "--show-superproject-working-tree" });
+         p.waitForFinished(5000);
+
+         const auto output = p.readAll().trimmed();
+         const auto isSubmodule = !output.isEmpty();
+
+         mRepos->setTabIcon(index, QIcon(isSubmodule ? QString(":/icons/submodules") : QString(":/icons/local")));
+
+         QLog_Info("UI", "Attaching repository to a new tab");
+
+         if (isSubmodule)
+         {
+            const auto parentRepo = QString::fromUtf8(output.split('/').last());
+
+            mRepos->setTabText(index, QString("%1 \u2192 %2").arg(parentRepo, repoName));
+
+            QLog_Info("UI",
+                      QString("Opening the submodule {%1} from the repo {%2} on tab index {%3}")
+                          .arg(repoName, parentRepo)
+                          .arg(index));
+         }
       }
       else
       {
@@ -480,8 +476,14 @@ void GitQlient::restorePinnedRepos()
 
    const auto pinnedRepos = settings.globalValue(GitQlientSettings::PinnedRepos, QStringList()).toStringList();
 
-   for (auto &repo : pinnedRepos)
-      addNewRepoTab(repo, true);
+   if (!pinnedRepos.isEmpty())
+   {
+      for (auto &repo : pinnedRepos)
+         addNewRepoTab(repo, true);
+
+      mRepos->setCurrentIndex(0);
+      mStackedLayout->setCurrentIndex(1);
+   }
 }
 
 void GitQlient::onSuccessOpen(const QString &fullPath)

@@ -48,22 +48,31 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    , mGit(git)
    , mCache(cache)
    , mSettings(settings)
-   , mWipWidget(new WipWidget(mCache, mGit))
-   , mAmendWidget(new AmendWidget(mCache, mGit))
-   , mCommitInfoWidget(new CommitInfoWidget(mCache, mGit))
-   , mReturnFromFull(new QPushButton())
+   , mReturnFromFull(new QPushButton(QIcon(":/icons/back"), ""))
    , mUserName(new QLabel())
    , mUserEmail(new QLabel())
    , mSplitter(new QSplitter())
 {
+   QLog_Info("Performance", "HistoryWidget loading...");
    setAttribute(Qt::WA_DeleteOnClose);
 
-   QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   const auto localUserInfo = gitConfig->getLocalUserInfo();
-   const auto globalUserInfo = gitConfig->getGlobalUserInfo();
+   QSharedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+   gitConfig->getUserNameAsync(true);
+   gitConfig->getUserEmailAsync(true);
 
-   mUserName->setText(localUserInfo.mUserName.isEmpty() ? globalUserInfo.mUserName : localUserInfo.mUserName);
-   mUserEmail->setText(localUserInfo.mUserEmail.isEmpty() ? globalUserInfo.mUserEmail : localUserInfo.mUserEmail);
+   connect(gitConfig.get(), &GitConfig::signalNameReceived, this, [this, gitConfig](QString name, bool local) {
+      if (!name.isEmpty())
+         mUserName->setText(name);
+      else if (local)
+         gitConfig->getUserNameAsync(false);
+   });
+
+   connect(gitConfig.get(), &GitConfig::signalEmailReceived, this, [this, gitConfig](QString email, bool local) {
+      if (!email.isEmpty())
+         mUserEmail->setText(email);
+      else if (local)
+         gitConfig->getUserEmailAsync(false);
+   });
 
    const auto wipInfoFrame = new QFrame();
    wipInfoFrame->setObjectName("wipInfoFrame");
@@ -72,6 +81,10 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    wipInfoLayout->setSpacing(10);
    wipInfoLayout->addWidget(mUserName);
    wipInfoLayout->addWidget(mUserEmail);
+
+   mWipWidget = new WipWidget(mCache, mGit);
+   mAmendWidget = new AmendWidget(mCache, mGit);
+   mCommitInfoWidget = new CommitInfoWidget(mCache, mGit);
 
    mCommitStackedWidget = new QStackedWidget();
    mCommitStackedWidget->setCurrentIndex(0);
@@ -196,7 +209,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    mWipFileDiff = new FileDiffWidget(mGit, mCache);
 
-   mReturnFromFull->setIcon(QIcon(":/icons/back"));
    connect(mReturnFromFull, &QPushButton::clicked, this, &HistoryWidget::returnToView);
 
    mCenterStackedWidget = new QStackedWidget();
@@ -293,7 +305,6 @@ void HistoryWidget::focusOnCommit(const QString &sha)
    mRepositoryView->focusOnCommit(sha);
 }
 
-#include <QDebug>
 void HistoryWidget::updateGraphView(int totalCommits)
 {
    mRepositoryModel->onNewRevisions(totalCommits);

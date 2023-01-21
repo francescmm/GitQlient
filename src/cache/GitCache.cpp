@@ -59,7 +59,7 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
       if (sha == mCommitsMap.value(ZERO_SHA).firstParent())
          commit.appendChild(&mCommitsMap[ZERO_SHA]);
 
-      mCommitsMap[sha] = commit;
+      mCommitsMap[sha] = std::move(commit);
       mCommits[++count] = &mCommitsMap[sha];
 
       if (tmpChildsStorage.contains(sha))

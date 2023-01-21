@@ -63,7 +63,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
-   QLog_Info("UI", QString("Initializing GitQlient"));
+   QLog_Info("UI", QString("Initializing GitQlient for repo %1").arg(git->getGitDir()));
 
    setObjectName("mainWindow");
    setWindowTitle("GitQlient");
@@ -162,6 +162,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    m_loaderThread = new QThread();
    mGitLoader->moveToThread(m_loaderThread);
    mGitQlientCache->moveToThread(m_loaderThread);
+   connect(this, &GitQlientRepo::loadRepo, mGitLoader.data(), &GitRepoLoader::loadAll);
    connect(this, &GitQlientRepo::fullReload, mGitLoader.data(), &GitRepoLoader::loadAll);
    connect(this, &GitQlientRepo::referencesReload, mGitLoader.data(), &GitRepoLoader::loadReferences);
    connect(this, &GitQlientRepo::logReload, mGitLoader.data(), &GitRepoLoader::loadLogHistory);
@@ -197,32 +198,6 @@ void GitQlientRepo::updateUiFromWatcher()
    mHistoryWidget->updateUiFromWatcher();
 
    mDiffWidget->reload();
-}
-
-void GitQlientRepo::setRepository(const QString &newDir)
-{
-   if (!newDir.isEmpty())
-   {
-      QLog_Info("UI", QString("Loading repository at {%1}...").arg(newDir));
-
-      mGitLoader->cancelAll();
-
-      emit fullReload();
-
-      updateUiFromWatcher();
-
-      mCurrentDir = newDir;
-      clearWindow();
-      setWidgetsEnabled(false);
-   }
-   else
-   {
-      QLog_Info("UI", QString("Repository is empty. Cleaning GitQlient"));
-
-      mCurrentDir = "";
-      clearWindow();
-      setWidgetsEnabled(false);
-   }
 }
 
 void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
@@ -334,7 +309,7 @@ void GitQlientRepo::createProgressDialog()
    }
 }
 
-void GitQlientRepo::onRepoLoadFinished(bool fullReload)
+void GitQlientRepo::onRepoLoadFinished()
 {
    if (!mIsInit)
    {
@@ -381,7 +356,6 @@ void GitQlientRepo::onRepoLoadFinished(bool fullReload)
       return;
    }
 
-   mHistoryWidget->loadBranches(fullReload);
    mHistoryWidget->updateGraphView(totalCommits);
 
    mBlameWidget->onNewRevisions(totalCommits);

@@ -33,9 +33,8 @@ int main(int argc, char *argv[])
    {
       GitQlient mainWin;
       mainWin.setRepositories(repos);
+      mainWin.restorePinnedRepos();
       mainWin.show();
-
-      QTimer::singleShot(250, &mainWin, &GitQlient::restorePinnedRepos);
 
       return app.exec();
    }

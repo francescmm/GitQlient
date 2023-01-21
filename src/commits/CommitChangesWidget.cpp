@@ -293,9 +293,7 @@ void CommitChangesWidget::addAllFilesToCommitList()
    const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
 
    if (const auto ret = git->markFilesAsResolved(files); ret.success)
-   {
       WipHelper::update(mGit, mCache);
-   }
 
    ui->applyActionBtn->setEnabled(ui->stagedFilesList->count() > 0);
 }
@@ -416,7 +414,7 @@ QStringList CommitChangesWidget::getFiles()
 
    for (auto i = 0; i < totalItems; ++i)
    {
-      const auto fileWidget = static_cast<FileWidget *>(ui->stagedFilesList->itemWidget(ui->stagedFilesList->item(i)));
+      const auto fileWidget = ui->stagedFilesList->itemWidget(ui->stagedFilesList->item(i));
       selFiles.append(fileWidget->toolTip());
    }
 
@@ -425,7 +423,7 @@ QStringList CommitChangesWidget::getFiles()
 
 bool CommitChangesWidget::checkMsg(QString &msg)
 {
-   const auto title = ui->leCommitTitle->text();
+   const auto title = ui->leCommitTitle->text().trimmed();
 
    if (title.isEmpty())
    {
@@ -438,11 +436,11 @@ bool CommitChangesWidget::checkMsg(QString &msg)
    if (!ui->teDescription->toPlainText().isEmpty())
    {
       auto description = QString("\n\n%1").arg(ui->teDescription->toPlainText());
-      description.remove(QRegularExpression("(^|\\n)\\s*#[^\\n]*")); // strip comments
+      description.remove(QRegularExpression("(^|\\n)\\s*#[^\\n]*"));
       msg += description;
    }
 
-   msg.replace(QRegularExpression("[ \\t\\r\\f\\v]+\\n"), "\n"); // strip line trailing cruft
+   msg.replace(QRegularExpression("[ \\t\\r\\f\\v]+\\n"), "\n");
    msg = msg.trimmed();
 
    if (msg.isEmpty())

@@ -78,6 +78,8 @@ signals:
    */
    void signalOpenSubmodule(const QString &submoduleName);
 
+   void loadRepo();
+
    /**
     * @brief signalLoadRepo Signal used to trigger the data update in a different thread.
     * @param full Requests a full repository refresh: includes commits and references.
@@ -132,13 +134,6 @@ public:
     * @return QString The current branch.
     */
    QString currentBranch() const;
-
-   /*!
-    \brief Sets the repository once the widget is created.
-
-    \param newDir The new repository to be opened.
-   */
-   void setRepository(const QString &newDir);
 
    /**
     * @brief Sets the plugins loaded by GitQlient to be used by the repo instance.
@@ -224,9 +219,8 @@ private:
 
    /**
     * @brief When the loading finishes this method closes and destroys the dialog.
-    * @param fullReload Indicates that the load finished in the full mode (commits + references).
     */
-   void onRepoLoadFinished(bool fullReload);
+   void onRepoLoadFinished();
    /*!
     \brief Loads the view to show the diff of a specific file.
 
