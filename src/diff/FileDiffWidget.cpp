@@ -651,7 +651,7 @@ void FileDiffWidget::deleteHunkView()
 
    hunkView->deleteLater();
 
-   if (mHunks.isEmpty())
+   if (mHunks.isEmpty() && !mIsCached)
    {
       // We stage the file no matter what: if the file has no modifications, nothing will happen. But if the file has
       // modifications this will force Git to refresh the information about the changes and avoid partially cached
