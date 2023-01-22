@@ -171,7 +171,7 @@ void HunkWidget::discardLine()
 
    for (auto i = 0; i < lines.count(); ++i)
    {
-      if (i == mLineToDiscard + 1)
+      if (i == mLineToDiscard)
          lines[i][0] = QChar('-');
       else if (lines[i].startsWith("+"))
          lines[i][0] = QChar(' ');
