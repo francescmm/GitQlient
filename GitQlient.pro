@@ -56,7 +56,8 @@ isEmpty(VERSION) {
 win32 {
    VERSION = 0.0.0
 } else {
-   VERSION = $$system(git rev-parse --short HEAD)
+   VERSION = $$system(git describe --abbrev=0)
+   VERSION = $$replace(VERSION, "v", "")
 }
 }
 
