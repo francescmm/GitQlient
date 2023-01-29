@@ -69,6 +69,8 @@ DEFINES += \
     VER=\\\"$$VERSION\\\" \
     SHA_VER=\\\"$$GQ_SHA\\\"
 
+message("Found version \"$$VERSION\" at commit \"$$GQ_SHA\".")
+
 debug {
    DEFINES += DEBUG
 }
