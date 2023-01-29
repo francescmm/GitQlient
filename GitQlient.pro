@@ -61,7 +61,9 @@ win32 {
 }
 }
 
-GQ_SHA = $$system(git rev-parse --short HEAD)
+!defined(GQ_SHA, var) {
+   GQ_SHA = $$system(git rev-parse --short HEAD)
+}
 
 DEFINES += \
     VER=\\\"$$VERSION\\\" \
