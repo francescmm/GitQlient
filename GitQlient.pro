@@ -56,15 +56,20 @@ isEmpty(VERSION) {
 win32 {
    VERSION = 0.0.0
 } else {
-   VERSION = $$system(git rev-parse --short HEAD)
+   VERSION = $$system(git describe --abbrev=0)
+   VERSION = $$replace(VERSION, "v", "")
 }
 }
 
-GQ_SHA = $$system(git rev-parse --short HEAD)
+!defined(GQ_SHA, var) {
+   GQ_SHA = $$system(git rev-parse --short HEAD)
+}
 
 DEFINES += \
     VER=\\\"$$VERSION\\\" \
     SHA_VER=\\\"$$GQ_SHA\\\"
+
+message("Found version \"$$VERSION\" at commit \"$$GQ_SHA\".")
 
 debug {
    DEFINES += DEBUG
