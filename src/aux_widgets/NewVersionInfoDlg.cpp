@@ -35,7 +35,7 @@ NewVersionInfoDlg::NewVersionInfoDlg(QWidget *parent)
           "select your preferred color scheme for the terminal widget based on the ones available in your OS."));
 
    createAddPage(
-       tr("3. GiHub and Jenkins become plugins"), {},
+       tr("3. GitHub and Jenkins become plugins"), {},
        tr("The old GitServer view (to connect to GitHub) and Jenkins view (to show and trigger Jenkins jobs and "
           "builds) have been converted into plugins and are now available to be downloaded from their release page in "
           "their own GitHub repo. By having this views detached, GitQlient takes less dependencies (WebEngine, "
