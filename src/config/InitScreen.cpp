@@ -239,8 +239,8 @@ void InitScreen::showAbout()
             "If you want to integrate GitQlient into QtCreator, I also provide a plugin that you can download from "
             "<a style='color: #D89000' href='https://github.com/francescmm/GitQlient/releases'>here</a>. Just make "
             "sure you pick the right version and follow the instructions in the main page of the repo.<br><br>"
-            "GitQlient can be compiled from Qt 5.12 on.<br><br>"
-            "Copyright &copy; 2019 - 2020 GitQlient (Francesc Martínez)");
+            "GitQlient can be compiled from Qt 5.15 on.<br><br>"
+            "Copyright &copy; 2019 - 2023 GitQlient (Francesc Martínez)");
 
    QMessageBox::about(this, tr("About GitQlient v%1").arg(VER), aboutMsg);
 }
