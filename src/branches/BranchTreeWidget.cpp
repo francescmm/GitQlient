@@ -80,19 +80,28 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
       }
       else if (item->data(0, IsRoot).toBool())
       {
-         const auto menu = new QMenu(this);
-         const auto removeRemote = menu->addAction(tr("Remove remote"));
-         connect(removeRemote, &QAction::triggered, this, [this, item]() {
-            QScopedPointer<GitRemote> git(new GitRemote(mGit));
-            if (const auto ret = git->removeRemote(item->text(0)); ret.success)
-            {
-               mCache->deleteReference(item->data(0, ShaRole).toString(), References::Type::RemoteBranches,
-                                       item->text(0));
-               emit logReload();
-            }
-         });
+         QScopedPointer<GitRemote> git(new GitRemote(mGit));
+         if (const auto ret = git->getRemotes(); ret.success)
+         {
+            const auto remotes = ret.output.split("\n", Qt::SkipEmptyParts);
 
-         menu->exec(viewport()->mapToGlobal(pos));
+            if (remotes.count() > 1)
+            {
+               const auto menu = new QMenu(this);
+               const auto removeRemote = menu->addAction(tr("Remove remote"));
+               connect(removeRemote, &QAction::triggered, this, [this, item]() {
+                  QScopedPointer<GitRemote> git(new GitRemote(mGit));
+                  if (const auto ret = git->removeRemote(item->text(0)); ret.success)
+                  {
+                     mCache->deleteReference(item->data(0, ShaRole).toString(), References::Type::RemoteBranches,
+                                             item->text(0));
+                     emit fullReload();
+                  }
+               });
+
+               menu->exec(viewport()->mapToGlobal(pos));
+            }
+         }
       }
       else
       {

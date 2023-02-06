@@ -128,7 +128,7 @@ private:
    */
    void push();
 
-   void unsetUpstream() const;
+   void unsetUpstream();
 
    /*!
     \brief Pushes force all the local changes into the remote repo.

@@ -35,6 +35,7 @@ BranchContextMenu::BranchContextMenu(BranchContextMenuConfig config, QWidget *pa
    if (mConfig.currentBranch == mConfig.branchSelected)
    {
       connect(addAction(tr("Push force")), &QAction::triggered, this, &BranchContextMenu::pushForce);
+      connect(addAction(tr("Set upstream")), &QAction::triggered, this, &BranchContextMenu::push);
       connect(addAction(tr("Unset upstream")), &QAction::triggered, this, &BranchContextMenu::unsetUpstream);
    }
 
@@ -147,8 +148,23 @@ void BranchContextMenu::push()
             && ret.output.contains("does not match", Qt::CaseInsensitive)
             && ret.output.contains("the name of your current branch", Qt::CaseInsensitive))
    {
-      UpstreamDlg dlg(mConfig.mGit, ret.output);
-      dlg.exec();
+      QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
+      const auto ret = git->getRemotes();
+      QStringList remotes;
+
+      if (ret.success)
+         remotes = ret.output.split("\n", Qt::SkipEmptyParts);
+
+      if (remotes.isEmpty())
+      {
+         UpstreamDlg dlg(mConfig.mGit, ret.output);
+         dlg.exec();
+      }
+      else
+      {
+         BranchDlg dlg({ mConfig.branchSelected, BranchDlgMode::PUSH_UPSTREAM, mConfig.mCache, mConfig.mGit });
+         dlg.exec();
+      }
    }
    else if (ret.success)
    {
@@ -181,12 +197,20 @@ void BranchContextMenu::push()
    }
 }
 
-void BranchContextMenu::unsetUpstream() const
+void BranchContextMenu::unsetUpstream()
 {
    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
    QScopedPointer<GitBranches> git(new GitBranches(mConfig.mGit));
    const auto ret = git->unsetUpstream();
    QApplication::restoreOverrideCursor();
+
+   if (ret.success)
+   {
+      QMessageBox msgBox(QMessageBox::Information, tr("Upstream unset!"), tr("Upstream unset successfully!"),
+                         QMessageBox::Ok, this);
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
 }
 
 void BranchContextMenu::pushForce()

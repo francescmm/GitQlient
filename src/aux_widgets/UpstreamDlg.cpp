@@ -37,7 +37,7 @@ void UpstreamDlg::accept()
    if (ret.success)
    {
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-      const auto ret = git->pushUpstream(mGit->getCurrentBranch());
+      const auto ret = git->pushUpstream(mGit->getCurrentBranch(), "origin", mGit->getCurrentBranch());
       QApplication::restoreOverrideCursor();
 
       QDialog::accept();

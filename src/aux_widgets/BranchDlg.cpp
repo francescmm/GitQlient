@@ -6,6 +6,7 @@
 #include <GitCache.h>
 #include <GitConfig.h>
 #include <GitQlientStyles.h>
+#include <GitRemote.h>
 #include <GitStashes.h>
 
 #include <QFile>
@@ -24,6 +25,24 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
    ui->leOldName->setText(mConfig.mCurrentBranchName);
 
    ui->chbCopyRemote->setHidden(true);
+
+   QScopedPointer<GitRemote> git(new GitRemote(mConfig.mGit));
+   const auto ret = git->getRemotes();
+
+   if (ret.success)
+   {
+      const auto remotes = ret.output.split("\n", Qt::SkipEmptyParts);
+
+      if (remotes.size() > 1)
+      {
+         for (const auto &remote : remotes)
+            ui->cbRemotes->addItem(remote);
+      }
+      else
+         ui->cbRemotes->setVisible(false);
+   }
+   else
+      ui->cbRemotes->setVisible(false);
 
    switch (mConfig.mDialogMode)
    {
@@ -51,8 +70,8 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
          break;
       case BranchDlgMode::PUSH_UPSTREAM:
          connect(ui->chbCopyRemote, &CheckBox::stateChanged, this, &BranchDlg::copyBranchName);
-         ui->chbCopyRemote->setVisible(true);
-         ui->chbCopyRemote->setChecked(true);
+         ui->chbCopyRemote->setVisible(ui->cbRemotes->isHidden());
+         ui->chbCopyRemote->setChecked(ui->cbRemotes->isHidden());
          setWindowTitle(tr("Push upstream branch"));
          ui->pbAccept->setText(tr("Push"));
          break;
@@ -164,7 +183,8 @@ void BranchDlg::accept()
       }
       else if (mConfig.mDialogMode == BranchDlgMode::PUSH_UPSTREAM)
       {
-         ret = git->pushUpstream(ui->leNewName->text());
+         const auto remote = ui->cbRemotes->isVisible() ? ui->cbRemotes->currentText() : "origin";
+         ret = git->pushUpstream(ui->leNewName->text(), remote, ui->leOldName->text());
 
          if (ret.success)
          {
