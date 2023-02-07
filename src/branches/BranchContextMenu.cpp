@@ -153,7 +153,14 @@ void BranchContextMenu::push()
       QStringList remotes;
 
       if (ret.success)
-         remotes = ret.output.split("\n", Qt::SkipEmptyParts);
+      {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+         const auto flag = Qt::SkipEmptyParts;
+#else
+         const auto flag = QString::SkipEmptyParts;
+#endif
+         remotes = ret.output.split("\n", flag);
+      }
 
       if (remotes.isEmpty())
       {

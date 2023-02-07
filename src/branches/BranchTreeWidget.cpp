@@ -83,7 +83,12 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
          QScopedPointer<GitRemote> git(new GitRemote(mGit));
          if (const auto ret = git->getRemotes(); ret.success)
          {
-            const auto remotes = ret.output.split("\n", Qt::SkipEmptyParts);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+            const auto flag = Qt::SkipEmptyParts;
+#else
+            const auto flag = QString::SkipEmptyParts;
+#endif
+            const auto remotes = ret.output.split("\n", flag);
 
             if (remotes.count() > 1)
             {
