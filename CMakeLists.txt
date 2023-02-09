@@ -23,7 +23,6 @@ if (NOT DEFINED VERSION OR "${VERSION}" STREQUAL "")
    if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
       set(VERSION "0.0.0")
    else()
-      message("Pasa")
       set(VERSION ${GQ_SHA})
    endif()
 endif()
@@ -37,6 +36,19 @@ add_compile_definitions(QT_DEPRECATED_WARNINGS)
 #if (NOT WIN32)
 #   list(APPEND CPP_FLAGS "-Wextra" "-Wpedantic")
 #endif()
+
+if (NOT EXISTS "${PROJECT_SOURCE_DIR}/src/AuxiliarCustomWidgets/.git" OR
+    NOT EXISTS "${PROJECT_SOURCE_DIR}/src/QLogger/.git" OR
+    NOT EXISTS "${PROJECT_SOURCE_DIR}/src/QPinnableTabWidget/.git" OR
+    NOT EXISTS "${PROJECT_SOURCE_DIR}/src/git/.git")
+    message(STATUS "Submodule update:")
+    execute_process(COMMAND git submodule update --init --recursive
+                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                    RESULT_VARIABLE GIT_SUBMOD_RESULT)
+    if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+        message(FATAL_ERROR "git submodule update --init --recursive failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+    endif()
+endif()
 
 find_package(Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
