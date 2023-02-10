@@ -7,7 +7,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 if (!exists(src/git/.git) || !exists(src/AuxiliarCustomWidgets/.git) || !exists(src/QLogger/.git) || !exists(src/QPinnableTabWidget/.git)){
     message("Submodule update:")
-    $$system(git submodule update --init --recursive)
+    system(git submodule update --init --recursive)
 }
 
 unix:!macos {
