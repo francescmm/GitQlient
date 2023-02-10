@@ -5,6 +5,11 @@ TARGET = gitqlient
 QT += widgets core network gui
 DEFINES += QT_DEPRECATED_WARNINGS
 
+if (!exists(src/git/.git) || !exists(src/AuxiliarCustomWidgets/.git) || !exists(src/QLogger/.git) || !exists(src/QPinnableTabWidget/.git)){
+    message(STATUS "Submodule update:")
+    $$system(git submodule update --init --recursive)
+}
+
 unix:!macos {
    QMAKE_LFLAGS += -no-pie
 
