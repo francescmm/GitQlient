@@ -96,5 +96,5 @@ private:
 
    friend class GitCache;
 
-   void parseDiff(QByteArray &data, int startingField);
+   void parseDiff(QByteArray &data, qsizetype startingField);
 };
