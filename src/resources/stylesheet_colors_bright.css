@@ -2,6 +2,11 @@
 /*               QWidgets START              */
 /*********************************************/
 
+QGroupBox
+{
+    color: #D89000;
+}
+
 QToolButton
 {
    background: white;
@@ -184,7 +189,7 @@ QComboBox:editable {
 }
 
 QComboBox:on {
-   background: #2E2F30;
+   background: #606162;
 }
 
 QComboBox QAbstractItemView
@@ -476,6 +481,24 @@ InitScreen
 
 /*********************************************/
 /*            GitQlient class END            */
+/*********************************************/
+
+/*********************************************/
+/*            ConfigWidget START             */
+/*********************************************/
+
+ConfigWidget QTabBar::tab:selected, ConfigWidget QTabWidget QWidget, ConfigWidget QScrollArea QWidget
+{
+   background-color: #F4F5F5;
+}
+
+ConfigWidget FileDiffView, HunkWidget FileDiffView
+{
+   border: 0;
+}
+
+/*********************************************/
+/*             ConfigWidget END              */
 /*********************************************/
 
 /*********************************************/
