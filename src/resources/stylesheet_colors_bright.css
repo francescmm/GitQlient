@@ -441,6 +441,11 @@ RepoConfigDlg QPushButton:pressed
    background: #C6C6C7;
 }
 
+InitialRepoConfig QGroupBox
+{
+   background-color: #E6E6E7;
+}
+
 /*********************************************/
 /*             RepoConfigDlg END             */
 /*********************************************/
