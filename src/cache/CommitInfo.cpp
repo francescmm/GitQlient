@@ -16,7 +16,7 @@ CommitInfo::CommitInfo(QByteArray data)
    parseDiff(data, 1);
 }
 
-void CommitInfo::parseDiff(QByteArray &data, int startingField)
+void CommitInfo::parseDiff(QByteArray &data, qsizetype startingField)
 {
    if (data.isEmpty())
       return;
@@ -39,9 +39,9 @@ void CommitInfo::parseDiff(QByteArray &data, int startingField)
       committer = fields.at(startingField++);
       author = fields.at(startingField++);
       dateSinceEpoch = std::chrono::seconds(fields.at(startingField++).toInt());
-      shortLog = fields.at(startingField);
+      shortLog = fields.at(startingField++);
 
-      for (auto i = 6; i < fields.count(); ++i)
+      for (auto i = startingField; i < fields.count(); ++i)
          longLog += fields.at(i) + '\n';
 
       longLog = longLog.trimmed();
