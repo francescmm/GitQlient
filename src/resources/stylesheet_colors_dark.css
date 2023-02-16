@@ -435,6 +435,11 @@ RepoConfigDlg
    background-color: #2E2F30;
 }
 
+InitialRepoConfig QGroupBox
+{
+   background-color: #404142;
+}
+
 QFrame#tabWidget > QPushButton[selected=true], QFrame#tabWidget > QPushButton[selected=true]:hover
 {
     background-color: #606162;
@@ -481,7 +486,7 @@ InitScreen
 /*            ConfigWidget START             */
 /*********************************************/
 
-ConfigWidget QTabBar::tab:selected, ConfigWidget QTabWidget > QWidget, ConfigWidget QScrollArea QWidget
+ConfigWidget QTabBar::tab:selected, ConfigWidget QTabWidget QWidget, ConfigWidget QScrollArea QWidget
 {
    background-color: #2E2F30;
 }
