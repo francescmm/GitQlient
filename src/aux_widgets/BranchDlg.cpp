@@ -5,6 +5,7 @@
 #include <GitBranches.h>
 #include <GitCache.h>
 #include <GitConfig.h>
+#include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 #include <GitRemote.h>
 #include <GitStashes.h>
@@ -84,6 +85,7 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
          break;
    }
 
+   connect(ui->leNewName, &QLineEdit::textEdited, this, &BranchDlg::replaceWhiteSpaces);
    connect(ui->leNewName, &QLineEdit::editingFinished, this, &BranchDlg::checkNewBranchName);
    connect(ui->leNewName, &QLineEdit::returnPressed, this, &BranchDlg::accept);
    connect(ui->pbAccept, &QPushButton::clicked, this, &BranchDlg::accept);
@@ -99,6 +101,13 @@ void BranchDlg::checkNewBranchName()
 {
    if (ui->leNewName->text() == ui->leOldName->text() && mConfig.mDialogMode != BranchDlgMode::PUSH_UPSTREAM)
       ui->leNewName->setStyleSheet("border: 1px solid red;");
+}
+
+void BranchDlg::replaceWhiteSpaces(const QString &newName)
+{
+   auto whiteSpacesFreeName = newName;
+   whiteSpacesFreeName.replace(' ', GitQlientSettings().globalValue("BranchSeparator").toString());
+   ui->leNewName->setText(whiteSpacesFreeName);
 }
 
 void BranchDlg::accept()

@@ -114,6 +114,11 @@ private:
     * trying to push the branch it won't validate it's name.
     */
    void checkNewBranchName();
+
+   /**
+    * @brief replaceWhiteSpaces Replaces the whitespaces in the name of a branch for the character '-'.
+    */
+   void replaceWhiteSpaces(const QString &newName);
    /**
     * @brief Executes the Git actions based on the configuration once the validation as taken place.
     */
