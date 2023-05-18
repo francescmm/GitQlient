@@ -37,6 +37,7 @@ class CommitInfoWidget;
 class CheckBox;
 class RepositoryViewDelegate;
 class FileDiffWidget;
+class FullDiffWidget;
 class BranchesWidgetMinimal;
 class QPushButton;
 class IGitServerCache;
@@ -69,6 +70,12 @@ signals:
    void referencesReload();
 
    void logReload();
+
+   /**
+    * @brief Signal triggered when the user wants to see the diff of the selected SHA compared to its first parent.
+    * @param sha The selected commit SHA.
+    */
+   void signalOpenDiff(const QString &sha);
 
    /*!
     \brief Signal triggered when the user opens a new submodule. It is necessary to propagate this signal since is the
@@ -217,7 +224,8 @@ private:
    enum class Pages
    {
       Graph,
-      FileDiff
+      FileDiff,
+      FullDiff
    };
 
    QSharedPointer<GitBase> mGit;
@@ -237,6 +245,7 @@ private:
    RepositoryViewDelegate *mItemDelegate = nullptr;
    QFrame *mGraphFrame = nullptr;
    FileDiffWidget *mWipFileDiff = nullptr;
+   FullDiffWidget *mFullDiffWidget = nullptr;
    QPushButton *mReturnFromFull = nullptr;
    QLabel *mUserName = nullptr;
    QLabel *mUserEmail = nullptr;
@@ -317,6 +326,13 @@ private:
     * @param isCached Indicates if the file to show the diff is already cached or is still unstaged.
     */
    void showWipFileDiff(const QString &fileName, bool isCached);
+
+   /**
+    * @brief showFullDiff Shows the full commit diff.
+    * @param sha The base commit SHA.
+    * @param parentSha The commit SHA to compare with.
+    */
+   void onOpenFullDiff(const QString &sha);
 
    void rearrangeSplittrer(bool minimalActive);
 

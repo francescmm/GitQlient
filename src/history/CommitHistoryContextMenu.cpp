@@ -65,6 +65,9 @@ void CommitHistoryContextMenu::createIndividualShaMenu()
       }
       else
       {
+         const auto commitAction = addAction(tr("Show diff"));
+         connect(commitAction, &QAction::triggered, this, [this]() { emit signalOpenDiff(mShas.first()); });
+
          const auto createMenu = addMenu(tr("Create"));
 
          const auto createBranchAction = createMenu->addAction(tr("Branch"));
