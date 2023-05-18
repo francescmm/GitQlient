@@ -210,7 +210,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->cbBranchSeparator, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
 
    ui->cbDiffView->setCurrentIndex(settings.globalValue("DefaultDiffView").toInt());
-   ui->cbBranchSeparator->setCurrentText(settings.globalValue("BranchSeparator").toString());
+   ui->cbBranchSeparator->setCurrentText(settings.globalValue("BranchSeparator", "-").toString());
 
    auto size = calculateDirSize(ui->leLogsLocation->text());
    ui->lLogsSize->setText(QString("%1 KB").arg(size));
