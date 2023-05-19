@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ${{ matrix.env.os }}
     env:
-      VERSION: 1.6.1
+      VERSION: 1.6.2
     strategy:
       matrix:
         env:
@@ -16,7 +16,7 @@ jobs:
             os: ubuntu-20.04
             qtplatform: linux
           - name: Linux AppImage
-            os: ubuntu-18.04
+            os: ubuntu-20.04
             qtplatform: linux
             qtversion: 5.15.2
 
