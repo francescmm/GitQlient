@@ -2,6 +2,7 @@
 #include <QFontDatabase>
 #include <QIcon>
 #include <QTimer>
+#include <QTranslator>
 
 #include <GitQlient.h>
 #include <QLogger.h>
@@ -27,6 +28,12 @@ int main(int argc, char *argv[])
 
    QFontDatabase::addApplicationFont(":/DejaVuSans");
    QFontDatabase::addApplicationFont(":/DejaVuSansMono");
+
+   QTranslator qtTranslator;
+   if (qtTranslator.load(QLocale(), "gitqlient", "_", ":/translations/"))
+   {
+      app.installTranslator(&qtTranslator);
+   }
 
    QStringList repos;
    if (GitQlient::parseArguments(app.arguments(), &repos))
