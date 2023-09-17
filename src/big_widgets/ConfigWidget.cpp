@@ -118,11 +118,12 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->labelExtFileExplorer->setHidden(true);
 #endif
 
-   const auto originalStyles = settings.globalValue("colorSchema", "dark").toString();
-   ui->cbStyle->setCurrentText(originalStyles);
+   const auto originalStyles = settings.globalValue("colorSchema", 0).toInt();
+
+   ui->cbStyle->setCurrentIndex(originalStyles);
    connect(ui->cbStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
-           [this, originalStyles]() {
-              mShowResetMsg = ui->cbStyle->currentText() != originalStyles;
+           [this, originalStyles](int newIndex) {
+              mShowResetMsg = newIndex != originalStyles;
               saveConfig();
            });
 
@@ -372,7 +373,7 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("logsFolder", ui->leLogsLocation->text());
    settings.setGlobalValue("commitTitleMaxLength", ui->spCommitTitleLength->value());
    settings.setGlobalValue("FileDiffView/FontSize", ui->sbEditorFontSize->value());
-   settings.setGlobalValue("colorSchema", ui->cbStyle->currentText());
+   settings.setGlobalValue("colorSchema", ui->cbStyle->currentIndex());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
    settings.setGlobalValue("singleClickDiffView", ui->chSingleClickDiffView->isChecked());
    settings.setGlobalValue("DefaultDiffView", ui->cbDiffView->currentIndex());
