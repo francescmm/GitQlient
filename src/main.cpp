@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
    QFontDatabase::addApplicationFont(":/DejaVuSansMono");
 
    QTranslator qtTranslator;
-   if (qtTranslator.load(QLocale(), "gitqlient", "_", ":/translations/"))
+   if (qtTranslator.load(QLocale(), QString::fromUtf8("gitqlient"), QString::fromUtf8("_"), QString::fromUtf8(":/translations/")))
    {
       app.installTranslator(&qtTranslator);
    }
