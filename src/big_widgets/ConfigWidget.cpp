@@ -14,6 +14,7 @@
 #include <qtermwidget_interface.h>
 
 #include <QDir>
+#include <QDirIterator>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QGridLayout>
@@ -208,6 +209,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->chSingleClickDiffView, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbDiffView, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbBranchSeparator, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->cbLanguage, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
 
    ui->cbDiffView->setCurrentIndex(settings.globalValue("DefaultDiffView").toInt());
    ui->cbBranchSeparator->setCurrentText(settings.globalValue("BranchSeparator", "-").toString());
@@ -217,6 +219,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    size = calculateDirSize(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
    ui->lCacheSize->setText(QString("%1 KB").arg(size));
+
+   fillLanguageBox();
 
    mPluginsDownloader->checkAvailablePlugins();
 }
@@ -373,6 +377,7 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("singleClickDiffView", ui->chSingleClickDiffView->isChecked());
    settings.setGlobalValue("DefaultDiffView", ui->cbDiffView->currentIndex());
    settings.setGlobalValue("BranchSeparator", ui->cbBranchSeparator->currentText());
+   settings.setGlobalValue("UILanguage", ui->cbLanguage->currentData().toString());
 
    if (!ui->leEditor->text().isEmpty())
       settings.setGlobalValue("ExternalEditor", ui->leEditor->text());
@@ -666,5 +671,30 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
    for (auto iter = mPluginDataMap.cbegin(); iter != mPluginDataMap.cend(); ++iter)
    {
       iter.key()->setEnabled(!mPluginNames.contains(iter.value().name));
+   }
+}
+
+void ConfigWidget::fillLanguageBox() const
+{
+   const auto currentLanguage = GitQlientSettings().globalValue("UILanguage", "gitqlient_en.qm").toString();
+
+   const auto list = QDir(":translations", "gitqlient_*.qm").entryList();
+   QDirIterator trIter(":translations", QStringList() << "gitqlient_*.qm");
+
+   while (trIter.hasNext())
+   {
+      trIter.next();
+
+      const auto name = trIter.fileName();
+      auto start = name.indexOf('_') + 1;
+      auto end = name.lastIndexOf('.');
+      QLocale tmpLocale(name.mid(start, end - start));
+      QString languageItem = QLocale::languageToString(tmpLocale.language()) + QLatin1String(" (")
+          + QLocale::countryToString(tmpLocale.country()) + QLatin1Char(')');
+
+      ui->cbLanguage->addItem(languageItem, name);
+
+      if (name == currentLanguage)
+         ui->cbLanguage->setCurrentIndex(ui->cbLanguage->count() - 1);
    }
 }

@@ -390,24 +390,17 @@
              <string>General</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_67">
-               <property name="text">
-                <string>Default diff view</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_34">
-               <property name="text">
-                <string>Single click on file to open diff view (needs restart) </string>
-               </property>
-              </widget>
-             </item>
              <item row="0" column="1">
               <widget class="CheckBox" name="chSingleClickDiffView">
                <property name="text">
                 <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_67">
+               <property name="text">
+                <string>Default diff view</string>
                </property>
               </widget>
              </item>
@@ -430,6 +423,20 @@
                </item>
               </widget>
              </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_68">
+               <property name="text">
+                <string>Branch seprator (when space is used):</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_34">
+               <property name="text">
+                <string>Single click on file to open diff view (needs restart) </string>
+               </property>
+              </widget>
+             </item>
              <item row="2" column="1">
               <widget class="QComboBox" name="cbBranchSeparator">
                <item>
@@ -449,12 +456,15 @@
                </item>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_68">
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_69">
                <property name="text">
-                <string>Branch seprator (when space is used):</string>
+                <string>Language:</string>
                </property>
               </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QComboBox" name="cbLanguage"/>
              </item>
             </layout>
            </widget>

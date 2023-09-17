@@ -2,50 +2,16 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US">
 <context>
-    <name>AGitServerItemList</name>
+    <name>AddRemoteDlg</name>
     <message>
-        <location filename="../../git_server/AGitServerItemList.cpp" line="28"/>
-        <source>Page: </source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>AddCodeReviewDialog</name>
-    <message>
-        <location filename="../../git_server/AddCodeReviewDialog.ui" line="14"/>
-        <source>Add review</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../branches/AddRemoteDlg.cpp" line="44"/>
+        <source>Invalid fields</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/AddCodeReviewDialog.ui" line="25"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/AddCodeReviewDialog.ui" line="45"/>
-        <location filename="../../git_server/AddCodeReviewDialog.cpp" line="21"/>
-        <source>Add comment</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/AddCodeReviewDialog.cpp" line="24"/>
-        <source>Approve PR</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/AddCodeReviewDialog.cpp" line="27"/>
-        <source>Request changes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/AddCodeReviewDialog.cpp" line="52"/>
-        <source>Empty comment!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/AddCodeReviewDialog.cpp" line="53"/>
-        <source>The body cannot be empty when adding a comment or requesting changes.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../branches/AddRemoteDlg.cpp" line="45"/>
+        <source>The information provided is incorrect. Please fix the URL and/or the name and submit again.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -53,393 +19,610 @@
     <message>
         <location filename="../../branches/AddSubmoduleDlg.ui" line="14"/>
         <source>Add new submodule</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/AddSubmoduleDlg.ui" line="20"/>
         <source>Set URL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/AddSubmoduleDlg.ui" line="27"/>
         <source>Set name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/AddSubmoduleDlg.ui" line="34"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/AddSubmoduleDlg.ui" line="54"/>
         <source>Accept</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>AddSubtreeDlg</name>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.ui" line="14"/>
+        <source>Add new subtree</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.ui" line="20"/>
+        <source>Accept</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.ui" line="40"/>
+        <source>Set URL</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.ui" line="47"/>
+        <source>Set prefix</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.ui" line="54"/>
+        <source>Cancel</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.ui" line="61"/>
+        <source>Set reference</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.ui" line="68"/>
+        <source>Squash commits</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.cpp" line="39"/>
+        <source>Configure subtree</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.cpp" line="68"/>
+        <source>Invalid fields</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.cpp" line="69"/>
+        <source>The information provided is incorrect. Please fix the URL and/or the name and submit again.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/AddSubtreeDlg.cpp" line="101"/>
+        <source>Error when adding a subtree.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>AmendWidget</name>
     <message>
-        <location filename="../../commits/AmendWidget.cpp" line="20"/>
+        <location filename="../../commits/AmendWidget.cpp" line="23"/>
         <source>Amend</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/AmendWidget.cpp" line="94"/>
+        <location filename="../../commits/AmendWidget.cpp" line="105"/>
         <source>Impossible to commit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/AmendWidget.cpp" line="95"/>
+        <location filename="../../commits/AmendWidget.cpp" line="106"/>
         <source>There are files with conflicts. Please, resolve the conflicts first.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/AmendWidget.cpp" line="149"/>
+        <source>Error when amending</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/AmendWidget.cpp" line="150"/>
+        <source>There were problems during the commit operation. Please, see the detailed description for more information.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>BlameWidget</name>
     <message>
-        <location filename="../../big_widgets/BlameWidget.cpp" line="121"/>
+        <location filename="../../big_widgets/BlameWidget.cpp" line="141"/>
         <source>No info</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/BlameWidget.cpp" line="221"/>
+        <location filename="../../big_widgets/BlameWidget.cpp" line="243"/>
+        <source>Open with external editor</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/BlameWidget.cpp" line="269"/>
         <source>Copy SHA</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/BlameWidget.cpp" line="224"/>
+        <location filename="../../big_widgets/BlameWidget.cpp" line="272"/>
         <source>Show file diff</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/BlameWidget.cpp" line="230"/>
-        <source>Show commit diff</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../big_widgets/BlameWidget.cpp" line="300"/>
+        <source>Error opening file editor</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/BlameWidget.cpp" line="301"/>
+        <source>There was a problem opening the file editor, please review the value set in GitQlient config.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>BranchContextMenu</name>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="22"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="31"/>
         <source>Pull</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="23"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="30"/>
         <source>Fetch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="24"/>
-        <source>Push</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/BranchContextMenu.cpp" line="28"/>
-        <source>Push force</source>
-        <translation type="unfinished"></translation>
+        <source>Reset to origin</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchContextMenu.cpp" line="29"/>
+        <source>Reset to SHA...</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/BranchContextMenu.cpp" line="32"/>
-        <source>Create branch</source>
-        <translation type="unfinished"></translation>
+        <source>Push</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="33"/>
-        <source>Create &amp;&amp; checkout branch</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../branches/BranchContextMenu.cpp" line="37"/>
+        <source>Push force</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="35"/>
-        <source>Checkout branch</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../branches/BranchContextMenu.cpp" line="38"/>
+        <source>Set upstream</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/BranchContextMenu.cpp" line="39"/>
-        <source>Merge %1 into %2</source>
-        <translation type="unfinished"></translation>
+        <source>Unset upstream</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchContextMenu.cpp" line="44"/>
+        <source>Create branch</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/BranchContextMenu.cpp" line="45"/>
+        <source>Create &amp;&amp; checkout branch</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchContextMenu.cpp" line="47"/>
+        <source>Checkout branch</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchContextMenu.cpp" line="51"/>
+        <source>Merge %1 into %2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchContextMenu.cpp" line="54"/>
+        <source>Squash-merge %1 into %2</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchContextMenu.cpp" line="60"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="46"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="61"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="69"/>
-        <location filename="../../branches/BranchContextMenu.cpp" line="140"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="62"/>
+        <source>Copy name</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchContextMenu.cpp" line="89"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="237"/>
         <source>Error while pulling</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="70"/>
-        <location filename="../../branches/BranchContextMenu.cpp" line="141"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="90"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="238"/>
         <source>There were problems during the pull operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="93"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="110"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="123"/>
         <source>Fetch failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="93"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="110"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="123"/>
         <source>There were some problems while fetching. Please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="116"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="197"/>
         <source>Error while pushing</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="117"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="198"/>
         <source>There were problems during the push operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="185"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="216"/>
+        <source>Upstream unset!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchContextMenu.cpp" line="216"/>
+        <source>Upstream unset successfully!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchContextMenu.cpp" line="280"/>
         <source>Delete master?!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="185"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="280"/>
         <source>You are not allowed to delete remote master.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="189"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="284"/>
         <source>Delete branch!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="189"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="284"/>
         <source>Are you sure you want to delete the branch?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="204"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="304"/>
         <source>Delete a branch failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchContextMenu.cpp" line="205"/>
+        <location filename="../../branches/BranchContextMenu.cpp" line="305"/>
         <source>There were some problems while deleting the branch:&lt;br&gt;&lt;br&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>BranchDlg</name>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.ui" line="14"/>
+        <location filename="../../aux_widgets/BranchDlg.ui" line="26"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.ui" line="20"/>
+        <location filename="../../aux_widgets/BranchDlg.ui" line="136"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.ui" line="27"/>
+        <location filename="../../aux_widgets/BranchDlg.ui" line="129"/>
         <source>Set the branch name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.ui" line="47"/>
+        <location filename="../../aux_widgets/BranchDlg.ui" line="69"/>
+        <source>Current branch:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/BranchDlg.ui" line="99"/>
         <source>Create</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.ui" line="61"/>
+        <location filename="../../aux_widgets/BranchDlg.ui" line="122"/>
         <source>Same as remote branch name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.cpp" line="28"/>
+        <location filename="../../aux_widgets/BranchDlg.cpp" line="56"/>
         <source>Create branch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.cpp" line="31"/>
+        <location filename="../../aux_widgets/BranchDlg.cpp" line="59"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.cpp" line="35"/>
+        <location filename="../../aux_widgets/BranchDlg.cpp" line="63"/>
+        <location filename="../../aux_widgets/BranchDlg.cpp" line="71"/>
         <source>Create and checkout branch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.cpp" line="39"/>
+        <location filename="../../aux_widgets/BranchDlg.cpp" line="67"/>
         <source>Create branch at commit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.cpp" line="43"/>
+        <location filename="../../aux_widgets/BranchDlg.cpp" line="75"/>
         <source>Stash branch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.cpp" line="48"/>
+        <location filename="../../aux_widgets/BranchDlg.cpp" line="81"/>
         <source>Push upstream branch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.cpp" line="49"/>
+        <location filename="../../aux_widgets/BranchDlg.cpp" line="82"/>
         <source>Push</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.cpp" line="106"/>
+        <location filename="../../aux_widgets/BranchDlg.cpp" line="225"/>
         <source>Error on branch action!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/BranchDlg.cpp" line="107"/>
+        <location filename="../../aux_widgets/BranchDlg.cpp" line="226"/>
         <source>There were problems during the branch operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>BranchTreeWidget</name>
     <message>
-        <location filename="../../branches/BranchTreeWidget.cpp" line="92"/>
-        <source>Error while checking out</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="96"/>
+        <source>Remove remote</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchTreeWidget.cpp" line="93"/>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="118"/>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="294"/>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="315"/>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="346"/>
+        <source>Delete branch!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="119"/>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="347"/>
+        <source>Deleting multiple remote branches at the same time is disabled in the configuration of GitQlient.
+
+To enable, go to the Configuration panel, Repository tab.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="129"/>
+        <source>Add remote</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="190"/>
+        <source>Error while checking out</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="191"/>
         <source>There were problems during the checkout operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="249"/>
+        <source>Delete multiple branches!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="250"/>
+        <source>Are you sure you want to delete the following branches?
+
+%1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="272"/>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="334"/>
+        <source>Delete a branch failed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="273"/>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="335"/>
+        <source>There were some problems while deleting the branch:&lt;br&gt;&lt;br&gt; %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="294"/>
+        <source>Are you sure you want to delete the remote?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="311"/>
+        <source>Delete master?!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="311"/>
+        <source>You are not allowed to delete remote master.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchTreeWidget.cpp" line="315"/>
+        <source>Are you sure you want to delete the branch?</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>BranchesWidget</name>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="81"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="111"/>
         <source>Local</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="83"/>
-        <source>Master</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="84"/>
-        <source>Origin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="91"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="149"/>
         <source>Remote</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="122"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="184"/>
         <source>Tags</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="162"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="220"/>
         <source>Stashes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="163"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="79"/>
         <source>(0)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="200"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="254"/>
         <source>Submodules</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="227"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="291"/>
+        <source>Subtrees</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchesWidget.cpp" line="312"/>
+        <source>Prese ENTER to search a branch or tag...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchesWidget.cpp" line="317"/>
         <source>Show minimalist view</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="628"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="1013"/>
         <source>Remove tag</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="639"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="1024"/>
         <source>Push tag</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="678"/>
-        <source>Add submodule</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../branches/BranchesWidget.cpp" line="1076"/>
+        <source>Pull</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="690"/>
-        <source>Update</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../branches/BranchesWidget.cpp" line="1089"/>
+        <source>Error when pulling</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidget.cpp" line="701"/>
-        <source>Open</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../branches/BranchesWidget.cpp" line="1105"/>
+        <source>Push</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchesWidget.cpp" line="1118"/>
+        <source>Error when pushing</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchesWidget.cpp" line="1121"/>
+        <source>Configure</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchesWidget.cpp" line="1134"/>
+        <source>Add subtree</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchesWidget.cpp" line="1345"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="1384"/>
+        <source>Subtree configuration not found!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchesWidget.cpp" line="1346"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="1385"/>
+        <source>The subtree configuration was not found. It could be that it was created outside GitQlient.&lt;br&gt;To operate with this subtree, it needs to be configured.&lt;br&gt;&lt;br&gt;&lt;b&gt;Do you want to configure it now?&lt;b&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchesWidget.cpp" line="1361"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="1400"/>
+        <source>Unexpected error!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/BranchesWidget.cpp" line="1362"/>
+        <location filename="../../branches/BranchesWidget.cpp" line="1401"/>
+        <source>An unidentified error happened while using subtrees. Please contact the creator of GitQlient for support.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>BranchesWidgetMinimal</name>
     <message>
-        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="32"/>
+        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="33"/>
         <source>Full view</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="52"/>
+        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="54"/>
         <source>Local branches</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="61"/>
+        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="63"/>
         <source>Remote branches</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="70"/>
+        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="72"/>
         <source>Tags</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="79"/>
+        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="81"/>
         <source>Stashes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="88"/>
+        <location filename="../../branches/BranchesWidgetMinimal.cpp" line="90"/>
         <source>Submodules</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CodeReviewComment</name>
-    <message>
-        <location filename="../../git_server/CodeReviewComment.cpp" line="58"/>
-        <source> %1 days ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CodeReviewComment.cpp" line="58"/>
-        <source> today</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CodeReviewComment.cpp" line="59"/>
-        <source> on %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -447,82 +630,60 @@
     <message>
         <location filename="../../commits/CommitChangesWidget.ui" line="14"/>
         <source>Commit changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="114"/>
-        <source>Unstaged files </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="121"/>
-        <location filename="../../commits/CommitChangesWidget.ui" line="316"/>
-        <location filename="../../commits/CommitChangesWidget.ui" line="559"/>
-        <source>(0)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="190"/>
+        <location filename="../../commits/CommitChangesWidget.ui" line="93"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="203"/>
+        <location filename="../../commits/CommitChangesWidget.ui" line="106"/>
         <source>Commit selected files</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="206"/>
+        <location filename="../../commits/CommitChangesWidget.ui" line="109"/>
         <source>&amp;Amend</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="209"/>
+        <location filename="../../commits/CommitChangesWidget.ui" line="112"/>
         <source>Alt+C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="309"/>
-        <source>Untracked files </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="396"/>
+        <location filename="../../commits/CommitChangesWidget.ui" line="81"/>
         <source>Summary</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="427"/>
+        <location filename="../../commits/CommitChangesWidget.ui" line="145"/>
         <source>Author name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="434"/>
+        <location filename="../../commits/CommitChangesWidget.ui" line="152"/>
         <source>Author email</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="552"/>
-        <source>Staged files </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/CommitChangesWidget.ui" line="648"/>
+        <location filename="../../commits/CommitChangesWidget.ui" line="171"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.cpp" line="106"/>
+        <location filename="../../commits/CommitChangesWidget.cpp" line="93"/>
         <source>Commit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.cpp" line="373"/>
+        <location filename="../../commits/CommitChangesWidget.cpp" line="310"/>
         <source>(conflicts)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../commits/CommitChangesWidget.cpp" line="451"/>
+        <location filename="../../commits/CommitChangesWidget.cpp" line="394"/>
         <source> (conflicts)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -530,701 +691,1209 @@
 <context>
     <name>CommitHistoryContextMenu</name>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="65"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="59"/>
         <source>Stash</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="66"/>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="117"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="60"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="114"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="129"/>
         <source>Push</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="69"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="63"/>
         <source>Pop</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="71"/>
+        <source>Create</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../history/CommitHistoryContextMenu.cpp" line="73"/>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="200"/>
-        <source>See diff</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="78"/>
-        <source>Create</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="80"/>
         <source>Branch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="83"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="76"/>
         <source>Tag</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="86"/>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="206"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="79"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="174"/>
         <source>Export as patch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="91"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="84"/>
         <source>Checkout commit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="105"/>
-        <source>Amend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="109"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="106"/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="108"/>
+        <source>Patch</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../history/CommitHistoryContextMenu.cpp" line="111"/>
-        <source>Patch</source>
-        <translation type="unfinished"></translation>
+        <source>Commit</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="114"/>
-        <source>Commit</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="117"/>
+        <source>Pull</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../history/CommitHistoryContextMenu.cpp" line="120"/>
-        <source>Pull</source>
-        <translation type="unfinished"></translation>
+        <source>Fetch</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="138"/>
+        <source>Reset</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="155"/>
+        <source>Copy</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="157"/>
+        <source>Commit SHA</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="161"/>
+        <source>Commit title</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="68"/>
+        <source>Show diff</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="97"/>
+        <source>Amend (edit last commit)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="98"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="103"/>
+        <source>Edit the last commit of the branch.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="102"/>
+        <source>Amend without edit</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../history/CommitHistoryContextMenu.cpp" line="123"/>
-        <source>Fetch</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="132"/>
+        <source>Revert commit</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="128"/>
-        <source>Reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="130"/>
-        <source>Soft</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="124"/>
         <location filename="../../history/CommitHistoryContextMenu.cpp" line="133"/>
-        <source>Mixed</source>
-        <translation type="unfinished"></translation>
+        <source>Reverts the selected commit of the branch.</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="136"/>
-        <source>Hard</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="140"/>
+        <source>Soft (keep changes)</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../history/CommitHistoryContextMenu.cpp" line="141"/>
-        <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <source>Point to the selected commit &lt;strong&gt;keeping all changes&lt;/strong&gt;.</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="143"/>
-        <source>Commit SHA</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="144"/>
+        <source>Mixed (keep files, reset their changes)</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="147"/>
-        <source>Commit title</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="146"/>
+        <source>Point to the selected commit &lt;strong&gt;keeping all changes but resetting the file status&lt;strong&gt;.</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="179"/>
-        <source>Merge PR</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="149"/>
+        <source>Hard (discard chanbges)</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="188"/>
-        <source>Show PR detailed view</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="150"/>
+        <source>Point to the selected commit &lt;strong&gt;losing all changes&lt;strong&gt;.</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="209"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="177"/>
         <source>Copy all SHA</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="261"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="189"/>
+        <source>Cherry pick ALL commits</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="194"/>
+        <source>Squash commits</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="242"/>
         <source>Patch generated</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="262"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="243"/>
         <source>&lt;p&gt;The patch has been generated!&lt;/p&gt;&lt;p&gt;&lt;b&gt;Commit:&lt;/b&gt;&lt;/p&gt;&lt;p&gt;%1&lt;/p&gt;&lt;p&gt;&lt;b&gt;Destination:&lt;/b&gt; %2&lt;/p&gt;&lt;p&gt;&lt;b&gt;File names:&lt;/b&gt;&lt;/p&gt;&lt;p&gt;%3&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="318"/>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="349"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="298"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="328"/>
         <source>Error while checking out</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="319"/>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="350"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="299"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="329"/>
         <source>There were problems during the checkout operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../history/CommitHistoryContextMenu.cpp" line="377"/>
         <source>Error while cherry-pick</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../history/CommitHistoryContextMenu.cpp" line="378"/>
         <source>There were problems during the cherry-pich operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="390"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="391"/>
         <source>Select a patch to apply</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="432"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="444"/>
         <source>Error while pushing</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="433"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="445"/>
         <source>There were problems during the push operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="462"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="477"/>
         <source>Error while pulling</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="463"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="478"/>
         <source>There were problems during the pull operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="566"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="517"/>
+        <source>Revert &quot;%1&quot;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="650"/>
         <source>%1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="573"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="657"/>
         <source>Checkout branch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="575"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="659"/>
         <source>New Branch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="575"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="659"/>
         <source>Checkout new branch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="592"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="676"/>
         <source>Merge %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryContextMenu.cpp" line="602"/>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="680"/>
+        <source>Squash-merge %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="688"/>
         <source>Cherry pick commit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="699"/>
+        <source>Squash not possible</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="700"/>
+        <source>Please, make sure there are no pending changes to be committed.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="732"/>
+        <source>Error when amending</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../history/CommitHistoryContextMenu.cpp" line="733"/>
+        <source>There were problems during the commit operation. Please, see the detailed description for more information.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>CommitHistoryModel</name>
     <message>
-        <location filename="../../history/CommitHistoryModel.cpp" line="82"/>
+        <location filename="../../history/CommitHistoryModel.cpp" line="80"/>
         <source>&lt;p&gt;Status: &lt;b&gt;detached&lt;/b&gt;&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryModel.cpp" line="87"/>
+        <location filename="../../history/CommitHistoryModel.cpp" line="85"/>
         <source>&lt;p&gt;&lt;b&gt;Local: &lt;/b&gt;%1&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryModel.cpp" line="92"/>
+        <location filename="../../history/CommitHistoryModel.cpp" line="90"/>
         <source>&lt;p&gt;&lt;b&gt;Remote: &lt;/b&gt;%1&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryModel.cpp" line="97"/>
+        <location filename="../../history/CommitHistoryModel.cpp" line="95"/>
         <source>&lt;p&gt;&lt;b&gt;Tags: &lt;/b&gt;%1&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../history/CommitHistoryModel.cpp" line="109"/>
-        <source>&lt;p&gt;Commit signed!&lt;/p&gt;&lt;p&gt; GPG key: %1&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../history/CommitHistoryModel.cpp" line="108"/>
+        <source>&lt;p&gt; GPG key (%1): %2&lt;/p&gt;</source>
+        <translation></translation>
     </message>
+</context>
+<context>
+    <name>CommitInfoPanel</name>
     <message>
-        <location filename="../../history/CommitHistoryModel.cpp" line="114"/>
-        <source>&lt;p&gt;&lt;b&gt;PR state: &lt;/b&gt;%1.&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/CommitInfoPanel.cpp" line="61"/>
+        <source>Copied!</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>ConfigWidget</name>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="29"/>
-        <source>OPEN</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="14"/>
+        <source>Form</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="57"/>
+        <source>Enable developer mode</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="68"/>
+        <source>Git local</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="73"/>
+        <source>Git global</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="85"/>
+        <source>GitQlient</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="109"/>
+        <source>Logs</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="115"/>
+        <source>Disable logs</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="134"/>
+        <source>Select folder</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="145"/>
+        <source>Reset to default value</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="165"/>
+        <source>Set log level</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="173"/>
+        <source>Trace</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="178"/>
+        <source>Debug</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="183"/>
+        <source>Info</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="188"/>
+        <source>Warning</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="193"/>
+        <source>Error</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="198"/>
+        <source>Fatal</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="206"/>
+        <source>Logs location</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="213"/>
+        <source>Logs space used:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="232"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="883"/>
+        <source>Clear</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="257"/>
+        <source>GitQlient styles</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="263"/>
+        <source>Editor font size</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="270"/>
+        <source> pt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="30"/>
-        <source>CLONE</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="277"/>
+        <source>Styles schema</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="285"/>
+        <source>dark</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="290"/>
+        <source>bright</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="298"/>
+        <source>Commit title max. length</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="315"/>
+        <source>External config</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="321"/>
+        <source>Git Location (if not in PATH)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="328"/>
+        <source>Git location...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="335"/>
+        <source>External file browser</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="345"/>
+        <source>External editor (IDE)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="378"/>
+        <source>Terminal color scheme</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="390"/>
+        <source>General</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="403"/>
+        <source>Default diff view</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="411"/>
+        <source>Hunks</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="416"/>
+        <source>Unified</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="421"/>
+        <source>Split</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="429"/>
+        <source>Branch seprator (when space is used):</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="436"/>
+        <source>Single click on file to open diff view (needs restart) </source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="444"/>
+        <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="31"/>
-        <source>NEW</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="449"/>
+        <source>_</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="71"/>
-        <source>GitQlient %1</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="454"/>
+        <source>/</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="97"/>
-        <source>About GitQlient...</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="462"/>
+        <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="101"/>
-        <source>Source code</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="488"/>
+        <source>Features tour</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="499"/>
+        <source>Repository</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="575"/>
+        <source>All commits</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="578"/>
+        <source> last commits</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="594"/>
+        <source>Show submodules</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="601"/>
+        <source>Cache space used:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="608"/>
+        <source>Delete remote branches folder</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="615"/>
+        <source>Pull strategy:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="622"/>
+        <source>Never</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="625"/>
+        <source> minutes</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="641"/>
+        <source>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="651"/>
+        <source>Show stashes</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="668"/>
+        <source>Auto-Fetch interval</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="675"/>
+        <source>Show subtrees</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="685"/>
+        <source>Prune when fetch</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="692"/>
+        <source>Credentials configuration</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="713"/>
+        <source>Store credentials using GitQlient (Current session or in Storage)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="723"/>
+        <source>Storage</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="733"/>
+        <source>Cache for current session</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="757"/>
+        <source>TextLabel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="104"/>
-        <source>Get the source code in GitHub</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="764"/>
+        <source> mins.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="782"/>
+        <source>Add credentials</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="793"/>
+        <source>Author date order</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="798"/>
+        <source>Date order</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="803"/>
+        <source>Topo order</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="812"/>
+        <source>Merge (default)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="817"/>
+        <source>Rebase</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="822"/>
+        <source>Fast-forward only</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="830"/>
+        <source>Language</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="837"/>
+        <source>Max. commits to retrieve (0 for all)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="844"/>
+        <source>Show remote branches</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="905"/>
+        <source>Enable pomodoro</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="912"/>
+        <source>Show local branches</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="940"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run clang-format before commit&lt;br/&gt;(Requires clang-format)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="954"/>
+        <source>Order of commits in the graph</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="971"/>
+        <source>Update submodules when pull</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="978"/>
+        <source>Show tags</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1014"/>
+        <source>Plugins</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1027"/>
+        <source>Plugins folder:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1042"/>
+        <source>To be able to download plugins, first you need to define a folder.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1049"/>
+        <source>Installed plugins</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1072"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1183"/>
+        <source>Name</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1084"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1195"/>
+        <source>Version</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1102"/>
+        <source>Enabled</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1160"/>
+        <source>Official GitQlient plugins</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1222"/>
+        <source>Shortcuts</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1244"/>
+        <source>Branches panel</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1250"/>
+        <source>Ctrl + B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="106"/>
-        <source>Report an issue</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1257"/>
+        <source>Toggle minimalistic branch view:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1264"/>
+        <source>Delete selected branch:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1271"/>
+        <source>Supr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="109"/>
-        <source>Report an issue in GitHub</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1281"/>
+        <source>GitQlient repo operations</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1287"/>
+        <source>Ctrl + W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="173"/>
-        <source>Loading repository...</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1294"/>
+        <source>Ctrl + I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="191"/>
-        <source>Recent</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1301"/>
+        <source>Close repository:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1308"/>
+        <source>Ctrl + N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="212"/>
-        <location filename="../../config/ConfigWidget.cpp" line="255"/>
-        <source>Clear list</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1315"/>
+        <source>New repository:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1322"/>
+        <source>Clone repository:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1329"/>
+        <source>Ctrl + O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="234"/>
-        <source>Most used</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1336"/>
+        <source>Open repository:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1346"/>
+        <source>GitQlient general</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1352"/>
+        <source>Ctrl + 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="296"/>
-        <source>Error!</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1359"/>
+        <source>Ctrl + 7</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="301"/>
-        <source>GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client. With GitQlient you will be able to add commits, branches and manage all the options Git provides. &lt;br&gt;&lt;br&gt;Once a fork of QGit, GitQlient has followed is own path and is currently develop and maintain by Francesc M. You can download the code from &lt;a href=&apos;https://github.com/francescmm/GitQlient&apos;&gt;GitHub&lt;/a&gt;. If you find any bug or problem, please report it in &lt;a href=&apos;https://github.com/francescmm/GitQlient/issues&apos;&gt;the issues page&lt;/a&gt; so I can fix it as soon as possible.&lt;br&gt;&lt;br&gt;If you want to integrate GitQlient into QtCreator, there I also provide a plugin that you can download from &lt;a href=&apos;https://github.com/francescmm/GitQlient/releases&apos;&gt;here&lt;/a&gt;. Just make sure you pick the right version and follow the instructions in the main page of the repo.&lt;br&gt;&lt;br&gt;GitQlient can be compiled from Qt 5.12 on.&lt;br&gt;&lt;br&gt;Copyright &amp;copy; 2019 - 2020 GitQlient (Francesc Martínez)</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1366"/>
+        <source>Ctrl + 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../config/ConfigWidget.cpp" line="314"/>
-        <source>About GitQlient v%1</source>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1373"/>
+        <source>Go to History view:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1380"/>
+        <source>Push changes:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1387"/>
+        <source>Go to Terminal view (if available):</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1394"/>
+        <source>Ctrl + 8</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1401"/>
+        <source>Pull changes:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1408"/>
+        <source>Ctrl + 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1415"/>
+        <source>Ctrl + 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1422"/>
+        <source>Go to Blame view:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1429"/>
+        <source>Ctrl + 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1436"/>
+        <source>Go to Git Server view:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1443"/>
+        <source>Ctrl + 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1450"/>
+        <source>Go to Diff view:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1457"/>
+        <source>Go to Config view:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1464"/>
+        <source>Go to Jenkins view:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1471"/>
+        <source>Ctrl + 9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1478"/>
+        <source>F5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1485"/>
+        <source>Refresh:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="72"/>
+        <source>Save</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="282"/>
+        <source>Dependencies needed!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="283"/>
+        <source>This plugin needs some dependencies to work. Please make sure you have them installed:&lt;br&gt;&lt;br&gt;%1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="299"/>
+        <source>Reset needed</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="299"/>
+        <source>You need to restart GitQlient to load the plugins.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="362"/>
+        <source>Changes saved</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="392"/>
+        <source>Reset needed!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="393"/>
+        <source>You need to restart GitQlient to see the changes in the styles applied.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="483"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="545"/>
+        <source>Restart needed!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="484"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="546"/>
+        <source>The folder chosen to store GitQlient logs is: &lt;br&gt; &lt;strong&gt;%1&lt;/strong&gt;. If you confirm the change, GitQlient will move all the logs to that folder. Once done, GitQlient will close. You need to restart it.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>Controls</name>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="47"/>
-        <source>WARNING: There is a merge pending to be commited! Click here to solve it.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../big_widgets/Controls.cpp" line="44"/>
+        <source>WARNING: There is a merge pending to be committed! Click here to solve it.</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="59"/>
+        <location filename="../../big_widgets/Controls.cpp" line="61"/>
         <source>View</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="66"/>
+        <location filename="../../big_widgets/Controls.cpp" line="69"/>
         <source>Diff</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="74"/>
+        <location filename="../../big_widgets/Controls.cpp" line="78"/>
         <source>Blame</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="81"/>
+        <location filename="../../big_widgets/Controls.cpp" line="86"/>
         <source>Fetch all</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../big_widgets/Controls.cpp" line="84"/>
-        <source>Prune</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../big_widgets/Controls.cpp" line="89"/>
+        <source>Prune</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/Controls.cpp" line="94"/>
         <source>Pull</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="111"/>
+        <location filename="../../big_widgets/Controls.cpp" line="117"/>
         <source>Push</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="116"/>
+        <location filename="../../big_widgets/Controls.cpp" line="123"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="121"/>
+        <location filename="../../big_widgets/Controls.cpp" line="130"/>
         <source>Config</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="167"/>
+        <location filename="../../big_widgets/Controls.cpp" line="139"/>
+        <source>Terminal</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/Controls.cpp" line="169"/>
         <source>New version</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="256"/>
+        <location filename="../../big_widgets/Controls.cpp" line="299"/>
         <source>Error while pulling</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="257"/>
+        <location filename="../../big_widgets/Controls.cpp" line="300"/>
         <source>There were problems during the pull operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="333"/>
+        <location filename="../../big_widgets/Controls.cpp" line="426"/>
         <source>Error while pushing</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="334"/>
+        <location filename="../../big_widgets/Controls.cpp" line="427"/>
         <source>There were problems during the push operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="361"/>
-        <source>Error while poping a stash</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../big_widgets/Controls.cpp" line="362"/>
-        <source>There were problems during the stash pop operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../big_widgets/Controls.cpp" line="410"/>
+        <location filename="../../big_widgets/Controls.cpp" line="462"/>
         <source>Pull Request</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/Controls.cpp" line="418"/>
+        <location filename="../../big_widgets/Controls.cpp" line="470"/>
         <source>Merge Request</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CreateIssueDlg</name>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.ui" line="32"/>
-        <source>New Issue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.ui" line="40"/>
-        <source>Title:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.ui" line="47"/>
-        <source>Description:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.ui" line="54"/>
-        <source>Milestone:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.ui" line="61"/>
-        <source>Labels:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.ui" line="91"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.ui" line="111"/>
-        <source>Create</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.cpp" line="42"/>
-        <source>Empty fields</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.cpp" line="42"/>
-        <source>Please, complete all fields with valid data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.cpp" line="80"/>
-        <source>Select milestone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.cpp" line="104"/>
-        <source>Issue created</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.cpp" line="105"/>
-        <source>The issue has been created. You can &lt;a href=&quot;%1&quot;&gt;find it here&lt;/a&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreateIssueDlg.cpp" line="114"/>
-        <source>API access error!</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CreatePullRequestDlg</name>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="26"/>
-        <source>Create Pull Request</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="34"/>
-        <source>Title:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="44"/>
-        <source>Description:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="54"/>
-        <source>Origin branch (HEAD):</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="64"/>
-        <source>Destination branch (base):</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="74"/>
-        <source>Milestone:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="84"/>
-        <source>Labels:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="101"/>
-        <source>Mark as draft</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="108"/>
-        <source>Allow maintainers to modify the Pull Request</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="122"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.ui" line="142"/>
-        <source>Create</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.cpp" line="70"/>
-        <source>Empty fields</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.cpp" line="70"/>
-        <source>Please, complete all fields with valid data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.cpp" line="74"/>
-        <source>Error in the branch selection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.cpp" line="75"/>
-        <source>The base branch and the branch to merge from cannot be the same. Please, select different branches.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.cpp" line="153"/>
-        <source>Pull Request created</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.cpp" line="154"/>
-        <source>The Pull Request has been created. You can &lt;a href=&quot;%1&quot;&gt;find it here&lt;/a&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/CreatePullRequestDlg.cpp" line="166"/>
-        <source>API access error!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>CreateRepoDlg</name>
     <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="20"/>
+        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="71"/>
         <source>Open repository after %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="30"/>
+        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="20"/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="37"/>
-        <source>Config Git user for this repo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="47"/>
-        <source>Git user name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="54"/>
+        <source>Config Git user for this repo</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="95"/>
+        <source>Git user name</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="109"/>
+        <source>Us as default clone directory </source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="88"/>
         <source>Repository destination</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="61"/>
-        <source>URL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="68"/>
-        <source>Repository name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="75"/>
-        <source>Accept</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="82"/>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="102"/>
+        <source>URL</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="27"/>
+        <source>Repository name</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="64"/>
+        <source>Accept</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="34"/>
+        <source>Cancel</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/CreateRepoDlg.ui" line="81"/>
         <source>Git user email</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="32"/>
+        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="41"/>
         <source>%1 repository</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="33"/>
+        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="42"/>
         <source>Initialize</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="33"/>
+        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="42"/>
         <source>Clone</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="116"/>
+        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="157"/>
         <source>You need to provider a URL to clone a repository.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="118"/>
-        <source>Nor URL provided</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="176"/>
+        <source>Error when %1: 
+ %2</source>
+        <translation></translation>
     </message>
+</context>
+<context>
+    <name>CredentialsDlg</name>
     <message>
-        <location filename="../../aux_widgets/CreateRepoDlg.cpp" line="145"/>
-        <source>Error when %1</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/CredentialsDlg.ui" line="26"/>
+        <source>Credentials</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>DiffWidget</name>
     <message>
-        <location filename="../../big_widgets/DiffWidget.cpp" line="110"/>
+        <location filename="../../big_widgets/DiffWidget.cpp" line="125"/>
         <source>No modifications</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/DiffWidget.cpp" line="110"/>
+        <location filename="../../big_widgets/DiffWidget.cpp" line="125"/>
         <source>There are no content modifications for this file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/DiffWidget.cpp" line="157"/>
+        <location filename="../../big_widgets/DiffWidget.cpp" line="175"/>
         <source>No diff to show!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/DiffWidget.cpp" line="158"/>
+        <location filename="../../big_widgets/DiffWidget.cpp" line="176"/>
         <source>There is no diff to show between commit SHAs {%1} and {%2}</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1232,335 +1901,343 @@
     <message>
         <location filename="../../QPinnableTabWidget/FakeCloseButton.cpp" line="11"/>
         <source>Close Tab</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>FileBlameWidget</name>
     <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="43"/>
+        <location filename="../../diff/FileBlameWidget.cpp" line="42"/>
         <source>Select a file to blame</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../diff/FileBlameWidget.cpp" line="55"/>
+        <source>Current SHA:</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../diff/FileBlameWidget.cpp" line="56"/>
-        <source>Current SHA:</source>
-        <translation type="unfinished"></translation>
+        <source>Previous SHA:</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="57"/>
-        <source>Previous SHA:</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../diff/FileBlameWidget.cpp" line="97"/>
+        <source>File not in Git</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../diff/FileBlameWidget.cpp" line="98"/>
-        <source>File not in Git</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="99"/>
         <source>The file {%1} is not under Git control version. You cannot blame it.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="235"/>
-        <source>more than 1 year ago</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../diff/FileBlameWidget.cpp" line="234"/>
+        <source>%1 years ago</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="237"/>
-        <source> days ago</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../diff/FileBlameWidget.cpp" line="236"/>
+        <source>%1 months ago</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="239"/>
+        <location filename="../../diff/FileBlameWidget.cpp" line="238"/>
+        <source>%1 days ago</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../diff/FileBlameWidget.cpp" line="242"/>
+        <source>%1 hours ago</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../diff/FileBlameWidget.cpp" line="246"/>
+        <source>%1 secs / 60minutes ago</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../diff/FileBlameWidget.cpp" line="250"/>
+        <source>%1 secs ago</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../diff/FileBlameWidget.cpp" line="240"/>
         <source>yesterday</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="241"/>
-        <source> hours ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="243"/>
+        <location filename="../../diff/FileBlameWidget.cpp" line="244"/>
         <source>1 hour ago</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="245"/>
-        <source> minutes ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="247"/>
+        <location filename="../../diff/FileBlameWidget.cpp" line="248"/>
         <source>1 minute ago</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="249"/>
-        <source> secs ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../diff/FileBlameWidget.cpp" line="274"/>
+        <location filename="../../diff/FileBlameWidget.cpp" line="275"/>
         <source>Local changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>FileContextMenu</name>
     <message>
-        <location filename="../../commits/FileContextMenu.cpp" line="13"/>
+        <location filename="../../commits/FileContextMenu.cpp" line="17"/>
         <source>History</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/FileContextMenu.cpp" line="16"/>
+        <location filename="../../commits/FileContextMenu.cpp" line="20"/>
         <source>Blame</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/FileContextMenu.cpp" line="18"/>
+        <location filename="../../commits/FileContextMenu.cpp" line="22"/>
         <source>Diff</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/FileContextMenu.cpp" line="25"/>
+        <location filename="../../commits/FileContextMenu.cpp" line="29"/>
         <source>Edit file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/FileContextMenu.cpp" line="30"/>
+        <location filename="../../commits/FileContextMenu.cpp" line="34"/>
+        <source>Open containing folder</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/FileContextMenu.cpp" line="35"/>
         <source>Copy path</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
-</context>
-<context>
-    <name>FileDiffView</name>
     <message>
-        <location filename="../../diff/FileDiffView.cpp" line="258"/>
-        <source>Stage chunk</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../commits/FileContextMenu.cpp" line="51"/>
+        <location filename="../../commits/FileContextMenu.cpp" line="72"/>
+        <source>Error opening file explorer</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/FileContextMenu.cpp" line="52"/>
+        <source>The file explorer value in the settings is invalid. Please define what file explorer you want to use to open file locations.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/FileContextMenu.cpp" line="73"/>
+        <source>There was a problem opening the file explorer.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>FileDiffWidget</name>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="68"/>
-        <location filename="../../diff/FileDiffWidget.cpp" line="78"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="92"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="111"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="121"/>
         <source>Press Enter to search a text... </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="122"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="169"/>
         <source>Return to the view</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="126"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="173"/>
         <source>Previous change</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="129"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="176"/>
         <source>Next change</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="135"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="182"/>
         <source>Edit file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="140"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="187"/>
+        <source>Hunks view</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../diff/FileDiffWidget.cpp" line="192"/>
         <source>Full file view</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="145"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="197"/>
         <source>Split file view</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="150"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="202"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="155"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="207"/>
         <source>Stage file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="159"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="211"/>
         <source>Revert changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="426"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="219"/>
+        <source>Copied!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../diff/FileDiffWidget.cpp" line="559"/>
         <source>Revert all changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="427"/>
+        <location filename="../../diff/FileDiffWidget.cpp" line="560"/>
         <source>Please, take into account that this will revert all the changes you have performed so far.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="515"/>
-        <source>Changes staged!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="515"/>
-        <source>The chunk has been successfully staged.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="528"/>
-        <source>Stage failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../diff/FileDiffWidget.cpp" line="529"/>
-        <source>The chunk couldn&apos;t be applied:
-%1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>FileEditor</name>
     <message>
-        <location filename="../../diff/FileEditor.cpp" line="54"/>
+        <location filename="../../diff/FileEditor.cpp" line="64"/>
         <source>Unsaved changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileEditor.cpp" line="55"/>
+        <location filename="../../diff/FileEditor.cpp" line="65"/>
         <source>The current text was modified. Do you want to save the changes?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileEditor.cpp" line="57"/>
+        <location filename="../../diff/FileEditor.cpp" line="67"/>
         <source>Discard</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FileEditor.cpp" line="58"/>
+        <location filename="../../diff/FileEditor.cpp" line="68"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>FullDiffWidget</name>
     <message>
-        <location filename="../../diff/FullDiffWidget.cpp" line="85"/>
+        <location filename="../../diff/FullDiffWidget.cpp" line="89"/>
         <source>Press Enter to search a text... </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FullDiffWidget.cpp" line="105"/>
+        <location filename="../../diff/FullDiffWidget.cpp" line="109"/>
         <source>Previous change</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/FullDiffWidget.cpp" line="108"/>
+        <location filename="../../diff/FullDiffWidget.cpp" line="112"/>
         <source>Next change</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>GeneralConfigDlg</name>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="29"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../config/GeneralConfigDlg.cpp" line="30"/>
-        <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <source>Close</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GeneralConfigDlg.cpp" line="31"/>
-        <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <source>Reset</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="34"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="32"/>
+        <source>Apply</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="35"/>
         <source>Git location...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GeneralConfigDlg.cpp" line="72"/>
         <source>Disable logs</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GeneralConfigDlg.cpp" line="74"/>
         <source>Set log level</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GeneralConfigDlg.cpp" line="76"/>
         <source>Styles schema</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GeneralConfigDlg.cpp" line="78"/>
         <source>Git location (if not in PATH):</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GeneralConfigDlg.cpp" line="81"/>
         <source>Export config...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GeneralConfigDlg.cpp" line="86"/>
         <source>Import config...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="117"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="115"/>
         <source>Reset needed!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="118"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="116"/>
         <source>You need to restart GitQlient to see the changes in the styles applid.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="134"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="132"/>
         <source>Select a config file...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="156"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="154"/>
         <source>External configuration loaded!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="157"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="155"/>
         <source>The configuration has been loaded successfully. Remember to apply the changes.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="167"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="165"/>
         <source>Select a folder...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="190"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="188"/>
         <source>Configuration exported!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="191"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="189"/>
         <source>The configuration has been stored in {%1}</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1568,12 +2245,12 @@
     <message>
         <location filename="../../cache/GitCache.cpp" line="197"/>
         <source>No local changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../cache/GitCache.cpp" line="197"/>
         <source>Local changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1581,636 +2258,726 @@
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="14"/>
         <source>Git Config</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="35"/>
         <source>Global Git name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="42"/>
         <source>Global Git email</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="49"/>
         <source>User global settings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="56"/>
         <source>Local Git name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="63"/>
         <source>Local Git email</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>GitQlient</name>
     <message>
-        <location filename="../../big_widgets/GitQlient.cpp" line="46"/>
-        <source>Open new repository</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../big_widgets/GitQlient.cpp" line="71"/>
+        <source>Open repo...</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/GitQlient.cpp" line="235"/>
+        <location filename="../../big_widgets/GitQlient.cpp" line="75"/>
+        <source>Clone repo...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="79"/>
+        <source>New repo...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="83"/>
+        <source>Close repo</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="217"/>
+        <source>Clonin g repository...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="260"/>
+        <source>Error!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="291"/>
+        <source>Multi-platform Git client written with Qt</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="292"/>
+        <source>Git repositories to open</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="292"/>
+        <source>[repos...]</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="298"/>
+        <source>Displays version information.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="301"/>
+        <source>Disables logs.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="304"/>
+        <source>Sets log level.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="304"/>
+        <source>level</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="336"/>
+        <source>version</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="337"/>
+        <source>Git SHA </source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="375"/>
+        <source>Not a repository</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="376"/>
+        <source>The selected folder is not a Git repository. Please make sure you open a Git repository.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlient.cpp" line="443"/>
         <source>Not a Git repository</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/GitQlient.cpp" line="236"/>
+        <location filename="../../big_widgets/GitQlient.cpp" line="444"/>
         <source>The selected path is not a Git repository. Please make sure you opened the correct directory.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>GitQlientRepo</name>
     <message>
-        <location filename="../../big_widgets/GitQlientRepo.cpp" line="268"/>
+        <location filename="../../big_widgets/GitQlientRepo.cpp" line="318"/>
         <source>Loading repository...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/GitQlientRepo.cpp" line="494"/>
+        <location filename="../../big_widgets/GitQlientRepo.cpp" line="387"/>
+        <source>Merge in progress</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlientRepo.cpp" line="388"/>
+        <source>There is a merge conflict in progress. Solve the merge before moving on.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlientRepo.cpp" line="396"/>
+        <source>Cherry-pick in progress</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlientRepo.cpp" line="397"/>
+        <source>There is a cherry-pick in progress that contains with conflicts. Solve them before moving on.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/GitQlientRepo.cpp" line="635"/>
         <source>Branch not found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/GitQlientRepo.cpp" line="495"/>
+        <location filename="../../big_widgets/GitQlientRepo.cpp" line="636"/>
         <source>The branch couldn&apos;t be found. Please, make sure you fetched and have the latest changes.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../big_widgets/GitQlientRepo.cpp" line="539"/>
-        <source>Commit error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../big_widgets/GitQlientRepo.cpp" line="539"/>
-        <source>Failed to commit changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>GitQlientUpdater</name>
     <message>
-        <location filename="../../aux_widgets/GitQlientUpdater.cpp" line="41"/>
-        <source>New version of GitQlient!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/GitQlientUpdater.cpp" line="42"/>
-        <source>There is a new version of GitQlient available. Your current vrsion is {%1} and the new one is {%2}. You can read more about the new changes in the detailed description.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../aux_widgets/GitQlientUpdater.cpp" line="46"/>
+        <source>New version of GitQlient!</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/GitQlientUpdater.cpp" line="47"/>
+        <source>There is a new version of GitQlient available. Your current version is {%1} and the new one is {%2}. You can read more about the new changes in the detailed description.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/GitQlientUpdater.cpp" line="51"/>
         <source>Download</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/GitQlientUpdater.cpp" line="94"/>
-        <source>New version available!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/GitQlientUpdater.cpp" line="95"/>
-        <source>There is a new version of GitQlient available but your OS doesn&apos;t have a binary built. If you want to get the latest version, pleas &lt;a href=&apos;https://github.com/francescmm/GitQlient/releases/tag/v%1&apos;&gt;get the source code from GitHub&lt;/a&gt;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/GitQlientUpdater.cpp" line="144"/>
-        <source>Downloading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/GitQlientUpdater.cpp" line="144"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GitServerWidget</name>
-    <message>
-        <location filename="../../big_widgets/GitServerWidget.cpp" line="67"/>
-        <source>Create a new issue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../big_widgets/GitServerWidget.cpp" line="72"/>
-        <source>Create a new %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../big_widgets/GitServerWidget.cpp" line="77"/>
-        <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>HistoryWidget</name>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="62"/>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="394"/>
-        <source>Working branch: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="115"/>
-        <source>Press Enter to search by SHA or log message...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="159"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="181"/>
         <source>Cherry-pick</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="166"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="191"/>
         <source>Show all branches</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="334"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="359"/>
         <source>No diff available!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="334"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="359"/>
         <source>There is no diff to show.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="364"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="434"/>
         <source>Not found!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="364"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="434"/>
         <source>No commits where found based on the search text.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="419"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="499"/>
         <source>Merge failed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="420"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="500"/>
         <source>There were problems during the merge. Please, see the detailed description for more information.&lt;br&gt;&lt;br&gt;GitQlient will show the merge helper tool.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="440"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="531"/>
         <source>Merge successful</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="441"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="532"/>
         <source>The merge was successfully done. See the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="450"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="517"/>
         <source>Merge status</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="451"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="139"/>
+        <source>Press Return/Enter to search by SHA/message. Press Ctrl+Return/Enter to cherry-pick the SHA.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="518"/>
         <source>There were problems during the merge. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="509"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="650"/>
         <source>Error while cherry-pick</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/HistoryWidget.cpp" line="510"/>
+        <location filename="../../big_widgets/HistoryWidget.cpp" line="651"/>
         <source>There were problems during the cherry-pick operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>HunkWidget</name>
+    <message>
+        <location filename="../../aux_widgets/HunkWidget.cpp" line="253"/>
+        <source>Stage line</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/HunkWidget.cpp" line="254"/>
+        <source>Discard line</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/HunkWidget.cpp" line="262"/>
+        <source>Revert line</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>InitScreen</name>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="30"/>
+        <source>OPEN</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="31"/>
+        <source>CLONE</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="32"/>
+        <source>NEW</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="70"/>
+        <source>GitQlient %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="96"/>
+        <source>About GitQlient...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="100"/>
+        <source>Source code</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="103"/>
+        <source>Get the source code in GitHub</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="105"/>
+        <source>Report an issue</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="108"/>
+        <source>Report an issue in GitHub</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="147"/>
+        <source>Recent</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="168"/>
+        <location filename="../../config/InitScreen.cpp" line="211"/>
+        <source>Clear list</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="190"/>
+        <source>Most used</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="231"/>
+        <source>GitQlient, pronounced as git+client (/gɪtˈklaɪənt/) is a multi-platform Git client. With GitQlient you will be able to add commits, branches and manage all the options Git provides. &lt;br&gt;&lt;br&gt;Once a fork of QGit, GitQlient has followed is own path. You can download the code from &lt;a style=&apos;color: #D89000&apos; href=&apos;https://github.com/francescmm/GitQlient&apos;&gt;GitHub&lt;/a&gt;. If you find any bug or problem, please report it in &lt;a style=&apos;color: #D89000&apos; href=&apos;https://github.com/francescmm/GitQlient/issues&apos;&gt;the issues page&lt;/a&gt; so I can fix it as soon as possible.&lt;br&gt;&lt;br&gt;If you want to integrate GitQlient into QtCreator, I also provide a plugin that you can download from &lt;a style=&apos;color: #D89000&apos; href=&apos;https://github.com/francescmm/GitQlient/releases&apos;&gt;here&lt;/a&gt;. Just make sure you pick the right version and follow the instructions in the main page of the repo.&lt;br&gt;&lt;br&gt;GitQlient can be compiled from Qt 5.15 on.&lt;br&gt;&lt;br&gt;Copyright &amp;copy; 2019 - 2023 GitQlient (Francesc Martínez)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../config/InitScreen.cpp" line="245"/>
+        <source>About GitQlient v%1</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>InitialRepoConfig</name>
     <message>
-        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="14"/>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="26"/>
         <source>Repo config</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="20"/>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="99"/>
         <source> last commits</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="68"/>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="64"/>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="77"/>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="32"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the first time you open this repository. GitQlient includes some parameters to help you to configure the it. Please, take a moment to change them if you&apos;d like.&lt;/p&gt;&lt;p&gt;If you already have configured some of them, they will show the already set value.&lt;/p&gt;&lt;p&gt;You can modify these values at any moment using the &lt;span style=&quot; font-style:italic;&quot;&gt;Config &lt;/span&gt;button in the top icons list of GitQlient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="96"/>
+        <source>All commits</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="115"/>
         <source>Max. commits to retrieve (0 for all)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="84"/>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="162"/>
+        <source>Never</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="178"/>
         <source>Update submodules when pull</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="91"/>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="185"/>
+        <source>Credentials configuration</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="206"/>
+        <source>Storage</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="216"/>
+        <source>Store credentials using GitQlient (Current session or in Storage)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="226"/>
+        <source>Cache</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="244"/>
+        <source>Timeout:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="251"/>
+        <source> mins.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="165"/>
         <source> minutes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="104"/>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="132"/>
         <source>Auto-Fetch interval</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="111"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this new version, GitQlient includes some new parameters to help you to configure the repository. Please take a moment to change them if you&apos;d like.&lt;/p&gt;&lt;p&gt;If you already have configured some of them, they will show the already set value.&lt;/p&gt;&lt;p&gt;You can modify these values at any moment using the &lt;span style=&quot; font-style:italic;&quot;&gt;Config &lt;/span&gt;button in the top icons list of GitQlient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="131"/>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="139"/>
         <source>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="141"/>
+        <location filename="../../aux_widgets/InitialRepoConfig.ui" line="73"/>
         <source>Prune when fetch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
-    <name>IssueDetailedView</name>
+    <name>InputShaDlg</name>
     <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="37"/>
-        <source>Detailed View</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/InputShaDlg.ui" line="26"/>
+        <source>Dialog</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="43"/>
-        <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/InputShaDlg.ui" line="32"/>
+        <source>Reset</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="49"/>
-        <source>Comments view</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/InputShaDlg.ui" line="39"/>
+        <source>Commit SHA to reset the branch</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="58"/>
-        <source>Changes view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="66"/>
-        <source>Commits view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="77"/>
-        <source>Start review</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="81"/>
-        <source>Only comments</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="82"/>
-        <source>Comment</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="89"/>
-        <source>Review: Approve</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="91"/>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="98"/>
-        <source>The comments will be part of a review</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="96"/>
-        <source>Review: Request changes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="108"/>
-        <source>Add new comment</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="116"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="201"/>
-        <source> %1 days ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="201"/>
-        <source> today</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="202"/>
-        <source> on %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="204"/>
-        <source>Created by &lt;b&gt;%1&lt;/b&gt;%2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="250"/>
-        <source>Close issue</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="250"/>
-        <source>Are you sure you want to close the issue?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="266"/>
-        <source>Comment review</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="271"/>
-        <source>Approve review</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueDetailedView.cpp" line="276"/>
-        <source>Request changes</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>IssueItem</name>
-    <message>
-        <location filename="../../git_server/IssueItem.cpp" line="50"/>
-        <source>Created by </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueItem.cpp" line="59"/>
-        <source> %1 days ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueItem.cpp" line="60"/>
-        <source> on %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/IssueItem.cpp" line="105"/>
-        <source>Assigned to </source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>IssuesList</name>
-    <message>
-        <location filename="../../git_server/IssuesList.cpp" line="16"/>
-        <source>Issues</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Jenkins::JenkinsJobPanel</name>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="44"/>
-        <source>Open job in Jenkins...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="45"/>
-        <source>Trigger build</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="107"/>
-        <source>Request in progress</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="108"/>
-        <source>There is a request in progress. Please, wait until the builds and stages for this job have been loaded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="309"/>
-        <source>Find text... </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="392"/>
-        <source>Build</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="403"/>
-        <source>Build with params</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="448"/>
-        <source>Update requested</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="449"/>
-        <source>The build has been triggered and the information will be refreshed in 10 secs.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="477"/>
-        <source>Artifacts for #%1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="509"/>
-        <source>File already exists!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="510"/>
-        <source>The file already exists in %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="519"/>
-        <source>File downloaded!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="520"/>
-        <source>The file (%1) has been downloaded in: %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="525"/>
-        <source>File download error!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../jenkins/JenkinsJobPanel.cpp" line="525"/>
-        <source>The file (%1) couldn&apos;t be downloaded.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MergePullRequestDlg</name>
-    <message>
-        <location filename="../../git_server/MergePullRequestDlg.ui" line="14"/>
-        <location filename="../../git_server/MergePullRequestDlg.ui" line="66"/>
-        <source>Merge</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/MergePullRequestDlg.ui" line="22"/>
-        <source>Title:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/MergePullRequestDlg.ui" line="32"/>
-        <source>Message:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/MergePullRequestDlg.ui" line="46"/>
+        <location filename="../../aux_widgets/InputShaDlg.ui" line="75"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/MergePullRequestDlg.cpp" line="53"/>
-        <source>Empty fields</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/InputShaDlg.cpp" line="47"/>
+        <source>Reset failed</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/MergePullRequestDlg.cpp" line="53"/>
-        <source>Please, complete all fields with valid data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/MergePullRequestDlg.cpp" line="72"/>
-        <source>PR merged!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/MergePullRequestDlg.cpp" line="72"/>
-        <source>The pull request has been merged.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/MergePullRequestDlg.cpp" line="89"/>
-        <source>API access error!</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/InputShaDlg.cpp" line="48"/>
+        <source>There were some problems while fetching. Please try again.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>MergeWidget</name>
     <message>
-        <location filename="../../big_widgets/MergeWidget.cpp" line="33"/>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="37"/>
         <source>Merge &amp;&amp; Commit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/MergeWidget.cpp" line="34"/>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="38"/>
         <source>Abort merge</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/MergeWidget.cpp" line="43"/>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="47"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/MergeWidget.cpp" line="69"/>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="73"/>
         <source>Conflicts</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/MergeWidget.cpp" line="72"/>
-        <source>Changes to be commited</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="76"/>
+        <source>Changes to be committed</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/MergeWidget.cpp" line="180"/>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="95"/>
+        <source>Select a file from the list to show its contents.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="196"/>
+        <source>File deleted by them</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="197"/>
+        <source>The file has been deleted by them. Please add or remove the file to mark resolution.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="203"/>
+        <source>File deleted by us</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="204"/>
+        <source>The file has been deleted by us. Please add or remove the file to mark resolution.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="225"/>
+        <source>No diff to show</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="225"/>
+        <source>There is not diff information to be shown.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="408"/>
+        <source>Error while cherry-pick</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="409"/>
+        <source>There were problems during the cherry-pich operation. Please, see the detailed description for more information.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="251"/>
         <source>Error aborting</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/MergeWidget.cpp" line="181"/>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="252"/>
         <source>There were problems during the aborting the merge. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/MergeWidget.cpp" line="219"/>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="328"/>
         <source>Error while merging</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/MergeWidget.cpp" line="329"/>
+        <source>There were problems during the merge operation. Please, see the detailed description for more information.</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>NewVersionInfoDlg</name>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.ui" line="14"/>
+        <source>What&apos;s new in GitQlient?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.ui" line="95"/>
+        <source>Don&apos;t show again (accessible through the config)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.ui" line="115"/>
+        <source>Previous</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.ui" line="122"/>
+        <source>Next</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.ui" line="129"/>
+        <source>Close</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="16"/>
+        <source>1. Plugins support</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="17"/>
+        <source>After some months of work and refactor, GitQlient can be extended with plugins!&lt;br&gt;&lt;br&gt;The plugin system works by deploying &lt;a style=&apos;color: #D89000&apos; href=&apos;https://doc.qt.io/qt-6/plugins-howto.html&apos;&gt;Qt plugins&lt;/a&gt; into the selected folder. GitQlient will automatically read the metadata for the plugins on every restart and list the available plugins (those that are valid) in the installed plugins panel.&lt;br&gt;&lt;br&gt;All the GitQlient plugins are downloaded from their official GitHub repo page and stored in the folder selected. Once they are downloaded, a list with checkbox will be shown in the &lt;em&gt;Installed plugins&lt;/em&gt; section where you can enable/disable them. In addition, the icon will be shown in the Controls panel for an easy access.&lt;br&gt;&lt;br&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="28"/>
+        <source>2. New terminal widget (Linux/MacOS)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="29"/>
+        <source>If you are a Linux or MacOS user, you are lucky!&lt;br&gt;&lt;br&gt;GitQlient now supports the terminal plugin where you can access the same functionalities you have in your usual terminal. It also keeps the history of commands so now you can take advantage of a shortcut to update and generate your projects.&lt;br&gt;&lt;br&gt;Once the plugin is enabled, it will show an icon in the Controls panel to access it directly. In addition, in the &lt;em&gt;GitQlient&lt;/em&gt; section of the configuration, you will find a combo box to select your preferred color scheme for the terminal widget based on the ones available in your OS.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="38"/>
+        <source>3. GitHub and Jenkins become plugins</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="39"/>
+        <source>The old GitServer view (to connect to GitHub) and Jenkins view (to show and trigger Jenkins jobs and builds) have been converted into plugins and are now available to be downloaded from their release page in their own GitHub repo. By having this views detached, GitQlient takes less dependencies (WebEngine, WebChannel, etc.), allows the release of the GitQlientPlugin for QtCreator and in addition, makes it possible to improve those plugins independently to GitQlient.&lt;br&gt;&lt;br&gt;</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="45"/>
+        <source>4. Hunks view</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="46"/>
+        <source>Now it&apos;s possible to stage by hunk or by line!&lt;br&gt;&lt;br&gt;There is a new view in when showing the diff of a file where GitQlient will show the changes ordered by hunks. Each hunk has its own Discard/Stage buttons to apply the changes individually.&lt;br&gt;&lt;br&gt;In addition, by using the right button of the mouse, you will be able to stage or discard changes by line.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/MergeWidget.cpp" line="220"/>
-        <source>There were problems during the merge operation. Please, see the detailed description for more information.</source>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="53"/>
+        <source>5. Foldable branches panel</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="54"/>
+        <source>From now on, all the panels of the Branches widget are foldable. This has been a long requested feature that is now included in GitQlient.&lt;br&gt;&lt;br&gt;This will help you to save a lot of space if you work with small screens. Fold and unfold is as easy as clicking in the plus sign, but you can also do it from the config widget.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="60"/>
+        <source>6. Shortcuts</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="61"/>
+        <source>In this new version of GitQlient, some shortcuts have been introduced so you don&apos;t need to navigate with the mouse the whole time.&lt;br&gt;&lt;br&gt;For now, the shortcuts are used in the Controls panel and in the branches panel (in this case to use toggle the minimal/normal view). The shortcuts are:&lt;ul&gt;&lt;li&gt;Graph view: &lt;strong&gt;Ctrl+1&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;Diff view: &lt;strong&gt;Ctrl+2&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;Blame view: &lt;strong&gt;Ctrl+3&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;Pull: &lt;strong&gt;Ctrl+4&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;Push: &lt;strong&gt;Ctrl+5&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;Config view: &lt;strong&gt;Ctrl+6&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;Refresh/Update: &lt;strong&gt;F5&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;Terminal (if enabled): &lt;strong&gt;Ctrl+7&lt;strong&gt;&lt;/li&gt;&lt;li&gt;GitHub (if enabled): &lt;strong&gt;Ctrl+8&lt;/strong&gt;&lt;/li&gt;&lt;li&gt;Jenkins (if enabled): &lt;strong&gt;Ctrl+9&lt;/strong&gt;&lt;/li&gt;&lt;/ul&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="75"/>
+        <source>7. New version notification</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/NewVersionInfoDlg.cpp" line="76"/>
+        <source>Until now, whenever a new version of GitQlient was released, the app would notify making it available for download.&lt;br&gt;&lt;br&gt;This will change from now on since GitQlient is available through different ways: DEB and &lt;a style=&apos;color: #D89000&apos; href=&apos;https://src.fedoraproject.org/rpms/gitqlient&apos;&gt;RPM&lt;/a&gt; packages, AppImage, installer for Windows, and DMG/ports for MacOS. Since it&apos;s quite hard and error prone to verify what binary is being used, the icon will notify that a new version have been released but it the download will have to happen manually.&lt;br&gt;&lt;br&gt;You can of course download the latest version &lt;a style=&apos;color: #D89000&apos; href=&apos;https://github.com/francescmm/GitQlient/releases&apos;&gt;from the official GitHub repo&lt;/a&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PluginsDownloader</name>
+    <message>
+        <location filename="../../aux_widgets/PluginsDownloader.cpp" line="97"/>
+        <source>Downloading...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../aux_widgets/PluginsDownloader.cpp" line="97"/>
+        <source>Close</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>PomodoroButton</name>
     <message>
-        <location filename="../../aux_widgets/PomodoroButton.cpp" line="25"/>
+        <location filename="../../aux_widgets/PomodoroButton.cpp" line="26"/>
         <source>Pomodoro</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/PomodoroButton.cpp" line="29"/>
+        <location filename="../../aux_widgets/PomodoroButton.cpp" line="30"/>
         <source>Options...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/PomodoroButton.cpp" line="42"/>
+        <location filename="../../aux_widgets/PomodoroButton.cpp" line="43"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/PomodoroButton.cpp" line="225"/>
+        <location filename="../../aux_widgets/PomodoroButton.cpp" line="249"/>
         <source>Time for a break!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/PomodoroButton.cpp" line="225"/>
+        <location filename="../../aux_widgets/PomodoroButton.cpp" line="249"/>
         <source>It&apos;s time to do a break. Are you ready?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/PomodoroButton.cpp" line="261"/>
-        <location filename="../../aux_widgets/PomodoroButton.cpp" line="290"/>
+        <location filename="../../aux_widgets/PomodoroButton.cpp" line="289"/>
+        <location filename="../../aux_widgets/PomodoroButton.cpp" line="321"/>
         <source>Time to work!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/PomodoroButton.cpp" line="261"/>
-        <location filename="../../aux_widgets/PomodoroButton.cpp" line="290"/>
+        <location filename="../../aux_widgets/PomodoroButton.cpp" line="289"/>
+        <location filename="../../aux_widgets/PomodoroButton.cpp" line="321"/>
         <source>It&apos;s time to go back to work. Are you ready?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2218,12 +2985,12 @@
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="14"/>
         <source>Pomodoro configuration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="41"/>
         <source>Pomodoro duration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="61"/>
@@ -2235,12 +3002,12 @@
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="125"/>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="179"/>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="98"/>
         <source>Break duration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="118"/>
@@ -2250,7 +3017,7 @@
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="152"/>
         <source>Long break duration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="172"/>
@@ -2260,134 +3027,32 @@
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="209"/>
         <source>Long break after:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="216"/>
         <source> pomodoros</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="239"/>
         <source>Enable alarm sound:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="253"/>
         <source>Reset counter when stop:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PrCommentsList</name>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="61"/>
-        <location filename="../../git_server/PrCommentsList.cpp" line="535"/>
-        <source>Add your comment...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="64"/>
-        <location filename="../../git_server/PrCommentsList.cpp" line="538"/>
+        <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="274"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="65"/>
-        <location filename="../../git_server/PrCommentsList.cpp" line="539"/>
-        <source>Comment</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="131"/>
-        <source>Assigned to </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="146"/>
-        <source>Unassigned</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="271"/>
-        <source> %1 days ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="271"/>
-        <source> today</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="272"/>
-        <source> on %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="340"/>
-        <source>Comment by </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="393"/>
-        <source>&lt;b&gt;%1&lt;/b&gt; (%2) requested changes to the PR </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="399"/>
-        <source>&lt;b&gt;%1&lt;/b&gt; (%2) approved the PR </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="411"/>
-        <source>&lt;b&gt;%1&lt;/b&gt; (%2) reviewed the PR and added some comments </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="515"/>
-        <source>Outdated</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommentsList.cpp" line="530"/>
-        <source>Add new comment</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PrCommitsList</name>
-    <message>
-        <location filename="../../git_server/PrCommitsList.cpp" line="86"/>
-        <source> %1 days ago</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommitsList.cpp" line="86"/>
-        <source> today</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommitsList.cpp" line="87"/>
-        <source> on %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommitsList.cpp" line="89"/>
-        <source>Committed by &lt;b&gt;%1&lt;/b&gt; %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/PrCommitsList.cpp" line="115"/>
-        <source>Copied!</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PrList</name>
-    <message>
-        <location filename="../../git_server/PrList.cpp" line="16"/>
-        <source>Pull Requests</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="294"/>
+        <source>Save</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2395,53 +3060,35 @@
     <message>
         <location filename="../../aux_widgets/PullDlg.ui" line="14"/>
         <source>Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/PullDlg.ui" line="36"/>
-        <source>Would you like to pull the last changes?</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/PullDlg.cpp" line="20"/>
+        <source>&lt;strong&gt;Would you like to pull the last changes?&lt;/strong&gt;</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/PullDlg.cpp" line="53"/>
+        <location filename="../../aux_widgets/PullDlg.cpp" line="57"/>
         <source>Error while pulling</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../aux_widgets/PullDlg.cpp" line="54"/>
+        <location filename="../../aux_widgets/PullDlg.cpp" line="58"/>
         <source>There were problems during the pull operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../diff/DiffHelper.h" line="210"/>
+        <location filename="../../AuxiliarCustomWidgets/DiffHelper.h" line="291"/>
         <source>Text not found</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../diff/DiffHelper.h" line="210"/>
+        <location filename="../../AuxiliarCustomWidgets/DiffHelper.h" line="291"/>
         <source>Text not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QPinnableTabWidget</name>
-    <message>
-        <location filename="../../QPinnableTabWidget/QPinnableTabWidget.cpp" line="193"/>
-        <source>Unpin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../QPinnableTabWidget/QPinnableTabWidget.cpp" line="195"/>
-        <source>Pin</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../QPinnableTabWidget/QPinnableTabWidget.cpp" line="197"/>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2449,189 +3096,39 @@
     <message>
         <location filename="../../QPinnableTabWidget/RealCloseButton.cpp" line="14"/>
         <source>Close Tab</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>RepoConfigDlg</name>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="14"/>
-        <source>Repository configuration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="60"/>
-        <source>Config</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="88"/>
-        <source> last commits</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="116"/>
-        <source>Clear</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="138"/>
-        <source>Max. commits to retrieve (0 for all)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="145"/>
-        <source>Update submodules when pull</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="152"/>
-        <source>Auto-Fetch interval</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="159"/>
-        <source>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="182"/>
-        <source>Prune when fetch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="199"/>
-        <source>Cache space used:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="206"/>
-        <source> minutes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="236"/>
-        <source>Enable pomodoro</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="243"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run clang-format before commit&lt;br/&gt;(Requires clang-format)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="250"/>
-        <source>Language</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="265"/>
-        <source>Build System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="271"/>
-        <source>Enable build system view</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="285"/>
-        <source>User:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="292"/>
-        <source>Token:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="322"/>
-        <source>Endpoint URL:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="337"/>
-        <source>Git Local</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../aux_widgets/RepoConfigDlg.ui" line="346"/>
-        <source>Git Global</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>RepositoryViewDelegate</name>
     <message>
-        <location filename="../../history/RepositoryViewDelegate.cpp" line="145"/>
+        <location filename="../../history/RepositoryViewDelegate.cpp" line="149"/>
         <source>Copied!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
-    <name>ServerConfigDlg</name>
+    <name>SquashDlg</name>
     <message>
-        <location filename="../../git_server/ServerConfigDlg.ui" line="26"/>
-        <source>Server configuration</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/SquashDlg.ui" line="26"/>
+        <location filename="../../aux_widgets/SquashDlg.ui" line="150"/>
+        <source>Squash</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/ServerConfigDlg.ui" line="32"/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/SquashDlg.ui" line="96"/>
+        <source>Summary</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/ServerConfigDlg.ui" line="65"/>
-        <source>Set the user name</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/SquashDlg.ui" line="119"/>
+        <source>Description</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../git_server/ServerConfigDlg.ui" line="79"/>
+        <location filename="../../aux_widgets/SquashDlg.ui" line="130"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/ServerConfigDlg.ui" line="89"/>
-        <source>Test token</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/ServerConfigDlg.ui" line="112"/>
-        <source>Set the repository endpoint</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/ServerConfigDlg.ui" line="137"/>
-        <source>Set the user token</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/ServerConfigDlg.cpp" line="82"/>
-        <source>How to get a token?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/ServerConfigDlg.cpp" line="159"/>
-        <source>Token confirmed!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../git_server/ServerConfigDlg.cpp" line="165"/>
-        <source>API access error!</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>StagedFilesList</name>
-    <message>
-        <location filename="../../commits/StagedFilesList.cpp" line="25"/>
-        <source>Reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/StagedFilesList.cpp" line="27"/>
-        <source>See changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2639,37 +3136,67 @@
     <message>
         <location filename="../../branches/StashesContextMenu.cpp" line="16"/>
         <source>Branch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/StashesContextMenu.cpp" line="17"/>
         <source>Drop</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/StashesContextMenu.cpp" line="18"/>
         <source>Clear all</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/StashesContextMenu.cpp" line="39"/>
-        <source>Error while droping stash</source>
-        <translation type="unfinished"></translation>
+        <source>Error while dropping stash</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/StashesContextMenu.cpp" line="40"/>
         <source>There were problems during the stash drop operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/StashesContextMenu.cpp" line="58"/>
         <source>Error while branch stash</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/StashesContextMenu.cpp" line="59"/>
         <source>There were problems during the branch stash operation. Please, see the detailed description for more information.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>SubmodulesContextMenu</name>
+    <message>
+        <location filename="../../branches/SubmodulesContextMenu.cpp" line="23"/>
+        <source>Add submodule</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/SubmodulesContextMenu.cpp" line="34"/>
+        <source>Update all</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/SubmodulesContextMenu.cpp" line="49"/>
+        <location filename="../../branches/SubmodulesContextMenu.cpp" line="82"/>
+        <source>Update</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/SubmodulesContextMenu.cpp" line="60"/>
+        <location filename="../../branches/SubmodulesContextMenu.cpp" line="93"/>
+        <source>Open</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../branches/SubmodulesContextMenu.cpp" line="64"/>
+        <source>Delete</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2677,244 +3204,239 @@
     <message>
         <location filename="../../branches/TagDlg.ui" line="14"/>
         <source>Create tag</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/TagDlg.ui" line="20"/>
         <source>Tag name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/TagDlg.ui" line="27"/>
         <source>Tag message</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/TagDlg.ui" line="34"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../branches/TagDlg.ui" line="54"/>
         <source>Accept</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>UnstagedMenu</name>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="20"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="22"/>
         <source>See changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="21"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="23"/>
         <source>Blame</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="25"/>
-        <source>Edit file</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../commits/UnstagedMenu.cpp" line="29"/>
+        <source>Open with external editor</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="31"/>
-        <source>Mark as resolved</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../commits/UnstagedMenu.cpp" line="32"/>
+        <source>Open containing folder</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="36"/>
+        <source>Stage file</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="38"/>
+        <source>Revert file changes</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../commits/UnstagedMenu.cpp" line="40"/>
-        <source>Stage file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="42"/>
-        <source>Revert file changes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="44"/>
-        <location filename="../../commits/UnstagedMenu.cpp" line="60"/>
-        <location filename="../../commits/UnstagedMenu.cpp" line="109"/>
-        <source>Ignoring file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="44"/>
-        <source>Are you sure you want to revert the changes?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../commits/UnstagedMenu.cpp" line="57"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="110"/>
+        <source>Ignoring file</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="40"/>
+        <source>Are you sure you want to revert the changes?</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="54"/>
         <source>Ignore</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="59"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="56"/>
         <source>Ignore file</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="61"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="58"/>
         <source>Are you sure you want to add the file to the black list?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="72"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="69"/>
+        <source>Delete file</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="71"/>
+        <source>Delete ALL untracked files</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="73"/>
         <source>Ignore extension</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="74"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="75"/>
         <source>Ignoring extension</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="74"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="75"/>
         <source>Are you sure you want to add the file extension to the black list?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="88"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="89"/>
         <source>Ignore containing folder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="90"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="91"/>
         <source>Ignoring folder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="90"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="91"/>
         <source>Are you sure you want to add the containing folder to the black list?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="106"/>
-        <source>Add all files to commit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../commits/UnstagedMenu.cpp" line="107"/>
+        <source>Add all files to commit</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="108"/>
         <source>Revert all changes</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="109"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="110"/>
         <source>Are you sure you want to undo all the changes?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="133"/>
-        <source>File added to .gitignore</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../commits/UnstagedMenu.cpp" line="134"/>
-        <source>The file has been added to the ignore list in the file .gitignore.</source>
-        <translation type="unfinished"></translation>
+        <source>File added to .gitignore</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UnstagedMenu.cpp" line="139"/>
-        <source>Unable to add the entry</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../commits/UnstagedMenu.cpp" line="135"/>
+        <source>The file has been added to the ignore list in the file .gitignore.</source>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../commits/UnstagedMenu.cpp" line="140"/>
+        <source>Unable to add the entry</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="141"/>
         <source>It was impossible to add the entry in the .gitignore file.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="172"/>
+        <location filename="../../commits/UnstagedMenu.cpp" line="193"/>
+        <source>Error opening file explorer</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="173"/>
+        <source>The file explorer value in the settings is invalid. Please define what file explorer you want to use to open file locations.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="194"/>
+        <source>There was a problem opening the file explorer.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="217"/>
+        <source>Error opening file editor</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="218"/>
+        <source>There was a problem opening the file editor, please review the value set in GitQlient config.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="231"/>
+        <source>Error cleaning untracked files</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/UnstagedMenu.cpp" line="232"/>
+        <source>There was a problem removing all untracked files.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
-    <name>UntrackedMenu</name>
+    <name>UpstreamDlg</name>
     <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="17"/>
-        <source>Stage file</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/UpstreamDlg.cpp" line="19"/>
+        <source>&lt;strong&gt;Would you like to reconfigure the upstream and push the branch?&lt;/strong&gt;</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="18"/>
-        <source>Delete file</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/UpstreamDlg.cpp" line="47"/>
+        <source>Error while pulling</source>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="20"/>
-        <source>Ignore</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="22"/>
-        <source>Ignore file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="23"/>
-        <location filename="../../commits/UntrackedMenu.cpp" line="37"/>
-        <source>Ignoring file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="24"/>
-        <source>Are you sure you want to add the file to the black list?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="35"/>
-        <source>Ignore extension</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="37"/>
-        <source>Are you sure you want to add the file extension to the black list?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="51"/>
-        <source>Ignore containing folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="53"/>
-        <source>Ignoring folder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="53"/>
-        <source>Are you sure you want to add the containing folder to the black list?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="100"/>
-        <source>File added to .gitignore</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="101"/>
-        <source>The file has been added to the ignore list in the file .gitignore.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="106"/>
-        <source>Unable to add the entry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../commits/UntrackedMenu.cpp" line="107"/>
-        <source>It was impossible to add the entry in the .gitignore file.</source>
-        <translation type="unfinished"></translation>
+        <location filename="../../aux_widgets/UpstreamDlg.cpp" line="48"/>
+        <source>There were problems during the pull operation. Please, see the detailed description for more information.</source>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>WipWidget</name>
     <message>
-        <location filename="../../commits/WipWidget.cpp" line="59"/>
+        <location filename="../../commits/WipWidget.cpp" line="57"/>
         <source>Impossible to commit</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../commits/WipWidget.cpp" line="60"/>
+        <location filename="../../commits/WipWidget.cpp" line="58"/>
         <source>There are files with conflicts. Please, resolve the conflicts first.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/WipWidget.cpp" line="120"/>
+        <source>Error when committing</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../commits/WipWidget.cpp" line="121"/>
+        <source>There were problems during the commit operation. Please, see the detailed description for more information.</source>
+        <translation></translation>
     </message>
 </context>
 </TS>

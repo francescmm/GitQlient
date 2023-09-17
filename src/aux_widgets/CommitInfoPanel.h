@@ -37,6 +37,8 @@ class ButtonLink;
  */
 class CommitInfoPanel : public QFrame
 {
+   Q_OBJECT
+
 public:
    /**
     * @brief CommitInfoPanel Default constructor.

@@ -112,3 +112,6 @@ macos{
 
    QMAKE_EXTRA_TARGETS += dmg
 }
+
+TRANSLATIONS += \
+   $$PWD/src/resources/translations/gitqlient_en.ts
