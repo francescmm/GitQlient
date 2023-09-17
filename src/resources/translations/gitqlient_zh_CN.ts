@@ -2939,7 +2939,7 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <message>
         <location filename="../../big_widgets/MergeWidget.cpp" line="38"/>
         <source>Abort merge</source>
-        <translation>关于合并</translation>
+        <translation>中止合并</translation>
     </message>
     <message>
         <location filename="../../big_widgets/MergeWidget.cpp" line="47"/>
