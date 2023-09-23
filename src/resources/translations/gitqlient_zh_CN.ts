@@ -18,31 +18,26 @@
     <name>AddSubmoduleDlg</name>
     <message>
         <location filename="../../branches/AddSubmoduleDlg.ui" line="14"/>
-        <location filename="../../../ui_AddSubmoduleDlg.h" line="74"/>
         <source>Add new submodule</source>
         <translation>添加新子模块</translation>
     </message>
     <message>
         <location filename="../../branches/AddSubmoduleDlg.ui" line="20"/>
-        <location filename="../../../ui_AddSubmoduleDlg.h" line="75"/>
         <source>Set URL</source>
         <translation>设置链接</translation>
     </message>
     <message>
         <location filename="../../branches/AddSubmoduleDlg.ui" line="27"/>
-        <location filename="../../../ui_AddSubmoduleDlg.h" line="76"/>
         <source>Set name</source>
         <translation>设置名字</translation>
     </message>
     <message>
         <location filename="../../branches/AddSubmoduleDlg.ui" line="34"/>
-        <location filename="../../../ui_AddSubmoduleDlg.h" line="77"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
         <location filename="../../branches/AddSubmoduleDlg.ui" line="54"/>
-        <location filename="../../../ui_AddSubmoduleDlg.h" line="78"/>
         <source>Accept</source>
         <translation>确定</translation>
     </message>
@@ -51,43 +46,36 @@
     <name>AddSubtreeDlg</name>
     <message>
         <location filename="../../branches/AddSubtreeDlg.ui" line="14"/>
-        <location filename="../../../ui_AddSubtreeDlg.h" line="89"/>
         <source>Add new subtree</source>
         <translation>添加新子树</translation>
     </message>
     <message>
         <location filename="../../branches/AddSubtreeDlg.ui" line="20"/>
-        <location filename="../../../ui_AddSubtreeDlg.h" line="90"/>
         <source>Accept</source>
         <translation>确定</translation>
     </message>
     <message>
         <location filename="../../branches/AddSubtreeDlg.ui" line="40"/>
-        <location filename="../../../ui_AddSubtreeDlg.h" line="91"/>
         <source>Set URL</source>
         <translation>设置链接</translation>
     </message>
     <message>
         <location filename="../../branches/AddSubtreeDlg.ui" line="47"/>
-        <location filename="../../../ui_AddSubtreeDlg.h" line="92"/>
         <source>Set prefix</source>
         <translation>设置路径</translation>
     </message>
     <message>
         <location filename="../../branches/AddSubtreeDlg.ui" line="54"/>
-        <location filename="../../../ui_AddSubtreeDlg.h" line="93"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
         <location filename="../../branches/AddSubtreeDlg.ui" line="61"/>
-        <location filename="../../../ui_AddSubtreeDlg.h" line="94"/>
         <source>Set reference</source>
         <translation>设置引用</translation>
     </message>
     <message>
         <location filename="../../branches/AddSubtreeDlg.ui" line="68"/>
-        <location filename="../../../ui_AddSubtreeDlg.h" line="95"/>
         <source>Squash commits</source>
         <translation>压缩提交</translation>
     </message>
@@ -334,37 +322,31 @@
     <name>BranchDlg</name>
     <message>
         <location filename="../../aux_widgets/BranchDlg.ui" line="26"/>
-        <location filename="../../../ui_BranchDlg.h" line="124"/>
         <source>Dialog</source>
         <translation>对话框</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/BranchDlg.ui" line="136"/>
-        <location filename="../../../ui_BranchDlg.h" line="130"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/BranchDlg.ui" line="129"/>
-        <location filename="../../../ui_BranchDlg.h" line="129"/>
         <source>Set the branch name</source>
         <translation>设置分支名称</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/BranchDlg.ui" line="69"/>
-        <location filename="../../../ui_BranchDlg.h" line="125"/>
         <source>Current branch:</source>
         <translation>当前分支：</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/BranchDlg.ui" line="99"/>
-        <location filename="../../../ui_BranchDlg.h" line="127"/>
         <source>Create</source>
         <translation>创建</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/BranchDlg.ui" line="122"/>
-        <location filename="../../../ui_BranchDlg.h" line="128"/>
         <source>Same as remote branch name</source>
         <translation>与远程分支名称相同</translation>
     </message>
@@ -651,55 +633,46 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>CommitChangesWidget</name>
     <message>
         <location filename="../../commits/CommitChangesWidget.ui" line="14"/>
-        <location filename="../../../ui_CommitChangesWidget.h" line="164"/>
         <source>Commit changes</source>
         <translation>提交更改</translation>
     </message>
     <message>
         <location filename="../../commits/CommitChangesWidget.ui" line="93"/>
-        <location filename="../../../ui_CommitChangesWidget.h" line="166"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
         <location filename="../../commits/CommitChangesWidget.ui" line="106"/>
-        <location filename="../../../ui_CommitChangesWidget.h" line="168"/>
         <source>Commit selected files</source>
         <translation>提交所选文件</translation>
     </message>
     <message>
         <location filename="../../commits/CommitChangesWidget.ui" line="109"/>
-        <location filename="../../../ui_CommitChangesWidget.h" line="170"/>
         <source>&amp;Amend</source>
         <translation>修改（&amp;A）</translation>
     </message>
     <message>
         <location filename="../../commits/CommitChangesWidget.ui" line="112"/>
-        <location filename="../../../ui_CommitChangesWidget.h" line="172"/>
         <source>Alt+C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../commits/CommitChangesWidget.ui" line="81"/>
-        <location filename="../../../ui_CommitChangesWidget.h" line="165"/>
         <source>Summary</source>
         <translation>概要</translation>
     </message>
     <message>
         <location filename="../../commits/CommitChangesWidget.ui" line="145"/>
-        <location filename="../../../ui_CommitChangesWidget.h" line="174"/>
         <source>Author name</source>
         <translation>作者名</translation>
     </message>
     <message>
         <location filename="../../commits/CommitChangesWidget.ui" line="152"/>
-        <location filename="../../../ui_CommitChangesWidget.h" line="175"/>
         <source>Author email</source>
         <translation>作者电子邮箱</translation>
     </message>
     <message>
         <location filename="../../commits/CommitChangesWidget.ui" line="171"/>
-        <location filename="../../../ui_CommitChangesWidget.h" line="176"/>
         <source>Description</source>
         <translation>描述</translation>
     </message>
@@ -1045,797 +1018,676 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>ConfigWidget</name>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="14"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1148"/>
         <source>Form</source>
         <translation>配置</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="57"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1150"/>
         <source>Enable developer mode</source>
         <translation>启用开发者模式</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="68"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1151"/>
         <source>Git local</source>
         <translation>本地 Git</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="73"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1152"/>
         <source>Git global</source>
         <translation>全局 Git</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="85"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1202"/>
         <source>GitQlient</source>
         <translation>GitQlient</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="109"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1153"/>
         <source>Logs</source>
         <translation>日志</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="115"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1154"/>
         <source>Disable logs</source>
         <translation>禁用日志</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="134"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1156"/>
         <source>Select folder</source>
         <translation>选择文件夹</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="145"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1159"/>
         <source>Reset to default value</source>
         <translation>重置到默认值</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="165"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1162"/>
         <source>Set log level</source>
         <translation>设置日志级别</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="173"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1163"/>
         <source>Trace</source>
         <translation>跟踪</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="178"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1164"/>
         <source>Debug</source>
         <translation>调试</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="183"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1165"/>
         <source>Info</source>
         <translation>信息</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="188"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1166"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="193"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1167"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="198"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1168"/>
         <source>Fatal</source>
         <translation>致命</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="206"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1170"/>
         <source>Logs location</source>
         <translation>日志位置</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="213"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1171"/>
         <source>Logs space used:</source>
         <translation>日志占用空间：</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="232"/>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="873"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1173"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1238"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="883"/>
         <source>Clear</source>
         <translation>清除</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="257"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1174"/>
         <source>GitQlient styles</source>
         <translation>GitQlient 样式</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="263"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1175"/>
         <source>Editor font size</source>
         <translation>编辑器字体大小</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="270"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1176"/>
         <source> pt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="277"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1177"/>
         <source>Styles schema</source>
         <translation>样式方案</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="285"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1178"/>
         <source>dark</source>
         <translation>暗</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="290"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1179"/>
         <source>bright</source>
         <translation>亮</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="298"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1181"/>
         <source>Commit title max. length</source>
         <translation>提交标题最大长度</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="315"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1182"/>
         <source>External config</source>
         <translation>外部配置</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="321"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1183"/>
         <source>Git Location (if not in PATH)</source>
         <translation>Git 位置（如果不在路径变量中）</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="328"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1184"/>
         <source>Git location...</source>
         <translation>Git 位置</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="335"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1185"/>
         <source>External file browser</source>
         <translation>外部文件浏览器</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="345"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1186"/>
         <source>External editor (IDE)</source>
         <translation>外部编辑器（集成开发环境）</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="378"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1187"/>
         <source>Terminal color scheme</source>
         <translation>终端颜色方案</translation>
     </message>
     <message>
         <location filename="../../big_widgets/ConfigWidget.ui" line="390"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1188"/>
         <source>General</source>
         <translation>通用</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="396"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1189"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="403"/>
         <source>Default diff view</source>
         <translation>默认差异视图</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="403"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1190"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="436"/>
         <source>Single click on file to open diff view (needs restart) </source>
         <translation>单击文件打开差异视图（需要重启）</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="418"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1192"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="411"/>
         <source>Hunks</source>
         <translation>块</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="423"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1193"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="416"/>
         <source>Unified</source>
         <translation>一体</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="428"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1194"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="421"/>
         <source>Split</source>
         <translation>分屏</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="437"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1196"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="444"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="442"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1197"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="449"/>
         <source>_</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="447"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1198"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="454"/>
         <source>/</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="455"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1200"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="429"/>
         <source>Branch seprator (when space is used):</source>
         <translation>分支分隔符（使用空格时）</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="478"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1201"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="462"/>
+        <source>Language:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="488"/>
         <source>Features tour</source>
         <translation>功能导览</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="489"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1253"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="499"/>
         <source>Repository</source>
         <translation>仓库</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="565"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1204"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="575"/>
         <source>All commits</source>
         <translation>所有提交</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="568"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1205"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="578"/>
         <source> last commits</source>
         <translation> 最新提交</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="584"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1206"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="594"/>
         <source>Show submodules</source>
         <translation>显示子模块</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="591"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1207"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="601"/>
         <source>Cache space used:</source>
         <translation>缓存占用空间：</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="598"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1208"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="608"/>
         <source>Delete remote branches folder</source>
         <translation>删除远程分支文件夹</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="605"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1209"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="615"/>
         <source>Pull strategy:</source>
         <translation>拉取合并策略</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="612"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1210"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="622"/>
         <source>Never</source>
         <translation>不自动拉取</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="615"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1211"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="625"/>
         <source> minutes</source>
         <translation> 分钟</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="631"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1212"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="641"/>
         <source>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</source>
         <translation>设置间隔几分钟。在0（表示禁用）和60之间选择一个值。</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="641"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1213"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="651"/>
         <source>Show stashes</source>
         <translation>显示贮藏</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="658"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1215"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="668"/>
         <source>Auto-Fetch interval</source>
         <translation>自动拉取间隔</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="665"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1216"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="675"/>
         <source>Show subtrees</source>
         <translation>显示子树</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="675"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1217"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="685"/>
         <source>Prune when fetch</source>
         <translation>拉取时清理</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="682"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1218"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="692"/>
         <source>Credentials configuration</source>
         <translation>凭证</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="703"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1219"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="713"/>
         <source>Store credentials using GitQlient (Current session or in Storage)</source>
         <translation>使用 GitQlient 存储凭证（当前会话或存储空间中）</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="713"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1220"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="723"/>
         <source>Storage</source>
         <translation>存储空间</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="723"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1221"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="733"/>
         <source>Cache for current session</source>
         <translation>缓存到当前会话</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="747"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1222"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="757"/>
         <source>TextLabel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="754"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1223"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="764"/>
         <source> mins.</source>
         <translation> 分钟</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="772"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1224"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="782"/>
         <source>Add credentials</source>
         <translation>添加凭证</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="783"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1225"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="793"/>
         <source>Author date order</source>
         <translation>作者日期顺序</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="788"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1226"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="798"/>
         <source>Date order</source>
         <translation>日期顺序</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="793"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1227"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="803"/>
         <source>Topo order</source>
         <translation>拓扑顺序</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="802"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1229"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="812"/>
         <source>Merge (default)</source>
         <translation>合并（默认）</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="807"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1230"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="817"/>
         <source>Rebase</source>
         <translation>变基</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="812"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1231"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="822"/>
         <source>Fast-forward only</source>
         <translation>仅快进</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="820"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1233"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="830"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="827"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1234"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="837"/>
         <source>Max. commits to retrieve (0 for all)</source>
         <translation>最大检索提交（0 为全部）</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="834"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1235"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="844"/>
         <source>Show remote branches</source>
         <translation>显示远程分支</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="895"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1239"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="905"/>
         <source>Enable pomodoro</source>
         <translation>启用番茄钟</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="902"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1240"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="912"/>
         <source>Show local branches</source>
         <translation>显示本地分支</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="930"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1244"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="940"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run clang-format before commit&lt;br/&gt;(Requires clang-format)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;提交前运行 clang-format&lt;br/&gt;（需要安装 clang-format）&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="944"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1246"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="954"/>
         <source>Order of commits in the graph</source>
         <translation>图表中提交的顺序</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="961"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1248"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="971"/>
         <source>Update submodules when pull</source>
         <translation>拉取合并时更新子模块</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="968"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1249"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="978"/>
         <source>Show tags</source>
         <translation>显示标签</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1004"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1263"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1014"/>
         <source>Plugins</source>
         <translation>插件</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1017"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1254"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1027"/>
         <source>Plugins folder:</source>
         <translation>插件文件夹</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1032"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1255"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1042"/>
         <source>To be able to download plugins, first you need to define a folder.</source>
         <translation>为了能够下载插件，首先需要定义一个文件夹。</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1039"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1256"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1049"/>
         <source>Installed plugins</source>
         <translation>已安装插件</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1062"/>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1173"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1257"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1261"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1072"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1183"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1074"/>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1185"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1258"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1262"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1084"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1195"/>
         <source>Version</source>
         <translation>版本</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1092"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1259"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1102"/>
         <source>Enabled</source>
         <translation>启用</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1150"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1260"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1160"/>
         <source>Official GitQlient plugins</source>
         <translation>GitQlient 官方插件</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1212"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1299"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1222"/>
         <source>Shortcuts</source>
         <translation>快捷键</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1234"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1264"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1244"/>
         <source>Branches panel</source>
         <translation>分支面板</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1240"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1265"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1250"/>
         <source>Ctrl + B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1247"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1266"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1257"/>
         <source>Toggle minimalistic branch view:</source>
         <translation>切换极简分支视图</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1254"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1267"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1264"/>
         <source>Delete selected branch:</source>
         <translation>删除所选分支</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1261"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1268"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1271"/>
         <source>Supr</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1271"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1269"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1281"/>
         <source>GitQlient repo operations</source>
         <translation>GitQlient 仓库操作</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1277"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1270"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1287"/>
         <source>Ctrl + W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1284"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1271"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1294"/>
         <source>Ctrl + I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1291"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1272"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1301"/>
         <source>Close repository:</source>
         <translation>关闭仓库</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1298"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1273"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1308"/>
         <source>Ctrl + N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1305"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1274"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1315"/>
         <source>New repository:</source>
         <translation>新建仓库</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1312"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1275"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1322"/>
         <source>Clone repository:</source>
         <translation>克隆仓库</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1319"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1276"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1329"/>
         <source>Ctrl + O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1326"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1277"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1336"/>
         <source>Open repository:</source>
         <translation>打开仓库</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1336"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1278"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1346"/>
         <source>GitQlient general</source>
         <translation>GitQlient 通用</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1342"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1279"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1352"/>
         <source>Ctrl + 3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1349"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1280"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1359"/>
         <source>Ctrl + 7</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1356"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1281"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1366"/>
         <source>Ctrl + 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1363"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1282"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1373"/>
         <source>Go to History view:</source>
         <translation>转到历史视图</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1370"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1283"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1380"/>
         <source>Push changes:</source>
         <translation>推送更改</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1377"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1284"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1387"/>
         <source>Go to Terminal view (if available):</source>
         <translation>转到终端视图（如果可用）</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1384"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1285"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1394"/>
         <source>Ctrl + 8</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1391"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1286"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1401"/>
         <source>Pull changes:</source>
         <translation>拉取合并更改</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1398"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1287"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1408"/>
         <source>Ctrl + 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1405"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1288"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1415"/>
         <source>Ctrl + 6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1412"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1289"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1422"/>
         <source>Go to Blame view:</source>
         <translation>转到追溯视图</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1419"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1290"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1429"/>
         <source>Ctrl + 4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1426"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1291"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1436"/>
         <source>Go to Git Server view:</source>
         <translation>转到 Git 服务器视图</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1433"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1292"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1443"/>
         <source>Ctrl + 5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1440"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1293"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1450"/>
         <source>Go to Diff view:</source>
         <translation>转到差异视图</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1447"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1294"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1457"/>
         <source>Go to Config view:</source>
         <translation>转到配置视图</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1454"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1295"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1464"/>
         <source>Go to Jenkins view:</source>
         <translation>转到 Jenkins 视图</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1461"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1296"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1471"/>
         <source>Ctrl + 9</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1468"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1297"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1478"/>
         <source>F5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.ui" line="1475"/>
-        <location filename="../../../ui_ConfigWidget.h" line="1298"/>
+        <location filename="../../big_widgets/ConfigWidget.ui" line="1485"/>
         <source>Refresh:</source>
         <translation>刷新</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="72"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="73"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="282"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="287"/>
         <source>Dependencies needed!</source>
         <translation>需要依赖！</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="283"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="288"/>
         <source>This plugin needs some dependencies to work. Please make sure you have them installed:&lt;br&gt;&lt;br&gt;%1</source>
         <translation>这个插件需要一些依赖项才能工作。请确保已安装：&lt;br&gt;&lt;br&gt;%1</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="299"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="304"/>
         <source>Reset needed</source>
         <translation>需要重启</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="299"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="304"/>
         <source>You need to restart GitQlient to load the plugins.</source>
         <translation>需要重新启动 GitQlient 以加载插件。</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="362"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="367"/>
         <source>Changes saved</source>
         <translation>已保存更改</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="392"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="398"/>
         <source>Reset needed!</source>
         <translation>需要重启！</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="393"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="399"/>
         <source>You need to restart GitQlient to see the changes in the styles applied.</source>
         <translation>需要重新启动 GitQlient 以查看应用的样式更改。</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="483"/>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="545"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="489"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="551"/>
         <source>Restart needed!</source>
         <translation>需要重启！</translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="484"/>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="546"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="490"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="552"/>
         <source>The folder chosen to store GitQlient logs is: &lt;br&gt; &lt;strong&gt;%1&lt;/strong&gt;. If you confirm the change, GitQlient will move all the logs to that folder. Once done, GitQlient will close. You need to restart it.</source>
         <translation>选择用于存储 GitQlient 日志的文件夹为：&lt;br&gt;&lt;strong&gt;%1&lt;/strong&gt;。如果确认更改，GitQlient 将把所有日志移到该文件夹中。完成后，GitQlient 将关闭，需要重新启动。</translation>
     </message>
@@ -1937,67 +1789,56 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>CreateRepoDlg</name>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="71"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="131"/>
         <source>Open repository after %1</source>
         <translation>在 %1 之后打开仓库</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="20"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="126"/>
         <source>Browse...</source>
         <translation>浏览</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="54"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="129"/>
         <source>Config Git user for this repo</source>
         <translation>为仓库配置 Git 用户</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="95"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="134"/>
         <source>Git user name</source>
         <translation>Git 用户名</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="109"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="136"/>
         <source>Us as default clone directory </source>
         <translation>作为默认的克隆目录</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="88"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="133"/>
         <source>Repository destination</source>
         <translation>仓库目的地</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="102"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="135"/>
         <source>URL</source>
         <translation>链接</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="27"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="127"/>
         <source>Repository name</source>
         <translation>仓库名</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="64"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="130"/>
         <source>Accept</source>
         <translation>确定</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="34"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="128"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/CreateRepoDlg.ui" line="81"/>
-        <location filename="../../../ui_CreateRepoDlg.h" line="132"/>
         <source>Git user email</source>
         <translation>Git 用户电子邮箱</translation>
     </message>
@@ -2033,7 +1874,6 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>CredentialsDlg</name>
     <message>
         <location filename="../../aux_widgets/CredentialsDlg.ui" line="26"/>
-        <location filename="../../../ui_CredentialsDlg.h" line="68"/>
         <source>Credentials</source>
         <translation>凭证</translation>
     </message>
@@ -2335,72 +2175,82 @@ To enable, go to the Configuration panel, Repository tab.</source>
         <translation>Git 位置</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="72"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="46"/>
+        <source>dark</source>
+        <translation type="unfinished">暗</translation>
+    </message>
+    <message>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="47"/>
+        <source>bright</source>
+        <translation type="unfinished">亮</translation>
+    </message>
+    <message>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="74"/>
         <source>Disable logs</source>
         <translation>禁用日志</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="74"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="76"/>
         <source>Set log level</source>
         <translation>设置日志级别</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="76"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="78"/>
         <source>Styles schema</source>
         <translation>样式方案</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="78"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="80"/>
         <source>Git location (if not in PATH):</source>
         <translation>Git 位置（如果不在路径变量中）</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="81"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="83"/>
         <source>Export config...</source>
         <translation>导出配置</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="86"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="88"/>
         <source>Import config...</source>
         <translation>导入配置</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="115"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="117"/>
         <source>Reset needed!</source>
         <translation>需要重启！</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="116"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="118"/>
         <source>You need to restart GitQlient to see the changes in the styles applid.</source>
         <translation>需要重新启动 GitQlient 以查看应用的样式更改。</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="132"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="134"/>
         <source>Select a config file...</source>
         <translation>选择配置文件</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="154"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="156"/>
         <source>External configuration loaded!</source>
         <translation>外部配置已加载！</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="155"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="157"/>
         <source>The configuration has been loaded successfully. Remember to apply the changes.</source>
         <translation>配置加载成功。记住应用这些更改。</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="165"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="167"/>
         <source>Select a folder...</source>
         <translation>选择文件夹</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="188"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="190"/>
         <source>Configuration exported!</source>
         <translation>配置已导出！</translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="189"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="191"/>
         <source>The configuration has been stored in {%1}</source>
         <translation>配置已存储在 {%1}</translation>
     </message>
@@ -2422,37 +2272,31 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>GitConfigDlg</name>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="14"/>
-        <location filename="../../../ui_GitConfigDlg.h" line="82"/>
         <source>Git Config</source>
         <translation>Git 配置</translation>
     </message>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="35"/>
-        <location filename="../../../ui_GitConfigDlg.h" line="83"/>
         <source>Global Git name</source>
         <translation>全局 Git 名称</translation>
     </message>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="42"/>
-        <location filename="../../../ui_GitConfigDlg.h" line="84"/>
         <source>Global Git email</source>
         <translation>全局 Git 电子邮箱</translation>
     </message>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="49"/>
-        <location filename="../../../ui_GitConfigDlg.h" line="85"/>
         <source>User global settings</source>
         <translation>用户全局设置</translation>
     </message>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="56"/>
-        <location filename="../../../ui_GitConfigDlg.h" line="86"/>
         <source>Local Git name</source>
         <translation>本地 Git 名称</translation>
     </message>
     <message>
         <location filename="../../config/GitConfigDlg.ui" line="63"/>
-        <location filename="../../../ui_GitConfigDlg.h" line="87"/>
         <source>Local Git email</source>
         <translation>本地 Git 电子邮箱</translation>
     </message>
@@ -2785,109 +2629,91 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>InitialRepoConfig</name>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="26"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="217"/>
         <source>Repo config</source>
         <translation>仓库配置</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="99"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="223"/>
         <source> last commits</source>
         <translation> 最新提交</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="64"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="220"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="32"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="218"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is the first time you open this repository. GitQlient includes some parameters to help you to configure the it. Please, take a moment to change them if you&apos;d like.&lt;/p&gt;&lt;p&gt;If you already have configured some of them, they will show the already set value.&lt;/p&gt;&lt;p&gt;You can modify these values at any moment using the &lt;span style=&quot; font-style:italic;&quot;&gt;Config &lt;/span&gt;button in the top icons list of GitQlient.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;首次打开此仓库。GitQlient 包含一些参数来帮助配置它。如果愿意的话，请花点时间更改一下。&lt;/p&gt;&lt;p&gt;如果已经配置了其中的一些，它们应当显示已经设置的值。&lt;/p&gt;&lt;p&gt;随时可以使用 GitQlient 顶部图标列表中的&lt;span style=&quot; font-style:italic;&quot;&gt;配置&lt;/span&gt;按钮修改这些值。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="96"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="222"/>
         <source>All commits</source>
         <translation>所有提交</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="115"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="224"/>
         <source>Max. commits to retrieve (0 for all)</source>
         <translation>最大检索提交（0 为全部）</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="162"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="228"/>
         <source>Never</source>
         <translation>不自动拉取</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="178"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="230"/>
         <source>Update submodules when pull</source>
         <translation>拉取合并时更新子模块</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="185"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="231"/>
         <source>Credentials configuration</source>
         <translation>凭证</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="206"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="232"/>
         <source>Storage</source>
         <translation>存储空间</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="216"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="233"/>
         <source>Store credentials using GitQlient (Current session or in Storage)</source>
         <translation>使用 GitQlient 存储凭证（当前会话或存储空间中）</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="226"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="234"/>
         <source>Cache</source>
         <translation>缓存</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="244"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="235"/>
         <source>Timeout:</source>
         <translation>超时</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="251"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="236"/>
         <source> mins.</source>
         <translation> 分钟</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="165"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="229"/>
         <source> minutes</source>
         <translation> 分钟</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="132"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="226"/>
         <source>Auto-Fetch interval</source>
         <translation>自动拉取间隔</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="139"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="227"/>
         <source>The interval is expected to be in minutes. Choose a value between 0 (for disabled) and 60.</source>
         <translation>设置间隔几分钟。在0（表示禁用）和60之间选择一个值。</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InitialRepoConfig.ui" line="73"/>
-        <location filename="../../../ui_InitialRepoConfig.h" line="221"/>
         <source>Prune when fetch</source>
         <translation>拉取时清理</translation>
     </message>
@@ -2896,25 +2722,21 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>InputShaDlg</name>
     <message>
         <location filename="../../aux_widgets/InputShaDlg.ui" line="26"/>
-        <location filename="../../../ui_InputShaDlg.h" line="74"/>
         <source>Dialog</source>
         <translation>对话框</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InputShaDlg.ui" line="32"/>
-        <location filename="../../../ui_InputShaDlg.h" line="75"/>
         <source>Reset</source>
         <translation>重置</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InputShaDlg.ui" line="39"/>
-        <location filename="../../../ui_InputShaDlg.h" line="76"/>
         <source>Commit SHA to reset the branch</source>
         <translation>提交安全散列算法值重置分支</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/InputShaDlg.ui" line="75"/>
-        <location filename="../../../ui_InputShaDlg.h" line="77"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
@@ -3026,31 +2848,26 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>NewVersionInfoDlg</name>
     <message>
         <location filename="../../aux_widgets/NewVersionInfoDlg.ui" line="14"/>
-        <location filename="../../../ui_NewVersionInfoDlg.h" line="116"/>
         <source>What&apos;s new in GitQlient?</source>
         <translation>GitQlient 有什么新功能?</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/NewVersionInfoDlg.ui" line="95"/>
-        <location filename="../../../ui_NewVersionInfoDlg.h" line="118"/>
         <source>Don&apos;t show again (accessible through the config)</source>
         <translation>不再显示（可通过配置访问）</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/NewVersionInfoDlg.ui" line="115"/>
-        <location filename="../../../ui_NewVersionInfoDlg.h" line="119"/>
         <source>Previous</source>
         <translation>上一个</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/NewVersionInfoDlg.ui" line="122"/>
-        <location filename="../../../ui_NewVersionInfoDlg.h" line="120"/>
         <source>Next</source>
         <translation>下一个</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/NewVersionInfoDlg.ui" line="129"/>
-        <location filename="../../../ui_NewVersionInfoDlg.h" line="121"/>
         <source>Close</source>
         <translation>关闭</translation>
     </message>
@@ -3182,19 +2999,16 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>PomodoroConfigDlg</name>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="14"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="255"/>
         <source>Pomodoro configuration</source>
         <translation>番茄钟配置</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="41"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="256"/>
         <source>Pomodoro duration</source>
         <translation>番茄钟时间</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="61"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="257"/>
         <source>25</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3202,69 +3016,56 @@ To enable, go to the Configuration panel, Repository tab.</source>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="68"/>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="125"/>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="179"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="258"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="261"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="264"/>
         <source>minutes</source>
         <translation>分钟</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="98"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="259"/>
         <source>Break duration</source>
         <translation>休息时间</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="118"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="260"/>
         <source>5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="152"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="262"/>
         <source>Long break duration</source>
         <translation>长休息时间</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="172"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="263"/>
         <source>15</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="209"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="265"/>
         <source>Long break after:</source>
         <translation>多少次之后进入长休息时间</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="216"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="266"/>
         <source> pomodoros</source>
         <translation> 次番茄钟</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="239"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="267"/>
         <source>Enable alarm sound:</source>
         <translation>启用闹钟声音</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="253"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="269"/>
         <source>Reset counter when stop:</source>
         <translation>停止时复位计数器</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="274"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="271"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/PomodoroConfigDlg.ui" line="294"/>
-        <location filename="../../../ui_PomodoroConfigDlg.h" line="272"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
@@ -3273,7 +3074,6 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>PullDlg</name>
     <message>
         <location filename="../../aux_widgets/PullDlg.ui" line="14"/>
-        <location filename="../../../ui_PullDlg.h" line="67"/>
         <source>Dialog</source>
         <translation>对话框</translation>
     </message>
@@ -3327,26 +3127,21 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <message>
         <location filename="../../aux_widgets/SquashDlg.ui" line="26"/>
         <location filename="../../aux_widgets/SquashDlg.ui" line="150"/>
-        <location filename="../../../ui_SquashDlg.h" line="133"/>
-        <location filename="../../../ui_SquashDlg.h" line="138"/>
         <source>Squash</source>
         <translation>压缩</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/SquashDlg.ui" line="96"/>
-        <location filename="../../../ui_SquashDlg.h" line="134"/>
         <source>Summary</source>
         <translation>概要</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/SquashDlg.ui" line="119"/>
-        <location filename="../../../ui_SquashDlg.h" line="136"/>
         <source>Description</source>
         <translation>描述</translation>
     </message>
     <message>
         <location filename="../../aux_widgets/SquashDlg.ui" line="130"/>
-        <location filename="../../../ui_SquashDlg.h" line="137"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
@@ -3423,31 +3218,26 @@ To enable, go to the Configuration panel, Repository tab.</source>
     <name>TagDlg</name>
     <message>
         <location filename="../../branches/TagDlg.ui" line="14"/>
-        <location filename="../../../ui_TagDlg.h" line="74"/>
         <source>Create tag</source>
         <translation>创建标签</translation>
     </message>
     <message>
         <location filename="../../branches/TagDlg.ui" line="20"/>
-        <location filename="../../../ui_TagDlg.h" line="75"/>
         <source>Tag name</source>
         <translation>标签名</translation>
     </message>
     <message>
         <location filename="../../branches/TagDlg.ui" line="27"/>
-        <location filename="../../../ui_TagDlg.h" line="76"/>
         <source>Tag message</source>
         <translation>标签信息</translation>
     </message>
     <message>
         <location filename="../../branches/TagDlg.ui" line="34"/>
-        <location filename="../../../ui_TagDlg.h" line="77"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
         <location filename="../../branches/TagDlg.ui" line="54"/>
-        <location filename="../../../ui_TagDlg.h" line="78"/>
         <source>Accept</source>
         <translation>确定</translation>
     </message>

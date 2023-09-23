@@ -1636,54 +1636,54 @@ To enable, go to the Configuration panel, Repository tab.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="72"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="73"/>
         <source>Save</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="282"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="287"/>
         <source>Dependencies needed!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="283"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="288"/>
         <source>This plugin needs some dependencies to work. Please make sure you have them installed:&lt;br&gt;&lt;br&gt;%1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="299"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="304"/>
         <source>Reset needed</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="299"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="304"/>
         <source>You need to restart GitQlient to load the plugins.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="362"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="367"/>
         <source>Changes saved</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="392"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="398"/>
         <source>Reset needed!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="393"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="399"/>
         <source>You need to restart GitQlient to see the changes in the styles applied.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="483"/>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="545"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="489"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="551"/>
         <source>Restart needed!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="484"/>
-        <location filename="../../big_widgets/ConfigWidget.cpp" line="546"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="490"/>
+        <location filename="../../big_widgets/ConfigWidget.cpp" line="552"/>
         <source>The folder chosen to store GitQlient logs is: &lt;br&gt; &lt;strong&gt;%1&lt;/strong&gt;. If you confirm the change, GitQlient will move all the logs to that folder. Once done, GitQlient will close. You need to restart it.</source>
         <translation></translation>
     </message>
@@ -2170,72 +2170,82 @@ To enable, go to the Configuration panel, Repository tab.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="72"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="46"/>
+        <source>dark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="47"/>
+        <source>bright</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="74"/>
         <source>Disable logs</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="74"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="76"/>
         <source>Set log level</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="76"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="78"/>
         <source>Styles schema</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="78"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="80"/>
         <source>Git location (if not in PATH):</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="81"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="83"/>
         <source>Export config...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="86"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="88"/>
         <source>Import config...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="115"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="117"/>
         <source>Reset needed!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="116"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="118"/>
         <source>You need to restart GitQlient to see the changes in the styles applid.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="132"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="134"/>
         <source>Select a config file...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="154"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="156"/>
         <source>External configuration loaded!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="155"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="157"/>
         <source>The configuration has been loaded successfully. Remember to apply the changes.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="165"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="167"/>
         <source>Select a folder...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="188"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="190"/>
         <source>Configuration exported!</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../config/GeneralConfigDlg.cpp" line="189"/>
+        <location filename="../../config/GeneralConfigDlg.cpp" line="191"/>
         <source>The configuration has been stored in {%1}</source>
         <translation></translation>
     </message>
