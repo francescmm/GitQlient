@@ -356,7 +356,10 @@ void GitQlient::addRepoTab(const QString &repoPath)
 
 void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
 {
-   const auto repoPath = QFileInfo(repoPathArg).canonicalFilePath();
+   auto repoPath = QFileInfo(repoPathArg).canonicalFilePath();
+
+   QSharedPointer<GitBase> git(new GitBase(repoPath));
+   repoPath = git->getTopLevelRepo(repoPath);
 
    if (!mCurrentRepos.contains(repoPath))
    {
@@ -375,7 +378,6 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
             return;
          }
 
-         QSharedPointer<GitBase> git(new GitBase(repoPath));
          QSharedPointer<GitQlientSettings> settings(new GitQlientSettings(git->getGitDir()));
 
          conditionallyOpenPreConfigDlg(git, settings);

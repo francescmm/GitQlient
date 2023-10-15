@@ -35,6 +35,13 @@ CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, cons
    connect(header(), &QHeaderView::customContextMenuRequested, this, &CommitHistoryView::onHeaderContextMenu);
 
    connect(mCache.get(), &GitCache::signalCacheUpdated, this, &CommitHistoryView::refreshView);
+   connect(this, &CommitHistoryView::doubleClicked, this, [this](const QModelIndex &index) {
+      if (mCommitHistoryModel)
+      {
+         const auto sha = mCommitHistoryModel->sha(index.row());
+         emit signalOpenDiff(sha);
+      }
+   });
 }
 
 void CommitHistoryView::setModel(QAbstractItemModel *model)
@@ -198,6 +205,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
          connect(menu, &CommitHistoryContextMenu::fullReload, this, &CommitHistoryView::fullReload);
          connect(menu, &CommitHistoryContextMenu::referencesReload, this, &CommitHistoryView::referencesReload);
          connect(menu, &CommitHistoryContextMenu::logReload, this, &CommitHistoryView::logReload);
+         connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
          connect(menu, &CommitHistoryContextMenu::signalMergeRequired, this, &CommitHistoryView::signalMergeRequired);
          connect(menu, &CommitHistoryContextMenu::mergeSqushRequested, this, &CommitHistoryView::mergeSqushRequested);

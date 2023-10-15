@@ -43,6 +43,12 @@ signals:
    void referencesReload();
    void logReload();
 
+   /**
+    * @brief Signal triggered when the user wants to open the diff of a commit compared to its parent.
+    * @param sha The SHA to diff.
+    */
+   void signalOpenDiff(const QString &sha);
+
    /*!
     \brief Signal triggered when the user wants to amend a commit.
 

@@ -188,6 +188,13 @@ private:
 
    */
    void updateUiFromWatcher();
+
+   /**
+    * @brief Opens the diff view with the selected commit from the repository view.
+    * @param currentSha The current selected commit SHA.
+    */
+   void openCommitDiff(const QString currentSha);
+
    /*!
     \brief Method called when changes are committed through the WIP widget.
 

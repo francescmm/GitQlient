@@ -123,6 +123,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
            &ConfigWidget::onPanelsVisibilityChanged);
    connect(mHistoryWidget, &HistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
    connect(mHistoryWidget, &HistoryWidget::signalShowDiff, this, &GitQlientRepo::loadFileDiff);
+   connect(mHistoryWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
    connect(mHistoryWidget, &HistoryWidget::changesCommitted, this, &GitQlientRepo::onChangesCommitted);
    connect(mHistoryWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, mControls, &Controls::activateMergeWarning);
@@ -198,6 +199,19 @@ void GitQlientRepo::updateUiFromWatcher()
    mHistoryWidget->updateUiFromWatcher();
 
    mDiffWidget->reload();
+}
+
+void GitQlientRepo::openCommitDiff(const QString currentSha)
+{
+   const auto rev = mGitQlientCache->commitInfo(currentSha);
+   const auto loaded = mDiffWidget->loadCommitDiff(currentSha, rev.firstParent());
+
+   if (loaded)
+   {
+      mControls->enableDiff();
+
+      showDiffView();
+   }
 }
 
 void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)

@@ -9,6 +9,7 @@
 #include <CommitInfoWidget.h>
 #include <FileDiffWidget.h>
 #include <FileEditor.h>
+#include <FullDiffWidget.h>
 #include <GitBase.h>
 #include <GitBranches.h>
 #include <GitCache.h>
@@ -144,7 +145,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mRepositoryView, &CommitHistoryView::fullReload, this, &HistoryWidget::fullReload);
    connect(mRepositoryView, &CommitHistoryView::referencesReload, this, &HistoryWidget::referencesReload);
    connect(mRepositoryView, &CommitHistoryView::logReload, this, &HistoryWidget::logReload);
-
+   connect(mRepositoryView, &CommitHistoryView::signalOpenDiff, this, &HistoryWidget::onOpenFullDiff);
    connect(mRepositoryView, &CommitHistoryView::clicked, this, &HistoryWidget::commitSelected);
    connect(mRepositoryView, &CommitHistoryView::customContextMenuRequested, this, [this](const QPoint &pos) {
       const auto rowIndex = mRepositoryView->indexAt(pos);
@@ -211,10 +212,21 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
 
    connect(mReturnFromFull, &QPushButton::clicked, this, &HistoryWidget::returnToView);
 
+   mFullDiffWidget = new FullDiffWidget(mGit, mCache);
+
+   const auto fullFrame = new QFrame();
+   const auto fullLayout = new QGridLayout(fullFrame);
+   fullLayout->setSpacing(10);
+   fullLayout->setContentsMargins(QMargins());
+   fullLayout->addWidget(mReturnFromFull, 0, 0);
+   fullLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
+   fullLayout->addWidget(mFullDiffWidget, 1, 0, 1, 2);
+
    mCenterStackedWidget = new QStackedWidget();
    mCenterStackedWidget->setMinimumWidth(600);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mWipFileDiff);
+   mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FullDiff), fullFrame);
 
    connect(mWipFileDiff, &FileDiffWidget::exitRequested, this, &HistoryWidget::returnToView);
    connect(mWipFileDiff, &FileDiffWidget::fileStaged, this, &HistoryWidget::signalUpdateWip);
@@ -328,6 +340,26 @@ void HistoryWidget::keyReleaseEvent(QKeyEvent *event)
       mReverseSearch = false;
 
    QFrame::keyReleaseEvent(event);
+}
+
+void HistoryWidget::onOpenFullDiff(const QString &sha)
+{
+   if (sha == ZERO_SHA)
+   {
+      const auto commit = mCache->commitInfo(ZERO_SHA);
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
+      const auto ret = git->getCommitDiff(ZERO_SHA, commit.firstParent());
+
+      if (ret.success && !ret.output.isEmpty())
+      {
+         mFullDiffWidget->loadDiff(ZERO_SHA, commit.firstParent(), ret.output);
+         mCenterStackedWidget->setCurrentIndex(static_cast<int>(Pages::FullDiff));
+      }
+      else
+         QMessageBox::warning(this, tr("No diff available!"), tr("There is no diff to show."));
+   }
+   else
+      emit signalOpenDiff(sha);
 }
 
 void HistoryWidget::rearrangeSplittrer(bool minimalActive)

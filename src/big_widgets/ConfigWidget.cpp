@@ -207,8 +207,10 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->pbFeaturesTour, &QPushButton::clicked, this, &ConfigWidget::showFeaturesTour);
    connect(ui->chSingleClickDiffView, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbDiffView, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->cbBranchSeparator, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
 
-   ui->cbDiffView->setCurrentIndex(0);
+   ui->cbDiffView->setCurrentIndex(settings.globalValue("DefaultDiffView").toInt());
+   ui->cbBranchSeparator->setCurrentText(settings.globalValue("BranchSeparator", "-").toString());
 
    auto size = calculateDirSize(ui->leLogsLocation->text());
    ui->lLogsSize->setText(QString("%1 KB").arg(size));
@@ -370,6 +372,7 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
    settings.setGlobalValue("singleClickDiffView", ui->chSingleClickDiffView->isChecked());
    settings.setGlobalValue("DefaultDiffView", ui->cbDiffView->currentIndex());
+   settings.setGlobalValue("BranchSeparator", ui->cbBranchSeparator->currentText());
 
    if (!ui->leEditor->text().isEmpty())
       settings.setGlobalValue("ExternalEditor", ui->leEditor->text());

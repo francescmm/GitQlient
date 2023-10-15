@@ -452,6 +452,9 @@ bool CommitChangesWidget::checkMsg(QString &msg)
    msg = QString("%1\n%2\n")
              .arg(msg.section('\n', 0, 0, QString::SectionIncludeTrailingSep), msg.section('\n', 1).trimmed());
 
+   msg.replace("'", "\'");
+   msg.replace('"', '\"');
+
    return true;
 }
 

@@ -93,6 +93,14 @@ public:
    */
    bool loadFileDiff(const QString &sha, const QString &previousSha, const QString &file);
 
+   /*!
+    \brief Loads a full commit diff.
+    \param sha The base SHA.
+    \param parentSha The SHA to compare to.
+    \return True if the load was successful, otherwise false.
+   */
+   bool loadCommitDiff(const QString &sha, const QString &parentSha);
+
    /**
     * @brief onDiffFontSizeChanged Reloads the diff widgets with the new font size stored in the settings.
     */
