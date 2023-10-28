@@ -11,7 +11,6 @@
 #include <QPushButton>
 #include <QScrollBar>
 #include <QTextCharFormat>
-#include <QTextCodec>
 #include <QVBoxLayout>
 
 FullDiffWidget::DiffHighlighter::DiffHighlighter(QTextDocument *document)

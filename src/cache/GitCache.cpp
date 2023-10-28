@@ -7,9 +7,11 @@ using namespace QLogger;
 
 GitCache::GitCache(QObject *parent)
    : QObject(parent)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
    , mCommitsMutex(QMutex::Recursive)
    , mRevisionsMutex(QMutex::Recursive)
    , mReferencesMutex(QMutex::Recursive)
+#endif
 {
 }
 

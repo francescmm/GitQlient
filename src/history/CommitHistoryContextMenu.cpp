@@ -28,6 +28,10 @@
 
 #include <QLogger.h>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#   include <QRegularExpression>
+#endif
+
 using namespace QLogger;
 
 CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache,
@@ -277,9 +281,14 @@ void CommitHistoryContextMenu::checkoutBranch()
 
    if (ret.success)
    {
-      QRegExp rx("by \\d+ commits");
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+      static QRegExp rx("by \\d+ commits");
       rx.indexIn(ret.output);
       auto value = rx.capturedTexts().constFirst().split(" ");
+#else
+      static QRegularExpression rx("by \\d+ commits");
+      auto value = rx.match(ret.output).capturedTexts().constFirst().split(" ");
+#endif
 
       if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
       {

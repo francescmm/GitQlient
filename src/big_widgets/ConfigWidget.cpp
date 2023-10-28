@@ -11,7 +11,6 @@
 #include <NewVersionInfoDlg.h>
 #include <PluginsDownloader.h>
 #include <QLogger.h>
-#include <qtermwidget_interface.h>
 
 #include <QDir>
 #include <QFileDialog>
@@ -22,6 +21,10 @@
 #include <QPushButton>
 #include <QStandardPaths>
 #include <QTimer>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#   include <qtermwidget_interface.h>
+#endif
 
 using namespace QLogger;
 
@@ -608,6 +611,7 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 
       if (labelName->text().contains("qtermwidget", Qt::CaseInsensitive))
       {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
          GitQlientSettings settings(mGit->getGitDir());
          const auto isTerminalEnabled = settings.localValue("TerminalEnabled", false).toBool();
          const auto terminal = qobject_cast<QTermWidgetInterface *>(iter.value());
@@ -640,6 +644,7 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 
             emit terminalEnabled(checked);
          });
+#endif
       }
       else if (labelName->text().contains("jenkinsplugin", Qt::CaseInsensitive))
       {
