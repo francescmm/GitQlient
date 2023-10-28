@@ -22,8 +22,8 @@ QString GitQlientStyles::getStyles()
 
    if (stylesFile.open(QIODevice::ReadOnly))
    {
-      const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
-      QFile colorsFile(QString(":/colors_%1").arg(colorSchema));
+      const auto colorSchema = GitQlientSettings().globalValue("colorSchema", 0).toInt();
+      QFile colorsFile(QString(":/colors_%1").arg(QString::fromUtf8(colorSchema ? "bright" : "dark")));
       QString colorsCss;
 
       if (colorsFile.open(QIODevice::ReadOnly))
@@ -42,44 +42,44 @@ QString GitQlientStyles::getStyles()
 
 QColor GitQlientStyles::getTextColor()
 {
-   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", 0).toInt();
 
-   return colorSchema == "bright" ? textColorBright : textColorDark;
+   return colorSchema == 1 ? textColorBright : textColorDark;
 }
 
 QColor GitQlientStyles::getGraphSelectionColor()
 {
-   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", 0).toInt();
 
-   return colorSchema == "dark" ? graphSelectionColorDark : graphSelectionColorBright;
+   return colorSchema == 0 ? graphSelectionColorDark : graphSelectionColorBright;
 }
 
 QColor GitQlientStyles::getGraphHoverColor()
 {
-   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", 0).toInt();
 
-   return colorSchema == "dark" ? graphHoverColorDark : graphHoverColorBright;
+   return colorSchema == 0 ? graphHoverColorDark : graphHoverColorBright;
 }
 
 QColor GitQlientStyles::getBackgroundColor()
 {
-   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", 0).toInt();
 
-   return colorSchema == "dark" ? graphBackgroundColorDark : graphBackgroundColorBright;
+   return colorSchema == 0 ? graphBackgroundColorDark : graphBackgroundColorBright;
 }
 
 QColor GitQlientStyles::getTabColor()
 {
-   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", 0).toInt();
 
-   return colorSchema == "dark" ? graphHoverColorDark : graphBackgroundColorBright;
+   return colorSchema == 0 ? graphHoverColorDark : graphBackgroundColorBright;
 }
 
 QColor GitQlientStyles::getBlue()
 {
-   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+   const auto colorSchema = GitQlientSettings().globalValue("colorSchema", 0).toInt();
 
-   return colorSchema == "dark" ? graphBlueDark : graphBlueBright;
+   return colorSchema == 0 ? graphBlueDark : graphBlueBright;
 }
 
 QColor GitQlientStyles::getRed()
@@ -99,16 +99,16 @@ QColor GitQlientStyles::getOrange()
 
 QColor GitQlientStyles::getShadowedRed()
 {
-   const auto colorScheme = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+   const auto colorScheme = GitQlientSettings().globalValue("colorSchema", 0).toInt();
 
-   return colorScheme == "dark" ? editorRedShadowDark : editorRedShadowBright;
+   return colorScheme == 0 ? editorRedShadowDark : editorRedShadowBright;
 }
 
 QColor GitQlientStyles::getShadowedGreen()
 {
-   const auto colorScheme = GitQlientSettings().globalValue("colorSchema", "dark").toString();
+   const auto colorScheme = GitQlientSettings().globalValue("colorSchema", 0).toInt();
 
-   return colorScheme == "dark" ? editorGreenShadowDark : editorGreenShadowBright;
+   return colorScheme == 0 ? editorGreenShadowDark : editorGreenShadowBright;
 }
 
 std::array<QColor, GitQlientStyles::kBranchColors> GitQlientStyles::getBranchColors()
