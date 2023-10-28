@@ -168,6 +168,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    else if (mergeStrategyFF.contains("true", Qt::CaseInsensitive))
       ui->cbPullStrategy->setCurrentIndex(2);
 
+   fillLanguageBox();
+
    connect(ui->cbPullStrategy, SIGNAL(currentIndexChanged(int)), this, SLOT(onPullStrategyChanged(int)));
 
    connect(ui->buttonGroup, qOverload<QAbstractButton *>(&QButtonGroup::buttonClicked), this,
@@ -220,8 +222,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
 
    size = calculateDirSize(QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
    ui->lCacheSize->setText(QString("%1 KB").arg(size));
-
-   fillLanguageBox();
 
    mPluginsDownloader->checkAvailablePlugins();
 }
@@ -393,7 +393,7 @@ void ConfigWidget::saveConfig()
    emit reloadDiffFont();
    emit commitTitleMaxLenghtChanged();
 
-   if (mShowResetMsg)
+   if (mShowResetMsg || qobject_cast<QComboBox*>(sender()) == ui->cbLanguage)
    {
       QMessageBox::information(this, tr("Reset needed!"),
                                tr("You need to restart GitQlient to see the changes in the styles applied."));
@@ -677,7 +677,7 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
 
 void ConfigWidget::fillLanguageBox() const
 {
-   const auto currentLanguage = GitQlientSettings().globalValue("UILanguage", "gitqlient_en.qm").toString();
+   const auto currentLanguage = GitQlientSettings().globalValue("UILanguage", "gitqlient_en").toString();
 
    const auto list = QDir(":translations", "gitqlient_*.qm").entryList();
    QDirIterator trIter(":translations", QStringList() << "gitqlient_*.qm");
@@ -686,12 +686,13 @@ void ConfigWidget::fillLanguageBox() const
    {
       trIter.next();
 
-      const auto name = trIter.fileName();
-      auto start = name.indexOf('_') + 1;
-      auto end = name.lastIndexOf('.');
-      QLocale tmpLocale(name.mid(start, end - start));
-      QString languageItem = QLocale::languageToString(tmpLocale.language()) + QLatin1String(" (")
-          + QLocale::countryToString(tmpLocale.country()) + QLatin1Char(')');
+      auto name = trIter.fileName();
+      name.remove(".qm");
+
+      const auto lang = name.mid(name.indexOf('_') + 1);
+      QLocale tmpLocale(lang);
+      const auto languageItem = QString::fromUtf8("%1 (%2)").arg(QLocale::languageToString(tmpLocale.language()),
+                                                                   QLocale::countryToString(tmpLocale.country()));
 
       ui->cbLanguage->addItem(languageItem, name);
 
