@@ -35,6 +35,7 @@ class GitBase;
 class GitCache;
 class GitQlientSettings;
 class GitTags;
+class GitRequestorProcess;
 
 class GitRepoLoader : public QObject
 {
@@ -65,6 +66,8 @@ private:
    QSharedPointer<GitCache> mRevCache;
    QSharedPointer<GitQlientSettings> mSettings;
    QSharedPointer<GitTags> mGitTags;
+   GitRequestorProcess *mRevRequestor = nullptr;
+   GitRequestorProcess *mRefRequestor = nullptr;
 
    bool configureRepoDirectory();
    void requestReferences();
