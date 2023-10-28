@@ -143,11 +143,14 @@ void GitRepoLoader::requestReferences()
 {
    QLog_Debug("Git", "Loading references...");
 
-   const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());
-   connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processReferences);
-   connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
+   if (!mRefRequestor)
+   {
+      mRefRequestor = new GitRequestorProcess(mGitBase->getWorkingDir());
+      connect(mRefRequestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processReferences);
+      connect(this, &GitRepoLoader::cancelAllProcesses, mRefRequestor, &AGitProcess::onCancel);
+   }
 
-   requestor->run("git show-ref -d");
+   mRefRequestor->run("git show-ref -d");
 
    mGitTags->getRemoteTags();
 }
@@ -208,7 +211,8 @@ void GitRepoLoader::requestRevisions()
 
    const auto maxCommits = mSettings->localValue("MaxCommits", 0).toInt();
    const auto commitsToRetrieve = maxCommits != 0 ? QString::fromUtf8("-n %1").arg(maxCommits)
-                                                  : mShowAll ? QString("--all") : mGitBase->getCurrentBranch();
+       : mShowAll                                 ? QString("--all")
+                                                  : mGitBase->getCurrentBranch();
 
    QString order;
 
@@ -234,11 +238,14 @@ void GitRepoLoader::requestRevisions()
    if (!mRevCache->isInitialized())
       emit signalLoadingStarted();
 
-   const auto requestor = new GitRequestorProcess(mGitBase->getWorkingDir());
-   connect(requestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevisions);
-   connect(this, &GitRepoLoader::cancelAllProcesses, requestor, &AGitProcess::onCancel);
+   if (!mRevRequestor)
+   {
+      mRevRequestor = new GitRequestorProcess(mGitBase->getWorkingDir());
+      connect(mRevRequestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevisions);
+      connect(this, &GitRepoLoader::cancelAllProcesses, mRevRequestor, &AGitProcess::onCancel);
+   }
 
-   requestor->run(baseCmd);
+   mRevRequestor->run(baseCmd);
 }
 
 void GitRepoLoader::processRevisions(QByteArray ba)
@@ -285,7 +292,8 @@ QVector<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
    auto pos = 0;
    while (!lines.isEmpty())
    {
-      if (auto commit = CommitInfo { lines.takeFirst() }; commit.isValid())
+      std::string lineStr = lines.takeFirst().toStdString();
+      if (auto commit = CommitInfo { lineStr.c_str() }; commit.isValid())
       {
          commit.pos = ++pos;
          commits.append(std::move(commit));
