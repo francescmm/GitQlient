@@ -287,7 +287,8 @@ void CommitHistoryContextMenu::checkoutBranch()
       auto value = rx.capturedTexts().constFirst().split(" ");
 #else
       static QRegularExpression rx("by \\d+ commits");
-      auto value = rx.match(ret.output).capturedTexts().constFirst().split(" ");
+      const auto texts = rx.match(ret.output).capturedTexts();
+      auto value = texts.isEmpty() ? QStringList() : texts.constFirst().split(" ");
 #endif
 
       if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))

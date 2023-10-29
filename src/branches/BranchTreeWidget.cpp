@@ -168,7 +168,8 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
             auto value = rx.capturedTexts().constFirst().split(" ");
 #else
             static QRegularExpression rx("by \\d+ commits");
-            auto value = rx.match(output).capturedTexts().constFirst().split(" ");
+            const auto texts = rx.match(output).capturedTexts();
+            const auto value = texts.isEmpty() ? QStringList() : texts.constFirst().split(" ");
 #endif
 
             auto uiUpdateRequested = false;
