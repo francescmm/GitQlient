@@ -41,7 +41,7 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
 
    insertWipRevision(parentSha, files);
 
-   const auto totalCommits = mCommitsCache.count() + 1;
+   const auto totalCommits = mCommitsCache.count();
 
    QLog_Debug("Cache", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
 
@@ -197,10 +197,13 @@ void GitCache::insertWipRevision(const QString parentSha, const RevisionFiles &f
    CommitInfo c(ZERO_SHA, parents, std::chrono::seconds(QDateTime::currentSecsSinceEpoch()), log);
    calculateLanes(c);
 
-   if (!mCommits.isEmpty() && mCommits[0])
-      c.setLanes(mCommits[0]->lanes());
+   if (!mCommitsCache.isEmpty())
+      c.setLanes(mCommitsCache[0].lanes());
 
-   mCommitsCache.push_front(std::move(c));
+   if (mCommitsCache[0].sha != ZERO_SHA)
+      mCommitsCache.prepend(std::move(c));
+   else
+      mCommitsCache[0] = std::move(c);
 
    mCommitsMap.insert(ZERO_SHA, &mCommitsCache[0]);
 
@@ -327,21 +330,28 @@ void GitCache::insertCommit(CommitInfo commit)
    const auto parentSha = commit.firstParent();
 
    commit.setLanes({ LaneType::ACTIVE });
-   commit.pos = 1;
 
-   mCommitsMap[ZERO_SHA]->setParents({ commit.sha });
+   mCommitsCache[0].setParents({ sha });
+   mCommitsCache.insert(1, std::move(commit));
+   mCommitsCache[1].appendChild(&mCommitsCache[0]);
 
-   *mCommitsMap[sha] = std::move(commit);
-   mCommitsMap[sha]->appendChild(mCommitsMap[ZERO_SHA]);
+   mCommitsMap.clear();
+   mCommits.clear();
+
+   const auto totalCommits = mCommitsCache.count();
+   mCommitsMap.reserve(totalCommits);
+   mCommits.resize(totalCommits);
+
+   auto count = 0;
+   for (auto &commit : mCommitsCache)
+   {
+      commit.pos = count;
+      mCommitsMap[commit.sha] = &commit;
+      mCommits[count++] = &commit;
+   }
 
    mCommitsMap[parentSha]->removeChild(mCommitsMap[ZERO_SHA]);
    mCommitsMap[parentSha]->appendChild(mCommitsMap[sha]);
-
-   const auto total = mCommits.count();
-   for (auto i = 1; i < total; ++i)
-      ++mCommits[i]->pos;
-
-   mCommits.insert(1, mCommitsMap[sha]);
 }
 
 void GitCache::updateCommit(const QString &oldSha, CommitInfo newCommit)
