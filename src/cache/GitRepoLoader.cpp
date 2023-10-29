@@ -147,6 +147,7 @@ void GitRepoLoader::requestReferences()
    {
       mRefRequestor = new GitRequestorProcess(mGitBase->getWorkingDir());
       connect(mRefRequestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processReferences);
+      connect(mRefRequestor, &GitRequestorProcess::destroyed, this, [this]() { mRefRequestor = nullptr; });
       connect(this, &GitRepoLoader::cancelAllProcesses, mRefRequestor, &AGitProcess::onCancel);
    }
 
@@ -242,6 +243,7 @@ void GitRepoLoader::requestRevisions()
    {
       mRevRequestor = new GitRequestorProcess(mGitBase->getWorkingDir());
       connect(mRevRequestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevisions);
+      connect(mRevRequestor, &GitRequestorProcess::destroyed, this, [this]() { mRevRequestor = nullptr; });
       connect(this, &GitRepoLoader::cancelAllProcesses, mRevRequestor, &AGitProcess::onCancel);
    }
 
