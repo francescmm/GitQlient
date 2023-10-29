@@ -94,7 +94,6 @@ private:
 
    mutable QMutex mCommitsMutex;
    QVector<CommitInfo> mCommitsCache;
-   QVector<CommitInfo *> mCommits;
    QHash<QString, CommitInfo *> mCommitsMap;
 
    mutable QMutex mRevisionsMutex;

@@ -29,8 +29,6 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
    mInitialized = true;
    mConfigured = false;
 
-   mCommits.clear();
-   mCommits.squeeze();
    mCommitsMap.clear();
    mCommitsMap.squeeze();
    mUntrackedFiles.clear();
@@ -46,12 +44,10 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
    QLog_Debug("Cache", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
 
    mCommitsMap.reserve(totalCommits);
-   mCommits.resize(totalCommits);
 
    QLog_Debug("Cache", QString("Adding committed revisions."));
 
    QHash<QString, QVector<CommitInfo *>> tmpChildsStorage;
-   auto count = 0;
 
    for (auto iter = mCommitsCache.begin() + 1; iter != mCommitsCache.end(); ++iter)
    {
@@ -62,7 +58,6 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
          commit.appendChild(&mCommitsCache[0]);
 
       mCommitsMap[commit.sha] = &commit;
-      mCommits[++count] = &commit;
 
       if (tmpChildsStorage.contains(commit.sha))
       {
@@ -84,23 +79,21 @@ CommitInfo GitCache::commitInfo(int row)
 {
    QMutexLocker lock(&mCommitsMutex);
 
-   const auto commit = row >= 0 && row < mCommits.count() ? mCommits.at(row) : nullptr;
-
-   return commit ? *commit : CommitInfo();
+   return row >= 0 && row < mCommitsCache.count() ? mCommitsCache.at(row) : CommitInfo();
 }
 
 auto GitCache::searchCommit(const QString &text, const int startingPoint) const
 {
-   return std::find_if(mCommits.constBegin() + startingPoint, mCommits.constEnd(),
-                       [text](CommitInfo *info) { return info->contains(text); });
+   return std::find_if(mCommitsCache.constBegin() + startingPoint, mCommitsCache.constEnd(),
+                       [text](const CommitInfo &info) { return info.contains(text); });
 }
 
 auto GitCache::reverseSearchCommit(const QString &text, int startingPoint) const
 {
-   const auto startEndPos = startingPoint > 0 ? mCommits.count() - startingPoint + 1 : 0;
+   const auto startEndPos = startingPoint > 0 ? mCommitsCache.count() - startingPoint + 1 : 0;
 
-   return std::find_if(mCommits.crbegin() + startEndPos, mCommits.crend(),
-                       [text](CommitInfo *info) { return info->contains(text); });
+   return std::find_if(mCommitsCache.crbegin() + startEndPos, mCommitsCache.crend(),
+                       [text](const CommitInfo &info) { return info.contains(text); });
 }
 
 CommitInfo GitCache::searchCommitInfo(const QString &text, int startingPoint, bool reverse)
@@ -112,21 +105,21 @@ CommitInfo GitCache::searchCommitInfo(const QString &text, int startingPoint, bo
    {
       auto commitIter = searchCommit(text, startingPoint);
 
-      if (commitIter == mCommits.constEnd())
+      if (commitIter == mCommitsCache.constEnd())
          commitIter = searchCommit(text);
 
-      if (commitIter != mCommits.constEnd())
-         commit = **commitIter;
+      if (commitIter != mCommitsCache.constEnd())
+         commit = *commitIter;
    }
    else
    {
       auto commitIter = reverseSearchCommit(text, startingPoint);
 
-      if (commitIter == mCommits.crend())
+      if (commitIter == mCommitsCache.crend())
          commitIter = reverseSearchCommit(text);
 
-      if (commitIter != mCommits.crend())
-         commit = **commitIter;
+      if (commitIter != mCommitsCache.crend())
+         commit = *commitIter;
    }
 
    return commit;
@@ -206,11 +199,6 @@ void GitCache::insertWipRevision(const QString parentSha, const RevisionFiles &f
       mCommitsCache[0] = std::move(c);
 
    mCommitsMap.insert(ZERO_SHA, &mCommitsCache[0]);
-
-   if (!mCommits.isEmpty())
-      mCommits[0] = &mCommitsCache[0];
-   else
-      mCommits.append(&mCommitsCache[0]);
 }
 
 bool GitCache::insertRevisionFiles(const QString &sha1, const QString &sha2, const RevisionFiles &file)
@@ -336,18 +324,15 @@ void GitCache::insertCommit(CommitInfo commit)
    mCommitsCache[1].appendChild(&mCommitsCache[0]);
 
    mCommitsMap.clear();
-   mCommits.clear();
 
    const auto totalCommits = mCommitsCache.count();
    mCommitsMap.reserve(totalCommits);
-   mCommits.resize(totalCommits);
 
    auto count = 0;
    for (auto &commit : mCommitsCache)
    {
       commit.pos = count;
       mCommitsMap[commit.sha] = &commit;
-      mCommits[count++] = &commit;
    }
 
    mCommitsMap[parentSha]->removeChild(mCommitsMap[ZERO_SHA]);
@@ -367,7 +352,6 @@ void GitCache::updateCommit(const QString &oldSha, CommitInfo newCommit)
    mCommitsCache[newPos] = std::move(newCommit);
    mCommitsMap.remove(oldSha);
    mCommitsMap.insert(newCommitSha, &mCommitsCache[newPos]);
-   mCommits[newCommit.pos] = mCommitsMap[newCommitSha];
 
    for (const auto &parent : oldCommitParens)
    {
@@ -486,8 +470,6 @@ void GitCache::resetLanes(const CommitInfo &c, bool isFork)
 
 void GitCache::clearInternalData()
 {
-   mCommits.clear();
-   mCommits.squeeze();
    mCommitsMap.clear();
    mCommitsMap.squeeze();
    mReferences.clear();
@@ -502,7 +484,7 @@ void GitCache::clearInternalData()
 
 int GitCache::commitCount() const
 {
-   return mCommits.count();
+   return mCommitsCache.count();
 }
 
 void GitCache::setUntrackedFilesList(QVector<QString> untrackedFiles)
