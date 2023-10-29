@@ -71,7 +71,7 @@ bool CommitInfo::operator!=(const CommitInfo &commit) const
    return !(*this == commit);
 }
 
-bool CommitInfo::contains(const QString &value)
+bool CommitInfo::contains(const QString &value) const
 {
    return sha.startsWith(value, Qt::CaseInsensitive) || shortLog.contains(value, Qt::CaseInsensitive)
        || committer.contains(value, Qt::CaseInsensitive) || author.contains(value, Qt::CaseInsensitive);
