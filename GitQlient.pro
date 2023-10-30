@@ -84,12 +84,16 @@ DEFINES += \
    QT_USE_QSTRINGBUILDER
 
 macos{
+   isEmpty(ARCH) {
+      ARCH = x86_64
+   }
+
    QMAKE_INFO_PLIST=$$PWD/src/resources/Info.plist
    CONFIG+=sdk_no_version_check
    ICON = $$PWD/src/resources/icon.icns
 
    BUNDLE_FILENAME = $${TARGET}.app
-   DMG_FILENAME = "GitQlient-$$(VERSION).dmg"
+   DMG_FILENAME = "GitQlient-$$(VERSION)-$${ARCH}.dmg"
 #Target for pretty DMG generation
    dmg.commands += echo "Generate DMG";
    dmg.commands += rm -f *.dmg && macdeployqt $$BUNDLE_FILENAME &&
