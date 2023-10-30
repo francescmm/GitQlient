@@ -88,16 +88,21 @@ macos{
       ARCH = x86_64
    }
 
+   isEmpty(CREATEDMGPATH) {
+      CREATEDMGPATH = /usr/local/bin
+   }
+
    QMAKE_INFO_PLIST=$$PWD/src/resources/Info.plist
    CONFIG+=sdk_no_version_check
    ICON = $$PWD/src/resources/icon.icns
+   QMAKE_INFO_PLIST = $$PWD/src/resources/Info.plist
 
    BUNDLE_FILENAME = $${TARGET}.app
-   DMG_FILENAME = "GitQlient-$$(VERSION)-$${ARCH}.dmg"
+   DMG_FILENAME = "GitQlient-$${VERSION}-$${ARCH}.dmg"
 #Target for pretty DMG generation
    dmg.commands += echo "Generate DMG";
    dmg.commands += rm -f *.dmg && macdeployqt $$BUNDLE_FILENAME &&
-   dmg.commands += /usr/local/bin/create-dmg \
+   dmg.commands += $${CREATEDMGPATH}/create-dmg \
     --volname $${TARGET} \
     --volicon "$${PWD}/src/resources/icon.icns" \
     --background "$${PWD}/src/resources/dmg_bg.png" \
