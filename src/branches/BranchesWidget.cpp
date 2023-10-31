@@ -316,7 +316,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    mMinimize->setIcon(QIcon(":/icons/ahead"));
    mMinimize->setToolTip(tr("Show minimalist view"));
    mMinimize->setObjectName("BranchesWidgetOptionsButton");
-   mMinimize->setShortcut(Qt::CTRL + Qt::Key_B);
+   mMinimize->setShortcut(Qt::CTRL | Qt::Key_B);
    connect(mMinimize, &QPushButton::clicked, this, &BranchesWidget::minimalView);
 
    const auto mainControlsLayout = new QHBoxLayout();
@@ -436,7 +436,7 @@ void BranchesWidget::showBranches()
    std::map<QString, QString> branchShaMap;
    std::map<QString, QString> branchFolderShaMap;
 
-   for (const auto &pair : qAsConst(branches))
+   for (const auto &pair : std::as_const(branches))
    {
       for (const auto &branch : pair.second)
       {
@@ -486,7 +486,7 @@ void BranchesWidget::showBranches()
 
    QVector<RemoteBranch> remoteBranches;
 
-   for (const auto &pair : qAsConst(branches))
+   for (const auto &pair : std::as_const(branches))
    {
       for (const auto &branch : pair.second)
       {
@@ -499,7 +499,7 @@ void BranchesWidget::showBranches()
       return r1.remote == r2.remote ? r1.branch < r2.branch : r1.remote < r2.remote;
    });
 
-   for (const auto &branchInfo : qAsConst(remoteBranches))
+   for (const auto &branchInfo : std::as_const(remoteBranches))
    {
       const auto fullBranchName = QString("%1/%2").arg(branchInfo.remote, branchInfo.branch);
 
@@ -656,7 +656,7 @@ void BranchesWidget::processLocalBranch(const QString &sha, QString branch)
    auto folders = branch.split("/");
    branch = folders.takeLast();
 
-   for (const auto &folder : qAsConst(folders))
+   for (const auto &folder : std::as_const(folders))
    {
       QTreeWidgetItem *child = nullptr;
 
@@ -734,7 +734,7 @@ void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
 
    QTreeWidgetItem *parent = nullptr;
 
-   for (const auto &folder : qAsConst(folders))
+   for (const auto &folder : std::as_const(folders))
    {
       QTreeWidgetItem *child = nullptr;
 
@@ -794,7 +794,7 @@ void BranchesWidget::processTags()
       auto folders = fullTagName.split("/");
       auto tagName = folders.takeLast();
 
-      for (const auto &folder : qAsConst(folders))
+      for (const auto &folder : std::as_const(folders))
       {
          QTreeWidgetItem *child = nullptr;
 
@@ -857,7 +857,7 @@ void BranchesWidget::processTags()
       auto folders = fullTagName.split("/");
       auto tagName = folders.takeLast();
 
-      for (const auto &folder : qAsConst(folders))
+      for (const auto &folder : std::as_const(folders))
       {
          QTreeWidgetItem *child = nullptr;
 

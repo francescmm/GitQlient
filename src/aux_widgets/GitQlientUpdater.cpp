@@ -48,7 +48,7 @@ void GitQlientUpdater::showInfoMessage()
                   "one is {%2}. You can read more about the new changes in the detailed description."))
            .arg(QString::fromUtf8(VER), mLatestGitQlient),
        QMessageBox::Ok | QMessageBox::Close, qobject_cast<QWidget *>(parent()));
-   msgBox.setButtonText(QMessageBox::Ok, tr("Download"));
+   msgBox.addButton(tr("Download"), QMessageBox::YesRole);
    msgBox.setDetailedText(mChangeLog);
    msgBox.setStyleSheet(GitQlientStyles::getStyles());
    msgBox.exec();

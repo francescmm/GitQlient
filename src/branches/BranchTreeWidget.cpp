@@ -266,7 +266,7 @@ void BranchTreeWidget::deleteFolder()
       auto deleted = false;
       QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-      for (const auto &branch : qAsConst(branchesToRemove))
+      for (const auto &branch : std::as_const(branchesToRemove))
       {
          const auto type = mLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
          const auto sha = mCache->getShaOfReference(branch, type);

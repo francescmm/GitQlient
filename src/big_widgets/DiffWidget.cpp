@@ -190,7 +190,7 @@ bool DiffWidget::loadCommitDiff(const QString &sha, const QString &parentSha)
 
 void DiffWidget::onDiffFontSizeChanged()
 {
-   for (const auto &diffWidget : qAsConst(mDiffWidgets))
+   for (const auto &diffWidget : std::as_const(mDiffWidgets))
       diffWidget->updateFontSize();
 }
 

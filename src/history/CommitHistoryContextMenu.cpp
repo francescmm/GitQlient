@@ -185,7 +185,7 @@ void CommitHistoryContextMenu::createMultipleShasMenu()
       auto shasInCurrenTree = 0;
       QScopedPointer<GitBranches> git(new GitBranches(mGit));
 
-      for (const auto &sha : qAsConst(mShas))
+      for (const auto &sha : std::as_const(mShas))
          shasInCurrenTree += git->isCommitInCurrentGeneologyTree(sha);
 
       if (shasInCurrenTree == 0)
@@ -348,7 +348,7 @@ void CommitHistoryContextMenu::checkoutCommit()
 void CommitHistoryContextMenu::cherryPickCommit()
 {
    auto shas = mShas;
-   for (const auto &sha : qAsConst(mShas))
+   for (const auto &sha : std::as_const(mShas))
    {
       const auto lastShaBeforeCommit = mGit->getLastCommit().output.trimmed();
       QScopedPointer<GitLocal> git(new GitLocal(mGit));

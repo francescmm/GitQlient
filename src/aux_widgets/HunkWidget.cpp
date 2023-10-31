@@ -31,7 +31,7 @@ HunkWidget::HunkWidget(QSharedPointer<GitBase> git, QSharedPointer<GitCache> cac
    auto font = mHunkView->font();
    font.setPointSize(points);
    mHunkView->setFont(font);
-   mHunkView->loadDiff(mHunk.right(mHunk.count() - mHunk.indexOf('\n') - 1));
+   mHunkView->loadDiff(mHunk.right(mHunk.length() - mHunk.indexOf('\n') - 1));
    mHunkView->setFixedHeight(mHunkView->getHeight() + mHunkView->getLineHeigth() * 2);
    connect(mHunkView, &QPlainTextEdit::customContextMenuRequested, this, &HunkWidget::showContextMenu);
 

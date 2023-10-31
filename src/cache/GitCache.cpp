@@ -61,13 +61,13 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
 
       if (tmpChildsStorage.contains(commit.sha))
       {
-         for (const auto &child : qAsConst(tmpChildsStorage[commit.sha]))
+         for (const auto &child : std::as_const(tmpChildsStorage[commit.sha]))
             commit.appendChild(child);
 
          tmpChildsStorage.remove(commit.sha);
       }
 
-      for (const auto &parent : qAsConst(commit.mParentsSha))
+      for (const auto &parent : std::as_const(commit.mParentsSha))
          tmpChildsStorage[parent].append(&commit);
    }
 

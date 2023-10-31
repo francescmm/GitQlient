@@ -72,19 +72,19 @@ GitQlient::GitQlient(QWidget *parent)
    menu->installEventFilter(this);
 
    const auto open = menu->addAction(tr("Open repo..."));
-   open->setShortcut(Qt::CTRL + Qt::Key_O);
+   open->setShortcut(Qt::CTRL | Qt::Key_O);
    connect(open, &QAction::triggered, this, &GitQlient::openRepo);
 
    const auto clone = menu->addAction(tr("Clone repo..."));
-   clone->setShortcut(Qt::CTRL + Qt::Key_I);
+   clone->setShortcut(Qt::CTRL | Qt::Key_I);
    connect(clone, &QAction::triggered, this, &GitQlient::cloneRepo);
 
    const auto init = menu->addAction(tr("New repo..."));
-   init->setShortcut(Qt::CTRL + Qt::Key_N);
+   init->setShortcut(Qt::CTRL | Qt::Key_N);
    connect(init, &QAction::triggered, this, &GitQlient::initRepo);
 
    const auto close = menu->addAction(tr("Close repo"));
-   close->setShortcut(Qt::CTRL + Qt::Key_W);
+   close->setShortcut(Qt::CTRL | Qt::Key_W);
    connect(close, &QAction::triggered, this, &GitQlient::closeRepoIfNotPinned);
 
    menu->addSeparator();
