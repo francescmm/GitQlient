@@ -71,7 +71,7 @@ void PluginsDownloader::processPluginsFile()
          {
             const auto dependencies = jsonObject[dependenciesStr].toArray();
             for (const auto &dependency : dependencies)
-               pluginInfo.dependencies.append(std::move(dependency.toString()));
+               pluginInfo.dependencies.append(dependency.toString());
          }
 
          pluginsInfo.append(std::move(pluginInfo));
