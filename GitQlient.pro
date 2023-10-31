@@ -1,7 +1,6 @@
 #General stuff
 CONFIG += qt warn_on c++17 c++1z
 
-TARGET = gitqlient
 QT += widgets core network gui
 DEFINES += QT_DEPRECATED_WARNINGS
 
@@ -11,6 +10,7 @@ if (!exists(src/git/.git) || !exists(src/AuxiliarCustomWidgets/.git) || !exists(
 }
 
 unix:!macos {
+   TARGET = gitqlient
    QMAKE_LFLAGS += -no-pie
 
    isEmpty(PREFIX) {
@@ -44,6 +44,8 @@ unix:!macos {
    icon512.path = $$PREFIX/share/icons/hicolor/512x512/apps
    icon512.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo512.png \$(INSTALL_ROOT)$${icon512.path}/$${TARGET}.png
    INSTALLS += iconsvg icon16 icon24 icon32 icon48 icon64 icon96 icon128 icon256 icon512
+} else {
+   TARGET = GitQlient
 }
 
 INSTALLS += target
@@ -95,7 +97,6 @@ macos{
    QMAKE_INFO_PLIST=$$PWD/src/resources/Info.plist
    CONFIG+=sdk_no_version_check
    ICON = $$PWD/src/resources/icon.icns
-   QMAKE_INFO_PLIST = $$PWD/src/resources/Info.plist
 
    BUNDLE_FILENAME = $${TARGET}.app
    DMG_FILENAME = "GitQlient-$${VERSION}-$${ARCH}.dmg"
@@ -110,7 +111,7 @@ macos{
     --window-size 600 450 \
     --icon-size 100 \
     --hdiutil-quiet \
-    --hide-extension "gitqlient.app" \
+    --hide-extension $${BUNDLE_FILENAME} \
     --app-drop-link 475 220 \
     $${DMG_FILENAME} \
     $${BUNDLE_FILENAME}
