@@ -460,12 +460,12 @@ bool CommitChangesWidget::checkMsg(QString &msg)
 
 void CommitChangesWidget::updateCounter(const QString &text)
 {
-   ui->lCounter->setText(QString::number(mTitleMaxLength - text.count()));
+   ui->lCounter->setText(QString::number(mTitleMaxLength - text.length()));
 }
 
 bool CommitChangesWidget::hasConflicts()
 {
-   for (const auto &iter : qAsConst(mInternalCache))
+   for (const auto &iter : std::as_const(mInternalCache))
       if (iter.item->data(GitQlientRole::U_IsConflict).toBool())
          return true;
 

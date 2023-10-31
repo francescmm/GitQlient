@@ -33,7 +33,7 @@ struct Issue;
 struct Label;
 struct Milestone;
 struct PullRequest;
-};
+}
 
 class IGitServerCache
 {

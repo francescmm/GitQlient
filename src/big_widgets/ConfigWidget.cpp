@@ -37,7 +37,7 @@ qint64 dirSize(QString dirPath)
 
    auto entryList = dir.entryList(QDir::Files | QDir::System | QDir::Hidden);
 
-   for (const auto &filePath : qAsConst(entryList))
+   for (const auto &filePath : std::as_const(entryList))
    {
       QFileInfo fi(dir, filePath);
       size += fi.size();
@@ -45,7 +45,7 @@ qint64 dirSize(QString dirPath)
 
    entryList = dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot | QDir::System | QDir::Hidden);
 
-   for (const auto &childDirPath : qAsConst(entryList))
+   for (const auto &childDirPath : std::as_const(entryList))
       size += dirSize(dirPath + QDir::separator() + childDirPath);
 
    return size;
@@ -272,7 +272,7 @@ void ConfigWidget::onPluginsInfoReceived(const QVector<PluginInfo> &pluginsInfo)
    mPluginsInfo = pluginsInfo;
 
    auto row = 0;
-   for (const auto &plugin : qAsConst(mPluginsInfo))
+   for (const auto &plugin : std::as_const(mPluginsInfo))
    {
       ui->availablePluginsLayout->addWidget(new QLabel(plugin.name), ++row, 0);
       ui->availablePluginsLayout->addWidget(new QLabel(plugin.version), row, 1);

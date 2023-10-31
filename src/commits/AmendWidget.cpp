@@ -58,7 +58,7 @@ void AmendWidget::configure(const QString &sha)
 
       const auto author = commit.author.split("<");
       ui->leAuthorName->setText(author.first());
-      ui->leAuthorEmail->setText(author.last().mid(0, author.last().count() - 1));
+      ui->leAuthorEmail->setText(author.last().mid(0, author.last().length() - 1));
       ui->teDescription->setPlainText(commit.longLog.trimmed());
       ui->leCommitTitle->setText(commit.shortLog);
 

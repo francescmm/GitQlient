@@ -583,7 +583,7 @@ void FileDiffWidget::processHunks(const QString &file)
    else
       hunks = git->getFileDiff(file, mIsCached, mCurrentSha, mPreviousSha);
 
-   for (auto hunk : qAsConst(mHunks))
+   for (auto hunk : std::as_const(mHunks))
       delete hunk;
 
    mHunks.clear();
@@ -593,7 +593,7 @@ void FileDiffWidget::processHunks(const QString &file)
    {
       auto chunk = hunks.output;
       const auto header = chunk.left(chunk.indexOf("@@"));
-      chunk.remove(0, header.count());
+      chunk.remove(0, header.length());
 
       auto chunkLines = chunk.split('\n');
       QString hunk;
@@ -611,7 +611,7 @@ void FileDiffWidget::processHunks(const QString &file)
 
          hunk.append(line);
 
-         if (!(line.count() == 1 && line[0] == '\n'))
+         if (!(line.length() == 1 && line[0] == '\n'))
             hunk.append('\n');
       }
 

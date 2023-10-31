@@ -138,7 +138,7 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
       const auto lineNumAndContent = line.mid(start);
       const auto divisorChar = lineNumAndContent.indexOf(")");
       const auto lineText = lineNumAndContent.mid(0, divisorChar);
-      const auto content = lineNumAndContent.mid(divisorChar + 1, lineNumAndContent.count() - lineText.count() - 1);
+      const auto content = lineNumAndContent.mid(divisorChar + 1, lineNumAndContent.length() - lineText.length() - 1);
 
       annotations.append({ revision.sha, name, dt, lineText.toInt(), content });
 
@@ -278,7 +278,7 @@ ButtonLink *FileBlameWidget::createMessageLabel(const QString &sha, bool isFirst
    {
       auto log = revision.shortLog;
 
-      if (log.count() > 47)
+      if (log.length() > 47)
          log = log.left(47) + QString("...");
 
       commitMsg = log;
