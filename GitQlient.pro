@@ -44,11 +44,10 @@ unix:!macos {
    icon512.path = $$PREFIX/share/icons/hicolor/512x512/apps
    icon512.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo512.png \$(INSTALL_ROOT)$${icon512.path}/$${TARGET}.png
    INSTALLS += iconsvg icon16 icon24 icon32 icon48 icon64 icon96 icon128 icon256 icon512
+   INSTALLS += target
 } else {
    TARGET = GitQlient
 }
-
-INSTALLS += target
 
 #project files
 SOURCES += src/main.cpp
@@ -72,10 +71,11 @@ DEFINES += \
     VER=\\\"$$VERSION\\\" \
     SHA_VER=\\\"$$GQ_SHA\\\"
 
-message("Found version \"$$VERSION\" at commit \"$$GQ_SHA\".")
-
-debug {
-   DEFINES += DEBUG
+!win32-msvc* {
+    debug {
+       DEFINES += DEBUG
+       QMAKE_CXXFLAGS += -Wall -pedantic-errors -Werror
+    }
 }
 
 DEFINES += \

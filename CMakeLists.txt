@@ -8,6 +8,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "-Wall -Werror -pedantic-errors")
 
 execute_process(
    COMMAND
@@ -31,11 +32,11 @@ add_compile_definitions(SHA_VER="${GQ_SHA}")
 add_compile_definitions(VER="${VERSION}")
 add_compile_definitions(QT_DEPRECATED_WARNINGS)
 
-#list(APPEND CPP_FLAGS "-Wall")
-#
-#if (NOT WIN32)
-#   list(APPEND CPP_FLAGS "-Wextra" "-Wpedantic")
-#endif()
+list(APPEND CPP_FLAGS "-Wall")
+
+if (CMAKE_BUILD_TYPE EQUAL "DEBUG" AND NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+   list(APPEND CPP_FLAGS "-Wextra" "-Wpedantic")
+endif()
 
 if (NOT EXISTS "${PROJECT_SOURCE_DIR}/src/AuxiliarCustomWidgets/.git" OR
     NOT EXISTS "${PROJECT_SOURCE_DIR}/src/QLogger/.git" OR
