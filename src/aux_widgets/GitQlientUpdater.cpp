@@ -3,6 +3,7 @@
 #include <GitQlientStyles.h>
 #include <QLogger.h>
 
+#include <QDesktopServices>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -48,10 +49,15 @@ void GitQlientUpdater::showInfoMessage()
                   "one is {%2}. You can read more about the new changes in the detailed description."))
            .arg(QString::fromUtf8(VER), mLatestGitQlient),
        QMessageBox::Ok | QMessageBox::Close, qobject_cast<QWidget *>(parent()));
-   msgBox.setButtonText(QMessageBox::Ok, tr("Download"));
+   msgBox.setButtonText(QMessageBox::Ok, tr("Go to GitHub"));
    msgBox.setDetailedText(mChangeLog);
    msgBox.setStyleSheet(GitQlientStyles::getStyles());
-   msgBox.exec();
+
+   if (msgBox.exec() == QMessageBox::Ok)
+   {
+      QString url = QString::fromUtf8("https://github.com/francescmm/GitQlient/releases/tag/v%1").arg(mLatestGitQlient);
+      QDesktopServices::openUrl(QUrl(url));
+   }
 }
 
 void GitQlientUpdater::processUpdateFile()
