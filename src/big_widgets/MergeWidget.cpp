@@ -30,14 +30,14 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
    : QFrame(parent)
    , mGitQlientCache(gitQlientCache)
    , mGit(git)
-   , mConflictFiles(new QListWidget())
-   , mMergedFiles(new QListWidget())
-   , mCommitTitle(new QLineEdit())
-   , mDescription(new QTextEdit())
-   , mMergeBtn(new QPushButton(tr("Merge && Commit")))
-   , mAbortBtn(new QPushButton(tr("Abort merge")))
-   , mStacked(new QStackedWidget())
-   , mFileDiff(new FileDiffWidget(mGit, mGitQlientCache))
+   , mConflictFiles(new QListWidget(this))
+   , mMergedFiles(new QListWidget(this))
+   , mCommitTitle(new QLineEdit(this))
+   , mDescription(new QTextEdit(this))
+   , mMergeBtn(new QPushButton(tr("Merge && Commit"), this))
+   , mAbortBtn(new QPushButton(tr("Abort merge"), this))
+   , mStacked(new QStackedWidget(this))
+   , mFileDiff(new FileDiffWidget(mGit, mGitQlientCache, this))
 {
    mFileDiff->hideHunks();
 
@@ -67,13 +67,13 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
    mergeInfoLayout->addSpacerItem(new QSpacerItem(1, 10, QSizePolicy::Fixed, QSizePolicy::Fixed));
    mergeInfoLayout->addLayout(mergeBtnLayout);
 
-   const auto mergeFrame = new QFrame();
+   const auto mergeFrame = new QFrame(this);
    mergeFrame->setObjectName("mergeFrame");
 
-   const auto conflictsLabel = new QLabel(tr("Conflicts"));
+   const auto conflictsLabel = new QLabel(tr("Conflicts"), this);
    conflictsLabel->setObjectName("FilesListTitle");
 
-   const auto automergeLabel = new QLabel(tr("Changes to be committed"));
+   const auto automergeLabel = new QLabel(tr("Changes to be committed"), this);
    automergeLabel->setObjectName("FilesListTitle");
 
    const auto mergeLayout = new QVBoxLayout(mergeFrame);
@@ -87,7 +87,7 @@ MergeWidget::MergeWidget(const QSharedPointer<GitCache> &gitQlientCache, const Q
    mergeLayout->addStretch(2);
    mergeLayout->addLayout(mergeInfoLayout);
 
-   const auto noFileFrame = new QFrame();
+   const auto noFileFrame = new QFrame(this);
    const auto noFileLayout = new QGridLayout();
    noFileLayout->setContentsMargins(0, 0, 0, 0);
    noFileLayout->setSpacing(0);

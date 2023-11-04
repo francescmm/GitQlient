@@ -28,10 +28,10 @@ BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPoi
    , mGit(git)
    , mSettings(settings)
    , mFileSystemModel(new QFileSystemModel())
-   , mRepoModel(new CommitHistoryModel(mCache, mGit, nullptr))
-   , mRepoView(new CommitHistoryView(mCache, mGit, mSettings, nullptr))
-   , mFileSystemView(new QTreeView())
-   , mTabWidget(new QTabWidget())
+   , mRepoModel(new CommitHistoryModel(mCache, mGit, this))
+   , mRepoView(new CommitHistoryView(mCache, mGit, mSettings, this))
+   , mFileSystemView(new QTreeView(this))
+   , mTabWidget(new QTabWidget(this))
 {
    mTabWidget->setObjectName("HistoryTab");
    mRepoView->setObjectName("blameGraphView");

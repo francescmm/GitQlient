@@ -49,10 +49,10 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    , mGit(git)
    , mCache(cache)
    , mSettings(settings)
-   , mReturnFromFull(new QPushButton(QIcon(":/icons/back"), ""))
-   , mUserName(new QLabel())
-   , mUserEmail(new QLabel())
-   , mSplitter(new QSplitter())
+   , mReturnFromFull(new QPushButton(QIcon(":/icons/back"), "", this))
+   , mUserName(new QLabel(this))
+   , mUserEmail(new QLabel(this))
+   , mSplitter(new QSplitter(this))
 {
    QLog_Info("Performance", "HistoryWidget loading...");
    setAttribute(Qt::WA_DeleteOnClose);
@@ -75,7 +75,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
          gitConfig->getUserEmailAsync(false);
    });
 
-   const auto wipInfoFrame = new QFrame();
+   const auto wipInfoFrame = new QFrame(this);
    wipInfoFrame->setObjectName("wipInfoFrame");
    const auto wipInfoLayout = new QVBoxLayout(wipInfoFrame);
    wipInfoLayout->setContentsMargins(QMargins());
@@ -83,11 +83,11 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    wipInfoLayout->addWidget(mUserName);
    wipInfoLayout->addWidget(mUserEmail);
 
-   mWipWidget = new WipWidget(mCache, mGit);
-   mAmendWidget = new AmendWidget(mCache, mGit);
-   mCommitInfoWidget = new CommitInfoWidget(mCache, mGit);
+   mWipWidget = new WipWidget(mCache, mGit, this);
+   mAmendWidget = new AmendWidget(mCache, mGit, this);
+   mCommitInfoWidget = new CommitInfoWidget(mCache, mGit, this);
 
-   mCommitStackedWidget = new QStackedWidget();
+   mCommitStackedWidget = new QStackedWidget(this);
    mCommitStackedWidget->setCurrentIndex(0);
    mCommitStackedWidget->addWidget(mCommitInfoWidget);
    mCommitStackedWidget->addWidget(mWipWidget);
@@ -99,7 +99,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    wipLayout->addWidget(wipInfoFrame);
    wipLayout->addWidget(mCommitStackedWidget);
 
-   const auto wipFrame = new QFrame();
+   const auto wipFrame = new QFrame(this);
    wipFrame->setLayout(wipLayout);
    wipFrame->setMinimumWidth(200);
    wipFrame->setMaximumWidth(500);
@@ -132,7 +132,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mCommitInfoWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalShowDiff);
    connect(mCommitInfoWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
 
-   mSearchInput = new QLineEdit();
+   mSearchInput = new QLineEdit(this);
    mSearchInput->setObjectName("SearchInput");
 
    mSearchInput->setPlaceholderText(
@@ -140,7 +140,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
    mRepositoryModel = new CommitHistoryModel(mCache, mGit);
-   mRepositoryView = new CommitHistoryView(mCache, mGit, mSettings);
+   mRepositoryView = new CommitHistoryView(mCache, mGit, mSettings, this);
 
    connect(mRepositoryView, &CommitHistoryView::fullReload, this, &HistoryWidget::fullReload);
    connect(mRepositoryView, &CommitHistoryView::referencesReload, this, &HistoryWidget::referencesReload);
@@ -165,7 +165,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
                                     = new RepositoryViewDelegate(mCache, mGit, mGitServerCache, mRepositoryView));
    mRepositoryView->setEnabled(true);
 
-   mBranchesWidget = new BranchesWidget(mCache, mGit);
+   mBranchesWidget = new BranchesWidget(mCache, mGit, this);
 
    connect(mBranchesWidget, &BranchesWidget::fullReload, this, &HistoryWidget::fullReload);
    connect(mBranchesWidget, &BranchesWidget::logReload, this, &HistoryWidget::logReload);
@@ -178,7 +178,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mBranchesWidget, &BranchesWidget::signalPullConflict, this, &HistoryWidget::signalPullConflict);
    connect(mBranchesWidget, &BranchesWidget::panelsVisibilityChanged, this, &HistoryWidget::panelsVisibilityChanged);
 
-   const auto cherryPickBtn = new QPushButton(tr("Cherry-pick"));
+   const auto cherryPickBtn = new QPushButton(tr("Cherry-pick"), this);
    cherryPickBtn->setEnabled(false);
    cherryPickBtn->setObjectName("cherryPickBtn");
    cherryPickBtn->setToolTip("Cherry-pick the commit");
@@ -188,7 +188,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mSearchInput, &QLineEdit::textChanged, this,
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });
 
-   mChShowAllBranches = new CheckBox(tr("Show all branches"));
+   mChShowAllBranches = new CheckBox(tr("Show all branches"), this);
    mChShowAllBranches->setChecked(mSettings->localValue("ShowAllBranches", true).toBool());
    connect(mChShowAllBranches, &CheckBox::toggled, this, &HistoryWidget::onShowAllUpdated);
 
@@ -205,16 +205,16 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    viewLayout->addLayout(graphOptionsLayout);
    viewLayout->addWidget(mRepositoryView);
 
-   mGraphFrame = new QFrame();
+   mGraphFrame = new QFrame(this);
    mGraphFrame->setLayout(viewLayout);
 
-   mWipFileDiff = new FileDiffWidget(mGit, mCache);
+   mWipFileDiff = new FileDiffWidget(mGit, mCache, this);
 
    connect(mReturnFromFull, &QPushButton::clicked, this, &HistoryWidget::returnToView);
 
    mFullDiffWidget = new FullDiffWidget(mGit, mCache);
 
-   const auto fullFrame = new QFrame();
+   const auto fullFrame = new QFrame(this);
    const auto fullLayout = new QGridLayout(fullFrame);
    fullLayout->setSpacing(10);
    fullLayout->setContentsMargins(QMargins());
@@ -222,7 +222,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    fullLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed), 0, 1);
    fullLayout->addWidget(mFullDiffWidget, 1, 0, 1, 2);
 
-   mCenterStackedWidget = new QStackedWidget();
+   mCenterStackedWidget = new QStackedWidget(this);
    mCenterStackedWidget->setMinimumWidth(600);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::Graph), mGraphFrame);
    mCenterStackedWidget->insertWidget(static_cast<int>(Pages::FileDiff), mWipFileDiff);
