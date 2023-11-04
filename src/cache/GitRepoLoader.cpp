@@ -143,12 +143,9 @@ void GitRepoLoader::requestReferences()
 {
    QLog_Debug("Git", "Loading references...");
 
-   if (!mRefRequestor)
-   {
-      mRefRequestor = new GitRequestorProcess(mGitBase->getWorkingDir());
-      connect(mRefRequestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processReferences);
-      connect(this, &GitRepoLoader::cancelAllProcesses, mRefRequestor, &AGitProcess::onCancel);
-   }
+   mRefRequestor = new GitRequestorProcess(mGitBase->getWorkingDir());
+   connect(mRefRequestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processReferences);
+   connect(this, &GitRepoLoader::cancelAllProcesses, mRefRequestor, &AGitProcess::onCancel);
 
    mRefRequestor->run("git show-ref -d");
 
@@ -238,12 +235,9 @@ void GitRepoLoader::requestRevisions()
    if (!mRevCache->isInitialized())
       emit signalLoadingStarted();
 
-   if (!mRevRequestor)
-   {
-      mRevRequestor = new GitRequestorProcess(mGitBase->getWorkingDir());
-      connect(mRevRequestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevisions);
-      connect(this, &GitRepoLoader::cancelAllProcesses, mRevRequestor, &AGitProcess::onCancel);
-   }
+   mRevRequestor = new GitRequestorProcess(mGitBase->getWorkingDir());
+   connect(mRevRequestor, &GitRequestorProcess::procDataReady, this, &GitRepoLoader::processRevisions);
+   connect(this, &GitRepoLoader::cancelAllProcesses, mRevRequestor, &AGitProcess::onCancel);
 
    mRevRequestor->run(baseCmd);
 }
