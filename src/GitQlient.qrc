@@ -16,6 +16,8 @@
     <qresource prefix="/translations">
         <file alias="gitqlient_en.qm">resources/translations/gitqlient_en.qm</file>
         <file alias="gitqlient_en.ts">resources/translations/gitqlient_en.ts</file>
+        <file alias="gitqlient_zh_CN.qm">resources/translations/gitqlient_zh_CN.qm</file>
+        <file alias="gitqlient_zh_CN.ts">resources/translations/gitqlient_zh_CN.ts</file>
     </qresource>
     <qresource prefix="/images/NewVersionInfoDlg">
         <file alias="hunkPage">resources/images/hunkPage.png</file>

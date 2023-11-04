@@ -72,6 +72,7 @@ private:
    void useDefaultLogsFolder();
    void readRemotePluginsInfo();
    void showFeaturesTour();
+   void fillLanguageBox() const;
 
 private slots:
    void saveConfig();

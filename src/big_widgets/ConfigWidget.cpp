@@ -14,6 +14,7 @@
 #include <qtermwidget_interface.h>
 
 #include <QDir>
+#include <QDirIterator>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QGridLayout>
@@ -117,11 +118,12 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->labelExtFileExplorer->setHidden(true);
 #endif
 
-   const auto originalStyles = settings.globalValue("colorSchema", "dark").toString();
-   ui->cbStyle->setCurrentText(originalStyles);
+   const auto originalStyles = settings.globalValue("colorSchema", 0).toInt();
+
+   ui->cbStyle->setCurrentIndex(originalStyles);
    connect(ui->cbStyle, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
-           [this, originalStyles]() {
-              mShowResetMsg = ui->cbStyle->currentText() != originalStyles;
+           [this, originalStyles](int newIndex) {
+              mShowResetMsg = newIndex != originalStyles;
               saveConfig();
            });
 
@@ -166,6 +168,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    else if (mergeStrategyFF.contains("true", Qt::CaseInsensitive))
       ui->cbPullStrategy->setCurrentIndex(2);
 
+   fillLanguageBox();
+
    connect(ui->cbPullStrategy, SIGNAL(currentIndexChanged(int)), this, SLOT(onPullStrategyChanged(int)));
 
    connect(ui->buttonGroup, qOverload<QAbstractButton *>(&QButtonGroup::buttonClicked), this,
@@ -208,6 +212,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->chSingleClickDiffView, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbDiffView, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbBranchSeparator, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->cbLanguage, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
 
    ui->cbDiffView->setCurrentIndex(settings.globalValue("DefaultDiffView").toInt());
    ui->cbBranchSeparator->setCurrentText(settings.globalValue("BranchSeparator", "-").toString());
@@ -368,11 +373,12 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("logsFolder", ui->leLogsLocation->text());
    settings.setGlobalValue("commitTitleMaxLength", ui->spCommitTitleLength->value());
    settings.setGlobalValue("FileDiffView/FontSize", ui->sbEditorFontSize->value());
-   settings.setGlobalValue("colorSchema", ui->cbStyle->currentText());
+   settings.setGlobalValue("colorSchema", ui->cbStyle->currentIndex());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
    settings.setGlobalValue("singleClickDiffView", ui->chSingleClickDiffView->isChecked());
    settings.setGlobalValue("DefaultDiffView", ui->cbDiffView->currentIndex());
    settings.setGlobalValue("BranchSeparator", ui->cbBranchSeparator->currentText());
+   settings.setGlobalValue("UILanguage", ui->cbLanguage->currentData().toString());
 
    if (!ui->leEditor->text().isEmpty())
       settings.setGlobalValue("ExternalEditor", ui->leEditor->text());
@@ -387,7 +393,7 @@ void ConfigWidget::saveConfig()
    emit reloadDiffFont();
    emit commitTitleMaxLenghtChanged();
 
-   if (mShowResetMsg)
+   if (mShowResetMsg || qobject_cast<QComboBox*>(sender()) == ui->cbLanguage)
    {
       QMessageBox::information(this, tr("Reset needed!"),
                                tr("You need to restart GitQlient to see the changes in the styles applied."));
@@ -666,5 +672,31 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
    for (auto iter = mPluginDataMap.cbegin(); iter != mPluginDataMap.cend(); ++iter)
    {
       iter.key()->setEnabled(!mPluginNames.contains(iter.value().name));
+   }
+}
+
+void ConfigWidget::fillLanguageBox() const
+{
+   const auto currentLanguage = GitQlientSettings().globalValue("UILanguage", "gitqlient_en").toString();
+
+   const auto list = QDir(":translations", "gitqlient_*.qm").entryList();
+   QDirIterator trIter(":translations", QStringList() << "gitqlient_*.qm");
+
+   while (trIter.hasNext())
+   {
+      trIter.next();
+
+      auto name = trIter.fileName();
+      name.remove(".qm");
+
+      const auto lang = name.mid(name.indexOf('_') + 1);
+      QLocale tmpLocale(lang);
+      const auto languageItem = QString::fromUtf8("%1 (%2)").arg(QLocale::languageToString(tmpLocale.language()),
+                                                                   QLocale::countryToString(tmpLocale.country()));
+
+      ui->cbLanguage->addItem(languageItem, name);
+
+      if (name == currentLanguage)
+         ui->cbLanguage->setCurrentIndex(ui->cbLanguage->count() - 1);
    }
 }
