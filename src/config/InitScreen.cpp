@@ -27,20 +27,22 @@ using namespace QLogger;
 
 InitScreen::InitScreen(QWidget *parent)
    : QFrame(parent)
-   , mOpenRepo(new QPushButton(tr("OPEN")))
-   , mCloneRepo(new QPushButton(tr("CLONE")))
-   , mInitRepo(new QPushButton(tr("NEW")))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
    setStyleSheet(GitQlientStyles::getStyles());
 
+   mOpenRepo = new QPushButton(tr("OPEN"), this);
    mOpenRepo->setObjectName("bigButton");
+
+   mCloneRepo = new QPushButton(tr("CLONE"), this);
    mCloneRepo->setObjectName("bigButton");
+
+   mInitRepo = new QPushButton(tr("NEW"), this);
    mInitRepo->setObjectName("bigButton");
 
    // Adding buttons to open or init repos
-   const auto repoOptionsFrame = new QFrame();
+   const auto repoOptionsFrame = new QFrame(this);
    const auto repoOptionsLayout = new QHBoxLayout(repoOptionsFrame);
    repoOptionsLayout->setSpacing(0);
    repoOptionsLayout->setContentsMargins(QMargins());
@@ -50,12 +52,12 @@ InitScreen::InitScreen(QWidget *parent)
    repoOptionsLayout->addStretch();
    repoOptionsLayout->addWidget(mInitRepo);
 
-   const auto projectsFrame = new QFrame();
+   const auto projectsFrame = new QFrame(this);
    mRecentProjectsLayout = new QVBoxLayout(projectsFrame);
    mRecentProjectsLayout->setContentsMargins(QMargins());
    mRecentProjectsLayout->addWidget(createRecentProjectsPage());
 
-   const auto mostUsedProjectsFrame = new QFrame();
+   const auto mostUsedProjectsFrame = new QFrame(this);
    mUsedProjectsLayout = new QVBoxLayout(mostUsedProjectsFrame);
    mUsedProjectsLayout->setContentsMargins(QMargins());
    mUsedProjectsLayout->addWidget(createUsedProjectsPage());
@@ -70,11 +72,11 @@ InitScreen::InitScreen(QWidget *parent)
    const auto title = new QLabel(tr("GitQlient %1").arg(VER));
    title->setObjectName("title");
 
-   const auto gitqlientIcon = new QLabel();
+   const auto gitqlientIcon = new QLabel(this);
    QIcon stagedIcon(":/icons/GitQlientLogoSVG");
    gitqlientIcon->setPixmap(stagedIcon.pixmap(96, 96));
 
-   const auto configBtn = new QPushButton();
+   const auto configBtn = new QPushButton(this);
    configBtn->setIcon(QIcon(":/icons/config"));
    connect(configBtn, &QPushButton::clicked, this, &InitScreen::openConfigDlg);
 
@@ -87,10 +89,10 @@ InitScreen::InitScreen(QWidget *parent)
    titleLayout->addStretch();
    titleLayout->addWidget(configBtn);
 
-   const auto lineTitle = new QFrame();
+   const auto lineTitle = new QFrame(this);
    lineTitle->setObjectName("orangeHSeparator");
 
-   const auto lineTitle2 = new QFrame();
+   const auto lineTitle2 = new QFrame(this);
    lineTitle2->setObjectName("orangeHSeparator");
 
    const auto version = new ButtonLink(tr("About GitQlient..."));
@@ -116,7 +118,7 @@ InitScreen::InitScreen(QWidget *parent)
    promoLayout->addStretch();
    promoLayout->addWidget(goToBlog);
 
-   const auto centerFrame = new QFrame();
+   const auto centerFrame = new QFrame(this);
    centerFrame->setObjectName("InitWidget");
    const auto centerLayout = new QVBoxLayout(centerFrame);
    centerLayout->setSpacing(10);
@@ -142,9 +144,9 @@ InitScreen::InitScreen(QWidget *parent)
 QWidget *InitScreen::createRecentProjectsPage()
 {
    delete mInnerWidget;
-   mInnerWidget = new QFrame();
+   mInnerWidget = new QFrame(this);
 
-   auto title = new QLabel(tr("Recent"));
+   auto title = new QLabel(tr("Recent"), this);
    title->setStyleSheet("font-size: 14pt;");
 
    const auto innerLayout = new QVBoxLayout(mInnerWidget);
@@ -165,7 +167,7 @@ QWidget *InitScreen::createRecentProjectsPage()
 
    innerLayout->addStretch();
 
-   const auto clear = new ButtonLink(tr("Clear list"));
+   const auto clear = new ButtonLink(tr("Clear list"), this);
    clear->setVisible(!projects.isEmpty());
    connect(clear, &ButtonLink::clicked, this, [this]() {
       GitQlientSettings().clearRecentProjects();
@@ -173,7 +175,7 @@ QWidget *InitScreen::createRecentProjectsPage()
       mRecentProjectsLayout->addWidget(createRecentProjectsPage());
    });
 
-   const auto lineTitle = new QFrame();
+   const auto lineTitle = new QFrame(this);
    lineTitle->setObjectName("separator");
 
    innerLayout->addWidget(lineTitle);
@@ -185,7 +187,7 @@ QWidget *InitScreen::createRecentProjectsPage()
 QWidget *InitScreen::createUsedProjectsPage()
 {
    delete mMostUsedInnerWidget;
-   mMostUsedInnerWidget = new QFrame();
+   mMostUsedInnerWidget = new QFrame(this);
 
    auto title = new QLabel(tr("Most used"));
    title->setStyleSheet("font-size: 14pt;");
@@ -201,14 +203,14 @@ QWidget *InitScreen::createUsedProjectsPage()
    {
       const auto projectName = project.mid(project.lastIndexOf("/") + 1);
       const auto labelText = QString("%1<br><em>%2</em>").arg(projectName, project);
-      const auto clickableFrame = new ButtonLink(labelText);
+      const auto clickableFrame = new ButtonLink(labelText, this);
       connect(clickableFrame, &ButtonLink::clicked, this, [this, project]() { emit signalOpenRepo(project); });
       innerLayout->addWidget(clickableFrame);
    }
 
    innerLayout->addStretch();
 
-   const auto clear = new ButtonLink(tr("Clear list"));
+   const auto clear = new ButtonLink(tr("Clear list"), this);
    clear->setVisible(!projects.isEmpty());
    connect(clear, &ButtonLink::clicked, this, [this]() {
       GitQlientSettings().clearMostUsedProjects();
@@ -216,7 +218,7 @@ QWidget *InitScreen::createUsedProjectsPage()
       mUsedProjectsLayout->addWidget(createUsedProjectsPage());
    });
 
-   const auto lineTitle = new QFrame();
+   const auto lineTitle = new QFrame(this);
    lineTitle->setObjectName("separator");
 
    innerLayout->addWidget(lineTitle);

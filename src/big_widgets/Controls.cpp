@@ -28,23 +28,24 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
-   , mHistory(new QToolButton())
-   , mDiff(new QToolButton())
-   , mBlame(new QToolButton())
-   , mPullBtn(new QToolButton())
-   , mPullOptions(new QToolButton())
-   , mPushBtn(new QToolButton())
-   , mRefreshBtn(new QToolButton())
-   , mConfigBtn(new QToolButton())
-   , mGitPlatform(new QToolButton())
-   , mBuildSystem(new QToolButton())
-   , mTerminal(new QToolButton())
-   , mPomodoro(new PomodoroButton(mGit))
-   , mVersionCheck(new QToolButton())
-   , mMergeWarning(new QPushButton(tr("WARNING: There is a merge pending to be committed! Click here to solve it.")))
+   , mHistory(new QToolButton(this))
+   , mDiff(new QToolButton(this))
+   , mBlame(new QToolButton(this))
+   , mPullBtn(new QToolButton(this))
+   , mPullOptions(new QToolButton(this))
+   , mPushBtn(new QToolButton(this))
+   , mRefreshBtn(new QToolButton(this))
+   , mConfigBtn(new QToolButton(this))
+   , mGitPlatform(new QToolButton(this))
+   , mBuildSystem(new QToolButton(this))
+   , mTerminal(new QToolButton(this))
+   , mPomodoro(new PomodoroButton(mGit, this))
+   , mVersionCheck(new QToolButton(this))
+   , mMergeWarning(
+         new QPushButton(tr("WARNING: There is a merge pending to be committed! Click here to solve it."), this))
    , mUpdater(new GitQlientUpdater(this))
-   , mBtnGroup(new QButtonGroup())
-   , mLastSeparator(new QFrame())
+   , mBtnGroup(new QButtonGroup(this))
+   , mLastSeparator(new QFrame(this))
 {
    GitQlientSettings settings(mGit->getGitDir());
 
@@ -141,11 +142,11 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mTerminal->setShortcut(Qt::CTRL | Qt::Key_7);
    mBtnGroup->addButton(mTerminal, static_cast<int>(ControlsMainViews::Terminal));
 
-   const auto separator = new QFrame();
+   const auto separator = new QFrame(this);
    separator->setObjectName("orangeSeparator");
    separator->setFixedHeight(20);
 
-   const auto separator2 = new QFrame();
+   const auto separator2 = new QFrame(this);
    separator2->setObjectName("orangeSeparator");
    separator2->setFixedHeight(20);
 
@@ -179,7 +180,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mGitPlatform->setVisible(false);
    mBuildSystem->setVisible(false);
 
-   mPluginsSeparator = new QFrame();
+   mPluginsSeparator = new QFrame(this);
    mPluginsSeparator->setObjectName("orangeSeparator");
    mPluginsSeparator->setFixedHeight(20);
    mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible() || mTerminal->isVisible());

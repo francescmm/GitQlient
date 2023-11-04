@@ -51,13 +51,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    , mGitBase(git)
    , mSettings(settings)
    , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache, mSettings))
-   , mHistoryWidget(new HistoryWidget(mGitQlientCache, mGitBase, mSettings))
-   , mStackedLayout(new QStackedLayout())
-   , mControls(new Controls(mGitQlientCache, mGitBase))
-   , mDiffWidget(new DiffWidget(mGitBase, mGitQlientCache))
-   , mBlameWidget(new BlameWidget(mGitQlientCache, mGitBase, mSettings))
-   , mMergeWidget(new MergeWidget(mGitQlientCache, mGitBase))
-   , mConfigWidget(new ConfigWidget(mGitBase))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
@@ -69,10 +62,21 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    setWindowTitle("GitQlient");
    setAttribute(Qt::WA_DeleteOnClose);
 
+   mStackedLayout = new QStackedLayout();
+
+   mHistoryWidget = new HistoryWidget(mGitQlientCache, mGitBase, mSettings, this);
    mHistoryWidget->setContentsMargins(QMargins(5, 5, 5, 5));
+
+   mDiffWidget = new DiffWidget(mGitBase, mGitQlientCache, this);
    mDiffWidget->setContentsMargins(QMargins(5, 5, 5, 5));
+
+   mBlameWidget = new BlameWidget(mGitQlientCache, mGitBase, mSettings, this);
    mBlameWidget->setContentsMargins(QMargins(5, 5, 5, 5));
+
+   mMergeWidget = new MergeWidget(mGitQlientCache, mGitBase, this);
    mMergeWidget->setContentsMargins(QMargins(5, 5, 5, 5));
+
+   mConfigWidget = new ConfigWidget(mGitBase, this);
    mConfigWidget->setContentsMargins(QMargins(5, 5, 5, 5));
 
    mIndexMap[ControlsMainViews::History] = mStackedLayout->addWidget(mHistoryWidget);
@@ -80,6 +84,8 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    mIndexMap[ControlsMainViews::Blame] = mStackedLayout->addWidget(mBlameWidget);
    mIndexMap[ControlsMainViews::Merge] = mStackedLayout->addWidget(mMergeWidget);
    mIndexMap[ControlsMainViews::Config] = mStackedLayout->addWidget(mConfigWidget);
+
+   mControls = new Controls(mGitQlientCache, mGitBase, this);
 
    const auto mainLayout = new QVBoxLayout();
    mainLayout->setSpacing(0);

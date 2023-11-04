@@ -38,9 +38,6 @@ using namespace QLogger;
 
 GitQlient::GitQlient(QWidget *parent)
    : QWidget(parent)
-   , mStackedLayout(new QStackedLayout(this))
-   , mRepos(new QPinnableTabWidget())
-   , mConfigWidget(new InitScreen())
 {
 
    auto font = QApplication::font();
@@ -57,7 +54,7 @@ GitQlient::GitQlient(QWidget *parent)
 
    setStyleSheet(GitQlientStyles::getStyles());
 
-   const auto homeMenu = new QPushButton();
+   const auto homeMenu = new QPushButton(this);
    const auto menu = new QMenu(homeMenu);
 
    homeMenu->setIcon(QIcon(":/icons/burger_menu"));
@@ -113,18 +110,20 @@ GitQlient::GitQlient(QWidget *parent)
 
    menu->addMenu(mostUsed);
 
+   mRepos = new QPinnableTabWidget(this);
    mRepos->setObjectName("GitQlientTab");
    mRepos->setStyleSheet(GitQlientStyles::getStyles());
    mRepos->setCornerWidget(homeMenu, Qt::TopLeftCorner);
    connect(mRepos, &QTabWidget::tabCloseRequested, this, &GitQlient::closeTab);
    connect(mRepos, &QTabWidget::currentChanged, this, &GitQlient::updateWindowTitle);
 
+   mConfigWidget = new InitScreen(this);
+
+   mStackedLayout = new QStackedLayout(this);
    mStackedLayout->setContentsMargins(QMargins());
    mStackedLayout->addWidget(mConfigWidget);
    mStackedLayout->addWidget(mRepos);
    mStackedLayout->setCurrentIndex(0);
-
-   mConfigWidget->onRepoOpened();
 
    connect(mConfigWidget, qOverload<>(&InitScreen::signalOpenRepo), this, &GitQlient::openRepo);
    connect(mConfigWidget, qOverload<const QString &>(&InitScreen::signalOpenRepo), this, &GitQlient::addRepoTab);
@@ -142,6 +141,8 @@ GitQlient::GitQlient(QWidget *parent)
    connect(mGit.data(), &GitConfig::signalCloningProgress, this, &GitQlient::updateProgressDialog,
            Qt::DirectConnection);
    connect(mGit.data(), &GitConfig::signalCloningFailure, this, &GitQlient::showError, Qt::DirectConnection);
+
+   // mConfigWidget->onRepoOpened();
 }
 
 GitQlient::~GitQlient()
