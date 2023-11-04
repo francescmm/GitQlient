@@ -20,10 +20,10 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<GitCach
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)
-   , mInfoPanelBase(new CommitInfoPanel())
-   , mInfoPanelParent(new CommitInfoPanel())
-   , mCenterStackedWidget(new QPinnableTabWidget())
-   , fileListWidget(new FileListWidget(mGit, cache))
+   , mInfoPanelBase(new CommitInfoPanel(this))
+   , mInfoPanelParent(new CommitInfoPanel(this))
+   , mCenterStackedWidget(new QPinnableTabWidget(this))
+   , fileListWidget(new FileListWidget(mGit, cache, this))
 {
    setAttribute(Qt::WA_DeleteOnClose);
 
@@ -35,10 +35,10 @@ DiffWidget::DiffWidget(const QSharedPointer<GitBase> git, QSharedPointer<GitCach
    connect(mCenterStackedWidget, &QTabWidget::currentChanged, this, &DiffWidget::changeSelection);
    connect(mCenterStackedWidget, &QTabWidget::tabCloseRequested, this, &DiffWidget::onTabClosed);
 
-   const auto wipSeparator = new QFrame();
+   const auto wipSeparator = new QFrame(this);
    wipSeparator->setObjectName("separator");
 
-   const auto infoPanel = new QFrame();
+   const auto infoPanel = new QFrame(this);
    infoPanel->setFixedWidth(350);
    infoPanel->setObjectName("InfoPanel");
    const auto diffsLayout = new QVBoxLayout(infoPanel);

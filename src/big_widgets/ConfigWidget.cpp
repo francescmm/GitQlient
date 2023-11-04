@@ -57,7 +57,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    , ui(new Ui::ConfigWidget)
    , mGit(git)
    , mFeedbackTimer(new QTimer())
-   , mSave(new QPushButton())
+   , mSave(new QPushButton(this))
    , mPluginsDownloader(new PluginsDownloader(this))
    , mDownloadButtons(new QButtonGroup(this))
 {
