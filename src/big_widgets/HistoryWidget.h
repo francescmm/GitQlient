@@ -115,6 +115,12 @@ signals:
     \brief Signal triggered when the user performs a merge and it contains conflicts.
    */
    void signalMergeConflicts();
+
+   /**
+    * @brief Signal triggered when trying to rebase and a conflict happens.
+    */
+   void signalRebaseConflict();
+
    /*!
     * \brief signalConflict Signal triggered when trying to cherry-pick or pull and a conflict happens.
     */

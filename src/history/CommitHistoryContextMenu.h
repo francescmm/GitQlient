@@ -55,6 +55,12 @@ signals:
     \param sha The SHA of the commit to amend.
    */
    void signalAmendCommit(const QString &sha);
+
+   /**
+    * @brief Signal triggered when trying to rebase and a conflict happens.
+    */
+   void signalRebaseConflict();
+
    /*!
     \brief Signal triggered when a merge has been requested. Since it involves a lot of changes at UI level this action
     is not performed here.
@@ -187,6 +193,12 @@ private:
     \brief Resets the current branch reference into the selected commit overriding all changes.
    */
    void resetHard();
+
+   /**
+    * @brief Rebases the current branch over the selected branch.
+    */
+   void rebase();
+
    /*!
     \brief Merges the \p branchFrom into the current branch.
 

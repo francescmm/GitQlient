@@ -160,6 +160,11 @@ void MergeWidget::configureForCherryPick(const RevisionFiles &files, const QStri
    fillButtonFileList(files);
 }
 
+void MergeWidget::configureForRebase()
+{
+
+}
+
 void MergeWidget::fillButtonFileList(const RevisionFiles &files)
 {
    for (auto i = 0; i < files.count(); ++i)

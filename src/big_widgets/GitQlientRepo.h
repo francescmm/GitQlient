@@ -257,6 +257,9 @@ private:
 
    */
    void showWarningMerge();
+
+   void showRebaseConflict();
+
    /*!
     * \brief Configures the merge widget when a conflict happens and is due to a cherry-pick. The conflicts are shown in
     * the merge view.

@@ -132,6 +132,8 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mHistoryWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
    connect(mHistoryWidget, &HistoryWidget::changesCommitted, this, &GitQlientRepo::onChangesCommitted);
    connect(mHistoryWidget, &HistoryWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
+   connect(mHistoryWidget, &HistoryWidget::signalRebaseConflict, mControls, &Controls::activateMergeWarning);
+   connect(mHistoryWidget, &HistoryWidget::signalRebaseConflict, this, &GitQlientRepo::showRebaseConflict);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, mControls, &Controls::activateMergeWarning);
    connect(mHistoryWidget, &HistoryWidget::signalMergeConflicts, this, &GitQlientRepo::showWarningMerge);
    connect(mHistoryWidget, &HistoryWidget::signalCherryPickConflict, mControls, &Controls::activateMergeWarning);
@@ -454,6 +456,20 @@ void GitQlientRepo::showWarningMerge()
 
    if (file)
       mMergeWidget->configure(file.value(), MergeWidget::ConflictReason::Merge);
+}
+
+void GitQlientRepo::showRebaseConflict()
+{
+   showMergeView();
+
+   const auto wipCommit = mGitQlientCache->commitInfo(ZERO_SHA);
+
+   WipHelper::update(mGitBase, mGitQlientCache);
+
+   const auto files = mGitQlientCache->revisionFile(ZERO_SHA, wipCommit.firstParent());
+
+   if (files)
+      mMergeWidget->configureForRebase();
 }
 
 // TODO: Optimize

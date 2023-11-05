@@ -208,6 +208,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
          connect(menu, &CommitHistoryContextMenu::signalOpenDiff, this, &CommitHistoryView::signalOpenDiff);
          connect(menu, &CommitHistoryContextMenu::signalAmendCommit, this, &CommitHistoryView::signalAmendCommit);
          connect(menu, &CommitHistoryContextMenu::signalMergeRequired, this, &CommitHistoryView::signalMergeRequired);
+         connect(menu, &CommitHistoryContextMenu::signalRebaseConflict, this, &CommitHistoryView::signalRebaseConflict);
          connect(menu, &CommitHistoryContextMenu::mergeSqushRequested, this, &CommitHistoryView::mergeSqushRequested);
          connect(menu, &CommitHistoryContextMenu::signalCherryPickConflict, this,
                  &CommitHistoryView::signalCherryPickConflict);

@@ -9,6 +9,7 @@
 #include <GitConfig.h>
 #include <GitHistory.h>
 #include <GitLocal.h>
+#include <GitMerge.h>
 #include <GitPatches.h>
 #include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
@@ -386,6 +387,67 @@ void CommitHistoryContextMenu::cherryPickCommit()
    }
 }
 
+void CommitHistoryContextMenu::rebase()
+{
+   const auto action = qobject_cast<QAction *>(sender());
+   const auto branchToRebase = action->data().toString();
+
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   QScopedPointer<GitMerge> git(new GitMerge(mGit));
+   const auto ret = git->rebase(branchToRebase);
+   QApplication::restoreOverrideCursor();
+
+   if (ret.success)
+   {
+      if (!ret.output.isEmpty())
+      {
+         if (ret.output.contains("error: could not apply", Qt::CaseInsensitive)
+             || ret.output.contains(" conflict", Qt::CaseInsensitive))
+         {
+            QMessageBox msgBox(
+                QMessageBox::Warning, tr("Rebase status"),
+                QString(tr(
+                    "There were problems during the rebase. Please, see the detailed description for more "
+                    "information.<br><br>GitQlient cannot handle these conflicts at the moment.<br><br>The rebase will "
+                    "be aborted.")),
+                QMessageBox::Ok, this);
+            msgBox.setDetailedText(ret.output);
+            msgBox.setStyleSheet(GitQlientStyles::getStyles());
+            msgBox.exec();
+
+            git->rebaseAbort();
+
+            // TODO: For future implementation of manage rebase conflics
+            // emit signalRebaseConflict();
+         }
+      }
+      else
+      {
+         WipHelper::update(mGit, mCache);
+
+         emit fullReload();
+      }
+   }
+   else
+   {
+      QMessageBox msgBox(
+          QMessageBox::Critical, tr("Rebase failed"),
+          QString(
+              tr("There were problems during the rebase. Please, see the detailed description for more "
+                 "information.<br><br>GitQlient cannot handle these conflicts at the moment.<br><br>The rebase will be "
+                 "aborted.")),
+          QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output);
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+
+      git->rebaseAbort();
+
+      // TODO: For future implementation of manage rebase conflics
+      // emit signalRebaseConflict();
+   }
+}
+
 void CommitHistoryContextMenu::applyPatch()
 {
    const QString fileName(QFileDialog::getOpenFileName(this, tr("Select a patch to apply")));
@@ -667,17 +729,25 @@ void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 
    if (QScopedPointer<GitBranches> git(new GitBranches(mGit)); !git->isCommitInCurrentGeneologyTree(sha))
    {
+      const auto rebaseMenu = !branchTracking.isEmpty() ? addMenu(tr("Rebase")) : this;
+      const auto mergeMenu = !branchTracking.isEmpty() ? addMenu(tr("Merge")) : this;
+      const auto squashMergeMenu = !branchTracking.isEmpty() ? addMenu(tr("Squash-merge")) : this;
+
       for (const auto &pair : branchTracking.toStdMap())
       {
          if (!pair.first.isEmpty() && pair.first != currentBranch
              && pair.first != QString("origin/%1").arg(currentBranch))
          {
             // If is the last commit of a branch
-            const auto mergeBranchAction = addAction(QString(tr("Merge %1")).arg(pair.first));
+            const auto rebaseBranchAction = rebaseMenu->addAction(QString(tr("%1")).arg(pair.first));
+            rebaseBranchAction->setData(pair.first);
+            connect(rebaseBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::rebase);
+
+            const auto mergeBranchAction = mergeMenu->addAction(QString(tr("%1")).arg(pair.first));
             mergeBranchAction->setData(pair.first);
             connect(mergeBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::merge);
 
-            const auto mergeSquashBranchAction = addAction(QString(tr("Squash-merge %1")).arg(pair.first));
+            const auto mergeSquashBranchAction = squashMergeMenu->addAction(QString(tr("%1")).arg(pair.first));
             mergeSquashBranchAction->setData(pair.first);
             connect(mergeSquashBranchAction, &QAction::triggered, this, &CommitHistoryContextMenu::mergeSquash);
          }

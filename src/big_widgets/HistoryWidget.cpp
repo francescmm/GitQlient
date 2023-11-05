@@ -152,6 +152,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
       commitSelected(rowIndex);
    });
    connect(mRepositoryView, &CommitHistoryView::signalAmendCommit, this, &HistoryWidget::onAmendCommit);
+   connect(mRepositoryView, &CommitHistoryView::signalRebaseConflict, this, &HistoryWidget::signalRebaseConflict);
    connect(mRepositoryView, &CommitHistoryView::signalMergeRequired, this, &HistoryWidget::mergeBranch);
    connect(mRepositoryView, &CommitHistoryView::mergeSqushRequested, this, &HistoryWidget::mergeSquashBranch);
    connect(mRepositoryView, &CommitHistoryView::signalCherryPickConflict, this,

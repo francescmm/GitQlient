@@ -91,6 +91,8 @@ public:
     */
    void configureForCherryPick(const RevisionFiles &files, const QStringList &pendingShas = QStringList());
 
+   void configureForRebase();
+
 private:
    QSharedPointer<GitCache> mGitQlientCache;
    QSharedPointer<GitBase> mGit;

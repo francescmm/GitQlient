@@ -61,6 +61,12 @@ signals:
     \param sha The SHA of the commit to amend.
    */
    void signalAmendCommit(const QString &sha);
+
+   /**
+    * @brief Signal triggered when trying to rebase and a conflict happens.
+    */
+   void signalRebaseConflict();
+
    /*!
     \brief Signal triggered when a merge has been requested. Since it involves a lot of changes at UI level this action
     is not performed here.
