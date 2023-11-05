@@ -114,7 +114,8 @@ QColor GitQlientStyles::getShadowedGreen()
 std::array<QColor, GitQlientStyles::kBranchColors> GitQlientStyles::getBranchColors()
 {
    static std::array<QColor, kBranchColors> colors { { getTextColor(), graphRed, getBlue(), graphGreen, graphOrange,
-                                                       graphGrey, graphPink, graphPastel } };
+                                                       graphAubergine, graphCoral, graphGrey, graphTurquoise, graphPink,
+                                                       graphPastel } };
 
    return colors;
 }

@@ -90,20 +90,28 @@ private:
    int mColumnPressed = -1;
 
    /**
+    * @brief Paints a fine vertical line aimed to help in the visualization of to what branch the commit belongs to.
+    * @param p The painter device.
+    * @param o The style options of the item.
+    * @param commit The commit information.
+    */
+   void painBranchHelper(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit) const;
+
+   /**
     * @brief Paints the log column. This method is in charge of painting the commit message as well as tags or
     * branches.
     *
     * @param p The painter device.
     * @param o The style options of the item.
-    * @param i The index with the item data.
+    * @param commit The commit information.
     */
-   void paintLog(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit, const QString &text) const;
+   void paintLog(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit) const;
    /**
     * @brief Method that sets up the configuration to paint the lane for the commit graph representation.
     *
     * @param p The painter device.
     * @param o The style options of the item.
-    * @param index The index with the item data.
+    * @param commit The commit information.
     */
    void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit) const;
 

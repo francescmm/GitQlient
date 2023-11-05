@@ -39,7 +39,7 @@ class GitQlientSettings;
 class GitQlientStyles
 {
 private:
-   static const int kBranchColors = 8; /*!< Total of branch colors. */
+   static const int kBranchColors = 11; /*!< Total of branch colors. */
 
 public:
    /*!

@@ -18,6 +18,7 @@
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QEvent>
+#include <QHeaderView>
 #include <QPainter>
 #include <QPainterPath>
 #include <QSortFilterProxyModel>
@@ -41,16 +42,6 @@ RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<GitCache> &c
 
 void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt, const QModelIndex &index) const
 {
-   p->setRenderHints(QPainter::Antialiasing);
-
-   QStyleOptionViewItem newOpt(opt);
-   newOpt.font.setPointSize(9);
-
-   if (newOpt.state & QStyle::State_Selected)
-      p->fillRect(newOpt.rect, GitQlientStyles::getGraphSelectionColor());
-   else if (newOpt.state & QStyle::State_MouseOver)
-      p->fillRect(newOpt.rect, GitQlientStyles::getGraphHoverColor());
-
    const auto row = mView->hasActiveFilter()
        ? dynamic_cast<QSortFilterProxyModel *>(mView->model())->mapToSource(index).row()
        : index.row();
@@ -60,67 +51,104 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
    if (commit.sha.isEmpty())
       return;
 
+   p->setRenderHints(QPainter::Antialiasing);
+
+   QStyleOptionViewItem newOpt(opt);
+   newOpt.font.setPointSize(9);
+
+   if (newOpt.state & QStyle::State_Selected || newOpt.state & QStyle::State_MouseOver)
+   {
+      const auto nonGraphColumnBkgColor = newOpt.state & QStyle::State_Selected
+          ? GitQlientStyles::getGraphSelectionColor()
+          : GitQlientStyles::getGraphHoverColor();
+
+      p->fillRect(newOpt.rect, nonGraphColumnBkgColor);
+
+      if (index.column() == static_cast<int>(CommitHistoryColumns::Graph)
+          && (mView->hasActiveFilter() || commit.sha != ZERO_SHA))
+      {
+         auto color = GitQlientStyles::getBranchColorAt(
+             mView->hasActiveFilter() ? 0 : commit.getActiveLane() % GitQlientStyles::getTotalBranchColors());
+         color.setAlpha(90);
+
+         newOpt.rect.setWidth(newOpt.rect.width() - 3);
+
+         p->fillRect(newOpt.rect, color);
+      }
+   }
+
    if (index.column() == static_cast<int>(CommitHistoryColumns::Graph))
    {
       newOpt.rect.setX(newOpt.rect.x() + 10);
       paintGraph(p, newOpt, commit);
    }
-   else if (index.column() == static_cast<int>(CommitHistoryColumns::Log))
-      paintLog(p, newOpt, commit, index.data().toString());
    else
    {
+      const auto currentColVisualIndex = mView->header()->visualIndex(index.column());
+      const auto firstNonGraphColVisualIndex
+          = mView->header()->visualIndex(static_cast<int>(CommitHistoryColumns::Graph)) + 1;
 
-      p->setPen(GitQlientStyles::getTextColor());
-      newOpt.rect.setX(newOpt.rect.x() + 10);
+      if (currentColVisualIndex == firstNonGraphColVisualIndex)
+         painBranchHelper(p, newOpt, commit);
 
-      QTextOption textalignment(Qt::AlignLeft | Qt::AlignVCenter);
-      auto text = index.data().toString();
-
-      if (index.column() == static_cast<int>(CommitHistoryColumns::Date))
+      if (index.column() == static_cast<int>(CommitHistoryColumns::Log))
       {
-         textalignment = QTextOption(Qt::AlignRight | Qt::AlignVCenter);
-         const auto prev = QDateTime::fromString(mView->indexAbove(index).data().toString(), "dd MMM yyyy hh:mm");
-         const auto current = QDateTime::fromString(text, "dd MMM yyyy hh:mm");
-
-         if (current.date() == prev.date())
-            text = current.toString("hh:mm");
-         else
-            text = current.toString("dd MMM yyyy - hh:mm");
-
-         newOpt.rect.setWidth(newOpt.rect.width() - 5);
+         paintLog(p, newOpt, commit);
       }
-      else if (index.column() == static_cast<int>(CommitHistoryColumns::Sha))
+      else
       {
-         newOpt.font.setPointSize(8);
-         newOpt.font.setFamily("DejaVu Sans Mono");
+         p->setPen(GitQlientStyles::getTextColor());
+         newOpt.rect.setX(newOpt.rect.x() + 10);
 
-         text = commit.sha != ZERO_SHA ? text.left(8) : "";
+         QTextOption textalignment(Qt::AlignLeft | Qt::AlignVCenter);
+         auto text = index.data().toString();
+
+         if (index.column() == static_cast<int>(CommitHistoryColumns::Date))
+         {
+            textalignment = QTextOption(Qt::AlignRight | Qt::AlignVCenter);
+            const auto prev = QDateTime::fromString(mView->indexAbove(index).data().toString(), "dd MMM yyyy hh:mm");
+            const auto current = QDateTime::fromString(text, "dd MMM yyyy hh:mm");
+
+            if (current.date() == prev.date())
+               text = current.toString("hh:mm");
+            else
+               text = current.toString("dd MMM yyyy - hh:mm");
+
+            newOpt.rect.setWidth(newOpt.rect.width() - 5);
+         }
+         else if (index.column() == static_cast<int>(CommitHistoryColumns::Sha))
+         {
+            newOpt.font.setPointSize(8);
+            newOpt.font.setFamily("DejaVu Sans Mono");
+
+            text = commit.sha != ZERO_SHA ? text.left(8) : "";
+         }
+         else if (index.column() == static_cast<int>(CommitHistoryColumns::Author) && commit.isSigned())
+         {
+            static const auto size = 15;
+            static const auto offset = 5;
+            QPixmap pic(QString::fromUtf8(commit.verifiedSignature() ? ":/icons/signed" : ":/icons/unsigned"));
+            pic = pic.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+            const auto inc = (newOpt.rect.height() - size) / 2;
+
+            p->drawPixmap(QRect(newOpt.rect.x(), newOpt.rect.y() + inc, size, size), pic);
+
+            newOpt.rect.setX(newOpt.rect.x() + size + offset);
+         }
+
+         QFontMetrics fm(newOpt.font);
+         p->setFont(newOpt.font);
+
+         if (const auto cursorColumn = mView->indexAt(mView->mapFromGlobal(QCursor::pos())).column();
+             newOpt.state & QStyle::State_MouseOver && cursorColumn == index.column()
+             && cursorColumn == static_cast<int>(CommitHistoryColumns::Sha))
+         {
+            p->setPen(gitQlientOrange);
+         }
+
+         p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()), textalignment);
       }
-      else if (index.column() == static_cast<int>(CommitHistoryColumns::Author) && commit.isSigned())
-      {
-         static const auto size = 15;
-         static const auto offset = 5;
-         QPixmap pic(QString::fromUtf8(commit.verifiedSignature() ? ":/icons/signed" : ":/icons/unsigned"));
-         pic = pic.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-         const auto inc = (newOpt.rect.height() - size) / 2;
-
-         p->drawPixmap(QRect(newOpt.rect.x(), newOpt.rect.y() + inc, size, size), pic);
-
-         newOpt.rect.setX(newOpt.rect.x() + size + offset);
-      }
-
-      QFontMetrics fm(newOpt.font);
-      p->setFont(newOpt.font);
-
-      if (const auto cursorColumn = mView->indexAt(mView->mapFromGlobal(QCursor::pos())).column();
-          newOpt.state & QStyle::State_MouseOver && cursorColumn == index.column()
-          && cursorColumn == static_cast<int>(CommitHistoryColumns::Sha))
-      {
-         p->setPen(gitQlientOrange);
-      }
-
-      p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()), textalignment);
    }
 }
 
@@ -154,6 +182,32 @@ bool RepositoryViewDelegate::editorEvent(QEvent *event, QAbstractItemModel *mode
    }
 
    return QStyledItemDelegate::editorEvent(event, model, option, index);
+}
+
+void RepositoryViewDelegate::painBranchHelper(QPainter *p, const QStyleOptionViewItem &opt,
+                                              const CommitInfo &commit) const
+{
+   const auto colorIndex = mView->hasActiveFilter() ? 0
+       : commit.sha != ZERO_SHA                     ? commit.getActiveLane() % GitQlientStyles::getTotalBranchColors()
+                                                    : -1;
+
+   if (colorIndex != -1)
+   {
+      static const auto LINE_OFFSET = 6;
+
+      const auto activeColor = GitQlientStyles::getBranchColorAt(colorIndex);
+
+      static QPen lanePen(GitQlientStyles::getTextColor(), 2); // fast path here
+      lanePen.setBrush(activeColor);
+      lanePen.setColor(activeColor);
+
+      p->save();
+      p->setRenderHint(QPainter::Antialiasing);
+      p->setPen(lanePen);
+      p->drawLine(opt.rect.x() + 3, opt.rect.y() + LINE_OFFSET, opt.rect.x() + 3,
+                  opt.rect.y() + ROW_HEIGHT - LINE_OFFSET);
+      p->restore();
+   }
 }
 
 void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool laneHeadPresent, int x1, int x2,
@@ -421,21 +475,20 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    p->restore();
 }
 
-void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const CommitInfo &commit,
-                                      const QString &text) const
+void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const CommitInfo &commit) const
 {
    const auto sha = commit.sha;
 
    if (sha.isEmpty())
       return;
 
-   auto offset = 0;
+   auto offset = 5;
 
    if (mGitServerCache)
    {
       if (const auto pr = mGitServerCache->getPullRequest(commit.sha); pr.isValid())
       {
-         offset = 5;
+         offset += 5;
          paintPrStatus(p, opt, offset, pr);
       }
    }
@@ -449,7 +502,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    p->setFont(newOpt.font);
    p->setPen(GitQlientStyles::getTextColor());
-   p->drawText(newOpt.rect, fm.elidedText(text, Qt::ElideRight, newOpt.rect.width()),
+   p->drawText(newOpt.rect, fm.elidedText(commit.shortLog, Qt::ElideRight, newOpt.rect.width()),
                QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
 }
 
@@ -462,8 +515,8 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
       QVector<QColor> colors;
       const auto currentBranch = mGit->getCurrentBranch();
 
-      if (startPoint == 0)
-         startPoint = 5;
+      if (startPoint <= 5)
+         startPoint += 5;
 
       if ((currentBranch.isEmpty() || currentBranch == "HEAD"))
       {
