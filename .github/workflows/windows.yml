@@ -28,7 +28,7 @@ jobs:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         timeout-minutes: 10
         with:
-          version: 5.15.2
+          version: 6.6.0
           target: desktop
           host: windows
           install-deps: true
