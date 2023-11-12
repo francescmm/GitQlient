@@ -23,7 +23,7 @@ jobs:
           submodules: 'true'
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2.13.2
+        uses: jurplel/install-qt-action@v3
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         timeout-minutes: 10
@@ -33,6 +33,7 @@ jobs:
           host: windows
           install-deps: true
           arch: win64_msvc2019_64
+          aqtversion: '==3.1.*'
 
       - name: Install dependencies
         run: choco install jom -y

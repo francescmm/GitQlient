@@ -51,7 +51,7 @@ jobs:
 
       - name: Install Qt for AppImage
         if: matrix.env.name == 'Linux AppImage'
-        uses: jurplel/install-qt-action@v3.2.1
+        uses: jurplel/install-qt-action@v3
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         timeout-minutes: 10
@@ -60,6 +60,7 @@ jobs:
           target: desktop
           host: ${{ matrix.env.qtplatform }}
           install-deps: true
+          aqtversion: '==3.1.*'
 
       - name: Build GitQlient AppImage
         if: matrix.env.name == 'Linux AppImage'

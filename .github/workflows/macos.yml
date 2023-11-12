@@ -26,7 +26,7 @@ jobs:
           submodules: 'true'
 
       - name: Installing Qt
-        uses: jurplel/install-qt-action@v3.2.1
+        uses: jurplel/install-qt-action@v3
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         timeout-minutes: 10
@@ -35,6 +35,7 @@ jobs:
           target: desktop
           host: ${{ matrix.env.qtplatform }}
           install-deps: true
+          aqtversion: '==3.1.*'
 
       - name: Installing dependencies
         id: vars
