@@ -8,6 +8,7 @@
 #include <GitBase.h>
 #include <GitCache.h>
 #include <GitLocal.h>
+#include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
 #include <GitServerTypes.h>
 #include <IGitServerCache.h>
@@ -88,12 +89,14 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
       const auto firstNonGraphColVisualIndex
           = mView->header()->visualIndex(static_cast<int>(CommitHistoryColumns::Graph)) + 1;
 
+      QColor laneColor;
+
       if (currentColVisualIndex == firstNonGraphColVisualIndex)
-         painBranchHelper(p, newOpt, commit);
+         laneColor = paintBranchHelper(p, newOpt, commit);
 
       if (index.column() == static_cast<int>(CommitHistoryColumns::Log))
       {
-         paintLog(p, newOpt, commit);
+         paintLog(p, newOpt, laneColor, commit);
       }
       else
       {
@@ -184,8 +187,8 @@ bool RepositoryViewDelegate::editorEvent(QEvent *event, QAbstractItemModel *mode
    return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
 
-void RepositoryViewDelegate::painBranchHelper(QPainter *p, const QStyleOptionViewItem &opt,
-                                              const CommitInfo &commit) const
+QColor RepositoryViewDelegate::paintBranchHelper(QPainter *p, const QStyleOptionViewItem &opt,
+                                                 const CommitInfo &commit) const
 {
    const auto colorIndex = mView->hasActiveFilter() ? 0
        : commit.sha != ZERO_SHA                     ? commit.getActiveLane() % GitQlientStyles::getTotalBranchColors()
@@ -207,7 +210,11 @@ void RepositoryViewDelegate::painBranchHelper(QPainter *p, const QStyleOptionVie
       p->drawLine(opt.rect.x() + 3, opt.rect.y() + LINE_OFFSET, opt.rect.x() + 3,
                   opt.rect.y() + ROW_HEIGHT - LINE_OFFSET);
       p->restore();
+
+      return activeColor;
    }
+
+   return QColor();
 }
 
 void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool laneHeadPresent, int x1, int x2,
@@ -475,7 +482,8 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
    p->restore();
 }
 
-void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const CommitInfo &commit) const
+void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QColor &currentLangeColor,
+                                      const CommitInfo &commit) const
 {
    const auto sha = commit.sha;
 
@@ -493,10 +501,11 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
       }
    }
 
-   paintTagBranch(p, opt, offset, sha);
+   paintTagBranch(p, opt, currentLangeColor, offset, sha);
 
    auto newOpt = opt;
    newOpt.rect.setX(opt.rect.x() + offset + 5);
+   newOpt.rect.setY(newOpt.rect.y() - TEXT_HEIGHT_OFFSET);
 
    QFontMetrics fm(newOpt.font);
 
@@ -506,13 +515,20 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
                QTextOption(Qt::AlignLeft | Qt::AlignVCenter));
 }
 
-void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewItem o, int &startPoint,
-                                            const QString &sha) const
+void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewItem o, const QColor &currentLangeColor,
+                                            int &startPoint, const QString &sha) const
 {
    if (mCache->hasReferences(sha) && !mView->hasActiveFilter())
    {
-      QVector<QString> marks;
-      QVector<QColor> colors;
+      struct RefConfig
+      {
+         QString name;
+         QColor color;
+         QString icon;
+         bool isTag = false;
+      };
+
+      QVector<RefConfig> refs;
       const auto currentBranch = mGit->getCurrentBranch();
 
       if (startPoint <= 5)
@@ -522,71 +538,73 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
       {
          if (const auto ret = mGit->getLastCommit(); ret.success && sha == ret.output.trimmed())
          {
-            marks.append("detached");
-            colors.append(graphDetached);
+            refs.append({ "detached", graphDetached, "" });
          }
       }
 
+      static const auto suffix
+          = QString::fromUtf8(GitQlientSettings().globalValue("colorSchema", 0).toInt() == 1 ? "bright" : "dark");
       const auto localBranches = mCache->getReferences(sha, References::Type::LocalBranch);
       for (const auto &branch : localBranches)
       {
-         if (branch == currentBranch)
-         {
-            marks.prepend(branch);
-            colors.prepend(graphCurrentBranch);
-         }
-         else
-         {
-            marks.append(branch);
-            colors.append(graphLocalBranch);
-         }
+         refs.append({ branch, currentLangeColor, QString(":/icons/branch_indicator_%1").arg(suffix) });
       }
 
       const auto tags = mCache->getReferences(sha, References::Type::LocalTag);
       for (const auto &tag : tags)
       {
-         marks.append(tag);
-         colors.append(graphTag);
+         refs.append({ tag, graphTag, QString(":/icons/tag_indicator_%1").arg(suffix), true });
       }
 
       const auto remoteBranches = mCache->getReferences(sha, References::Type::RemoteBranches);
       for (const auto &branch : remoteBranches)
       {
-         marks.append(branch);
-         colors.append(graphRemoteBranch);
+         refs.append({ branch, currentLangeColor, QString(":/icons/branch_indicator_%1").arg(suffix) });
       }
 
       const auto showMinimal = o.rect.width() <= MIN_VIEW_WIDTH_PX;
-      const auto mark_spacing = 5; // Space between markers in pixels
-      const auto mapEnd = marks.constEnd();
+      const auto mark_spacing = 7; // Space between markers in pixels
 
-      auto mapIt = marks.constBegin();
-      auto colorIter = colors.constBegin();
-      for (; mapIt != mapEnd; ++mapIt, ++colorIter)
+      for (auto &iter : refs)
       {
-         const auto isCurrentSpot = *mapIt == "detached" || *mapIt == currentBranch;
+         const auto isCurrentSpot = iter.name == "detached" || iter.name == currentBranch;
          o.font.setBold(isCurrentSpot);
 
-         const auto nameToDisplay = showMinimal ? QString(". . .") : *mapIt;
+         const auto nameToDisplay = showMinimal ? QString(". . .") : iter.name;
          const QFontMetrics fm(o.font);
          const auto textBoundingRect = fm.boundingRect(nameToDisplay);
-         const int textPadding = 3;
-         const auto rectWidth = textBoundingRect.width() + 2 * textPadding;
-         const QRectF markerRect(o.rect.x() + startPoint, o.rect.y() + 2, rectWidth, ROW_HEIGHT - 4);
+         const int textPadding = 5;
+         const auto iconSize = ROW_HEIGHT - 4;
+         const auto rectWidth = textBoundingRect.width() + 2 * textPadding + iconSize;
 
          painter->save();
          painter->setRenderHint(QPainter::Antialiasing);
-         painter->setPen(QPen(*colorIter, 2));
-         QPainterPath path;
-         path.addRoundedRect(markerRect, 1, 1);
-         painter->fillPath(path, *colorIter);
-         painter->drawPath(path);
+         painter->setPen(QPen(iter.color, 2));
 
-         // TODO: Fix this with a nicer way
-         painter->setPen(QColor(*colorIter == graphTag ? textColorBright : textColorDark));
+         QRectF markerRect(o.rect.x() + startPoint, o.rect.y() + 2, rectWidth, iconSize);
+         {
+            QPainterPath path;
+            path.addRoundedRect(markerRect, 1, 1);
+            painter->drawPath(path);
+         }
 
-         painter->setFont(o.font);
-         painter->drawText(markerRect, Qt::AlignCenter, nameToDisplay);
+         QRectF iconRect(o.rect.x() + startPoint, o.rect.y() + 2, iconSize, iconSize);
+         {
+            QPainterPath smallPath;
+            smallPath.addRoundedRect(iconRect, 1, 1);
+            painter->fillPath(smallPath, iter.color);
+            painter->drawImage(iconRect, QImage(iter.icon));
+         }
+
+         {
+            QRectF textRect(iconRect.x() + iconRect.width() + textPadding, o.rect.y(), textBoundingRect.width(),
+                            iconSize);
+            painter->setPen(GitQlientSettings().globalValue("colorSchema", 0).toInt() == 1 ? textColorBright
+                                                                                           : textColorDark);
+            painter->setFont(o.font);
+            painter->drawText(textRect, Qt::AlignCenter, nameToDisplay);
+         }
+
          painter->restore();
 
          startPoint += rectWidth + mark_spacing;

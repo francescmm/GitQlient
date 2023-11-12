@@ -40,6 +40,7 @@ struct PullRequest;
 
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
+const int TEXT_HEIGHT_OFFSET = 3;
 
 /**
  * @brief The RepositoryViewDelegate class is the delegate overloads the paint functionality in the RepositoryView. This
@@ -95,7 +96,7 @@ private:
     * @param o The style options of the item.
     * @param commit The commit information.
     */
-   void painBranchHelper(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit) const;
+   [[nodiscard]] QColor paintBranchHelper(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit) const;
 
    /**
     * @brief Paints the log column. This method is in charge of painting the commit message as well as tags or
@@ -103,9 +104,11 @@ private:
     *
     * @param p The painter device.
     * @param o The style options of the item.
+    * @param currentLangeColor The color of current lane used for local branches.
     * @param commit The commit information.
     */
-   void paintLog(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit) const;
+   void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QColor &currentLangeColor,
+                 const CommitInfo &commit) const;
    /**
     * @brief Method that sets up the configuration to paint the lane for the commit graph representation.
     *
@@ -137,10 +140,12 @@ private:
     *
     * @param painter The painter device.
     * @param opt The style options of the item.
+    * @param currentLangeColor The color of current lane used for local branches.
     * @param startPoint The starting X coordinate for the tag.
     * @param sha The SHA reference to paint. It can be local branch, remote branch, tag or it could be detached.
     */
-   void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, int &startPoint, const QString &sha) const;
+   void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, const QColor &currentLangeColor, int &startPoint,
+                       const QString &sha) const;
 
    /**
     * @brief Specialized method that paints a tag in the commit message column.
