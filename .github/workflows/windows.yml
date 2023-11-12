@@ -32,7 +32,7 @@ jobs:
           target: desktop
           host: windows
           install-deps: true
-          arch: win64_msvc2019_64
+          arch: win64_mingw
           aqtversion: '==3.1.*'
 
       - name: Install dependencies
