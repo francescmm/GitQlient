@@ -43,13 +43,20 @@ jobs:
         shell: bash
         run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
 
+      #- name: Build GitQlient
+      #  run: |
+      #    # Setup VS compiler
+      #    cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+      #    Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+      #    qmake GitQlient.pro VERSION=${{env.VERSION}}
+      #    jom -j2
+
       - name: Build GitQlient
         run: |
-          # Setup VS compiler
-          cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
-          Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-          qmake GitQlient.pro VERSION=${{env.VERSION}}
-          jom -j2
+          mkdir build
+          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
+          make -j 4
+          make install
 
       - name: Prune previous runs
         uses: actions/github-script@v4
