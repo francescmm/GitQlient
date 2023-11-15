@@ -162,7 +162,6 @@ QVector<FileBlameWidget::Annotation> FileBlameWidget::processBlame(const QString
 void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations)
 {
    auto labelRow = 0;
-   auto labelRowSpan = 1;
    QLabel *dateLabel = nullptr;
    QLabel *authorLabel = nullptr;
    ButtonLink *messageLabel = nullptr;
@@ -192,10 +191,7 @@ void FileBlameWidget::formatAnnotatedFile(const QVector<Annotation> &annotations
          messageLabel = createMessageLabel(annotations.at(row).sha, row == 0);
 
          labelRow = row;
-         labelRowSpan = 1;
       }
-      else
-         ++labelRowSpan;
 
       annotationLayout->addWidget(createNumLabel(annotations.at(row), row), row, 3);
       annotationLayout->addWidget(createCodeLabel(annotations.at(row).content), row, 4);

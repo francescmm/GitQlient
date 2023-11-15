@@ -58,7 +58,7 @@ void PluginsDownloader::processPluginsFile()
 
 #if defined(Q_OS_WIN)
       platform = QString("windows");
-#elif defined(Q_OS_OSX)
+#elif defined(Q_OS_MACOS)
       platform = QString("macos");
 #endif
       if (const auto jsonUrl = QStringLiteral("%1-url").arg(platform); jsonObject.contains(jsonUrl))

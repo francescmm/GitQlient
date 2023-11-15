@@ -60,7 +60,7 @@ void FileContextMenu::openFileExplorer()
 #elif defined(Q_OS_WIN)
    app = QString::fromUtf8("explorer.ext");
    arguments = QStringList { "/select", QDir::toNativeSeparators(absoluteFilePath) };
-#elif defined(Q_OS_OSX)
+#elif defined(Q_OS_MACOS)
    app = QString::fromUtf8("/usr/bin/open");
    arguments = QStringList { "-R", absoluteFilePath };
 #endif
