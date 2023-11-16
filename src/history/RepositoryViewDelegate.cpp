@@ -505,7 +505,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto newOpt = opt;
    newOpt.rect.setX(opt.rect.x() + offset + 5);
-   newOpt.rect.setY(newOpt.rect.y() - TEXT_HEIGHT_OFFSET);
+   newOpt.rect.setY(newOpt.rect.y() + TEXT_HEIGHT_OFFSET);
 
    QFontMetrics fm(newOpt.font);
 
@@ -597,8 +597,8 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
          }
 
          {
-            QRectF textRect(iconRect.x() + iconRect.width() + textPadding, o.rect.y(), textBoundingRect.width(),
-                            iconSize);
+            QRectF textRect(iconRect.x() + iconRect.width() + textPadding, o.rect.y() + TEXT_HEIGHT_OFFSET,
+                            textBoundingRect.width(), iconSize);
             painter->setPen(GitQlientSettings().globalValue("colorSchema", 0).toInt() == 1 ? textColorBright
                                                                                            : textColorDark);
             painter->setFont(o.font);

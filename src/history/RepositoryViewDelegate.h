@@ -40,7 +40,7 @@ struct PullRequest;
 
 const int ROW_HEIGHT = 25;
 const int LANE_WIDTH = 3 * ROW_HEIGHT / 4;
-const int TEXT_HEIGHT_OFFSET = 3;
+const int TEXT_HEIGHT_OFFSET = 2;
 
 /**
  * @brief The RepositoryViewDelegate class is the delegate overloads the paint functionality in the RepositoryView. This
