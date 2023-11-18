@@ -56,7 +56,7 @@ public:
    bool operator!=(const CommitInfo &commit) const;
 
    bool isValid() const;
-   bool contains(const QString &value);
+   bool contains(const QString &value) const;
 
    int parentsCount() const;
    QString firstParent() const;

@@ -1,7 +1,6 @@
 #General stuff
 CONFIG += qt warn_on c++17 c++1z
 
-TARGET = gitqlient
 QT += widgets core network gui
 DEFINES += QT_DEPRECATED_WARNINGS
 
@@ -11,6 +10,7 @@ if (!exists(src/git/.git) || !exists(src/AuxiliarCustomWidgets/.git) || !exists(
 }
 
 unix:!macos {
+   TARGET = gitqlient
    QMAKE_LFLAGS += -no-pie
 
    isEmpty(PREFIX) {
@@ -44,9 +44,10 @@ unix:!macos {
    icon512.path = $$PREFIX/share/icons/hicolor/512x512/apps
    icon512.extra = \$(QINSTALL) $$PWD/src/resources/icons/GitQlientLogo512.png \$(INSTALL_ROOT)$${icon512.path}/$${TARGET}.png
    INSTALLS += iconsvg icon16 icon24 icon32 icon48 icon64 icon96 icon128 icon256 icon512
+   INSTALLS += target
+} else {
+   TARGET = GitQlient
 }
-
-INSTALLS += target
 
 #project files
 SOURCES += src/main.cpp
@@ -58,12 +59,8 @@ OTHER_FILES += \
 
 
 isEmpty(VERSION) {
-win32 {
-   VERSION = 0.0.0
-} else {
    VERSION = $$system(git describe --abbrev=0)
    VERSION = $$replace(VERSION, "v", "")
-}
 }
 
 !defined(GQ_SHA, var) {
@@ -74,10 +71,11 @@ DEFINES += \
     VER=\\\"$$VERSION\\\" \
     SHA_VER=\\\"$$GQ_SHA\\\"
 
-message("Found version \"$$VERSION\" at commit \"$$GQ_SHA\".")
-
-debug {
-   DEFINES += DEBUG
+!win32-msvc* {
+    debug {
+       DEFINES += DEBUG
+       QMAKE_CXXFLAGS += -Wall -pedantic-errors -Werror
+    }
 }
 
 DEFINES += \
@@ -88,16 +86,24 @@ DEFINES += \
    QT_USE_QSTRINGBUILDER
 
 macos{
+   isEmpty(ARCH) {
+      ARCH = x86_64
+   }
+
+   isEmpty(CREATEDMGPATH) {
+      CREATEDMGPATH = /usr/local/bin
+   }
+
    QMAKE_INFO_PLIST=$$PWD/src/resources/Info.plist
    CONFIG+=sdk_no_version_check
    ICON = $$PWD/src/resources/icon.icns
 
    BUNDLE_FILENAME = $${TARGET}.app
-   DMG_FILENAME = "GitQlient-$$(VERSION).dmg"
+   DMG_FILENAME = "GitQlient-$${VERSION}-$${ARCH}.dmg"
 #Target for pretty DMG generation
    dmg.commands += echo "Generate DMG";
    dmg.commands += rm -f *.dmg && macdeployqt $$BUNDLE_FILENAME &&
-   dmg.commands += /usr/local/bin/create-dmg \
+   dmg.commands += $${CREATEDMGPATH}/create-dmg \
     --volname $${TARGET} \
     --volicon "$${PWD}/src/resources/icon.icns" \
     --background "$${PWD}/src/resources/dmg_bg.png" \
@@ -105,7 +111,7 @@ macos{
     --window-size 600 450 \
     --icon-size 100 \
     --hdiutil-quiet \
-    --hide-extension "gitqlient.app" \
+    --hide-extension $${BUNDLE_FILENAME} \
     --app-drop-link 475 220 \
     $${DMG_FILENAME} \
     $${BUNDLE_FILENAME}

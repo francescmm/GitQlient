@@ -29,6 +29,10 @@
 
 #include <QLogger.h>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#   include <QRegularExpression>
+#endif
+
 using namespace QLogger;
 
 CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache,
@@ -182,7 +186,7 @@ void CommitHistoryContextMenu::createMultipleShasMenu()
       auto shasInCurrenTree = 0;
       QScopedPointer<GitBranches> git(new GitBranches(mGit));
 
-      for (const auto &sha : qAsConst(mShas))
+      for (const auto &sha : std::as_const(mShas))
          shasInCurrenTree += git->isCommitInCurrentGeneologyTree(sha);
 
       if (shasInCurrenTree == 0)
@@ -278,9 +282,15 @@ void CommitHistoryContextMenu::checkoutBranch()
 
    if (ret.success)
    {
-      QRegExp rx("by \\d+ commits");
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+      static QRegExp rx("by \\d+ commits");
       rx.indexIn(ret.output);
       auto value = rx.capturedTexts().constFirst().split(" ");
+#else
+      static QRegularExpression rx("by \\d+ commits");
+      const auto texts = rx.match(ret.output).capturedTexts();
+      auto value = texts.isEmpty() ? QStringList() : texts.constFirst().split(" ");
+#endif
 
       if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
       {
@@ -339,7 +349,7 @@ void CommitHistoryContextMenu::checkoutCommit()
 void CommitHistoryContextMenu::cherryPickCommit()
 {
    auto shas = mShas;
-   for (const auto &sha : qAsConst(mShas))
+   for (const auto &sha : std::as_const(mShas))
    {
       const auto lastShaBeforeCommit = mGit->getLastCommit().output.trimmed();
       QScopedPointer<GitLocal> git(new GitLocal(mGit));

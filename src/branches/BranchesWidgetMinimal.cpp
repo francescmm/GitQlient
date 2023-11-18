@@ -31,7 +31,7 @@ BranchesWidgetMinimal::BranchesWidgetMinimal(const QSharedPointer<GitCache> &cac
 {
    mBack->setIcon(QIcon(":/icons/back"));
    mBack->setToolTip(tr("Full view"));
-   mBack->setShortcut(Qt::CTRL + Qt::Key_B);
+   mBack->setShortcut(Qt::CTRL | Qt::Key_B);
    connect(mBack, &QPushButton::clicked, this, &BranchesWidgetMinimal::showFullBranchesView);
 
    const auto layout = new QVBoxLayout(this);

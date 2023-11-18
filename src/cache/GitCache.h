@@ -93,8 +93,8 @@ private:
    QVector<QString> mUntrackedFiles;
 
    mutable QMutex mCommitsMutex;
-   QVector<CommitInfo *> mCommits;
-   QHash<QString, CommitInfo> mCommitsMap;
+   QVector<CommitInfo> mCommitsCache;
+   QHash<QString, CommitInfo *> mCommitsMap;
 
    mutable QMutex mRevisionsMutex;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;

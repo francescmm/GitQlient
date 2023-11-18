@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
-set(APP_NAME "GitQlient")
+set(PROJECT_NAME "GitQlient")
 
-project(${APP_NAME} LANGUAGES CXX)
+project(${PROJECT_NAME} LANGUAGES CXX)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "-Wall -Werror -pedantic-errors")
 
 execute_process(
    COMMAND
@@ -31,11 +32,11 @@ add_compile_definitions(SHA_VER="${GQ_SHA}")
 add_compile_definitions(VER="${VERSION}")
 add_compile_definitions(QT_DEPRECATED_WARNINGS)
 
-#list(APPEND CPP_FLAGS "-Wall")
-#
-#if (NOT WIN32)
-#   list(APPEND CPP_FLAGS "-Wextra" "-Wpedantic")
-#endif()
+list(APPEND CPP_FLAGS "-Wall")
+
+if (CMAKE_BUILD_TYPE EQUAL "DEBUG" AND NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
+   list(APPEND CPP_FLAGS "-Wextra" "-Wpedantic")
+endif()
 
 if (NOT EXISTS "${PROJECT_SOURCE_DIR}/src/AuxiliarCustomWidgets/.git" OR
     NOT EXISTS "${PROJECT_SOURCE_DIR}/src/QLogger/.git" OR
@@ -50,13 +51,17 @@ if (NOT EXISTS "${PROJECT_SOURCE_DIR}/src/AuxiliarCustomWidgets/.git" OR
     endif()
 endif()
 
-find_package(Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt5 COMPONENTS Network REQUIRED)
+find_package(Qt6 COMPONENTS Core Widgets Network REQUIRED)
 
-add_executable(${APP_NAME} "${PROJECT_SOURCE_DIR}/src/main.cpp")
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(MACOSX_BUNDLE_ICON_FILE icon.icns)
+    set(MACOS_APP_ICON_GITQLIENT "${PROJECT_SOURCE_DIR}/src/resources/icon.icns")
+    set_source_files_properties(${MACOS_APP_ICON_GITQLIENT} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+endif()
 
 file(GLOB SRC_FILES
+   ${MACOS_APP_ICON_GITQLIENT}
+   ${PROJECT_SOURCE_DIR}/src/main.cpp
    ${PROJECT_SOURCE_DIR}/src/GitQlient.qrc
    ${PROJECT_SOURCE_DIR}/src/AuxiliarCustomWidgets/*.cpp
    ${PROJECT_SOURCE_DIR}/src/AuxiliarCustomWidgets/*.h
@@ -106,20 +111,13 @@ file(GLOB SRC_FILES
    ${PROJECT_SOURCE_DIR}/src/terminal/*.ui
 )
 
-target_sources(${APP_NAME} PRIVATE ${SRC_FILES} ${RC_FILES})
+qt_add_executable(
+    ${PROJECT_NAME}
+    ${SRC_FILES})
 
-#set_target_properties(${APP_NAME} PROPERTIES
-#    WIN32_EXECUTABLE TRUE
-#    MACOSX_BUNDLE TRUE
-#)
-
-#target_compile_options(${APP_NAME}
-#   PRIVATE
-#   ${CPP_FLAGS}
-#)
-
-target_include_directories(${APP_NAME}
-   PRIVATE
+target_include_directories(
+   ${PROJECT_NAME}
+   PUBLIC
    ${PROJECT_SOURCE_DIR}/src
    ${PROJECT_SOURCE_DIR}/src/AuxiliarCustomWidgets
    ${PROJECT_SOURCE_DIR}/src/aux_widgets
@@ -138,23 +136,42 @@ target_include_directories(${APP_NAME}
    ${PROJECT_SOURCE_DIR}/src/terminal
 )
 
-target_link_libraries(${APP_NAME}
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE TRUE
+        MACOSX_BUNDLE TRUE
+        AUTOMOC TRUE
+        AUTOUIC TRUE
+        AUTORCC TRUE
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/src/resources/Info.plist"
+    )
+else()
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        WIN32_EXECUTABLE TRUE
+        AUTOMOC TRUE
+        AUTOUIC TRUE
+        AUTORCC TRUE
+    )
+endif()
+
+target_link_libraries(
+    ${PROJECT_NAME}
     PUBLIC
     Qt::Core
-    Qt::Gui
     Qt::Widgets
     Qt::Network
 )
 
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-   target_link_options(${APP_NAME} PUBLIC "-no-pie")
+   target_link_options(${PROJECT_NAME} PUBLIC "-no-pie")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 endif()
 
-install(TARGETS ${APP_NAME}
-    RUNTIME DESTINATION "${INSTALL_EXAMPLEDIR}"
-    BUNDLE DESTINATION "${INSTALL_EXAMPLEDIR}"
-    LIBRARY DESTINATION "${INSTALL_EXAMPLEDIR}"
+install(
+    TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
+    BUNDLE DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
+    LIBRARY DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
 )

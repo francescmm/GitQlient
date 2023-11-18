@@ -183,8 +183,8 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    cherryPickBtn->setEnabled(false);
    cherryPickBtn->setObjectName("cherryPickBtn");
    cherryPickBtn->setToolTip("Cherry-pick the commit");
-   cherryPickBtn->setShortcut(Qt::CTRL + Qt::Key_Return);
-   cherryPickBtn->setShortcut(Qt::CTRL + Qt::Key_Enter);
+   cherryPickBtn->setShortcut(Qt::CTRL | Qt::Key_Return);
+   cherryPickBtn->setShortcut(Qt::CTRL | Qt::Key_Enter);
    connect(cherryPickBtn, &QPushButton::clicked, this, &HistoryWidget::cherryPickCommit);
    connect(mSearchInput, &QLineEdit::textChanged, this,
            [cherryPickBtn](const QString &text) { cherryPickBtn->setEnabled(!text.isEmpty()); });

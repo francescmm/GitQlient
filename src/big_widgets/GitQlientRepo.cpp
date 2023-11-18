@@ -30,7 +30,6 @@
 #include <QLogger.h>
 #include <WaitingDlg.h>
 #include <WipHelper.h>
-#include <qtermwidget_interface.h>
 
 #include <QApplication>
 #include <QDirIterator>
@@ -40,6 +39,10 @@
 #include <QStackedLayout>
 #include <QStackedWidget>
 #include <QTimer>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#   include <qtermwidget_interface.h>
+#endif
 
 using namespace QLogger;
 using namespace GitServerPlugin;
@@ -258,14 +261,15 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
       else if (iter.key().split("-").constFirst().contains("qtermwidget", Qt::CaseInsensitive)
                && qobject_cast<QWidget *>(iter.value()))
       {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
          QFont font = QApplication::font();
-#ifdef Q_OS_MACOS
+#   ifdef Q_OS_MACOS
          font.setFamily(QStringLiteral("Monaco"));
-#elif defined(Q_WS_QWS)
+#   elif defined(Q_WS_QWS)
          font.setFamily(QStringLiteral("fixed"));
-#else
+#   else
          font.setFamily(QStringLiteral("Monospace"));
-#endif
+#   endif
          font.setPointSize(12);
 
          const auto terminalWidget = qobject_cast<QTermWidgetInterface *>(iter.value());
@@ -289,6 +293,7 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
          mIndexMap[ControlsMainViews::Terminal] = mStackedLayout->addWidget(widget);
 
          mControls->showTerminalButton(true);
+#endif
       }
       else
          mPlugins[iter.key()] = iter.value();

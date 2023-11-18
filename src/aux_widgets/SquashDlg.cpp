@@ -149,7 +149,7 @@ void SquashDlg::accept()
 
 void SquashDlg::updateCounter(const QString &text)
 {
-   ui->lCounter->setText(QString::number(mTitleMaxLength - text.count()));
+   ui->lCounter->setText(QString::number(mTitleMaxLength - text.length()));
 }
 
 bool SquashDlg::checkMsg(QString &msg)

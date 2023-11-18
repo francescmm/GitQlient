@@ -18,7 +18,7 @@ jobs:
           - name: Linux AppImage
             os: ubuntu-20.04
             qtplatform: linux
-            qtversion: 5.15.2
+            qtversion: 6.6.*
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -51,7 +51,7 @@ jobs:
 
       - name: Install Qt for AppImage
         if: matrix.env.name == 'Linux AppImage'
-        uses: jurplel/install-qt-action@v2.13.2
+        uses: jurplel/install-qt-action@v3.2.1
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         timeout-minutes: 10

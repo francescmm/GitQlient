@@ -7,9 +7,11 @@ using namespace QLogger;
 
 GitCache::GitCache(QObject *parent)
    : QObject(parent)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
    , mCommitsMutex(QMutex::Recursive)
    , mRevisionsMutex(QMutex::Recursive)
    , mReferencesMutex(QMutex::Recursive)
+#endif
 {
 }
 
@@ -22,60 +24,52 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
 {
    QMutexLocker lock(&mCommitsMutex);
 
+   mCommitsCache = std::move(commits);
+
    mInitialized = true;
-
-   const auto totalCommits = commits.count() + 1;
-
-   QLog_Debug("Cache", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
-
    mConfigured = false;
 
-   mCommits.clear();
-   mCommits.squeeze();
    mCommitsMap.clear();
    mCommitsMap.squeeze();
    mUntrackedFiles.clear();
    mUntrackedFiles.squeeze();
    mLanes.clear();
 
-   mCommitsMap.reserve(totalCommits);
-   mCommits.resize(totalCommits);
-
    QLog_Debug("Cache", QString("Adding WIP revision."));
 
    insertWipRevision(parentSha, files);
 
+   const auto totalCommits = mCommitsCache.count();
+
+   QLog_Debug("Cache", QString("Configuring the cache for {%1} elements.").arg(totalCommits));
+
+   mCommitsMap.reserve(totalCommits);
+
    QLog_Debug("Cache", QString("Adding committed revisions."));
 
    QHash<QString, QVector<CommitInfo *>> tmpChildsStorage;
-   auto count = 0;
 
-   for (auto &commit : commits)
+   for (auto iter = mCommitsCache.begin() + 1; iter != mCommitsCache.end(); ++iter)
    {
+      auto &commit = *iter;
       calculateLanes(commit);
 
-      const auto sha = commit.sha;
+      if (commit.sha == mCommitsCache[0].firstParent())
+         commit.appendChild(&mCommitsCache[0]);
 
-      if (sha == mCommitsMap.value(ZERO_SHA).firstParent())
-         commit.appendChild(&mCommitsMap[ZERO_SHA]);
+      mCommitsMap[commit.sha] = &commit;
 
-      mCommitsMap[sha] = std::move(commit);
-      mCommits[++count] = &mCommitsMap[sha];
-
-      if (tmpChildsStorage.contains(sha))
+      if (tmpChildsStorage.contains(commit.sha))
       {
-         for (const auto &child : qAsConst(tmpChildsStorage[sha]))
-            mCommitsMap[sha].appendChild(child);
+         for (const auto &child : std::as_const(tmpChildsStorage[commit.sha]))
+            commit.appendChild(child);
 
-         tmpChildsStorage.remove(sha);
+         tmpChildsStorage.remove(commit.sha);
       }
 
-      for (const auto &parent : qAsConst(mCommitsMap[sha].mParentsSha))
-         tmpChildsStorage[parent].append(&mCommitsMap[sha]);
+      for (const auto &parent : std::as_const(commit.mParentsSha))
+         tmpChildsStorage[parent].append(&commit);
    }
-
-   mCommitsMap.squeeze();
-   mCommits.squeeze();
 
    tmpChildsStorage.clear();
    tmpChildsStorage.squeeze();
@@ -85,23 +79,21 @@ CommitInfo GitCache::commitInfo(int row)
 {
    QMutexLocker lock(&mCommitsMutex);
 
-   const auto commit = row >= 0 && row < mCommits.count() ? mCommits.at(row) : nullptr;
-
-   return commit ? *commit : CommitInfo();
+   return row >= 0 && row < mCommitsCache.count() ? mCommitsCache.at(row) : CommitInfo();
 }
 
 auto GitCache::searchCommit(const QString &text, const int startingPoint) const
 {
-   return std::find_if(mCommits.constBegin() + startingPoint, mCommits.constEnd(),
-                       [text](CommitInfo *info) { return info->contains(text); });
+   return std::find_if(mCommitsCache.constBegin() + startingPoint, mCommitsCache.constEnd(),
+                       [text](const CommitInfo &info) { return info.contains(text); });
 }
 
 auto GitCache::reverseSearchCommit(const QString &text, int startingPoint) const
 {
-   const auto startEndPos = startingPoint > 0 ? mCommits.count() - startingPoint + 1 : 0;
+   const auto startEndPos = startingPoint > 0 ? mCommitsCache.count() - startingPoint + 1 : 0;
 
-   return std::find_if(mCommits.crbegin() + startEndPos, mCommits.crend(),
-                       [text](CommitInfo *info) { return info->contains(text); });
+   return std::find_if(mCommitsCache.crbegin() + startEndPos, mCommitsCache.crend(),
+                       [text](const CommitInfo &info) { return info.contains(text); });
 }
 
 CommitInfo GitCache::searchCommitInfo(const QString &text, int startingPoint, bool reverse)
@@ -113,21 +105,21 @@ CommitInfo GitCache::searchCommitInfo(const QString &text, int startingPoint, bo
    {
       auto commitIter = searchCommit(text, startingPoint);
 
-      if (commitIter == mCommits.constEnd())
+      if (commitIter == mCommitsCache.constEnd())
          commitIter = searchCommit(text);
 
-      if (commitIter != mCommits.constEnd())
-         commit = **commitIter;
+      if (commitIter != mCommitsCache.constEnd())
+         commit = *commitIter;
    }
    else
    {
       auto commitIter = reverseSearchCommit(text, startingPoint);
 
-      if (commitIter == mCommits.crend())
+      if (commitIter == mCommitsCache.crend())
          commitIter = reverseSearchCommit(text);
 
-      if (commitIter != mCommits.crend())
-         commit = **commitIter;
+      if (commitIter != mCommitsCache.crend())
+         commit = *commitIter;
    }
 
    return commit;
@@ -139,21 +131,21 @@ CommitInfo GitCache::commitInfo(const QString &sha)
 
    if (!sha.isEmpty())
    {
-      const auto c = mCommitsMap.value(sha, CommitInfo());
+      const auto c = mCommitsMap.value(sha, nullptr);
 
-      if (!c.isValid())
+      if (!c)
       {
          const auto shas = mCommitsMap.keys();
          const auto it = std::find_if(shas.cbegin(), shas.cend(),
                                       [sha](const QString &shaToCompare) { return shaToCompare.startsWith(sha); });
 
          if (it != shas.cend())
-            return mCommitsMap.value(*it);
+            return *mCommitsMap.value(*it);
 
          return CommitInfo();
       }
 
-      return c;
+      return *c;
    }
 
    return CommitInfo();
@@ -198,15 +190,15 @@ void GitCache::insertWipRevision(const QString parentSha, const RevisionFiles &f
    CommitInfo c(ZERO_SHA, parents, std::chrono::seconds(QDateTime::currentSecsSinceEpoch()), log);
    calculateLanes(c);
 
-   if (!mCommits.isEmpty() && mCommits[0])
-      c.setLanes(mCommits[0]->lanes());
+   if (!mCommitsCache.isEmpty())
+      c.setLanes(mCommitsCache[0].lanes());
 
-   mCommitsMap.insert(ZERO_SHA, std::move(c));
-
-   if (!mCommits.isEmpty())
-      mCommits[0] = &mCommitsMap[ZERO_SHA];
+   if (mCommitsCache[0].sha != ZERO_SHA)
+      mCommitsCache.prepend(std::move(c));
    else
-      mCommits.append(&mCommitsMap[ZERO_SHA]);
+      mCommitsCache[0] = std::move(c);
+
+   mCommitsMap.insert(ZERO_SHA, &mCommitsCache[0]);
 }
 
 bool GitCache::insertRevisionFiles(const QString &sha1, const QString &sha2, const RevisionFiles &file)
@@ -326,21 +318,25 @@ void GitCache::insertCommit(CommitInfo commit)
    const auto parentSha = commit.firstParent();
 
    commit.setLanes({ LaneType::ACTIVE });
-   commit.pos = 1;
 
-   mCommitsMap[ZERO_SHA].setParents({ commit.sha });
+   mCommitsCache[0].setParents({ sha });
+   mCommitsCache.insert(1, std::move(commit));
+   mCommitsCache[1].appendChild(&mCommitsCache[0]);
 
-   mCommitsMap[sha] = std::move(commit);
-   mCommitsMap[sha].appendChild(&mCommitsMap[ZERO_SHA]);
+   mCommitsMap.clear();
 
-   mCommitsMap[parentSha].removeChild(&mCommitsMap[ZERO_SHA]);
-   mCommitsMap[parentSha].appendChild(&mCommitsMap[sha]);
+   const auto totalCommits = mCommitsCache.count();
+   mCommitsMap.reserve(totalCommits);
 
-   const auto total = mCommits.count();
-   for (auto i = 1; i < total; ++i)
-      ++mCommits[i]->pos;
+   auto count = 0;
+   for (auto &commit : mCommitsCache)
+   {
+      commit.pos = count;
+      mCommitsMap[commit.sha] = &commit;
+   }
 
-   mCommits.insert(1, &mCommitsMap[sha]);
+   mCommitsMap[parentSha]->removeChild(mCommitsMap[ZERO_SHA]);
+   mCommitsMap[parentSha]->appendChild(mCommitsMap[sha]);
 }
 
 void GitCache::updateCommit(const QString &oldSha, CommitInfo newCommit)
@@ -349,17 +345,18 @@ void GitCache::updateCommit(const QString &oldSha, CommitInfo newCommit)
    QMutexLocker lock2(&mRevisionsMutex);
 
    auto &oldCommit = mCommitsMap[oldSha];
-   const auto oldCommitParens = oldCommit.parents();
+   const auto oldCommitParens = oldCommit->parents();
    const auto newCommitSha = newCommit.sha;
+   const auto newPos = newCommit.pos;
 
+   mCommitsCache[newPos] = std::move(newCommit);
    mCommitsMap.remove(oldSha);
-   mCommitsMap.insert(newCommitSha, std::move(newCommit));
-   mCommits[newCommit.pos] = &mCommitsMap[newCommitSha];
+   mCommitsMap.insert(newCommitSha, &mCommitsCache[newPos]);
 
    for (const auto &parent : oldCommitParens)
    {
-      mCommitsMap[parent].removeChild(&oldCommit);
-      mCommitsMap[parent].appendChild(&mCommitsMap[newCommitSha]);
+      mCommitsMap[parent]->removeChild(oldCommit);
+      mCommitsMap[parent]->appendChild(mCommitsMap[newCommitSha]);
    }
 
    const auto tags = getReferences(oldSha, References::Type::LocalTag);
@@ -407,13 +404,12 @@ void GitCache::calculateLanes(CommitInfo &c)
 bool GitCache::pendingLocalChanges()
 {
    QMutexLocker lock(&mCommitsMutex);
-   QMutexLocker lock2(&mRevisionsMutex);
 
    auto localChanges = false;
 
-   if (const auto commit = mCommitsMap.value(ZERO_SHA, CommitInfo()); commit.isValid())
+   if (const auto commit = mCommitsMap.value(ZERO_SHA, nullptr))
    {
-      if (const auto rf = revisionFile(ZERO_SHA, commit.firstParent()); rf)
+      if (const auto rf = revisionFile(ZERO_SHA, commit->firstParent()); rf)
          localChanges = rf.value().count() - mUntrackedFiles.count() > 0;
    }
 
@@ -474,8 +470,6 @@ void GitCache::resetLanes(const CommitInfo &c, bool isFork)
 
 void GitCache::clearInternalData()
 {
-   mCommits.clear();
-   mCommits.squeeze();
    mCommitsMap.clear();
    mCommitsMap.squeeze();
    mReferences.clear();
@@ -490,7 +484,7 @@ void GitCache::clearInternalData()
 
 int GitCache::commitCount() const
 {
-   return mCommits.count();
+   return mCommitsCache.count();
 }
 
 void GitCache::setUntrackedFilesList(QVector<QString> untrackedFiles)

@@ -4,6 +4,8 @@
 
 #include <QStringList>
 
+#include <regex>
+
 CommitInfo::CommitInfo(QByteArray commitData, const QString &gpg, bool goodSignature)
    : gpgKey(gpg)
    , mGoodSignature(goodSignature)
@@ -69,7 +71,7 @@ bool CommitInfo::operator!=(const CommitInfo &commit) const
    return !(*this == commit);
 }
 
-bool CommitInfo::contains(const QString &value)
+bool CommitInfo::contains(const QString &value) const
 {
    return sha.startsWith(value, Qt::CaseInsensitive) || shortLog.contains(value, Qt::CaseInsensitive)
        || committer.contains(value, Qt::CaseInsensitive) || author.contains(value, Qt::CaseInsensitive);
@@ -120,10 +122,9 @@ void CommitInfo::setLanes(QVector<Lane> lanes)
    this->mLanes.squeeze();
    this->mLanes = std::move(lanes);
 }
-#include <regex>
+
 bool CommitInfo::isValid() const
 {
-   // static QRegExp hexMatcher("^[0-9A-F]{40}$", Qt::CaseInsensitive);
    const static std::regex hexMatcher("[0-9a-fA-F]{40}");
    const auto isMatch = std::regex_match(sha.toStdString(), hexMatcher);
 

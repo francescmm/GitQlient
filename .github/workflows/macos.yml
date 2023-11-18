@@ -12,10 +12,10 @@ jobs:
     strategy:
       matrix:
         env:
-          - name: MacOS
+          - name: MacOS x86_64
             os: macos-11
             qtplatform: mac
-            qtversion: 5.15.2
+            qtversion: 6.6.*
             arch: darwin64-x86_64-cc
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -26,7 +26,7 @@ jobs:
           submodules: 'true'
 
       - name: Installing Qt
-        uses: jurplel/install-qt-action@v2.13.2
+        uses: jurplel/install-qt-action@v3.2.1
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         timeout-minutes: 10

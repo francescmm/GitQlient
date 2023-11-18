@@ -195,6 +195,9 @@ void MergeWidget::changeDiffView(QListWidgetItem *item)
    if (status != GitWip::FileStatus::BothModified)
    {
       int resolution = 0;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
       if (status == GitWip::FileStatus::DeletedByThem)
       {
          resolution = QMessageBox::warning(
@@ -209,6 +212,7 @@ void MergeWidget::changeDiffView(QListWidgetItem *item)
              tr("The file has been deleted by us. Please add or remove the file to mark resolution."), "Remove file",
              "Add file");
       }
+#pragma GCC diagnostic pop
 
       QScopedPointer<GitLocal> git(new GitLocal(mGit));
 
@@ -342,7 +346,9 @@ void MergeWidget::commit()
       {
          removeMergeComponents();
 
-         if (!mPendingShas.isEmpty()) { }
+         if (!mPendingShas.isEmpty())
+         {
+         }
 
          emit signalMergeFinished();
       }
@@ -383,7 +389,7 @@ void MergeWidget::onConflictResolved(const QString &)
 void MergeWidget::cherryPickCommit()
 {
    auto shas = mPendingShas;
-   for (const auto &sha : qAsConst(mPendingShas))
+   for (const auto &sha : std::as_const(mPendingShas))
    {
       QScopedPointer<GitLocal> git(new GitLocal(mGit));
       const auto ret = git->cherryPickCommit(sha);
