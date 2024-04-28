@@ -33,10 +33,6 @@
 
 #include <QLogger.h>
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#   include <qtermwidget_interface.h>
-#endif
-
 using namespace QLogger;
 
 GitQlient::GitQlient(QWidget *parent)
@@ -150,14 +146,6 @@ GitQlient::GitQlient(QWidget *parent)
 
 GitQlient::~GitQlient()
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-   if (mTerminal.second)
-   {
-      mTerminal.second->sendText("exit\n");
-      delete mTerminal.second;
-   }
-#endif
-
    QStringList pinnedRepos;
    const auto totalTabs = mRepos->count();
 
@@ -398,11 +386,7 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
 
          repo->loadRepo();
 
-         if (!mPlugins.isEmpty() || (mPlugins.empty() && mJenkins.second) || (mPlugins.empty() && mGitServer.second)
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-             || (mPlugins.empty() && mTerminal.second)
-#endif
-         )
+         if (!mPlugins.isEmpty() || (mPlugins.empty() && mJenkins.second) || (mPlugins.empty() && mGitServer.second))
          {
             decltype(mPlugins) plugins;
             plugins = mPlugins;
@@ -412,11 +396,6 @@ void GitQlient::addNewRepoTab(const QString &repoPathArg, bool pinned)
 
             if (mGitServer.second)
                plugins[mGitServer.first] = mGitServer.second->createWidget(git);
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            if (mTerminal.second)
-               plugins[mTerminal.first] = dynamic_cast<QObject *>(mTerminal.second->createWidget(0));
-#endif
 
             repo->setPlugins(plugins);
          }
@@ -594,17 +573,6 @@ void GitQlient::loadPlugins()
             else
                QLog_Error("UI", "It was impossible to load the GitServerPlugin since there are dependencies missing.");
          }
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-         else if (name.contains("qtermwidget", Qt::CaseInsensitive)
-                  && (!mTerminal.second || mTerminal.first.split("-").constLast() < version))
-         {
-            mTerminal = qMakePair(newKey, qobject_cast<QTermWidgetInterface *>(plugin));
-         }
-#endif
-         /*
-         else
-            mPlugins[newKey] = plugin;
-         */
       }
       else
       {

@@ -299,11 +299,7 @@ private:
 
    void gitServerActivationToggled(bool enabled);
 
-   void terminalActivationToggled(bool enabled);
-
    void showConfig();
-
-   void showTerminal();
 
    /*!
     \brief Opens the previous view. This method is used when the diff view is closed and GitQlientRepo must return to

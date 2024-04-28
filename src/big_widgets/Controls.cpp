@@ -38,7 +38,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    , mConfigBtn(new QToolButton(this))
    , mGitPlatform(new QToolButton(this))
    , mBuildSystem(new QToolButton(this))
-   , mTerminal(new QToolButton(this))
    , mPomodoro(new PomodoroButton(mGit, this))
    , mVersionCheck(new QToolButton(this))
    , mMergeWarning(
@@ -133,15 +132,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mConfigBtn->setShortcut(Qt::CTRL | Qt::Key_6);
    mBtnGroup->addButton(mConfigBtn, static_cast<int>(ControlsMainViews::Config));
 
-   mTerminal->setVisible(false);
-   mTerminal->setCheckable(true);
-   mTerminal->setIcon(QIcon(":/icons/terminal"));
-   mTerminal->setIconSize(QSize(22, 22));
-   mTerminal->setToolTip(tr("Terminal"));
-   mTerminal->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mTerminal->setShortcut(Qt::CTRL | Qt::Key_7);
-   mBtnGroup->addButton(mTerminal, static_cast<int>(ControlsMainViews::Terminal));
-
    const auto separator = new QFrame(this);
    separator->setObjectName("orangeSeparator");
    separator->setFixedHeight(20);
@@ -183,9 +173,8 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mPluginsSeparator = new QFrame(this);
    mPluginsSeparator->setObjectName("orangeSeparator");
    mPluginsSeparator->setFixedHeight(20);
-   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible() || mTerminal->isVisible());
+   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible());
    hLayout->addWidget(mPluginsSeparator);
-   hLayout->addWidget(mTerminal);
 
    createGitPlatformButton(hLayout);
 
@@ -204,7 +193,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    mBuildSystem->setEnabled(settings.localValue("BuildSystemEnabled", false).toBool());
    mGitPlatform->setEnabled(settings.localValue("GitServerEnabled", false).toBool());
-   mTerminal->setEnabled(settings.localValue("TerminalEnabled", false).toBool());
 
    mLastSeparator->setObjectName("orangeSeparator");
    mLastSeparator->setFixedHeight(20);
@@ -234,7 +222,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
    connect(mVersionCheck, &QToolButton::clicked, mUpdater, &GitQlientUpdater::showInfoMessage);
    connect(mConfigBtn, &QToolButton::clicked, this, &Controls::goConfig);
-   connect(mTerminal, &QToolButton::clicked, this, &Controls::goTerminal);
    connect(mBuildSystem, &QToolButton::clicked, this, &Controls::signalGoBuildSystem);
 
    enableButtons(false);
@@ -355,7 +342,7 @@ void Controls::changePomodoroVisibility()
 void Controls::showJenkinsButton(bool show)
 {
    mBuildSystem->setVisible(show);
-   mPluginsSeparator->setVisible(show || mGitPlatform->isVisible() || mTerminal->isVisible());
+   mPluginsSeparator->setVisible(show || mGitPlatform->isVisible());
 }
 
 void Controls::enableJenkins(bool enable)
@@ -366,24 +353,12 @@ void Controls::enableJenkins(bool enable)
 void Controls::showGitServerButton(bool show)
 {
    mGitPlatform->setVisible(show);
-   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || show || mTerminal->isVisible());
+   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || show);
 }
 
 void Controls::enableGitServer(bool enabled)
 {
    mGitPlatform->setEnabled(enabled);
-}
-
-void Controls::showTerminalButton(bool show)
-{
-   mTerminal->setVisible(show);
-
-   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || mGitPlatform->isVisible() || show);
-}
-
-void Controls::enableTerminal(bool enabled)
-{
-   mTerminal->setEnabled(enabled);
 }
 
 void Controls::pushCurrentBranch()

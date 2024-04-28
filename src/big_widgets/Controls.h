@@ -47,7 +47,6 @@ enum class ControlsMainViews
    Merge,
    GitServer,
    BuildSystem,
-   Terminal,
    Config
 };
 
@@ -115,8 +114,6 @@ signals:
     * @brief goConfig Signal triggered when the user selected the config view.
     */
    void goConfig();
-
-   void goTerminal();
 
    void goPlugins();
 
@@ -197,10 +194,6 @@ public:
 
    void enableGitServer(bool enabled);
 
-   void showTerminalButton(bool show);
-
-   void enableTerminal(bool enabled);
-
 private:
    QString mCurrentSha;
    QSharedPointer<GitCache> mCache;
@@ -215,7 +208,6 @@ private:
    QToolButton *mConfigBtn = nullptr;
    QToolButton *mGitPlatform = nullptr;
    QToolButton *mBuildSystem = nullptr;
-   QToolButton *mTerminal = nullptr;
    PomodoroButton *mPomodoro = nullptr;
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;

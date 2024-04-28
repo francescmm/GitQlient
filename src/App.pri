@@ -13,9 +13,5 @@ include($$PWD/QLogger/QLogger.pri)
 include($$PWD/QPinnableTabWidget/QPinnableTabWidget.pri)
 include($$PWD/jenkins/Jenkins.pri)
 
-lessThan(QT_MAJOR_VERSION, 6) {
-    include($$PWD/terminal/Terminal.pri)
-}
-
 RESOURCES += \
     $$PWD/GitQlient.qrc

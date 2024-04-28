@@ -40,10 +40,6 @@
 #include <QStackedWidget>
 #include <QTimer>
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#   include <qtermwidget_interface.h>
-#endif
-
 using namespace QLogger;
 using namespace GitServerPlugin;
 
@@ -119,7 +115,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mControls, &Controls::signalGoServer, this, &GitQlientRepo::showGitServerView);
    connect(mControls, &Controls::signalGoBuildSystem, this, &GitQlientRepo::showBuildSystemView);
    connect(mControls, &Controls::goConfig, this, &GitQlientRepo::showConfig);
-   connect(mControls, &Controls::goTerminal, this, &GitQlientRepo::showTerminal);
    connect(mControls, &Controls::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
 
@@ -166,7 +161,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mConfigWidget, &ConfigWidget::autoFetchChanged, this, &GitQlientRepo::reconfigureAutoFetch);
    connect(mConfigWidget, &ConfigWidget::buildSystemEnabled, this, &GitQlientRepo::buildSystemActivationToggled);
    connect(mConfigWidget, &ConfigWidget::gitServerEnabled, this, &GitQlientRepo::gitServerActivationToggled);
-   connect(mConfigWidget, &ConfigWidget::terminalEnabled, this, &GitQlientRepo::terminalActivationToggled);
 
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::createProgressDialog);
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished);
@@ -185,8 +179,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
 
 GitQlientRepo::~GitQlientRepo()
 {
-   mStackedLayout->widget(mIndexMap[ControlsMainViews::Terminal])->deleteLater();
-
    delete mAutoFetch;
    delete mAutoFilesUpdate;
 
@@ -257,43 +249,6 @@ void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
 
          mControls->showGitServerButton(true);
          mIndexMap[ControlsMainViews::GitServer] = mStackedLayout->addWidget(mGitServerWidget);
-      }
-      else if (iter.key().split("-").constFirst().contains("qtermwidget", Qt::CaseInsensitive)
-               && qobject_cast<QWidget *>(iter.value()))
-      {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-         QFont font = QApplication::font();
-#   ifdef Q_OS_MACOS
-         font.setFamily(QStringLiteral("Monaco"));
-#   elif defined(Q_WS_QWS)
-         font.setFamily(QStringLiteral("fixed"));
-#   else
-         font.setFamily(QStringLiteral("Monospace"));
-#   endif
-         font.setPointSize(12);
-
-         const auto terminalWidget = qobject_cast<QTermWidgetInterface *>(iter.value());
-         terminalWidget->setTerminalFont(font);
-         terminalWidget->setScrollBarPosition(QTermWidgetInterface::ScrollBarRight);
-         terminalWidget->setBlinkingCursor(true);
-         terminalWidget->setWorkingDirectory(mGitBase->getWorkingDir());
-         terminalWidget->startShellProgram();
-
-         QTimer::singleShot(250, this, [terminalWidget]() {
-            const auto historySize = terminalWidget->historySize();
-            terminalWidget->setHistorySize(0);
-            terminalWidget->sendText(
-                QString::fromUtf8(" export TERM=xterm-color\n source  ~/.bashrc\n alias "
-                                  "exit=\"echo \\\"The exit command has been disabled\\\"\"\n clear\n"));
-            terminalWidget->setHistorySize(historySize);
-         });
-
-         auto widget = dynamic_cast<QWidget *>(iter.value());
-         widget->setContentsMargins(QMargins(5, 5, 5, 5));
-         mIndexMap[ControlsMainViews::Terminal] = mStackedLayout->addWidget(widget);
-
-         mControls->showTerminalButton(true);
-#endif
       }
       else
          mPlugins[iter.key()] = iter.value();
@@ -606,21 +561,10 @@ void GitQlientRepo::gitServerActivationToggled(bool enabled)
    mControls->enableGitServer(enabled);
 }
 
-void GitQlientRepo::terminalActivationToggled(bool enabled)
-{
-   mControls->enableTerminal(enabled);
-}
-
 void GitQlientRepo::showConfig()
 {
    mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Config]);
    mControls->toggleButton(ControlsMainViews::Config);
-}
-
-void GitQlientRepo::showTerminal()
-{
-   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Terminal]);
-   mControls->toggleButton(ControlsMainViews::Terminal);
 }
 
 void GitQlientRepo::showPreviousView()

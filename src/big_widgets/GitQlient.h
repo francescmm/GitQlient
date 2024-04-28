@@ -37,10 +37,6 @@ class GitBase;
 class IJenkinsWidget;
 class IGitServerWidget;
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-class QTermWidgetInterface;
-#endif
-
 /*!
  \brief The GitQlient class is the MainWindow of the GitQlient application. Is the widget that stores all the tabs about
  the opened repositories and their submodules. Acts as a bridge between the repository actions performed by the
@@ -111,10 +107,6 @@ private:
    QMap<QString, QObject *> mPlugins;
    QPair<QString, IJenkinsWidget *> mJenkins;
    QPair<QString, IGitServerWidget *> mGitServer;
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-   QPair<QString, QTermWidgetInterface *> mTerminal;
-#endif
 
    /*!
     \brief Opens a QFileDialog to select a repository in the local disk.
