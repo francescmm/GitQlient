@@ -23,10 +23,6 @@
 #include <QStandardPaths>
 #include <QTimer>
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#   include <qtermwidget_interface.h>
-#endif
-
 using namespace QLogger;
 
 namespace
@@ -396,7 +392,7 @@ void ConfigWidget::saveConfig()
    emit reloadDiffFont();
    emit commitTitleMaxLenghtChanged();
 
-   if (mShowResetMsg || qobject_cast<QComboBox*>(sender()) == ui->cbLanguage)
+   if (mShowResetMsg || qobject_cast<QComboBox *>(sender()) == ui->cbLanguage)
    {
       QMessageBox::information(this, tr("Reset needed!"),
                                tr("You need to restart GitQlient to see the changes in the styles applied."));
@@ -615,44 +611,7 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
       mPluginWidgets.append(labelName);
       mPluginWidgets.append(labelVersion);
 
-      if (labelName->text().contains("qtermwidget", Qt::CaseInsensitive))
-      {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-         GitQlientSettings settings(mGit->getGitDir());
-         const auto isTerminalEnabled = settings.localValue("TerminalEnabled", false).toBool();
-         const auto terminal = qobject_cast<QTermWidgetInterface *>(iter.value());
-         const auto availableSchemes = terminal->getAvailableColorSchemes();
-
-         ui->lTerminalColorScheme->setVisible(isTerminalEnabled);
-         ui->cbTerminalColorScheme->setVisible(isTerminalEnabled);
-         ui->cbTerminalColorScheme->addItems(availableSchemes);
-
-         if (const auto lastScheme = QSettings().value("TerminalScheme", QString()).toString();
-             !lastScheme.isEmpty() && availableSchemes.contains(lastScheme))
-         {
-            ui->cbTerminalColorScheme->setCurrentText(lastScheme);
-            terminal->setColorScheme(lastScheme);
-         }
-
-         connect(ui->cbTerminalColorScheme, &QComboBox::currentTextChanged, this, [terminal](const QString &newScheme) {
-            dynamic_cast<QTermWidgetInterface *>(terminal)->setColorScheme(newScheme);
-
-            QSettings().setValue("TerminalScheme", newScheme);
-         });
-
-         chEnabled->setChecked(GitQlientSettings(mGit->getGitDir()).localValue("TerminalEnabled", false).toBool());
-         connect(chEnabled, &QCheckBox::stateChanged, this, [this, chEnabled](int) {
-            const auto checked = chEnabled->isChecked();
-            GitQlientSettings(mGit->getGitDir()).setLocalValue("TerminalEnabled", checked);
-
-            ui->lTerminalColorScheme->setVisible(checked);
-            ui->cbTerminalColorScheme->setVisible(checked);
-
-            emit terminalEnabled(checked);
-         });
-#endif
-      }
-      else if (labelName->text().contains("jenkinsplugin", Qt::CaseInsensitive))
+      if (labelName->text().contains("jenkinsplugin", Qt::CaseInsensitive))
       {
          chEnabled->setChecked(GitQlientSettings(mGit->getGitDir()).localValue("BuildSystemEnabled", false).toBool());
 
@@ -697,7 +656,7 @@ void ConfigWidget::fillLanguageBox() const
       const auto lang = name.mid(name.indexOf('_') + 1);
       QLocale tmpLocale(lang);
       const auto languageItem = QString::fromUtf8("%1 (%2)").arg(QLocale::languageToString(tmpLocale.language()),
-                                                                   QLocale::countryToString(tmpLocale.country()));
+                                                                 QLocale::countryToString(tmpLocale.country()));
 
       ui->cbLanguage->addItem(languageItem, name);
 
