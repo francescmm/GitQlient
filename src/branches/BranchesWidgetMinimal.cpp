@@ -144,7 +144,7 @@ void BranchesWidgetMinimal::configureTagsMenu(const QString &sha, const QString 
 
 void BranchesWidgetMinimal::configureStashesMenu(const QString &stashId, const QString &name)
 {
-   const auto action = new QAction(name);
+   const auto action = new QAction(name, mStashesMenu);
    action->setData(stashId);
    connect(action, &QAction::triggered, this, [this, stashId] { emit stashSelected(stashId); });
 
@@ -154,7 +154,7 @@ void BranchesWidgetMinimal::configureStashesMenu(const QString &stashId, const Q
 
 void BranchesWidgetMinimal::configureSubmodulesMenu(const QString &name)
 {
-   const auto action = new QAction(name);
+   const auto action = new QAction(name, mSubmodulesMenu);
    action->setData(name);
    mSubmodulesMenu->addAction(action);
    mSubmodules->setText("   " + QString::number(mSubmodulesMenu->actions().count()));
