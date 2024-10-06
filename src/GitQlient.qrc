@@ -12,6 +12,7 @@
         <file alias="colors_dark">resources/stylesheet_colors_dark.css</file>
         <file alias="DejaVuSans">resources/DejaVuSans.ttf</file>
         <file alias="DejaVuSansMono">resources/DejaVuSansMono.ttf</file>
+        <file alias="font_sizes">resources/font_sizes.css</file>
     </qresource>
     <qresource prefix="/translations">
         <file alias="gitqlient_en.qm">resources/translations/gitqlient_en.qm</file>

@@ -54,8 +54,9 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
    p->setRenderHints(QPainter::Antialiasing);
 
+   const auto defaultFontSize = QApplication::font().pointSize();
    QStyleOptionViewItem newOpt(opt);
-   newOpt.font.setPointSize(9);
+   newOpt.font.setPointSize(defaultFontSize - 1);
 
    if (newOpt.state & QStyle::State_Selected || newOpt.state & QStyle::State_MouseOver)
    {
@@ -121,7 +122,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
          }
          else if (index.column() == static_cast<int>(CommitHistoryColumns::Sha))
          {
-            newOpt.font.setPointSize(8);
+            newOpt.font.setPointSize(defaultFontSize - 2);
             newOpt.font.setFamily("DejaVu Sans Mono");
 
             text = commit.sha != ZERO_SHA ? text.left(8) : "";

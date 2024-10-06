@@ -1,0 +1,46 @@
+base-font: 10pt;
+
+QPushButton, QToolButton
+{
+   font-size: 10pt;
+}
+
+PomodoroButton > QLabel
+{
+   font-size: 7pt;
+}
+
+#lCounter
+{
+   font-size: 9pt;
+}
+
+#labelSha
+{
+   font-size: 14pt;
+}
+
+#labelAuthor
+{
+   font-size: 12pt;
+}
+
+#labelDateTime
+{
+   font-size: 9pt;
+}
+
+#normalLabel
+{
+   font-size: 9pt;
+}
+
+QLabel#numberLabel
+{
+   font-size: 9pt;
+}
+
+QLabel#title
+{
+   font-size: 24pt;
+}

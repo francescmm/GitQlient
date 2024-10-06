@@ -74,7 +74,6 @@ QPushButton, QToolButton
 {
     border: 0;
     padding: 5px;
-    font-size: 10pt;
 }
 
 QPushButton
@@ -443,7 +442,6 @@ GeneralConfigPage > QLabel#configLabel
 PomodoroButton > QLabel
 {
    qproperty-alignment: AlignCenter;
-   font-size: 7pt;
    font-family: DejaVu Sans Mono;
 }
 
@@ -648,7 +646,6 @@ CommitChangesWidget #wipSeparator
 
 #lCounter
 {
-   font-size: 9pt;
    border-width: 1px;
    border-style: solid;
    border-left-width: 0;
@@ -688,7 +685,6 @@ CommitChangesWidget #wipSeparator
     padding: 8px 10px;
     font-weight: bold;
     font-family: "DejaVu Sans Mono";
-    font-size: 8pt;
 }
 
 #labelTitle, #labelDescription
@@ -698,7 +694,6 @@ CommitChangesWidget #wipSeparator
 
 #labelAuthor
 {
-   font-size: 12pt;
    padding: 10px;
    padding-bottom: 1px;
    border: none;
@@ -706,7 +701,6 @@ CommitChangesWidget #wipSeparator
 
 #labelDateTime
 {
-   font-size: 9pt;
    padding: 10px;
    padding-top: 1px;
 }
@@ -894,7 +888,6 @@ BlameWidget > QTreeView::item
     padding-left: 5px;
     max-height: 22px;
     min-height: 22px;
-    font-size: 9pt;
 }
 
 QLabel#numberLabel
@@ -905,7 +898,6 @@ QLabel#numberLabel
     border-right-style: solid;
     max-height: 22px;
     min-height: 22px;
-    font-size: 9pt;
 }
 
 QLabel#authorFirstOfItsName, QLabel#authorPrimusInterPares
@@ -983,11 +975,6 @@ MergeWidget > #leCommitTitle
 /*********************************************/
 /*              InitScreen START             */
 /*********************************************/
-
-QLabel#title
-{
-    font-size: 24pt;
-}
 
 QPushButton#bigButton
 {

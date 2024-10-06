@@ -40,7 +40,6 @@ GitQlient::GitQlient(QWidget *parent)
 {
 
    auto font = QApplication::font();
-   font.setPointSize(10);
 
    QApplication::setFont(font);
 
