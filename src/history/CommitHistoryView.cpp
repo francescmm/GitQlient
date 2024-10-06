@@ -176,16 +176,16 @@ void CommitHistoryView::focusOnCommit(const QString &goToSha)
 
    if (mIsFiltering)
    {
-      const auto sourceIndex = mProxyModel->sourceModel()->index(row, 0);
+      const auto sourceIndex = mProxyModel->sourceModel()->index(row, 1);
       row = mProxyModel->mapFromSource(sourceIndex).row();
    }
 
    clearSelection();
 
-   const auto index = model()->index(row, 0);
+   const auto index = model()->index(row, 1);
 
    setCurrentIndex(index);
-   scrollTo(currentIndex());
+   scrollTo(index);
 }
 
 QModelIndexList CommitHistoryView::selectedIndexes() const
