@@ -1,5 +1,5 @@
 #General stuff
-CONFIG += qt warn_on c++17 c++1z
+CONFIG += qt warn_on c++20 c++1z
 
 QT += widgets core network gui
 DEFINES += QT_DEPRECATED_WARNINGS
@@ -87,11 +87,11 @@ DEFINES += \
 
 macos{
    isEmpty(ARCH) {
-      ARCH = x86_64
+      ARCH = arm64
    }
 
    isEmpty(CREATEDMGPATH) {
-      CREATEDMGPATH = /usr/local/bin
+      CREATEDMGPATH = /opt/homebrew/bin
    }
 
    QMAKE_INFO_PLIST=$$PWD/src/resources/Info.plist
