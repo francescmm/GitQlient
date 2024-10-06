@@ -244,7 +244,7 @@ void CommitHistoryContextMenu::exportAsPatch()
 
    if (ret.success)
    {
-      const auto action = QMessageBox::information(this, tr("Patch generated"),
+      const auto action = QMessageBox::information(parentWidget(), tr("Patch generated"),
                                                    tr("<p>The patch has been generated!</p>"
                                                       "<p><b>Commit:</b></p><p>%1</p>"
                                                       "<p><b>Destination:</b> %2</p>"
@@ -309,7 +309,7 @@ void CommitHistoryContextMenu::checkoutBranch()
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
                          tr("There were problems during the checkout operation. Please, see the detailed "
                             "description for more information."),
-                         QMessageBox::Ok, this);
+                         QMessageBox::Ok, parentWidget());
       msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
@@ -339,7 +339,7 @@ void CommitHistoryContextMenu::checkoutCommit()
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
                          tr("There were problems during the checkout operation. Please, see the detailed "
                             "description for more information."),
-                         QMessageBox::Ok, this);
+                         QMessageBox::Ok, parentWidget());
       msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
@@ -388,7 +388,7 @@ void CommitHistoryContextMenu::cherryPickCommit()
             QMessageBox msgBox(QMessageBox::Critical, tr("Error while cherry-pick"),
                                tr("There were problems during the cherry-pich operation. Please, see the detailed "
                                   "description for more information."),
-                               QMessageBox::Ok, this);
+                               QMessageBox::Ok, parentWidget());
             msgBox.setDetailedText(errorMsg);
             msgBox.setStyleSheet(GitQlientStyles::getStyles());
             msgBox.exec();
@@ -420,7 +420,7 @@ void CommitHistoryContextMenu::rebase()
                     "There were problems during the rebase. Please, see the detailed description for more "
                     "information.<br><br>GitQlient cannot handle these conflicts at the moment.<br><br>The rebase will "
                     "be aborted.")),
-                QMessageBox::Ok, this);
+                QMessageBox::Ok, parentWidget());
             msgBox.setDetailedText(ret.output);
             msgBox.setStyleSheet(GitQlientStyles::getStyles());
             msgBox.exec();
@@ -446,7 +446,7 @@ void CommitHistoryContextMenu::rebase()
               tr("There were problems during the rebase. Please, see the detailed description for more "
                  "information.<br><br>GitQlient cannot handle these conflicts at the moment.<br><br>The rebase will be "
                  "aborted.")),
-          QMessageBox::Ok, this);
+          QMessageBox::Ok, parentWidget());
       msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
@@ -460,7 +460,7 @@ void CommitHistoryContextMenu::rebase()
 
 void CommitHistoryContextMenu::applyPatch()
 {
-   const QString fileName(QFileDialog::getOpenFileName(this, tr("Select a patch to apply")));
+   const QString fileName(QFileDialog::getOpenFileName(parentWidget(), tr("Select a patch to apply")));
    QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
    if (!fileName.isEmpty() && git->applyPatch(fileName).success)
@@ -469,7 +469,7 @@ void CommitHistoryContextMenu::applyPatch()
 
 void CommitHistoryContextMenu::applyCommit()
 {
-   const QString fileName(QFileDialog::getOpenFileName(this, "Select a patch to apply"));
+   const QString fileName(QFileDialog::getOpenFileName(parentWidget(), "Select a patch to apply"));
    QScopedPointer<GitPatches> git(new GitPatches(mGit));
 
    if (!fileName.isEmpty() && git->applyPatch(fileName, true).success)
@@ -516,7 +516,7 @@ void CommitHistoryContextMenu::push()
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
                          tr("There were problems during the push operation. Please, see the detailed description "
                             "for more information."),
-                         QMessageBox::Ok, this);
+                         QMessageBox::Ok, parentWidget());
       msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
@@ -549,7 +549,7 @@ void CommitHistoryContextMenu::pull()
          QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
                             tr("There were problems during the pull operation. Please, see the detailed "
                                "description for more information."),
-                            QMessageBox::Ok, this);
+                            QMessageBox::Ok, parentWidget());
          msgBox.setDetailedText(errorMsg);
          msgBox.setStyleSheet(GitQlientStyles::getStyles());
          msgBox.exec();
@@ -640,7 +640,7 @@ void CommitHistoryContextMenu::resetMixed()
 void CommitHistoryContextMenu::resetHard()
 {
    const auto retMsg = QMessageBox::warning(
-       this, "Reset hard requested!", "Are you sure you want to reset the branch to this commit in a <b>hard</b> way?",
+       parentWidget(), "Reset hard requested!", "Are you sure you want to reset the branch to this commit in a <b>hard</b> way?",
        QMessageBox::Ok, QMessageBox::Cancel);
 
    if (retMsg == QMessageBox::Ok)
@@ -776,7 +776,7 @@ void CommitHistoryContextMenu::showSquashDialog()
 {
    if (mCache->pendingLocalChanges())
    {
-      QMessageBox::warning(this, tr("Squash not possible"),
+      QMessageBox::warning(parentWidget(), tr("Squash not possible"),
                            tr("Please, make sure there are no pending changes to be committed."));
    }
    else
@@ -813,7 +813,7 @@ void CommitHistoryContextMenu::amendNoEdit()
                          tr("There were problems during the commit "
                             "operation. Please, see the detailed "
                             "description for more information."),
-                         QMessageBox::Ok, this);
+                         QMessageBox::Ok, parentWidget());
       msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();

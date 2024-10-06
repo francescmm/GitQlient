@@ -89,7 +89,7 @@ void BranchContextMenu::pull()
          QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
                             tr("There were problems during the pull operation. Please, see the detailed "
                                "description for more information."),
-                            QMessageBox::Ok, this);
+                            QMessageBox::Ok, parentWidget());
          msgBox.setDetailedText(errorMsg);
          msgBox.setStyleSheet(GitQlientStyles::getStyles());
          msgBox.exec();
@@ -107,7 +107,7 @@ void BranchContextMenu::fetch()
    if (ret)
       emit fullReload();
    else
-      QMessageBox::critical(this, tr("Fetch failed"), tr("There were some problems while fetching. Please try again."));
+      QMessageBox::critical(parentWidget(), tr("Fetch failed"), tr("There were some problems while fetching. Please try again."));
 }
 
 void BranchContextMenu::resetToOrigin()
@@ -120,7 +120,7 @@ void BranchContextMenu::resetToOrigin()
    if (ret.success)
       emit fullReload();
    else
-      QMessageBox::critical(this, tr("Fetch failed"), tr("There were some problems while fetching. Please try again."));
+      QMessageBox::critical(parentWidget(), tr("Fetch failed"), tr("There were some problems while fetching. Please try again."));
 }
 
 void BranchContextMenu::resetToSha()
@@ -197,7 +197,7 @@ void BranchContextMenu::push()
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pushing"),
                          tr("There were problems during the push operation. Please, see the detailed description "
                             "for more information."),
-                         QMessageBox::Ok, this);
+                         QMessageBox::Ok, parentWidget());
       msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
@@ -214,7 +214,7 @@ void BranchContextMenu::unsetUpstream()
    if (ret.success)
    {
       QMessageBox msgBox(QMessageBox::Information, tr("Upstream unset!"), tr("Upstream unset successfully!"),
-                         QMessageBox::Ok, this);
+                         QMessageBox::Ok, parentWidget());
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
    }
@@ -237,7 +237,7 @@ void BranchContextMenu::pushForce()
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while pulling"),
                          tr("There were problems during the pull operation. Please, see the detailed description "
                             "for more information."),
-                         QMessageBox::Ok, this);
+                         QMessageBox::Ok, parentWidget());
       msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
@@ -277,11 +277,11 @@ void BranchContextMenu::rename()
 void BranchContextMenu::deleteBranch()
 {
    if (!mConfig.isLocal && mConfig.branchSelected == "master")
-      QMessageBox::critical(this, tr("Delete master?!"), tr("You are not allowed to delete remote master."),
+      QMessageBox::critical(parentWidget(), tr("Delete master?!"), tr("You are not allowed to delete remote master."),
                             QMessageBox::Ok);
    else
    {
-      auto ret = QMessageBox::warning(this, tr("Delete branch!"), tr("Are you sure you want to delete the branch?"),
+      auto ret = QMessageBox::warning(parentWidget(), tr("Delete branch!"), tr("Are you sure you want to delete the branch?"),
                                       QMessageBox::Ok, QMessageBox::Cancel);
 
       if (ret == QMessageBox::Ok)
@@ -301,7 +301,7 @@ void BranchContextMenu::deleteBranch()
          }
          else
             QMessageBox::critical(
-                this, tr("Delete a branch failed"),
+                parentWidget(), tr("Delete a branch failed"),
                 tr("There were some problems while deleting the branch:<br><br> %1").arg(ret2.output));
       }
    }

@@ -39,7 +39,7 @@ void StashesContextMenu::drop()
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while dropping stash"),
                          tr("There were problems during the stash drop operation. Please, see the detailed "
                             "description for more information."),
-                         QMessageBox::Ok, this);
+                         QMessageBox::Ok, parentWidget());
       msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
@@ -58,7 +58,7 @@ void StashesContextMenu::clear()
       QMessageBox msgBox(QMessageBox::Critical, tr("Error while branch stash"),
                          tr("There were problems during the branch stash operation. Please, see the detailed "
                             "description for more information."),
-                         QMessageBox::Ok, this);
+                         QMessageBox::Ok, parentWidget());
       msgBox.setDetailedText(ret.output);
       msgBox.setStyleSheet(GitQlientStyles::getStyles());
       msgBox.exec();
