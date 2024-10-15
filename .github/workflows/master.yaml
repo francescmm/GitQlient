@@ -1,0 +1,19 @@
+name: Master
+run-name: Latest master run
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build-project:
+    name: Build 🧱
+    uses: ./.github/workflows/build.yaml
+    secrets: inherit
+    permissions:
+      actions: write
+      contents: read

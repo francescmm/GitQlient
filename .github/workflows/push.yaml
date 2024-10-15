@@ -1,0 +1,38 @@
+name: Push
+run-name: ${{ github.ref_name }} push run
+
+on:
+  push:
+    tags-ignore:
+      - '*'
+    branches-ignore:
+      - master
+    branches:
+
+permissions:
+  contents: write
+
+jobs:
+  Clean:
+    name: Clean old builds
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Prune previous runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          keep_minimum_runs: 2
+          repository: ${{ github.repository }}
+          retain_days: 0
+
+  BuildProject:
+    needs: [Clean]
+    name: Build 🧱
+    uses: ./.github/workflows/build.yaml
+    secrets: inherit
+    permissions:
+      actions: write
+      contents: read
