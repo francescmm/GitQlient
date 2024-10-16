@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   Clean:
-    name: Clean old builds
+    name: Clean old workflows
     runs-on: ubuntu-latest
     permissions:
       actions: write
@@ -38,7 +38,7 @@ jobs:
           access_token: ${{ secrets.GITHUB_TOKEN }}
 
   BuildProject:
-    needs: [Clean]
+    needs: [Clean, CancelPrevious]
     name: Build 🧱
     uses: ./.github/workflows/build.yaml
     secrets: inherit
