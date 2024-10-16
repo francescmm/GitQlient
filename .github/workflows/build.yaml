@@ -177,7 +177,6 @@ jobs:
           qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
           make -j 4
       - name: Download tarball
-        working-directory: build
         uses: actions/download-artifact@v4
         with:
           name: tarball
