@@ -17,11 +17,11 @@ jobs:
         run: |
           git-archive-all --prefix=gitqlient_${{env.VERSION}} gitqlient_${{env.VERSION}}.tar.gz
       - name: Upload tarball
-          uses: actions/upload-artifact@v4
-          with:
-            name: fedora-${{matrix.fedora_version}}
-            path: |
-              gitqlient_${{env.VERSION}}.tar.gz
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarball
+          path: |
+            gitqlient_${{env.VERSION}}.tar.gz
 
 
   Ubuntu:
@@ -99,6 +99,13 @@ jobs:
             gitqlient*.deb
             gitqlient_${{env.VERSION}}.tar.gz
 
+      - name: Download tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: tarball
+          path: |
+            gitqlient_${{env.VERSION}}.tar.gz
+
   Fedora:
     name: Fedora
     runs-on: ubuntu-latest
@@ -159,33 +166,30 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: Add safe git directory
-        run: git config --global --add safe.directory ${GITHUB_WORKSPACE}
-      - name: Create Build Environment
-        run: cmake -E make_directory build
-      - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_WERROR=ON
-      - name: Create source tarball
-        working-directory: build
-        run: ../dist/scripts/maketarball.sh
+      - name: Download tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: tarball
+          path: |
+            gitqlient_${{env.VERSION}}.tar.gz
       - name: Create RPM build sources directories
         working-directory: build
         run: mkdir -p ~/rpmbuild/SOURCES /usr/src/packages/SOURCES
       - name: Copy source tarball
         working-directory: build
-        run: cp strawberry-*.tar.xz ~/rpmbuild/SOURCES/
+        run: cp gitqlient_${{env.VERSION}}.tar.gz ~/rpmbuild/SOURCES/
       - name: Build RPM
         env:
           RPM_BUILD_NCPUS: "2"
         working-directory: build
-        run: rpmbuild -ba ../dist/unix/strawberry.spec
+        run: rpmbuild -ba ../contrib/rpm/strawberry.spec
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: fedora-${{matrix.fedora_version}}
           path: |
-            /github/home/rpmbuild/SRPMS/*.rpm
-            /github/home/rpmbuild/RPMS/x86_64/*.rpm
+            ~/rpmbuild/SRPMS/*.rpm
+            ~/rpmbuild/RPMS/x86_64/*.rpm
 
   Windows:
     name: Windows
