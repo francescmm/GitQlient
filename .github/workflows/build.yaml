@@ -174,8 +174,8 @@ jobs:
       - name: Compile
         run: |
           mkdir build
-#          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
-#          make -j 4
+          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
+          make -j 4
       - name: Download tarball
         uses: actions/download-artifact@v4
         with:
