@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install dependencies
-        runs: |
+        run: |
           sudo pip install git-archive-all
       - name: Checking out the code
         uses: actions/checkout@v4
