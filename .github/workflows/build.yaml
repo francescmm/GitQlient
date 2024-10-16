@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Install dependencies
         runs: |
-        sudo pip install git-archive-all
+          sudo pip install git-archive-all
       - name: Checking out the code
         uses: actions/checkout@v4
         with:
