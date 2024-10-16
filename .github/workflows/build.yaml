@@ -169,12 +169,15 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Add safe git directory
+        run: git config --global --add safe.directory ${GITHUB_WORKSPACE}
       - name: Compile
         run: |
           mkdir build
           qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
           make -j 4
       - name: Download tarball
+        working-directory: build
         uses: actions/download-artifact@v4
         with:
           name: tarball
