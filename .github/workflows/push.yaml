@@ -28,6 +28,15 @@ jobs:
           repository: ${{ github.repository }}
           retain_days: 0
 
+  CancelPrevious:
+    name: Cancel previous builds
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
+
   BuildProject:
     needs: [Clean]
     name: Build 🧱
