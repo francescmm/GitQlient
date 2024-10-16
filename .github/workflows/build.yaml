@@ -169,6 +169,11 @@ jobs:
         with:
           fetch-depth: 0
           submodules: recursive
+      - name: Compile
+        run: |
+          mkdir build
+          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
+          make -j 4
       - name: Download tarball
         uses: actions/download-artifact@v4
         with:
@@ -177,10 +182,10 @@ jobs:
             gitqlient_${{env.VERSION}}.tar.gz
       - name: Create RPM build sources directories
         working-directory: build
-        run: mkdir -p ~/rpmbuild/SOURCES /usr/src/packages/SOURCES
+        run: mkdir -p rpmbuild/SOURCES /usr/src/packages/SOURCES
       - name: Copy source tarball
         working-directory: build
-        run: cp gitqlient_${{env.VERSION}}.tar.gz ~/rpmbuild/SOURCES/
+        run: cp gitqlient_${{env.VERSION}}.tar.gz rpmbuild/SOURCES/
       - name: Build RPM
         env:
           RPM_BUILD_NCPUS: "2"
@@ -191,8 +196,8 @@ jobs:
         with:
           name: fedora-${{matrix.fedora_version}}
           path: |
-            ~/rpmbuild/SRPMS/*.rpm
-            ~/rpmbuild/RPMS/x86_64/*.rpm
+            rpmbuild/SRPMS/*.rpm
+            rpmbuild/RPMS/x86_64/*.rpm
 
   Windows:
     name: Windows
