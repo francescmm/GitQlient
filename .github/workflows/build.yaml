@@ -186,8 +186,7 @@ jobs:
         working-directory: build
         run: mkdir -p rpmbuild/SOURCES /usr/src/packages/SOURCES
       - name: Copy source tarball
-        working-directory: build
-        run: cp ../gitqlient_${{env.VERSION}}.tar.gz rpmbuild/SOURCES/
+        run: cp gitqlient_${{env.VERSION}}.tar.gz build/rpmbuild/SOURCES/
       - name: Build RPM
         env:
           RPM_BUILD_NCPUS: "2"
