@@ -25,6 +25,7 @@
 #include <QSortFilterProxyModel>
 #include <QToolTip>
 #include <QUrl>
+#include <QFontDatabase>
 
 using namespace GitServerPlugin;
 
@@ -54,7 +55,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
 
    p->setRenderHints(QPainter::Antialiasing);
 
-   const auto defaultFontSize = QApplication::font().pointSize();
+   const auto defaultFontSize = GitQlientSettings().globalValue("HistoryView/FontSize", QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize()).toInt();
    QStyleOptionViewItem newOpt(opt);
    newOpt.font.setPointSize(defaultFontSize - 1);
 

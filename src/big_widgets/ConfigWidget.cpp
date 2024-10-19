@@ -22,6 +22,8 @@
 #include <QPushButton>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QApplication>
+#include <QFontDatabase>
 
 using namespace QLogger;
 
@@ -106,6 +108,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->chDisableLogs->setChecked(settings.globalValue("logsDisabled", true).toBool());
    ui->cbLogLevel->setCurrentIndex(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
    ui->spCommitTitleLength->setValue(settings.globalValue("commitTitleMaxLength", 50).toInt());
+   ui->sbUiFontSize->setValue(settings.globalValue("UiBaseFontSize", QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize()).toInt());
+   ui->sbHistoryViewFontSize->setValue(settings.globalValue("HistoryView/FontSize", QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize()).toInt());
    ui->sbEditorFontSize->setValue(settings.globalValue("FileDiffView/FontSize", 8).toInt());
    ui->chSingleClickDiffView->setChecked(settings.globalValue("singleClickDiffView", false).toBool());
 
@@ -184,6 +188,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->cbLogLevel, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->leGitPath, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->spCommitTitleLength, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->sbUiFontSize, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->sbHistoryViewFontSize, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->sbEditorFontSize, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbTranslations, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->sbMaxCommits, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
@@ -371,6 +377,8 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("logsLevel", ui->cbLogLevel->currentIndex());
    settings.setGlobalValue("logsFolder", ui->leLogsLocation->text());
    settings.setGlobalValue("commitTitleMaxLength", ui->spCommitTitleLength->value());
+   settings.setGlobalValue("UiBaseFontSize", ui->sbUiFontSize->value());
+   settings.setGlobalValue("HistoryView/FontSize", ui->sbHistoryViewFontSize->value());
    settings.setGlobalValue("FileDiffView/FontSize", ui->sbEditorFontSize->value());
    settings.setGlobalValue("colorSchema", ui->cbStyle->currentIndex());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());

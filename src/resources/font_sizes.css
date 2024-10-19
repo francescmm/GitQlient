@@ -10,6 +10,11 @@ PomodoroButton > QLabel
    font-size: 7pt;
 }
 
+QLabel
+{
+   font-size: 10pt;
+}
+
 #lCounter
 {
    font-size: 9pt;

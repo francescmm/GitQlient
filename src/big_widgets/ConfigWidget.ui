@@ -19,7 +19,7 @@
      <item>
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -39,7 +39,7 @@
      <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -236,7 +236,7 @@
                <item>
                 <spacer name="horizontalSpacer_4">
                  <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
+                  <enum>Qt::Orientation::Horizontal</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -257,28 +257,68 @@
              <string>GitQlient styles</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_6">
-             <item row="0" column="2">
+             <item row="0" column="1">
+              <widget class="QSpinBox" name="sbUiFontSize">
+               <property name="suffix">
+                <string> pt</string>
+               </property>
+               <property name="minimum">
+                <number>6</number>
+               </property>
+               <property name="maximum">
+                <number>32</number>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_70">
+               <property name="text">
+                <string>History view font size:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_71">
+               <property name="text">
+                <string>UI base font size:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="sbHistoryViewFontSize">
+               <property name="suffix">
+                <string> pt</string>
+               </property>
+               <property name="minimum">
+                <number>6</number>
+               </property>
+               <property name="maximum">
+                <number>32</number>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
               <widget class="QLabel" name="label_21">
                <property name="text">
                 <string>Editor font size</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="3">
-              <widget class="QSpinBox" name="sbEditorFontSize">
-               <property name="suffix">
-                <string> pt</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
+             <item row="1" column="2">
               <widget class="QLabel" name="label_3">
                <property name="text">
                 <string>Styles schema</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
+             <item row="2" column="1">
+              <widget class="QSpinBox" name="sbEditorFontSize">
+               <property name="suffix">
+                <string> pt</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
               <widget class="QComboBox" name="cbStyle">
                <item>
                 <property name="text">
@@ -292,14 +332,14 @@
                </item>
               </widget>
              </item>
-             <item row="1" column="0">
+             <item row="2" column="2">
               <widget class="QLabel" name="label_15">
                <property name="text">
                 <string>Commit title max. length</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
+             <item row="2" column="3">
               <widget class="QSpinBox" name="spCommitTitleLength">
                <property name="value">
                 <number>50</number>
@@ -472,7 +512,7 @@
           <item>
            <spacer name="verticalSpacer_2">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Orientation::Vertical</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -524,8 +564,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>551</width>
-            <height>778</height>
+            <width>431</width>
+            <height>750</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -855,7 +895,7 @@
               <item row="19" column="0">
                <spacer name="verticalSpacer_3">
                 <property name="orientation">
-                 <enum>Qt::Vertical</enum>
+                 <enum>Qt::Orientation::Vertical</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -887,7 +927,7 @@
                 <item>
                  <spacer name="horizontalSpacer">
                   <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                   <enum>Qt::Orientation::Horizontal</enum>
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
@@ -1102,7 +1142,7 @@
              <string>Enabled</string>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignmentFlag::AlignCenter</set>
             </property>
            </widget>
           </item>
@@ -1112,10 +1152,10 @@
        <item row="3" column="0">
         <spacer name="verticalSpacer_5">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+          <enum>QSizePolicy::Policy::Fixed</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -1128,10 +1168,10 @@
        <item row="6" column="0">
         <spacer name="verticalSpacer_4">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+          <enum>QSizePolicy::Policy::Fixed</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -1144,7 +1184,7 @@
        <item row="8" column="0">
         <spacer name="verticalSpacer_6">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -1202,10 +1242,10 @@
        <item row="1" column="0">
         <spacer name="verticalSpacer_7">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
+          <enum>QSizePolicy::Policy::Fixed</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -1228,7 +1268,7 @@
        <item row="24" column="0">
         <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
