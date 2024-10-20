@@ -209,7 +209,7 @@ jobs:
     runs-on: ${{ matrix.env.os }}
     steps:
       - name: Checking out the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
 
@@ -255,7 +255,7 @@ jobs:
             qtplatform: mac
     steps:
       - name: Checking out the code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: 'true'
 
