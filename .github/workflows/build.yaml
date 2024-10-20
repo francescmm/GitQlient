@@ -202,6 +202,9 @@ jobs:
   Windows:
     name: Windows
     needs: [Tarball]
+    defaults:
+      run:
+        shell: bash
     strategy:
       matrix:
         env:
