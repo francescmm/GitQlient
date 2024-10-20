@@ -366,6 +366,12 @@ jobs:
     needs: [Ubuntu, Windows, MacOS, Appimage]
     runs-on: ubuntu-latest
     steps:
+      - name: Checking out the code
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          fetch-depth: 0
+
       - name: Delete previous dev-latest release
         continue-on-error: true
         if: github.ref == 'refs/heads/master'
@@ -384,6 +390,7 @@ jobs:
         with:
           name: "Continuous Build: latest development"
           tag_name: "dev-latest"
+          body: "Build with the latest changes in master."
           draft: false
           files: |
             appimage/GitQlient*.AppImage
@@ -406,6 +413,7 @@ jobs:
   PostBuildClean:
     name: Post-release actions
     runs-on: ubuntu-latest
+    if: always()
     needs: [UpdateAssets]
     steps:
       - name: Clean artifacts
