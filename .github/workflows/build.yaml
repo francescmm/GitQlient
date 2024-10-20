@@ -22,9 +22,8 @@ jobs:
       - name: Upload tarball
         uses: actions/upload-artifact@v4
         with:
-          name: tarball
-          path: |
-            gitqlient_${{env.VERSION}}.tar.gz
+          name: linux
+          path: gitqlient_${{env.VERSION}}.tar.gz
 
 
   Ubuntu:
@@ -62,6 +61,13 @@ jobs:
           make -j 4
           make install
 
+      - name: Download tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: linux
+          path: |
+            gitqlient_${{env.VERSION}}.tar.gz
+
       - name: Build DEB package
         run: |
           echo "Version: ${{env.VERSION}}" >> deb_pkg/DEBIAN/control
@@ -92,114 +98,104 @@ jobs:
           fakeroot dpkg-deb -v --build gitqlient_${{env.VERSION}}_amd64
           cp *.deb ../
 
-      - name: Uploading
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Upload DEB package
+        uses: actions/upload-artifact@v4
         with:
-          files: |
-            gitqlient*.deb
-            gitqlient_${{env.VERSION}}.tar.gz
-
-      - name: Download tarball
-        uses: actions/download-artifact@v4
-        with:
-          name: tarball
+          name: linux
           path: |
-            gitqlient_${{env.VERSION}}.tar.gz
+            gitqlient*.deb
 
-  Fedora:
-    name: Fedora
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        fedora_version: [ '39', '40', '41' ]
-    container:
-      image: fedora:${{matrix.fedora_version}}
-    steps:
-      - name: Update repositories
-        run: dnf -y update
-      - name: Upgrade packages
-        run: dnf -y upgrade
-      - name: Install dependencies
-        run: >
-            dnf -y install
-            @development-tools
-            redhat-lsb-core
-            which
-            git
-            glibc
-            gcc-c++
-            rpmdevtools
-            make
-            cmake
-            pkgconfig
-            glib
-            man
-            tar
-            gettext
-            openssh
-            rsync
-            boost-devel
-            sqlite-devel
-            alsa-lib-devel
-            pulseaudio-libs-devel
-            libnotify-devel
-            libicu-devel
-            qt6-qtbase-devel
-            qt6-qtbase-private-devel
-            qt6-qttools-devel
-            gstreamer1-devel
-            gstreamer1-plugins-base-devel
-            taglib-devel
-            libcdio-devel
-            libgpod-devel
-            libmtp-devel
-            libchromaprint-devel
-            libebur128-devel
-            fftw-devel
-            desktop-file-utils
-            libappstream-glib
-            hicolor-icon-theme
-            kdsingleapplication-qt6-devel
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: recursive
-      - name: Add safe git directory
-        run: git config --global --add safe.directory ${GITHUB_WORKSPACE}
-      - name: Compile
-        run: |
-          mkdir build
+#  Fedora:
+#    name: Fedora
+#    runs-on: ubuntu-latest
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        fedora_version: [ '39', '40', '41' ]
+#    container:
+#      image: fedora:${{matrix.fedora_version}}
+#    steps:
+#      - name: Update repositories
+#        run: dnf -y update
+#      - name: Upgrade packages
+#        run: dnf -y upgrade
+#      - name: Install dependencies
+#        run: >
+#            dnf -y install
+#            @development-tools
+#            redhat-lsb-core
+#            which
+#            git
+#            glibc
+#            gcc-c++
+#            rpmdevtools
+#            make
+#            cmake
+#            pkgconfig
+#            glib
+#            man
+#            tar
+#            gettext
+#            openssh
+#            rsync
+#            boost-devel
+#            sqlite-devel
+#            alsa-lib-devel
+#            pulseaudio-libs-devel
+#            libnotify-devel
+#            libicu-devel
+#            qt6-qtbase-devel
+#            qt6-qtbase-private-devel
+#            qt6-qttools-devel
+#            gstreamer1-devel
+#            gstreamer1-plugins-base-devel
+#            taglib-devel
+#            libcdio-devel
+#            libgpod-devel
+#            libmtp-devel
+#            libchromaprint-devel
+#            libebur128-devel
+#            fftw-devel
+#            desktop-file-utils
+#            libappstream-glib
+#            hicolor-icon-theme
+#            kdsingleapplication-qt6-devel
+#      - name: Checkout
+#        uses: actions/checkout@v4
+#        with:
+#          fetch-depth: 0
+#          submodules: recursive
+#      - name: Add safe git directory
+#        run: git config --global --add safe.directory ${GITHUB_WORKSPACE}
+#      - name: Compile
+#        run: |
+#          mkdir build
 #          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
 #          make -j 4
 #          make install
-      - name: Download tarball
-        uses: actions/download-artifact@v4
-        with:
-          name: tarball
-          path: |
-            gitqlient_${{env.VERSION}}.tar.gz
-      - name: Create RPM build sources directories
-        working-directory: build
-        run: mkdir -p rpmbuild/SOURCES /usr/src/packages/SOURCES
-      - name: Copy source tarball
-        run: mv gitqlient_${{env.VERSION}}.tar.gz build/rpmbuild/SOURCES/
-      - name: Build RPM
-        env:
-          RPM_BUILD_NCPUS: "2"
-        working-directory: build
-        run: rpmbuild -ba ../contrib/rpm/gitqlient.spec
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: fedora-${{matrix.fedora_version}}
-          path: |
-            rpmbuild/SRPMS/*.rpm
-            rpmbuild/RPMS/x86_64/*.rpm
+#      - name: Download tarball
+#        uses: actions/download-artifact@v4
+#        with:
+#          name: tarball
+#          path: |
+#            gitqlient_${{env.VERSION}}.tar.gz
+#      - name: Create RPM build sources directories
+#        working-directory: build
+#        run: mkdir -p rpmbuild/SOURCES /usr/src/packages/SOURCES
+#      - name: Copy source tarball
+#        run: mv gitqlient_${{env.VERSION}}.tar.gz build/rpmbuild/SOURCES/
+#      - name: Build RPM
+#        env:
+#          RPM_BUILD_NCPUS: "2"
+#        working-directory: build
+#        run: rpmbuild -ba ../contrib/rpm/gitqlient.spec
+#      - name: Upload artifacts
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: fedora-${{matrix.fedora_version}}
+#          path: |
+#            rpmbuild/SRPMS/*.rpm
+#            rpmbuild/RPMS/x86_64/*.rpm
 
   Windows:
     name: Windows
@@ -290,13 +286,11 @@ jobs:
         run:
           make dmg
 
-      - name: Uploading GitQlient DMG
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
         with:
-          files: GitQlient-*
+          name: macos
+          path: GitQlient-*
 
   Appimage:
     name: AppImage
@@ -362,10 +356,51 @@ jobs:
           chmod +x GitQlient-*
           cp GitQlient-* ../
 
-      - name: Uploading
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: GitQlient-*.AppImage
+
+  UpdateAssets:
+    if: github.repository_owner == 'francescmm'
+    needs: [Ubuntu, Windows, MacOS, Appimage]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+
+      - name: Delete existing
+        run: gh release delete "dev-latest" -y
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch artifacts
+        uses: actions/download-artifact@main
+
+      - name: Upload latest pre-release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/master'
+        with:
+          name: "Continuous Build: latest development"
+          tag_name: "dev-latest"
+          draft: false
+          files: |
+            linux/GitQlient*.AppImage
+            linux/gitqlient*.deb
+            linux/gitqlient*.tar.gz
+            macos/GitQlient*.dmg
+
+      - name: Upload latest release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: GitQlient-*
+          files: |
+            linux/GitQlient*.AppImage
+            linux/gitqlient*.deb
+            linux/gitqlient*.tar.gz
+            macos/GitQlient*.dmg
