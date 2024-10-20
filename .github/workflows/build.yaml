@@ -3,6 +3,7 @@ on:
   workflow_call:
 
 jobs:
+
   Tarball:
     name: Generate tarball
     runs-on: ubuntu-latest
@@ -16,12 +17,12 @@ jobs:
           submodules: 'true'
       - name: Create Tarball
         run: |
-          git-archive-all --prefix=gitqlient_${{env.VERSION}} gitqlient_${{env.VERSION}}.tar.gz
+          git-archive-all --prefix=gitqlient_`git describe --always` gitqlient_`git describe --always`.tar.gz
       - name: Upload tarball
         uses: actions/upload-artifact@v4
         with:
           name: tarball
-          path: gitqlient_${{env.VERSION}}.tar.gz
+          path: gitqlient_*.tar.gz
 
 
   Ubuntu:
@@ -56,7 +57,7 @@ jobs:
         run: |
           qmake -v
           mkdir build
-          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=${{env.VERSION}}
+          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
           make -j 4
           make install
 
@@ -65,36 +66,36 @@ jobs:
         with:
           name: tarball
           path: |
-            gitqlient_${{env.VERSION}}.tar.gz
+            gitqlient_*.tar.gz
 
       - name: Build DEB package
         run: |
-          echo "Version: ${{env.VERSION}}" >> deb_pkg/DEBIAN/control
-          echo "Standards-Version: ${{env.VERSION}}" >> deb_pkg/DEBIAN/control
+          echo "Version: `git describe --always`" >> deb_pkg/DEBIAN/control
+          echo "Standards-Version: `git describe --always`" >> deb_pkg/DEBIAN/control
           mkdir -p deb_pkg/usr/bin
           cp gitqlient deb_pkg/usr/bin/
-          mv deb_pkg gitqlient_${{env.VERSION}}_amd64
-          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/scalable/apps
-          cp ./src/resources/icons/GitQlientLogo.svg gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/scalable/apps/gitqlient.svg
-          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/16x16/apps/
-          cp ./src/resources/icons/GitQlientLogo16.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/16x16/apps/gitqlient.png
-          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/24x24/apps/
-          cp ./src/resources/icons/GitQlientLogo24.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/24x24/apps/gitqlient.png
-          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/32x32/apps/
-          cp ./src/resources/icons/GitQlientLogo32.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/32x32/apps/gitqlient.png
-          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/48x48/apps/
-          cp ./src/resources/icons/GitQlientLogo48.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/48x48/apps/gitqlient.png
-          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/64x64/apps/
-          cp ./src/resources/icons/GitQlientLogo64.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/64x64/apps/gitqlient.png
-          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/96x96/apps/
-          cp ./src/resources/icons/GitQlientLogo96.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/96x96/apps/gitqlient.png
-          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/128x128/apps/
-          cp ./src/resources/icons/GitQlientLogo128.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/128x128/apps/gitqlient.png
-          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/256x256/apps/
-          cp ./src/resources/icons/GitQlientLogo256.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/256x256/apps/gitqlient.png
-          mkdir -p gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/512x512/apps/
-          cp ./src/resources/icons/GitQlientLogo512.png gitqlient_${{env.VERSION}}_amd64/usr/share/icons/hicolor/512x512/apps/gitqlient.png
-          fakeroot dpkg-deb -v --build gitqlient_${{env.VERSION}}_amd64
+          mv deb_pkg gitqlient_`git describe --always`_amd64
+          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/scalable/apps
+          cp ./src/resources/icons/GitQlientLogo.svg gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/scalable/apps/gitqlient.svg
+          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/16x16/apps/
+          cp ./src/resources/icons/GitQlientLogo16.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/16x16/apps/gitqlient.png
+          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/24x24/apps/
+          cp ./src/resources/icons/GitQlientLogo24.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/24x24/apps/gitqlient.png
+          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/32x32/apps/
+          cp ./src/resources/icons/GitQlientLogo32.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/32x32/apps/gitqlient.png
+          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/48x48/apps/
+          cp ./src/resources/icons/GitQlientLogo48.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/48x48/apps/gitqlient.png
+          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/64x64/apps/
+          cp ./src/resources/icons/GitQlientLogo64.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/64x64/apps/gitqlient.png
+          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/96x96/apps/
+          cp ./src/resources/icons/GitQlientLogo96.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/96x96/apps/gitqlient.png
+          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/128x128/apps/
+          cp ./src/resources/icons/GitQlientLogo128.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/128x128/apps/gitqlient.png
+          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/256x256/apps/
+          cp ./src/resources/icons/GitQlientLogo256.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/256x256/apps/gitqlient.png
+          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/512x512/apps/
+          cp ./src/resources/icons/GitQlientLogo512.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/512x512/apps/gitqlient.png
+          fakeroot dpkg-deb -v --build gitqlient_`git describe --always`_amd64
           cp *.deb ../
 
       - name: Upload DEB package
@@ -169,7 +170,7 @@ jobs:
 #      - name: Compile
 #        run: |
 #          mkdir build
-#          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
+#          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=`git describe --always`
 #          make -j 4
 #          make install
 #      - name: Download tarball
@@ -177,12 +178,12 @@ jobs:
 #        with:
 #          name: tarball
 #          path: |
-#            gitqlient_${{env.VERSION}}.tar.gz
+#            gitqlient_`git describe --always`.tar.gz
 #      - name: Create RPM build sources directories
 #        working-directory: build
 #        run: mkdir -p rpmbuild/SOURCES /usr/src/packages/SOURCES
 #      - name: Copy source tarball
-#        run: mv gitqlient_${{env.VERSION}}.tar.gz build/rpmbuild/SOURCES/
+#        run: mv gitqlient_`git describe --always`.tar.gz build/rpmbuild/SOURCES/
 #      - name: Build RPM
 #        env:
 #          RPM_BUILD_NCPUS: "2"
@@ -232,13 +233,13 @@ jobs:
       #    # Setup VS compiler
       #    cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
       #    Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-      #    qmake GitQlient.pro VERSION=${{env.VERSION}}
+      #    qmake GitQlient.pro VERSION=`git describe --always`
       #    jom -j2
 
       - name: Compile
         run: |
           mkdir build
-          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
+          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=`git describe --always`
           make -j 4
           make install
 
@@ -279,7 +280,7 @@ jobs:
       - name: Compile
         run: |
           mkdir build
-          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=${{env.VERSION}}
+          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=`git describe --always`
           make -j 4
           make install
 
@@ -304,11 +305,6 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.1
-        with:
-          access_token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Checking out the code
         uses: actions/checkout@v4
         with:
@@ -324,11 +320,6 @@ jobs:
           sudo ln -s /usr/bin/g++-9 /usr/bin/g++
           sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
           sudo pip install git-archive-all
-
-      - name: Create Tarball
-        if: startsWith(github.ref, 'refs/tags/')
-        run: |
-          git-archive-all --prefix=gitqlient_${{env.VERSION}} gitqlient_${{env.VERSION}}.tar.gz
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
@@ -346,7 +337,7 @@ jobs:
         run: |
           qmake -v
           mkdir build
-          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=${{env.VERSION}}
+          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
           make -j 4
           make install
 

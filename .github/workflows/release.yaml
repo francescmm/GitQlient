@@ -12,8 +12,6 @@ jobs:
   BuildProject:
     name: Build 🧱
     uses: ./.github/workflows/build.yaml
-    env:
-      VERSION: 1.6.3
     secrets: inherit
     permissions:
       actions: write
