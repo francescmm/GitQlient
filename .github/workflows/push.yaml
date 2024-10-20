@@ -9,6 +9,9 @@ on:
       - master
     branches:
 
+env:
+  VERSION: ${{ github.sha }}
+
 permissions:
   contents: write
 

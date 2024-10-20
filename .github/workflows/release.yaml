@@ -5,6 +5,9 @@ on:
   push:
     tags: v*
 
+env:
+  VERSION: 1.6.3
+
 permissions:
   contents: write
 
