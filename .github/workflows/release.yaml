@@ -18,4 +18,4 @@ jobs:
     secrets: inherit
     permissions:
       actions: write
-      contents: read
+      contents: write
