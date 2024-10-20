@@ -5,16 +5,15 @@ on:
   push:
     tags: v*
 
-env:
-  VERSION: 1.6.3
-
 permissions:
   contents: write
 
 jobs:
-  build-project:
+  BuildProject:
     name: Build 🧱
     uses: ./.github/workflows/build.yaml
+    env:
+      VERSION: 1.6.3
     secrets: inherit
     permissions:
       actions: write

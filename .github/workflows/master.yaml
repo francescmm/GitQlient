@@ -29,6 +29,8 @@ jobs:
           retain_days: 0
   BuildProject:
     name: Build 🧱
+    env:
+      VERSION: ${{ github.sha }}
     uses: ./.github/workflows/build.yaml
     secrets: inherit
     permissions:
