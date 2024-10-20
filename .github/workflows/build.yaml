@@ -22,7 +22,7 @@ jobs:
       - name: Upload tarball
         uses: actions/upload-artifact@v4
         with:
-          name: linux
+          name: tarball
           path: gitqlient_${{env.VERSION}}.tar.gz
 
 
@@ -64,7 +64,7 @@ jobs:
       - name: Download tarball
         uses: actions/download-artifact@v4
         with:
-          name: linux
+          name: tarball
           path: |
             gitqlient_${{env.VERSION}}.tar.gz
 
@@ -356,10 +356,10 @@ jobs:
           chmod +x GitQlient-*
           cp GitQlient-* ../
 
-      - name: Upload DMG
+      - name: Upload AppImage
         uses: actions/upload-artifact@v4
         with:
-          name: linux
+          name: appimage
           path: GitQlient-*.AppImage
 
   UpdateAssets:
@@ -400,7 +400,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            linux/GitQlient*.AppImage
+            appimage/GitQlient*.AppImage
             linux/gitqlient*.deb
-            linux/gitqlient*.tar.gz
+            tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
