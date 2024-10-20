@@ -200,6 +200,7 @@ jobs:
 
   Windows:
     name: Windows
+    needs: [Tarball]
     strategy:
       matrix:
         env:
@@ -244,6 +245,7 @@ jobs:
           make install
 
   MacOS:
+    needs: [Tarball]
     runs-on: ${{ matrix.env.os }}
     strategy:
       matrix:
@@ -295,6 +297,7 @@ jobs:
 
   Appimage:
     name: AppImage
+    needs: [Tarball]
     strategy:
       matrix:
         os: [ubuntu-20.04]
