@@ -13,7 +13,21 @@ permissions:
   contents: write
 
 jobs:
-  build-project:
+  Clean:
+    name: Clean old workflows
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Prune previous runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          keep_minimum_runs: 2
+          repository: ${{ github.repository }}
+          retain_days: 0
+  BuildProject:
     name: Build 🧱
     uses: ./.github/workflows/build.yaml
     secrets: inherit

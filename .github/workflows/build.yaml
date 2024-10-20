@@ -384,15 +384,17 @@ jobs:
 
       - name: Release dev binaries
         uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: github.ref == 'refs/heads/master'
         with:
           name: "Continuous Build: latest development"
           tag_name: "dev-latest"
           draft: false
           files: |
-            linux/GitQlient*.AppImage
+            appimage/GitQlient*.AppImage
             linux/gitqlient*.deb
-            linux/gitqlient*.tar.gz
+            tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
 
       - name: Release version binaries
