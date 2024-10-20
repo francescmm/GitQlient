@@ -28,6 +28,7 @@ jobs:
 
   Ubuntu:
     name: Ubuntu
+    needs: [Tarball]
     strategy:
       matrix:
         os: [ubuntu-20.04]
