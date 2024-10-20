@@ -406,6 +406,8 @@ jobs:
 
   PostBuildClean:
     name: Post-release actions
+    runs-on: ubuntu-latest
+    needs: [UpdateAssets]
     steps:
       name: Clean artifacts
       - uses: geekyeggo/delete-artifact@v5
