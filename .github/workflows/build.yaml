@@ -1,8 +1,6 @@
 name: Build Project
 on:
   workflow_call:
-env:
-  VERSION: 1.6.3
 
 jobs:
   Tarball:
