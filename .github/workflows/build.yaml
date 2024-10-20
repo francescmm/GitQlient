@@ -409,8 +409,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [UpdateAssets]
     steps:
-      name: Clean artifacts
-      - uses: geekyeggo/delete-artifact@v5
+      - name: Clean artifacts
+        uses: geekyeggo/delete-artifact@v5
         with:
           name: |
             appimage
