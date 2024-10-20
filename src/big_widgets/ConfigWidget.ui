@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>781</width>
-    <height>733</height>
+    <height>812</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -270,11 +270,18 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_70">
-               <property name="text">
-                <string>History view font size:</string>
-               </property>
+             <item row="1" column="3">
+              <widget class="QComboBox" name="cbStyle">
+               <item>
+                <property name="text">
+                 <string>dark</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>bright</string>
+                </property>
+               </item>
               </widget>
              </item>
              <item row="0" column="0">
@@ -284,16 +291,10 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QSpinBox" name="sbHistoryViewFontSize">
-               <property name="suffix">
-                <string> pt</string>
-               </property>
-               <property name="minimum">
-                <number>6</number>
-               </property>
-               <property name="maximum">
-                <number>32</number>
+             <item row="2" column="2">
+              <widget class="QLabel" name="label_15">
+               <property name="text">
+                <string>Commit title max. length</string>
                </property>
               </widget>
              </item>
@@ -311,6 +312,13 @@
                </property>
               </widget>
              </item>
+             <item row="2" column="3">
+              <widget class="QSpinBox" name="spCommitTitleLength">
+               <property name="value">
+                <number>50</number>
+               </property>
+              </widget>
+             </item>
              <item row="2" column="1">
               <widget class="QSpinBox" name="sbEditorFontSize">
                <property name="suffix">
@@ -318,31 +326,55 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="3">
-              <widget class="QComboBox" name="cbStyle">
-               <item>
-                <property name="text">
-                 <string>dark</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>bright</string>
-                </property>
-               </item>
+             <item row="3" column="0" rowspan="2" colspan="4">
+              <widget class="QGroupBox" name="groupBox_8">
+               <property name="title">
+                <string>When text in History View is too long</string>
+               </property>
+               <layout class="QGridLayout" name="gridLayout_11">
+                <item row="1" column="0">
+                 <widget class="QRadioButton" name="rbShowRefs">
+                  <property name="text">
+                   <string>Prefer showing tags/branches</string>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">bgHistoryViewPreferredView</string>
+                  </attribute>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QRadioButton" name="rbShowCommit">
+                  <property name="text">
+                   <string>Prefer commit message</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                  <attribute name="buttonGroup">
+                   <string notr="true">bgHistoryViewPreferredView</string>
+                  </attribute>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
-             <item row="2" column="2">
-              <widget class="QLabel" name="label_15">
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_70">
                <property name="text">
-                <string>Commit title max. length</string>
+                <string>History view font size:</string>
                </property>
               </widget>
              </item>
-             <item row="2" column="3">
-              <widget class="QSpinBox" name="spCommitTitleLength">
-               <property name="value">
-                <number>50</number>
+             <item row="1" column="1">
+              <widget class="QSpinBox" name="sbHistoryViewFontSize">
+               <property name="suffix">
+                <string> pt</string>
+               </property>
+               <property name="minimum">
+                <number>6</number>
+               </property>
+               <property name="maximum">
+                <number>32</number>
                </property>
               </widget>
              </item>
@@ -1586,5 +1618,6 @@
  </slots>
  <buttongroups>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="bgHistoryViewPreferredView"/>
  </buttongroups>
 </ui>

@@ -29,8 +29,6 @@
 
 using namespace GitServerPlugin;
 
-static const int MIN_VIEW_WIDTH_PX = 480;
-
 RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<GitCache> &cache,
                                                const QSharedPointer<GitBase> &git,
                                                const QSharedPointer<IGitServerCache> &gitServerCache,
@@ -487,9 +485,7 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
 void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &opt, const QColor &currentLangeColor,
                                       const CommitInfo &commit) const
 {
-   const auto sha = commit.sha;
-
-   if (sha.isEmpty())
+   if (commit.sha.isEmpty())
       return;
 
    auto offset = 5;
@@ -503,7 +499,7 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
       }
    }
 
-   paintTagBranch(p, opt, currentLangeColor, offset, sha);
+   paintTagBranch(p, opt, currentLangeColor, offset, commit);
 
    auto newOpt = opt;
    newOpt.rect.setX(opt.rect.x() + offset + 5);
@@ -518,9 +514,9 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 }
 
 void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewItem o, const QColor &currentLangeColor,
-                                            int &startPoint, const QString &sha) const
+                                            int &startPoint, const CommitInfo &commit) const
 {
-   if (mCache->hasReferences(sha) && !mView->hasActiveFilter())
+   if (mCache->hasReferences(commit.sha) && !mView->hasActiveFilter())
    {
       struct RefConfig
       {
@@ -538,7 +534,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
       if ((currentBranch.isEmpty() || currentBranch == "HEAD"))
       {
-         if (const auto ret = mGit->getLastCommit(); ret.success && sha == ret.output.trimmed())
+         if (const auto ret = mGit->getLastCommit(); ret.success && commit.sha == ret.output.trimmed())
          {
             refs.append({ "detached", graphDetached, "" });
          }
@@ -546,33 +542,56 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 
       static const auto suffix
           = QString::fromUtf8(GitQlientSettings().globalValue("colorSchema", 0).toInt() == 1 ? "bright" : "dark");
-      const auto localBranches = mCache->getReferences(sha, References::Type::LocalBranch);
+      const auto localBranches = mCache->getReferences(commit.sha, References::Type::LocalBranch);
       for (const auto &branch : localBranches)
       {
          refs.append({ branch, currentLangeColor, QString(":/icons/branch_indicator_%1").arg(suffix) });
       }
 
-      const auto tags = mCache->getReferences(sha, References::Type::LocalTag);
+      const auto tags = mCache->getReferences(commit.sha, References::Type::LocalTag);
       for (const auto &tag : tags)
       {
          refs.append({ tag, graphTag, QString(":/icons/tag_indicator_%1").arg(suffix), true });
       }
 
-      const auto remoteBranches = mCache->getReferences(sha, References::Type::RemoteBranches);
+      const auto remoteBranches = mCache->getReferences(commit.sha, References::Type::RemoteBranches);
       for (const auto &branch : remoteBranches)
       {
          refs.append({ branch, currentLangeColor, QString(":/icons/branch_indicator_%1").arg(suffix) });
       }
 
-      const auto showMinimal = o.rect.width() <= MIN_VIEW_WIDTH_PX;
+      auto offset = 5;
       const auto mark_spacing = 7; // Space between markers in pixels
+
+      auto newOpt = o;
+      newOpt.rect.setX(o.rect.x() + offset + 5);
+      newOpt.rect.setY(newOpt.rect.y() + TEXT_HEIGHT_OFFSET);
+
+      QFontMetrics fm(newOpt.font);
+      QString finalText;
+
+      auto tmpBuffer = 0;
+      for (auto &iter : refs)
+      {
+          finalText += QString("%1 ").arg(iter.name);
+          tmpBuffer += 20;
+      }
+
+      finalText.append(commit.shortLog);
+
+      QString nameToDisplay;
+
+      if (auto textWidth = fm.boundingRect(finalText).width(); textWidth + tmpBuffer >= o.rect.width() && GitQlientSettings().globalValue("HistoryView/PreferCommit", true).toBool())
+          nameToDisplay = QString("...");
 
       for (auto &iter : refs)
       {
          const auto isCurrentSpot = iter.name == "detached" || iter.name == currentBranch;
          o.font.setBold(isCurrentSpot);
 
-         const auto nameToDisplay = showMinimal ? QString(". . .") : iter.name;
+         if (nameToDisplay.isEmpty())
+            nameToDisplay = iter.name;
+
          const QFontMetrics fm(o.font);
          const auto textBoundingRect = fm.boundingRect(nameToDisplay);
          const int textPadding = 5;

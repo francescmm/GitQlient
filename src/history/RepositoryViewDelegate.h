@@ -142,10 +142,10 @@ private:
     * @param opt The style options of the item.
     * @param currentLangeColor The color of current lane used for local branches.
     * @param startPoint The starting X coordinate for the tag.
-    * @param sha The SHA reference to paint. It can be local branch, remote branch, tag or it could be detached.
+    * @param commit The SHA reference to paint. It can be local branch, remote branch, tag or it could be detached.
     */
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, const QColor &currentLangeColor, int &startPoint,
-                       const QString &sha) const;
+                       const CommitInfo &commit) const;
 
    /**
     * @brief Specialized method that paints a tag in the commit message column.
