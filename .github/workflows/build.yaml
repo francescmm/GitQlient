@@ -364,16 +364,12 @@ jobs:
           path: GitQlient-*.AppImage
 
   UpdateAssets:
+    name: Release new binaries
     if: github.repository_owner == 'francescmm'
     needs: [Ubuntu, Windows, MacOS, Appimage]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@main
-        with:
-          fetch-depth: 0
-
-      - name: Delete existing
+      - name: Delete previous dev-latest release
         continue-on-error: true
         if: github.ref == 'refs/heads/master'
         run: gh release delete "dev-latest" -y
@@ -383,7 +379,7 @@ jobs:
       - name: Fetch artifacts
         uses: actions/download-artifact@main
 
-      - name: Upload latest pre-release
+      - name: Release dev binaries
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/master'
         with:
@@ -396,7 +392,7 @@ jobs:
             linux/gitqlient*.tar.gz
             macos/GitQlient*.dmg
 
-      - name: Upload latest release
+      - name: Release version binaries
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -407,3 +403,15 @@ jobs:
             linux/gitqlient*.deb
             tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
+
+  PostBuildClean:
+    name: Post-release actions
+    steps:
+      name: Clean artifacts
+      - uses: geekyeggo/delete-artifact@v5
+        with:
+          name: |
+            appimage
+            linux
+            tarball
+            macos
