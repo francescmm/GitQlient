@@ -319,6 +319,12 @@ private:
     */
    void reconfigureAutoFetch(int newInterval);
 
+   /**
+    * @brief reconfigureAutoRefresh Changes the interval for the auto refresh timer.
+    * @param newInterval The new interval (in seconds) to automatically fetch the data from local git repository.
+    */
+   void reconfigureAutoRefresh(int newInterval);
+
 private slots:
    /**
     * @brief focusHistoryOnBranch Opens the graph view and focuses on the SHA of the last commit of the given branch.

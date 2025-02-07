@@ -99,7 +99,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    if (const auto fetchInterval = mSettings->localValue("AutoFetch", 5).toInt(); fetchInterval > 0)
       mAutoFetch->setInterval(fetchInterval * 60 * 1000);
 
-   mAutoFilesUpdate->setInterval(15000);
+   mAutoFilesUpdate->setInterval(mSettings->localValue("AutoRefresh", 60).toInt() * 1000);
 
    connect(mAutoFetch, &QTimer::timeout, mControls, &Controls::fetchAll);
    connect(mAutoFilesUpdate, &QTimer::timeout, this, &GitQlientRepo::updateUiFromWatcher);
@@ -159,6 +159,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mConfigWidget, &ConfigWidget::pomodoroVisibilityChanged, mControls, &Controls::changePomodoroVisibility);
    connect(mConfigWidget, &ConfigWidget::moveLogsAndClose, this, &GitQlientRepo::moveLogsAndClose);
    connect(mConfigWidget, &ConfigWidget::autoFetchChanged, this, &GitQlientRepo::reconfigureAutoFetch);
+   connect(mConfigWidget, &ConfigWidget::autoRefreshChanged, this, &GitQlientRepo::reconfigureAutoFetch);
    connect(mConfigWidget, &ConfigWidget::buildSystemEnabled, this, &GitQlientRepo::buildSystemActivationToggled);
    connect(mConfigWidget, &ConfigWidget::gitServerEnabled, this, &GitQlientRepo::gitServerActivationToggled);
 
@@ -312,9 +313,7 @@ void GitQlientRepo::onRepoLoadFinished()
       if (const auto fetchInterval = mSettings->localValue("AutoFetch", 5).toInt(); fetchInterval > 0)
          mAutoFetch->start();
 
-      QScopedPointer<GitConfig> git(new GitConfig(mGitBase));
-
-      if (!git->getGlobalUserInfo().isValid() && !git->getLocalUserInfo().isValid())
+      if (GitConfig git(mGitBase); !git.getGlobalUserInfo().isValid() && !git.getLocalUserInfo().isValid())
       {
          QLog_Info("UI", QString("Configuring Git..."));
 
@@ -621,6 +620,14 @@ void GitQlientRepo::reconfigureAutoFetch(int newInterval)
       mAutoFetch->start(newInterval * 60 * 1000);
    else
       mAutoFetch->stop();
+}
+
+void GitQlientRepo::reconfigureAutoRefresh(int newInterval)
+{
+   if (newInterval > 0)
+      mAutoFilesUpdate->start(newInterval * 1000);
+   else
+      mAutoFilesUpdate->stop();
 }
 
 void GitQlientRepo::onChangesCommitted()
