@@ -54,7 +54,7 @@ endif()
 find_package(Qt6 COMPONENTS Core Widgets Network REQUIRED)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    set(MACOSX_BUNDLE_ICON_FILE icon.icns)
+    set(MACOSX_BUNDLE_ICON_FILE "icon.icns")
     set(MACOS_APP_ICON_GITQLIENT "${PROJECT_SOURCE_DIR}/src/resources/icon.icns")
     set_source_files_properties(${MACOS_APP_ICON_GITQLIENT} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
@@ -154,6 +154,12 @@ else()
     )
 endif()
 
+qt_add_resources(${PROJECT_NAME} "translations"
+    PREFIX "/i18n"
+    BASE "${CMAKE_CURRENT_SOURCE_DIR}"
+    FILES "src/resources/translations/gitqlient_en.qm" "src/resources/translations/gitqlient_zh_CN.qm"
+)
+
 target_link_libraries(
     ${PROJECT_NAME}
     PUBLIC
@@ -175,3 +181,10 @@ install(
     BUNDLE DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
     LIBRARY DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
 )
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    add_custom_target(
+        "dmg"
+        echo \"Generate DMG\" && rm -f *.dmg && /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "${PROJECT_SOURCE_DIR}/src/resources/icon.icns" --background "${PROJECT_SOURCE_DIR}/src/resources/dmg_bg.png" --icon "GitQlient.app" 125 22 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient.dmg" "GitQlient.app"
+    )
+endif()
