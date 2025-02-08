@@ -49,7 +49,7 @@ void GitQlientUpdater::showInfoMessage()
                   "one is {%2}. You can read more about the new changes in the detailed description."))
            .arg(QString::fromUtf8(VER), mLatestGitQlient),
        QMessageBox::Ok | QMessageBox::Close, qobject_cast<QWidget *>(parent()));
-   msgBox.setButtonText(QMessageBox::Ok, tr("Go to GitHub"));
+   msgBox.addButton(tr("Go to GitHub"), QMessageBox::ButtonRole::YesRole);
    msgBox.setDetailedText(mChangeLog);
    msgBox.setStyleSheet(GitQlientStyles::getStyles());
 
