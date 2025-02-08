@@ -375,7 +375,9 @@ jobs:
       - name: Delete previous dev-latest release
         continue-on-error: true
         if: github.ref == 'refs/heads/master'
-        run: gh release delete "dev-latest" -y
+        run: |
+          gh release delete "dev-latest" -y
+          git push origin --delete dev-latest
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
