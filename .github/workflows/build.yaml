@@ -51,16 +51,12 @@ jobs:
           sudo apt install -y qt6-base-dev qt6-tools-dev
           sudo pip install git-archive-all
           qtchooser -install qt6 $(which qmake6)
-          sudo mv ~/.config/qtchooser/qt6.conf /usr/share/qtchooser/qt6.conf
-          sudo mkdir -p /usr/lib/$(uname -p)-linux-gnu/qt-default/qtchooser
-          sudo ln -n /usr/share/qtchooser/qt6.conf /usr/lib/$(uname -p)-linux-gnu/qt-default/qtchooser/default.conf
-
 
       - name: Compile
         run: |
-          qmake -v
+          qmake6 -v
           mkdir build
-          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
+          qmake6 GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
           make -j 4
           make install
 
