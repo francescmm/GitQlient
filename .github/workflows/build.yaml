@@ -343,7 +343,7 @@ jobs:
         run: |
           wget -c https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases/expanded_assets/continuous -O - | grep "appimagetool-.*-x86_64.AppImage" | head -n 1 | cut -d '"' -f 2)
           chmod +x appimagetool-*.AppImage
-          ./appimagetool-*.AppImage -s deploy AppImage/gitqlient/usr/share/applications/*.desktop
+          ./appimagetool-*.AppImage deploy AppImage/gitqlient/usr/share/applications/*.desktop
           chmod +x GitQlient-*
           cp GitQlient-* ../
 
