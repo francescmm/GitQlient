@@ -341,6 +341,7 @@ jobs:
 
       - name: Build AppImage
         run: |
+          export QTDIR=/home/runner/work/GitQlient/Qt/6.6.3/gcc_64/
           wget -c https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases/expanded_assets/continuous -O - | grep "appimagetool-.*-x86_64.AppImage" | head -n 1 | cut -d '"' -f 2)
           chmod +x appimagetool-*.AppImage
           ./appimagetool-*.AppImage deploy AppImage/gitqlient/usr/share/applications/*.desktop
