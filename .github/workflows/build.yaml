@@ -31,7 +31,7 @@ jobs:
     needs: [Tarball]
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -303,7 +303,7 @@ jobs:
     needs: [Tarball]
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -320,10 +320,6 @@ jobs:
         run: |
           sudo apt-get -qq update
           sudo apt-get -qq install libgl1-mesa-dev libxkbcommon-x11-0 libc6-i386 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxkbcommon-x11-0 libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-* fakeroot
-          sudo apt-get -qq remove gcc g++
-          sudo apt-get install -y -qq gcc-9 g++-9
-          sudo ln -s /usr/bin/g++-9 /usr/bin/g++
-          sudo ln -s /usr/bin/gcc-9 /usr/bin/gcc
           sudo pip install git-archive-all
 
       - name: Install Qt
