@@ -341,9 +341,9 @@ jobs:
 
       - name: Build AppImage
         run: |
-          wget -q -O linuxdeployqt https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
-          chmod +x linuxdeployqt
-          ./linuxdeployqt AppImage/gitqlient/usr/share/applications/*.desktop -verbose=3 -unsupported-bundle-everything -appimage -no-translations -bundle-non-qt-libs -extra-plugins=iconengines,imageformats
+          wget -c https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases/expanded_assets/continuous -O - | grep "appimagetool-.*-x86_64.AppImage" | head -n 1 | cut -d '"' -f 2)
+          chmod +x appimagetool-*.AppImage
+          ./appimagetool-*.AppImage -s deploy AppImage/gitqlient/usr/share/applications/*.desktop
           chmod +x GitQlient-*
           cp GitQlient-* ../
 
