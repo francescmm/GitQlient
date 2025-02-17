@@ -343,7 +343,7 @@ jobs:
         run: |
           wget -q -O linuxdeployqt https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           chmod +x linuxdeployqt
-          ./linuxdeployqt --appdir AppDir --executable ./gitqlient <...> --output appimage
+          ./linuxdeployqt --appdir AppDir --executable ./gitqlient --output appimage
           chmod +x AppImage
           cp GitQlient-* ../
 
