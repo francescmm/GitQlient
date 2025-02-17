@@ -335,20 +335,15 @@ jobs:
         run: |
           qmake -v
           mkdir build
-          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
+          qmake GitQlient.pro PREFIX=AppDir VERSION=`git describe --always`
           make -j 4
           make install
 
       - name: Build AppImage
         run: |
-          export PATH="~/work/GitQlient/Qt/6.6.3/gcc_64:$PATH"
-          export QTDIR=~/work/GitQlient/Qt/6.6.3/gcc_64
-          wget -c https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases/expanded_assets/continuous -O - | grep "appimagetool-.*-x86_64.AppImage" | head -n 1 | cut -d '"' -f 2)
-          chmod +x appimagetool-*.AppImage
-          ./appimagetool-*.AppImage -s deploy AppImage/gitqlient/usr/share/applications/*.desktop
-          ls -lsa
-          VERSION=1.0 ./appimagetool-*.AppImage ./AppImage
-          ls -lsa
+          wget -q -O linuxdeployqt https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeployqt
+          ./linuxdeployqt --appdir AppDir --executable ./gitqlient <...> --output appimage
           chmod +x AppImage
           cp GitQlient-* ../
 
