@@ -31,7 +31,7 @@ jobs:
     needs: [Tarball]
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -303,7 +303,7 @@ jobs:
     needs: [Tarball]
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04]
     runs-on: ${{ matrix.os }}
     defaults:
       run:
