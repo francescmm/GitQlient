@@ -206,7 +206,7 @@ jobs:
       matrix:
         env:
           - name: Windows
-            os: windows-2019
+            os: windows-2025
     runs-on: ${{ matrix.env.os }}
     steps:
       - name: Checking out the code
