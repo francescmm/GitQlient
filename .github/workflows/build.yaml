@@ -57,7 +57,7 @@ jobs:
         run: |
           qmake6 -v
           mkdir build
-          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
+          qmake6 GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
           make -j 4
           make install
 
