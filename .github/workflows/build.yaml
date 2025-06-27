@@ -50,6 +50,8 @@ jobs:
           sudo apt-get -qq install libgl1-mesa-dev libxkbcommon-x11-0 libc6-i386 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxkbcommon-x11-0 libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-* fakeroot
           sudo apt-get -qq install qt6-base-dev qt6-tools-dev
           sudo pip install git-archive-all
+          qtchooser -install qt6 $(which qmake6)
+          export QT_SELECT=qt6
 
       - name: Compile
         run: |
