@@ -184,8 +184,8 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->pbPluginsFolder, &QPushButton::clicked, this, &ConfigWidget::selectPluginsFolder);
 
    // Connects for automatic save
-   connect(ui->chDevMode, &CheckBox::checkStateChanged, this, &ConfigWidget::enableWidgets);
-   connect(ui->chDisableLogs, &CheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->chDevMode, &CheckBox::stateChanged, this, &ConfigWidget::enableWidgets);
+   connect(ui->chDisableLogs, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbLogLevel, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->leGitPath, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->spCommitTitleLength, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
@@ -198,17 +198,17 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->cbLogOrder, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->autoFetch, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->autoRefresh, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
-   connect(ui->pruneOnFetch, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->updateOnPull, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->clangFormat, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->cbPomodoroEnabled, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->cbLocal, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->cbRemote, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->cbTags, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->cbStash, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->cbSubmodule, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->cbSubtree, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->cbDeleteFolder, &QCheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->pruneOnFetch, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->updateOnPull, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->clangFormat, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbPomodoroEnabled, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbLocal, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbRemote, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbTags, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbStash, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbSubmodule, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbSubtree, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->cbDeleteFolder, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->pbSelectFolder, &QPushButton::clicked, this, &ConfigWidget::selectFolder);
    connect(ui->pbDefault, &QPushButton::clicked, this, &ConfigWidget::useDefaultLogsFolder);
    connect(ui->leEditor, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
@@ -217,7 +217,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(mPluginsDownloader, &PluginsDownloader::availablePlugins, this, &ConfigWidget::onPluginsInfoReceived);
    connect(mPluginsDownloader, &PluginsDownloader::pluginStored, this, &ConfigWidget::onPluginStored);
    connect(ui->pbFeaturesTour, &QPushButton::clicked, this, &ConfigWidget::showFeaturesTour);
-   connect(ui->chSingleClickDiffView, &CheckBox::checkStateChanged, this, &ConfigWidget::saveConfig);
+   connect(ui->chSingleClickDiffView, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbDiffView, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbBranchSeparator, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbLanguage, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
@@ -630,7 +630,7 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
       {
          chEnabled->setChecked(GitQlientSettings(mGit->getGitDir()).localValue("BuildSystemEnabled", false).toBool());
 
-         connect(chEnabled, &QCheckBox::checkStateChanged, this, [this, chEnabled]() {
+         connect(chEnabled, &QCheckBox::stateChanged, this, [this, chEnabled]() {
             const auto checked = chEnabled->isChecked();
             GitQlientSettings(mGit->getGitDir()).setLocalValue("BuildSystemEnabled", checked);
             emit buildSystemEnabled(checked);
@@ -640,7 +640,7 @@ void ConfigWidget::loadPlugins(QMap<QString, QObject *> plugins)
       {
          chEnabled->setChecked(GitQlientSettings(mGit->getGitDir()).localValue("GitServerEnabled", false).toBool());
 
-         connect(chEnabled, &QCheckBox::checkStateChanged, this, [this, chEnabled]() {
+         connect(chEnabled, &QCheckBox::stateChanged, this, [this, chEnabled]() {
             const auto checked = chEnabled->isChecked();
             GitQlientSettings(mGit->getGitDir()).setLocalValue("GitServerEnabled", checked);
             emit gitServerEnabled(checked);

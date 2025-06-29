@@ -17,13 +17,13 @@
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QEvent>
-#include <QFontDatabase>
 #include <QHeaderView>
 #include <QPainter>
 #include <QPainterPath>
 #include <QSortFilterProxyModel>
 #include <QToolTip>
 #include <QUrl>
+#include <QFontDatabase>
 
 using namespace GitServerPlugin;
 
@@ -562,8 +562,8 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
       auto tmpBuffer = 0;
       for (auto &iter : refs)
       {
-         finalText += QString("%1 ").arg(iter.name);
-         tmpBuffer += 20;
+          finalText += QString("%1 ").arg(iter.name);
+          tmpBuffer += 20;
       }
 
       finalText.append(commit.shortLog);
@@ -571,7 +571,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
       QString nameToDisplay;
 
       if (auto textWidth = fm.boundingRect(finalText).width(); textWidth + tmpBuffer >= o.rect.width() && GitQlientSettings().globalValue("HistoryView/PreferCommit", true).toBool())
-         nameToDisplay = QString("...");
+          nameToDisplay = QString("...");
 
       for (auto &iter : refs)
       {
@@ -622,7 +622,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
    }
 }
 
-void RepositoryViewDelegate::paintPrStatus(QPainter *, QStyleOptionViewItem, int &,
-                                           const PullRequest &) const
+void RepositoryViewDelegate::paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
+                                           const PullRequest &pr) const
 {
 }
