@@ -10,8 +10,6 @@
 #include <GitLocal.h>
 #include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
-#include <GitServerTypes.h>
-#include <IGitServerCache.h>
 #include <Lane.h>
 #include <LaneType.h>
 
@@ -490,15 +488,6 @@ void RepositoryViewDelegate::paintLog(QPainter *p, const QStyleOptionViewItem &o
 
    auto offset = 5;
 
-   if (mGitServerCache)
-   {
-      if (const auto pr = mGitServerCache->getPullRequest(commit.sha); pr.isValid())
-      {
-         offset += 5;
-         paintPrStatus(p, opt, offset, pr);
-      }
-   }
-
    paintTagBranch(p, opt, currentLangeColor, offset, commit);
 
    auto newOpt = opt;
@@ -636,28 +625,4 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
 void RepositoryViewDelegate::paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
                                            const PullRequest &pr) const
 {
-   QColor c;
-
-   switch (pr.state.eState)
-   {
-      case PullRequest::HeadState::State::Failure:
-         c = GitQlientStyles::getRed();
-         break;
-      case PullRequest::HeadState::State::Success:
-         c = GitQlientStyles::getGreen();
-         break;
-      default:
-      case PullRequest::HeadState::State::Pending:
-         c = GitQlientStyles::getOrange();
-         break;
-   }
-
-   painter->save();
-   painter->setRenderHint(QPainter::Antialiasing);
-   painter->setPen(c);
-   painter->setBrush(c);
-   painter->drawEllipse(opt.rect.x() + startPoint, opt.rect.y() + (opt.rect.height() / 2) - 5, 10, 10);
-   painter->restore();
-
-   startPoint += 10 + 5;
 }
