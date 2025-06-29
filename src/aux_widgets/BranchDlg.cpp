@@ -75,7 +75,7 @@ BranchDlg::BranchDlg(BranchDlgConfig config, QWidget *parent)
          setWindowTitle(tr("Stash branch"));
          break;
       case BranchDlgMode::PUSH_UPSTREAM:
-         connect(ui->chbCopyRemote, &QCheckBox::checkStateChanged, this, &BranchDlg::copyBranchName);
+         connect(ui->chbCopyRemote, &CheckBox::checkStateChanged, this, &BranchDlg::copyBranchName);
          ui->chbCopyRemote->setVisible(ui->cbRemotes->isHidden());
          ui->chbCopyRemote->setChecked(ui->cbRemotes->isHidden());
          setWindowTitle(tr("Push upstream branch"));
