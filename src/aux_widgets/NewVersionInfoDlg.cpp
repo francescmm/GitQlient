@@ -88,7 +88,7 @@ NewVersionInfoDlg::NewVersionInfoDlg(QWidget *parent)
    connect(ui->pbPrevious, &QPushButton::clicked, this, &NewVersionInfoDlg::goPreviousPage);
    connect(ui->pbNext, &QPushButton::clicked, this, &NewVersionInfoDlg::goNextPage);
    connect(ui->pbClose, &QPushButton::clicked, this, &QDialog::close);
-   connect(ui->chNotAgain, &QCheckBox::stateChanged, this, &NewVersionInfoDlg::saveConfig);
+   connect(ui->chNotAgain, &QCheckBox::checkStateChanged, this, &NewVersionInfoDlg::saveConfig);
 }
 
 NewVersionInfoDlg::~NewVersionInfoDlg()
