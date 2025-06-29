@@ -212,10 +212,6 @@ void GitQlientRepo::openCommitDiff(const QString currentSha)
    }
 }
 
-void GitQlientRepo::setPlugins(QMap<QString, QObject *> plugins)
-{
-}
-
 void GitQlientRepo::clearWindow()
 {
    blockSignals(true);
@@ -436,7 +432,7 @@ void GitQlientRepo::showGitServerView()
 {
 }
 
-void GitQlientRepo::showGitServerPrView(int prNumber)
+void GitQlientRepo::showGitServerPrView(int)
 {
 }
 
@@ -498,10 +494,6 @@ void GitQlientRepo::focusHistoryOnBranch(const QString &branch)
       QMessageBox::information(
           this, tr("Branch not found"),
           tr("The branch couldn't be found. Please, make sure you fetched and have the latest changes."));
-}
-
-void GitQlientRepo::focusHistoryOnPr(int prNumber)
-{
 }
 
 void GitQlientRepo::reconfigureAutoFetch(int newInterval)

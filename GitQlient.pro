@@ -2,7 +2,6 @@
 CONFIG += qt warn_on c++20 c++1z
 
 QT += widgets core network gui
-DEFINES += QT_DEPRECATED_WARNINGS
 
 if (!exists(src/git/.git) || !exists(src/AuxiliarCustomWidgets/.git) || !exists(src/QLogger/.git) || !exists(src/QPinnableTabWidget/.git)) {
     message("Submodule update:")
@@ -74,7 +73,7 @@ DEFINES += \
 !win32-msvc* {
     debug {
        DEFINES += DEBUG
-       QMAKE_CXXFLAGS += -Wall -pedantic-errors -Werror
+       QMAKE_CXXFLAGS += -Wall -pedantic-errors -Werror -Wno-deprecated -Wno-error=deprecated-declarations
     }
 }
 
@@ -82,7 +81,6 @@ DEFINES += \
    QT_NO_JAVA_STYLE_ITERATORS \
    QT_NO_CAST_TO_ASCII \
    QT_RESTRICTED_CAST_FROM_ASCII \
-   QT_DISABLE_DEPRECATED_BEFORE=0x050900 \
    QT_USE_QSTRINGBUILDER
 
 macos{

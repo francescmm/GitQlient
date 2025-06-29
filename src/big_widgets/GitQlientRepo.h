@@ -136,12 +136,6 @@ public:
    QString currentBranch() const;
 
    /**
-    * @brief Sets the plugins loaded by GitQlient to be used by the repo instance.
-    * @param plugins The list of plugins.
-    */
-   void setPlugins(QMap<QString, QObject *> plugins);
-
-   /**
     * @brief getGitQlientCache Retrieves the GitQlient internal cache object.
     * @return Shared pointer to the internal cache.
     */
@@ -331,10 +325,4 @@ private slots:
     * @param branch The branch.
     */
    void focusHistoryOnBranch(const QString &branch);
-
-   /**
-    * @brief focusHistoryOnPr Opens the graph view and focuses on the SHA of the PR number.
-    * @param prNumber The PR to put the focus on.
-    */
-   void focusHistoryOnPr(int prNumber);
 };
