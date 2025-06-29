@@ -58,6 +58,7 @@ GitQlient::GitQlient(QWidget *parent)
    homeMenu->setIcon(QIcon(":/icons/burger_menu"));
    homeMenu->setIconSize(QSize(17, 17));
    homeMenu->setToolTip("Options");
+
    homeMenu->setMenu(menu);
    homeMenu->setObjectName("MainMenuBtn");
 
