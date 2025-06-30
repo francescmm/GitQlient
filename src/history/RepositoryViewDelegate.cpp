@@ -578,7 +578,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
          const auto isCurrentSpot = iter.name == "detached" || iter.name == currentBranch;
          o.font.setBold(isCurrentSpot);
 
-         if (nameToDisplay.isEmpty())
+         if (nameToDisplay.isEmpty() || (!nameToDisplay.isEmpty() && nameToDisplay != QString("...")))
             nameToDisplay = iter.name;
 
          const QFontMetrics fm(o.font);
@@ -620,9 +620,4 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
          startPoint += rectWidth + mark_spacing;
       }
    }
-}
-
-void RepositoryViewDelegate::paintPrStatus(QPainter *, QStyleOptionViewItem, int &,
-                                           const PullRequest &) const
-{
 }

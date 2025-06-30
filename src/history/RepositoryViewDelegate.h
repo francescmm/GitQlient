@@ -148,17 +148,6 @@ private:
                        const CommitInfo &commit) const;
 
    /**
-    * @brief Specialized method that paints a tag in the commit message column.
-    *
-    * @param painter The painter device.
-    * @param opt The style options of the item.
-    * @param startPoint The starting X coordinate for the tag.
-    * @param pr The PullRequest status.
-    */
-   void paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
-                      const GitServerPlugin::PullRequest &pr) const;
-
-   /**
     * @brief getMergeColor Returns the color to be used for painting the external circle of the node. This methods
     * searches the origin of the merge and uses the same lane color.
     * @param currentLane The current lane type.
