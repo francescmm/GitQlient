@@ -21,4 +21,9 @@ target_link_libraries(big_widget
     config
     QPinnableTabWidget
 )
+
 target_include_directories(big_widget PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+install(TARGETS AuxiliarCustomWidgets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
