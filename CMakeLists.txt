@@ -75,9 +75,7 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/src/QPinnableTabWidget)
 
 qt_add_resources(
   RESOURCES
-    gitqlientp.qrc
     ${PROJECT_SOURCE_DIR}/src/GitQlient.qrc
-    ${PROJECT_SOURCE_DIR}/src/AuxiliarCustomWidgets/*.qrc
 )
 
 
@@ -93,20 +91,8 @@ add_executable(
 
 target_include_directories(
    ${PROJECT_NAME}
-   PUBLIC
-   ${PROJECT_SOURCE_DIR}/src
-   ${PROJECT_SOURCE_DIR}/src/AuxiliarCustomWidgets
-   ${PROJECT_SOURCE_DIR}/src/aux_widgets
-   ${PROJECT_SOURCE_DIR}/src/big_widgets
-   ${PROJECT_SOURCE_DIR}/src/branches
-   ${PROJECT_SOURCE_DIR}/src/cache
-   ${PROJECT_SOURCE_DIR}/src/commits
-   ${PROJECT_SOURCE_DIR}/src/config
-   ${PROJECT_SOURCE_DIR}/src/diff
-   ${PROJECT_SOURCE_DIR}/src/git
-   ${PROJECT_SOURCE_DIR}/src/history
-   ${PROJECT_SOURCE_DIR}/src/QLogger
-   ${PROJECT_SOURCE_DIR}/src/QPinnableTabWidget
+   PRIVATE
+   ${PROJECT_SOURCE_DIR}
 )
 
 target_link_libraries(
@@ -114,7 +100,7 @@ target_link_libraries(
    PUBLIC
    AuxiliarCustomWidgets
    aux_widgets
-   big_widgets
+   BigWidgets
    branches
    cache
    commits

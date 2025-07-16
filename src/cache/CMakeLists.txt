@@ -12,7 +12,9 @@ add_library(cache STATIC
 target_link_libraries(cache
     PUBLIC
     Qt::Core
+    PRIVATE
+    BigWidgets
     git
-    big_widget
+    QLogger
 )
 target_include_directories(cache PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

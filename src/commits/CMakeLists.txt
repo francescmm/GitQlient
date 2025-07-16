@@ -13,6 +13,12 @@ target_link_libraries(commits
     PUBLIC
     Qt::Core
     Qt::Widgets
+    PRIVATE
+    aux_widgets
+    AuxiliarCustomWidgets
+    BigWidgets
     cache
+    git
+    QLogger
 )
 target_include_directories(commits PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

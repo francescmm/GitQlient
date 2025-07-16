@@ -4,7 +4,6 @@ file(GLOB SRC_FILES
   *.ui
 )
 
-
 add_library(aux_widgets STATIC
     ${SRC_FILES}
 )
@@ -14,9 +13,11 @@ target_link_libraries(aux_widgets
     Qt::Core
     Qt::Widgets
     Qt::Network
+    PRIVATE
     AuxiliarCustomWidgets
     git
-    big_widget
+    BigWidgets
     cache
+    QLogger
 )
 target_include_directories(aux_widgets PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
