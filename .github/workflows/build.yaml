@@ -226,23 +226,59 @@ jobs:
           arch: win64_mingw
           aqtversion: '==3.1.*'
 
-      - name: Install dependencies
-        run: choco install jom -y
+      - name: Compile and deploy
+        run: |
+          $version = git describe --always
+          echo "VERSION_TAG=$version" >> $env:GITHUB_ENV
+          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION="${{ env.VERSION_TAG }}"
+          make -j 4
 
-      #- name: Build GitQlient
-      #  run: |
-      #    # Setup VS compiler
-      #    cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
-      #    Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-      #    qmake GitQlient.pro VERSION=`git describe --always`
-      #    jom -j2
-
-      - name: Compile
+      - name: Create folder structure
         run: |
           mkdir build
-          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY
-          make -j 4
-          make install
+          cp release\GitQlient* build\
+          windeployqt --no-compiler-runtime --release --dir build build\GitQlient.exe
+
+      # - name: Sign Executable
+      # run: |
+      #   $certPath = "cert.pfx"
+      #   [IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String("${{ secrets.SIGN_CERTIFICATE }}"))
+      #   & "C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe" sign /f "$certPath" /p "${{ secrets.SIGN_PASSWORD }}" /tr http://timestamp.digicert.com /td sha256 /fd sha256 "build\GitQlient.exe"
+
+      - name: Create ZIP
+        run: |
+          $zipName = "GitQlient-${{ env.VERSION_TAG }}.zip"
+          Compress-Archive -Path build\* -DestinationPath $zipName
+          echo "INSTALLER_NAME=$zipName" >> $env:GITHUB_ENV
+
+      - name: Upload ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: win
+          path: GitQlient*.zip
+
+      - name: Calculate SHA256
+        run: |
+          $hash = Get-FileHash "$env:INSTALLER_NAME" -Algorithm SHA256
+          echo "SHA256=$($hash.Hash)" >> $env:GITHUB_ENV
+
+      - name: Generate Winget Manifest
+        run: |
+          mkdir manifest
+          echo "VERSION=${{ github.event.release.tag_name }}" >> $env:GITHUB_ENV
+          echo "INSTALLER_URL=https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/${{ env.INSTALLER_NAME }}" >> $env:GITHUB_ENV
+          $version = "${{ github.event.release.tag_name }}"
+          $template = Get-Content manifest/FrancescMaestre.GitQlient.template.yaml -Raw
+          $manifest = $template.Replace("{{VERSION}}", $version).Replace("{{INSTALLER_URL}}", "$env:INSTALLER_URL").Replace("<REPLACE_WITH_SHA256>", "$env:SHA256")
+          $manifest | Out-File -Encoding UTF8 manifest/FrancescMartinez.GitQlient.yaml
+
+      # - name: Submit to Winget
+      # uses: vedantmgoyal9/winget-releaser@v2
+      # with:
+      #   identifier: FrancescMartinez.GitQlient
+      #   token: ${{ secrets.WINGET_TOKEN }}
+      #   installers-regex: 'GitQlient-.*\.zip'
+      #   manifest-dir: manifest
 
   MacOS:
     needs: [Tarball]
@@ -394,6 +430,7 @@ jobs:
             linux/gitqlient*.deb
             tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
+            win/GitQlient*.zip
 
       - name: Release version binaries
         uses: softprops/action-gh-release@v2
@@ -406,18 +443,20 @@ jobs:
             linux/gitqlient*.deb
             tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
+            win/GitQlient*.zip
 
-  PostBuildClean:
-    name: Post-release actions
-    runs-on: ubuntu-latest
-    if: always()
-    needs: [UpdateAssets]
-    steps:
-      - name: Clean artifacts
-        uses: geekyeggo/delete-artifact@v5
-        with:
-          name: |
-            appimage
-            linux
-            tarball
-            macos
+  # PostBuildClean:
+  #   name: Post-release actions
+  #   runs-on: ubuntu-latest
+  #   if: always()
+  #   needs: [UpdateAssets]
+  #   steps:
+  #     - name: Clean artifacts
+  #       uses: geekyeggo/delete-artifact@v5
+  #       with:
+  #         name: |
+  #           appimage
+  #           linux
+  #           tarball
+  #           macos
+  #           win
