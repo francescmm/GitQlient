@@ -43,8 +43,7 @@ QString GitQlientStyles::getStyles()
           auto baseSize = css.takeFirst().trimmed();
 
           const auto end = baseSize.indexOf("pt;");
-          auto font = QFontDatabase::systemFont(QFontDatabase::GeneralFont);
-          auto fontSize = font.pointSize();
+          const auto fontSize =  GitQlientSettings().globalValue("UiBaseFontSize", QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize()).toInt();
           auto increment = fontSize - baseSize.mid(11,end-11).toInt();
           for (auto& line : css)
           {
@@ -58,13 +57,12 @@ QString GitQlientStyles::getStyles()
               }
           }
 
-          (void)fontSize;
           textSizeContent = QString::fromUtf8(css.join('\n'));
           textSizeContent = textSizeContent.trimmed();
       }
 
       styles = stylesFile.readAll() + colorsCss;
-      //styles += textSizeContent;
+      styles += textSizeContent;
 
       stylesFile.close();
    }

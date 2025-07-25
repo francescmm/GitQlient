@@ -12,10 +12,12 @@
 #include <PluginsDownloader.h>
 #include <QLogger.h>
 
+#include <QApplication>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QFontDatabase>
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QProcess>
@@ -106,6 +108,9 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->chDisableLogs->setChecked(settings.globalValue("logsDisabled", true).toBool());
    ui->cbLogLevel->setCurrentIndex(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
    ui->spCommitTitleLength->setValue(settings.globalValue("commitTitleMaxLength", 50).toInt());
+   ui->sbUiFontSize->setValue(settings.globalValue("UiBaseFontSize", QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize()).toInt());
+   ui->sbHistoryViewFontSize->setValue(settings.globalValue("HistoryView/FontSize", QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize()).toInt());
+   ui->rbShowCommit->setChecked(settings.globalValue("HistoryView/PreferCommit", true).toBool());
    ui->sbEditorFontSize->setValue(settings.globalValue("FileDiffView/FontSize", 8).toInt());
    ui->chSingleClickDiffView->setChecked(settings.globalValue("singleClickDiffView", false).toBool());
 
@@ -184,11 +189,15 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->cbLogLevel, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->leGitPath, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
    connect(ui->spCommitTitleLength, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->sbUiFontSize, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->sbHistoryViewFontSize, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->bgHistoryViewPreferredView, qOverload<QAbstractButton *>(&QButtonGroup::buttonClicked), this, &ConfigWidget::saveConfig);
    connect(ui->sbEditorFontSize, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbTranslations, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->sbMaxCommits, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbLogOrder, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->autoFetch, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->autoRefresh, SIGNAL(valueChanged(int)), this, SLOT(saveConfig()));
    connect(ui->pruneOnFetch, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->updateOnPull, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->clangFormat, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
@@ -212,6 +221,7 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->cbDiffView, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbBranchSeparator, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbLanguage, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
+   connect(ui->leLogsLocation, &QLineEdit::editingFinished, this, &ConfigWidget::saveConfig);
 
    ui->cbDiffView->setCurrentIndex(settings.globalValue("DefaultDiffView").toInt());
    ui->cbBranchSeparator->setCurrentText(settings.globalValue("BranchSeparator", "-").toString());
@@ -371,6 +381,9 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("logsLevel", ui->cbLogLevel->currentIndex());
    settings.setGlobalValue("logsFolder", ui->leLogsLocation->text());
    settings.setGlobalValue("commitTitleMaxLength", ui->spCommitTitleLength->value());
+   settings.setGlobalValue("UiBaseFontSize", ui->sbUiFontSize->value());
+   settings.setGlobalValue("HistoryView/FontSize", ui->sbHistoryViewFontSize->value());
+   settings.setGlobalValue("HistoryView/PreferCommit", ui->rbShowCommit->isChecked());
    settings.setGlobalValue("FileDiffView/FontSize", ui->sbEditorFontSize->value());
    settings.setGlobalValue("colorSchema", ui->cbStyle->currentIndex());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
@@ -413,8 +426,10 @@ void ConfigWidget::saveConfig()
    }
 
    settings.setLocalValue("AutoFetch", ui->autoFetch->value());
+   settings.setLocalValue("AutoRefresh", ui->autoRefresh->value());
 
    emit autoFetchChanged(ui->autoFetch->value());
+   emit autoRefreshChanged(ui->autoRefresh->value());
 
    settings.setLocalValue("PruneOnFetch", ui->pruneOnFetch->isChecked());
    settings.setLocalValue("ClangFormatOnCommit", ui->clangFormat->isChecked());
@@ -656,7 +671,11 @@ void ConfigWidget::fillLanguageBox() const
       const auto lang = name.mid(name.indexOf('_') + 1);
       QLocale tmpLocale(lang);
       const auto languageItem = QString::fromUtf8("%1 (%2)").arg(QLocale::languageToString(tmpLocale.language()),
+#if QT_VERSION > QT_VERSION_CHECK(6, 2, 0)
+                                                                 QLocale::territoryToString(tmpLocale.territory()));
+#else
                                                                  QLocale::countryToString(tmpLocale.country()));
+#endif
 
       ui->cbLanguage->addItem(languageItem, name);
 

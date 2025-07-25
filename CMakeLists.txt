@@ -139,7 +139,6 @@ target_include_directories(
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set_target_properties(${PROJECT_NAME} PROPERTIES
-        WIN32_EXECUTABLE TRUE
         MACOSX_BUNDLE TRUE
         AUTOMOC TRUE
         AUTOUIC TRUE
@@ -154,6 +153,12 @@ else()
         AUTORCC TRUE
     )
 endif()
+
+qt_add_resources(${PROJECT_NAME} "translations"
+    PREFIX "/i18n"
+    BASE "${CMAKE_CURRENT_SOURCE_DIR}"
+    FILES "src/resources/translations/gitqlient_en.qm" "src/resources/translations/gitqlient_zh_CN.qm"
+)
 
 target_link_libraries(
     ${PROJECT_NAME}
@@ -176,3 +181,10 @@ install(
     BUNDLE DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
     LIBRARY DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
 )
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    add_custom_target(
+        "dmg"
+        echo \"Generate DMG\" && rm -f *.dmg && /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "${PROJECT_SOURCE_DIR}/src/resources/icon.icns" --background "${PROJECT_SOURCE_DIR}/src/resources/dmg_bg.png" --icon "GitQlient.app" 125 220 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient.dmg" "GitQlient.app"
+    )
+endif()

@@ -105,8 +105,6 @@ private:
    QString mPathToOpen;
    bool mMoveLogs = false;
    QMap<QString, QObject *> mPlugins;
-   QPair<QString, IJenkinsWidget *> mJenkins;
-   QPair<QString, IGitServerWidget *> mGitServer;
 
    /*!
     \brief Opens a QFileDialog to select a repository in the local disk.

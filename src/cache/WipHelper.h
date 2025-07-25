@@ -33,16 +33,14 @@ namespace WipHelper
 {
 inline bool update(const QSharedPointer<GitBase> &git, const QSharedPointer<GitCache> cache)
 {
-   QScopedPointer<GitWip> wip(new GitWip(git));
+   GitWip wip(git);
 
-   const auto files = wip->getUntrackedFiles();
+   const auto files = wip.getUntrackedFiles();
    cache->setUntrackedFilesList(std::move(files));
 
-   if (const auto info = wip->getWipInfo(); info->second.isValid())
+   if (const auto info = wip.getWipInfo(); info->second.isValid())
       return cache->updateWipCommit(info->first, info->second);
 
    return false;
-
-   return true;
 }
 }

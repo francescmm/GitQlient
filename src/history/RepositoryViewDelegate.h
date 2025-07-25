@@ -142,21 +142,10 @@ private:
     * @param opt The style options of the item.
     * @param currentLangeColor The color of current lane used for local branches.
     * @param startPoint The starting X coordinate for the tag.
-    * @param sha The SHA reference to paint. It can be local branch, remote branch, tag or it could be detached.
+    * @param commit The SHA reference to paint. It can be local branch, remote branch, tag or it could be detached.
     */
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, const QColor &currentLangeColor, int &startPoint,
-                       const QString &sha) const;
-
-   /**
-    * @brief Specialized method that paints a tag in the commit message column.
-    *
-    * @param painter The painter device.
-    * @param opt The style options of the item.
-    * @param startPoint The starting X coordinate for the tag.
-    * @param pr The PullRequest status.
-    */
-   void paintPrStatus(QPainter *painter, QStyleOptionViewItem opt, int &startPoint,
-                      const GitServerPlugin::PullRequest &pr) const;
+                       const CommitInfo &commit) const;
 
    /**
     * @brief getMergeColor Returns the color to be used for painting the external circle of the node. This methods
