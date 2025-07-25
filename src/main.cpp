@@ -12,11 +12,6 @@ using namespace QLogger;
 
 int main(int argc, char *argv[])
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-   QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-   QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-
    QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
 
    QApplication app(argc, argv);
@@ -30,7 +25,7 @@ int main(int argc, char *argv[])
    QFontDatabase::addApplicationFont(":/DejaVuSans");
    QFontDatabase::addApplicationFont(":/DejaVuSansMono");
 
-   const auto languageFile = GitQlientSettings().globalValue("UILanguage","gitqlient_en").toString();
+   const auto languageFile = GitQlientSettings().globalValue("UILanguage", "gitqlient_en").toString();
    QTranslator qtTranslator;
 
    if (qtTranslator.load(languageFile, QString::fromUtf8(":/translations/")))

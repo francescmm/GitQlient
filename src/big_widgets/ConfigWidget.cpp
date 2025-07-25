@@ -671,11 +671,7 @@ void ConfigWidget::fillLanguageBox() const
       const auto lang = name.mid(name.indexOf('_') + 1);
       QLocale tmpLocale(lang);
       const auto languageItem = QString::fromUtf8("%1 (%2)").arg(QLocale::languageToString(tmpLocale.language()),
-#if QT_VERSION > QT_VERSION_CHECK(6, 2, 0)
                                                                  QLocale::territoryToString(tmpLocale.territory()));
-#else
-                                                                 QLocale::countryToString(tmpLocale.country()));
-#endif
 
       ui->cbLanguage->addItem(languageItem, name);
 

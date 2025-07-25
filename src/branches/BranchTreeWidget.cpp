@@ -15,9 +15,7 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 
-#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
-#   include <QRegularExpression>
-#endif
+#include <QRegularExpression>
 
 using namespace GitQlient;
 
@@ -87,11 +85,7 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
          QScopedPointer<GitRemote> git(new GitRemote(mGit));
          if (const auto ret = git->getRemotes(); ret.success)
          {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
             const auto flag = Qt::SkipEmptyParts;
-#else
-            const auto flag = QString::SkipEmptyParts;
-#endif
             const auto remotes = ret.output.split("\n", flag);
 
             if (remotes.count() > 1)
@@ -162,15 +156,9 @@ void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 
          if (ret.success)
          {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            static QRegExp rx("by \\d+ commits");
-            rx.indexIn(output);
-            auto value = rx.capturedTexts().constFirst().split(" ");
-#else
             static QRegularExpression rx("by \\d+ commits");
             const auto texts = rx.match(output).capturedTexts();
             const auto value = texts.isEmpty() ? QStringList() : texts.constFirst().split(" ");
-#endif
 
             auto uiUpdateRequested = false;
 

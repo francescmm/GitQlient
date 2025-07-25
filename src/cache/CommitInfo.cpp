@@ -31,13 +31,8 @@ void CommitInfo::parseDiff(QByteArray &data, qsizetype startingField)
       sha = first.remove(0, 1);
 
       if (!shas.isEmpty())
-      {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
          mParentsSha = shas.takeFirst().split(' ', Qt::SkipEmptyParts);
-#else
-         mParentsSha = shas.takeFirst().split(' ', QString::SkipEmptyParts);
-#endif
-      }
+
       committer = fields.at(startingField++);
       author = fields.at(startingField++);
       dateSinceEpoch = std::chrono::seconds(fields.at(startingField++).toInt());
