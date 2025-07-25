@@ -8,7 +8,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "-Wall -Werror -pedantic-errors")
+set(CMAKE_CXX_FLAGS "-Wall -Werror -pedantic-errors -Wno-deprecated")
+
 
 execute_process(
    COMMAND
