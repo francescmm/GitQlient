@@ -8,8 +8,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "-Wall -Werror -pedantic-errors -Wno-deprecated")
-
+set(CMAKE_CXX_FLAGS "-Wall -Werror -pedantic-errors -Wno-deprecated -Wno-deprecated-declarations")
 
 execute_process(
    COMMAND
@@ -22,22 +21,12 @@ execute_process(
 )
 
 if (NOT DEFINED VERSION OR "${VERSION}" STREQUAL "")
-   if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-      set(VERSION "0.0.0")
-   else()
-      set(VERSION ${GQ_SHA})
-   endif()
+   set(VERSION ${GQ_SHA})
 endif()
 
 add_compile_definitions(SHA_VER="${GQ_SHA}")
 add_compile_definitions(VER="${VERSION}")
 add_compile_definitions(QT_DEPRECATED_WARNINGS)
-
-list(APPEND CPP_FLAGS "-Wall")
-
-if (CMAKE_BUILD_TYPE EQUAL "DEBUG" AND NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
-   list(APPEND CPP_FLAGS "-Wextra" "-Wpedantic")
-endif()
 
 if (NOT EXISTS "${PROJECT_SOURCE_DIR}/src/AuxiliarCustomWidgets/.git" OR
     NOT EXISTS "${PROJECT_SOURCE_DIR}/src/QLogger/.git" OR
@@ -111,6 +100,9 @@ file(GLOB SRC_FILES
    ${PROJECT_SOURCE_DIR}/src/terminal/*.h
    ${PROJECT_SOURCE_DIR}/src/terminal/*.ui
 )
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+   list(APPEND SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/resources/resources.rc")
+endif()
 
 qt_add_executable(
     ${PROJECT_NAME}
@@ -168,23 +160,75 @@ target_link_libraries(
     Qt::Network
 )
 
-
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+   install(
+       TARGETS ${PROJECT_NAME}
+       RUNTIME DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
+       BUNDLE DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
+       LIBRARY DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
+   )
+
    target_link_options(${PROJECT_NAME} PUBLIC "-no-pie")
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+   install(
+       TARGETS ${PROJECT_NAME}
+       RUNTIME DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
+       BUNDLE DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
+       LIBRARY DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
+   )
+
+   add_custom_target(
+       "dmg"
+       echo \"Generate DMG\" && rm -f *.dmg && /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "${PROJECT_SOURCE_DIR}/src/resources/icon.icns" --background "${PROJECT_SOURCE_DIR}/src/resources/dmg_bg.png" --icon "GitQlient.app" 125 220 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient.dmg" "GitQlient.app"
+   )
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-endif()
+   find_program(WINDEPLOYQT_EXECUTABLE
+       NAMES windeployqt
+       HINTS $ENV{QT6_DIR}/bin
+   )
 
-install(
-    TARGETS ${PROJECT_NAME}
-    RUNTIME DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
-    BUNDLE DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
-    LIBRARY DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
-)
+   add_custom_command(
+       TARGET GitQlient
+       POST_BUILD
+       COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:GitQlient>/deploy"
+       COMMAND
+           ${WINDEPLOYQT_EXECUTABLE}
+           --release
+           --dir "$<TARGET_FILE_DIR:GitQlient>/deploy"
+           "$<TARGET_FILE:GitQlient>"
+       COMMENT "Running windeployqt to collect Qt6 dependencies"
+   )
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    add_custom_target(
-        "dmg"
-        echo \"Generate DMG\" && rm -f *.dmg && /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "${PROJECT_SOURCE_DIR}/src/resources/icon.icns" --background "${PROJECT_SOURCE_DIR}/src/resources/dmg_bg.png" --icon "GitQlient.app" 125 220 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient.dmg" "GitQlient.app"
-    )
+   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
+
+   include(InstallRequiredSystemLibraries)
+
+   install(TARGETS ${PROJECT_NAME}
+       RUNTIME DESTINATION .
+   )
+
+   install(DIRECTORY "$<TARGET_FILE_DIR:GitQlient>/deploy/"
+       DESTINATION .
+       FILES_MATCHING PATTERN "*"
+   )
+
+   set(CPACK_OUTPUT_FILE_PREFIX ${CMAKE_BINARY_DIR}/packages)
+   set(CPACK_GENERATOR "NSIS")
+   set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+   set(CPACK_PACKAGE_VENDOR "${PROJECT_NAME}")
+   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
+   set(CPACK_PACKAGE_EXECUTABLES "${PROJECT_NAME};${PROJECT_NAME}")
+   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+   set(CPACK_NSIS_DISPLAY_NAME "${PROJECT_NAME}")
+   set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME}")
+   set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo.ico")
+   set(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo.ico")
+   set(CPACK_CREATE_DESKTOP_LINKS cmake-gui)
+   set(CPACK_PACKAGE_VERSION "${VERSION}")
+   #set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/src/resources/GitQlientLogoMedium.png")
+   set(CPACK_NSIS_INSTALLED_ICON_NAME "${PROJECT_NAME}.exe")
+   set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '\\$SMPROGRAMS\\\\${PROJECT_NAME}\\\\${PROJECT_NAME}.lnk' '\\$INSTDIR\\\\${PROJECT_NAME}.exe'")
+   set(CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '\\$SMPROGRAMS\\\\${PROJECT_NAME}\\\\${PROJECT_NAME}.lnk'\\nRMDir '\\$SMPROGRAMS\\\\${PROJECT_NAME}'")
+   include(CPack)
+
 endif()

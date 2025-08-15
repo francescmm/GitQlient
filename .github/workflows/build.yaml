@@ -226,23 +226,37 @@ jobs:
           arch: win64_mingw
           aqtversion: '==3.1.*'
 
-      - name: Install dependencies
-        run: choco install jom -y
-
-      #- name: Build GitQlient
-      #  run: |
-      #    # Setup VS compiler
-      #    cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
-      #    Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-      #    qmake GitQlient.pro VERSION=`git describe --always`
-      #    jom -j2
-
-      - name: Compile
+      - name: Install NSIS
         run: |
-          mkdir build
-          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY
-          make -j 4
-          make install
+          choco install nsis -y
+        shell: powershell
+
+      - name: Store version
+        run: |
+          $version = git describe --always
+          echo "VERSION_TAG=$version" >> $env:GITHUB_ENV
+
+      - name: Generate project
+        run: |
+          cmake -S . -B build -G "MinGW Makefiles" -DVERSION="${{ env.VERSION_TAG }}"
+
+      - name: Compile and deploy
+        run: |
+          cmake --build build --target GitQlient -j4
+          cmake --build build --target install
+          cmake --build build --target package
+
+      # - name: Sign Executable
+      # run: |
+      #   $certPath = "cert.pfx"
+      #   [IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String("${{ secrets.SIGN_CERTIFICATE }}"))
+      #   & "C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe" sign /f "$certPath" /p "${{ secrets.SIGN_PASSWORD }}" /tr http://timestamp.digicert.com /td sha256 /fd sha256 "build\GitQlient.exe"
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: win
+          path: build/packages/GitQlient*.exe
 
   MacOS:
     needs: [Tarball]
@@ -394,6 +408,7 @@ jobs:
             linux/gitqlient*.deb
             tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
+            win/GitQlient*.exe
 
       - name: Release version binaries
         uses: softprops/action-gh-release@v2
@@ -406,18 +421,20 @@ jobs:
             linux/gitqlient*.deb
             tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
+            win/GitQlient*.exe
 
-  PostBuildClean:
-    name: Post-release actions
-    runs-on: ubuntu-latest
-    if: always()
-    needs: [UpdateAssets]
-    steps:
-      - name: Clean artifacts
-        uses: geekyeggo/delete-artifact@v5
-        with:
-          name: |
-            appimage
-            linux
-            tarball
-            macos
+  # PostBuildClean:
+  #   name: Post-release actions
+  #   runs-on: ubuntu-latest
+  #   if: always()
+  #   needs: [UpdateAssets]
+  #   steps:
+  #     - name: Clean artifacts
+  #       uses: geekyeggo/delete-artifact@v5
+  #       with:
+  #         name: |
+  #           appimage
+  #           linux
+  #           tarball
+  #           macos
+  #           win

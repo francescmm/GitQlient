@@ -324,14 +324,14 @@ void RepositoryViewDelegate::paintGraphLane(QPainter *p, const Lane &lane, bool 
          case LaneType::MERGE_FORK:
          case LaneType::MERGE_FORK_R:
             isCommit = true;
-            p->setPen(QPen(mergeColor, 2));
-            p->setBrush(col);
+            p->setPen(QPen(col, 2));
+            p->setBrush(mergeColor);
             p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
             break;
          case LaneType::MERGE_FORK_L:
             isCommit = true;
-            p->setPen(QPen(laneHeadPresent ? mergeColor : col, 2));
-            p->setBrush(col);
+            p->setPen(QPen(col, 2));
+            p->setBrush(laneHeadPresent ? mergeColor : GitQlientStyles::getBackgroundColor());
             p->drawEllipse(m - r + 2, h - r + 2, 8, 8);
             break;
          case LaneType::ACTIVE: {
