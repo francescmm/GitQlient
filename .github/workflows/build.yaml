@@ -357,11 +357,11 @@ jobs:
 
       - name: Build AppImage
         run: |
+          export VERSION=`git describe --always`
           wget -q -O linuxdeployqt https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
           chmod +x linuxdeployqt
-          ./linuxdeployqt AppImage/gitqlient/usr/share/applications/*.desktop -appimage -no-translations -bundle-non-qt-libs -extra-plugins=iconengines,imageformats
+          ./linuxdeployqt AppImage/gitqlient/usr/share/applications/*.desktop -appimage -no-translations -extra-plugins=iconengines,imageformats
           chmod +x GitQlient-*
-          cp GitQlient-* ../
 
       - name: Upload AppImage
         uses: actions/upload-artifact@v4
