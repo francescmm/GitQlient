@@ -318,13 +318,13 @@ jobs:
       - name: Build DMG
         run: |
           macdeployqt build/*.app
-          cmake --build build --target dmg
+          /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "src/resources/icon.icns" --background "src/resources/dmg_bg.png" --icon "GitQlient.app" 125 220 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient-`git describe --always`-arm64.dmg" "build/GitQlient.app"
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: build/GitQlient-*.dmg
+          path: GitQlient-*.dmg
 
   Appimage:
     name: AppImage

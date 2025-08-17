@@ -187,11 +187,6 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
        BUNDLE DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
        LIBRARY DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
    )
-
-   add_custom_target(
-       "dmg"
-       echo \"Generate DMG\" && rm -f *.dmg && /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "${PROJECT_SOURCE_DIR}/src/resources/icon.icns" --background "${PROJECT_SOURCE_DIR}/src/resources/dmg_bg.png" --icon "GitQlient.app" 125 220 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient-${VERSION}-arm64.dmg" "GitQlient.app"
-   )
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
    set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
 
