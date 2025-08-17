@@ -18,21 +18,31 @@ jobs:
           fetch-depth: 0
       - name: Create Tarball
         run: |
-          git-archive-all --prefix=gitqlient_`git describe --always` gitqlient_`git describe --always`.tar.gz
+          git-archive-all --prefix=gitqlient-`git describe --always` gitqlient-`git describe --always`.tar.gz
       - name: Upload tarball
         uses: actions/upload-artifact@v4
         with:
           name: tarball
-          path: gitqlient_*.tar.gz
+          path: gitqlient-*.tar.gz
 
 
   Ubuntu:
-    name: Ubuntu
+    name: ${{ matrix.config.name }}
     needs: [Tarball]
     strategy:
       matrix:
-        os: [ubuntu-22.04]
-    runs-on: ${{ matrix.os }}
+        config:
+        - {
+            name: "Ubuntu x86_64",
+            os: ubuntu-22.04,
+            platform: x86_64
+          }
+        - {
+            name: "Ubuntu ARM64",
+            os: ubuntu-22.04-arm,
+            platform: arm64
+          }
+    runs-on: ${{ matrix.config.os }}
     defaults:
       run:
         shell: bash
@@ -47,7 +57,7 @@ jobs:
         id: vars
         run: |
           sudo apt-get -qq update
-          sudo apt-get -qq install libgl1-mesa-dev libxkbcommon-x11-0 libc6-i386 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxkbcommon-x11-0 libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-* fakeroot
+          sudo apt-get -qq install libxkbcommon-x11-0 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-* fakeroot
           sudo apt-get -qq install qt6-base-dev qt6-tools-dev qmake6
           sudo pip install git-archive-all
           sudo qtchooser -install qt6 $(which qmake6)
@@ -55,7 +65,6 @@ jobs:
 
       - name: Compile
         run: |
-          qmake6 -v
           mkdir build
           qmake6 GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
           make -j 4
@@ -66,7 +75,7 @@ jobs:
         with:
           name: tarball
           path: |
-            gitqlient_*.tar.gz
+            gitqlient-*.tar.gz
 
       - name: Build DEB package
         run: |
@@ -74,34 +83,33 @@ jobs:
           echo "Standards-Version: `git describe --always`" >> deb_pkg/DEBIAN/control
           mkdir -p deb_pkg/usr/bin
           cp gitqlient deb_pkg/usr/bin/
-          mv deb_pkg gitqlient_`git describe --always`_amd64
-          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/scalable/apps
-          cp ./src/resources/icons/GitQlientLogo.svg gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/scalable/apps/gitqlient.svg
-          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/16x16/apps/
-          cp ./src/resources/icons/GitQlientLogo16.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/16x16/apps/gitqlient.png
-          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/24x24/apps/
-          cp ./src/resources/icons/GitQlientLogo24.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/24x24/apps/gitqlient.png
-          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/32x32/apps/
-          cp ./src/resources/icons/GitQlientLogo32.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/32x32/apps/gitqlient.png
-          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/48x48/apps/
-          cp ./src/resources/icons/GitQlientLogo48.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/48x48/apps/gitqlient.png
-          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/64x64/apps/
-          cp ./src/resources/icons/GitQlientLogo64.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/64x64/apps/gitqlient.png
-          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/96x96/apps/
-          cp ./src/resources/icons/GitQlientLogo96.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/96x96/apps/gitqlient.png
-          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/128x128/apps/
-          cp ./src/resources/icons/GitQlientLogo128.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/128x128/apps/gitqlient.png
-          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/256x256/apps/
-          cp ./src/resources/icons/GitQlientLogo256.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/256x256/apps/gitqlient.png
-          mkdir -p gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/512x512/apps/
-          cp ./src/resources/icons/GitQlientLogo512.png gitqlient_`git describe --always`_amd64/usr/share/icons/hicolor/512x512/apps/gitqlient.png
-          fakeroot dpkg-deb -v --build gitqlient_`git describe --always`_amd64
-          cp *.deb ../
+          mkdir -p deb_pkg/usr/share/icons/hicolor/scalable/apps
+          cp ./src/resources/icons/GitQlientLogo.svg deb_pkg/usr/share/icons/hicolor/scalable/apps/gitqlient.svg
+          mkdir -p deb_pkg/usr/share/icons/hicolor/16x16/apps/
+          cp ./src/resources/icons/GitQlientLogo16.png deb_pkg/usr/share/icons/hicolor/16x16/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/24x24/apps/
+          cp ./src/resources/icons/GitQlientLogo24.png deb_pkg/usr/share/icons/hicolor/24x24/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/32x32/apps/
+          cp ./src/resources/icons/GitQlientLogo32.png deb_pkg/usr/share/icons/hicolor/32x32/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/48x48/apps/
+          cp ./src/resources/icons/GitQlientLogo48.png deb_pkg/usr/share/icons/hicolor/48x48/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/64x64/apps/
+          cp ./src/resources/icons/GitQlientLogo64.png deb_pkg/usr/share/icons/hicolor/64x64/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/96x96/apps/
+          cp ./src/resources/icons/GitQlientLogo96.png deb_pkg/usr/share/icons/hicolor/96x96/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/128x128/apps/
+          cp ./src/resources/icons/GitQlientLogo128.png deb_pkg/usr/share/icons/hicolor/128x128/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/256x256/apps/
+          cp ./src/resources/icons/GitQlientLogo256.png deb_pkg/usr/share/icons/hicolor/256x256/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/512x512/apps/
+          cp ./src/resources/icons/GitQlientLogo512.png deb_pkg/usr/share/icons/hicolor/512x512/apps/gitqlient.png
+          mv deb_pkg gitqlient-`git describe --always`-${{ matrix.config.platform }}
+          fakeroot dpkg-deb -v --build gitqlient-`git describe --always`-${{ matrix.config.platform }}
 
       - name: Upload DEB package
         uses: actions/upload-artifact@v4
         with:
-          name: linux
+          name: linux_deb_${{ matrix.config.platform }}
           path: |
             gitqlient*.deb
 
@@ -198,7 +206,7 @@ jobs:
 #            rpmbuild/RPMS/x86_64/*.rpm
 
   Windows:
-    name: Windows
+    name: ${{ matrix.env.name }}
     needs: [Tarball]
     strategy:
       matrix:
@@ -259,6 +267,7 @@ jobs:
           path: build/packages/GitQlient*.exe
 
   MacOS:
+    name: ${{ matrix.env.name }}
     needs: [Tarball]
     runs-on: ${{ matrix.env.os }}
     strategy:
@@ -293,22 +302,24 @@ jobs:
           brew install create-dmg
           brew uninstall --force --ignore-dependencies java
 
-      - name: Compile
+      - name: Generate project
         run: |
-          mkdir build
-          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=`git describe --always`
-          make -j 4
-          make install
+          cmake -S . -B build -G "Ninja" -DVERSION="`git describe --always`"
+
+      - name: Compile and deploy
+        run: |
+          cmake --build build --target GitQlient -j4
 
       - name: Build DMG
-        run:
-          make dmg
+        run: |
+          macdeployqt build/*.app
+          cmake --build build --target dmg
 
       - name: Upload DMG
         uses: actions/upload-artifact@v4
         with:
           name: macos
-          path: GitQlient-*
+          path: build/GitQlient-*.dmg
 
   Appimage:
     name: AppImage

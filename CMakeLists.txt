@@ -43,12 +43,6 @@ endif()
 
 find_package(Qt6 COMPONENTS Core Widgets Network REQUIRED)
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    set(MACOSX_BUNDLE_ICON_FILE icon.icns)
-    set(MACOS_APP_ICON_GITQLIENT "${PROJECT_SOURCE_DIR}/src/resources/icon.icns")
-    set_source_files_properties(${MACOS_APP_ICON_GITQLIENT} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-endif()
-
 file(GLOB SRC_FILES
    ${MACOS_APP_ICON_GITQLIENT}
    ${PROJECT_SOURCE_DIR}/src/main.cpp
@@ -102,6 +96,10 @@ file(GLOB SRC_FILES
 )
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
    list(APPEND SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/resources/resources.rc")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(MACOSX_BUNDLE_ICON_FILE icon.icns)
+    set(MACOS_APP_ICON_GITQLIENT "${PROJECT_SOURCE_DIR}/src/resources/icon.icns")
+    set_source_files_properties(${MACOS_APP_ICON_GITQLIENT} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
 qt_add_executable(
@@ -160,6 +158,19 @@ target_link_libraries(
     Qt::Network
 )
 
+# Setting CPack variables
+
+set(CPACK_OUTPUT_FILE_PREFIX ${CMAKE_BINARY_DIR}/packages)
+set(CPACK_PACKAGE_CONTACT "francescmm@gmail.com")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GitQlient is a multi-platform Git client written in C++ and Qt")
+set(CPACK_PACKAGE_EXECUTABLES "${PROJECT_NAME};${PROJECT_NAME}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
+set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VENDOR "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VERSION "${VERSION}")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
+set(CPACK_CREATE_DESKTOP_LINKS cmake-gui)
+
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
    install(
        TARGETS ${PROJECT_NAME}
@@ -179,7 +190,7 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 
    add_custom_target(
        "dmg"
-       echo \"Generate DMG\" && rm -f *.dmg && /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "${PROJECT_SOURCE_DIR}/src/resources/icon.icns" --background "${PROJECT_SOURCE_DIR}/src/resources/dmg_bg.png" --icon "GitQlient.app" 125 220 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient.dmg" "GitQlient.app"
+       echo \"Generate DMG\" && rm -f *.dmg && /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "${PROJECT_SOURCE_DIR}/src/resources/icon.icns" --background "${PROJECT_SOURCE_DIR}/src/resources/dmg_bg.png" --icon "GitQlient.app" 125 220 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient-${VERSION}-arm64.dmg" "GitQlient.app"
    )
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
    find_program(WINDEPLOYQT_EXECUTABLE
@@ -212,20 +223,11 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
        FILES_MATCHING PATTERN "*"
    )
 
-   set(CPACK_OUTPUT_FILE_PREFIX ${CMAKE_BINARY_DIR}/packages)
    set(CPACK_GENERATOR "NSIS")
-   set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
-   set(CPACK_PACKAGE_VENDOR "${PROJECT_NAME}")
-   set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
-   set(CPACK_PACKAGE_EXECUTABLES "${PROJECT_NAME};${PROJECT_NAME}")
-   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
    set(CPACK_NSIS_DISPLAY_NAME "${PROJECT_NAME}")
    set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME}")
    set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo.ico")
    set(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo.ico")
-   set(CPACK_CREATE_DESKTOP_LINKS cmake-gui)
-   set(CPACK_PACKAGE_VERSION "${VERSION}")
-   #set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/src/resources/GitQlientLogoMedium.png")
    set(CPACK_NSIS_INSTALLED_ICON_NAME "${PROJECT_NAME}.exe")
    set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '\\$SMPROGRAMS\\\\${PROJECT_NAME}\\\\${PROJECT_NAME}.lnk' '\\$INSTDIR\\\\${PROJECT_NAME}.exe'")
    set(CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '\\$SMPROGRAMS\\\\${PROJECT_NAME}\\\\${PROJECT_NAME}.lnk'\\nRMDir '\\$SMPROGRAMS\\\\${PROJECT_NAME}'")
