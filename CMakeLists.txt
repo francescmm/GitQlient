@@ -193,23 +193,6 @@ elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
        echo \"Generate DMG\" && rm -f *.dmg && /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "${PROJECT_SOURCE_DIR}/src/resources/icon.icns" --background "${PROJECT_SOURCE_DIR}/src/resources/dmg_bg.png" --icon "GitQlient.app" 125 220 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient-${VERSION}-arm64.dmg" "GitQlient.app"
    )
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-   find_program(WINDEPLOYQT_EXECUTABLE
-       NAMES windeployqt
-       HINTS $ENV{QT6_DIR}/bin
-   )
-
-   add_custom_command(
-       TARGET GitQlient
-       POST_BUILD
-       COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:GitQlient>/deploy"
-       COMMAND
-           ${WINDEPLOYQT_EXECUTABLE}
-           --release
-           --dir "$<TARGET_FILE_DIR:GitQlient>/deploy"
-           "$<TARGET_FILE:GitQlient>"
-       COMMENT "Running windeployqt to collect Qt6 dependencies"
-   )
-
    set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
 
    include(InstallRequiredSystemLibraries)

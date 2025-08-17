@@ -235,9 +235,9 @@ jobs:
           aqtversion: '==3.1.*'
 
       - name: Install NSIS
+        shell: powershell
         run: |
           choco install nsis -y
-        shell: powershell
 
       - name: Store version
         run: |
@@ -251,6 +251,11 @@ jobs:
       - name: Compile and deploy
         run: |
           cmake --build build --target GitQlient -j4
+          mkdir build/deploy
+          windeployqt --release --dir build/deploy build/GitQlient.exe
+
+      - name: Generate installer
+        run: |
           cmake --build build --target install
           cmake --build build --target package
 
@@ -342,7 +347,7 @@ jobs:
         id: vars
         run: |
           sudo apt-get -qq update
-          sudo apt-get -qq install libgl1-mesa-dev libxkbcommon-x11-0 libc6-i386 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxkbcommon-x11-0 libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-* fakeroot
+          sudo apt-get -qq install libxkbcommon-x11-0 libc6-i386 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxkbcommon-x11-0 libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-* fakeroot
           sudo apt-get install libfuse2
           sudo pip install git-archive-all
 
@@ -416,7 +421,8 @@ jobs:
           draft: false
           files: |
             appimage/GitQlient*.AppImage
-            linux/gitqlient*.deb
+            linux_deb_arm64/gitqlient*.deb
+            linux_deb_x86_64/gitqlient*.deb
             tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
             win/GitQlient*.exe
@@ -429,7 +435,8 @@ jobs:
         with:
           files: |
             appimage/GitQlient*.AppImage
-            linux/gitqlient*.deb
+            linux_deb_arm64/gitqlient*.deb
+            linux_deb_x86_64/gitqlient*.deb
             tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
             win/GitQlient*.exe
