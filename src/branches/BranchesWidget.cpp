@@ -1,5 +1,6 @@
-﻿#include "BranchesWidget.h"
+﻿#include <BranchesWidget.h>
 
+#include <RefWidget.h>
 #include <AddSubtreeDlg.h>
 #include <BranchTreeWidget.h>
 #include <BranchesViewDelegate.h>
@@ -66,12 +67,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    , mCache(cache)
    , mGit(git)
    , mGitTags(new GitTags(mGit))
-   , mLocalBranchesCount(new QLabel("(0)"))
-   , mLocalBranchesArrow(new QLabel())
-   , mLocalBranchesTree(new BranchTreeWidget(mCache, mGit))
-   , mRemoteBranchesCount(new QLabel("(0)"))
-   , mRemoteBranchesArrow(new QLabel())
-   , mRemoteBranchesTree(new BranchTreeWidget(mCache, mGit))
    , mTagsCount(new QLabel("(0)"))
    , mTagsArrow(new QLabel())
    , mTagsTree(new RefTreeWidget())
@@ -95,76 +90,14 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    setAttribute(Qt::WA_DeleteOnClose);
 
    /* LOCAL BRANCHES START*/
-   if (const auto visible = settings.localValue("LocalHeader", true).toBool(); !visible)
-   {
-      const auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
-      mLocalBranchesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-      mLocalBranchesTree->setVisible(visible);
-   }
-   else
-      mLocalBranchesArrow->setPixmap(QIcon(":/icons/remove").pixmap(QSize(15, 15)));
+   mLocalFrame = new RefWidget(tr("Local"), "LocalHeader", mCache, mGit);
+   mLocalFrame->setObjectName("sectionFrame");
 
-   const auto localHeaderFrame = new ClickableFrame();
-   const auto localHeaderLayout = new QHBoxLayout(localHeaderFrame);
-   localHeaderLayout->setContentsMargins(10, 0, 0, 0);
-   localHeaderLayout->setSpacing(10);
-   localHeaderLayout->addWidget(new QLabel(tr("Local")));
-   localHeaderLayout->addWidget(mLocalBranchesCount);
-   localHeaderLayout->addStretch();
-   localHeaderLayout->addWidget(mLocalBranchesArrow);
-
-   mLocalBranchesTree->setLocalRepo(true);
-   mLocalBranchesTree->setMouseTracking(true);
-   mLocalBranchesTree->setItemDelegate(mLocalDelegate = new BranchesViewDelegate());
-   mLocalBranchesTree->setColumnCount(1);
-   mLocalBranchesTree->setObjectName("LocalBranches");
-
-   const auto localLayout = new QVBoxLayout();
-   localLayout->setContentsMargins(QMargins());
-   localLayout->setSpacing(0);
-   localLayout->addWidget(localHeaderFrame);
-   localLayout->addSpacing(5);
-   localLayout->addWidget(mLocalBranchesTree);
-
-   const auto localFrame = new QFrame();
-   localFrame->setObjectName("sectionFrame");
-   localFrame->setLayout(localLayout);
-
-   /* REMOTE BRANCHES END */
+   /* LOCAL BRANCHES END */
 
    /* REMOTE BRANCHES START*/
-   if (const auto visible = settings.localValue("RemoteHeader", true).toBool(); !visible)
-   {
-      const auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
-      mRemoteBranchesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-      mRemoteBranchesTree->setVisible(visible);
-   }
-   else
-      mRemoteBranchesArrow->setPixmap(QIcon(":/icons/remove").pixmap(QSize(15, 15)));
-
-   const auto remoteHeaderFrame = new ClickableFrame();
-   const auto remoteHeaderLayout = new QHBoxLayout(remoteHeaderFrame);
-   remoteHeaderLayout->setContentsMargins(10, 0, 0, 0);
-   remoteHeaderLayout->setSpacing(10);
-   remoteHeaderLayout->addWidget(new QLabel(tr("Remote")));
-   remoteHeaderLayout->addWidget(mRemoteBranchesCount);
-   remoteHeaderLayout->addStretch();
-   remoteHeaderLayout->addWidget(mRemoteBranchesArrow);
-
-   mRemoteBranchesTree->setColumnCount(1);
-   mRemoteBranchesTree->setMouseTracking(true);
-   mRemoteBranchesTree->setItemDelegate(mRemotesDelegate = new BranchesViewDelegate());
-
-   const auto remoteLayout = new QVBoxLayout();
-   remoteLayout->setContentsMargins(QMargins());
-   remoteLayout->setSpacing(0);
-   remoteLayout->addWidget(remoteHeaderFrame);
-   remoteLayout->addSpacing(5);
-   remoteLayout->addWidget(mRemoteBranchesTree);
-
-   const auto remoteFrame = new QFrame();
-   remoteFrame->setObjectName("sectionFrame");
-   remoteFrame->setLayout(remoteLayout);
+   mRemoteFrame = new RefWidget(tr("Remote"), "RemoteHeader", mCache, mGit);
+   mRemoteFrame->setObjectName("sectionFrame");
    /* REMOTE BRANCHES END */
 
    /* TAGS START */
@@ -308,23 +241,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    subtreeFrame->setLayout(subtreeLayout);
    /* SUBTREE END */
 
-   const auto searchBranch = new QLineEdit();
-   searchBranch->setPlaceholderText(tr("Prese ENTER to search a branch or tag..."));
-   searchBranch->setObjectName("SearchInput");
-   connect(searchBranch, &QLineEdit::returnPressed, this, &BranchesWidget::onSearchBranch);
-
-   mMinimize->setIcon(QIcon(":/icons/ahead"));
-   mMinimize->setToolTip(tr("Show minimalist view"));
-   mMinimize->setObjectName("BranchesWidgetOptionsButton");
-   mMinimize->setShortcut(Qt::CTRL | Qt::Key_B);
-   connect(mMinimize, &QPushButton::clicked, this, &BranchesWidget::minimalView);
-
-   const auto mainControlsLayout = new QHBoxLayout();
-   mainControlsLayout->setContentsMargins(QMargins());
-   mainControlsLayout->setSpacing(5);
-   mainControlsLayout->addWidget(mMinimize);
-   mainControlsLayout->addWidget(searchBranch);
-
    const auto separator = new QFrame();
    separator->setObjectName("separator");
 
@@ -332,13 +248,19 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    panelsLayout->setContentsMargins(QMargins());
    panelsLayout->setSpacing(0);
    panelsLayout->setAlignment(Qt::AlignTop);
-   panelsLayout->addWidget(localFrame);
-   panelsLayout->addWidget(remoteFrame);
+   panelsLayout->addWidget(mLocalFrame);
+   panelsLayout->addWidget(mRemoteFrame);
    panelsLayout->addWidget(tagsFrame);
    panelsLayout->addWidget(stashFrame);
    panelsLayout->addWidget(submoduleFrame);
    panelsLayout->addWidget(subtreeFrame);
    panelsLayout->addWidget(separator);
+
+   mMinimize->setIcon(QIcon(":/icons/ahead"));
+   mMinimize->setToolTip(tr("Show minimalist view"));
+   mMinimize->setObjectName("BranchesWidgetOptionsButton");
+   mMinimize->setShortcut(Qt::CTRL | Qt::Key_B);
+   connect(mMinimize, &QPushButton::clicked, this, &BranchesWidget::minimalView);
 
    const auto panelsFrame = new QFrame();
    panelsFrame->setObjectName("panelsFrame");
@@ -347,7 +269,7 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    const auto vLayout = new QVBoxLayout();
    vLayout->setContentsMargins(0, 0, 0, 0);
    vLayout->setSpacing(0);
-   vLayout->addLayout(mainControlsLayout);
+   vLayout->addWidget(mMinimize);
    vLayout->addSpacing(5);
    vLayout->addWidget(panelsFrame);
 
@@ -377,22 +299,20 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    connect(mLocalBranchesTree, &BranchTreeWidget::signalRefreshPRsCache, mCache.get(),
            &GitCache::refreshPRsCache);
 */
-   connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
-   connect(mLocalBranchesTree, &BranchTreeWidget::signalSelectCommit, mRemoteBranchesTree,
-           &BranchTreeWidget::clearSelection);
-   connect(mLocalBranchesTree, &BranchTreeWidget::fullReload, this, &BranchesWidget::fullReload);
-   connect(mLocalBranchesTree, &BranchTreeWidget::logReload, this, &BranchesWidget::logReload);
-   connect(mLocalBranchesTree, &BranchTreeWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
-   connect(mLocalBranchesTree, &BranchTreeWidget::mergeSqushRequested, this, &BranchesWidget::mergeSqushRequested);
-   connect(mLocalBranchesTree, &BranchTreeWidget::signalPullConflict, this, &BranchesWidget::signalPullConflict);
+   connect(mLocalFrame, &RefWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
+   connect(mLocalFrame, &RefWidget::signalSelectCommit, mRemoteFrame, &RefWidget::clearSelection);
+   connect(mLocalFrame, &RefWidget::fullReload, this, &BranchesWidget::fullReload);
+   connect(mLocalFrame, &RefWidget::logReload, this, &BranchesWidget::logReload);
+   connect(mLocalFrame, &RefWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
+   connect(mLocalFrame, &RefWidget::mergeSqushRequested, this, &BranchesWidget::mergeSqushRequested);
+   connect(mLocalFrame, &RefWidget::signalPullConflict, this, &BranchesWidget::signalPullConflict);
 
-   connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
-   connect(mRemoteBranchesTree, &BranchTreeWidget::signalSelectCommit, mLocalBranchesTree,
-           &BranchTreeWidget::clearSelection);
-   connect(mRemoteBranchesTree, &BranchTreeWidget::fullReload, this, &BranchesWidget::fullReload);
-   connect(mRemoteBranchesTree, &BranchTreeWidget::logReload, this, &BranchesWidget::logReload);
-   connect(mRemoteBranchesTree, &BranchTreeWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
-   connect(mRemoteBranchesTree, &BranchTreeWidget::mergeSqushRequested, this, &BranchesWidget::mergeSqushRequested);
+   connect(mRemoteFrame, &RefWidget::signalSelectCommit, this, &BranchesWidget::signalSelectCommit);
+   connect(mRemoteFrame, &RefWidget::signalSelectCommit, mLocalFrame, &RefWidget::clearSelection);
+   connect(mRemoteFrame, &RefWidget::fullReload, this, &BranchesWidget::fullReload);
+   connect(mRemoteFrame, &RefWidget::logReload, this, &BranchesWidget::logReload);
+   connect(mRemoteFrame, &RefWidget::signalMergeRequired, this, &BranchesWidget::signalMergeRequired);
+   connect(mRemoteFrame, &RefWidget::mergeSqushRequested, this, &BranchesWidget::mergeSqushRequested);
 
    connect(mTagsTree, &QTreeWidget::itemClicked, this, &BranchesWidget::onTagClicked);
    connect(mTagsTree, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showTagsContextMenu);
@@ -400,8 +320,8 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
    connect(mStashesList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showStashesContextMenu);
    connect(mSubmodulesList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showSubmodulesContextMenu);
    connect(mSubtreeList, &QListWidget::customContextMenuRequested, this, &BranchesWidget::showSubtreesContextMenu);
-   connect(localHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onLocalHeaderClicked);
-   connect(remoteHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onRemoteHeaderClicked);
+   connect(mLocalFrame, &ClickableFrame::clicked, this, &BranchesWidget::panelsVisibilityChanged);
+   connect(mRemoteFrame, &ClickableFrame::clicked, this, &BranchesWidget::panelsVisibilityChanged);
    connect(tagsHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onTagsHeaderClicked);
    connect(stashHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onStashesHeaderClicked);
    connect(submoduleHeaderFrame, &ClickableFrame::clicked, this, &BranchesWidget::onSubmodulesHeaderClicked);
@@ -412,8 +332,6 @@ BranchesWidget::BranchesWidget(const QSharedPointer<GitCache> &cache, const QSha
 
 BranchesWidget::~BranchesWidget()
 {
-   delete mLocalDelegate;
-   delete mRemotesDelegate;
    delete mTagsDelegate;
 }
 
@@ -473,7 +391,7 @@ void BranchesWidget::showBranches()
          }
       }
 
-      mLocalBranchesCount->setText(QString("(%1)").arg(count));
+      mLocalFrame->setCount(QString("(%1)").arg(count));
 
       QLog_Info("UI", QString("... local branches processed"));
    }
@@ -534,7 +452,7 @@ void BranchesWidget::showBranches()
          }
       }
 
-      mRemoteBranchesCount->setText(QString("(%1)").arg(count));
+      mRemoteFrame->setCount(QString("(%1)").arg(count));
 
       branches.clear();
       branches.squeeze();
@@ -548,19 +466,19 @@ void BranchesWidget::showBranches()
 
    QApplication::restoreOverrideCursor();
 
-   adjustBranchesTree(mLocalBranchesTree);
+   mLocalFrame->adjustBranchesTree();
 }
 
 void BranchesWidget::refreshCurrentBranchLink()
 {
-   mLocalBranchesTree->reloadCurrentBranchLink();
+   mLocalFrame->reloadCurrentBranchLink();
 }
 
 void BranchesWidget::clear()
 {
    blockSignals(true);
-   mLocalBranchesTree->clear();
-   mRemoteBranchesTree->clear();
+   mLocalFrame->clear();
+   mRemoteFrame->clear();
    blockSignals(false);
 }
 
@@ -609,18 +527,11 @@ void BranchesWidget::onPanelsVisibilityChaned()
 {
    GitQlientSettings settings(mGit->getGitDir());
 
-   auto visible = settings.localValue("LocalHeader", true).toBool();
+   mLocalFrame->reloadVisibility();
+   mRemoteFrame->reloadVisibility();
+
+   auto visible = settings.localValue("TagsHeader", true).toBool();
    auto icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
-   mLocalBranchesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-   mLocalBranchesTree->setVisible(visible);
-
-   visible = settings.localValue("RemoteHeader", true).toBool();
-   icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
-   mRemoteBranchesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-   mRemoteBranchesTree->setVisible(visible);
-
-   visible = settings.localValue("TagsHeader", true).toBool();
-   icon = QIcon(!visible ? QString(":/icons/add") : QString(":/icons/remove"));
    mTagsArrow->setPixmap(icon.pixmap(QSize(15, 15)));
    mTagsTree->setVisible(visible);
 
@@ -651,131 +562,14 @@ void BranchesWidget::processLocalBranch(const QString &sha, QString branch)
 
    const auto fullBranchName = branch;
 
-   QVector<QTreeWidgetItem *> parents;
-   QTreeWidgetItem *parent = nullptr;
-   auto folders = branch.split("/");
-   branch = folders.takeLast();
-
-   for (const auto &folder : std::as_const(folders))
-   {
-      QTreeWidgetItem *child = nullptr;
-
-      if (parent)
-      {
-         child = getChild(parent, folder);
-         parents.append(child);
-      }
-      else
-      {
-         for (auto i = 0; i < mLocalBranchesTree->topLevelItemCount(); ++i)
-         {
-            if (mLocalBranchesTree->topLevelItem(i)->text(0) == folder)
-            {
-               child = mLocalBranchesTree->topLevelItem(i);
-               parents.append(child);
-            }
-         }
-      }
-
-      if (!child)
-      {
-         const auto item = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem();
-         item->setText(0, folder);
-
-         if (!parent)
-            mLocalBranchesTree->addTopLevelItem(item);
-
-         parent = item;
-         parents.append(parent);
-      }
-      else
-      {
-         parent = child;
-         parents.append(child);
-      }
-   }
-
-   auto item = new QTreeWidgetItem(parent);
-   item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
-   item->setText(0, branch);
-   item->setData(0, GitQlient::IsCurrentBranchRole, isCurrentBranch);
-   item->setData(0, GitQlient::FullNameRole, fullBranchName);
-   item->setData(0, GitQlient::LocalBranchRole, true);
-   item->setData(0, GitQlient::ShaRole, sha);
-   item->setData(0, Qt::ToolTipRole, fullBranchName);
-   item->setData(0, GitQlient::IsLeaf, true);
-
-   if (isCurrentBranch)
-   {
-      item->setSelected(true);
-
-      for (const auto parent : parents)
-      {
-         mLocalBranchesTree->setCurrentItem(item);
-         mLocalBranchesTree->expandItem(parent);
-         const auto indexToScroll = mLocalBranchesTree->currentIndex();
-         mLocalBranchesTree->scrollTo(indexToScroll);
-      }
-   }
-
-   parents.clear();
-   parents.squeeze();
-
-   mLocalBranchesTree->addTopLevelItem(item);
+   mLocalFrame->addItems(isCurrentBranch, fullBranchName, sha);
 
    QLog_Debug("UI", QString("Finish gathering local branch information"));
 }
 
 void BranchesWidget::processRemoteBranch(const QString &sha, QString branch)
 {
-   const auto fullBranchName = branch;
-   auto folders = branch.split("/");
-   branch = folders.takeLast();
-
-   QTreeWidgetItem *parent = nullptr;
-
-   for (const auto &folder : std::as_const(folders))
-   {
-      QTreeWidgetItem *child = nullptr;
-
-      if (parent)
-         child = getChild(parent, folder);
-      else
-      {
-         for (auto i = 0; i < mRemoteBranchesTree->topLevelItemCount(); ++i)
-         {
-            if (mRemoteBranchesTree->topLevelItem(i)->text(0) == folder)
-               child = mRemoteBranchesTree->topLevelItem(i);
-         }
-      }
-
-      if (!child)
-      {
-         const auto item = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem();
-         item->setText(0, folder);
-
-         if (!parent)
-         {
-            item->setData(0, GitQlient::IsRoot, true);
-            mRemoteBranchesTree->addTopLevelItem(item);
-         }
-
-         parent = item;
-      }
-      else
-         parent = child;
-   }
-
-   QLog_Trace("UI", QString("Adding remote branch {%1}").arg(branch));
-
-   const auto item = new QTreeWidgetItem(parent);
-   item->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
-   item->setText(0, branch);
-   item->setData(0, GitQlient::FullNameRole, fullBranchName);
-   item->setData(0, GitQlient::LocalBranchRole, false);
-   item->setData(0, GitQlient::ShaRole, sha);
-   item->setData(0, Qt::ToolTipRole, fullBranchName);
-   item->setData(0, GitQlient::IsLeaf, true);
+   mRemoteFrame->addItems(false, branch, sha);
 }
 
 void BranchesWidget::processTags()
@@ -1143,32 +937,6 @@ void BranchesWidget::showSubtreesContextMenu(const QPoint &p)
    menu->exec(mSubtreeList->viewport()->mapToGlobal(p));
 }
 
-void BranchesWidget::onLocalHeaderClicked()
-{
-   const auto localAreVisible = mLocalBranchesTree->isVisible();
-   const auto icon = QIcon(localAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
-   mLocalBranchesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-   mLocalBranchesTree->setVisible(!localAreVisible);
-
-   GitQlientSettings settings(mGit->getGitDir());
-   settings.setLocalValue("LocalHeader", !localAreVisible);
-
-   emit panelsVisibilityChanged();
-}
-
-void BranchesWidget::onRemoteHeaderClicked()
-{
-   const auto remoteAreVisible = mRemoteBranchesTree->isVisible();
-   const auto icon = QIcon(remoteAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
-   mRemoteBranchesArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-   mRemoteBranchesTree->setVisible(!remoteAreVisible);
-
-   GitQlientSettings settings(mGit->getGitDir());
-   settings.setLocalValue("RemoteHeader", !remoteAreVisible);
-
-   emit panelsVisibilityChanged();
-}
-
 void BranchesWidget::onTagsHeaderClicked()
 {
    const auto tagsAreVisible = mTagsTree->isVisible();
@@ -1238,89 +1006,6 @@ void BranchesWidget::onStashSelected(const QString &stashId)
    const auto sha = git->getTagCommit(stashId).output;
 
    emit signalSelectCommit(sha);
-}
-
-void BranchesWidget::onSearchBranch()
-{
-   const auto lineEdit = qobject_cast<QLineEdit *>(sender());
-
-   const auto text = lineEdit->text();
-
-   if (mLastSearch != text)
-   {
-      mLastSearch = text;
-      mLastIndex = mLocalBranchesTree->focusOnBranch(mLastSearch);
-      mLastTreeSearched = mLocalBranchesTree;
-
-      if (mLastIndex == -1)
-      {
-         mLastIndex = mRemoteBranchesTree->focusOnBranch(mLastSearch);
-         mLastTreeSearched = mRemoteBranchesTree;
-
-         if (mLastIndex == -1)
-         {
-            mLastIndex = mTagsTree->focusOnBranch(mLastSearch);
-            mLastTreeSearched = mTagsTree;
-
-            if (mLastIndex == -1)
-               mLastTreeSearched = mLocalBranchesTree;
-         }
-      }
-   }
-   else
-   {
-      if (mLastTreeSearched == mLocalBranchesTree)
-      {
-         if (mLastIndex != -1)
-         {
-            mLastIndex = mLocalBranchesTree->focusOnBranch(mLastSearch, mLastIndex);
-            mLastTreeSearched = mLocalBranchesTree;
-         }
-
-         if (mLastIndex == -1)
-         {
-            mLastIndex = mRemoteBranchesTree->focusOnBranch(mLastSearch);
-            mLastTreeSearched = mRemoteBranchesTree;
-         }
-
-         if (mLastIndex == -1)
-         {
-            mLastIndex = mTagsTree->focusOnBranch(mLastSearch);
-            mLastTreeSearched = mTagsTree;
-         }
-      }
-      else if (mLastTreeSearched == mRemoteBranchesTree)
-      {
-         if (mLastIndex != -1)
-         {
-            mLastIndex = mRemoteBranchesTree->focusOnBranch(mLastSearch);
-            mLastTreeSearched = mRemoteBranchesTree;
-         }
-
-         if (mLastIndex == -1)
-         {
-            mLastIndex = mTagsTree->focusOnBranch(mLastSearch);
-            mLastTreeSearched = mTagsTree;
-         }
-
-         if (mLastIndex == -1)
-         {
-            mLastIndex = mLocalBranchesTree->focusOnBranch(mLastSearch, mLastIndex);
-            mLastTreeSearched = mLocalBranchesTree;
-         }
-      }
-      else if (mLastIndex != -1)
-      {
-         mLastIndex = mTagsTree->focusOnBranch(mLastSearch, mLastIndex);
-         mLastTreeSearched = mTagsTree;
-
-         if (mLastIndex == -1)
-         {
-            mLastIndex = mLocalBranchesTree->focusOnBranch(mLastSearch, mLastIndex);
-            mLastTreeSearched = mLocalBranchesTree;
-         }
-      }
-   }
 }
 
 QPair<QString, QString> BranchesWidget::getSubtreeData(const QString &prefix)

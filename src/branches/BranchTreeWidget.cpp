@@ -21,9 +21,12 @@ using namespace GitQlient;
 
 BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                    QWidget *parent)
-   : RefTreeWidget(parent)
-   , mCache(cache)
-   , mGit(git)
+   : BranchTreeWidget(parent)
+{
+   init(cache, git);
+}
+
+BranchTreeWidget::BranchTreeWidget(QWidget *parent)
 {
    installEventFilter(this);
 
@@ -35,6 +38,12 @@ BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitCache> &cache, const 
    const auto delAction = new QAction(this);
    delAction->setShortcut(Qt::Key_Delete);
    connect(delAction, &QAction::triggered, this, &BranchTreeWidget::onDeleteBranch);
+}
+
+void BranchTreeWidget::init(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git)
+{
+   mCache = cache;
+   mGit = git;
 }
 
 void BranchTreeWidget::reloadCurrentBranchLink() const

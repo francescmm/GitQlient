@@ -55,7 +55,7 @@ public:
     * @param key The key.
     * @param defaultValue (optional) A default value in case the key doesn't exist.
     */
-   QVariant globalValue(const QString &key, const QVariant &defaultValue = QVariant());
+   QVariant globalValue(const QString &key, const QVariant &defaultValue = QVariant()) const;
 
    /**
     * @brief setLocalValue Sets a value for a given @p repo with a @p key and @p value.
@@ -71,7 +71,7 @@ public:
     * @param key The key
     * @param defaultValue (optional) A default value in case the key doesn't exist.
     */
-   QVariant localValue(const QString &key, const QVariant &defaultValue = QVariant());
+   QVariant localValue(const QString &key, const QVariant &defaultValue = QVariant()) const;
 
    /*!
     \brief Stores that a project is opened. This is used to recalculate which projects are the most used.

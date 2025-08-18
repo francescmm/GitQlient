@@ -82,6 +82,11 @@ public:
    */
    explicit BranchTreeWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                              QWidget *parent = nullptr);
+
+   explicit BranchTreeWidget(QWidget *parent = nullptr);
+
+   void init(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git);
+
    /*!
     \brief Configures the widget to be the local branches widget.
 

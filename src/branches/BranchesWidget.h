@@ -38,6 +38,7 @@ class BranchesViewDelegate;
 class QTreeWidget;
 class QTreeWidgetItem;
 class RefTreeWidget;
+class RefWidget;
 
 /*!
  \brief BranchesWidget is the widget that creates the layout that contains all the widgets related with the display of
@@ -154,14 +155,8 @@ private:
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitTags> mGitTags;
-   QLabel *mLocalBranchesCount = nullptr;
-   QLabel *mLocalBranchesArrow = nullptr;
-   BranchTreeWidget *mLocalBranchesTree = nullptr;
-   BranchesViewDelegate *mLocalDelegate = nullptr;
-   QLabel *mRemoteBranchesCount = nullptr;
-   QLabel *mRemoteBranchesArrow = nullptr;
-   BranchTreeWidget *mRemoteBranchesTree = nullptr;
-   BranchesViewDelegate *mRemotesDelegate = nullptr;
+   RefWidget *mLocalFrame = nullptr;
+   RefWidget *mRemoteFrame = nullptr;
    BranchesViewDelegate *mTagsDelegate = nullptr;
    QLabel *mTagsCount = nullptr;
    QLabel *mTagsArrow = nullptr;
@@ -259,16 +254,6 @@ private:
    void showSubtreesContextMenu(const QPoint &p);
 
    /**
-    * @brief Expands or collapses the local branches list.
-    */
-   void onLocalHeaderClicked();
-
-   /**
-    * @brief Expands or collapses the remote branches list.
-    */
-   void onRemoteHeaderClicked();
-
-   /**
     * @brief Expands or collapses the tags list.
     */
    void onTagsHeaderClicked();
@@ -307,11 +292,6 @@ private:
     * @param stash The stash name.
     */
    void onStashSelected(const QString &stashId);
-
-   /**
-    * @brief onSearchBranch Searches for a branch in the children BranchTreeWidget.
-    */
-   void onSearchBranch();
 
    QPair<QString, QString> getSubtreeData(const QString &prefix);
 };

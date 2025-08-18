@@ -16,7 +16,7 @@ void GitQlientSettings::setGlobalValue(const QString &key, const QVariant &value
    globalSettings.sync();
 }
 
-QVariant GitQlientSettings::globalValue(const QString &key, const QVariant &defaultValue)
+QVariant GitQlientSettings::globalValue(const QString &key, const QVariant &defaultValue) const
 {
    return globalSettings.value(key, defaultValue);
 }
@@ -28,7 +28,7 @@ void GitQlientSettings::setLocalValue(const QString &key, const QVariant &value)
    localSettings.sync();
 }
 
-QVariant GitQlientSettings::localValue(const QString &key, const QVariant &defaultValue)
+QVariant GitQlientSettings::localValue(const QString &key, const QVariant &defaultValue) const
 {
    QSettings localSettings(mGitRepoPath + "/GitQlientConfig.ini", QSettings::IniFormat);
    return localSettings.value(key, defaultValue);
