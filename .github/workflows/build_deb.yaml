@@ -1,0 +1,91 @@
+name: Build
+on:
+  workflow_call:
+
+jobs:
+  Ubuntu:
+    name: ${{ matrix.config.name }}
+    strategy:
+      matrix:
+        config:
+        - {
+            name: "Ubuntu x86_64",
+            os: ubuntu-22.04,
+            platform: amd64
+          }
+        - {
+            name: "Ubuntu ARM64",
+            os: ubuntu-22.04-arm,
+            platform: arm64
+          }
+    runs-on: ${{ matrix.config.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checking out the code
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          fetch-depth: 0
+
+      - name: Install dependencies
+        id: vars
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get -qq install libxkbcommon-x11-0 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-* fakeroot
+          sudo apt-get -qq install qt6-base-dev qt6-tools-dev qmake6
+          sudo pip install git-archive-all
+          sudo qtchooser -install qt6 $(which qmake6)
+          export QT_SELECT=qt6
+
+      - name: Compile
+        run: |
+          mkdir build
+          qmake6 GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
+          make -j 4
+          make install
+
+      - name: Build DEB package
+        run: |
+          echo "Version: `git describe --always`" >> deb_pkg/DEBIAN/control
+          echo "Standards-Version: `git describe --always`" >> deb_pkg/DEBIAN/control
+          echo "Architecture: ${{ matrix.config.platform }}" >> deb_pkg/DEBIAN/control
+          mkdir -p deb_pkg/usr/bin
+          cp gitqlient deb_pkg/usr/bin/
+          mkdir -p deb_pkg/usr/share/applications
+          cp ./src/resources/gitqlient.desktop deb_pkg/usr/share/applications/gitqlient.desktop
+          mkdir -p deb_pkg/usr/share/icons/hicolor/scalable/apps
+          cp ./src/resources/icons/GitQlientLogo.svg deb_pkg/usr/share/icons/hicolor/scalable/apps/gitqlient.svg
+          mkdir -p deb_pkg/usr/share/icons/hicolor/16x16/apps/
+          cp ./src/resources/icons/GitQlientLogo16.png deb_pkg/usr/share/icons/hicolor/16x16/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/24x24/apps/
+          cp ./src/resources/icons/GitQlientLogo24.png deb_pkg/usr/share/icons/hicolor/24x24/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/32x32/apps/
+          cp ./src/resources/icons/GitQlientLogo32.png deb_pkg/usr/share/icons/hicolor/32x32/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/48x48/apps/
+          cp ./src/resources/icons/GitQlientLogo48.png deb_pkg/usr/share/icons/hicolor/48x48/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/64x64/apps/
+          cp ./src/resources/icons/GitQlientLogo64.png deb_pkg/usr/share/icons/hicolor/64x64/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/96x96/apps/
+          cp ./src/resources/icons/GitQlientLogo96.png deb_pkg/usr/share/icons/hicolor/96x96/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/128x128/apps/
+          cp ./src/resources/icons/GitQlientLogo128.png deb_pkg/usr/share/icons/hicolor/128x128/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/256x256/apps/
+          cp ./src/resources/icons/GitQlientLogo256.png deb_pkg/usr/share/icons/hicolor/256x256/apps/gitqlient.png
+          mkdir -p deb_pkg/usr/share/icons/hicolor/512x512/apps/
+          cp ./src/resources/icons/GitQlientLogo512.png deb_pkg/usr/share/icons/hicolor/512x512/apps/gitqlient.png
+          mv deb_pkg gitqlient-`git describe --always`-${{ matrix.config.platform }}
+          fakeroot dpkg-deb -v --build gitqlient-`git describe --always`-${{ matrix.config.platform }}
+
+      - name: Test install
+        run: |
+          sudo dpkg -i gitqlient-*.deb
+          sudo apt-get install -f
+
+      - name: Upload DEB package
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux_deb_${{ matrix.config.platform }}
+          path: |
+            gitqlient*.deb

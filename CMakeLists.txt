@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.29 FATAL_ERROR)
 
 set(PROJECT_NAME "GitQlient")
 
@@ -161,7 +161,7 @@ target_link_libraries(
 # Setting CPack variables
 
 set(CPACK_OUTPUT_FILE_PREFIX ${CMAKE_BINARY_DIR}/packages)
-set(CPACK_PACKAGE_CONTACT "francescmm@gmail.com")
+set(CPACK_PACKAGE_CONTACT "Francesc M. <francescmm@gmail.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "GitQlient is a multi-platform Git client written in C++ and Qt")
 set(CPACK_PACKAGE_EXECUTABLES "${PROJECT_NAME};${PROJECT_NAME}")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "${PROJECT_NAME}")
@@ -171,34 +171,112 @@ set(CPACK_PACKAGE_VERSION "${VERSION}")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE")
 set(CPACK_CREATE_DESKTOP_LINKS cmake-gui)
 
+
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install/usr/share)
    install(
        TARGETS ${PROJECT_NAME}
-       RUNTIME DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
-       BUNDLE DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
-       LIBRARY DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
+       RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/bin"
+       BUNDLE DESTINATION "${CMAKE_INSTALL_PREFIX}"
+       LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}"
    )
 
    target_link_options(${PROJECT_NAME} PUBLIC "-no-pie")
+
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/gitqlient.desktop
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/applications"
+   )
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo.svg
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/icons/hicolor/scalable/apps"
+      RENAME "gitqlient.svg"
+   )
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo16.png
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/icons/hicolor/16x16/apps"
+      RENAME "gitqlient.png"
+   )
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo24.png
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/icons/hicolor/24x24/apps"
+      RENAME "gitqlient.png"
+   )
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo32.png
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/icons/hicolor/32x32/apps"
+      RENAME "gitqlient.png"
+   )
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo48.png
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/icons/hicolor/48x48/apps"
+      RENAME "gitqlient.png"
+   )
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo64.png
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/icons/hicolor/64x64/apps"
+      RENAME "gitqlient.png"
+   )
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo96.png
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/icons/hicolor/96x96/apps"
+      RENAME "gitqlient.png"
+   )
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo128.png
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/icons/hicolor/128x128/apps"
+      RENAME "gitqlient"
+   )
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo256.png
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/icons/hicolor/256x256/apps"
+      RENAME "gitqlient.png"
+   )
+   install(
+      FILES ${CMAKE_SOURCE_DIR}/src/resources/icons/GitQlientLogo512.png
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/icons/hicolor/512x512/apps"
+      RENAME "gitqlient.png"
+   )
+
+   # DEB-specific configuration
+    set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Francesc M.")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6core6, libqt6widgets6, libqt6network6")
+    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/francescmm/GitQlient")
+    set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+    set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
+    set(CPACK_DEBIAN_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
+
+    # RPM-specific configuration
+    set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
+    set(CPACK_RPM_PACKAGE_LICENSE "LGPLv2.1+")
+    set(CPACK_RPM_PACKAGE_GROUP "Development/Tools")
+    set(CPACK_RPM_PACKAGE_REQUIRES "qt6-qtbase, qt6-qtbase-gui, qt6-qtbase-network")
+    set(CPACK_RPM_PACKAGE_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
+    set(CPACK_RPM_PACKAGE_RELOCATABLE OFF)
+
+    # Enable both generators
+     set(CPACK_GENERATOR "DEB;RPM")
+
+     include(CPack)
+
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
    install(
        TARGETS ${PROJECT_NAME}
-       RUNTIME DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
-       BUNDLE DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
-       LIBRARY DESTINATION "${CMAKE_CURRENT_SOURCE_DIR}"
+       RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}"
+       BUNDLE DESTINATION "${CMAKE_INSTALL_PREFIX}"
+       LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}"
    )
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
-
    include(InstallRequiredSystemLibraries)
 
-   install(TARGETS ${PROJECT_NAME}
+   set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/install)
+   install(
+       TARGETS ${PROJECT_NAME}
        RUNTIME DESTINATION .
-   )
-
-   install(DIRECTORY "$<TARGET_FILE_DIR:GitQlient>/deploy/"
-       DESTINATION .
-       FILES_MATCHING PATTERN "*"
+       BUNDLE DESTINATION "${CMAKE_INSTALL_PREFIX}"
+       LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}"
    )
 
    set(CPACK_GENERATOR "NSIS")

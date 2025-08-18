@@ -4,8 +4,7 @@ Priority: optional
 Homepage: https://github.com/francescmm/GitQlient
 Maintainer: Francesc M. <francescmm@gmail.com>
 Package: gitqlient
-Architecture: amd64
-Pre-Depends: git (>= 2.0.0), libqt5core5a (>= 5.12.0), libqt5gui5 (>= 5.12.0), libqt5widgets5 (>= 5.12.0), libqt5network5 (>= 5.12.0), libstdc++6 (>= 5), libgcc-s1 (>= 3.0)
+Pre-Depends: git (>= 2.0.0), qt6-base-dev (>= 6.2.0), qt6-tools-dev (>= 6.2.0), libqt6gui6 (>= 6.2.0), libqt6widgets6 (>= 6.2.0), libqt6network6 (>= 6.2.0), libstdc++6 (>= 5), libgcc-s1 (>= 3.0)
 Description: GitQlient os a multi-platform Git client written with Qt
  Some of the major feature you can find are:
  - Easy access to remote actions like: push, pull, submodules management and branches

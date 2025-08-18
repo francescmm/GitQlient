@@ -1,0 +1,68 @@
+name: Build
+on:
+  workflow_call:
+
+jobs:
+  Windows:
+    name: ${{ matrix.env.name }}
+    strategy:
+      matrix:
+        env:
+          - name: Windows
+            os: windows-2025
+    runs-on: ${{ matrix.env.os }}
+    steps:
+      - name: Checking out the code
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          fetch-depth: 0
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        timeout-minutes: 10
+        with:
+          version: 6.6.*
+          target: desktop
+          host: windows
+          install-deps: true
+          arch: win64_mingw
+          aqtversion: '==3.1.*'
+
+      - name: Install NSIS
+        shell: powershell
+        run: |
+          choco install nsis -y
+
+      - name: Store version
+        run: |
+          $version = git describe --always
+          echo "VERSION_TAG=$version" >> $env:GITHUB_ENV
+
+      - name: Generate project
+        run: |
+          cmake -S . -B build -G "MinGW Makefiles" -DVERSION="${{ env.VERSION_TAG }}" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Compile and deploy
+        run: |
+          cmake --build build --target GitQlient -j4
+          cmake --build build --target install
+
+      - name: Generate installer
+        run: |
+          windeployqt --release --dir build/install build/install/GitQlient.exe
+          cmake --build build --target package
+
+      # - name: Sign Executable
+      # run: |
+      #   $certPath = "cert.pfx"
+      #   [IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String("${{ secrets.SIGN_CERTIFICATE }}"))
+      #   & "C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe" sign /f "$certPath" /p "${{ secrets.SIGN_PASSWORD }}" /tr http://timestamp.digicert.com /td sha256 /fd sha256 "build\GitQlient.exe"
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: win
+          path: build/packages/GitQlient*.exe

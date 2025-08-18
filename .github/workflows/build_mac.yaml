@@ -1,0 +1,58 @@
+name: Build
+on:
+  workflow_call:
+
+jobs:
+  MacOS:
+    name: ${{ matrix.env.name }}
+    runs-on: ${{ matrix.env.os }}
+    strategy:
+      matrix:
+        env:
+          - name: MacOS
+            os: macos-latest
+            qtplatform: mac
+    steps:
+      - name: Checking out the code
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+          fetch-depth: 0
+
+      - name: Installing Qt
+        uses: jurplel/install-qt-action@v3
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        timeout-minutes: 10
+        with:
+          version: 6.6.*
+          target: desktop
+          host: mac
+          install-deps: true
+          aqtversion: '==3.1.*'
+
+      - name: Installing dependencies
+        id: vars
+        run: |
+          brew install glew
+          brew install create-dmg
+          brew uninstall --force --ignore-dependencies java
+
+      - name: Generate project
+        run: |
+          cmake -S . -B build -G "Ninja" -DVERSION="`git describe --always`" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Compile and deploy
+        run: |
+          cmake --build build --target GitQlient -j4
+
+      - name: Build DMG
+        run: |
+          macdeployqt build/*.app
+          /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "src/resources/icon.icns" --background "src/resources/dmg_bg.png" --icon "GitQlient.app" 125 220 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient-`git describe --always`-arm64.dmg" "build/GitQlient.app"
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: GitQlient-*.dmg

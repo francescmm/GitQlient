@@ -1,0 +1,87 @@
+name: Build
+on:
+  workflow_call:
+
+jobs:
+  Fedora:
+    name: Fedora
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        fedora_version: [ '41', '42', '43' ]
+    container:
+      image: fedora:${{matrix.fedora_version}}
+    steps:
+      - name: Update repositories
+        run: dnf -y update
+      - name: Upgrade packages
+        run: dnf -y upgrade
+      - name: Install dependencies
+        run: >
+            dnf -y install --skip-unavailable
+            @development-tools
+            which
+            git
+            glibc
+            gcc-c++
+            rpmdevtools
+            make
+            cmake
+            pkgconfig
+            glib
+            man
+            tar
+            gettext
+            openssh
+            rsync
+            boost-devel
+            sqlite-devel
+            alsa-lib-devel
+            pulseaudio-libs-devel
+            libnotify-devel
+            libicu-devel
+            qt6-qtbase-devel
+            qt6-qtbase-private-devel
+            qt6-qttools-devel
+            gstreamer1-devel
+            gstreamer1-plugins-base-devel
+            taglib-devel
+            libcdio-devel
+            libgpod-devel
+            libmtp-devel
+            libchromaprint-devel
+            libebur128-devel
+            fftw-devel
+            desktop-file-utils
+            libappstream-glib
+            hicolor-icon-theme
+            kdsingleapplication-qt6-devel
+            ninja-build
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Add safe git directory
+        run: git config --global --add safe.directory ${GITHUB_WORKSPACE}
+
+      - name: Generate project
+        run: |
+          cmake -S . -B build -G "Ninja" -DVERSION=`git describe --always` -DCMAKE_BUILD_TYPE=Release
+
+      - name: Compile and deploy
+        run: |
+          cmake --build build --target GitQlient -j4
+          cmake --build build --target install
+          cmake --build build --target package
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: fedora-${{matrix.fedora_version}}
+          path: |
+            build/packages/*.rpm
+            build/packages/*.rpm

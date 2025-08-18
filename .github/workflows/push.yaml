@@ -39,7 +39,6 @@ jobs:
 
   BuildProject:
     needs: [Clean, CancelPrevious]
-    name: Build 🧱
     uses: ./.github/workflows/build.yaml
     secrets: inherit
     permissions:

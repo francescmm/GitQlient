@@ -3,7 +3,6 @@ on:
   workflow_call:
 
 jobs:
-
   Tarball:
     name: Generate tarball
     runs-on: ubuntu-latest
@@ -25,370 +24,50 @@ jobs:
           name: tarball
           path: gitqlient-*.tar.gz
 
-
-  Ubuntu:
-    name: ${{ matrix.config.name }}
+  BuildDeb:
     needs: [Tarball]
-    strategy:
-      matrix:
-        config:
-        - {
-            name: "Ubuntu x86_64",
-            os: ubuntu-22.04,
-            platform: x86_64
-          }
-        - {
-            name: "Ubuntu ARM64",
-            os: ubuntu-22.04-arm,
-            platform: arm64
-          }
-    runs-on: ${{ matrix.config.os }}
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checking out the code
-        uses: actions/checkout@v4
-        with:
-          submodules: 'true'
-          fetch-depth: 0
+    uses: ./.github/workflows/build_deb.yaml
+    secrets: inherit
+    permissions:
+      actions: write
+      contents: read
 
-      - name: Install dependencies
-        id: vars
-        run: |
-          sudo apt-get -qq update
-          sudo apt-get -qq install libxkbcommon-x11-0 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-* fakeroot
-          sudo apt-get -qq install qt6-base-dev qt6-tools-dev qmake6
-          sudo pip install git-archive-all
-          sudo qtchooser -install qt6 $(which qmake6)
-          export QT_SELECT=qt6
-
-      - name: Compile
-        run: |
-          mkdir build
-          qmake6 GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
-          make -j 4
-          make install
-
-      - name: Download tarball
-        uses: actions/download-artifact@v4
-        with:
-          name: tarball
-          path: |
-            gitqlient-*.tar.gz
-
-      - name: Build DEB package
-        run: |
-          echo "Version: `git describe --always`" >> deb_pkg/DEBIAN/control
-          echo "Standards-Version: `git describe --always`" >> deb_pkg/DEBIAN/control
-          mkdir -p deb_pkg/usr/bin
-          cp gitqlient deb_pkg/usr/bin/
-          mkdir -p deb_pkg/usr/share/icons/hicolor/scalable/apps
-          cp ./src/resources/icons/GitQlientLogo.svg deb_pkg/usr/share/icons/hicolor/scalable/apps/gitqlient.svg
-          mkdir -p deb_pkg/usr/share/icons/hicolor/16x16/apps/
-          cp ./src/resources/icons/GitQlientLogo16.png deb_pkg/usr/share/icons/hicolor/16x16/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/24x24/apps/
-          cp ./src/resources/icons/GitQlientLogo24.png deb_pkg/usr/share/icons/hicolor/24x24/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/32x32/apps/
-          cp ./src/resources/icons/GitQlientLogo32.png deb_pkg/usr/share/icons/hicolor/32x32/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/48x48/apps/
-          cp ./src/resources/icons/GitQlientLogo48.png deb_pkg/usr/share/icons/hicolor/48x48/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/64x64/apps/
-          cp ./src/resources/icons/GitQlientLogo64.png deb_pkg/usr/share/icons/hicolor/64x64/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/96x96/apps/
-          cp ./src/resources/icons/GitQlientLogo96.png deb_pkg/usr/share/icons/hicolor/96x96/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/128x128/apps/
-          cp ./src/resources/icons/GitQlientLogo128.png deb_pkg/usr/share/icons/hicolor/128x128/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/256x256/apps/
-          cp ./src/resources/icons/GitQlientLogo256.png deb_pkg/usr/share/icons/hicolor/256x256/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/512x512/apps/
-          cp ./src/resources/icons/GitQlientLogo512.png deb_pkg/usr/share/icons/hicolor/512x512/apps/gitqlient.png
-          mv deb_pkg gitqlient-`git describe --always`-${{ matrix.config.platform }}
-          fakeroot dpkg-deb -v --build gitqlient-`git describe --always`-${{ matrix.config.platform }}
-
-      - name: Upload DEB package
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux_deb_${{ matrix.config.platform }}
-          path: |
-            gitqlient*.deb
-
-#  Fedora:
-#    name: Fedora
-#    runs-on: ubuntu-latest
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        fedora_version: [ '39', '40', '41' ]
-#    container:
-#      image: fedora:${{matrix.fedora_version}}
-#    steps:
-#      - name: Update repositories
-#        run: dnf -y update
-#      - name: Upgrade packages
-#        run: dnf -y upgrade
-#      - name: Install dependencies
-#        run: >
-#            dnf -y install
-#            @development-tools
-#            redhat-lsb-core
-#            which
-#            git
-#            glibc
-#            gcc-c++
-#            rpmdevtools
-#            make
-#            cmake
-#            pkgconfig
-#            glib
-#            man
-#            tar
-#            gettext
-#            openssh
-#            rsync
-#            boost-devel
-#            sqlite-devel
-#            alsa-lib-devel
-#            pulseaudio-libs-devel
-#            libnotify-devel
-#            libicu-devel
-#            qt6-qtbase-devel
-#            qt6-qtbase-private-devel
-#            qt6-qttools-devel
-#            gstreamer1-devel
-#            gstreamer1-plugins-base-devel
-#            taglib-devel
-#            libcdio-devel
-#            libgpod-devel
-#            libmtp-devel
-#            libchromaprint-devel
-#            libebur128-devel
-#            fftw-devel
-#            desktop-file-utils
-#            libappstream-glib
-#            hicolor-icon-theme
-#            kdsingleapplication-qt6-devel
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0
-#          submodules: recursive
-#      - name: Add safe git directory
-#        run: git config --global --add safe.directory ${GITHUB_WORKSPACE}
-#      - name: Compile
-#        run: |
-#          mkdir build
-#          qmake GitQlient.pro CONFIG+=_LIBCPP_DISABLE_AVAILABILITY VERSION=`git describe --always`
-#          make -j 4
-#          make install
-#      - name: Download tarball
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: tarball
-#          path: |
-#            gitqlient_`git describe --always`.tar.gz
-#      - name: Create RPM build sources directories
-#        working-directory: build
-#        run: mkdir -p rpmbuild/SOURCES /usr/src/packages/SOURCES
-#      - name: Copy source tarball
-#        run: mv gitqlient_`git describe --always`.tar.gz build/rpmbuild/SOURCES/
-#      - name: Build RPM
-#        env:
-#          RPM_BUILD_NCPUS: "2"
-#        working-directory: build
-#        run: rpmbuild -ba ../contrib/rpm/gitqlient.spec
-#      - name: Upload artifacts
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: fedora-${{matrix.fedora_version}}
-#          path: |
-#            rpmbuild/SRPMS/*.rpm
-#            rpmbuild/RPMS/x86_64/*.rpm
-
-  Windows:
-    name: ${{ matrix.env.name }}
+  BuildRpm:
     needs: [Tarball]
-    strategy:
-      matrix:
-        env:
-          - name: Windows
-            os: windows-2025
-    runs-on: ${{ matrix.env.os }}
-    steps:
-      - name: Checking out the code
-        uses: actions/checkout@v4
-        with:
-          submodules: 'true'
-          fetch-depth: 0
+    uses: ./.github/workflows/build_rpm.yaml
+    secrets: inherit
+    permissions:
+      actions: write
+      contents: read
 
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v3
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        timeout-minutes: 10
-        with:
-          version: 6.6.*
-          target: desktop
-          host: windows
-          install-deps: true
-          arch: win64_mingw
-          aqtversion: '==3.1.*'
-
-      - name: Install NSIS
-        shell: powershell
-        run: |
-          choco install nsis -y
-
-      - name: Store version
-        run: |
-          $version = git describe --always
-          echo "VERSION_TAG=$version" >> $env:GITHUB_ENV
-
-      - name: Generate project
-        run: |
-          cmake -S . -B build -G "MinGW Makefiles" -DVERSION="${{ env.VERSION_TAG }}"
-
-      - name: Compile and deploy
-        run: |
-          cmake --build build --target GitQlient -j4
-          mkdir build/deploy
-          windeployqt --release --dir build/deploy build/GitQlient.exe
-
-      - name: Generate installer
-        run: |
-          cmake --build build --target install
-          cmake --build build --target package
-
-      # - name: Sign Executable
-      # run: |
-      #   $certPath = "cert.pfx"
-      #   [IO.File]::WriteAllBytes($certPath, [Convert]::FromBase64String("${{ secrets.SIGN_CERTIFICATE }}"))
-      #   & "C:\Program Files (x86)\Windows Kits\10\bin\x64\signtool.exe" sign /f "$certPath" /p "${{ secrets.SIGN_PASSWORD }}" /tr http://timestamp.digicert.com /td sha256 /fd sha256 "build\GitQlient.exe"
-
-      - name: Upload installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: win
-          path: build/packages/GitQlient*.exe
-
-  MacOS:
-    name: ${{ matrix.env.name }}
+  BuildWin:
     needs: [Tarball]
-    runs-on: ${{ matrix.env.os }}
-    strategy:
-      matrix:
-        env:
-          - name: MacOS
-            os: macos-latest
-            qtplatform: mac
-    steps:
-      - name: Checking out the code
-        uses: actions/checkout@v4
-        with:
-          submodules: 'true'
-          fetch-depth: 0
+    uses: ./.github/workflows/build_win.yaml
+    secrets: inherit
+    permissions:
+      actions: write
+      contents: read
 
-      - name: Installing Qt
-        uses: jurplel/install-qt-action@v3
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        timeout-minutes: 10
-        with:
-          version: 6.6.*
-          target: desktop
-          host: mac
-          install-deps: true
-          aqtversion: '==3.1.*'
-
-      - name: Installing dependencies
-        id: vars
-        run: |
-          brew install glew
-          brew install create-dmg
-          brew uninstall --force --ignore-dependencies java
-
-      - name: Generate project
-        run: |
-          cmake -S . -B build -G "Ninja" -DVERSION="`git describe --always`"
-
-      - name: Compile and deploy
-        run: |
-          cmake --build build --target GitQlient -j4
-
-      - name: Build DMG
-        run: |
-          macdeployqt build/*.app
-          /opt/homebrew/bin/create-dmg --volname "GitQlient" --volicon "src/resources/icon.icns" --background "src/resources/dmg_bg.png" --icon "GitQlient.app" 125 220 --icon-size 100 --window-size 600 450 --app-drop-link 475 220 "GitQlient-`git describe --always`-arm64.dmg" "build/GitQlient.app"
-
-      - name: Upload DMG
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos
-          path: GitQlient-*.dmg
-
-  Appimage:
-    name: AppImage
+  BuildMac:
     needs: [Tarball]
-    strategy:
-      matrix:
-        os: [ubuntu-22.04]
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - name: Checking out the code
-        uses: actions/checkout@v4
-        with:
-          submodules: 'true'
-          fetch-depth: 0
+    uses: ./.github/workflows/build_mac.yaml
+    secrets: inherit
+    permissions:
+      actions: write
+      contents: read
 
-      - name: Install dependencies
-        id: vars
-        run: |
-          sudo apt-get -qq update
-          sudo apt-get -qq install libxkbcommon-x11-0 libc6-i386 build-essential libgl1-mesa-dev mesa-common-dev libgles2-mesa-dev libxkbcommon-x11-0 libxcb-icccm4-dev libxcb-xinerama0 libxcb-image0 libxcb-keysyms1 libxcb-* fakeroot
-          sudo apt-get install libfuse2
-          sudo pip install git-archive-all
-
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v3
-        env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        timeout-minutes: 10
-        with:
-          version: 6.6.*
-          target: desktop
-          host: linux
-          install-deps: true
-          aqtversion: '==3.1.*'
-
-      - name: Compile
-        run: |
-          qmake -v
-          mkdir build
-          qmake GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
-          make -j 4
-          make install
-
-      - name: Build AppImage
-        run: |
-          export VERSION=`git describe --always`
-          wget -q -O linuxdeployqt https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
-          chmod +x linuxdeployqt
-          ./linuxdeployqt AppImage/gitqlient/usr/share/applications/*.desktop -appimage -no-translations -extra-plugins=iconengines,imageformats
-          chmod +x GitQlient-*
-
-      - name: Upload AppImage
-        uses: actions/upload-artifact@v4
-        with:
-          name: appimage
-          path: GitQlient-*.AppImage
+  BuildAppImage:
+    needs: [Tarball]
+    uses: ./.github/workflows/build_appimg.yaml
+    secrets: inherit
+    permissions:
+      actions: write
+      contents: read
 
   UpdateAssets:
     name: Release new binaries
     if: github.repository_owner == 'francescmm'
-    needs: [Ubuntu, Windows, MacOS, Appimage]
+    needs: [BuildDeb, BuildWin, BuildMac, BuildAppImage]
     runs-on: ubuntu-latest
     steps:
       - name: Checking out the code
@@ -440,19 +119,3 @@ jobs:
             tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
             win/GitQlient*.exe
-
-  # PostBuildClean:
-  #   name: Post-release actions
-  #   runs-on: ubuntu-latest
-  #   if: always()
-  #   needs: [UpdateAssets]
-  #   steps:
-  #     - name: Clean artifacts
-  #       uses: geekyeggo/delete-artifact@v5
-  #       with:
-  #         name: |
-  #           appimage
-  #           linux
-  #           tarball
-  #           macos
-  #           win
