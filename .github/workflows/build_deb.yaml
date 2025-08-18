@@ -38,49 +38,26 @@ jobs:
           sudo pip install git-archive-all
           sudo qtchooser -install qt6 $(which qmake6)
           export QT_SELECT=qt6
+          QT6_CONFIG_PATH=$(dpkg -L qt6-base-dev | grep 'Qt6Config.cmake' | head -n1)
+          QT6_DIR=$(dirname "$QT6_CONFIG_PATH")
+          echo "Qt6_DIR=$QT6_DIR" >> "$GITHUB_ENV"
 
-      - name: Compile
+      - name: Generate project
         run: |
-          mkdir build
-          qmake6 GitQlient.pro PREFIX=$(pwd)/AppImage/gitqlient/usr VERSION=`git describe --always`
-          make -j 4
-          make install
+          cmake -S . -B build -G "Unix Makefiles" -DVERSION="${{ env.VERSION_TAG }}" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$Qt6_DIR
+
+      - name: Compile and deploy
+        run: |
+          cmake --build build --target GitQlient -j4
+          cmake --build build --target install
 
       - name: Build DEB package
         run: |
-          echo "Version: `git describe --always`" >> deb_pkg/DEBIAN/control
-          echo "Standards-Version: `git describe --always`" >> deb_pkg/DEBIAN/control
-          echo "Architecture: ${{ matrix.config.platform }}" >> deb_pkg/DEBIAN/control
-          mkdir -p deb_pkg/usr/bin
-          cp gitqlient deb_pkg/usr/bin/
-          mkdir -p deb_pkg/usr/share/applications
-          cp ./src/resources/gitqlient.desktop deb_pkg/usr/share/applications/gitqlient.desktop
-          mkdir -p deb_pkg/usr/share/icons/hicolor/scalable/apps
-          cp ./src/resources/icons/GitQlientLogo.svg deb_pkg/usr/share/icons/hicolor/scalable/apps/gitqlient.svg
-          mkdir -p deb_pkg/usr/share/icons/hicolor/16x16/apps/
-          cp ./src/resources/icons/GitQlientLogo16.png deb_pkg/usr/share/icons/hicolor/16x16/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/24x24/apps/
-          cp ./src/resources/icons/GitQlientLogo24.png deb_pkg/usr/share/icons/hicolor/24x24/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/32x32/apps/
-          cp ./src/resources/icons/GitQlientLogo32.png deb_pkg/usr/share/icons/hicolor/32x32/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/48x48/apps/
-          cp ./src/resources/icons/GitQlientLogo48.png deb_pkg/usr/share/icons/hicolor/48x48/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/64x64/apps/
-          cp ./src/resources/icons/GitQlientLogo64.png deb_pkg/usr/share/icons/hicolor/64x64/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/96x96/apps/
-          cp ./src/resources/icons/GitQlientLogo96.png deb_pkg/usr/share/icons/hicolor/96x96/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/128x128/apps/
-          cp ./src/resources/icons/GitQlientLogo128.png deb_pkg/usr/share/icons/hicolor/128x128/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/256x256/apps/
-          cp ./src/resources/icons/GitQlientLogo256.png deb_pkg/usr/share/icons/hicolor/256x256/apps/gitqlient.png
-          mkdir -p deb_pkg/usr/share/icons/hicolor/512x512/apps/
-          cp ./src/resources/icons/GitQlientLogo512.png deb_pkg/usr/share/icons/hicolor/512x512/apps/gitqlient.png
-          mv deb_pkg gitqlient-`git describe --always`-${{ matrix.config.platform }}
-          fakeroot dpkg-deb -v --build gitqlient-`git describe --always`-${{ matrix.config.platform }}
+          cmake --build build --target package
 
       - name: Test install
         run: |
-          sudo dpkg -i gitqlient-*.deb
+          sudo dpkg -i build/packages/gitqlient*.deb
           sudo apt-get install -f
 
       - name: Upload DEB package
@@ -88,4 +65,4 @@ jobs:
         with:
           name: linux_deb_${{ matrix.config.platform }}
           path: |
-            gitqlient*.deb
+            build/packages/gitqlient*.deb
