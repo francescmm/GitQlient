@@ -84,4 +84,3 @@ jobs:
           name: fedora-${{matrix.fedora_version}}
           path: |
             build/packages/*.rpm
-            build/packages/*.rpm
