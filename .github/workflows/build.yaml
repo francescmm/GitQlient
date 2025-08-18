@@ -100,8 +100,7 @@ jobs:
           draft: false
           files: |
             appimage/GitQlient*.AppImage
-            linux_deb_arm64/gitqlient*.deb
-            linux_deb_x86_64/gitqlient*.deb
+            linux_deb*/gitqlient*.deb
             tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
             win/GitQlient*.exe
@@ -115,8 +114,7 @@ jobs:
         with:
           files: |
             appimage/GitQlient*.AppImage
-            linux_deb_arm64/gitqlient*.deb
-            linux_deb_x86_64/gitqlient*.deb
+            linux_deb*/gitqlient*.deb
             tarball/gitqlient*.tar.gz
             macos/GitQlient*.dmg
             win/GitQlient*.exe
