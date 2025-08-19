@@ -14,6 +14,24 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="mainLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="horizontalSpacing">
+    <number>0</number>
+   </property>
+   <property name="verticalSpacing">
+    <number>5</number>
+   </property>
    <item row="6" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
@@ -580,7 +598,7 @@
             <x>0</x>
             <y>0</y>
             <width>420</width>
-            <height>781</height>
+            <height>800</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">

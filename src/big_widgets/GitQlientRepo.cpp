@@ -69,14 +69,10 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    mMergeWidget = new MergeWidget(mGitQlientCache, mGitBase, this);
    mMergeWidget->setContentsMargins(QMargins(5, 5, 5, 5));
 
-   mConfigWidget = new ConfigWidget(mGitBase, this);
-   mConfigWidget->setContentsMargins(QMargins(5, 5, 5, 5));
-
    mIndexMap[ControlsMainViews::History] = mStackedLayout->addWidget(mHistoryWidget);
    mIndexMap[ControlsMainViews::Diff] = mStackedLayout->addWidget(mDiffWidget);
    mIndexMap[ControlsMainViews::Blame] = mStackedLayout->addWidget(mBlameWidget);
    mIndexMap[ControlsMainViews::Merge] = mStackedLayout->addWidget(mMergeWidget);
-   mIndexMap[ControlsMainViews::Config] = mStackedLayout->addWidget(mConfigWidget);
 
    mControls = new Controls(mGitQlientCache, mGitBase, this);
 
@@ -101,21 +97,23 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mControls, &Controls::requestFullReload, this, &GitQlientRepo::fullReload);
    connect(mControls, &Controls::requestFullReload, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mControls, &Controls::requestReferencesReload, this, &GitQlientRepo::referencesReload);
-
    connect(mControls, &Controls::signalGoMerge, this, &GitQlientRepo::showMergeView);
-   connect(mControls, &Controls::signalGoServer, this, &GitQlientRepo::showGitServerView);
-   connect(mControls, &Controls::signalGoBuildSystem, this, &GitQlientRepo::showBuildSystemView);
-   connect(mControls, &Controls::goConfig, this, &GitQlientRepo::showConfig);
+   connect(mControls, &Controls::autoFetchIntervalChanged, this, &GitQlientRepo::reconfigureAutoFetch);
+   connect(mControls, &Controls::autoRefreshIntervalChanged, this, &GitQlientRepo::reconfigureAutoRefresh);
    connect(mControls, &Controls::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mControls, &Controls::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
+   connect(mControls, &Controls::commitTitleMaxLenghtChanged, mHistoryWidget,
+           &HistoryWidget::onCommitTitleMaxLenghtChanged);
+   connect(mControls, &Controls::panelsVisibilityChanged, mHistoryWidget,
+           &HistoryWidget::onPanelsVisibilityChanged);
+   connect(mControls, &Controls::reloadDiffFont, mHistoryWidget, &HistoryWidget::onDiffFontSizeChanged);
+   connect(mControls, &Controls::moveLogsAndClose, this, &GitQlientRepo::moveLogsAndClose);
 
    connect(mHistoryWidget, &HistoryWidget::signalAllBranchesActive, mGitLoader.data(), &GitRepoLoader::setShowAll);
    connect(mHistoryWidget, &HistoryWidget::fullReload, this, &GitQlientRepo::fullReload);
    connect(mHistoryWidget, &HistoryWidget::referencesReload, this, &GitQlientRepo::referencesReload);
    connect(mHistoryWidget, &HistoryWidget::logReload, this, &GitQlientRepo::logReload);
 
-   connect(mHistoryWidget, &HistoryWidget::panelsVisibilityChanged, mConfigWidget,
-           &ConfigWidget::onPanelsVisibilityChanged);
    connect(mHistoryWidget, &HistoryWidget::signalOpenSubmodule, this, &GitQlientRepo::signalOpenSubmodule);
    connect(mHistoryWidget, &HistoryWidget::signalShowDiff, this, &GitQlientRepo::loadFileDiff);
    connect(mHistoryWidget, &HistoryWidget::signalOpenDiff, this, &GitQlientRepo::openCommitDiff);
@@ -141,17 +139,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, this, &GitQlientRepo::showHistoryView);
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, mGitLoader.data(), &GitRepoLoader::loadAll);
    connect(mMergeWidget, &MergeWidget::signalMergeFinished, mControls, &Controls::disableMergeWarning);
-
-   connect(mConfigWidget, &ConfigWidget::commitTitleMaxLenghtChanged, mHistoryWidget,
-           &HistoryWidget::onCommitTitleMaxLenghtChanged);
-   connect(mConfigWidget, &ConfigWidget::panelsVisibilityChanged, mHistoryWidget,
-           &HistoryWidget::onPanelsVisibilityChanged);
-   connect(mConfigWidget, &ConfigWidget::reloadDiffFont, mHistoryWidget, &HistoryWidget::onDiffFontSizeChanged);
-   connect(mConfigWidget, &ConfigWidget::moveLogsAndClose, this, &GitQlientRepo::moveLogsAndClose);
-   connect(mConfigWidget, &ConfigWidget::autoFetchChanged, this, &GitQlientRepo::reconfigureAutoFetch);
-   connect(mConfigWidget, &ConfigWidget::autoRefreshChanged, this, &GitQlientRepo::reconfigureAutoFetch);
-   connect(mConfigWidget, &ConfigWidget::buildSystemEnabled, this, &GitQlientRepo::buildSystemActivationToggled);
-   connect(mConfigWidget, &ConfigWidget::gitServerEnabled, this, &GitQlientRepo::gitServerActivationToggled);
 
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingStarted, this, &GitQlientRepo::createProgressDialog);
    connect(mGitLoader.data(), &GitRepoLoader::signalLoadingFinished, this, &GitQlientRepo::onRepoLoadFinished);
@@ -416,38 +403,6 @@ void GitQlientRepo::showPullConflict()
 void GitQlientRepo::showMergeView()
 {
    mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Merge]);
-}
-
-bool GitQlientRepo::configureGitServer() const
-{
-   return false;
-}
-
-void GitQlientRepo::showGitServerView()
-{
-}
-
-void GitQlientRepo::showGitServerPrView(int)
-{
-}
-
-void GitQlientRepo::showBuildSystemView()
-{
-}
-
-void GitQlientRepo::buildSystemActivationToggled(bool enabled)
-{
-   mControls->enableJenkins(enabled);
-}
-
-void GitQlientRepo::gitServerActivationToggled(bool enabled)
-{
-   mControls->enableGitServer(enabled);
-}
-
-void GitQlientRepo::showConfig()
-{
-   mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Config]);
 }
 
 void GitQlientRepo::showPreviousView()

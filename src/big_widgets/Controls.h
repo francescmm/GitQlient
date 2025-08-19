@@ -24,6 +24,7 @@
  ***************************************************************************************/
 
 #include <QFrame>
+#include <QPointer>
 
 class QToolButton;
 class QPushButton;
@@ -45,9 +46,6 @@ enum class ControlsMainViews
    Diff,
    Blame,
    Merge,
-   GitServer,
-   BuildSystem,
-   Config
 };
 
 /*!
@@ -99,6 +97,12 @@ signals:
     * @brief goConfig Signal triggered when the user selected the config view.
     */
    void goConfig();
+   void autoFetchIntervalChanged(int interval);
+   void autoRefreshIntervalChanged(int interval);
+   void commitTitleMaxLenghtChanged();
+   void panelsVisibilityChanged();
+   void reloadDiffFont();
+   void moveLogsAndClose();
 
    void goPlugins();
 
@@ -175,8 +179,6 @@ private:
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;
    QFrame *mLastSeparator = nullptr;
-   QFrame *mPluginsSeparator = nullptr;
-   bool mGoGitServerView = false;
 
    QToolButton *createToolButton(const QString &iconPath, const QString &tooltip,
                                  const QKeySequence &shortcut = QKeySequence());
@@ -211,4 +213,5 @@ private:
    void configBuildSystemButton();
 
    bool eventFilter(QObject *obj, QEvent *event);
+   void showConfigDialog();
 };

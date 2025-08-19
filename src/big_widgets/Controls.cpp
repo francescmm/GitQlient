@@ -1,6 +1,7 @@
 #include "Controls.h"
 
 #include <BranchDlg.h>
+#include <ConfigWidget.h>
 #include <GitBase.h>
 #include <GitCache.h>
 #include <GitConfig.h>
@@ -155,8 +156,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::requestFullReload);
    connect(mMergeWarning, &QPushButton::clicked, this, &Controls::signalGoMerge);
    connect(mVersionCheck, &QToolButton::clicked, mUpdater, &GitQlientUpdater::showInfoMessage);
-   connect(mConfigBtn, &QToolButton::clicked, this, &Controls::goConfig);
-   connect(mBuildSystem, &QToolButton::clicked, this, &Controls::signalGoBuildSystem);
+   connect(mConfigBtn, &QToolButton::clicked, this, &Controls::showConfigDialog);
 
    enableButtons(false);
 }
@@ -216,14 +216,13 @@ void Controls::stashPop()
    {
       QLog_Debug("Controls", "Stash pop successful");
 
-      // Check if there were merge conflicts during pop
       if (ret.output.contains("CONFLICT", Qt::CaseInsensitive))
       {
          QMessageBox::warning(this, tr("Stash pop conflicts"),
                               tr("There were merge conflicts when applying the stash. "
                                  "Please resolve them manually."),
                               QMessageBox::Ok);
-         emit signalPullConflict(); // Reuse the existing conflict signal
+         emit signalPullConflict();
       }
 
       emit requestFullReload();
@@ -464,4 +463,44 @@ bool Controls::eventFilter(QObject *obj, QEvent *event)
    }
 
    return false;
+}
+
+void Controls::showConfigDialog()
+{
+   if (mConfigDialog && mConfigDialog->isVisible())
+   {
+      mConfigDialog->raise();
+      mConfigDialog->activateWindow();
+      return;
+   }
+
+   mConfigDialog = new QDialog(this);
+   mConfigDialog->setWindowTitle(tr("Repository Configuration"));
+   mConfigDialog->setAttribute(Qt::WA_DeleteOnClose);
+   mConfigDialog->setModal(false);
+   mConfigDialog->resize(800, 600);
+
+   auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok, mConfigDialog);
+   buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Accept"));
+   connect(buttonBox, &QDialogButtonBox::accepted, mConfigDialog, &QDialog::accept);
+
+   auto configWidget = new ConfigWidget(mGit, mConfigDialog);
+
+   auto layout = new QVBoxLayout(mConfigDialog);
+   layout->setContentsMargins(QMargins(10, 10, 10, 10));
+   layout->addWidget(configWidget);
+   layout->addWidget(buttonBox);
+
+   connect(configWidget, &ConfigWidget::reloadDiffFont, this, &Controls::requestFullReload);
+   connect(configWidget, &ConfigWidget::autoFetchChanged, this, &Controls::autoFetchIntervalChanged);
+   connect(configWidget, &ConfigWidget::autoRefreshChanged, this, &Controls::autoRefreshIntervalChanged);
+   connect(configWidget, &ConfigWidget::autoRefreshChanged, this, &Controls::commitTitleMaxLenghtChanged);
+   connect(configWidget, &ConfigWidget::panelsVisibilityChanged, this, &Controls::panelsVisibilityChanged);
+   connect(configWidget, &ConfigWidget::moveLogsAndClose, this, [this]() {
+      emit moveLogsAndClose();
+      if (mConfigDialog)
+         mConfigDialog->close();
+   });
+
+   mConfigDialog->show();
 }

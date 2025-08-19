@@ -162,10 +162,6 @@ private:
    DiffWidget *mDiffWidget = nullptr;
    BlameWidget *mBlameWidget = nullptr;
    MergeWidget *mMergeWidget = nullptr;
-   IGitServerWidget *mGitServerWidget = nullptr;
-   IJenkinsWidget *mJenkins = nullptr;
-   ConfigWidget *mConfigWidget = nullptr;
-   QMap<QString, QObject *> mPlugins;
    QTimer *mAutoFetch = nullptr;
    QTimer *mAutoFilesUpdate = nullptr;
    QTimer *mAutoPrUpdater = nullptr;
@@ -269,31 +265,6 @@ private:
     \brief Shows the merge view.
    */
    void showMergeView();
-
-   bool configureGitServer() const;
-
-   /**
-    * @brief showGitServerView Shows the configured git server view.
-    */
-   void showGitServerView();
-
-   /**
-    * @brief showGitServerPrView Shows the configured git server view opening the details of the pull request identified
-    * by the given @p prNumber.
-    * @param prNumber The pull request number to show the details.
-    */
-   void showGitServerPrView(int prNumber);
-
-   /**
-    * @brief showBuildSystemView Shows the build system view.
-    */
-   void showBuildSystemView();
-
-   void buildSystemActivationToggled(bool enabled);
-
-   void gitServerActivationToggled(bool enabled);
-
-   void showConfig();
 
    /*!
     \brief Opens the previous view. This method is used when the diff view is closed and GitQlientRepo must return to
