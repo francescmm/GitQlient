@@ -26,7 +26,7 @@ signals:
    void clearSelection();
 
 public:
-   explicit RefWidget(const QString &header, const QString& settingsKey, const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
+   explicit RefWidget(const QString &header, const QString &settingsKey, const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent = nullptr);
    ~RefWidget();
 
    void setCount(const QString &count);
@@ -35,13 +35,13 @@ public:
    void reloadCurrentBranchLink();
    void clear();
    void reloadVisibility();
-   void addItems(bool isCurrentBranch, const QString& fullBranchName, const QString& sha);
+   void addItems(bool isCurrentBranch, const QString &fullBranchName, const QString &sha);
 
 private:
    Ui::RefWidget *ui;
    QString mSettingsKey;
    GitQlientSettings mSettings;
-   BranchesViewDelegate* mLocalDelegate = nullptr;
+   BranchesViewDelegate *mLocalDelegate = nullptr;
 
    void onHeaderClicked();
 };

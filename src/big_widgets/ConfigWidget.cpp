@@ -112,7 +112,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->sbHistoryViewFontSize->setValue(settings.globalValue("HistoryView/FontSize", QFontDatabase::systemFont(QFontDatabase::GeneralFont).pointSize()).toInt());
    ui->rbShowCommit->setChecked(settings.globalValue("HistoryView/PreferCommit", true).toBool());
    ui->sbEditorFontSize->setValue(settings.globalValue("FileDiffView/FontSize", 8).toInt());
-   ui->chSingleClickDiffView->setChecked(settings.globalValue("singleClickDiffView", false).toBool());
 
 #ifdef Q_OS_LINUX
    ui->leEditor->setText(settings.globalValue("ExternalEditor", QString()).toString());
@@ -143,8 +142,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->tabWidget->setCurrentIndex(0);
    connect(ui->pbClearLogs, &ButtonLink::clicked, this, &ConfigWidget::clearLogs);
    connect(ui->pbClearCache, &ButtonLink::clicked, this, &ConfigWidget::clearCache);
-
-   ui->cbPomodoroEnabled->setChecked(settings.localValue("Pomodoro/Enabled", true).toBool());
 
    ui->cbLocal->setChecked(settings.localValue("LocalHeader", true).toBool());
    ui->cbRemote->setChecked(settings.localValue("RemoteHeader", true).toBool());
@@ -201,7 +198,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(ui->pruneOnFetch, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->updateOnPull, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->clangFormat, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
-   connect(ui->cbPomodoroEnabled, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbLocal, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbRemote, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbTags, &QCheckBox::stateChanged, this, &ConfigWidget::saveConfig);
@@ -217,7 +213,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    connect(mPluginsDownloader, &PluginsDownloader::availablePlugins, this, &ConfigWidget::onPluginsInfoReceived);
    connect(mPluginsDownloader, &PluginsDownloader::pluginStored, this, &ConfigWidget::onPluginStored);
    connect(ui->pbFeaturesTour, &QPushButton::clicked, this, &ConfigWidget::showFeaturesTour);
-   connect(ui->chSingleClickDiffView, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbDiffView, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbBranchSeparator, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
    connect(ui->cbLanguage, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
@@ -387,7 +382,6 @@ void ConfigWidget::saveConfig()
    settings.setGlobalValue("FileDiffView/FontSize", ui->sbEditorFontSize->value());
    settings.setGlobalValue("colorSchema", ui->cbStyle->currentIndex());
    settings.setGlobalValue("gitLocation", ui->leGitPath->text());
-   settings.setGlobalValue("singleClickDiffView", ui->chSingleClickDiffView->isChecked());
    settings.setGlobalValue("DefaultDiffView", ui->cbDiffView->currentIndex());
    settings.setGlobalValue("BranchSeparator", ui->cbBranchSeparator->currentText());
    settings.setGlobalValue("UILanguage", ui->cbLanguage->currentData().toString());
@@ -446,11 +440,6 @@ void ConfigWidget::saveConfig()
    settings.setLocalValue("DeleteRemoteFolder", ui->cbDeleteFolder->isChecked());
 
    emit panelsVisibilityChanged();
-
-   /* POMODORO CONFIG */
-   settings.setLocalValue("Pomodoro/Enabled", ui->cbPomodoroEnabled->isChecked());
-
-   emit pomodoroVisibilityChanged();
 
    mFeedbackTimer->singleShot(3000, ui->lFeedback, &QLabel::clear);
 }

@@ -28,7 +28,6 @@ void AmendWidget::configure(const QString &sha)
    const auto commit = mCache->commitInfo(sha);
 
    ui->amendFrame->setVisible(true);
-   ui->warningButton->setVisible(true);
 
    if (commit.parentsCount() <= 0)
       return;

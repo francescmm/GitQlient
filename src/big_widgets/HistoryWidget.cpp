@@ -50,38 +50,10 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    , mCache(cache)
    , mSettings(settings)
    , mReturnFromFull(new QPushButton(QIcon(":/icons/back"), "", this))
-   , mUserName(new QLabel(this))
-   , mUserEmail(new QLabel(this))
    , mSplitter(new QSplitter(this))
 {
    QLog_Info("Performance", "HistoryWidget loading...");
    setAttribute(Qt::WA_DeleteOnClose);
-
-   QSharedPointer<GitConfig> gitConfig(new GitConfig(mGit));
-   gitConfig->getUserNameAsync(true);
-   gitConfig->getUserEmailAsync(true);
-
-   connect(gitConfig.get(), &GitConfig::signalNameReceived, this, [this, gitConfig](QString name, bool local) {
-      if (!name.isEmpty())
-         mUserName->setText(name);
-      else if (local)
-         gitConfig->getUserNameAsync(false);
-   });
-
-   connect(gitConfig.get(), &GitConfig::signalEmailReceived, this, [this, gitConfig](QString email, bool local) {
-      if (!email.isEmpty())
-         mUserEmail->setText(email);
-      else if (local)
-         gitConfig->getUserEmailAsync(false);
-   });
-
-   const auto wipInfoFrame = new QFrame(this);
-   wipInfoFrame->setObjectName("wipInfoFrame");
-   const auto wipInfoLayout = new QVBoxLayout(wipInfoFrame);
-   wipInfoLayout->setContentsMargins(QMargins());
-   wipInfoLayout->setSpacing(10);
-   wipInfoLayout->addWidget(mUserName);
-   wipInfoLayout->addWidget(mUserEmail);
 
    mWipWidget = new WipWidget(mCache, mGit, this);
    mAmendWidget = new AmendWidget(mCache, mGit, this);
@@ -96,7 +68,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    const auto wipLayout = new QVBoxLayout();
    wipLayout->setContentsMargins(QMargins());
    wipLayout->setSpacing(5);
-   wipLayout->addWidget(wipInfoFrame);
    wipLayout->addWidget(mCommitStackedWidget);
 
    const auto wipFrame = new QFrame(this);

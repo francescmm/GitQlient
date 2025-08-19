@@ -1,5 +1,6 @@
 #include <CommitChangesWidget.h>
-#include <ui_CommitChangesWidget.h>
+
+#include "ui_CommitChangesWidget.h"
 
 #include <ClickableFrame.h>
 #include <CommitInfo.h>
@@ -49,47 +50,57 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
    setAttribute(Qt::WA_DeleteOnClose);
 
    ui->amendFrame->setVisible(false);
+   ui->listsLayout->setAlignment(Qt::AlignTop);
 
    mTitleMaxLength = GitQlientSettings().globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
-   bool singleClick = GitQlientSettings().globalValue("singleClickDiffView", false).toBool();
-
    ui->lCounter->setText(QString::number(mTitleMaxLength));
    ui->leCommitTitle->setMaxLength(mTitleMaxLength);
    ui->teDescription->setMaximumHeight(100);
 
+   const auto icon = QIcon(QString(":/icons/remove"));
+   ui->lUnstagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+   ui->unstagedFilesList->setVisible(true);
+
+   ui->lStagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+   ui->stagedFilesList->setVisible(true);
+
+   connect(ui->unstagedFrame, &ClickableFrame::clicked, this, [this]() {
+      const auto localAreVisible = ui->unstagedFilesList->isVisible();
+      const auto icon = QIcon(localAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
+      ui->lUnstagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+      ui->unstagedFilesList->setVisible(!localAreVisible);
+   });
+   connect(ui->stagedFrame, &ClickableFrame::clicked, this, [this]() {
+      const auto localAreVisible = ui->stagedFilesList->isVisible();
+      const auto icon = QIcon(localAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
+      ui->lStagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
+      ui->stagedFilesList->setVisible(!localAreVisible);
+   });
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitChangesWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitChangesWidget::commitChanges);
    connect(ui->applyActionBtn, &QPushButton::clicked, this, &CommitChangesWidget::commitChanges);
-   connect(ui->warningButton, &QPushButton::clicked, this, [this]() { emit signalCancelAmend(mCurrentSha); });
 
-   if (singleClick)
-   {
-      connect(ui->stagedFilesList, &QListWidget::itemSelectionChanged, this, [this]() {
-         if (const auto items = ui->stagedFilesList->selectedItems(); !items.empty())
-         {
-            const auto item = items.constFirst();
-            requestDiff(mGit->getWorkingDir() + "/" + item->toolTip());
-         }
-      });
+   connect(ui->stagedFilesList, &QListWidget::itemSelectionChanged, this, [this]() {
+      if (const auto items = ui->stagedFilesList->selectedItems(); !items.empty())
+      {
+         requestDiff(mGit->getWorkingDir() + "/" + items.constFirst()->toolTip());
+      }
+   });
 
-      connect(ui->unstagedFilesList, &QListWidget::itemSelectionChanged, this, [this]() {
-         if (const auto items = ui->unstagedFilesList->selectedItems(); !items.empty())
-         {
-            const auto item = items.constFirst();
-            requestDiff(mGit->getWorkingDir() + "/" + item->toolTip());
-         }
-      });
-   }
+   connect(ui->unstagedFilesList, &QListWidget::itemSelectionChanged, this, [this]() {
+      if (const auto items = ui->unstagedFilesList->selectedItems(); !items.empty())
+      {
+         requestDiff(mGit->getWorkingDir() + "/" + items.constFirst()->toolTip());
+      }
+   });
 
-   connect(ui->stagedFilesList, singleClick ? &QListWidget::itemClicked : &QListWidget::itemDoubleClicked, this,
+   connect(ui->stagedFilesList, &QListWidget::itemClicked, this,
            [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
-
    connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
            &CommitChangesWidget::showUnstagedMenu);
-   connect(ui->unstagedFilesList, singleClick ? &QListWidget::itemClicked : &QListWidget::itemDoubleClicked, this,
+   connect(ui->unstagedFilesList, &QListWidget::itemClicked, this,
            [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
 
-   ui->warningButton->setVisible(false);
    ui->applyActionBtn->setText(tr("Commit"));
 }
 

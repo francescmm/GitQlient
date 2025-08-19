@@ -1,6 +1,5 @@
 ﻿#include <BranchesWidget.h>
 
-#include <RefWidget.h>
 #include <AddSubtreeDlg.h>
 #include <BranchTreeWidget.h>
 #include <BranchesViewDelegate.h>
@@ -15,6 +14,7 @@
 #include <GitSubmodules.h>
 #include <GitSubtree.h>
 #include <GitTags.h>
+#include <RefWidget.h>
 #include <StashesContextMenu.h>
 #include <SubmodulesContextMenu.h>
 

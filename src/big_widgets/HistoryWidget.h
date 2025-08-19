@@ -253,8 +253,6 @@ private:
    FileDiffWidget *mWipFileDiff = nullptr;
    FullDiffWidget *mFullDiffWidget = nullptr;
    QPushButton *mReturnFromFull = nullptr;
-   QLabel *mUserName = nullptr;
-   QLabel *mUserEmail = nullptr;
    bool mReverseSearch = false;
    QSplitter *mSplitter = nullptr;
 

@@ -25,7 +25,7 @@ QTreeWidgetItem *getChild(QTreeWidgetItem *parent, const QString &childName)
 }
 }
 
-RefWidget::RefWidget(const QString& header, const QString& settingsKey, const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
+RefWidget::RefWidget(const QString &header, const QString &settingsKey, const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git, QWidget *parent)
    : ClickableFrame(parent)
    , ui(new Ui::RefWidget)
    , mSettingsKey(settingsKey)
@@ -69,7 +69,7 @@ RefWidget::~RefWidget()
    delete mLocalDelegate;
 }
 
-void RefWidget::setCount(const QString& count)
+void RefWidget::setCount(const QString &count)
 {
    ui->lCount->setText(count);
 }
@@ -105,7 +105,7 @@ void RefWidget::reloadVisibility()
    ui->treeWidget->setVisible(visible);
 }
 
-void RefWidget::addItems(bool isCurrentBranch, const QString& fullBranchName, const QString& sha)
+void RefWidget::addItems(bool isCurrentBranch, const QString &fullBranchName, const QString &sha)
 {
    QVector<QTreeWidgetItem *> parents;
    QTreeWidgetItem *parent = nullptr;

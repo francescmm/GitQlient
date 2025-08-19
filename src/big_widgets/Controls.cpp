@@ -28,17 +28,13 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
-   , mHistory(new QToolButton(this))
-   , mDiff(new QToolButton(this))
-   , mBlame(new QToolButton(this))
+   , mStashPop(new QToolButton(this))
+   , mStashPush(new QToolButton(this))
    , mPullBtn(new QToolButton(this))
    , mPullOptions(new QToolButton(this))
    , mPushBtn(new QToolButton(this))
    , mRefreshBtn(new QToolButton(this))
    , mConfigBtn(new QToolButton(this))
-   , mGitPlatform(new QToolButton(this))
-   , mBuildSystem(new QToolButton(this))
-   , mPomodoro(new PomodoroButton(mGit, this))
    , mVersionCheck(new QToolButton(this))
    , mMergeWarning(
          new QPushButton(tr("WARNING: There is a merge pending to be committed! Click here to solve it."), this))
@@ -52,33 +48,23 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    connect(mUpdater, &GitQlientUpdater::newVersionAvailable, this, [this]() {
       mVersionCheck->setVisible(true);
-      mLastSeparator->setVisible(mPomodoro->isVisible() || mVersionCheck->isVisible());
+      mLastSeparator->setVisible(mVersionCheck->isVisible());
    });
 
-   mHistory->setCheckable(true);
-   mHistory->setIcon(QIcon(":/icons/git_orange"));
-   mHistory->setIconSize(QSize(22, 22));
-   mHistory->setToolTip(tr("View"));
-   mHistory->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mHistory->setShortcut(Qt::CTRL | Qt::Key_1);
-   mBtnGroup->addButton(mHistory, static_cast<int>(ControlsMainViews::History));
+   mStashPop->setCheckable(true);
+   mStashPop->setIcon(QIcon(":/icons/diff"));
+   mStashPop->setIconSize(QSize(22, 22));
+   mStashPop->setToolTip(tr("Diff"));
+   mStashPop->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mStashPop->setEnabled(false);
+   mStashPop->setShortcut(Qt::CTRL | Qt::Key_2);
 
-   mDiff->setCheckable(true);
-   mDiff->setIcon(QIcon(":/icons/diff"));
-   mDiff->setIconSize(QSize(22, 22));
-   mDiff->setToolTip(tr("Diff"));
-   mDiff->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mDiff->setEnabled(false);
-   mDiff->setShortcut(Qt::CTRL | Qt::Key_2);
-   mBtnGroup->addButton(mDiff, static_cast<int>(ControlsMainViews::Diff));
-
-   mBlame->setCheckable(true);
-   mBlame->setIcon(QIcon(":/icons/blame"));
-   mBlame->setIconSize(QSize(22, 22));
-   mBlame->setToolTip(tr("Blame"));
-   mBlame->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mBlame->setShortcut(Qt::CTRL | Qt::Key_3);
-   mBtnGroup->addButton(mBlame, static_cast<int>(ControlsMainViews::Blame));
+   mStashPush->setCheckable(true);
+   mStashPush->setIcon(QIcon(":/icons/blame"));
+   mStashPush->setIconSize(QSize(22, 22));
+   mStashPush->setToolTip(tr("Blame"));
+   mStashPush->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   mStashPush->setShortcut(Qt::CTRL | Qt::Key_3);
 
    const auto menu = new QMenu(mPullOptions);
    menu->installEventFilter(this);
@@ -144,16 +130,12 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    hLayout->setContentsMargins(QMargins());
    hLayout->addStretch();
    hLayout->setSpacing(5);
-   hLayout->addWidget(mHistory);
-   hLayout->addWidget(mDiff);
-   hLayout->addWidget(mBlame);
+   hLayout->addWidget(mStashPop);
+   hLayout->addWidget(mStashPush);
    hLayout->addWidget(separator);
    hLayout->addLayout(pullLayout);
    hLayout->addWidget(mPushBtn);
    hLayout->addWidget(separator2);
-
-   const auto isVisible = settings.localValue("Pomodoro/Enabled", true);
-   mPomodoro->setVisible(isVisible.toBool());
 
    mVersionCheck->setIcon(QIcon(":/icons/get_gitqlient"));
    mVersionCheck->setIconSize(QSize(22, 22));
@@ -196,10 +178,9 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    mLastSeparator->setObjectName("orangeSeparator");
    mLastSeparator->setFixedHeight(20);
-   mLastSeparator->setVisible(mPomodoro->isVisible() || mVersionCheck->isVisible());
+   mLastSeparator->setVisible(mVersionCheck->isVisible());
 
    hLayout->addWidget(mLastSeparator);
-   hLayout->addWidget(mPomodoro);
    hLayout->addWidget(mVersionCheck);
    hLayout->addStretch();
 
@@ -213,9 +194,8 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    vLayout->addLayout(hLayout);
    vLayout->addWidget(mMergeWarning);
 
-   connect(mHistory, &QToolButton::clicked, this, &Controls::signalGoRepo);
-   connect(mDiff, &QToolButton::clicked, this, &Controls::signalGoDiff);
-   connect(mBlame, &QToolButton::clicked, this, &Controls::signalGoBlame);
+   connect(mStashPop, &QToolButton::clicked, this, &Controls::signalGoDiff);
+   connect(mStashPush, &QToolButton::clicked, this, &Controls::signalGoBlame);
    connect(mPullBtn, &QToolButton::clicked, this, &Controls::pullCurrentBranch);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::requestFullReload);
@@ -232,15 +212,9 @@ Controls::~Controls()
    delete mBtnGroup;
 }
 
-void Controls::toggleButton(ControlsMainViews view)
-{
-   mBtnGroup->button(static_cast<int>(view))->setChecked(true);
-}
-
 void Controls::enableButtons(bool enabled)
 {
-   mHistory->setEnabled(enabled);
-   mBlame->setEnabled(enabled);
+   mStashPush->setEnabled(enabled);
    mPullBtn->setEnabled(enabled);
    mPullOptions->setEnabled(enabled);
    mPushBtn->setEnabled(enabled);
@@ -319,24 +293,17 @@ void Controls::disableMergeWarning()
 
 void Controls::disableDiff()
 {
-   mDiff->setDisabled(true);
+   mStashPop->setDisabled(true);
 }
 
 void Controls::enableDiff()
 {
-   mDiff->setEnabled(true);
+   mStashPop->setEnabled(true);
 }
 
 ControlsMainViews Controls::getCurrentSelectedButton() const
 {
-   return mBlame->isChecked() ? ControlsMainViews::Blame : ControlsMainViews::History;
-}
-
-void Controls::changePomodoroVisibility()
-{
-   GitQlientSettings settings(mGit->getGitDir());
-   const auto isVisible = settings.localValue("Pomodoro/Enabled", true);
-   mPomodoro->setVisible(isVisible.toBool());
+   return mStashPush->isChecked() ? ControlsMainViews::Blame : ControlsMainViews::History;
 }
 
 void Controls::showJenkinsButton(bool show)

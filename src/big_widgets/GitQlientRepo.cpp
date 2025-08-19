@@ -102,7 +102,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mControls, &Controls::requestFullReload, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mControls, &Controls::requestReferencesReload, this, &GitQlientRepo::referencesReload);
 
-   connect(mControls, &Controls::signalGoRepo, this, &GitQlientRepo::showHistoryView);
    connect(mControls, &Controls::signalGoBlame, this, &GitQlientRepo::showBlameView);
    connect(mControls, &Controls::signalGoDiff, this, &GitQlientRepo::showDiffView);
    connect(mControls, &Controls::signalGoMerge, this, &GitQlientRepo::showMergeView);
@@ -150,7 +149,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mConfigWidget, &ConfigWidget::panelsVisibilityChanged, mHistoryWidget,
            &HistoryWidget::onPanelsVisibilityChanged);
    connect(mConfigWidget, &ConfigWidget::reloadDiffFont, mHistoryWidget, &HistoryWidget::onDiffFontSizeChanged);
-   connect(mConfigWidget, &ConfigWidget::pomodoroVisibilityChanged, mControls, &Controls::changePomodoroVisibility);
    connect(mConfigWidget, &ConfigWidget::moveLogsAndClose, this, &GitQlientRepo::moveLogsAndClose);
    connect(mConfigWidget, &ConfigWidget::autoFetchChanged, this, &GitQlientRepo::reconfigureAutoFetch);
    connect(mConfigWidget, &ConfigWidget::autoRefreshChanged, this, &GitQlientRepo::reconfigureAutoFetch);
@@ -339,7 +337,6 @@ void GitQlientRepo::showHistoryView()
    mPreviousView = mStackedLayout->currentIndex();
 
    mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::History]);
-   mControls->toggleButton(ControlsMainViews::History);
 }
 
 void GitQlientRepo::showBlameView()
@@ -347,7 +344,6 @@ void GitQlientRepo::showBlameView()
    mPreviousView = mStackedLayout->currentIndex();
 
    mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Blame]);
-   mControls->toggleButton(ControlsMainViews::Blame);
 }
 
 void GitQlientRepo::showDiffView()
@@ -355,7 +351,6 @@ void GitQlientRepo::showDiffView()
    mPreviousView = mStackedLayout->currentIndex();
 
    mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Diff]);
-   mControls->toggleButton(ControlsMainViews::Diff);
 }
 
 // TODO: Optimize
@@ -420,7 +415,6 @@ void GitQlientRepo::showPullConflict()
 void GitQlientRepo::showMergeView()
 {
    mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Merge]);
-   mControls->toggleButton(ControlsMainViews::Merge);
 }
 
 bool GitQlientRepo::configureGitServer() const
@@ -453,13 +447,11 @@ void GitQlientRepo::gitServerActivationToggled(bool enabled)
 void GitQlientRepo::showConfig()
 {
    mStackedLayout->setCurrentIndex(mIndexMap[ControlsMainViews::Config]);
-   mControls->toggleButton(ControlsMainViews::Config);
 }
 
 void GitQlientRepo::showPreviousView()
 {
    mStackedLayout->setCurrentIndex(mPreviousView);
-   mControls->toggleButton(static_cast<ControlsMainViews>(mPreviousView));
 }
 
 void GitQlientRepo::updateWip()

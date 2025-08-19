@@ -61,11 +61,6 @@ class Controls : public QFrame
 
 signals:
    /*!
-    \brief Signal triggered when the user wants to go to the main repository view.
-
-   */
-   void signalGoRepo();
-   /*!
     \brief Signal triggered when the user selects the diff view.
 
    */
@@ -132,12 +127,6 @@ public:
     */
    ~Controls();
    /*!
-    \brief Process the toggled button and triggers its corresponding action.
-
-    \param view The view the user selected.
-   */
-   void toggleButton(ControlsMainViews view);
-   /*!
     \brief Sets the current SHA.
 
     \param sha The SHA hash.
@@ -181,34 +170,17 @@ public:
    */
    ControlsMainViews getCurrentSelectedButton() const;
 
-   /**
-    * @brief changePomodoroVisibility Toggles the visibility for the pomodoro button.
-    */
-   void changePomodoroVisibility();
-
-   void showJenkinsButton(bool show);
-
-   void enableJenkins(bool enable);
-
-   void showGitServerButton(bool show);
-
-   void enableGitServer(bool enabled);
-
 private:
    QString mCurrentSha;
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
-   QToolButton *mHistory = nullptr;
-   QToolButton *mDiff = nullptr;
-   QToolButton *mBlame = nullptr;
+   QToolButton *mStashPop = nullptr;
+   QToolButton *mStashPush = nullptr;
    QToolButton *mPullBtn = nullptr;
    QToolButton *mPullOptions = nullptr;
    QToolButton *mPushBtn = nullptr;
    QToolButton *mRefreshBtn = nullptr;
    QToolButton *mConfigBtn = nullptr;
-   QToolButton *mGitPlatform = nullptr;
-   QToolButton *mBuildSystem = nullptr;
-   PomodoroButton *mPomodoro = nullptr;
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;

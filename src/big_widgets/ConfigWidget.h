@@ -30,7 +30,6 @@ signals:
    void terminalEnabled(bool enabled);
    void commitTitleMaxLenghtChanged();
    void panelsVisibilityChanged();
-   void pomodoroVisibilityChanged();
    void moveLogsAndClose();
    void autoFetchChanged(int minutes);
    void autoRefreshChanged(int seconds);
