@@ -180,6 +180,10 @@ private:
 
    QToolButton *createToolButton(const QString &iconPath, const QString &tooltip,
                                  const QKeySequence &shortcut = QKeySequence());
+
+   void stashPush();
+   void stashPop();
+
    /*!
     \brief Pulls the current branch.
 

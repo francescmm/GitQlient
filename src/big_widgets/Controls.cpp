@@ -148,6 +148,8 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    vLayout->addLayout(hLayout);
    vLayout->addWidget(mMergeWarning);
 
+   connect(mStashPush, &QToolButton::clicked, this, &Controls::stashPush);
+   connect(mStashPop, &QToolButton::clicked, this, &Controls::stashPop);
    connect(mPullBtn, &QToolButton::clicked, this, &Controls::pullCurrentBranch);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::requestFullReload);
@@ -177,6 +179,74 @@ void Controls::enableButtons(bool enabled)
    }
    else
       mBuildSystem->setEnabled(false);
+}
+
+void Controls::stashPush()
+{
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   QScopedPointer<GitStashes> git(new GitStashes(mGit));
+   const auto ret = git->stash();
+   QApplication::restoreOverrideCursor();
+
+   if (ret.success)
+   {
+      QLog_Debug("Controls", "Stash push successful");
+      emit requestFullReload();
+   }
+   else
+   {
+      QMessageBox msgBox(QMessageBox::Critical, tr("Error while stashing"),
+                         QString(tr("There were problems during the stash operation. Please, see the detailed "
+                                    "description for more information.")),
+                         QMessageBox::Ok, this);
+      msgBox.setDetailedText(ret.output);
+      msgBox.setStyleSheet(GitQlientStyles::getStyles());
+      msgBox.exec();
+   }
+}
+
+void Controls::stashPop()
+{
+   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+   QScopedPointer<GitStashes> git(new GitStashes(mGit));
+   const auto ret = git->pop();
+   QApplication::restoreOverrideCursor();
+
+   if (ret.success)
+   {
+      QLog_Debug("Controls", "Stash pop successful");
+
+      // Check if there were merge conflicts during pop
+      if (ret.output.contains("CONFLICT", Qt::CaseInsensitive))
+      {
+         QMessageBox::warning(this, tr("Stash pop conflicts"),
+                              tr("There were merge conflicts when applying the stash. "
+                                 "Please resolve them manually."),
+                              QMessageBox::Ok);
+         emit signalPullConflict(); // Reuse the existing conflict signal
+      }
+
+      emit requestFullReload();
+   }
+   else
+   {
+      if (ret.output.contains("No stash entries found", Qt::CaseInsensitive) || ret.output.contains("No stash found", Qt::CaseInsensitive))
+      {
+         QMessageBox::information(this, tr("No stashes"),
+                                  tr("There are no stashes to pop."),
+                                  QMessageBox::Ok);
+      }
+      else
+      {
+         QMessageBox msgBox(QMessageBox::Critical, tr("Error while popping stash"),
+                            QString(tr("There were problems during the stash pop operation. Please, see the detailed "
+                                       "description for more information.")),
+                            QMessageBox::Ok, this);
+         msgBox.setDetailedText(ret.output);
+         msgBox.setStyleSheet(GitQlientStyles::getStyles());
+         msgBox.exec();
+      }
+   }
 }
 
 void Controls::pullCurrentBranch()
