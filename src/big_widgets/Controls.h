@@ -61,16 +61,6 @@ class Controls : public QFrame
 
 signals:
    /*!
-    \brief Signal triggered when the user selects the diff view.
-
-   */
-   void signalGoDiff();
-   /*!
-    \brief Signal triggered when the user selects the Blame&History view.
-
-   */
-   void signalGoBlame();
-   /*!
     \brief Signal triggered when the user selects the merge conflict resolution view.
 
    */
@@ -125,7 +115,7 @@ public:
    /**
     * @brief Destructor.
     */
-   ~Controls();
+   ~Controls() = default;
    /*!
     \brief Sets the current SHA.
 
@@ -184,7 +174,6 @@ private:
    QToolButton *mVersionCheck = nullptr;
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;
-   QButtonGroup *mBtnGroup = nullptr;
    QFrame *mLastSeparator = nullptr;
    QFrame *mPluginsSeparator = nullptr;
    bool mGoGitServerView = false;

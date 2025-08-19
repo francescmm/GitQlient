@@ -39,7 +39,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    , mMergeWarning(
          new QPushButton(tr("WARNING: There is a merge pending to be committed! Click here to solve it."), this))
    , mUpdater(new GitQlientUpdater(this))
-   , mBtnGroup(new QButtonGroup(this))
    , mLastSeparator(new QFrame(this))
 {
    GitQlientSettings settings(mGit->getGitDir());
@@ -51,18 +50,15 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
       mLastSeparator->setVisible(mVersionCheck->isVisible());
    });
 
-   mStashPop->setCheckable(true);
-   mStashPop->setIcon(QIcon(":/icons/diff"));
+   mStashPop->setIcon(QIcon(":/icons/git_pop"));
    mStashPop->setIconSize(QSize(22, 22));
-   mStashPop->setToolTip(tr("Diff"));
+   mStashPop->setToolTip(tr("Stash Pop"));
    mStashPop->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mStashPop->setEnabled(false);
    mStashPop->setShortcut(Qt::CTRL | Qt::Key_2);
 
-   mStashPush->setCheckable(true);
-   mStashPush->setIcon(QIcon(":/icons/blame"));
+   mStashPush->setIcon(QIcon(":/icons/git_stash"));
    mStashPush->setIconSize(QSize(22, 22));
-   mStashPush->setToolTip(tr("Blame"));
+   mStashPush->setToolTip(tr("Stash Push"));
    mStashPush->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mStashPush->setShortcut(Qt::CTRL | Qt::Key_3);
 
@@ -116,7 +112,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mConfigBtn->setToolTip(tr("Config"));
    mConfigBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mConfigBtn->setShortcut(Qt::CTRL | Qt::Key_6);
-   mBtnGroup->addButton(mConfigBtn, static_cast<int>(ControlsMainViews::Config));
 
    const auto separator = new QFrame(this);
    separator->setObjectName("orangeSeparator");
@@ -130,8 +125,8 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    hLayout->setContentsMargins(QMargins());
    hLayout->addStretch();
    hLayout->setSpacing(5);
-   hLayout->addWidget(mStashPop);
    hLayout->addWidget(mStashPush);
+   hLayout->addWidget(mStashPop);
    hLayout->addWidget(separator);
    hLayout->addLayout(pullLayout);
    hLayout->addWidget(mPushBtn);
@@ -186,7 +181,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 
    mMergeWarning->setObjectName("WarningButton");
    mMergeWarning->setVisible(false);
-   mBtnGroup->addButton(mMergeWarning, static_cast<int>(ControlsMainViews::Merge));
 
    const auto vLayout = new QVBoxLayout(this);
    vLayout->setContentsMargins(0, 5, 0, 0);
@@ -194,8 +188,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    vLayout->addLayout(hLayout);
    vLayout->addWidget(mMergeWarning);
 
-   connect(mStashPop, &QToolButton::clicked, this, &Controls::signalGoDiff);
-   connect(mStashPush, &QToolButton::clicked, this, &Controls::signalGoBlame);
    connect(mPullBtn, &QToolButton::clicked, this, &Controls::pullCurrentBranch);
    connect(mPushBtn, &QToolButton::clicked, this, &Controls::pushCurrentBranch);
    connect(mRefreshBtn, &QToolButton::clicked, this, &Controls::requestFullReload);
@@ -205,11 +197,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    connect(mBuildSystem, &QToolButton::clicked, this, &Controls::signalGoBuildSystem);
 
    enableButtons(false);
-}
-
-Controls::~Controls()
-{
-   delete mBtnGroup;
 }
 
 void Controls::enableButtons(bool enabled)

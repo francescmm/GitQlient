@@ -102,8 +102,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mControls, &Controls::requestFullReload, this, &GitQlientRepo::updateUiFromWatcher);
    connect(mControls, &Controls::requestReferencesReload, this, &GitQlientRepo::referencesReload);
 
-   connect(mControls, &Controls::signalGoBlame, this, &GitQlientRepo::showBlameView);
-   connect(mControls, &Controls::signalGoDiff, this, &GitQlientRepo::showDiffView);
    connect(mControls, &Controls::signalGoMerge, this, &GitQlientRepo::showMergeView);
    connect(mControls, &Controls::signalGoServer, this, &GitQlientRepo::showGitServerView);
    connect(mControls, &Controls::signalGoBuildSystem, this, &GitQlientRepo::showBuildSystemView);
