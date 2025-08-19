@@ -7,6 +7,8 @@
 #include <FileWidget.h>
 #include <GitBase.h>
 #include <GitCache.h>
+#include <GitConfig.h>
+#include <GitHistory.h>
 #include <GitLocal.h>
 #include <GitQlientSettings.h>
 #include <GitQlientStyles.h>
@@ -16,6 +18,7 @@
 #include <UnstagedMenu.h>
 #include <WipHelper.h>
 
+#include <QCheckBox>
 #include <QDir>
 #include <QItemDelegate>
 #include <QKeyEvent>
@@ -50,56 +53,49 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
    setAttribute(Qt::WA_DeleteOnClose);
 
    ui->amendFrame->setVisible(false);
-   ui->listsLayout->setAlignment(Qt::AlignTop);
 
    mTitleMaxLength = GitQlientSettings().globalValue("commitTitleMaxLength", mTitleMaxLength).toInt();
    ui->lCounter->setText(QString::number(mTitleMaxLength));
    ui->leCommitTitle->setMaxLength(mTitleMaxLength);
    ui->teDescription->setMaximumHeight(100);
 
-   const auto icon = QIcon(QString(":/icons/remove"));
-   ui->lUnstagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-   ui->unstagedFilesList->setVisible(true);
+   ui->unstagedFrame->setTitle(tr("Unstaged files"));
+   ui->unstagedFrame->setExpandable(true);
+   ui->unstagedFrame->setExpanded(true);
 
-   ui->lStagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-   ui->stagedFilesList->setVisible(true);
+   ui->stagedFrame->setTitle(tr("Staged files"));
+   ui->stagedFrame->setExpandable(true);
+   ui->stagedFrame->setExpanded(true);
 
-   connect(ui->unstagedFrame, &ClickableFrame::clicked, this, [this]() {
-      const auto localAreVisible = ui->unstagedFilesList->isVisible();
-      const auto icon = QIcon(localAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
-      ui->lUnstagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-      ui->unstagedFilesList->setVisible(!localAreVisible);
-   });
-   connect(ui->stagedFrame, &ClickableFrame::clicked, this, [this]() {
-      const auto localAreVisible = ui->stagedFilesList->isVisible();
-      const auto icon = QIcon(localAreVisible ? QString(":/icons/add") : QString(":/icons/remove"));
-      ui->lStagedArrow->setPixmap(icon.pixmap(QSize(15, 15)));
-      ui->stagedFilesList->setVisible(!localAreVisible);
-   });
+   mUnstagedFilesList = new QListWidget();
+   mUnstagedFilesList->setContextMenuPolicy(Qt::CustomContextMenu);
+   mUnstagedFilesList->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+   mUnstagedFilesList->setObjectName("unstaged");
+   ui->unstagedFrame->setContentWidget(mUnstagedFilesList);
+
+   mStagedFilesList = new QListWidget();
+   mStagedFilesList->setContextMenuPolicy(Qt::CustomContextMenu);
+   mStagedFilesList->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+   mStagedFilesList->setObjectName("staged");
+   ui->stagedFrame->setContentWidget(mStagedFilesList);
+
+   connect(ui->amendCheckBox, &QCheckBox::toggled, this, &CommitChangesWidget::onAmendToggled);
    connect(ui->leCommitTitle, &QLineEdit::textChanged, this, &CommitChangesWidget::updateCounter);
    connect(ui->leCommitTitle, &QLineEdit::returnPressed, this, &CommitChangesWidget::commitChanges);
    connect(ui->applyActionBtn, &QPushButton::clicked, this, &CommitChangesWidget::commitChanges);
 
-   connect(ui->stagedFilesList, &QListWidget::itemSelectionChanged, this, [this]() {
-      if (const auto items = ui->stagedFilesList->selectedItems(); !items.empty())
-      {
-         requestDiff(mGit->getWorkingDir() + "/" + items.constFirst()->toolTip());
-      }
-   });
-
-   connect(ui->unstagedFilesList, &QListWidget::itemSelectionChanged, this, [this]() {
-      if (const auto items = ui->unstagedFilesList->selectedItems(); !items.empty())
-      {
-         requestDiff(mGit->getWorkingDir() + "/" + items.constFirst()->toolTip());
-      }
-   });
-
-   connect(ui->stagedFilesList, &QListWidget::itemClicked, this,
-           [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
-   connect(ui->unstagedFilesList, &QListWidget::customContextMenuRequested, this,
+   connect(mUnstagedFilesList, &QListWidget::customContextMenuRequested, this,
            &CommitChangesWidget::showUnstagedMenu);
-   connect(ui->unstagedFilesList, &QListWidget::itemClicked, this,
-           [this](QListWidgetItem *item) { requestDiff(mGit->getWorkingDir() + "/" + item->toolTip()); });
+
+   connect(mStagedFilesList, &QListWidget::itemClicked, this,
+           [this](QListWidgetItem *item) {
+              handleItemClick(mStagedFilesList, item);
+           });
+
+   connect(mUnstagedFilesList, &QListWidget::itemClicked, this,
+           [this](QListWidgetItem *item) {
+              handleItemClick(mUnstagedFilesList, item);
+           });
 
    ui->applyActionBtn->setText(tr("Commit"));
 }
@@ -107,6 +103,312 @@ CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, 
 CommitChangesWidget::~CommitChangesWidget()
 {
    delete ui;
+}
+
+void CommitChangesWidget::setCommitMode(CommitMode mode)
+{
+   mCommitMode = mode;
+
+   const bool isAmend = (mode == CommitMode::Amend);
+   ui->amendCheckBox->setChecked(isAmend);
+   ui->amendFrame->setVisible(isAmend);
+   ui->applyActionBtn->setText(isAmend ? tr("Amend") : tr("Commit"));
+}
+
+void CommitChangesWidget::onAmendToggled(bool checked)
+{
+   if (checked)
+   {
+      mCommitMode = CommitMode::Amend;
+      ui->amendFrame->setVisible(true);
+      ui->applyActionBtn->setText(tr("Amend"));
+
+      const auto lastCommitSha = mGit->getLastCommit().output.trimmed();
+      configureAmendMode(lastCommitSha);
+   }
+   else
+   {
+      mCommitMode = CommitMode::Wip;
+      ui->amendFrame->setVisible(false);
+      ui->applyActionBtn->setText(tr("Commit"));
+
+      ui->leAuthorName->clear();
+      ui->leAuthorEmail->clear();
+
+      configureWipMode(ZERO_SHA);
+   }
+}
+
+void CommitChangesWidget::configure(const QString &sha)
+{
+   if (mCommitMode == CommitMode::Amend)
+   {
+      configureAmendMode(sha);
+   }
+   else
+   {
+      configureWipMode(sha);
+   }
+}
+
+void CommitChangesWidget::configureWipMode(const QString &sha)
+{
+   mCurrentSha = ZERO_SHA;
+   const auto commit = mCache->commitInfo(sha);
+
+   WipHelper::update(mGit, mCache);
+
+   const auto files = mCache->revisionFile(ZERO_SHA, commit.firstParent());
+
+   QLog_Info("UI", QString("Configuring WIP widget"));
+
+   prepareCache();
+
+   if (files)
+      insertFiles(files.value(), mUnstagedFilesList);
+
+   clearCache();
+
+   ui->applyActionBtn->setEnabled(mStagedFilesList->count());
+}
+
+void CommitChangesWidget::configureAmendMode(const QString &sha)
+{
+   const auto commitSha = (sha == ZERO_SHA) ? mGit->getLastCommit().output.trimmed() : sha;
+   const auto commit = mCache->commitInfo(commitSha);
+
+   if (commit.parentsCount() <= 0)
+      return;
+
+   WipHelper::update(mGit, mCache);
+
+   const auto files = mCache->revisionFile(ZERO_SHA, commitSha);
+   auto amendFiles = mCache->revisionFile(commitSha, commit.firstParent());
+
+   if (!amendFiles)
+   {
+      QScopedPointer<GitHistory> git(new GitHistory(mGit));
+      const auto ret = git->getDiffFiles(commitSha, commit.firstParent());
+
+      if (ret.success)
+      {
+         amendFiles = RevisionFiles(ret.output);
+         mCache->insertRevisionFiles(commitSha, commit.firstParent(), amendFiles.value());
+      }
+   }
+
+   if (mCurrentSha != commitSha)
+   {
+      QLog_Info("UI", QString("Amending sha {%1}.").arg(commitSha));
+
+      mCurrentSha = commitSha;
+
+      const auto author = commit.author;
+      if (author.contains("<") && author.contains(">"))
+      {
+         const auto nameEnd = author.indexOf('<');
+         const auto emailStart = nameEnd + 1;
+         const auto emailEnd = author.indexOf('>');
+
+         ui->leAuthorName->setText(author.left(nameEnd).trimmed());
+         ui->leAuthorEmail->setText(author.mid(emailStart, emailEnd - emailStart));
+      }
+
+      ui->teDescription->setPlainText(commit.longLog.trimmed());
+      ui->leCommitTitle->setText(commit.shortLog);
+
+      blockSignals(true);
+      mUnstagedFilesList->clear();
+      mStagedFilesList->clear();
+      mInternalCache.clear();
+      blockSignals(false);
+
+      if (files)
+         insertFiles(files.value(), mUnstagedFilesList);
+
+      if (amendFiles)
+         insertFiles(amendFiles.value(), mStagedFilesList);
+   }
+   else
+   {
+      QLog_Info("UI", QString("Updating files for SHA {%1}").arg(mCurrentSha));
+
+      prepareCache();
+
+      if (files)
+         insertFiles(files.value(), mUnstagedFilesList);
+
+      clearCache();
+
+      if (amendFiles)
+         insertFiles(amendFiles.value(), mStagedFilesList);
+   }
+
+   ui->applyActionBtn->setEnabled(mStagedFilesList->count());
+}
+
+void CommitChangesWidget::commitChanges()
+{
+   if (mCommitMode == CommitMode::Amend)
+   {
+      commitAmendChanges();
+   }
+   else
+   {
+      commitWipChanges();
+   }
+}
+
+void CommitChangesWidget::commitWipChanges()
+{
+   QString msg;
+   QStringList selFiles = getFiles();
+
+   if (!selFiles.isEmpty())
+   {
+      if (hasConflicts())
+         QMessageBox::warning(this, tr("Impossible to commit"),
+                              tr("There are files with conflicts. Please, resolve "
+                                 "the conflicts first."));
+      else if (checkMsg(msg))
+      {
+         const auto revInfo = mCache->commitInfo(ZERO_SHA);
+
+         WipHelper::update(mGit, mCache);
+
+         if (const auto files = mCache->revisionFile(ZERO_SHA, revInfo.firstParent()); files)
+         {
+            const auto lastShaBeforeCommit = mGit->getLastCommit().output.trimmed();
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+            QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+            const auto ret = gitLocal->commitFiles(selFiles, files.value(), msg);
+            QApplication::restoreOverrideCursor();
+
+            if (ret.success)
+            {
+               const auto currentSha = mGit->getLastCommit().output.trimmed();
+               QScopedPointer<GitConfig> gitConfig(new GitConfig(mGit));
+               auto committer = gitConfig->getLocalUserInfo();
+
+               if (committer.mUserEmail.isEmpty() || committer.mUserName.isEmpty())
+                  committer = gitConfig->getGlobalUserInfo();
+
+               const auto message = msg.split("\n\n");
+
+               CommitInfo newCommit { currentSha,
+                                      { lastShaBeforeCommit },
+                                      std::chrono::seconds(QDateTime::currentDateTime().toSecsSinceEpoch()),
+                                      ui->leCommitTitle->text() };
+
+               newCommit.committer = QString("%1<%2>").arg(committer.mUserName, committer.mUserEmail);
+               newCommit.author = QString("%1<%2>").arg(committer.mUserName, committer.mUserEmail);
+               newCommit.longLog = ui->teDescription->toPlainText();
+
+               mCache->insertCommit(newCommit);
+               mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
+               mCache->insertReference(currentSha, References::Type::LocalBranch, mGit->getCurrentBranch());
+
+               QScopedPointer<GitHistory> gitHistory(new GitHistory(mGit));
+               const auto ret = gitHistory->getDiffFiles(currentSha, lastShaBeforeCommit);
+
+               mCache->insertRevisionFiles(currentSha, lastShaBeforeCommit, RevisionFiles(ret.output));
+
+               prepareCache();
+               clearCache();
+
+               mStagedFilesList->clear();
+               mStagedFilesList->update();
+
+               ui->leCommitTitle->clear();
+               ui->teDescription->clear();
+
+               WipHelper::update(mGit, mCache);
+
+               emit mCache->signalCacheUpdated();
+               emit changesCommitted();
+            }
+            else
+            {
+               QMessageBox msgBox(QMessageBox::Critical, tr("Error when committing"),
+                                  tr("There were problems during the commit "
+                                     "operation. Please, see the detailed "
+                                     "description for more information."),
+                                  QMessageBox::Ok, this);
+               msgBox.setDetailedText(ret.output);
+               msgBox.setStyleSheet(GitQlientStyles::getStyles());
+               msgBox.exec();
+            }
+         }
+      }
+   }
+}
+
+void CommitChangesWidget::commitAmendChanges()
+{
+   QStringList selFiles = getFiles();
+
+   if (!selFiles.isEmpty())
+   {
+      QString msg;
+
+      if (hasConflicts())
+      {
+         QMessageBox::critical(this, tr("Impossible to commit"),
+                               tr("There are files with conflicts. Please, resolve the conflicts first."));
+      }
+      else if (checkMsg(msg))
+      {
+         WipHelper::update(mGit, mCache);
+
+         const auto files = mCache->revisionFile(ZERO_SHA, mCurrentSha);
+
+         if (files)
+         {
+            const auto author = QString("%1<%2>").arg(ui->leAuthorName->text(), ui->leAuthorEmail->text());
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+            QScopedPointer<GitLocal> gitLocal(new GitLocal(mGit));
+            const auto ret = gitLocal->amendCommit(selFiles, files.value(), msg, author);
+            QApplication::restoreOverrideCursor();
+
+            emit logReload();
+
+            if (ret.success)
+            {
+               const auto newSha = mGit->getLastCommit().output.trimmed();
+               auto commit = mCache->commitInfo(mCurrentSha);
+               const auto oldSha = commit.sha;
+               commit.sha = newSha;
+               commit.committer = author;
+               commit.author = author;
+
+               const auto log = msg.split("\n\n");
+               commit.shortLog = log.constFirst();
+               commit.longLog = log.constLast();
+
+               mCache->updateCommit(oldSha, std::move(commit));
+
+               QScopedPointer<GitHistory> git(new GitHistory(mGit));
+               const auto ret = git->getDiffFiles(mCurrentSha, commit.firstParent());
+
+               mCache->insertRevisionFiles(mCurrentSha, commit.firstParent(), RevisionFiles(ret.output));
+
+               emit changesCommitted();
+            }
+            else
+            {
+               QMessageBox msgBox(QMessageBox::Critical, tr("Error when amending"),
+                                  tr("There were problems during the commit "
+                                     "operation. Please, see the detailed "
+                                     "description for more information."),
+                                  QMessageBox::Ok, this);
+               msgBox.setDetailedText(ret.output);
+               msgBox.setStyleSheet(GitQlientStyles::getStyles());
+               msgBox.exec();
+            }
+         }
+      }
+   }
 }
 
 void CommitChangesWidget::reload()
@@ -133,8 +435,8 @@ void CommitChangesWidget::resetFile(QListWidgetItem *item)
 
          if (isInIndex || untrackedFile)
          {
-            ui->stagedFilesList->takeItem(ui->stagedFilesList->row(item));
-            ui->stagedFilesList->repaint();
+            mStagedFilesList->takeItem(mStagedFilesList->row(item));
+            mStagedFilesList->repaint();
 
             const auto clippedText = metrix.elidedText(item->toolTip(), Qt::ElideMiddle, width() - 10);
             const auto newFileWidget = new FileWidget(":/icons/add", clippedText, this);
@@ -142,18 +444,21 @@ void CommitChangesWidget::resetFile(QListWidgetItem *item)
 
             connect(newFileWidget, &FileWidget::clicked, this, [this, item]() { addFileToCommitList(item); });
 
-            ui->unstagedFilesList->addItem(item);
-            ui->unstagedFilesList->setItemWidget(item, newFileWidget);
-            ui->unstagedFilesList->repaint();
+            mUnstagedFilesList->addItem(item);
+            mUnstagedFilesList->setItemWidget(item, newFileWidget);
+            mUnstagedFilesList->repaint();
 
-            ui->applyActionBtn->setDisabled(ui->stagedFilesList->count() == 0);
+            ui->applyActionBtn->setDisabled(mStagedFilesList->count() == 0);
 
-            delete ui->stagedFilesList->itemWidget(item);
+            delete mStagedFilesList->itemWidget(item);
 
             break;
          }
       }
    }
+
+   ui->unstagedFrame->setCount(mUnstagedFilesList->count());
+   ui->stagedFrame->setCount(mStagedFilesList->count());
 
    QScopedPointer<GitLocal> git(new GitLocal(mGit));
    if (const auto ret = git->resetFile(item->toolTip()); ret.success)
@@ -210,7 +515,7 @@ void CommitChangesWidget::clearCache()
 
 void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *fileList)
 {
-   for (auto &cachedItem : mInternalCache) // Move to prepareCache
+   for (auto &cachedItem : mInternalCache)
       cachedItem.keep = false;
 
    for (auto i = 0; i < files.count(); ++i)
@@ -221,7 +526,7 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
       const auto isConflict = files.statusCmp(i, RevisionFiles::CONFLICT);
       const auto isPartiallyCached = files.statusCmp(i, RevisionFiles::PARTIALLY_CACHED);
       const auto staged = isInIndex && !isUnknown && !isConflict;
-      auto wip = QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName());
+      auto wip = QString("%1-%2").arg(fileName, mStagedFilesList->objectName());
 
       if (staged || isPartiallyCached)
       {
@@ -229,10 +534,10 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
          {
             const auto color = getColorForFile(files, i);
             const auto itemPair
-                = fillFileItemInfo(fileName, isConflict, QString(":/icons/remove"), color, ui->stagedFilesList);
+                = fillFileItemInfo(fileName, isConflict, QString(":/icons/remove"), color, mStagedFilesList);
             connect(itemPair.second, &FileWidget::clicked, this, [this, item = itemPair.first]() { resetFile(item); });
 
-            ui->stagedFilesList->setItemWidget(itemPair.first, itemPair.second);
+            mStagedFilesList->setItemWidget(itemPair.first, itemPair.second);
             itemPair.first->setSizeHint(itemPair.second->sizeHint());
          }
          else
@@ -244,11 +549,8 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
          wip = QString("%1-%2").arg(fileName, fileList->objectName());
          if (!mInternalCache.contains(wip))
          {
-            // Item configuration
             auto color = getColorForFile(files, i);
 
-            // If the item is not new but the color is green this is not correct.
-            // It means that the file was partially staged so the color backs to default.
             if (!files.statusCmp(i, RevisionFiles::NEW) && color == GitQlientStyles::getGreen())
                color = GitQlientStyles::getTextColor();
 
@@ -264,6 +566,9 @@ void CommitChangesWidget::insertFiles(const RevisionFiles &files, QListWidget *f
             mInternalCache[wip].keep = true;
       }
    }
+
+   ui->unstagedFrame->setCount(mUnstagedFilesList->count());
+   ui->stagedFrame->setCount(mStagedFilesList->count());
 }
 
 QPair<QListWidgetItem *, FileWidget *> CommitChangesWidget::fillFileItemInfo(const QString &file, bool isConflict,
@@ -298,39 +603,39 @@ void CommitChangesWidget::addAllFilesToCommitList()
 {
    QStringList files;
 
-   for (auto i = ui->unstagedFilesList->count() - 1; i >= 0; --i)
-      files += addFileToCommitList(ui->unstagedFilesList->item(i), false);
+   for (auto i = mUnstagedFilesList->count() - 1; i >= 0; --i)
+      files += addFileToCommitList(mUnstagedFilesList->item(i), false);
 
    const auto git = QScopedPointer<GitLocal>(new GitLocal(mGit));
 
    if (const auto ret = git->markFilesAsResolved(files); ret.success)
       WipHelper::update(mGit, mCache);
 
-   ui->applyActionBtn->setEnabled(ui->stagedFilesList->count() > 0);
+   ui->applyActionBtn->setEnabled(mStagedFilesList->count() > 0);
 }
 
 void CommitChangesWidget::requestDiff(const QString &fileName)
 {
-   const auto isCached = qobject_cast<QListWidget *>(sender()) == ui->stagedFilesList;
+   const auto isCached = qobject_cast<QListWidget *>(sender()) == mStagedFilesList;
    emit signalShowDiff(fileName, isCached);
 }
 
 QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool updateGit)
 {
-   const auto fileWidget = qobject_cast<FileWidget *>(ui->unstagedFilesList->itemWidget(item));
+   const auto fileWidget = qobject_cast<FileWidget *>(mUnstagedFilesList->itemWidget(item));
    const auto fileName = fileWidget->toolTip().remove(tr("(conflicts)")).trimmed();
    const auto textColor = fileWidget->getTextColor();
 
-   ui->unstagedFilesList->removeItemWidget(item);
-   ui->unstagedFilesList->takeItem(ui->unstagedFilesList->row(item));
-   ui->unstagedFilesList->repaint();
+   mUnstagedFilesList->removeItemWidget(item);
+   mUnstagedFilesList->takeItem(mUnstagedFilesList->row(item));
+   mUnstagedFilesList->repaint();
    delete fileWidget;
 
-   const auto newKey = QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName());
+   const auto newKey = QString("%1-%2").arg(fileName, mStagedFilesList->objectName());
 
    if (!mInternalCache.contains(newKey))
    {
-      const auto wip = mInternalCache.take(QString("%1-%2").arg(fileName, ui->unstagedFilesList->objectName()));
+      const auto wip = mInternalCache.take(QString("%1-%2").arg(fileName, mUnstagedFilesList->objectName()));
       mInternalCache.insert(newKey, wip);
 
       QFontMetrics metrix(item->font());
@@ -342,9 +647,9 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
 
       connect(newFileWidget, &FileWidget::clicked, this, [this, item]() { removeFileFromCommitList(item); });
 
-      ui->stagedFilesList->addItem(item);
-      ui->stagedFilesList->setItemWidget(item, newFileWidget);
-      ui->stagedFilesList->repaint();
+      mStagedFilesList->addItem(item);
+      mStagedFilesList->setItemWidget(item, newFileWidget);
+      mStagedFilesList->repaint();
 
       if (item->data(GitQlientRole::U_IsConflict).toBool())
          newFileWidget->setText(fileName);
@@ -360,6 +665,9 @@ QString CommitChangesWidget::addFileToCommitList(QListWidgetItem *item, bool upd
          WipHelper::update(mGit, mCache);
    }
 
+   ui->unstagedFrame->setCount(mUnstagedFilesList->count());
+   ui->stagedFrame->setCount(mStagedFilesList->count());
+
    emit fileStaged(fileName);
 
    return fileName;
@@ -369,10 +677,10 @@ void CommitChangesWidget::revertAllChanges()
 {
    auto needsUpdate = false;
 
-   for (auto i = ui->unstagedFilesList->count() - 1; i >= 0; --i)
+   for (auto i = mUnstagedFilesList->count() - 1; i >= 0; --i)
    {
       QScopedPointer<GitLocal> git(new GitLocal(mGit));
-      needsUpdate |= git->checkoutFile(ui->unstagedFilesList->takeItem(i)->toolTip());
+      needsUpdate |= git->checkoutFile(mUnstagedFilesList->takeItem(i)->toolTip());
    }
 
    if (needsUpdate)
@@ -383,17 +691,17 @@ void CommitChangesWidget::removeFileFromCommitList(QListWidgetItem *item)
 {
    if (item->flags() & Qt::ItemIsSelectable)
    {
-      const auto row = ui->stagedFilesList->row(item);
-      const auto fileWidget = qobject_cast<FileWidget *>(ui->stagedFilesList->itemWidget(item));
+      const auto row = mStagedFilesList->row(item);
+      const auto fileWidget = qobject_cast<FileWidget *>(mStagedFilesList->itemWidget(item));
       const auto fileName = fileWidget->toolTip();
       const auto clippedText = QFontMetrics(item->font()).elidedText(fileName, Qt::ElideMiddle, width() - 10);
-      const auto wip = mInternalCache.take(QString("%1-%2").arg(fileName, ui->stagedFilesList->objectName()));
+      const auto wip = mInternalCache.take(QString("%1-%2").arg(fileName, mStagedFilesList->objectName()));
 
-      mInternalCache.insert(QString("%1-%2").arg(fileName, ui->unstagedFilesList->objectName()), wip);
+      mInternalCache.insert(QString("%1-%2").arg(fileName, mUnstagedFilesList->objectName()), wip);
 
-      ui->stagedFilesList->removeItemWidget(item);
-      ui->stagedFilesList->takeItem(row);
-      ui->stagedFilesList->repaint();
+      mStagedFilesList->removeItemWidget(item);
+      mStagedFilesList->takeItem(row);
+      mStagedFilesList->repaint();
 
       const auto newFileWidget = new FileWidget(":/icons/add", clippedText, this);
       newFileWidget->setTextColor(fileWidget->getTextColor());
@@ -404,28 +712,31 @@ void CommitChangesWidget::removeFileFromCommitList(QListWidgetItem *item)
       if (item->data(GitQlientRole::U_IsConflict).toBool())
          newFileWidget->setText(fileName + tr(" (conflicts)"));
 
-      ui->unstagedFilesList->addItem(item);
-      ui->unstagedFilesList->setItemWidget(item, newFileWidget);
-      ui->unstagedFilesList->repaint();
+      mUnstagedFilesList->addItem(item);
+      mUnstagedFilesList->setItemWidget(item, newFileWidget);
+      mUnstagedFilesList->repaint();
 
-      ui->applyActionBtn->setDisabled(ui->stagedFilesList->count() == 0);
+      ui->applyActionBtn->setDisabled(mStagedFilesList->count() == 0);
 
       delete fileWidget;
 
       QScopedPointer<GitLocal> git(new GitLocal(mGit));
       if (const auto ret = git->resetFile(item->toolTip()); ret.success)
          emit signalUpdateWip();
+
+      ui->unstagedFrame->setCount(mUnstagedFilesList->count());
+      ui->stagedFrame->setCount(mStagedFilesList->count());
    }
 }
 
 QStringList CommitChangesWidget::getFiles()
 {
    QStringList selFiles;
-   const auto totalItems = ui->stagedFilesList->count();
+   const auto totalItems = mStagedFilesList->count();
 
    for (auto i = 0; i < totalItems; ++i)
    {
-      const auto fileWidget = ui->stagedFilesList->itemWidget(ui->stagedFilesList->item(i));
+      const auto fileWidget = mStagedFilesList->itemWidget(mStagedFilesList->item(i));
       selFiles.append(fileWidget->toolTip());
    }
 
@@ -485,28 +796,42 @@ bool CommitChangesWidget::hasConflicts()
 
 void CommitChangesWidget::clear()
 {
-   ui->unstagedFilesList->clear();
-   ui->stagedFilesList->clear();
+   mUnstagedFilesList->clear();
+   mStagedFilesList->clear();
    mInternalCache.clear();
    ui->leCommitTitle->clear();
    ui->teDescription->clear();
    ui->applyActionBtn->setEnabled(false);
+
+   mLastSelectedItem = nullptr;
+   mLastSelectedList = nullptr;
+
+   ui->unstagedFrame->setCount(0);
+   ui->stagedFrame->setCount(0);
 }
 
 void CommitChangesWidget::clearStaged()
 {
-   ui->stagedFilesList->clear();
+   if (mLastSelectedList == mStagedFilesList)
+   {
+      mLastSelectedItem = nullptr;
+      mLastSelectedList = nullptr;
+   }
+
+   mStagedFilesList->clear();
 
    const auto end = mInternalCache.end();
    for (auto it = mInternalCache.begin(); it != end;)
    {
-      if (it.key().contains(QString("-%1").arg(ui->stagedFilesList->objectName())))
+      if (it.key().contains(QString("-%1").arg(mStagedFilesList->objectName())))
          it = mInternalCache.erase(it);
       else
          ++it;
    }
 
    ui->applyActionBtn->setEnabled(false);
+
+   ui->stagedFrame->setCount(0);
 }
 
 void CommitChangesWidget::setCommitTitleMaxLength()
@@ -520,7 +845,7 @@ void CommitChangesWidget::setCommitTitleMaxLength()
 
 void CommitChangesWidget::showUnstagedMenu(const QPoint &pos)
 {
-   const auto item = ui->unstagedFilesList->itemAt(pos);
+   const auto item = mUnstagedFilesList->itemAt(pos);
 
    if (item)
    {
@@ -534,7 +859,32 @@ void CommitChangesWidget::showUnstagedMenu(const QPoint &pos)
       connect(contextMenu, &UnstagedMenu::signalStageFile, this, [this, item] { addFileToCommitList(item); });
       connect(contextMenu, &UnstagedMenu::untrackedDeleted, this, &CommitChangesWidget::unstagedFilesChanged);
 
-      const auto parentPos = ui->unstagedFilesList->mapToParent(pos);
+      const auto parentPos = mUnstagedFilesList->mapToParent(pos);
       contextMenu->popup(mapToGlobal(parentPos));
+   }
+}
+
+void CommitChangesWidget::handleItemClick(QListWidget *list, QListWidgetItem *item)
+{
+   if (mLastSelectedItem == item && mLastSelectedList == list && item->isSelected())
+   {
+      list->clearSelection();
+      mLastSelectedItem = nullptr;
+      mLastSelectedList = nullptr;
+
+      emit signalReturnToHistory();
+   }
+   else
+   {
+      if (list == mStagedFilesList)
+         mUnstagedFilesList->clearSelection();
+      else
+         mStagedFilesList->clearSelection();
+
+      item->setSelected(true);
+      mLastSelectedItem = item;
+      mLastSelectedList = list;
+
+      requestDiff(mGit->getWorkingDir() + "/" + item->toolTip());
    }
 }

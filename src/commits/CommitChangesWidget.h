@@ -32,6 +32,7 @@ class GitCache;
 class GitBase;
 class RevisionFiles;
 class FileWidget;
+class QCheckBox;
 
 namespace Ui
 {
@@ -52,18 +53,27 @@ signals:
    void signalUpdateWip();
    void signalCancelAmend(const QString &commitSha);
    void fileStaged(const QString &fileName);
+   void signalReturnToHistory();
 
 public:
+   enum class CommitMode
+   {
+      Wip,
+      Amend
+   };
+
    explicit CommitChangesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
                                 QWidget *parent = nullptr);
 
    ~CommitChangesWidget();
 
-   virtual void configure(const QString &sha) = 0;
-   virtual void reload() final;
-   virtual void clear() final;
-   virtual void clearStaged() final;
-   virtual void setCommitTitleMaxLength() final;
+   void configure(const QString &sha);
+   void reload();
+   void clear();
+   void clearStaged();
+   void setCommitTitleMaxLength();
+   void setCommitMode(CommitMode mode);
+   CommitMode getCommitMode() const { return mCommitMode; }
 
 protected:
    struct WipCacheItem
@@ -75,27 +85,41 @@ protected:
    Ui::CommitChangesWidget *ui = nullptr;
    QSharedPointer<GitCache> mCache;
    QSharedPointer<GitBase> mGit;
+   QListWidget *mUnstagedFilesList = nullptr;
+   QListWidget *mStagedFilesList = nullptr;
    QString mCurrentSha;
    QMap<QString, WipCacheItem> mInternalCache;
    int mTitleMaxLength = 50;
+   CommitMode mCommitMode = CommitMode::Wip;
+   QListWidgetItem *mLastSelectedItem = nullptr;
+   QListWidget *mLastSelectedList = nullptr;
 
-   virtual void commitChanges() = 0;
-   virtual void showUnstagedMenu(const QPoint &pos) final;
+private slots:
+   void commitChanges();
+   void showUnstagedMenu(const QPoint &pos);
+   void onAmendToggled(bool checked);
 
-   virtual void insertFiles(const RevisionFiles &files, QListWidget *fileList) final;
+private:
+   void configureWipMode(const QString &sha);
+   void configureAmendMode(const QString &sha);
+   void commitWipChanges();
+   void commitAmendChanges();
+
+   void insertFiles(const RevisionFiles &files, QListWidget *fileList);
    QPair<QListWidgetItem *, FileWidget *> fillFileItemInfo(const QString &file, bool isConflict, const QString &icon,
                                                            const QColor &color, QListWidget *parent);
-   virtual void prepareCache() final;
-   virtual void clearCache() final;
-   virtual void addAllFilesToCommitList() final;
-   virtual void requestDiff(const QString &fileName) final;
-   virtual QString addFileToCommitList(QListWidgetItem *item, bool updateGit = true) final;
-   virtual void revertAllChanges() final;
-   virtual void removeFileFromCommitList(QListWidgetItem *item) final;
-   virtual QStringList getFiles() final;
-   virtual bool checkMsg(QString &msg) final;
-   virtual void updateCounter(const QString &text) final;
-   virtual bool hasConflicts() final;
-   virtual void resetFile(QListWidgetItem *item) final;
-   virtual QColor getColorForFile(const RevisionFiles &files, int index) const final;
+   void prepareCache();
+   void clearCache();
+   void addAllFilesToCommitList();
+   void requestDiff(const QString &fileName);
+   QString addFileToCommitList(QListWidgetItem *item, bool updateGit = true);
+   void revertAllChanges();
+   void removeFileFromCommitList(QListWidgetItem *item);
+   QStringList getFiles();
+   bool checkMsg(QString &msg);
+   void updateCounter(const QString &text);
+   bool hasConflicts();
+   void resetFile(QListWidgetItem *item);
+   QColor getColorForFile(const RevisionFiles &files, int index) const;
+   void handleItemClick(QListWidget *list, QListWidgetItem *item);
 };

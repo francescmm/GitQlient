@@ -1,8 +1,8 @@
 #include "HistoryWidget.h"
 
-#include <AmendWidget.h>
 #include <BranchesWidget.h>
 #include <CheckBox.h>
+#include <CommitChangesWidget.h>
 #include <CommitHistoryModel.h>
 #include <CommitHistoryView.h>
 #include <CommitInfo.h>
@@ -24,7 +24,6 @@
 #include <GitWip.h>
 #include <RepositoryViewDelegate.h>
 #include <WipHelper.h>
-#include <WipWidget.h>
 
 #include <QLogger.h>
 
@@ -55,15 +54,13 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    QLog_Info("Performance", "HistoryWidget loading...");
    setAttribute(Qt::WA_DeleteOnClose);
 
-   mWipWidget = new WipWidget(mCache, mGit, this);
-   mAmendWidget = new AmendWidget(mCache, mGit, this);
+   mCommitChangesWidget = new CommitChangesWidget(mCache, mGit, this);
    mCommitInfoWidget = new CommitInfoWidget(mCache, mGit, this);
 
    mCommitStackedWidget = new QStackedWidget(this);
    mCommitStackedWidget->setCurrentIndex(0);
    mCommitStackedWidget->addWidget(mCommitInfoWidget);
-   mCommitStackedWidget->addWidget(mWipWidget);
-   mCommitStackedWidget->addWidget(mAmendWidget);
+   mCommitStackedWidget->addWidget(mCommitChangesWidget);
 
    const auto wipLayout = new QVBoxLayout();
    wipLayout->setContentsMargins(QMargins());
@@ -75,30 +72,22 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    wipFrame->setMinimumWidth(200);
    wipFrame->setMaximumWidth(500);
 
-   connect(mWipWidget, &CommitChangesWidget::signalShowDiff, this, &HistoryWidget::showWipFileDiff);
-   connect(mWipWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::returnToView);
-   connect(mWipWidget, &CommitChangesWidget::fileStaged, this, &HistoryWidget::returnToViewIfObsolete);
-   connect(mWipWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
-   connect(mWipWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::cleanCommitPanels);
-   connect(mWipWidget, &CommitChangesWidget::unstagedFilesChanged, this, &HistoryWidget::onRevertedChanges);
-   connect(mWipWidget, &CommitChangesWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
-   connect(mWipWidget, &CommitChangesWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
-   connect(mWipWidget, &CommitChangesWidget::changeReverted, this, [this](const QString &revertedFile) {
+   connect(mCommitChangesWidget, &CommitChangesWidget::signalShowDiff, this, &HistoryWidget::showWipFileDiff);
+   connect(mCommitChangesWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::returnToView);
+   connect(mCommitChangesWidget, &CommitChangesWidget::fileStaged, this, &HistoryWidget::returnToViewIfObsolete);
+   connect(mCommitChangesWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
+   connect(mCommitChangesWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::cleanCommitPanels);
+   connect(mCommitChangesWidget, &CommitChangesWidget::unstagedFilesChanged, this, &HistoryWidget::onRevertedChanges);
+   connect(mCommitChangesWidget, &CommitChangesWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
+   connect(mCommitChangesWidget, &CommitChangesWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
+   connect(mCommitChangesWidget, &CommitChangesWidget::changeReverted, this, [this](const QString &revertedFile) {
       if (mWipFileDiff->getCurrentFile().contains(revertedFile))
          returnToView();
    });
-   connect(mWipWidget, &CommitChangesWidget::changeReverted, this, &HistoryWidget::onRevertedChanges);
-
-   connect(mAmendWidget, &CommitChangesWidget::logReload, this, &HistoryWidget::logReload);
-   connect(mAmendWidget, &CommitChangesWidget::signalShowDiff, this, &HistoryWidget::showWipFileDiff);
-   connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::returnToView);
-   connect(mAmendWidget, &CommitChangesWidget::fileStaged, this, &HistoryWidget::returnToViewIfObsolete);
-   connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::changesCommitted);
-   connect(mAmendWidget, &CommitChangesWidget::changesCommitted, this, &HistoryWidget::cleanCommitPanels);
-   connect(mAmendWidget, &CommitChangesWidget::unstagedFilesChanged, this, &HistoryWidget::onRevertedChanges);
-   connect(mAmendWidget, &CommitChangesWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
-   connect(mAmendWidget, &CommitChangesWidget::signalUpdateWip, this, &HistoryWidget::signalUpdateWip);
-   connect(mAmendWidget, &CommitChangesWidget::signalCancelAmend, this, &HistoryWidget::selectCommit);
+   connect(mCommitChangesWidget, &CommitChangesWidget::changeReverted, this, &HistoryWidget::onRevertedChanges);
+   connect(mCommitChangesWidget, &CommitChangesWidget::logReload, this, &HistoryWidget::logReload);
+   connect(mCommitChangesWidget, &CommitChangesWidget::signalCancelAmend, this, &HistoryWidget::selectCommit);
+   connect(mCommitChangesWidget, &CommitChangesWidget::signalReturnToHistory, this, &HistoryWidget::returnToView);
 
    connect(mCommitInfoWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalShowDiff);
    connect(mCommitInfoWidget, &CommitInfoWidget::signalShowFileHistory, this, &HistoryWidget::signalShowFileHistory);
@@ -257,14 +246,14 @@ void HistoryWidget::clear()
    resetWip();
    mBranchesWidget->clear();
    mCommitInfoWidget->clear();
-   mAmendWidget->clear();
+   mCommitChangesWidget->clear();
 
    mCommitStackedWidget->setCurrentIndex(mCommitStackedWidget->currentIndex());
 }
 
 void HistoryWidget::resetWip()
 {
-   mWipWidget->clear();
+   mCommitChangesWidget->clear();
 }
 
 void HistoryWidget::loadBranches(bool fullReload)
@@ -351,8 +340,7 @@ void HistoryWidget::rearrangeSplittrer(bool minimalActive)
 
 void HistoryWidget::cleanCommitPanels()
 {
-   mWipWidget->clearStaged();
-   mAmendWidget->clearStaged();
+   mCommitChangesWidget->clearStaged();
 }
 
 void HistoryWidget::onRevertedChanges()
@@ -364,8 +352,7 @@ void HistoryWidget::onRevertedChanges()
 
 void HistoryWidget::onCommitTitleMaxLenghtChanged()
 {
-   mWipWidget->setCommitTitleMaxLength();
-   mAmendWidget->setCommitTitleMaxLength();
+   mCommitChangesWidget->setCommitTitleMaxLength();
 }
 
 void HistoryWidget::onPanelsVisibilityChanged()
@@ -518,16 +505,18 @@ void HistoryWidget::selectCommit(const QString &goToSha)
 
    QLog_Info("UI", QString("Selected commit {%1}").arg(goToSha));
 
-   if (isWip)
-      mWipWidget->reload();
-   else
-      mCommitInfoWidget->configure(goToSha);
+   mCommitChangesWidget->setCommitMode(isWip ? CommitChangesWidget::CommitMode::Wip : CommitChangesWidget::CommitMode::Amend);
+   mCommitInfoWidget->configure(goToSha);
 }
 
 void HistoryWidget::onAmendCommit(const QString &sha)
 {
-   mCommitStackedWidget->setCurrentIndex(2);
-   mAmendWidget->configure(sha);
+   mCommitStackedWidget->setCurrentIndex(1);
+
+   const auto commitToAmend = (sha == ZERO_SHA) ? mGit->getLastCommit().output.trimmed() : sha;
+
+   mCommitChangesWidget->setCommitMode(CommitChangesWidget::CommitMode::Amend);
+   mCommitChangesWidget->configure(commitToAmend);
 }
 
 void HistoryWidget::returnToView()

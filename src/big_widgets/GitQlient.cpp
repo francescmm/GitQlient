@@ -136,8 +136,6 @@ GitQlient::GitQlient(QWidget *parent)
    connect(mGit.data(), &GitConfig::signalCloningProgress, this, &GitQlient::updateProgressDialog,
            Qt::DirectConnection);
    connect(mGit.data(), &GitConfig::signalCloningFailure, this, &GitQlient::showError, Qt::DirectConnection);
-
-   // mConfigWidget->onRepoOpened();
 }
 
 GitQlient::~GitQlient()

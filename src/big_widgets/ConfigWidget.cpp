@@ -104,7 +104,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
    ui->chDevMode->setChecked(settings.localValue("DevMode", false).toBool());
    enableWidgets();
 
-   // GitQlient configuration
    ui->chDisableLogs->setChecked(settings.globalValue("logsDisabled", true).toBool());
    ui->cbLogLevel->setCurrentIndex(settings.globalValue("logsLevel", static_cast<int>(LogLevel::Warning)).toInt());
    ui->spCommitTitleLength->setValue(settings.globalValue("commitTitleMaxLength", 50).toInt());
@@ -130,7 +129,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
               saveConfig();
            });
 
-   // Repository configuration
    mOriginalRepoOrder = settings.localValue("GraphSortingOrder", 0).toInt();
    ui->cbLogOrder->setCurrentIndex(mOriginalRepoOrder);
    ui->autoFetch->setValue(settings.localValue("AutoFetch", 5).toInt());
@@ -177,10 +175,6 @@ ConfigWidget::ConfigWidget(const QSharedPointer<GitBase> &git, QWidget *parent)
            &ConfigWidget::onCredentialsOptionChanged);
    connect(ui->pbAddCredentials, &QPushButton::clicked, this, &ConfigWidget::showCredentialsDlg);
 
-   // TODO: Download the plugins info
-   connect(ui->pbPluginsFolder, &QPushButton::clicked, this, &ConfigWidget::selectPluginsFolder);
-
-   // Connects for automatic save
    connect(ui->chDevMode, &CheckBox::stateChanged, this, &ConfigWidget::enableWidgets);
    connect(ui->chDisableLogs, &CheckBox::stateChanged, this, &ConfigWidget::saveConfig);
    connect(ui->cbLogLevel, SIGNAL(currentIndexChanged(int)), this, SLOT(saveConfig()));
@@ -466,7 +460,6 @@ void ConfigWidget::saveFile()
 
 void ConfigWidget::showCredentialsDlg()
 {
-   // Store credentials if allowed and the user checked the box
    if (ui->credentialsFrames->isVisible() && ui->chbCredentials->isChecked())
    {
       if (ui->rbCache->isChecked())

@@ -21,6 +21,7 @@
 #include <QPushButton>
 #include <QTimer>
 #include <QToolButton>
+#include <qwidget.h>
 
 using namespace QLogger;
 
@@ -28,13 +29,13 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    : QFrame(parent)
    , mCache(cache)
    , mGit(git)
-   , mStashPop(new QToolButton(this))
-   , mStashPush(new QToolButton(this))
-   , mPullBtn(new QToolButton(this))
-   , mPullOptions(new QToolButton(this))
-   , mPushBtn(new QToolButton(this))
-   , mRefreshBtn(new QToolButton(this))
-   , mConfigBtn(new QToolButton(this))
+   , mStashPop(createToolButton(":/icons/git_pop", tr("Stash Pop"), Qt::CTRL | Qt::Key_2))
+   , mStashPush(createToolButton(":/icons/git_stash", tr("Stash Push"), Qt::CTRL | Qt::Key_3))
+   , mPullBtn(createToolButton(":/icons/git_pull", tr("Pull"), Qt::CTRL | Qt::Key_4))
+   , mPullOptions(createToolButton(":/icons/arrow_down", tr("Remote actions")))
+   , mPushBtn(createToolButton(":/icons/git_push", tr("Push"), Qt::CTRL | Qt::Key_5))
+   , mRefreshBtn(createToolButton(":/icons/refresh", tr("Refresh"), Qt::Key_F5))
+   , mConfigBtn(createToolButton(":/icons/config", tr("Config"), Qt::CTRL | Qt::Key_6))
    , mVersionCheck(new QToolButton(this))
    , mMergeWarning(
          new QPushButton(tr("WARNING: There is a merge pending to be committed! Click here to solve it."), this))
@@ -50,18 +51,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
       mLastSeparator->setVisible(mVersionCheck->isVisible());
    });
 
-   mStashPop->setIcon(QIcon(":/icons/git_pop"));
-   mStashPop->setIconSize(QSize(22, 22));
-   mStashPop->setToolTip(tr("Stash Pop"));
-   mStashPop->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mStashPop->setShortcut(Qt::CTRL | Qt::Key_2);
-
-   mStashPush->setIcon(QIcon(":/icons/git_stash"));
-   mStashPush->setIconSize(QSize(22, 22));
-   mStashPush->setToolTip(tr("Stash Push"));
-   mStashPush->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mStashPush->setShortcut(Qt::CTRL | Qt::Key_3);
-
    const auto menu = new QMenu(mPullOptions);
    menu->installEventFilter(this);
 
@@ -72,20 +61,10 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    connect(action, &QAction::triggered, this, &Controls::pruneBranches);
    menu->addSeparator();
 
-   mPullBtn->setIconSize(QSize(22, 22));
-   mPullBtn->setToolTip(tr("Pull"));
-   mPullBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mPullBtn->setPopupMode(QToolButton::InstantPopup);
-   mPullBtn->setIcon(QIcon(":/icons/git_pull"));
    mPullBtn->setObjectName("ToolButtonAboveMenu");
-   mPullBtn->setShortcut(Qt::CTRL | Qt::Key_4);
 
-   mPullOptions->setMenu(menu);
-   mPullOptions->setIcon(QIcon(":/icons/arrow_down"));
-   mPullOptions->setIconSize(QSize(22, 22));
-   mPullOptions->setToolButtonStyle(Qt::ToolButtonIconOnly);
    mPullOptions->setPopupMode(QToolButton::InstantPopup);
-   mPullOptions->setToolTip("Remote actions");
    mPullOptions->setObjectName("ToolButtonWithMenu");
 
    const auto pullLayout = new QVBoxLayout();
@@ -93,25 +72,6 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    pullLayout->setSpacing(0);
    pullLayout->addWidget(mPullBtn);
    pullLayout->addWidget(mPullOptions);
-
-   mPushBtn->setIcon(QIcon(":/icons/git_push"));
-   mPushBtn->setIconSize(QSize(22, 22));
-   mPushBtn->setToolTip(tr("Push"));
-   mPushBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mPushBtn->setShortcut(Qt::CTRL | Qt::Key_5);
-
-   mRefreshBtn->setIcon(QIcon(":/icons/refresh"));
-   mRefreshBtn->setIconSize(QSize(22, 22));
-   mRefreshBtn->setToolTip(tr("Refresh"));
-   mRefreshBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mRefreshBtn->setShortcut(Qt::Key_F5);
-
-   mConfigBtn->setCheckable(true);
-   mConfigBtn->setIcon(QIcon(":/icons/config"));
-   mConfigBtn->setIconSize(QSize(22, 22));
-   mConfigBtn->setToolTip(tr("Config"));
-   mConfigBtn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-   mConfigBtn->setShortcut(Qt::CTRL | Qt::Key_6);
 
    const auto separator = new QFrame(this);
    separator->setObjectName("orangeSeparator");
@@ -293,26 +253,19 @@ ControlsMainViews Controls::getCurrentSelectedButton() const
    return mStashPush->isChecked() ? ControlsMainViews::Blame : ControlsMainViews::History;
 }
 
-void Controls::showJenkinsButton(bool show)
+QToolButton *Controls::createToolButton(const QString &iconPath, const QString &tooltip,
+                                        const QKeySequence &shortcut)
 {
-   mBuildSystem->setVisible(show);
-   mPluginsSeparator->setVisible(show || mGitPlatform->isVisible());
-}
-
-void Controls::enableJenkins(bool enable)
-{
-   mBuildSystem->setEnabled(enable);
-}
-
-void Controls::showGitServerButton(bool show)
-{
-   mGitPlatform->setVisible(show);
-   mPluginsSeparator->setVisible(mBuildSystem->isVisible() || show);
-}
-
-void Controls::enableGitServer(bool enabled)
-{
-   mGitPlatform->setEnabled(enabled);
+   auto button = new QToolButton(this);
+   button->setIcon(QIcon(iconPath));
+   button->setIconSize(QSize(22, 22));
+   button->setToolTip(tooltip);
+   button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+   if (!shortcut.isEmpty())
+   {
+      button->setShortcut(shortcut);
+   }
+   return button;
 }
 
 void Controls::pushCurrentBranch()

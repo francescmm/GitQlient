@@ -13,41 +13,60 @@
 
 #include <QApplication>
 #include <QKeyEvent>
+#include <QMenu>
 #include <QMessageBox>
-
 #include <QRegularExpression>
 
 using namespace GitQlient;
 
-BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+BranchTreeWidget::BranchTreeWidget(QWidget *parent)
+   : QTreeWidget(parent)
+{
+   setHeaderHidden(true);
+
+   setRootIsDecorated(true);
+   setIndentation(20);
+   setAnimated(true);
+
+   installEventFilter(this);
+   setMouseTracking(true);
+   setContextMenuPolicy(Qt::CustomContextMenu);
+
+   connect(this, &BranchTreeWidget::customContextMenuRequested,
+           this, &BranchTreeWidget::showBranchesContextMenu);
+   connect(this, &BranchTreeWidget::itemClicked,
+           this, &BranchTreeWidget::selectCommit);
+   connect(this, &BranchTreeWidget::itemSelectionChanged,
+           this, &BranchTreeWidget::onSelectionChanged);
+   connect(this, &BranchTreeWidget::itemDoubleClicked,
+           this, &BranchTreeWidget::checkoutBranch);
+
+   const auto delAction = new QAction(this);
+   delAction->setShortcut(Qt::Key_Delete);
+   connect(delAction, &QAction::triggered, this, &BranchTreeWidget::onDeleteBranch);
+   addAction(delAction);
+}
+
+BranchTreeWidget::BranchTreeWidget(const QSharedPointer<GitCache> &cache,
+                                   const QSharedPointer<GitBase> &git,
                                    QWidget *parent)
    : BranchTreeWidget(parent)
 {
    init(cache, git);
 }
 
-BranchTreeWidget::BranchTreeWidget(QWidget *parent)
-{
-   installEventFilter(this);
-
-   connect(this, &BranchTreeWidget::customContextMenuRequested, this, &BranchTreeWidget::showBranchesContextMenu);
-   connect(this, &BranchTreeWidget::itemClicked, this, &BranchTreeWidget::selectCommit);
-   connect(this, &BranchTreeWidget::itemSelectionChanged, this, &BranchTreeWidget::onSelectionChanged);
-   connect(this, &BranchTreeWidget::itemDoubleClicked, this, &BranchTreeWidget::checkoutBranch);
-
-   const auto delAction = new QAction(this);
-   delAction->setShortcut(Qt::Key_Delete);
-   connect(delAction, &QAction::triggered, this, &BranchTreeWidget::onDeleteBranch);
-}
-
-void BranchTreeWidget::init(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git)
+void BranchTreeWidget::init(const QSharedPointer<GitCache> &cache,
+                            const QSharedPointer<GitBase> &git)
 {
    mCache = cache;
    mGit = git;
 }
 
-void BranchTreeWidget::reloadCurrentBranchLink() const
+void BranchTreeWidget::reloadCurrentBranchLink()
 {
+   if (!mGit)
+      return;
+
    const auto items = findChildItem(mGit->getCurrentBranch());
 
    if (!items.isEmpty())
@@ -57,19 +76,89 @@ void BranchTreeWidget::reloadCurrentBranchLink() const
    }
 }
 
-bool BranchTreeWidget::eventFilter(QObject *, QEvent *event)
+void BranchTreeWidget::clearSelection()
 {
-   if (hasFocus() && event->type() == QEvent::KeyRelease && dynamic_cast<QKeyEvent *>(event)->key() == Qt::Key_Delete)
+   QTreeWidget::clearSelection();
+}
+
+int BranchTreeWidget::focusOnBranch(const QString &itemText, int startSearchPos)
+{
+   const auto items = findChildItem(itemText);
+
+   if (items.isEmpty())
+      return -1;
+
+   if (startSearchPos >= 0 && startSearchPos < items.count())
    {
-      onDeleteBranch();
-      return true;
+      setCurrentItem(items.at(startSearchPos));
+      return startSearchPos;
+   }
+   else if (!items.isEmpty())
+   {
+      setCurrentItem(items.first());
+      return 0;
    }
 
+   return -1;
+}
+
+QVector<QTreeWidgetItem *> BranchTreeWidget::findChildItem(const QString &text) const
+{
+   QVector<QTreeWidgetItem *> items;
+
+   for (int i = 0; i < topLevelItemCount(); ++i)
+   {
+      auto item = topLevelItem(i);
+      if (item->text(0) == text || item->data(0, FullNameRole).toString() == text)
+      {
+         items.append(item);
+      }
+
+      QList<QTreeWidgetItem *> stack;
+      stack.append(item);
+
+      while (!stack.isEmpty())
+      {
+         auto current = stack.takeFirst();
+         for (int j = 0; j < current->childCount(); ++j)
+         {
+            auto child = current->child(j);
+            if (child->text(0) == text || child->data(0, FullNameRole).toString() == text)
+            {
+               items.append(child);
+            }
+            if (child->childCount() > 0)
+            {
+               stack.append(child);
+            }
+         }
+      }
+   }
+
+   return items;
+}
+
+bool BranchTreeWidget::eventFilter(QObject *, QEvent *event)
+{
+   if (hasFocus() && event->type() == QEvent::KeyRelease)
+   {
+      if (auto keyEvent = dynamic_cast<QKeyEvent *>(event))
+      {
+         if (keyEvent->key() == Qt::Key_Delete)
+         {
+            onDeleteBranch();
+            return true;
+         }
+      }
+   }
    return false;
 }
 
 void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 {
+   if (!mCache || !mGit)
+      return;
+
    if (const auto item = itemAt(pos); item != nullptr)
    {
       auto selectedBranch = item->data(0, FullNameRole).toString();
@@ -78,14 +167,21 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
       {
          auto currentBranch = mGit->getCurrentBranch();
 
-         const auto menu = new BranchContextMenu({ currentBranch, selectedBranch, mLocal, mCache, mGit }, this);
-         connect(menu, &BranchContextMenu::signalRefreshPRsCache, this, &BranchTreeWidget::signalRefreshPRsCache);
-         connect(menu, &BranchContextMenu::logReload, this, &BranchTreeWidget::logReload);
-         connect(menu, &BranchContextMenu::fullReload, this, &BranchTreeWidget::fullReload);
-         connect(menu, &BranchContextMenu::signalCheckoutBranch, this, [this, item]() { checkoutBranch(item); });
-         connect(menu, &BranchContextMenu::signalMergeRequired, this, &BranchTreeWidget::signalMergeRequired);
-         connect(menu, &BranchContextMenu::mergeSqushRequested, this, &BranchTreeWidget::mergeSqushRequested);
-         connect(menu, &BranchContextMenu::signalPullConflict, this, &BranchTreeWidget::signalPullConflict);
+         const auto menu = new BranchContextMenu({ currentBranch, selectedBranch, mIsLocal, mCache, mGit }, this);
+         connect(menu, &BranchContextMenu::signalRefreshPRsCache,
+                 this, &BranchTreeWidget::signalRefreshPRsCache);
+         connect(menu, &BranchContextMenu::logReload,
+                 this, &BranchTreeWidget::logReload);
+         connect(menu, &BranchContextMenu::fullReload,
+                 this, &BranchTreeWidget::fullReload);
+         connect(menu, &BranchContextMenu::signalCheckoutBranch,
+                 this, [this, item]() { checkoutBranch(item); });
+         connect(menu, &BranchContextMenu::signalMergeRequired,
+                 this, &BranchTreeWidget::signalMergeRequired);
+         connect(menu, &BranchContextMenu::mergeSqushRequested,
+                 this, &BranchTreeWidget::mergeSqushRequested);
+         connect(menu, &BranchContextMenu::signalPullConflict,
+                 this, &BranchTreeWidget::signalPullConflict);
 
          menu->exec(viewport()->mapToGlobal(pos));
       }
@@ -94,8 +190,7 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
          QScopedPointer<GitRemote> git(new GitRemote(mGit));
          if (const auto ret = git->getRemotes(); ret.success)
          {
-            const auto flag = Qt::SkipEmptyParts;
-            const auto remotes = ret.output.split("\n", flag);
+            const auto remotes = ret.output.split("\n", Qt::SkipEmptyParts);
 
             if (remotes.count() > 1)
             {
@@ -105,7 +200,8 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
                   QScopedPointer<GitRemote> git(new GitRemote(mGit));
                   if (const auto ret = git->removeRemote(item->text(0)); ret.success)
                   {
-                     mCache->deleteReference(item->data(0, ShaRole).toString(), References::Type::RemoteBranches,
+                     mCache->deleteReference(item->data(0, ShaRole).toString(),
+                                             References::Type::RemoteBranches,
                                              item->text(0));
                      emit fullReload();
                   }
@@ -118,7 +214,7 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
       else
       {
          GitQlientSettings settings(mGit->getGitDir());
-         if (settings.localValue("DeleteRemoteFolder", false).toBool() || mLocal)
+         if (settings.localValue("DeleteRemoteFolder", false).toBool() || mIsLocal)
             showDeleteFolderMenu(item, pos);
          else
          {
@@ -130,7 +226,7 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
          }
       }
    }
-   else if (!mLocal)
+   else if (!mIsLocal)
    {
       const auto menu = new QMenu(this);
       const auto addRemote = menu->addAction(tr("Add remote"));
@@ -148,61 +244,62 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
 
 void BranchTreeWidget::checkoutBranch(QTreeWidgetItem *item)
 {
-   if (item)
+   if (!item || !mGit)
+      return;
+
+   auto branchName = item->data(0, FullNameRole).toString();
+
+   if (!branchName.isEmpty())
    {
-      auto branchName = item->data(0, FullNameRole).toString();
+      const auto isLocal = item->data(0, LocalBranchRole).toBool();
+      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+      QScopedPointer<GitBranches> git(new GitBranches(mGit));
+      const auto ret = isLocal
+          ? git->checkoutLocalBranch(branchName.remove("origin/"))
+          : git->checkoutRemoteBranch(branchName);
+      QApplication::restoreOverrideCursor();
 
-      if (!branchName.isEmpty())
+      const auto output = ret.output;
+
+      if (ret.success)
       {
-         const auto isLocal = item->data(0, LocalBranchRole).toBool();
-         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-         QScopedPointer<GitBranches> git(new GitBranches(mGit));
-         const auto ret
-             = isLocal ? git->checkoutLocalBranch(branchName.remove("origin/")) : git->checkoutRemoteBranch(branchName);
-         QApplication::restoreOverrideCursor();
+         static QRegularExpression rx("by \\d+ commits");
+         const auto texts = rx.match(output).capturedTexts();
+         const auto value = texts.isEmpty() ? QStringList() : texts.constFirst().split(" ");
 
-         const auto output = ret.output;
+         auto uiUpdateRequested = false;
 
-         if (ret.success)
+         if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
          {
-            static QRegularExpression rx("by \\d+ commits");
-            const auto texts = rx.match(output).capturedTexts();
-            const auto value = texts.isEmpty() ? QStringList() : texts.constFirst().split(" ");
+            PullDlg pull(mGit, output.split('\n').first());
+            connect(&pull, &PullDlg::signalRepositoryUpdated, this, &BranchTreeWidget::fullReload);
+            connect(&pull, &PullDlg::signalPullConflict, this, &BranchTreeWidget::signalPullConflict);
 
-            auto uiUpdateRequested = false;
-
-            if (value.count() == 3 && output.contains("your branch is behind", Qt::CaseInsensitive))
-            {
-               PullDlg pull(mGit, output.split('\n').first());
-               connect(&pull, &PullDlg::signalRepositoryUpdated, this, &BranchTreeWidget::fullReload);
-               connect(&pull, &PullDlg::signalPullConflict, this, &BranchTreeWidget::signalPullConflict);
-
-               if (pull.exec() == QDialog::Accepted)
-                  uiUpdateRequested = true;
-            }
-
-            if (!uiUpdateRequested)
-            {
-               if (auto oldItem = findChildItem(mGit->getCurrentBranch()); !oldItem.empty())
-               {
-                  oldItem.at(0)->setData(0, GitQlient::IsCurrentBranchRole, false);
-                  oldItem.clear();
-                  oldItem.squeeze();
-               }
-            }
-
-            emit fullReload();
+            if (pull.exec() == QDialog::Accepted)
+               uiUpdateRequested = true;
          }
-         else
+
+         if (!uiUpdateRequested)
          {
-            QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
-                               tr("There were problems during the checkout operation. Please, see the detailed "
-                                  "description for more information."),
-                               QMessageBox::Ok, this);
-            msgBox.setDetailedText(output);
-            msgBox.setStyleSheet(GitQlientStyles::getStyles());
-            msgBox.exec();
+            if (auto oldItem = findChildItem(mGit->getCurrentBranch()); !oldItem.empty())
+            {
+               oldItem.at(0)->setData(0, GitQlient::IsCurrentBranchRole, false);
+               oldItem.clear();
+               oldItem.squeeze();
+            }
          }
+
+         emit fullReload();
+      }
+      else
+      {
+         QMessageBox msgBox(QMessageBox::Critical, tr("Error while checking out"),
+                            tr("There were problems during the checkout operation. Please, see the detailed "
+                               "description for more information."),
+                            QMessageBox::Ok, this);
+         msgBox.setDetailedText(output);
+         msgBox.setStyleSheet(GitQlientStyles::getStyles());
+         msgBox.exec();
       }
    }
 }
@@ -226,7 +323,8 @@ void BranchTreeWidget::showDeleteFolderMenu(QTreeWidgetItem *item, const QPoint 
    mFolderToRemove = item;
 
    const auto menu = new QMenu(this);
-   connect(menu->addAction("Delete folder"), &QAction::triggered, this, &BranchTreeWidget::deleteFolder);
+   connect(menu->addAction("Delete folder"), &QAction::triggered,
+           this, &BranchTreeWidget::deleteFolder);
    menu->exec(viewport()->mapToGlobal(pos));
 }
 
@@ -239,15 +337,13 @@ void BranchTreeWidget::discoverBranchesInFolder(QTreeWidgetItem *folder, QString
       if (const auto fullName = folder->child(i)->data(0, FullNameRole).toString(); !fullName.isEmpty())
          branches.append(fullName);
       else
-      {
          discoverBranchesInFolder(folder->child(i), branches);
-      }
    }
 }
 
 void BranchTreeWidget::deleteFolder()
 {
-   if (!mFolderToRemove)
+   if (!mFolderToRemove || !mGit || !mCache)
       return;
 
    QStringList branchesToRemove;
@@ -265,10 +361,10 @@ void BranchTreeWidget::deleteFolder()
 
       for (const auto &branch : std::as_const(branchesToRemove))
       {
-         const auto type = mLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
+         const auto type = mIsLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
          const auto sha = mCache->getShaOfReference(branch, type);
          QScopedPointer<GitBranches> git(new GitBranches(mGit));
-         const auto ret2 = mLocal ? git->removeLocalBranch(branch) : git->removeRemoteBranch(branch);
+         const auto ret2 = mIsLocal ? git->removeLocalBranch(branch) : git->removeRemoteBranch(branch);
 
          if (ret2.success)
          {
@@ -295,11 +391,19 @@ void BranchTreeWidget::deleteFolder()
 
 void BranchTreeWidget::onDeleteBranch()
 {
-   const auto item = selectedItems().constFirst();
+   if (!mCache || !mGit)
+      return;
+
+   const auto items = selectedItems();
+   if (items.isEmpty())
+      return;
+
+   const auto item = items.constFirst();
 
    if (item->data(0, IsRoot).toBool())
    {
-      auto ret = QMessageBox::warning(this, tr("Delete branch!"), tr("Are you sure you want to delete the remote?"),
+      auto ret = QMessageBox::warning(this, tr("Delete branch!"),
+                                      tr("Are you sure you want to delete the remote?"),
                                       QMessageBox::Ok, QMessageBox::Cancel);
 
       if (ret == QMessageBox::Ok)
@@ -307,29 +411,33 @@ void BranchTreeWidget::onDeleteBranch()
          QScopedPointer<GitRemote> git(new GitRemote(mGit));
          if (const auto ret = git->removeRemote(item->text(0)); ret.success)
          {
-            mCache->deleteReference(item->data(0, ShaRole).toString(), References::Type::RemoteBranches, item->text(0));
+            mCache->deleteReference(item->data(0, ShaRole).toString(),
+                                    References::Type::RemoteBranches,
+                                    item->text(0));
             emit fullReload();
          }
       }
    }
    else if (auto selectedBranch = item->data(0, FullNameRole).toString(); !selectedBranch.isEmpty())
    {
-
-      if (!mLocal && selectedBranch == "master")
-         QMessageBox::critical(this, tr("Delete master?!"), tr("You are not allowed to delete remote master."),
+      if (!mIsLocal && selectedBranch == "master")
+         QMessageBox::critical(this, tr("Delete master?!"),
+                               tr("You are not allowed to delete remote master."),
                                QMessageBox::Ok);
       else
       {
-         auto ret = QMessageBox::warning(this, tr("Delete branch!"), tr("Are you sure you want to delete the branch?"),
+         auto ret = QMessageBox::warning(this, tr("Delete branch!"),
+                                         tr("Are you sure you want to delete the branch?"),
                                          QMessageBox::Ok, QMessageBox::Cancel);
 
          if (ret == QMessageBox::Ok)
          {
-            const auto type = mLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
+            const auto type = mIsLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
             const auto sha = mCache->getShaOfReference(selectedBranch, type);
             QScopedPointer<GitBranches> git(new GitBranches(mGit));
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-            const auto ret2 = mLocal ? git->removeLocalBranch(selectedBranch) : git->removeRemoteBranch(selectedBranch);
+            const auto ret2 = mIsLocal ? git->removeLocalBranch(selectedBranch)
+                                       : git->removeRemoteBranch(selectedBranch);
             QApplication::restoreOverrideCursor();
 
             if (ret2.success)
@@ -347,7 +455,7 @@ void BranchTreeWidget::onDeleteBranch()
    else
    {
       GitQlientSettings settings(mGit->getGitDir());
-      if (settings.localValue("DeleteRemoteFolder", false).toBool() || mLocal)
+      if (settings.localValue("DeleteRemoteFolder", false).toBool() || mIsLocal)
          deleteFolder();
       else
       {

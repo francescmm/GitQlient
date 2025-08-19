@@ -178,6 +178,8 @@ private:
    QFrame *mPluginsSeparator = nullptr;
    bool mGoGitServerView = false;
 
+   QToolButton *createToolButton(const QString &iconPath, const QString &tooltip,
+                                 const QKeySequence &shortcut = QKeySequence());
    /*!
     \brief Pulls the current branch.
 

@@ -244,8 +244,7 @@ private:
    QLineEdit *mSearchInput = nullptr;
    QStackedWidget *mCommitStackedWidget = nullptr;
    QStackedWidget *mCenterStackedWidget = nullptr;
-   CommitChangesWidget *mWipWidget = nullptr;
-   CommitChangesWidget *mAmendWidget = nullptr;
+   CommitChangesWidget *mCommitChangesWidget = nullptr;
    CommitInfoWidget *mCommitInfoWidget = nullptr;
    CheckBox *mChShowAllBranches = nullptr;
    RepositoryViewDelegate *mItemDelegate = nullptr;
