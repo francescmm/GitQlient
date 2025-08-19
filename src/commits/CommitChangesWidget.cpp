@@ -109,7 +109,7 @@ void CommitChangesWidget::setCommitMode(CommitMode mode)
 {
    mCommitMode = mode;
 
-   const bool isAmend = (mode == CommitMode::Amend);
+   const auto isAmend = mCommitMode == CommitMode::Amend;
    ui->amendCheckBox->setChecked(isAmend);
    ui->amendFrame->setVisible(isAmend);
    ui->applyActionBtn->setText(isAmend ? tr("Amend") : tr("Commit"));
@@ -132,6 +132,8 @@ void CommitChangesWidget::onAmendToggled(bool checked)
       ui->amendFrame->setVisible(false);
       ui->applyActionBtn->setText(tr("Commit"));
 
+      ui->leCommitTitle->clear();
+      ui->teDescription->clear();
       ui->leAuthorName->clear();
       ui->leAuthorEmail->clear();
 

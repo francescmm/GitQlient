@@ -51,7 +51,6 @@ signals:
    void unstagedFilesChanged();
    void signalShowFileHistory(const QString &fileName);
    void signalUpdateWip();
-   void signalCancelAmend(const QString &commitSha);
    void fileStaged(const QString &fileName);
    void signalReturnToHistory();
 

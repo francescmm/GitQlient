@@ -86,7 +86,6 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    });
    connect(mCommitChangesWidget, &CommitChangesWidget::changeReverted, this, &HistoryWidget::onRevertedChanges);
    connect(mCommitChangesWidget, &CommitChangesWidget::logReload, this, &HistoryWidget::logReload);
-   connect(mCommitChangesWidget, &CommitChangesWidget::signalCancelAmend, this, &HistoryWidget::selectCommit);
    connect(mCommitChangesWidget, &CommitChangesWidget::signalReturnToHistory, this, &HistoryWidget::returnToView);
 
    connect(mCommitInfoWidget, &CommitInfoWidget::signalOpenFileCommit, this, &HistoryWidget::signalShowDiff);
@@ -505,7 +504,9 @@ void HistoryWidget::selectCommit(const QString &goToSha)
 
    QLog_Info("UI", QString("Selected commit {%1}").arg(goToSha));
 
-   mCommitChangesWidget->setCommitMode(isWip ? CommitChangesWidget::CommitMode::Wip : CommitChangesWidget::CommitMode::Amend);
+   if (isWip)
+      mCommitChangesWidget->setCommitMode(CommitChangesWidget::CommitMode::Wip);
+
    mCommitInfoWidget->configure(goToSha);
 }
 
