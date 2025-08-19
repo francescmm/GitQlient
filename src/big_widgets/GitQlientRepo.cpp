@@ -289,6 +289,9 @@ void GitQlientRepo::onRepoLoadFinished()
       return;
    }
 
+   // Update WIP information on initial load
+   WipHelper::update(mGitBase, mGitQlientCache);
+
    mHistoryWidget->updateGraphView(totalCommits);
 
    mBlameWidget->onNewRevisions(totalCommits);
