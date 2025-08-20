@@ -148,16 +148,6 @@ public:
    */
    void disableMergeWarning();
    /*!
-    \brief Disables the diff button and view.
-
-   */
-   void disableDiff();
-   /*!
-    \brief Enables the diff button and view.
-
-   */
-   void enableDiff();
-   /*!
     \brief Gets the current selected button/view.
 
     \return ControlsMainViews The value of the current selected button.

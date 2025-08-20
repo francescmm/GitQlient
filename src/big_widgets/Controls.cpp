@@ -164,6 +164,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
 void Controls::enableButtons(bool enabled)
 {
    mStashPush->setEnabled(enabled);
+   mStashPop->setEnabled(enabled);
    mPullBtn->setEnabled(enabled);
    mPullOptions->setEnabled(enabled);
    mPushBtn->setEnabled(enabled);
@@ -305,16 +306,6 @@ void Controls::activateMergeWarning()
 void Controls::disableMergeWarning()
 {
    mMergeWarning->setVisible(false);
-}
-
-void Controls::disableDiff()
-{
-   mStashPop->setDisabled(true);
-}
-
-void Controls::enableDiff()
-{
-   mStashPop->setEnabled(true);
 }
 
 ControlsMainViews Controls::getCurrentSelectedButton() const

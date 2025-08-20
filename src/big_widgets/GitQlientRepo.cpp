@@ -131,7 +131,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mHistoryWidget, &HistoryWidget::showPrDetailedView, this, &GitQlientRepo::showGitServerPrView);
 
    connect(mDiffWidget, &DiffWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
-   connect(mDiffWidget, &DiffWidget::signalDiffEmpty, mControls, &Controls::disableDiff);
    connect(mDiffWidget, &DiffWidget::signalDiffEmpty, this, &GitQlientRepo::showPreviousView);
 
    connect(mBlameWidget, &BlameWidget::showFileDiff, this, &GitQlientRepo::loadFileDiff);
@@ -188,11 +187,7 @@ void GitQlientRepo::openCommitDiff(const QString currentSha)
    const auto loaded = mDiffWidget->loadCommitDiff(currentSha, rev.firstParent());
 
    if (loaded)
-   {
-      mControls->enableDiff();
-
       showDiffView();
-   }
 }
 
 void GitQlientRepo::clearWindow()
@@ -244,8 +239,6 @@ void GitQlientRepo::onRepoLoadFinished()
       setWidgetsEnabled(true);
 
       mBlameWidget->init(mCurrentDir);
-
-      mControls->enableButtons(true);
 
       mAutoFilesUpdate->start();
 
@@ -314,10 +307,7 @@ void GitQlientRepo::loadFileDiff(const QString &currentSha, const QString &previ
    const auto loaded = mDiffWidget->loadFileDiff(currentSha, previousSha, file);
 
    if (loaded)
-   {
-      mControls->enableDiff();
       showDiffView();
-   }
 }
 
 void GitQlientRepo::showHistoryView()
