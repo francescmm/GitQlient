@@ -185,7 +185,7 @@ void BranchesWidget::processBranches()
       }
    }
 
-   mLocalBranches->setCount(QString("(%1)").arg(localCount));
+   mLocalBranches->setCount(localCount);
 
    branches = mCache->getBranches(References::Type::RemoteBranches);
    int remoteCount = 0;
@@ -203,7 +203,7 @@ void BranchesWidget::processBranches()
       }
    }
 
-   mRemoteBranches->setCount(QString("(%1)").arg(remoteCount));
+   mRemoteBranches->setCount(remoteCount);
 }
 
 void BranchesWidget::processTags()
@@ -237,7 +237,7 @@ void BranchesWidget::processTags()
       }
    }
 
-   mTags->setCount(QString("(%1)").arg(tagsCount));
+   mTags->setCount(tagsCount);
 }
 
 void BranchesWidget::processListItems()

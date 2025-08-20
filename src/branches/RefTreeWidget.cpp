@@ -85,11 +85,6 @@ RefTreeWidget::~RefTreeWidget()
    delete mDelegate;
 }
 
-void RefTreeWidget::setCount(const QString &count)
-{
-   mFrame->setCount(count);
-}
-
 void RefTreeWidget::setCount(int count)
 {
    mFrame->setCount(count);

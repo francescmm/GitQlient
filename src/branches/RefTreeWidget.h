@@ -39,7 +39,6 @@ public:
                           QWidget *parent = nullptr);
    ~RefTreeWidget();
 
-   void setCount(const QString &count);
    void setCount(int count);
    void adjustBranchesTree();
    void reloadCurrentBranchLink();
