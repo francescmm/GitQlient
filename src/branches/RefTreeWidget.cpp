@@ -170,7 +170,6 @@ void RefTreeWidget::addItems(bool isCurrentBranch, const QString &fullBranchName
       {
          const auto item = parent ? new QTreeWidgetItem(parent) : new QTreeWidgetItem();
          item->setText(0, folder);
-         item->setData(0, GitQlient::IsLeaf, false);
          item->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
 
          if (!parent)
