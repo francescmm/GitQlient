@@ -187,7 +187,7 @@ void BranchesWidget::processBranches()
 
    mLocalBranches->setCount(localCount);
 
-   branches = mCache->getBranches(References::Type::RemoteBranches);
+   branches = mCache->getBranches(References::Type::RemoteBranche);
    int remoteCount = 0;
 
    for (const auto &[sha, branchList] : qAsConst(branches))

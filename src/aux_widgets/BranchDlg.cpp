@@ -128,7 +128,7 @@ void BranchDlg::accept()
 
             if (sha.isEmpty())
             {
-               type = References::Type::RemoteBranches;
+               type = References::Type::RemoteBranche;
                sha = mConfig.mCache->getShaOfReference(ui->leOldName->text(), type);
             }
 
@@ -204,7 +204,7 @@ void BranchDlg::accept()
             if (remote.success)
             {
                const auto sha = mConfig.mCache->getShaOfReference(ui->leOldName->text(), References::Type::LocalBranch);
-               mConfig.mCache->insertReference(sha, References::Type::RemoteBranches,
+               mConfig.mCache->insertReference(sha, References::Type::RemoteBranche,
                                                QString("%1/%2").arg(remote.output, ui->leNewName->text()));
                emit mConfig.mCache->signalCacheUpdated();
             }

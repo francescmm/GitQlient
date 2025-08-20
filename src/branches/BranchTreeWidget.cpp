@@ -201,7 +201,7 @@ void BranchTreeWidget::showBranchesContextMenu(const QPoint &pos)
                   if (const auto ret = git->removeRemote(item->text(0)); ret.success)
                   {
                      mCache->deleteReference(item->data(0, ShaRole).toString(),
-                                             References::Type::RemoteBranches,
+                                             References::Type::RemoteBranche,
                                              item->text(0));
                      emit fullReload();
                   }
@@ -361,7 +361,7 @@ void BranchTreeWidget::deleteFolder()
 
       for (const auto &branch : std::as_const(branchesToRemove))
       {
-         const auto type = mIsLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
+         const auto type = mIsLocal ? References::Type::LocalBranch : References::Type::RemoteBranche;
          const auto sha = mCache->getShaOfReference(branch, type);
          QScopedPointer<GitBranches> git(new GitBranches(mGit));
          const auto ret2 = mIsLocal ? git->removeLocalBranch(branch) : git->removeRemoteBranch(branch);
@@ -412,7 +412,7 @@ void BranchTreeWidget::onDeleteBranch()
          if (const auto ret = git->removeRemote(item->text(0)); ret.success)
          {
             mCache->deleteReference(item->data(0, ShaRole).toString(),
-                                    References::Type::RemoteBranches,
+                                    References::Type::RemoteBranche,
                                     item->text(0));
             emit fullReload();
          }
@@ -432,7 +432,7 @@ void BranchTreeWidget::onDeleteBranch()
 
          if (ret == QMessageBox::Ok)
          {
-            const auto type = mIsLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
+            const auto type = mIsLocal ? References::Type::LocalBranch : References::Type::RemoteBranche;
             const auto sha = mCache->getShaOfReference(selectedBranch, type);
             QScopedPointer<GitBranches> git(new GitBranches(mGit));
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));

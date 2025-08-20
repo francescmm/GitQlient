@@ -84,7 +84,7 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
    if (!localBranches.isEmpty())
       auxMessage.append(tr("<p><b>Local: </b>%1</p>").arg(localBranches.join(",")));
 
-   const auto remoteBranches = mCache->getReferences(sha, References::Type::RemoteBranches);
+   const auto remoteBranches = mCache->getReferences(sha, References::Type::RemoteBranche);
 
    if (!remoteBranches.isEmpty())
       auxMessage.append(tr("<p><b>Remote: </b>%1</p>").arg(remoteBranches.join(",")));

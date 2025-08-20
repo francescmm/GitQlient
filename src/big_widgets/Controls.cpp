@@ -354,11 +354,11 @@ void Controls::pushCurrentBranch()
       if (remote.success)
       {
          const auto oldSha = mCache->getShaOfReference(QString("%1/%2").arg(remote.output, currentBranch),
-                                                       References::Type::RemoteBranches);
+                                                       References::Type::RemoteBranche);
          const auto sha = mCache->getShaOfReference(currentBranch, References::Type::LocalBranch);
-         mCache->deleteReference(oldSha, References::Type::RemoteBranches,
+         mCache->deleteReference(oldSha, References::Type::RemoteBranche,
                                  QString("%1/%2").arg(remote.output, currentBranch));
-         mCache->insertReference(sha, References::Type::RemoteBranches,
+         mCache->insertReference(sha, References::Type::RemoteBranche,
                                  QString("%1/%2").arg(remote.output, currentBranch));
          emit mCache->signalCacheUpdated();
          emit signalRefreshPRsCache();

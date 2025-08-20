@@ -63,6 +63,12 @@ file(GLOB SRC_FILES
    ${PROJECT_SOURCE_DIR}/src/cache/*.cpp
    ${PROJECT_SOURCE_DIR}/src/cache/*.h
    ${PROJECT_SOURCE_DIR}/src/cache/*.ui
+   ${PROJECT_SOURCE_DIR}/src/cache/core/*.cpp
+   ${PROJECT_SOURCE_DIR}/src/cache/core/*.h
+   ${PROJECT_SOURCE_DIR}/src/cache/graph/*.cpp
+   ${PROJECT_SOURCE_DIR}/src/cache/graph/*.h
+   ${PROJECT_SOURCE_DIR}/src/cache/storage/*.cpp
+   ${PROJECT_SOURCE_DIR}/src/cache/storage/*.h
    ${PROJECT_SOURCE_DIR}/src/commits/*.cpp
    ${PROJECT_SOURCE_DIR}/src/commits/*.h
    ${PROJECT_SOURCE_DIR}/src/commits/*.ui
@@ -115,6 +121,9 @@ target_include_directories(
    ${PROJECT_SOURCE_DIR}/src/big_widgets
    ${PROJECT_SOURCE_DIR}/src/branches
    ${PROJECT_SOURCE_DIR}/src/cache
+   ${PROJECT_SOURCE_DIR}/src/cache/core
+   ${PROJECT_SOURCE_DIR}/src/cache/graph
+   ${PROJECT_SOURCE_DIR}/src/cache/storage
    ${PROJECT_SOURCE_DIR}/src/commits
    ${PROJECT_SOURCE_DIR}/src/config
    ${PROJECT_SOURCE_DIR}/src/diff

@@ -491,11 +491,11 @@ void CommitHistoryContextMenu::push()
       if (remote.success)
       {
          const auto oldSha = mCache->getShaOfReference(QString("%1/%2").arg(remote.output, currentBranch),
-                                                       References::Type::RemoteBranches);
+                                                       References::Type::RemoteBranche);
          const auto sha = mCache->getShaOfReference(currentBranch, References::Type::LocalBranch);
-         mCache->deleteReference(oldSha, References::Type::RemoteBranches,
+         mCache->deleteReference(oldSha, References::Type::RemoteBranche,
                                  QString("%1/%2").arg(remote.output, currentBranch));
-         mCache->insertReference(sha, References::Type::RemoteBranches,
+         mCache->insertReference(sha, References::Type::RemoteBranche,
                                  QString("%1/%2").arg(remote.output, currentBranch));
          emit mCache->signalCacheUpdated();
          emit signalRefreshPRsCache();
@@ -672,7 +672,7 @@ void CommitHistoryContextMenu::mergeSquash()
 
 void CommitHistoryContextMenu::addBranchActions(const QString &sha)
 {
-   auto remoteBranches = mCache->getReferences(sha, References::Type::RemoteBranches);
+   auto remoteBranches = mCache->getReferences(sha, References::Type::RemoteBranche);
    const auto localBranches = mCache->getReferences(sha, References::Type::LocalBranch);
 
    QMap<QString, bool> branchTracking;

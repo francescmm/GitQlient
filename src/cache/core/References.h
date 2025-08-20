@@ -34,7 +34,7 @@ public:
       LocalTag,
       RemoteTag,
       LocalBranch,
-      RemoteBranches,
+      RemoteBranche,
    };
 
    void addReference(Type type, const QString &value);

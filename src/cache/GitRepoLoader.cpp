@@ -185,7 +185,7 @@ void GitRepoLoader::processReferences(QByteArray ba)
             }
             else if (refName.startsWith("refs/remotes/") && !refName.endsWith("HEAD"))
             {
-               type = References::Type::RemoteBranches;
+               type = References::Type::RemoteBranche;
                name = QString::fromUtf8(refName.mid(13));
             }
             else

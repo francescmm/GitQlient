@@ -543,7 +543,7 @@ void RepositoryViewDelegate::paintTagBranch(QPainter *painter, QStyleOptionViewI
          refs.append({ tag, graphTag, QString(":/icons/tag_indicator_%1").arg(suffix), true });
       }
 
-      const auto remoteBranches = mCache->getReferences(commit.sha, References::Type::RemoteBranches);
+      const auto remoteBranches = mCache->getReferences(commit.sha, References::Type::RemoteBranche);
       for (const auto &branch : remoteBranches)
       {
          refs.append({ branch, currentLangeColor, QString(":/icons/branch_indicator_%1").arg(suffix) });

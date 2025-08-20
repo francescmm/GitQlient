@@ -10,8 +10,8 @@
 #include <QString>
 #include <QVector>
 
-#include <LaneType.h>
-#include <Lane.h>
+#include <LaneTypeManager.h>
+#include <ShaTracker.h>
 
 //
 //  At any given time, the Lanes class represents a single revision (row) of the history graph.
@@ -28,7 +28,7 @@ class Lanes
 {
 public:
    Lanes() = default;
-   bool isEmpty() { return typeVec.empty(); }
+   bool isEmpty() { return laneTypes.count() == 0; }
    void init(const QString &expectedSha);
    void clear();
    bool isFork(const QString &sha, bool &isDiscontinuity);
@@ -41,21 +41,14 @@ public:
    bool isBranch();
    void afterBranch();
    void nextParent(const QString &sha);
-   void setLanes(QVector<Lane> &ln) { ln = typeVec; } // O(1) vector is implicitly shared
-   QVector<Lane> getLanes() const { return typeVec; }
+   QVector<Lane> getLanes() const { return laneTypes.getLanes(); }
 
 private:
-   int findNextSha(const QString &next, int pos);
-   int findType(LaneType type, int pos);
    int add(LaneType type, const QString &next, int pos);
-   bool isNode(Lane lane) const;
 
-   int activeLane;
-   QVector<Lane> typeVec; // Describes which glyphs should be drawn.
-   QVector<QString> nextShaVec; // The sha1 hashes of the next commit to appear in each lane (column).
-   LaneType NODE = LaneType::MERGE_FORK;
-   LaneType NODE_R = LaneType::MERGE_FORK_R;
-   LaneType NODE_L = LaneType::MERGE_FORK_L;
+   int activeLane = 0;
+   ShaTracker shaTracker;
+   LaneTypeManager laneTypes;
 };
 
 #endif

@@ -177,11 +177,11 @@ void BranchContextMenu::push()
       if (remote.success)
       {
          const auto oldSha = mConfig.mCache->getShaOfReference(
-             QString("%1/%2").arg(remote.output, mConfig.branchSelected), References::Type::RemoteBranches);
+             QString("%1/%2").arg(remote.output, mConfig.branchSelected), References::Type::RemoteBranche);
          const auto sha = mConfig.mCache->getShaOfReference(mConfig.branchSelected, References::Type::LocalBranch);
-         mConfig.mCache->deleteReference(oldSha, References::Type::RemoteBranches,
+         mConfig.mCache->deleteReference(oldSha, References::Type::RemoteBranche,
                                          QString("%1/%2").arg(remote.output, mConfig.branchSelected));
-         mConfig.mCache->insertReference(sha, References::Type::RemoteBranches,
+         mConfig.mCache->insertReference(sha, References::Type::RemoteBranche,
                                          QString("%1/%2").arg(remote.output, mConfig.branchSelected));
          emit mConfig.mCache->signalCacheUpdated();
       }
@@ -282,7 +282,7 @@ void BranchContextMenu::deleteBranch()
 
       if (ret == QMessageBox::Ok)
       {
-         const auto type = mConfig.isLocal ? References::Type::LocalBranch : References::Type::RemoteBranches;
+         const auto type = mConfig.isLocal ? References::Type::LocalBranch : References::Type::RemoteBranche;
          const auto sha = mConfig.mCache->getShaOfReference(mConfig.branchSelected, type);
          QScopedPointer<GitBranches> git(new GitBranches(mConfig.mGit));
          QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));

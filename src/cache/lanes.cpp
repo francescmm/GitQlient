@@ -6,7 +6,7 @@
         Copyright: See COPYING file that comes with this distribution
 
 */
-#include "lanes.h"
+#include <lanes.h>
 
 #include <QStringList>
 
@@ -19,43 +19,40 @@ void Lanes::init(const QString &expectedSha)
 
 void Lanes::clear()
 {
-   typeVec.clear();
-   typeVec.squeeze();
-   nextShaVec.clear();
-   nextShaVec.squeeze();
+   laneTypes.clear();
+   shaTracker.clear();
 }
 
 bool Lanes::isFork(const QString &sha, bool &isDiscontinuity)
 {
-   int pos = findNextSha(sha, 0);
+   int pos = shaTracker.findNextSha(sha, 0);
    isDiscontinuity = activeLane != pos;
-
-   return pos == -1 ? false : findNextSha(sha, pos + 1) != -1;
+   return pos == -1 ? false : shaTracker.findNextSha(sha, pos + 1) != -1;
 }
 
 void Lanes::setFork(const QString &sha)
 {
    auto rangeEnd = 0;
    auto idx = 0;
-   auto rangeStart = rangeEnd = idx = findNextSha(sha, 0);
+   auto rangeStart = rangeEnd = idx = shaTracker.findNextSha(sha, 0);
 
    while (idx != -1)
    {
       rangeEnd = idx;
-      typeVec[idx].setType(LaneType::TAIL);
-      idx = findNextSha(sha, idx + 1);
+      laneTypes.setType(idx, LaneType::TAIL);
+      idx = shaTracker.findNextSha(sha, idx + 1);
    }
 
-   typeVec[activeLane].setType(NODE);
+   laneTypes.setType(activeLane, LaneType::MERGE_FORK);
 
-   auto &startT = typeVec[rangeStart];
-   auto &endT = typeVec[rangeEnd];
+   auto &startT = laneTypes[rangeStart];
+   auto &endT = laneTypes[rangeEnd];
 
-   if (startT.equals(NODE))
-      startT.setType(NODE_L);
+   if (startT.equals(LaneType::MERGE_FORK))
+      startT.setType(LaneType::MERGE_FORK_L);
 
-   if (endT.equals(NODE))
-      endT.setType(NODE_R);
+   if (endT.equals(LaneType::MERGE_FORK))
+      endT.setType(LaneType::MERGE_FORK_R);
 
    if (startT.equals(LaneType::TAIL))
       startT.setType(LaneType::TAIL_L);
@@ -65,7 +62,7 @@ void Lanes::setFork(const QString &sha)
 
    for (int i = rangeStart + 1; i < rangeEnd; ++i)
    {
-      switch (auto &t = typeVec[i]; t.getType())
+      switch (auto &t = laneTypes[i]; t.getType())
       {
          case LaneType::NOT_ACTIVE:
             t.setType(LaneType::CROSS);
@@ -81,51 +78,51 @@ void Lanes::setFork(const QString &sha)
 
 void Lanes::setMerge(const QStringList &parents)
 {
-   auto &t = typeVec[activeLane];
-   auto wasFork = t.equals(NODE);
-   auto wasFork_L = t.equals(NODE_L);
-   auto wasFork_R = t.equals(NODE_R);
+   auto &t = laneTypes[activeLane];
+   auto wasFork = t.equals(LaneType::MERGE_FORK);
+   auto wasFork_L = t.equals(LaneType::MERGE_FORK_L);
+   auto wasFork_R = t.equals(LaneType::MERGE_FORK_R);
    auto startJoinWasACross = false;
    auto endJoinWasACross = false;
 
-   t.setType(NODE);
+   t.setType(LaneType::MERGE_FORK);
 
    auto rangeStart = activeLane;
    auto rangeEnd = activeLane;
    QStringList::const_iterator it(parents.constBegin());
 
    for (++it; it != parents.constEnd(); ++it)
-   { // skip first parent
-      int idx = findNextSha(*it, 0);
+   {
+      int idx = shaTracker.findNextSha(*it, 0);
 
       if (idx != -1)
       {
          if (idx > rangeEnd)
          {
             rangeEnd = idx;
-            endJoinWasACross = typeVec[idx].equals(LaneType::CROSS);
+            endJoinWasACross = laneTypes[idx].equals(LaneType::CROSS);
          }
 
          if (idx < rangeStart)
          {
             rangeStart = idx;
-            startJoinWasACross = typeVec[idx].equals(LaneType::CROSS);
+            startJoinWasACross = laneTypes[idx].equals(LaneType::CROSS);
          }
 
-         typeVec[idx].setType(LaneType::JOIN);
+         laneTypes.setType(idx, LaneType::JOIN);
       }
       else
          rangeEnd = add(LaneType::HEAD, *it, rangeEnd + 1);
    }
 
-   auto &startT = typeVec[rangeStart];
-   auto &endT = typeVec[rangeEnd];
+   auto &startT = laneTypes[rangeStart];
+   auto &endT = laneTypes[rangeEnd];
 
-   if (startT.equals(NODE) && !wasFork && !wasFork_R)
-      startT.setType(NODE_L);
+   if (startT.equals(LaneType::MERGE_FORK) && !wasFork && !wasFork_R)
+      startT.setType(LaneType::MERGE_FORK_L);
 
-   if (endT.equals(NODE) && !wasFork && !wasFork_L)
-      endT.setType(NODE_R);
+   if (endT.equals(LaneType::MERGE_FORK) && !wasFork && !wasFork_L)
+      endT.setType(LaneType::MERGE_FORK_R);
 
    if (startT.equals(LaneType::JOIN) && !startJoinWasACross)
       startT.setType(LaneType::JOIN_L);
@@ -141,7 +138,7 @@ void Lanes::setMerge(const QStringList &parents)
 
    for (int i = rangeStart + 1; i < rangeEnd; i++)
    {
-      auto &t = typeVec[i];
+      auto &t = laneTypes[i];
 
       if (t.equals(LaneType::NOT_ACTIVE))
          t.setType(LaneType::CROSS);
@@ -154,24 +151,23 @@ void Lanes::setMerge(const QStringList &parents)
 
 void Lanes::setInitial()
 {
-   auto &t = typeVec[activeLane];
-
-   if (!isNode(t))
+   auto &t = laneTypes[activeLane];
+   if (!laneTypes.isNode(t))
       t.setType(LaneType::INITIAL);
 }
 
 void Lanes::changeActiveLane(const QString &sha)
 {
-   auto &t = typeVec[activeLane];
+   auto &t = laneTypes[activeLane];
 
    if (t.equals(LaneType::INITIAL))
       t.setType(LaneType::EMPTY);
    else
       t.setType(LaneType::NOT_ACTIVE);
 
-   int idx = findNextSha(sha, 0);
+   int idx = shaTracker.findNextSha(sha, 0);
    if (idx != -1)
-      typeVec[idx].setType(LaneType::ACTIVE);
+      laneTypes.setType(idx, LaneType::ACTIVE);
    else
       idx = add(LaneType::BRANCH, sha, activeLane);
 
@@ -180,102 +176,72 @@ void Lanes::changeActiveLane(const QString &sha)
 
 void Lanes::afterMerge()
 {
-   for (int i = 0; i < typeVec.count(); i++)
+   for (int i = 0; i < laneTypes.count(); i++)
    {
-      auto &t = typeVec[i];
+      auto &t = laneTypes[i];
 
       if (t.isHead() || t.isJoin() || t.equals(LaneType::CROSS))
          t.setType(LaneType::NOT_ACTIVE);
       else if (t.equals(LaneType::CROSS_EMPTY))
          t.setType(LaneType::EMPTY);
-      else if (isNode(t))
+      else if (laneTypes.isNode(t))
          t.setType(LaneType::ACTIVE);
    }
 }
 
 void Lanes::afterFork()
 {
-   for (int i = 0; i < typeVec.count(); i++)
+   for (int i = 0; i < laneTypes.count(); i++)
    {
-      auto &t = typeVec[i];
+      auto &t = laneTypes[i];
 
       if (t.equals(LaneType::CROSS))
          t.setType(LaneType::NOT_ACTIVE);
       else if (t.isTail() || t.equals(LaneType::CROSS_EMPTY))
          t.setType(LaneType::EMPTY);
 
-      if (isNode(t))
+      if (laneTypes.isNode(t))
          t.setType(LaneType::ACTIVE);
    }
 
-   while (typeVec.last().equals(LaneType::EMPTY))
+   while (laneTypes.last().equals(LaneType::EMPTY))
    {
-      typeVec.pop_back();
-      nextShaVec.pop_back();
+      laneTypes.removeLast();
+      shaTracker.removeLast();
    }
 }
 
 bool Lanes::isBranch()
 {
-   if (typeVec.count() > activeLane)
-      return typeVec.at(activeLane).equals(LaneType::BRANCH);
-
+   if (laneTypes.count() > activeLane)
+      return laneTypes.at(activeLane).equals(LaneType::BRANCH);
    return false;
 }
 
 void Lanes::afterBranch()
 {
-   typeVec[activeLane].setType(LaneType::ACTIVE);
+   laneTypes.setType(activeLane, LaneType::ACTIVE);
 }
 
 void Lanes::nextParent(const QString &sha)
 {
-   nextShaVec[activeLane] = sha;
+   shaTracker.setNextSha(activeLane, sha);
 }
 
-int Lanes::findNextSha(const QString &next, int pos)
+int Lanes::add(LaneType type, const QString &next, int pos)
 {
-   for (int i = pos; i < nextShaVec.count(); i++)
+   if (pos < laneTypes.count())
    {
-      if (nextShaVec[i] == next)
-         return i;
-   }
-
-   return -1;
-}
-
-int Lanes::findType(const LaneType type, int pos)
-{
-   const auto typeVecCount = typeVec.count();
-
-   for (int i = pos; i < typeVecCount; i++)
-   {
-      if (typeVec[i].equals(type))
-         return i;
-   }
-
-   return -1;
-}
-
-int Lanes::add(const LaneType type, const QString &next, int pos)
-{
-   if (pos < typeVec.count())
-   {
-      pos = findType(LaneType::EMPTY, pos);
+      pos = laneTypes.findType(LaneType::EMPTY, pos);
       if (pos != -1)
       {
-         typeVec[pos].setType(type);
-         nextShaVec[pos] = next;
+         laneTypes.setType(pos, type);
+         shaTracker.setNextSha(pos, next);
          return pos;
       }
    }
 
-   typeVec.append(type);
-   nextShaVec.append(next);
-   return typeVec.count() - 1;
-}
-
-bool Lanes::isNode(Lane lane) const
-{
-   return lane.equals(NODE) || lane.equals(NODE_R) || lane.equals(NODE_L);
+   laneTypes.append(type);
+   shaTracker.append(next);
+   return laneTypes.count() - 1;
 }

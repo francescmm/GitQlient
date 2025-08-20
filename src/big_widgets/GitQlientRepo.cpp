@@ -413,7 +413,7 @@ void GitQlientRepo::focusHistoryOnBranch(const QString &branch)
 {
    auto found = false;
    const auto fullBranch = QString("origin/%1").arg(branch);
-   auto remoteBranches = mGitQlientCache->getBranches(References::Type::RemoteBranches);
+   auto remoteBranches = mGitQlientCache->getBranches(References::Type::RemoteBranche);
 
    for (const auto &remote : remoteBranches)
    {

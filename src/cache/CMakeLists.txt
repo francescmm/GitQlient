@@ -2,6 +2,12 @@ file(GLOB SRC_FILES
   *.cpp
   *.h
   *.ui
+  core/*.cpp
+  core/*.h
+  graph/*.cpp
+  graph/*.h
+  storage/*.cpp
+  storage/*.h
 )
 
 
