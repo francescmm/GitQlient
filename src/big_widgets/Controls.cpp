@@ -65,6 +65,7 @@ Controls::Controls(const QSharedPointer<GitCache> &cache, const QSharedPointer<G
    mPullBtn->setPopupMode(QToolButton::InstantPopup);
    mPullBtn->setObjectName("ToolButtonAboveMenu");
 
+   mPullOptions->setMenu(menu);
    mPullOptions->setPopupMode(QToolButton::InstantPopup);
    mPullOptions->setObjectName("ToolButtonWithMenu");
 
