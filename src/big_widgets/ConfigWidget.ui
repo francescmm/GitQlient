@@ -26,11 +26,8 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <property name="horizontalSpacing">
-    <number>0</number>
-   </property>
-   <property name="verticalSpacing">
-    <number>5</number>
+   <property name="spacing">
+    <number>10</number>
    </property>
    <item row="6" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -598,7 +595,7 @@
             <x>0</x>
             <y>0</y>
             <width>420</width>
-            <height>800</height>
+            <height>795</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
