@@ -27,7 +27,7 @@
 #include <QMap>
 
 class GitCache;
-class GraphCache;
+namespace Graph { class Cache; }
 class GitBase;
 class QFileSystemModel;
 class FileBlameWidget;
@@ -74,7 +74,7 @@ public:
     * @param git The Git object to execute git commands.
     * @param parent The parent widget if needed.
     */
-   explicit BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GraphCache> &graphCache, const QSharedPointer<GitBase> &git,
+   explicit BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<Graph::Cache> &graphCache, const QSharedPointer<GitBase> &git,
                         const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
    /**
     * @brief Destructor.
@@ -105,7 +105,7 @@ public:
 
 private:
    QSharedPointer<GitCache> mCache;
-   QSharedPointer<GraphCache> mGraphCache;
+   QSharedPointer<Graph::Cache> mGraphCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitQlientSettings> mSettings;
    QFileSystemModel *mFileSystemModel = nullptr;

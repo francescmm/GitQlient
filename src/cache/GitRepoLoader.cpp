@@ -20,7 +20,7 @@ static const char *GIT_LOG_FORMAT("%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ");
 
 GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase,
                              QSharedPointer<GitCache> cache,
-                             const QSharedPointer<GraphCache> &graphCache,
+                             const QSharedPointer<Graph::Cache> &graphCache,
                              const QSharedPointer<GitQlientSettings> &settings,
                              QObject *parent)
    : QObject(parent)
@@ -277,24 +277,24 @@ void GitRepoLoader::processRevisions(QByteArray ba)
 
       auto processedCommits = mRevCache->processCommits(info.first, info.second, std::move(commits));
 
-      mGraphCache->init(ZERO_SHA);
-      mGraphCache->processLanes(processedCommits);
+      mGraphCache->init();
+      mGraphCache->createMultiverse(processedCommits);
    }
 
    notifyLoadingFinished();
 }
 
-QVector<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
+QVector<Commit> GitRepoLoader::processUnsignedLog(QByteArray &log) const
 {
    auto lines = log.split('\000');
-   QVector<CommitInfo> commits;
+   QVector<Commit> commits;
    commits.reserve(lines.count());
 
    auto pos = 0;
    while (!lines.isEmpty())
    {
       std::string lineStr = lines.takeFirst().toStdString();
-      if (auto commit = CommitInfo { lineStr.c_str() }; commit.isValid())
+      if (auto commit = Commit { lineStr.c_str() }; commit.isValid())
       {
          commit.pos = ++pos;
          commits.append(std::move(commit));
@@ -304,11 +304,11 @@ QVector<CommitInfo> GitRepoLoader::processUnsignedLog(QByteArray &log) const
    return commits;
 }
 
-QVector<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
+QVector<Commit> GitRepoLoader::processSignedLog(QByteArray &log) const
 {
    log.replace('\000', '\n');
 
-   QVector<CommitInfo> commits;
+   QVector<Commit> commits;
 
    QByteArray commit;
    QByteArray gpg;
@@ -339,7 +339,7 @@ QVector<CommitInfo> GitRepoLoader::processSignedLog(QByteArray &log) const
       {
          if (!commit.isEmpty())
          {
-            if (auto revision = CommitInfo { commit, gpgKey, goodSignature }; revision.isValid())
+            if (auto revision = Commit { commit, gpgKey, goodSignature }; revision.isValid())
             {
                revision.pos = pos++;
                commits.append(std::move(revision));

@@ -26,7 +26,7 @@
 #include <QMenu>
 
 class GitCache;
-class GraphCache;
+namespace Graph { class Cache; }
 class GitBase;
 
 /*!
@@ -103,13 +103,13 @@ public:
     \param parent The parent widget if needed.
    */
    explicit CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache,
-                                     const QSharedPointer<GraphCache> &graphCache,
+                                     const QSharedPointer<Graph::Cache> &graphCache,
                                      const QSharedPointer<GitBase> &git,
                                      const QStringList &shas, QWidget *parent = nullptr);
 
 private:
    QSharedPointer<GitCache> mCache;
-   QSharedPointer<GraphCache> mGraphCache;
+   QSharedPointer<Graph::Cache> mGraphCache;
    QSharedPointer<GitBase> mGit;
    QStringList mShas;
 

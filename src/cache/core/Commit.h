@@ -8,7 +8,7 @@
 
 #include <References.h>
 
-class CommitInfo
+class Commit
 {
 public:
    enum class Field
@@ -22,14 +22,14 @@ public:
       LONG_LOG
    };
 
-   CommitInfo() = default;
-   ~CommitInfo() = default;
-   CommitInfo(QByteArray commitData);
-   CommitInfo(QByteArray commitData, const QString &gpg, bool goodSignature);
-   explicit CommitInfo(const QString &sha, const QStringList &parents, std::chrono::seconds commitDate,
+   Commit() = default;
+   ~Commit() = default;
+   Commit(QByteArray commitData);
+   Commit(QByteArray commitData, const QString &gpg, bool goodSignature);
+   explicit Commit(const QString &sha, const QStringList &parents, std::chrono::seconds commitDate,
                        const QString &log);
-   bool operator==(const CommitInfo &commit) const;
-   bool operator!=(const CommitInfo &commit) const;
+   bool operator==(const Commit &commit) const;
+   bool operator!=(const Commit &commit) const;
 
    bool isValid() const;
    bool contains(const QString &value) const;
@@ -40,8 +40,8 @@ public:
    void setParents(const QStringList &parents);
    bool isInWorkingBranch() const;
 
-   void appendChild(CommitInfo *commit) { mChilds.append(commit); }
-   void removeChild(CommitInfo *commit);
+   void appendChild(Commit *commit) { mChilds.append(commit); }
+   void removeChild(Commit *commit);
    bool hasChilds() const { return !mChilds.empty(); }
    QString getFirstChildSha() const;
    int getChildsCount() const { return mChilds.count(); }
@@ -61,7 +61,7 @@ public:
 private:
    bool mGoodSignature = false;
    QStringList mParentsSha;
-   QVector<CommitInfo *> mChilds;
+   QVector<Commit *> mChilds;
 
    friend class GitCache;
 

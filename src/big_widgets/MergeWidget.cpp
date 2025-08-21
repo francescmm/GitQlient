@@ -1,6 +1,6 @@
 #include "MergeWidget.h"
 
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <FileDiffWidget.h>
 #include <FileEditor.h>
 #include <GitBase.h>

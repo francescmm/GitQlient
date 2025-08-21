@@ -29,13 +29,11 @@
 class CommitHistoryView;
 class GitCache;
 class GitBase;
-class Lane;
-class CommitInfo;
-class GraphCache;
-
-namespace GitServerPlugin
+class Commit;
+namespace Graph
 {
-struct PullRequest;
+class Cache;
+class State;
 }
 
 const int ROW_HEIGHT = 25;
@@ -61,7 +59,7 @@ public:
     * @param view The view that uses the delegate.
     */
    RepositoryViewDelegate(const QSharedPointer<GitCache> &cache,
-                          const QSharedPointer<GraphCache> &graphCache,
+                          const QSharedPointer<Graph::Cache> &graphCache,
                           const QSharedPointer<GitBase> &git,
                           CommitHistoryView *view);
 
@@ -86,7 +84,7 @@ protected:
 
 private:
    QSharedPointer<GitCache> mCache;
-   QSharedPointer<GraphCache> mGraphCache;
+   QSharedPointer<Graph::Cache> mGraphCache;
    QSharedPointer<GitBase> mGit;
    CommitHistoryView *mView = nullptr;
    int diffTargetRow = -1;
@@ -98,7 +96,7 @@ private:
     * @param o The style options of the item.
     * @param commit The commit information.
     */
-   [[nodiscard]] QColor paintBranchHelper(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit) const;
+   [[nodiscard]] QColor paintBranchHelper(QPainter *p, const QStyleOptionViewItem &o, const Commit &commit) const;
 
    /**
     * @brief Paints the log column. This method is in charge of painting the commit message as well as tags or
@@ -110,7 +108,7 @@ private:
     * @param commit The commit information.
     */
    void paintLog(QPainter *p, const QStyleOptionViewItem &o, const QColor &currentLangeColor,
-                 const CommitInfo &commit) const;
+                 const Commit &commit) const;
    /**
     * @brief Method that sets up the configuration to paint the lane for the commit graph representation.
     *
@@ -118,7 +116,7 @@ private:
     * @param o The style options of the item.
     * @param commit The commit information.
     */
-   void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const CommitInfo &commit) const;
+   void paintGraph(QPainter *p, const QStyleOptionViewItem &o, const Commit &commit) const;
 
    /**
     * @brief Specialization method called by @ref paintGrapth that does the actual lane painting.
@@ -133,7 +131,7 @@ private:
     * @param mergeColor Color of the lane where the merge comes from in case the commit is a end-merge point.
     * @param isWip Tells the method if it's the WIP commit so it's painted differently.
     */
-   void paintGraphLane(QPainter *p, const Lane &type, bool laneHeadPresent, int x1, int x2, const QColor &col,
+   void paintGraphLane(QPainter *p, const Graph::State &type, bool laneHeadPresent, int x1, int x2, const QColor &col,
                        const QColor &activeCol, const QColor &mergeColor, bool isWip = false,
                        bool hasChilds = true) const;
 
@@ -147,7 +145,7 @@ private:
     * @param commit The SHA reference to paint. It can be local branch, remote branch, tag or it could be detached.
     */
    void paintTagBranch(QPainter *painter, QStyleOptionViewItem opt, const QColor &currentLangeColor, int &startPoint,
-                       const CommitInfo &commit) const;
+                       const Commit &commit) const;
 
    /**
     * @brief getMergeColor Returns the color to be used for painting the external circle of the node. This methods
@@ -160,6 +158,6 @@ private:
     * following lanes.
     * @return Returns the color of the lane that merges into the current node, otherwise it returns @p defaultColor.
     */
-   QColor getMergeColor(const Lane &currentLane, const CommitInfo &commit, int currentLaneIndex,
+   QColor getMergeColor(const Graph::State &currentLane, const Commit &commit, int currentLaneIndex,
                         const QColor &defaultColor, bool &isSet) const;
 };

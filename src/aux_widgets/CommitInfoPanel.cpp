@@ -1,7 +1,7 @@
 #include <CommitInfoPanel.h>
 
 #include <ButtonLink.hpp>
-#include <CommitInfo.h>
+#include <Commit.h>
 
 #include <QApplication>
 #include <QClipboard>
@@ -62,7 +62,7 @@ CommitInfoPanel::CommitInfoPanel(QWidget *parent)
    });
 }
 
-void CommitInfoPanel::configure(const CommitInfo &commit)
+void CommitInfoPanel::configure(const Commit &commit)
 {
    mLabelSha->setText(commit.sha.left(8));
    mLabelSha->setData(commit.sha);

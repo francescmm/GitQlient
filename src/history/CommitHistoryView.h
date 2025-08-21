@@ -25,12 +25,12 @@
 
 #include <QTreeView>
 
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <GitExecResult.h>
 
 class GitCache;
 class GitBase;
-class GraphCache;
+namespace Graph { class Cache; }
 class CommitHistoryModel;
 class ShaFilterProxyModel;
 class GitQlientSettings;
@@ -103,7 +103,7 @@ public:
     * @param git The git object to perform Git commands.
     * @param parent The parent widget if needed.
     */
-   explicit CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GraphCache> &graphCache, const QSharedPointer<GitBase> &git,
+   explicit CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<Graph::Cache> &graphCache, const QSharedPointer<GitBase> &git,
                               const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
    /**
     * @brief Destructor.
@@ -166,7 +166,7 @@ public:
 
 private:
    QSharedPointer<GitCache> mCache;
-   QSharedPointer<GraphCache> mGraphCache;
+   QSharedPointer<Graph::Cache> mGraphCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitQlientSettings> mSettings;
    CommitHistoryModel *mCommitHistoryModel = nullptr;

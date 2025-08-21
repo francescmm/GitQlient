@@ -2,7 +2,7 @@
 
 #include <ButtonLink.hpp>
 #include <CheckBox.h>
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <DiffHelper.h>
 #include <FileDiffView.h>
 #include <FileEditor.h>

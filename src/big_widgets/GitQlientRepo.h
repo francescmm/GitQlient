@@ -42,7 +42,7 @@ class MergeWidget;
 class QTimer;
 class WaitingDlg;
 class GitTags;
-class GraphCache;
+namespace Graph { class Cache; }
 class ConfigWidget;
 
 namespace GitServer
@@ -149,7 +149,7 @@ protected:
 private:
    QString mCurrentDir;
    QSharedPointer<GitCache> mGitQlientCache;
-   QSharedPointer<GraphCache> mGraphCache;
+   QSharedPointer<Graph::Cache> mGraphCache;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitQlientSettings> mSettings;
    QSharedPointer<GitRepoLoader> mGitLoader;

@@ -23,15 +23,18 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-enum class LaneType;
+namespace Graph
+{
 
-class Lane
+enum class StateType;
+
+class State
 {
 public:
-   Lane() = default;
-   Lane(LaneType type);
+   State() = default;
+   State(StateType type);
 
-   bool operator==(const Lane &lane) const { return mType == lane.mType; }
+   bool operator==(const State &lane) const { return mType == lane.mType; }
 
    bool isHead() const;
    bool isTail() const;
@@ -39,11 +42,11 @@ public:
    bool isFreeLane() const;
    bool isMerge() const;
    bool isActive() const;
-   bool equals(LaneType type) const { return mType == type; }
 
-   LaneType getType() const { return mType; }
-   void setType(LaneType type) { mType = type; }
+   StateType getType() const { return mType; }
+   void setType(StateType type) { mType = type; }
 
 private:
-   LaneType mType;
+   StateType mType;
 };
+}

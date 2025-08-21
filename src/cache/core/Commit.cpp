@@ -1,4 +1,4 @@
-#include "CommitInfo.h"
+#include "Commit.h"
 
 #include <GitExecResult.h>
 
@@ -6,19 +6,19 @@
 
 #include <regex>
 
-CommitInfo::CommitInfo(QByteArray commitData, const QString &gpg, bool goodSignature)
+Commit::Commit(QByteArray commitData, const QString &gpg, bool goodSignature)
    : gpgKey(gpg)
    , mGoodSignature(goodSignature)
 {
    parseDiff(commitData, 0);
 }
 
-CommitInfo::CommitInfo(QByteArray data)
+Commit::Commit(QByteArray data)
 {
    parseDiff(data, 1);
 }
 
-void CommitInfo::parseDiff(QByteArray &data, qsizetype startingField)
+void Commit::parseDiff(QByteArray &data, qsizetype startingField)
 {
    if (data.isEmpty())
       return;
@@ -45,7 +45,7 @@ void CommitInfo::parseDiff(QByteArray &data, qsizetype startingField)
    }
 }
 
-CommitInfo::CommitInfo(const QString &sha, const QStringList &parents, std::chrono::seconds commitDate,
+Commit::Commit(const QString &sha, const QStringList &parents, std::chrono::seconds commitDate,
                        const QString &log)
    : sha(sha)
    , dateSinceEpoch(commitDate)
@@ -54,25 +54,25 @@ CommitInfo::CommitInfo(const QString &sha, const QStringList &parents, std::chro
 {
 }
 
-bool CommitInfo::operator==(const CommitInfo &commit) const
+bool Commit::operator==(const Commit &commit) const
 {
    return sha.startsWith(commit.sha) && mParentsSha == commit.mParentsSha && committer == commit.committer
        && author == commit.author && dateSinceEpoch == commit.dateSinceEpoch && shortLog == commit.shortLog
        && longLog == commit.longLog;
 }
 
-bool CommitInfo::operator!=(const CommitInfo &commit) const
+bool Commit::operator!=(const Commit &commit) const
 {
    return !(*this == commit);
 }
 
-bool CommitInfo::contains(const QString &value) const
+bool Commit::contains(const QString &value) const
 {
    return sha.startsWith(value, Qt::CaseInsensitive) || shortLog.contains(value, Qt::CaseInsensitive)
        || committer.contains(value, Qt::CaseInsensitive) || author.contains(value, Qt::CaseInsensitive);
 }
 
-int CommitInfo::parentsCount() const
+int Commit::parentsCount() const
 {
    auto count = mParentsSha.count();
 
@@ -82,22 +82,22 @@ int CommitInfo::parentsCount() const
    return count;
 }
 
-QString CommitInfo::firstParent() const
+QString Commit::firstParent() const
 {
    return !mParentsSha.isEmpty() ? mParentsSha.at(0) : QString();
 }
 
-QStringList CommitInfo::parents() const
+QStringList Commit::parents() const
 {
    return mParentsSha;
 }
 
-void CommitInfo::setParents(const QStringList &parents)
+void Commit::setParents(const QStringList &parents)
 {
    mParentsSha = parents;
 }
 
-bool CommitInfo::isInWorkingBranch() const
+bool Commit::isInWorkingBranch() const
 {
    for (const auto &child : mChilds)
    {
@@ -111,7 +111,7 @@ bool CommitInfo::isInWorkingBranch() const
    return false;
 }
 
-bool CommitInfo::isValid() const
+bool Commit::isValid() const
 {
    const static std::regex hexMatcher("[0-9a-fA-F]{40}");
    const auto isMatch = std::regex_match(sha.toStdString(), hexMatcher);
@@ -119,13 +119,13 @@ bool CommitInfo::isValid() const
    return !sha.isEmpty() && isMatch;
 }
 
-void CommitInfo::removeChild(CommitInfo *commit)
+void Commit::removeChild(Commit *commit)
 {
    if (mChilds.contains(commit))
       mChilds.removeAll(commit);
 }
 
-QString CommitInfo::getFirstChildSha() const
+QString Commit::getFirstChildSha() const
 {
    return !mChilds.isEmpty() ? mChilds.constFirst()->sha : QString {};
 }

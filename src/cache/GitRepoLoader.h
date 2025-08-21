@@ -23,7 +23,7 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <GitExecResult.h>
 
 #include <QObject>
@@ -33,7 +33,7 @@
 struct WipRevisionInfo;
 class GitBase;
 class GitCache;
-class GraphCache;
+namespace Graph { class Cache; }
 class GitQlientSettings;
 class GitTags;
 class GitRequestorProcess;
@@ -55,7 +55,7 @@ public slots:
 public:
    explicit GitRepoLoader(QSharedPointer<GitBase> gitBase,
                           QSharedPointer<GitCache> cache,
-                          const QSharedPointer<GraphCache> &graphCache,
+                          const QSharedPointer<Graph::Cache> &graphCache,
                           const QSharedPointer<GitQlientSettings> &settings,
                           QObject *parent = nullptr);
    void cancelAll();
@@ -68,7 +68,7 @@ private:
    std::atomic<int> mSteps { 0 };
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitCache> mRevCache;
-   QSharedPointer<GraphCache> mGraphCache;
+   QSharedPointer<Graph::Cache> mGraphCache;
    QSharedPointer<GitQlientSettings> mSettings;
    QSharedPointer<GitTags> mGitTags;
    GitRequestorProcess *mRevRequestor = nullptr;
@@ -79,7 +79,7 @@ private:
    void processReferences(QByteArray ba);
    void requestRevisions();
    void processRevisions(QByteArray ba);
-   QVector<CommitInfo> processUnsignedLog(QByteArray &log) const;
-   QVector<CommitInfo> processSignedLog(QByteArray &log) const;
+   QVector<Commit> processUnsignedLog(QByteArray &log) const;
+   QVector<Commit> processSignedLog(QByteArray &log) const;
    void notifyLoadingFinished();
 };

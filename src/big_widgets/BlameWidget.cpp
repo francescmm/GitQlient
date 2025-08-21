@@ -4,7 +4,7 @@
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryModel.h>
 #include <CommitHistoryView.h>
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <FileBlameWidget.h>
 #include <GitHistory.h>
 #include <GitQlientSettings.h>
@@ -21,7 +21,7 @@
 #include <QTabWidget>
 #include <QTreeView>
 
-BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GraphCache> &graphCache, const QSharedPointer<GitBase> &git,
+BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<Graph::Cache> &graphCache, const QSharedPointer<GitBase> &git,
                          const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QFrame(parent)
    , mCache(cache)

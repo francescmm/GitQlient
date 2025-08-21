@@ -3,10 +3,10 @@
 #include <QString>
 #include <QVector>
 
-class ShaTracker
+class StateTracker
 {
 public:
-   ShaTracker() = default;
+   StateTracker() = default;
    void clear();
    int findNextSha(const QString &next, int pos) const;
    void setNextSha(int lane, const QString &sha);

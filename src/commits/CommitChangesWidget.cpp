@@ -3,7 +3,7 @@
 #include "ui_CommitChangesWidget.h"
 
 #include <ClickableFrame.h>
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <FileWidget.h>
 #include <GitBase.h>
 #include <GitCache.h>
@@ -43,7 +43,7 @@ enum GitQlientRole
 };
 
 CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache,
-                                         const QSharedPointer<GraphCache> &graphCache,
+                                         const QSharedPointer<Graph::Cache> &graphCache,
                                          const QSharedPointer<GitBase> &git,
                                          QWidget *parent)
    : QWidget(parent)
@@ -300,7 +300,7 @@ void CommitChangesWidget::commitWipChanges()
 
                const auto message = msg.split("\n\n");
 
-               CommitInfo newCommit { currentSha,
+               Commit newCommit { currentSha,
                                       { lastShaBeforeCommit },
                                       std::chrono::seconds(QDateTime::currentDateTime().toSecsSinceEpoch()),
                                       ui->leCommitTitle->text() };
@@ -310,7 +310,7 @@ void CommitChangesWidget::commitWipChanges()
                newCommit.longLog = ui->teDescription->toPlainText();
 
                mCache->insertCommit(newCommit);
-               mGraphCache->addCommit(newCommit);
+               mGraphCache->addTimeline(newCommit);
                mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
                mCache->insertReference(currentSha, References::Type::LocalBranch, mGit->getCurrentBranch());
 

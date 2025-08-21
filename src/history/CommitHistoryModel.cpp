@@ -1,7 +1,7 @@
 #include "CommitHistoryModel.h"
 
 #include <CommitHistoryColumns.h>
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <GitBase.h>
 #include <GitCache.h>
 
@@ -71,7 +71,7 @@ QModelIndex CommitHistoryModel::parent(const QModelIndex &) const
    return QModelIndex();
 }
 
-QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
+QVariant CommitHistoryModel::getToolTipData(const Commit &r) const
 {
    QString auxMessage;
    const auto sha = r.sha;
@@ -110,7 +110,7 @@ QVariant CommitHistoryModel::getToolTipData(const CommitInfo &r) const
                       : "");
 }
 
-QVariant CommitHistoryModel::getDisplayData(const CommitInfo &rev, int column) const
+QVariant CommitHistoryModel::getDisplayData(const Commit &rev, int column) const
 {
    switch (static_cast<CommitHistoryColumns>(column))
    {

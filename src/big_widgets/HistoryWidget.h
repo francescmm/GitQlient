@@ -40,7 +40,7 @@ class FileDiffWidget;
 class FullDiffWidget;
 class BranchesWidgetMinimal;
 class QPushButton;
-class GraphCache;
+namespace Graph { class Cache; }
 class QLabel;
 class GitQlientSettings;
 class QSplitter;
@@ -148,7 +148,7 @@ public:
     \param parent The parent widget if needed.
    */
    explicit HistoryWidget(const QSharedPointer<GitCache> &cache,
-                          const QSharedPointer<GraphCache> &graphCache,
+                          const QSharedPointer<Graph::Cache> &graphCache,
                           const QSharedPointer<GitBase> git,
                           const QSharedPointer<GitQlientSettings> &settings,
                           QWidget *parent = nullptr);
@@ -231,7 +231,7 @@ private:
 
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitCache> mCache;
-   QSharedPointer<GraphCache> mGraphCache;
+   QSharedPointer<Graph::Cache> mGraphCache;
    QSharedPointer<GitQlientSettings> mSettings;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;

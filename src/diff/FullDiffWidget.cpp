@@ -1,6 +1,6 @@
 #include "FullDiffWidget.h"
 
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <DiffHelper.h>
 #include <GitCache.h>
 #include <GitHistory.h>

@@ -25,7 +25,7 @@
 
 #include <QFrame>
 
-class CommitInfo;
+class Commit;
 class QLabel;
 class QScrollArea;
 class ButtonLink;
@@ -50,7 +50,7 @@ public:
     * @brief configure Configures the panel with the information of the given @p commit.
     * @param commit The commit to get the data from.
     */
-   void configure(const CommitInfo &commit);
+   void configure(const Commit &commit);
    /**
     * @brief clear Clears all the widgets data.
     */

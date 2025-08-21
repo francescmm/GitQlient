@@ -24,10 +24,10 @@
  ***************************************************************************************/
 
 #include "GraphCache.h"
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <GitExecResult.h>
 #include <RevisionFiles.h>
-#include <lanes.h>
+#include <TemporalLoom.h>
 
 #include <QHash>
 #include <QMutex>
@@ -57,12 +57,12 @@ public:
 
    int commitCount() const;
 
-   CommitInfo commitInfo(const QString &sha);
-   CommitInfo commitInfo(int row);
-   CommitInfo searchCommitInfo(const QString &text, int startingPoint = 0, bool reverse = false);
+   Commit commitInfo(const QString &sha);
+   Commit commitInfo(int row);
+   Commit searchCommitInfo(const QString &text, int startingPoint = 0, bool reverse = false);
    bool updateWipCommit(const QString &parentSha, const RevisionFiles &files);
-   void insertCommit(CommitInfo commit);
-   void updateCommit(const QString &oldSha, CommitInfo newCommit);
+   void insertCommit(Commit commit);
+   void updateCommit(const QString &oldSha, Commit newCommit);
 
    bool insertRevisionFiles(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    std::optional<RevisionFiles> revisionFile(const QString &sha1, const QString &sha2) const;
@@ -93,8 +93,8 @@ private:
    QVector<QString> mUntrackedFiles;
 
    mutable QMutex mCommitsMutex;
-   QVector<CommitInfo> mCommitsCache;
-   QHash<QString, CommitInfo *> mCommitsMap;
+   QVector<Commit> mCommitsCache;
+   QHash<QString, Commit *> mCommitsMap;
 
    mutable QMutex mRevisionsMutex;
    QHash<QPair<QString, QString>, RevisionFiles> mRevisionFilesMap;
@@ -102,7 +102,7 @@ private:
    mutable QMutex mReferencesMutex;
    QHash<QString, References> mReferences;
 
-   std::span<CommitInfo> processCommits(const QString &parentSha, const RevisionFiles &files, QVector<CommitInfo> commits);
+   std::span<Commit> processCommits(const QString &parentSha, const RevisionFiles &files, QVector<Commit> commits);
    void setConfigurationDone() { mConfigured = true; }
 
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);

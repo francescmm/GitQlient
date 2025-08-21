@@ -2,10 +2,10 @@
 
 #include <BranchesWidget.h>
 #include <CheckBox.h>
+#include <Commit.h>
 #include <CommitChangesWidget.h>
 #include <CommitHistoryModel.h>
 #include <CommitHistoryView.h>
-#include <CommitInfo.h>
 #include <CommitInfoWidget.h>
 #include <FileDiffWidget.h>
 #include <FileEditor.h>
@@ -43,7 +43,7 @@
 using namespace QLogger;
 
 HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache,
-                             const QSharedPointer<GraphCache> &graphCache,
+                             const QSharedPointer<Graph::Cache> &graphCache,
                              const QSharedPointer<GitBase> git,
                              const QSharedPointer<GitQlientSettings> &settings,
                              QWidget *parent)
@@ -543,7 +543,7 @@ void HistoryWidget::cherryPickCommit()
          commit.sha = mGit->getLastCommit().output.trimmed();
 
          mCache->insertCommit(commit);
-         mGraphCache->addCommit(commit);
+         mGraphCache->addTimeline(commit);
          mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
          mCache->insertReference(commit.sha, References::Type::LocalBranch, mGit->getCurrentBranch());
 
@@ -582,7 +582,7 @@ void HistoryWidget::cherryPickCommit()
          commit.sha = mGit->getLastCommit().output.trimmed();
 
          mCache->insertCommit(commit);
-         mGraphCache->addCommit(commit);
+         mGraphCache->addTimeline(commit);
          mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
          mCache->insertReference(commit.sha, References::Type::LocalBranch, mGit->getCurrentBranch());
 

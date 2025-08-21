@@ -1,7 +1,7 @@
 #include "CommitHistoryContextMenu.h"
 
 #include <BranchDlg.h>
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <GitBase.h>
 #include <GitBranches.h>
 #include <GitCache.h>
@@ -32,7 +32,7 @@
 using namespace QLogger;
 
 CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache,
-                                                   const QSharedPointer<GraphCache> &graphCache,
+                                                   const QSharedPointer<Graph::Cache> &graphCache,
                                                    const QSharedPointer<GitBase> &git,
                                                    const QStringList &shas,
                                                    QWidget *parent)
@@ -356,7 +356,7 @@ void CommitHistoryContextMenu::cherryPickCommit()
          commit.sha = mGit->getLastCommit().output.trimmed();
 
          mCache->insertCommit(commit);
-         mGraphCache->addCommit(commit);
+         mGraphCache->addTimeline(commit);
          mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
          mCache->insertReference(commit.sha, References::Type::LocalBranch, mGit->getCurrentBranch());
 
@@ -577,7 +577,7 @@ void CommitHistoryContextMenu::revertCommit()
       if (committer.mUserEmail.isEmpty() || committer.mUserName.isEmpty())
          committer = gitConfig->getGlobalUserInfo();
 
-      CommitInfo newCommit { currentSha,
+      Commit newCommit { currentSha,
                              { previousSha },
                              std::chrono::seconds(QDateTime::currentDateTime().toSecsSinceEpoch()),
                              tr("Revert \"%1\"").arg(revertedCommit.shortLog) };
@@ -588,7 +588,7 @@ void CommitHistoryContextMenu::revertCommit()
                               .arg(newCommit.shortLog, QString::fromUtf8("This reverts commit"), revertedCommit.sha);
 
       mCache->insertCommit(newCommit);
-      mGraphCache->addCommit(newCommit);
+      mGraphCache->addTimeline(newCommit);
       mCache->deleteReference(previousSha, References::Type::LocalBranch, mGit->getCurrentBranch());
       mCache->insertReference(currentSha, References::Type::LocalBranch, mGit->getCurrentBranch());
 

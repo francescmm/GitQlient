@@ -28,7 +28,7 @@
 
 class GitCache;
 class GitBase;
-class CommitInfo;
+class Commit;
 enum class CommitHistoryColumns;
 
 /**
@@ -141,7 +141,7 @@ private:
     * @param r The commit to generate the tooltip data.
     * @return QVariant The tool tip data.
     */
-   QVariant getToolTipData(const CommitInfo &r) const;
+   QVariant getToolTipData(const Commit &r) const;
    /**
     * @brief Returns the data that will be display for every \p column.
     *
@@ -149,5 +149,5 @@ private:
     * @param column The column where the data will be shown.
     * @return QVariant The data to be shown.
     */
-   QVariant getDisplayData(const CommitInfo &rev, int column) const;
+   QVariant getDisplayData(const Commit &rev, int column) const;
 };

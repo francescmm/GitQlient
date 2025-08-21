@@ -1,4 +1,4 @@
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <CommitInfoPanel.h>
 #include <CommitInfoWidget.h>
 #include <FileListWidget.h>

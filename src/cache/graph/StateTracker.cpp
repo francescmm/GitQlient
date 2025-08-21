@@ -1,12 +1,12 @@
-#include "ShaTracker.h"
+#include "StateTracker.h"
 
-void ShaTracker::clear()
+void StateTracker::clear()
 {
    nextShaVec.clear();
    nextShaVec.squeeze();
 }
 
-int ShaTracker::findNextSha(const QString &next, int pos) const
+int StateTracker::findNextSha(const QString &next, int pos) const
 {
    for (int i = pos; i < nextShaVec.count(); i++)
       if (nextShaVec[i] == next)
@@ -14,17 +14,17 @@ int ShaTracker::findNextSha(const QString &next, int pos) const
    return -1;
 }
 
-void ShaTracker::setNextSha(int lane, const QString &sha)
+void StateTracker::setNextSha(int lane, const QString &sha)
 {
    nextShaVec[lane] = sha;
 }
 
-void ShaTracker::append(const QString &sha)
+void StateTracker::append(const QString &sha)
 {
    nextShaVec.append(sha);
 }
 
-void ShaTracker::removeLast()
+void StateTracker::removeLast()
 {
    nextShaVec.pop_back();
 }

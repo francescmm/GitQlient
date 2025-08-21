@@ -3,7 +3,7 @@
 #include <BlameWidget.h>
 #include <BranchesWidget.h>
 #include <CommitHistoryColumns.h>
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <ConfigWidget.h>
 #include <Controls.h>
 #include <DiffWidget.h>
@@ -42,7 +42,7 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
                              QWidget *parent)
    : QFrame(parent)
    , mGitQlientCache(new GitCache())
-   , mGraphCache(new GraphCache())
+   , mGraphCache(new Graph::Cache())
    , mGitBase(git)
    , mSettings(settings)
    , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache, mGraphCache, mSettings))

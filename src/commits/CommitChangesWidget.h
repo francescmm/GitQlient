@@ -29,7 +29,7 @@
 class QListWidget;
 class QListWidgetItem;
 class GitCache;
-class GraphCache;
+namespace Graph { class Cache; }
 class GitBase;
 class RevisionFiles;
 class FileWidget;
@@ -63,7 +63,7 @@ public:
    };
 
    explicit CommitChangesWidget(const QSharedPointer<GitCache> &cache,
-                                const QSharedPointer<GraphCache> &graphCache,
+                                const QSharedPointer<Graph::Cache> &graphCache,
                                 const QSharedPointer<GitBase> &git,
                                 QWidget *parent = nullptr);
 
@@ -86,7 +86,7 @@ protected:
 
    Ui::CommitChangesWidget *ui = nullptr;
    QSharedPointer<GitCache> mCache;
-   QSharedPointer<GraphCache> mGraphCache;
+   QSharedPointer<Graph::Cache> mGraphCache;
    QSharedPointer<GitBase> mGit;
    QListWidget *mUnstagedFilesList = nullptr;
    QListWidget *mStagedFilesList = nullptr;

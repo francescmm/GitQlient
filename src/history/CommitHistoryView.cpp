@@ -3,7 +3,7 @@
 #include <CommitHistoryColumns.h>
 #include <CommitHistoryContextMenu.h>
 #include <CommitHistoryModel.h>
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <GitBase.h>
 #include <GitCache.h>
 #include <GitConfig.h>
@@ -16,7 +16,7 @@
 #include <QLogger.h>
 using namespace QLogger;
 
-CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GraphCache> &graphCache, const QSharedPointer<GitBase> &git,
+CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<Graph::Cache> &graphCache, const QSharedPointer<GitBase> &git,
                                      const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QTreeView(parent)
    , mCache(cache)

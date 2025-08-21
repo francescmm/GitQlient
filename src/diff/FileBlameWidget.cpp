@@ -1,7 +1,7 @@
 #include "FileBlameWidget.h"
 
 #include <ButtonLink.hpp>
-#include <CommitInfo.h>
+#include <Commit.h>
 #include <GitCache.h>
 #include <GitHistory.h>
 
