@@ -4,8 +4,6 @@
 #include <QMap>
 #include <QWidget>
 
-#include <PluginsDownloader.h>
-
 class GitBase;
 class QTimer;
 class FileEditor;
@@ -39,7 +37,6 @@ public:
    ~ConfigWidget();
 
    void onPanelsVisibilityChanged();
-   void loadPlugins(QMap<QString, QObject *> plugins);
 
 private:
    Ui::ConfigWidget *ui;
@@ -50,11 +47,8 @@ private:
    QPushButton *mSave = nullptr;
    FileEditor *mLocalGit = nullptr;
    FileEditor *mGlobalGit = nullptr;
-   PluginsDownloader *mPluginsDownloader = nullptr;
    QButtonGroup *mDownloadButtons = nullptr;
    QVector<QWidget *> mPluginWidgets;
-   QVector<PluginInfo> mPluginsInfo;
-   QMap<QPushButton *, PluginInfo> mPluginDataMap;
    QStringList mPluginNames;
    QPushButton *mPbFeaturesTour;
 
@@ -67,7 +61,6 @@ private:
    void saveFile();
    void showCredentialsDlg();
    void selectFolder();
-   void selectPluginsFolder();
    void selectEditor();
    void useDefaultLogsFolder();
    void readRemotePluginsInfo();
@@ -78,6 +71,4 @@ private slots:
    void saveConfig();
    void onCredentialsOptionChanged(QAbstractButton *button);
    void onPullStrategyChanged(int index);
-   void onPluginsInfoReceived(const QVector<PluginInfo> &pluginsInfo);
-   void onPluginStored();
 };

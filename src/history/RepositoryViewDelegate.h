@@ -31,7 +31,7 @@ class GitCache;
 class GitBase;
 class Lane;
 class CommitInfo;
-class IGitServerCache;
+class GraphCache;
 
 namespace GitServerPlugin
 {
@@ -60,8 +60,10 @@ public:
     * @param git The git object to execute git commands.
     * @param view The view that uses the delegate.
     */
-   RepositoryViewDelegate(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
-                          const QSharedPointer<IGitServerCache> &gitServerCache, CommitHistoryView *view);
+   RepositoryViewDelegate(const QSharedPointer<GitCache> &cache,
+                          const QSharedPointer<GraphCache> &graphCache,
+                          const QSharedPointer<GitBase> &git,
+                          CommitHistoryView *view);
 
    /**
     * @brief Overridden method to paint the different columns and rows in the view.
@@ -84,8 +86,8 @@ protected:
 
 private:
    QSharedPointer<GitCache> mCache;
+   QSharedPointer<GraphCache> mGraphCache;
    QSharedPointer<GitBase> mGit;
-   QSharedPointer<IGitServerCache> mGitServerCache;
    CommitHistoryView *mView = nullptr;
    int diffTargetRow = -1;
    int mColumnPressed = -1;

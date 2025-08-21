@@ -58,7 +58,7 @@ bool CommitInfo::operator==(const CommitInfo &commit) const
 {
    return sha.startsWith(commit.sha) && mParentsSha == commit.mParentsSha && committer == commit.committer
        && author == commit.author && dateSinceEpoch == commit.dateSinceEpoch && shortLog == commit.shortLog
-       && longLog == commit.longLog && mLanes == commit.mLanes;
+       && longLog == commit.longLog;
 }
 
 bool CommitInfo::operator!=(const CommitInfo &commit) const
@@ -111,34 +111,12 @@ bool CommitInfo::isInWorkingBranch() const
    return false;
 }
 
-void CommitInfo::setLanes(QVector<Lane> lanes)
-{
-   this->mLanes.clear();
-   this->mLanes.squeeze();
-   this->mLanes = std::move(lanes);
-}
-
 bool CommitInfo::isValid() const
 {
    const static std::regex hexMatcher("[0-9a-fA-F]{40}");
    const auto isMatch = std::regex_match(sha.toStdString(), hexMatcher);
 
    return !sha.isEmpty() && isMatch;
-}
-
-int CommitInfo::getActiveLane() const
-{
-   auto i = 0;
-
-   for (auto lane : mLanes)
-   {
-      if (lane.isActive())
-         return i;
-      else
-         ++i;
-   }
-
-   return -1;
 }
 
 void CommitInfo::removeChild(CommitInfo *commit)

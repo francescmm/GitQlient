@@ -42,11 +42,15 @@
 
 using namespace QLogger;
 
-HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
-                             const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
+HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache,
+                             const QSharedPointer<GraphCache> &graphCache,
+                             const QSharedPointer<GitBase> git,
+                             const QSharedPointer<GitQlientSettings> &settings,
+                             QWidget *parent)
    : QFrame(parent)
    , mGit(git)
    , mCache(cache)
+   , mGraphCache(graphCache)
    , mSettings(settings)
    , mReturnFromFull(new QPushButton(QIcon(":/icons/back"), "", this))
    , mSplitter(new QSplitter(this))
@@ -54,7 +58,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    QLog_Info("Performance", "HistoryWidget loading...");
    setAttribute(Qt::WA_DeleteOnClose);
 
-   mCommitChangesWidget = new CommitChangesWidget(mCache, mGit, this);
+   mCommitChangesWidget = new CommitChangesWidget(mCache, mGraphCache, mGit, this);
    mCommitInfoWidget = new CommitInfoWidget(mCache, mGit, this);
 
    mCommitStackedWidget = new QStackedWidget(this);
@@ -99,7 +103,7 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mSearchInput, &QLineEdit::returnPressed, this, &HistoryWidget::search);
 
    mRepositoryModel = new CommitHistoryModel(mCache, mGit);
-   mRepositoryView = new CommitHistoryView(mCache, mGit, mSettings, this);
+   mRepositoryView = new CommitHistoryView(mCache, mGraphCache, mGit, mSettings, this);
 
    connect(mRepositoryView, &CommitHistoryView::fullReload, this, &HistoryWidget::fullReload);
    connect(mRepositoryView, &CommitHistoryView::referencesReload, this, &HistoryWidget::referencesReload);
@@ -117,12 +121,11 @@ HistoryWidget::HistoryWidget(const QSharedPointer<GitCache> &cache, const QShare
    connect(mRepositoryView, &CommitHistoryView::signalCherryPickConflict, this,
            &HistoryWidget::signalCherryPickConflict);
    connect(mRepositoryView, &CommitHistoryView::signalPullConflict, this, &HistoryWidget::signalPullConflict);
-   connect(mRepositoryView, &CommitHistoryView::showPrDetailedView, this, &HistoryWidget::showPrDetailedView);
 
    mRepositoryView->setObjectName("historyGraphView");
    mRepositoryView->setModel(mRepositoryModel);
    mRepositoryView->setItemDelegate(mItemDelegate
-                                    = new RepositoryViewDelegate(mCache, mGit, mGitServerCache, mRepositoryView));
+                                    = new RepositoryViewDelegate(mCache, mGraphCache, mGit, mRepositoryView));
    mRepositoryView->setEnabled(true);
 
    mBranchesWidget = new BranchesWidget(mCache, mGit, this);
@@ -227,16 +230,6 @@ HistoryWidget::~HistoryWidget()
 
    delete mItemDelegate;
    delete mRepositoryModel;
-}
-
-void HistoryWidget::enableGitServerFeatures(const QSharedPointer<IGitServerCache> &gitServerCache)
-{
-   mGitServerCache = gitServerCache;
-
-   delete mItemDelegate;
-
-   mRepositoryView->setItemDelegate(mItemDelegate
-                                    = new RepositoryViewDelegate(mCache, mGit, mGitServerCache, mRepositoryView));
 }
 
 void HistoryWidget::clear()
@@ -550,6 +543,7 @@ void HistoryWidget::cherryPickCommit()
          commit.sha = mGit->getLastCommit().output.trimmed();
 
          mCache->insertCommit(commit);
+         mGraphCache->addCommit(commit);
          mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
          mCache->insertReference(commit.sha, References::Type::LocalBranch, mGit->getCurrentBranch());
 
@@ -588,6 +582,7 @@ void HistoryWidget::cherryPickCommit()
          commit.sha = mGit->getLastCommit().output.trimmed();
 
          mCache->insertCommit(commit);
+         mGraphCache->addCommit(commit);
          mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
          mCache->insertReference(commit.sha, References::Type::LocalBranch, mGit->getCurrentBranch());
 

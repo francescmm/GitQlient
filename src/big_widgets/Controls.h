@@ -169,6 +169,7 @@ private:
    QPushButton *mMergeWarning = nullptr;
    GitQlientUpdater *mUpdater = nullptr;
    QFrame *mLastSeparator = nullptr;
+   QDialog *mConfigDialog = nullptr;
 
    QToolButton *createToolButton(const QString &iconPath, const QString &tooltip,
                                  const QKeySequence &shortcut = QKeySequence());
@@ -191,16 +192,6 @@ private:
 
    */
    void pruneBranches();
-
-   /**
-    * @brief createGitPlatformButton Createst the git platform button if the user has enabled it.
-    */
-   void createGitPlatformButton(QHBoxLayout *layout);
-
-   /**
-    * @brief createBuildSystemButton Creates the build system platform button if the user has enabled it.
-    */
-   void configBuildSystemButton();
 
    bool eventFilter(QObject *obj, QEvent *event);
    void showConfigDialog();

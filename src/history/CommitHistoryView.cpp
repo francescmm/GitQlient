@@ -16,10 +16,11 @@
 #include <QLogger.h>
 using namespace QLogger;
 
-CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+CommitHistoryView::CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GraphCache> &graphCache, const QSharedPointer<GitBase> &git,
                                      const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QTreeView(parent)
    , mCache(cache)
+   , mGraphCache(graphCache)
    , mGit(git)
    , mSettings(settings)
 {
@@ -201,7 +202,7 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
 
       if (!shas.isEmpty())
       {
-         const auto menu = new CommitHistoryContextMenu(mCache, mGit, shas, this);
+         const auto menu = new CommitHistoryContextMenu(mCache, mGraphCache, mGit, shas, this);
          connect(menu, &CommitHistoryContextMenu::fullReload, this, &CommitHistoryView::fullReload);
          connect(menu, &CommitHistoryContextMenu::referencesReload, this, &CommitHistoryView::referencesReload);
          connect(menu, &CommitHistoryContextMenu::logReload, this, &CommitHistoryView::logReload);
@@ -213,7 +214,6 @@ void CommitHistoryView::showContextMenu(const QPoint &pos)
          connect(menu, &CommitHistoryContextMenu::signalCherryPickConflict, this,
                  &CommitHistoryView::signalCherryPickConflict);
          connect(menu, &CommitHistoryContextMenu::signalPullConflict, this, &CommitHistoryView::signalPullConflict);
-         connect(menu, &CommitHistoryContextMenu::showPrDetailedView, this, &CommitHistoryView::showPrDetailedView);
          menu->exec(viewport()->mapToGlobal(pos));
       }
       else

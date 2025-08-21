@@ -15,7 +15,7 @@ GitCache::~GitCache()
    clearInternalData();
 }
 
-void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVector<CommitInfo> commits)
+std::span<CommitInfo> GitCache::processCommits(const QString &parentSha, const RevisionFiles &files, QVector<CommitInfo> commits)
 {
    QMutexLocker lock(&mCommitsMutex);
 
@@ -28,7 +28,6 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
    mCommitsMap.squeeze();
    mUntrackedFiles.clear();
    mUntrackedFiles.squeeze();
-   mLanes.clear();
 
    QLog_Debug("Cache", QString("Adding WIP revision."));
 
@@ -47,7 +46,6 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
    for (auto iter = mCommitsCache.begin() + 1; iter != mCommitsCache.end(); ++iter)
    {
       auto &commit = *iter;
-      calculateLanes(commit);
 
       if (commit.sha == mCommitsCache[0].firstParent())
          commit.appendChild(&mCommitsCache[0]);
@@ -68,6 +66,8 @@ void GitCache::setup(const QString &parentSha, const RevisionFiles &files, QVect
 
    tmpChildsStorage.clear();
    tmpChildsStorage.squeeze();
+
+   return std::span<CommitInfo>(mCommitsCache.data(), mCommitsCache.size());
 }
 
 CommitInfo GitCache::commitInfo(int row)
@@ -178,15 +178,8 @@ void GitCache::insertWipRevision(const QString parentSha, const RevisionFiles &f
    if (!newParentSha.isEmpty())
       parents.append(newParentSha);
 
-   if (mLanes.isEmpty())
-      mLanes.init(ZERO_SHA);
-
    const auto log = files.count() == mUntrackedFiles.count() ? tr("No local changes") : tr("Local changes");
    CommitInfo c(ZERO_SHA, parents, std::chrono::seconds(QDateTime::currentSecsSinceEpoch()), log);
-   calculateLanes(c);
-
-   if (!mCommitsCache.isEmpty())
-      c.setLanes(mCommitsCache[0].lanes());
 
    if (mCommitsCache[0].sha != ZERO_SHA)
       mCommitsCache.prepend(std::move(c));
@@ -312,8 +305,6 @@ void GitCache::insertCommit(CommitInfo commit)
    const auto sha = commit.sha;
    const auto parentSha = commit.firstParent();
 
-   commit.setLanes({ LaneType::ACTIVE });
-
    mCommitsCache[0].setParents({ sha });
    mCommitsCache.insert(1, std::move(commit));
    mCommitsCache[1].appendChild(&mCommitsCache[0]);
@@ -326,7 +317,7 @@ void GitCache::insertCommit(CommitInfo commit)
    auto count = 0;
    for (auto &commit : mCommitsCache)
    {
-      commit.pos = count;
+      commit.pos = count++;
       mCommitsMap[commit.sha] = &commit;
    }
 
@@ -367,33 +358,6 @@ void GitCache::updateCommit(const QString &oldSha, CommitInfo newCommit)
       insertReference(newCommitSha, References::Type::LocalBranch, branch);
       deleteReference(oldSha, References::Type::LocalBranch, branch);
    }
-}
-
-void GitCache::calculateLanes(CommitInfo &c)
-{
-   const auto sha = c.sha;
-
-   QLog_Trace("Cache", QString("Updating the lanes for SHA {%1}.").arg(sha));
-
-   bool isDiscontinuity;
-   bool isFork = mLanes.isFork(sha, isDiscontinuity);
-   bool isMerge = c.parentsCount() > 1;
-
-   if (isDiscontinuity)
-      mLanes.changeActiveLane(sha);
-
-   if (isFork)
-      mLanes.setFork(sha);
-   if (isMerge)
-      mLanes.setMerge(c.parents());
-   if (c.parentsCount() == 0)
-      mLanes.setInitial();
-
-   const auto lanes = mLanes.getLanes();
-
-   resetLanes(c, isFork);
-
-   c.setLanes(std::move(lanes));
 }
 
 bool GitCache::pendingLocalChanges()
@@ -449,20 +413,6 @@ void GitCache::updateTags(QMap<QString, QString> remoteTags)
    emit signalCacheUpdated();
 }
 
-void GitCache::resetLanes(const CommitInfo &c, bool isFork)
-{
-   const auto nextSha = c.parentsCount() == 0 ? QString() : c.firstParent();
-
-   mLanes.nextParent(nextSha);
-
-   if (c.parentsCount() > 1)
-      mLanes.afterMerge();
-   if (isFork)
-      mLanes.afterFork();
-   if (mLanes.isBranch())
-      mLanes.afterBranch();
-}
-
 void GitCache::clearInternalData()
 {
    mCommitsMap.clear();
@@ -472,7 +422,6 @@ void GitCache::clearInternalData()
    mRevisionFilesMap.squeeze();
    mUntrackedFiles.clear();
    mUntrackedFiles.squeeze();
-   mLanes.clear();
    mReferences.clear();
    mReferences.squeeze();
 }

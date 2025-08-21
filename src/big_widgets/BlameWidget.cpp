@@ -21,15 +21,16 @@
 #include <QTabWidget>
 #include <QTreeView>
 
-BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GraphCache> &graphCache, const QSharedPointer<GitBase> &git,
                          const QSharedPointer<GitQlientSettings> &settings, QWidget *parent)
    : QFrame(parent)
    , mCache(cache)
+   , mGraphCache(graphCache)
    , mGit(git)
    , mSettings(settings)
    , mFileSystemModel(new QFileSystemModel())
    , mRepoModel(new CommitHistoryModel(mCache, mGit, this))
-   , mRepoView(new CommitHistoryView(mCache, mGit, mSettings, this))
+   , mRepoView(new CommitHistoryView(mCache, mGraphCache, mGit, mSettings, this))
    , mFileSystemView(new QTreeView(this))
    , mTabWidget(new QTabWidget(this))
 {
@@ -39,7 +40,7 @@ BlameWidget::BlameWidget(const QSharedPointer<GitCache> &cache, const QSharedPoi
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::Graph), true);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::Date), true);
    mRepoView->header()->setSectionHidden(static_cast<int>(CommitHistoryColumns::Author), true);
-   mRepoView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, mGit, nullptr, mRepoView));
+   // mRepoView->setItemDelegate(mItemDelegate = new RepositoryViewDelegate(cache, mGit, nullptr, mRepoView));
    mRepoView->setEnabled(true);
    mRepoView->setMaximumWidth(450);
    mRepoView->setSelectionBehavior(QAbstractItemView::SelectRows);

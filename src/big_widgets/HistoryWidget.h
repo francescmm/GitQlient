@@ -40,7 +40,7 @@ class FileDiffWidget;
 class FullDiffWidget;
 class BranchesWidgetMinimal;
 class QPushButton;
-class IGitServerCache;
+class GraphCache;
 class QLabel;
 class GitQlientSettings;
 class QSplitter;
@@ -134,12 +134,6 @@ signals:
    */
    void signalUpdateWip();
    /**
-    * @brief showPrDetailedView Signal that makes the view change to the Pull Request detailed view
-    * @param pr The pull request number to show.
-    */
-   void showPrDetailedView(int pr);
-
-   /**
     * @brief panelsVisibilityChanged Signal triggered whenever the visibility of the panels in the BranchesWidget
     * changes.
     */
@@ -153,15 +147,16 @@ public:
     \param git The git object to perform Git operations.
     \param parent The parent widget if needed.
    */
-   explicit HistoryWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> git,
-                          const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
+   explicit HistoryWidget(const QSharedPointer<GitCache> &cache,
+                          const QSharedPointer<GraphCache> &graphCache,
+                          const QSharedPointer<GitBase> git,
+                          const QSharedPointer<GitQlientSettings> &settings,
+                          QWidget *parent = nullptr);
    /*!
     \brief Destructor.
 
    */
    ~HistoryWidget();
-
-   void enableGitServerFeatures(const QSharedPointer<IGitServerCache> &gitServerCache);
 
    /*!
     \brief Clears all the information in the subwidgets.
@@ -236,7 +231,7 @@ private:
 
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitCache> mCache;
-   QSharedPointer<IGitServerCache> mGitServerCache;
+   QSharedPointer<GraphCache> mGraphCache;
    QSharedPointer<GitQlientSettings> mSettings;
    CommitHistoryModel *mRepositoryModel = nullptr;
    CommitHistoryView *mRepositoryView = nullptr;

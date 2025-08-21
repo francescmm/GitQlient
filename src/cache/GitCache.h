@@ -23,6 +23,7 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  ***************************************************************************************/
 
+#include "GraphCache.h"
 #include <CommitInfo.h>
 #include <GitExecResult.h>
 #include <RevisionFiles.h>
@@ -89,7 +90,6 @@ private:
 
    bool mInitialized = false;
    bool mConfigured = true;
-   Lanes mLanes;
    QVector<QString> mUntrackedFiles;
 
    mutable QMutex mCommitsMutex;
@@ -102,14 +102,12 @@ private:
    mutable QMutex mReferencesMutex;
    QHash<QString, References> mReferences;
 
-   void setup(const QString &parentSha, const RevisionFiles &files, QVector<CommitInfo> commits);
+   std::span<CommitInfo> processCommits(const QString &parentSha, const RevisionFiles &files, QVector<CommitInfo> commits);
    void setConfigurationDone() { mConfigured = true; }
 
    bool insertRevisionFile(const QString &sha1, const QString &sha2, const RevisionFiles &file);
    void insertWipRevision(const QString parentSha, const RevisionFiles &files);
-   void calculateLanes(CommitInfo &c);
    auto searchCommit(const QString &text, int startingPoint = 0) const;
    auto reverseSearchCommit(const QString &text, int startingPoint = 0) const;
-   void resetLanes(const CommitInfo &c, bool isFork);
    void clearInternalData();
 };

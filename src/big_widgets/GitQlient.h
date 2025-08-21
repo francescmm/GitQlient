@@ -34,8 +34,6 @@ class GitConfig;
 class QStackedLayout;
 class GitQlientSettings;
 class GitBase;
-class IJenkinsWidget;
-class IGitServerWidget;
 
 /*!
  \brief The GitQlient class is the MainWindow of the GitQlient application. Is the widget that stores all the tabs about

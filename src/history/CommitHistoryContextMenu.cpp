@@ -32,10 +32,13 @@
 using namespace QLogger;
 
 CommitHistoryContextMenu::CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache,
-                                                   const QSharedPointer<GitBase> &git, const QStringList &shas,
+                                                   const QSharedPointer<GraphCache> &graphCache,
+                                                   const QSharedPointer<GitBase> &git,
+                                                   const QStringList &shas,
                                                    QWidget *parent)
    : QMenu(parent)
    , mCache(cache)
+   , mGraphCache(graphCache)
    , mGit(git)
    , mShas(shas)
 {
@@ -353,6 +356,7 @@ void CommitHistoryContextMenu::cherryPickCommit()
          commit.sha = mGit->getLastCommit().output.trimmed();
 
          mCache->insertCommit(commit);
+         mGraphCache->addCommit(commit);
          mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
          mCache->insertReference(commit.sha, References::Type::LocalBranch, mGit->getCurrentBranch());
 
@@ -584,6 +588,7 @@ void CommitHistoryContextMenu::revertCommit()
                               .arg(newCommit.shortLog, QString::fromUtf8("This reverts commit"), revertedCommit.sha);
 
       mCache->insertCommit(newCommit);
+      mGraphCache->addCommit(newCommit);
       mCache->deleteReference(previousSha, References::Type::LocalBranch, mGit->getCurrentBranch());
       mCache->insertReference(currentSha, References::Type::LocalBranch, mGit->getCurrentBranch());
 

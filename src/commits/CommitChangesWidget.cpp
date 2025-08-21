@@ -42,11 +42,14 @@ enum GitQlientRole
    U_FullPath
 };
 
-CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+CommitChangesWidget::CommitChangesWidget(const QSharedPointer<GitCache> &cache,
+                                         const QSharedPointer<GraphCache> &graphCache,
+                                         const QSharedPointer<GitBase> &git,
                                          QWidget *parent)
    : QWidget(parent)
    , ui(new Ui::CommitChangesWidget)
    , mCache(cache)
+   , mGraphCache(graphCache)
    , mGit(git)
 {
    ui->setupUi(this);
@@ -307,6 +310,7 @@ void CommitChangesWidget::commitWipChanges()
                newCommit.longLog = ui->teDescription->toPlainText();
 
                mCache->insertCommit(newCommit);
+               mGraphCache->addCommit(newCommit);
                mCache->deleteReference(lastShaBeforeCommit, References::Type::LocalBranch, mGit->getCurrentBranch());
                mCache->insertReference(currentSha, References::Type::LocalBranch, mGit->getCurrentBranch());
 

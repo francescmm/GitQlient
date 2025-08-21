@@ -30,6 +30,7 @@
 
 class GitCache;
 class GitBase;
+class GraphCache;
 class CommitHistoryModel;
 class ShaFilterProxyModel;
 class GitQlientSettings;
@@ -93,11 +94,6 @@ signals:
     * \brief signalPullConflict Signal triggered when trying to pull and a conflict happens.
     */
    void signalPullConflict();
-   /**
-    * @brief showPrDetailedView Signal that makes the view change to the Pull Request detailed view
-    * @param pr The pull request number to show.
-    */
-   void showPrDetailedView(int pr);
 
 public:
    /**
@@ -107,7 +103,7 @@ public:
     * @param git The git object to perform Git commands.
     * @param parent The parent widget if needed.
     */
-   explicit CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit CommitHistoryView(const QSharedPointer<GitCache> &cache, const QSharedPointer<GraphCache> &graphCache, const QSharedPointer<GitBase> &git,
                               const QSharedPointer<GitQlientSettings> &settings, QWidget *parent = nullptr);
    /**
     * @brief Destructor.
@@ -170,6 +166,7 @@ public:
 
 private:
    QSharedPointer<GitCache> mCache;
+   QSharedPointer<GraphCache> mGraphCache;
    QSharedPointer<GitBase> mGit;
    QSharedPointer<GitQlientSettings> mSettings;
    CommitHistoryModel *mCommitHistoryModel = nullptr;

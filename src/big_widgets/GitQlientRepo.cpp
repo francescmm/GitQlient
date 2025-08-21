@@ -20,6 +20,7 @@
 #include <GitSubmodules.h>
 #include <GitTags.h>
 #include <GitWip.h>
+#include <GraphCache.h>
 #include <HistoryWidget.h>
 #include <MergeWidget.h>
 #include <QLogger.h>
@@ -41,9 +42,10 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
                              QWidget *parent)
    : QFrame(parent)
    , mGitQlientCache(new GitCache())
+   , mGraphCache(new GraphCache())
    , mGitBase(git)
    , mSettings(settings)
-   , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache, mSettings))
+   , mGitLoader(new GitRepoLoader(mGitBase, mGitQlientCache, mGraphCache, mSettings))
    , mAutoFetch(new QTimer())
    , mAutoFilesUpdate(new QTimer())
 {
@@ -57,13 +59,13 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
 
    mStackedLayout = new QStackedLayout();
 
-   mHistoryWidget = new HistoryWidget(mGitQlientCache, mGitBase, mSettings, this);
+   mHistoryWidget = new HistoryWidget(mGitQlientCache, mGraphCache, mGitBase, mSettings, this);
    mHistoryWidget->setContentsMargins(QMargins(5, 5, 5, 5));
 
    mDiffWidget = new DiffWidget(mGitBase, mGitQlientCache, this);
    mDiffWidget->setContentsMargins(QMargins(5, 5, 5, 5));
 
-   mBlameWidget = new BlameWidget(mGitQlientCache, mGitBase, mSettings, this);
+   mBlameWidget = new BlameWidget(mGitQlientCache, mGraphCache, mGitBase, mSettings, this);
    mBlameWidget->setContentsMargins(QMargins(5, 5, 5, 5));
 
    mMergeWidget = new MergeWidget(mGitQlientCache, mGitBase, this);
@@ -128,7 +130,6 @@ GitQlientRepo::GitQlientRepo(const QSharedPointer<GitBase> &git, const QSharedPo
    connect(mHistoryWidget, &HistoryWidget::signalPullConflict, mControls, &Controls::activateMergeWarning);
    connect(mHistoryWidget, &HistoryWidget::signalPullConflict, this, &GitQlientRepo::showWarningMerge);
    connect(mHistoryWidget, &HistoryWidget::signalUpdateWip, this, &GitQlientRepo::updateWip);
-   connect(mHistoryWidget, &HistoryWidget::showPrDetailedView, this, &GitQlientRepo::showGitServerPrView);
 
    connect(mDiffWidget, &DiffWidget::signalShowFileHistory, this, &GitQlientRepo::showFileHistory);
    connect(mDiffWidget, &DiffWidget::signalDiffEmpty, this, &GitQlientRepo::showPreviousView);

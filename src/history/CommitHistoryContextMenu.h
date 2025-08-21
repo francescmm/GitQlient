@@ -26,6 +26,7 @@
 #include <QMenu>
 
 class GitCache;
+class GraphCache;
 class GitBase;
 
 /*!
@@ -91,11 +92,6 @@ signals:
     * @brief signalRefreshPRsCache Signal that refreshes PRs cache.
     */
    void signalRefreshPRsCache();
-   /**
-    * @brief showPrDetailedView Signal that makes the view change to the Pull Request detailed view
-    * @param pr The pull request number to show.
-    */
-   void showPrDetailedView(int pr);
 
 public:
    /*!
@@ -106,11 +102,14 @@ public:
     \param shas The list of SHAs selected.
     \param parent The parent widget if needed.
    */
-   explicit CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache, const QSharedPointer<GitBase> &git,
+   explicit CommitHistoryContextMenu(const QSharedPointer<GitCache> &cache,
+                                     const QSharedPointer<GraphCache> &graphCache,
+                                     const QSharedPointer<GitBase> &git,
                                      const QStringList &shas, QWidget *parent = nullptr);
 
 private:
    QSharedPointer<GitCache> mCache;
+   QSharedPointer<GraphCache> mGraphCache;
    QSharedPointer<GitBase> mGit;
    QStringList mShas;
 

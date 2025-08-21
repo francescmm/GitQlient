@@ -33,6 +33,7 @@
 struct WipRevisionInfo;
 class GitBase;
 class GitCache;
+class GraphCache;
 class GitQlientSettings;
 class GitTags;
 class GitRequestorProcess;
@@ -52,8 +53,11 @@ public slots:
    void loadAll();
 
 public:
-   explicit GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache,
-                          const QSharedPointer<GitQlientSettings> &settings, QObject *parent = nullptr);
+   explicit GitRepoLoader(QSharedPointer<GitBase> gitBase,
+                          QSharedPointer<GitCache> cache,
+                          const QSharedPointer<GraphCache> &graphCache,
+                          const QSharedPointer<GitQlientSettings> &settings,
+                          QObject *parent = nullptr);
    void cancelAll();
    void setShowAll(bool showAll = true) { mShowAll = showAll; }
 
@@ -64,6 +68,7 @@ private:
    std::atomic<int> mSteps { 0 };
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitCache> mRevCache;
+   QSharedPointer<GraphCache> mGraphCache;
    QSharedPointer<GitQlientSettings> mSettings;
    QSharedPointer<GitTags> mGitTags;
    GitRequestorProcess *mRevRequestor = nullptr;

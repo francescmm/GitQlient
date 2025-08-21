@@ -18,11 +18,15 @@ using namespace QLogger;
 
 static const char *GIT_LOG_FORMAT("%m%HX%P%n%cn<%ce>%n%an<%ae>%n%at%n%s%n%b ");
 
-GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase, QSharedPointer<GitCache> cache,
-                             const QSharedPointer<GitQlientSettings> &settings, QObject *parent)
+GitRepoLoader::GitRepoLoader(QSharedPointer<GitBase> gitBase,
+                             QSharedPointer<GitCache> cache,
+                             const QSharedPointer<GraphCache> &graphCache,
+                             const QSharedPointer<GitQlientSettings> &settings,
+                             QObject *parent)
    : QObject(parent)
    , mGitBase(gitBase)
    , mRevCache(std::move(cache))
+   , mGraphCache(graphCache)
    , mSettings(settings)
    , mGitTags(new GitTags(mGitBase))
 {
@@ -271,7 +275,10 @@ void GitRepoLoader::processRevisions(QByteArray ba)
       mRevCache->setUntrackedFilesList(std::move(files));
       const auto info = git->getWipInfo().value();
 
-      mRevCache->setup(info.first, info.second, std::move(commits));
+      auto processedCommits = mRevCache->processCommits(info.first, info.second, std::move(commits));
+
+      mGraphCache->init(ZERO_SHA);
+      mGraphCache->processLanes(processedCommits);
    }
 
    notifyLoadingFinished();

@@ -42,6 +42,7 @@ public:
    void afterBranch();
    void nextParent(const QString &sha);
    QVector<Lane> getLanes() const { return laneTypes.getLanes(); }
+   int getActiveLane() const { return activeLane; }
 
 private:
    int add(LaneType type, const QString &next, int pos);

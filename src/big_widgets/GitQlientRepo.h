@@ -39,14 +39,11 @@ class HistoryWidget;
 class DiffWidget;
 class BlameWidget;
 class MergeWidget;
-class IGitServerWidget;
 class QTimer;
 class WaitingDlg;
-class IGitServerCache;
 class GitTags;
+class GraphCache;
 class ConfigWidget;
-
-class IJenkinsWidget;
 
 namespace GitServer
 {
@@ -152,7 +149,7 @@ protected:
 private:
    QString mCurrentDir;
    QSharedPointer<GitCache> mGitQlientCache;
-   QSharedPointer<IGitServerCache> mGitServerCache;
+   QSharedPointer<GraphCache> mGraphCache;
    QSharedPointer<GitBase> mGitBase;
    QSharedPointer<GitQlientSettings> mSettings;
    QSharedPointer<GitRepoLoader> mGitLoader;

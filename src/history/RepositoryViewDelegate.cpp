@@ -28,12 +28,12 @@
 using namespace GitServerPlugin;
 
 RepositoryViewDelegate::RepositoryViewDelegate(const QSharedPointer<GitCache> &cache,
+                                               const QSharedPointer<GraphCache> &graphCache,
                                                const QSharedPointer<GitBase> &git,
-                                               const QSharedPointer<IGitServerCache> &gitServerCache,
                                                CommitHistoryView *view)
    : mCache(cache)
+   , mGraphCache(graphCache)
    , mGit(git)
-   , mGitServerCache(gitServerCache)
    , mView(view)
 {
 }
@@ -67,7 +67,7 @@ void RepositoryViewDelegate::paint(QPainter *p, const QStyleOptionViewItem &opt,
           && (mView->hasActiveFilter() || commit.sha != ZERO_SHA))
       {
          auto color = GitQlientStyles::getBranchColorAt(
-             mView->hasActiveFilter() ? 0 : commit.getActiveLane() % GitQlientStyles::getTotalBranchColors());
+             mView->hasActiveFilter() ? 0 : mGraphCache->getActiveLane(commit.sha) % GitQlientStyles::getTotalBranchColors());
          color.setAlpha(90);
 
          newOpt.rect.setWidth(newOpt.rect.width() - 3);
@@ -189,7 +189,7 @@ QColor RepositoryViewDelegate::paintBranchHelper(QPainter *p, const QStyleOption
                                                  const CommitInfo &commit) const
 {
    const auto colorIndex = mView->hasActiveFilter() ? 0
-       : commit.sha != ZERO_SHA                     ? commit.getActiveLane() % GitQlientStyles::getTotalBranchColors()
+       : commit.sha != ZERO_SHA                     ? mGraphCache->getActiveLane(commit.sha) % GitQlientStyles::getTotalBranchColors()
                                                     : -1;
 
    if (colorIndex != -1)
@@ -394,7 +394,7 @@ QColor RepositoryViewDelegate::getMergeColor(const Lane &currentLane, const Comm
       case LaneType::JOIN_L:
          for (auto laneCount = 0; laneCount < currentLaneIndex; ++laneCount)
          {
-            if (commit.laneAt(laneCount).equals(LaneType::JOIN_L))
+            if (mGraphCache->getLaneAt(commit.sha, laneCount).equals(LaneType::JOIN_L))
             {
                mergeColor = GitQlientStyles::getBranchColorAt(laneCount % GitQlientStyles::getTotalBranchColors());
                isSet = true;
@@ -436,8 +436,8 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
       }
       else
       {
-         const auto laneNum = commit.lanesCount();
-         const auto activeLane = commit.getActiveLane();
+         const auto laneNum = mGraphCache->getLanesCount(commit.sha);
+         const auto activeLane = mGraphCache->getActiveLane(commit.sha);
          const auto activeColor
              = GitQlientStyles::getBranchColorAt(activeLane % GitQlientStyles::getTotalBranchColors());
          auto x1 = 0;
@@ -449,11 +449,11 @@ void RepositoryViewDelegate::paintGraph(QPainter *p, const QStyleOptionViewItem 
          {
             x1 = x2 - LANE_WIDTH;
 
-            auto currentLane = commit.laneAt(i);
+            auto currentLane = mGraphCache->getLaneAt(commit.sha, i);
 
             if (!laneHeadPresent && i < laneNum - 1)
             {
-               auto prevLane = commit.laneAt(i + 1);
+               auto prevLane = mGraphCache->getLaneAt(commit.sha, i + 1);
                laneHeadPresent
                    = prevLane.isHead() || prevLane.equals(LaneType::JOIN_R) || prevLane.equals(LaneType::JOIN_L);
             }
