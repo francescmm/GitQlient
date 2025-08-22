@@ -6,6 +6,7 @@
 
 namespace Graph
 {
+
 TemporalLoom::TemporalLoom()
 {
    add(StateType::Branch, ZERO_SHA, 0);
@@ -13,6 +14,8 @@ TemporalLoom::TemporalLoom()
 
 Timeline TemporalLoom::createTimeline(const QString &sha, const QStringList &parents)
 {
+   qDebug() << QString("%1 workflow").arg(sha);
+
    const auto isMerge = parents.count() > 1;
    const auto isFirstOfItsName = parents.count() == 0;
    const auto fork = isFork(sha);
@@ -20,10 +23,7 @@ Timeline TemporalLoom::createTimeline(const QString &sha, const QStringList &par
    if (isMerge)
       setMerge(parents);
    else if (isFirstOfItsName)
-   {
-      auto &u = mTimeline[activeLane];
-      u.setType(StateType::Initial);
-   }
+      mTimeline.setType(activeLane, StateType::Initial);
 
    const auto lanes = mTimeline;
 
@@ -37,6 +37,18 @@ Timeline TemporalLoom::createTimeline(const QString &sha, const QStringList &par
       afterFork();
    if (isBranch())
       afterBranch();
+
+   QStringList shas;
+   for (auto i = 0; i < mStateTracker.count(); ++i)
+      shas.append(mStateTracker.at(i));
+
+   qDebug() << shas.join(",");
+
+   QStringList states;
+   for (auto i = 0; i < lanes.count(); i++)
+      states.append(kStateTypeMap.value(lanes.at(i).getType()));
+
+   qDebug() << QString("%1 - %2").arg(sha, states.join(" | "));
 
    return lanes;
 }
@@ -71,30 +83,31 @@ void TemporalLoom::setFork(const QString &sha)
 
    mTimeline.setType(activeLane, StateType::MergeFork);
 
-   auto &startT = mTimeline[rangeStart];
-   auto &endT = mTimeline[rangeEnd];
+   const auto &startT = mTimeline.at(rangeStart);
 
    if (startT == StateType::MergeFork)
-      startT.setType(StateType::MergeForkLeft);
+      mTimeline.setType(rangeStart, StateType::MergeForkLeft);
 
    if (startT == StateType::Tail)
-      startT.setType(StateType::TailLeft);
+      mTimeline.setType(rangeStart, StateType::TailLeft);
+
+   const auto &endT = mTimeline.at(rangeEnd);
 
    if (endT == StateType::MergeFork)
-      endT.setType(StateType::MergeForkRight);
+      mTimeline.setType(rangeEnd, StateType::MergeForkRight);
 
    if (endT == StateType::Tail)
-      endT.setType(StateType::TailRight);
+      mTimeline.setType(rangeEnd, StateType::TailRight);
 
    for (int i = rangeStart + 1; i < rangeEnd; ++i)
    {
-      switch (auto &t = mTimeline[i]; t.getType())
+      switch (mTimeline.at(i).getType())
       {
          case StateType::Inactive:
-            t.setType(StateType::Cross);
+            mTimeline.setType(i, StateType::Cross);
             break;
          case StateType::Empty:
-            t.setType(StateType::CrossEmpty);
+            mTimeline.setType(i, StateType::CrossEmpty);
             break;
          default:
             break;
@@ -104,14 +117,14 @@ void TemporalLoom::setFork(const QString &sha)
 
 void TemporalLoom::setMerge(const QStringList &parents)
 {
-   auto &t = mTimeline[activeLane];
+   const auto &t = mTimeline.at(activeLane);
    auto wasFork = t == StateType::MergeFork;
    auto wasFork_L = t == StateType::MergeForkLeft;
    auto wasFork_R = t == StateType::MergeForkRight;
    auto startJoinWasACross = false;
    auto endJoinWasACross = false;
 
-   t.setType(StateType::MergeFork);
+   mTimeline.setType(activeLane, StateType::MergeFork);
 
    auto rangeStart = activeLane;
    auto rangeEnd = activeLane;
@@ -126,13 +139,13 @@ void TemporalLoom::setMerge(const QStringList &parents)
          if (idx > rangeEnd)
          {
             rangeEnd = idx;
-            endJoinWasACross = mTimeline[idx] == StateType::Cross;
+            endJoinWasACross = mTimeline.at(idx) == StateType::Cross;
          }
 
          if (idx < rangeStart)
          {
             rangeStart = idx;
-            startJoinWasACross = mTimeline[idx] == StateType::Cross;
+            startJoinWasACross = mTimeline.at(idx) == StateType::Cross;
          }
 
          mTimeline.setType(idx, StateType::Join);
@@ -141,55 +154,53 @@ void TemporalLoom::setMerge(const QStringList &parents)
          rangeEnd = add(StateType::Head, *it, rangeEnd + 1);
    }
 
-   auto &startT = mTimeline[rangeStart];
-   auto &endT = mTimeline[rangeEnd];
+   const auto &startT = mTimeline.at(rangeStart);
 
    if (startT == StateType::MergeFork && !wasFork && !wasFork_R)
-      startT.setType(StateType::MergeForkLeft);
-
-   if (endT == StateType::MergeFork && !wasFork && !wasFork_L)
-      endT.setType(StateType::MergeForkRight);
+      mTimeline.setType(rangeStart, StateType::MergeForkLeft);
 
    if (startT == StateType::Join && !startJoinWasACross)
-      startT.setType(StateType::JoinLeft);
-
-   if (endT == StateType::Join && !endJoinWasACross)
-      endT.setType(StateType::JoinRight);
+      mTimeline.setType(rangeStart, StateType::JoinLeft);
 
    if (startT == StateType::Head)
-      startT.setType(StateType::HeadLeft);
+      mTimeline.setType(rangeStart, StateType::HeadLeft);
+
+   const auto &endT = mTimeline.at(rangeEnd);
+
+   if (endT == StateType::MergeFork && !wasFork && !wasFork_L)
+      mTimeline.setType(rangeEnd, StateType::MergeForkRight);
+
+   if (endT == StateType::Join && !endJoinWasACross)
+      mTimeline.setType(rangeEnd, StateType::JoinRight);
 
    if (endT == StateType::Head)
-      endT.setType(StateType::HeadRight);
+      mTimeline.setType(rangeEnd, StateType::HeadRight);
 
    for (int i = rangeStart + 1; i < rangeEnd; i++)
    {
-      auto &t = mTimeline[i];
+      const auto &t = mTimeline.at(i);
 
       if (t == StateType::Inactive)
-         t.setType(StateType::Cross);
+         mTimeline.setType(i, StateType::Cross);
       else if (t == StateType::Empty)
-         t.setType(StateType::CrossEmpty);
+         mTimeline.setType(i, StateType::CrossEmpty);
       else if (t == StateType::TailRight || t == StateType::TailLeft)
-         t.setType(StateType::Tail);
+         mTimeline.setType(i, StateType::Tail);
    }
 }
 
 void TemporalLoom::setInitial()
 {
-   auto &t = mTimeline[activeLane];
-   if (!t.isMerge())
-      t.setType(StateType::Initial);
+   if (!mTimeline.at(activeLane).isMerge())
+      mTimeline.setType(activeLane, StateType::Initial);
 }
 
 void TemporalLoom::changeActiveLane(const QString &sha)
 {
-   auto &t = mTimeline[activeLane];
-
-   if (t == StateType::Initial)
-      t.setType(StateType::Empty);
+   if (mTimeline.at(activeLane) == StateType::Initial)
+      mTimeline.setType(activeLane, StateType::Empty);
    else
-      t.setType(StateType::Inactive);
+      mTimeline.setType(activeLane, StateType::Inactive);
 
    int idx = mStateTracker.findNextSha(sha, 0);
    if (idx != -1)
@@ -204,14 +215,14 @@ void TemporalLoom::afterMerge()
 {
    for (int i = 0; i < mTimeline.count(); i++)
    {
-      auto &t = mTimeline[i];
+      const auto &t = mTimeline.at(i);
 
       if (t.isHead() || t.isJoin() || t == StateType::Cross)
-         t.setType(StateType::Inactive);
+         mTimeline.setType(i, StateType::Inactive);
       else if (t == StateType::CrossEmpty)
-         t.setType(StateType::Empty);
+         mTimeline.setType(i, StateType::Empty);
       else if (t.isMerge())
-         t.setType(StateType::Active);
+         mTimeline.setType(i, StateType::Active);
    }
 }
 
@@ -219,15 +230,15 @@ void TemporalLoom::afterFork()
 {
    for (int i = 0; i < mTimeline.count(); i++)
    {
-      auto &t = mTimeline[i];
+      const auto &t = mTimeline.at(i);
 
       if (t == StateType::Cross)
-         t.setType(StateType::Inactive);
+         mTimeline.setType(i, StateType::Inactive);
       else if (t.isTail() || t == StateType::CrossEmpty)
-         t.setType(StateType::Empty);
+         mTimeline.setType(i, StateType::Empty);
 
       if (t.isMerge())
-         t.setType(StateType::Active);
+         mTimeline.setType(i, StateType::Active);
    }
 
    while (mTimeline.last() == StateType::Empty)

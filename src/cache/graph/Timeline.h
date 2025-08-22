@@ -16,7 +16,6 @@ public:
    void append(StateType type);
    void removeLast();
    int count() const { return mStates.count(); }
-   State &operator[](int index) { return mStates[index]; }
    const State &at(int index) const { return mStates.at(index); }
    const State &last() const { return mStates.last(); }
 

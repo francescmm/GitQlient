@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QMap>
+#include <QString>
+
 namespace Graph
 {
 enum class StateType
@@ -23,5 +26,27 @@ enum class StateType
    CrossEmpty,
    Initial,
    Branch
+};
+
+const QMap<StateType, QString> kStateTypeMap {
+   { StateType::Empty, "Empty" },
+   { StateType::Active, "Active" },
+   { StateType::Inactive, "Inactive" },
+   { StateType::MergeFork, "MergeFork" },
+   { StateType::MergeForkRight, "MergeForkRight" },
+   { StateType::MergeForkLeft, "MergeForkLeft" },
+   { StateType::Join, "Join" },
+   { StateType::JoinRight, "JoinRight" },
+   { StateType::JoinLeft, "JoinLeft" },
+   { StateType::Head, "Head" },
+   { StateType::HeadRight, "HeadRight" },
+   { StateType::HeadLeft, "HeadLeft" },
+   { StateType::Tail, "Tail" },
+   { StateType::TailRight, "TailRight" },
+   { StateType::TailLeft, "TailLeft" },
+   { StateType::Cross, "Cross" },
+   { StateType::CrossEmpty, "CrossEmpty" },
+   { StateType::Initial, "Initial" },
+   { StateType::Branch, "Branch" }
 };
 }

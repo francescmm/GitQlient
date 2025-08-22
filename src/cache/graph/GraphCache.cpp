@@ -36,10 +36,10 @@ int Cache::timelinesCount(const QString &sha) const
 
 State Cache::getTimelineAt(const QString &sha, int index) const
 {
-   if (const auto &univers = mMultiverse.value(sha);
-       index >= 0 && index < univers.count())
+   if (const auto &timeline = mMultiverse.value(sha);
+       index >= 0 && index < timeline.count())
    {
-      return univers.at(index);
+      return timeline.at(index);
    }
 
    return State();
@@ -47,10 +47,10 @@ State Cache::getTimelineAt(const QString &sha, int index) const
 
 int Cache::getSacredTimeline(const QString &sha) const
 {
-   const auto &univers = mMultiverse.value(sha);
-   for (int i = 0; i < univers.count(); ++i)
+   const auto &timeline = mMultiverse.value(sha);
+   for (int i = 0; i < timeline.count(); ++i)
    {
-      const auto &state = univers.at(i);
+      const auto &state = timeline.at(i);
       if (state.isActive())
          return i;
    }
