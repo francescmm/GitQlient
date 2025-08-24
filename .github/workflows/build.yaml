@@ -98,6 +98,7 @@ jobs:
           tag_name: "dev-latest"
           body: "Build with the latest changes in master."
           draft: false
+          prerelease: true
           files: |
             appimage/GitQlient*.AppImage
             linux_deb*/gitqlient*.deb
