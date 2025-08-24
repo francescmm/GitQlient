@@ -14,9 +14,6 @@ TemporalLoom::TemporalLoom()
 
 Timeline TemporalLoom::createTimeline(const QString &sha, const QStringList &parents)
 {
-   qDebug() << QString("%1 workflow").arg(sha);
-   qDebug() << QString("Parents:\n{ %1 }").arg(parents.join(", "));
-
    const auto isMerge = parents.count() > 1;
    const auto isFirstOfItsName = parents.count() == 0;
    const auto fork = isFork(sha);
@@ -43,13 +40,9 @@ Timeline TemporalLoom::createTimeline(const QString &sha, const QStringList &par
    for (auto i = 0; i < mStateTracker.count(); ++i)
       shas.append(mStateTracker.at(i));
 
-   qDebug() << shas.join(",");
-
    QStringList states;
    for (auto i = 0; i < lanes.count(); i++)
       states.append(kStateTypeMap.value(lanes.at(i).getType()));
-
-   qDebug() << QString("%1 - %2").arg(sha, states.join(" | "));
 
    return lanes;
 }
