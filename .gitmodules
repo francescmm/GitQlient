@@ -1,12 +1,15 @@
-[submodule "src/QPinnableTabWidget"]
-	path = src/QPinnableTabWidget
+[submodule "app/QPinnableTabWidget"]
+	path = app/QPinnableTabWidget
 	url = ../QPinnableTabWidget.git
-[submodule "src/QLogger"]
-	path = src/QLogger
+[submodule "app/QLogger"]
+	path = app/QLogger
 	url = ../QLogger.git
-[submodule "src/AuxiliarCustomWidgets"]
-	path = src/AuxiliarCustomWidgets
+[submodule "app/AuxiliarCustomWidgets"]
+	path = app/AuxiliarCustomWidgets
 	url = ../AuxiliarCustomWidgets.git
-[submodule "src/git"]
-	path = src/git
+[submodule "app/git"]
+	path = app/git
 	url = ../git.git
+[submodule "tests/catch2"]
+	path = tests/deps/catch2
+	url = https://github.com/catchorg/Catch2.git
