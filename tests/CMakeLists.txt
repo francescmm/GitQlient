@@ -19,4 +19,4 @@ add_subdirectory(Tests_Core)
 #include(Catch)
 #
 #add_subdirectory(tests_cache)
-add_subdirectory(Tests_Commits)
+add_subdirectory(Tests_Graph)

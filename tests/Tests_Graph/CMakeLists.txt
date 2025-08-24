@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Tests_Commits LANGUAGES CXX)
+project(Tests_Graph LANGUAGES CXX)
 
 enable_testing()
 
@@ -13,23 +13,24 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 file(GLOB TEST_SOURCES
+    *.h
     *.cpp
 )
 
 add_executable(
-    Tests_Commits
+    Tests_Graph
     ${TEST_SOURCES})
 
 add_test(
-    NAME Tests_Commits
-    COMMAND Tests_Commits)
+    NAME Tests_Graph
+    COMMAND Tests_Graph)
 
 target_link_libraries(
-    Tests_Commits
+    Tests_Graph
     PRIVATE
     Qt::Gui
     Qt::Test
-    commits
+    cache
 )
 
-target_include_directories(Tests_Commits PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(Tests_Graph PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

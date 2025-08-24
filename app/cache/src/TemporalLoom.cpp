@@ -15,6 +15,7 @@ TemporalLoom::TemporalLoom()
 Timeline TemporalLoom::createTimeline(const QString &sha, const QStringList &parents)
 {
    qDebug() << QString("%1 workflow").arg(sha);
+   qDebug() << QString("Parents:\n{ %1 }").arg(parents.join(", "));
 
    const auto isMerge = parents.count() > 1;
    const auto isFirstOfItsName = parents.count() == 0;
